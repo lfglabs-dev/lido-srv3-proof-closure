@@ -18,8 +18,12 @@ earlier callee effects and spending writes/events. Actual prefix executions are
 premises of this composition lemma; the independent spending/whole-withdrawal
 specification still must discharge them. This is not full parent completion.
 
-The checker now includes 29 owned modules. Current terminal evidence is recorded
-separately from historical runtime receipts; no runtime implementation changed.
+All 29 owned modules passed at `3275479a6803833bc6808a7456bf9fecd3e73ebb`.
+`receipts/tail-summary.json` links exact component/toolchain evidence, six baseline
+checks and import-DAG validation (all 0), dependency/wrapper identity and source
+delta. Inspected axioms are only propext, Classical.choice and Quot.sound.
+Historical runtime receipts retain their original source; no runtime implementation
+changed. Full gates remain missing, with no new remote job/bundle/node identity.
 
 ## Admission and ABI continuation
 

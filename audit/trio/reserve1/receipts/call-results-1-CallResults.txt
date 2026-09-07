@@ -1,0 +1,1595 @@
+LidoSRv3/Audit/Source/TrioReserve1/CallResults.lean:17:45: error: Invalid simp theorem: Expected a proposition, but found
+  Context → Nat → Exec Word
+LidoSRv3/Audit/Source/TrioReserve1/CallResults.lean:18:6: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  call external ctx (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) selector (word 0)
+    w
+in the target expression
+  (match
+      (match (Live.read ctx locatorSlot w).outcome with
+        | Except.error e =>
+          { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+            attempts := (Live.read ctx locatorSlot w).attempts }
+        | Except.ok a =>
+          { outcome := Except.ok (Verity.Core.Address.ofNat a.val), world := (Live.read ctx locatorSlot w).world,
+            attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).outcome with
+    | Except.error e =>
+      { outcome := Except.error e,
+        world :=
+          (match (Live.read ctx locatorSlot w).outcome with
+            | Except.error e =>
+              { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                attempts := (Live.read ctx locatorSlot w).attempts }
+            | Except.ok a =>
+              { outcome := Except.ok (Verity.Core.Address.ofNat a.val), world := (Live.read ctx locatorSlot w).world,
+                attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world,
+        attempts :=
+          (match (Live.read ctx locatorSlot w).outcome with
+            | Except.error e =>
+              { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                attempts := (Live.read ctx locatorSlot w).attempts }
+            | Except.ok a =>
+              { outcome := Except.ok (Verity.Core.Address.ofNat a.val), world := (Live.read ctx locatorSlot w).world,
+                attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).attempts }
+    | Except.ok a =>
+      {
+        outcome :=
+          (match
+              (call external ctx a selector (word 0)
+                  (match (Live.read ctx locatorSlot w).outcome with
+                    | Except.error e =>
+                      { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                        attempts := (Live.read ctx locatorSlot w).attempts }
+                    | Except.ok a =>
+                      { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                        world := (Live.read ctx locatorSlot w).world,
+                        attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world).outcome with
+            | Except.error e =>
+              { outcome := Except.error e,
+                world :=
+                  (call external ctx a selector (word 0)
+                      (match (Live.read ctx locatorSlot w).outcome with
+                        | Except.error e =>
+                          { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                            attempts := (Live.read ctx locatorSlot w).attempts }
+                        | Except.ok a =>
+                          { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                            world := (Live.read ctx locatorSlot w).world,
+                            attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world).world,
+                attempts :=
+                  (call external ctx a selector (word 0)
+                      (match (Live.read ctx locatorSlot w).outcome with
+                        | Except.error e =>
+                          { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                            attempts := (Live.read ctx locatorSlot w).attempts }
+                        | Except.ok a =>
+                          { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                            world := (Live.read ctx locatorSlot w).world,
+                            attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world).attempts }
+            | Except.ok a_1 =>
+              {
+                outcome :=
+                  (match
+                      (decodeWord a_1 0
+                          (call external ctx a selector (word 0)
+                              (match (Live.read ctx locatorSlot w).outcome with
+                                | Except.error e =>
+                                  { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                    attempts := (Live.read ctx locatorSlot w).attempts }
+                                | Except.ok a =>
+                                  { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                    world := (Live.read ctx locatorSlot w).world,
+                                    attempts :=
+                                      (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).outcome with
+                    | Except.error e =>
+                      { outcome := Except.error e,
+                        world :=
+                          (decodeWord a_1 0
+                              (call external ctx a selector (word 0)
+                                  (match (Live.read ctx locatorSlot w).outcome with
+                                    | Except.error e =>
+                                      { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts }
+                                    | Except.ok a =>
+                                      { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                        world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).world,
+                        attempts :=
+                          (decodeWord a_1 0
+                              (call external ctx a selector (word 0)
+                                  (match (Live.read ctx locatorSlot w).outcome with
+                                    | Except.error e =>
+                                      { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts }
+                                    | Except.ok a =>
+                                      { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                        world := (Live.read ctx locatorSlot w).world,
+                                        attempts :=
+                                          (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).attempts }
+                    | Except.ok a_2 =>
+                      { outcome := Except.ok (Verity.Core.Address.ofNat a_2.val),
+                        world :=
+                          (decodeWord a_1 0
+                              (call external ctx a selector (word 0)
+                                  (match (Live.read ctx locatorSlot w).outcome with
+                                    | Except.error e =>
+                                      { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts }
+                                    | Except.ok a =>
+                                      { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                        world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).world,
+                        attempts :=
+                          (decodeWord a_1 0
+                                (call external ctx a selector (word 0)
+                                    (match (Live.read ctx locatorSlot w).outcome with
+                                      | Except.error e =>
+                                        { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                          attempts := (Live.read ctx locatorSlot w).attempts }
+                                      | Except.ok a =>
+                                        { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                          world := (Live.read ctx locatorSlot w).world,
+                                          attempts :=
+                                            (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).attempts ++
+                            [] }).outcome,
+                world :=
+                  (match
+                      (decodeWord a_1 0
+                          (call external ctx a selector (word 0)
+                              (match (Live.read ctx locatorSlot w).outcome with
+                                | Except.error e =>
+                                  { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                    attempts := (Live.read ctx locatorSlot w).attempts }
+                                | Except.ok a =>
+                                  { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                    world := (Live.read ctx locatorSlot w).world,
+                                    attempts :=
+                                      (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).outcome with
+                    | Except.error e =>
+                      { outcome := Except.error e,
+                        world :=
+                          (decodeWord a_1 0
+                              (call external ctx a selector (word 0)
+                                  (match (Live.read ctx locatorSlot w).outcome with
+                                    | Except.error e =>
+                                      { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts }
+                                    | Except.ok a =>
+                                      { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                        world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).world,
+                        attempts :=
+                          (decodeWord a_1 0
+                              (call external ctx a selector (word 0)
+                                  (match (Live.read ctx locatorSlot w).outcome with
+                                    | Except.error e =>
+                                      { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts }
+                                    | Except.ok a =>
+                                      { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                        world := (Live.read ctx locatorSlot w).world,
+                                        attempts :=
+                                          (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).attempts }
+                    | Except.ok a_2 =>
+                      { outcome := Except.ok (Verity.Core.Address.ofNat a_2.val),
+                        world :=
+                          (decodeWord a_1 0
+                              (call external ctx a selector (word 0)
+                                  (match (Live.read ctx locatorSlot w).outcome with
+                                    | Except.error e =>
+                                      { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts }
+                                    | Except.ok a =>
+                                      { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                        world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).world,
+                        attempts :=
+                          (decodeWord a_1 0
+                                (call external ctx a selector (word 0)
+                                    (match (Live.read ctx locatorSlot w).outcome with
+                                      | Except.error e =>
+                                        { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                          attempts := (Live.read ctx locatorSlot w).attempts }
+                                      | Except.ok a =>
+                                        { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                          world := (Live.read ctx locatorSlot w).world,
+                                          attempts :=
+                                            (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).attempts ++
+                            [] }).world,
+                attempts :=
+                  (call external ctx a selector (word 0)
+                        (match (Live.read ctx locatorSlot w).outcome with
+                          | Except.error e =>
+                            { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                              attempts := (Live.read ctx locatorSlot w).attempts }
+                          | Except.ok a =>
+                            { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                              world := (Live.read ctx locatorSlot w).world,
+                              attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world).attempts ++
+                    (match
+                        (decodeWord a_1 0
+                            (call external ctx a selector (word 0)
+                                (match (Live.read ctx locatorSlot w).outcome with
+                                  | Except.error e =>
+                                    { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                      attempts := (Live.read ctx locatorSlot w).attempts }
+                                  | Except.ok a =>
+                                    { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                      world := (Live.read ctx locatorSlot w).world,
+                                      attempts :=
+                                        (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).outcome with
+                      | Except.error e =>
+                        { outcome := Except.error e,
+                          world :=
+                            (decodeWord a_1 0
+                                (call external ctx a selector (word 0)
+                                    (match (Live.read ctx locatorSlot w).outcome with
+                                      | Except.error e =>
+                                        { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                          attempts := (Live.read ctx locatorSlot w).attempts }
+                                      | Except.ok a =>
+                                        { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                          world := (Live.read ctx locatorSlot w).world,
+                                          attempts :=
+                                            (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).world,
+                          attempts :=
+                            (decodeWord a_1 0
+                                (call external ctx a selector (word 0)
+                                    (match (Live.read ctx locatorSlot w).outcome with
+                                      | Except.error e =>
+                                        { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                          attempts := (Live.read ctx locatorSlot w).attempts }
+                                      | Except.ok a =>
+                                        { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                          world := (Live.read ctx locatorSlot w).world,
+                                          attempts :=
+                                            (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).attempts }
+                      | Except.ok a_2 =>
+                        { outcome := Except.ok (Verity.Core.Address.ofNat a_2.val),
+                          world :=
+                            (decodeWord a_1 0
+                                (call external ctx a selector (word 0)
+                                    (match (Live.read ctx locatorSlot w).outcome with
+                                      | Except.error e =>
+                                        { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                          attempts := (Live.read ctx locatorSlot w).attempts }
+                                      | Except.ok a =>
+                                        { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                          world := (Live.read ctx locatorSlot w).world,
+                                          attempts :=
+                                            (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).world,
+                          attempts :=
+                            (decodeWord a_1 0
+                                  (call external ctx a selector (word 0)
+                                      (match (Live.read ctx locatorSlot w).outcome with
+                                        | Except.error e =>
+                                          { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                            attempts := (Live.read ctx locatorSlot w).attempts }
+                                        | Except.ok a =>
+                                          { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                            world := (Live.read ctx locatorSlot w).world,
+                                            attempts :=
+                                              (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).attempts ++
+                              [] }).attempts }).outcome,
+        world :=
+          (match
+              (call external ctx a selector (word 0)
+                  (match (Live.read ctx locatorSlot w).outcome with
+                    | Except.error e =>
+                      { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                        attempts := (Live.read ctx locatorSlot w).attempts }
+                    | Except.ok a =>
+                      { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                        world := (Live.read ctx locatorSlot w).world,
+                        attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world).outcome with
+            | Except.error e =>
+              { outcome := Except.error e,
+                world :=
+                  (call external ctx a selector (word 0)
+                      (match (Live.read ctx locatorSlot w).outcome with
+                        | Except.error e =>
+                          { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                            attempts := (Live.read ctx locatorSlot w).attempts }
+                        | Except.ok a =>
+                          { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                            world := (Live.read ctx locatorSlot w).world,
+                            attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world).world,
+                attempts :=
+                  (call external ctx a selector (word 0)
+                      (match (Live.read ctx locatorSlot w).outcome with
+                        | Except.error e =>
+                          { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                            attempts := (Live.read ctx locatorSlot w).attempts }
+                        | Except.ok a =>
+                          { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                            world := (Live.read ctx locatorSlot w).world,
+                            attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world).attempts }
+            | Except.ok a_1 =>
+              {
+                outcome :=
+                  (match
+                      (decodeWord a_1 0
+                          (call external ctx a selector (word 0)
+                              (match (Live.read ctx locatorSlot w).outcome with
+                                | Except.error e =>
+                                  { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                    attempts := (Live.read ctx locatorSlot w).attempts }
+                                | Except.ok a =>
+                                  { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                    world := (Live.read ctx locatorSlot w).world,
+                                    attempts :=
+                                      (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).outcome with
+                    | Except.error e =>
+                      { outcome := Except.error e,
+                        world :=
+                          (decodeWord a_1 0
+                              (call external ctx a selector (word 0)
+                                  (match (Live.read ctx locatorSlot w).outcome with
+                                    | Except.error e =>
+                                      { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts }
+                                    | Except.ok a =>
+                                      { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                        world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).world,
+                        attempts :=
+                          (decodeWord a_1 0
+                              (call external ctx a selector (word 0)
+                                  (match (Live.read ctx locatorSlot w).outcome with
+                                    | Except.error e =>
+                                      { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts }
+                                    | Except.ok a =>
+                                      { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                        world := (Live.read ctx locatorSlot w).world,
+                                        attempts :=
+                                          (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).attempts }
+                    | Except.ok a_2 =>
+                      { outcome := Except.ok (Verity.Core.Address.ofNat a_2.val),
+                        world :=
+                          (decodeWord a_1 0
+                              (call external ctx a selector (word 0)
+                                  (match (Live.read ctx locatorSlot w).outcome with
+                                    | Except.error e =>
+                                      { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts }
+                                    | Except.ok a =>
+                                      { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                        world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).world,
+                        attempts :=
+                          (decodeWord a_1 0
+                                (call external ctx a selector (word 0)
+                                    (match (Live.read ctx locatorSlot w).outcome with
+                                      | Except.error e =>
+                                        { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                          attempts := (Live.read ctx locatorSlot w).attempts }
+                                      | Except.ok a =>
+                                        { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                          world := (Live.read ctx locatorSlot w).world,
+                                          attempts :=
+                                            (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).attempts ++
+                            [] }).outcome,
+                world :=
+                  (match
+                      (decodeWord a_1 0
+                          (call external ctx a selector (word 0)
+                              (match (Live.read ctx locatorSlot w).outcome with
+                                | Except.error e =>
+                                  { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                    attempts := (Live.read ctx locatorSlot w).attempts }
+                                | Except.ok a =>
+                                  { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                    world := (Live.read ctx locatorSlot w).world,
+                                    attempts :=
+                                      (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).outcome with
+                    | Except.error e =>
+                      { outcome := Except.error e,
+                        world :=
+                          (decodeWord a_1 0
+                              (call external ctx a selector (word 0)
+                                  (match (Live.read ctx locatorSlot w).outcome with
+                                    | Except.error e =>
+                                      { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts }
+                                    | Except.ok a =>
+                                      { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                        world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).world,
+                        attempts :=
+                          (decodeWord a_1 0
+                              (call external ctx a selector (word 0)
+                                  (match (Live.read ctx locatorSlot w).outcome with
+                                    | Except.error e =>
+                                      { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts }
+                                    | Except.ok a =>
+                                      { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                        world := (Live.read ctx locatorSlot w).world,
+                                        attempts :=
+                                          (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).attempts }
+                    | Except.ok a_2 =>
+                      { outcome := Except.ok (Verity.Core.Address.ofNat a_2.val),
+                        world :=
+                          (decodeWord a_1 0
+                              (call external ctx a selector (word 0)
+                                  (match (Live.read ctx locatorSlot w).outcome with
+                                    | Except.error e =>
+                                      { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts }
+                                    | Except.ok a =>
+                                      { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                        world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).world,
+                        attempts :=
+                          (decodeWord a_1 0
+                                (call external ctx a selector (word 0)
+                                    (match (Live.read ctx locatorSlot w).outcome with
+                                      | Except.error e =>
+                                        { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                          attempts := (Live.read ctx locatorSlot w).attempts }
+                                      | Except.ok a =>
+                                        { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                          world := (Live.read ctx locatorSlot w).world,
+                                          attempts :=
+                                            (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).attempts ++
+                            [] }).world,
+                attempts :=
+                  (call external ctx a selector (word 0)
+                        (match (Live.read ctx locatorSlot w).outcome with
+                          | Except.error e =>
+                            { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                              attempts := (Live.read ctx locatorSlot w).attempts }
+                          | Except.ok a =>
+                            { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                              world := (Live.read ctx locatorSlot w).world,
+                              attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world).attempts ++
+                    (match
+                        (decodeWord a_1 0
+                            (call external ctx a selector (word 0)
+                                (match (Live.read ctx locatorSlot w).outcome with
+                                  | Except.error e =>
+                                    { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                      attempts := (Live.read ctx locatorSlot w).attempts }
+                                  | Except.ok a =>
+                                    { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                      world := (Live.read ctx locatorSlot w).world,
+                                      attempts :=
+                                        (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).outcome with
+                      | Except.error e =>
+                        { outcome := Except.error e,
+                          world :=
+                            (decodeWord a_1 0
+                                (call external ctx a selector (word 0)
+                                    (match (Live.read ctx locatorSlot w).outcome with
+                                      | Except.error e =>
+                                        { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                          attempts := (Live.read ctx locatorSlot w).attempts }
+                                      | Except.ok a =>
+                                        { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                          world := (Live.read ctx locatorSlot w).world,
+                                          attempts :=
+                                            (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).world,
+                          attempts :=
+                            (decodeWord a_1 0
+                                (call external ctx a selector (word 0)
+                                    (match (Live.read ctx locatorSlot w).outcome with
+                                      | Except.error e =>
+                                        { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                          attempts := (Live.read ctx locatorSlot w).attempts }
+                                      | Except.ok a =>
+                                        { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                          world := (Live.read ctx locatorSlot w).world,
+                                          attempts :=
+                                            (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).attempts }
+                      | Except.ok a_2 =>
+                        { outcome := Except.ok (Verity.Core.Address.ofNat a_2.val),
+                          world :=
+                            (decodeWord a_1 0
+                                (call external ctx a selector (word 0)
+                                    (match (Live.read ctx locatorSlot w).outcome with
+                                      | Except.error e =>
+                                        { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                          attempts := (Live.read ctx locatorSlot w).attempts }
+                                      | Except.ok a =>
+                                        { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                          world := (Live.read ctx locatorSlot w).world,
+                                          attempts :=
+                                            (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).world,
+                          attempts :=
+                            (decodeWord a_1 0
+                                  (call external ctx a selector (word 0)
+                                      (match (Live.read ctx locatorSlot w).outcome with
+                                        | Except.error e =>
+                                          { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                            attempts := (Live.read ctx locatorSlot w).attempts }
+                                        | Except.ok a =>
+                                          { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                            world := (Live.read ctx locatorSlot w).world,
+                                            attempts :=
+                                              (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).attempts ++
+                              [] }).attempts }).world,
+        attempts :=
+          (match (Live.read ctx locatorSlot w).outcome with
+              | Except.error e =>
+                { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                  attempts := (Live.read ctx locatorSlot w).attempts }
+              | Except.ok a =>
+                { outcome := Except.ok (Verity.Core.Address.ofNat a.val), world := (Live.read ctx locatorSlot w).world,
+                  attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).attempts ++
+            (match
+                (call external ctx a selector (word 0)
+                    (match (Live.read ctx locatorSlot w).outcome with
+                      | Except.error e =>
+                        { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                          attempts := (Live.read ctx locatorSlot w).attempts }
+                      | Except.ok a =>
+                        { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                          world := (Live.read ctx locatorSlot w).world,
+                          attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world).outcome with
+              | Except.error e =>
+                { outcome := Except.error e,
+                  world :=
+                    (call external ctx a selector (word 0)
+                        (match (Live.read ctx locatorSlot w).outcome with
+                          | Except.error e =>
+                            { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                              attempts := (Live.read ctx locatorSlot w).attempts }
+                          | Except.ok a =>
+                            { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                              world := (Live.read ctx locatorSlot w).world,
+                              attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world).world,
+                  attempts :=
+                    (call external ctx a selector (word 0)
+                        (match (Live.read ctx locatorSlot w).outcome with
+                          | Except.error e =>
+                            { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                              attempts := (Live.read ctx locatorSlot w).attempts }
+                          | Except.ok a =>
+                            { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                              world := (Live.read ctx locatorSlot w).world,
+                              attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world).attempts }
+              | Except.ok a_1 =>
+                {
+                  outcome :=
+                    (match
+                        (decodeWord a_1 0
+                            (call external ctx a selector (word 0)
+                                (match (Live.read ctx locatorSlot w).outcome with
+                                  | Except.error e =>
+                                    { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                      attempts := (Live.read ctx locatorSlot w).attempts }
+                                  | Except.ok a =>
+                                    { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                      world := (Live.read ctx locatorSlot w).world,
+                                      attempts :=
+                                        (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).outcome with
+                      | Except.error e =>
+                        { outcome := Except.error e,
+                          world :=
+                            (decodeWord a_1 0
+                                (call external ctx a selector (word 0)
+                                    (match (Live.read ctx locatorSlot w).outcome with
+                                      | Except.error e =>
+                                        { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                          attempts := (Live.read ctx locatorSlot w).attempts }
+                                      | Except.ok a =>
+                                        { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                          world := (Live.read ctx locatorSlot w).world,
+                                          attempts :=
+                                            (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).world,
+                          attempts :=
+                            (decodeWord a_1 0
+                                (call external ctx a selector (word 0)
+                                    (match (Live.read ctx locatorSlot w).outcome with
+                                      | Except.error e =>
+                                        { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                          attempts := (Live.read ctx locatorSlot w).attempts }
+                                      | Except.ok a =>
+                                        { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                          world := (Live.read ctx locatorSlot w).world,
+                                          attempts :=
+                                            (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).attempts }
+                      | Except.ok a_2 =>
+                        { outcome := Except.ok (Verity.Core.Address.ofNat a_2.val),
+                          world :=
+                            (decodeWord a_1 0
+                                (call external ctx a selector (word 0)
+                                    (match (Live.read ctx locatorSlot w).outcome with
+                                      | Except.error e =>
+                                        { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                          attempts := (Live.read ctx locatorSlot w).attempts }
+                                      | Except.ok a =>
+                                        { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                          world := (Live.read ctx locatorSlot w).world,
+                                          attempts :=
+                                            (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).world,
+                          attempts :=
+                            (decodeWord a_1 0
+                                  (call external ctx a selector (word 0)
+                                      (match (Live.read ctx locatorSlot w).outcome with
+                                        | Except.error e =>
+                                          { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                            attempts := (Live.read ctx locatorSlot w).attempts }
+                                        | Except.ok a =>
+                                          { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                            world := (Live.read ctx locatorSlot w).world,
+                                            attempts :=
+                                              (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).attempts ++
+                              [] }).outcome,
+                  world :=
+                    (match
+                        (decodeWord a_1 0
+                            (call external ctx a selector (word 0)
+                                (match (Live.read ctx locatorSlot w).outcome with
+                                  | Except.error e =>
+                                    { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                      attempts := (Live.read ctx locatorSlot w).attempts }
+                                  | Except.ok a =>
+                                    { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                      world := (Live.read ctx locatorSlot w).world,
+                                      attempts :=
+                                        (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).outcome with
+                      | Except.error e =>
+                        { outcome := Except.error e,
+                          world :=
+                            (decodeWord a_1 0
+                                (call external ctx a selector (word 0)
+                                    (match (Live.read ctx locatorSlot w).outcome with
+                                      | Except.error e =>
+                                        { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                          attempts := (Live.read ctx locatorSlot w).attempts }
+                                      | Except.ok a =>
+                                        { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                          world := (Live.read ctx locatorSlot w).world,
+                                          attempts :=
+                                            (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).world,
+                          attempts :=
+                            (decodeWord a_1 0
+                                (call external ctx a selector (word 0)
+                                    (match (Live.read ctx locatorSlot w).outcome with
+                                      | Except.error e =>
+                                        { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                          attempts := (Live.read ctx locatorSlot w).attempts }
+                                      | Except.ok a =>
+                                        { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                          world := (Live.read ctx locatorSlot w).world,
+                                          attempts :=
+                                            (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).attempts }
+                      | Except.ok a_2 =>
+                        { outcome := Except.ok (Verity.Core.Address.ofNat a_2.val),
+                          world :=
+                            (decodeWord a_1 0
+                                (call external ctx a selector (word 0)
+                                    (match (Live.read ctx locatorSlot w).outcome with
+                                      | Except.error e =>
+                                        { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                          attempts := (Live.read ctx locatorSlot w).attempts }
+                                      | Except.ok a =>
+                                        { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                          world := (Live.read ctx locatorSlot w).world,
+                                          attempts :=
+                                            (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).world,
+                          attempts :=
+                            (decodeWord a_1 0
+                                  (call external ctx a selector (word 0)
+                                      (match (Live.read ctx locatorSlot w).outcome with
+                                        | Except.error e =>
+                                          { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                            attempts := (Live.read ctx locatorSlot w).attempts }
+                                        | Except.ok a =>
+                                          { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                            world := (Live.read ctx locatorSlot w).world,
+                                            attempts :=
+                                              (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).attempts ++
+                              [] }).world,
+                  attempts :=
+                    (call external ctx a selector (word 0)
+                          (match (Live.read ctx locatorSlot w).outcome with
+                            | Except.error e =>
+                              { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                attempts := (Live.read ctx locatorSlot w).attempts }
+                            | Except.ok a =>
+                              { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                world := (Live.read ctx locatorSlot w).world,
+                                attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world).attempts ++
+                      (match
+                          (decodeWord a_1 0
+                              (call external ctx a selector (word 0)
+                                  (match (Live.read ctx locatorSlot w).outcome with
+                                    | Except.error e =>
+                                      { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts }
+                                    | Except.ok a =>
+                                      { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                        world := (Live.read ctx locatorSlot w).world,
+                                        attempts :=
+                                          (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).outcome with
+                        | Except.error e =>
+                          { outcome := Except.error e,
+                            world :=
+                              (decodeWord a_1 0
+                                  (call external ctx a selector (word 0)
+                                      (match (Live.read ctx locatorSlot w).outcome with
+                                        | Except.error e =>
+                                          { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                            attempts := (Live.read ctx locatorSlot w).attempts }
+                                        | Except.ok a =>
+                                          { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                            world := (Live.read ctx locatorSlot w).world,
+                                            attempts :=
+                                              (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).world,
+                            attempts :=
+                              (decodeWord a_1 0
+                                  (call external ctx a selector (word 0)
+                                      (match (Live.read ctx locatorSlot w).outcome with
+                                        | Except.error e =>
+                                          { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                            attempts := (Live.read ctx locatorSlot w).attempts }
+                                        | Except.ok a =>
+                                          { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                            world := (Live.read ctx locatorSlot w).world,
+                                            attempts :=
+                                              (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).attempts }
+                        | Except.ok a_2 =>
+                          { outcome := Except.ok (Verity.Core.Address.ofNat a_2.val),
+                            world :=
+                              (decodeWord a_1 0
+                                  (call external ctx a selector (word 0)
+                                      (match (Live.read ctx locatorSlot w).outcome with
+                                        | Except.error e =>
+                                          { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                            attempts := (Live.read ctx locatorSlot w).attempts }
+                                        | Except.ok a =>
+                                          { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                            world := (Live.read ctx locatorSlot w).world,
+                                            attempts :=
+                                              (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).world,
+                            attempts :=
+                              (decodeWord a_1 0
+                                    (call external ctx a selector (word 0)
+                                        (match (Live.read ctx locatorSlot w).outcome with
+                                          | Except.error e =>
+                                            { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                              attempts := (Live.read ctx locatorSlot w).attempts }
+                                          | Except.ok a =>
+                                            { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                              world := (Live.read ctx locatorSlot w).world,
+                                              attempts :=
+                                                (Live.read ctx locatorSlot w).attempts ++
+                                                  [] }).world).world).attempts ++
+                                [] }).attempts }).attempts }) =
+    { outcome := Except.ok (Verity.Core.Address.ofNat (word n).val), world := after, attempts := trace }
+
+external : External
+ctx : Context
+selector n : Nat
+w after : World
+suffix : Bytes
+trace : List Attempt
+h :
+  call external ctx (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) selector (word 0)
+      w =
+    { outcome := Except.ok (encode 32 n ++ suffix), world := after, attempts := trace }
+⊢ (match
+      (match (Live.read ctx locatorSlot w).outcome with
+        | Except.error e =>
+          { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+            attempts := (Live.read ctx locatorSlot w).attempts }
+        | Except.ok a =>
+          { outcome := Except.ok (Verity.Core.Address.ofNat a.val), world := (Live.read ctx locatorSlot w).world,
+            attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).outcome with
+    | Except.error e =>
+      { outcome := Except.error e,
+        world :=
+          (match (Live.read ctx locatorSlot w).outcome with
+            | Except.error e =>
+              { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                attempts := (Live.read ctx locatorSlot w).attempts }
+            | Except.ok a =>
+              { outcome := Except.ok (Verity.Core.Address.ofNat a.val), world := (Live.read ctx locatorSlot w).world,
+                attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world,
+        attempts :=
+          (match (Live.read ctx locatorSlot w).outcome with
+            | Except.error e =>
+              { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                attempts := (Live.read ctx locatorSlot w).attempts }
+            | Except.ok a =>
+              { outcome := Except.ok (Verity.Core.Address.ofNat a.val), world := (Live.read ctx locatorSlot w).world,
+                attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).attempts }
+    | Except.ok a =>
+      {
+        outcome :=
+          (match
+              (call external ctx a selector (word 0)
+                  (match (Live.read ctx locatorSlot w).outcome with
+                    | Except.error e =>
+                      { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                        attempts := (Live.read ctx locatorSlot w).attempts }
+                    | Except.ok a =>
+                      { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                        world := (Live.read ctx locatorSlot w).world,
+                        attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world).outcome with
+            | Except.error e =>
+              { outcome := Except.error e,
+                world :=
+                  (call external ctx a selector (word 0)
+                      (match (Live.read ctx locatorSlot w).outcome with
+                        | Except.error e =>
+                          { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                            attempts := (Live.read ctx locatorSlot w).attempts }
+                        | Except.ok a =>
+                          { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                            world := (Live.read ctx locatorSlot w).world,
+                            attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world).world,
+                attempts :=
+                  (call external ctx a selector (word 0)
+                      (match (Live.read ctx locatorSlot w).outcome with
+                        | Except.error e =>
+                          { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                            attempts := (Live.read ctx locatorSlot w).attempts }
+                        | Except.ok a =>
+                          { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                            world := (Live.read ctx locatorSlot w).world,
+                            attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world).attempts }
+            | Except.ok a_1 =>
+              {
+                outcome :=
+                  (match
+                      (decodeWord a_1 0
+                          (call external ctx a selector (word 0)
+                              (match (Live.read ctx locatorSlot w).outcome with
+                                | Except.error e =>
+                                  { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                    attempts := (Live.read ctx locatorSlot w).attempts }
+                                | Except.ok a =>
+                                  { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                    world := (Live.read ctx locatorSlot w).world,
+                                    attempts :=
+                                      (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).outcome with
+                    | Except.error e =>
+                      { outcome := Except.error e,
+                        world :=
+                          (decodeWord a_1 0
+                              (call external ctx a selector (word 0)
+                                  (match (Live.read ctx locatorSlot w).outcome with
+                                    | Except.error e =>
+                                      { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts }
+                                    | Except.ok a =>
+                                      { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                        world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).world,
+                        attempts :=
+                          (decodeWord a_1 0
+                              (call external ctx a selector (word 0)
+                                  (match (Live.read ctx locatorSlot w).outcome with
+                                    | Except.error e =>
+                                      { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts }
+                                    | Except.ok a =>
+                                      { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                        world := (Live.read ctx locatorSlot w).world,
+                                        attempts :=
+                                          (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).attempts }
+                    | Except.ok a_2 =>
+                      { outcome := Except.ok (Verity.Core.Address.ofNat a_2.val),
+                        world :=
+                          (decodeWord a_1 0
+                              (call external ctx a selector (word 0)
+                                  (match (Live.read ctx locatorSlot w).outcome with
+                                    | Except.error e =>
+                                      { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts }
+                                    | Except.ok a =>
+                                      { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                        world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).world,
+                        attempts :=
+                          (decodeWord a_1 0
+                                (call external ctx a selector (word 0)
+                                    (match (Live.read ctx locatorSlot w).outcome with
+                                      | Except.error e =>
+                                        { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                          attempts := (Live.read ctx locatorSlot w).attempts }
+                                      | Except.ok a =>
+                                        { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                          world := (Live.read ctx locatorSlot w).world,
+                                          attempts :=
+                                            (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).attempts ++
+                            [] }).outcome,
+                world :=
+                  (match
+                      (decodeWord a_1 0
+                          (call external ctx a selector (word 0)
+                              (match (Live.read ctx locatorSlot w).outcome with
+                                | Except.error e =>
+                                  { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                    attempts := (Live.read ctx locatorSlot w).attempts }
+                                | Except.ok a =>
+                                  { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                    world := (Live.read ctx locatorSlot w).world,
+                                    attempts :=
+                                      (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).outcome with
+                    | Except.error e =>
+                      { outcome := Except.error e,
+                        world :=
+                          (decodeWord a_1 0
+                              (call external ctx a selector (word 0)
+                                  (match (Live.read ctx locatorSlot w).outcome with
+                                    | Except.error e =>
+                                      { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts }
+                                    | Except.ok a =>
+                                      { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                        world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).world,
+                        attempts :=
+                          (decodeWord a_1 0
+                              (call external ctx a selector (word 0)
+                                  (match (Live.read ctx locatorSlot w).outcome with
+                                    | Except.error e =>
+                                      { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts }
+                                    | Except.ok a =>
+                                      { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                        world := (Live.read ctx locatorSlot w).world,
+                                        attempts :=
+                                          (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).attempts }
+                    | Except.ok a_2 =>
+                      { outcome := Except.ok (Verity.Core.Address.ofNat a_2.val),
+                        world :=
+                          (decodeWord a_1 0
+                              (call external ctx a selector (word 0)
+                                  (match (Live.read ctx locatorSlot w).outcome with
+                                    | Except.error e =>
+                                      { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts }
+                                    | Except.ok a =>
+                                      { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                        world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).world,
+                        attempts :=
+                          (decodeWord a_1 0
+                                (call external ctx a selector (word 0)
+                                    (match (Live.read ctx locatorSlot w).outcome with
+                                      | Except.error e =>
+                                        { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                          attempts := (Live.read ctx locatorSlot w).attempts }
+                                      | Except.ok a =>
+                                        { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                          world := (Live.read ctx locatorSlot w).world,
+                                          attempts :=
+                                            (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).attempts ++
+                            [] }).world,
+                attempts :=
+                  (call external ctx a selector (word 0)
+                        (match (Live.read ctx locatorSlot w).outcome with
+                          | Except.error e =>
+                            { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                              attempts := (Live.read ctx locatorSlot w).attempts }
+                          | Except.ok a =>
+                            { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                              world := (Live.read ctx locatorSlot w).world,
+                              attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world).attempts ++
+                    (match
+                        (decodeWord a_1 0
+                            (call external ctx a selector (word 0)
+                                (match (Live.read ctx locatorSlot w).outcome with
+                                  | Except.error e =>
+                                    { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                      attempts := (Live.read ctx locatorSlot w).attempts }
+                                  | Except.ok a =>
+                                    { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                      world := (Live.read ctx locatorSlot w).world,
+                                      attempts :=
+                                        (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).outcome with
+                      | Except.error e =>
+                        { outcome := Except.error e,
+                          world :=
+                            (decodeWord a_1 0
+                                (call external ctx a selector (word 0)
+                                    (match (Live.read ctx locatorSlot w).outcome with
+                                      | Except.error e =>
+                                        { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                          attempts := (Live.read ctx locatorSlot w).attempts }
+                                      | Except.ok a =>
+                                        { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                          world := (Live.read ctx locatorSlot w).world,
+                                          attempts :=
+                                            (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).world,
+                          attempts :=
+                            (decodeWord a_1 0
+                                (call external ctx a selector (word 0)
+                                    (match (Live.read ctx locatorSlot w).outcome with
+                                      | Except.error e =>
+                                        { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                          attempts := (Live.read ctx locatorSlot w).attempts }
+                                      | Except.ok a =>
+                                        { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                          world := (Live.read ctx locatorSlot w).world,
+                                          attempts :=
+                                            (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).attempts }
+                      | Except.ok a_2 =>
+                        { outcome := Except.ok (Verity.Core.Address.ofNat a_2.val),
+                          world :=
+                            (decodeWord a_1 0
+                                (call external ctx a selector (word 0)
+                                    (match (Live.read ctx locatorSlot w).outcome with
+                                      | Except.error e =>
+                                        { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                          attempts := (Live.read ctx locatorSlot w).attempts }
+                                      | Except.ok a =>
+                                        { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                          world := (Live.read ctx locatorSlot w).world,
+                                          attempts :=
+                                            (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).world,
+                          attempts :=
+                            (decodeWord a_1 0
+                                  (call external ctx a selector (word 0)
+                                      (match (Live.read ctx locatorSlot w).outcome with
+                                        | Except.error e =>
+                                          { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                            attempts := (Live.read ctx locatorSlot w).attempts }
+                                        | Except.ok a =>
+                                          { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                            world := (Live.read ctx locatorSlot w).world,
+                                            attempts :=
+                                              (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).attempts ++
+                              [] }).attempts }).outcome,
+        world :=
+          (match
+              (call external ctx a selector (word 0)
+                  (match (Live.read ctx locatorSlot w).outcome with
+                    | Except.error e =>
+                      { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                        attempts := (Live.read ctx locatorSlot w).attempts }
+                    | Except.ok a =>
+                      { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                        world := (Live.read ctx locatorSlot w).world,
+                        attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world).outcome with
+            | Except.error e =>
+              { outcome := Except.error e,
+                world :=
+                  (call external ctx a selector (word 0)
+                      (match (Live.read ctx locatorSlot w).outcome with
+                        | Except.error e =>
+                          { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                            attempts := (Live.read ctx locatorSlot w).attempts }
+                        | Except.ok a =>
+                          { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                            world := (Live.read ctx locatorSlot w).world,
+                            attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world).world,
+                attempts :=
+                  (call external ctx a selector (word 0)
+                      (match (Live.read ctx locatorSlot w).outcome with
+                        | Except.error e =>
+                          { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                            attempts := (Live.read ctx locatorSlot w).attempts }
+                        | Except.ok a =>
+                          { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                            world := (Live.read ctx locatorSlot w).world,
+                            attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world).attempts }
+            | Except.ok a_1 =>
+              {
+                outcome :=
+                  (match
+                      (decodeWord a_1 0
+                          (call external ctx a selector (word 0)
+                              (match (Live.read ctx locatorSlot w).outcome with
+                                | Except.error e =>
+                                  { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                    attempts := (Live.read ctx locatorSlot w).attempts }
+                                | Except.ok a =>
+                                  { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                    world := (Live.read ctx locatorSlot w).world,
+                                    attempts :=
+                                      (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).outcome with
+                    | Except.error e =>
+                      { outcome := Except.error e,
+                        world :=
+                          (decodeWord a_1 0
+                              (call external ctx a selector (word 0)
+                                  (match (Live.read ctx locatorSlot w).outcome with
+                                    | Except.error e =>
+                                      { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts }
+                                    | Except.ok a =>
+                                      { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                        world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).world,
+                        attempts :=
+                          (decodeWord a_1 0
+                              (call external ctx a selector (word 0)
+                                  (match (Live.read ctx locatorSlot w).outcome with
+                                    | Except.error e =>
+                                      { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts }
+                                    | Except.ok a =>
+                                      { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                        world := (Live.read ctx locatorSlot w).world,
+                                        attempts :=
+                                          (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).attempts }
+                    | Except.ok a_2 =>
+                      { outcome := Except.ok (Verity.Core.Address.ofNat a_2.val),
+                        world :=
+                          (decodeWord a_1 0
+                              (call external ctx a selector (word 0)
+                                  (match (Live.read ctx locatorSlot w).outcome with
+                                    | Except.error e =>
+                                      { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts }
+                                    | Except.ok a =>
+                                      { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                        world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).world,
+                        attempts :=
+                          (decodeWord a_1 0
+                                (call external ctx a selector (word 0)
+                                    (match (Live.read ctx locatorSlot w).outcome with
+                                      | Except.error e =>
+                                        { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                          attempts := (Live.read ctx locatorSlot w).attempts }
+                                      | Except.ok a =>
+                                        { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                          world := (Live.read ctx locatorSlot w).world,
+                                          attempts :=
+                                            (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).attempts ++
+                            [] }).outcome,
+                world :=
+                  (match
+                      (decodeWord a_1 0
+                          (call external ctx a selector (word 0)
+                              (match (Live.read ctx locatorSlot w).outcome with
+                                | Except.error e =>
+                                  { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                    attempts := (Live.read ctx locatorSlot w).attempts }
+                                | Except.ok a =>
+                                  { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                    world := (Live.read ctx locatorSlot w).world,
+                                    attempts :=
+                                      (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).outcome with
+                    | Except.error e =>
+                      { outcome := Except.error e,
+                        world :=
+                          (decodeWord a_1 0
+                              (call external ctx a selector (word 0)
+                                  (match (Live.read ctx locatorSlot w).outcome with
+                                    | Except.error e =>
+                                      { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts }
+                                    | Except.ok a =>
+                                      { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                        world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).world,
+                        attempts :=
+                          (decodeWord a_1 0
+                              (call external ctx a selector (word 0)
+                                  (match (Live.read ctx locatorSlot w).outcome with
+                                    | Except.error e =>
+                                      { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts }
+                                    | Except.ok a =>
+                                      { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                        world := (Live.read ctx locatorSlot w).world,
+                                        attempts :=
+                                          (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).attempts }
+                    | Except.ok a_2 =>
+                      { outcome := Except.ok (Verity.Core.Address.ofNat a_2.val),
+                        world :=
+                          (decodeWord a_1 0
+                              (call external ctx a selector (word 0)
+                                  (match (Live.read ctx locatorSlot w).outcome with
+                                    | Except.error e =>
+                                      { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts }
+                                    | Except.ok a =>
+                                      { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                        world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).world,
+                        attempts :=
+                          (decodeWord a_1 0
+                                (call external ctx a selector (word 0)
+                                    (match (Live.read ctx locatorSlot w).outcome with
+                                      | Except.error e =>
+                                        { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                          attempts := (Live.read ctx locatorSlot w).attempts }
+                                      | Except.ok a =>
+                                        { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                          world := (Live.read ctx locatorSlot w).world,
+                                          attempts :=
+                                            (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).attempts ++
+                            [] }).world,
+                attempts :=
+                  (call external ctx a selector (word 0)
+                        (match (Live.read ctx locatorSlot w).outcome with
+                          | Except.error e =>
+                            { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                              attempts := (Live.read ctx locatorSlot w).attempts }
+                          | Except.ok a =>
+                            { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                              world := (Live.read ctx locatorSlot w).world,
+                              attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world).attempts ++
+                    (match
+                        (decodeWord a_1 0
+                            (call external ctx a selector (word 0)
+                                (match (Live.read ctx locatorSlot w).outcome with
+                                  | Except.error e =>
+                                    { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                      attempts := (Live.read ctx locatorSlot w).attempts }
+                                  | Except.ok a =>
+                                    { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                      world := (Live.read ctx locatorSlot w).world,
+                                      attempts :=
+                                        (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).outcome with
+                      | Except.error e =>
+                        { outcome := Except.error e,
+                          world :=
+                            (decodeWord a_1 0
+                                (call external ctx a selector (word 0)
+                                    (match (Live.read ctx locatorSlot w).outcome with
+                                      | Except.error e =>
+                                        { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                          attempts := (Live.read ctx locatorSlot w).attempts }
+                                      | Except.ok a =>
+                                        { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                          world := (Live.read ctx locatorSlot w).world,
+                                          attempts :=
+                                            (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).world,
+                          attempts :=
+                            (decodeWord a_1 0
+                                (call external ctx a selector (word 0)
+                                    (match (Live.read ctx locatorSlot w).outcome with
+                                      | Except.error e =>
+                                        { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                          attempts := (Live.read ctx locatorSlot w).attempts }
+                                      | Except.ok a =>
+                                        { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                          world := (Live.read ctx locatorSlot w).world,
+                                          attempts :=
+                                            (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).attempts }
+                      | Except.ok a_2 =>
+                        { outcome := Except.ok (Verity.Core.Address.ofNat a_2.val),
+                          world :=
+                            (decodeWord a_1 0
+                                (call external ctx a selector (word 0)
+                                    (match (Live.read ctx locatorSlot w).outcome with
+                                      | Except.error e =>
+                                        { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                          attempts := (Live.read ctx locatorSlot w).attempts }
+                                      | Except.ok a =>
+                                        { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                          world := (Live.read ctx locatorSlot w).world,
+                                          attempts :=
+                                            (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).world,
+                          attempts :=
+                            (decodeWord a_1 0
+                                  (call external ctx a selector (word 0)
+                                      (match (Live.read ctx locatorSlot w).outcome with
+                                        | Except.error e =>
+                                          { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                            attempts := (Live.read ctx locatorSlot w).attempts }
+                                        | Except.ok a =>
+                                          { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                            world := (Live.read ctx locatorSlot w).world,
+                                            attempts :=
+                                              (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).attempts ++
+                              [] }).attempts }).world,
+        attempts :=
+          (match (Live.read ctx locatorSlot w).outcome with
+              | Except.error e =>
+                { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                  attempts := (Live.read ctx locatorSlot w).attempts }
+              | Except.ok a =>
+                { outcome := Except.ok (Verity.Core.Address.ofNat a.val), world := (Live.read ctx locatorSlot w).world,
+                  attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).attempts ++
+            (match
+                (call external ctx a selector (word 0)
+                    (match (Live.read ctx locatorSlot w).outcome with
+                      | Except.error e =>
+                        { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                          attempts := (Live.read ctx locatorSlot w).attempts }
+                      | Except.ok a =>
+                        { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                          world := (Live.read ctx locatorSlot w).world,
+                          attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world).outcome with
+              | Except.error e =>
+                { outcome := Except.error e,
+                  world :=
+                    (call external ctx a selector (word 0)
+                        (match (Live.read ctx locatorSlot w).outcome with
+                          | Except.error e =>
+                            { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                              attempts := (Live.read ctx locatorSlot w).attempts }
+                          | Except.ok a =>
+                            { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                              world := (Live.read ctx locatorSlot w).world,
+                              attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world).world,
+                  attempts :=
+                    (call external ctx a selector (word 0)
+                        (match (Live.read ctx locatorSlot w).outcome with
+                          | Except.error e =>
+                            { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                              attempts := (Live.read ctx locatorSlot w).attempts }
+                          | Except.ok a =>
+                            { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                              world := (Live.read ctx locatorSlot w).world,
+                              attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world).attempts }
+              | Except.ok a_1 =>
+                {
+                  outcome :=
+                    (match
+                        (decodeWord a_1 0
+                            (call external ctx a selector (word 0)
+                                (match (Live.read ctx locatorSlot w).outcome with
+                                  | Except.error e =>
+                                    { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                      attempts := (Live.read ctx locatorSlot w).attempts }
+                                  | Except.ok a =>
+                                    { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                      world := (Live.read ctx locatorSlot w).world,
+                                      attempts :=
+                                        (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).outcome with
+                      | Except.error e =>
+                        { outcome := Except.error e,
+                          world :=
+                            (decodeWord a_1 0
+                                (call external ctx a selector (word 0)
+                                    (match (Live.read ctx locatorSlot w).outcome with
+                                      | Except.error e =>
+                                        { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                          attempts := (Live.read ctx locatorSlot w).attempts }
+                                      | Except.ok a =>
+                                        { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                          world := (Live.read ctx locatorSlot w).world,
+                                          attempts :=
+                                            (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).world,
+                          attempts :=
+                            (decodeWord a_1 0
+                                (call external ctx a selector (word 0)
+                                    (match (Live.read ctx locatorSlot w).outcome with
+                                      | Except.error e =>
+                                        { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                          attempts := (Live.read ctx locatorSlot w).attempts }
+                                      | Except.ok a =>
+                                        { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                          world := (Live.read ctx locatorSlot w).world,
+                                          attempts :=
+                                            (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).attempts }
+                      | Except.ok a_2 =>
+                        { outcome := Except.ok (Verity.Core.Address.ofNat a_2.val),
+                          world :=
+                            (decodeWord a_1 0
+                                (call external ctx a selector (word 0)
+                                    (match (Live.read ctx locatorSlot w).outcome with
+                                      | Except.error e =>
+                                        { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                          attempts := (Live.read ctx locatorSlot w).attempts }
+                                      | Except.ok a =>
+                                        { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                          world := (Live.read ctx locatorSlot w).world,
+                                          attempts :=
+                                            (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).world,
+                          attempts :=
+                            (decodeWord a_1 0
+                                  (call external ctx a selector (word 0)
+                                      (match (Live.read ctx locatorSlot w).outcome with
+                                        | Except.error e =>
+                                          { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                            attempts := (Live.read ctx locatorSlot w).attempts }
+                                        | Except.ok a =>
+                                          { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                            world := (Live.read ctx locatorSlot w).world,
+                                            attempts :=
+                                              (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).attempts ++
+                              [] }).outcome,
+                  world :=
+                    (match
+                        (decodeWord a_1 0
+                            (call external ctx a selector (word 0)
+                                (match (Live.read ctx locatorSlot w).outcome with
+                                  | Except.error e =>
+                                    { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                      attempts := (Live.read ctx locatorSlot w).attempts }
+                                  | Except.ok a =>
+                                    { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                      world := (Live.read ctx locatorSlot w).world,
+                                      attempts :=
+                                        (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).outcome with
+                      | Except.error e =>
+                        { outcome := Except.error e,
+                          world :=
+                            (decodeWord a_1 0
+                                (call external ctx a selector (word 0)
+                                    (match (Live.read ctx locatorSlot w).outcome with
+                                      | Except.error e =>
+                                        { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                          attempts := (Live.read ctx locatorSlot w).attempts }
+                                      | Except.ok a =>
+                                        { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                          world := (Live.read ctx locatorSlot w).world,
+                                          attempts :=
+                                            (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).world,
+                          attempts :=
+                            (decodeWord a_1 0
+                                (call external ctx a selector (word 0)
+                                    (match (Live.read ctx locatorSlot w).outcome with
+                                      | Except.error e =>
+                                        { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                          attempts := (Live.read ctx locatorSlot w).attempts }
+                                      | Except.ok a =>
+                                        { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                          world := (Live.read ctx locatorSlot w).world,
+                                          attempts :=
+                                            (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).attempts }
+                      | Except.ok a_2 =>
+                        { outcome := Except.ok (Verity.Core.Address.ofNat a_2.val),
+                          world :=
+                            (decodeWord a_1 0
+                                (call external ctx a selector (word 0)
+                                    (match (Live.read ctx locatorSlot w).outcome with
+                                      | Except.error e =>
+                                        { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                          attempts := (Live.read ctx locatorSlot w).attempts }
+                                      | Except.ok a =>
+                                        { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                          world := (Live.read ctx locatorSlot w).world,
+                                          attempts :=
+                                            (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).world,
+                          attempts :=
+                            (decodeWord a_1 0
+                                  (call external ctx a selector (word 0)
+                                      (match (Live.read ctx locatorSlot w).outcome with
+                                        | Except.error e =>
+                                          { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                            attempts := (Live.read ctx locatorSlot w).attempts }
+                                        | Except.ok a =>
+                                          { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                            world := (Live.read ctx locatorSlot w).world,
+                                            attempts :=
+                                              (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).attempts ++
+                              [] }).world,
+                  attempts :=
+                    (call external ctx a selector (word 0)
+                          (match (Live.read ctx locatorSlot w).outcome with
+                            | Except.error e =>
+                              { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                attempts := (Live.read ctx locatorSlot w).attempts }
+                            | Except.ok a =>
+                              { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                world := (Live.read ctx locatorSlot w).world,
+                                attempts := (Live.read ctx locatorSlot w).attempts ++ [] }).world).attempts ++
+                      (match
+                          (decodeWord a_1 0
+                              (call external ctx a selector (word 0)
+                                  (match (Live.read ctx locatorSlot w).outcome with
+                                    | Except.error e =>
+                                      { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                        attempts := (Live.read ctx locatorSlot w).attempts }
+                                    | Except.ok a =>
+                                      { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                        world := (Live.read ctx locatorSlot w).world,
+                                        attempts :=
+                                          (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).outcome with
+                        | Except.error e =>
+                          { outcome := Except.error e,
+                            world :=
+                              (decodeWord a_1 0
+                                  (call external ctx a selector (word 0)
+                                      (match (Live.read ctx locatorSlot w).outcome with
+                                        | Except.error e =>
+                                          { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                            attempts := (Live.read ctx locatorSlot w).attempts }
+                                        | Except.ok a =>
+                                          { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                            world := (Live.read ctx locatorSlot w).world,
+                                            attempts :=
+                                              (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).world,
+                            attempts :=
+                              (decodeWord a_1 0
+                                  (call external ctx a selector (word 0)
+                                      (match (Live.read ctx locatorSlot w).outcome with
+                                        | Except.error e =>
+                                          { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                            attempts := (Live.read ctx locatorSlot w).attempts }
+                                        | Except.ok a =>
+                                          { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                            world := (Live.read ctx locatorSlot w).world,
+                                            attempts :=
+                                              (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).attempts }
+                        | Except.ok a_2 =>
+                          { outcome := Except.ok (Verity.Core.Address.ofNat a_2.val),
+                            world :=
+                              (decodeWord a_1 0
+                                  (call external ctx a selector (word 0)
+                                      (match (Live.read ctx locatorSlot w).outcome with
+                                        | Except.error e =>
+                                          { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                            attempts := (Live.read ctx locatorSlot w).attempts }
+                                        | Except.ok a =>
+                                          { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                            world := (Live.read ctx locatorSlot w).world,
+                                            attempts :=
+                                              (Live.read ctx locatorSlot w).attempts ++ [] }).world).world).world,
+                            attempts :=
+                              (decodeWord a_1 0
+                                    (call external ctx a selector (word 0)
+                                        (match (Live.read ctx locatorSlot w).outcome with
+                                          | Except.error e =>
+                                            { outcome := Except.error e, world := (Live.read ctx locatorSlot w).world,
+                                              attempts := (Live.read ctx locatorSlot w).attempts }
+                                          | Except.ok a =>
+                                            { outcome := Except.ok (Verity.Core.Address.ofNat a.val),
+                                              world := (Live.read ctx locatorSlot w).world,
+                                              attempts :=
+                                                (Live.read ctx locatorSlot w).attempts ++
+                                                  [] }).world).world).attempts ++
+                                [] }).attempts }).attempts }) =
+    { outcome := Except.ok (Verity.Core.Address.ofNat (word n).val), world := after, attempts := trace }
+LidoSRv3/Audit/Source/TrioReserve1/CallResults.lean:37:37: warning: This simp argument is unused:
+  List.nil_append
+
+Hint: Omit it from the simp argument list.
+  simp only [ABI.decode_second_word, L̵i̵s̵t̵.̵n̵i̵l̵_̵a̵p̵p̵e̵n̵d̵,̵ ̵List.append_nil]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/CallResults.lean:45:40: error: Invalid simp theorem: Expected a proposition, but found
+  Context → Nat → Exec Word
+LidoSRv3/Audit/Source/TrioReserve1/CallResults.lean:44:99: error: unsolved goals
+external : External
+ctx : Context
+w after : World
+nonce time : Nat
+trace : List Attempt
+h : getCurrentFrame external ctx w = { outcome := Except.ok (nonce, time), world := after, attempts := trace }
+⊢ (match (Live.read ctx nextSlot w).outcome with
+    | Except.error e =>
+      { outcome := Except.error e, world := (Live.read ctx nextSlot w).world,
+        attempts := (Live.read ctx nextSlot w).attempts }
+    | Except.ok a =>
+      {
+        outcome :=
+          (match (getCurrentFrame external ctx (Live.read ctx nextSlot w).world).outcome with
+            | Except.error e =>
+              { outcome := Except.error e,
+                world := (getCurrentFrame external ctx (Live.read ctx nextSlot w).world).world,
+                attempts := (getCurrentFrame external ctx (Live.read ctx nextSlot w).world).attempts }
+            | Except.ok a_1 =>
+              { outcome := Except.ok (if a_1.fst = a.val / width then a.val % width else 0, a_1.fst),
+                world := (getCurrentFrame external ctx (Live.read ctx nextSlot w).world).world,
+                attempts := (getCurrentFrame external ctx (Live.read ctx nextSlot w).world).attempts }).outcome,
+        world :=
+          (match (getCurrentFrame external ctx (Live.read ctx nextSlot w).world).outcome with
+            | Except.error e =>
+              { outcome := Except.error e,
+                world := (getCurrentFrame external ctx (Live.read ctx nextSlot w).world).world,
+                attempts := (getCurrentFrame external ctx (Live.read ctx nextSlot w).world).attempts }
+            | Except.ok a_1 =>
+              { outcome := Except.ok (if a_1.fst = a.val / width then a.val % width else 0, a_1.fst),
+                world := (getCurrentFrame external ctx (Live.read ctx nextSlot w).world).world,
+                attempts := (getCurrentFrame external ctx (Live.read ctx nextSlot w).world).attempts }).world,
+        attempts :=
+          (Live.read ctx nextSlot w).attempts ++
+            (match (getCurrentFrame external ctx (Live.read ctx nextSlot w).world).outcome with
+              | Except.error e =>
+                { outcome := Except.error e,
+                  world := (getCurrentFrame external ctx (Live.read ctx nextSlot w).world).world,
+                  attempts := (getCurrentFrame external ctx (Live.read ctx nextSlot w).world).attempts }
+              | Except.ok a_1 =>
+                { outcome := Except.ok (if a_1.fst = a.val / width then a.val % width else 0, a_1.fst),
+                  world := (getCurrentFrame external ctx (Live.read ctx nextSlot w).world).world,
+                  attempts := (getCurrentFrame external ctx (Live.read ctx nextSlot w).world).attempts }).attempts }) =
+    {
+      outcome :=
+        Except.ok
+          (if nonce = (w.core.readContractSlot ctx.self.val nextSlot).val / width then
+              (w.core.readContractSlot ctx.self.val nextSlot).val % width
+            else 0,
+            nonce),
+      world := after, attempts := trace }
+LidoSRv3/Audit/Source/TrioReserve1/CallResults.lean:45:78: warning: This simp argument is unused:
+  h
+
+Hint: Omit it from the simp argument list.
+  simp [getDepositedNextReportAdjusted, read, bind, bindExec, pure, pureExec,̵ ̵h̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
