@@ -67,3 +67,26 @@ checkpoint, not track completion. ALLOC-2 remains at `4dce12b7` with unpublished
 `composition/LibraryABI.lean`, preparation/config changes and receipts. RESERVE-1
 is at `016052c7` with unpublished `CallResults.lean`, `WithdrawalTail.lean` and
 receipts. Those active workspaces were preserved without mutation.
+
+## Latest integration and tracked full build
+
+Integration `9d0bcdbe` includes writer checkpoints ALLOC-1 `9923f9d6`,
+ALLOC-2 `b279d572`, and RESERVE-1 `1b3adaed`. These publish the memory allocation
+primitives and callback fixtures, staged canonical library ABI bridge, and
+getter/withdrawal-tail composition respectively. The ABI modules still need
+production integration and alignment with the current producer. The full
+withdrawal theorem still must discharge the spending premise. These are not
+completed track claims or fresh clean-workspace attestations.
+
+Proof-escape (305 project Lean files), source annotations (750 citations), and
+import-DAG checks passed after integration. The source index was regenerated.
+
+A command-only Sandboxed mission `239f13eb-952d-495f-8341-a0c7319f6c0f`
+owns a separate validation checkout and durable job
+`2eeec2f4-ab09-5940-9948-718b991b00a7`. The official remote-build wrapper
+submitted job `e380a57b-921d-46af-b2ea-38053f29ad72` to DGX Spark for
+`lake build LidoSRv3 LidoSRv3Test LidoSRv3Audit` at **91684800**, before these
+latest writer merges. Its terminal result must be collected; it cannot certify
+9d0bcdbe or subsequent source. Earlier admission attempts failed on Ashur's
+unchanged disk reserve. Explicit command routing resolved the workspace's
+default-node override. No AI harness or duplicate writer was launched.
