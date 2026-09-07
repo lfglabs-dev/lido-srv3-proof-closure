@@ -23,6 +23,7 @@ theorems derive successful independent distribution without assuming consumer
 success. The byte theorem derives the memory relation from `outputBytes` and an
 explicit nonwrapping extent bound.
 
+
 The execution checks cover prefixes/gaps, proportional ties, empty arrays,
 zero-demand precedence over short capacity arrays, short-capacity failure,
 already-over-capacity rows, and a wrong-capacity-pointer negative control. They
@@ -48,7 +49,38 @@ commands and exit codes. The initial integration check passed all 23 modules;
 its receipt is in `audit/trio/integration/composition-init-receipt.json`. This is
 not a production/test/trust build, make-prove/test result, or certification.
 
-`prepare.py`, `source-identity.json` and earlier remote receipts retain the
-historical candidate setup against producer `5f1683eaf753ff73aec6f1e787cb7f68bedcf056`.
-They do not validate the integrated producer. Use the root build for complete
-validation; the bounded command above only checks this decoded composition.
+`prepare.py` and `source-identity.json` retain the isolated ABI candidate setup
+against producer `8269ac576cf119975a7e9954459cd4aa04d5cd82`. They do not validate
+the integrated producer. `LibraryABI.lean` and its vectors remain staged outside
+the production glob; the decoded and memory compositions above are integrated.
+Use the root build for complete validation.
+
+Historical job `d6b747be-05b7-486a-b03c-bfb97f840ad1` against producer
+`5f1683eaf753ff73aec6f1e787cb7f68bedcf056`, old-agent, exit 0, 21 jobs,
+compiled the complete producer/consumer source closure. The historical receipt records its verified source bundle; `source-identity.json`
+now records the current candidate described below.
+The receipt is in the parent audit directory. Both bridge theorem inspections
+report only propext and Quot.sound. This is implementation evidence, not
+independent certification or full-suite validation.
+
+The isolated ABI candidate includes the producer's Bytes and Memory modules.
+`LibraryABI.lean` uses that exact byte codec for bounds-checked array decoding,
+standard dynamic-array arguments, return tuples and Panic(uint256) bytes.
+`decodeArguments_encoded`, `decodeReturn_encoded` and `run_encoded` prove canonical
+byte round trips and the all-outcome bridge to the decoded consumer. The byte
+extent bound is explicit; uint256 count representability alone does not derive
+it. This remains an open producer-allocation/reachability obligation, not an
+assumed count<=32 shortcut. Compiler dispatch, memory allocation/copying, full
+noncanonical input correspondence, parent conversion/rollback and Verity runtime
+execution remain open. The old decoded bridge is still checked at the new pin.
+
+`LibraryABIVectors.lean` executes the byte decoder, loop and encoder for eleven
+canonical/malformed cases. Receipt 6e204674-c98f-4e7a-b66c-4b5e18947deb is
+successful, 30 jobs, complete 29-file source/config closure; source-identity.json
+records every file. The new axiom reports contain only propext, Classical.choice
+and Quot.sound. The Solidity runner accepts this as a second receipt and compares
+the model's exact input and output bytes with the pinned public library.
+
+Coordination remains pending: ask_worker again returned writer_identity_stale
+for the producer's existing PR #245 / trio-alloc1 writer. No tags were changed.
+
