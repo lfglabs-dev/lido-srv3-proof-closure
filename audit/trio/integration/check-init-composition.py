@@ -67,6 +67,7 @@ try:
     check('LidoSRv3.Tests.TrioIntegration.MemoryProducer')
     check('LidoSRv3.Audit.Source.TrioComposition.MemoryParentCalls')
     check('LidoSRv3.Audit.Source.TrioComposition.WriterMemory')
+    check('LidoSRv3.Audit.Source.TrioComposition.CallerMemory')
     check('LidoSRv3.Audit.Source.TrioComposition.WriterExtent')
     check('LidoSRv3.Audit.Source.TrioAlloc2.ParentValues')
     check('LidoSRv3.Audit.Source.TrioAlloc1.AdmissionWriter')

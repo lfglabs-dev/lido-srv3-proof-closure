@@ -37,3 +37,28 @@ fi
 printf '%s  %s\n' "$digest" "$archive" | sha256sum --check --strict
 tar -xzf "$archive" -C "$tools" forge
 "$tools/forge" --version
+
+# The full regression suite uses ripgrep and deliberately rejects its absence.
+# Release checksum assets were read from BurntSushi/ripgrep 14.1.1 on 2026-09-07.
+case "$(uname -m)" in
+  x86_64)
+    rg_target=x86_64-unknown-linux-musl
+    rg_digest=4cf9f2741e6c465ffdb7c26f38056a59e2a2544b51f7cc128ef28337eeae4d8e
+    ;;
+  aarch64|arm64)
+    rg_target=aarch64-unknown-linux-gnu
+    rg_digest=c827481c4ff4ea10c9dc7a4022c8de5db34a5737cb74484d62eb94a95841ab2f
+    ;;
+esac
+rg_tools=.lake/trio-tools/ripgrep-14.1.1
+mkdir -p "$rg_tools"
+rg_archive="$rg_tools/ripgrep.tar.gz"
+if ! test -f "$rg_archive"; then
+  curl --fail --location --retry 3 --connect-timeout 20 --max-time 300 \
+    "https://github.com/BurntSushi/ripgrep/releases/download/14.1.1/ripgrep-14.1.1-${rg_target}.tar.gz" \
+    --output "$rg_archive.part"
+  mv "$rg_archive.part" "$rg_archive"
+fi
+printf '%s  %s\n' "$rg_digest" "$rg_archive" | sha256sum --check --strict
+tar -xzf "$rg_archive" -C "$rg_tools" --strip-components=1 "ripgrep-14.1.1-${rg_target}/rg"
+"$rg_tools/rg" --version

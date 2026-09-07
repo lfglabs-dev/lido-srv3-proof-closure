@@ -1,0 +1,6 @@
+Cloning into '/workspaces/lido-integration-validation-431e73ee'...
+HEAD is now at 431e73e Validate combined admission and exact parent outcomes
+remote-lean-build: pinned tree contains submodules; using legacy runner fetch
+remote-lean-build: dispatching lake env lean --run audit/trio/integration/RunValidation.lean for 431e73ee2a85 ...
+remote-lean-build: submitted job 592f6ed2-a8ee-4af8-8e5e-6887ab80aa86 on node 'nippur'; receipt /root/.local/state/sandboxed-sh/remote-builds/9dd7829028f61e0cc296c5c42a4ccab23e07eed4ec013bac2b185290d2531f55.json
+remote-lean-build: job 592f6ed2-a8ee-4af8-8e5e-6887ab80aa86 on node 'nippur' finished: failed (exit 1, 2410s)

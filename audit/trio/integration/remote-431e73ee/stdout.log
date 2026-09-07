@@ -1,0 +1,878 @@
+is simp argument is unused:
+  read_at _ _ newInside
+
+Hint: Omit it from the simp argument list.
+  simp only [checkedMul, delta, ↓reduceDIte, Except.bind,̵ ̵r̵e̵a̵d̵_̵a̵t̵ ̵_̵ ̵_̵ ̵n̵e̵w̵I̵n̵s̵i̵d̵e̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioAlloc2/ParentArraySafety.lean:31:40: This simp argument is unused:
+  Except.bind
+
+Hint: Omit it from the simp argument list.
+  simp only [next, ↓reduceDIte,̵ ̵E̵x̵c̵e̵p̵t̵.̵b̵i̵n̵d̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioAlloc2/ParentArraySafety.lean:53:50: This simp argument is unused:
+  Except.bind
+
+Hint: Omit it from the simp argument list.
+  simp only [checkedMul, scaled, ↓reduceDIte, E̵x̵c̵e̵p̵t̵.̵b̵i̵n̵d̵,̵
+  ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵read_at _ _ oldInside, read_at _ _ newInside]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioAlloc2/ParentArraySafety.lean:54:8: This simp argument is unused:
+  read_at _ _ oldInside
+
+Hint: Omit it from the simp argument list.
+  simp only [checkedMul, scaled, ↓reduceDIte, Except.bind, read_at _ _ o̵l̵d̵I̵n̵s̵i̵d̵e̵,̵ ̵r̵e̵a̵d̵_̵a̵t̵ ̵_̵ ̵_̵ ̵newInside]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioAlloc2/ParentArraySafety.lean:54:31: This simp argument is unused:
+  read_at _ _ newInside
+
+Hint: Omit it from the simp argument list.
+  simp only [checkedMul, scaled, ↓reduceDIte, Except.bind, read_at _ _ o̵l̵d̵I̵n̵s̵i̵d̵e̵,̵ ̵r̵e̵a̵d̵_̵a̵t̵ ̵_̵ ̵_̵ ̵n̵e̵w̵I̵n̵s̵i̵d̵e̵]̵o̲l̲d̲I̲n̲s̲i̲d̲e̲]̲
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+info: LidoSRv3/Audit/Source/TrioAlloc2/ParentArraySafety.lean:61:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.positiveRows_array_safe' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/ParentArraySafety.lean:62:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.zeroRows_array_safe' depends on axioms: [propext, Quot.sound]
+⚠ [1446/1515] Replayed LidoSRv3.Audit.Source.TrioAlloc2.ParentSuccess
+warning: LidoSRv3/Audit/Source/TrioAlloc2/ParentSuccess.lean:54:31: This simp argument is unused:
+  readNew
+
+Hint: Omit it from the simp argument list.
+  simp [zeroRows, readOld, r̵e̵a̵d̵N̵e̵w̵,̵ ̵checkedMul, safe, bind, Except.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioAlloc2/ParentSuccess.lean:68:10: This simp argument is unused:
+  result
+
+Hint: Omit it from the simp argument list.
+  simp [̵r̵e̵s̵u̵l̵t̵,̵ ̵s̵u̵c̵c̵e̵s̵s̵]̵[̲s̲u̲c̲c̲e̲s̲s̲]̲
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioAlloc2/ParentSuccess.lean:71:10: This simp argument is unused:
+  result
+
+Hint: Omit it from the simp argument list.
+  simp [̵r̵e̵s̵u̵l̵t̵,̵ ̵s̵u̵c̵c̵e̵s̵s̵]̵[̲s̲u̲c̲c̲e̲s̲s̲]̲
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioAlloc2/ParentSuccess.lean:156:10: This simp argument is unused:
+  result
+
+Hint: Omit it from the simp argument list.
+  simp [̵r̵e̵s̵u̵l̵t̵,̵ ̵s̵u̵c̵c̵e̵s̵s̵]̵[̲s̲u̲c̲c̲e̲s̲s̲]̲
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioAlloc2/ParentSuccess.lean:159:10: This simp argument is unused:
+  result
+
+Hint: Omit it from the simp argument list.
+  simp [̵r̵e̵s̵u̵l̵t̵,̵ ̵s̵u̵c̵c̵e̵s̵s̵]̵[̲s̲u̲c̲c̲e̲s̲s̲]̲
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+info: LidoSRv3/Audit/Source/TrioAlloc2/ParentSuccess.lean:202:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.positive_success_iff' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/ParentSuccess.lean:203:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.positive_arithmetic_iff' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/ParentSuccess.lean:204:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.zeroDemand_success_iff' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/ParentSuccess.lean:205:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.zeroDemand_arithmetic_iff' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/ParentSuccess.lean:207:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.positiveRows_success_iff' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/ParentSuccess.lean:208:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.positiveRows_arithmetic_iff' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/ParentSuccess.lean:210:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.zeroRows_success_iff' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/ParentSuccess.lean:211:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.zeroRows_arithmetic_iff' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [1447/1515] Replayed LidoSRv3.Audit.Source.TrioAlloc2.ParentValues
+info: LidoSRv3/Audit/Source/TrioAlloc2/ParentValues.lean:150:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.positive_values' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/ParentValues.lean:151:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.zeroDemand_values' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/ParentValues.lean:153:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.positiveRows_values' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/ParentValues.lean:155:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.zeroRows_values' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [1448/1515] Replayed LidoSRv3.Audit.Source.TrioComposition.AllocationExtent
+info: LidoSRv3/Audit/Source/TrioComposition/AllocationExtent.lean:57:0: 'LidoSRv3.Audit.Source.TrioComposition.allocated_array_extent' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/AllocationExtent.lean:58:0: 'LidoSRv3.Audit.Source.TrioComposition.two_allocations_abi_extent' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [1449/1515] Replayed LidoSRv3.Audit.Source.TrioComposition.Parent
+info: LidoSRv3/Audit/Source/TrioComposition/Parent.lean:252:0: 'LidoSRv3.Audit.Source.TrioComposition.getDepositAllocations_total_bound' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/Parent.lean:253:0: 'LidoSRv3.Audit.Source.TrioComposition.convertPositive_refines' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/Parent.lean:254:0: 'LidoSRv3.Audit.Source.TrioComposition.convertZero_refines' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1450/1515] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentComposition
+info: LidoSRv3/Audit/Source/TrioComposition/ParentComposition.lean:65:0: 'LidoSRv3.Audit.Source.TrioComposition.producer_consumer_conversion_refines' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ParentComposition.lean:66:0: 'LidoSRv3.Audit.Source.TrioComposition.producer_zero_conversion_refines' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ParentComposition.lean:67:0: 'LidoSRv3.Audit.Source.TrioComposition.producer_consumer_parent_subtraction' depends on axioms: [propext, Quot.sound]
+ℹ [1451/1515] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentRelational
+info: LidoSRv3/Audit/Source/TrioComposition/ParentRelational.lean:185:0: 'LidoSRv3.Audit.Source.TrioComposition.ParentSpec.public_all_outcomes' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [1452/1515] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentDeterminism
+info: LidoSRv3/Audit/Source/TrioComposition/ParentDeterminism.lean:155:0: 'LidoSRv3.Audit.Source.TrioComposition.ParentSpec.public_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1453/1515] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentABI
+info: LidoSRv3/Audit/Source/TrioComposition/ParentABI.lean:110:0: 'LidoSRv3.Audit.Source.TrioComposition.public_abi_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1454/1515] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentCalls
+info: LidoSRv3/Audit/Source/TrioComposition/ParentCalls.lean:42:0: 'LidoSRv3.Audit.Source.TrioComposition.ParentCalls.correspondence' depends on axioms: [propext, Quot.sound]
+ℹ [1455/1515] Replayed LidoSRv3.Audit.Source.TrioComposition.MemoryGuard
+info: LidoSRv3/Audit/Source/TrioComposition/MemoryGuard.lean:38:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryGuard.run_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/MemoryGuard.lean:39:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryGuard.check_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+⚠ [1456/1515] Replayed LidoSRv3.Audit.Source.TrioComposition.AllocationParentCalls
+warning: LidoSRv3/Audit/Source/TrioComposition/AllocationParentCalls.lean:31:12: This simp argument is unused:
+  divided
+
+Hint: Omit it from the simp argument list.
+  simp [d̵i̵v̵i̵d̵e̵d̵,̵ ̵success, CallTree.check, bind, CallTree.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+info: LidoSRv3/Audit/Source/TrioComposition/AllocationParentCalls.lean:82:0: 'LidoSRv3.Audit.Source.TrioComposition.AllocationParentCalls.successful_prefix_extent' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/AllocationParentCalls.lean:84:0: 'LidoSRv3.Audit.Source.TrioComposition.AllocationParentCalls.successful_prefix_correspondence' depends on axioms: [propext,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/AllocationParentCalls.lean:85:0: 'LidoSRv3.Audit.Source.TrioComposition.AllocationParentCalls.empty_memory_failure' depends on axioms: [propext,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/AllocationParentCalls.lean:86:0: 'LidoSRv3.Audit.Source.TrioComposition.AllocationParentCalls.division_failure' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/AllocationParentCalls.lean:87:0: 'LidoSRv3.Audit.Source.TrioComposition.AllocationParentCalls.memory_failure' depends on axioms: [propext, Quot.sound]
+⚠ [1457/1515] Replayed LidoSRv3.Audit.Source.TrioComposition.ConversionBridge
+warning: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:21:32: This simp argument is unused:
+  hn
+
+Hint: Omit it from the simp argument list.
+  simp [h̵n̵,̵ ̵bind, Except.bind, Except.map]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:23:32: This simp argument is unused:
+  hp
+
+Hint: Omit it from the simp argument list.
+  simp [h̵p̵,̵ ̵bind, Except.bind, Except.map]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:23:36: This simp argument is unused:
+  bind
+
+Hint: Omit it from the simp argument list.
+  simp [hp, b̵i̵n̵d̵,̵ ̵Except.bind, Except.map]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:23:42: This simp argument is unused:
+  Except.bind
+
+Hint: Omit it from the simp argument list.
+  simp [hp, bind, Except.b̵i̵n̵d̵,̵ ̵E̵x̵c̵e̵p̵t̵.̵map]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:23:55: This simp argument is unused:
+  Except.map
+
+Hint: Omit it from the simp argument list.
+  simp [hp, bind, Except.bind,̵ ̵E̵x̵c̵e̵p̵t̵.̵m̵a̵p̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:25:61: This simp argument is unused:
+  hs
+
+Hint: Omit it from the simp argument list.
+  simp [h̵s̵,̵ ̵bind, Except.bind, Except.map]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:25:65: This simp argument is unused:
+  bind
+
+Hint: Omit it from the simp argument list.
+  simp [hs, b̵i̵n̵d̵,̵ ̵Except.bind, Except.map]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:25:71: This simp argument is unused:
+  Except.bind
+
+Hint: Omit it from the simp argument list.
+  simp [hs, bind, Except.b̵i̵n̵d̵,̵ ̵E̵x̵c̵e̵p̵t̵.̵map]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:25:84: This simp argument is unused:
+  Except.map
+
+Hint: Omit it from the simp argument list.
+  simp [hs, bind, Except.bind,̵ ̵E̵x̵c̵e̵p̵t̵.̵m̵a̵p̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:27:58: This simp argument is unused:
+  hd
+
+Hint: Omit it from the simp argument list.
+  simp [h̵d̵,̵ ̵bind, Except.bind, Except.map]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:27:62: This simp argument is unused:
+  bind
+
+Hint: Omit it from the simp argument list.
+  simp [hd, b̵i̵n̵d̵,̵ ̵Except.bind, Except.map]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:27:68: This simp argument is unused:
+  Except.bind
+
+Hint: Omit it from the simp argument list.
+  simp [hd, bind, Except.b̵i̵n̵d̵,̵ ̵E̵x̵c̵e̵p̵t̵.̵map]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:27:81: This simp argument is unused:
+  Except.map
+
+Hint: Omit it from the simp argument list.
+  simp [hd, bind, Except.bind,̵ ̵E̵x̵c̵e̵p̵t̵.̵m̵a̵p̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:29:57: This simp argument is unused:
+  hm
+
+Hint: Omit it from the simp argument list.
+  simp [h̵m̵,̵ ̵bind, Except.bind, Except.map]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:29:61: This simp argument is unused:
+  bind
+
+Hint: Omit it from the simp argument list.
+  simp [hm, b̵i̵n̵d̵,̵ ̵Except.bind, Except.map]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:29:67: This simp argument is unused:
+  Except.bind
+
+Hint: Omit it from the simp argument list.
+  simp [hm, bind, Except.b̵i̵n̵d̵,̵ ̵E̵x̵c̵e̵p̵t̵.̵map]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:29:80: This simp argument is unused:
+  Except.map
+
+Hint: Omit it from the simp argument list.
+  simp [hm, bind, Except.bind,̵ ̵E̵x̵c̵e̵p̵t̵.̵m̵a̵p̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:41:32: This simp argument is unused:
+  hp
+
+Hint: Omit it from the simp argument list.
+  simp [h̵p̵,̵ ̵bind, Except.bind, Except.map]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:43:61: This simp argument is unused:
+  hm
+
+Hint: Omit it from the simp argument list.
+  simp [h̵m̵,̵ ̵bind, Except.bind, Except.map]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:43:65: This simp argument is unused:
+  bind
+
+Hint: Omit it from the simp argument list.
+  simp [hm, b̵i̵n̵d̵,̵ ̵Except.bind, Except.map]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:43:71: This simp argument is unused:
+  Except.bind
+
+Hint: Omit it from the simp argument list.
+  simp [hm, bind, Except.b̵i̵n̵d̵,̵ ̵E̵x̵c̵e̵p̵t̵.̵map]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:43:84: This simp argument is unused:
+  Except.map
+
+Hint: Omit it from the simp argument list.
+  simp [hm, bind, Except.bind,̵ ̵E̵x̵c̵e̵p̵t̵.̵m̵a̵p̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:45:32: This simp argument is unused:
+  hn
+
+Hint: Omit it from the simp argument list.
+  simp [h̵n̵,̵ ̵bind, Except.bind, Except.map]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:45:36: This simp argument is unused:
+  bind
+
+Hint: Omit it from the simp argument list.
+  simp [hn, b̵i̵n̵d̵,̵ ̵Except.bind, Except.map]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:45:42: This simp argument is unused:
+  Except.bind
+
+Hint: Omit it from the simp argument list.
+  simp [hn, bind, Except.b̵i̵n̵d̵,̵ ̵E̵x̵c̵e̵p̵t̵.̵map]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:45:55: This simp argument is unused:
+  Except.map
+
+Hint: Omit it from the simp argument list.
+  simp [hn, bind, Except.bind,̵ ̵E̵x̵c̵e̵p̵t̵.̵m̵a̵p̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:106:63: This simp argument is unused:
+  hs
+
+Hint: Omit it from the simp argument list.
+  simp [h̵s̵,̵ ̵Except.map]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:108:58: This simp argument is unused:
+  hd
+
+Hint: Omit it from the simp argument list.
+  simp [h̵d̵,̵ ̵Except.map]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:108:62: This simp argument is unused:
+  Except.map
+
+Hint: Omit it from the simp argument list.
+  simp [hd,̵ ̵E̵x̵c̵e̵p̵t̵.̵m̵a̵p̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:110:54: This simp argument is unused:
+  hm
+
+Hint: Omit it from the simp argument list.
+  simp [h̵m̵,̵ ̵Except.map]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:110:58: This simp argument is unused:
+  Except.map
+
+Hint: Omit it from the simp argument list.
+  simp [hm,̵ ̵E̵x̵c̵e̵p̵t̵.̵m̵a̵p̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:137:54: This simp argument is unused:
+  hm
+
+Hint: Omit it from the simp argument list.
+  simp [h̵m̵,̵ ̵Except.map]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:155:52: This simp argument is unused:
+  hm
+
+Hint: Omit it from the simp argument list.
+  simp [h̵m̵,̵ ̵bind, Except.bind, Except.map]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+info: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:192:0: 'LidoSRv3.Audit.Source.TrioComposition.ConversionBridge.positive_conversion_equiv' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:193:0: 'LidoSRv3.Audit.Source.TrioComposition.ConversionBridge.zero_conversion_equiv' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:194:0: 'LidoSRv3.Audit.Source.TrioComposition.ConversionBridge.producer_consumer_conversion_equiv' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:196:0: 'LidoSRv3.Audit.Source.TrioComposition.ConversionBridge.positive_equiv' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:197:0: 'LidoSRv3.Audit.Source.TrioComposition.ConversionBridge.zero_equiv' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [1458/1515] Replayed LidoSRv3.Audit.Source.TrioComposition.ReturnMemory
+info: LidoSRv3/Audit/Source/TrioComposition/ReturnMemory.lean:132:0: 'LidoSRv3.Audit.Source.TrioComposition.ReturnMemory.summary_correspondence' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ReturnMemory.lean:133:0: 'LidoSRv3.Audit.Source.TrioComposition.ReturnMemory.stake_correspondence' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ReturnMemory.lean:134:0: 'LidoSRv3.Audit.Source.TrioComposition.ReturnMemory.summary_allocation_failure' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ReturnMemory.lean:136:0: 'LidoSRv3.Audit.Source.TrioComposition.ReturnMemory.summary_take' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ReturnMemory.lean:137:0: 'LidoSRv3.Audit.Source.TrioComposition.ReturnMemory.allocation_failure' depends on axioms: [propext]
+info: LidoSRv3/Audit/Source/TrioComposition/ReturnMemory.lean:138:0: 'LidoSRv3.Audit.Source.TrioComposition.ReturnMemory.bounded_summary_projection' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ReturnMemory.lean:139:0: 'LidoSRv3.Audit.Source.TrioComposition.ReturnMemory.bounded_stake_projection' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [1459/1515] Replayed LidoSRv3.Audit.Source.TrioComposition.VerityParent
+info: LidoSRv3/Audit/Source/TrioComposition/VerityParent.lean:78:0: 'LidoSRv3.Audit.Source.TrioComposition.VerityParent.memory_correspondence' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/VerityParent.lean:79:0: 'LidoSRv3.Audit.Source.TrioComposition.VerityParent.memory_public_iff' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/VerityParent.lean:81:0: 'LidoSRv3.Audit.Source.TrioComposition.VerityParent.correspondence' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/VerityParent.lean:82:0: 'LidoSRv3.Audit.Source.TrioComposition.VerityParent.public_iff' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [1460/1515] Replayed LidoSRv3.Audit.Source.TrioComposition.WriterExtent
+info: LidoSRv3/Audit/Source/TrioComposition/WriterExtent.lean:47:0: 'LidoSRv3.Audit.Source.TrioComposition.share_writer_abi_extent' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/WriterExtent.lean:61:0: 'LidoSRv3.Audit.Source.TrioComposition.parameter_writer_abi_extent' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+⚠ [1503/1515] Replayed LidoSRv3.Audit.Verity.ConsolidationFee
+warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:446:5: Variable name `hsize` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:446:35: Variable name `hdecode` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:447:5: Variable name `hvalue` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:452:70: This simp argument is unused:
+  hsize
+
+Hint: Omit it from the simp argument list.
+  simp [batchCalls, batchCalls.loop, ObservedCalls, denoteCall, hfee, hs̵i̵z̵e̵,̵ ̵h̵decode,
+  ̵  ̵ ̵ ̵hvalue, hkey]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:452:77: This simp argument is unused:
+  hdecode
+
+Hint: Omit it from the simp argument list.
+  simp [batchCalls, batchCalls.loop, ObservedCalls, denoteCall, hfee, hsize, hd̵e̵c̵o̵d̵e̵,̵
+  ̵ ̵ ̵ ̵ ̵h̵value, hkey]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:453:4: This simp argument is unused:
+  hvalue
+
+Hint: Omit it from the simp argument list.
+  simp [batchCalls, batchCalls.loop, ObservedCalls, denoteCall, hfee, hsize, hdecode,
+  ̵  ̵ ̵ ̵hv̵a̵l̵u̵e̵,̵ ̵h̵key]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:466:5: Variable name `hrequest` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:477:32: This simp argument is unused:
+  hrequest
+
+Hint: Omit it from the simp argument list.
+  simp [batchCalls, batchCalls.loop, ObservedCalls, denoteCall, hfee, hsize, hdecode,
+  ̵  ̵ ̵ ̵hbound,
+  ̲  ̲ ̲ ̲hvalid₀, hinvalid₁,̵ ̵h̵r̵e̵q̵u̵e̵s̵t̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [1504/1515] Replayed LidoSRv3.Audit.Verity.DepositLedgerTx
+warning: LidoSRv3/Audit/Verity/DepositLedgerTx.lean:140:35: Variable name `n` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+⚠ [1506/1515] Replayed LidoSRv3.Audit.Verity.DepositTx
+warning: LidoSRv3/Audit/Verity/DepositTx.lean:153:35: This simp argument is unused:
+  Pure.pure
+
+Hint: Omit it from the simp argument list.
+  simp [executeOutcome, executeCalls, hRun, observe, DepositTxContract.execute,
+      _root_.Contracts.externalCallBind, _root_.Contracts.externalCallStubSuccess,
+      _root_.Verity.require,
+  ̵  ̵ ̵ ̵_root_.Verity.Contract.run, _root_.Verity.bind,
+  ̵  ̵ ̵ ̵_root_.Verity.pure,
+  ̲  ̲ ̲ ̲Bind.bind, P̵u̵r̵e̵.̵p̵u̵r̵e̵,̵ ̵committedBalances, Nat.sub_add_cancel hFunds,
+  ̵  ̵ ̵ ̵Core.Uint256.ofNat,
+  ̲  ̲ ̲ ̲Nat.mod_eq_of_lt hAmountLt]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [1514/1515] Built LidoSRv3.Legacy.SpecProofs (5.8s)
+warning: LidoSRv3/Legacy/SpecProofs.lean:1631:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+Build completed successfully (1515 jobs).
+proof report written to proofs/logs/proof-report.json
+INTEGRATION_GATE_EXIT 0 make prove
+INTEGRATION_GATE_START make test
+⚠ [11/357] Replayed Verity.Core
+warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1041:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+⚠ [1136/1198] Replayed Conform.Wheels
+warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: Conform/Wheels.lean:106:70: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1137/1198] Replayed EvmYul.Pretty
+warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: EvmYul/Pretty.lean:36:32: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1184/1198] Replayed EvmYul.Semantics
+warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1185/1198] Replayed EvmYul.EVM.Semantics
+warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1210/1211] Replayed LidoSRv3.Audit.Verity.MinFirstDistributionTx
+warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:142:52: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:485:22: This simp argument is unused:
+  modelAllocateLoop
+
+Hint: Omit it from the simp argument list.
+  simp [m̵o̵d̵e̵l̵A̵l̵l̵o̵c̵a̵t̵e̵L̵o̵o̵p̵,̵ ̵hModelStep, hzv]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:485:53: This simp argument is unused:
+  hzv
+
+Hint: Omit it from the simp argument list.
+  simp [modelAllocateLoop, hModelStep,̵ ̵h̵z̵v̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:492:25: This simp argument is unused:
+  modelAllocateLoop
+
+Hint: Omit it from the simp argument list.
+  simp only [m̵o̵d̵e̵l̵A̵l̵l̵o̵c̵a̵t̵e̵L̵o̵o̵p̵,̵ ̵if_neg hzv, hModelStep, if_neg hav]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:492:44: This simp argument is unused:
+  if_neg hzv
+
+Hint: Omit it from the simp argument list.
+  simp only [modelAllocateLoop, i̵f̵_̵n̵e̵g̵ ̵h̵z̵v̵,̵ ̵hModelStep, if_neg hav]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+Build completed successfully (1211 jobs).
+Compiling 3 files with Solc 0.8.25
+Solc 0.8.25 finished in 2.38s
+Compiler run successful!
+
+Ran 4 tests for solidity/minfirst/test/MinFirstDifferential.t.sol:MinFirstDifferentialTest
+[PASS] testEagerLengthGuardMutationProducesMismatch() (gas: 34824)
+[PASS] testEmptyAndZeroBoundaries() (gas: 75608)
+[PASS] testSurplusCapacitiesAndExactCaps() (gas: 117852)
+[PASS] testWordBoundaries() (gas: 75678)
+Suite result: ok. 4 passed; 0 failed; 0 skipped; finished in 18.95s (57.45s CPU time)
+
+Ran 1 test suite in 18.95s (18.95s CPU time): 4 tests passed, 0 failed, 0 skipped (4 total tests)
+MinFirst guard mutation rejected by the zero_demand theorem
+audit metadata v4 ok: 11 canonical guarantees + 19 subordinate evidence rows
+ux2 artifacts ok: 11 guarantee records match the registry and the Lean declarations
+ux2 artifact mutants ok: drift, stale, missing, unresolved/duplicate theorem, canonical order, unregistered assumption, missing source target, missing headline boundary, scope tracking, doc-comment and statement slicing, let/have binders, where-proofs, escaped identifier delimiters and ordinary delimiter controls, symlinked inputs and root, and the Lean source tree id
+python-quality ok: 382 executable scopes under cyclomatic 22 and 28 scripts under 500 lines, except pinned baseline debt (blob 315a8ed5253e8c4d8987aa509dc45789927005b2) which did not grow
+python-quality mutants ok: pinned baseline, new dense function, new long script, growth past baseline, stale row, retired-but-listed row, malformed row, missing baseline, baseline rewrite, nested directories, an un-pinned improvement, scope-qualified and nested definitions, module-level lambdas, body-only traversal, and the branch metric
+gfm table reader ok: 41 pinned cmark-gfm cases (5 deliberately declined), body-window offsets, and the cell split; no cmark-gfm installed; the pinned expectations above are the renderer's own answers, recorded when they were taken
+markdown text reducer ok: 26 pinned cases, 15 shapes that publish the sentence to no reader and 11 that do; 6 inline-HTML cases where an attribute is markup and a bare `<` is not a tag; 31 element-body cases over 8 non-rendered elements, 22 bodies a reader never meets and 9 controls a reader plainly does
+optimized assurance-v4 mutants rejected: objective, canonical claims, classifications, assumptions, SSZ-only binding, pins, source spans, proof policy, README fidelity-gap disclosure, duplicate headline rows, and stale views; and every one of 11 headline rows re-filed into a later table, re-filed into loose prose, and dropped outright, plus a non-canonical row printed inside the table, a second table claiming the headline's own columns, the gap column repainted so the table cannot be located, the table wrapped in an HTML comment, and the table wrapped in a block-level HTML element (`<div>`); and each headline qualification re-filed into an appendix, into prose above the table, into a later blockquote and dropped outright, and spelled inside the block by each of 20 constructs that publish no visible text (single- and multi-line comments, a processing instruction, CDATA, a declaration, the body of every one of the eight elements the shared reader holds to be non-rendered — with an attributed and an upper-case opener and a nested `template` whose close the body runs past, since naming three of them and stopping at the first end tag let `<template>` publish a qualification to no reader — `title`/`alt` attribute values, Markdown link reference definition titles, inline link destination/title fields, and six inline-link shapes whose destination carries balanced or angle-bracketed parentheses — the form a `[^)]*` pattern stopped short of, leaving the title standing as ordinary text, including one hidden in a nested label, and a full reference link whose second bracket group names a definition that renders as nothing), with a collapsed reference link still read because it renders its own label, with the opening blockquote demoted to prose, pushed below an introduction, deleted, unheaded and its title demoted all rejected, while a renamed title, a longer block, a redundant restatement, and each qualification restated through inline markup that still renders it, and each carried in a link label or beside an unterminated link, and each printed on either side of a non-rendered element, beside one of a different name, inside two whose names only look like one, or inside the `xmp` a browser paints — text a reader is shown — stay accepted; and the delimiter row that makes the headline a table deleted, blanked to pipes and spaces, narrowed, widened, and indented into a four-column chunk all rejected, with alignment colons and up to three columns of indentation on the delimiter, the header and a row all still located as the table they render; the escaped pipe that delimits no cell driven through every header cell in three spellings under a delimiter widened to match its characters — the shape that rendered no table on the page while every gap count below was checked against it — rejected, with the same header at its own true width still located when the escape is in a free-text column and rejected when it rewords the index, the ID or the gap-count column; and the whole table relocated under a trailing appendix and under a later section rejected, since a gap count a reader reaches only after the CHECKED cells it was written to qualify no longer qualifies them
+validation receipt ok: final tracked content tree excluding receipt 79add7a4e05793509617cd33eb285ea76b8fed43
+validation receipt regression ok: P-ORACLE-SANITY-1 source-layer mutant fails closed
+proof-escape check ok: 351 project Lean files; no sorry/admit/axiom/constant/unsafe/Lean.ofReduceBool; native_decide inventory 46df09dbc9ae95a3196dc32ed3a6c0a2ea2369b13c3e7e910c78a73b9c701fb7
+scripts/test_check_proof_escapes.sh: line 23: rg: command not found
+proof-escape check failed: LidoSRv3/Audit/Source/SanityEnvelope.lean:829: forbidden sorry
+make: *** [Makefile:48: test] Error 1
+INTEGRATION_GATE_EXIT 2 make test
+INTEGRATION_GATE_START lake env lean --run audit/trio/alloc1/RunVerityVectors.lean
+⚠ [19/53] Replayed Verity.Core
+warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1041:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+Build completed successfully (53 jobs).
+'LidoSRv3.Audit.Source.TrioAlloc1.producer_router_order' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.producer_total_bound' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.outputBytes_related' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.Relational.producer_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.CallTree.producer_correspondence' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.world_producer_correspondence' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.ShareWriter.execute_revert_restores' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.ShareWriter.execute_stored_share_bound' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.WriterInvariant.share_writer_preserves' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.WriterInvariant.parameter_writer_preserves' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.ParameterWriter.helper_stored_share_bound' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.ParameterWriter.execute_revert_restores' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.AdmissionChecks.check_success' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.AdmissionChecks.nextId_success' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.AdmissionWriter.revert_restores' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.AdmissionFacts.success_stored_share' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.AdmissionFacts.public_preserves' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.AdmissionWriter.successful_entry_bound_and_freshness' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.StringStorage.writeShort_stored' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.EnumerationWriter.insertion_preserves_consistency' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.EnumerationWriter.oversized_absent' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioAlloc1.AllocationMemory.bounded_array_allocates' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Tests.TrioAlloc1.prefetch_trace_refutes_relational_parent' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Tests.TrioAlloc1.target_only_refutes_relational_parent' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+[{"name":"mixed","actual":[[3,3],[8,3]],"calls":["0:9abddf09","1:9abddf09","1:0c852f5c"]},{"name":"underflow-before-stake","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000011","calls":["0:9abddf09"]},{"name":"late-rejection","actual":"0xdead","calls":["0:9abddf09","1:9abddf09"]},{"name":"short-summary","actual":"0x","calls":["0:9abddf09"]},{"name":"short-stake","actual":"0x","calls":["0:9abddf09","0:0c852f5c"]},{"name":"trailing-summary","actual":[[1],[2]],"calls":["0:9abddf09"]},{"name":"zero-ceil-divisor","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000012","calls":["0:9abddf09","0:0c852f5c"]},{"name":"invalid-enum-before-call","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000021","calls":[]},{"name":"below-allocation","actual":[[1],[0]],"calls":["0:9abddf09"]},{"name":"topup-product-before-division","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000011","calls":["0:9abddf09","0:0c852f5c"]},{"name":"empty-zero-divisor","actual":[[],[]],"calls":[]},{"name":"total-overflow-before-next-row","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000011","calls":["0:9abddf09"]}]
+INTEGRATION_GATE_EXIT 0 lake env lean --run audit/trio/alloc1/RunVerityVectors.lean
+INTEGRATION_GATE_START lake env lean --run audit/trio/integration/RunVerityParent.lean
+⚠ [13/79] Replayed LidoSRv3.Audit.Source.TrioAlloc2.Selection
+warning: LidoSRv3/Audit/Source/TrioAlloc2/Selection.lean:53:10: This simp argument is unused:
+  levelsEq
+
+Hint: Omit it from the simp argument list.
+  simp [l̵e̵v̵e̵l̵s̵E̵q̵,̵ ̵Spec.minimum, countEq]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioAlloc2/Selection.lean:70:10: This simp argument is unused:
+  levelsEq
+
+Hint: Omit it from the simp argument list.
+  simp [l̵e̵v̵e̵l̵s̵E̵q̵,̵ ̵Spec.minimum, nonzero, minimumEq]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [22/79] Replayed LidoSRv3.Audit.Source.TrioAlloc2.StepCorrespondence
+warning: LidoSRv3/Audit/Source/TrioAlloc2/StepCorrespondence.lean:16:71: This simp argument is unused:
+  eq
+
+Hint: Omit it from the simp argument list.
+  simp [decodedRows, List.getElem?_zipWith, List.getElem?_set_ne eq,̵ ̵e̵q̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+ℹ [25/79] Replayed LidoSRv3.Audit.Source.TrioAlloc2.Composition
+info: LidoSRv3/Audit/Source/TrioAlloc2/Composition.lean:53:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_success_establishes_consumer_premises' depends on axioms: [propext,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/Composition.lean:54:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_then_consumer_succeeds' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/Composition.lean:71:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_then_consumer_distributes' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [26/79] Replayed LidoSRv3.Audit.Source.TrioComposition.Parent
+info: LidoSRv3/Audit/Source/TrioComposition/Parent.lean:252:0: 'LidoSRv3.Audit.Source.TrioComposition.getDepositAllocations_total_bound' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/Parent.lean:253:0: 'LidoSRv3.Audit.Source.TrioComposition.convertPositive_refines' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/Parent.lean:254:0: 'LidoSRv3.Audit.Source.TrioComposition.convertZero_refines' depends on axioms: [propext, Classical.choice, Quot.sound]
+⚠ [29/79] Replayed LidoSRv3.Audit.Source.TrioAlloc2.RowBounds
+warning: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:171:20: This simp argument is unused:
+  ↓reduceDIte
+
+Hint: Omit it from the simp argument list.
+  simp only [bound,̵ ̵↓̵r̵e̵d̵u̵c̵e̵D̵I̵t̵e̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+info: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:174:0: 'LidoSRv3.Audit.Source.TrioAlloc2.step_row_bounds' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:175:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocateLoop_row_bounds' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:176:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocate_row_bounds' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:177:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocate_delta_success' depends on axioms: [propext, Quot.sound]
+ℹ [30/79] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentComposition
+info: LidoSRv3/Audit/Source/TrioComposition/ParentComposition.lean:65:0: 'LidoSRv3.Audit.Source.TrioComposition.producer_consumer_conversion_refines' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ParentComposition.lean:66:0: 'LidoSRv3.Audit.Source.TrioComposition.producer_zero_conversion_refines' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ParentComposition.lean:67:0: 'LidoSRv3.Audit.Source.TrioComposition.producer_consumer_parent_subtraction' depends on axioms: [propext, Quot.sound]
+ℹ [33/79] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentRelational
+info: LidoSRv3/Audit/Source/TrioComposition/ParentRelational.lean:185:0: 'LidoSRv3.Audit.Source.TrioComposition.ParentSpec.public_all_outcomes' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [35/79] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentDeterminism
+info: LidoSRv3/Audit/Source/TrioComposition/ParentDeterminism.lean:155:0: 'LidoSRv3.Audit.Source.TrioComposition.ParentSpec.public_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [36/79] Replayed LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI
+info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:169:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.decodeArray_encoded' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:170:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.decodeArguments_encoded' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:171:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.decodeReturn_encoded' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:172:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.run_encoded' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:173:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.run_short' depends on axioms: [propext, Quot.sound]
+ℹ [37/79] Replayed LidoSRv3.Audit.Source.TrioAlloc2.ABIComposition
+info: LidoSRv3/Audit/Source/TrioAlloc2/ABIComposition.lean:46:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_then_abi_distributes' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [38/79] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentABI
+info: LidoSRv3/Audit/Source/TrioComposition/ParentABI.lean:110:0: 'LidoSRv3.Audit.Source.TrioComposition.public_abi_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [40/79] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentCalls
+info: LidoSRv3/Audit/Source/TrioComposition/ParentCalls.lean:42:0: 'LidoSRv3.Audit.Source.TrioComposition.ParentCalls.correspondence' depends on axioms: [propext, Quot.sound]
+ℹ [41/79] Replayed LidoSRv3.Audit.Source.TrioAlloc2.MemoryPrefix
+info: LidoSRv3/Audit/Source/TrioAlloc2/MemoryPrefix.lean:148:0: 'LidoSRv3.Audit.Source.TrioAlloc2.MemoryPrefix.execute_success_iff' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/MemoryPrefix.lean:149:0: 'LidoSRv3.Audit.Source.TrioAlloc2.MemoryPrefix.execute_overflow_iff' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/MemoryPrefix.lean:151:0: 'LidoSRv3.Audit.Source.TrioAlloc2.MemoryPrefix.reserve_success' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/MemoryPrefix.lean:152:0: 'LidoSRv3.Audit.Source.TrioAlloc2.MemoryPrefix.execute_extent' depends on axioms: [propext, Quot.sound]
+ℹ [42/79] Replayed LidoSRv3.Audit.Source.TrioComposition.MemoryGuard
+info: LidoSRv3/Audit/Source/TrioComposition/MemoryGuard.lean:38:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryGuard.run_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/MemoryGuard.lean:39:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryGuard.check_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+⚠ [43/79] Replayed LidoSRv3.Audit.Source.TrioComposition.AllocationParentCalls
+warning: LidoSRv3/Audit/Source/TrioComposition/AllocationParentCalls.lean:31:12: This simp argument is unused:
+  divided
+
+Hint: Omit it from the simp argument list.
+  simp [d̵i̵v̵i̵d̵e̵d̵,̵ ̵success, CallTree.check, bind, CallTree.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+info: LidoSRv3/Audit/Source/TrioComposition/AllocationParentCalls.lean:82:0: 'LidoSRv3.Audit.Source.TrioComposition.AllocationParentCalls.successful_prefix_extent' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/AllocationParentCalls.lean:84:0: 'LidoSRv3.Audit.Source.TrioComposition.AllocationParentCalls.successful_prefix_correspondence' depends on axioms: [propext,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/AllocationParentCalls.lean:85:0: 'LidoSRv3.Audit.Source.TrioComposition.AllocationParentCalls.empty_memory_failure' depends on axioms: [propext,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/AllocationParentCalls.lean:86:0: 'LidoSRv3.Audit.Source.TrioComposition.AllocationParentCalls.division_failure' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/AllocationParentCalls.lean:87:0: 'LidoSRv3.Audit.Source.TrioComposition.AllocationParentCalls.memory_failure' depends on axioms: [propext, Quot.sound]
+⚠ [54/79] Replayed Verity.Core
+warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1041:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+ℹ [72/79] Replayed LidoSRv3.Audit.Source.TrioComposition.VerityParent
+info: LidoSRv3/Audit/Source/TrioComposition/VerityParent.lean:78:0: 'LidoSRv3.Audit.Source.TrioComposition.VerityParent.memory_correspondence' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/VerityParent.lean:79:0: 'LidoSRv3.Audit.Source.TrioComposition.VerityParent.memory_public_iff' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/VerityParent.lean:81:0: 'LidoSRv3.Audit.Source.TrioComposition.VerityParent.correspondence' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/VerityParent.lean:82:0: 'LidoSRv3.Audit.Source.TrioComposition.VerityParent.public_iff' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [78/79] Replayed LidoSRv3.Audit.Source.TrioComposition.ReturnMemory
+info: LidoSRv3/Audit/Source/TrioComposition/ReturnMemory.lean:132:0: 'LidoSRv3.Audit.Source.TrioComposition.ReturnMemory.summary_correspondence' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ReturnMemory.lean:133:0: 'LidoSRv3.Audit.Source.TrioComposition.ReturnMemory.stake_correspondence' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ReturnMemory.lean:134:0: 'LidoSRv3.Audit.Source.TrioComposition.ReturnMemory.summary_allocation_failure' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ReturnMemory.lean:136:0: 'LidoSRv3.Audit.Source.TrioComposition.ReturnMemory.summary_take' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ReturnMemory.lean:137:0: 'LidoSRv3.Audit.Source.TrioComposition.ReturnMemory.allocation_failure' depends on axioms: [propext]
+info: LidoSRv3/Audit/Source/TrioComposition/ReturnMemory.lean:138:0: 'LidoSRv3.Audit.Source.TrioComposition.ReturnMemory.bounded_summary_projection' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ReturnMemory.lean:139:0: 'LidoSRv3.Audit.Source.TrioComposition.ReturnMemory.bounded_stake_projection' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+Build completed successfully (79 jobs).
+VERITY_PARENT_VECTOR_PASS empty-before-division calls=0 result=Except.ok { totalAllocated := 0, allocated := [], newAllocations := [] }
+VERITY_PARENT_VECTOR_PASS division-before-calls calls=0 result=Except.error (LidoSRv3.Audit.Source.TrioAlloc1.Failure.panic 18)
+VERITY_PARENT_VECTOR_PASS positive-rounded-demand calls=1 result=Except.ok { totalAllocated := 64, allocated := [64], newAllocations := [96] }
+VERITY_PARENT_VECTOR_PASS zero-demand-still-calls calls=1 result=Except.ok { totalAllocated := 0, allocated := [0], newAllocations := [32] }
+VERITY_PARENT_VECTOR_PASS module-rejection calls=1 result=Except.error (LidoSRv3.Audit.Source.TrioAlloc1.Failure.revertData [171])
+VERITY_PARENT_VECTOR_PASS late-conversion-overflow calls=1 result=Except.error (LidoSRv3.Audit.Source.TrioAlloc1.Failure.panic 17)
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"normal","actual":"0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000040","reverted":false,"count":1,"shares":[10000,10000],"unit":"32","amount":"320","summaries":["0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001","0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"],"reject1":false,"calls":["0:9abddf09"]}
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"zero-demand","actual":"0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000020","reverted":false,"count":1,"shares":[10000,10000],"unit":"32","amount":"31","summaries":["0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001","0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"],"reject1":false,"calls":["0:9abddf09"]}
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"empty-zero-divisor","actual":"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000","reverted":false,"count":0,"shares":[10000,10000],"unit":"0","amount":"320","summaries":["0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001","0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"],"reject1":false,"calls":[]}
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"division-before-producer","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000012","reverted":true,"count":1,"shares":[10000,10000],"unit":"0","amount":"320","summaries":["0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001","0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"],"reject1":false,"calls":[]}
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"zero-demand-overflow","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000011","reverted":true,"count":1,"shares":[10000,10000],"unit":"1048576","amount":"0","summaries":["0x000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000","0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"],"reject1":false,"calls":["0:9abddf09"]}
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"late-second-row-overflow","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000011","reverted":true,"count":2,"shares":[0,10000],"unit":"1048576","amount":"1048576","summaries":["0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000","0x000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001"],"reject1":false,"calls":["0:9abddf09","1:9abddf09"]}
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"zero-demand-late-rejection","actual":"0xdead","reverted":true,"count":2,"shares":[10000,10000],"unit":"32","amount":"0","summaries":["0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001","0xdead"],"reject1":true,"calls":["0:9abddf09","1:9abddf09"]}
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"malformed-summary","actual":"0x","reverted":true,"count":1,"shares":[10000,10000],"unit":"32","amount":"320","summaries":["0xdead","0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"],"reject1":false,"calls":["0:9abddf09"]}
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"memory-max-count","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000041","reverted":true,"count":115792089237316195423570985008687907853269984665640564039457584007913129639935,"shares":[10000,10000],"unit":"32","amount":"0","summaries":["0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001","0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"],"reject1":false,"calls":[]}
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"memory-length-limit","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000041","reverted":true,"count":18446744073709551616,"shares":[10000,10000],"unit":"32","amount":"0","summaries":["0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001","0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"],"reject1":false,"calls":[]}
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"memory-size-limit","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000041","reverted":true,"count":576460752303423488,"shares":[10000,10000],"unit":"32","amount":"0","summaries":["0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001","0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"],"reject1":false,"calls":[]}
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"division-before-memory-limit","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000012","reverted":true,"count":18446744073709551616,"shares":[10000,10000],"unit":"0","amount":"320","summaries":["0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001","0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"],"reject1":false,"calls":[]}
+VERITY_RETURN_MEMORY_PASS short-safe
+VERITY_RETURN_MEMORY_PASS allocation-before-short-decode
+VERITY_RETURN_MEMORY_PASS empty-response-no-growth
+VERITY_RETURN_MEMORY_PASS rejection-before-allocation
+VERITY_RETURN_MEMORY_PASS exception-before-allocation
+VERITY_RETURN_MEMORY_PASS summary-copy-cap
+VERITY_RETURN_MEMORY_PASS stake-copy-cap
+INTEGRATION_GATE_EXIT 0 lake env lean --run audit/trio/integration/RunVerityParent.lean
+INTEGRATION_GATE_SUMMARY 0 bash scripts/prepare_trio_validation.sh
+INTEGRATION_GATE_SUMMARY 1 lake build LidoSRv3 LidoSRv3Test LidoSRv3Audit TrioIntegrationChecks
+INTEGRATION_GATE_SUMMARY 0 make prove
+INTEGRATION_GATE_SUMMARY 2 make test
+INTEGRATION_GATE_SUMMARY 0 lake env lean --run audit/trio/alloc1/RunVerityVectors.lean
+INTEGRATION_GATE_SUMMARY 0 lake env lean --run audit/trio/integration/RunVerityParent.lean
+uncaught exception: integration gates failed: lake build LidoSRv3 LidoSRv3Test LidoSRv3Audit TrioIntegrationChecks: exit 1; make test: exit 2

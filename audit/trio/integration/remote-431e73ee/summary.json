@@ -1,0 +1,14 @@
+{
+  "classification": "FAILED_FULL_VALIDATION",
+  "source_head": "431e73ee2a85ad46b708fcd1121b562f336c4f27",
+  "build_failure": "Missing staged Parent.olean; ownership corrected in f99ab36c, whose full run is still pending.",
+  "test_failure": "scripts/test_check_proof_escapes.sh requires rg; remote node lacked it. Canonical receipt gate passed.",
+  "passed_gates": [
+    "bootstrap",
+    "make prove (legacy scope)",
+    "actual producer VM",
+    "actual parent VM"
+  ],
+  "log_scope": "Receipt contains capped node tail; stdout/stderr are complete durable wrapper logs, not a complete node build log.",
+  "certification": false
+}

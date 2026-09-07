@@ -449,3 +449,30 @@ pass. `history-parent-comparison.json` confirms that the new recorded Solidity
 baseline still matches all twelve actual parent VM cases at `3f22469d`; the VM
 source closure is unchanged. This does not certify the newly added writer or ACL
 modules. The running `f99ab36c` full build predates this writer integration.
+
+
+## Caller allocation component and remote tooling correction
+
+`CallerMemory.zero_exact` proves the zero-demand allocation occurs before Ether
+conversion and erases under derived primitive bounds. Allocation failure takes
+precedence over conversion. `canonicalReturn_exact` proves the caller finalizes
+the canonical 96+32*n-byte reply and then allocates a separate 32+32*n-byte decoded
+array. `library_failure` preserves failed library execution before those success
+allocations. These are component theorems: wiring the complete caller schedule
+into `MemoryParentCalls`, canonical-byte shape, physical copies and pointer
+provenance remain to be composed. No parent fidelity claim is upgraded.
+
+`caller-memory-init-receipt.json` records 87 passing bounded Init-only modules
+with matching source hashes and no nonstandard proof axioms. The existing actual
+parent VM comparison still describes its previously recorded implementation; it
+does not execute this new component.
+
+The full `431e73ee` run terminated in failure. The combined build encountered the
+previous staged module ownership problem, already corrected in `f99ab36c`.
+Its test gate passed canonical receipt and UX checks, then stopped because the
+node lacked `rg`. `remote-431e73ee` archives the terminal receipt and durable logs.
+The validation bootstrap now installs checkout-local ripgrep 14.1.1 with pinned
+upstream SHA-256 values for both supported architectures, and the driver exposes
+it on PATH. Both downloaded archives match those checksums locally. This tooling
+change still requires remote execution. The full `f99ab36c` run remains pending
+and predates this tooling correction and the latest writer/caller work.

@@ -6,6 +6,7 @@ Invoke only in a private remote checkout at the recorded source SHA. -/
 def main : IO Unit := do
   let systemPath := (← IO.getEnv "PATH").getD "/usr/local/bin:/usr/bin:/bin"
   let tools := (← IO.currentDir) / ".lake/trio-tools/foundry-v1.3.1"
+  let searchTools := (← IO.currentDir) / ".lake/trio-tools/ripgrep-14.1.1"
   let commands : Array (String × Array String) := #[
     ("bash", #["scripts/prepare_trio_validation.sh"]),
     ("lake", #["build", "LidoSRv3", "LidoSRv3Test", "LidoSRv3Audit", "TrioIntegrationChecks"]),
@@ -23,7 +24,7 @@ def main : IO Unit := do
       args := args
       stdout := .inherit
       stderr := .inherit
-      env := #[("PATH", some s!"{tools}:{systemPath}")]
+      env := #[("PATH", some s!"{tools}:{searchTools}:{systemPath}")]
     }
     let status ← child.wait
     IO.println s!"INTEGRATION_GATE_EXIT {status} {cmd} {String.intercalate " " args.toList}"
