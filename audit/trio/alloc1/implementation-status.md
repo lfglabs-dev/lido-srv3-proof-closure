@@ -63,19 +63,36 @@ count truncation or assumed callee success is introduced.
   rollback and both invariant predicates preserved, and extends the history
   induction to four public writer families. ABI decoding of malformed input is
   outside the typed entry relation.
+- `ACLWriter`: vendored upgradeable OZ role/member/admin slot formulas, public
+  `grantRole`, internal grant used by initialization, packed bool, enumerable
+  insertion and four-topic event. It proves other-slot preservation, grant
+  rejection rollback and router invariant preservation under explicit finite
+  separation. Successful grant derives membership when the member slot is
+  separate from the actual set writes. Initialization composition remains open.
+- `Initialization`: models the vendored reinitializer version/flag writes and
+  outer rollback, plus the ordered router body through an explicit notification
+  execution. It derives empty enumeration through the grant, credentials and
+  cap writes; the source loop control executes zero iterations on that state,
+  for every iteration implementation. `execute_from_empty` proves the capacity
+  invariant under finite slot separation; `execute_records` preserves FreshRecords
+  through the same empty-enumeration initialization. Full notification iteration
+  and proxy-deployment/lifecycle composition remain open.
 - `AllocationMemory`: exact word rounding, oversized-array panic 0x41, allocation
   monotonicity/limit on success, and a bounded allocation lemma. Integration of
   these primitives into the entire compiler execution remains open.
 
-Twenty-six Init-only modules are included in the fresh light validation driver.
-All pass in `receipts/light-v22.json`.
+Twenty-eight Init-only modules are included in the fresh light validation driver.
+All pass in `receipts/light-v25.json`.
 The earlier five selected AdmissionFacts theorems use only propext, Classical.choice
 and Quot.sound (`admission-axioms-v1.json`).
 The six selected admission/history theorems use the same standard axioms
 (`admission-axioms-v2.json`). Eight selected theorems including status history and
 rollback pass in `admission-axioms-v3.json`; the full Solidity writer suite with
-five status cases passes in `status-writer-validation.json`. These new invariant proofs have not received remote
-closure validation.
+five status cases passes in `status-writer-validation.json`. Fourteen selected
+theorems including ACL and initialization pass in `admission-axioms-v4.json`,
+with only the same standard axioms. The expanded writer suite passes in
+`initialization-validation.json`. These new invariant proofs have not received
+remote closure validation.
 The full production/test/audit-trust/legacy build passed 1,505 jobs at
 `8269ac576cf119975a7e9954459cd4aa04d5cd82`, remote job
 `3ca9d1e4-e496-43f7-87f2-a5925a9bd083` on nippur. This is **STALE_SUCCESS** for
@@ -168,3 +185,10 @@ proxy initialization proof: zero storage also has no authorized role members.
 The unconditional transition-preservation lemmas cover nonzero entry states
 satisfying their stated predicates; connecting those states to actual deployment
 and ACL initialization is still required.
+
+Fresh pinned proxy deployment also passes without test storage seeding
+(`proxy-initialization-validation.json`): constructor initialization grants admin,
+then public grantRole/addStakingModule/updateModuleShares/setStakingModuleStatus
+reach a two-module state with checked physical identities/shares; duplicate
+admission rejects. This is actual reachable-state execution evidence, not the
+universal proxy-genesis/lifecycle theorem that remains required.

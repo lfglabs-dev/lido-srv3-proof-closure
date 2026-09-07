@@ -6,7 +6,7 @@ import LidoSRv3.Audit.Source.TrioAlloc1.WriterInvariant
 import LidoSRv3.Audit.Source.TrioAlloc1.AdmissionChecks
 import LidoSRv3.Audit.Source.TrioAlloc1.EnumerationWriter
 import LidoSRv3.Audit.Source.TrioAlloc1.AdmissionWriter
-import LidoSRv3.Audit.Source.TrioAlloc1.StatusWriter
+import LidoSRv3.Audit.Source.TrioAlloc1.Initialization
 import LidoSRv3.Audit.Source.TrioAlloc1.AllocationMemory
 import LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer
 import LidoSRv3.Tests.TrioAlloc1.Correspondence
@@ -40,3 +40,12 @@ import LidoSRv3.Tests.TrioAlloc1.Correspondence
 
 #print axioms LidoSRv3.Audit.Source.TrioAlloc1.StatusWriter.history_invariants
 #print axioms LidoSRv3.Audit.Source.TrioAlloc1.StatusWriter.revert_restores
+
+#print axioms LidoSRv3.Audit.Source.TrioAlloc1.ACLWriter.grant_preserves
+#print axioms LidoSRv3.Audit.Source.TrioAlloc1.ACLWriter.grant_hasRole
+#print axioms LidoSRv3.Audit.Source.TrioAlloc1.ACLWriter.grant_revert_restores
+
+#print axioms LidoSRv3.Audit.Source.TrioAlloc1.Initialization.revert_restores
+#print axioms LidoSRv3.Audit.Source.TrioAlloc1.Initialization.execute_from_empty
+
+#print axioms LidoSRv3.Audit.Source.TrioAlloc1.Initialization.execute_records

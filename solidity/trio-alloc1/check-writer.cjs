@@ -25,7 +25,7 @@ async function main(){
  const acl=BigInt('0x02dd7bc7dec4dceedda775e58dd541e08a116c6c53815c0bd028192f7b626800');
  const member=BigInt(ethers.keccak256(words(BigInt(caller),BigInt(ethers.keccak256(words(BigInt(role),acl))))));
  const slot=BigInt(ethers.keccak256(words(7n,base))),position=BigInt(ethers.keccak256(words(7n,base+2n)));
- const write=async(s,v)=>await(await h.writeSlot(s,v)).wait();const read=async s=>{const raw=await rpc.request({method:'eth_getStorageAt',params:[address,ethers.toBeHex(s),'latest']});return raw==='0x'?0n:BigInt(raw||'0x0');};
+ const write=async(s,v)=>await(await h.writeSlot(s,v,{gasLimit:1000000})).wait();const read=async s=>{const raw=await rpc.request({method:'eth_getStorageAt',params:[address,ethers.toBeHex(s),'latest']});return raw==='0x'?0n:BigInt(raw||'0x0');};
  const original=(0xabcdefn<<232n)|(2n<<224n)|(9999n<<208n)|(9000n<<192n)|(0x12345678n<<160n)|21n;
  await write(slot,original);await write(position,1n);await write(member,1n);
  const tx=await h.updateModuleShares(7,5000,7000),receipt=await tx.wait();const actual=await read(slot);
@@ -186,6 +186,64 @@ async function main(){
  assert.deepEqual([...statusReceipt.logs[0].topics],[ethers.id('StakingModuleStatusSet(uint256,uint8,address)'),ethers.toBeHex(7,32)]);
  assert.equal(statusReceipt.logs[0].data,words(1,BigInt(caller)));
  fs.writeFileSync(path.join(out,'status.json'),JSON.stringify({pin,compiler:solc.version(),checks:statusChecks,original:ethers.toBeHex(original,32),expected:ethers.toBeHex(statusExpected,32),actual:ethers.toBeHex(await read(slot),32),events:statusReceipt.logs.map(x=>({topics:x.topics,data:x.data}))},null,2));
+ const grantRole=ethers.id('ALLOC1_TEST_ROLE'),grantAccount=ethers.getAddress(ethers.toBeHex(23n,20));
+ const grantRoot=BigInt(ethers.keccak256(words(BigInt(grantRole),acl)));
+ const grantMember=BigInt(ethers.keccak256(words(23n,grantRoot)));
+ const adminMember=BigInt(ethers.keccak256(words(BigInt(caller),BigInt(ethers.keccak256(words(0n,acl))))));
+ const enumerableRoot=BigInt('0xc1f6fe24621ce81ec5827caf0253cadb74709b061630e6b55e82371705932000');
+ const grantSet=BigInt(ethers.keccak256(words(BigInt(grantRole),enumerableRoot)));
+ const grantPosition=BigInt(ethers.keccak256(words(23n,grantSet+1n))),grantArray=BigInt(ethers.keccak256(words(grantSet)));
+ await write(grantRoot+1n,0n);await write(adminMember,0n);await write(grantMember,0n);
+ let unauthorizedGrant;try{await h.grantRole.staticCall(grantRole,grantAccount);assert.fail('expected missing role admin');}catch(e){unauthorizedGrant=e.data;}
+ assert.equal(unauthorizedGrant,selector('AccessControlUnauthorizedAccount(address,bytes32)')+words(BigInt(caller),0n).slice(2));
+ await write(adminMember,1n);await write(grantSet,1n<<64n);await write(grantPosition,0n);
+ let oversizedGrant;try{await h.grantRole.staticCall(grantRole,grantAccount);assert.fail('expected ACL array push panic');}catch(e){oversizedGrant=e.data;}
+ assert.equal(oversizedGrant,'0x4e487b71'+words(65).slice(2));
+ let failedGrant;try{await(await h.grantRole(grantRole,grantAccount,{gasLimit:1000000})).wait();assert.fail('expected ACL transaction failure');}catch(e){failedGrant=e.receipt;}
+ assert(failedGrant);assert.equal(failedGrant.logs.length,0);assert.equal(await read(grantMember),0n);assert.equal(await read(grantSet),1n<<64n);
+ const grantTrace=await rpc.request({method:'debug_traceTransaction',params:[failedGrant.hash,{}]});
+ assert(grantTrace.structLogs.some(x=>x.op==='SSTORE'),'bool write precedes set insertion failure');
+ await write(grantMember,1n);const noopGrant=await(await h.grantRole(grantRole,grantAccount,{gasLimit:1000000})).wait();
+ assert.equal(noopGrant.logs.length,0);assert.equal(await read(grantSet),1n<<64n);
+ await write(grantMember,0xabcdef00n);await write(grantPosition,1n);
+ const presentPositionGrant=await(await h.grantRole(grantRole,grantAccount,{gasLimit:1000000})).wait();
+ assert.equal(await read(grantMember),0xabcdef01n);assert.equal(await read(grantSet),1n<<64n);assert.equal(presentPositionGrant.logs.length,1);
+ await write(grantMember,0xabcdef00n);await write(grantPosition,0n);await write(grantSet,0n);
+ const addedGrant=await(await h.grantRole(grantRole,grantAccount,{gasLimit:1000000})).wait();
+ assert.equal(await read(grantMember),0xabcdef01n);assert.equal(await read(grantSet),1n);assert.equal(await read(grantPosition),1n);assert.equal(await read(grantArray),23n);
+ assert.equal(addedGrant.logs.length,1);assert.deepEqual([...addedGrant.logs[0].topics],[ethers.id('RoleGranted(bytes32,address,address)'),grantRole,ethers.toBeHex(23n,32),ethers.toBeHex(BigInt(caller),32)]);assert.equal(addedGrant.logs[0].data,'0x');
+ fs.writeFileSync(path.join(out,'acl.json'),JSON.stringify({pin,compiler:solc.version(),unauthorizedGrant,oversizedGrant,boolWriteAttemptedBeforePanic:true,panicRestoresBoolAndEvents:true,presentBoolNoop:true,presentPositionNoopAfterBoolWrite:true,successfulPackedBool:ethers.toBeHex(await read(grantMember),32),count:1,position:1,element:23,events:addedGrant.logs.map(x=>({topics:x.topics,data:x.data}))},null,2));
+ const initSlot=BigInt('0xf0c57e16840df040f15088dc2f81fe391c3923bec73e23a9662efc9c229c6a00');
+ const initAdmin=ethers.getAddress(ethers.toBeHex(29n,20)),initWC=(1n<<248n)|32n;
+ const initMember=BigInt(ethers.keccak256(words(29n,BigInt(ethers.keccak256(words(0n,acl))))));
+ const initSet=BigInt(ethers.keccak256(words(0n,enumerableRoot))),initPosition=BigInt(ethers.keccak256(words(29n,initSet+1n)));
+ const initArray=BigInt(ethers.keccak256(words(initSet))),initReserved=0xabcdefn<<72n;
+ const initCases=[
+  {name:'initializing-before-zero-admin',versionWord:initReserved|(1n<<64n),admin:ethers.ZeroAddress,wc:initWC,cap:42n,error:selector('InvalidInitialization()')},
+  {name:'version-four-before-zero-admin',versionWord:initReserved|4n,admin:ethers.ZeroAddress,wc:initWC,cap:42n,error:selector('InvalidInitialization()')},
+  {name:'zero-admin',versionWord:initReserved,admin:ethers.ZeroAddress,wc:initWC,cap:42n,error:selector('ZeroAddress()')},
+  {name:'zero-wc-address-after-grant',versionWord:initReserved,admin:initAdmin,wc:1n<<248n,cap:42n,error:selector('ZeroAddress()')},
+  {name:'invalid-wc-type-after-grant',versionWord:initReserved,admin:initAdmin,wc:32n,cap:42n,error:selector('WrongWithdrawalCredentialsType()')},
+  {name:'invalid-cap-after-credentials',versionWord:initReserved,admin:initAdmin,wc:initWC,cap:0n,error:selector('InvalidMaxTopUpPerBlockGwei()')}
+ ];
+ const initChecks=[];
+ for(const test of initCases){
+  await write(initSlot,test.versionWord);await write(base+1n,0n);await write(initMember,0n);await write(initSet,0n);await write(initPosition,0n);await write(initArray,0n);await write(base+4n,0n);await write(base+5n,0n);
+  let raw;try{await h.initialize.staticCall(test.admin,ethers.toBeHex(test.wc,32),test.cap);assert.fail('expected initialization rejection');}catch(e){raw=e.data;}
+  assert.equal(raw,test.error,test.name);
+  let failed;try{await(await h.initialize(test.admin,ethers.toBeHex(test.wc,32),test.cap,{gasLimit:1000000})).wait();assert.fail('expected initialization failure');}catch(e){failed=e.receipt;}
+  assert(failed);assert.equal(failed.logs.length,0);assert.equal(await read(initSlot),test.versionWord);
+  for(const target of [initMember,initSet,initPosition,initArray,base+4n,base+5n])assert.equal(await read(target),0n,test.name+' rollback');
+  const trace=await rpc.request({method:'debug_traceTransaction',params:[failed.hash,{}]});
+  initChecks.push({name:test.name,revert:raw,attemptedWrites:trace.structLogs.filter(x=>x.op==='SSTORE').length,storageRestored:true,events:0});
+ }
+ await write(initSlot,initReserved);
+ const initialized=await(await h.initialize(initAdmin,ethers.toBeHex(initWC,32),42,{gasLimit:1000000})).wait();
+ assert.equal(await read(initSlot),initReserved|4n);assert.equal(await read(initMember),1n);assert.equal(await read(initSet),1n);assert.equal(await read(initPosition),1n);assert.equal(await read(initArray),29n);assert.equal(await read(base+4n),initWC);assert.equal(await read(base+5n),42n<<24n);
+ assert.equal(initialized.logs.length,4);
+ assert.deepEqual(initialized.logs.map(x=>x.topics[0]),['RoleGranted(bytes32,address,address)','WithdrawalCredentialsSet(bytes32,address)','MaxTopUpPerBlockGweiSet(uint256,address)','Initialized(uint64)'].map(ethers.id));
+ assert.equal(initialized.logs[3].data,words(4));
+ fs.writeFileSync(path.join(out,'initialization.json'),JSON.stringify({pin,compiler:solc.version(),scope:'Actual inherited initialize from adversarial test-written storage, not proxy deployment',checks:initChecks,initializedWord:ethers.toBeHex(await read(initSlot),32),adminGranted:true,zeroModuleCount:true,credentials:ethers.toBeHex(initWC,32),capWord:ethers.toBeHex(await read(base+5n),32),events:initialized.logs.map(x=>({topics:x.topics,data:x.data}))},null,2));
  }finally{await rpc.disconnect();}
 }
 main().catch(e=>{console.error(e);process.exitCode=1;});
