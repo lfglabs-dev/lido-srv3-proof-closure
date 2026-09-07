@@ -1,4 +1,4 @@
-import LidoSRv3.Audit.Source.TrioComposition.ParentDeterminism
+import LidoSRv3.Audit.Source.TrioComposition.ParentABI
 
 namespace LidoSRv3.Tests.TrioIntegration.Parent
 open LidoSRv3.Audit.Source
@@ -28,6 +28,14 @@ private def check (count status unit amount : Nat) (oracle : StaticOracle)
     | _, _ => false
   unless equal && trace.length == calls do
     throw (IO.userError s!"parent mismatch: {repr result}, {trace.length} calls")
+  let (abiResult, abiTrace) := getDepositAllocationsABI layout (storage count status) oracle
+    (config unit) (word amount) false []
+  let abiEqual := match abiResult, expected with
+    | .ok actual, .ok wanted => decide (actual = wanted)
+    | .error actual, .error wanted => decide (actual = wanted)
+    | _, _ => false
+  unless abiEqual && decide (abiTrace = trace) do
+    throw (IO.userError s!"ABI parent mismatch: {repr abiResult}, {abiTrace.length} calls")
 
 -- Empty enumeration takes precedence over unit division and arbitrary rejection.
 #eval check 0 0 0 10 rejects (.ok ⟨word 0, [], []⟩) 0
