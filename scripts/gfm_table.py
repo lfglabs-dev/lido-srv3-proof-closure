@@ -333,7 +333,12 @@ def _literal_lines(lines: list[Row]) -> list[bool]:
                         literal[index] = True
                         html_end = _HTML_BLOCK_BLANK_END
         table = _next_table(table, literal[index], lines, index, line)
-        paragraph = not (literal[index] or _closes_paragraph(line))
+        # An indented chunk cannot interrupt an existing paragraph (where it is
+        # a lazy continuation), but after a block boundary it starts its own
+        # block rather than a paragraph.  Keeping the latter as paragraph text
+        # made a following type-7 tag look inline after a list-contained table.
+        paragraph = (not literal[index] and not _closes_paragraph(line)
+                     and (paragraph or indent_width(line) < 4))
     return literal
 def mask_literal_regions(text: str) -> str:
     """Blank literal regions, preserving offsets and line endings."""

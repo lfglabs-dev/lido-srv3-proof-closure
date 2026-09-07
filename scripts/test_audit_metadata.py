@@ -24,6 +24,11 @@ def invoke(root, ok, needle=None, command="generate"):
 def reject_html_stage_a_families(reject, module):
     """A Stage A heading inside any CommonMark HTML block is invisible."""
     table_then_type_7 = "| heading |\n| --- |\n| body |\n{}\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n\n"
+    nested_table_then_type_7 = (
+        "- list item\n\n{}| heading |\n{}| --- |\n{}| body |\n"
+        "<span>\n## Stage A disclosure\n\n"
+        "All 68 canonical fidelity-gap entries remain.\n\n"
+    )
     bodies = (
         "<pre>\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n</pre>\n\n",
         "<?stage-a\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n?>\n\n",
@@ -33,6 +38,8 @@ def reject_html_stage_a_families(reject, module):
         "<stage-a>\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n\n",
         "Prelude\n=======\n<span>\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n\n",
         *(table_then_type_7.format(tag) for tag in ("<span>", "</span>", "<stage-a data-gap=\"68\">")),
+        *(nested_table_then_type_7.format(" " * indent, " " * indent, " " * indent)
+          for indent in (4, 5)),
     )
     for body in bodies:
         reject(body)
