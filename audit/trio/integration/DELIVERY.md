@@ -1,7 +1,8 @@
 # Trio composition delivery record
 
-Status: final source candidate; exact-candidate full validation and independent
-merge approval remain pending. This document is not a deployment certificate.
+Status: the final stored-parent composition passed full official validation at
+`51037be4c0f518f8cb6b62c638aad454173d8bf1`. The integrated additive byte-memory
+and report modules await their final combined full validation and merge verdict. This document is not a deployment certificate.
 The old primary guarantee declarations are preserved. The new source composition
 is registered separately in each trio target's `execution_review` in
 `audit/source-map.yaml` and printed by `LidoSRv3/Audit/Trust.lean`.
@@ -18,7 +19,9 @@ is registered separately in each trio target's `execution_review` in
 - Source reviews: `final-independent-review-round4.md` and
   `final-independent-review-published-addendum.md`. Each records exact source
   identities and a scope-limited verdict. The combined parent requires its own
-  final review. Requested Astra configuration is recorded; actual runtime model
+  final review is recorded in `final-independent-review-stored-parent.md`.
+  Later additive reviews are recorded in `final-independent-review-additions.md`.
+  Requested Astra configuration is recorded; actual runtime model
   identity is not independently attested by the session.
 
 ## Source properties
@@ -91,6 +94,10 @@ return-memory/guard cases and the complete stored-parent runtime regressions.
 with pinned Solidity observations and rejects stale transitive source hashes.
 Reserve and sequential-library archives retain their own source/runner hashes
 and mutation outcomes; recorded execution comparison is not a fresh VM run.
+
+The complete passing receipt for the stored-parent composition is archived in
+`remote-51037be4/progress.json`; its twelve parent observations independently
+match the pinned Solidity records (`remote-51037be4/parent-comparison.json`).
 
 Earlier failed full/targeted jobs remain under `remote-*` with their actual
 failure classification. Final source SHA, full receipt, independent approval,

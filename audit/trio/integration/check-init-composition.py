@@ -91,6 +91,8 @@ try:
     check('audit.trio.alloc2.composition.ProducerMemoryVectors')
     check('audit.trio.alloc2.composition.MemoryWriteVectors')
     check('LidoSRv3.Tests.TrioIntegration.FinalMemoryStoredParent')
+    # ByteVectors executes 129 physical-byte rows; run it only on the remote runner.
+    check('audit.trio.alloc2.composition.ByteProducer')
     receipt['classification'] = 'PASS_INIT_ONLY_COMPOSITION'
 finally:
     (out / 'receipt.json').write_text(json.dumps(receipt, indent=2) + '\n')
