@@ -1,3 +1,4 @@
+import LidoSRv3.Audit.Source.TrioReserve1.WithdrawalBalance
 import LidoSRv3.Audit.Source.TrioReserve1.CalleeBalance
 import LidoSRv3.Audit.Source.TrioReserve1.Balance
 import LidoSRv3.Audit.Source.TrioReserve1.WithdrawalCalls
@@ -365,3 +366,13 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms CalleeBalance.call_conserves
 #print axioms CalleeBalance.call_uint256
 #print axioms CalleeBalance.pipeline_call_uint256
+
+#print axioms WithdrawalBalance.unchanged
+#print axioms WithdrawalBalance.bind_preserves
+#print axioms WithdrawalBalance.call_preserves
+#print axioms WithdrawalBalance.withdrawal
+#print axioms WithdrawalBalance.root_preserves
+#print axioms WithdrawalBalance.withdrawal_uint256
+#print axioms WithdrawalBalance.pipeline_withdrawal
+#print axioms WithdrawalBalance.target
+#print axioms WithdrawalBalance.rebalance
