@@ -24,17 +24,17 @@ import markdown_text  # noqa: E402  (sibling module, located above)
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
 SOURCE_FIDELITY = AUDIT / "SOURCE-FIDELITY.md"
-R1_REVIEW_BASE = "eda35b611f08879241411d12f943d011f748e5a4"
-# The report records the normal source-fidelity-A reconciliation merge as its input basis. Keep the exact
-# generator inputs bound both to that Git object and to their expected bytes:
-# a changed registry, source map, or Trust allowlist must not be presented as
-# if it had that review.
+R1_REVIEW_BASE = "f0adf9ebcbb762a303c6c6466d45c4fa290393c7"
+# The report records the ALLOC-2 source-domain amendment input commit. The prior
+# input basis was eda35b611f08879241411d12f943d011f748e5a4; this is not external
+# review approval. Keep inputs bound to the immutable commit and expected bytes:
+# Changed inputs must not be presented as if they had that review.
 # This exact family is every structured input used to render the R1 review
 # report.  A normal regeneration may never pair changed family content with a
 # stale certified basis.
 R1_REPORT_INPUT_SHA256 = {
-    "audit/guarantees.yaml": "b06ca4bb08a80fc528a1a1242083af58cfb589346dd6ce056b45fdcdfcc121a5",
-    "audit/source-map.yaml": "a0a09ba6b7e3737b67137825ee5456a307d7fd364b215ea48d0d5c22d5e343a7",
+    "audit/guarantees.yaml": "2a312b7bce49a688e26a4918732296844a279d2139d1b083e1a99a30bead729d",
+    "audit/source-map.yaml": "6d918d4450d993bcd8377d149ed3ef1299abba014a73b4f5c59c4347290e5394",
     "audit/trust-native-decide-allowlist.txt": "4874951cd0717f16756f3f644c424f06bdbbfcca1561173b32fd134b1fb6730c",
 }
 CANONICAL_IDS = [
@@ -87,7 +87,7 @@ EXPECTED_CANONICAL_CLAIMS = {
 }
 EXPECTED_CANONICAL_DETAIL_SHA256 = {
     "P-ALLOC-1": "9ad778510fac55548ab9b51cb802743fa33eabcc2908ffdbaae38bb59065a5f3",
-    "P-ALLOC-2": "e5955a7a287a477ee8e21da15dabed644676f247d242035be35cf8db5f39f70e",
+    "P-ALLOC-2": "224409328f7ec054b1c666273f423ffdc60df703b8c59a98641979d67392c7f1",
     "P-DEPOSIT-1": "768e8ca14a82e6185ec6cfaaa87365c708434f9a6281fa265eb332a8a10e8208",
     "P-TOPUP-1": "7097df87332a3b9f4996ae897b5619947c71d4bdc547dad407759174fa62212f",
     "P-ACCOUNT-1": "0bfe71a24bbb39a1c72af1020f7aab17feeb628dc0889f0688ab7499e5ee1a0b",
@@ -748,7 +748,7 @@ def rendered(rows, source_map):
         gap_note = "No row is gap-free."
     report = [header + "# R1 final auditor report\n\n",
         "## Decision\n\n",
-        f"Review basis: recorded input set (bounded token ownership amendment; no canonical status upgrade) `{R1_REVIEW_BASE}`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.\n\n",
+        f"Review basis: recorded input set (ALLOC-2 source-domain amendment; no canonical status upgrade or external review approval) `{R1_REVIEW_BASE}`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.\n\n",
         "## Architecture and evidence boundary\n\n",
         "The evidence stack is: pinned Lido source spans → source-shaped/abstract Lean specifications → Verity Lean program and `Contract.run` transaction observables → named theorem and negative-mutant receipts. Revert theorems concern the modeled snapshot and journal. External calls, storage observations, and source correspondences have only the scope stated per row. Lean theorem names are authoritative; metadata records classification and fidelity, never proof progress.\n\n",
         "Pinned upstream source is `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`; Verity is pinned in `audit/artifacts.lock.json`; Lean is `leanprover/lean4:v4.31.0`. Canonical source anchors are immutable permalinks in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance. Supplemental rows deliberately have no independent source-map target unless their parent mapping says otherwise.\n\n",

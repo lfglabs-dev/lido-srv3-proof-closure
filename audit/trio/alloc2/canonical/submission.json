@@ -1,0 +1,22 @@
+{
+  "job_id": "c54d0852-387a-444c-a304-4d133d48f79c",
+  "validation": {
+    "base_tree_sha": "94b91391fd9417da474871fa5d5d9e57a03f076e",
+    "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87",
+    "build_protocol_version": "1",
+    "command": [
+      "lake",
+      "build",
+      "LidoSRv3",
+      "LidoSRv3Test",
+      "LidoSRv3Audit"
+    ],
+    "commit": "924891ed58bbd9f424f298dae57b8982a82aad24",
+    "cwd_rel_known": true,
+    "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+    "source_bundle_digest": "d023987e4ec9cba935defa73e305ec4e8ee1711f9348a450e262571072c476e8",
+    "toolchain": "leanprover/lean4:v4.31.0",
+    "version": 1
+  },
+  "source_bundle_sha256": "3e0eda8c26c38e838f25e2335d9ee5d9984e13bf8681f2273c31e30cdd2f5c49"
+}

@@ -1,0 +1,105 @@
+{
+  "git_head": "f0adf9ebcbb762a303c6c6466d45c4fa290393c7",
+  "files": {
+    "LidoSRv3/Audit/Guarantees/PAlloc2.lean": "a856a9088b35fcc872597377933945430837860643efed6383d53097c20edd6e",
+    "audit/guarantees.yaml": "e2dacc7970c1ec3a2d3d36f228985790e0a6cea9820492a9f01084ef224f06ed",
+    "audit/source-map.yaml": "b0e73615fa533cc377bc23a84fc750cdfe70c47fcc6776bd806160aa98fff7dd",
+    "scripts/audit_metadata.py": "95860bbde0d1ca06c56ed94dfc614fbe7bf9d175e7e20321ab20873ccc5dc37a",
+    "audit/ux2/P-ALLOC-2.json": "f4e34bb8af27c9fece74153a4f27cd0b0dd816943fe57a9d54fe43e92ab58f58"
+  },
+  "results": [
+    {
+      "command": [
+        "python3",
+        "scripts/audit_metadata.py",
+        "check"
+      ],
+      "exit_code": 0,
+      "stdout": "audit metadata v4 ok: 11 canonical guarantees + 19 subordinate evidence rows\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/generate_ux2.py",
+        "check"
+      ],
+      "exit_code": 0,
+      "stdout": "ux2 artifacts ok: 11 guarantee records match the registry and the Lean declarations\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "-O",
+        "scripts/test_audit_metadata.py"
+      ],
+      "exit_code": 0,
+      "stdout": "optimized assurance-v4 mutants rejected: objective, canonical claims, classifications, assumptions, SSZ-only binding, pins, source spans, proof policy, README fidelity-gap disclosure, duplicate headline rows, and stale views; and every one of 11 headline rows re-filed into a later table, re-filed into loose prose, and dropped outright, plus a non-canonical row printed inside the table, a second table claiming the headline's own columns, the gap column repainted so the table cannot be located, the table wrapped in an HTML comment, and the table wrapped in a block-level HTML element (`<div>`); and each headline qualification re-filed into an appendix, into prose above the table, into a later blockquote and dropped outright, and spelled inside the block by each of 20 constructs that publish no visible text (single- and multi-line comments, a processing instruction, CDATA, a declaration, the body of every one of the eight elements the shared reader holds to be non-rendered \u2014 with an attributed and an upper-case opener and a nested `template` whose close the body runs past, since naming three of them and stopping at the first end tag let `<template>` publish a qualification to no reader \u2014 `title`/`alt` attribute values, Markdown link reference definition titles, inline link destination/title fields, and six inline-link shapes whose destination carries balanced or angle-bracketed parentheses \u2014 the form a `[^)]*` pattern stopped short of, leaving the title standing as ordinary text, including one hidden in a nested label, and a full reference link whose second bracket group names a definition that renders as nothing), with a collapsed reference link still read because it renders its own label, with the opening blockquote demoted to prose, pushed below an introduction, deleted, unheaded and its title demoted all rejected, while a renamed title, a longer block, a redundant restatement, and each qualification restated through inline markup that still renders it, and each carried in a link label or beside an unterminated link, and each printed on either side of a non-rendered element, beside one of a different name, inside two whose names only look like one, or inside the `xmp` a browser paints \u2014 text a reader is shown \u2014 stay accepted; and the delimiter row that makes the headline a table deleted, blanked to pipes and spaces, narrowed, widened, and indented into a four-column chunk all rejected, with alignment colons and up to three columns of indentation on the delimiter, the header and a row all still located as the table they render; the escaped pipe that delimits no cell driven through every header cell in three spellings under a delimiter widened to match its characters \u2014 the shape that rendered no table on the page while every gap count below was checked against it \u2014 rejected, with the same header at its own true width still located when the escape is in a free-text column and rejected when it rewords the index, the ID or the gap-count column; and the whole table relocated under a trailing appendix and under a later section rejected, since a gap count a reader reaches only after the CHECKED cells it was written to qualify no longer qualifies them\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/check_public_claim_surfaces.py"
+      ],
+      "exit_code": 0,
+      "stdout": "public claim surfaces match canonical faithful-Verity claims\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/test_public_claim_surfaces.py"
+      ],
+      "exit_code": 0,
+      "stdout": "public claim surface regressions ok: allowed declarations pass; ASCII/quoted/Unicode/escaped/whitespace/attribute/import-modifier/multiline-import/registry/README/missing-file mutants fail closed; a column inserted before `Verity Executable Contract` with the real cells set to OPEN is rejected, the same insertion with the real cells intact is still read, and a header that names that column zero or twice is refused\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/check_report_theorem_inventory.py"
+      ],
+      "exit_code": 0,
+      "stdout": "report theorem inventory ok: 8 P-ALLOC-1 theorems, 2 registered\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/test_report_theorem_inventory.py"
+      ],
+      "exit_code": 0,
+      "stdout": "report theorem inventory mutants rejected: dropped row, undisclosed theorem (column-zero, indented, tabbed, attributed, private, protected, nonrec, `lemma`, and combined), a name wrapped onto the line after its keyword (bare, `lemma`, blank-line-separated, prefixed, escaped and letter-like) with the wrapped form cited at its keyword's line, a line or block comment standing as the whitespace between a keyword and its name (bare, `lemma`, doubled, mixed, behind a modifier, behind an attribute, combined, escaped and letter-like) with that form cited at its keyword's line and neither the comment's newline nor a keyword written only as comment prose allowed to splice a declaration, letter-like/subscript/`!`/`?`/escaped/dotted Lean identifiers, declaration after a nested comment, `/-` in a line comment and in a string literal, unterminated comment, report-only promotion, registry drift, stale line, missing plane, a row repeated with each checked cell falsified in one copy (REGISTERED, line, plane, and a verbatim repeat) in either order; commented-out declarations, theorem-like identifiers (ASCII and letter-like), and prose inside nested block comments not miscounted; a letter-like name round-trips to a row; each of the 3 modifiers Lean elaborates on a theorem driven end to end and the 5 kept only as parser widening asserted to still read the name behind them, both from the checker's own table; comment markers inside escaped identifiers (`/-`, `-/`, `--`, `\"`, `/--`) kept as name text, a balancing pair of them not allowed to blank the declarations in between, a stray `\u00ab` and a `\u00ab` inside a real comment not allowed to swallow code, and an escaped name carrying `/-` round-trips to a row; a row re-rendered in each of 6 whitespace layouts still read, with a repeat and a Lean-absent row in each rejected rather than slipping past the parser on padding; same-leaf theorems in sibling namespaces demanded as distinct qualified names, qualified and sectioned names round-tripping to rows (including named namespaces and named sections closed with a bare `end`), and mis-nested, dangling and stray scope commands rejected; each REGISTERED row bound to the registry field and the plane it prints, with the registrations exchanged, the plane labels exchanged, both exchanged, two rows filed under one field, and a registration naming no field all rejected, driven from the checker's own plane table; each registered row widened to each of the 1 plane column(s) its own label is spelled inside, and the composite row promoted to each field in turn, rejected while the composite column stays printable by an unregistered row; every one of 8 rows printed with each of 16 Registered-column lookalikes \u2014 case variants of both markers, a bare `REGISTERED`, a negated and a hyphenated spelling, a trailing stop, and a lower- or mixed-cased registration naming each plane \u2014 rejected rather than skipped as an unrecognized cell, so the two markers are matched case-sensitively as the whole cell and a lookalike cannot promote a theorem the registry does not record; and every one of 8 rows relocated out of the `## Theorems` section and copied outside it, a second inventory filed further down, and the section heading renamed, demoted and unheaded all rejected; and every one of those rows hidden in each of 23 constructs Markdown does not render as a row (backtick, info-string, tilde, indented, over-long and over-closed fences, space- and tab-indented code, and all seven HTML block conditions: raw-text elements, processing instructions, declarations, CDATA, inline, block and reopened comments, named blocks plain, attributed, uppercased, indented and closing-tag-first, and a bare tag after a blank line) rejected, with each of the 64 named-block spellings the checker's own list carries driven once, an unterminated comment and an unclosed raw-text element each hiding the rows below them, a heading quoted in a fence or an HTML block not allowed to relocate the section, a row quoted in either outside it not counted as a stray claim, and 16 look-alike openers \u2014 13 above the section and 3 directly above the first row, where a block would blank the whole inventory \u2014 asserted to leave the real table rendered while a complete tag alone on its line, which is HTML block condition 7 and does end a table body, is rejected as the eight rows it takes out of the inventory; every row hidden mid-table asserted to take the rows below it out of the rendered table too; and the one delimiter row that makes the header and its rows a table deleted, blanked to pipes and spaces, narrowed, widened, and indented into a four-column chunk all rejected, with alignment colons and up to three columns of indentation on the delimiter, the header and a row all still read as the table they render; and the escaped pipe that delimits no cell driven through every header cell in three spellings under a delimiter widened to match its characters \u2014 the shape that rendered no table at all while the gate reported eight theorems \u2014 rejected, with the same header at its own true width still read when the escape is in the free-text column and rejected when it rewords a bound column label, a legitimate escaped pipe inside a role cell still read as the five-cell row it renders, and an escape that removes a real cell boundary rejected as the four-cell row it renders\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/check_python_quality.py"
+      ],
+      "exit_code": 0,
+      "stdout": "python-quality ok: 382 executable scopes under cyclomatic 22 and 28 scripts under 500 lines, except pinned baseline debt (blob 315a8ed5253e8c4d8987aa509dc45789927005b2) which did not grow\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/check_import_dag.py"
+      ],
+      "exit_code": 0,
+      "stdout": "import-dag ok: production \u219b test/legacy/Trust; globs cover production; layer debt did not grow past immutable baseline blob 62ce9c6132d4902cc5e4f1150ffde6fc286d81b7 or return after retirement tombstone blob f10e32c7b942d3f896911d814ae430234291e098\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/check_proof_escapes.py"
+      ],
+      "exit_code": 0,
+      "stdout": "proof-escape check ok: 254 project Lean files; no sorry/admit/axiom/constant/unsafe/Lean.ofReduceBool; native_decide inventory 46df09dbc9ae95a3196dc32ed3a6c0a2ea2369b13c3e7e910c78a73b9c701fb7\n",
+      "stderr": ""
+    }
+  ]
+}

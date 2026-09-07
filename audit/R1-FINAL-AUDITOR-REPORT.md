@@ -4,7 +4,7 @@
 
 ## Decision
 
-Review basis: recorded input set (bounded token ownership amendment; no canonical status upgrade) `eda35b611f08879241411d12f943d011f748e5a4`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
+Review basis: recorded input set (ALLOC-2 source-domain amendment; no canonical status upgrade or external review approval) `f0adf9ebcbb762a303c6c6466d45c4fa290393c7`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
 
 ## Architecture and evidence boundary
 
@@ -76,7 +76,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Accepted theorem planes.** Abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PAlloc2.step_correspondence_and_full_loop_conservation`. Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PAlloc2.verity_tx_simulates_min_first_distribution`.
 
-**Proof shape / exact domain statement.** step_correspondence_and_full_loop_conservation is the registered parent. Its first conjunct retains the explicit-∀ independent Model/Source candidate correspondence, Model.amount equality, positivity, demand bound, and capacity bound. Its second conjunct proves exact request conservation for every successful fuel-bounded sourceAllocateLoop run. Its third conjunct proves that the independently defined proportional Nat modelAllocateLoop has a matching successful run with equal mathematical totals and RowsCorrespond final rows; the proof lifts the relation across every successful mutation. The sourceAllocateLoop_eq_allocateLoop bridge still connects conservation to the Verity executor. The distinct +1 Nat model remains a separate child, and no Solidity equivalence is claimed.
+**Proof shape / exact domain statement.** The registered parent retains proportional-step Model/Source correspondence, fuel-bounded conservation, and multi-step RowsCorrespond for the legacy model. Its fourth conjunct adds the well-founded TrioAlloc2 executor without a fuel parameter: for every representable bucket length, successful execution satisfying independent Spec.Distributes exists exactly when demand is zero or capacities cover the buckets; positive demand with short capacities returns arrayBounds. The separately registered Verity transaction still uses the legacy word-map/fuel model. The +1 model remains a separate child. This is a source-model theorem, not deployed-bytecode equivalence.
 
 **Source/artifact provenance.** `MAPPED`; 4 immutable pinned source span(s) in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance.
 
@@ -84,14 +84,14 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Limitations — 4 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
-- Solidity allocate does not test active (filtered upstream)
-- +1 Strategy and proportional Source are different algorithms
-- memoryArrayElement reads are proved oracle-independent: this array path reads word-addressed memory directly and does not evaluate a keccak expression
-- cross-call mutation of the decoded arrays
+- Registered legacy Verity transaction still uses fuel and word-map read premises; connect the canonical transaction to the well-founded source and byte denotation
+- Connect the actual ALLOC-1 entry and interleaved allocation/store/ABI-copy schedule to the canonical consumer; standalone serialization and guard-execution bridges remain separate evidence
+- Complete the enclosing checked wei conversion, rollback and applicable lifecycle/callback composition at the registered entrypoint; the decoded producer-success theorem itself assumes no lifecycle bound
+- Complete exact raw ABI dispatch, decoder/error and public-library copy correspondence at the canonical transaction boundary
 
-**Classification.** **IMPLEMENTATION_PENDING** — Keep the checked proportional model/source multi-step correspondence and conservation in the parent, with the +1 model as a separate child. The direct-memory/keccak boundary is discharged only for memoryArrayElement reads; cross-call mutation and upstream active filtering remain open. Do not merge the algorithms or claim Solidity equivalence.
+**Classification.** **IMPLEMENTATION_PENDING** — Preserve the well-founded exact success/error partition and independent distribution result in the registered parent, with the +1 model separate. Integrate the canonical Verity/producer entry and memory/ABI schedule, review applicable lifecycle obligations, and run final-head prove/test/UX2/trust gates. Do not infer deployed-bytecode equivalence from source-model or standalone differential evidence.
 
-**Next gate.** CHECKED: independent proportional modelAllocateLoop and sourceAllocateLoop now match across every successful fuel-bounded mutation with final RowsCorrespond and equal totals; conservation remains bridged to allocateLoop, and direct memory-array reads are oracle-independent (no keccak expression is evaluated). OPEN: upstream active filtering and cross-call mutation of decoded arrays. Keep the distinct +1 model as a separate child and do not claim Solidity equivalence.
+**Next gate.** CHECKED: the parent includes the well-founded proportional executor, exact success domain, independent distribution and short-capacity arrayBounds while retaining the three legacy conjuncts. OPEN: canonical Verity and producer-entry memory/ABI integration, enclosing conversion/lifecycle composition, and final-head full gates. Keep +1 separate.
 
 ### `P-DEPOSIT-1`
 
