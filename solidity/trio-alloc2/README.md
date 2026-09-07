@@ -9,7 +9,7 @@ From this directory:
 
 ```
 npm ci --ignore-scripts --no-audit --no-fund
-node differential.mjs ../../audit/trio/alloc2/receipt-0af9fe87-bfdf-4fbc-ad93-7d5bf2dae555.json
+node differential.mjs ../../audit/trio/alloc2/receipt-4b111ff4-89b5-474e-9b8e-0ddbba3a2656.json ../../audit/trio/alloc2/receipt-6e204674-c98f-4e7a-b66c-4b5e18947deb.json
 ```
 
 The source manifest `audit/trio/alloc2/differential-source-identity.json` must
@@ -37,3 +37,12 @@ Still outstanding: actual Verity execution, byte-memory/ABI correspondence proof
 parent-shaped mutation tests, arbitrary callee rejection and late parent rollback,
 and ALLOC-1 producer composition. These executions supplement, not replace, the
 universal correspondence proofs and full production/test/trust gates.
+
+The second receipt enables eleven additional direct-library comparisons. Lean
+executes the byte decoder, allocation loop and return/error encoder; the EVM
+receives exactly those argument bytes plus the library selector. The runner
+checks the complete ABI source manifest against the remote verified overlay,
+including producer blobs at the immutable pin, before accepting vectors. Empty
+and oversized-offset heads and a truncated tail with zero demand exercise
+actual decoder error precedence. This is byte-model execution, not Verity
+runtime execution or a proof of all compiler-generated memory behavior.

@@ -35,6 +35,40 @@ const vectors = receipt.log_tail.split('\n').map(line => line.match(vectorLine))
 assert.equal(vectors.length, 32, 'missing/truncated Lean execution output');
 assert.equal(new Set(vectors.map(v => v.name)).size, 32);
 
+let abiEvidence = null;
+let abiVectors = [];
+if (process.argv[3]) {
+  const abiReceiptPath = resolve(process.argv[3]);
+  const abiReceipt = JSON.parse(readFileSync(abiReceiptPath));
+  assert.equal(abiReceipt.state, 'succeeded');
+  assert.equal(abiReceipt.exit_code, 0);
+  assert.equal(abiReceipt.validation.toolchain, 'leanprover/lean4:v4.31.0');
+  const abiIdentity = JSON.parse(readFileSync(resolve(root, 'audit/trio/alloc2/composition/source-identity.json')));
+  for (const path of ['audit/trio/alloc2/composition/LibraryABI.lean',
+    'audit/trio/alloc2/composition/LibraryABIVectors.lean', 'LidoSRv3/Audit/Source/TrioAlloc1/Bytes.lean']) {
+    assert.ok(Object.hasOwn(abiIdentity.files, path), `missing ABI source: ${path}`);
+  }
+  assert.match(abiIdentity.producer, /^[0-9a-f]{40}$/);
+  let abiManifest = 'sandboxed-source-bundle-v1\n';
+  for (const path of Object.keys(abiIdentity.files).sort()) {
+    assert.match(path, /^(LidoSRv3\/Audit\/Source\/TrioAlloc[12]\/[^/]+\.lean|audit\/trio\/alloc2\/composition\/[^/]+\.lean)$/);
+    const bytes = path.startsWith('LidoSRv3/Audit/Source/TrioAlloc1/')
+      ? execFileSync('git', ['-C', root, 'show', `${abiIdentity.producer}:${path}`])
+      : readFileSync(resolve(root, path));
+    assert.equal(sha(bytes), abiIdentity.files[path], `stale ABI source: ${path}`);
+    abiManifest += `${path}\0${abiIdentity.files[path]}\n`;
+  }
+  const abiManifestHash = sha(abiManifest);
+  assert.ok(abiReceipt.log_tail.includes(`source bundle verified sha256=${abiManifestHash} files=${Object.keys(abiIdentity.files).length} `),
+    'ABI source identity does not match verified remote overlay');
+  abiVectors = abiReceipt.log_tail.split('\n').map(line => line.match(/(?:^|: )ALLOC2_ABI_VECTOR (.+)$/))
+    .filter(Boolean).map(match => JSON.parse(match[1]));
+  assert.equal(abiVectors.length, 11, 'missing/truncated byte-model executions');
+  assert.equal(new Set(abiVectors.map(v => v.name)).size, 11);
+  abiEvidence = {job: abiReceipt.job_id, producer: abiIdentity.producer, overlay: abiManifestHash,
+    receiptSha256: sha(readFileSync(abiReceiptPath)), vectors: abiVectors.length};
+}
+
 const sources = {};
 const sourceHashes = {};
 for (const path of ['contracts/common/lib/MinFirstAllocationStrategy.sol', 'contracts/common/lib/Math256.sol']) {
@@ -110,6 +144,13 @@ try {
     await call(`${vector.name}:direct-library`, libraryIface.encodeFunctionData('allocate', args),
       failed ? panic(out.panic) : coder.encode(['uint256', 'uint256[]'], [out.amount, out.buckets]), libraryAddress, failed);
   }
+  for (const vector of abiVectors) {
+    assert.match(vector.arguments, /^0x(?:[0-9a-f]{2})*$/);
+    assert.match(vector.data, /^0x(?:[0-9a-f]{2})*$/);
+    assert.equal(typeof vector.reverted, 'boolean');
+    await call(`byte-model:${vector.name}`, libraryIface.getFunction('allocate').selector + vector.arguments.slice(2),
+      vector.data, libraryAddress, vector.reverted);
+  }
   const max = (1n << 256n) - 1n;
   for (const [a, b, expected] of [[0n, 0n, 0n], [1n, 0n, null], [max, 1n, max], [max, max, 1n], [31n, 2n, 16n]]) {
     await call(`ceil:${a}:${b}`, iface.encodeFunctionData('ceil', [a, b]),
@@ -124,6 +165,7 @@ try {
   const record = {
     scope: 'pinned Solidity EVM vs executed decoded Lean; not Verity runtime or full parent correspondence',
     leanJob: receipt.job_id, leanOverlay: manifestHash, leanReceiptSha256: sha(readFileSync(receiptPath)),
+    abiEvidence,
     compiler: solc.version(), compilerInputSha256: sha(compilerInput), settings, solidityPin: pin, sourceHashes,
     runnerSha256: sha(readFileSync(fileURLToPath(import.meta.url))),
     packageLockSha256: sha(readFileSync(resolve(here, 'package-lock.json'))),
@@ -131,7 +173,7 @@ try {
     tests: results.length, results
   };
   writeFileSync(resolve(root, 'audit/trio/alloc2/solidity-execution.json'), JSON.stringify(record, null, 2) + '\n');
-  console.log(`PASS: ${results.length} exact return/revert byte comparisons; 32 executed Lean vectors; caller-copy boundary checked`);
+  console.log(`PASS: ${results.length} exact return/revert byte comparisons; 32 decoded and ${abiVectors.length} byte-model Lean vectors; caller-copy boundary checked`);
 } finally {
   provider.destroy();
   await vm.disconnect();
