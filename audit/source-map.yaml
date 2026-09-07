@@ -277,9 +277,12 @@
           "LidoSRv3.Audit.Verity.MinFirstSourceEntry.short_capacity",
           "LidoSRv3.Audit.Verity.MinFirstSourceEntry.success_preserves_state",
           "LidoSRv3.Audit.Verity.MinFirstSourceEntry.revert_restores_snapshot",
-          "LidoSRv3.Audit.Verity.MinFirstSourceEntry.success_refines_proportional_model"
+          "LidoSRv3.Audit.Verity.MinFirstSourceEntry.success_refines_proportional_model",
+          "LidoSRv3.Audit.Source.TrioAlloc2.allocate_refines",
+          "LidoSRv3.Audit.Source.TrioAlloc2.allocate_success_iff",
+          "LidoSRv3.Audit.Source.TrioAlloc2.allocate_short_error"
         ],
-        "correspondence_status": "OPEN for full source/ABI path; decoded-array boundary correction and conditional independent-model success refinement only."
+        "correspondence_status": "The registered abstract parent now includes the well-founded decoded source executor, independent distribution and exact success/short-capacity partition. OPEN for the full canonical Verity/producer/ABI path; the legacy decoded entry and standalone byte/runtime bridges remain distinct boundaries."
       }
     },
     {

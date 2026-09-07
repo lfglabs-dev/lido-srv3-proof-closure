@@ -4,6 +4,8 @@ import LidoSRv3.Audit.MinFirstAllocation
 import LidoSRv3.Audit.Verity.MinFirstAmountTx
 import LidoSRv3.Audit.Verity.MinFirstDistributionTx
 import LidoSRv3.Audit.Guarantees.Registry
+import LidoSRv3.Audit.Source.TrioAlloc2.LoopCorrespondence
+import LidoSRv3.Audit.Source.TrioAlloc2.Errors
 
 namespace LidoSRv3.Audit.Guarantees.PAlloc2
 
@@ -287,13 +289,33 @@ abbrev LoopStaysInCorrespondence : Prop :=
 candidate and proportional-amount equality from the step theorem load-bearing,
 and adds fuel-bounded conservation for every successful run of the full
 independently stated source allocation loop, plus multi-step row correspondence
-with an independently stated proportional model loop.  It does not identify
-that proportional loop with the separate +1 `MinFirst` child model. -/
+with an independently stated proportional model loop. Its fourth conjunct
+adds the well-founded executor: exact success domain, independent distribution,
+and the precise short-capacity error, with no fuel parameter. The separate +1
+`MinFirst` child model is unchanged. -/
 theorem step_correspondence_and_full_loop_conservation :
-    StepMatchesModel ∧ FullLoopConserves ∧ LoopStaysInCorrespondence :=
-  ⟨forall_proportional_step_correspondence_and_bounded,
-   source_allocate_loop_conserves_requested,
-   proportional_model_loop_preserves_rows⟩
+    StepMatchesModel ∧ FullLoopConserves ∧ LoopStaysInCorrespondence ∧
+    (∀ (buckets capacities : List Source.TrioAlloc2.Word) (demand : Source.TrioAlloc2.Word),
+      buckets.length < 2^256 →
+      ((∃ result,
+        Source.TrioAlloc2.allocate buckets capacities demand = .ok result ∧
+        Source.TrioAlloc2.Spec.Distributes (Source.TrioAlloc2.decodedRows buckets capacities)
+          demand.val result.amount.val (Source.TrioAlloc2.decodedRows result.buckets capacities)) ↔
+        demand.val = 0 ∨ buckets.length ≤ capacities.length) ∧
+      (demand.val ≠ 0 → capacities.length < buckets.length →
+        Source.TrioAlloc2.allocate buckets capacities demand = .error .arrayBounds)) := by
+  refine ⟨forall_proportional_step_correspondence_and_bounded,
+    source_allocate_loop_conserves_requested, proportional_model_loop_preserves_rows, ?_⟩
+  intro buckets capacities demand bounded
+  constructor
+  · constructor
+    · rintro ⟨result, executed, _⟩
+      exact (Source.TrioAlloc2.allocate_success_iff buckets capacities demand bounded).mp ⟨result, executed⟩
+    · intro admitted
+      obtain ⟨result, executed⟩ := (Source.TrioAlloc2.allocate_success_iff buckets capacities demand bounded).mpr admitted
+      exact ⟨result, executed, Source.TrioAlloc2.allocate_refines buckets capacities demand result executed⟩
+  · intro positive short
+    exact Source.TrioAlloc2.allocate_short_error buckets capacities demand positive short bounded
 
 /-! ## Verity transaction plane -/
 
