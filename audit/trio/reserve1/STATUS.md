@@ -1,5 +1,31 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Physical ACL evaluation and source composition
+
+`ACL` reads specific/wildcard permission hashes and packed parameter arrays from
+physical mappings. It implements comparison/RET operators, block/time/constants,
+uint240 parameter narrowing, short-circuit NOT/AND/OR/XOR/IF_ELSE, invalid enum
+failure and raw oracle STATICCALL. Oracle failures and return lengths other than
+exactly 32 deny; raw calls have no high-level code guard. Wildcard evaluation
+passes ANY_ENTITY to the oracle. Kernel lifts oracle trace depths through its
+nested call. `ACLSpec` independently states comparison and grant rules;
+`grants_corresponds` relates successful source parameter evaluations to selection.
+
+The recursive evaluator has an explicit depth bound. Exhaustion is a distinct
+host result delegated separately, not a source denial or a claim about EVM gas.
+The differential runner rejects exhausted evaluations. Relational parameter-tree
+correspondence and termination/resource binding still require proof. `ACLCalls`
+composes a terminating source ACL evaluation through Kernel and Aragon; its
+unconditional-specific theorem derives admission solely from physical/configuration
+conditions, without a supplied ACL or kernel reply.
+
+28 draft comparisons against actual inherited ACL/Kernel/Aragon/Lido code pass,
+including physical layout, logic short-circuiting, wildcard oracle arguments,
+malformed oracle replies, static writes and invalid enum values. Exact immutable
+component/compiler/runtime receipts follow the source commit. This does not
+close ACL mutation admission, proxy/deployment/primitive binding, recursive
+callback interpretation, all writer sequences or the exhaustive parent relation.
+
 ## Concrete Kernel permission forwarding
 
 `Kernel` reads the installed ACL through KernelStorage.apps' two physical

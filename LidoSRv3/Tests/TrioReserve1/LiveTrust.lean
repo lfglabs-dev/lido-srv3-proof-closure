@@ -20,6 +20,7 @@ import LidoSRv3.Audit.Source.TrioReserve1.PhysicalReserve
 import LidoSRv3.Audit.Source.TrioReserve1.PhysicalSequence
 import LidoSRv3.Audit.Source.TrioReserve1.Aragon
 import LidoSRv3.Audit.Source.TrioReserve1.Kernel
+import LidoSRv3.Audit.Source.TrioReserve1.ACLCalls
 
 /-! Owned inspection, pending coordinated canonical Trust registration. -/
 open LidoSRv3.Audit.Source.TrioReserve1
@@ -186,3 +187,15 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms Kernel.acl_reply
 #print axioms Kernel.aragon_from_acl
 #print axioms Kernel.target_from_acl
+
+#print axioms Kernel.acl_reply_traced
+#print axioms Kernel.aragon_from_acl_traced
+#print axioms ACL.compare_corresponds
+#print axioms ACL.no_permission
+#print axioms ACL.unconditional_specific
+#print axioms ACL.unconditional_wildcard
+#print axioms ACL.oracle_rejection_is_false
+#print axioms ACL.oracle_wrong_size_is_false
+#print axioms ACL.grants_corresponds
+#print axioms ACLCalls.canPerform
+#print axioms ACLCalls.unconditional_specific
