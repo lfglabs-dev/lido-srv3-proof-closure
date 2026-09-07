@@ -1,0 +1,77 @@
+# Reproducing ALLOC-1 implementation checks
+
+These are implementation receipts, not independent certification. The full original
+scope is tracked in `implementation-status.md` and remains open.
+
+## Lightweight Lean
+
+With Lean 4.31.0 available, run from the repository root:
+
+```sh
+python3 audit/trio/alloc1/validate-light.py --lean /path/to/lean --output /fresh/output/light
+```
+
+The script checks all nine owned modules (including the interface and test entry)
+with private oleans, rejects non-Init/non-owned imports, bounds each check to 30
+seconds, and records each source SHA-256, exact command, output and exit status.
+`vectors.json` is produced by actually evaluating `produce`, not by printing expected
+results. Increasing the kernel reduction depth to 4096 in the test module permits
+nested fixed-width byte encodings; no unchecked reduction or new axiom is used.
+
+## Executed Solidity and paired SOURCE model
+
+```sh
+npm ci --prefix solidity/trio-alloc1 --no-audit --no-fund
+node solidity/trio-alloc1/check-layout.cjs /fresh/output/compiler-layout.json
+node solidity/trio-alloc1/run.cjs /fresh/output/solidity /fresh/output/light/vectors.json
+node solidity/trio-alloc1/run.cjs /fresh/output/target-mutant /fresh/output/light/vectors.json target-only
+node solidity/trio-alloc1/run.cjs /fresh/output/prefetch-mutant /fresh/output/light/vectors.json stake-before-subtraction
+```
+
+The ordinary run must exit 0. The mutant runs must exit 1 **because of the recorded
+outcome mismatch**, not because of compilation/deployment/infrastructure failure.
+The target-only mutant reaches `trailing-summary`: `[1]/[11]` differs from `[1]/[2]`.
+The prefetch mutant reaches `underflow-before-stake`: its raw stake rejection and
+extra attempted call differ from the original arithmetic panic and one-call trace.
+
+The harness invokes the unmodified pinned internal helper. Seeding and raw modules
+are test instrumentation. Source and solc versions are checked, imported file hashes
+and optimizer settings are recorded, and `debug_traceTransaction` observes executed
+STATICCALL target/payload order. Target addresses are normalized to seeded module
+indices; outcomes preserve raw revert bytes. Relevant router slots and harness/module
+balances must be unchanged, with no SSTORE and no committed events. Sender gas costs
+are excluded. Calls nested inside callbacks are not exercised by these vectors.
+
+The compiler is solc 0.8.25, with optimizer 200 and via-IR. These runs target Shanghai
+because this Ganache version does not implement Cancun. They are pinned-source
+execution evidence, not a production Cancun bytecode receipt. The optional µWS
+native binary is unavailable on this Node build; Ganache falls back to its JS
+implementation and the EVM runs complete normally.
+
+The paired Lean side is the new **SOURCE executor**, not a Verity `Contract.run`
+execution. The required Solidity/Verity comparison and all-outcome correspondence
+remain open. Passing these vectors cannot substitute for those obligations.
+
+## Heavy Lean and infrastructure
+
+Use `remote-lean-build` for production/test/trust and full-repository Lean targets.
+`initialize-deps.py --cache /read-only/pinned/package/cache` creates private Git
+checkouts at every root manifest revision without sharing mutable Lake state.
+`prepare-remote.py` can construct a complete pinned-source/dependency snapshot.
+It never reads credential files or copies compiled caches.
+
+Observed remote diagnostics:
+
+- Full JSON source bundle: HTTP 413, `Failed to buffer the request body: length limit exceeded`.
+- Complete Git-object archive: HTTP 413, `remote build JSON exceeds 33554432 bytes after decompression`.
+- Published pinned-repository fetch: HTTP 422, `insufficient node disk: 86 GiB available, 32 GiB estimated plus 80 GiB emergency floor`.
+- Explicit `old-agent` also resolves to `ashur` and returns the same disk rejection.
+
+No rejected request is a successful remote build. No estimate was reduced, emergency
+floor bypassed, credential accessed, or heavy local fallback performed.
+
+`make test` currently exits 2 at `scripts/generate_ux2.py check`: the shared
+`audit/ux2/index.json` differs from the registry/Lean sources. This branch does not
+regenerate shared canonical files during the agreed additive phase. The ALLOC-2
+owner has the shared integration gate in its goal. Current main was inspected at
+`bcfbb5f027a5c370594891c1a455fde137709941`; it was not merged or modified.

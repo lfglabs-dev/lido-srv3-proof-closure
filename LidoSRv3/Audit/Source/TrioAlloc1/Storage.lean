@@ -11,8 +11,12 @@ namespace LidoSRv3.Audit.Source.TrioAlloc1
 def word (n : Nat) : Word := ⟨n % 2^256, Nat.mod_lt _ (by decide)⟩
 def byte (n : Nat) : Byte := ⟨n % 256, Nat.mod_lt _ (by decide)⟩
 
-def encodeWord (w : Word) : Bytes :=
-  (List.range 32).map fun i => byte (w.val / 256^(31-i))
+/-- Fixed-width big-endian ABI encoding, truncating only above the chosen width. -/
+def encodeBE : Nat → Nat → Bytes
+  | 0, _ => []
+  | width+1, n => encodeBE width (n/256) ++ [byte n]
+
+def encodeWord (w : Word) : Bytes := encodeBE 32 w.val
 
 abbrev Storage := Word → Word
 

@@ -1,0 +1,105 @@
+{
+  "scope": "Historical and current partial implementation checks; not full validation or independent certification",
+  "jobs": [
+    {
+      "job_id": "6cc211c1-5037-48ba-82fa-a5ec7104c778",
+      "command": "python3 audit/trio/alloc1/validate-light.py --lean /root/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean --output /workspaces/mission-c01b16cf/output/light-v3",
+      "status": "failed",
+      "exit_code": 1,
+      "started_at": "2026-09-07T11:54:23.318017662Z",
+      "updated_at": "2026-09-07T11:54:36Z",
+      "stdout": "LidoSRv3/Audit/Source/TrioAlloc1/Interface.lean exit=0\nLidoSRv3/Audit/Source/TrioAlloc1/Storage.lean exit=0\nLidoSRv3/Audit/Source/TrioAlloc1/Execution.lean exit=0\nLidoSRv3/Audit/Source/TrioAlloc1/Properties.lean exit=0\nLidoSRv3/Audit/Source/TrioAlloc1/CapacitySpec.lean exit=0\nLidoSRv3/Audit/Source/TrioAlloc1/Bytes.lean exit=0\nLidoSRv3/Audit/Source/TrioAlloc1/Memory.lean exit=0\nLidoSRv3/Tests/TrioAlloc1/Execution.lean exit=1\n",
+      "stderr": "Traceback (most recent call last):\n  File \"/workspaces/mission-c01b16cf/alloc1/audit/trio/alloc1/validate-light.py\", line 47, in <module>\n    raise RuntimeError(run.stdout + run.stderr)\nRuntimeError: LidoSRv3/Tests/TrioAlloc1/Execution.lean:47:52: error: maximum recursion depth has been reached\nuse `set_option maxRecDepth <num>` to increase limit\nuse `set_option diagnostics true` to get diagnostic information\nLidoSRv3/Tests/TrioAlloc1/Execution.lean:51:75: error: maximum recursion depth has been reached\nuse `set_option maxRecDepth <num>` to increase limit\nuse `set_option diagnostics true` to get diagnostic information\nLidoSRv3/Tests/TrioAlloc1/Execution.lean:54:25: error: maximum recursion depth has been reached\nuse `set_option maxRecDepth <num>` to increase limit\nuse `set_option diagnostics true` to get diagnostic information\nLidoSRv3/Tests/TrioAlloc1/Execution.lean:58:79: error: maximum recursion depth has been reached\nuse `set_option maxRecDepth <num>` to increase limit\nuse `set_option diagnostics true` to get diagnostic information\nLidoSRv3/Tests/TrioAlloc1/Execution.lean:71:62: error: maximum recursion depth has been reached\nuse `set_option maxRecDepth <num>` to increase limit\nuse `set_option diagnostics true` to get diagnostic information\nLidoSRv3/Tests/TrioAlloc1/Execution.lean:73:43: error: maximum recursion depth has been reached\nuse `set_option maxRecDepth <num>` to increase limit\nuse `set_option diagnostics true` to get diagnostic information\nLidoSRv3/Tests/TrioAlloc1/Execution.lean:80:79: error: maximum recursion depth has been reached\nuse `set_option maxRecDepth <num>` to increase limit\nuse `set_option diagnostics true` to get diagnostic information\nLidoSRv3/Tests/TrioAlloc1/Execution.lean:82:44: error: maximum recursion depth has been reached\nuse `set_option maxRecDepth <num>` to increase limit\nuse `set_option diagnostics true` to get diagnostic information\nLidoSRv3/Tests/TrioAlloc1/Execution.lean:99:66: error: maximum recursion depth has been reached\nuse `set_option maxRecDepth <num>` to increase limit\nuse `set_option diagnostics true` to get diagnostic information\nLidoSRv3/Tests/TrioAlloc1/Execution.lean:104:14: error: maximum recursion depth has been reached\nuse `set_option maxRecDepth <num>` to increase limit\nuse `set_option diagnostics true` to get diagnostic information\nLidoSRv3/Tests/TrioAlloc1/Execution.lean:106:79: error: maximum recursion depth has been reached\nuse `set_option maxRecDepth <num>` to increase limit\nuse `set_option diagnostics true` to get diagnostic information\n\n"
+    },
+    {
+      "job_id": "be62238e-0052-4be2-a9e1-8832e40c8a44",
+      "command": "node solidity/trio-alloc1/run.cjs /workspaces/mission-c01b16cf/output/solidity-paired-v2 /workspaces/mission-c01b16cf/output/lean-solidity-vectors.json",
+      "status": "completed",
+      "exit_code": 0,
+      "started_at": "2026-09-07T11:41:24.108078990Z",
+      "updated_at": "2026-09-07T11:43:25Z",
+      "stdout": "PASS mixed\nPASS underflow-before-stake\nPASS late-rejection\nPASS short-summary\nPASS short-stake\nPASS trailing-summary\nPASS zero-ceil-divisor\nPASS invalid-enum-before-call\nPASS below-allocation\nPASS topup-product-before-division\nPASS empty-zero-divisor\nPASS total-overflow-before-next-row\n",
+      "stderr": "This version of µWS is not compatible with your Node.js build:\n\nError: Cannot find module '../binaries/uws_linux_x64_109.node'\nRequire stack:\n- /workspaces/mission-c01b16cf/temp/solidity-tools/node_modules/ganache/node_modules/@trufflesuite/uws-js-unofficial/src/uws.js\n- /workspaces/mission-c01b16cf/temp/solidity-tools/node_modules/ganache/dist/node/core.js\n- /workspaces/mission-c01b16cf/alloc1/solidity/trio-alloc1/run.cjs\nFalling back to a NodeJS implementation; performance may be degraded.\n\n\n"
+    },
+    {
+      "job_id": "55746785-f9c6-4517-900b-201ae1aea07d",
+      "command": "node solidity/trio-alloc1/run.cjs /workspaces/mission-c01b16cf/output/solidity-mutant-target /workspaces/mission-c01b16cf/output/lean-solidity-vectors.json target-only",
+      "status": "failed",
+      "exit_code": 1,
+      "started_at": "2026-09-07T11:45:46.496923759Z",
+      "updated_at": "2026-09-07T11:47:34Z",
+      "stdout": "PASS mixed\nPASS underflow-before-stake\nPASS late-rejection\nPASS short-summary\nPASS short-stake\n",
+      "stderr": "This version of µWS is not compatible with your Node.js build:\n\nError: Cannot find module '../binaries/uws_linux_x64_109.node'\nRequire stack:\n- /workspaces/mission-c01b16cf/temp/solidity-tools/node_modules/ganache/node_modules/@trufflesuite/uws-js-unofficial/src/uws.js\n- /workspaces/mission-c01b16cf/temp/solidity-tools/node_modules/ganache/dist/node/core.js\n- /workspaces/mission-c01b16cf/alloc1/solidity/trio-alloc1/run.cjs\nFalling back to a NodeJS implementation; performance may be degraded.\n\n\nAssertionError [ERR_ASSERTION]: trailing-summary outcome\n    at main (/workspaces/mission-c01b16cf/alloc1/solidity/trio-alloc1/run.cjs:119:10) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: [Array],\n  expected: [Array],\n  operator: 'deepStrictEqual'\n}\n"
+    },
+    {
+      "job_id": "17924c45-311e-438f-8e97-20ddac7c5e59",
+      "command": "node solidity/trio-alloc1/run.cjs /workspaces/mission-c01b16cf/output/solidity-mutant-prefetch /workspaces/mission-c01b16cf/output/lean-solidity-vectors.json stake-before-subtraction",
+      "status": "failed",
+      "exit_code": 1,
+      "started_at": "2026-09-07T11:45:46.734892791Z",
+      "updated_at": "2026-09-07T11:47:20Z",
+      "stdout": "PASS mixed\n",
+      "stderr": "This version of µWS is not compatible with your Node.js build:\n\nError: Cannot find module '../binaries/uws_linux_x64_109.node'\nRequire stack:\n- /workspaces/mission-c01b16cf/temp/solidity-tools/node_modules/ganache/node_modules/@trufflesuite/uws-js-unofficial/src/uws.js\n- /workspaces/mission-c01b16cf/temp/solidity-tools/node_modules/ganache/dist/node/core.js\n- /workspaces/mission-c01b16cf/alloc1/solidity/trio-alloc1/run.cjs\nFalling back to a NodeJS implementation; performance may be degraded.\n\n\nAssertionError [ERR_ASSERTION]: underflow-before-stake outcome\n    at main (/workspaces/mission-c01b16cf/alloc1/solidity/trio-alloc1/run.cjs:119:10) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: '0x0000000000000000000000000000000000000000000000000000000000000041',\n  expected: '0x4e487b710000000000000000000000000000000000000000000000000000000000000011',\n  operator: 'deepStrictEqual'\n}\n"
+    },
+    {
+      "job_id": "34dd84c4-b1a2-4807-8eac-a50dfe355299",
+      "command": "remote-lean-build lake build LidoSRv3.Audit.Source.TrioAlloc1.CapacitySpec LidoSRv3.Tests.TrioAlloc1.Execution",
+      "status": "failed",
+      "exit_code": 1,
+      "started_at": "2026-09-07T11:37:49.364881125Z",
+      "updated_at": "2026-09-07T11:37:50Z",
+      "stdout": "",
+      "stderr": "remote-lean-build: pinned tree contains submodules; using legacy runner fetch\nremote-lean-build: ignoring untracked non-Lean files: solidity/trio-alloc1/run.cjs\nremote-lean-build: dispatching lake build LidoSRv3.Audit.Source.TrioAlloc1.CapacitySpec LidoSRv3.Tests.TrioAlloc1.Execution for 5f1683eaf753 ...\nremote-lean-build: HTTP 422 from http://127.0.0.1:3000/api/remote-build:\nremote node 'ashur' did not accept the build: remote node rejected request with HTTP 422: insufficient node disk: 86 GiB available, 32 GiB estimated plus 80 GiB emergency floor\n"
+    },
+    {
+      "job_id": "df00a3e0-0397-4c75-af59-b89a26b558de",
+      "command": "remote-lean-build lake build LidoSRv3.Audit.Source.TrioAlloc1.CapacitySpec LidoSRv3.Audit.Source.TrioAlloc1.Memory LidoSRv3.Tests.TrioAlloc1.Execution LidoSRv3.Tests.TrioAlloc1.SolidityVectors",
+      "status": "failed",
+      "exit_code": 1,
+      "started_at": "2026-09-07T11:45:56.950079268Z",
+      "updated_at": "2026-09-07T11:45:58Z",
+      "stdout": "",
+      "stderr": "remote-lean-build: pinned tree contains submodules; using legacy runner fetch\nremote-lean-build: ignoring untracked non-Lean files: audit/trio/alloc1/initialize-deps.py, solidity/trio-alloc1/run.cjs\nremote-lean-build: dispatching lake build LidoSRv3.Audit.Source.TrioAlloc1.CapacitySpec LidoSRv3.Audit.Source.TrioAlloc1.Memory LidoSRv3.Tests.TrioAlloc1.Execution LidoSRv3.Tests.TrioAlloc1.SolidityVectors for 5f1683eaf753 ...\nremote-lean-build: HTTP 422 from http://127.0.0.1:3000/api/remote-build:\nremote node 'ashur' did not accept the build: remote node rejected request with HTTP 422: insufficient node disk: 86 GiB available, 32 GiB estimated plus 80 GiB emergency floor\n"
+    },
+    {
+      "job_id": "5b86a0e6-0533-4c74-b7ec-4761eefddeb2",
+      "command": "make test",
+      "status": "failed",
+      "exit_code": 2,
+      "started_at": "2026-09-07T11:39:05.365398760Z",
+      "updated_at": "2026-09-07T11:39:12Z",
+      "stdout": "audit metadata v4 ok: 11 canonical guarantees + 18 subordinate evidence rows\n",
+      "stderr": "ux2 artifact error: audit/ux2/index.json differs from the registry and Lean sources; run `scripts/generate_ux2.py generate`\nmake: *** [Makefile:36: test] Error 1\n"
+    },
+    {
+      "job_id": "a72ffd23-b0dc-4a4b-a53f-d51c0ee26ab1",
+      "command": "node solidity/trio-alloc1/run.cjs /workspaces/mission-c01b16cf/output/solidity-paired-v3 /workspaces/mission-c01b16cf/output/light-v4/vectors.json",
+      "status": "completed",
+      "exit_code": 0,
+      "started_at": "2026-09-07T11:57:54.270920583Z",
+      "updated_at": "2026-09-07T11:59:17Z",
+      "stdout": "PASS mixed\nPASS underflow-before-stake\nPASS late-rejection\nPASS short-summary\nPASS short-stake\nPASS trailing-summary\nPASS zero-ceil-divisor\nPASS invalid-enum-before-call\nPASS below-allocation\nPASS topup-product-before-division\nPASS empty-zero-divisor\nPASS total-overflow-before-next-row\n",
+      "stderr": "This version of µWS is not compatible with your Node.js build:\n\nError: Cannot find module '../binaries/uws_linux_x64_109.node'\nRequire stack:\n- /workspaces/mission-c01b16cf/temp/solidity-tools/node_modules/ganache/node_modules/@trufflesuite/uws-js-unofficial/src/uws.js\n- /workspaces/mission-c01b16cf/temp/solidity-tools/node_modules/ganache/dist/node/core.js\n- /workspaces/mission-c01b16cf/alloc1/solidity/trio-alloc1/run.cjs\nFalling back to a NodeJS implementation; performance may be degraded.\n\n\n"
+    },
+    {
+      "job_id": "83c40efb-a3d1-4b2b-900b-3f4362b2b5eb",
+      "command": "remote-lean-build lake build LidoSRv3.Audit.Source.TrioAlloc1.CapacitySpec LidoSRv3.Tests.TrioAlloc1.Execution",
+      "status": "failed",
+      "exit_code": 1,
+      "started_at": "2026-09-07T11:33:43.044919871Z",
+      "updated_at": "2026-09-07T11:34:09Z",
+      "stdout": "",
+      "stderr": "remote-lean-build: dispatching lake build LidoSRv3.Audit.Source.TrioAlloc1.CapacitySpec LidoSRv3.Tests.TrioAlloc1.Execution for 0696ca1dee46 ...\nremote-lean-build: HTTP 413 from http://127.0.0.1:3000/api/remote-build:\nFailed to buffer the request body: length limit exceeded\n"
+    },
+    {
+      "job_id": "03b81a6c-6ccb-402b-99c1-0a5f28ee8f5b",
+      "command": "remote-lean-build lake build LidoSRv3.Audit.Source.TrioAlloc1.CapacitySpec LidoSRv3.Tests.TrioAlloc1.Execution",
+      "status": "failed",
+      "exit_code": 1,
+      "started_at": "2026-09-07T11:35:52.813692660Z",
+      "updated_at": "2026-09-07T11:36:28Z",
+      "stdout": "",
+      "stderr": "remote-lean-build: dispatching lake build LidoSRv3.Audit.Source.TrioAlloc1.CapacitySpec LidoSRv3.Tests.TrioAlloc1.Execution for 0696ca1dee46 ...\nremote-lean-build: HTTP 413 from http://127.0.0.1:3000/api/remote-build:\nremote build JSON exceeds 33554432 bytes after decompression\n"
+    }
+  ]
+}

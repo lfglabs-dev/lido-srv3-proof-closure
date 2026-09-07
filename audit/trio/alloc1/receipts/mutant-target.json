@@ -1,0 +1,114 @@
+[
+  {
+    "name": "mixed",
+    "actual": [
+      [
+        3,
+        3
+      ],
+      [
+        8,
+        3
+      ]
+    ],
+    "expected": [
+      [
+        3,
+        3
+      ],
+      [
+        8,
+        3
+      ]
+    ],
+    "calls": [
+      "0:9abddf09",
+      "1:9abddf09",
+      "1:0c852f5c"
+    ],
+    "expectedCalls": [
+      "0:9abddf09",
+      "1:9abddf09",
+      "1:0c852f5c"
+    ],
+    "transaction": "0x3e87e4dace20fb5439ac0c6f52c86f83d0b81dc45221ce60d546e2dc8965ed9b"
+  },
+  {
+    "name": "underflow-before-stake",
+    "actual": "0x4e487b710000000000000000000000000000000000000000000000000000000000000011",
+    "expected": "0x4e487b710000000000000000000000000000000000000000000000000000000000000011",
+    "calls": [
+      "0:9abddf09"
+    ],
+    "expectedCalls": [
+      "0:9abddf09"
+    ],
+    "transaction": "0xa0115c61fe467b7313e5fc2de91688683920a0e3da1c55432808a01dd70a3c94"
+  },
+  {
+    "name": "late-rejection",
+    "actual": "0xdead",
+    "expected": "0xdead",
+    "calls": [
+      "0:9abddf09",
+      "1:9abddf09"
+    ],
+    "expectedCalls": [
+      "0:9abddf09",
+      "1:9abddf09"
+    ],
+    "transaction": "0xd1aaed8d7ea4a3e8e2fa3e770ddb94caeca9cab2df4ce0bcdab7ed81406f432e"
+  },
+  {
+    "name": "short-summary",
+    "actual": "0x",
+    "expected": "0x",
+    "calls": [
+      "0:9abddf09"
+    ],
+    "expectedCalls": [
+      "0:9abddf09"
+    ],
+    "transaction": "0x66fe8519a76c97ccac695f4d9098eac1feec3bbbfa880ae90f0abe03606e2adf"
+  },
+  {
+    "name": "short-stake",
+    "actual": "0x",
+    "expected": "0x",
+    "calls": [
+      "0:9abddf09",
+      "0:0c852f5c"
+    ],
+    "expectedCalls": [
+      "0:9abddf09",
+      "0:0c852f5c"
+    ],
+    "transaction": "0x4bea4711011f9ca3d1bdab1fe5494d8465be11793958e73fe758ebe0f9fe91b4"
+  },
+  {
+    "name": "trailing-summary",
+    "actual": [
+      [
+        1
+      ],
+      [
+        11
+      ]
+    ],
+    "expected": [
+      [
+        1
+      ],
+      [
+        2
+      ]
+    ],
+    "calls": [
+      "0:9abddf09"
+    ],
+    "expectedCalls": [
+      "0:9abddf09"
+    ],
+    "transaction": "0x5419fc0b62baa04579aecc98acd79f2ba372d34aca8d93d119a5de484edca27a"
+  }
+]

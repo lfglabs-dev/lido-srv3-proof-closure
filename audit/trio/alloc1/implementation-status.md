@@ -17,7 +17,12 @@ The v0 `Interface.lean` types are unchanged. New additive modules:
 - `Properties`: first-row storage identity, complete first-loop order, second-pass
   preservation and per-bucket equations, `producer_router_order`.
 - `CapacitySpec`: independent Nat capacity formulas, success correspondence, and
-  bounds on the checked executor's returned capacity word.
+  bounds on the checked executor's returned capacity word. `producer_math_view`
+  derives the network total from demand plus returned allocations;
+  `producer_total_bound` derives its uint256 bound from execution success.
+- `Bytes` and `Memory`: generic word encode/decode inverse, exact summary field
+  order with trailing bytes, array element byte decoding, constructive byte-backed
+  `MemoryArraysRelated`, and output lengths equal to the stored count.
 - `Tests/TrioAlloc1/Execution`: actual executor reductions for ordered mixed WC rows,
   top-up, below-allocation capacities, empty helper, underflow before stake, late
   rejection, raw revert preservation, malformed/trailing returndata, zero divisor,
@@ -32,16 +37,16 @@ production/test/trust or full-suite receipts.
 
 | Requirement | Evidence / remaining work |
 | --- | --- |
-| Physical storage | Slot formulas and width proofs implemented. Bind router-slot/hash to actual deployment; execute compiler layout checks and prove writer transitions. |
+| Physical storage | Slot formulas, width proofs and executed solc layout checks implemented. Deployment/hash primitive relation and physical writer-transition proofs remain open. |
 | Reachable bounds, address uniqueness | Width bounds derived. Count<=32, share<=10000, unique addresses, admission and migration reachability remain open; never imposed as read guards. |
-| Exact call and error behavior | Ordered executor and regressions implemented. Compiler enum/call decoder behavior and panic bytes still need executed confirmation and all-outcome source relation. |
-| Independent specification | Second-pass Nat spec and proof implemented. First-pass/call-level independent relational specification still open. |
-| Memory / ABI | v0 word-memory relation only. Construct actual memory, prove byte relation, allocation failures and consumer ABI bridge. |
+| Exact call and error behavior | Ordered executor and regressions implemented. Pinned Solidity executions confirm enum panic, malformed returndata and raw error bytes on the vectors. The universal all-outcome source relation remains open. |
+| Independent specification | Second-pass Nat spec and checked-total accumulation proofs implemented. First-pass/call-level independent relational specification still open. |
+| Memory / ABI | Constructive byte-backed array relation and decoder inverses proved. Actual solc allocation sequencing/failures (including panic 0x41), complete compiler memory correspondence and consumer ABI bridge remain open. |
 | Rollback / sequential behavior | View executor has no state effects. This alone does not establish parent/writer rollback or callback realization; those proofs/tests remain open. |
 | ALLOC-2 interface | Messages sent to mission 44053c4f-2578-4df5-84f2-4f66bc73586a. v0 unchanged; agreement and composition consumer evidence pending. |
-| Differential execution | Pinned helper harness added; Solidity-vs-Verity execution remains open. Lean reductions alone are not differential evidence. |
+| Differential execution | 12 paired Solidity/SOURCE-executor executions pass, including state/balances/calls/events observations. Two compiled Solidity mutants are killed by outcome mismatches. Solidity-vs-Verity execution remains open. |
 | Full verification | Production/test/trust, make prove/test, annotations/metadata/inventory/provenance/proof-escape and parent-shaped executed mutations remain required. |
-| Delivery | Scoped PR and immutable validated SHA still required; no merge, publication or self-certification authorized. |
+| Delivery | Draft scoped PR #245 is open; complete validation at its immutable final SHA is still required. No merge, publication or self-certification authorized. |
 
 ## Remote transport preparation
 
@@ -60,3 +65,21 @@ The next request stopped before submission on transport-invalid path
 transport-only handling in the preparation script. No failed preflight is a build
 receipt. Snapshot SHA/manifest and final job logs must be reconciled with the actual
 candidate source before they can support validation.
+
+## Latest evidence
+
+The receipt packet under `receipts/` is partial validation evidence, with its scope
+and reproduction commands in `reproduce.md`. All nine owned Lean modules pass the
+bounded Init-only checker. The evaluated vector JSON is byte-identical after the
+encoding proof refinement (SHA-256
+`eaac1882ec16fe743d11fd4b2309910896fcffe7d285f72a33a697c373c4ecde`).
+Proof-escape, source-annotation, report-inventory and pinned Verity provenance
+checks pass. `make test` stops at shared UX2. Remote build requests are rejected by
+source request-size limits or the ashur node disk admission floor; exact messages
+are recorded in `reproduce.md` and the job diagnostics. No remote heavy validation
+succeeded during this continuation.
+
+ALLOC-2 remains authoritatively active/healthy, with its current run ID confirmed
+on 2026-09-07. Messages provide the producer declarations and draft PR. No explicit
+acceptance has been received in this mission, so mediated agreement remains pending.
+The interface has not been changed incompatibly.

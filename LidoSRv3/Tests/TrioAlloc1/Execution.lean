@@ -1,5 +1,8 @@
 import LidoSRv3.Audit.Source.TrioAlloc1.Properties
 
+-- Kernel reduction traverses nested 32-byte encodings in full producer vectors.
+set_option maxRecDepth 4096
+
 namespace LidoSRv3.Tests.TrioAlloc1
 open LidoSRv3.Audit.Source.TrioAlloc1
 
