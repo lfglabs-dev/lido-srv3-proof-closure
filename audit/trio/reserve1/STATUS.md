@@ -14,7 +14,7 @@ are preserved until the withdrawal parent performs full rollback.
 parent relation with bidirectional exact correspondence. Allocation/current-frame
 semantics and CALL/deployed primitive interpretation remain explicit lower interfaces.
 Remaining report/queue writers, deployment/resource closure, canonical registration
-and full remote gates remain open. Immutable validation follows checks. Runtime
+and full remote gates remain open. At source `3e5611f7cc00c60015750ad4e865f3ae8f842042`, three selected component checks and seven baseline/import checks pass. The other 66 source/olean pairs match earlier successful receipts. See `receipts/spend-rules-summary.json`; only standard axioms were printed. Eleven dependency revisions match the manifest. These are bounded checks, not full gates. Runtime
 execution source and historical receipts are unchanged.
 
 ## Complete seed/receiver tail rules substituted into withdrawal
