@@ -78,6 +78,9 @@ or duplicate the old terminal remote job. The old local full-gate handle is abse
    admission from physical storage. 28 draft full-source comparisons pass.
    ACLBounds now proves completed-result/trace stability under increased depth,
    full dispatcher stability, and uniqueness across any completed capacities.
+   ACLLogicSpec/ACLLogic now give independent total/unique next-child control,
+   exact source short-circuit/trace correspondence, and early logic failure rules.
+   Compose those node rules recursively and bind independent leaf/oracle rules.
    Complete independent parameter-tree correspondence and termination/resource
    binding: recursion exhaustion is a host limit, never source denial. Complete
    ACL mutation admission, deployment/proxy/primitive and callback binding; oracle

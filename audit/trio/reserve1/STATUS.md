@@ -1,5 +1,22 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Independent ACL logic control
+
+`ACLLogicSpec` gives a total, unique control relation after the first child:
+finish immediately, or visit exactly one selected child with an explicit bool
+negation. It covers NOT, AND/OR short-circuiting, XOR and IF_ELSE, plus the source
+fallback behavior for other valid enum values used as logic operators. It imports
+no executor. `ACLLogic.corresponds` relates that independent control decision to
+the exact physical source node, remaining evaluation and concatenated oracle trace.
+Unselected children have no execution premises and contribute no attempts.
+
+Separate proofs cover out-of-bounds parameter indices, invalid logic opcodes before
+any child evaluation, and propagation of first-child failure with its trace.
+These are logic-node correspondence rules; recursive whole-tree and independent
+leaf/primitive/resource correspondence remain required. Runtime code is unchanged.
+The two new modules passed draft bounded elaboration; immutable checks follow the
+source commit.
+
 ## ACL capacity stability
 
 `ACLBounds` proves that increasing the evaluator's recursion depth preserves

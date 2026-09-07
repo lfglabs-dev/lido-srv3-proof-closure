@@ -22,6 +22,7 @@ import LidoSRv3.Audit.Source.TrioReserve1.Aragon
 import LidoSRv3.Audit.Source.TrioReserve1.Kernel
 import LidoSRv3.Audit.Source.TrioReserve1.ACLCalls
 import LidoSRv3.Audit.Source.TrioReserve1.ACLBounds
+import LidoSRv3.Audit.Source.TrioReserve1.ACLLogic
 
 /-! Owned inspection, pending coordinated canonical Trust registration. -/
 open LidoSRv3.Audit.Source.TrioReserve1
@@ -208,3 +209,10 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms ACLBounds.dispatch_stable
 #print axioms ACLBounds.eval_unique
 #print axioms ACLBounds.permission_unique
+
+#print axioms ACLLogicSpec.exists_route
+#print axioms ACLLogicSpec.unique
+#print axioms ACLLogic.corresponds
+#print axioms ACLLogic.out_of_bounds
+#print axioms ACLLogic.invalid_before_children
+#print axioms ACLLogic.first_failure
