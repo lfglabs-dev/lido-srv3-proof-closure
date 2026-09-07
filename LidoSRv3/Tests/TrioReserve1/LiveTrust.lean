@@ -1,3 +1,4 @@
+import LidoSRv3.Audit.Source.TrioReserve1.Balance
 import LidoSRv3.Audit.Source.TrioReserve1.WithdrawalCalls
 import LidoSRv3.Audit.Source.TrioReserve1.CallFlow
 import LidoSRv3.Audit.Source.TrioReserve1.AllocationFlow
@@ -341,3 +342,15 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms WithdrawalCalls.complete
 #print axioms WithdrawalCalls.failure_restores
 #print axioms WithdrawalCalls.success_nonzero
+
+#print axioms BalanceSpec.member_bound
+#print axioms BalanceSpec.account_bound
+#print axioms BalanceSpec.mass_equation
+#print axioms BalanceSpec.include_member
+#print axioms BalanceSpec.include_retains
+#print axioms BalanceSpec.include_bounded
+#print axioms BalanceSpec.preserves
+#print axioms Balance.transfer_preserves
+#print axioms Balance.transfer_uint256
+#print axioms Balance.transfer_finite
+#print axioms Balance.transfer_finite_uint256

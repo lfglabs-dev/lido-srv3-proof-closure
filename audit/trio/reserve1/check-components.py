@@ -81,6 +81,8 @@ MODULES = [
     "Audit/Source/TrioReserve1/CallSpec",
     "Audit/Source/TrioReserve1/CallFlow",
     "Audit/Source/TrioReserve1/WithdrawalCalls",
+    "Audit/Source/TrioReserve1/BalanceSpec",
+    "Audit/Source/TrioReserve1/Balance",
     "Tests/TrioReserve1/Foundations",
     "Tests/TrioReserve1/OracleMutants",
     "Tests/TrioReserve1/Differential",
