@@ -107,3 +107,19 @@ The actual inherited public share writer compiled and executed with solc 0.8.25
 outside the two share fields. The receipt is `writer-v1/writer.json` in mission
 output. All six expanded error-order/rollback cases passed with exact raw errors,
 unchanged seeded storage and no events. The copied receipts are under `receipts/`.
+
+The pinned via-IR successful memory schedule was checked against executed root
+RETURN snapshots on all successful vectors: allocation pointer 256, capacity
+pointer `544 + 928*count + 160*wc2Count`, disjoint ranges and exact elements.
+`AllocationMemory` proves explicit rounded allocation bounds and oversized-array
+panic 0x41. The full compiler schedule-to-producer proof remains open. A nested
+Solidity read callback and attempted write also passed: outer success, expected
+three call sites, unchanged module storage and no events (`receipts/callback.json`).
+
+The first actual Verity vector run at a35ca25 built 37 jobs and executed, but one
+fixture mismatched: the old late-rejection SOURCE fixture depended on history
+while the VM fixture adapter used target/payload. The differential fixture now
+uses the same rejecting second target as Solidity; the separate history-sensitive
+SOURCE regression remains. The mismatch is retained in receipts. The corrected
+remote request at550e795 was rejected by ashur: 84 GiB available, 5 GiB estimated
+plus the unchanged 80 GiB emergency floor. It is not a passing differential receipt.
