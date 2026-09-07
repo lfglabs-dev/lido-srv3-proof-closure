@@ -18,3 +18,18 @@ Vectors.lean emits eleven executions of Contract.run, paired by exact input and
 output with the existing ABI vectors. The Solidity runner accepts the successful
 runtime receipt as its fourth argument after the two earlier receipts and
 requires the full current source manifest to match the verified remote overlay.
+
+The separate `memoryExecute` adapter reads and updates ContractState.memory.
+`memory_run_success` fixes the entire successful returned state, so storage,
+balance, events and calls are preserved while bucket memory is updated. Its
+ArrayAt relation and write proofs are in composition/MemoryWrite.lean. This is
+byte-addressed word-map semantics, not overlapping byte stores. Five sequential
+vectors feed the actual returned ContractState into the next Contract.run and
+check a nonzero outside-memory sentinel, capacities and balance. The byte-only
+`execute` adapter above still preserves all memory.
+
+The public Solidity library uses delegatecall ABI copies. MemorySequence.sol
+therefore passes the first returned buckets to the second library call and
+returns the caller's original arrays separately. memory-sequence.mjs compares
+these exact ABI bytes to both the word-memory and Verity sequence vectors. It
+does not claim the public call mutates the caller's original buckets.
