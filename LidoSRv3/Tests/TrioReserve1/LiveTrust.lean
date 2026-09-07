@@ -17,6 +17,9 @@ import LidoSRv3.Audit.Source.TrioReserve1.OracleCalls
 import LidoSRv3.Audit.Source.TrioReserve1.ConsensusCalls
 import LidoSRv3.Audit.Source.TrioReserve1.Pipeline
 import LidoSRv3.Audit.Source.TrioReserve1.PhysicalReserve
+import LidoSRv3.Audit.Source.TrioReserve1.PhysicalSequence
+import LidoSRv3.Audit.Source.TrioReserve1.Aragon
+import LidoSRv3.Audit.Source.TrioReserve1.Kernel
 
 /-! Owned inspection, pending coordinated canonical Trust registration. -/
 open LidoSRv3.Audit.Source.TrioReserve1
@@ -152,3 +155,34 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms PhysicalReserve.committed_other_account
 #print axioms PhysicalReserve.committed_queue
 #print axioms PhysicalReserve.success_preserves
+
+#print axioms SequenceSpec.target_protection
+#print axioms SequenceSpec.rebalance_partition
+#print axioms PhysicalSequence.committed_step
+#print axioms PhysicalSequence.corresponds
+#print axioms PhysicalSequence.target_protection
+#print axioms PhysicalSequence.rebalance_partition
+#print axioms PhysicalSequence.other_account
+#print axioms PhysicalSequence.queue_preserved
+#print axioms PhysicalSequence.concrete_success_step
+
+#print axioms AragonSpec.exclusive
+#print axioms Aragon.prefix_corresponds
+#print axioms Aragon.uninitialized
+#print axioms Aragon.absent_kernel
+#print axioms Aragon.kernel_reply
+#print axioms Aragon.kernel_rejection
+#print axioms Aragon.kernel_no_code
+#print axioms Aragon.kernel_short_reply
+#print axioms Aragon.denied
+#print axioms Aragon.permission_failure
+#print axioms Aragon.allowed
+#print axioms Aragon.target_from_kernel_reply
+
+#print axioms Kernel.no_acl
+#print axioms Kernel.no_acl_code
+#print axioms Kernel.acl_rejection
+#print axioms Kernel.decoded_word
+#print axioms Kernel.acl_reply
+#print axioms Kernel.aragon_from_acl
+#print axioms Kernel.target_from_acl

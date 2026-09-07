@@ -1,0 +1,52 @@
+{
+  "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "node": "v22.15.0",
+  "receipts": [
+    {
+      "entry": "KernelHarness.sol",
+      "compiler": "0.4.24+commit.e67f0147.Emscripten.clang",
+      "evmVersion": "constantinople",
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "contracts": [
+        "KernelHarness"
+      ],
+      "warnings": [
+        "@aragon/os/contracts/acl/IACL.sol:13:5: Warning: Functions in interfaces should be declared external.\n    function hasPermission(address who, address where, bytes32 what, bytes how) public view returns (bool);\n    ^-----------------------------------------------------------------------------------------------------^\n",
+        "@aragon/os/contracts/common/VaultRecoverable.sol:49:34: Warning: Unused function parameter. Remove or comment out the variable name to silence this warning.\n    function allowRecoverability(address token) public view returns (bool) {\n                                 ^-----------^\n"
+      ]
+    }
+  ],
+  "sourceHashes": {
+    "solidity/trio-reserve1/KernelHarness.sol": "0f148186cc31c689ff6adb3e60b05e0d68ed68f35f70ab6e7e3dad1d8b3f857a",
+    "@aragon/os/contracts/kernel/Kernel.sol": "b71032e5791e183a528995b9cf19efdc9fe84f6f79bd74001dddceb664485bc9",
+    "@aragon/os/contracts/kernel/IKernel.sol": "d626355aef13b741acf2b0f51bfb03eefe2dce9517e28623dafcf5478f43e255",
+    "@aragon/os/contracts/kernel/KernelConstants.sol": "4c154c4e292dfcdcdc0b1ad0738c29769d7db1b129f6b135ea6a713b975223b3",
+    "@aragon/os/contracts/kernel/KernelStorage.sol": "69bc0edbcbb9a53b2e76aef3247d363f16eeea905e745d69c596432528f2c458",
+    "@aragon/os/contracts/acl/IACL.sol": "0d6092f108df51af376d55c64e482d514182a0fc1933f354c4afbd7a82160c01",
+    "@aragon/os/contracts/acl/ACLSyntaxSugar.sol": "8a16dec5bd7ce42d05e8fda25202864995db194b648d671525b9a7b54d7eee67",
+    "@aragon/os/contracts/common/ConversionHelpers.sol": "4d4fb3e35f192c6005f2146867f094433d575179415769127fd1869d7e86bc06",
+    "@aragon/os/contracts/common/IsContract.sol": "209acf5e2e50d9dae4f53b1f96febd03c48ed8ef5b3b88085010db628be7cdc2",
+    "@aragon/os/contracts/common/Petrifiable.sol": "e565fd0513d66f4657d9a445ad76d63e6785dece37382ce12661bcc5f126e2cd",
+    "@aragon/os/contracts/common/VaultRecoverable.sol": "5072a07438a6d55dd98f24c5c9e391be897990c750f4301fd4f9ddab5e253e78",
+    "@aragon/os/contracts/factory/AppProxyFactory.sol": "1257b8ee1dfc268bf62a6dbc95ea1eecac38d7545471ea0d7b2431908d442445",
+    "@aragon/os/contracts/lib/misc/ERCProxy.sol": "401a01e61cea1ee2d680806e57c5cacf294c787176f0e12785db0be1241e21e8",
+    "@aragon/os/contracts/common/Initializable.sol": "9b6f2892b7ddafee6c4c6ff41d6314e0cfa8a3090cd764a815bcf72a3f764318",
+    "@aragon/os/contracts/lib/token/ERC20.sol": "1db31dfde01bcdf4c253010a0a46491a7a8ab698d20e8bdd5bc12cc743deec7d",
+    "@aragon/os/contracts/common/EtherTokenConstant.sol": "630cece2f24d3b9072d3743570d01029cafaa6fab5abbee0015c81abfd92fc8f",
+    "@aragon/os/contracts/common/IVaultRecoverable.sol": "780ce73c985b926a7e9bcf956060572c78ef8d55b545fc546325dc865291e479",
+    "@aragon/os/contracts/common/SafeERC20.sol": "022bdbc71e31f0a2042f33ede9b340efc04abf972a2c26f6677c0bf70aff2893",
+    "@aragon/os/contracts/apps/AppProxyUpgradeable.sol": "ac1db72c55e93e2ad9b41f2322cc3a0c28b1dd809f2dfb5c5f2bf9ee0b9c98fc",
+    "@aragon/os/contracts/apps/AppProxyPinned.sol": "6f8cdc57e84b5fedee8267a762ba04240e77af04387fd658636fdf577fb6b3d1",
+    "@aragon/os/contracts/common/TimeHelpers.sol": "09242e7e0f60a92d40a37c787a4d24c239c31eaf9ccbebf92bfc37e1d05e78a7",
+    "@aragon/os/contracts/common/UnstructuredStorage.sol": "6bbbb8fb3d32ba56d6f967f0eb437941aedae143c6dcedecac87d81a81ffd000",
+    "@aragon/os/contracts/apps/AppProxyBase.sol": "f0bd3ee304b66c1c8a673ca5afd091b70cf67e894a8afd1dc67d6492242ba078",
+    "@aragon/os/contracts/common/Uint256Helpers.sol": "5b545ff91be8d1d3a5f1c6b4fd45c6db4bc901cb6c503ad754361a475dce0d38",
+    "@aragon/os/contracts/apps/AppStorage.sol": "8e91fc929525676dd70fb9770499e93d148d27a97664d53f96c635d41783a7b1",
+    "@aragon/os/contracts/common/DepositableDelegateProxy.sol": "5b806ddf32d5b9ebf61f8d355338e0543695f93b5d8f900f836ceb33b1c6b34d",
+    "@aragon/os/contracts/common/DelegateProxy.sol": "b21961b9c2939784ef4ad9c837878e84675064fe526cbe92e2cbf6134a46b43d",
+    "@aragon/os/contracts/common/DepositableStorage.sol": "d9fbdd5aad225d67d88a4677f8adc621067edd28114d83917d606a85875d4c07"
+  }
+}

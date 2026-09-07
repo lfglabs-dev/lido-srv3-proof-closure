@@ -1,5 +1,78 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Concrete Kernel permission forwarding
+
+`Kernel` reads the installed ACL through KernelStorage.apps' two physical
+mapping hashes, using an explicit keccak primitive. Zero ACL returns false;
+missing ACL code rejects without a nested CALL. Otherwise the source query
+forwards the original sender/app/role/empty-parameter bytes with the kernel as
+caller, decodes the ACL bool, and retains nested acceptance/rejection/return bytes
+and deeper trace depths. Callee world effects remain explicit.
+
+`aragon_from_acl` and `target_from_acl` compose that source behavior through the
+Lido role decoder and external target writer. The kernel response is derived;
+ACL evaluation remains the explicit boundary. This is specialized to the complete
+argument tuple sent by Lido._auth, with other calls delegated. Concrete ACL
+permission rows, parameter logic and oracle recursion still require implementation.
+At `4917545c7aad3093bfdd6ddfa1dda4ff2cae2618`, ten fresh pinned
+Kernel/Aragon/Lido comparisons pass, checking the physical mapping against
+Kernel.acl(), final storage/events and direct/nested targets, values, payloads,
+acceptance, returned bytes and depths. Three selected Lean checks, seven baseline/
+import checks and pinned Kernel compilation pass. The other 41 modules' source
+and olean hashes match prior receipts; only standard axioms appear.
+`receipts/kernel-summary.json` links exact compiler/source/toolchain/runtime
+receipts. Draft failures and the earlier simpler draft comparison are retained.
+The remote wrapper hash is unchanged and no supported dependency-bundle tool
+was discovered; no new remote job or full-gate result is claimed.
+
+## Aragon target-writer admission
+
+`Aragon` implements the inherited initialization/kernel prefix and the external
+Lido target writer's role check. It reads the physical initialization block and
+kernel pointer, sends exact hasPermission(sender,self,role,empty-bytes) calldata,
+and decodes actual reply bytes. Missing initialization/kernel, missing code,
+denial, short replies and kernel rejection are distinct. Failed admission restores
+the original world. Successful permission evaluation retains the callee world;
+the target writer's independent relation starts from that world, so callbacks
+are not silently discarded. `AragonSpec` independently describes the prefix.
+
+Ten comparisons against pinned inherited Lido/Aragon bytecode match, covering
+all these cases plus noncanonical nonzero bool and trailing return bytes. The
+executed call opcode is CALL. Kernel replies are explicit boundary fixtures;
+this does not implement Kernel.hasPermission, ACL permission evaluation or its
+oracle recursion. Full ACL and callback binding remain required.
+
+At `5ff24074eb374d5b79287991ece3e5206da95bfc`, all four selected Lean checks,
+all seven baseline/import checks and the fresh ten-case execution pass. The other
+38 modules' source and olean hashes match prior receipts. Only standard axioms
+appear. `receipts/aragon-summary.json` links source/toolchain/commands and terminal
+receipts, including artifact/compiler-input verification. Failed draft elaboration,
+the failed component check at 0ec3353, and the initial fixture-setup execution
+failure are retained. This adds no full remote gate or independent certification.
+
+## Internal writer and committed withdrawal sequences
+
+`SequenceSpec` independently distinguishes target min, rebalance max, and admitted
+spending with buffer conservation, saturating reserve debit and unchanged target.
+`PhysicalSequence.corresponds` relates arbitrary finite interleavings of the
+internal target/rebalance writers and committed withdrawal worlds to this relation.
+Each spend reads demand from its incoming physical queue. All storage of distinct
+contracts is preserved throughout, so queue IDs, rows and live demand survive.
+`concrete_success_step` derives the independent spend transition from the actual
+Pipeline withdrawal execution and its raw configuration/numeric conditions.
+
+Target lowering cannot reduce protection; rebalance establishes the explicitly
+recomputed partition and may reduce protection. These proofs do not cover ACL
+admission, enclosing report execution, queue-changing transitions or exhaustive
+parent failures. Their sequence constructors describe internal/committed effects;
+they are not a claim that every constructed sequence is externally executable.
+At `e47b7d1720dffeb0d09a2aa52e0fd0a5335e0ecf`, SequenceSpec, PhysicalSequence
+and updated LiveTrust pass (3 selected checks), along with all seven baseline/import
+checks. The other 36 modules' source and olean hashes match prior receipts. Only
+standard axioms appear. `receipts/physical-sequence-summary.json` records exact
+evidence. Runtime sources remain unchanged; the 51-case execution is still tied
+to its original source commit. No new full remote gate receipt is claimed.
+
 ## Physical reserve preservation
 
 `PhysicalReserve.success_preserves` connects the concrete `Pipeline.success`

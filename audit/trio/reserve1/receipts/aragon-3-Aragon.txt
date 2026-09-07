@@ -1,0 +1,7 @@
+LidoSRv3/Audit/Source/TrioReserve1/Aragon.lean:71:10: warning: This simp argument is unused:
+  h
+
+Hint: Omit it from the simp argument list.
+  simp ̵[̵h̵]̵
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

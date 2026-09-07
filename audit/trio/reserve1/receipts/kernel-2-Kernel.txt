@@ -1,0 +1,359 @@
+LidoSRv3/Audit/Source/TrioReserve1/Kernel.lean:105:90: error: unsolved goals
+case pos
+k : Queue.Keccak
+aclExternal other : External
+ctx : Context
+role value : Word
+w after : World
+suffix : Bytes
+hi : Aragon.initialized ctx w = true
+hk : (Aragon.kernel ctx w).val ≠ 0
+hkc : (w.core.codeSize (Aragon.kernel ctx w).val).val ≠ 0
+ha : (acl k (Aragon.kernel ctx w) w).val ≠ 0
+hac : (w.core.codeSize (acl k (Aragon.kernel ctx w) w).val).val ≠ 0
+hr :
+  aclExternal
+      { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w, value := Verity.Core.Uint256.ofNat 0,
+        payload := Aragon.permissionPayload ctx role }
+      w =
+    Reply.success (encode 32 value.val ++ suffix) after
+hr' :
+  hasPermission k aclExternal (Aragon.kernel ctx w) ctx role w =
+    Reply.successWithTrace (encode 32 (if value.val ≠ 0 then 1 else 0)) after
+      (attempted
+        { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w, value := Verity.Core.Uint256.ofNat 0,
+          payload := Aragon.permissionPayload ctx role }
+        true (encode 32 value.val ++ suffix))
+hd0 : decodeWord (encode 32 0) 0 after = { outcome := Except.ok (Verity.Core.Uint256.ofNat 0), world := after }
+hd1 : decodeWord (encode 32 1) 0 after = { outcome := Except.ok (Verity.Core.Uint256.ofNat 1), world := after }
+hv : value.val = 0
+⊢ (match
+      (Aragon.permissionCall (dispatch k (Aragon.kernel ctx w) ctx role aclExternal other) ctx (Aragon.kernel ctx w)
+          role w).outcome with
+    | Except.error e =>
+      { outcome := Except.error e,
+        world :=
+          (Aragon.permissionCall (dispatch k (Aragon.kernel ctx w) ctx role aclExternal other) ctx (Aragon.kernel ctx w)
+              role w).world,
+        attempts :=
+          (Aragon.permissionCall (dispatch k (Aragon.kernel ctx w) ctx role aclExternal other) ctx (Aragon.kernel ctx w)
+              role w).attempts }
+    | Except.ok a =>
+      {
+        outcome :=
+          (match
+              (decodeWord a 0
+                  (Aragon.permissionCall (dispatch k (Aragon.kernel ctx w) ctx role aclExternal other) ctx
+                      (Aragon.kernel ctx w) role w).world).outcome with
+            | Except.error e =>
+              { outcome := Except.error e,
+                world :=
+                  (decodeWord a 0
+                      (Aragon.permissionCall (dispatch k (Aragon.kernel ctx w) ctx role aclExternal other) ctx
+                          (Aragon.kernel ctx w) role w).world).world,
+                attempts :=
+                  (decodeWord a 0
+                      (Aragon.permissionCall (dispatch k (Aragon.kernel ctx w) ctx role aclExternal other) ctx
+                          (Aragon.kernel ctx w) role w).world).attempts }
+            | Except.ok a_1 =>
+              { outcome := Except.ok !decide (a_1.val = 0),
+                world :=
+                  (decodeWord a 0
+                      (Aragon.permissionCall (dispatch k (Aragon.kernel ctx w) ctx role aclExternal other) ctx
+                          (Aragon.kernel ctx w) role w).world).world,
+                attempts :=
+                  (decodeWord a 0
+                      (Aragon.permissionCall (dispatch k (Aragon.kernel ctx w) ctx role aclExternal other) ctx
+                          (Aragon.kernel ctx w) role w).world).attempts }).outcome,
+        world :=
+          (match
+              (decodeWord a 0
+                  (Aragon.permissionCall (dispatch k (Aragon.kernel ctx w) ctx role aclExternal other) ctx
+                      (Aragon.kernel ctx w) role w).world).outcome with
+            | Except.error e =>
+              { outcome := Except.error e,
+                world :=
+                  (decodeWord a 0
+                      (Aragon.permissionCall (dispatch k (Aragon.kernel ctx w) ctx role aclExternal other) ctx
+                          (Aragon.kernel ctx w) role w).world).world,
+                attempts :=
+                  (decodeWord a 0
+                      (Aragon.permissionCall (dispatch k (Aragon.kernel ctx w) ctx role aclExternal other) ctx
+                          (Aragon.kernel ctx w) role w).world).attempts }
+            | Except.ok a_1 =>
+              { outcome := Except.ok !decide (a_1.val = 0),
+                world :=
+                  (decodeWord a 0
+                      (Aragon.permissionCall (dispatch k (Aragon.kernel ctx w) ctx role aclExternal other) ctx
+                          (Aragon.kernel ctx w) role w).world).world,
+                attempts :=
+                  (decodeWord a 0
+                      (Aragon.permissionCall (dispatch k (Aragon.kernel ctx w) ctx role aclExternal other) ctx
+                          (Aragon.kernel ctx w) role w).world).attempts }).world,
+        attempts :=
+          (Aragon.permissionCall (dispatch k (Aragon.kernel ctx w) ctx role aclExternal other) ctx (Aragon.kernel ctx w)
+                role w).attempts ++
+            (match
+                (decodeWord a 0
+                    (Aragon.permissionCall (dispatch k (Aragon.kernel ctx w) ctx role aclExternal other) ctx
+                        (Aragon.kernel ctx w) role w).world).outcome with
+              | Except.error e =>
+                { outcome := Except.error e,
+                  world :=
+                    (decodeWord a 0
+                        (Aragon.permissionCall (dispatch k (Aragon.kernel ctx w) ctx role aclExternal other) ctx
+                            (Aragon.kernel ctx w) role w).world).world,
+                  attempts :=
+                    (decodeWord a 0
+                        (Aragon.permissionCall (dispatch k (Aragon.kernel ctx w) ctx role aclExternal other) ctx
+                            (Aragon.kernel ctx w) role w).world).attempts }
+              | Except.ok a_1 =>
+                { outcome := Except.ok !decide (a_1.val = 0),
+                  world :=
+                    (decodeWord a 0
+                        (Aragon.permissionCall (dispatch k (Aragon.kernel ctx w) ctx role aclExternal other) ctx
+                            (Aragon.kernel ctx w) role w).world).world,
+                  attempts :=
+                    (decodeWord a 0
+                        (Aragon.permissionCall (dispatch k (Aragon.kernel ctx w) ctx role aclExternal other) ctx
+                            (Aragon.kernel ctx w) role w).world).attempts }).attempts }) =
+    { outcome := Except.ok false, world := after,
+      attempts :=
+        [{
+            request :=
+              { caller := ctx.self, target := Aragon.kernel ctx w, value := 0,
+                payload := Aragon.permissionPayload ctx role },
+            accepted := true, returned := encode 32 0,
+            nested :=
+              attempted
+                { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w, value := 0,
+                  payload := Aragon.permissionPayload ctx role }
+                true (encode 32 0 ++ suffix) }] }
+
+case neg
+k : Queue.Keccak
+aclExternal other : External
+ctx : Context
+role value : Word
+w after : World
+suffix : Bytes
+hi : Aragon.initialized ctx w = true
+hk : (Aragon.kernel ctx w).val ≠ 0
+hkc : (w.core.codeSize (Aragon.kernel ctx w).val).val ≠ 0
+ha : (acl k (Aragon.kernel ctx w) w).val ≠ 0
+hac : (w.core.codeSize (acl k (Aragon.kernel ctx w) w).val).val ≠ 0
+hr :
+  aclExternal
+      { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w, value := Verity.Core.Uint256.ofNat 0,
+        payload := Aragon.permissionPayload ctx role }
+      w =
+    Reply.success (encode 32 value.val ++ suffix) after
+hr' :
+  hasPermission k aclExternal (Aragon.kernel ctx w) ctx role w =
+    Reply.successWithTrace (encode 32 (if value.val ≠ 0 then 1 else 0)) after
+      (attempted
+        { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w, value := Verity.Core.Uint256.ofNat 0,
+          payload := Aragon.permissionPayload ctx role }
+        true (encode 32 value.val ++ suffix))
+hd0 : decodeWord (encode 32 0) 0 after = { outcome := Except.ok (Verity.Core.Uint256.ofNat 0), world := after }
+hd1 : decodeWord (encode 32 1) 0 after = { outcome := Except.ok (Verity.Core.Uint256.ofNat 1), world := after }
+hv : ¬value.val = 0
+⊢ (match
+      (Aragon.permissionCall (dispatch k (Aragon.kernel ctx w) ctx role aclExternal other) ctx (Aragon.kernel ctx w)
+          role w).outcome with
+    | Except.error e =>
+      { outcome := Except.error e,
+        world :=
+          (Aragon.permissionCall (dispatch k (Aragon.kernel ctx w) ctx role aclExternal other) ctx (Aragon.kernel ctx w)
+              role w).world,
+        attempts :=
+          (Aragon.permissionCall (dispatch k (Aragon.kernel ctx w) ctx role aclExternal other) ctx (Aragon.kernel ctx w)
+              role w).attempts }
+    | Except.ok a =>
+      {
+        outcome :=
+          (match
+              (decodeWord a 0
+                  (Aragon.permissionCall (dispatch k (Aragon.kernel ctx w) ctx role aclExternal other) ctx
+                      (Aragon.kernel ctx w) role w).world).outcome with
+            | Except.error e =>
+              { outcome := Except.error e,
+                world :=
+                  (decodeWord a 0
+                      (Aragon.permissionCall (dispatch k (Aragon.kernel ctx w) ctx role aclExternal other) ctx
+                          (Aragon.kernel ctx w) role w).world).world,
+                attempts :=
+                  (decodeWord a 0
+                      (Aragon.permissionCall (dispatch k (Aragon.kernel ctx w) ctx role aclExternal other) ctx
+                          (Aragon.kernel ctx w) role w).world).attempts }
+            | Except.ok a_1 =>
+              { outcome := Except.ok !decide (a_1.val = 0),
+                world :=
+                  (decodeWord a 0
+                      (Aragon.permissionCall (dispatch k (Aragon.kernel ctx w) ctx role aclExternal other) ctx
+                          (Aragon.kernel ctx w) role w).world).world,
+                attempts :=
+                  (decodeWord a 0
+                      (Aragon.permissionCall (dispatch k (Aragon.kernel ctx w) ctx role aclExternal other) ctx
+                          (Aragon.kernel ctx w) role w).world).attempts }).outcome,
+        world :=
+          (match
+              (decodeWord a 0
+                  (Aragon.permissionCall (dispatch k (Aragon.kernel ctx w) ctx role aclExternal other) ctx
+                      (Aragon.kernel ctx w) role w).world).outcome with
+            | Except.error e =>
+              { outcome := Except.error e,
+                world :=
+                  (decodeWord a 0
+                      (Aragon.permissionCall (dispatch k (Aragon.kernel ctx w) ctx role aclExternal other) ctx
+                          (Aragon.kernel ctx w) role w).world).world,
+                attempts :=
+                  (decodeWord a 0
+                      (Aragon.permissionCall (dispatch k (Aragon.kernel ctx w) ctx role aclExternal other) ctx
+                          (Aragon.kernel ctx w) role w).world).attempts }
+            | Except.ok a_1 =>
+              { outcome := Except.ok !decide (a_1.val = 0),
+                world :=
+                  (decodeWord a 0
+                      (Aragon.permissionCall (dispatch k (Aragon.kernel ctx w) ctx role aclExternal other) ctx
+                          (Aragon.kernel ctx w) role w).world).world,
+                attempts :=
+                  (decodeWord a 0
+                      (Aragon.permissionCall (dispatch k (Aragon.kernel ctx w) ctx role aclExternal other) ctx
+                          (Aragon.kernel ctx w) role w).world).attempts }).world,
+        attempts :=
+          (Aragon.permissionCall (dispatch k (Aragon.kernel ctx w) ctx role aclExternal other) ctx (Aragon.kernel ctx w)
+                role w).attempts ++
+            (match
+                (decodeWord a 0
+                    (Aragon.permissionCall (dispatch k (Aragon.kernel ctx w) ctx role aclExternal other) ctx
+                        (Aragon.kernel ctx w) role w).world).outcome with
+              | Except.error e =>
+                { outcome := Except.error e,
+                  world :=
+                    (decodeWord a 0
+                        (Aragon.permissionCall (dispatch k (Aragon.kernel ctx w) ctx role aclExternal other) ctx
+                            (Aragon.kernel ctx w) role w).world).world,
+                  attempts :=
+                    (decodeWord a 0
+                        (Aragon.permissionCall (dispatch k (Aragon.kernel ctx w) ctx role aclExternal other) ctx
+                            (Aragon.kernel ctx w) role w).world).attempts }
+              | Except.ok a_1 =>
+                { outcome := Except.ok !decide (a_1.val = 0),
+                  world :=
+                    (decodeWord a 0
+                        (Aragon.permissionCall (dispatch k (Aragon.kernel ctx w) ctx role aclExternal other) ctx
+                            (Aragon.kernel ctx w) role w).world).world,
+                  attempts :=
+                    (decodeWord a 0
+                        (Aragon.permissionCall (dispatch k (Aragon.kernel ctx w) ctx role aclExternal other) ctx
+                            (Aragon.kernel ctx w) role w).world).attempts }).attempts }) =
+    { outcome := Except.ok true, world := after,
+      attempts :=
+        [{
+            request :=
+              { caller := ctx.self, target := Aragon.kernel ctx w, value := 0,
+                payload := Aragon.permissionPayload ctx role },
+            accepted := true, returned := encode 32 1,
+            nested :=
+              attempted
+                { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w, value := 0,
+                  payload := Aragon.permissionPayload ctx role }
+                true (encode 32 value.val ++ suffix) }] }
+LidoSRv3/Audit/Source/TrioReserve1/Kernel.lean:111:4: warning: This simp argument is unused:
+  Aragon.permissionCall
+
+Hint: Omit it from the simp argument list.
+  simp only [Aragon.canPerform, hi, Bool.not_true, Bool.false_eq_true, ite_false, hk, A̵r̵a̵g̵o̵n̵.̵p̵e̵r̵m̵i̵s̵s̵i̵o̵n̵C̵a̵l̵l̵,̵ ̵hkc, dispatch]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/Kernel.lean:111:27: warning: This simp argument is unused:
+  hkc
+
+Hint: Omit it from the simp argument list.
+  simp only [Aragon.canPerform, hi, Bool.not_true, Bool.false_eq_true, ite_false, hk,
+      Aragon.permissionCall, h̵k̵c̵,̵ ̵dispatch]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/Kernel.lean:111:32: warning: This simp argument is unused:
+  dispatch
+
+Hint: Omit it from the simp argument list.
+  simp only [Aragon.canPerform, hi, Bool.not_true, Bool.false_eq_true, ite_false, hk,
+      Aragon.permissionCall, hkc,̵ ̵d̵i̵s̵p̵a̵t̵c̵h̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/Kernel.lean:112:13: warning: This simp argument is unused:
+  and_self
+
+Hint: Omit it from the simp argument list.
+  simp only [a̵n̵d̵_̵s̵e̵l̵f̵,̵ ̵ite_true, word, Verity.Core.Uint256.val_ofNat] at *
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/Kernel.lean:112:23: warning: This simp argument is unused:
+  ite_true
+
+Hint: Omit it from the simp argument list.
+  simp only [and_self, i̵t̵e̵_̵t̵r̵u̵e̵,̵ ̵word, Verity.Core.Uint256.val_ofNat] at *
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/Kernel.lean:112:39: warning: This simp argument is unused:
+  Verity.Core.Uint256.val_ofNat
+
+Hint: Omit it from the simp argument list.
+  simp only [and_self, ite_true, word,̵ ̵V̵e̵r̵i̵t̵y̵.̵C̵o̵r̵e̵.̵U̵i̵n̵t̵2̵5̵6̵.̵v̵a̵l̵_̵o̵f̵N̵a̵t̵] at *
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/Kernel.lean:113:13: warning: This simp argument is unused:
+  show (0 : Nat) % Verity.Core.Uint256.modulus = 0 by rfl
+
+Hint: Omit it from the simp argument list.
+  simp only [̵s̵h̵o̵w̵ ̵(̵0̵ ̵:̵ ̵N̵a̵t̵)̵ ̵%̵ ̵V̵e̵r̵i̵t̵y̵.̵C̵o̵r̵e̵.̵U̵i̵n̵t̵2̵5̵6̵.̵m̵o̵d̵u̵l̵u̵s̵ ̵=̵ ̵0̵ ̵b̵y̵ ̵r̵f̵l̵,̵ ̵n̵e̵_̵e̵q̵,̵[̲n̲e̲_̲e̲q̲,̲ not_true_eq_false, ite_false, hr', bind, bindExec]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/Kernel.lean:113:77: warning: This simp argument is unused:
+  not_true_eq_false
+
+Hint: Omit it from the simp argument list.
+  simp only [show (0 : Nat) % Verity.Core.Uint256.modulus = 0 by rfl, ne_eq, n̵o̵t̵_̵t̵r̵u̵e̵_̵e̵q̵_̵f̵a̵l̵s̵e̵,̵ite_false, hr', bind,
+  ̲  ̲ ̲ ̲bindExec]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/Kernel.lean:114:4: warning: This simp argument is unused:
+  ite_false
+
+Hint: Omit it from the simp argument list.
+  simp only [show (0 : Nat) % Verity.Core.Uint256.modulus = 0 by rfl, ne_eq, not_true_eq_false,
+  ̵  ̵ ̵ ̵i̵t̵e̵_̵f̵a̵l̵s̵e̵,̵ ̵hr',
+  ̲  ̲ ̲ ̲bind, bindExec]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/Kernel.lean:114:15: warning: This simp argument is unused:
+  hr'
+
+Hint: Omit it from the simp argument list.
+  simp only [show (0 : Nat) % Verity.Core.Uint256.modulus = 0 by rfl, ne_eq, not_true_eq_false,
+      ite_false, h̵r̵'̵,̵ ̵bind, bindExec]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/Kernel.lean:115:44: warning: This simp argument is unused:
+  hd0
+
+Hint: Omit it from the simp argument list.
+  simp [hv, hd0̵,̵ ̵h̵d̵1, pure, pureExec, bindExec]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/Kernel.lean:115:49: warning: This simp argument is unused:
+  hd1
+
+Hint: Omit it from the simp argument list.
+  simp [hv, hd0, h̵d̵1̵,̵ ̵pure, pureExec, bindExec]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/Kernel.lean:115:70: warning: This simp argument is unused:
+  bindExec
+
+Hint: Omit it from the simp argument list.
+  simp [hv, hd0, hd1, pure, pureExec,̵ ̵b̵i̵n̵d̵E̵x̵e̵c̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
