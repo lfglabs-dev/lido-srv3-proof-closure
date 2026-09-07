@@ -2,6 +2,10 @@ import LidoSRv3.Audit.Source.TrioReserve1.Queue
 import LidoSRv3.Audit.Source.TrioReserve1.Erasure
 import LidoSRv3.Audit.Source.TrioReserve1.PhysicalPacking
 import LidoSRv3.Audit.Source.TrioReserve1.Writers
+import LidoSRv3.Audit.Source.TrioReserve1.Allocation
+import LidoSRv3.Audit.Source.TrioReserve1.Router
+import LidoSRv3.Audit.Source.TrioReserve1.Locator
+import LidoSRv3.Audit.Source.TrioReserve1.Transfers
 
 /-! Owned inspection, pending coordinated canonical Trust registration. -/
 open LidoSRv3.Audit.Source.TrioReserve1
@@ -22,3 +26,17 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms Writers.rebalance_corresponds
 #print axioms Writers.target_observations
 #print axioms Writers.rebalance_observations
+
+#print axioms AllocationSpec.unique
+#print axioms AllocationSpec.two_live_spends
+#print axioms Allocation.success_corresponds
+#print axioms Allocation.successful_queue_observation
+#print axioms Router.source_rule
+#print axioms Router.authorized_call
+#print axioms Router.unauthorized_call
+#print axioms Locator.queue_getter
+#print axioms Locator.router_getter
+#print axioms Locator.oracle_getter
+#print axioms Transfers.conserves
+#print axioms Transfers.self_transfer_balance
+#print axioms Transfers.credit_bound_from_aggregate

@@ -1,4 +1,6 @@
 import LidoSRv3.Audit.Source.TrioReserve1.Queue
+import LidoSRv3.Audit.Source.TrioReserve1.Router
+import LidoSRv3.Audit.Source.TrioReserve1.Locator
 import Lean
 
 /-!
@@ -64,13 +66,24 @@ private def execute (j : Json) : Except String Json := do
   let queue ← address j "queue"
   let cells ← (← list (← field j "storage")).mapM cell
   let funds ← (← list (← field j "balances")).mapM fun v => do
-    pure (← address v "account", ← number v "value")
+    let amount ← number v "value"
+    if amount ≥ 2^256 then throw "invalid account balance"
+    pure (← address v "account", amount)
   let codes ← (← list (← field j "code")).mapM fun v => do
     pure (← address v "account", ← number v "size")
   let fixtures ← (← list (← field j "fixtures")).mapM fixture
   let fixtureTargets ← (← list (← field j "fixtureTargets")).mapM fun v => do
     let n ← nat v
     pure (Verity.Core.Address.ofNat n)
+  let sourceRouters ← match j.getObjVal? "sourceRouters" with
+    | .error _ => pure []
+    | .ok rows => (← list rows).mapM fun v => do
+        pure (← address v "router", ← address v "lido")
+  let sourceLocators ← match j.getObjVal? "sourceLocators" with
+    | .error _ => pure []
+    | .ok rows => (← list rows).mapM fun v => do
+        let config : Locator.Config := ⟨← address v "queue", ← address v "router", ← address v "oracle"⟩
+        pure (← address v "locator", config)
   let hashes ← (← list (← field j "hashes")).mapM fun v => do
     pure (← bytes (← field v "input"), word (← number v "output"))
   let core := cells.foldl (fun s c => s.writeContractSlot c.account.val c.slot c.value)
@@ -89,10 +102,22 @@ private def execute (j : Json) : Except String Json := do
     match fixtures.find? (fun f => f.target = req.target ∧ f.payload = req.payload) with
     | some f => if f.reject then .rejected f.returned else .success f.returned w
     | none => if fixtureTargets.contains req.target then .success [] w else .rejected []
-  let external := Queue.dispatch keccak queue fixtureExternal
   let mutation := (j.getObjValAs? String "mutation").toOption.getD "none"
-  if mutation != "none" && mutation != "cached-demand" && mutation != "omit-rollback" then
+  if !(["none", "cached-demand", "omit-rollback", "receiver-no-auth", "receiver-no-event"].contains mutation) then
     throw "unknown mutation"
+  let receiverExternal := sourceRouters.foldr (fun (router, lido) other =>
+    Router.dispatch router (if mutation = "receiver-no-auth" then ctx.self else lido) other) fixtureExternal
+  let receiverExternal : External := if mutation = "receiver-no-event" then
+    fun req w => match receiverExternal req w with
+      | .success data after =>
+        if sourceRouters.any (fun (router, _) => req.target = router) ∧
+            req.payload = encode 4 0x13ae8460 then .success data {after with logs := w.logs}
+        else .success data after
+      | .rejected data => .rejected data
+    else receiverExternal
+  let locatorExternal := sourceLocators.foldr (fun (locator, config) other =>
+    Locator.dispatch locator config other) receiverExternal
+  let external := Queue.dispatch keccak queue locatorExternal
   -- Executed negative control: replace the live queue body by a cached word.
   let external : External := if mutation = "cached-demand" then
     fun req w => if req.payload = encode 4 0xd0fb84e8 then .success (encode 32 50) w

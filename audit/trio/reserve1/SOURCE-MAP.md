@@ -5,7 +5,7 @@ No canonical source-map or guarantee entries are changed.
 
 | Body | Source | Executable / evidence | Boundary |
 | --- | --- | --- | --- |
-| allocation | `contracts/0.4.24/Lido.sol:605-616` | `Live.getBufferedEtherAllocation` | saves total/deposit partition before locator/queue CALL; full correspondence open |
+| allocation | `contracts/0.4.24/Lido.sol:605-616` | `Live.getBufferedEtherAllocation` | Allocation.successful_queue_observation relates maximality to actual CALL bytes and saved physical locals; full withdrawal composition open |
 | canDeposit | `Lido.sol:815-816` | `Live.canDeposit` | bunker CALL before local pause read; source-shaped executor plus differential evidence |
 | spending | `Lido.sol:839-859` | `Live.spendDepositableEther` | packed writes/events before frame CALL; full correspondence open |
 | withdrawal | `Lido.sol:869-886` | `Live.withdrawDepositableEther` | caller/config admission, seeds, ETH CALL; full correspondence open |
@@ -14,9 +14,9 @@ No canonical source-map or guarantee entries are changed.
 | packed setters | `contracts/0.4.24/utils/UnstructuredStorageExt.sol:20-46` | `PhysicalPacking` | bitwise pair-packer equivalence and projections checked; all parent writer correspondences not closed |
 | queue demand | `contracts/0.8.9/WithdrawalQueueBase.sol:143-146` | `Queue.unfinalized_corresponds` / `QueueSpec` | physical current ids/rows, numeric return/panic relation; cryptographic primitive parameter |
 | bunker getter | `contracts/0.8.9/WithdrawalQueue.sol:346-354` | `Queue.isBunkerModeActive`; inherited Solidity execution | actual timestamp/max sentinel; writer ACL closure open |
-| locator getters | `contracts/0.8.9/LidoLocator.sol:46-56,78-88` | external interpreter boundary | actual immutable constructor bindings still to compose |
+| locator getters | `contracts/0.8.9/LidoLocator.sol:46-56,78-88` | Locator.dispatch/getter proofs; inherited 0.8.9 constructor/getters executed | queue/router/oracle immutable values; deployment binding remains explicit |
 | oracle frame | `contracts/0.8.9/oracle/AccountingOracle.sol:439-442` | external interpreter boundary | BaseOracle consensus/ref-slot/time helpers still to compose |
-| router receipt | `contracts/0.8.25/sr/StakingRouter.sol:665-669` | external interpreter boundary | actual LIDO auth and DepositableEthReceived event still to compose; source compiler 0.8.25 |
+| router receipt | `contracts/0.8.25/sr/StakingRouter.sol:665-669` | Router/RouterSpec auth, event and CALL theorems; inherited 0.8.25 Cancun execution | exact-selector receiver composition; full router parent/bytecode refinement open |
 
 ## Writer inventory requiring composition
 
@@ -49,11 +49,15 @@ order, and committed ABI events. Queue mapping preimages are computed with
 ethers keccak and provided to Lean; missing current-row preimages fail the driver.
 The trace is outside contract state; erasure is checked compositionally.
 
-Nested callee traces, reentrancy/callback composition, production immutable
-locator binding, actual consensus/oracle interpretation, actual router receipt,
-Aragon ACL and complete report/writer composition remain open. World balances
-use Nat; the bounded EVM account relation and credit behavior remain to be tied
-to source execution, not inferred from the finite small-balance cases. The generic
+Nested callee traces, reentrancy/callback composition, complete deployment
+binding, actual consensus/oracle interpretation, Aragon ACL and complete
+report/writer composition remain open. Locator getters and router receiver now
+have source implementations and finite composed executions; full withdrawal
+correspondence is not implied. World balances
+use Nat. Transfers proves debit/credit, self-call identity, conservation and
+a conditional credit bound from aggregate available ETH. Deriving that aggregate
+bound and the complete bounded EVM world relation remains open; it is not
+inferred from the finite small-balance cases. The generic
 external interpreter permits rejection, arbitrary bytes, and successful world
 effects; that permissiveness is not itself a proof of production behavior.
 Fixtures are finite test data, not successful-callee proof premises.

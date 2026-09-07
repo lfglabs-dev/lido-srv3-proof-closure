@@ -1,5 +1,41 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Current source composition work
+
+`Allocation.successful_queue_observation` now connects the independent maximal
+allocation relation to the actual locator result, queue CALL, first ABI word and
+saved pre-call physical buffer/reserve locals. Arbitrary callee effects are
+allowed; no freshness or preservation premise replaces the live observation.
+
+`Router`/`RouterSpec` implement and check immutable LIDO authorization, exact
+NotAuthorized rejection, DepositableEthReceived event and value-CALL effects.
+`Locator` models the three immutable getters, with checked exact-selector
+replies and no state effects. Pinned Solidity tests inherit these real bodies,
+with linked StakingRouter libraries and the repository's 0.8.25 viaIR/Cancun
+settings. The in-process test EVM is Hardhat 2.26.3 Cancun. Router forwarding
+remains fixture admission; oracle/consensus behavior remains a fixture boundary.
+
+`Transfers` proves sender debit, recipient credit, other-account frame,
+self-transfer balance identity and exact ETH conservation. The credit-bound
+theorem explicitly requires an aggregate balance bound. Deriving that bound
+from a full bounded EVM world remains open. The JSON driver rejects account
+balances outside uint256 rather than accepting them as EVM input states.
+
+Receipts `router-execute-1` and `router-execute-2` record respectively 32 and 35
+matching executions, each with two executed mutant kills. The expanded driver
+adds receiver-authorization and receiver-event mutants. Final component and
+execution receipts against immutable source are recorded separately under
+`source-composition-immutable` and `router-composition`; consult their actual
+exits rather than infer success from this description. Earlier 29-case receipts
+and the 32-case comparison are retained. Component checks report standard axioms
+only; they use existing imported oleans and are not clean/full build evidence.
+
+The remote wrapper hash is unchanged from continuation-recovery.json. Its
+complete-source/dependency transport blocker remains; no new remote job was
+submitted. Full gates, complete withdrawal and writer/oracle/sequence composition,
+canonical registration and independent review remain required. The older status
+sections below retain the prior checkpoint's historical evidence and limitations.
+
 ## Continuation after recovery of fa377ac
 
 Recovered exact head `fa377ac1372733b8781255a5e47cfde80f92e9d6` and verified

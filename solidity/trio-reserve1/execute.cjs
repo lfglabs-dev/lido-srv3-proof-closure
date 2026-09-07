@@ -3,7 +3,6 @@ const fs = require('node:fs');
 const path = require('node:path');
 const cp = require('node:child_process');
 const assert = require('node:assert/strict');
-const ganache = require('ganache');
 const {ethers} = require('ethers');
 const U128 = 1n << 128n;
 const slots = {
@@ -27,14 +26,17 @@ const coder = ethers.AbiCoder.defaultAbiCoder();
 const selector = signature => ethers.id(signature).slice(0,10);
 const encode = (types, values) => coder.encode(types, values);
 const artifacts = name => JSON.parse(fs.readFileSync(path.join(__dirname,'artifacts',name+'.sol.json')));
+const receiptDir = path.resolve(__dirname,'../../audit/trio/reserve1/receipts/router-composition');
 async function main() {
-  const backend = ganache.provider({logging:{quiet:true},chain:{hardfork:'shanghai',allowUnlimitedContractSize:true},wallet:{deterministic:true}});
+  fs.mkdirSync(receiptDir,{recursive:true});
+  process.env.HARDHAT_CONFIG = path.join(__dirname,'hardhat.config.cjs');
+  const backend = require('hardhat').network.provider;
   const provider = new ethers.BrowserProvider(backend);
   provider.pollingInterval = 10;
   const signer = await provider.getSigner();
-  async function deploy(file, name) {
+  async function deploy(file, name, args=[]) {
     const a = artifacts(file)[name];
-    const c = await new ethers.ContractFactory(a.abi,a.evm.bytecode.object,signer).deploy({gasLimit:29000000});
+    const c = await new ethers.ContractFactory(a.abi,a.evm.bytecode.object,signer).deploy(...args,{gasLimit:29000000});
     await c.waitForDeployment(); return c;
   }
   const lido = await deploy('LidoHarness','LidoHarness');
@@ -42,7 +44,44 @@ async function main() {
   const locator = await deploy('LidoHarness','CallFixture');
   const router = await deploy('LidoHarness','CallFixture');
   const oracle = await deploy('LidoHarness','CallFixture');
+  const routerArtifacts = JSON.parse(fs.readFileSync(path.join(__dirname,'artifacts','router-linked.json')));
+  const libraries = new Map();
+  async function deployLinked(file, name, args=[]) {
+    const a = routerArtifacts[file][name];
+    let bytecode = a.evm.bytecode.object;
+    for (const [source, refs] of Object.entries(a.evm.bytecode.linkReferences)) {
+      for (const [library, positions] of Object.entries(refs)) {
+        const key = source+':'+library;
+        if (!libraries.has(key)) libraries.set(key,await deployLinked(source,library));
+        const address = (await libraries.get(key).getAddress()).slice(2);
+        for (const p of positions) {
+          assert.equal(p.length,20);
+          bytecode = bytecode.slice(0,p.start*2)+address+bytecode.slice((p.start+p.length)*2);
+        }
+      }
+    }
+    const c = await new ethers.ContractFactory(a.abi,bytecode,signer).deploy(...args,{gasLimit:29000000});
+    await c.waitForDeployment(); return c;
+  }
+  const sourceRouter = await deployLinked('solidity/trio-reserve1/RouterHarness.sol','RouterHarness',
+    [await lido.getAddress(),await locator.getAddress()]);
+  const wrongRouter = await deployLinked('solidity/trio-reserve1/RouterHarness.sol','RouterHarness',
+    [await signer.getAddress(),await locator.getAddress()]);
   const addresses = {lido:await lido.getAddress(),queue:await queue.getAddress(),locator:await locator.getAddress(),router:await router.getAddress(),oracle:await oracle.getAddress()};
+  addresses.sourceRouter = await sourceRouter.getAddress();
+  addresses.wrongRouter = await wrongRouter.getAddress();
+  const locatorConfig = Object.fromEntries(artifacts('LocatorHarness').LocatorHarness.abi
+    .find(x=>x.type==='constructor').inputs[0].components.map(x=>[x.name,addresses.lido]));
+  Object.assign(locatorConfig,{accountingOracle:addresses.oracle,stakingRouter:addresses.sourceRouter,
+    withdrawalQueue:addresses.queue});
+  const sourceLocator = await deploy('LocatorHarness','LocatorHarness',[locatorConfig]);
+  addresses.sourceLocator = await sourceLocator.getAddress();
+  const sourceLocators = [{locator:decimal(addresses.sourceLocator),queue:decimal(addresses.queue),
+    router:decimal(addresses.sourceRouter),oracle:decimal(addresses.oracle)}];
+  const sourceRouters = [
+    {router:decimal(addresses.sourceRouter),lido:decimal(addresses.lido)},
+    {router:decimal(addresses.wrongRouter),lido:decimal(await signer.getAddress())},
+  ];
   const send = async tx => (await tx).wait();
   let fixtureRows = [];
   const configure = async (c, signature, data, reject=false) => {
@@ -63,18 +102,18 @@ async function main() {
   await store('target',20n);
   await store('next',10n * U128 + 9n); // old frame, must reset
   await send(queue.fixtureEnqueue(50n,50n,await signer.getAddress()));
-  await backend.request({method:'evm_setAccountBalance',params:[addresses.lido,ethers.toQuantity(100n)]});
+  await backend.request({method:'hardhat_setBalance',params:[addresses.lido,ethers.toQuantity(100n)]});
   async function observe() {
     const storage = {};
     for (const [key, slot] of Object.entries(slots)) storage[key] = (await lido.fixtureLoad(slot)).toString();
     const balances = {};
-    for (const key of ['lido','router','queue']) balances[key] = BigInt(await backend.request({method:'eth_getBalance',params:[addresses[key],'latest']})).toString();
+    for (const key of ['lido','router','queue','sourceRouter','wrongRouter']) balances[key] = BigInt(await backend.request({method:'eth_getBalance',params:[addresses[key],'latest']})).toString();
     return {storage,balances};
   }
   const cases = [], vectors = [], expected = [];
   const rawCell = async (account, slot) => ({account:decimal(account),slot:decimal(slot),
     value:decimal((await backend.request({method:'eth_getStorageAt',params:[account,ethers.toBeHex(BigInt(slot),32),'latest']})).replace(/^0x$/, '0x0'))});
-  async function input(name, amount, seeds, direct) {
+  async function input(name, amount, seeds, direct, forwarder) {
     const storage = [];
     for (const slot of Object.values(slots)) storage.push(await rawCell(addresses.lido,slot));
     for (const slot of Object.values(queueSlots)) storage.push(await rawCell(addresses.queue,slot));
@@ -91,23 +130,23 @@ async function main() {
       balances.push({account:decimal(account),value:decimal(await backend.request({method:'eth_getBalance',params:[account,'latest']}))});
       code.push({account:decimal(account),size:String(ethers.getBytes(await provider.getCode(account)).length)});
     }
-    return {name,self:decimal(addresses.lido),sender:decimal(direct ? await signer.getAddress() : addresses.router),
+    return {name,self:decimal(addresses.lido),sender:decimal(direct ? await signer.getAddress() : await forwarder.getAddress()),sourceRouters,sourceLocators,
       queue:decimal(addresses.queue),storage,balances,code,hashes,fixtures:structuredClone(fixtureRows),
       fixtureTargets:[addresses.locator,addresses.router,addresses.oracle].map(decimal),amount:String(amount),seeds:String(seeds)};
   }
-  async function run(name, setup, amount, seeds, expectedSuccess, check=()=>{}, direct=false) {
+  async function run(name, setup, amount, seeds, expectedSuccess, check=()=>{}, direct=false, forwarder=router) {
     const snapshot = await backend.request({method:'evm_snapshot',params:[]});
     const savedFixtures = structuredClone(fixtureRows);
     try {
       await setup();
       const before = await observe();
-      const vector = await input(name,amount,seeds,direct);
+      const vector = await input(name,amount,seeds,direct,forwarder);
       vectors.push(vector);
       const payload = lido.interface.encodeFunctionData('withdrawDepositableEther',[amount,seeds]);
       let receipt;
       try {
         const tx = direct ? await signer.sendTransaction({to:addresses.lido,data:payload,gasLimit:5000000})
-          : await router.forward(addresses.lido,payload,{gasLimit:5000000});
+          : await forwarder.forward(addresses.lido,payload,{gasLimit:5000000});
         receipt = await tx.wait();
       } catch (e) { if (!e.receipt) throw e; receipt=e.receipt; }
       const success = receipt.status === 1;
@@ -155,7 +194,7 @@ async function main() {
   await run('oracle rejection after packed write',()=>configure(oracle,'getCurrentFrame()','0xdeadbeef',true),30n,0n,false);
   await run('short oracle result after packed write',()=>configure(oracle,'getCurrentFrame()','0x01'),30n,0n,false);
   await run('ETH recipient rejection after seed write',()=>configure(router,'receiveDepositableEther()','0xdeadbeef',true),30n,2n,false);
-  await run('actual ETH balance insufficient',()=>backend.request({method:'evm_setAccountBalance',params:[addresses.lido,'0x01']}),30n,2n,false);
+  await run('actual ETH balance insufficient',()=>backend.request({method:'hardhat_setBalance',params:[addresses.lido,'0x1']}),30n,2n,false);
   await run('post report truncation',()=>store('buffer',(U128-1n)*U128+100n),30n,0n,true,after=>assert.equal(BigInt(after.storage.buffer),29n*U128+70n));
   await run('seed truncation',()=>store('seed',U128-1n),30n,1n,true,after=>assert.equal(after.storage.seed,'0'));
   async function queueAnswer(bytes) {
@@ -195,10 +234,24 @@ async function main() {
     await send(router.forward(addresses.lido,lido.interface.encodeFunctionData('withdrawDepositableEther',[20n,0n])));
     await send(queue.fixtureEnqueue(10n,10n,signer.address));
   },20n,0n,true,after=>assert.equal(BigInt(after.storage.next),11n*U128+40n));
-  fs.writeFileSync(path.resolve(__dirname,'../../audit/trio/reserve1/receipts/solidity-execution.json'),JSON.stringify({node:process.version,scope:'Pinned Solidity with matching Lean/Verity execution. Locator/oracle/router are fixture boundaries. Inherited live queue demand and bunker. Gas excluded; tests are not correspondence proofs.',addresses,cases},null,2)+'\n');
+  await run('source router receives ETH and emits event',
+    ()=>configure(locator,'stakingRouter()',encode(['address'],[addresses.sourceRouter])),30n,2n,true,
+    after=>{assert.equal(after.balances.lido,'70');assert.equal(after.balances.sourceRouter,'30');},false,sourceRouter);
+  await run('source router immutable auth rejects after accounting and seed writes',
+    ()=>configure(locator,'stakingRouter()',encode(['address'],[addresses.wrongRouter])),30n,2n,false,
+    ()=>{},false,wrongRouter);
+  await run('source router Lido admission rejects fixture caller',
+    ()=>configure(locator,'stakingRouter()',encode(['address'],[addresses.sourceRouter])),30n,2n,false);
+  await run('source locator queue and router compose',()=>store('locator',BigInt(addresses.sourceLocator)),
+    30n,2n,true,after=>{assert.equal(after.balances.lido,'70');assert.equal(after.balances.sourceRouter,'30');},false,sourceRouter);
+  await run('source locator queue growth blocks overspend',async()=>{
+    await store('locator',BigInt(addresses.sourceLocator));
+    await send(queue.fixtureEnqueue(40n,40n,signer.address));
+  },30n,2n,false,()=>{},false,sourceRouter);
+  await run('source locator caller authorization',()=>store('locator',BigInt(addresses.sourceLocator)),
+    30n,2n,false);
+  fs.writeFileSync(path.join(receiptDir,'solidity-execution.json'),JSON.stringify({node:process.version,backend:'hardhat 2.26.3 in-process Cancun',scope:'Pinned Solidity with matching Lean/Verity execution. Three cases compose source immutable locator, live queue and router. Oracle and adversarial boundaries remain fixtures. Inherited router receiver/auth/event. Gas excluded; tests are not correspondence proofs.',addresses,locatorConfig,libraries:[...libraries.keys()],cases},null,2)+'\n');
   console.log(`${cases.length} pinned Solidity cases executed; reverts checked against physical storage, balances and logs.`);
-  await backend.disconnect();
-  const receiptDir = path.resolve(__dirname,'../../audit/trio/reserve1/receipts');
   fs.writeFileSync(path.join(receiptDir,'differential-input.json'),JSON.stringify(vectors,null,2)+'\n');
   fs.writeFileSync(path.join(receiptDir,'differential-solidity.json'),JSON.stringify(expected,null,2)+'\n');
   cp.execFileSync('lake',['env','lean','--run','LidoSRv3/Tests/TrioReserve1/Differential.lean',
@@ -211,8 +264,9 @@ async function main() {
       bytes(ethers.concat(['0x08c379a0',encode(['string'],[f.reason])]));
     return {name:r.name,success:r.result.success,returned,storage:r.storage,balances:r.balances,calls:r.calls,
       logs:r.logs.map(l=> {
-        const event = lido.interface.getEvent(l.name);
-        const encoded = lido.interface.encodeEventLog(event,l.values);
+        const iface = l.name === 'DepositableEthReceived' ? sourceRouter.interface : lido.interface;
+        const event = iface.getEvent(l.name);
+        const encoded = iface.encodeEventLog(event,l.values);
         return {emitter:l.emitter,topics:encoded.topics.map(x=>x.toLowerCase()),data:encoded.data.toLowerCase()};
       })};
   }
@@ -225,6 +279,8 @@ async function main() {
   const mutationInputs = [
     {...vectors.find(v=>v.name==='queue grows before spend'),mutation:'cached-demand'},
     {...vectors.find(v=>v.name==='oracle rejection after packed write'),mutation:'omit-rollback'},
+    {...vectors.find(v=>v.name==='source router immutable auth rejects after accounting and seed writes'),mutation:'receiver-no-auth'},
+    {...vectors.find(v=>v.name==='source router receives ETH and emits event'),mutation:'receiver-no-event'},
   ];
   fs.writeFileSync(path.join(receiptDir,'mutation-input.json'),JSON.stringify(mutationInputs,null,2)+'\n');
   cp.execFileSync('lake',['env','lean','--run','LidoSRv3/Tests/TrioReserve1/Differential.lean',

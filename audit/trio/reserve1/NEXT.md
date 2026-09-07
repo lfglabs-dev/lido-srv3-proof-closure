@@ -1,8 +1,9 @@
 # Continuation — not a completion claim
 
-The code checkpoint is b06cf0dc0861b93592f1de80820b68ff10b6905f. Read STATUS and
-receipts/live-jobs.json first. Do not duplicate the existing gate runner; its
-terminal receipts are durable. Do not poll/resubmit the failed remote job.
+Read STATUS and the latest source-composition receipts first. The old gate
+runner handle is absent, and full gates have no verified terminal success.
+The unchanged remote wrapper rejects the submodule in complete-source mode;
+use a supported complete-source/dependency transport when available. Do not poll/resubmit the failed remote job.
 The final complete P-RESERVE-1 proof has not been constructed.
 
 ## Highest priority proof/implementation work
@@ -22,11 +23,12 @@ The final complete P-RESERVE-1 proof has not been constructed.
    Timestamp at AccountingOracle:561-563 is checked GENESIS_TIME +
    slot * SECONDS_PER_SLOT. Runtime-code/config binding is an explicit
    compilation/deployment assumption; behavioral postconditions must be derived.
-3. The actual router receiver is 0.8.25 StakingRouter.sol:665-669: compare caller
+3. Router/RouterSpec and inherited execution now cover the actual receiver;
+   maintain these while closing the full parent. The actual router receiver is 0.8.25 StakingRouter.sol:665-669: compare caller
    to immutable LIDO through _checkAppAuth (1177-1179), revert NotAuthorized(),
-   then emit DepositableEthReceived(msg.value). Current fixture deliberately does
-   not implement this source body/event; extend compiler configuration by that
-   source compiler, not by changing Lido to 0.8.25.
+   then emit DepositableEthReceived(msg.value). The source compiler is now pinned to 0.8.25 with viaIR/Cancun, and tests
+   run an in-process Cancun EVM. The forwarding harness is still fixture
+   admission, not production router withdrawal initiation.
 4. Nested call observations are missing from the current External reply type.
    Extend their representation separately from World state, prove the extended
    erasure laws, and model STATICCALL's state restrictions and failure behavior.
@@ -46,7 +48,8 @@ The final complete P-RESERVE-1 proof has not been constructed.
    mutation cases to follow the complete composed model. Keep source/payload/
    event normalization and exclusions explicit.
 
-The existing comparison suite runs 29 matching cases and two mutants. The generic
+The comparison suite now runs 35 matching cases; receiver-auth/event mutants
+join the cached-demand/rollback negative controls. See actual exit receipts. The generic
 external interpreter permits arbitrary world effects; this supports failure
 modeling but does not itself derive preservation by actual deployed source.
 Old registered declarations remain untouched until full migration validation.
