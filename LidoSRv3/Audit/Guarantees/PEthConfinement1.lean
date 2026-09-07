@@ -19,13 +19,13 @@ cannot live in the model layer, because `scripts/check_import_dag.py` rejects
 a model → guarantees import; it lives here, where importing
 `LidoSRv3.Audit.Guarantees.Registry` is the ordinary direction.
 
-## What the conclusion says
+## What the presence-only conclusion says
 
 For every modeled ETH-world trace, every positive-value authorized frame is
 either
 
 * one of three explicitly named residual hops, or
-* covered by a registered parent guarantee **and** landing on a frozen
+* labeled with a registered parent identifier **and** a frozen
   `Spec.ApprovedDestination`.
 
 Its content is the agreement of three tables that are written independently
@@ -39,6 +39,10 @@ Agreement between (1) and (2) is what makes the conclusion refutable rather
 than a restatement of one table, and (3) forbids naming a covering parent
 that is not actually a registered guarantee.  `EthConfinementMutants` edits
 one line of each table and refutes the corresponding conjunct.
+
+The additive `modeled_inventory_matches_exact_assignments` also binds exact
+labels to an independent literal table. Neither theorem establishes that the
+named parent semantically covers a live execution; that composition is open.
 
 ## What it does not say
 
@@ -92,7 +96,7 @@ theorem coveringParentsAreRegistered : CoveringParentsAreRegistered := by
 /-- **P-ETH-CONFINEMENT-1 candidate parent.** Universal over ETH-world
 traces: the three independently written tables agree, the residual list is
 exactly the uncovered inventory, and every positive-value authorized frame is
-either a named residual hop or is both parent-covered and Spec-approved.
+either a named residual hop or has both a parent label and Spec approval.
 
 Scope: `ValueRoute`, not the pinned Solidity.  One ETH exit in the source
 (`WithdrawalQueueBase.sol:529`) is outside this enumeration entirely; see the
@@ -102,6 +106,21 @@ theorem modeled_positive_value_is_confined_or_residual
     ConfinementConclusion ∧ Confined flows :=
   ⟨⟨coveringParentsAreRegistered, coverageAgreesWithSpecApproval,
       residualIsExactlyTheUncoveredInventory, residualHopsAreUnclassified⟩,
+    confined flows⟩
+
+/-- Additive exact-assignment conclusion. The old conclusion only checks option
+presence; this also rejects changing a label to another registered parent or
+another approved destination. Neither proves semantic theorem applicability. -/
+def ExactConfinementConclusion : Prop :=
+  ConfinementConclusion ∧
+    RouteAssignmentsMatch ValueRoute.primaryParent ValueRoute.destination Destination.toSpec
+
+/-- Exact agreement of the modeled inventory with independent literal route
+assignments, plus the existing residual/registry facts. This is an inventory
+result, not a composition with the named parents or a Solidity confinement proof. -/
+theorem modeled_inventory_matches_exact_assignments (flows : List GeneralFlow) :
+    ExactConfinementConclusion ∧ Confined flows :=
+  ⟨⟨(modeled_positive_value_is_confined_or_residual flows).1, routeAssignmentsMatch⟩,
     confined flows⟩
 
 end LidoSRv3.Audit.Guarantees.PEthConfinement1

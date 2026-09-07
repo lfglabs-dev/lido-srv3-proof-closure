@@ -168,4 +168,58 @@ theorem production_conclusion_holds : ConfinementConclusion :=
   ⟨coveringParentsAreRegistered, coverageAgreesWithSpecApproval,
     residualIsExactlyTheUncoveredInventory, residualHopsAreUnclassified⟩
 
+/-! ## Exact-assignment regressions: substitutions that preserve presence -/
+
+def parent_swapped (r : ValueRoute) : Option CoveringParent :=
+  if r = .vaultConsolidationCall then some .pDepositOne else r.primaryParent
+
+def approval_swapped (d : Destination) : Option ApprovedDestination :=
+  if d = .consolidationPredeploy then some .lidoPull else d.toSpec
+
+def destination_swapped (r : ValueRoute) : Destination :=
+  if r = .vaultConsolidationCall then .lidoPull else r.destination
+
+theorem control_parent_swap_only_one_row :
+    (∀ r, r ≠ .vaultConsolidationCall → parent_swapped r = r.primaryParent) ∧
+      parent_swapped .vaultConsolidationCall ≠ ValueRoute.primaryParent .vaultConsolidationCall := by
+  constructor
+  · intro r h; simp [parent_swapped, h]
+  · decide
+
+theorem control_approval_swap_only_one_row :
+    (∀ d, d ≠ .consolidationPredeploy → approval_swapped d = d.toSpec) ∧
+      approval_swapped .consolidationPredeploy ≠ Destination.toSpec .consolidationPredeploy := by
+  constructor
+  · intro d h; simp [approval_swapped, h]
+  · decide
+
+theorem control_destination_swap_only_one_row :
+    (∀ r, r ≠ .vaultConsolidationCall → destination_swapped r = r.destination) ∧
+      destination_swapped .vaultConsolidationCall ≠ ValueRoute.destination .vaultConsolidationCall := by
+  constructor
+  · intro r h; simp [destination_swapped, h]
+  · decide
+
+/-- These wrong identities evade the former isSome check. -/
+theorem swaps_preserve_presence :
+    (∀ r, (parent_swapped r).isSome = (r.destination.toSpec).isSome) ∧
+      (∀ r : ValueRoute, r.primaryParent.isSome = (approval_swapped r.destination).isSome) ∧
+        (∀ r : ValueRoute, r.primaryParent.isSome = ((destination_swapped r).toSpec).isSome) := by
+  refine ⟨?_, ?_, ?_⟩ <;> intro r <;> cases r <;> decide
+
+theorem kill_exact_assignment_parent_swap :
+    ¬ RouteAssignmentsMatch parent_swapped ValueRoute.destination Destination.toSpec := by
+  intro h
+  exact absurd (h .vaultConsolidationCall) (by decide)
+
+theorem kill_exact_assignment_approval_swap :
+    ¬ RouteAssignmentsMatch ValueRoute.primaryParent ValueRoute.destination approval_swapped := by
+  intro h
+  exact absurd (h .vaultConsolidationCall) (by decide)
+
+theorem kill_exact_assignment_destination_swap :
+    ¬ RouteAssignmentsMatch ValueRoute.primaryParent destination_swapped Destination.toSpec := by
+  intro h
+  exact absurd (h .vaultConsolidationCall) (by decide)
+
 end LidoSRv3.Tests.EthConfinementMutants
