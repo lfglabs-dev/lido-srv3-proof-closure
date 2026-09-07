@@ -1,5 +1,21 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## ACL capacity stability
+
+`ACLBounds` proves that increasing the evaluator's recursion depth preserves
+any completed result, including invalid-opcode failure and the entire ordered
+oracle trace. The proof covers parameter evaluation, specific/wildcard permission
+selection and the externally visible ACL dispatch reply. Two completed runs at
+arbitrary bounds must agree, by extending both to a common capacity. Host
+exhaustion stays distinct from denial and source failure throughout.
+
+This closes capacity stability and completed-result uniqueness, not termination
+for arbitrary cyclic storage, independent parameter-tree correspondence, or the
+relation between host depth and EVM gas/stack resources. Runtime implementations
+are unchanged; the 28-case source execution remains tied to its original commit.
+The new module passed draft bounded elaboration; immutable checks follow the
+source commit.
+
 ## Physical ACL evaluation and source composition
 
 `ACL` reads specific/wildcard permission hashes and packed parameter arrays from

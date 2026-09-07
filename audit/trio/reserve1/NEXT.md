@@ -76,6 +76,8 @@ or duplicate the old terminal remote job. The old local full-gate handle is abse
    comparison and logic operators, and raw oracle STATICCALL. ACLCalls composes
    terminating evaluation through Kernel/Aragon and proves unconditional source
    admission from physical storage. 28 draft full-source comparisons pass.
+   ACLBounds now proves completed-result/trace stability under increased depth,
+   full dispatcher stability, and uniqueness across any completed capacities.
    Complete independent parameter-tree correspondence and termination/resource
    binding: recursion exhaustion is a host limit, never source denial. Complete
    ACL mutation admission, deployment/proxy/primitive and callback binding; oracle

@@ -21,6 +21,7 @@ import LidoSRv3.Audit.Source.TrioReserve1.PhysicalSequence
 import LidoSRv3.Audit.Source.TrioReserve1.Aragon
 import LidoSRv3.Audit.Source.TrioReserve1.Kernel
 import LidoSRv3.Audit.Source.TrioReserve1.ACLCalls
+import LidoSRv3.Audit.Source.TrioReserve1.ACLBounds
 
 /-! Owned inspection, pending coordinated canonical Trust registration. -/
 open LidoSRv3.Audit.Source.TrioReserve1
@@ -199,3 +200,11 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms ACL.grants_corresponds
 #print axioms ACLCalls.canPerform
 #print axioms ACLCalls.unconditional_specific
+
+#print axioms ACLBounds.bind_extends
+#print axioms ACLBounds.eval_succ
+#print axioms ACLBounds.eval_mono
+#print axioms ACLBounds.permission_mono
+#print axioms ACLBounds.dispatch_stable
+#print axioms ACLBounds.eval_unique
+#print axioms ACLBounds.permission_unique
