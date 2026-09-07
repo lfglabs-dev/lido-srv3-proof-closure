@@ -303,3 +303,34 @@ source hash. The full remote target now also includes staged `ParentErrors`.
 The canonical metadata, proof-escape, source-annotation, import-DAG and Python
 quality checks passed on the combined source. Full remote validation of this
 integration remains required, including the new response-memory VM cases.
+
+
+## Interleaved first-pass memory guards
+
+`RowMemory.firstRow_exact` threads the 224-byte configuration allocation before
+enum validation, followed by the actual summary and optional stake calls and
+their response allocations. With pointer + 352 <= 2^32 it equals the original
+row call tree plus the exact successful pointer (320 or 352 additional bytes).
+`firstRow_erasure` preserves every return/error alternative and attempted call
+when the pointer is erased. `config_failure` covers allocation failure before
+any enum check or external call.
+
+`firstLoop_exact` lifts that result to the complete first pass, with the explicit
+budget pointer + 352*n <= 2^32. It threads each successful row's pointer rather
+than independently assuming room for each row; `endPointer_bound` derives the
+final upper bound. Seven source cases cover configuration/enum/decoder priority,
+summary and stake buffer sizes, two-row success and allocation failure in the
+second row after an earlier call. `row-memory-init-receipt.json` passes 75 modules
+with matching source hashes and only standard logical axioms for these proofs.
+
+This pass still needs composition with the entry array/cache prefix, the initial
+scratch configuration allocation, the following capacity array, second pass and
+parent ABI copies. Its pointer is a source value; physical stores, memory aliasing,
+gas and full compiler refinement are not proved. The new row/loop source needs
+full remote compilation and actual VM execution after that composition.
+
+Full job `592f6ed2-a8ee-4af8-8e5e-6887ab80aa86` on Nippur validates
+`431e73ee` under durable `7c33729b-a873-5380-a416-d7d3855dbc55`. It includes
+the published writer integrations and seven response-memory VM cases, but
+predates `RowMemory`. Both it and old-agent job `7d446706` were authoritatively
+running at the latest check; neither is final-head certification.
