@@ -1,0 +1,91 @@
+{
+  "dependencies": [
+    {
+      "name": "verity",
+      "head": "e977aaad6e1a9e92e0132d41b3d33a14135a4d46",
+      "expected": "e977aaad6e1a9e92e0132d41b3d33a14135a4d46",
+      "private_directory": true
+    },
+    {
+      "name": "evmyul",
+      "head": "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9",
+      "expected": "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9",
+      "private_directory": true
+    },
+    {
+      "name": "mathlib",
+      "head": "fabf563a7c95a166b8d7b6efca11c8b4dc9d911f",
+      "expected": "fabf563a7c95a166b8d7b6efca11c8b4dc9d911f",
+      "private_directory": true
+    },
+    {
+      "name": "plausible",
+      "head": "63045536fe95024e6c18fc7b48e03f506701c5bc",
+      "expected": "63045536fe95024e6c18fc7b48e03f506701c5bc",
+      "private_directory": true
+    },
+    {
+      "name": "LeanSearchClient",
+      "head": "c5d5b8fe6e5158def25cd28eb94e4141ad97c843",
+      "expected": "c5d5b8fe6e5158def25cd28eb94e4141ad97c843",
+      "private_directory": true
+    },
+    {
+      "name": "importGraph",
+      "head": "5c7542ed018c78194f1e2b903eaf6a792b74c03d",
+      "expected": "5c7542ed018c78194f1e2b903eaf6a792b74c03d",
+      "private_directory": true
+    },
+    {
+      "name": "proofwidgets",
+      "head": "24b0d9dc081c5423f8eec7e866c441e5184f29d9",
+      "expected": "24b0d9dc081c5423f8eec7e866c441e5184f29d9",
+      "private_directory": true
+    },
+    {
+      "name": "aesop",
+      "head": "e3cb2f741431ce31bf73549fb52316a57368b06f",
+      "expected": "e3cb2f741431ce31bf73549fb52316a57368b06f",
+      "private_directory": true
+    },
+    {
+      "name": "Qq",
+      "head": "f46324995fca5f0483b742e4eb4daec7f4ee50d2",
+      "expected": "f46324995fca5f0483b742e4eb4daec7f4ee50d2",
+      "private_directory": true
+    },
+    {
+      "name": "batteries",
+      "head": "fa08db58b30eb033edcdab331bba000827f9f785",
+      "expected": "fa08db58b30eb033edcdab331bba000827f9f785",
+      "private_directory": true
+    },
+    {
+      "name": "Cli",
+      "head": "92564e5770e4d09f2d86dfbf8ada1e9c715b384c",
+      "expected": "92564e5770e4d09f2d86dfbf8ada1e9c715b384c",
+      "private_directory": true
+    }
+  ],
+  "source_sha256": {
+    "LidoSRv3/Audit/Source/TrioReserve1/PartitionSpec.lean": "36f1afa4bf2c60832bc7edc34c8c9623e492c3f8ab92a75d4bbd713442d8987b",
+    "LidoSRv3/Audit/Source/TrioReserve1/QueueSpec.lean": "b9fe21bb34946a83565a61b298ab178ccff6adab6cc711ab3eb1e3672c7729e4",
+    "LidoSRv3/Audit/Source/TrioReserve1/WriterSpec.lean": "4d060c61f360d339e52c72eba03b8f1c6e06856f7f7c643d7945a05f2f51371e",
+    "LidoSRv3/Audit/Source/TrioReserve1/Queue.lean": "be75949b3843e55ce9cbe56ad20f54dcf95b8d0ed6dbe380778366863aac6890",
+    "LidoSRv3/Audit/Source/TrioReserve1/Erasure.lean": "9681f6a6992cb1db27f2bdb82febc3915c59d9eae68b2b2796a0e8003bffc99e",
+    "LidoSRv3/Audit/Source/TrioReserve1/PhysicalPacking.lean": "058f7d0641e27963179c02fa84e1c233960535e22f67ea1aa72835af6c89245e",
+    "LidoSRv3/Audit/Source/TrioReserve1/Packing.lean": "4b4dda2555af0a8977ce2185b851bd63ca3ddd9420d493d438c7abed31bf38f3",
+    "LidoSRv3/Audit/Source/TrioReserve1/Writers.lean": "463d563881d6433272f930ebf9d465a9c275a822b8b2e1ced66632246d89a7ba",
+    "LidoSRv3/Audit/Source/TrioReserve1/Live.lean": "7b3f4cfd6d6578ed492402f684b1f572158752d107ce94cd630aeb312fb6aac0",
+    "LidoSRv3/Tests/TrioReserve1/LiveTrust.lean": "7fc5199a9b3afcac47b588801bd2e5b55dde6338fa2da8e04b347854ad12d7a5",
+    "LidoSRv3/Tests/TrioReserve1/Foundations.lean": "268fbe724132adf67e00bb6e6dd90f1063bd03c545c1749e52d94f69be77d1ab",
+    "LidoSRv3/Tests/TrioReserve1/Differential.lean": "656c48f05df8b8a1ea0370d9246e3c01394fb4a09d11e385f1288a442dc2c278",
+    "solidity/trio-reserve1/compile.cjs": "bc8380edfe0a28b17929799b81aafd84ac04a5a44e9c058cd14a154e8e8fc85b",
+    "solidity/trio-reserve1/execute.cjs": "4cfcde18bbcaa2827cf3f35612fda990c81dbefac80c0034b772f09e6db36b9c",
+    "solidity/trio-reserve1/QueueHarness.sol": "8dce70332e635d5c5a149432436212fda29f7e533a466f2d10a39767bd334d88",
+    "solidity/trio-reserve1/LidoHarness.sol": "c91bc08a3f9cf324e3a530b8b41e99e74a5eb8f31e83d441f248518a965c3f37",
+    "solidity/trio-reserve1/package-lock.json": "868a72074cf41509b1314875d3c0663d39e637dc7f8f780ad0bf038110468ad7",
+    "lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
+    "lean-toolchain": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee"
+  }
+}

@@ -1,0 +1,4 @@
+remote-lean-build: pinned tree contains submodules; using legacy runner fetch
+remote-lean-build: dispatching lake build LidoSRv3 LidoSRv3Test LidoSRv3Audit for c7adae044167 ...
+reserve1 resume-only guard: refusing possible submission
+remote-lean-build: submit transport failed with an unknown outcome (curl 93); do not fall back locally, check the fleet before retrying

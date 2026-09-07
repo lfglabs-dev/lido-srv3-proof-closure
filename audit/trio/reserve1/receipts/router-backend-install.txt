@@ -1,0 +1,16 @@
+npm warn deprecated glob@8.1.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+
+added 207 packages, and audited 986 packages in 26s
+
+102 packages are looking for funding
+  run `npm fund` for details
+
+77 vulnerabilities (13 low, 20 moderate, 37 high, 7 critical)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.

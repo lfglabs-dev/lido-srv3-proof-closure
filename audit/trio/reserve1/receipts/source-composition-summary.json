@@ -1,0 +1,66 @@
+{
+  "source_commit": "df5a6b52d561ffa6014d6cf4cdae48481b398a3f",
+  "finished_utc": "2026-09-07T11:45:12.803558+00:00",
+  "previous_goal_turn": "progress: checked independent allocation specification and pushed 863301c",
+  "this_turn": "progress: live allocation correspondence, source router and locator composition, transfer proofs and executed matching tests",
+  "source_and_artifact_hashes_rechecked": true,
+  "compilation": [
+    {
+      "inventory": "router-compilation.json",
+      "sha256": "77edbf8ffbbb824cf90d0afbaa280703e87eaf7919174ce8b63293f50ba3d63f",
+      "all_source_hashes_match": true
+    },
+    {
+      "inventory": "solidity-compilation-with-locator.json",
+      "sha256": "22966362c212cd9f59c147e93efc52eea23f8be92147fa995d38c607b0daa570",
+      "all_source_hashes_match": true
+    }
+  ],
+  "component_checks": 8,
+  "components_exit": 0,
+  "execution_exit": 0,
+  "matching_cases": 35,
+  "mutants": [
+    {
+      "name": "queue grows before spend",
+      "mutation": "cached-demand",
+      "killed": true
+    },
+    {
+      "name": "oracle rejection after packed write",
+      "mutation": "omit-rollback",
+      "killed": true
+    },
+    {
+      "name": "source router immutable auth rejects after accounting and seed writes",
+      "mutation": "receiver-no-auth",
+      "killed": true
+    },
+    {
+      "name": "source router receives ETH and emits event",
+      "mutation": "receiver-no-event",
+      "killed": true
+    }
+  ],
+  "invalid_balance_probe": {
+    "exit": 1,
+    "expected_exit": 1,
+    "diagnostic": "invalid account balance"
+  },
+  "remote_attempt": {
+    "source_commit": "df5a6b52d561ffa6014d6cf4cdae48481b398a3f",
+    "toolchain": "leanprover/lean4:v4.31.0",
+    "command": "REMOTE_BUILD_SOURCE_MODE=full remote-lean-build lake build LidoSRv3 LidoSRv3Test LidoSRv3Audit",
+    "wrapper_sha256": "83736ff6da600782680e9ce6f8d4e7b7e32f58acc5bbc6f0e127130088357d20",
+    "exit": 2,
+    "job_id": null,
+    "node_id": null,
+    "bundle_digest": null,
+    "diagnostic": "source bundle path must be a regular file, not a symlink: lido-core; failed to encode request",
+    "classification": "infrastructure: local source encoding failure, no remote submission"
+  },
+  "full_gates": "missing",
+  "complete_withdrawal_correspondence": "open",
+  "independent_certification": false,
+  "goal_complete": false
+}

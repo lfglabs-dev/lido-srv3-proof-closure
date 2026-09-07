@@ -1,0 +1,47 @@
+LidoSRv3/Audit/Source/TrioReserve1/Oracle.lean:29:6: error: omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  b ≥ 0
+  0 ≤ a ≤ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+  a + b ≤ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+where
+ a := ↑slot * ↑seconds
+ b := ↑genesis
+LidoSRv3/Audit/Source/TrioReserve1/Oracle.lean:61:2: error: Tactic `split` failed: Could not split an `if` or `match` expression in the type
+  (have consensus := Verity.Core.Address.ofNat (w.core.readContractSlot oracle.val consensusSlot).val;
+    have r := StaticCall.call external oracle consensus 1928829715 w;
+    match r.outcome with
+    | Except.error data => Reply.rejectedWithTrace data r.attempts
+    | Except.ok data =>
+      if List.length data < 64 then Reply.rejectedWithTrace [] r.attempts
+      else
+        have refSlot := (word (decode (List.take 32 data))).val;
+        match timestamp c.genesis.val c.secondsPerSlot.val refSlot with
+        | OracleSpec.Timestamp.overflow => Reply.rejectedWithTrace panic r.attempts
+        | OracleSpec.Timestamp.value time =>
+          Reply.successWithTrace (encode 32 refSlot ++ encode 32 time) w r.attempts) =
+    Reply.successWithTrace data after trace
+of `h`
+
+Hint: Use `set_option trace.split.failure true` to display additional diagnostic information
+
+external : StaticCall.External
+oracle : Address
+c : Config
+w after : World
+data : Bytes
+trace : List NestedAttempt
+h :
+  (have consensus := Verity.Core.Address.ofNat (w.core.readContractSlot oracle.val consensusSlot).val;
+    have r := StaticCall.call external oracle consensus 1928829715 w;
+    match r.outcome with
+    | Except.error data => Reply.rejectedWithTrace data r.attempts
+    | Except.ok data =>
+      if List.length data < 64 then Reply.rejectedWithTrace [] r.attempts
+      else
+        have refSlot := (word (decode (List.take 32 data))).val;
+        match timestamp c.genesis.val c.secondsPerSlot.val refSlot with
+        | OracleSpec.Timestamp.overflow => Reply.rejectedWithTrace panic r.attempts
+        | OracleSpec.Timestamp.value time =>
+          Reply.successWithTrace (encode 32 refSlot ++ encode 32 time) w r.attempts) =
+    Reply.successWithTrace data after trace
+⊢ after = w

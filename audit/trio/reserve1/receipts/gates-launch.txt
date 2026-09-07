@@ -1,0 +1,21 @@
+Preparing worktree (detached HEAD b06cf0d)
+HEAD is now at b06cf0d WIP reserve1: execute live queue and prove packing, erasure, internal writers
+Cloning into '/workspaces/mission-f19a12b3/reserve1-private/audit/trio/reserve1/.local/gates-b06cf0dc0861b93592f1de80820b68ff10b6905f/lido-core'...
+done.
+Note: switching to '17005714f151e5502c559932319a3f2f74ac2436'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+

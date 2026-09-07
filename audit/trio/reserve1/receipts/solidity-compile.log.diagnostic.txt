@@ -1,0 +1,11 @@
+Full local log SHA256: e0312b51feff977a4b1eda3540a633b9b667f951e7e0b6d8720a982fbb7973dc
+Error: Invalid input source specified.
+    at Object.<anonymous> (/workspaces/mission-f19a12b3/reserve1-private/solidity/trio-reserve1/compile.cjs:36:28)
+    at Module._compile (node:internal/modules/cjs/loader:1356:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1414:10)
+    at Module.load (node:internal/modules/cjs/loader:1197:32)
+    at Module._load (node:internal/modules/cjs/loader:1013:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:128:12)
+    at node:internal/main/run_main_module:28:49
+
+Node.js v18.19.1

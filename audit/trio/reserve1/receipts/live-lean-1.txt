@@ -1,0 +1,2 @@
+LidoSRv3/Audit/Source/TrioReserve1/Live.lean:126:26: error: unexpected token 'from'; expected '_' or identifier
+LidoSRv3/Audit/Source/TrioReserve1/Live.lean:140:24: error(lean.unknownIdentifier): Unknown identifier `transfer`

@@ -1,0 +1,19 @@
+/workspaces/mission-f19a12b3/reserve1-private/solidity/trio-reserve1/compile-router.cjs:25
+if (errors.length) throw Error(errors.map(x => x.formattedMessage).join('\n'));
+                   ^
+
+Error: YulException: Cannot swap Variable var_keyIndices_length with Variable _11: too deep in the stack by 1 slots in [ var_keyIndices_length expr_3 var__pubkeys_length var_topUpLimits_offset var__topUpLimits_length RET var_stakingModuleId var_pubkeys_offset expr_1592_component_2_slot expr_1671_address var_keyIndices_offset var__pubkeys_length expr_3 var__topUpLimits_length var_topUpLimits_offset var_operatorIds_length var_operatorIds_offset _11 ]
+No memoryguard was present. Consider using memory-safe assembly only and annotating it via 'assembly ("memory-safe") { ... }'.
+
+
+    at Object.<anonymous> (/workspaces/mission-f19a12b3/reserve1-private/solidity/trio-reserve1/compile-router.cjs:25:26)
+    at Module._compile (node:internal/modules/cjs/loader:1730:14)
+    at Object..js (node:internal/modules/cjs/loader:1895:10)
+    at Module.load (node:internal/modules/cjs/loader:1465:32)
+    at Function._load (node:internal/modules/cjs/loader:1282:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:170:5)
+    at node:internal/main/run_main_module:36:49
+
+Node.js v22.15.0

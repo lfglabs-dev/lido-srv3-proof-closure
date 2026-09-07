@@ -1,0 +1,45 @@
+{
+  "scope": "Existing baseline gates plus owned additions discoverable by each checker; NOT new delivery trust/registration coverage.",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "scripts/check_proof_escapes.py"
+      ],
+      "exit": 0,
+      "log": "check_proof_escapes.py.txt"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/check_source_annotations.py"
+      ],
+      "exit": 0,
+      "log": "check_source_annotations.py.txt"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/check_report_theorem_inventory.py"
+      ],
+      "exit": 0,
+      "log": "check_report_theorem_inventory.py.txt"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/check_verity_provenance.py"
+      ],
+      "exit": 0,
+      "log": "check_verity_provenance.py.txt"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/check_pinned_source.py"
+      ],
+      "exit": 0,
+      "log": "check_pinned_source.py.txt"
+    }
+  ]
+}

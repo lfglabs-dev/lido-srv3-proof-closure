@@ -1,0 +1,4 @@
+node-v22.15.0-linux-x64.tar.xz
+SHA256 dafe2e8f82cb97de1bd10db9e2ec4c07bbf53389b0799b1e095a918951e78fd4
+Matches upstream SHASUMS256.txt; transport/compiler distribution trust assumed.
+Selected from pinned lido-core/.nvmrc: 22.15

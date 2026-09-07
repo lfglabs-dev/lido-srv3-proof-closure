@@ -1,0 +1,145 @@
+{
+  "scope": "Matching finite boundary fixtures; not a universal correspondence proof. Root return/revert bytes, relevant storage/balances, ordered calls and ABI logs.",
+  "results": [
+    {
+      "name": "live queue spend and frame reset",
+      "matched": true
+    },
+    {
+      "name": "unauthorized caller",
+      "matched": true
+    },
+    {
+      "name": "zero amount",
+      "matched": true
+    },
+    {
+      "name": "bunker",
+      "matched": true
+    },
+    {
+      "name": "paused",
+      "matched": true
+    },
+    {
+      "name": "queue grows before spend",
+      "matched": true
+    },
+    {
+      "name": "oracle rejection after packed write",
+      "matched": true
+    },
+    {
+      "name": "short oracle result after packed write",
+      "matched": true
+    },
+    {
+      "name": "ETH recipient rejection after seed write",
+      "matched": true
+    },
+    {
+      "name": "actual ETH balance insufficient",
+      "matched": true
+    },
+    {
+      "name": "post report truncation",
+      "matched": true
+    },
+    {
+      "name": "seed truncation",
+      "matched": true
+    },
+    {
+      "name": "empty live queue result",
+      "matched": true
+    },
+    {
+      "name": "31 byte live queue result",
+      "matched": true
+    },
+    {
+      "name": "extra live queue return bytes",
+      "matched": true
+    },
+    {
+      "name": "uint256 seed add overflow after effects",
+      "matched": true
+    },
+    {
+      "name": "current frame nonce truncation",
+      "matched": true
+    },
+    {
+      "name": "reversed physical cumulative rows panic",
+      "matched": true
+    },
+    {
+      "name": "queue finalization releases demand",
+      "matched": true
+    },
+    {
+      "name": "uint256 amount rejected",
+      "matched": true
+    },
+    {
+      "name": "noncanonical bunker bool is true",
+      "matched": true
+    },
+    {
+      "name": "paused still decodes bunker result",
+      "matched": true
+    },
+    {
+      "name": "queue address has no code",
+      "matched": true
+    },
+    {
+      "name": "uint256 live demand clamps",
+      "matched": true
+    },
+    {
+      "name": "dirty address upper bits truncate",
+      "matched": true
+    },
+    {
+      "name": "same frame next accounting truncates",
+      "matched": true
+    },
+    {
+      "name": "rebalance target above buffer then full spend",
+      "matched": true
+    },
+    {
+      "name": "lower target releases withdrawal protection",
+      "matched": true
+    },
+    {
+      "name": "second spend uses current queue and accounting",
+      "matched": true
+    },
+    {
+      "name": "source router receives ETH and emits event",
+      "matched": true
+    },
+    {
+      "name": "source router immutable auth rejects after accounting and seed writes",
+      "matched": true
+    },
+    {
+      "name": "source router Lido admission rejects fixture caller",
+      "matched": true
+    },
+    {
+      "name": "source locator queue and router compose",
+      "matched": true
+    },
+    {
+      "name": "source locator queue growth blocks overspend",
+      "matched": true
+    },
+    {
+      "name": "source locator caller authorization",
+      "matched": true
+    }
+  ]
+}

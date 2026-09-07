@@ -1,0 +1,3 @@
+Compiled pinned Lido, queue, locator, AccountingOracle and HashConsensus.
+(node:116928) V8: /workspaces/mission-f19a12b3/reserve1-private/solidity/trio-reserve1/node_modules/solc-0424/soljson.js:3 Invalid asm.js: Invalid member of stdlib
+(Use `node --trace-warnings ...` to show where the warning was created)

@@ -1,0 +1,4 @@
+info: Version 4.2.4 of elan is available! Use `elan self update` to update.
+info: downloading https://releases.lean-lang.org/lean4/v4.31.0/lean-4.31.0-linux.tar.zst
+info: installing /workspaces/mission-5a294468/.elan/toolchains/leanprover--lean4---v4.31.0
+Lake version 5.0.0-src+68218e8 (Lean version 4.31.0)

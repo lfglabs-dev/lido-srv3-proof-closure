@@ -1,0 +1,37 @@
+[
+  {
+    "name": "queue grows before spend",
+    "mutation": "cached-demand",
+    "killed": true
+  },
+  {
+    "name": "oracle rejection after packed write",
+    "mutation": "omit-rollback",
+    "killed": true
+  },
+  {
+    "name": "source router immutable auth rejects after accounting and seed writes",
+    "mutation": "receiver-no-auth",
+    "killed": true
+  },
+  {
+    "name": "source router receives ETH and emits event",
+    "mutation": "receiver-no-event",
+    "killed": true
+  },
+  {
+    "name": "source oracle consensus frame and receiver compose",
+    "mutation": "cached-frame",
+    "killed": true
+  },
+  {
+    "name": "source oracle STATICCALL rejects SSTORE",
+    "mutation": "static-write-success",
+    "killed": true
+  },
+  {
+    "name": "source consensus uint64 frame span overflow panics",
+    "mutation": "consensus-wide-span",
+    "killed": true
+  }
+]

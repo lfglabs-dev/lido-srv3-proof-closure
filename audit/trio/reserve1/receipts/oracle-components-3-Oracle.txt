@@ -1,0 +1,9 @@
+LidoSRv3/Audit/Source/TrioReserve1/Oracle.lean:29:13: error: Application type mismatch: The argument
+  rfl
+has type
+  ?m.45 = ?m.45
+but is expected to have type
+  True
+in the application
+  And.intro rfl
+LidoSRv3/Audit/Source/TrioReserve1/Oracle.lean:66:6: error: `dsimp` made no progress
