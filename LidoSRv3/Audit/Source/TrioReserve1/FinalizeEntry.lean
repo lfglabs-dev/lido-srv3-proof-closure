@@ -121,8 +121,10 @@ theorem dispatch_corresponds (keccak : Queue.Keccak) (queue : Address) (other : 
       QueueFinalize.dispatch keccak queue other req before = reply := by
   by_cases hs : req.target = queue ∧ req.payload.take 4 = encode 4 0xb6013cef
   · by_cases hl : req.payload.length < 68
-    · simp [Dispatches, QueueFinalize.dispatch, hs, hl, eq_comm]
+    · simp [Dispatches, QueueFinalize.dispatch, hs, hl]
+      exact eq_comm
     · simp [Dispatches, QueueFinalize.dispatch, hs, hl, replies_corresponds]
-  · simp [Dispatches, QueueFinalize.dispatch, hs, eq_comm]
+  · simp [Dispatches, QueueFinalize.dispatch, hs]
+    exact eq_comm
 
 end LidoSRv3.Audit.Source.TrioReserve1.FinalizeEntry
