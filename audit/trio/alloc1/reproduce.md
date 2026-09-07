@@ -11,7 +11,7 @@ With Lean 4.31.0 available, run from the repository root:
 python3 audit/trio/alloc1/validate-light.py --lean /path/to/lean --output /fresh/output/light
 ```
 
-The script checks all nine owned modules (including the interface and test entry)
+The script checks the 16 Init-only owned modules (including the interface and test entry)
 with private oleans, rejects non-Init/non-owned imports, bounds each check to 30
 seconds, and records each source SHA-256, exact command, output and exit status.
 `vectors.json` is produced by actually evaluating `produce`, not by printing expected
@@ -88,3 +88,27 @@ fallback occurred.
 regenerate shared canonical files during the agreed additive phase. The ALLOC-2
 owner has the shared integration gate in its goal. Current main was inspected at
 `bcfbb5f027a5c370594891c1a455fde137709941`; it was not merged or modified.
+
+## Verity call VM and public writer
+
+The complete call-tree bridge at `9360d989e9b6b7fd3b1dd306e3fecae6e7c7b3d3`
+passed remote elaboration (33 jobs, exit 0):
+
+```sh
+remote-lean-build lake build LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer
+```
+
+Remote job `88d993e7-7dd5-44f6-910d-73a01757e510` on ashur; exact logs are
+in `receipts/verity-build-9360.json`. The later world-storage adapter and actual
+Verity vector execution are not covered by that older receipt. The remote-only
+vector driver builds its imports before executing the same fixtures through Verity:
+
+```sh
+remote-lean-build lake env lean --run audit/trio/alloc1/RunVerityVectors.lean
+node solidity/trio-alloc1/check-writer.cjs /fresh/output/writer
+```
+
+The writer harness inherits the unmodified public StakingRouter entry point. The
+packed-word test and six error-order/rejection-rollback cases passed; receipts
+`writer-storage.json` and `writer-errors.json` include exact words and raw errors.
+These writer vectors do not establish all-writer reachability.

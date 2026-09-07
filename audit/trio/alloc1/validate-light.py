@@ -23,7 +23,7 @@ env = {**os.environ, 'LEAN_PATH': str(objects)}
 modules = [
     'Audit/Source/TrioAlloc1/' + name for name in
     ['Interface', 'Storage', 'Execution', 'Properties', 'CapacitySpec', 'Bytes', 'Memory', 'FirstPass', 'Relational', 'Determinism', 'ShareWriter', 'CallTree']
-] + ['Tests/TrioAlloc1/' + name for name in ['Execution', 'SolidityVectors', 'Correspondence']]
+] + ['Tests/TrioAlloc1/' + name for name in ['Execution', 'VectorCases', 'SolidityVectors', 'Correspondence']]
 receipt = dict(compiler=subprocess.check_output([str(args.lean), '--version'], text=True).strip(),
                started_at=time.time(), checks=[], classification='IN_PROGRESS')
 try:

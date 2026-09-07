@@ -131,5 +131,33 @@ theorem execute_derives_admission_and_bounds (l : Layout) (s : Storage) (input :
   unfold execute at h
   repeat first | split at h | (simp_all [rejected])
 
+theorem execute_success_storage (l : Layout) (s : Storage) (input : Input)
+    (h : (execute l s input).result = .ok ()) :
+    (execute l s input).storage = write s (moduleSlot l input.moduleId)
+      (replaceShares (s (moduleSlot l input.moduleId)) input.share input.threshold) := by
+  rcases execute_derives_admission_and_bounds l s input h with ⟨role, member, share, threshold, order⟩
+  have enum : ¬ field (s (moduleSlot l input.moduleId)) 224 8 ≥ 3 := by
+    intro bad
+    simp [execute, role, member, Nat.not_lt.mpr share, Nat.not_lt.mpr threshold,
+      Nat.not_lt.mpr order, bad, rejected] at h
+  simp [execute, role, member, Nat.not_lt.mpr share, Nat.not_lt.mpr threshold,
+    Nat.not_lt.mpr order, enum]
+
+theorem execute_stored_share_bound (l : Layout) (s : Storage) (input : Input)
+    (h : (execute l s input).result = .ok ()) :
+    field ((execute l s input).storage (moduleSlot l input.moduleId)) 192 16 ≤ 10000 := by
+  rw [execute_success_storage l s input h]
+  simp only [write, ite_true, replaceShares_share]
+  exact (execute_derives_admission_and_bounds l s input h).2.2.1
+
+theorem execute_other_slot_preserved (l : Layout) (s : Storage) (input : Input)
+    (slot : Word) (separate : slot ≠ moduleSlot l input.moduleId) :
+    (execute l s input).storage slot = s slot := by
+  rcases execute_cases l s input with ⟨reason, rejected⟩ | success
+  · rw [rejected]
+    rfl
+  · rw [execute_success_storage l s input success]
+    exact if_neg separate
+
 end ShareWriter
 end LidoSRv3.Audit.Source.TrioAlloc1

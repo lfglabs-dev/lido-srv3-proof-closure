@@ -1,0 +1,48 @@
+{
+  "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "compiler": "0.8.25+commit.b61c2a91.Emscripten.clang",
+  "checks": [
+    {
+      "name": "role-before-membership-and-share",
+      "revert": "0xe2517d3f00000000000000000000000090f8bf6a479f320ead074411a4b0e7944ea8c9c143bf0e13900cfaa1b03ed5681dc143266597e29a1d6f9cbd84114f0ac21cd208",
+      "status": 0,
+      "events": 0,
+      "storageUnchanged": true
+    },
+    {
+      "name": "membership-before-share",
+      "revert": "0xd41d6282",
+      "status": 0,
+      "events": 0,
+      "storageUnchanged": true
+    },
+    {
+      "name": "share-before-threshold-and-enum",
+      "revert": "0xde009d7a",
+      "status": 0,
+      "events": 0,
+      "storageUnchanged": true
+    },
+    {
+      "name": "threshold-before-enum",
+      "revert": "0x142d5678",
+      "status": 0,
+      "events": 0,
+      "storageUnchanged": true
+    },
+    {
+      "name": "share-exceeds-threshold",
+      "revert": "0x142d5678",
+      "status": 0,
+      "events": 0,
+      "storageUnchanged": true
+    },
+    {
+      "name": "enum-after-validation",
+      "revert": "0x4e487b710000000000000000000000000000000000000000000000000000000000000021",
+      "status": 0,
+      "events": 0,
+      "storageUnchanged": true
+    }
+  ]
+}

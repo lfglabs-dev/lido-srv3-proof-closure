@@ -29,8 +29,9 @@ The v0 `Interface.lean` types are unchanged. New additive modules:
 - `CallTree`: response-dependent full producer program and universal interpreter
   equivalence to the SOURCE executor.
 - `VerityProducer`: full call-tree translation to pinned Verity external-call
-  denotation and proposed correspondence/world-preservation proofs. Heavy remote
-  elaboration is pending; this module is not yet passing evidence.
+  denotation and correspondence/world-preservation proofs passed remote elaboration
+  at 9360d98 (33 jobs, exit 0). The later physical VM-world adapter and vector
+  execution require a new receipt.
 - `ShareWriter`: public role/membership/validation ordering, packed share updates,
   derived admission/share bounds, and rejection snapshot restoration. Compiler
   validation and full reachable-state preservation remain separate obligations.
@@ -104,4 +105,5 @@ The interface has not been changed incompatibly.
 The actual inherited public share writer compiled and executed with solc 0.8.25
 (via IR, optimizer 200, Shanghai). The seeded packed word retained every bit
 outside the two share fields. The receipt is `writer-v1/writer.json` in mission
-output; expanded error-order/rollback vectors are running separately.
+output. All six expanded error-order/rollback cases passed with exact raw errors,
+unchanged seeded storage and no events. The copied receipts are under `receipts/`.

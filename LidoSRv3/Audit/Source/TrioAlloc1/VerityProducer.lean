@@ -62,5 +62,23 @@ theorem producer_correspondence (l : Layout) (s : Storage) (input : CapacityInpu
   rw [CallTree.producer_correspondence] at h
   exact h
 
+/-- Physical word slots of the actual Verity pre-call world. Logical map/array
+channels are not substituted for the pinned Solidity hash-derived slots. -/
+def worldStorage (world : _root_.Verity.ContractState) : Storage := fun slot =>
+  ⟨(world.storage slot.val).val, (world.storage slot.val).isLt⟩
+
+def executeWorld (l : Layout) (input : CapacityInput)
+    (adversary : DenoteExternalCalls.AdversaryModel) (state : DenoteExternalCalls.CallState)
+    (before : Transcript := []) :=
+  execute l (worldStorage state.world) input adversary state before
+
+theorem world_producer_correspondence (l : Layout) (input : CapacityInput)
+    (adversary : DenoteExternalCalls.AdversaryModel) (state : DenoteExternalCalls.CallState)
+    (before : Transcript) :
+    (executeWorld l input adversary state before).1 =
+      produce l (worldStorage state.world) (sourceOracle adversary state.world) input before ∧
+    (executeWorld l input adversary state before).2.world = state.world :=
+  producer_correspondence l (worldStorage state.world) input adversary state before
+
 end VerityProducer
 end LidoSRv3.Audit.Source.TrioAlloc1
