@@ -1,3 +1,4 @@
+import LidoSRv3.Audit.Source.TrioReserve1.ReportRules
 import LidoSRv3.Audit.Source.TrioReserve1.ReportCalls
 import LidoSRv3.Audit.Source.TrioReserve1.ReportParent
 import LidoSRv3.Audit.Source.TrioReserve1.ReportAccounting
@@ -425,3 +426,19 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms ReportCalls.parent_corresponds
 #print axioms ReportCalls.complete
 #print axioms ReportCalls.failure_restores
+
+#print axioms CallDataFlow.of_spec
+#print axioms CallDataFlow.exists_spec
+#print axioms CallDataFlow.to_spec
+#print axioms CallDataFlow.corresponds
+#print axioms ReportLookup.getter_observations
+#print axioms ReportLookup.of_spec
+#print axioms ReportLookup.exists_spec
+#print axioms ReportLookup.corresponds
+#print axioms ReportRules.lookup_observations
+#print axioms ReportRules.call_observations
+#print axioms ReportRules.stage_observations
+#print axioms ReportRules.corresponds
+#print axioms ReportRules.complete
+#print axioms ReportRules.failure_restores
+#print axioms ReportRules.success_active
