@@ -8,7 +8,7 @@ def main : IO Unit := do
   let tools := (← IO.currentDir) / ".lake/trio-tools/foundry-v1.3.1"
   let commands : Array (String × Array String) := #[
     ("bash", #["scripts/prepare_trio_validation.sh"]),
-    ("lake", #["build", "LidoSRv3", "LidoSRv3Test", "LidoSRv3Audit"]),
+    ("lake", #["build", "LidoSRv3", "LidoSRv3Test", "LidoSRv3Audit", "TrioIntegrationChecks"]),
     ("make", #["prove"]),
     ("make", #["test"]),
     ("lake", #["env", "lean", "--run", "audit/trio/alloc1/RunVerityVectors.lean"]),

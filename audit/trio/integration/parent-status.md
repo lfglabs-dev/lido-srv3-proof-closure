@@ -166,3 +166,24 @@ The validation driver now repeats all gate outcomes at the end, allowing capped
 remote logs to retain the complete gate summary. It elaborates locally. The
 active full run at earlier `03f170850b5b` predates these writer integrations and
 the summary change; its result cannot certify this newer source.
+
+## Indexed conversion and parent equivalence
+
+`ConversionBridge.lean` proves exact return/error equivalence between the
+indexed in-place decoded conversion loops and the recursive conversion used by
+the integrated parent, including total multiplication before row reads and
+ordered late failures. Producer and consumer results discharge array-length
+premises; conversion success is not assumed.
+
+`IndexedParentBridge.lean` extends this to the complete staged ALLOC-2 parent,
+preserving the empty-count guard, division, producer calls, both demand branches,
+all failures and attempted-call transcripts. Consumer success is derived from
+the actual producer. `indexed_parent_iff` transfers the independent parent
+relation, and `indexed_parent_abi_eq` connects canonical ABI execution under the
+explicit reachable extent premise. This closes the decoded indexed/recursive
+model alignment, not the compiler-memory or deployed-call boundary.
+
+All 58 Init-only modules pass; `indexed-parent-init-receipt.json` records source
+hashes and standard-axiom output. The new `TrioIntegrationChecks` Lake target
+wires the staged-parent bridge into the remote full-validation driver. That
+expanded full target still requires a fresh remote run.

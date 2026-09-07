@@ -28,7 +28,9 @@ def check(module):
     if not module.startswith(('LidoSRv3.Audit.Source.TrioAlloc1.',
                               'LidoSRv3.Audit.Source.TrioAlloc2.',
                               'LidoSRv3.Tests.TrioIntegration.',
-                              'LidoSRv3.Audit.Source.TrioComposition.')):
+                              'LidoSRv3.Audit.Source.TrioComposition.',
+                              'audit.trio.alloc2.composition.',
+                              'audit.trio.integration.IndexedParentBridge')):
         raise RuntimeError(f'Non-Init closure requires full validation: {module}')
     visited.add(module)
     relative = Path(*module.split('.')).with_suffix('.lean')
@@ -60,6 +62,7 @@ try:
     check('LidoSRv3.Audit.Source.TrioComposition.ParentCalls')
     check('LidoSRv3.Audit.Source.TrioComposition.WriterExtent')
     check('LidoSRv3.Audit.Source.TrioAlloc2.ParentValues')
+    check('audit.trio.integration.IndexedParentBridge')
     receipt['classification'] = 'PASS_INIT_ONLY_COMPOSITION'
 finally:
     (out / 'receipt.json').write_text(json.dumps(receipt, indent=2) + '\n')
