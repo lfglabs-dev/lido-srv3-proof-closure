@@ -1,0 +1,398 @@
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:99:100: warning: This simp argument is unused:
+  fail
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲f̵a̵i̵l̵,̵ ̵write, emit, result, committed, written, observations, checkpointed, finalized,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲index, h0, h1, sub_ok _ _ h2, h3, add_ok _ _ h4, add_ok _ _ h5, add_ok _ _ h6,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲sub_ok _ _ h7]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:104:113: warning: This simp argument is unused:
+  emit
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲fail, write, e̵m̵i̵t̵,̵ ̵result, written, observations, checkpointed, finalized, index, h0,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲h1, sub_ok _ _ h2, h3, add_ok _ _ h4, add_ok _ _ h5, add_ok _ _ h6,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲sub_error _ _ h7]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:104:136: warning: This simp argument is unused:
+  observations
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲fail, write, emit, result, written, o̵b̵s̵e̵r̵v̵a̵t̵i̵o̵n̵s̵,̵ ̵checkpointed, finalized, index, h0, h1,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲sub_ok _ _ h2, h3, add_ok _ _ h4, add_ok _ _ h5, add_ok _ _ h6,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲sub_error _ _ h7]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:109:111: warning: This simp argument is unused:
+  emit
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲fail, write, e̵m̵i̵t̵,̵ ̵result, written, observations, checkpointed, finalized, index, h0,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲h1, sub_ok _ _ h2, h3, add_ok _ _ h4, add_ok _ _ h5, add_error _ _ h6]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:109:125: warning: This simp argument is unused:
+  written
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲fail, write, emit, result, w̵r̵i̵t̵t̵e̵n̵,̵ ̵observations, checkpointed, finalized, index, h0, h1,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲sub_ok _ _ h2, h3, add_ok _ _ h4, add_ok _ _ h5, add_error _ _ h6]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:109:134: warning: This simp argument is unused:
+  observations
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲fail, write, emit, result, written, o̵b̵s̵e̵r̵v̵a̵t̵i̵o̵n̵s̵,̵ ̵checkpointed, finalized, index, h0, h1,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲sub_ok _ _ h2, h3, add_ok _ _ h4, add_ok _ _ h5, add_error _ _ h6]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:114:102: warning: This simp argument is unused:
+  write
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲fail, w̵r̵i̵t̵e,̵ ̵e̵mit, result, written, observations, checkpointed, finalized, index, h0, h1,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲sub_ok _ _ h2, h3, add_ok _ _ h4, add_error _ _ h5]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:114:109: warning: This simp argument is unused:
+  emit
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲fail, write, e̵m̵i̵t̵,̵ ̵result, written, observations, checkpointed, finalized, index, h0, h1,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲sub_ok _ _ h2, h3, add_ok _ _ h4, add_error _ _ h5]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:114:123: warning: This simp argument is unused:
+  written
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲fail, write, emit, result, w̵r̵i̵t̵t̵e̵n̵,̵ ̵observations, checkpointed, finalized, index, h0, h1,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲sub_ok _ _ h2, h3, add_ok _ _ h4, add_error _ _ h5]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:114:132: warning: This simp argument is unused:
+  observations
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲fail, write, emit, result, written, o̵b̵s̵e̵r̵v̵a̵t̵i̵o̵n̵s̵,̵ ̵checkpointed, finalized, index, h0, h1,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲sub_ok _ _ h2, h3, add_ok _ _ h4, add_error _ _ h5]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:114:146: warning: This simp argument is unused:
+  checkpointed
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲fail, write, emit, result, written, observations, c̵h̵e̵c̵k̵p̵o̵i̵n̵t̵e̵d̵,̵ ̵finalized, index, h0, h1,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲sub_ok _ _ h2, h3, add_ok _ _ h4, add_error _ _ h5]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:114:160: warning: This simp argument is unused:
+  finalized
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲fail, write, emit, result, written, observations, checkpointed, f̵ina̵l̵i̵z̵e̵d,̵ ̵i̵n̵d̵ex, h0, h1,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲sub_ok _ _ h2, h3, add_ok _ _ h4, add_error _ _ h5]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:114:171: warning: This simp argument is unused:
+  index
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲fail, write, emit, result, written, observations, checkpointed, finalized, i̵n̵d̵e̵x̵,̵ ̵h0, h1,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲sub_ok _ _ h2, h3, add_ok _ _ h4, add_error _ _ h5]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:119:100: warning: This simp argument is unused:
+  write
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec, fail,
+  ̲ w̵r̵i̵t̵e̵,̵  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲emit, result, written, observations, checkpointed, finalized, index, h0, h1,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲sub_ok _ _ h2, h3, add_error _ _ h4]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:119:107: warning: This simp argument is unused:
+  emit
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec, fail,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲write, e̵m̵i̵t̵,̵ ̵result, written, observations, checkpointed, finalized, index, h0, h1,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲sub_ok _ _ h2, h3, add_error _ _ h4]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:119:121: warning: This simp argument is unused:
+  written
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec, fail,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲write, emit, result, w̵r̵i̵t̵t̵e̵n̵,̵ ̵observations, checkpointed, finalized, index, h0, h1,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲sub_ok _ _ h2, h3, add_error _ _ h4]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:119:130: warning: This simp argument is unused:
+  observations
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec, fail,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲write, emit, result, written, o̵b̵s̵e̵r̵v̵a̵t̵i̵o̵n̵s̵,̵ ̵checkpointed, finalized, index, h0, h1, sub_ok _ _ h2,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲h3, add_error _ _ h4]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:119:144: warning: This simp argument is unused:
+  checkpointed
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec, fail,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲write, emit, result, written, observations, c̵h̵e̵c̵k̵p̵o̵i̵n̵t̵e̵d̵,̵ ̵finalized, index, h0, h1, sub_ok _ _ h2,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲h3, add_error _ _ h4]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:119:158: warning: This simp argument is unused:
+  finalized
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec, fail,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲write, emit, result, written, observations, checkpointed, f̵ina̵l̵i̵z̵e̵d,̵ ̵i̵n̵d̵ex, h0, h1,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲sub_ok _ _ h2, h3, add_error _ _ h4]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:119:169: warning: This simp argument is unused:
+  index
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec, fail,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲write, emit, result, written, observations, checkpointed, finalized, i̵n̵d̵e̵x̵,̵ ̵h0, h1,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲sub_ok _ _ h2, h3, add_error _ _ h4]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:124:98: warning: This simp argument is unused:
+  write
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec, fail,
+  ̲ w̵r̵i̵t̵e̵,̵  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲emit, result, written, observations, checkpointed, finalized, index, h0, h1,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲sub_ok _ _ h2, h3]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:124:105: warning: This simp argument is unused:
+  emit
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec, fail,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲write, e̵m̵i̵t̵,̵ ̵result, written, observations, checkpointed, finalized, index, h0, h1,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲sub_ok _ _ h2, h3]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:124:119: warning: This simp argument is unused:
+  written
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec, fail,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲write, emit, result, w̵r̵i̵t̵t̵e̵n̵,̵ ̵observations, checkpointed, finalized, index, h0, h1,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲sub_ok _ _ h2, h3]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:129:96: warning: This simp argument is unused:
+  write
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec, fail,
+  ̲ w̵r̵i̵t̵e̵,̵  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲emit, result, written, observations, checkpointed, finalized, index, h0, h1,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲sub_error _ _ h2]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:129:103: warning: This simp argument is unused:
+  emit
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec, fail,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲write, e̵m̵i̵t̵,̵ ̵result, written, observations, checkpointed, finalized, index, h0, h1,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲sub_error _ _ h2]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:129:117: warning: This simp argument is unused:
+  written
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec, fail,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲write, emit, result, w̵r̵i̵t̵t̵e̵n̵,̵ ̵observations, checkpointed, finalized, index, h0, h1,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲sub_error _ _ h2]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:129:126: warning: This simp argument is unused:
+  observations
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec, fail,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲write, emit, result, written, o̵b̵s̵e̵r̵v̵a̵t̵i̵o̵n̵s̵,̵ ̵checkpointed, finalized, index, h0, h1, sub_error _ _ h2]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:129:140: warning: This simp argument is unused:
+  checkpointed
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec, fail,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲write, emit, result, written, observations, c̵h̵e̵c̵k̵p̵o̵i̵n̵t̵e̵d̵,̵ ̵finalized, index, h0, h1, sub_error _ _ h2]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:129:154: warning: This simp argument is unused:
+  finalized
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec, fail,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲write, emit, result, written, observations, checkpointed, f̵ina̵l̵i̵z̵e̵d,̵ ̵i̵n̵d̵ex, h0, h1, sub_error _ _ h2]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:129:165: warning: This simp argument is unused:
+  index
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec, fail,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲write, emit, result, written, observations, checkpointed, finalized, i̵n̵d̵e̵x̵,̵ ̵h0, h1,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲sub_error _ _ h2]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:134:94: warning: This simp argument is unused:
+  write
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec, fail, w̵r̵e̲m̲ite̵,
+  ̲ e̵m̵i̵t̵,̵  ̲ ̲ ̲ ̲ ̲ ̲result, written, observations, checkpointed, finalized, index, h0, h1]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:134:101: warning: This simp argument is unused:
+  emit
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec, fail, write,
+  ̲ e̵m̵i̵t̵,̵  ̲ ̲ ̲ ̲ ̲ ̲result, written, observations, checkpointed, finalized, index, h0, h1]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:134:115: warning: This simp argument is unused:
+  written
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec, fail, write,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲emit, result, w̵r̵i̵t̵t̵e̵n̵,̵ ̵observations, checkpointed, finalized, index, h0, h1]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:134:124: warning: This simp argument is unused:
+  observations
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec, fail, write,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲emit, result, written, o̵b̵s̵e̵r̵v̵a̵t̵i̵o̵n̵s̵,̵ ̵checkpointed, finalized, index, h0, h1]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:134:138: warning: This simp argument is unused:
+  checkpointed
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec, fail, write,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲emit, result, written, observations, c̵h̵e̵c̵k̵p̵o̵i̵n̵t̵e̵d̵,̵ ̵finalized, index, h0, h1]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:134:152: warning: This simp argument is unused:
+  finalized
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec, fail, write,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲emit, result, written, observations, checkpointed, f̵ina̵l̵i̵z̵e̵d,̵ ̵i̵n̵d̵ex, h0, h1]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:134:163: warning: This simp argument is unused:
+  index
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec, fail, write,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲emit, result, written, observations, checkpointed, finalized, i̵n̵d̵e̵x̵,̵ ̵h0, h1]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:139:70: warning: This simp argument is unused:
+  pure
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure,̵ ̵p̵u̵r̵e̵Exec, fail, write, emit,
+  ̲  ̲ ̲ ̲ ̲ ̲result, written, observations, checkpointed, finalized, index, h0]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:139:76: warning: This simp argument is unused:
+  pureExec
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, p̵u̵r̵e̵E̵x̵e̵c̵,̵ ̵fail, write, emit,
+  ̲  ̲ ̲ ̲ ̲ ̲result, written, observations, checkpointed, finalized, index, h0]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:139:92: warning: This simp argument is unused:
+  write
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec, fail, w̵r̵e̲m̲ite̵,
+  ̲ e̵m̵i̵t̵,̵  ̲ ̲ ̲ ̲result, written, observations, checkpointed, finalized, index, h0]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:139:99: warning: This simp argument is unused:
+  emit
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec, fail, write,
+  ̲ e̵m̵i̵t̵,̵  ̲ ̲ ̲ ̲result, written, observations, checkpointed, finalized, index, h0]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:139:113: warning: This simp argument is unused:
+  written
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec, fail, write,
+  ̲  ̲ ̲ ̲ ̲ ̲emit, result, w̵r̵i̵t̵t̵e̵n̵,̵ ̵observations, checkpointed, finalized, index, h0]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:139:122: warning: This simp argument is unused:
+  observations
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec, fail, write,
+  ̲  ̲ ̲ ̲ ̲ ̲emit, result, written, o̵b̵s̵e̵r̵v̵a̵t̵i̵o̵n̵s̵,̵ ̵checkpointed, finalized, index, h0]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:139:136: warning: This simp argument is unused:
+  checkpointed
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec, fail, write,
+  ̲  ̲ ̲ ̲ ̲ ̲emit, result, written, observations, c̵h̵e̵c̵k̵p̵o̵i̵n̵t̵e̵d̵,̵ ̵finalized, index, h0]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:139:150: warning: This simp argument is unused:
+  finalized
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec, fail, write,
+  ̲  ̲ ̲ ̲ ̲ ̲emit, result, written, observations, checkpointed, f̵ina̵l̵i̵z̵e̵d,̵ ̵i̵n̵d̵ex, h0]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeRules.lean:139:161: warning: This simp argument is unused:
+  index
+
+Hint: Omit it from the simp argument list.
+  simp [QueueFinalize.finalize, Live.read, bind, bindExec, require, pure, pureExec, fail, write,
+  ̲  ̲ ̲ ̲ ̲ ̲emit, result, written, observations, checkpointed, finalized, i̵n̵d̵e̵x̵,̵ ̵h0]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

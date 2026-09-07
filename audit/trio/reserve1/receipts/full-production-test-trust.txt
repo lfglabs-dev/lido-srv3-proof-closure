@@ -1,0 +1,318 @@
+source_commit=b06cf0dc0861b93592f1de80820b68ff10b6905f
+command=lake build LidoSRv3 LidoSRv3Test LidoSRv3Audit 
+⚠ [11/21] Replayed Verity.Core
+warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1041:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+✔ [12/78] Built Verity.Core.Model.Constants (3.2s)
+✔ [13/95] Built LidoSRv3.Audit.Common.Units (4.7s)
+✔ [14/97] Built Compiler.Yul.Ast (4.7s)
+✔ [15/98] Built Verity.Core.Model.ProofStatus (5.9s)
+✔ [16/98] Built Compiler.CompilationModel.IssueRefs (5.8s)
+✔ [18/98] Built Verity.Core.Model.Identifier (6.2s)
+✔ [19/116] Built Compiler.CompilationModel.InternalNaming (6.2s)
+✔ [143/250] Built Compiler.Json (6.6s)
+✔ [352/455] Built LidoSRv3.Audit.Guarantees.Registry (7.7s)
+✔ [667/743] Built Verity.EVM.Uint256 (6.1s)
+✔ [1069/1158] Built Compiler.Keccak.Circuit (12s)
+✔ [1071/1162] Built LidoSRv3.Audit.Spec (9.0s)
+✔ [1078/1189] Built Compiler.ProofStatus (8.2s)
+✔ [1080/1189] Built Verity.Core.Model.ECM (10s)
+✔ [1081/1193] Built Compiler.IR (12s)
+✔ [1086/1232] Built EvmYul.SpongeHash.Keccak256 (8.9s)
+✔ [1087/1232] Built EvmYul.FFI.ffi (10s)
+✔ [1088/1238] Built Verity.Stdlib.Math (23s)
+✔ [1089/1238] Built Compiler.CompilationModel.DynamicData (18s)
+✔ [1090/1240] Built Compiler.ECM (8.1s)
+✔ [1091/1240] Built EvmYul.PerformIO (11s)
+✔ [1092/1261] Built EvmYul.Data.Stack (10s)
+✔ [1095/1272] Built Compiler.Constants (9.9s)
+✔ [1097/1272] Built Compiler.Proofs.YulGeneration.LogNames (7.9s)
+✔ [1098/1296] Built Compiler.Proofs.YulGeneration.Calldata (5.4s)
+✔ [1100/1358] Built Compiler.Proofs.YulGeneration.Backends.EvmYulLeanSignedArithSpec (14s)
+✔ [1101/1358] Built Verity.Core.Free.IRStepAttr (16s)
+✔ [1102/1358] Built Verity.Specs.Common (32s)
+✔ [1103/1358] Built Verity.Core.Semantics (22s)
+✔ [1104/1358] Built LidoSRv3.Audit.Source.GIndexConcatCorrespondence (9.6s)
+✔ [1105/1358] Built Verity.Macro.Syntax (47s)
+✔ [1106/1358] Built LidoSRv3.Audit.Ssz (15s)
+✔ [1107/1358] Built LidoSRv3.Audit.Spec.VaultHubScopeChild (6.2s)
+✔ [1108/1358] Built LidoSRv3.Audit.Arithmetic (27s)
+✔ [1109/1358] Built Compiler.Sha256.Engine (14s)
+✔ [1110/1358] Built LidoSRv3.Audit.Spec.Eip4788AnchorChild (11s)
+✔ [1111/1358] Built LidoSRv3.Audit.Source.AddressTransferCorrespondence (12s)
+✔ [1112/1358] Built LidoSRv3.Audit.Common.Bounded (11s)
+✔ [1113/1358] Built LidoSRv3.Audit.Common.Result (12s)
+✔ [1114/1358] Built Compiler.Keccak.CircuitData (52s)
+✔ [1115/1358] Built LidoSRv3.Audit.Common.Trace (11s)
+✔ [1116/1358] Built LidoSRv3.Audit.Model.ReserveRelational (18s)
+✔ [1117/1358] Built LidoSRv3.Audit.Model.AllocCapacity (44s)
+✔ [1118/1358] Built LidoSRv3.Audit.Guarantees.PTopup2 (43s)
+✔ [1119/1358] Built LidoSRv3.Audit.Spec.ProductionGindexChild (7.4s)
+✔ [1120/1358] Built LidoSRv3.Audit.Source.VaultEthCorrespondence (32s)
+✔ [1121/1358] Built LidoSRv3.Audit.Source.BeaconRootsCorrespondence (12s)
+✔ [1122/1358] Built LidoSRv3.Audit.Common.Atomicity (8.5s)
+✔ [1123/1358] Built Compiler.Keccak.Sponge (18s)
+✔ [1124/1358] Built LidoSRv3.Audit.Source.ConsolidationCorrespondence (50s)
+✔ [1125/1358] Built EvmYul.UInt256 (81s)
+✔ [1126/1358] Built LidoSRv3.Audit.Trace (26s)
+✔ [1127/1358] Built LidoSRv3.Audit.Source.ReserveRelationalCorrespondence (17s)
+✔ [1128/1358] Built LidoSRv3.Audit.Spec.SszLiveCorrespondence (14s)
+✔ [1129/1358] Built LidoSRv3.Audit.Source.AccountingCorrespondence (44s)
+✔ [1130/1358] Built LidoSRv3.Audit.Source.AllocCapacityCorrespondence (26s)
+✔ [1131/1358] Built LidoSRv3.Audit.Source.DepositDataRootCorrespondence (46s)
+✔ [1132/1358] Built LidoSRv3.Audit.Verity.BeaconRootsTx (13s)
+✔ [1133/1358] Built Compiler.Keccak.SpongeProperties (5.3s)
+✔ [1134/1358] Built LidoSRv3.Audit.Source.Topup2Correspondence (31s)
+✔ [1135/1358] Built Verity.Core.Model.CodeData (8.1s)
+✔ [1136/1358] Built Compiler.Selectors (10s)
+✔ [1137/1358] Built LidoSRv3.Audit.MinFirstAllocation (55s)
+✔ [1138/1358] Built Verity.Core.Free.TypedIR (61s)
+✔ [1139/1358] Built Verity.Proofs.Stdlib.Automation (74s)
+✔ [1140/1358] Built LidoSRv3.Audit.Spec.Topup2WeiConversionChild (39s)
+✔ [1141/1358] Built LidoSRv3.Audit.Spec.VaultEthCorrespondence (36s)
+✔ [1142/1358] Built Verity.Macro.KeccakLit (33s)
+✔ [1143/1358] Built LidoSRv3.Audit.Guarantees.PReserveRelational (13s)
+✔ [1144/1358] Built Verity.Macro.KeccakString (39s)
+✔ [1145/1358] Built LidoSRv3.Audit.AddressEquivariance (29s)
+✔ [1146/1358] Built Compiler.Proofs.IRGeneration.IRStorageWord (34s)
+✔ [1147/1358] Built LidoSRv3.Audit.Guarantees.PSszLive1 (4.7s)
+✔ [1148/1358] Built LidoSRv3.Audit.Allocation (30s)
+✔ [1149/1358] Built LidoSRv3.Audit.Spec.SszCorrespondence (12s)
+✔ [1150/1358] Built LidoSRv3.Audit.Source.TopupCorrespondence (40s)
+✔ [1151/1358] Built LidoSRv3.Audit.Source.SanityEnvelope (22s)
+✔ [1152/1358] Built EvmYul.EVM.GasConstants (47s)
+✔ [1153/1358] Built EvmYul.Wheels (48s)
+✔ [1154/1358] Built LidoSRv3.Audit.Source.DepositCorrespondence (45s)
+✔ [1155/1358] Built LidoSRv3.Audit.Verity.HandleOracleReportTx (31s)
+⚠ [1156/1358] Built LidoSRv3.Audit.SszDepositEquivalence (25s)
+warning: LidoSRv3/Audit/SszDepositEquivalence.lean:93:4: This simp argument is unused:
+  Ssz.traverseBranch
+
+Hint: Omit it from the simp argument list.
+  simp [structuralEncoding, structuralWitness, structuralCombine, Ssz.validatorRoot,̵
+  ̵ ̵ ̵ ̵ ̵S̵s̵z̵.̵t̵r̵a̵v̵e̵r̵s̵e̵B̵r̵a̵n̵c̵h̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/SszDepositEquivalence.lean:213:12: This simp argument is unused:
+  sourceWitness
+
+Hint: Omit it from the simp argument list.
+  simp [̵s̵o̵u̵r̵c̵e̵W̵i̵t̵n̵e̵s̵s̵,̵ ̵s̵t̵r̵u̵c̵t̵u̵r̵a̵l̵W̵i̵t̵n̵e̵s̵s̵]̵[̲s̲t̲r̲u̲c̲t̲u̲r̲a̲l̲W̲i̲t̲n̲e̲s̲s̲]̲
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/SszDepositEquivalence.lean:213:27: This simp argument is unused:
+  structuralWitness
+
+Hint: Omit it from the simp argument list.
+  simp [sourceWitness,̵ ̵s̵t̵r̵u̵c̵t̵u̵r̵a̵l̵W̵i̵t̵n̵e̵s̵s̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+✔ [1157/1358] Built Compiler.Proofs.IRGeneration.IRRuntimeTypes (20s)
+✔ [1158/1358] Built LidoSRv3.Audit.Spec.HashIdentificationChild (16s)
+✔ [1159/1358] Built LidoSRv3.Audit.Source.AddressCorrespondence (25s)
+✔ [1160/1358] Built Compiler.Proofs.YulGeneration.Backends.EvmYulLeanNativeSignedArithLemmas (75s)
+✔ [1161/1358] Built Verity.Macro.SpecGen (129s)
+✔ [1162/1358] Built LidoSRv3.Audit.Strategy (29s)
+✔ [1163/1358] Built LidoSRv3.Audit.Source.TopupParentCorrespondence (26s)
+✔ [1164/1358] Built EvmYul.State.TrieRoot (19s)
+✔ [1165/1373] Built LidoSRv3.Audit.Guarantees.POracleSanity1 (33s)
+✔ [1166/1378] Built LidoSRv3.Audit.Spec.PauseAdmissionCorrespondence (20s)
+✔ [1167/1378] Built EvmYul.Maps.ByteMap (23s)
+⚠ [1168/1379] Built Conform.Wheels (35s)
+warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: Conform/Wheels.lean:106:70: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+✔ [1169/1379] Built LidoSRv3.Audit.Guarantees.PAccount1 (24s)
+✔ [1170/1379] Built EvmYul.Yul.Wheels (28s)
+✔ [1171/1379] Built EvmYul.State.BlockHeader (37s)
+✔ [1172/1379] Built LidoSRv3.Audit.Source.MinFirstAmountCorrespondence (54s)
+✔ [1173/1379] Built LidoSRv3.Audit.StrategyProofs (19s)
+✔ [1174/1379] Built LidoSRv3.Audit.Source.MinFirstCorrespondence (20s)
+✔ [1175/1379] Built Compiler.Hex (15s)
+✔ [1176/1379] Built EvmYul.BN_ADD (12s)
+✔ [1177/1416] Built Compiler.Proofs.YulGeneration.Backends.EvmYulLeanBridgePredicates (19s)
+✔ [1178/1416] Built EvmYul.BLAKE2_F (17s)
+✔ [1179/1416] Built EvmYul.Maps.StorageMap (30s)
+✔ [1180/1416] Built Compiler.Yul.PatchFramework (30s)
+✔ [1181/1416] Built LidoSRv3.Audit.Source.WithdrawalQueueRequestAmount (9.6s)
+✔ [1186/1416] Built EvmYul.BN_MUL (28s)
+✔ [1187/1416] Built EvmYul.RIP160 (19s)
+✔ [1188/1416] Built EvmYul.MachineState (35s)
+✔ [1189/1416] Built Compiler.Yul.PrettyPrint (22s)
+✔ [1190/1416] Built EvmYul.EllipticCurves (38s)
+✔ [1195/1416] Built EvmYul.PointEval (38s)
+✔ [1196/1416] Built EvmYul.SNARKV (39s)
+✔ [1197/1416] Built LidoSRv3.Audit.Model.EthWorld (22s)
+✔ [1198/1495] Built EvmYul.SHA256 (34s)
+✔ [1199/1495] Built LidoSRv3.Audit.Source.WithdrawalQueueSingleRequestControl (11s)
+ℹ [1200/1495] Replayed LidoSRv3.Tests.TrioReserve1.LiveTrust
+info: LidoSRv3/Tests/TrioReserve1/LiveTrust.lean:8:0: 'LidoSRv3.Audit.Source.TrioReserve1.Queue.unfinalized_corresponds' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/TrioReserve1/LiveTrust.lean:9:0: 'LidoSRv3.Audit.Source.TrioReserve1.Queue.cumulative_bound' does not depend on any axioms
+info: LidoSRv3/Tests/TrioReserve1/LiveTrust.lean:10:0: 'LidoSRv3.Audit.Source.TrioReserve1.Erasure.erase_bind' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/TrioReserve1/LiveTrust.lean:11:0: 'LidoSRv3.Audit.Source.TrioReserve1.Erasure.erase_pure' does not depend on any axioms
+info: LidoSRv3/Tests/TrioReserve1/LiveTrust.lean:12:0: 'LidoSRv3.Audit.Source.TrioReserve1.Erasure.erase_run' depends on axioms: [propext]
+info: LidoSRv3/Tests/TrioReserve1/LiveTrust.lean:13:0: 'LidoSRv3.Audit.Source.TrioReserve1.Erasure.failure_restores_world' depends on axioms: [propext]
+info: LidoSRv3/Tests/TrioReserve1/LiveTrust.lean:14:0: 'LidoSRv3.Audit.Source.TrioReserve1.Erasure.replacing_attempts_preserves_observables' does not depend on any axioms
+info: LidoSRv3/Tests/TrioReserve1/LiveTrust.lean:15:0: 'LidoSRv3.Audit.Source.TrioReserve1.PhysicalPacking.pack_matches_bitwise' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TrioReserve1/LiveTrust.lean:16:0: 'LidoSRv3.Audit.Source.TrioReserve1.PhysicalPacking.physical_low_bound' does not depend on any axioms
+info: LidoSRv3/Tests/TrioReserve1/LiveTrust.lean:17:0: 'LidoSRv3.Audit.Source.TrioReserve1.PhysicalPacking.physical_high_bound' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/TrioReserve1/LiveTrust.lean:18:0: 'LidoSRv3.Audit.Source.TrioReserve1.PhysicalPacking.low_pack' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/TrioReserve1/LiveTrust.lean:19:0: 'LidoSRv3.Audit.Source.TrioReserve1.PhysicalPacking.high_pack' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/TrioReserve1/LiveTrust.lean:21:0: 'LidoSRv3.Audit.Source.TrioReserve1.Writers.target_corresponds' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TrioReserve1/LiveTrust.lean:22:0: 'LidoSRv3.Audit.Source.TrioReserve1.Writers.rebalance_corresponds' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TrioReserve1/LiveTrust.lean:23:0: 'LidoSRv3.Audit.Source.TrioReserve1.Writers.target_observations' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TrioReserve1/LiveTrust.lean:24:0: 'LidoSRv3.Audit.Source.TrioReserve1.Writers.rebalance_observations' depends on axioms: [propext]
+✔ [1201/1495] Built LidoSRv3.Tests.PackW2Eip4788Mutants (10s)
+✔ [1202/1495] Built LidoSRv3.Audit.Source.SszVerifierProgram (28s)
+✔ [1203/1495] Built LidoSRv3.Audit.Source.TrioReserve1.PartitionSpec (31s)
+✔ [1204/1495] Built LidoSRv3.Audit.Verity.TopupParent (31s)
+✔ [1205/1495] Built LidoSRv3.Audit.Verity.PConsolidationEth1RequestTx (38s)
+✔ [1206/1495] Built LidoSRv3.Tests.ReserveRelationalMutants (12s)
+✔ [1207/1495] Built LidoSRv3.Tests.PackCSszMutants (28s)
+✔ [1208/1495] Built LidoSRv3.Audit.Verity.PConsolidationEth1RefundTx (43s)
+✔ [1209/1495] Built EvmYul.MachineStateOps (33s)
+ℹ [1210/1495] Built LidoSRv3.Tests.GIndexConcatMutants (6.9s)
+info: LidoSRv3/Tests/GIndexConcatMutants.lean:59:0: 'LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_matches_spec' depends on axioms: [propext]
+info: LidoSRv3/Tests/GIndexConcatMutants.lean:60:0: 'LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_value_of_fits' depends on axioms: [propext]
+info: LidoSRv3/Tests/GIndexConcatMutants.lean:61:0: 'LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_depth_overflow' depends on axioms: [propext]
+✔ [1211/1495] Built LidoSRv3.Tests.WithdrawalQueueRequestAmountMutants (6.5s)
+✔ [1212/1495] Built EvmYul.Yul.MachineState (43s)
+✔ [1213/1495] Built LidoSRv3.Tests.SanityEnvelopeMutants (32s)
+✔ [1214/1495] Built LidoSRv3.Tests.PackN5SszLiveMutants (6.2s)
+✔ [1216/1497] Built LidoSRv3.Tests.TrioReserve1.Differential (44s)
+✔ [1217/1497] Built LidoSRv3.Tests.PackW2ScopeMutants (27s)
+✔ [1218/1497] Built Verity.Core.Model.Types (149s)
+✔ [1219/1497] Built LidoSRv3.Tests.WithdrawalQueueSingleRequestControlMutants (4.1s)
+✔ [1220/1497] Built LidoSRv3.Tests.HandleOracleReportTxMutants (41s)
+✔ [1221/1497] Built LidoSRv3.Tests.PackW2GindexMutants (10s)
+ℹ [1222/1497] Built LidoSRv3.Tests.SszVerifierProgram (8.2s)
+info: LidoSRv3/Tests/SszVerifierProgram.lean:102:0: 'LidoSRv3.Audit.Source.SszVerifierProgram.deposit_call_preimages_exact' does not depend on any axioms
+info: LidoSRv3/Tests/SszVerifierProgram.lean:103:0: 'LidoSRv3.Audit.Source.SszVerifierProgram.validator_root_preimages_exact' does not depend on any axioms
+info: LidoSRv3/Tests/SszVerifierProgram.lean:104:0: 'LidoSRv3.Audit.Source.SszVerifierProgram.verifier_pair_preimage_exact' depends on axioms: [propext]
+info: LidoSRv3/Tests/SszVerifierProgram.lean:105:0: 'LidoSRv3.Audit.Source.SszVerifierProgram.missing_memory_fails_closed' depends on axioms: [propext]
+info: LidoSRv3/Tests/SszVerifierProgram.lean:106:0: 'LidoSRv3.Audit.Source.SszVerifierProgram.missing_abi_fails_closed' depends on axioms: [propext]
+info: LidoSRv3/Tests/SszVerifierProgram.lean:107:0: 'LidoSRv3.Audit.Source.SszVerifierProgram.missing_sha_fails_closed' depends on axioms: [propext]
+✔ [1223/1497] Built LidoSRv3.Tests.SanityEnvelopeParentMutants (29s)
+✔ [1224/1497] Built LidoSRv3.Tests.EthWorldMutants (12s)
+ℹ [1225/1497] Built LidoSRv3.Tests.TrioReserve1.Foundations (11s)
+info: LidoSRv3/Tests/TrioReserve1/Foundations.lean:23:0: 'LidoSRv3.Audit.Source.TrioReserve1.Packing.low_pack' depends on axioms: [propext]
+info: LidoSRv3/Tests/TrioReserve1/Foundations.lean:24:0: 'LidoSRv3.Audit.Source.TrioReserve1.Packing.high_pack' depends on axioms: [propext]
+info: LidoSRv3/Tests/TrioReserve1/Foundations.lean:25:0: 'LidoSRv3.Audit.Source.TrioReserve1.Packing.companion_preserved' depends on axioms: [propext]
+info: LidoSRv3/Tests/TrioReserve1/Foundations.lean:26:0: 'LidoSRv3.Audit.Source.TrioReserve1.PartitionSpec.spend_preserves' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/TrioReserve1/Foundations.lean:27:0: 'LidoSRv3.Audit.Source.TrioReserve1.PartitionSpec.lowering_reserve' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/TrioReserve1/Foundations.lean:28:0: 'LidoSRv3.Audit.Source.TrioReserve1.PartitionSpec.demand_monotone' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/TrioReserve1/Foundations.lean:29:0: 'LidoSRv3.Audit.Source.TrioReserve1.PartitionSpec.two_spends' depends on axioms: [propext, Quot.sound]
+✔ [1226/1497] Built LidoSRv3.Tests.AddressEquivariance (38s)
+✔ [1227/1497] Built LidoSRv3.Tests.AccountingVectors (39s)
+✔ [1228/1497] Built LidoSRv3.Tests.AllocCapacityRegression (37s)
+✔ [1229/1497] Built LidoSRv3.Tests.PackW2Topup2WeiMutants (30s)
+✔ [1230/1497] Built Compiler.CompilationModel.Types (9.3s)
+✔ [1231/1497] Built EvmYul.Operations (82s)
+✔ [1232/1497] Built Compiler.CompilationModel.LogicalPurity (11s)
+✔ [1233/1497] Built LidoSRv3.Tests.PackS1HashMutants (23s)
+✔ [1234/1497] Built Compiler.CompilationModel.YulImporter (13s)
+ℹ [1235/1497] Built LidoSRv3.Tests.PConsolidationEth1RequestTxMutants (27s)
+info: LidoSRv3/Tests/PConsolidationEth1RequestTxMutants.lean:56:0: LidoSRv3.Audit.Verity.PConsolidationEth1RequestTx.bus_failure_restores_snapshot (msgValue : Uint256) (gatewayOk : Bool)
+  (state rollback : ContractState) (reason : String)
+  (h : (busForward msgValue gatewayOk).run state = ContractResult.revert reason rollback) : rollback = state
+info: LidoSRv3/Tests/PConsolidationEth1RequestTxMutants.lean:57:0: LidoSRv3.Audit.Verity.PConsolidationEth1RequestTx.consolidation_prefix_failure_restores_snapshot (fee : Uint256)
+  (secondOk : Bool) (state rollback : ContractState) (reason : String)
+  (h : (sendTwoConsolidationFees fee secondOk).run state = ContractResult.revert reason rollback) : rollback = state
+ℹ [1236/1497] Built LidoSRv3.Tests.TopupParentMutants (29s)
+info: LidoSRv3/Tests/TopupParentMutants.lean:95:0: LidoSRv3.Audit.Verity.TopupParent.parent_transaction_closure (cfg : SourceTopupConfig) (base : SourceTopupInput)
+  (gateway : Address) (iface : CalleeInterface) (state : ContractState) : ParentProposition cfg base gateway iface state
+info: LidoSRv3/Tests/TopupParentMutants.lean:96:0: LidoSRv3.Audit.Verity.TopupParent.revert_restores_caller_frame (cfg : SourceTopupConfig) (base : SourceTopupInput)
+  (gateway : Address) (iface : CalleeInterface) (state rollback : ContractState) (reason : String)
+  (h : (execute cfg base gateway iface).run state = ContractResult.revert reason rollback) : rollback = state
+✔ [1237/1497] Built Compiler.CompilationModel.ReservedScratchNames (18s)
+ℹ [1238/1497] Built LidoSRv3.Tests.PConsolidationEth1RefundTxMutants (29s)
+info: LidoSRv3/Tests/PConsolidationEth1RefundTxMutants.lean:69:0: LidoSRv3.Audit.Verity.PConsolidationEth1RefundTx.refund_failure_restores_snapshot (msgValue fee : Uint256)
+  (vaultOk refundOk : Bool) (state rollback : ContractState) (reason : String)
+  (h : (gatewayRefund msgValue fee vaultOk refundOk).run state = ContractResult.revert reason rollback) :
+  rollback = state
+info: LidoSRv3/Tests/PConsolidationEth1RefundTxMutants.lean:70:0: LidoSRv3.Audit.Verity.PConsolidationEth1RefundTx.withdraw_failure_restores_snapshot (amount : Uint256)
+  (callerIsLido : Bool) (state rollback : ContractState) (reason : String)
+  (h : (withdrawToLido amount callerIsLido).run state = ContractResult.revert reason rollback) : rollback = state
+✔ [1239/1497] Built Compiler.CompilationModel.AdtStorageLayout (7.8s)
+✔ [1240/1497] Built Compiler.CompilationModel.SelectorInteropHelpers (10s)
+✔ [1241/1497] Built Compiler.CompilationModel.AbiHelpers (8.5s)
+✔ [1242/1497] Built Compiler.CompilationModel.EcmAxiomCollection (17s)
+✔ [1243/1497] Built LidoSRv3.Legacy.Model (50s)
+✔ [1244/1497] Built Compiler.CompilationModel.AbiTypeLayout (16s)
+✔ [1245/1497] Built Compiler.CompilationModel.InternalArgs (14s)
+✔ [1246/1497] Built Verity.Macro.Types (61s)
+⚠ [1247/1497] Built EvmYul.Pretty (45s)
+warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: EvmYul/Pretty.lean:36:32: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+✔ [1248/1497] Built Compiler.CompilationModel.TrustSurface (44s)
+✔ [1249/1497] Built LidoSRv3.Audit.Regression.AllocCapacityLegacy (41s)
+✔ [1250/1497] Built EvmYul.Yul.Ast (53s)
+✔ [1251/1497] Built Verity.Core.Model.DynamicAbi (30s)
+✔ [1252/1497] Built Compiler.CompilationModel.ParamLoading (18s)
+✔ [1253/1497] Built EvmYul.EVM.Instr (63s)
+✔ [1254/1497] Built Compiler.CodegenCommon (64s)
+✔ [1255/1497] Built Verity.Macro.Functions (26s)
+✔ [1256/1497] Built Compiler.Proofs.IRGeneration.ExprCore (104s)
+✔ [1257/1497] Built Verity.Macro.ExternalCalls (38s)
+✔ [1258/1497] Built Compiler.CompilationModel.ValidationHelpers (101s)
+✔ [1259/1497] Built Verity.Macro.Interfaces (48s)
+✔ [1260/1497] Built Verity.Macro.Internal (42s)
+✔ [1261/1497] Built Verity.Macro.Executable (39s)
+✔ [1262/1497] Built EvmYul.State.Account (39s)
+✔ [1263/1497] Built Compiler.CompilationModel.MappingWrites (15s)
+✔ [1264/1497] Built Verity.Macro.Storage (69s)
+✔ [1265/1497] Built Compiler.CompilationModel.LayoutValidation (20s)
+✔ [1266/1497] Built Compiler.CompilationModel.ValidationInterop (122s)
+✔ [1267/1497] Built EvmYul.State.ExecutionEnv (45s)
+✔ [1268/1497] Built Compiler.CompilationModel.LayoutReport (14s)
+✔ [1269/1497] Built EvmYul.Yul.SizeLemmas (52s)
+✔ [1270/1497] Built EvmYul.State.Substate (33s)
+✔ [1271/1497] Built Compiler.CompilationModel.LayoutCompatibilityReport (12s)
+✔ [1272/1497] Built EvmYul.State.AccountOps (37s)
+✔ [1273/1497] Built EvmYul.Yul.YulNotation (72s)
+✔ [1274/1497] Built Verity.Core.Model.Denote (64s)
+✔ [1275/1497] Built EvmYul.State.Transaction (26s)
+✔ [1276/1497] Built EvmYul.State.SubstateOps (30s)
+✔ [1277/1497] Built Compiler.CompilationModel.ScopeValidation (132s)
+✔ [1278/1497] Built Verity.Macro.Translate.Parsing (59s)
+✔ [1279/1497] Built LidoSRv3.Audit.Verity.AddressTransferTx (23s)
+✔ [1280/1497] Built Verity.Core.Model.DenoteSha256 (25s)
+✔ [1281/1497] Built EvmYul.Maps.AccountMap (29s)
+✔ [1282/1497] Built Verity.Core.Model.DenoteExternalCalls (30s)
+✔ [1283/1497] Built EvmYul.State.TransactionOps (31s)
+✔ [1284/1497] Built LidoSRv3.Audit.Verity.Topup2DistributionTx (45s)
+✔ [1285/1497] Built EvmYul.EVM.Exception (27s)

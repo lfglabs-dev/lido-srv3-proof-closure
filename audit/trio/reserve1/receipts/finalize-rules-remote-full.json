@@ -1,0 +1,9 @@
+{
+  "utc": "2026-09-07T20:32:39.260950+00:00",
+  "source_commit": "b09e004b5f7a9654912d4dfe45a4d746a29af54f",
+  "command": "REMOTE_BUILD_SOURCE_MODE=full remote-lean-build lake build LidoSRv3 LidoSRv3Test LidoSRv3Audit",
+  "exit": 2,
+  "output": "remote-lean-build: ignoring untracked non-Lean files: audit/trio/reserve1/receipts/component-checks/b09e004b5f7a9654912d4dfe45a4d746a29af54f/FinalizeRules.txt, audit/trio/reserve1/receipts/component-checks/b09e004b5f7a9654912d4dfe45a4d746a29af54f/FinalizeSpec.txt, audit/trio/reserve1/receipts/component-checks/b09e004b5f7a9654912d4dfe45a4d746a29af54f/LiveTrust.txt, audit/trio/reserve1/receipts/component-checks/b09e004b5f7a9654912d4dfe45a4d746a29af54f/receipt.json, audit/trio/reserve1/receipts/finalize-rules-1-FinalizeRules.exit, audit/trio/reserve1/receipts/finalize-rules-1-FinalizeRules.txt, audit/trio/reserve1/receipts/finalize-rules-1-FinalizeSpec.exit, audit/trio/reserve1/receipts/finalize-rules-1-FinalizeSpec.txt\nsource bundle is 16818445 bytes; maximum is 16777216\nremote-lean-build: failed to encode request\n",
+  "wrapper_sha256": "83736ff6da600782680e9ce6f8d4e7b7e32f58acc5bbc6f0e127130088357d20",
+  "gitlink": "160000 17005714f151e5502c559932319a3f2f74ac2436 0\tlido-core"
+}

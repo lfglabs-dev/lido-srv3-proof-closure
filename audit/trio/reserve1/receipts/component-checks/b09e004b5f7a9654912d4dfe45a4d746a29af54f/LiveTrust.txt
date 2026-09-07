@@ -1,0 +1,551 @@
+'LidoSRv3.Audit.Source.TrioReserve1.Queue.unfinalized_corresponds' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Queue.cumulative_bound' does not depend on any axioms
+'LidoSRv3.Audit.Source.TrioReserve1.Erasure.erase_bind' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Erasure.erase_pure' does not depend on any axioms
+'LidoSRv3.Audit.Source.TrioReserve1.Erasure.erase_run' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.Erasure.failure_restores_world' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.Erasure.replacing_attempts_preserves_observables' does not depend on any axioms
+'LidoSRv3.Audit.Source.TrioReserve1.PhysicalPacking.pack_matches_bitwise' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.PhysicalPacking.physical_low_bound' does not depend on any axioms
+'LidoSRv3.Audit.Source.TrioReserve1.PhysicalPacking.physical_high_bound' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.PhysicalPacking.low_pack' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.PhysicalPacking.high_pack' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Writers.target_corresponds' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Writers.rebalance_corresponds' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Writers.target_observations' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Writers.rebalance_observations' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.AllocationSpec.unique' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.AllocationSpec.two_live_spends' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Allocation.success_corresponds' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Allocation.successful_queue_observation' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Router.source_rule' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.Router.authorized_call' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Router.unauthorized_call' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.Locator.queue_getter' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.Locator.router_getter' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.Locator.oracle_getter' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.Transfers.conserves' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Transfers.self_transfer_balance' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Transfers.credit_bound_from_aggregate' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Erasure.call_nested_erasure' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.StaticCall.state_change_rejected' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.Oracle.timestamp_corresponds' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Oracle.frame_preserves' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.Oracle.frame_success' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Consensus.compute_success' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.FrameSpec.unique' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Admission.live_status' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Admission.live_status_false' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Admission.success_corresponds' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Admission.status_failure_stops' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.Admission.cannot_deposit_stops' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.Admission.router_failure_stops' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.Admission.unauthorized_stops' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.Admission.zero_amount_stops' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.ABI.decode_encode' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ABI.decode_encode_bounded' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ABI.decode_word' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ABI.decode_second_word' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.CallResults.locator_reply' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.CallResults.queue_lookup' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.CallResults.frame_reply' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.CallResults.adjusted_frame' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.CallResults.frame_call_failure' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.CallResults.frame_short_reply' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.WithdrawalTail.source_decomposition' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.WithdrawalTail.seeds_zero' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.WithdrawalTail.seeds_success' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.WithdrawalTail.seeds_overflow' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.WithdrawalTail.actual_receiver' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.WithdrawalTail.finish_rejection' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.WithdrawalTail.seed_failure_stops' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.WithdrawalTail.after_spend' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.WithdrawalTail.tail_failure_rolls_back' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.SpendingSpec.admitted_bound' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.SpendingSpec.accounting_corresponds' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Spending.allocation_bounds' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Spending.accounting_add_bound' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Spending.adjusted_next_bound' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.Spending.success_world' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Spending.success_corresponds' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Spending.allocation_failure' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.Spending.insufficient' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Spending.frame_failure' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.WithdrawalComposition.after_frame' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.WithdrawalComposition.late_failure' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.WithdrawalComposition.spending_failure' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.CallResults.router_lookup' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.CallResults.oracle_lookup' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.QueueCalls.bunker_call' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.QueueCalls.status' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.QueueCalls.demand_call' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.QueueCalls.demand_panic' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.QueueCalls.demand_bound' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.QueueCalls.allocation_success' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.QueueCalls.allocation_panic' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.QueueCalls.live_allocation_spec' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.OracleCalls.frame_call' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.OracleCalls.frame_rejection' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.OracleCalls.current_frame' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.OracleCalls.current_frame_rejection' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ConsensusCalls.compute_bounds' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ConsensusCalls.static_success' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.ConsensusCalls.static_rejection' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.ConsensusCalls.decode_reference' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ConsensusCalls.oracle_frame' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ConsensusCalls.oracle_rejection' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.ConsensusCalls.oracle_overflow' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ConsensusCalls.oracle_no_code' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.ConsensusCalls.independent_rules' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ConsensusCalls.lido_frame' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Pipeline.read_other_slot' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Pipeline.prepared_locator' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Pipeline.prepared_consensus' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Pipeline.frame_result' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Pipeline.status_result' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Pipeline.router_result' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Pipeline.allocation_result' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Pipeline.before_tail' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Pipeline.seed_result' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Pipeline.final_code' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.Pipeline.final_balances' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.Pipeline.receiver' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Pipeline.receiver_rejection' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.Pipeline.receiver_shortage' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.Pipeline.success' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Pipeline.rejected' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Pipeline.shortage' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.PhysicalReserve.committed_fields' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.PhysicalReserve.admitted' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.PhysicalReserve.committed_protection' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.PhysicalReserve.committed_other_account' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.PhysicalReserve.committed_queue' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.PhysicalReserve.success_preserves' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.SequenceSpec.target_protection' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.SequenceSpec.rebalance_partition' does not depend on any axioms
+'LidoSRv3.Audit.Source.TrioReserve1.PhysicalSequence.committed_step' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.PhysicalSequence.corresponds' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.PhysicalSequence.target_protection' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.PhysicalSequence.rebalance_partition' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.PhysicalSequence.other_account' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.PhysicalSequence.queue_preserved' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.PhysicalSequence.concrete_success_step' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.AragonSpec.exclusive' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Aragon.prefix_corresponds' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Aragon.uninitialized' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.Aragon.absent_kernel' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.Aragon.kernel_reply' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Aragon.kernel_rejection' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.Aragon.kernel_no_code' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.Aragon.kernel_short_reply' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.Aragon.denied' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.Aragon.permission_failure' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.Aragon.allowed' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Aragon.target_from_kernel_reply' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Kernel.no_acl' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.Kernel.no_acl_code' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.Kernel.acl_rejection' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.Kernel.decoded_word' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Kernel.acl_reply' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Kernel.aragon_from_acl' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Kernel.target_from_acl' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Kernel.acl_reply_traced' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Kernel.aragon_from_acl_traced' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ACL.compare_corresponds' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ACL.no_permission' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.ACL.unconditional_specific' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.ACL.unconditional_wildcard' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.ACL.oracle_rejection_is_false' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.ACL.oracle_wrong_size_is_false' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ACL.grants_corresponds' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ACLCalls.canPerform' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ACLCalls.unconditional_specific' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ACLBounds.bind_extends' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.ACLBounds.eval_succ' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.ACLBounds.eval_mono' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.ACLBounds.permission_mono' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.ACLBounds.dispatch_stable' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ACLBounds.eval_unique' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.ACLBounds.permission_unique' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.ACLLogicSpec.exists_route' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ACLLogicSpec.unique' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.ACLLogic.corresponds' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ACLLogic.out_of_bounds' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.ACLLogic.invalid_before_children' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.ACLLogic.first_failure' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.ACLTree.of_spec' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ACLTree.of_spec_stable' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ACLTree.derivations_agree' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ACLTree.to_spec' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ACLTree.corresponds' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ACLLeafSpec.input_exists' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ACLLeaf.finish_corresponds' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ACLLeaf.input_source' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ACLLeaf.nonoracle_corresponds' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ACLLeaf.oracle_reply_source' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ACLLeaf.oracle_corresponds' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ACLLeaf.describes_source' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ACLLeaf.describes_complete' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ACLLeaf.tree_corresponds' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ACLPermission.attempt_of_spec' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ACLPermission.attempt_to_spec' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ACLPermission.attempt_lift' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.ACLPermission.selection_source' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ACLPermission.of_spec' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ACLPermission.to_spec' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ACLPermission.corresponds' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ACLPermission.of_spec_stable' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ACLPermission.canPerform_traced' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ACLPermission.target_allowed' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ACLPermission.target_denied' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Target.writer_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Target.accounting' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Target.balances' does not depend on any axioms
+'LidoSRv3.Audit.Source.TrioReserve1.Target.other_slot' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Target.other_account' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Target.success' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Target.queue_preserved' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Target.sequence_step' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Target.after_authorization' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Target.complete' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Target.prefix_denied' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Target.kernel_no_code' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.WithdrawalSpec.failure_restores' does not depend on any axioms
+'LidoSRv3.Audit.Source.TrioReserve1.WithdrawalSpec.success_nonzero' does not depend on any axioms
+'LidoSRv3.Audit.Source.TrioReserve1.WithdrawalParent.of_spec' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.WithdrawalParent.exists_spec' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.WithdrawalParent.to_spec' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.WithdrawalParent.corresponds' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.WithdrawalParent.complete' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Status.of_spec' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.Status.exists_spec' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Status.to_spec' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Status.corresponds' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Status.withdrawal_denied' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Status.withdrawal_failure' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Status.withdrawal_corresponds' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Lookup.address_narrowing' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.Lookup.of_spec' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.Lookup.exists_spec' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Lookup.to_spec' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Lookup.corresponds' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Lookup.status_corresponds' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Lookup.withdrawal_corresponds' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Tail.seed_source' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.Tail.seed_exists' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Tail.of_spec' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.Tail.exists_spec' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Tail.to_spec' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Tail.corresponds' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Tail.withdrawal_corresponds' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Spend.frame_failed' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Spend.of_spec' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Spend.exists_spec' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Spend.to_spec' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Spend.corresponds' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Spend.withdrawal_corresponds' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.FrameRead.of_spec' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.FrameRead.exists_spec' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.FrameRead.to_spec' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.FrameRead.corresponds' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.FrameRead.spending_corresponds' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.FrameRead.withdrawal_corresponds' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.AllocationFlow.allocation_spec' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.AllocationFlow.allocation_unique' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.AllocationFlow.of_spec' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.AllocationFlow.exists_spec' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.AllocationFlow.to_spec' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.AllocationFlow.corresponds' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.AllocationFlow.spending_corresponds' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.AllocationFlow.withdrawal_corresponds' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.CallSpec.failure_restores' does not depend on any axioms
+'LidoSRv3.Audit.Source.TrioReserve1.CallSpec.success_funded' does not depend on any axioms
+'LidoSRv3.Audit.Source.TrioReserve1.CallFlow.transfer_balances' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.CallFlow.transfer_frame' does not depend on any axioms
+'LidoSRv3.Audit.Source.TrioReserve1.CallFlow.of_spec' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.CallFlow.exists_spec' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.CallFlow.to_spec' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.CallFlow.corresponds' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.WithdrawalCalls.call_observations' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.WithdrawalCalls.corresponds' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.WithdrawalCalls.complete' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.WithdrawalCalls.failure_restores' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.WithdrawalCalls.success_nonzero' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.BalanceSpec.member_bound' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.BalanceSpec.account_bound' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.BalanceSpec.mass_equation' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.BalanceSpec.include_member' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.BalanceSpec.include_retains' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.BalanceSpec.include_bounded' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.BalanceSpec.preserves' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Balance.transfer_preserves' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Balance.transfer_uint256' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Balance.transfer_finite' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.Balance.transfer_finite_uint256' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.CalleeBalance.locator' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.CalleeBalance.queue' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.CalleeBalance.router' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.CalleeBalance.oracle_frame' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.CalleeBalance.oracle' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.CalleeBalance.pipeline' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.CalleeBalance.call_conserves' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.CalleeBalance.call_uint256' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.CalleeBalance.pipeline_call_uint256' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.WithdrawalBalance.unchanged' does not depend on any axioms
+'LidoSRv3.Audit.Source.TrioReserve1.WithdrawalBalance.bind_preserves' does not depend on any axioms
+'LidoSRv3.Audit.Source.TrioReserve1.WithdrawalBalance.call_preserves' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.WithdrawalBalance.withdrawal' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.WithdrawalBalance.root_preserves' does not depend on any axioms
+'LidoSRv3.Audit.Source.TrioReserve1.WithdrawalBalance.withdrawal_uint256' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.WithdrawalBalance.pipeline_withdrawal' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.WithdrawalBalance.target' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.WithdrawalBalance.rebalance' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.AuthorizationBalance.acl' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.AuthorizationBalance.decoded' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.AuthorizationBalance.kernel_permission' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.AuthorizationBalance.kernel' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.AuthorizationBalance.external' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.AuthorizationBalance.permission_call' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.AuthorizationBalance.can_perform' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.AuthorizationBalance.set_target' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.AuthorizationBalance.concrete_target' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.CallData.selector_call' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.Report.stopped' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportAccountingSpec.total' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportAccountingSpec.unique' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportAccountingSpec.success_bound' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportAccounting.of_spec' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportAccounting.exists_spec' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportAccounting.corresponds' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportAccounting.complete' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportAccounting.failure_restores' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportAccounting.committed_balances' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportStages.source_decomposition' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportSpec.failure_restores' does not depend on any axioms
+'LidoSRv3.Audit.Source.TrioReserve1.ReportSpec.success_active' does not depend on any axioms
+'LidoSRv3.Audit.Source.TrioReserve1.ReportParent.accounting_observations' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportParent.of_spec' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportParent.exists_spec' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportParent.to_spec' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportParent.corresponds' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportParent.complete' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportParent.failure_restores' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportCalls.of_spec' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportCalls.exists_spec' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportCalls.corresponds' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportCalls.rewards_corresponds' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportCalls.withdrawals_corresponds' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportCalls.finalize_corresponds' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportCalls.parent_corresponds' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportCalls.complete' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportCalls.failure_restores' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.CallDataFlow.of_spec' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.CallDataFlow.exists_spec' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.CallDataFlow.to_spec' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.CallDataFlow.corresponds' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportLookup.getter_observations' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportLookup.of_spec' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportLookup.exists_spec' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportLookup.corresponds' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportRules.lookup_observations' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportRules.call_observations' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportRules.stage_observations' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportRules.corresponds' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportRules.complete' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportRules.failure_restores' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportRules.success_active' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.Vaults.reward_amount_bound' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.VaultSpec.capped_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.VaultSpec.root_failure_restores' does not depend on any axioms
+'LidoSRv3.Audit.Source.TrioReserve1.VaultRules.call_observations' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.VaultRules.rewards_of_spec' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.VaultRules.withdrawals_of_spec' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.VaultRules.rewards_exists' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.VaultRules.withdrawals_exists' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.VaultRules.rewards_corresponds' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.VaultRules.withdrawals_corresponds' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.VaultRules.root_corresponds' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.VaultRules.rewards_root_corresponds' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.VaultRules.withdrawals_root_corresponds' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.CallbackRules.lookup_observations' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.CallbackRules.rewards_of_spec' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.CallbackRules.withdrawals_of_spec' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.CallbackRules.rewards_exists' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.CallbackRules.withdrawals_exists' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.CallbackRules.rewards_corresponds' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.CallbackRules.withdrawals_corresponds' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.CallbackRules.rewards_root_corresponds' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.CallbackRules.withdrawals_root_corresponds' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.CallbackRules.reward_commit_total' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.CallbackRules.reward_commit_balances' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.CallbackRules.withdrawal_commit_core' does not depend on any axioms
+'LidoSRv3.Audit.Source.TrioReserve1.CallbackRules.withdrawal_commit_balances' does not depend on any axioms
+'LidoSRv3.Audit.Source.TrioReserve1.EntryRules.returns_corresponds' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.EntryRules.dispatch_corresponds' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.EntryRules.callbacks_corresponds' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.EntryRules.vaults_corresponds' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.EntryRules.callbacks_complete' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.EntryRules.vaults_complete' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.CalleeRules.calls_observations' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.CalleeRules.selector_observations' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportVaults.callback_observations' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportVaults.reward_observations' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportVaults.withdrawal_observations' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportVaults.vault_observations' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportVaults.corresponds' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportVaults.complete' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.ReportVaults.failure_restores' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.FinalizeRules.of_spec' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.FinalizeRules.complete' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.FinalizeRules.corresponds' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.FinalizeRules.root_corresponds' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]

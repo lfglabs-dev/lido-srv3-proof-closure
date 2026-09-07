@@ -1,5 +1,28 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Independent finalization base-body correspondence
+
+At source `b09e004b5f7a9654912d4dfe45a4d746a29af54f`, FinalizeSpec,
+FinalizeRules and LiveTrust pass. The independent ordered-guard specification
+has totality; exact bidirectional base-body outcome/world/trace correspondence
+and transaction commit/rollback correspondence are proved. Saved cumulative rows
+and post-checkpoint locked reads retain arbitrary mapping-slot alias behavior.
+The inspected new theorems use only standard axioms. Seven baseline checks pass;
+`receipts/finalize-rules-summary.json` binds all current source/olean pairs and
+pinned dependency revisions. Prior draft receipts and interrupted full-gate log
+are preserved. ERC721 admission/dispatch and report-finalizer composition remain
+open; this is not full-gate or independent review evidence.
+
+Exact independently reproduced transport blocker: the installed full-source
+remote wrapper exits 2 before submission because tracked `lido-core` is a gitlink,
+not a regular file. The default attempt first encounters its size limit; the
+supported expanded size setting reaches the gitlink rejection. Both receipts are
+retained under `finalize-rules-remote-full*`. Wrapper source and Git index metadata
+independently corroborate the failure. No remote job was created. The prior local
+full-gate process is absent and its partial log has no terminal receipt. Complete
+source/dependency transport, full gates and remaining integration obligations are
+still required. No merge, force-push, gate weakening or completion is claimed.
+
 ## ERC721 queue finalization bytecode comparisons
 
 Fifteen comparisons now match the inherited pinned WithdrawalQueueERC721.finalize
