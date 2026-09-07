@@ -14,9 +14,16 @@ Lido role decoder and external target writer. The kernel response is derived;
 ACL evaluation remains the explicit boundary. This is specialized to the complete
 argument tuple sent by Lido._auth, with other calls delegated. Concrete ACL
 permission rows, parameter logic and oracle recursion still require implementation.
-Ten draft pinned Kernel/Aragon/Lido comparisons pass, checking the actual physical
-mapping against Kernel.acl(). Final checks additionally compare complete direct
-and nested call observations; immutable evidence follows the source commit.
+At `4917545c7aad3093bfdd6ddfa1dda4ff2cae2618`, ten fresh pinned
+Kernel/Aragon/Lido comparisons pass, checking the physical mapping against
+Kernel.acl(), final storage/events and direct/nested targets, values, payloads,
+acceptance, returned bytes and depths. Three selected Lean checks, seven baseline/
+import checks and pinned Kernel compilation pass. The other 41 modules' source
+and olean hashes match prior receipts; only standard axioms appear.
+`receipts/kernel-summary.json` links exact compiler/source/toolchain/runtime
+receipts. Draft failures and the earlier simpler draft comparison are retained.
+The remote wrapper hash is unchanged and no supported dependency-bundle tool
+was discovered; no new remote job or full-gate result is claimed.
 
 ## Aragon target-writer admission
 

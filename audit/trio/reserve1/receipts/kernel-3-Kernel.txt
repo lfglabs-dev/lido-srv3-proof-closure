@@ -1,0 +1,1728 @@
+LidoSRv3/Audit/Source/TrioReserve1/Kernel.lean:105:90: error: unsolved goals
+case pos
+k : Queue.Keccak
+aclExternal other : External
+ctx : Context
+role value : Word
+w after : World
+suffix : Bytes
+hi : Aragon.initialized ctx w = true
+hk : (Aragon.kernel ctx w).val ≠ 0
+hkc : (w.core.codeSize (Aragon.kernel ctx w).val).val ≠ 0
+ha : (acl k (Aragon.kernel ctx w) w).val ≠ 0
+hac : (w.core.codeSize (acl k (Aragon.kernel ctx w) w).val).val ≠ 0
+hr :
+  aclExternal
+      { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w, value := word 0,
+        payload := Aragon.permissionPayload ctx role }
+      w =
+    Reply.success (encode 32 value.val ++ suffix) after
+hr' :
+  hasPermission k aclExternal (Aragon.kernel ctx w) ctx role w =
+    Reply.successWithTrace (encode 32 (if value.val ≠ 0 then 1 else 0)) after
+      (attempted
+        { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w, value := word 0,
+          payload := Aragon.permissionPayload ctx role }
+        true (encode 32 value.val ++ suffix))
+hd0 : decodeWord (encode 32 0) 0 after = { outcome := Except.ok (word 0), world := after }
+hd1 : decodeWord (encode 32 1) 0 after = { outcome := Except.ok (word 1), world := after }
+hv : value.val = 0
+⊢ (match
+      (match
+          if (word 0).val = 0 then
+            Reply.successWithTrace (encode 32 0) after
+              (attempted
+                { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w, value := word 0,
+                  payload := Aragon.permissionPayload ctx role }
+                true (encode 32 0 ++ suffix))
+          else Reply.rejected [] with
+        | Reply.rejected data =>
+          { outcome := Except.error (Fault.bubbled data), world := w,
+            attempts :=
+              [{
+                  request :=
+                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                      payload := Aragon.permissionPayload ctx role },
+                  accepted := false, returned := data }] }
+        | Reply.success data after =>
+          { outcome := Except.ok data, world := after,
+            attempts :=
+              [{
+                  request :=
+                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                      payload := Aragon.permissionPayload ctx role },
+                  accepted := true, returned := data }] }
+        | Reply.successWithTrace data after nested =>
+          { outcome := Except.ok data, world := after,
+            attempts :=
+              [{
+                  request :=
+                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                      payload := Aragon.permissionPayload ctx role },
+                  accepted := true, returned := data, nested := nested }] }
+        | Reply.rejectedWithTrace data nested =>
+          { outcome := Except.error (Fault.bubbled data), world := w,
+            attempts :=
+              [{
+                  request :=
+                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                      payload := Aragon.permissionPayload ctx role },
+                  accepted := false, returned := data, nested := nested }] }).outcome with
+    | Except.error e =>
+      { outcome := Except.error e,
+        world :=
+          (match
+              if (word 0).val = 0 then
+                Reply.successWithTrace (encode 32 0) after
+                  (attempted
+                    { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w, value := word 0,
+                      payload := Aragon.permissionPayload ctx role }
+                    true (encode 32 0 ++ suffix))
+              else Reply.rejected [] with
+            | Reply.rejected data =>
+              { outcome := Except.error (Fault.bubbled data), world := w,
+                attempts :=
+                  [{
+                      request :=
+                        { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                          payload := Aragon.permissionPayload ctx role },
+                      accepted := false, returned := data }] }
+            | Reply.success data after =>
+              { outcome := Except.ok data, world := after,
+                attempts :=
+                  [{
+                      request :=
+                        { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                          payload := Aragon.permissionPayload ctx role },
+                      accepted := true, returned := data }] }
+            | Reply.successWithTrace data after nested =>
+              { outcome := Except.ok data, world := after,
+                attempts :=
+                  [{
+                      request :=
+                        { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                          payload := Aragon.permissionPayload ctx role },
+                      accepted := true, returned := data, nested := nested }] }
+            | Reply.rejectedWithTrace data nested =>
+              { outcome := Except.error (Fault.bubbled data), world := w,
+                attempts :=
+                  [{
+                      request :=
+                        { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                          payload := Aragon.permissionPayload ctx role },
+                      accepted := false, returned := data, nested := nested }] }).world,
+        attempts :=
+          (match
+              if (word 0).val = 0 then
+                Reply.successWithTrace (encode 32 0) after
+                  (attempted
+                    { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w, value := word 0,
+                      payload := Aragon.permissionPayload ctx role }
+                    true (encode 32 0 ++ suffix))
+              else Reply.rejected [] with
+            | Reply.rejected data =>
+              { outcome := Except.error (Fault.bubbled data), world := w,
+                attempts :=
+                  [{
+                      request :=
+                        { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                          payload := Aragon.permissionPayload ctx role },
+                      accepted := false, returned := data }] }
+            | Reply.success data after =>
+              { outcome := Except.ok data, world := after,
+                attempts :=
+                  [{
+                      request :=
+                        { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                          payload := Aragon.permissionPayload ctx role },
+                      accepted := true, returned := data }] }
+            | Reply.successWithTrace data after nested =>
+              { outcome := Except.ok data, world := after,
+                attempts :=
+                  [{
+                      request :=
+                        { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                          payload := Aragon.permissionPayload ctx role },
+                      accepted := true, returned := data, nested := nested }] }
+            | Reply.rejectedWithTrace data nested =>
+              { outcome := Except.error (Fault.bubbled data), world := w,
+                attempts :=
+                  [{
+                      request :=
+                        { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                          payload := Aragon.permissionPayload ctx role },
+                      accepted := false, returned := data, nested := nested }] }).attempts }
+    | Except.ok a =>
+      {
+        outcome :=
+          (match
+              (decodeWord a 0
+                  (match
+                      if (word 0).val = 0 then
+                        Reply.successWithTrace (encode 32 0) after
+                          (attempted
+                            { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w, value := word 0,
+                              payload := Aragon.permissionPayload ctx role }
+                            true (encode 32 0 ++ suffix))
+                      else Reply.rejected [] with
+                    | Reply.rejected data =>
+                      { outcome := Except.error (Fault.bubbled data), world := w,
+                        attempts :=
+                          [{
+                              request :=
+                                { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                  payload := Aragon.permissionPayload ctx role },
+                              accepted := false, returned := data }] }
+                    | Reply.success data after =>
+                      { outcome := Except.ok data, world := after,
+                        attempts :=
+                          [{
+                              request :=
+                                { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                  payload := Aragon.permissionPayload ctx role },
+                              accepted := true, returned := data }] }
+                    | Reply.successWithTrace data after nested =>
+                      { outcome := Except.ok data, world := after,
+                        attempts :=
+                          [{
+                              request :=
+                                { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                  payload := Aragon.permissionPayload ctx role },
+                              accepted := true, returned := data, nested := nested }] }
+                    | Reply.rejectedWithTrace data nested =>
+                      { outcome := Except.error (Fault.bubbled data), world := w,
+                        attempts :=
+                          [{
+                              request :=
+                                { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                  payload := Aragon.permissionPayload ctx role },
+                              accepted := false, returned := data, nested := nested }] }).world).outcome with
+            | Except.error e =>
+              { outcome := Except.error e,
+                world :=
+                  (decodeWord a 0
+                      (match
+                          if (word 0).val = 0 then
+                            Reply.successWithTrace (encode 32 0) after
+                              (attempted
+                                { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w,
+                                  value := word 0, payload := Aragon.permissionPayload ctx role }
+                                true (encode 32 0 ++ suffix))
+                          else Reply.rejected [] with
+                        | Reply.rejected data =>
+                          { outcome := Except.error (Fault.bubbled data), world := w,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := false, returned := data }] }
+                        | Reply.success data after =>
+                          { outcome := Except.ok data, world := after,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := true, returned := data }] }
+                        | Reply.successWithTrace data after nested =>
+                          { outcome := Except.ok data, world := after,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := true, returned := data, nested := nested }] }
+                        | Reply.rejectedWithTrace data nested =>
+                          { outcome := Except.error (Fault.bubbled data), world := w,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := false, returned := data, nested := nested }] }).world).world,
+                attempts :=
+                  (decodeWord a 0
+                      (match
+                          if (word 0).val = 0 then
+                            Reply.successWithTrace (encode 32 0) after
+                              (attempted
+                                { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w,
+                                  value := word 0, payload := Aragon.permissionPayload ctx role }
+                                true (encode 32 0 ++ suffix))
+                          else Reply.rejected [] with
+                        | Reply.rejected data =>
+                          { outcome := Except.error (Fault.bubbled data), world := w,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := false, returned := data }] }
+                        | Reply.success data after =>
+                          { outcome := Except.ok data, world := after,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := true, returned := data }] }
+                        | Reply.successWithTrace data after nested =>
+                          { outcome := Except.ok data, world := after,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := true, returned := data, nested := nested }] }
+                        | Reply.rejectedWithTrace data nested =>
+                          { outcome := Except.error (Fault.bubbled data), world := w,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := false, returned := data, nested := nested }] }).world).attempts }
+            | Except.ok a_1 =>
+              { outcome := Except.ok !decide (a_1.val = 0),
+                world :=
+                  (decodeWord a 0
+                      (match
+                          if (word 0).val = 0 then
+                            Reply.successWithTrace (encode 32 0) after
+                              (attempted
+                                { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w,
+                                  value := word 0, payload := Aragon.permissionPayload ctx role }
+                                true (encode 32 0 ++ suffix))
+                          else Reply.rejected [] with
+                        | Reply.rejected data =>
+                          { outcome := Except.error (Fault.bubbled data), world := w,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := false, returned := data }] }
+                        | Reply.success data after =>
+                          { outcome := Except.ok data, world := after,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := true, returned := data }] }
+                        | Reply.successWithTrace data after nested =>
+                          { outcome := Except.ok data, world := after,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := true, returned := data, nested := nested }] }
+                        | Reply.rejectedWithTrace data nested =>
+                          { outcome := Except.error (Fault.bubbled data), world := w,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := false, returned := data, nested := nested }] }).world).world,
+                attempts :=
+                  (decodeWord a 0
+                      (match
+                          if (word 0).val = 0 then
+                            Reply.successWithTrace (encode 32 0) after
+                              (attempted
+                                { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w,
+                                  value := word 0, payload := Aragon.permissionPayload ctx role }
+                                true (encode 32 0 ++ suffix))
+                          else Reply.rejected [] with
+                        | Reply.rejected data =>
+                          { outcome := Except.error (Fault.bubbled data), world := w,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := false, returned := data }] }
+                        | Reply.success data after =>
+                          { outcome := Except.ok data, world := after,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := true, returned := data }] }
+                        | Reply.successWithTrace data after nested =>
+                          { outcome := Except.ok data, world := after,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := true, returned := data, nested := nested }] }
+                        | Reply.rejectedWithTrace data nested =>
+                          { outcome := Except.error (Fault.bubbled data), world := w,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := false, returned := data,
+                                  nested := nested }] }).world).attempts }).outcome,
+        world :=
+          (match
+              (decodeWord a 0
+                  (match
+                      if (word 0).val = 0 then
+                        Reply.successWithTrace (encode 32 0) after
+                          (attempted
+                            { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w, value := word 0,
+                              payload := Aragon.permissionPayload ctx role }
+                            true (encode 32 0 ++ suffix))
+                      else Reply.rejected [] with
+                    | Reply.rejected data =>
+                      { outcome := Except.error (Fault.bubbled data), world := w,
+                        attempts :=
+                          [{
+                              request :=
+                                { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                  payload := Aragon.permissionPayload ctx role },
+                              accepted := false, returned := data }] }
+                    | Reply.success data after =>
+                      { outcome := Except.ok data, world := after,
+                        attempts :=
+                          [{
+                              request :=
+                                { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                  payload := Aragon.permissionPayload ctx role },
+                              accepted := true, returned := data }] }
+                    | Reply.successWithTrace data after nested =>
+                      { outcome := Except.ok data, world := after,
+                        attempts :=
+                          [{
+                              request :=
+                                { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                  payload := Aragon.permissionPayload ctx role },
+                              accepted := true, returned := data, nested := nested }] }
+                    | Reply.rejectedWithTrace data nested =>
+                      { outcome := Except.error (Fault.bubbled data), world := w,
+                        attempts :=
+                          [{
+                              request :=
+                                { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                  payload := Aragon.permissionPayload ctx role },
+                              accepted := false, returned := data, nested := nested }] }).world).outcome with
+            | Except.error e =>
+              { outcome := Except.error e,
+                world :=
+                  (decodeWord a 0
+                      (match
+                          if (word 0).val = 0 then
+                            Reply.successWithTrace (encode 32 0) after
+                              (attempted
+                                { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w,
+                                  value := word 0, payload := Aragon.permissionPayload ctx role }
+                                true (encode 32 0 ++ suffix))
+                          else Reply.rejected [] with
+                        | Reply.rejected data =>
+                          { outcome := Except.error (Fault.bubbled data), world := w,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := false, returned := data }] }
+                        | Reply.success data after =>
+                          { outcome := Except.ok data, world := after,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := true, returned := data }] }
+                        | Reply.successWithTrace data after nested =>
+                          { outcome := Except.ok data, world := after,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := true, returned := data, nested := nested }] }
+                        | Reply.rejectedWithTrace data nested =>
+                          { outcome := Except.error (Fault.bubbled data), world := w,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := false, returned := data, nested := nested }] }).world).world,
+                attempts :=
+                  (decodeWord a 0
+                      (match
+                          if (word 0).val = 0 then
+                            Reply.successWithTrace (encode 32 0) after
+                              (attempted
+                                { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w,
+                                  value := word 0, payload := Aragon.permissionPayload ctx role }
+                                true (encode 32 0 ++ suffix))
+                          else Reply.rejected [] with
+                        | Reply.rejected data =>
+                          { outcome := Except.error (Fault.bubbled data), world := w,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := false, returned := data }] }
+                        | Reply.success data after =>
+                          { outcome := Except.ok data, world := after,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := true, returned := data }] }
+                        | Reply.successWithTrace data after nested =>
+                          { outcome := Except.ok data, world := after,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := true, returned := data, nested := nested }] }
+                        | Reply.rejectedWithTrace data nested =>
+                          { outcome := Except.error (Fault.bubbled data), world := w,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := false, returned := data, nested := nested }] }).world).attempts }
+            | Except.ok a_1 =>
+              { outcome := Except.ok !decide (a_1.val = 0),
+                world :=
+                  (decodeWord a 0
+                      (match
+                          if (word 0).val = 0 then
+                            Reply.successWithTrace (encode 32 0) after
+                              (attempted
+                                { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w,
+                                  value := word 0, payload := Aragon.permissionPayload ctx role }
+                                true (encode 32 0 ++ suffix))
+                          else Reply.rejected [] with
+                        | Reply.rejected data =>
+                          { outcome := Except.error (Fault.bubbled data), world := w,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := false, returned := data }] }
+                        | Reply.success data after =>
+                          { outcome := Except.ok data, world := after,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := true, returned := data }] }
+                        | Reply.successWithTrace data after nested =>
+                          { outcome := Except.ok data, world := after,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := true, returned := data, nested := nested }] }
+                        | Reply.rejectedWithTrace data nested =>
+                          { outcome := Except.error (Fault.bubbled data), world := w,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := false, returned := data, nested := nested }] }).world).world,
+                attempts :=
+                  (decodeWord a 0
+                      (match
+                          if (word 0).val = 0 then
+                            Reply.successWithTrace (encode 32 0) after
+                              (attempted
+                                { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w,
+                                  value := word 0, payload := Aragon.permissionPayload ctx role }
+                                true (encode 32 0 ++ suffix))
+                          else Reply.rejected [] with
+                        | Reply.rejected data =>
+                          { outcome := Except.error (Fault.bubbled data), world := w,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := false, returned := data }] }
+                        | Reply.success data after =>
+                          { outcome := Except.ok data, world := after,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := true, returned := data }] }
+                        | Reply.successWithTrace data after nested =>
+                          { outcome := Except.ok data, world := after,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := true, returned := data, nested := nested }] }
+                        | Reply.rejectedWithTrace data nested =>
+                          { outcome := Except.error (Fault.bubbled data), world := w,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := false, returned := data, nested := nested }] }).world).attempts }).world,
+        attempts :=
+          (match
+                if (word 0).val = 0 then
+                  Reply.successWithTrace (encode 32 0) after
+                    (attempted
+                      { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w, value := word 0,
+                        payload := Aragon.permissionPayload ctx role }
+                      true (encode 32 0 ++ suffix))
+                else Reply.rejected [] with
+              | Reply.rejected data =>
+                { outcome := Except.error (Fault.bubbled data), world := w,
+                  attempts :=
+                    [{
+                        request :=
+                          { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                            payload := Aragon.permissionPayload ctx role },
+                        accepted := false, returned := data }] }
+              | Reply.success data after =>
+                { outcome := Except.ok data, world := after,
+                  attempts :=
+                    [{
+                        request :=
+                          { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                            payload := Aragon.permissionPayload ctx role },
+                        accepted := true, returned := data }] }
+              | Reply.successWithTrace data after nested =>
+                { outcome := Except.ok data, world := after,
+                  attempts :=
+                    [{
+                        request :=
+                          { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                            payload := Aragon.permissionPayload ctx role },
+                        accepted := true, returned := data, nested := nested }] }
+              | Reply.rejectedWithTrace data nested =>
+                { outcome := Except.error (Fault.bubbled data), world := w,
+                  attempts :=
+                    [{
+                        request :=
+                          { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                            payload := Aragon.permissionPayload ctx role },
+                        accepted := false, returned := data, nested := nested }] }).attempts ++
+            (match
+                (decodeWord a 0
+                    (match
+                        if (word 0).val = 0 then
+                          Reply.successWithTrace (encode 32 0) after
+                            (attempted
+                              { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w, value := word 0,
+                                payload := Aragon.permissionPayload ctx role }
+                              true (encode 32 0 ++ suffix))
+                        else Reply.rejected [] with
+                      | Reply.rejected data =>
+                        { outcome := Except.error (Fault.bubbled data), world := w,
+                          attempts :=
+                            [{
+                                request :=
+                                  { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                    payload := Aragon.permissionPayload ctx role },
+                                accepted := false, returned := data }] }
+                      | Reply.success data after =>
+                        { outcome := Except.ok data, world := after,
+                          attempts :=
+                            [{
+                                request :=
+                                  { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                    payload := Aragon.permissionPayload ctx role },
+                                accepted := true, returned := data }] }
+                      | Reply.successWithTrace data after nested =>
+                        { outcome := Except.ok data, world := after,
+                          attempts :=
+                            [{
+                                request :=
+                                  { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                    payload := Aragon.permissionPayload ctx role },
+                                accepted := true, returned := data, nested := nested }] }
+                      | Reply.rejectedWithTrace data nested =>
+                        { outcome := Except.error (Fault.bubbled data), world := w,
+                          attempts :=
+                            [{
+                                request :=
+                                  { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                    payload := Aragon.permissionPayload ctx role },
+                                accepted := false, returned := data, nested := nested }] }).world).outcome with
+              | Except.error e =>
+                { outcome := Except.error e,
+                  world :=
+                    (decodeWord a 0
+                        (match
+                            if (word 0).val = 0 then
+                              Reply.successWithTrace (encode 32 0) after
+                                (attempted
+                                  { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w,
+                                    value := word 0, payload := Aragon.permissionPayload ctx role }
+                                  true (encode 32 0 ++ suffix))
+                            else Reply.rejected [] with
+                          | Reply.rejected data =>
+                            { outcome := Except.error (Fault.bubbled data), world := w,
+                              attempts :=
+                                [{
+                                    request :=
+                                      { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                        payload := Aragon.permissionPayload ctx role },
+                                    accepted := false, returned := data }] }
+                          | Reply.success data after =>
+                            { outcome := Except.ok data, world := after,
+                              attempts :=
+                                [{
+                                    request :=
+                                      { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                        payload := Aragon.permissionPayload ctx role },
+                                    accepted := true, returned := data }] }
+                          | Reply.successWithTrace data after nested =>
+                            { outcome := Except.ok data, world := after,
+                              attempts :=
+                                [{
+                                    request :=
+                                      { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                        payload := Aragon.permissionPayload ctx role },
+                                    accepted := true, returned := data, nested := nested }] }
+                          | Reply.rejectedWithTrace data nested =>
+                            { outcome := Except.error (Fault.bubbled data), world := w,
+                              attempts :=
+                                [{
+                                    request :=
+                                      { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                        payload := Aragon.permissionPayload ctx role },
+                                    accepted := false, returned := data, nested := nested }] }).world).world,
+                  attempts :=
+                    (decodeWord a 0
+                        (match
+                            if (word 0).val = 0 then
+                              Reply.successWithTrace (encode 32 0) after
+                                (attempted
+                                  { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w,
+                                    value := word 0, payload := Aragon.permissionPayload ctx role }
+                                  true (encode 32 0 ++ suffix))
+                            else Reply.rejected [] with
+                          | Reply.rejected data =>
+                            { outcome := Except.error (Fault.bubbled data), world := w,
+                              attempts :=
+                                [{
+                                    request :=
+                                      { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                        payload := Aragon.permissionPayload ctx role },
+                                    accepted := false, returned := data }] }
+                          | Reply.success data after =>
+                            { outcome := Except.ok data, world := after,
+                              attempts :=
+                                [{
+                                    request :=
+                                      { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                        payload := Aragon.permissionPayload ctx role },
+                                    accepted := true, returned := data }] }
+                          | Reply.successWithTrace data after nested =>
+                            { outcome := Except.ok data, world := after,
+                              attempts :=
+                                [{
+                                    request :=
+                                      { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                        payload := Aragon.permissionPayload ctx role },
+                                    accepted := true, returned := data, nested := nested }] }
+                          | Reply.rejectedWithTrace data nested =>
+                            { outcome := Except.error (Fault.bubbled data), world := w,
+                              attempts :=
+                                [{
+                                    request :=
+                                      { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                        payload := Aragon.permissionPayload ctx role },
+                                    accepted := false, returned := data, nested := nested }] }).world).attempts }
+              | Except.ok a_1 =>
+                { outcome := Except.ok !decide (a_1.val = 0),
+                  world :=
+                    (decodeWord a 0
+                        (match
+                            if (word 0).val = 0 then
+                              Reply.successWithTrace (encode 32 0) after
+                                (attempted
+                                  { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w,
+                                    value := word 0, payload := Aragon.permissionPayload ctx role }
+                                  true (encode 32 0 ++ suffix))
+                            else Reply.rejected [] with
+                          | Reply.rejected data =>
+                            { outcome := Except.error (Fault.bubbled data), world := w,
+                              attempts :=
+                                [{
+                                    request :=
+                                      { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                        payload := Aragon.permissionPayload ctx role },
+                                    accepted := false, returned := data }] }
+                          | Reply.success data after =>
+                            { outcome := Except.ok data, world := after,
+                              attempts :=
+                                [{
+                                    request :=
+                                      { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                        payload := Aragon.permissionPayload ctx role },
+                                    accepted := true, returned := data }] }
+                          | Reply.successWithTrace data after nested =>
+                            { outcome := Except.ok data, world := after,
+                              attempts :=
+                                [{
+                                    request :=
+                                      { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                        payload := Aragon.permissionPayload ctx role },
+                                    accepted := true, returned := data, nested := nested }] }
+                          | Reply.rejectedWithTrace data nested =>
+                            { outcome := Except.error (Fault.bubbled data), world := w,
+                              attempts :=
+                                [{
+                                    request :=
+                                      { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                        payload := Aragon.permissionPayload ctx role },
+                                    accepted := false, returned := data, nested := nested }] }).world).world,
+                  attempts :=
+                    (decodeWord a 0
+                        (match
+                            if (word 0).val = 0 then
+                              Reply.successWithTrace (encode 32 0) after
+                                (attempted
+                                  { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w,
+                                    value := word 0, payload := Aragon.permissionPayload ctx role }
+                                  true (encode 32 0 ++ suffix))
+                            else Reply.rejected [] with
+                          | Reply.rejected data =>
+                            { outcome := Except.error (Fault.bubbled data), world := w,
+                              attempts :=
+                                [{
+                                    request :=
+                                      { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                        payload := Aragon.permissionPayload ctx role },
+                                    accepted := false, returned := data }] }
+                          | Reply.success data after =>
+                            { outcome := Except.ok data, world := after,
+                              attempts :=
+                                [{
+                                    request :=
+                                      { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                        payload := Aragon.permissionPayload ctx role },
+                                    accepted := true, returned := data }] }
+                          | Reply.successWithTrace data after nested =>
+                            { outcome := Except.ok data, world := after,
+                              attempts :=
+                                [{
+                                    request :=
+                                      { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                        payload := Aragon.permissionPayload ctx role },
+                                    accepted := true, returned := data, nested := nested }] }
+                          | Reply.rejectedWithTrace data nested =>
+                            { outcome := Except.error (Fault.bubbled data), world := w,
+                              attempts :=
+                                [{
+                                    request :=
+                                      { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                        payload := Aragon.permissionPayload ctx role },
+                                    accepted := false, returned := data,
+                                    nested := nested }] }).world).attempts }).attempts }) =
+    { outcome := Except.ok false, world := after,
+      attempts :=
+        [{
+            request :=
+              { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                payload := Aragon.permissionPayload ctx role },
+            accepted := true, returned := encode 32 0,
+            nested :=
+              attempted
+                { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w, value := word 0,
+                  payload := Aragon.permissionPayload ctx role }
+                true (encode 32 0 ++ suffix) }] }
+
+case neg
+k : Queue.Keccak
+aclExternal other : External
+ctx : Context
+role value : Word
+w after : World
+suffix : Bytes
+hi : Aragon.initialized ctx w = true
+hk : (Aragon.kernel ctx w).val ≠ 0
+hkc : (w.core.codeSize (Aragon.kernel ctx w).val).val ≠ 0
+ha : (acl k (Aragon.kernel ctx w) w).val ≠ 0
+hac : (w.core.codeSize (acl k (Aragon.kernel ctx w) w).val).val ≠ 0
+hr :
+  aclExternal
+      { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w, value := word 0,
+        payload := Aragon.permissionPayload ctx role }
+      w =
+    Reply.success (encode 32 value.val ++ suffix) after
+hr' :
+  hasPermission k aclExternal (Aragon.kernel ctx w) ctx role w =
+    Reply.successWithTrace (encode 32 (if value.val ≠ 0 then 1 else 0)) after
+      (attempted
+        { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w, value := word 0,
+          payload := Aragon.permissionPayload ctx role }
+        true (encode 32 value.val ++ suffix))
+hd0 : decodeWord (encode 32 0) 0 after = { outcome := Except.ok (word 0), world := after }
+hd1 : decodeWord (encode 32 1) 0 after = { outcome := Except.ok (word 1), world := after }
+hv : ¬value.val = 0
+⊢ (match
+      (match
+          if (word 0).val = 0 then
+            Reply.successWithTrace (encode 32 1) after
+              (attempted
+                { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w, value := word 0,
+                  payload := Aragon.permissionPayload ctx role }
+                true (encode 32 value.val ++ suffix))
+          else Reply.rejected [] with
+        | Reply.rejected data =>
+          { outcome := Except.error (Fault.bubbled data), world := w,
+            attempts :=
+              [{
+                  request :=
+                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                      payload := Aragon.permissionPayload ctx role },
+                  accepted := false, returned := data }] }
+        | Reply.success data after =>
+          { outcome := Except.ok data, world := after,
+            attempts :=
+              [{
+                  request :=
+                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                      payload := Aragon.permissionPayload ctx role },
+                  accepted := true, returned := data }] }
+        | Reply.successWithTrace data after nested =>
+          { outcome := Except.ok data, world := after,
+            attempts :=
+              [{
+                  request :=
+                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                      payload := Aragon.permissionPayload ctx role },
+                  accepted := true, returned := data, nested := nested }] }
+        | Reply.rejectedWithTrace data nested =>
+          { outcome := Except.error (Fault.bubbled data), world := w,
+            attempts :=
+              [{
+                  request :=
+                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                      payload := Aragon.permissionPayload ctx role },
+                  accepted := false, returned := data, nested := nested }] }).outcome with
+    | Except.error e =>
+      { outcome := Except.error e,
+        world :=
+          (match
+              if (word 0).val = 0 then
+                Reply.successWithTrace (encode 32 1) after
+                  (attempted
+                    { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w, value := word 0,
+                      payload := Aragon.permissionPayload ctx role }
+                    true (encode 32 value.val ++ suffix))
+              else Reply.rejected [] with
+            | Reply.rejected data =>
+              { outcome := Except.error (Fault.bubbled data), world := w,
+                attempts :=
+                  [{
+                      request :=
+                        { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                          payload := Aragon.permissionPayload ctx role },
+                      accepted := false, returned := data }] }
+            | Reply.success data after =>
+              { outcome := Except.ok data, world := after,
+                attempts :=
+                  [{
+                      request :=
+                        { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                          payload := Aragon.permissionPayload ctx role },
+                      accepted := true, returned := data }] }
+            | Reply.successWithTrace data after nested =>
+              { outcome := Except.ok data, world := after,
+                attempts :=
+                  [{
+                      request :=
+                        { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                          payload := Aragon.permissionPayload ctx role },
+                      accepted := true, returned := data, nested := nested }] }
+            | Reply.rejectedWithTrace data nested =>
+              { outcome := Except.error (Fault.bubbled data), world := w,
+                attempts :=
+                  [{
+                      request :=
+                        { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                          payload := Aragon.permissionPayload ctx role },
+                      accepted := false, returned := data, nested := nested }] }).world,
+        attempts :=
+          (match
+              if (word 0).val = 0 then
+                Reply.successWithTrace (encode 32 1) after
+                  (attempted
+                    { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w, value := word 0,
+                      payload := Aragon.permissionPayload ctx role }
+                    true (encode 32 value.val ++ suffix))
+              else Reply.rejected [] with
+            | Reply.rejected data =>
+              { outcome := Except.error (Fault.bubbled data), world := w,
+                attempts :=
+                  [{
+                      request :=
+                        { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                          payload := Aragon.permissionPayload ctx role },
+                      accepted := false, returned := data }] }
+            | Reply.success data after =>
+              { outcome := Except.ok data, world := after,
+                attempts :=
+                  [{
+                      request :=
+                        { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                          payload := Aragon.permissionPayload ctx role },
+                      accepted := true, returned := data }] }
+            | Reply.successWithTrace data after nested =>
+              { outcome := Except.ok data, world := after,
+                attempts :=
+                  [{
+                      request :=
+                        { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                          payload := Aragon.permissionPayload ctx role },
+                      accepted := true, returned := data, nested := nested }] }
+            | Reply.rejectedWithTrace data nested =>
+              { outcome := Except.error (Fault.bubbled data), world := w,
+                attempts :=
+                  [{
+                      request :=
+                        { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                          payload := Aragon.permissionPayload ctx role },
+                      accepted := false, returned := data, nested := nested }] }).attempts }
+    | Except.ok a =>
+      {
+        outcome :=
+          (match
+              (decodeWord a 0
+                  (match
+                      if (word 0).val = 0 then
+                        Reply.successWithTrace (encode 32 1) after
+                          (attempted
+                            { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w, value := word 0,
+                              payload := Aragon.permissionPayload ctx role }
+                            true (encode 32 value.val ++ suffix))
+                      else Reply.rejected [] with
+                    | Reply.rejected data =>
+                      { outcome := Except.error (Fault.bubbled data), world := w,
+                        attempts :=
+                          [{
+                              request :=
+                                { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                  payload := Aragon.permissionPayload ctx role },
+                              accepted := false, returned := data }] }
+                    | Reply.success data after =>
+                      { outcome := Except.ok data, world := after,
+                        attempts :=
+                          [{
+                              request :=
+                                { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                  payload := Aragon.permissionPayload ctx role },
+                              accepted := true, returned := data }] }
+                    | Reply.successWithTrace data after nested =>
+                      { outcome := Except.ok data, world := after,
+                        attempts :=
+                          [{
+                              request :=
+                                { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                  payload := Aragon.permissionPayload ctx role },
+                              accepted := true, returned := data, nested := nested }] }
+                    | Reply.rejectedWithTrace data nested =>
+                      { outcome := Except.error (Fault.bubbled data), world := w,
+                        attempts :=
+                          [{
+                              request :=
+                                { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                  payload := Aragon.permissionPayload ctx role },
+                              accepted := false, returned := data, nested := nested }] }).world).outcome with
+            | Except.error e =>
+              { outcome := Except.error e,
+                world :=
+                  (decodeWord a 0
+                      (match
+                          if (word 0).val = 0 then
+                            Reply.successWithTrace (encode 32 1) after
+                              (attempted
+                                { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w,
+                                  value := word 0, payload := Aragon.permissionPayload ctx role }
+                                true (encode 32 value.val ++ suffix))
+                          else Reply.rejected [] with
+                        | Reply.rejected data =>
+                          { outcome := Except.error (Fault.bubbled data), world := w,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := false, returned := data }] }
+                        | Reply.success data after =>
+                          { outcome := Except.ok data, world := after,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := true, returned := data }] }
+                        | Reply.successWithTrace data after nested =>
+                          { outcome := Except.ok data, world := after,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := true, returned := data, nested := nested }] }
+                        | Reply.rejectedWithTrace data nested =>
+                          { outcome := Except.error (Fault.bubbled data), world := w,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := false, returned := data, nested := nested }] }).world).world,
+                attempts :=
+                  (decodeWord a 0
+                      (match
+                          if (word 0).val = 0 then
+                            Reply.successWithTrace (encode 32 1) after
+                              (attempted
+                                { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w,
+                                  value := word 0, payload := Aragon.permissionPayload ctx role }
+                                true (encode 32 value.val ++ suffix))
+                          else Reply.rejected [] with
+                        | Reply.rejected data =>
+                          { outcome := Except.error (Fault.bubbled data), world := w,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := false, returned := data }] }
+                        | Reply.success data after =>
+                          { outcome := Except.ok data, world := after,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := true, returned := data }] }
+                        | Reply.successWithTrace data after nested =>
+                          { outcome := Except.ok data, world := after,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := true, returned := data, nested := nested }] }
+                        | Reply.rejectedWithTrace data nested =>
+                          { outcome := Except.error (Fault.bubbled data), world := w,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := false, returned := data, nested := nested }] }).world).attempts }
+            | Except.ok a_1 =>
+              { outcome := Except.ok !decide (a_1.val = 0),
+                world :=
+                  (decodeWord a 0
+                      (match
+                          if (word 0).val = 0 then
+                            Reply.successWithTrace (encode 32 1) after
+                              (attempted
+                                { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w,
+                                  value := word 0, payload := Aragon.permissionPayload ctx role }
+                                true (encode 32 value.val ++ suffix))
+                          else Reply.rejected [] with
+                        | Reply.rejected data =>
+                          { outcome := Except.error (Fault.bubbled data), world := w,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := false, returned := data }] }
+                        | Reply.success data after =>
+                          { outcome := Except.ok data, world := after,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := true, returned := data }] }
+                        | Reply.successWithTrace data after nested =>
+                          { outcome := Except.ok data, world := after,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := true, returned := data, nested := nested }] }
+                        | Reply.rejectedWithTrace data nested =>
+                          { outcome := Except.error (Fault.bubbled data), world := w,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := false, returned := data, nested := nested }] }).world).world,
+                attempts :=
+                  (decodeWord a 0
+                      (match
+                          if (word 0).val = 0 then
+                            Reply.successWithTrace (encode 32 1) after
+                              (attempted
+                                { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w,
+                                  value := word 0, payload := Aragon.permissionPayload ctx role }
+                                true (encode 32 value.val ++ suffix))
+                          else Reply.rejected [] with
+                        | Reply.rejected data =>
+                          { outcome := Except.error (Fault.bubbled data), world := w,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := false, returned := data }] }
+                        | Reply.success data after =>
+                          { outcome := Except.ok data, world := after,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := true, returned := data }] }
+                        | Reply.successWithTrace data after nested =>
+                          { outcome := Except.ok data, world := after,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := true, returned := data, nested := nested }] }
+                        | Reply.rejectedWithTrace data nested =>
+                          { outcome := Except.error (Fault.bubbled data), world := w,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := false, returned := data,
+                                  nested := nested }] }).world).attempts }).outcome,
+        world :=
+          (match
+              (decodeWord a 0
+                  (match
+                      if (word 0).val = 0 then
+                        Reply.successWithTrace (encode 32 1) after
+                          (attempted
+                            { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w, value := word 0,
+                              payload := Aragon.permissionPayload ctx role }
+                            true (encode 32 value.val ++ suffix))
+                      else Reply.rejected [] with
+                    | Reply.rejected data =>
+                      { outcome := Except.error (Fault.bubbled data), world := w,
+                        attempts :=
+                          [{
+                              request :=
+                                { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                  payload := Aragon.permissionPayload ctx role },
+                              accepted := false, returned := data }] }
+                    | Reply.success data after =>
+                      { outcome := Except.ok data, world := after,
+                        attempts :=
+                          [{
+                              request :=
+                                { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                  payload := Aragon.permissionPayload ctx role },
+                              accepted := true, returned := data }] }
+                    | Reply.successWithTrace data after nested =>
+                      { outcome := Except.ok data, world := after,
+                        attempts :=
+                          [{
+                              request :=
+                                { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                  payload := Aragon.permissionPayload ctx role },
+                              accepted := true, returned := data, nested := nested }] }
+                    | Reply.rejectedWithTrace data nested =>
+                      { outcome := Except.error (Fault.bubbled data), world := w,
+                        attempts :=
+                          [{
+                              request :=
+                                { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                  payload := Aragon.permissionPayload ctx role },
+                              accepted := false, returned := data, nested := nested }] }).world).outcome with
+            | Except.error e =>
+              { outcome := Except.error e,
+                world :=
+                  (decodeWord a 0
+                      (match
+                          if (word 0).val = 0 then
+                            Reply.successWithTrace (encode 32 1) after
+                              (attempted
+                                { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w,
+                                  value := word 0, payload := Aragon.permissionPayload ctx role }
+                                true (encode 32 value.val ++ suffix))
+                          else Reply.rejected [] with
+                        | Reply.rejected data =>
+                          { outcome := Except.error (Fault.bubbled data), world := w,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := false, returned := data }] }
+                        | Reply.success data after =>
+                          { outcome := Except.ok data, world := after,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := true, returned := data }] }
+                        | Reply.successWithTrace data after nested =>
+                          { outcome := Except.ok data, world := after,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := true, returned := data, nested := nested }] }
+                        | Reply.rejectedWithTrace data nested =>
+                          { outcome := Except.error (Fault.bubbled data), world := w,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := false, returned := data, nested := nested }] }).world).world,
+                attempts :=
+                  (decodeWord a 0
+                      (match
+                          if (word 0).val = 0 then
+                            Reply.successWithTrace (encode 32 1) after
+                              (attempted
+                                { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w,
+                                  value := word 0, payload := Aragon.permissionPayload ctx role }
+                                true (encode 32 value.val ++ suffix))
+                          else Reply.rejected [] with
+                        | Reply.rejected data =>
+                          { outcome := Except.error (Fault.bubbled data), world := w,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := false, returned := data }] }
+                        | Reply.success data after =>
+                          { outcome := Except.ok data, world := after,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := true, returned := data }] }
+                        | Reply.successWithTrace data after nested =>
+                          { outcome := Except.ok data, world := after,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := true, returned := data, nested := nested }] }
+                        | Reply.rejectedWithTrace data nested =>
+                          { outcome := Except.error (Fault.bubbled data), world := w,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := false, returned := data, nested := nested }] }).world).attempts }
+            | Except.ok a_1 =>
+              { outcome := Except.ok !decide (a_1.val = 0),
+                world :=
+                  (decodeWord a 0
+                      (match
+                          if (word 0).val = 0 then
+                            Reply.successWithTrace (encode 32 1) after
+                              (attempted
+                                { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w,
+                                  value := word 0, payload := Aragon.permissionPayload ctx role }
+                                true (encode 32 value.val ++ suffix))
+                          else Reply.rejected [] with
+                        | Reply.rejected data =>
+                          { outcome := Except.error (Fault.bubbled data), world := w,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := false, returned := data }] }
+                        | Reply.success data after =>
+                          { outcome := Except.ok data, world := after,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := true, returned := data }] }
+                        | Reply.successWithTrace data after nested =>
+                          { outcome := Except.ok data, world := after,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := true, returned := data, nested := nested }] }
+                        | Reply.rejectedWithTrace data nested =>
+                          { outcome := Except.error (Fault.bubbled data), world := w,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := false, returned := data, nested := nested }] }).world).world,
+                attempts :=
+                  (decodeWord a 0
+                      (match
+                          if (word 0).val = 0 then
+                            Reply.successWithTrace (encode 32 1) after
+                              (attempted
+                                { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w,
+                                  value := word 0, payload := Aragon.permissionPayload ctx role }
+                                true (encode 32 value.val ++ suffix))
+                          else Reply.rejected [] with
+                        | Reply.rejected data =>
+                          { outcome := Except.error (Fault.bubbled data), world := w,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := false, returned := data }] }
+                        | Reply.success data after =>
+                          { outcome := Except.ok data, world := after,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := true, returned := data }] }
+                        | Reply.successWithTrace data after nested =>
+                          { outcome := Except.ok data, world := after,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := true, returned := data, nested := nested }] }
+                        | Reply.rejectedWithTrace data nested =>
+                          { outcome := Except.error (Fault.bubbled data), world := w,
+                            attempts :=
+                              [{
+                                  request :=
+                                    { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                      payload := Aragon.permissionPayload ctx role },
+                                  accepted := false, returned := data, nested := nested }] }).world).attempts }).world,
+        attempts :=
+          (match
+                if (word 0).val = 0 then
+                  Reply.successWithTrace (encode 32 1) after
+                    (attempted
+                      { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w, value := word 0,
+                        payload := Aragon.permissionPayload ctx role }
+                      true (encode 32 value.val ++ suffix))
+                else Reply.rejected [] with
+              | Reply.rejected data =>
+                { outcome := Except.error (Fault.bubbled data), world := w,
+                  attempts :=
+                    [{
+                        request :=
+                          { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                            payload := Aragon.permissionPayload ctx role },
+                        accepted := false, returned := data }] }
+              | Reply.success data after =>
+                { outcome := Except.ok data, world := after,
+                  attempts :=
+                    [{
+                        request :=
+                          { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                            payload := Aragon.permissionPayload ctx role },
+                        accepted := true, returned := data }] }
+              | Reply.successWithTrace data after nested =>
+                { outcome := Except.ok data, world := after,
+                  attempts :=
+                    [{
+                        request :=
+                          { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                            payload := Aragon.permissionPayload ctx role },
+                        accepted := true, returned := data, nested := nested }] }
+              | Reply.rejectedWithTrace data nested =>
+                { outcome := Except.error (Fault.bubbled data), world := w,
+                  attempts :=
+                    [{
+                        request :=
+                          { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                            payload := Aragon.permissionPayload ctx role },
+                        accepted := false, returned := data, nested := nested }] }).attempts ++
+            (match
+                (decodeWord a 0
+                    (match
+                        if (word 0).val = 0 then
+                          Reply.successWithTrace (encode 32 1) after
+                            (attempted
+                              { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w, value := word 0,
+                                payload := Aragon.permissionPayload ctx role }
+                              true (encode 32 value.val ++ suffix))
+                        else Reply.rejected [] with
+                      | Reply.rejected data =>
+                        { outcome := Except.error (Fault.bubbled data), world := w,
+                          attempts :=
+                            [{
+                                request :=
+                                  { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                    payload := Aragon.permissionPayload ctx role },
+                                accepted := false, returned := data }] }
+                      | Reply.success data after =>
+                        { outcome := Except.ok data, world := after,
+                          attempts :=
+                            [{
+                                request :=
+                                  { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                    payload := Aragon.permissionPayload ctx role },
+                                accepted := true, returned := data }] }
+                      | Reply.successWithTrace data after nested =>
+                        { outcome := Except.ok data, world := after,
+                          attempts :=
+                            [{
+                                request :=
+                                  { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                    payload := Aragon.permissionPayload ctx role },
+                                accepted := true, returned := data, nested := nested }] }
+                      | Reply.rejectedWithTrace data nested =>
+                        { outcome := Except.error (Fault.bubbled data), world := w,
+                          attempts :=
+                            [{
+                                request :=
+                                  { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                    payload := Aragon.permissionPayload ctx role },
+                                accepted := false, returned := data, nested := nested }] }).world).outcome with
+              | Except.error e =>
+                { outcome := Except.error e,
+                  world :=
+                    (decodeWord a 0
+                        (match
+                            if (word 0).val = 0 then
+                              Reply.successWithTrace (encode 32 1) after
+                                (attempted
+                                  { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w,
+                                    value := word 0, payload := Aragon.permissionPayload ctx role }
+                                  true (encode 32 value.val ++ suffix))
+                            else Reply.rejected [] with
+                          | Reply.rejected data =>
+                            { outcome := Except.error (Fault.bubbled data), world := w,
+                              attempts :=
+                                [{
+                                    request :=
+                                      { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                        payload := Aragon.permissionPayload ctx role },
+                                    accepted := false, returned := data }] }
+                          | Reply.success data after =>
+                            { outcome := Except.ok data, world := after,
+                              attempts :=
+                                [{
+                                    request :=
+                                      { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                        payload := Aragon.permissionPayload ctx role },
+                                    accepted := true, returned := data }] }
+                          | Reply.successWithTrace data after nested =>
+                            { outcome := Except.ok data, world := after,
+                              attempts :=
+                                [{
+                                    request :=
+                                      { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                        payload := Aragon.permissionPayload ctx role },
+                                    accepted := true, returned := data, nested := nested }] }
+                          | Reply.rejectedWithTrace data nested =>
+                            { outcome := Except.error (Fault.bubbled data), world := w,
+                              attempts :=
+                                [{
+                                    request :=
+                                      { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                        payload := Aragon.permissionPayload ctx role },
+                                    accepted := false, returned := data, nested := nested }] }).world).world,
+                  attempts :=
+                    (decodeWord a 0
+                        (match
+                            if (word 0).val = 0 then
+                              Reply.successWithTrace (encode 32 1) after
+                                (attempted
+                                  { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w,
+                                    value := word 0, payload := Aragon.permissionPayload ctx role }
+                                  true (encode 32 value.val ++ suffix))
+                            else Reply.rejected [] with
+                          | Reply.rejected data =>
+                            { outcome := Except.error (Fault.bubbled data), world := w,
+                              attempts :=
+                                [{
+                                    request :=
+                                      { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                        payload := Aragon.permissionPayload ctx role },
+                                    accepted := false, returned := data }] }
+                          | Reply.success data after =>
+                            { outcome := Except.ok data, world := after,
+                              attempts :=
+                                [{
+                                    request :=
+                                      { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                        payload := Aragon.permissionPayload ctx role },
+                                    accepted := true, returned := data }] }
+                          | Reply.successWithTrace data after nested =>
+                            { outcome := Except.ok data, world := after,
+                              attempts :=
+                                [{
+                                    request :=
+                                      { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                        payload := Aragon.permissionPayload ctx role },
+                                    accepted := true, returned := data, nested := nested }] }
+                          | Reply.rejectedWithTrace data nested =>
+                            { outcome := Except.error (Fault.bubbled data), world := w,
+                              attempts :=
+                                [{
+                                    request :=
+                                      { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                        payload := Aragon.permissionPayload ctx role },
+                                    accepted := false, returned := data, nested := nested }] }).world).attempts }
+              | Except.ok a_1 =>
+                { outcome := Except.ok !decide (a_1.val = 0),
+                  world :=
+                    (decodeWord a 0
+                        (match
+                            if (word 0).val = 0 then
+                              Reply.successWithTrace (encode 32 1) after
+                                (attempted
+                                  { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w,
+                                    value := word 0, payload := Aragon.permissionPayload ctx role }
+                                  true (encode 32 value.val ++ suffix))
+                            else Reply.rejected [] with
+                          | Reply.rejected data =>
+                            { outcome := Except.error (Fault.bubbled data), world := w,
+                              attempts :=
+                                [{
+                                    request :=
+                                      { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                        payload := Aragon.permissionPayload ctx role },
+                                    accepted := false, returned := data }] }
+                          | Reply.success data after =>
+                            { outcome := Except.ok data, world := after,
+                              attempts :=
+                                [{
+                                    request :=
+                                      { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                        payload := Aragon.permissionPayload ctx role },
+                                    accepted := true, returned := data }] }
+                          | Reply.successWithTrace data after nested =>
+                            { outcome := Except.ok data, world := after,
+                              attempts :=
+                                [{
+                                    request :=
+                                      { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                        payload := Aragon.permissionPayload ctx role },
+                                    accepted := true, returned := data, nested := nested }] }
+                          | Reply.rejectedWithTrace data nested =>
+                            { outcome := Except.error (Fault.bubbled data), world := w,
+                              attempts :=
+                                [{
+                                    request :=
+                                      { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                        payload := Aragon.permissionPayload ctx role },
+                                    accepted := false, returned := data, nested := nested }] }).world).world,
+                  attempts :=
+                    (decodeWord a 0
+                        (match
+                            if (word 0).val = 0 then
+                              Reply.successWithTrace (encode 32 1) after
+                                (attempted
+                                  { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w,
+                                    value := word 0, payload := Aragon.permissionPayload ctx role }
+                                  true (encode 32 value.val ++ suffix))
+                            else Reply.rejected [] with
+                          | Reply.rejected data =>
+                            { outcome := Except.error (Fault.bubbled data), world := w,
+                              attempts :=
+                                [{
+                                    request :=
+                                      { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                        payload := Aragon.permissionPayload ctx role },
+                                    accepted := false, returned := data }] }
+                          | Reply.success data after =>
+                            { outcome := Except.ok data, world := after,
+                              attempts :=
+                                [{
+                                    request :=
+                                      { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                        payload := Aragon.permissionPayload ctx role },
+                                    accepted := true, returned := data }] }
+                          | Reply.successWithTrace data after nested =>
+                            { outcome := Except.ok data, world := after,
+                              attempts :=
+                                [{
+                                    request :=
+                                      { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                        payload := Aragon.permissionPayload ctx role },
+                                    accepted := true, returned := data, nested := nested }] }
+                          | Reply.rejectedWithTrace data nested =>
+                            { outcome := Except.error (Fault.bubbled data), world := w,
+                              attempts :=
+                                [{
+                                    request :=
+                                      { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                                        payload := Aragon.permissionPayload ctx role },
+                                    accepted := false, returned := data,
+                                    nested := nested }] }).world).attempts }).attempts }) =
+    { outcome := Except.ok true, world := after,
+      attempts :=
+        [{
+            request :=
+              { caller := ctx.self, target := Aragon.kernel ctx w, value := word 0,
+                payload := Aragon.permissionPayload ctx role },
+            accepted := true, returned := encode 32 1,
+            nested :=
+              attempted
+                { caller := Aragon.kernel ctx w, target := acl k (Aragon.kernel ctx w) w, value := word 0,
+                  payload := Aragon.permissionPayload ctx role }
+                true (encode 32 value.val ++ suffix) }] }
+LidoSRv3/Audit/Source/TrioReserve1/Kernel.lean:112:25: warning: This simp argument is unused:
+  hd0
+
+Hint: Omit it from the simp argument list.
+  simp [Aragon.canPerform, hi, hk, bind, bindExec, Aragon.permissionCall, hkc,
+  ̵  ̵ ̵ ̵ ̵ ̵dispatch, hr', hv,
+  ̲ h̵d̵0̵,̵  ̲ ̲ ̲ ̲hd1, pure, pureExec]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/Kernel.lean:112:30: warning: This simp argument is unused:
+  hd1
+
+Hint: Omit it from the simp argument list.
+  simp [Aragon.canPerform, hi, hk, bind, bindExec, Aragon.permissionCall, hkc,
+  ̵  ̵ ̵ ̵ ̵ ̵dispatch, hr', hv,
+  ̲  ̲ ̲ ̲ ̲ ̲hd0, h̵d̵1̵,̵ ̵pure, pureExec]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
