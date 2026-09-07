@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """Optimized fail-closed mutants for the v4 assurance contract."""
-
 import copy
 import hashlib
 import importlib.util
@@ -10,7 +9,6 @@ import shutil
 import subprocess
 import tempfile
 from pathlib import Path
-
 ROOT = Path(__file__).resolve().parents[1]
 def write(path, value):
     path.write_text(json.dumps(value, indent=2) + "\n", encoding="utf-8")
@@ -32,6 +30,7 @@ def reject_html_stage_a_families(reject, module):
         "<!--\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n-->\n\n",
         "<div>\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n\n",
         "<stage-a>\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n\n",
+        "Prelude\n=======\n<span>\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n\n",
     )
     for body in bodies:
         reject(body)
@@ -39,6 +38,9 @@ def reject_html_stage_a_families(reject, module):
             raise AssertionError("HTML block exposed a Stage A heading")
     if any(char not in " \n" for char in module._mask_non_rendered_markdown("<!DOCTYPE stage-a>\n")):
         raise AssertionError("HTML block declaration was not fully masked")
+    visible = "Prelude\n<span>\n\n## Stage A disclosure\n"
+    if "## Stage A disclosure" not in module._mask_non_rendered_markdown(visible):
+        raise AssertionError("inline HTML after an ordinary paragraph was masked")
 def main():
     with tempfile.TemporaryDirectory(prefix="assurance-v4-mutants-") as tmp:
         fixture = Path(tmp)
@@ -61,7 +63,6 @@ def main():
         ):
             shutil.copy2(ROOT / "audit" / name, fixture / "audit" / name)
         shutil.copy2(ROOT / "verity/targets/audit-manifest.json", fixture / "verity/targets/audit-manifest.json")
-
         subprocess.run(["git", "init", "--quiet"], cwd=fixture, check=True)
         subprocess.run(["git", "config", "user.email", "audit-test@example.invalid"], cwd=fixture, check=True)
         subprocess.run(["git", "config", "user.name", "audit metadata test"], cwd=fixture, check=True)
@@ -79,7 +80,6 @@ def main():
         )
         assert substitutions == 1, "fixture could not rebase R1_REVIEW_BASE"
         audit_script.write_text(rebased_source, encoding="utf-8")
-
         gpath = fixture / "audit/guarantees.yaml"
         apath = fixture / "audit/assumptions.yaml"
         lpath = fixture / "audit/artifacts.lock.json"

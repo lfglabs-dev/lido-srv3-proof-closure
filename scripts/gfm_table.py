@@ -286,6 +286,9 @@ def _closes_paragraph(line: str) -> bool:
     return (
         line.strip(" \t") == ""
         or bool(_ATX_HEADING.match(line))
+        # A setext underline closes its paragraph, so a following complete tag
+        # may open HTML block type 7 rather than remain inline.
+        or bool(_SETEXT_UNDERLINE.match(line))
         or bool(_THEMATIC_BREAK.match(line))
         or bool(_BLOCK_QUOTE.match(line))
         or bool(_LIST_ITEM.match(line))
@@ -350,10 +353,8 @@ def _literal_lines(lines: list[Row]) -> list[bool]:
                     if not paragraph and _HTML_BLOCK_BARE_TAG.match(line):
                         literal[index] = True
                         html_end = _HTML_BLOCK_BLANK_END
-        paragraph = not (literal[index] or ends_table(line))
+        paragraph = not (literal[index] or _closes_paragraph(line))
     return literal
-
-
 def mask_literal_regions(text: str) -> str:
     """Blank literal regions, preserving offsets and line endings."""
     lines = _lines(text)

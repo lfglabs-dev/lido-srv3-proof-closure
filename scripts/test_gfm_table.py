@@ -65,6 +65,17 @@ CASES = (
     ("a setext underline is resolved before any table",
      "A\n---\nB\n",
      False, [], []),
+    # A setext underline closes the preceding paragraph.  Type-7 HTML may
+    # therefore start on the next line and holds its body through the blank
+    # line; it is not a table a reader can meet.
+    ("a type-7 HTML block starts after a setext heading",
+     "Prelude\n=======\n<span>\n| A | B |\n| --- | --- |\n| 1 | 2 |\n\n",
+     False, [], []),
+    # Conversely, the same tag is inline after ordinary paragraph text, so a
+    # later table remains visible.  This guards against blanket tag masking.
+    ("a type-7 tag remains inline after ordinary paragraph text",
+     "Prelude\n<span>\n\n| A | B |\n| --- | --- |\n| 1 | 2 |\n",
+     False, [(2, 1)], [(2, 1)]),
     ("an empty delimiter cell underlines nothing",
      "| A | B |\n|   |   |\n| 1 | 2 |\n",
      False, [], []),
