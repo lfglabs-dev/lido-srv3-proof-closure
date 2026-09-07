@@ -1,0 +1,13 @@
+LidoSRv3/Tests/TrioReserve1/Foundations.lean:19:53: error: failed to synthesize
+  Decidable
+    (PartitionSpec.AllowedSpend 100 20 80 20 ∧
+      PartitionSpec.protectedReserve (100 - 20) 20 80 ≠ PartitionSpec.protectedReserve 100 20 80)
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.
+'LidoSRv3.Audit.Source.TrioReserve1.Packing.low_pack' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.Packing.high_pack' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.Packing.companion_preserved' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.PartitionSpec.spend_preserves' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.PartitionSpec.lowering_reserve' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.PartitionSpec.demand_monotone' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.PartitionSpec.two_spends' depends on axioms: [propext, Quot.sound]

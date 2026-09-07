@@ -1,0 +1,18 @@
+{
+  "job_id": "72e45c29-b554-4616-9fd2-cd54a38dde96",
+  "node_id": "old-agent",
+  "state": "submitted",
+  "commit": "c7adae04416704a839d56333efad003f0a0f46b7",
+  "base_tree_sha": "27834bd59a19f789b2fb9d06f9de01b47af123c2",
+  "command": [
+    "lake",
+    "build",
+    "LidoSRv3",
+    "LidoSRv3Test",
+    "LidoSRv3Audit"
+  ],
+  "toolchain": "leanprover/lean4:v4.31.0",
+  "source_bundle_sha256": "4c3a74d902b835520c31ff648d6af4a4760d7d62e13e16d8c5abc004f8408eea",
+  "build_protocol_version": "1",
+  "estimated_disk_bytes": 12884901888
+}

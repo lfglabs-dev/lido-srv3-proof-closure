@@ -1,0 +1,95 @@
+{
+  "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "receipts": [
+    {
+      "entry": "LidoHarness.sol",
+      "compiler": "0.4.24+commit.e67f0147.Emscripten.clang",
+      "evmVersion": "constantinople",
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "contracts": [
+        "CallFixture",
+        "LidoHarness"
+      ],
+      "warnings": [
+        "lido-core/contracts/common/interfaces/ILidoLocator.sol:37:9: Warning: This declaration shadows an existing declaration.\n        address elRewardsVault,\n        ^--------------------^\nlido-core/contracts/common/interfaces/ILidoLocator.sol:11:5: The shadowed declaration is here:\n    function elRewardsVault() external view returns(address);\n    ^-------------------------------------------------------^\n\n",
+        "lido-core/contracts/common/interfaces/ILidoLocator.sol:38:9: Warning: This declaration shadows an existing declaration.\n        address oracleReportSanityChecker,\n        ^-------------------------------^\nlido-core/contracts/common/interfaces/ILidoLocator.sol:13:5: The shadowed declaration is here:\n    function oracleReportSanityChecker() external view returns(address);\n    ^------------------------------------------------------------------^\n\n",
+        "lido-core/contracts/common/interfaces/ILidoLocator.sol:39:9: Warning: This declaration shadows an existing declaration.\n        address stakingRouter,\n        ^-------------------^\nlido-core/contracts/common/interfaces/ILidoLocator.sol:15:5: The shadowed declaration is here:\n    function stakingRouter() external view returns(address);\n    ^------------------------------------------------------^\n\n",
+        "lido-core/contracts/common/interfaces/ILidoLocator.sol:40:9: Warning: This declaration shadows an existing declaration.\n        address treasury,\n        ^--------------^\nlido-core/contracts/common/interfaces/ILidoLocator.sol:16:5: The shadowed declaration is here:\n    function treasury() external view returns(address);\n    ^-------------------------------------------------^\n\n",
+        "lido-core/contracts/common/interfaces/ILidoLocator.sol:41:9: Warning: This declaration shadows an existing declaration.\n        address withdrawalQueue,\n        ^---------------------^\nlido-core/contracts/common/interfaces/ILidoLocator.sol:18:5: The shadowed declaration is here:\n    function withdrawalQueue() external view returns(address);\n    ^--------------------------------------------------------^\n\n",
+        "lido-core/contracts/common/interfaces/ILidoLocator.sol:42:9: Warning: This declaration shadows an existing declaration.\n        address withdrawalVault\n        ^---------------------^\nlido-core/contracts/common/interfaces/ILidoLocator.sol:19:5: The shadowed declaration is here:\n    function withdrawalVault() external view returns(address);\n    ^--------------------------------------------------------^\n\n",
+        "lido-core/contracts/common/interfaces/ILidoLocator.sol:48:9: Warning: This declaration shadows an existing declaration.\n        address accountingOracle,\n        ^----------------------^\nlido-core/contracts/common/interfaces/ILidoLocator.sol:9:5: The shadowed declaration is here:\n    function accountingOracle() external view returns(address);\n    ^---------------------------------------------------------^\n\n",
+        "lido-core/contracts/common/interfaces/ILidoLocator.sol:49:9: Warning: This declaration shadows an existing declaration.\n        address oracleReportSanityChecker,\n        ^-------------------------------^\nlido-core/contracts/common/interfaces/ILidoLocator.sol:13:5: The shadowed declaration is here:\n    function oracleReportSanityChecker() external view returns(address);\n    ^------------------------------------------------------------------^\n\n",
+        "lido-core/contracts/common/interfaces/ILidoLocator.sol:50:9: Warning: This declaration shadows an existing declaration.\n        address burner,\n        ^------------^\nlido-core/contracts/common/interfaces/ILidoLocator.sol:14:5: The shadowed declaration is here:\n    function burner() external view returns(address);\n    ^-----------------------------------------------^\n\n",
+        "lido-core/contracts/common/interfaces/ILidoLocator.sol:51:9: Warning: This declaration shadows an existing declaration.\n        address withdrawalQueue,\n        ^---------------------^\nlido-core/contracts/common/interfaces/ILidoLocator.sol:18:5: The shadowed declaration is here:\n    function withdrawalQueue() external view returns(address);\n    ^--------------------------------------------------------^\n\n",
+        "lido-core/contracts/common/interfaces/ILidoLocator.sol:52:9: Warning: This declaration shadows an existing declaration.\n        address postTokenRebaseReceiver,\n        ^-----------------------------^\nlido-core/contracts/common/interfaces/ILidoLocator.sol:20:5: The shadowed declaration is here:\n    function postTokenRebaseReceiver() external view returns(address);\n    ^----------------------------------------------------------------^\n\n",
+        "lido-core/contracts/common/interfaces/ILidoLocator.sol:53:9: Warning: This declaration shadows an existing declaration.\n        address stakingRouter,\n        ^-------------------^\nlido-core/contracts/common/interfaces/ILidoLocator.sol:15:5: The shadowed declaration is here:\n    function stakingRouter() external view returns(address);\n    ^------------------------------------------------------^\n\n",
+        "lido-core/contracts/common/interfaces/ILidoLocator.sol:54:9: Warning: This declaration shadows an existing declaration.\n        address vaultHub\n        ^--------------^\nlido-core/contracts/common/interfaces/ILidoLocator.sol:25:5: The shadowed declaration is here:\n    function vaultHub() external view returns (address);\n    ^--------------------------------------------------^\n\n",
+        "@aragon/os/contracts/acl/IACL.sol:13:5: Warning: Functions in interfaces should be declared external.\n    function hasPermission(address who, address where, bytes32 what, bytes how) public view returns (bool);\n    ^-----------------------------------------------------------------------------------------------------^\n",
+        "@aragon/os/contracts/evmscript/IEVMScriptRegistry.sol:24:5: Warning: Functions in interfaces should be declared external.\n    function getScriptExecutor(bytes script) public view returns (IEVMScriptExecutor);\n    ^--------------------------------------------------------------------------------^\n",
+        "@aragon/os/contracts/common/VaultRecoverable.sol:49:34: Warning: Unused function parameter. Remove or comment out the variable name to silence this warning.\n    function allowRecoverability(address token) public view returns (bool) {\n                                 ^-----------^\n"
+      ]
+    },
+    {
+      "entry": "QueueHarness.sol",
+      "compiler": "0.8.9+commit.e5eed63a.Emscripten.clang",
+      "evmVersion": "istanbul",
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "contracts": [
+        "QueueHarness"
+      ],
+      "warnings": [
+        "Warning: SPDX license identifier not provided in source file. Before publishing, consider adding a comment containing \"SPDX-License-Identifier: <SPDX-License>\" to each source file. Use \"SPDX-License-Identifier: UNLICENSED\" for non-open-source code. Please see https://spdx.org for more information.\n--> solidity/trio-reserve1/QueueHarness.sol\n\n"
+      ]
+    }
+  ],
+  "sourceHashes": {
+    "solidity/trio-reserve1/LidoHarness.sol": "c91bc08a3f9cf324e3a530b8b41e99e74a5eb8f31e83d441f248518a965c3f37",
+    "lido-core/contracts/0.4.24/Lido.sol": "3bf84b96fb155af2290e6b26bc0138de356442a9abe3ea0f5274497f9fbffc10",
+    "@aragon/os/contracts/apps/AragonApp.sol": "613d5cb8af90c0d2e1f7b6f2908495a46e9be81cf4417095c543bc43a27d27c2",
+    "@aragon/os/contracts/lib/math/SafeMath.sol": "ff141c591b220f5c9973f0bcbd5bad55f6121491aa490186e987c1ef0c9b7bae",
+    "lido-core/contracts/common/interfaces/ILidoLocator.sol": "cc65faee8789012cbb58c0073c770bddb37c9a7fc2594ff2e200fc7894a2dc7a",
+    "lido-core/contracts/0.4.24/StETHPermit.sol": "cc4e37048f98024a92c337b6209ba3dd7c2cc4e8cfbc526b6f755057fac9baef",
+    "lido-core/contracts/0.4.24/utils/Versioned.sol": "73804e634f20285f9ed1c323e3c56833048f893d1afe6219afd689076e58dedf",
+    "lido-core/contracts/0.4.24/lib/StakeLimitUtils.sol": "97b006a62f169eefe66279e2827ba5d5663fd74042602a5337a73509468503e3",
+    "lido-core/contracts/0.4.24/utils/UnstructuredStorageExt.sol": "11dbb51c4885d38eee1fdd632a45f79223647785ee80c0877a1d7123d7a3aea6",
+    "lido-core/contracts/common/lib/Math256.sol": "028e9b0c87fea3ec6fd5aac9e7a5724a18b4a175d5ab70159f24428dd28ea6b6",
+    "@aragon/os/contracts/apps/AppStorage.sol": "8e91fc929525676dd70fb9770499e93d148d27a97664d53f96c635d41783a7b1",
+    "@aragon/os/contracts/acl/ACLSyntaxSugar.sol": "8a16dec5bd7ce42d05e8fda25202864995db194b648d671525b9a7b54d7eee67",
+    "@aragon/os/contracts/common/Autopetrified.sol": "03548b960ee4bd0743da2c371c34910a6d736ca4b30ba30a23a1e2d3dfff7ee8",
+    "@aragon/os/contracts/common/ConversionHelpers.sol": "4d4fb3e35f192c6005f2146867f094433d575179415769127fd1869d7e86bc06",
+    "@aragon/os/contracts/common/ReentrancyGuard.sol": "c377f4d240a679b485ff16d44f6c61552ccc76f5d17e3885154c294da89371ab",
+    "@aragon/os/contracts/common/VaultRecoverable.sol": "5072a07438a6d55dd98f24c5c9e391be897990c750f4301fd4f9ddab5e253e78",
+    "@aragon/os/contracts/evmscript/EVMScriptRunner.sol": "e2aae282297c55d9c72e0dd5ad30102e196fe4d8f34eb3eb74153f90dc62650d",
+    "@aragon/os/contracts/common/UnstructuredStorage.sol": "6bbbb8fb3d32ba56d6f967f0eb437941aedae143c6dcedecac87d81a81ffd000",
+    "lido-core/contracts/common/lib/SignatureUtils.sol": "b3d93a1bcd82ea289ce7b8dde4b50e98e6719b26a3271f50f9766d650b143c7d",
+    "lido-core/contracts/common/interfaces/IEIP712StETH.sol": "449180685b8dc86d2ed43eeb92c375938e5d3b17b41ccce011f79bb0f5807a61",
+    "lido-core/contracts/0.4.24/StETH.sol": "63ebed0e205b602fe2e427bb09c111479f98253bd02f96ac052b38202d3713bd",
+    "@aragon/os/contracts/kernel/IKernel.sol": "d626355aef13b741acf2b0f51bfb03eefe2dce9517e28623dafcf5478f43e255",
+    "@aragon/os/contracts/common/Petrifiable.sol": "e565fd0513d66f4657d9a445ad76d63e6785dece37382ce12661bcc5f126e2cd",
+    "@aragon/os/contracts/lib/token/ERC20.sol": "1db31dfde01bcdf4c253010a0a46491a7a8ab698d20e8bdd5bc12cc743deec7d",
+    "@aragon/os/contracts/common/EtherTokenConstant.sol": "630cece2f24d3b9072d3743570d01029cafaa6fab5abbee0015c81abfd92fc8f",
+    "@aragon/os/contracts/common/IsContract.sol": "209acf5e2e50d9dae4f53b1f96febd03c48ed8ef5b3b88085010db628be7cdc2",
+    "@aragon/os/contracts/common/IVaultRecoverable.sol": "780ce73c985b926a7e9bcf956060572c78ef8d55b545fc546325dc865291e479",
+    "@aragon/os/contracts/common/SafeERC20.sol": "022bdbc71e31f0a2042f33ede9b340efc04abf972a2c26f6677c0bf70aff2893",
+    "@aragon/os/contracts/evmscript/IEVMScriptExecutor.sol": "cdc198208cd2765e5b287b56bfa8bd790998412b880aad6234476c5660c0f06f",
+    "@aragon/os/contracts/evmscript/IEVMScriptRegistry.sol": "f2f3b2f5b30d7b8c77b4b79ab34b8945be27a9f2c42de75bd2e2e02d4ee58550",
+    "@aragon/os/contracts/kernel/KernelConstants.sol": "4c154c4e292dfcdcdc0b1ad0738c29769d7db1b129f6b135ea6a713b975223b3",
+    "@aragon/os/contracts/common/Initializable.sol": "9b6f2892b7ddafee6c4c6ff41d6314e0cfa8a3090cd764a815bcf72a3f764318",
+    "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol": "103f9ae7c0715bb0e07f1258958a2c34e78800d49c877c0082fef0763ce1a576",
+    "lido-core/contracts/0.4.24/utils/Pausable.sol": "ae1be0a85b0171321429ad1079908c2bf89eb9551ee56bbded51f8b2cc0d1c36",
+    "lido-core/contracts/common/lib/ECDSA.sol": "9bf07e0a958e4eb956e22214d4a37537527f20966b325d1954a32f99c8945ab4",
+    "@aragon/os/contracts/acl/IACL.sol": "0d6092f108df51af376d55c64e482d514182a0fc1933f354c4afbd7a82160c01",
+    "@aragon/os/contracts/common/TimeHelpers.sol": "09242e7e0f60a92d40a37c787a4d24c239c31eaf9ccbebf92bfc37e1d05e78a7",
+    "@aragon/os/contracts/common/Uint256Helpers.sol": "5b545ff91be8d1d3a5f1c6b4fd45c6db4bc901cb6c503ad754361a475dce0d38",
+    "solidity/trio-reserve1/QueueHarness.sol": "6d78f7b59ea512654a5b03c5fe608599cc9e6b9e1876d243311872337205b880",
+    "lido-core/contracts/0.8.9/WithdrawalQueueBase.sol": "68d8919f89198c3d39272b2259a3144bf87a4aa48c570624b025fd86da47d2bb",
+    "@openzeppelin/contracts-v4.4/utils/structs/EnumerableSet.sol": "42a618e7d36efd2319d1bf05fedb31f3042baf535cfb97e783128cc1fe326686",
+    "lido-core/contracts/0.8.9/lib/UnstructuredStorage.sol": "955bfcb0bf265db114248bdabeabebc39bddb3fbb756e2448f6aed59f1994f56"
+  }
+}

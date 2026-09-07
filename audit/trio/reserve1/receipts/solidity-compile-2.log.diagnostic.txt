@@ -1,0 +1,14 @@
+Full local log SHA256: 79a377d3effb7048debce390921b80d801bcf25d144c16982ee3ff227794ace9
+Error: lido-core/contracts/0.4.24/StETH.sol:7:1: ParserError: Source "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol" not found: Unresolved pinned import: openzeppelin-solidity/contracts/token/ERC20/IERC20.sol
+import {IERC20} from "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
+^----------------------------------------------------------------------------^
+
+    at Object.<anonymous> (/workspaces/mission-f19a12b3/reserve1-private/solidity/trio-reserve1/compile.cjs:36:28)
+    at Module._compile (node:internal/modules/cjs/loader:1356:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1414:10)
+    at Module.load (node:internal/modules/cjs/loader:1197:32)
+    at Module._load (node:internal/modules/cjs/loader:1013:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:128:12)
+    at node:internal/main/run_main_module:28:49
+
+Node.js v18.19.1

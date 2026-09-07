@@ -1,0 +1,14 @@
+{
+  "name": "trio-reserve1-pinned-execution",
+  "private": true,
+  "version": "0.0.0",
+  "dependencies": {
+    "@aragon/os": "4.4.0",
+    "@openzeppelin/contracts-v4.4": "npm:@openzeppelin/contracts@4.4.1",
+    "ethers": "6.14.4",
+    "ganache": "7.9.2",
+    "openzeppelin-solidity": "2.0.0",
+    "solc-0424": "npm:solc@0.4.24",
+    "solc-089": "npm:solc@0.8.9"
+  }
+}

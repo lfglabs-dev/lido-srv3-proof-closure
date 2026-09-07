@@ -1,0 +1,17 @@
+LidoSRv3/Audit/Source/TrioReserve1/Packing.lean:32:68: error: unsolved goals
+lo hi : Nat
+⊢ (lo % width + width * (hi % width)) / width % width = hi % width
+LidoSRv3/Audit/Source/TrioReserve1/Packing.lean:33:20: warning: This simp argument is unused:
+  Nat.add_div
+
+Hint: Omit it from the simp argument list.
+  simp [high, pack, N̵a̵t̵.̵a̵d̵d̵_̵d̵i̵v̵,̵ ̵Nat.div_eq_of_lt (Nat.mod_lt lo width_pos)]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/Packing.lean:33:33: warning: This simp argument is unused:
+  Nat.div_eq_of_lt (Nat.mod_lt lo width_pos)
+
+Hint: Omit it from the simp argument list.
+  simp [high, pack, Nat.add_div,̵ ̵N̵a̵t̵.̵d̵i̵v̵_̵e̵q̵_̵o̵f̵_̵l̵t̵ ̵(̵N̵a̵t̵.̵m̵o̵d̵_̵l̵t̵ ̵l̵o̵ ̵w̵i̵d̵t̵h̵_̵p̵o̵s̵)̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
