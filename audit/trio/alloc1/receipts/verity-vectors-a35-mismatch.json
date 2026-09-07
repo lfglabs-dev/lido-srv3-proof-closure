@@ -1,0 +1,35 @@
+{
+  "source": "a35ca25a350610ce803dd3a2de019b5a66c80e8c",
+  "remote_job": "9efbbd8e-bb23-448b-9ffb-d9cd9c03d886",
+  "build_exit": 0,
+  "classification": "DIFFERENTIAL_MISMATCH",
+  "mismatches": [
+    {
+      "source": {
+        "name": "late-rejection",
+        "actual": "0xdead",
+        "calls": [
+          "0:9abddf09",
+          "1:9abddf09"
+        ]
+      },
+      "verity": {
+        "name": "late-rejection",
+        "actual": [
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            2
+          ]
+        ],
+        "calls": [
+          "0:9abddf09",
+          "1:9abddf09"
+        ]
+      }
+    }
+  ]
+}
