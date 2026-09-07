@@ -1,5 +1,23 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Concrete Kernel permission forwarding
+
+`Kernel` reads the installed ACL through KernelStorage.apps' two physical
+mapping hashes, using an explicit keccak primitive. Zero ACL returns false;
+missing ACL code rejects without a nested CALL. Otherwise the source query
+forwards the original sender/app/role/empty-parameter bytes with the kernel as
+caller, decodes the ACL bool, and retains nested acceptance/rejection/return bytes
+and deeper trace depths. Callee world effects remain explicit.
+
+`aragon_from_acl` and `target_from_acl` compose that source behavior through the
+Lido role decoder and external target writer. The kernel response is derived;
+ACL evaluation remains the explicit boundary. This is specialized to the complete
+argument tuple sent by Lido._auth, with other calls delegated. Concrete ACL
+permission rows, parameter logic and oracle recursion still require implementation.
+Ten draft pinned Kernel/Aragon/Lido comparisons pass, checking the actual physical
+mapping against Kernel.acl(). Final checks additionally compare complete direct
+and nested call observations; immutable evidence follows the source commit.
+
 ## Aragon target-writer admission
 
 `Aragon` implements the inherited initialization/kernel prefix and the external
