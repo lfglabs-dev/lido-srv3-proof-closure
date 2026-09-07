@@ -113,3 +113,19 @@ The full production/test/audit build at earlier `91684800` succeeded on DGX
 Spark (1577 jobs, 455 seconds). `remote-91684800/receipt.json` records its exact
 scope and the runner's capped terminal log tail. It does not certify the newer
 parent ABI, allocation-extent or withdrawal-composition source.
+
+## Writer invariant to parent byte extent
+
+`WriterExtent.lean` derives `ReachableABIExtent` from the physical enumeration
+count bound using actual producer success and its array-length theorem. It
+then derives this obligation after every outcome of the checked share writer,
+using `WriterInvariant.share_writer_preserves`. The initial physical invariant
+and concrete slot-separation premises remain explicit. This closes that numeric
+composition step, not all-writer reachability, deployment, or compiler memory.
+The 49-module Init-only closure passes; see `writer-extent-init-receipt.json`.
+
+The integration also includes producer checkpoint `4aa9557e`, consumer
+`1fac0206`, and reserve `f27b39d8`. These add admission/enumeration checks,
+parent array safety and a pure-library Verity runtime adapter, and concrete
+queue/oracle/consensus call binding respectively. Their component receipts do
+not replace final integration validation or independent certification.
