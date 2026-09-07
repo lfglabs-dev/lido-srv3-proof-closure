@@ -38,7 +38,16 @@ or duplicate the old terminal remote job. The old local full-gate handle is abse
    inputs and numeric checks. No successful callee outcome is assumed. The
    differential runner uses Pipeline.external where complete source configs are
    available. Assemble the exhaustive independent parent relation and remaining
-   failure alternatives, then close writer/sequence/deployment/world obligations. ABI.decode_encode and word/tuple decoding are now checked. Compose them
+   failure alternatives, then close writer/sequence/deployment/world obligations.
+   Prioritize physical reserve corollaries of Pipeline.success: derive exact
+   buffer/reserve subtraction after packed writes, seed writes and receiver;
+   prove queue storage is unchanged under actual distinct contract namespaces;
+   connect PartitionSpec.spend_preserves to the final physical world without
+   assuming reserve <= buffer or cryptographic injectivity. Preserve the broader
+   exhaustive parent and writer obligations.
+   Latest execution is 51 matched cases / seven mutant kills at 4b82879, with
+   nine explicitly flagged Pipeline.external cases. Lean source hashes match
+   the 36-module component check at parent 2e4b6a5; only test cases changed. ABI.decode_encode and word/tuple decoding are now checked. Compose them
    with actual callee outputs and source inputs rather than assuming decoded replies.
 2. The source callee path now contains immutable Locator, live Queue,
    AccountingOracle/BaseOracle and HashConsensus frame getters, and the router

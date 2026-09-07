@@ -22,8 +22,15 @@ The differential runner now uses Pipeline.external for complete unmutated source
 configurations and records sourcePipeline per case. Incomplete/adversarial
 configurations retain their explicit fixtures. The execution script accepts an
 owned receipt directory so fresh evidence cannot overwrite historical receipts.
-The component checker contains 36 modules; exact immutable checks and fresh
-Solidity/Lean comparison are to follow this source commit.
+All 36 Lean modules passed at `2e4b6a50f68077d65a3d716522f9818fafd50073`.
+A subsequent test-only commit `4b82879f28d0e1d58a9972a3db92aa5ea225d898` added
+full-pipeline receiver rejection and ETH shortage. Every checked Lean source hash
+was revalidated unchanged. Fresh execution at that commit passed 51 comparisons
+and seven mutant kills; nine cases use Pipeline.external.
+`receipts/pipeline-summary.json` links exact source/toolchain/component/execution
+evidence, six baseline checks and import-DAG validation (all 0). The earlier
+49-case pipeline run and original historical runs remain retained separately.
+Full remote gates remain missing; no remote bundle/node/job was created.
 
 ## Consensus-to-Lido frame composition
 

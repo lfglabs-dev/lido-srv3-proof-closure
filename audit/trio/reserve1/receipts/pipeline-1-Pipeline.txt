@@ -1,0 +1,29 @@
+LidoSRv3/Audit/Source/TrioReserve1/Pipeline.lean:64:90: error: unsolved goals
+k : Queue.Keccak
+c : Config
+staticOther : StaticCall.External
+other : External
+ctx : Context
+w : World
+amount : Word
+ha : ctx.self = c.lido
+hc : (w.core.codeSize c.contracts.router.val).val ≠ 0
+hb : amount.val ≤ w.balances ctx.self
+h1 : encode 4 330204256 ≠ encode 4 936771225
+h2 : encode 4 330204256 ≠ encode 4 4016834124
+h3 : encode 4 330204256 ≠ encode 4 1512059385
+h4 : encode 4 330204256 ≠ encode 4 3506144488
+h5 : encode 4 330204256 ≠ encode 4 731232129
+h6 : encode 4 330204256 ≠ encode 4 1928829715
+⊢ amount.val ≤ w.balances c.lido
+LidoSRv3/Audit/Source/TrioReserve1/Pipeline.lean:73:36: warning: This simp argument is unused:
+  Nat.not_lt.mpr hb
+
+Hint: Omit it from the simp argument list.
+  simp [call, external, OracleCalls.external, QueueCalls.external, Locator.dispatch,
+  ̵  ̵ ̵ ̵Queue.dispatch,
+  ̲  ̲ ̲ ̲Oracle.dispatch, Router.dispatch, Router.receiveDepositableEther,
+  ̵  ̵ ̵ ̵h1, h2, h3, h4, h5, h6, ha,
+  ̲  ̲ ̲ ̲hc, N̵a̵t.̵n̵o̵t̵_̵l̵t̵.̵m̵p̵r ̵h̵b̵,̵ ̵t̵r̵ansfer]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

@@ -8,7 +8,7 @@ No canonical source-map or guarantee entries are changed.
 | allocation | `contracts/0.4.24/Lido.sol:605-616` | `Live.getBufferedEtherAllocation` | Allocation.successful_queue_observation relates maximality to actual CALL bytes and saved physical locals; full withdrawal composition open |
 | canDeposit | `Lido.sol:815-816` | `Live.canDeposit` | Admission.live_status/live_status_false bind bunker bytes and post-call pause read; enclosing writer admission remains open |
 | spending | `Lido.sol:839-859` | `Live.spendDepositableEther` | Spending.success_corresponds/SpendingSpec; exact worlds, events and failures around frame CALL; whole-parent specification open |
-| withdrawal | `Lido.sol:869-886` | `Live.withdrawDepositableEther` | Admission.success_corresponds and exact early-stop proofs; seeds/ETH and full correspondence open |
+| withdrawal | `Lido.sol:869-886` | `Live.withdrawDepositableEther` | Pipeline.success/rejected/shortage compose concrete full execution; exhaustive independent parent and physical reserve corollaries open |
 | target writer | `Lido.sol:670-680` | `Live.setDepositsReserveTarget`, `Writers` | internal helper; external ACL at 656-659 remains open |
 | report rebalance | `Lido.sol:1125-1132` | `Live.updateBufferedEtherAllocation`, `Writers` | internal helper; report parent at 1072-1121 remains open |
 | packed setters | `contracts/0.4.24/utils/UnstructuredStorageExt.sol:20-46` | `PhysicalPacking` | bitwise pair-packer equivalence and projections checked; all parent writer correspondences not closed |
