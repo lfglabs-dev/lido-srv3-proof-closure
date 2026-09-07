@@ -22,7 +22,7 @@ import markdown_text  # noqa: E402  (sibling module, located above)
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
 SOURCE_FIDELITY = AUDIT / "SOURCE-FIDELITY.md"
-R1_REVIEW_BASE = "aed5a18fa059a6907e89de59dbc1bb4434f73670"
+R1_REVIEW_BASE = "359f9a0be59ef24ee206f89d9b7f04828d91c1f4"
 # The report records this commit as its Stage A disclosure input basis.  Keep the exact
 # generator inputs bound both to that Git object and to their expected bytes:
 # a changed registry, source map, or Trust allowlist must not be presented as
@@ -31,8 +31,8 @@ R1_REVIEW_BASE = "aed5a18fa059a6907e89de59dbc1bb4434f73670"
 # report.  A normal regeneration may never pair changed family content with a
 # stale certified basis.
 R1_REPORT_INPUT_SHA256 = {
-    "audit/guarantees.yaml": "22d2420714906d566f6250ddc5b0b50d0815567f0e8212ce37d4fd1ac34bed30",
-    "audit/source-map.yaml": "e592f4e15e9d3ce8ffdcefdc87bb664ac404c6d0b7447e29e35d5c60611eaba6",
+    "audit/guarantees.yaml": "b06ca4bb08a80fc528a1a1242083af58cfb589346dd6ce056b45fdcdfcc121a5",
+    "audit/source-map.yaml": "40fbac7c5f1e0c5985ebc0fc4affedba5cc1fe251610b2c4846c2c137a2962da",
     "audit/trust-native-decide-allowlist.txt": "4874951cd0717f16756f3f644c424f06bdbbfcca1561173b32fd134b1fb6730c",
 }
 CANONICAL_IDS = [
@@ -50,7 +50,7 @@ SUBORDINATE_IDS = [
     "P-ADDRESS-1.denote-admission",
     "P-RESERVE-RELATIONAL",
     "P-ALLOC-EXEC-1", "P-ETH-JOURNAL-1", "P-VAULT-ETH-1", "P-ORACLE-SUPPLY-1",
-    "P-ADDRESS-BATCH-1", "P-SSZ-LIVE-1", "P-CONSOLIDATION-VALUE-1",
+    "P-ADDRESS-BATCH-1", "P-SSZ-LIVE-1", "P-CONSOLIDATION-VALUE-1", "P-TOKEN-1",
 ]
 EXPECTED_IDS = CANONICAL_IDS + SUBORDINATE_IDS
 ASSURANCE_STATUSES = {"OPEN", "PARTIAL", "CHECKED"}
