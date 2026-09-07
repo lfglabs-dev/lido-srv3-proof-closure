@@ -1,3 +1,4 @@
+import LidoSRv3.Audit.Source.TrioAlloc1.ProxyGenesis
 import LidoSRv3.Audit.Source.TrioAlloc1.Initialization
 
 -- Init-only inspection; the complete Verity/trust driver remains remote-only.
@@ -20,3 +21,5 @@ import LidoSRv3.Audit.Source.TrioAlloc1.Initialization
 #print axioms LidoSRv3.Audit.Source.TrioAlloc1.Initialization.execute_from_empty
 
 #print axioms LidoSRv3.Audit.Source.TrioAlloc1.Initialization.execute_records
+
+#print axioms LidoSRv3.Audit.Source.TrioAlloc1.ProxyGenesis.initialization_invariants

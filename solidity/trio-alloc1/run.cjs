@@ -4,8 +4,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 const cp = require('node:child_process');
 const crypto = require('node:crypto');
-const solc = require('solc');
-const ganache = require('ganache');
+const solc = require('./compiler-receipt.cjs')(require('solc'));
+const ganache = require('./evm-backend.cjs');
 const { ethers } = require('ethers');
 const assert = require('node:assert/strict');
 const root = path.resolve(__dirname, '../..');
@@ -17,7 +17,7 @@ fs.mkdirSync(out, {recursive:true});
 const pin = cp.execFileSync('git', ['-C',path.join(root,'lido-core'),'rev-parse','HEAD'],{encoding:'utf8'}).trim();
 assert.equal(pin,'17005714f151e5502c559932319a3f2f74ac2436');
 assert.match(solc.version(),/^0\.8\.25\+/);
-const settings = {optimizer:{enabled:true,runs:200},viaIR:true,evmVersion:'shanghai',
+const settings = {optimizer:{enabled:true,runs:200},viaIR:true,evmVersion:process.env.ALLOC1_EVM || 'shanghai',
  outputSelection:{'*':{'*':['abi','evm.bytecode.object','storageLayout','irOptimized']}}};
 const input = {language:'Solidity',sources:{'Harness.sol':{content:fs.readFileSync(path.join(__dirname,'Harness.sol'),'utf8')}},settings};
 const sources = {};

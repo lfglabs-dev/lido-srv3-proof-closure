@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 const fs=require('node:fs'),path=require('node:path'),cp=require('node:child_process');
-const assert=require('node:assert/strict'), solc=require('solc'),ganache=require('ganache');
+const assert=require('node:assert/strict'), solc=require('./compiler-receipt.cjs')(require('solc')),ganache=require('./evm-backend.cjs');
 const {ethers}=require('ethers');
 const root=path.resolve(__dirname,'../..'),out=process.argv[2];
 assert(out,'output directory required');fs.mkdirSync(out,{recursive:true});
 const pin=cp.execFileSync('git',['-C',path.join(root,'lido-core'),'rev-parse','HEAD'],{encoding:'utf8'}).trim();
 assert.equal(pin,'17005714f151e5502c559932319a3f2f74ac2436');assert.match(solc.version(),/^0\.8\.25\+/);
-const settings={optimizer:{enabled:true,runs:200},viaIR:true,evmVersion:'shanghai',outputSelection:{'*':{'*':['abi','evm.bytecode','irOptimized']}}};
+const settings={optimizer:{enabled:true,runs:200},viaIR:true,evmVersion:process.env.ALLOC1_EVM || 'shanghai',outputSelection:{'*':{'*':['abi','evm.bytecode','irOptimized']}}};
 const compilation=JSON.parse(solc.compile(JSON.stringify({language:'Solidity',sources:{'WriterHarness.sol':{content:fs.readFileSync(path.join(__dirname,'WriterHarness.sol'),'utf8')}},settings}),{import:name=>{try{return {contents:fs.readFileSync(name.startsWith('@')?require.resolve(name):path.join(root,'lido-core',name),'utf8')}}catch(e){return {error:e.message}}}}));
 const errors=(compilation.errors||[]).filter(x=>x.severity==='error');assert.equal(errors.length,0,errors.map(x=>x.formattedMessage).join('\n'));
 fs.writeFileSync(path.join(out,'writer.ir'),compilation.contracts['WriterHarness.sol'].WriterHarness.irOptimized);

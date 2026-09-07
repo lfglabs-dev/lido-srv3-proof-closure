@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 const fs=require('node:fs'),path=require('node:path'),cp=require('node:child_process');
-const assert=require('node:assert/strict'),solc=require('solc'),ganache=require('ganache');
+const assert=require('node:assert/strict'),solc=require('./compiler-receipt.cjs')(require('solc')),ganache=require('./evm-backend.cjs');
 const {ethers}=require('ethers');
 const root=path.resolve(__dirname,'../..'),out=process.argv[2],proxyTools=process.argv[3];
 assert(out&&proxyTools,'output and exact proxy dependency directory required');fs.mkdirSync(out,{recursive:true});
-const proxySolc=require(path.join(path.resolve(proxyTools),'node_modules/solc'));
+const proxySolc=require('./compiler-receipt.cjs')(require(path.join(path.resolve(proxyTools),'node_modules/solc')));
 assert.match(solc.version(),/^0\.8\.25\+/);assert.match(proxySolc.version(),/^0\.8\.9\+/);
 const pin=cp.execFileSync('git',['-C',path.join(root,'lido-core'),'rev-parse','HEAD'],{encoding:'utf8'}).trim();assert.equal(pin,'17005714f151e5502c559932319a3f2f74ac2436');
 const routerFile='contracts/0.8.25/sr/StakingRouter.sol',proxyFile='contracts/0.8.9/proxy/OssifiableProxy.sol';
@@ -15,7 +15,7 @@ function compile(compiler,file,settings,dependencyRoot){
  return {result,sources,compiler:compiler.version(),settings};
 }
 const outputs={'*':{'*':['abi','evm.bytecode']}};
-const routerBuild=compile(solc,routerFile,{optimizer:{enabled:true,runs:200},viaIR:true,evmVersion:'shanghai',outputSelection:outputs},path.dirname(require.resolve('solc')));
+const routerBuild=compile(solc,routerFile,{optimizer:{enabled:true,runs:200},viaIR:true,evmVersion:process.env.ALLOC1_EVM || 'shanghai',outputSelection:outputs},path.dirname(require.resolve('solc')));
 const proxyBuild=compile(proxySolc,proxyFile,{optimizer:{enabled:true,runs:200},evmVersion:'london',outputSelection:outputs},path.resolve(proxyTools));
 const hash=value=>require('node:crypto').createHash('sha256').update(value).digest('hex');
 const identities=build=>({compiler:build.compiler,settings:build.settings,sources:Object.fromEntries(Object.entries(build.sources).map(([name,text])=>[name,hash(text)]))});
