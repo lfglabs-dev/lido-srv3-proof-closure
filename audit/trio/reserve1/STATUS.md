@@ -1,5 +1,24 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Ordered ACL permission correspondence and target admission
+
+`ACLPermissionSpec` independently distinguishes absent, unconditional and graph
+permissions, then selects specific before wildcard permission. Specific success
+or invalid-opcode failure requires no wildcard derivation; only denial falls back,
+with ordered trace concatenation. `ACLPermission` projects actual permission slots,
+uses the original sender for specific evaluation and ANY_ENTITY for wildcard, and
+proves both directions against completed `ACL.hasPermission`. Finite derivations
+provide stable sufficient depth without assuming unvisited graphs terminate.
+
+`canPerform_traced` composes these rules through actual Lido→Kernel→ACL dispatch,
+retaining the exact nested trace and unchanged permission-call world. `target_allowed`
+derives the independent target accounting rule from permission derivation;
+`target_denied` derives APP_AUTH_FAILED with full original-world rollback and the
+same call trace. Physical initialization/code/pointers and raw static-call
+interpretation remain explicit; this is not deployed-bytecode/EVM gas certification.
+Immutable validation is recorded after checks. Earlier receipts remain attributed
+to their original source commits. Full parent and writer coverage remains open.
+
 ## Atomic ACL rules and recursive leaf discharge
 
 `ACLLeafSpec` independently describes block/timestamp/constant/uint240 argument

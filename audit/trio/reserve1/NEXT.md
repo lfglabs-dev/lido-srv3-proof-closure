@@ -10,8 +10,13 @@ or duplicate the old terminal remote job. The old local full-gate handle is abse
 The latest leaf extension discharges the abstract atomic premises in the recursive
 ACL theorem through independent scalar rules and a physical projection of raw
 static-call replies. Continue with primitive/deployment/resource binding and
-permission/parent composition; do not reopen discharged leaf premises or treat
+parent composition and deployment binding; do not reopen discharged leaf premises or treat
 the arbitrary static-call interpreter as deployed bytecode evidence.
+
+ACLPermission now gives bidirectional ordered permission correspondence and
+derives traced Lido/Kernel/ACL admission plus target allowance/denial from the
+independent rules. Remaining target integration includes exhaustive parent faults,
+external sequence reachability and deployed primitive binding.
 
 1. Complete the independent withdrawal interaction specification and full
    return/revert/world/ordered-call/event correspondence. Allocation is now tied

@@ -1,3 +1,4 @@
+import LidoSRv3.Audit.Source.TrioReserve1.ACLPermission
 import LidoSRv3.Audit.Source.TrioReserve1.ACLLeaf
 import LidoSRv3.Audit.Source.TrioReserve1.Queue
 import LidoSRv3.Audit.Source.TrioReserve1.Erasure
@@ -234,3 +235,15 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms ACLLeaf.describes_source
 #print axioms ACLLeaf.describes_complete
 #print axioms ACLLeaf.tree_corresponds
+
+#print axioms ACLPermission.attempt_of_spec
+#print axioms ACLPermission.attempt_to_spec
+#print axioms ACLPermission.attempt_lift
+#print axioms ACLPermission.selection_source
+#print axioms ACLPermission.of_spec
+#print axioms ACLPermission.to_spec
+#print axioms ACLPermission.corresponds
+#print axioms ACLPermission.of_spec_stable
+#print axioms ACLPermission.canPerform_traced
+#print axioms ACLPermission.target_allowed
+#print axioms ACLPermission.target_denied
