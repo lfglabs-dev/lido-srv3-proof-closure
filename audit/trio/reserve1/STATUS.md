@@ -1,5 +1,23 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Recursive ACL graph correspondence
+
+`ACLTreeSpec` defines finite evaluation of an indexed graph without a fuel
+parameter or executor imports. It includes missing/invalid nodes, first-child
+failure, short-circuit completion and selected-child success/failure with exact
+trace concatenation. Cycles in storage are allowed; only the evaluated paths
+need finite derivations. Leaf semantics are an explicit independent relation.
+
+`ACLTree.corresponds` proves both directions between those derivations and
+completed source evaluations of the physical graph, subject to stated leaf
+soundness/completeness premises. `of_spec_stable` constructs a sufficient depth
+from each derivation and preserves the result for larger depths; related
+derivations agree on outcome and trace. No global cutoff or global acyclicity
+premise is inserted. This closes recursive structure correspondence, while the
+leaf premises, primitive/deployment relation and EVM resource binding remain open.
+Runtime implementations are unchanged. Draft checks pass; immutable evidence
+follows the source commit.
+
 ## Independent ACL logic control
 
 `ACLLogicSpec` gives a total, unique control relation after the first child:

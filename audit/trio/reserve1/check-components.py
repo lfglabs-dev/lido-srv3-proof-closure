@@ -56,6 +56,8 @@ MODULES = [
     "Audit/Source/TrioReserve1/ACLBounds",
     "Audit/Source/TrioReserve1/ACLLogicSpec",
     "Audit/Source/TrioReserve1/ACLLogic",
+    "Audit/Source/TrioReserve1/ACLTreeSpec",
+    "Audit/Source/TrioReserve1/ACLTree",
     "Tests/TrioReserve1/Foundations",
     "Tests/TrioReserve1/OracleMutants",
     "Tests/TrioReserve1/Differential",

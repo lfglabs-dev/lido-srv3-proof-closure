@@ -23,6 +23,7 @@ import LidoSRv3.Audit.Source.TrioReserve1.Kernel
 import LidoSRv3.Audit.Source.TrioReserve1.ACLCalls
 import LidoSRv3.Audit.Source.TrioReserve1.ACLBounds
 import LidoSRv3.Audit.Source.TrioReserve1.ACLLogic
+import LidoSRv3.Audit.Source.TrioReserve1.ACLTree
 
 /-! Owned inspection, pending coordinated canonical Trust registration. -/
 open LidoSRv3.Audit.Source.TrioReserve1
@@ -216,3 +217,9 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms ACLLogic.out_of_bounds
 #print axioms ACLLogic.invalid_before_children
 #print axioms ACLLogic.first_failure
+
+#print axioms ACLTree.of_spec
+#print axioms ACLTree.of_spec_stable
+#print axioms ACLTree.derivations_agree
+#print axioms ACLTree.to_spec
+#print axioms ACLTree.corresponds
