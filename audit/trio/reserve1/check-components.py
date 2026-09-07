@@ -12,6 +12,7 @@ RECEIPTS_ROOT = ROOT / "audit/trio/reserve1/receipts/component-checks"
 LEAN = ROOT / "audit/trio/reserve1/.local/lean4-v4.31.0/bin/lean"
 MODULES = [
     "Audit/Source/TrioReserve1/Live",
+    "Audit/Source/TrioReserve1/ABI",
     "Audit/Source/TrioReserve1/PartitionSpec",
     "Audit/Source/TrioReserve1/QueueSpec",
     "Audit/Source/TrioReserve1/Queue",
@@ -22,6 +23,8 @@ MODULES = [
     "Audit/Source/TrioReserve1/Writers",
     "Audit/Source/TrioReserve1/AllocationSpec",
     "Audit/Source/TrioReserve1/Allocation",
+    "Audit/Source/TrioReserve1/AdmissionSpec",
+    "Audit/Source/TrioReserve1/Admission",
     "Audit/Source/TrioReserve1/RouterSpec",
     "Audit/Source/TrioReserve1/Router",
     "Audit/Source/TrioReserve1/Locator",

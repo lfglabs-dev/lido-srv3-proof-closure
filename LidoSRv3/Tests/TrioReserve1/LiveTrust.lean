@@ -8,6 +8,8 @@ import LidoSRv3.Audit.Source.TrioReserve1.Locator
 import LidoSRv3.Audit.Source.TrioReserve1.Transfers
 import LidoSRv3.Audit.Source.TrioReserve1.Oracle
 import LidoSRv3.Audit.Source.TrioReserve1.Consensus
+import LidoSRv3.Audit.Source.TrioReserve1.Admission
+import LidoSRv3.Audit.Source.TrioReserve1.ABI
 
 /-! Owned inspection, pending coordinated canonical Trust registration. -/
 open LidoSRv3.Audit.Source.TrioReserve1
@@ -49,3 +51,16 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms Oracle.frame_success
 #print axioms Consensus.compute_success
 #print axioms FrameSpec.unique
+#print axioms Admission.live_status
+#print axioms Admission.live_status_false
+#print axioms Admission.success_corresponds
+#print axioms Admission.status_failure_stops
+#print axioms Admission.cannot_deposit_stops
+#print axioms Admission.router_failure_stops
+#print axioms Admission.unauthorized_stops
+#print axioms Admission.zero_amount_stops
+
+#print axioms ABI.decode_encode
+#print axioms ABI.decode_encode_bounded
+#print axioms ABI.decode_word
+#print axioms ABI.decode_second_word

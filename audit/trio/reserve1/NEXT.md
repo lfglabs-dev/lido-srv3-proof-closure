@@ -1,6 +1,6 @@
 # Continuation — not a completion claim
 
-Read STATUS, current git HEAD, and oracle/component receipts first. The previous
+Read STATUS, current git HEAD, and admission/ABI plus oracle/component receipts first. The previous
 goal turn was progress: source-callee implementations, checked specifications
 and executed differential receipts changed authoritative state. The installed
 remote wrapper still cannot encode the gitlink or carry Lake dependency sources.
@@ -10,16 +10,17 @@ or duplicate the old terminal remote job. The old local full-gate handle is abse
 1. Complete the independent withdrawal interaction specification and full
    return/revert/world/ordered-call/event correspondence. Allocation is now tied
    to actual queue CALL bytes and saved physical locals; compose through all
-   guards, packed writes, frame call, seed update and ETH receiver. Need ABI
-   round-trip/input binding proofs rather than assume decoded source replies.
+   guards, packed writes, frame call, seed update and ETH receiver. ABI.decode_encode and word/tuple decoding are now checked. Compose them
+   with actual callee outputs and source inputs rather than assuming decoded replies.
 2. The source callee path now contains immutable Locator, live Queue,
    AccountingOracle/BaseOracle and HashConsensus frame getters, and the router
    receiver. Maintain actual nested STATICCALL and rejection semantics. The
    independent FrameSpec uses quotient intervals and explicit uint64 narrowing;
    the source has a uint64 product for frame span, not uint256. Full deployment,
    compiler-layout and primitive relations remain explicit upstream obligations.
-3. Complete recursive callback/static-call interpretation and source admission
-   at all enclosing surfaces. Source frame getters are read-only, but this does
+3. Admission now proves the withdrawal status/auth/nonzero prefix and exact
+   early-failure rollback/trace. Complete recursive callback/static-call
+   interpretation and source admission at all other enclosing surfaces. Source frame getters are read-only, but this does
    not establish that arbitrary caller callbacks preserve invariants.
 4. Complete Aragon canPerform admission, report/reward/withdrawal finalization,
    initialization/migration, submissions and rebalance writer composition. Derive

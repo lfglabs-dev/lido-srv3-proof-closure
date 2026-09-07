@@ -1,0 +1,155 @@
+LidoSRv3/Audit/Source/TrioReserve1/ABI.lean:49:37: error: Function expected at
+  List.take_left
+but this term has type
+  List.take (List.length ?m.47) (?m.47 ++ ?m.48) = ?m.47
+
+Note: Expected a function because this term is being applied to the argument
+  (encode 32 n)
+LidoSRv3/Audit/Source/TrioReserve1/ABI.lean:45:70: error: unsolved goals
+n : Nat
+suffix : Bytes
+w : World
+hlen : List.length (encode 32 n ++ suffix) ≥ 32
+htake : List.take 32 (encode 32 n ++ suffix) = encode 32 n
+⊢ ((if 32 ≤ List.length (encode 32 n) + List.length suffix then pure () else fail Fault.empty) >>= fun x =>
+        pure
+          {
+            val :=
+              n % 115792089237316195423570985008687907853269984665640564039457584007913129639936 %
+                Verity.Core.Uint256.modulus,
+            isLt := ⋯ })
+      w =
+    { outcome := Except.ok { val := n % Verity.Core.Uint256.modulus, isLt := ⋯ }, world := w }
+LidoSRv3/Audit/Source/TrioReserve1/ABI.lean:50:29: warning: This simp argument is unused:
+  bindExec
+
+Hint: Omit it from the simp argument list.
+  simp [decodeWord, require, b̵i̵n̵d̵E̵x̵e̵c̵,̵ ̵pureExec, hlen, htake, decode_encode,
+  ̵  ̵ ̵ ̵word, Verity.Core.Uint256.ofNat,
+  ̲  ̲ ̲ ̲Verity.Core.UINT256_MODULUS]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/ABI.lean:50:39: warning: This simp argument is unused:
+  pureExec
+
+Hint: Omit it from the simp argument list.
+  simp [decodeWord, require, bindExec, p̵u̵r̵e̵E̵x̵e̵c̵,̵ ̵hlen, htake, decode_encode,
+  ̵  ̵ ̵ ̵word, Verity.Core.Uint256.ofNat,
+  ̲  ̲ ̲ ̲Verity.Core.UINT256_MODULUS]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/ABI.lean:50:49: warning: This simp argument is unused:
+  hlen
+
+Hint: Omit it from the simp argument list.
+  simp [decodeWord, require, bindExec, pureExec, hl̵e̵n̵,̵ ̵h̵take, decode_encode,
+  ̵  ̵ ̵ ̵word,
+  ̲  ̲ ̲ ̲Verity.Core.Uint256.ofNat, Verity.Core.UINT256_MODULUS]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/ABI.lean:51:37: warning: This simp argument is unused:
+  Verity.Core.UINT256_MODULUS
+
+Hint: Omit it from the simp argument list.
+  simp [decodeWord, require, bindExec, pureExec, hlen, htake, decode_encode, word,
+  ̲  ̲ ̲ ̲V̵e̵r̵i̵t̵y̵.̵C̵o̵r̵e̵.̵U̵i̵n̵t̵2̵5̵6̵.̵o̵f̵N̵a̵t̵,̵ ̵V̵e̵r̵i̵t̵y̵.̵C̵o̵r̵e̵.̵U̵I̵N̵T̵2̵5̵6̵_̵M̵O̵D̵U̵L̵U̵S̵]̵V̲e̲r̲i̲t̲y̲.̲C̲o̲r̲e̲.̲U̲i̲n̲t̲2̲5̲6̲.̲o̲f̲N̲a̲t̲]̲
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/ABI.lean:56:68: error: unsolved goals
+a b : Nat
+suffix : Bytes
+w : World
+⊢ 64 ≤ 32 + (32 + List.length suffix)
+LidoSRv3/Audit/Source/TrioReserve1/ABI.lean:60:37: error: Function expected at
+  List.drop_left
+but this term has type
+  List.drop (List.length ?m.75) (?m.75 ++ ?m.76) = ?m.76
+
+Note: Expected a function because this term is being applied to the argument
+  (encode 32 a)
+LidoSRv3/Audit/Source/TrioReserve1/ABI.lean:62:37: error: Function expected at
+  List.take_left
+but this term has type
+  List.take (List.length ?m.100) (?m.100 ++ ?m.101) = ?m.100
+
+Note: Expected a function because this term is being applied to the argument
+  (encode 32 b)
+LidoSRv3/Audit/Source/TrioReserve1/ABI.lean:55:31: error: unsolved goals
+a b : Nat
+suffix : Bytes
+w : World
+hlen : List.length (encode 32 a ++ encode 32 b ++ suffix) ≥ 64
+hdrop : List.drop 32 (encode 32 a ++ encode 32 b ++ suffix) = encode 32 b ++ suffix
+htake : List.take 32 (encode 32 b ++ suffix) = encode 32 b
+⊢ ((if 64 ≤ List.length (encode 32 a) + (List.length (encode 32 b) + List.length suffix) then pure ()
+        else fail Fault.empty) >>=
+        fun x =>
+        pure
+          {
+            val :=
+              decode (List.take 32 (List.drop 32 (encode 32 a ++ (encode 32 b ++ suffix)))) %
+                Verity.Core.Uint256.modulus,
+            isLt := ⋯ })
+      w =
+    { outcome := Except.ok { val := b % Verity.Core.Uint256.modulus, isLt := ⋯ }, world := w }
+LidoSRv3/Audit/Source/TrioReserve1/ABI.lean:63:29: warning: This simp argument is unused:
+  bindExec
+
+Hint: Omit it from the simp argument list.
+  simp [decodeWord, require, b̵i̵n̵d̵E̵x̵e̵c̵,̵ ̵pureExec, hlen, hdrop, htake, decode_encode,
+  ̵  ̵ ̵ ̵word,
+  ̲  ̲ ̲ ̲Verity.Core.Uint256.ofNat, Verity.Core.UINT256_MODULUS]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/ABI.lean:63:39: warning: This simp argument is unused:
+  pureExec
+
+Hint: Omit it from the simp argument list.
+  simp [decodeWord, require, bindExec, p̵u̵r̵e̵E̵x̵e̵c̵,̵ ̵hlen, hdrop, htake, decode_encode,
+  ̵  ̵ ̵ ̵word,
+  ̲  ̲ ̲ ̲Verity.Core.Uint256.ofNat, Verity.Core.UINT256_MODULUS]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/ABI.lean:63:49: warning: This simp argument is unused:
+  hlen
+
+Hint: Omit it from the simp argument list.
+  simp [decodeWord, require, bindExec, pureExec, hl̵e̵n̵,̵ ̵h̵drop, htake, decode_encode,
+  ̵  ̵ ̵ ̵word,
+  ̲  ̲ ̲ ̲Verity.Core.Uint256.ofNat, Verity.Core.UINT256_MODULUS]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/ABI.lean:63:55: warning: This simp argument is unused:
+  hdrop
+
+Hint: Omit it from the simp argument list.
+  simp [decodeWord, require, bindExec, pureExec, hlen, hd̵r̵o̵p̵,̵ ̵h̵take, decode_encode,
+  ̵  ̵ ̵ ̵word,
+  ̲  ̲ ̲ ̲Verity.Core.Uint256.ofNat, Verity.Core.UINT256_MODULUS]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/ABI.lean:63:62: warning: This simp argument is unused:
+  htake
+
+Hint: Omit it from the simp argument list.
+  simp [decodeWord, require, bindExec, pureExec, hlen, hdrop, h̵t̵a̵k̵e̵,̵ ̵decode_encode, word,
+  ̲  ̲ ̲ ̲Verity.Core.Uint256.ofNat, Verity.Core.UINT256_MODULUS]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/ABI.lean:63:69: warning: This simp argument is unused:
+  decode_encode
+
+Hint: Omit it from the simp argument list.
+  simp [decodeWord, require, bindExec, pureExec, hlen, hdrop, htake, d̵e̵c̵o̵d̵e̵_̵e̵n̵c̵o̵d̵e̵,̵
+  ̵ ̵ ̵ ̵ ̵word,
+  ̲  ̲ ̲ ̲Verity.Core.Uint256.ofNat, Verity.Core.UINT256_MODULUS]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/ABI.lean:64:37: warning: This simp argument is unused:
+  Verity.Core.UINT256_MODULUS
+
+Hint: Omit it from the simp argument list.
+  simp [decodeWord, require, bindExec, pureExec, hlen, hdrop, htake, decode_encode, word,
+  ̲  ̲ ̲ ̲V̵e̵r̵i̵t̵y̵.̵C̵o̵r̵e̵.̵U̵i̵n̵t̵2̵5̵6̵.̵o̵f̵N̵a̵t̵,̵ ̵V̵e̵r̵i̵t̵y̵.̵C̵o̵r̵e̵.̵U̵I̵N̵T̵2̵5̵6̵_̵M̵O̵D̵U̵L̵U̵S̵]̵V̲e̲r̲i̲t̲y̲.̲C̲o̲r̲e̲.̲U̲i̲n̲t̲2̲5̲6̲.̲o̲f̲N̲a̲t̲]̲
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

@@ -1,0 +1,13 @@
+LidoSRv3/Audit/Source/TrioReserve1/ABI.lean:45:70: error: unsolved goals
+n : Nat
+suffix : Bytes
+w : World
+hlen : List.length (encode 32 n ++ suffix) ≥ 32
+htake : List.take 32 (encode 32 n ++ suffix) = encode 32 n
+⊢ n % 115792089237316195423570985008687907853269984665640564039457584007913129639936 % Verity.Core.UINT256_MODULUS =
+    n % Verity.Core.UINT256_MODULUS
+LidoSRv3/Audit/Source/TrioReserve1/ABI.lean:69:2: error: omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  c ≥ 64
+where
+ c := ↑(List.length (encode 32 a ++ encode 32 b ++ suffix))
