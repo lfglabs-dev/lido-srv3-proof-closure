@@ -224,3 +224,26 @@ integration obligations remain open; neither producer nor consumer is certified.
 This coordination update only changes this owned note. Git source inspection,
 receipt JSON parsing and axiom-source hash verification exited 0. Existing work
 is preserved; no repin, PR mutation or remote build submission occurred.
+
+## Interim Cancun validation update reported 2026-09-07
+
+The producer reports using the RESERVE1 PR244 Hardhat 2.26.3 pattern with
+`allowUnlimitedContractSize=false`, targeting production Cancun with solc
+0.8.25, viaIR and optimizer runs 200. The initial twelve capacity vectors and
+existing root-memory pointer schedule reportedly pass, and comparison against
+preserved Verity outputs at `876649b` reportedly passes. These are attributed
+execution results; no compiler, deployment or source receipt was supplied or
+independently inspected for this update. PR244 was not inspected or modified.
+
+The comparison uses historical Verity outputs and is not fresh full Lean
+validation. Passing vectors and a pointer schedule do not establish universal
+memory correspondence or close the producer-to-consumer memory relation.
+Interface.lean is reported unchanged; the accepted v0 agreement and existing
+composition dependency pin remain unchanged.
+
+Final compiler/deployment/source receipts and mutants remain underway. The
+producer will publish an immutable SHA to PR245 when finalized; no new SHA or
+publication gate is inferred from this interim report. Full original proof,
+composition, integration and independent certification obligations remain open.
+This recording preserves existing work and makes no runtime, dependency,
+canonical metadata or PR changes and submits no remote build.
