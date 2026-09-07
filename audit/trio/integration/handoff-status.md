@@ -90,3 +90,29 @@ latest writer merges. Its terminal result must be collected; it cannot certify
 9d0bcdbe or subsequent source. Earlier admission attempts failed on Ashur's
 unchanged disk reserve. Explicit command routing resolved the workspace's
 default-node override. No AI harness or duplicate writer was launched.
+
+## Executed producer comparison and current validation
+
+Producer checkpoint `fcfa8419` publishes an actual Verity execution receipt at
+`03abaac4` and twelve Solidity/Verity comparisons. The integrator reran the
+comparison against the recorded Solidity and VM outputs, verified their hashes,
+and obtained the identical comparison receipt. The producer source and test
+trees are unchanged from the executed commit. Scope: decoded results or raw
+errors and ordered top-level calls, not the full nested world or compiler memory.
+
+The comparator's assertions allowed optimized Python to accept two empty lists.
+Explicit checks now reject them. Ten checks cover genuine, empty, truncated,
+duplicate and changed-result inputs in normal and optimized modes; the genuine
+receipt remains identical. `comparator-regression.json` records their exits.
+
+Read-only workspace inspection found ALLOC-1 clean at `fcfa8419`, matching
+GitHub. ALLOC-2 remains at `b279d572` with unpublished parent conversion,
+parent harness and receipts. RESERVE-1 remains at `dac0fc30` with unpublished
+locator/queue/oracle-call composition and receipts. No final all-writer
+checkpoint is claimed.
+
+The expanded full-suite job `1a3ffae2-3854-4335-beee-dbf883bd76f3` on DGX
+Spark is running at `c2f9f0fc`, under durable handle
+`4deb4669-060e-5552-a2df-01fe34d79680`. It executes the full build, make
+prove, make test and actual producer Verity vectors. The earlier full build at
+`91684800` succeeded; its checked receipt is `remote-91684800/receipt.json`.

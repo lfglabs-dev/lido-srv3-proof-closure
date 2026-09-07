@@ -12,10 +12,18 @@ parser.add_argument('output', type=Path)
 args = parser.parse_args()
 solidity = json.loads(args.solidity.read_text())
 verity = json.loads(args.verity.read_text())
-assert len(solidity) == len(verity) == 12, 'complete expected fixture set'
-assert len({x['name'] for x in solidity}) == 12, 'unique Solidity fixture names'
-assert len({x['name'] for x in verity}) == 12, 'unique Verity fixture names'
-assert {x['name'] for x in solidity} == {x['name'] for x in verity}, 'matching fixture sets'
+
+
+def require(condition, message):
+    if not condition:
+        raise SystemExit(message)
+
+
+require(isinstance(solidity, list) and isinstance(verity, list), 'execution lists required')
+require(len(solidity) == len(verity) == 12, 'complete expected fixture set')
+require(len({x['name'] for x in solidity}) == 12, 'unique Solidity fixture names')
+require(len({x['name'] for x in verity}) == 12, 'unique Verity fixture names')
+require({x['name'] for x in solidity} == {x['name'] for x in verity}, 'matching fixture sets')
 checks = []
 for actual in solidity:
     peer = next(x for x in verity if x['name'] == actual['name'])
