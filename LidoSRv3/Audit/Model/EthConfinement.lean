@@ -65,31 +65,23 @@ as prose.  The three residual hops remain unclassified, not discharged.
 
 Every quantifier below ranges over `EthWorld.ValueRoute`, an enumeration of
 eleven modeled hops.  It does **not** range over the ETH-moving sites of the
-pinned Solidity.  A site-by-site read of the fourteen in-scope files at the
-pinned commit (recorded in `audit/P-ETH-CONFINEMENT-1-BRIEF.md`) found three
-limitations of this inventory. Integrating this auxiliary theorem does not
-repair or discharge them:
+pinned Solidity. The named-site inspection at
+`17005714f151e5502c559932319a3f2f74ac2436` is recorded in
+`audit/P-ETH-CONFINEMENT-1-BRIEF.md`. Three limits remain:
 
-1. **One unclassified out-of-inventory hop.**
-   `contracts/0.8.9/WithdrawalQueueBase.sol:529` (`_sendValue`), reached from
-   in-scope `contracts/0.8.9/WithdrawalQueue.sol:253`, `:272`, `:285`, sends
-   ETH to an arbitrary caller-supplied recipient.  It matches no `ValueRoute`
-   and no `UnsupportedRoute` exclusion class.  `residualRoutes` therefore
-   names the residue *of the modeled inventory*, not every unclassified ETH
-   exit in the source.
-2. **One misattributed route endpoint.**  Route `vaultToWithdrawalQueue` is
-   documented as `Vault → WithdrawalQueue`; the only ETH-bearing call into the
-   queue is `contracts/0.4.24/Lido.sol:1099–1101`, whose source is Lido.  The
-   destination is right and the route is tagged `sourceShapedRuntime`, so no
-   Lean statement asserts the wrong endpoint, but the prose does.
-3. **One provenance under-claim.**  Route `vaultToLido` is tagged
-   `sourceShapedRuntime` although `contracts/0.8.9/WithdrawalVault.sol:120` is
-   a pinned call site.  Conservative, but inaccurate.
+1. `WithdrawalQueueBase.sol:529`, reached through the queue claim entrypoints,
+   pays an arbitrary recipient and has no `ValueRoute` or dedicated
+   `UnsupportedRoute` class. The residual list covers only the inventory.
+2. The legacy name `vaultToWithdrawalQueue` denotes a route whose inspected
+   source analogue is Lido → WithdrawalQueue (`Lido.sol:1099–1101`).
+   Correcting that documentation does not establish executable correspondence.
+3. `vaultToLido` remains `sourceShapedRuntime`: the matching call at
+   `WithdrawalVault.sol:120` does not establish model/runtime correspondence.
 
-The one solid negative result behind the enumeration: the fourteen in-scope
-files contain no `delegatecall`, `selfdestruct`, `create`/`create2`, inline
-assembly `call`, or `.transfer`/`.send`, but this syntactic observation does not constrain callee execution, callbacks,
-or dynamically selected call destinations.
+Neither this inspection nor an opcode search constrains arbitrary callees,
+callbacks, or dynamically selected destinations. No source-completeness
+conclusion follows from the finite enumeration.
+
 -/
 
 namespace LidoSRv3.Audit.Model.EthConfinement

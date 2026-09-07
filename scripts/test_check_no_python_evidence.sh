@@ -36,4 +36,21 @@ if ! grep -q 'content/stale-reference.tex' "$tmpdir/stale.err"; then
   fail "stale reference failure did not identify the fixture"
 fi
 
-printf '%s\n' 'check_no_python_evidence regressions ok: missing rg fails closed; stale references are rejected'
+# Real reproduction prerequisites are not Python proof evidence.
+rm "$fixture/content/stale-reference.tex"
+cat >"$fixture/README.md" <<'EOF'
+Needs [elan](https://github.com/leanprover/elan), Lean 4.31.0, Python 3.10+
+local Lean runner. Put these tools on `PATH`; macOS's system Bash and Python
+EOF
+(cd "$fixture" && /bin/bash scripts/check_no_python_evidence.sh) || fail "prerequisites rejected"
+printf '%s\n' 'Python proves this guarantee.' >>"$fixture/README.md"
+if (cd "$fixture" && /bin/bash scripts/check_no_python_evidence.sh) >/dev/null 2>&1; then
+  fail "Python proof claim in README was accepted"
+fi
+sed -i.bak '$d' "$fixture/README.md"
+printf '%s' 'Python proof evidence' >>"$fixture/README.md"
+if (cd "$fixture" && /bin/bash scripts/check_no_python_evidence.sh) >/dev/null 2>&1; then
+  fail "non-prerequisite Python text was accepted"
+fi
+
+printf '%s\n' 'check_no_python_evidence regressions ok: missing rg fails closed; exact prerequisites allowed; stale evidence rejected'
