@@ -69,6 +69,10 @@ compiler on the first build). The differential harness uses FFI to invoke the
 local Lean runner. Put these tools on `PATH`; macOS's system Bash and Python
 may be older than the required versions.
 
+Use a clone with complete Git history: audit checks read the recorded review
+basis with `git show`. A depth-one checkout omits that basis; run
+`git fetch --unshallow origin` when starting from a shallow clone.
+
 Before running the gates, provision and check their dependencies:
 
 ```bash

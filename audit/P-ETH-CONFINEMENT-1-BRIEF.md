@@ -22,7 +22,21 @@ The current merge preserves the already-landed Oracle #232 definitions and
 regressions. Candidate modules and mutants are built by the production/test
 targets; trust inspection is included separately.
 
-## What is proved
+## Exact-assignment amendment
+
+`modeled_inventory_matches_exact_assignments` adds exact route/parent/destination/
+Spec-projection agreement against an independent literal table. Three new mutants
+swap a parent for another registered parent, a Spec projection for another approved
+constructor, and a route destination for another approved destination. Each preserves
+the old presence-only check but refutes `RouteAssignmentsMatch`; positive controls
+prove that each mutant changes only its designated entry.
+
+This validates exact labels, not the semantic applicability of the named parent
+theorems. No theorem composition with live execution is established. The old
+`modeled_positive_value_is_confined_or_residual` is retained as the weaker
+presence-only inventory result. No guarantee is registered by this amendment.
+
+## What the retained presence-only theorem proves
 
 `LidoSRv3/Audit/Guarantees/PEthConfinement1.lean` proves
 `modeled_positive_value_is_confined_or_residual` over the model-layer conjuncts of

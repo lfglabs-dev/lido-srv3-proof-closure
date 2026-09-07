@@ -28,13 +28,13 @@ So the conclusion is a *candidate* parent: the theorem content is complete
 and kernel-checked (`PEthConfinement1.modeled_positive_value_is_confined_or_residual`),
 but no public claim surface asserts it.
 
-## What the conclusion says
+## What the presence-only conclusion says
 
 For every modeled ETH-world trace, every positive-value authorized frame is
 either
 
 * one of three explicitly named residual hops, or
-* covered by a registered parent guarantee **and** landing on a frozen
+* labeled with a registered parent identifier **and** a frozen
   `Spec.ApprovedDestination`.
 
 Its content is the agreement of three tables that are written independently
@@ -131,6 +131,42 @@ def RouteConfined (r : ValueRoute) : Prop :=
 /-- Trace-level confinement, universally quantified over ETH-world traces. -/
 def Confined (flows : List GeneralFlow) : Prop :=
   ∀ f ∈ authorizedFrames flows, f.isPositive → RouteConfined f.route
+
+/-! ## Exact inventory assignments
+
+An independent literal specification binds each route to its parent label,
+destination label and Spec projection. It validates these exact assignments,
+not the semantic applicability of the named parent's theorem to an execution.
+The earlier presence-only predicate is retained as a weaker compatibility result.
+-/
+
+def expectedAssignment : ValueRoute →
+    Option CoveringParent × Destination × Option ApprovedDestination
+  | .depositLidoPull => (some .pDepositOne, .lidoPull, some .lidoPull)
+  | .depositBeaconDeposit => (some .pDepositOne, .beaconDeposit, some .beaconDeposit)
+  | .topupLidoPull => (some .pTopupOne, .lidoPull, some .lidoPull)
+  | .topupBeaconDeposit => (some .pTopupOne, .beaconDeposit, some .beaconDeposit)
+  | .consolidationRefund => (some .pConsolidationEthOne, .refundRecipient, some .refundRecipient)
+  | .busToGateway => (none, .consolidationGateway, none)
+  | .gatewayToVault => (none, .withdrawalVault, none)
+  | .vaultConsolidationCall =>
+      (some .pConsolidationValueOne, .consolidationPredeploy, some .consolidationRequest)
+  | .vaultWithdrawalCall => (none, .withdrawalPredeploy, none)
+  | .vaultToLido => (some .pVaultEthOne, .vaultToLido, some .vaultToLido)
+  | .vaultToWithdrawalQueue => (some .pVaultEthOne, .vaultToWithdrawalQueue, some .vaultToWithdrawalQueue)
+
+/-- Parameterized over the tables so a wrong but registered/approved identity
+can refute the same predicate used by the exact inventory theorem. -/
+def RouteAssignmentsMatch
+    (parent : ValueRoute → Option CoveringParent)
+    (destination : ValueRoute → Destination)
+    (approval : Destination → Option ApprovedDestination) : Prop :=
+  ∀ r, (parent r, destination r, approval (destination r)) = expectedAssignment r
+
+theorem routeAssignmentsMatch :
+    RouteAssignmentsMatch ValueRoute.primaryParent ValueRoute.destination Destination.toSpec := by
+  intro r
+  cases r <;> rfl
 
 /-! ## Proofs -/
 

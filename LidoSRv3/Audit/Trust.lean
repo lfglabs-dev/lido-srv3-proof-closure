@@ -575,3 +575,9 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Verity.AllocationTx.live_revert_restores_snapshot
 
 #print axioms LidoSRv3.Audit.Verity.MinFirstSourceEntry.eager_guard_disagrees_on_zero_demand
+
+#print axioms LidoSRv3.Audit.Guarantees.PEthConfinement1.modeled_inventory_matches_exact_assignments
+#print axioms LidoSRv3.Tests.EthConfinementMutants.swaps_preserve_presence
+#print axioms LidoSRv3.Tests.EthConfinementMutants.kill_exact_assignment_parent_swap
+#print axioms LidoSRv3.Tests.EthConfinementMutants.kill_exact_assignment_approval_swap
+#print axioms LidoSRv3.Tests.EthConfinementMutants.kill_exact_assignment_destination_swap
