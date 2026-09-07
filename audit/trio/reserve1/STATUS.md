@@ -15,7 +15,7 @@ initialization/kernel-prefix denial rule. `kernel_no_code` derives exact empty-r
 rollback from physical code absence. These supplement the concrete allowed/denied
 ACL composition rather than claiming all deployed authorization failures closed.
 
-Immutable validation is recorded after checks. Deployment/primitive/resource binding,
+At source `01cad617b9692f618a3fa869597967a23720f36f`, three selected component checks and seven baseline/import checks pass. The other 56 source/olean pairs match earlier successful receipts. See `receipts/target-parent-summary.json`; only standard axioms were printed. Eleven dependency revisions match the manifest. These are bounded checks, not full gates. Deployment/primitive/resource binding,
 remaining authorization failure paths, external sequence reachability, withdrawal
 parent coverage, report/queue writers and full remote integration gates remain open.
 
