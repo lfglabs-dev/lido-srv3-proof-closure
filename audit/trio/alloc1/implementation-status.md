@@ -24,11 +24,21 @@ count truncation or assumed callee success is introduced.
   establish compiler memory, gas, or bytecode equivalence.
 - `ShareWriter`: public role/membership/guard order, packed update, derived stored
   share bound, other-slot preservation, and rejection snapshot restoration.
+- `WriterInvariant`: empty-state count/share/address invariant and preservation
+  through the public share writer, with finite slot separation explicit.
+- `AdmissionChecks`: physical role and ordered admission guards, address freshness
+  derived from the complete duplicate scan, count below 32 on success, and checked
+  uint24 last-ID increment. This is the prefix before admission writes.
+- `EnumerationWriter`: actual existing-ID no-op and absent-ID insertion, physical
+  count/old/new elements and positions, wrap-aware array-slot injectivity, and
+  preservation of one-based position consistency under finite slot separation.
+  Consistency derives uniqueness of enumerated IDs; it is not yet composed with
+  all admission/configuration/migration writes.
 - `AllocationMemory`: exact word rounding, oversized-array panic 0x41, allocation
   monotonicity/limit on success, and a bounded allocation lemma. Integration of
   these primitives into the entire compiler execution remains open.
 
-Seventeen Init-only modules pass fresh validation (`receipts/light-v12.json`).
+Twenty Init-only modules are included in the fresh light validation driver.
 The full production/test/audit-trust/legacy build passed 1,505 jobs at
 `8269ac576cf119975a7e9954459cd4aa04d5cd82`, remote job
 `3ca9d1e4-e496-43f7-87f2-a5925a9bd083` on nippur. This is **STALE_SUCCESS** for
@@ -49,6 +59,11 @@ Pinned solc 0.8.25 via-IR/optimizer-200 Shanghai execution also checked:
   elements, including empty arrays (`solidity-memory.json`).
 - Public share-writer packed-word preservation, event ABI, six exact error-order
   cases, unchanged storage and no events on rejection (`writer-*.json`).
+- Public admission: fourteen exact rejections and one successful insertion
+  (`admission.json`). Six late failures execute five distinct slot writes each;
+  every attempted slot is compared before/after the reverted transaction and is
+  restored, with no committed events. Includes uint24 last-ID overflow, fee-sum
+  arithmetic panic, and duplicate/credential/count/name/role precedence.
 - Nested read callback and rejected mutation CALL under static context: expected
   three call sites, unchanged module storage, no events (`callback.json`).
 - Actual compiler storage layout and two executed parent-shaped mutants, plus
@@ -75,6 +90,12 @@ pins producer8269ac and has its own receipts; it is not silently integrated here
 | Transaction composition | Parent checked wei conversions, sequential behavior, complete nested-call observation relation and rollback composition with ALLOC-2. |
 | Integration and full validation | Current-head production/test/trust, make prove/test, canonical source inventory/metadata integration and independent certification. The shared UX2 gate is consumer-owned; no shared file is regenerated here. |
 | Delivery | Draft PR245 is open. Final implementation and immutable-source validation are still required. No merge, deployment, public-site publication or Lido message. |
+
+Migration-specific boundary: `SRLib._migrateStorage` copies legacy count and share
+fields without rechecking the public admission limits. Its version check is not
+a proof of legacy state reachability. The remaining migration theorem must connect
+the legacy writers/deployment state to these bounds; it must not assume that a
+successful migration alone implies count<=32, bounded shares, or unique addresses.
 
 Infrastructure diagnostics and measured estimates are recorded in `reproduce.md`
 and `receipts/remote-admission-sizing.json`. The full build uses 5 GiB; the measured

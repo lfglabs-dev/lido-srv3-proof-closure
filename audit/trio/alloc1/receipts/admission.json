@@ -1,0 +1,206 @@
+{
+  "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "compiler": "0.8.25+commit.b61c2a91.Emscripten.clang",
+  "checks": [
+    {
+      "name": "admission-role-first",
+      "revert": "0xe2517d3f00000000000000000000000090f8bf6a479f320ead074411a4b0e7944ea8c9c13105bcbf19d4417b73ae0e58d508a65ecf75665e46c2622d8521732de6080c48",
+      "status": 0,
+      "events": 0,
+      "attemptedStorageSlots": [],
+      "allAttemptedSlotsRestored": true
+    },
+    {
+      "name": "address-before-name",
+      "revert": "0xd92e233d",
+      "status": 0,
+      "events": 0,
+      "attemptedStorageSlots": [],
+      "allAttemptedSlotsRestored": true
+    },
+    {
+      "name": "name-before-count",
+      "revert": "0xac187169",
+      "status": 0,
+      "events": 0,
+      "attemptedStorageSlots": [],
+      "allAttemptedSlotsRestored": true
+    },
+    {
+      "name": "long-name",
+      "revert": "0xac187169",
+      "status": 0,
+      "events": 0,
+      "attemptedStorageSlots": [],
+      "allAttemptedSlotsRestored": true
+    },
+    {
+      "name": "count-before-wc",
+      "revert": "0x309eed99",
+      "status": 0,
+      "events": 0,
+      "attemptedStorageSlots": [],
+      "allAttemptedSlotsRestored": true
+    },
+    {
+      "name": "wc-before-duplicate",
+      "revert": "0x2e5c948c",
+      "status": 0,
+      "events": 0,
+      "attemptedStorageSlots": [],
+      "allAttemptedSlotsRestored": true
+    },
+    {
+      "name": "duplicate-before-params",
+      "revert": "0x50f969d0",
+      "status": 0,
+      "events": 0,
+      "attemptedStorageSlots": [],
+      "allAttemptedSlotsRestored": true
+    },
+    {
+      "name": "last-id-uint24-overflow",
+      "revert": "0x4e487b710000000000000000000000000000000000000000000000000000000000000011",
+      "status": 0,
+      "events": 0,
+      "attemptedStorageSlots": [],
+      "allAttemptedSlotsRestored": true
+    },
+    {
+      "name": "late-share-rollback",
+      "revert": "0xde009d7a",
+      "status": 0,
+      "events": 0,
+      "attemptedStorageSlots": [
+        "0x5648d366b9f342bdcc64be95cdcf5f05da808509be70eaa548a8795901d5d001",
+        "0x296d48a0f284833a3ead9ef0308cdec370ed6b78e6e6367f467fcf30f0c7dc2a",
+        "0x928e763f8f308c5c1b98c7feaccffb43581be147fda383e4200b671090c50146",
+        "0x6cb32712f55ac267ce18d98d7dc431143c9280b359cd382326c727e8d1d9f887",
+        "0x6cb32712f55ac267ce18d98d7dc431143c9280b359cd382326c727e8d1d9f88a"
+      ],
+      "allAttemptedSlotsRestored": true
+    },
+    {
+      "name": "late-threshold-rollback",
+      "revert": "0x142d5678",
+      "status": 0,
+      "events": 0,
+      "attemptedStorageSlots": [
+        "0x5648d366b9f342bdcc64be95cdcf5f05da808509be70eaa548a8795901d5d001",
+        "0x296d48a0f284833a3ead9ef0308cdec370ed6b78e6e6367f467fcf30f0c7dc2a",
+        "0x928e763f8f308c5c1b98c7feaccffb43581be147fda383e4200b671090c50146",
+        "0x6cb32712f55ac267ce18d98d7dc431143c9280b359cd382326c727e8d1d9f887",
+        "0x6cb32712f55ac267ce18d98d7dc431143c9280b359cd382326c727e8d1d9f88a"
+      ],
+      "allAttemptedSlotsRestored": true
+    },
+    {
+      "name": "late-fee-overflow-rollback",
+      "revert": "0x4e487b710000000000000000000000000000000000000000000000000000000000000011",
+      "status": 0,
+      "events": 0,
+      "attemptedStorageSlots": [
+        "0x5648d366b9f342bdcc64be95cdcf5f05da808509be70eaa548a8795901d5d001",
+        "0x296d48a0f284833a3ead9ef0308cdec370ed6b78e6e6367f467fcf30f0c7dc2a",
+        "0x928e763f8f308c5c1b98c7feaccffb43581be147fda383e4200b671090c50146",
+        "0x6cb32712f55ac267ce18d98d7dc431143c9280b359cd382326c727e8d1d9f887",
+        "0x6cb32712f55ac267ce18d98d7dc431143c9280b359cd382326c727e8d1d9f88a"
+      ],
+      "allAttemptedSlotsRestored": true
+    },
+    {
+      "name": "late-fee-sum-rollback",
+      "revert": "0xb65e4c59",
+      "status": 0,
+      "events": 0,
+      "attemptedStorageSlots": [
+        "0x5648d366b9f342bdcc64be95cdcf5f05da808509be70eaa548a8795901d5d001",
+        "0x296d48a0f284833a3ead9ef0308cdec370ed6b78e6e6367f467fcf30f0c7dc2a",
+        "0x928e763f8f308c5c1b98c7feaccffb43581be147fda383e4200b671090c50146",
+        "0x6cb32712f55ac267ce18d98d7dc431143c9280b359cd382326c727e8d1d9f887",
+        "0x6cb32712f55ac267ce18d98d7dc431143c9280b359cd382326c727e8d1d9f88a"
+      ],
+      "allAttemptedSlotsRestored": true
+    },
+    {
+      "name": "late-min-distance-rollback",
+      "revert": "0x4f3b93a8",
+      "status": 0,
+      "events": 0,
+      "attemptedStorageSlots": [
+        "0x5648d366b9f342bdcc64be95cdcf5f05da808509be70eaa548a8795901d5d001",
+        "0x296d48a0f284833a3ead9ef0308cdec370ed6b78e6e6367f467fcf30f0c7dc2a",
+        "0x928e763f8f308c5c1b98c7feaccffb43581be147fda383e4200b671090c50146",
+        "0x6cb32712f55ac267ce18d98d7dc431143c9280b359cd382326c727e8d1d9f887",
+        "0x6cb32712f55ac267ce18d98d7dc431143c9280b359cd382326c727e8d1d9f88a"
+      ],
+      "allAttemptedSlotsRestored": true
+    },
+    {
+      "name": "late-max-deposits-rollback",
+      "revert": "0xe747a27f",
+      "status": 0,
+      "events": 0,
+      "attemptedStorageSlots": [
+        "0x5648d366b9f342bdcc64be95cdcf5f05da808509be70eaa548a8795901d5d001",
+        "0x296d48a0f284833a3ead9ef0308cdec370ed6b78e6e6367f467fcf30f0c7dc2a",
+        "0x928e763f8f308c5c1b98c7feaccffb43581be147fda383e4200b671090c50146",
+        "0x6cb32712f55ac267ce18d98d7dc431143c9280b359cd382326c727e8d1d9f887",
+        "0x6cb32712f55ac267ce18d98d7dc431143c9280b359cd382326c727e8d1d9f88a"
+      ],
+      "allAttemptedSlotsRestored": true
+    },
+    {
+      "name": "successful-first-admission",
+      "status": 1,
+      "count": 1,
+      "id": 1,
+      "position": 1,
+      "packedConfig": "0x000001001b581388000000000000000000000000000000000000000000000029",
+      "events": [
+        {
+          "topics": [
+            "0x43b5213f0e1666cd0b8692a73686164c94deb955a59c65e10dee8bb958e7ce3e",
+            "0x0000000000000000000000000000000000000000000000000000000000000001"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000000000000000000029000000000000000000000000000000000000000000000000000000000000006000000000000000000000000090f8bf6a479f320ead074411a4b0e7944ea8c9c100000000000000000000000000000000000000000000000000000000000000066d6f64756c650000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "topics": [
+            "0x1730859048adcce16559e75a58fd609e9dbf7d34f39bcb7a45ad388dfbba0e4e",
+            "0x0000000000000000000000000000000000000000000000000000000000000001"
+          ],
+          "data": "0x00000000000000000000000000000000000000000000000000000000000013880000000000000000000000000000000000000000000000000000000000001b5800000000000000000000000090f8bf6a479f320ead074411a4b0e7944ea8c9c1"
+        },
+        {
+          "topics": [
+            "0x303c8ac43d1b1f9b898ddd2915a294efa01e9b07c322d7deeb7db332b66f0410",
+            "0x0000000000000000000000000000000000000000000000000000000000000001"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000090f8bf6a479f320ead074411a4b0e7944ea8c9c1"
+        },
+        {
+          "topics": [
+            "0x72766c50f14fe492bd1281ceef0a57ad49a02b7e1042fb58723647bf38040f83",
+            "0x0000000000000000000000000000000000000000000000000000000000000001"
+          ],
+          "data": "0x000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000090f8bf6a479f320ead074411a4b0e7944ea8c9c1"
+        },
+        {
+          "topics": [
+            "0x4d106b4a7aff347abccca2dd6855d8d59d6cf792f1fdbb272c9858433d94b328",
+            "0x0000000000000000000000000000000000000000000000000000000000000001"
+          ],
+          "data": "0x000000000000000000000000000000000000000000000000000000000000000100000000000000000000000090f8bf6a479f320ead074411a4b0e7944ea8c9c1"
+        },
+        {
+          "topics": [
+            "0x9151b7f88aca05d432bb395647ef52b2ffc454e3c6afb69c95345af6b5a778c0",
+            "0x0000000000000000000000000000000000000000000000000000000000000001"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ]
+    }
+  ]
+}

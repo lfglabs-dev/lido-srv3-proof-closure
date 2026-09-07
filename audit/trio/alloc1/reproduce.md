@@ -11,7 +11,7 @@ With Lean 4.31.0 available, run from the repository root:
 python3 audit/trio/alloc1/validate-light.py --lean /path/to/lean --output /fresh/output/light
 ```
 
-The script checks the 17 Init-only owned modules (including the interface and test entry)
+The script checks the 20 Init-only owned modules (including the interface and test entry)
 with private oleans, rejects non-Init/non-owned imports, bounds each check to 30
 seconds, and records each source SHA-256, exact command, output and exit status.
 `vectors.json` is produced by actually evaluating `produce`, not by printing expected
@@ -109,10 +109,14 @@ remote-lean-build lake env lean --run audit/trio/alloc1/RunVerityVectors.lean
 node solidity/trio-alloc1/check-writer.cjs /fresh/output/writer
 ```
 
-The writer harness inherits the unmodified public StakingRouter entry point. The
+The writer harness inherits the unmodified public StakingRouter entry points. The
 packed-word test and six error-order/rejection-rollback cases passed; receipts
 `writer-storage.json` and `writer-errors.json` include exact words and raw errors.
-These writer vectors do not establish all-writer reachability.
+The same command also executes fourteen admission rejections and one successful
+insertion, writing `admission.json`. Reverted transaction traces identify every
+attempted SSTORE slot; historical reads compare those slots before and after the
+transaction. Six late failures must execute writes before reverting. These writer
+vectors do not establish all-writer reachability.
 
 Current differential receipt: `receipts/solidity-verity-comparison.json`. Recheck
 the independently produced outputs without reevaluating either model:
