@@ -1,3 +1,4 @@
+import LidoSRv3.Audit.Source.TrioReserve1.CallFlow
 import LidoSRv3.Audit.Source.TrioReserve1.AllocationFlow
 import LidoSRv3.Audit.Source.TrioReserve1.FrameRead
 import LidoSRv3.Audit.Source.TrioReserve1.Spend
@@ -324,3 +325,12 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms AllocationFlow.corresponds
 #print axioms AllocationFlow.spending_corresponds
 #print axioms AllocationFlow.withdrawal_corresponds
+
+#print axioms CallSpec.failure_restores
+#print axioms CallSpec.success_funded
+#print axioms CallFlow.transfer_balances
+#print axioms CallFlow.transfer_frame
+#print axioms CallFlow.of_spec
+#print axioms CallFlow.exists_spec
+#print axioms CallFlow.to_spec
+#print axioms CallFlow.corresponds

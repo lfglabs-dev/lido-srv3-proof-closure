@@ -1,5 +1,22 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Independent high-level CALL correspondence
+
+`CallSpec` independently orders target-code validation, balance admission and
+execution in the provisionally credited world. No-code and insufficient-funds
+paths need no callee observation; only the latter records a failed attempt.
+Success retains the callee-returned world and nested calls; rejection restores
+the incoming CALL world and preserves rejection bytes/nested attempts. Independent
+consequences establish failed-call restoration and successful-call funding/code.
+
+`CallFlow` proves bidirectional exact source CALL outcome/world/trace correspondence
+against explicit raw primitive replies, normalizing traced/untraced variants.
+Independent pointwise transfer accounting covers aliased self-calls, and the
+provisional transfer preserves storage and committed logs. These CALL rules must
+still be threaded into all expanded stage predicates; deployed primitive/bytecode
+and EVM resource/bounded-world binding remain open, along with other writers and
+full integration gates. Immutable validation follows checks. Runtime source unchanged.
+
 ## Complete allocation flow and internal withdrawal substitution
 
 `AllocationFlowSpec` independently orders lookup, queue CALL, demand decoding and

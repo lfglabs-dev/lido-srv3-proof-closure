@@ -32,6 +32,11 @@ buffer/reserve observations and independent maximal-priority arithmetic. All maj
 internal stages are expanded; CALL/deployed primitive binding remains the execution
 boundary.
 
+CallSpec/CallFlow now provide independent code/funds/transfer/reply/rollback rules
+with exact source CALL correspondence and pointwise transfer accounting. Substitute
+these rules into all expanded stage predicates, then bind raw primitive/deployed
+callee behavior and resource/world constraints.
+
 1. WithdrawalSpec/WithdrawalParent now cover all eight parent paths with
    bidirectional exact return/world/trace correspondence to actual stage
    observations. Status.Withdrawal now substitutes independent complete
