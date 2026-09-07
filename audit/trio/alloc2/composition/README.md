@@ -4,11 +4,11 @@ The composition declarations now live in
 `LidoSRv3/Audit/Source/TrioAlloc2/Composition.lean`, inside the production source
 glob. The former staged `Composition.lean` is a compatibility import.
 
-The integration branch combines ALLOC-1 `8269ac576cf119975a7e9954459cd4aa04d5cd82`,
-ALLOC-2 `460cc599d9fd350af51db27e4e8d175561f99773` and RESERVE-1
-`7173594e7518cc636fff9099f864fa61b021a7cf` on main
-`bcfbb5f027a5c370594891c1a455fde137709941`. This is local integration, not delivery
-or a merge into GitHub main.
+The integration branch includes ALLOC-1 `9923f9d6836a081d9c962846b898a52e44982af1`,
+ALLOC-2 `b279d572b694a9e106fdf61337323fbe5f6d3d33` and RESERVE-1
+`1b3adaed91651156071513f8b2d9a4990a26346c` on main
+`bcfbb5f027a5c370594891c1a455fde137709941`. This is integration-branch work,
+not delivery or a merge into GitHub main.
 
 The three composition theorems derive consumer array-length premises, successful
 allocation with conservation and demand bounds, and the independent proportional
