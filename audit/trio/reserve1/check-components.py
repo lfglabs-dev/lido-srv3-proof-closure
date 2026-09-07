@@ -103,6 +103,8 @@ MODULES = [
     "Audit/Source/TrioReserve1/Vaults",
     "Audit/Source/TrioReserve1/VaultSpec",
     "Audit/Source/TrioReserve1/VaultRules",
+    "Audit/Source/TrioReserve1/CallbackSpec",
+    "Audit/Source/TrioReserve1/CallbackRules",
     "Tests/TrioReserve1/VaultCases",
     "Tests/TrioReserve1/ReportCases",
     "Tests/TrioReserve1/ReportDifferential",

@@ -1,3 +1,4 @@
+import LidoSRv3.Audit.Source.TrioReserve1.CallbackRules
 import LidoSRv3.Audit.Source.TrioReserve1.VaultRules
 import LidoSRv3.Audit.Source.TrioReserve1.Vaults
 import LidoSRv3.Audit.Source.TrioReserve1.ReportRules
@@ -459,3 +460,17 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms VaultRules.root_corresponds
 #print axioms VaultRules.rewards_root_corresponds
 #print axioms VaultRules.withdrawals_root_corresponds
+
+#print axioms CallbackRules.lookup_observations
+#print axioms CallbackRules.rewards_of_spec
+#print axioms CallbackRules.withdrawals_of_spec
+#print axioms CallbackRules.rewards_exists
+#print axioms CallbackRules.withdrawals_exists
+#print axioms CallbackRules.rewards_corresponds
+#print axioms CallbackRules.withdrawals_corresponds
+#print axioms CallbackRules.rewards_root_corresponds
+#print axioms CallbackRules.withdrawals_root_corresponds
+#print axioms CallbackRules.reward_commit_total
+#print axioms CallbackRules.reward_commit_balances
+#print axioms CallbackRules.withdrawal_commit_core
+#print axioms CallbackRules.withdrawal_commit_balances
