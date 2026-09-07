@@ -1,15 +1,17 @@
 # Continuation — not a completion claim
 
-Latest increment: EntrySpec/EntryRules bind independent vault/callback body and root
-rules through exact dispatcher replies. Ordered selectors, ABI/value rejection,
-payable callbacks, fallback and success/failure nested traces are covered, with
-completeness for every modeled request. Encoding helpers remain dependencies.
-Source c7372c3e13804848bcf9740c3b996033410aebb3: three selected checks, seven baselines,
-103 unchanged source/olean pairs, standard axioms. See entry-rules-summary.json.
-Existing twelve production-vault EVM cases retain unchanged runtime sources.
-Next compose concrete callback/vault entry rules through report CALL observations;
-actual queue finalization and remaining deployment/primitive/codec/entry/writer/
-resource/bounded-world obligations and full remote gates remain open.
+Latest increment: CalleeRules/ReportVaults compose independent callback entries
+through vault CALLs and independent vault entries through all report stages.
+Exact bidirectional composed report outcome/world/attempt correspondence,
+completeness and root rollback pass. The differential runner now executes the exact
+composed interpreter: 12 fresh production-vault comparisons pass at source
+cd115f33e62b12e7253f0747860bfb16817a0a6e. Four selected checks, seven baselines and 104
+unchanged source/olean pairs pass; see report-vaults-summary.json for new traces.
+Next implement and bind actual queue finalization (currently delegated), then
+remaining deployment/entry/writer/resource/codec/bounded-world obligations. Full
+remote gates remain unavailable through supported complete-source transport.
+Do not reopen discharged vault/callback dispatch and report relation composition;
+that composition still has explicit delegated service and primitive boundaries.
 
 Read STATUS, current git HEAD, and admission/ABI plus oracle/component receipts first. The previous
 goal turn was progress: source-callee implementations, checked specifications

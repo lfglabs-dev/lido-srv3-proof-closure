@@ -19,9 +19,13 @@ Independent callback rules now cover fresh physical locator lookup, CALL/ABI dec
 
 Independent entry and reply rules now bind both vault and callback specifications through exact dispatcher replies. They cover selector priority, nonpayable/short vault calldata rejection, payable callbacks, fallback delegation and successful worlds or failure bytes with nested traces. Completeness covers every modeled request. ABI encoding helpers remain explicit dependencies; enclosing callee/report composition remains open.
 
-At source `c7372c3e13804848bcf9740c3b996033410aebb3`, three selected entry specification/rules/trust checks and seven baseline checks pass. The other 103 component source/olean pairs and eleven dependency revisions match retained receipts; inspected axioms are standard. [Entry evidence](audit/trio/reserve1/receipts/entry-rules-summary.json) records checks and reuse. Runtime sources remain unchanged from the twelve production-vault comparisons below; no new execution run is claimed. Component checks use existing dependency oleans and are not a clean/full build or canonical registration.
+Independent callee-reply relations now compose callback entries through vault CALLs and vault entries through every report CALL, lookup and optional stage. The complete composed report has exact bidirectional outcome/world/attempt correspondence, completeness and root failure restoration. Its expanded predicate contains no report/vault/callback source executor. Locator/queue services, unhandled selectors, codecs and physical primitives remain explicit boundaries.
+
+At source `cd115f33e62b12e7253f0747860bfb16817a0a6e`, four selected composition/test/trust checks and seven baseline checks pass; 104 unchanged component source/olean pairs and eleven dependency revisions match retained receipts, with standard inspected axioms. The differential runner now uses this exact composed interpreter, and twelve fresh production-vault/inherited-Lido comparisons pass. [Composed report evidence](audit/trio/reserve1/receipts/report-vaults-summary.json) links the immutable commands, source/artifact hashes and compressed traces. Component checks use existing dependency oleans and are not a clean/full build or canonical registration.
 
 Runtime evidence remains attributed to its tested commits:
+
+- `cd115f33e62b12e7253f0747860bfb16817a0a6e`: 12 fresh production-vault/inherited-Lido comparisons using the exact interpreter covered by the composed report proof. [Composed report evidence](audit/trio/reserve1/receipts/report-vaults-summary.json).
 
 - `86ec8bf257ad8244f1a7ef4ae6c194c22f3ba4b5`: 12 production-vault/inherited-Lido report and callback comparisons, including nested transfers and late rollback. Locator and queue use fixtures. [Vault evidence](audit/trio/reserve1/receipts/vault-execution-summary.json).
 

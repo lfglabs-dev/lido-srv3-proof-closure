@@ -239,3 +239,15 @@ independent body/root specifications. These source-level dispatchers map the pin
 vault one-word entries and Lido no-argument payable callback entries; ABI helper
 correctness and deployed compiler dispatch coverage remain explicit obligations.
 See receipts/entry-rules-summary.json. No new runtime execution is claimed.
+
+## Composed independent callee/report relation
+
+`CalleeRules.Calls` uses independent code/funds/provisional-transfer/response rules
+with a callee reply witness only on invoked paths. `ReportVaults.CallbackReplies`
+uses independent callback entry rules; RewardBody/WithdrawalBody substitute those
+through their CALL observations. VaultReplies then supplies independent vault entry
+observations to every enclosing report CALL/lookup/optional stage. Correspondence,
+completeness and failure restoration cover the full composed report. The modified
+VaultDifferential uses that exact interpreter, with twelve fresh runtime comparisons
+in receipts/report-vaults-summary.json. Delegated locator/queue services and raw
+primitive/deployment/codec/resource obligations are not discharged by this step.

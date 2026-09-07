@@ -1,5 +1,28 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Composed report, vault and callback rules
+
+`CalleeRules` makes independent CALL semantics consume a relation describing callee
+replies. `ReportVaults` substitutes independent callback entries into vault CALLs,
+then independent vault entries into every report CALL, lookup and optional stage.
+Exact bidirectional whole-report outcome/world/attempt correspondence, completeness
+and root failure restoration are proved for the concrete composed interpreter.
+The expanded predicate contains no report/vault/callback source executor; delegated
+services, codecs and physical primitives remain explicit dependencies.
+
+The differential runner now uses this exact composed interpreter. At source
+`cd115f33e62b12e7253f0747860bfb16817a0a6e`, twelve fresh production-vault/inherited-Lido
+comparisons pass, including raw failure bytes, physical state, four balances,
+events and direct/nested CALL results. Four selected checks and seven baseline
+checks pass; 104 unchanged source/olean pairs and eleven dependencies match retained
+evidence, with standard inspected axioms. `receipts/report-vaults-summary.json`
+links new immutable commands and compressed traces. The unchanged compiled Lido
+and vault artifacts are reused with verified source/artifact provenance.
+
+Locator/queue and unhandled services are delegated. Actual queue finalization,
+remaining deployed/entry/resource/codec/bounded-world and accounting writer closure,
+full remote gates and independent review remain open.
+
 ## Independent entry and reply correspondence
 
 `EntrySpec` specifies ordered two-entry selection and replies derived from complete
