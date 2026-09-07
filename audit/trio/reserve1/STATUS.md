@@ -1,5 +1,24 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Admission and ABI continuation
+
+`AdmissionSpec` independently specifies ordered status, caller and nonzero-amount
+admission. `Admission` relates successful withdrawal admission to actual queue
+lookup, bunker CALL bytes and the physical pause word after that call. It also
+relates false status to bunker/pause observations and proves exact early-failure
+fault precedence, retained attempted calls and complete transaction rollback.
+The external interpreter remains arbitrary; no successful-callee assumption is
+introduced. These prefix theorems do not prove the later spending/seed/ETH path.
+
+`ABI` proves byte encoder length, arbitrary-width decode/encode reduction,
+bounded exact round trips, and actual `decodeWord` results for the first and
+second 32-byte words with arbitrary trailing bytes. This closes the arithmetic
+byte-conversion lemma, not full deployment or caller/callee composition.
+`LiveTrust` inspects these new theorems. The immutable component checker now
+contains 27 modules; terminal evidence will identify the checked source SHA.
+Historical 49-case/seven-mutant execution below belongs to source `0fde648`;
+this proof-only continuation does not relabel it as current-head execution.
+
 ## Oracle and nested-call continuation
 
 Validated implementation source: `0fde6481707ba16f63ff324547bc2761e1d7b136`.
