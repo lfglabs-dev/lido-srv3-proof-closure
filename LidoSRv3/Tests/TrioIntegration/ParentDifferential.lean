@@ -39,7 +39,7 @@ private def failure : TrioAlloc1.Failure → Bytes
 /-- The VM executes the parent; expected Solidity results are not inputs. -/
 private def runVM (l : Layout) (s : Storage) (o : StaticOracle) (c : Config)
     (amount : Word) (topup : Bool) : Execution ParentOutput := fun before =>
-  (TrioComposition.VerityParent.execute l c amount topup (VMFixtures.vmAdversary o)
+  (TrioComposition.VerityParent.executeWithMemory (word 128) l c amount topup (VMFixtures.vmAdversary o)
     { world := VMFixtures.vmWorld s, gasRemaining := 2^256-1 } before).1
 
 private def emit (name : String) (count share0 share1 unit amount : Nat)
@@ -70,6 +70,10 @@ def runVectors : IO Unit := do
   emit "late-second-row-overflow" 2 0 10000 (2^20) (2^20) (summary 1 0) (summary (2^240) 1)
   emit "zero-demand-late-rejection" 2 10000 10000 32 0 (summary 1 1) [byte 0xde,byte 0xad] true
   emit "malformed-summary" 1 10000 10000 32 320 [byte 0xde,byte 0xad] (summary 1 1)
+  emit "memory-max-count" (2^256-1) 10000 10000 32 0 (summary 1 1) (summary 1 1)
+  emit "memory-length-limit" (2^64) 10000 10000 32 0 (summary 1 1) (summary 1 1)
+  emit "memory-size-limit" (2^59) 10000 10000 32 0 (summary 1 1) (summary 1 1)
+  emit "division-before-memory-limit" (2^64) 10000 10000 0 320 (summary 1 1) (summary 1 1)
 end LidoSRv3.Tests.TrioIntegration.ParentDifferential
 
 def main : IO Unit := LidoSRv3.Tests.TrioIntegration.ParentDifferential.runVectors

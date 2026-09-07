@@ -17,11 +17,11 @@ def digest(data):
     return hashlib.sha256(data).hexdigest()
 
 
-def vectors(log, prefix):
+def vectors(log, prefix, count):
     rows = [json.loads(match[1]) for line in log.splitlines()
             if (match := re.search(r'(?:^|: )' + prefix + r' (.+)$', line))]
-    require(len(rows) == 8, f'{prefix}: missing or truncated vectors')
-    require(len({row['name'] for row in rows}) == 8, f'{prefix}: duplicate names')
+    require(len(rows) == count, f'{prefix}: missing or truncated vectors')
+    require(len({row['name'] for row in rows}) == count, f'{prefix}: duplicate names')
     return {row['name']: row for row in rows}
 
 
@@ -69,7 +69,7 @@ def main():
                  command[-1], 'audit/trio/integration/RunVerityParent.lean',
                  'lean-toolchain', 'lake-manifest.json']:
         check_source(path)
-    actual = vectors(receipt['log_tail'], 'VERITY_PARENT_DIFFERENTIAL_VECTOR')
+    actual = vectors(receipt['log_tail'], 'VERITY_PARENT_DIFFERENTIAL_VECTOR', 12)
     solidity_path = root / 'audit/trio/alloc2/parent-execution.json'
     solidity = json.loads(solidity_path.read_text())
     for field, filename in [('harnessSha256', 'Harness.sol'), ('runnerSha256', 'run.cjs'),
@@ -82,9 +82,12 @@ def main():
     model = json.loads(model_path.read_text())
     require(model['job_id'] == solidity['model']['job'], 'wrong input fixture job')
     require(model['state'] == 'succeeded' and model['exit_code'] == 0, 'input fixture run failed')
-    inputs = vectors(model['log_tail'], 'ALLOC2_PARENT_VECTOR')
+    inputs = vectors(model['log_tail'], 'ALLOC2_PARENT_VECTOR', 8)
+    memory_inputs = vectors(model['log_tail'], 'ALLOC2_MEMORY_VECTOR', 4)
+    require(not (inputs.keys() & memory_inputs.keys()), 'overlapping fixture names')
+    inputs.update(memory_inputs)
     expected = {row['name']: row for row in solidity['receipts']}
-    require(len(solidity['receipts']) == len(expected) == 8, 'incomplete Solidity cases')
+    require(len(solidity['receipts']) == len(expected) == 12, 'incomplete Solidity cases')
     require(actual.keys() == inputs.keys() == expected.keys(), 'fixture sets differ')
     pin = '17005714f151e5502c559932319a3f2f74ac2436'
     require(solidity['pin'] == pin, 'wrong Solidity pin')
@@ -93,19 +96,25 @@ def main():
             blob = subprocess.check_output(['git', '-C', str(root / 'lido-core'), 'show', f'{pin}:{path}'])
             require(digest(blob) == sha, f'Solidity source hash mismatch: {path}')
     for name, row in actual.items():
-        for key in ('count', 'shares', 'unit', 'amount', 'summaries', 'reject1'):
-            require(row[key] == inputs[name][key], f'{name}: different input {key}')
+        for key in ('count', 'unit', 'amount'):
+            require(int(row[key]) == int(inputs[name][key]), f'{name}: different input {key}')
+        if name in memory_inputs:
+            require(int(row['count']) > 0 and row['calls'] == [], f'{name}: memory guard reached calls')
+        else:
+            for key in ('shares', 'summaries', 'reject1'):
+                require(row[key] == inputs[name][key], f'{name}: different input {key}')
         for key in ('actual', 'reverted', 'calls'):
             require(row[key] == expected[name][key], f'{name}: different observation {key}')
     args.output.write_text(json.dumps({
         'classification': 'SOLIDITY_PARENT_VERITY_PASS', 'vm_source': commit,
         'vm_job': receipt['job_id'], 'vm_receipt_sha256': digest(args.vm_receipt.read_bytes()),
         'solidity_receipt_sha256': digest(solidity_path.read_bytes()),
-        'scope': 'Eight identical inputs, raw return/revert bytes and ordered module calls. '
+        'scope': 'Twelve matched parent inputs, raw return/revert bytes and ordered module calls, '
+                 'including four early allocation/division failures. The modeled prefix uses pointer 128. '
                  'Compiler memory, deployed delegatecall and recursive world observations remain separate.',
         'cases': sorted(actual), 'vm_source_hashes': checked,
     }, indent=2) + '\n')
-    print('SOLIDITY_PARENT_VERITY_PASS: 8 cases')
+    print('SOLIDITY_PARENT_VERITY_PASS: 12 cases')
 
 
 if __name__ == '__main__':

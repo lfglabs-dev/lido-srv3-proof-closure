@@ -207,3 +207,24 @@ original eight parent cases. The existing VM parent suite executes the original
 eight only. The original recorded comparison remains valid for its recorded
 source and case set; it does not establish VM coverage of the four new memory
 cases. They require the compiler allocation prefix in the VM parent path.
+
+## Allocation guards in the parent call VM
+
+`MemoryGuard.run_eq` proves the constant-time guard evaluator equal to the
+iterative allocation prefix on every outcome. `AllocationParentCalls` places
+that guard between division and producer calls, proves division/memory failure
+priority, and derives canonical ABI extent from successful guards. Its initial
+free pointer is explicit. The bounded closure passes 67 modules; see
+`allocation-parent-init-receipt.json`.
+
+`VerityParent.executeWithMemory` translates this call tree through the pinned
+VM and includes world-frame and conditional public-relation theorems. The parent
+differential suite now invokes it with pointer 128 and includes all twelve
+Solidity cases. The comparator requires eight ordinary inputs plus four early
+allocation/division inputs and exact observations. These VM additions still
+require remote compilation/execution; no twelve-case pass is claimed yet.
+
+This executes proved guard arithmetic in the source call tree, not EVM MSTORE
+or solc's whole allocation schedule. Pointer provenance, compiler placement,
+zeroing/stores, return-data allocation, delegated call memory and gas remain
+open. The original eight-case receipt does not validate this changed VM source.
