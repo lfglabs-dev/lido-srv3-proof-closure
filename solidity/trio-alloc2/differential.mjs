@@ -27,7 +27,7 @@ for (const path of Object.keys(identity).sort()) {
   manifest += `${path}\0${identity[path]}\n`;
 }
 const manifestHash = sha(manifest);
-assert.ok(receipt.log_tail.includes(`source bundle verified sha256=${manifestHash} files=${Object.keys(identity).length} `),
+assert.ok(new RegExp(`^source bundle verified sha256=${manifestHash}(?: operations_sha256=[0-9a-f]{64})? files=${Object.keys(identity).length} `, 'm').test(receipt.log_tail),
   'source identity does not match verified remote overlay');
 const vectorLine = /^(?:info: \.\.\/\.\.\/\.\.\/LidoSRv3\/Tests\/TrioAlloc2\/DifferentialVectors\.lean:\d+:\d+: )?ALLOC2_VECTOR (.+)$/;
 const vectors = receipt.log_tail.split('\n').map(line => line.match(vectorLine))
@@ -61,7 +61,7 @@ if (process.argv[3]) {
     abiManifest += `${path}\0${abiIdentity.files[path]}\n`;
   }
   const abiManifestHash = sha(abiManifest);
-  assert.ok(abiReceipt.log_tail.includes(`source bundle verified sha256=${abiManifestHash} files=${Object.keys(abiIdentity.files).length} `),
+  assert.ok(new RegExp(`^source bundle verified sha256=${abiManifestHash}(?: operations_sha256=[0-9a-f]{64})? files=${Object.keys(abiIdentity.files).length} `, 'm').test(abiReceipt.log_tail),
     'ABI source identity does not match verified remote overlay');
   abiVectors = abiReceipt.log_tail.split('\n').map(line => line.match(/(?:^|: )ALLOC2_ABI_VECTOR (.+)$/))
     .filter(Boolean).map(match => JSON.parse(match[1]));

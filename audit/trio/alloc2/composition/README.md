@@ -96,3 +96,11 @@ the model's exact input and output bytes with the pinned public library.
 
 Coordination remains pending: ask_worker again returned writer_identity_stale
 for the producer's existing PR #245 / trio-alloc1 writer. No tags were changed.
+
+The current parent checkpoint adds Parent.lean and ParentVectors.lean and checks
+all 32 source/config files in successful 33-job receipt
+411a7646-5694-42fc-9173-37012c66f717. The previous 29-file receipt is historical.
+Parent.run executes the actual producer followed by the decoded proportional
+consumer and ordered wei conversion; eight paired parent vectors include late
+conversion overflow and producer rejection. See ../checkpoint-parent.md for the
+remaining universal, physical-memory, Verity and review obligations.

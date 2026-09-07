@@ -17,6 +17,7 @@
     "LidoSRv3/Audit/Source/TrioAlloc2/LoopBounds.lean": "f4862b07e0c08d4302ad291b9e16dd0dc6796fc45c5a37531b17c3e39420ff17",
     "LidoSRv3/Audit/Source/TrioAlloc2/LoopCorrespondence.lean": "82402ccea48e59c12090c408c578511d4c42d1c979c61b3f39a061b67ad06485",
     "LidoSRv3/Audit/Source/TrioAlloc2/LoopTotality.lean": "5006feb6b0bac67a23c87ee5223d2094a8403a66300164073919541ff1caa521",
+    "LidoSRv3/Audit/Source/TrioAlloc2/ParentConversion.lean": "e9df24a1fe4e8b94f9c2d5f038ed42ee5ad46d544e91109b92c1280fd79e1c1b",
     "LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean": "6bd90551f9cb4a39c3384b98b2a6ff40c27b7eba6b491308c2bfa02ca1c5b025",
     "LidoSRv3/Audit/Source/TrioAlloc2/ScanBounds.lean": "2e998cf69f26826b8974d72eabf8f15638be9c02e8a2473f92148491af07b2e1",
     "LidoSRv3/Audit/Source/TrioAlloc2/ScanCorrespondence.lean": "9fe0d714a57657508dc07351cd342f2e6aa4dd65b29801f4efc94b0b2ec28b4c",
@@ -31,6 +32,8 @@
     "audit/trio/alloc2/composition/Composition.lean": "c12061b0bbfd7ced775d879ad95fe43ca31c068b22e05b9198589464ce3718a5",
     "audit/trio/alloc2/composition/LibraryABI.lean": "b2f7d6085d8fa79f57acb3d0d710bf0b9037bcebc04ea9acb4f92418072abd57",
     "audit/trio/alloc2/composition/LibraryABIVectors.lean": "591809843b67addd13dd40053ee9a54b76c577f73d19b52dcbe7c2cae6b22018",
-    "audit/trio/alloc2/composition/lakefile.lean": "709b0292b481a36c0855f3f2c644f809a46eb3c562ae26a1c64ab77ecbe9f4a8"
+    "audit/trio/alloc2/composition/Parent.lean": "2d8505478d26a76d6f05ec361a94f76b93550302a7ae493f7c149ad3040953d5",
+    "audit/trio/alloc2/composition/ParentVectors.lean": "f7b0f86ebed4c2cef668c26b92bf69eae45350e674a2c89f7e744423701a22ab",
+    "audit/trio/alloc2/composition/lakefile.lean": "96dd9e45597849163be3c317be961033e02cfd125522a35e460726569c7b5dcd"
   }
 }
