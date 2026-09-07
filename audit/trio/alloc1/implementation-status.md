@@ -57,7 +57,7 @@ production/test/trust or full-suite receipts.
 | Independent specification | Second-pass Nat spec and checked-total accumulation proofs implemented. First-pass/call-level relational specification, determinism, and two-way SOURCE correspondence implemented. |
 | Memory / ABI | Constructive byte-backed array relation and decoder inverses proved. Actual solc allocation sequencing/failures (including panic 0x41), complete compiler memory correspondence and consumer ABI bridge remain open. |
 | Rollback / sequential behavior | View executor has no state effects. This alone does not establish parent/writer rollback or callback realization; those proofs/tests remain open. |
-| ALLOC-2 interface | Messages sent to mission 44053c4f-2578-4df5-84f2-4f66bc73586a. v0 unchanged; agreement and composition consumer evidence pending. |
+| ALLOC-2 interface | Messages sent to mission 44053c4f-2578-4df5-84f2-4f66bc73586a. v0 unchanged; consumer written v0 acceptance verified at b279d572; producer confirmation recorded in interface-agreement.md. Composition at producer8269ac exists in the isolated ALLOC-2 target; final integration remains open. |
 | Differential execution | 12 paired Solidity/SOURCE-executor executions pass, including state/balances/calls/events observations. Two compiled Solidity mutants are killed by outcome mismatches. Solidity-vs-Verity execution remains open. |
 | Full verification | Production/test/trust, make prove/test, annotations/metadata/inventory/provenance/proof-escape and parent-shaped executed mutations remain required. |
 | Delivery | Draft scoped PR #245 is open; complete validation at its immutable final SHA is still required. No merge, publication or self-certification authorized. |
@@ -83,7 +83,7 @@ candidate source before they can support validation.
 ## Latest evidence
 
 The receipt packet under `receipts/` is partial validation evidence, with its scope
-and reproduction commands in `reproduce.md`. Fifteen Init-only owned Lean modules pass the
+and reproduction commands in `reproduce.md`. Seventeen Init-only owned Lean modules pass the
 bounded Init-only checker. The evaluated vector JSON is byte-identical after the
 encoding proof refinement (SHA-256
 `eaac1882ec16fe743d11fd4b2309910896fcffe7d285f72a33a697c373c4ecde`).
@@ -98,8 +98,8 @@ on 2026-09-07; admission is not a passing build receipt. The disk safety floor
 was unchanged. Newer uncommitted additions require separate final-source checks.
 
 ALLOC-2 remains authoritatively active/healthy, with its current run ID confirmed
-on 2026-09-07. Messages provide the producer declarations and draft PR. No explicit
-acceptance has been received in this mission, so mediated agreement remains pending.
+on 2026-09-07. Messages provide the producer declarations and draft PR. The consumer written acceptance was subsequently verified from its pinned branch;
+matching producer confirmation was sent through the orchestrator.
 The interface has not been changed incompatibly.
 
 The actual inherited public share writer compiled and executed with solc 0.8.25
@@ -123,3 +123,5 @@ uses the same rejecting second target as Solidity; the separate history-sensitiv
 SOURCE regression remains. The mismatch is retained in receipts. The corrected
 remote request at550e795 was rejected by ashur: 84 GiB available, 5 GiB estimated
 plus the unchanged 80 GiB emergency floor. It is not a passing differential receipt.
+
+The small Verity vector closure was measured separately (about 882 MiB repository/dependencies and 35 MiB compiled Verity dependency artifacts). Its next estimate is 2 GiB; the full build remains at 5 GiB. The emergency floor is unchanged. See receipts/remote-admission-sizing.json.
