@@ -25,7 +25,7 @@ import trio_report  # noqa: E402  (sibling module, located above)
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
 SOURCE_FIDELITY = AUDIT / "SOURCE-FIDELITY.md"
-R1_REVIEW_BASE = "eda35b611f08879241411d12f943d011f748e5a4"
+R1_REVIEW_BASE = "b8219123ee1636b5cb210def74be26a0971cdb8f"
 # Bind the report inputs to the recorded Git object and exact bytes.
 # Changed inputs must never inherit an earlier source review.
 # This exact family is every structured input used to render the R1 review
@@ -33,7 +33,7 @@ R1_REVIEW_BASE = "eda35b611f08879241411d12f943d011f748e5a4"
 # stale certified basis.
 R1_REPORT_INPUT_SHA256 = {
     "audit/guarantees.yaml": "b06ca4bb08a80fc528a1a1242083af58cfb589346dd6ce056b45fdcdfcc121a5",
-    "audit/source-map.yaml": "a0a09ba6b7e3737b67137825ee5456a307d7fd364b215ea48d0d5c22d5e343a7",
+    "audit/source-map.yaml": "b390faebf0eb8ccea9e149c92f421e8f0bb1dca16c0dffa843489c31b52c5f32",
     "audit/trust-native-decide-allowlist.txt": "4874951cd0717f16756f3f644c424f06bdbbfcca1561173b32fd134b1fb6730c",
 }
 CANONICAL_IDS = [

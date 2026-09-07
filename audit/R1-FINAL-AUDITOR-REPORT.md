@@ -4,7 +4,7 @@
 
 ## Decision
 
-Review basis: recorded input set (bounded token ownership amendment; no canonical status upgrade) `eda35b611f08879241411d12f943d011f748e5a4`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
+Review basis: recorded structured input set (legacy primary registrations preserved; trio composition scoped separately) `b8219123ee1636b5cb210def74be26a0971cdb8f`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
 
 ## Architecture and evidence boundary
 
@@ -67,6 +67,14 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 - getDepositAllocations / MinFirst fill (see P-ALLOC-2)
 - reachable-router CheckedBounds
 - Contract.run rollback after intermediate writes for AllocationTx.allocate; the cited revert_restores_snapshot theorem does not cover allocateLiveFromStorage
+**Trio source composition.** The new source path reads physical count/configuration, executes each response-dependent module call and checked arithmetic in source order, then performs the capacity pass. Count is derived for modeled initialization/ACL/public-writer histories; the raw-state theorem takes count <=32. It does not cap an arbitrary corrupt count. The stored producer derives output arrays from executed per-row writes.
+
+**Composition validation.** SOURCE COMPOSITION CANDIDATE; final independent review and official exact-source gates pending. Legacy primary guarantee registrations remain unchanged.
+
+**Composition evidence.** `LidoSRv3.Audit.Source.TrioAlloc1.Relational.producer_iff`, `LidoSRv3.Audit.Source.TrioAlloc1.producer_math_view`, `LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredProducer.success`, `LidoSRv3.Audit.Source.TrioComposition.LifecycleHistory.stored_parent_iff`, `LidoSRv3.Audit.Source.TrioComposition.VerityParent.stored_correspondence`
+
+**Composition premises and exclusions.** Compiler interpretation of aligned, non-overlapping observed word loads/stores and copies; omitted private cache/configuration/scratch writes obey the stated frame and cache-field relations. Configured linked library identity, storage/hash interpretation, entry pointer provenance and primitive crypto/consensus bindings are explicit; general compiled/deployed-code and gas verification are excluded. count <=32; pointer +1184*count+704 <=2^32, or modeled initialization/writer history with pointer <=2^31 and finite storage separation; migration and other writer histories excluded.
+
 
 **Classification.** **IMPLEMENTATION_PENDING** — Keep the checked execute parent and the live-summary/type-2-stake/packed-config transaction correspondence. Reachable-router CheckedBounds and unique moduleAddress remain strengthening obligations; do not widen to getDepositAllocations or P-ALLOC-2, and do not re-fold the min-clamp tautology.
 
@@ -88,6 +96,14 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 - +1 Strategy and proportional Source are different algorithms
 - memoryArrayElement reads are proved oracle-independent: this array path reads word-addressed memory directly and does not evaluate a keccak expression
 - cross-call mutation of the decoded arrays
+**Trio source composition.** One source parent runs the storing producer, passes actual array-memory reads through the closed library ABI, records its configured DELEGATECALL request/raw response, copies returned words into a separate caller array, then performs checked in-place wei conversion. All outcomes project to the independent proportional parent; +1 selection stays separate. The module-call VM has matching return/error/module observations; the library event is a source observable, not an executed linked VM call.
+
+**Composition validation.** SOURCE COMPOSITION CANDIDATE; final independent review and official exact-source gates pending. Legacy primary guarantee registrations remain unchanged.
+
+**Composition evidence.** `LidoSRv3.Audit.Source.TrioAlloc2.allocate_refines`, `LidoSRv3.Audit.Source.TrioAlloc2.distribution_exists`, `LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredParent.public_iff`, `LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredParent.success`, `LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredParent.positive_calls`, `LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredParent.trace_shape`
+
+**Composition premises and exclusions.** Compiler interpretation of aligned, non-overlapping observed word loads/stores and copies; omitted private cache/configuration/scratch writes obey the stated frame and cache-field relations. Configured linked library identity, storage/hash interpretation, entry pointer provenance and primitive crypto/consensus bindings are explicit; general compiled/deployed-code and gas verification are excluded. count <=32; pointer +1184*count+704 <=2^32, or modeled initialization/writer history with pointer <=2^31 and finite storage separation; migration and other writer histories excluded.
+
 
 **Classification.** **IMPLEMENTATION_PENDING** — Keep the checked proportional model/source multi-step correspondence and conservation in the parent, with the +1 model as a separate child. The direct-memory/keccak boundary is discharged only for memoryArrayElement reads; cross-call mutation and upstream active filtering remain open. Do not merge the algorithms or claim Solidity equivalence.
 
@@ -177,6 +193,14 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 - _seedDepositsCount
 - buffer is a declared oracle word, not the contract balance
 - reserve-target writer surface setDepositsReserveTarget and its report-time rebalance interaction
+**Trio source composition.** Independent ordered status, authorization/locator, live queue/frame calls, ABI decoding, partition arithmetic, spending and receiver-tail relations cover every withdrawal outcome and root rollback. Physical protection is separately proved for the concrete bound queue/consensus/receiver pipeline, including final physical accounting and the next live queue demand. Generic arbitrary successful callbacks are not promised reserve protection.
+
+**Composition validation.** SOURCE COMPOSITION CANDIDATE; final independent review and official exact-source gates pending. Legacy primary guarantee registrations remain unchanged.
+
+**Composition evidence.** `LidoSRv3.Audit.Source.TrioComposition.ReserveLeafSpend.withdrawal_corresponds`, `LidoSRv3.Audit.Source.TrioReserve1.AllocationFlow.withdrawal_corresponds`, `LidoSRv3.Audit.Source.TrioReserve1.PhysicalReserve.success_preserves`, `LidoSRv3.Audit.Source.TrioReserve1.PhysicalSequence.corresponds`, `LidoSRv3.Audit.Source.TrioReserve1.Transfers.credit_bound_from_aggregate`
+
+**Composition premises and exclusions.** Compiler interpretation of aligned, non-overlapping observed word loads/stores and copies; omitted private cache/configuration/scratch writes obey the stated frame and cache-field relations. Configured linked library identity, storage/hash interpretation, entry pointer provenance and primitive crypto/consensus bindings are explicit; general compiled/deployed-code and gas verification are excluded. Concrete-pipeline protection takes physical address/code bindings, admitted amount, queue/frame computations, seed arithmetic, funding and queue/Lido separation. Balance credit bounds use an explicit aggregate-world bound. Sequence claims cover the modeled internal/committed transitions only.
+
 
 **Classification.** **IMPLEMENTATION_PENDING** — Keep the checked, guard-and-freshness-scoped spend-formula theorems; the relational independence fact is the P-RESERVE-1.relational child. Do not derive freshQueueCache from ReserveState alone; it stays an explicit per-call hypothesis until a live WithdrawalQueue call is modeled.
 
