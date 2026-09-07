@@ -1,0 +1,25 @@
+{
+  "sha": "817363984b65a7127c4418585f41c26a159257c6",
+  "mission": "239f13eb-952d-495f-8341-a0c7319f6c0f",
+  "owner_user_id": "codex-lido-integration",
+  "workspace": "440ec9d3-b7f3-4188-9454-cda805bb6259",
+  "durable_job": "f929f3a3-79c5-50ad-8faf-721b92fa6bfa",
+  "durable_pid": 3539807,
+  "remote_job": "dec7c452-5959-4b01-aff5-7a6256fe552c",
+  "node": "nippur",
+  "command": "REMOTE_BUILD_NODE_ID=nippur remote-lean-build lake env lean --run audit/trio/integration/RunVerityParent.lean",
+  "scope": "Compile parent call-VM bridge and execute six parent cases; not compiler memory or deployed delegatecall correspondence",
+  "status": "failed",
+  "exit_code": 1,
+  "failure": "Test runner ambiguous layout and duplicate main; VM correspondence modules compiled",
+  "logs": {
+    "stderr.log": {
+      "sha256": "12666959a0ab9d49f6a24b81ea5c7616371b68f6815afb328100704dfd2359e7",
+      "bytes": 796
+    },
+    "exit.json": {
+      "sha256": "a264d0777b77aba748b692d899b218a4187e282a37fee526486a55c88c1c8374",
+      "bytes": 67
+    }
+  }
+}

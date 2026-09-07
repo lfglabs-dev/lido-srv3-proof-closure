@@ -1,0 +1,51 @@
+{
+  "sha": "c2f9f0fc724ea3597e2ec7a022af26a8a14bb641",
+  "mission": "239f13eb-952d-495f-8341-a0c7319f6c0f",
+  "owner_user_id": "codex-lido-integration",
+  "workspace": "440ec9d3-b7f3-4188-9454-cda805bb6259",
+  "durable_job": "4deb4669-060e-5552-a2df-01fe34d79680",
+  "node": "dgx-spark",
+  "remote_job": "1a3ffae2-3854-4335-beee-dbf883bd76f3",
+  "command": "REMOTE_BUILD_NODE_ID=dgx-spark remote-lean-build lake env lean --run audit/trio/integration/RunValidation.lean",
+  "scope": "production/test/audit build, make prove, make test, actual ALLOC1 Verity vector execution",
+  "status": "failed",
+  "exit_code": 1,
+  "failure": "make test: forge not found",
+  "gate_results": {
+    "make prove": 0,
+    "make test": 2,
+    "producer Verity execution": 0
+  },
+  "stdout_scope": "65536-byte terminal log tail; initial build marker not retained",
+  "proof_report_scope": "legacy-srv3-p1-p15-superseded",
+  "logs": {
+    "stdout.log": {
+      "sha256": "f4af23684e9e7ac94532639bdca1aecf8af0b21d910511e57c0d32319165b504",
+      "bytes": 65536
+    },
+    "stderr.log": {
+      "sha256": "403b67d5a25b2e80c481afa81c335d1817738d9adf44fc75ba770ad35e50d724",
+      "bytes": 786
+    },
+    "exit.json": {
+      "sha256": "ab4040f7ab0b672cde936dafa599f4cc0a6bb6de31509415d9a42d30daf4f4d2",
+      "bytes": 67
+    },
+    "proof-report.json": {
+      "sha256": "c5828c61bce99950c7e07b257c4ed407592435c1f781e49c18b592a023cb9d9c",
+      "bytes": 13369
+    },
+    "prove.txt": {
+      "sha256": "f84e64748ab7dd4e3bca5503f126aa72c81cf957fa262ab9051c055a39eb2522",
+      "bytes": 164992
+    },
+    "verity-vectors.json": {
+      "sha256": "eaac1882ec16fe743d11fd4b2309910896fcffe7d285f72a33a697c373c4ecde",
+      "bytes": 1245
+    },
+    "producer-comparison.json": {
+      "sha256": "6ade643a81429f47c7c476b80a170ec55e0cafd9e46e3464cc3bc3ad72db8bd4",
+      "bytes": 1434
+    }
+  }
+}
