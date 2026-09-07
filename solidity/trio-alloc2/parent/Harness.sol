@@ -22,6 +22,19 @@ contract ParentHarness {
         return SRLib._getDepositAllocations(cfg, amount, topup);
     }
 
+    event BeforeParent(uint256 value);
+
+    /// Test-only enclosing transaction with observable effects before the real helper.
+    function parentWithPriorEffects(SRLib.Config calldata cfg, uint256 amount, bool topup,
+        address payable recipient) external returns (uint256, uint256[] memory, uint256[] memory)
+    {
+        assembly { sstore(0x123456, 42) }
+        emit BeforeParent(42);
+        (bool sent,) = recipient.call{value: 1}("");
+        require(sent);
+        return SRLib._getDepositAllocations(cfg, amount, topup);
+    }
+
     function capacity(SRLib.Config calldata cfg, uint256 demand, bool topup)
         external view returns (uint256[] memory, uint256[] memory)
     {
