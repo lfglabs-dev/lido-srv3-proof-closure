@@ -1,3 +1,4 @@
+import LidoSRv3.Audit.Source.TrioReserve1.FrameRead
 import LidoSRv3.Audit.Source.TrioReserve1.Spend
 import LidoSRv3.Audit.Source.TrioReserve1.Tail
 import LidoSRv3.Audit.Source.TrioReserve1.Lookup
@@ -306,3 +307,10 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms Spend.to_spec
 #print axioms Spend.corresponds
 #print axioms Spend.withdrawal_corresponds
+
+#print axioms FrameRead.of_spec
+#print axioms FrameRead.exists_spec
+#print axioms FrameRead.to_spec
+#print axioms FrameRead.corresponds
+#print axioms FrameRead.spending_corresponds
+#print axioms FrameRead.withdrawal_corresponds

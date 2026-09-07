@@ -1,5 +1,19 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Complete frame getter rules substituted through spending
+
+`FrameReadSpec` independently orders oracle lookup, oracle CALL and complete
+64-byte tuple validation. `FrameRead` substitutes physical locator/address rules,
+projects the two actual ABI words and proves bidirectional exact outcome/world/trace
+correspondence. The whole tuple is validated before either field can be returned;
+malformed successful replies retain the returned world until parent rollback.
+
+Frame rules are substituted through spending into `FrameRead.Withdrawal`, preserving
+bidirectional exact parent correspondence. Allocation remains the opaque internal
+interface; CALL/deployed locator/oracle/consensus binding and resource interpretation
+remain explicit. Other writers, integration gates and independent review remain open.
+Immutable validation follows checks. Runtime execution source is unchanged.
+
 ## Complete spending rules substituted into withdrawal
 
 `SpendSpec` independently orders allocation, amount admission, prepared accounting,
