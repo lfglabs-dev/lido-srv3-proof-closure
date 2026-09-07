@@ -1,0 +1,64 @@
+{
+  "source_commit": "7f431a39a4ba306a06b02dc273d4b1c79729b9c7",
+  "time": "2026-09-07T15:43:45.973629+00:00",
+  "dependency_revisions": [
+    {
+      "name": "verity",
+      "expected": "e977aaad6e1a9e92e0132d41b3d33a14135a4d46",
+      "actual": "e977aaad6e1a9e92e0132d41b3d33a14135a4d46"
+    },
+    {
+      "name": "evmyul",
+      "expected": "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9",
+      "actual": "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9"
+    },
+    {
+      "name": "mathlib",
+      "expected": "fabf563a7c95a166b8d7b6efca11c8b4dc9d911f",
+      "actual": "fabf563a7c95a166b8d7b6efca11c8b4dc9d911f"
+    },
+    {
+      "name": "plausible",
+      "expected": "63045536fe95024e6c18fc7b48e03f506701c5bc",
+      "actual": "63045536fe95024e6c18fc7b48e03f506701c5bc"
+    },
+    {
+      "name": "LeanSearchClient",
+      "expected": "c5d5b8fe6e5158def25cd28eb94e4141ad97c843",
+      "actual": "c5d5b8fe6e5158def25cd28eb94e4141ad97c843"
+    },
+    {
+      "name": "importGraph",
+      "expected": "5c7542ed018c78194f1e2b903eaf6a792b74c03d",
+      "actual": "5c7542ed018c78194f1e2b903eaf6a792b74c03d"
+    },
+    {
+      "name": "proofwidgets",
+      "expected": "24b0d9dc081c5423f8eec7e866c441e5184f29d9",
+      "actual": "24b0d9dc081c5423f8eec7e866c441e5184f29d9"
+    },
+    {
+      "name": "aesop",
+      "expected": "e3cb2f741431ce31bf73549fb52316a57368b06f",
+      "actual": "e3cb2f741431ce31bf73549fb52316a57368b06f"
+    },
+    {
+      "name": "Qq",
+      "expected": "f46324995fca5f0483b742e4eb4daec7f4ee50d2",
+      "actual": "f46324995fca5f0483b742e4eb4daec7f4ee50d2"
+    },
+    {
+      "name": "batteries",
+      "expected": "fa08db58b30eb033edcdab331bba000827f9f785",
+      "actual": "fa08db58b30eb033edcdab331bba000827f9f785"
+    },
+    {
+      "name": "Cli",
+      "expected": "92564e5770e4d09f2d86dfbf8ada1e9c715b384c",
+      "actual": "92564e5770e4d09f2d86dfbf8ada1e9c715b384c"
+    }
+  ],
+  "remote_wrapper_sha256": "83736ff6da600782680e9ce6f8d4e7b7e32f58acc5bbc6f0e127130088357d20",
+  "available_remote_or_dependency_bundle_tools": [],
+  "remote_state": "No new submission; unchanged wrapper and no newly exposed bundling tool. Existing encode/fetch failure receipts retained; no full gate claimed."
+}

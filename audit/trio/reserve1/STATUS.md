@@ -16,7 +16,7 @@ derives the independent target accounting rule from permission derivation;
 `target_denied` derives APP_AUTH_FAILED with full original-world rollback and the
 same call trace. Physical initialization/code/pointers and raw static-call
 interpretation remain explicit; this is not deployed-bytecode/EVM gas certification.
-Immutable validation is recorded after checks. Earlier receipts remain attributed
+At source `7f431a39a4ba306a06b02dc273d4b1c79729b9c7`, three selected component checks and seven baseline/import checks pass. The other 54 source/olean pairs match earlier successful receipts. See `receipts/acl-permission-summary.json`; only standard axioms were printed. Eleven dependency revisions match the manifest. These are bounded checks, not full gates. Earlier receipts remain attributed
 to their original source commits. Full parent and writer coverage remains open.
 
 ## Atomic ACL rules and recursive leaf discharge
