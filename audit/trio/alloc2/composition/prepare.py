@@ -32,7 +32,7 @@ def main():
     sources = {path: blob(PRODUCER, path) for path in producer_files}
     for path in sorted(ROOT.glob("LidoSRv3/Audit/Source/TrioAlloc2/*.lean")):
         sources[str(path.relative_to(ROOT))] = path.read_bytes()
-    for name in ("Composition.lean", "MemoryWrite.lean", "MemoryWriteVectors.lean", "LibraryABI.lean", "LibraryABIVectors.lean", "Parent.lean", "ParentVectors.lean", "ParentPostconditions.lean", "ParentErrors.lean", "ParentInversion.lean", "ProducerMemory.lean", "ProducerMemoryVectors.lean", "MemoryExtent.lean", "MemoryVectors.lean", "AllocationMemoryBridge.lean", "lakefile.lean"):
+    for name in ("Composition.lean", "MemoryWrite.lean", "IndexedMemory.lean", "MemoryWriteVectors.lean", "LibraryABI.lean", "LibraryABIVectors.lean", "Parent.lean", "ParentVectors.lean", "ParentPostconditions.lean", "ParentErrors.lean", "ParentInversion.lean", "ProducerMemory.lean", "ProducerMemoryVectors.lean", "MemoryExtent.lean", "MemoryVectors.lean", "AllocationMemoryBridge.lean", "lakefile.lean"):
         path = Path(__file__).parent / name
         sources[str(path.relative_to(ROOT))] = path.read_bytes()
     hashes = {}

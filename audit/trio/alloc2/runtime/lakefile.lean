@@ -10,6 +10,7 @@ lean_lib TrioAlloc2Runtime where
     .submodules `LidoSRv3.Audit.Source.TrioAlloc2,
     .one `audit.trio.alloc2.composition.Composition,
     .one `audit.trio.alloc2.composition.MemoryWrite,
+    .one `audit.trio.alloc2.composition.IndexedMemory,
     .one `audit.trio.alloc2.composition.MemoryWriteVectors,
     .one `audit.trio.alloc2.composition.LibraryABI,
     .one `audit.trio.alloc2.composition.MemoryExtent,

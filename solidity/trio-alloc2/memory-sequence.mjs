@@ -30,6 +30,8 @@ assert.equal(Number(verified[2]),Object.keys(identity.files).length);
 const parse=tag=>receipt.log_tail.split('\n').map(x=>x.match(new RegExp('(?:^|: )'+tag+' (.+)$'))).filter(Boolean).map(x=>JSON.parse(x[1]));
 const vectors=parse('ALLOC2_MEMORY_SEQUENCE'),runtime=parse('ALLOC2_VERITY_MEMORY_SEQUENCE');
 assert.equal(vectors.length,5);assert.equal(runtime.length,5);
+const rollback=parse('ALLOC2_INDEXED_PREFIX_ROLLBACK');
+assert.deepEqual(rollback,[{panic:50,storageRestored:true,balanceRestored:true,memoryRestored:true}]);
 assert.equal(new Set(vectors.map(x=>x.name)).size,5);assert.equal(new Set(runtime.map(x=>x.name)).size,5);
 for(const v of vectors){const r=runtime.find(x=>x.name===v.name);assert.ok(r);for(const key of ['firstAmount','secondAmount','first','second'])assert.deepEqual(r[key],v[key],v.name+' runtime '+key);}
 const sources={};
@@ -68,6 +70,18 @@ try{
     assert.equal(actual.toLowerCase(),expected.toLowerCase(),v.name+' exact bytes');
     results.push({name:v.name,calldata:data,returndata:actual}); console.log('PASS memory sequence '+v.name);
   }
+  const rollbackData=iface.encodeFunctionData('prefixThenAllocate',[[0],[],1]);
+  const expectedPanic='0x4e487b71'+coder.encode(['uint256'],[rollback[0].panic]).slice(2);
+  let revertBytes;
+  try{await rpc.request({method:'eth_call',params:[{to:contract.target,data:rollbackData,gas:'0x5f5e100'},'latest']});assert.fail('short capacities succeeded');}
+  catch(e){revertBytes=typeof e.data==='string'?e.data:e.data?.result;if(typeof revertBytes!=='string')throw e;}
+  assert.equal(revertBytes.toLowerCase(),expectedPanic);
+  const attempted=await signer.sendTransaction({to:contract.target,data:rollbackData,gasLimit:10000000});
+  try{await attempted.wait();assert.fail('prefix transaction succeeded');}catch(e){if(e.code!=='CALL_EXCEPTION')throw e;}
+  const txReceipt=await rpc.request({method:'eth_getTransactionReceipt',params:[attempted.hash]});
+  assert.equal(BigInt(txReceipt.status),0n);assert.equal(txReceipt.logs.length,0);assert.equal(await contract.marker(),0n);
+  results.push({name:'prefix-rollback',calldata:rollbackData,revertdata:revertBytes,status:txReceipt.status,logs:txReceipt.logs,marker:'0'});
+  console.log('PASS indexed prefix rollback');
   assert.equal(mutant,'','mutant unexpectedly survived all exact comparisons');
   writeFileSync(resolve(root,'audit/trio/alloc2/memory-sequence-execution.json'),JSON.stringify({
     scope:'Sequential outputs of pinned public Solidity library vs current word-memory and Verity state execution; public ABI copies preserved; not byte-memory/compiler store-trace refinement',

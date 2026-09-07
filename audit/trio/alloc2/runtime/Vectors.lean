@@ -37,10 +37,10 @@ private def memorySequence (name : String) (ap cp : Nat) (bs cs : List Nat) (d1 
     (MemoryWrite.writeWords (fun _ => word 0xcafe) ap (word buckets.length :: buckets))
     cp (word capacities.length :: capacities)
   let initialState := installMemory state initial
-  match (memoryExecute ap cp (word d1)).run initialState with
+  match (indexedMemoryExecute ap cp (word d1)).run initialState with
   | .revert reason _ => throw (IO.userError reason)
   | .success firstAmount firstState =>
-    match (memoryExecute ap cp (word d2)).run firstState with
+    match (indexedMemoryExecute ap cp (word d2)).run firstState with
     | .revert reason _ => throw (IO.userError reason)
     | .success secondAmount secondState =>
       let json := fun values : List Word => "[" ++ String.intercalate ","
@@ -59,5 +59,20 @@ private def memorySequence (name : String) (ap cp : Nat) (bs cs : List Nat) (d1 
   memorySequence "below-capacity" 128 512 [7,0] [3,10] 3 20
   memorySequence "zero-first" 128 512 [0,0] [100,100] 0 5
   memorySequence "129-rows" 128 8192 (List.replicate 129 0) (List.replicate 129 2) 129 129
+
+#eval do
+  let shortMemory := MemoryWrite.writeWords
+    (MemoryWrite.writeWords (fun _ => word 0xcafe) 128 [word 1, zero]) 512 [zero]
+  let prefix : _root_.Verity.Contract Unit := fun before =>
+    .success () (installMemory { before.writeSlot 77 (_root_.Verity.Core.Uint256.ofNat 42) with
+      selfBalance := _root_.Verity.Core.Uint256.ofNat 0 } shortMemory)
+  match (_root_.Verity.bind prefix (fun _ => indexedMemoryExecute 128 512 (word 1))).run state with
+  | .success _ _ => throw (IO.userError "short capacities unexpectedly succeeded")
+  | .revert reason restored =>
+    if reason ≠ reprStr Panic.arrayBounds then throw (IO.userError "wrong indexing error")
+    if restored.readSlot 77 ≠ state.readSlot 77 then throw (IO.userError "storage prefix committed")
+    if restored.selfBalance ≠ state.selfBalance then throw (IO.userError "balance prefix committed")
+    if restored.memory 128 ≠ state.memory 128 then throw (IO.userError "memory prefix committed")
+    IO.println "ALLOC2_INDEXED_PREFIX_ROLLBACK {\"panic\":50,\"storageRestored\":true,\"balanceRestored\":true,\"memoryRestored\":true}"
 
 end LidoSRv3.Audit.Source.TrioAlloc2.Runtime

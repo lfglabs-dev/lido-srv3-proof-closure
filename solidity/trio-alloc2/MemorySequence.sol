@@ -3,6 +3,17 @@ pragma solidity 0.8.9;
 import {MinFirstAllocationStrategy} from "contracts/common/lib/MinFirstAllocationStrategy.sol";
 
 contract MemorySequence {
+    uint256 public marker;
+    event Prefix(uint256 value);
+
+    function prefixThenAllocate(uint256[] memory buckets, uint256[] memory capacities, uint256 demand)
+        external returns (uint256, uint256[] memory)
+    {
+        marker = 42;
+        emit Prefix(42);
+        return MinFirstAllocationStrategy.allocate(buckets, capacities, demand);
+    }
+
     // Public library calls copy across delegatecall ABI. Feed the first returned
     // buckets to the second call, while exposing the original caller arrays.
     function sequence(uint256[] memory buckets, uint256[] memory capacities, uint256 d1, uint256 d2)
