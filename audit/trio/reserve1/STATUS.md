@@ -11,7 +11,7 @@ connects this state to the independent scalar target rule; other-slot/account an
 queue preservation require only the stated distinctness, with no hash-injectivity
 assumption. The committed state instantiates the physical sequence relation.
 
-Immutable validation is recorded after checks. Runtime implementations are unchanged.
+At source `e4858c718d7c3388f6f7f25ea7c251f723989f75`, two selected component checks and seven baseline/import checks pass. The other 56 source/olean pairs match earlier successful receipts. See `receipts/target-summary.json`; only standard axioms were printed. Eleven dependency revisions match the manifest. These are bounded checks, not full gates. Runtime implementations are unchanged.
 This closes the exact successful target composition under explicit initialization,
 code/pointer and primitive inputs. Exhaustive parent failures, external sequence
 reachability, remaining report/queue writers, deployed primitive/resource binding,
