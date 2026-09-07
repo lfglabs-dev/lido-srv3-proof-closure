@@ -247,3 +247,44 @@ publication gate is inferred from this interim report. Full original proof,
 composition, integration and independent certification obligations remain open.
 This recording preserves existing work and makes no runtime, dependency,
 canonical metadata or PR changes and submits no remote build.
+
+## Finalized Cancun evidence update reported 2026-09-07
+
+Fetched producer `db4a6fd1ccaf8310463527752514e190d9cb32a2` from origin
+successfully. PR245 publication at that immutable head is reported by the user;
+no live PR query was performed. Interface.lean has blob
+`d6eb95cceeb42421011acd1a5d7f9de7fea4a43d`, byte-identical to accepted
+`2a4e9d2a91d257353470677c6101fd91293cf4e4`. The matching v0 agreement and
+consumer composition dependency pin remain unchanged.
+
+Inspected committed Cancun documentation and receipts. The suite records seven
+passing checks: capacity/error/memory, callback, writer, historical London-proxy
+compatibility and preserved-Verity comparison exit 0; target-only and call-order
+mutants exit 1 with behavioral rejection reported. Verified SHA256 for all 64
+recorded archive artifacts directly from the committed tar archive. Suite source
+hashes match this producer head except check-proxy-initialization.cjs, whose
+production Istanbul correction is covered by the separate receipt. That corrected
+receipt records exit 0; all its source hashes match this head, and all 10 archive
+artifact hashes verify. This preserves the distinction between router solc 0.8.25
+Cancun (viaIR, optimizer 200) and production proxy solc 0.8.9 Istanbul. Strict
+EIP-170 enforcement, deployed code and complete compiler inputs/outputs are
+producer execution evidence, not locally rerun tests or independent certification.
+The preserved Verity comparison still uses historical 876649b outputs.
+
+Inspected ProxyGenesis.initialization_invariants: it derives WriterInvariant.Holds
+and FreshRecords from the implementation-slot prefix with explicit finite storage
+separation premises, without assuming initializer or notification success.
+The committed axiom receipt exits 0 and lists only propext, Classical.choice and
+Quot.sound for this declaration; both recorded source hashes match this head.
+Proxy code-existence/dispatch/admin correspondence, full lifecycle and migration
+closure, universal memory refinement and consumer composition remain open.
+Producer vector success does not resolve the consumer's recorded 1536-versus-1024
+memory differential failure.
+
+The user reports one reviewed full-source remote submission,
+`durable:921a08e5-b5b6-4c34-b282-0432cdf32cfd`. Its terminal receipt was not
+inspected here; submission establishes no passing current-head gate. The shared
+UX2 make-test failure remains reported and unresolved. No remote retry, repin,
+canonical change, PR mutation or certification occurred. Existing working changes
+were preserved. Fetch, Git inspection, receipt parsing and archive/source hash
+verification exited 0; this is an owned coordination-note update only.
