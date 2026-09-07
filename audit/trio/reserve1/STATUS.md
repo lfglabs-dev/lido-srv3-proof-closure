@@ -15,7 +15,7 @@ Independent pointwise transfer accounting covers aliased self-calls, and the
 provisional transfer preserves storage and committed logs. These CALL rules must
 still be threaded into all expanded stage predicates; deployed primitive/bytecode
 and EVM resource/bounded-world binding remain open, along with other writers and
-full integration gates. Immutable validation follows checks. Runtime source unchanged.
+full integration gates. At source `d2419a20db505dfde80c476407cd8b142c8e30a8`, three selected component checks and seven baseline/import checks pass. The other 72 source/olean pairs match earlier successful receipts. See `receipts/call-flow-rules-summary.json`; only standard axioms were printed. Eleven dependency revisions match the manifest. These are bounded checks, not full gates. Runtime source unchanged.
 
 ## Complete allocation flow and internal withdrawal substitution
 
