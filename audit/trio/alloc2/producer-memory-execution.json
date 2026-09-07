@@ -1,0 +1,222 @@
+{
+  "scope": "compiled capacity helper vs interleaved producer allocation guards: exact bytes, call order and final free pointer; finite tests, not full byte-memory/compiler refinement",
+  "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "compiler": "0.8.25+commit.b61c2a91.Emscripten.clang",
+  "settings": {
+    "optimizer": {
+      "enabled": true,
+      "runs": 200
+    },
+    "viaIR": true,
+    "evmVersion": "shanghai",
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode",
+          "irOptimized"
+        ]
+      }
+    }
+  },
+  "sources": {
+    "contracts/0.8.25/sr/SRLib.sol": "2a53ec2d183f3c3d8b6257f18dc7143e8afbc8d3d2f8a48bd0e5e0580b5b47ab",
+    "contracts/0.8.25/sr/SRStorage.sol": "62e922f76a1db7756684d73db3151a02f6d8f0de51fac27922f0a4095ceb9d95",
+    "@openzeppelin/contracts-v5.2/utils/math/Math.sol": "68cf79a637995d5ed243c4a5856b42a5e134ee8786a05034e24d75927fc40ebc",
+    "@openzeppelin/contracts-v5.2/utils/StorageSlot.sol": "75704538dcb223239280c6726d9a31cf769a7816718517c997fc7d63bdb70778",
+    "contracts/common/lib/MinFirstAllocationStrategy.sol": "90aae2101a74b1aec03470da771f673dc4310ae415e31391d81c589403166b9c",
+    "contracts/common/lib/WithdrawalCredentials.sol": "cf5e77be0c5d522d853d19a4c5284e53fa0fb149a9902f77648a8f6d5584636c",
+    "contracts/common/interfaces/IStakingModule.sol": "4a98e89e763d19b45cb1ea422cec1c554fbd43c9f39c6bcc7a18aad64d46e193",
+    "contracts/0.8.25/sr/SRUtils.sol": "1f59e455e510e5eb9c19bdf64dd7357c3e4a8c445c5baaa2f3691ecb7115d295",
+    "contracts/0.8.25/sr/SRTypes.sol": "22c28be7ceaf6ed841f18fc19296372ab246b1cfecc87902d49ee1670ed4aed6",
+    "contracts/0.8.25/sr/ISRBase.sol": "63466ac2f70f94c6b1045c628a7b677975aad56b95d7b8634758e97bdbebeb64",
+    "@openzeppelin/contracts-v5.2/utils/structs/EnumerableSet.sol": "ed0804f9dcff9d2dceba8cc83f31669a84491dfcfe510050c9371aa7c48db09c",
+    "contracts/common/interfaces/IStakingModuleV2.sol": "eacc19c668dd2ad94c7c0cffc5957181b8bf1ed2321c14c34c9845ea054a64ce",
+    "@openzeppelin/contracts-v5.2/utils/Panic.sol": "270fc8401c1a13fae6a7a4a2dd6e381b95d658896701e51f0d3e2688acab3dec",
+    "@openzeppelin/contracts-v5.2/utils/math/SafeCast.sol": "9769274bf53f26a7c7896c526ea1980dc9bea5bf5c2a5fd04870008c4afc1de9",
+    "contracts/common/lib/Math256.sol": "028e9b0c87fea3ec6fd5aac9e7a5724a18b4a175d5ab70159f24428dd28ea6b6"
+  },
+  "linkedHashes": {
+    "contracts/common/lib/MinFirstAllocationStrategy.sol:MinFirstAllocationStrategy": "726e5ddb1dd7fe22871b72a2a51e70813ae35df132f11153d84a18ff56705089",
+    "contracts/0.8.25/sr/SRLib.sol:SRLib": "63fe9bfd3eb06f89ef351f6fba4ed17380ba22c41ba7a95631b41ed9c1e98085",
+    "Harness.sol:ParentHarness": "2217c15cf886f54072ee195e63d699043e5573a937df1bd04dc1b8f1b1f84d3b"
+  },
+  "model": {
+    "job": "5f2465ec-7267-49a8-883d-53a74d58ef3b",
+    "producer": "8691c7881a863715ab5ec9b39631ab41243e7c91",
+    "overlay": "282f557328620f7359aa435c08e2d57f8bf485417b7e9a8407b0a1d1ed638d4a",
+    "receiptSha256": "d9ef6d71a3ee64a5506e078999858af4ae3f2fef54a4a2b0e92a72fb187b9300"
+  },
+  "harnessSha256": "00ad85561ff3edd7278a05d66461de1e669ac9f0828171b482dab833b51faff0",
+  "runnerSha256": "64fb25f970efd7c80be06cbe0322f1722eda8a4500987de984415011c3fc250e",
+  "lockSha256": "db03a10a2d46a83bf0fdb7d0d97e00cef05cdd31812658a103a5e18929d3a420",
+  "rows": [
+    {
+      "name": "one-row",
+      "actual": "0x000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000002",
+      "reverted": false,
+      "pointer": "1536",
+      "calls": [
+        "0:9abddf09"
+      ],
+      "pointerWrites": [
+        "128",
+        "192",
+        "256",
+        "320",
+        "384",
+        "544",
+        "768",
+        "832",
+        "896",
+        "960",
+        "1024",
+        "1248",
+        "1312",
+        "1376",
+        "1472",
+        "1536"
+      ]
+    },
+    {
+      "name": "two-rows",
+      "actual": "0x000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000a0000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002",
+      "reverted": false,
+      "pointer": "2496",
+      "calls": [
+        "0:9abddf09",
+        "1:9abddf09"
+      ],
+      "pointerWrites": [
+        "128",
+        "192",
+        "256",
+        "352",
+        "448",
+        "608",
+        "768",
+        "992",
+        "1056",
+        "1120",
+        "1184",
+        "1248",
+        "1472",
+        "1536",
+        "1600",
+        "1696",
+        "1760",
+        "1824",
+        "1888",
+        "1952",
+        "2176",
+        "2240",
+        "2304",
+        "2400",
+        "2496"
+      ]
+    },
+    {
+      "name": "type-two",
+      "actual": "0x000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000003",
+      "reverted": false,
+      "pointer": "1696",
+      "calls": [
+        "0:9abddf09",
+        "0:0c852f5c"
+      ],
+      "pointerWrites": [
+        "128",
+        "192",
+        "256",
+        "320",
+        "384",
+        "544",
+        "768",
+        "832",
+        "896",
+        "960",
+        "1024",
+        "1248",
+        "1312",
+        "1376",
+        "1472",
+        "1536",
+        "1600",
+        "1632",
+        "1696"
+      ]
+    },
+    {
+      "name": "short-summary",
+      "actual": "0x",
+      "reverted": true,
+      "pointer": "1408",
+      "calls": [
+        "0:9abddf09"
+      ],
+      "pointerWrites": [
+        "128",
+        "192",
+        "256",
+        "320",
+        "384",
+        "544",
+        "768",
+        "832",
+        "896",
+        "960",
+        "1024",
+        "1248",
+        "1312",
+        "1376",
+        "1408"
+      ]
+    },
+    {
+      "name": "rejected-summary",
+      "actual": "0xdead",
+      "reverted": true,
+      "pointer": "1376",
+      "calls": [
+        "0:9abddf09"
+      ],
+      "pointerWrites": [
+        "128",
+        "192",
+        "256",
+        "320",
+        "384",
+        "544",
+        "768",
+        "832",
+        "896",
+        "960",
+        "1024",
+        "1248",
+        "1312",
+        "1376"
+      ]
+    },
+    {
+      "name": "invalid-status",
+      "actual": "0x4e487b710000000000000000000000000000000000000000000000000000000000000021",
+      "reverted": true,
+      "pointer": "1248",
+      "calls": [],
+      "pointerWrites": [
+        "128",
+        "192",
+        "256",
+        "320",
+        "384",
+        "544",
+        "768",
+        "832",
+        "896",
+        "960",
+        "1024",
+        "1248"
+      ]
+    }
+  ]
+}

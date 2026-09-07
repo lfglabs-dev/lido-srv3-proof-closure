@@ -6,29 +6,29 @@ open _root_.LidoSRv3.Audit.Source.TrioAlloc1 (Bytes encodeWord encodeArray word 
 
 /-- Test-only slot projection and normalized module addresses. The Solidity
 runner uses physical keccak slots and normalizes its two deployed module addresses. -/
-private def layout : TrioAlloc1.Layout where
+def layout : TrioAlloc1.Layout where
   routerSlot := word 10
   keccak := fun bs =>
     if bs.length = 32 then word 100 else word (1000 + (TrioAlloc1.decodeWord bs 0).val*4)
-private def storage (count share0 share1 : Nat) : TrioAlloc1.Storage := fun slot =>
+def storage (count share0 share1 : Nat) : TrioAlloc1.Storage := fun slot =>
   if slot.val = 11 then word count
   else if slot.val = 100 then word 7
   else if slot.val = 101 then word 9
   else if slot.val = 1028 then word (21 + share0*2^192 + 2^232)
   else if slot.val = 1036 then word (22 + share1*2^192 + 2^232)
   else zero
-private def summary (deposited depositable : Nat) : Bytes :=
+def summary (deposited depositable : Nat) : Bytes :=
   encodeWord zero ++ encodeWord (word deposited) ++ encodeWord (word depositable)
-private def oracle (s0 s1 : Bytes) (reject1 : Bool) : TrioAlloc1.StaticOracle := fun _ call =>
+def oracle (s0 s1 : Bytes) (reject1 : Bool) : TrioAlloc1.StaticOracle := fun _ call =>
   if call.target.val = 21 then .returned s0
   else if reject1 then .reverted s1 else .returned s1
-private def hex (bytes : Bytes) : String := "0x" ++ String.ofList (bytes.flatMap fun b =>
+def hex (bytes : Bytes) : String := "0x" ++ String.ofList (bytes.flatMap fun b =>
   [("0123456789abcdef".toList)[b.val/16]!, ("0123456789abcdef".toList)[b.val%16]!])
 private def encodeOutput (out : ParentConversion.Output) : Bytes :=
   encodeWord out.totalAllocated ++ encodeWord (word 96) ++
   encodeWord (word (96+32*(out.arrays.allocated.length+1))) ++
   encodeArray out.arrays.allocated ++ encodeArray out.arrays.newAllocations
-private def failure : TrioAlloc1.Failure → Bytes
+def failure : TrioAlloc1.Failure → Bytes
   | .revertData bs => bs
   | .decoderFailure => []
   | .panic code => [byte 0x4e,byte 0x48,byte 0x7b,byte 0x71] ++ encodeWord code

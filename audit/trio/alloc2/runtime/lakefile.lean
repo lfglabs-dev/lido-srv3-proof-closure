@@ -8,4 +8,4 @@ require verity from git
 lean_lib TrioAlloc2Runtime where
   globs := #[.submodules `LidoSRv3.Audit.Source.TrioAlloc1,
     .submodules `LidoSRv3.Audit.Source.TrioAlloc2,
-    .one `audit.trio.alloc2.composition.LibraryABI, .one `audit.trio.alloc2.runtime.Library, .one `audit.trio.alloc2.runtime.Vectors]
+    .submodules `audit.trio.alloc2.composition, .one `audit.trio.alloc2.runtime.Library, .one `audit.trio.alloc2.runtime.Vectors]
