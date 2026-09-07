@@ -112,6 +112,7 @@ MODULES = [
     "Audit/Source/TrioReserve1/QueueFinalize",
     "Tests/TrioReserve1/VaultCases",
     "Tests/TrioReserve1/QueueFinalizeCases",
+    "Tests/TrioReserve1/QueueFinalizeDifferential",
     "Tests/TrioReserve1/ReportCases",
     "Tests/TrioReserve1/ReportDifferential",
     "Tests/TrioReserve1/VaultDifferential",
