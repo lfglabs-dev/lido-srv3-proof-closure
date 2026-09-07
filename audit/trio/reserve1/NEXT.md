@@ -1,11 +1,13 @@
 # Continuation — not a completion claim
 
-Latest increment: CalleeBalance proves balance preservation for concrete handled
-Locator/Queue/Oracle/Router paths and total conservation plus aggregate/uint256
-bounds for every CALL outcome. The composed dispatcher retains the premise only
-for delegated code. Continue with initial EVM aggregate reachability, general
-callbacks/delegated behavior, deployment/resource binding and parent/writer closure.
-Current evidence is callee-balance-summary.json: two selected checks and 77
+Latest increment: WithdrawalBalance carries total conservation and finite aggregate
+bounds through the complete withdrawal program, intermediate failures and root
+rollback, with a concrete pipeline specialization. Internal target/rebalance writers
+also conserve balances. Continue with initial EVM aggregate reachability, delegated
+callbacks, deployment/resource binding and the remaining parent/writer obligations.
+Do not reopen balance propagation through the modeled withdrawal or claim the
+incoming invariant and delegated-callee premise are deployment facts.
+Current evidence: withdrawal-balance-summary.json, two selected checks plus 78
 revalidated unchanged source/olean pairs. Full implementation and remote gates
 remain open. The prior turn changed source and published checked evidence.
 

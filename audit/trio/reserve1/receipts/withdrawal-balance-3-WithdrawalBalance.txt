@@ -1,0 +1,944 @@
+LidoSRv3/Audit/Source/TrioReserve1/WithdrawalBalance.lean:54:110: error: unsolved goals
+case hf.hf.hf.hf.value
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+⊢ ?hf.hf.hf.hf.α
+
+case hf.hf.hf.hf.α
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+⊢ Type
+
+case hf.hn.hn.hn.hr.hf.value
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹ : Address
+x✝ : Bytes
+x : Word
+⊢ ?hf.hn.hn.hn.hr.hf.α
+
+case hf.hn.hn.hn.hr.hf.α
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹ : Address
+x✝ : Bytes
+x : Word
+⊢ Type
+
+case hn.isTrue.hn.hf.hf.hf.value
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : seeds.val > 0
+x✝ : Bool
+x : Unit
+⊢ ?hn.isTrue.hn.hf.hf.hf.α
+
+case hn.isTrue.hn.hf.hf.hf.α
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : seeds.val > 0
+x✝ : Bool
+x : Unit
+⊢ Type
+
+case hn.isTrue.hn.hn.hn.hn.hf.hf.hf.value
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : seeds.val > 0
+x✝³ : Bool
+x✝² : Unit
+x✝¹ : Address
+x✝ x : Unit
+⊢ ?hn.isTrue.hn.hn.hn.hn.hf.hf.hf.α
+
+case hn.isTrue.hn.hn.hn.hn.hf.hf.hf.α
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : seeds.val > 0
+x✝³ : Bool
+x✝² : Unit
+x✝¹ : Address
+x✝ x : Unit
+⊢ Type
+
+case hn.isTrue.hn.hn.hn.hn.hf.hf.hn.hf.value
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : seeds.val > 0
+x✝⁴ : Bool
+x✝³ : Unit
+x✝² : Address
+x✝¹ x✝ : Unit
+x : Word
+⊢ ?hn.isTrue.hn.hn.hn.hn.hf.hf.hn.hf.α
+
+case hn.isTrue.hn.hn.hn.hn.hf.hf.hn.hf.α
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : seeds.val > 0
+x✝⁴ : Bool
+x✝³ : Unit
+x✝² : Address
+x✝¹ x✝ : Unit
+x : Word
+⊢ Type
+
+case hn.isTrue.hn.hn.hn.hn.hf.hf.hn.hn.hf.hf.hf.value
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : seeds.val > 0
+x✝⁵ : Bool
+x✝⁴ : Unit
+x✝³ : Address
+x✝² x✝¹ : Unit
+x✝ x : Word
+⊢ ?hn.isTrue.hn.hn.hn.hn.hf.hf.hn.hn.hf.hf.hf.α
+
+case hn.isTrue.hn.hn.hn.hn.hf.hf.hn.hn.hf.hf.hf.α
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : seeds.val > 0
+x✝⁵ : Bool
+x✝⁴ : Unit
+x✝³ : Address
+x✝² x✝¹ : Unit
+x✝ x : Word
+⊢ Type
+
+case hn.isTrue.hn.hn.hn.hn.hf.hn.hn.hf.value
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : seeds.val > 0
+x✝⁵ : Bool
+x✝⁴ : Unit
+x✝³ : Address
+x✝² x✝¹ : Unit
+x✝ : Allocation
+x : Unit
+⊢ ?hn.isTrue.hn.hn.hn.hn.hf.hn.hn.hf.α
+
+case hn.isTrue.hn.hn.hn.hn.hf.hn.hn.hf.α
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : seeds.val > 0
+x✝⁵ : Bool
+x✝⁴ : Unit
+x✝³ : Address
+x✝² x✝¹ : Unit
+x✝ : Allocation
+x : Unit
+⊢ Type
+
+case hn.isTrue.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hf.value
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : seeds.val > 0
+x✝⁸ : Bool
+x✝⁷ : Unit
+x✝⁶ : Address
+x✝⁵ x✝⁴ : Unit
+x✝³ : Allocation
+x✝² : Unit
+x✝¹ : Word
+x✝ x : Nat
+⊢ ?hn.isTrue.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hf.α
+
+case hn.isTrue.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hf.α
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : seeds.val > 0
+x✝⁸ : Bool
+x✝⁷ : Unit
+x✝⁶ : Address
+x✝⁵ x✝⁴ : Unit
+x✝³ : Allocation
+x✝² : Unit
+x✝¹ : Word
+x✝ x : Nat
+⊢ Type
+
+case hn.isTrue.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hf.value
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : seeds.val > 0
+x✝⁹ : Bool
+x✝⁸ : Unit
+x✝⁷ : Address
+x✝⁶ x✝⁵ : Unit
+x✝⁴ : Allocation
+x✝³ : Unit
+x✝² : Word
+x✝¹ x✝ : Nat
+x : Unit
+⊢ ?hn.isTrue.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hf.α
+
+case hn.isTrue.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hf.α
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : seeds.val > 0
+x✝⁹ : Bool
+x✝⁸ : Unit
+x✝⁷ : Address
+x✝⁶ x✝⁵ : Unit
+x✝⁴ : Allocation
+x✝³ : Unit
+x✝² : Word
+x✝¹ x✝ : Nat
+x : Unit
+⊢ Type
+
+case hn.isTrue.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hf.value
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : seeds.val > 0
+x✝¹⁰ : Bool
+x✝⁹ : Unit
+x✝⁸ : Address
+x✝⁷ x✝⁶ : Unit
+x✝⁵ : Allocation
+x✝⁴ : Unit
+x✝³ : Word
+x✝² x✝¹ : Nat
+x✝ x : Unit
+⊢ ?hn.isTrue.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hf.α
+
+case hn.isTrue.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hf.α
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : seeds.val > 0
+x✝¹⁰ : Bool
+x✝⁹ : Unit
+x✝⁸ : Address
+x✝⁷ x✝⁶ : Unit
+x✝⁵ : Allocation
+x✝⁴ : Unit
+x✝³ : Word
+x✝² x✝¹ : Nat
+x✝ x : Unit
+⊢ Type
+
+case hn.isTrue.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hf.hf.value
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : seeds.val > 0
+x✝¹¹ : Bool
+x✝¹⁰ : Unit
+x✝⁹ : Address
+x✝⁸ x✝⁷ : Unit
+x✝⁶ : Allocation
+x✝⁵ : Unit
+x✝⁴ : Word
+x✝³ x✝² : Nat
+x✝¹ x✝ x : Unit
+⊢ ?hn.isTrue.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hf.hf.α
+
+case hn.isTrue.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hf.hf.α
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : seeds.val > 0
+x✝¹¹ : Bool
+x✝¹⁰ : Unit
+x✝⁹ : Address
+x✝⁸ x✝⁷ : Unit
+x✝⁶ : Allocation
+x✝⁵ : Unit
+x✝⁴ : Word
+x✝³ x✝² : Nat
+x✝¹ x✝ x : Unit
+⊢ Type
+
+case hn.isTrue.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hf.hn.hf.hf.hf.hf.value
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : seeds.val > 0
+x✝¹² : Bool
+x✝¹¹ : Unit
+x✝¹⁰ : Address
+x✝⁹ x✝⁸ : Unit
+x✝⁷ : Allocation
+x✝⁶ : Unit
+x✝⁵ : Word
+x✝⁴ x✝³ : Nat
+x✝² x✝¹ x✝ : Unit
+x : Word
+⊢ ?hn.isTrue.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hf.hn.hf.hf.hf.hf.α
+
+case hn.isTrue.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hf.hn.hf.hf.hf.hf.α
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : seeds.val > 0
+x✝¹² : Bool
+x✝¹¹ : Unit
+x✝¹⁰ : Address
+x✝⁹ x✝⁸ : Unit
+x✝⁷ : Allocation
+x✝⁶ : Unit
+x✝⁵ : Word
+x✝⁴ x✝³ : Nat
+x✝² x✝¹ x✝ : Unit
+x : Word
+⊢ Type
+
+case hn.isTrue.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hf.value
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : seeds.val > 0
+x✝¹³ : Bool
+x✝¹² : Unit
+x✝¹¹ : Address
+x✝¹⁰ x✝⁹ : Unit
+x✝⁸ : Allocation
+x✝⁷ : Unit
+x✝⁶ : Word
+x✝⁵ x✝⁴ : Nat
+x✝³ x✝² x✝¹ : Unit
+x✝ : Nat × Nat
+x : Nat
+⊢ ?hn.isTrue.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hf.α
+
+case hn.isTrue.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hf.α
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : seeds.val > 0
+x✝¹³ : Bool
+x✝¹² : Unit
+x✝¹¹ : Address
+x✝¹⁰ x✝⁹ : Unit
+x✝⁸ : Allocation
+x✝⁷ : Unit
+x✝⁶ : Word
+x✝⁵ x✝⁴ : Nat
+x✝³ x✝² x✝¹ : Unit
+x✝ : Nat × Nat
+x : Nat
+⊢ Type
+
+case hn.isTrue.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hf.value
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : seeds.val > 0
+x✝¹⁴ : Bool
+x✝¹³ : Unit
+x✝¹² : Address
+x✝¹¹ x✝¹⁰ : Unit
+x✝⁹ : Allocation
+x✝⁸ : Unit
+x✝⁷ : Word
+x✝⁶ x✝⁵ : Nat
+x✝⁴ x✝³ x✝² : Unit
+x✝¹ : Nat × Nat
+x✝ : Nat
+x : Unit
+⊢ ?hn.isTrue.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hf.α
+
+case hn.isTrue.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hf.α
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : seeds.val > 0
+x✝¹⁴ : Bool
+x✝¹³ : Unit
+x✝¹² : Address
+x✝¹¹ x✝¹⁰ : Unit
+x✝⁹ : Allocation
+x✝⁸ : Unit
+x✝⁷ : Word
+x✝⁶ x✝⁵ : Nat
+x✝⁴ x✝³ x✝² : Unit
+x✝¹ : Nat × Nat
+x✝ : Nat
+x : Unit
+⊢ Type
+
+case hn.isTrue.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hl.hf.value
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : seeds.val > 0
+x✝¹⁵ : Bool
+x✝¹⁴ : Unit
+x✝¹³ : Address
+x✝¹² x✝¹¹ : Unit
+x✝¹⁰ : Allocation
+x✝⁹ : Unit
+x✝⁸ : Word
+x✝⁷ x✝⁶ : Nat
+x✝⁵ x✝⁴ x✝³ : Unit
+x✝² : Nat × Nat
+x✝¹ : Nat
+x✝ : Unit
+x : Word
+⊢ ?hn.isTrue.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hl.hf.α
+
+case hn.isTrue.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hl.hf.α
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : seeds.val > 0
+x✝¹⁵ : Bool
+x✝¹⁴ : Unit
+x✝¹³ : Address
+x✝¹² x✝¹¹ : Unit
+x✝¹⁰ : Allocation
+x✝⁹ : Unit
+x✝⁸ : Word
+x✝⁷ x✝⁶ : Nat
+x✝⁵ x✝⁴ x✝³ : Unit
+x✝² : Nat × Nat
+x✝¹ : Nat
+x✝ : Unit
+x : Word
+⊢ Type
+
+case hn.isTrue.hn.hn.hn.hn.hn.hf.value
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : seeds.val > 0
+x✝⁴ : Bool
+x✝³ : Unit
+x✝² : Address
+x✝¹ x✝ x : Unit
+⊢ ?hn.isTrue.hn.hn.hn.hn.hn.hf.α
+
+case hn.isTrue.hn.hn.hn.hn.hn.hf.α
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : seeds.val > 0
+x✝⁴ : Bool
+x✝³ : Unit
+x✝² : Address
+x✝¹ x✝ x : Unit
+⊢ Type
+
+case hn.isTrue.hn.hn.hn.hn.hn.hn.hn.hf.value
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : seeds.val > 0
+x✝⁶ : Bool
+x✝⁵ : Unit
+x✝⁴ : Address
+x✝³ x✝² x✝¹ : Unit
+x✝ : Word
+x : Nat
+⊢ ?hn.isTrue.hn.hn.hn.hn.hn.hn.hn.hf.α
+
+case hn.isTrue.hn.hn.hn.hn.hn.hn.hn.hf.α
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : seeds.val > 0
+x✝⁶ : Bool
+x✝⁵ : Unit
+x✝⁴ : Address
+x✝³ x✝² x✝¹ : Unit
+x✝ : Word
+x : Nat
+⊢ Type
+
+case hn.isTrue.hn.hn.hn.hn.hn.hn.hn.hn.hf.value
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : seeds.val > 0
+x✝⁷ : Bool
+x✝⁶ : Unit
+x✝⁵ : Address
+x✝⁴ x✝³ x✝² : Unit
+x✝¹ : Word
+x✝ : Nat
+x : Unit
+⊢ ?hn.isTrue.hn.hn.hn.hn.hn.hn.hn.hn.hf.α
+
+case hn.isTrue.hn.hn.hn.hn.hn.hn.hn.hn.hf.α
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : seeds.val > 0
+x✝⁷ : Bool
+x✝⁶ : Unit
+x✝⁵ : Address
+x✝⁴ x✝³ x✝² : Unit
+x✝¹ : Word
+x✝ : Nat
+x : Unit
+⊢ Type
+
+case hn.isFalse.hn.hf.hf.hf.value
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : ¬seeds.val > 0
+x✝ : Bool
+x : Unit
+⊢ ?hn.isFalse.hn.hf.hf.hf.α
+
+case hn.isFalse.hn.hf.hf.hf.α
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : ¬seeds.val > 0
+x✝ : Bool
+x : Unit
+⊢ Type
+
+case hn.isFalse.hn.hn.hn.hn.hf.hf.hf.value
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : ¬seeds.val > 0
+x✝³ : Bool
+x✝² : Unit
+x✝¹ : Address
+x✝ x : Unit
+⊢ ?hn.isFalse.hn.hn.hn.hn.hf.hf.hf.α
+
+case hn.isFalse.hn.hn.hn.hn.hf.hf.hf.α
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : ¬seeds.val > 0
+x✝³ : Bool
+x✝² : Unit
+x✝¹ : Address
+x✝ x : Unit
+⊢ Type
+
+case hn.isFalse.hn.hn.hn.hn.hf.hf.hn.hf.value
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : ¬seeds.val > 0
+x✝⁴ : Bool
+x✝³ : Unit
+x✝² : Address
+x✝¹ x✝ : Unit
+x : Word
+⊢ ?hn.isFalse.hn.hn.hn.hn.hf.hf.hn.hf.α
+
+case hn.isFalse.hn.hn.hn.hn.hf.hf.hn.hf.α
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : ¬seeds.val > 0
+x✝⁴ : Bool
+x✝³ : Unit
+x✝² : Address
+x✝¹ x✝ : Unit
+x : Word
+⊢ Type
+
+case hn.isFalse.hn.hn.hn.hn.hf.hf.hn.hn.hf.hf.hf.value
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : ¬seeds.val > 0
+x✝⁵ : Bool
+x✝⁴ : Unit
+x✝³ : Address
+x✝² x✝¹ : Unit
+x✝ x : Word
+⊢ ?hn.isFalse.hn.hn.hn.hn.hf.hf.hn.hn.hf.hf.hf.α
+
+case hn.isFalse.hn.hn.hn.hn.hf.hf.hn.hn.hf.hf.hf.α
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : ¬seeds.val > 0
+x✝⁵ : Bool
+x✝⁴ : Unit
+x✝³ : Address
+x✝² x✝¹ : Unit
+x✝ x : Word
+⊢ Type
+
+case hn.isFalse.hn.hn.hn.hn.hf.hn.hn.hf.value
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : ¬seeds.val > 0
+x✝⁵ : Bool
+x✝⁴ : Unit
+x✝³ : Address
+x✝² x✝¹ : Unit
+x✝ : Allocation
+x : Unit
+⊢ ?hn.isFalse.hn.hn.hn.hn.hf.hn.hn.hf.α
+
+case hn.isFalse.hn.hn.hn.hn.hf.hn.hn.hf.α
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : ¬seeds.val > 0
+x✝⁵ : Bool
+x✝⁴ : Unit
+x✝³ : Address
+x✝² x✝¹ : Unit
+x✝ : Allocation
+x : Unit
+⊢ Type
+
+case hn.isFalse.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hf.value
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : ¬seeds.val > 0
+x✝⁸ : Bool
+x✝⁷ : Unit
+x✝⁶ : Address
+x✝⁵ x✝⁴ : Unit
+x✝³ : Allocation
+x✝² : Unit
+x✝¹ : Word
+x✝ x : Nat
+⊢ ?hn.isFalse.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hf.α
+
+case hn.isFalse.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hf.α
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : ¬seeds.val > 0
+x✝⁸ : Bool
+x✝⁷ : Unit
+x✝⁶ : Address
+x✝⁵ x✝⁴ : Unit
+x✝³ : Allocation
+x✝² : Unit
+x✝¹ : Word
+x✝ x : Nat
+⊢ Type
+
+case hn.isFalse.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hf.value
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : ¬seeds.val > 0
+x✝⁹ : Bool
+x✝⁸ : Unit
+x✝⁷ : Address
+x✝⁶ x✝⁵ : Unit
+x✝⁴ : Allocation
+x✝³ : Unit
+x✝² : Word
+x✝¹ x✝ : Nat
+x : Unit
+⊢ ?hn.isFalse.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hf.α
+
+case hn.isFalse.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hf.α
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : ¬seeds.val > 0
+x✝⁹ : Bool
+x✝⁸ : Unit
+x✝⁷ : Address
+x✝⁶ x✝⁵ : Unit
+x✝⁴ : Allocation
+x✝³ : Unit
+x✝² : Word
+x✝¹ x✝ : Nat
+x : Unit
+⊢ Type
+
+case hn.isFalse.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hf.value
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : ¬seeds.val > 0
+x✝¹⁰ : Bool
+x✝⁹ : Unit
+x✝⁸ : Address
+x✝⁷ x✝⁶ : Unit
+x✝⁵ : Allocation
+x✝⁴ : Unit
+x✝³ : Word
+x✝² x✝¹ : Nat
+x✝ x : Unit
+⊢ ?hn.isFalse.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hf.α
+
+case hn.isFalse.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hf.α
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : ¬seeds.val > 0
+x✝¹⁰ : Bool
+x✝⁹ : Unit
+x✝⁸ : Address
+x✝⁷ x✝⁶ : Unit
+x✝⁵ : Allocation
+x✝⁴ : Unit
+x✝³ : Word
+x✝² x✝¹ : Nat
+x✝ x : Unit
+⊢ Type
+
+case hn.isFalse.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hf.hf.value
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : ¬seeds.val > 0
+x✝¹¹ : Bool
+x✝¹⁰ : Unit
+x✝⁹ : Address
+x✝⁸ x✝⁷ : Unit
+x✝⁶ : Allocation
+x✝⁵ : Unit
+x✝⁴ : Word
+x✝³ x✝² : Nat
+x✝¹ x✝ x : Unit
+⊢ ?hn.isFalse.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hf.hf.α
+
+case hn.isFalse.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hf.hf.α
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : ¬seeds.val > 0
+x✝¹¹ : Bool
+x✝¹⁰ : Unit
+x✝⁹ : Address
+x✝⁸ x✝⁷ : Unit
+x✝⁶ : Allocation
+x✝⁵ : Unit
+x✝⁴ : Word
+x✝³ x✝² : Nat
+x✝¹ x✝ x : Unit
+⊢ Type
+
+case hn.isFalse.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hf.hn.hf.hf.hf.hf.value
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : ¬seeds.val > 0
+x✝¹² : Bool
+x✝¹¹ : Unit
+x✝¹⁰ : Address
+x✝⁹ x✝⁸ : Unit
+x✝⁷ : Allocation
+x✝⁶ : Unit
+x✝⁵ : Word
+x✝⁴ x✝³ : Nat
+x✝² x✝¹ x✝ : Unit
+x : Word
+⊢ ?hn.isFalse.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hf.hn.hf.hf.hf.hf.α
+
+case hn.isFalse.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hf.hn.hf.hf.hf.hf.α
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : ¬seeds.val > 0
+x✝¹² : Bool
+x✝¹¹ : Unit
+x✝¹⁰ : Address
+x✝⁹ x✝⁸ : Unit
+x✝⁷ : Allocation
+x✝⁶ : Unit
+x✝⁵ : Word
+x✝⁴ x✝³ : Nat
+x✝² x✝¹ x✝ : Unit
+x : Word
+⊢ Type
+
+case hn.isFalse.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hf.value
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : ¬seeds.val > 0
+x✝¹³ : Bool
+x✝¹² : Unit
+x✝¹¹ : Address
+x✝¹⁰ x✝⁹ : Unit
+x✝⁸ : Allocation
+x✝⁷ : Unit
+x✝⁶ : Word
+x✝⁵ x✝⁴ : Nat
+x✝³ x✝² x✝¹ : Unit
+x✝ : Nat × Nat
+x : Nat
+⊢ ?hn.isFalse.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hf.α
+
+case hn.isFalse.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hf.α
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : ¬seeds.val > 0
+x✝¹³ : Bool
+x✝¹² : Unit
+x✝¹¹ : Address
+x✝¹⁰ x✝⁹ : Unit
+x✝⁸ : Allocation
+x✝⁷ : Unit
+x✝⁶ : Word
+x✝⁵ x✝⁴ : Nat
+x✝³ x✝² x✝¹ : Unit
+x✝ : Nat × Nat
+x : Nat
+⊢ Type
+
+case hn.isFalse.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hf.value
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : ¬seeds.val > 0
+x✝¹⁴ : Bool
+x✝¹³ : Unit
+x✝¹² : Address
+x✝¹¹ x✝¹⁰ : Unit
+x✝⁹ : Allocation
+x✝⁸ : Unit
+x✝⁷ : Word
+x✝⁶ x✝⁵ : Nat
+x✝⁴ x✝³ x✝² : Unit
+x✝¹ : Nat × Nat
+x✝ : Nat
+x : Unit
+⊢ ?hn.isFalse.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hf.α
+
+case hn.isFalse.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hf.α
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : ¬seeds.val > 0
+x✝¹⁴ : Bool
+x✝¹³ : Unit
+x✝¹² : Address
+x✝¹¹ x✝¹⁰ : Unit
+x✝⁹ : Allocation
+x✝⁸ : Unit
+x✝⁷ : Word
+x✝⁶ x✝⁵ : Nat
+x✝⁴ x✝³ x✝² : Unit
+x✝¹ : Nat × Nat
+x✝ : Nat
+x : Unit
+⊢ Type
+
+case hn.isFalse.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hl.hf.value
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : ¬seeds.val > 0
+x✝¹⁵ : Bool
+x✝¹⁴ : Unit
+x✝¹³ : Address
+x✝¹² x✝¹¹ : Unit
+x✝¹⁰ : Allocation
+x✝⁹ : Unit
+x✝⁸ : Word
+x✝⁷ x✝⁶ : Nat
+x✝⁵ x✝⁴ x✝³ : Unit
+x✝² : Nat × Nat
+x✝¹ : Nat
+x✝ : Unit
+x : Word
+⊢ ?hn.isFalse.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hl.hf.α
+
+case hn.isFalse.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hl.hf.α
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+h✝ : ¬seeds.val > 0
+x✝¹⁵ : Bool
+x✝¹⁴ : Unit
+x✝¹³ : Address
+x✝¹² x✝¹¹ : Unit
+x✝¹⁰ : Allocation
+x✝⁹ : Unit
+x✝⁸ : Word
+x✝⁷ x✝⁶ : Nat
+x✝⁵ x✝⁴ x✝³ : Unit
+x✝² : Nat × Nat
+x✝¹ : Nat
+x✝ : Unit
+x : Word
+⊢ Type

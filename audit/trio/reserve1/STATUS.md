@@ -1,5 +1,24 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Complete withdrawal balance invariant
+
+`WithdrawalBalance` carries exact total conservation and the finite aggregate bound
+through the entire source withdrawal program, including failed intermediate stages
+and root rollback. The proof composes balance-preserving reads, writes, events,
+guards, decoders and actual CALLs. It needs no successful-path, authorization,
+ABI-validity or packed-accounting premise. Every resulting account is uint256-bounded
+when the explicit incoming aggregate is below UINT256_MODULUS. The concrete pipeline
+specialization discharges its handled callees; delegated code retains its premise.
+Internal target and report-rebalance writers also conserve the aggregate.
+
+This closes balance propagation through the modeled withdrawal, not initial EVM
+aggregate reachability or general delegated/callback/deployment/resource behavior.
+Other parent/writer obligations, canonical full gates and independent review remain
+open. At source `e1fc0aebd77fe022a3548d86b6a174fdbf7e5d34`, two selected checks and seven baseline/import checks
+pass; 78 unchanged source/olean pairs and eleven dependency revisions are verified.
+Axioms are standard. See `receipts/withdrawal-balance-summary.json`. Runtime code
+and its prior execution evidence are unchanged. These are bounded checks only.
+
 ## Concrete callee balance preservation
 
 `CalleeBalance` proves that the handled Locator, Queue, Oracle and Router paths
