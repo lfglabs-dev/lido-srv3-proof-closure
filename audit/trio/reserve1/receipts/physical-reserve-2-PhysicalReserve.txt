@@ -1,0 +1,8 @@
+LidoSRv3/Audit/Source/TrioReserve1/PhysicalReserve.lean:76:44: error: Function expected at
+  Pipeline.read_other_slot ?m.102 ?m.103 ?m.104 ?m.105 ?m.106 ?m.107 ?m.108
+but this term has type
+  (Verity.ContractState.writeContractSlot ?m.102 ?m.103 ?m.105 ?m.107).readContractSlot ?m.104 ?m.106 =
+    Verity.ContractState.readContractSlot ?m.102 ?m.104 ?m.106
+
+Note: Expected a function because this term is being applied to the argument
+  (by decide : reserveSlot ≠ bufferSlot)

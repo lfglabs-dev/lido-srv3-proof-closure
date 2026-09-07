@@ -11,9 +11,13 @@ returns the same demand. No reserve <= buffer or mapping-hash injectivity premis
 is added. Queue/Lido namespace separation is explicit. This is forward successful
 withdrawal coverage, not an exhaustive parent specification or writer-sequence proof.
 
-The new module passed draft bounded elaboration. Immutable component/axiom
-receipts follow the source commit; existing 51-case runtime evidence remains tied
-to `4b82879f28d0e1d58a9972a3db92aa5ea225d898`. Runtime sources are unchanged.
+At `de68e309d6cef918e7153c971f2396aaa1ec8b2a`, the new module and updated
+LiveTrust inspection passed (2 selected checks). Source and olean hashes for the
+other 35 component modules match their prior receipts. All seven baseline/import
+checks passed; inspected axioms are only propext, Classical.choice and Quot.sound.
+`receipts/physical-reserve-summary.json` records this bounded evidence. Existing
+51-case runtime evidence remains tied to `4b82879f28d0e1d58a9972a3db92aa5ea225d898`;
+runtime sources are unchanged and were not rerun. Full remote gates remain open.
 
 ## Concrete withdrawal pipeline
 

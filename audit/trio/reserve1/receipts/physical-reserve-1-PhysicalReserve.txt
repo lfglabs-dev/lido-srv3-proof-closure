@@ -1,0 +1,9 @@
+LidoSRv3/Audit/Source/TrioReserve1/PhysicalReserve.lean:36:64: error: don't know how to synthesize placeholder for argument `h₂`
+context:
+ctx : Context
+amount : Word
+next nonce : Nat
+w : World
+h✝ : (w.core.readContractSlot ctx.self.val reserveSlot).val > 0
+⊢ (w.core.readContractSlot ctx.self.val reserveSlot).val < Verity.Core.Uint256.modulus
+LidoSRv3/Audit/Source/TrioReserve1/PhysicalReserve.lean:76:19: error(lean.unknownIdentifier): Unknown constant `LidoSRv3.Audit.Source.TrioReserve1.Live.Word.val`
