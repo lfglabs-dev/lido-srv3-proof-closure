@@ -69,6 +69,37 @@ if (process.argv[3]) {
     receiptSha256: sha(readFileSync(abiReceiptPath)), vectors: abiVectors.length};
 }
 
+let runtimeEvidence = null;
+let runtimeVectors = [];
+if (process.argv[4]) {
+  const runtimeReceiptPath = resolve(process.argv[4]);
+  const runtimeReceipt = JSON.parse(readFileSync(runtimeReceiptPath));
+  assert.equal(runtimeReceipt.state, 'succeeded');
+  assert.equal(runtimeReceipt.exit_code, 0);
+  assert.equal(runtimeReceipt.validation.toolchain, 'leanprover/lean4:v4.31.0');
+  const runtimeIdentity = JSON.parse(readFileSync(resolve(root, 'audit/trio/alloc2/runtime/source-identity.json')));
+  assert.equal(runtimeIdentity.verity, 'e977aaad6e1a9e92e0132d41b3d33a14135a4d46');
+  let runtimeManifest = 'sandboxed-source-bundle-v1\n';
+  for (const path of Object.keys(runtimeIdentity.files).sort()) {
+    assert.match(path, /^(LidoSRv3\/Audit\/Source\/TrioAlloc[12]\/[^/]+\.lean|audit\/trio\/alloc2\/(composition|runtime)\/([^/]+\.lean|lake-manifest\.json))$/);
+    const bytes = path.startsWith('LidoSRv3/Audit/Source/TrioAlloc1/')
+      ? execFileSync('git', ['-C', root, 'show', `${runtimeIdentity.producer}:${path}`])
+      : readFileSync(resolve(root, path));
+    assert.equal(sha(bytes), runtimeIdentity.files[path], `stale runtime source: ${path}`);
+    runtimeManifest += `${path}\0${runtimeIdentity.files[path]}\n`;
+  }
+  const overlay = sha(runtimeManifest);
+  assert.ok(new RegExp(`^source bundle verified sha256=${overlay}(?: operations_sha256=[0-9a-f]{64})? files=${Object.keys(runtimeIdentity.files).length} `, 'm').test(runtimeReceipt.log_tail),
+    'runtime source identity does not match verified remote overlay');
+  runtimeVectors = runtimeReceipt.log_tail.split('\n').map(line => line.match(/(?:^|: )ALLOC2_VERITY_VECTOR (.+)$/))
+    .filter(Boolean).map(match => JSON.parse(match[1]));
+  assert.equal(runtimeVectors.length, 11, 'missing/truncated Verity executions');
+  assert.equal(new Set(runtimeVectors.map(v => v.name)).size, 11);
+  assert.deepEqual(runtimeVectors, abiVectors, 'runtime and decoded ABI fixtures/outcomes differ');
+  runtimeEvidence = {job: runtimeReceipt.job_id, overlay, verity: runtimeIdentity.verity,
+    receiptSha256: sha(readFileSync(runtimeReceiptPath)), vectors: runtimeVectors.length};
+}
+
 const sources = {};
 const sourceHashes = {};
 for (const path of ['contracts/common/lib/MinFirstAllocationStrategy.sol', 'contracts/common/lib/Math256.sol']) {
@@ -151,6 +182,10 @@ try {
     await call(`byte-model:${vector.name}`, libraryIface.getFunction('allocate').selector + vector.arguments.slice(2),
       vector.data, libraryAddress, vector.reverted);
   }
+  for (const vector of runtimeVectors) {
+    await call(`verity-runtime:${vector.name}`, libraryIface.getFunction('allocate').selector + vector.arguments.slice(2),
+      vector.data, libraryAddress, vector.reverted);
+  }
   const max = (1n << 256n) - 1n;
   for (const [a, b, expected] of [[0n, 0n, 0n], [1n, 0n, null], [max, 1n, max], [max, max, 1n], [31n, 2n, 16n]]) {
     await call(`ceil:${a}:${b}`, iface.encodeFunctionData('ceil', [a, b]),
@@ -163,9 +198,11 @@ try {
   await call('malformed:offset-overflow-zero-demand', hugeOffset, '0x', target, true);
   await call('malformed:unknown-selector', '0xffffffff', '0x', target, true);
   const record = {
-    scope: 'pinned Solidity EVM vs executed decoded Lean; not Verity runtime or full parent correspondence',
+    scope: runtimeEvidence
+      ? 'pinned Solidity EVM vs decoded Lean and pinned Verity Contract.run; not compiler-memory or full parent correspondence'
+      : 'pinned Solidity EVM vs executed decoded Lean; not Verity runtime or full parent correspondence',
     leanJob: receipt.job_id, leanOverlay: manifestHash, leanReceiptSha256: sha(readFileSync(receiptPath)),
-    abiEvidence,
+    abiEvidence, runtimeEvidence,
     compiler: solc.version(), compilerInputSha256: sha(compilerInput), settings, solidityPin: pin, sourceHashes,
     runnerSha256: sha(readFileSync(fileURLToPath(import.meta.url))),
     packageLockSha256: sha(readFileSync(resolve(here, 'package-lock.json'))),
@@ -173,7 +210,7 @@ try {
     tests: results.length, results
   };
   writeFileSync(resolve(root, 'audit/trio/alloc2/solidity-execution.json'), JSON.stringify(record, null, 2) + '\n');
-  console.log(`PASS: ${results.length} exact return/revert byte comparisons; 32 decoded and ${abiVectors.length} byte-model Lean vectors; caller-copy boundary checked`);
+  console.log(`PASS: ${results.length} exact return/revert byte comparisons; 32 decoded, ${abiVectors.length} byte-model and ${runtimeVectors.length} Verity runtime vectors; caller-copy boundary checked`);
 } finally {
   provider.destroy();
   await vm.disconnect();
