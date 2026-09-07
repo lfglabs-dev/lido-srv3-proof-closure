@@ -150,7 +150,7 @@ theorem target_from_kernel_reply (external : External) (ctx : Context) (requeste
     WriterSpec.Target (Writers.project ctx after) requested.val
       (Writers.project ctx (run (setTarget external ctx requested) w).world) := by
   apply allowed external ctx requested w after
-  simpa only [hv, decide_true] using kernel_reply external ctx bufferReserveManagerRole value w after suffix hi hk hc hr
+  simpa [hv] using kernel_reply external ctx bufferReserveManagerRole value w after suffix hi hk hc hr
 
 
 end LidoSRv3.Audit.Source.TrioReserve1.Aragon
