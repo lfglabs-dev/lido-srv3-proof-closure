@@ -1293,7 +1293,9 @@
     {
       "id": "P-TOKEN-1",
       "assumptions": [
-        "A-SOURCE-SHAPED"
+        "A-SOURCE-SHAPED",
+        "A-SOLC-TRUSTED",
+        "A-RUNTIME-PROVENANCE"
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PToken1 LidoSRv3.Tests.WithdrawalQueueRequestCustodyMutants",
