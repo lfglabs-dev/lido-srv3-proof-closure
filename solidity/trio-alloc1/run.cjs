@@ -125,7 +125,25 @@ async function main() {
     const index=modules.findIndex(m=>m.target.toLowerCase()===target.toLowerCase());
     return index+':'+payload;
   });
-  const receipt={name:c.name,actual,expected:c.expected,calls,expectedCalls:c.calls,transaction:tx.hash,beforeState,afterState,committedEvents:txReceipt.logs,storageWrites:0};
+  let memoryArrays=null;
+  if (Array.isArray(actual)) {
+    const returned=trace.structLogs.findLast(x=>x.depth===1 && x.op==='RETURN');
+    assert(returned,c.name+' root return memory');
+    const bytes=returned.memory.join('');
+    const load=offset=>BigInt('0x'+bytes.slice(offset*2,(offset+32)*2));
+    // Exact successful allocation schedule of the pinned via-IR harness:
+    // root hash 128; arrays/cache, 160-byte cache rows, 224-byte config;
+    // each first-pass row uses 704 bytes, plus 160 for a WC2 stake call.
+    const allocationPointer=256;
+    const wc2=c.wc.slice(0,c.count).filter(x=>x===2).length;
+    const capacityPointer=544+928*c.count+160*wc2;
+    const decode=ptr=>{assert.equal(load(ptr),BigInt(c.count));return Array.from({length:c.count},(_,i)=>Number(load(ptr+32*(i+1))));};
+    const allocations=decode(allocationPointer),capacities=decode(capacityPointer);
+    assert.deepEqual([allocations,capacities],actual,c.name+' internal memory arrays');
+    assert(allocationPointer+32*(c.count+1)<=capacityPointer);
+    memoryArrays={allocationPointer,capacityPointer,allocations,capacities,freePointer:load(64).toString()};
+  }
+  const receipt={name:c.name,actual,expected:c.expected,calls,expectedCalls:c.calls,transaction:tx.hash,beforeState,afterState,committedEvents:txReceipt.logs,storageWrites:0,memoryArrays};
   receipts.push(receipt);
   fs.writeFileSync(path.join(out,'executions.json'),JSON.stringify(receipts,null,2));
   assert.deepEqual(actual,c.expected,c.name+' outcome');

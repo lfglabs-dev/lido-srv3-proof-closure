@@ -49,7 +49,8 @@ def solidityVectorsWith (run : Layout → Storage → StaticOracle → CapacityI
   array [
   vectorWith run "mixed" (storage 2 (packed 21 5000 0 1) (packed 22 5000 1 2)) honest,
   vectorWith run "underflow-before-stake" (seed 1 10000 0 2) underflow,
-  vectorWith run "late-rejection" (seed 2) lateReject,
+  vectorWith run "late-rejection" (seed 2)
+    (responseOracle (summary 0 1 1) [byte 0xde, byte 0xad] [] false true),
   vectorWith run "short-summary" (seed) (responseOracle (List.replicate 95 (byte 0)) [] []),
   vectorWith run "short-stake" (seed 1 10000 0 2)
     (responseOracle (summary 0 1 1) [] (List.replicate 31 (byte 0))),

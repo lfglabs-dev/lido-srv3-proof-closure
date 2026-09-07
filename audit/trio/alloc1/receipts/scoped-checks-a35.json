@@ -1,0 +1,38 @@
+[
+  {
+    "command": [
+      "python3",
+      "scripts/check_proof_escapes.py"
+    ],
+    "exit_code": 0,
+    "stdout": "proof-escape check ok: 235 project Lean files; no sorry/admit/axiom/constant/unsafe/Lean.ofReduceBool; native_decide inventory 46df09dbc9ae95a3196dc32ed3a6c0a2ea2369b13c3e7e910c78a73b9c701fb7\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "python3",
+      "scripts/check_source_annotations.py"
+    ],
+    "exit_code": 0,
+    "stdout": "source annotations: 720 citations checked, 0 false, 0 quote mismatches; transcribing declarations annotated: 95/142\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "python3",
+      "scripts/check_report_theorem_inventory.py"
+    ],
+    "exit_code": 0,
+    "stdout": "report theorem inventory ok: 8 P-ALLOC-1 theorems, 2 registered\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "python3",
+      "scripts/check_verity_provenance.py"
+    ],
+    "exit_code": 0,
+    "stdout": "e977aaad6e1a9e92e0132d41b3d33a14135a4d46\n",
+    "stderr": ""
+  }
+]
