@@ -107,6 +107,8 @@ MODULES = [
     "Audit/Source/TrioReserve1/CallbackRules",
     "Audit/Source/TrioReserve1/EntrySpec",
     "Audit/Source/TrioReserve1/EntryRules",
+    "Audit/Source/TrioReserve1/CalleeRules",
+    "Audit/Source/TrioReserve1/ReportVaults",
     "Tests/TrioReserve1/VaultCases",
     "Tests/TrioReserve1/ReportCases",
     "Tests/TrioReserve1/ReportDifferential",

@@ -1,3 +1,4 @@
+import LidoSRv3.Audit.Source.TrioReserve1.ReportVaults
 import LidoSRv3.Audit.Source.TrioReserve1.EntryRules
 import LidoSRv3.Audit.Source.TrioReserve1.CallbackRules
 import LidoSRv3.Audit.Source.TrioReserve1.VaultRules
@@ -482,3 +483,13 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms EntryRules.vaults_corresponds
 #print axioms EntryRules.callbacks_complete
 #print axioms EntryRules.vaults_complete
+
+#print axioms CalleeRules.calls_observations
+#print axioms CalleeRules.selector_observations
+#print axioms ReportVaults.callback_observations
+#print axioms ReportVaults.reward_observations
+#print axioms ReportVaults.withdrawal_observations
+#print axioms ReportVaults.vault_observations
+#print axioms ReportVaults.corresponds
+#print axioms ReportVaults.complete
+#print axioms ReportVaults.failure_restores

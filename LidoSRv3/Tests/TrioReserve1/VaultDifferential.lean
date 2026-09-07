@@ -1,5 +1,5 @@
 import LidoSRv3.Audit.Source.TrioReserve1.Report
-import LidoSRv3.Audit.Source.TrioReserve1.Vaults
+import LidoSRv3.Audit.Source.TrioReserve1.ReportVaults
 import Lean
 
 namespace LidoSRv3.Tests.TrioReserve1.VaultDifferential
@@ -63,11 +63,7 @@ def execute (j : Json) : Except String Json := do
     | none => .rejected [255]
     | some (_,_,data,reject) => if reject then .rejected data else .success data w
   let addr := Verity.Core.Address.ofNat
-  let rejected : External := fun _ _ => .rejected [255]
-  let callbacks := VaultCallbacks.dispatch boundary (addr self) rejected
-  let vaults := Vaults.dispatch callbacks (addr vault) (addr withdrawalVault) (addr self) rejected
-  let external : External := fun req w =>
-    if req.target.val = locator ∨ req.target.val = queue then boundary req w else vaults req w
+  let external := ReportVaults.external boundary (addr self) (addr vault) (addr withdrawalVault)
   let before : World := ⟨core, fun a => if a.val = self then balance else if a.val = queue then queueBalance else if a.val = vault then rewardBalance else if a.val = withdrawalVault then withdrawalBalance else 0, []⟩
   let r := run (Report.collect external ctx input) before
   let returned := match r.outcome with
