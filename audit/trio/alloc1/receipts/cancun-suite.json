@@ -1,0 +1,184 @@
+{
+  "scope": "Cancun source executions; prior Verity execution reused, not a fresh Lean build or universal compiler correspondence",
+  "head_at_start": "9423843213777d4d7482ecd1d7694e8dfaa7dd2a",
+  "source_sha256": {
+    "solidity/trio-alloc1/check-callback.cjs": "37521558d159c48d81e1530fd2105f479079fcc13005c6ac7ea5ce6f2e85842e",
+    "solidity/trio-alloc1/check-layout.cjs": "6e4142caa490a2c18f4886d72f5b867eaa0057b430d72281874e6a16422c35ad",
+    "solidity/trio-alloc1/check-proxy-initialization.cjs": "471b27c0d10e3c4d35048aebbf0a5e2a7517160f0d355aa25d01287d76ba4220",
+    "solidity/trio-alloc1/check-writer.cjs": "1b11d09071f92368746510032231d7a01458b54bf8b14612a264cba249f9f930",
+    "solidity/trio-alloc1/compiler-receipt.cjs": "9ee825fdd057e31322c7f82e7578f7935e1ea151b9534cdef1d325c72657a357",
+    "solidity/trio-alloc1/evm-backend.cjs": "cdc407d7d543211495e1860367b554aaf47c3809642c3b4753ec333fa307dfe4",
+    "solidity/trio-alloc1/hardhat.config.cjs": "edff287d29e897b1ecb4559f1c7e697a4d8afbd1a1d45c510a8c21057b76b468",
+    "solidity/trio-alloc1/run.cjs": "919200ea39abe9e5cf205d52994c9f770c152a2fa73a567402f976c05435b4f7",
+    "solidity/trio-alloc1/CallbackHarness.sol": "fca9bdc756d69caa30f097eb8a4e4fdfaa58f23cada17ac38718b932d77ae047",
+    "solidity/trio-alloc1/Harness.sol": "c8b7e6ef6a9e30f9fc50687e0c3e8dd589a31c4065ad2726eb95679427e18be0",
+    "solidity/trio-alloc1/WriterHarness.sol": "7292d6b607efac0eed50a234442f1a60451bb8bf8eadfcda21f82367f8905394",
+    "solidity/trio-alloc1/package-lock.json": "46c419963d738706203b671f13fe11549db7ef35dca79ff39f4c85e1d52e93b5",
+    "solidity/trio-alloc1/package.json": "7b217d22bfa7e78faa32240197c791f58cf582844aa6a1202142f4ef7795caeb",
+    "audit/trio/alloc1/validate-cancun.py": "21ea787e1fa872bc5f03e707e6a357013638fe7592db05da8b1824bb8437aec4"
+  },
+  "source_vectors_sha256": "eaac1882ec16fe743d11fd4b2309910896fcffe7d285f72a33a697c373c4ecde",
+  "verity_vectors_sha256": "d7716c9cc038e4a9d4d6e9252450a02113de78e32930a39eb3648769a8ecdd3a",
+  "steps": [
+    {
+      "name": "capacity",
+      "command": [
+        "node",
+        "solidity/trio-alloc1/run.cjs",
+        "/workspaces/mission-c01b16cf/output/cancun-final-v1/capacity",
+        "/workspaces/mission-c01b16cf/output/light-v25/vectors.json"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "passed": true,
+      "elapsed_seconds": 71.98051810264587
+    },
+    {
+      "name": "callback",
+      "command": [
+        "node",
+        "solidity/trio-alloc1/check-callback.cjs",
+        "/workspaces/mission-c01b16cf/output/cancun-final-v1/callback"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "passed": true,
+      "elapsed_seconds": 74.9033772945404
+    },
+    {
+      "name": "writer",
+      "command": [
+        "node",
+        "solidity/trio-alloc1/check-writer.cjs",
+        "/workspaces/mission-c01b16cf/output/cancun-final-v1/writer"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "passed": true,
+      "elapsed_seconds": 139.17907905578613
+    },
+    {
+      "name": "proxy",
+      "command": [
+        "node",
+        "solidity/trio-alloc1/check-proxy-initialization.cjs",
+        "/workspaces/mission-c01b16cf/output/cancun-final-v1/proxy",
+        "/workspaces/mission-c01b16cf/temp/proxy-tools"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "passed": true,
+      "elapsed_seconds": 90.029132604599
+    },
+    {
+      "name": "target-mutant",
+      "command": [
+        "node",
+        "solidity/trio-alloc1/run.cjs",
+        "/workspaces/mission-c01b16cf/output/cancun-final-v1/target-mutant",
+        "/workspaces/mission-c01b16cf/output/light-v25/vectors.json",
+        "target-only"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "passed": true,
+      "elapsed_seconds": 52.66725492477417
+    },
+    {
+      "name": "order-mutant",
+      "command": [
+        "node",
+        "solidity/trio-alloc1/run.cjs",
+        "/workspaces/mission-c01b16cf/output/cancun-final-v1/order-mutant",
+        "/workspaces/mission-c01b16cf/output/light-v25/vectors.json",
+        "stake-before-subtraction"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "passed": true,
+      "elapsed_seconds": 45.93419075012207
+    },
+    {
+      "name": "verity-comparison",
+      "command": [
+        "python3",
+        "audit/trio/alloc1/compare-executions.py",
+        "/workspaces/mission-c01b16cf/output/cancun-final-v1/capacity/executions.json",
+        "/workspaces/mission-c01b16cf/alloc1/audit/trio/alloc1/receipts/verity-vectors-876649b.json",
+        "/workspaces/mission-c01b16cf/output/cancun-final-v1/verity-comparison.json"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "passed": true,
+      "elapsed_seconds": 0.06191849708557129
+    }
+  ],
+  "source_unchanged": true,
+  "artifacts": {
+    "callback/callback.json": "7d58a128a740180d5ff881439ea260319e8a75665edc7962c43fc1642ffad081",
+    "callback/complete-compiler-1-input.json": "4e4524d80959648d68e7b4cf000403abe658abd979af811ceab1c2b6f78e76e1",
+    "callback/complete-compiler-1-output.json": "bee0140c0d2768f8c31912e58c8772e2f29215eda5c1baa8d1fd6d2f887d8b51",
+    "callback/complete-compiler-1-receipt.json": "b61d468c38b6fb4aab51ee11f3f8ef115f79d4577e73857e476d4cf83ef5fe25",
+    "callback/deployments.json": "79d5643f130be64ae8f89456e530f8c9cd2bc515ac8cb2403b586a4a3426efdd",
+    "callback.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "callback.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "capacity/compiler.json": "43deeced3a8f519a74eba52ff65dfb91c13c8fb613c4402a983cd6faa2206dbb",
+    "capacity/complete-compiler-1-input.json": "0970481916cd04e0e87d2c5baf6ef6876d15c84b0ea3a0cc4bb05a6420a05099",
+    "capacity/complete-compiler-1-output.json": "4042b84fb6e81da7b0cfee2fd3ebad63139a3076a17a20d840ef192cde516755",
+    "capacity/complete-compiler-1-receipt.json": "55f333fd3824adaae2c02d5d6daa775badf204863b3e533eb119dbc6dfc1a487",
+    "capacity/deployments.json": "48e9647889cd533a94d9bb09dcd02a20a7f0430f7aa3aded27b3ac22f3aabac9",
+    "capacity/executions.json": "efda0750963dd3ee9460ed242cff9af408ab8b6c6e51614a3d81bce6cd040396",
+    "capacity/harness.ir": "b695e4a998a92860d077c96931898cc5622b6854ca41535ea60a08d5fd642303",
+    "capacity.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "capacity.stdout": "093e12bfe0107517539ad63c7e8f9b1c6c924a4e765b651a8ab34aebb4e9cdf2",
+    "order-mutant/compiler.json": "7d56652610d4f776b890982d286f91ee166708d1516e364e99f91d195eb125c0",
+    "order-mutant/complete-compiler-1-input.json": "46faf69915c8a3bfb5c08053adc56911b1a72a0f06315bbb30c3ce4c3304375e",
+    "order-mutant/complete-compiler-1-output.json": "372b816e07844fab8b3d77ab95668a7928506212003362c185290cb30e4ab63b",
+    "order-mutant/complete-compiler-1-receipt.json": "d044afa42a0262ed43a1079f79ed62d4f5c82d1d0b3b59ca3e6d993017d602a2",
+    "order-mutant/deployments.json": "8ace4277ec31c2dbb243be12f20bcb8a57392d8efa2515a780847a93df91a0d5",
+    "order-mutant/executions.json": "a3e508d4761463c7ec235d04090647fa7d90f2ec8d7a638eddeae1542293448d",
+    "order-mutant/harness.ir": "bcf7709a911b0d8ea2ea30c9c060b0dc238e67a5988b5c384b55a835b9296102",
+    "order-mutant.stderr": "56ab8f167d060d44d39d3d867e18079fdfa2b7541a539bcbd1b6c8a7fb43c653",
+    "order-mutant.stdout": "9fed3e278b3bc5581442922ea22d7b06ffbab77cea73cb6cfdc07064dcbeec19",
+    "proxy/complete-compiler-1-input.json": "33b21f15cc009910d9e28a06c8778e8b5bf875302bac392fdf8cda8fe7d7ce68",
+    "proxy/complete-compiler-1-output.json": "d0d50ee5628746038f3c43b0d08a9bc7fde86eabc9514b8e2f446e2ac3a3bbbd",
+    "proxy/complete-compiler-1-receipt.json": "1c2a26ca0168a4aa6e47651038244d30427e118ff23c1968caa19c5f140f801f",
+    "proxy/complete-compiler-2-input.json": "88483b807b31a6dfc2868f9e06fac78e9738a9befa5f0cec64788b24dfbc4870",
+    "proxy/complete-compiler-2-output.json": "cdde8318e6b49ed834817eab46d19df0e6b75fab0a2b65eb831d480058fbba0c",
+    "proxy/complete-compiler-2-receipt.json": "29ad329aa232fc5ef0ea1b1738f1c76712170638939097096206979fde10f6d1",
+    "proxy/deployments.json": "fcd0f8309fe5a7a3ee7ecbc24a8e37e9e920df729a22f19eeb2390682b72a5c0",
+    "proxy/proxy-initialization.json": "81a0b956539d497e842c20485ebd52c44fdc316a18ed2f75fee9eb5ec2a541eb",
+    "proxy.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "proxy.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "target-mutant/compiler.json": "2d9cdcb0f48e0449150fce002a63ad5ddc8fe6bd186d77b741baa467ff916868",
+    "target-mutant/complete-compiler-1-input.json": "04430454aec8bca2891975c6759e7b028a116345283435b9a8248ba3a622597a",
+    "target-mutant/complete-compiler-1-output.json": "77b9362fe5804f7694320336d63ae7bdabea0d3942ebcba30c371dab4dffbb4a",
+    "target-mutant/complete-compiler-1-receipt.json": "a66477344cff6b56a3673fdc7cdfb8a13bd2eb9ad79136265b9c305e6fd28f01",
+    "target-mutant/deployments.json": "efd929a31d301468e0b7aaa16bad6ba32d615828f026b830597366e0955869a9",
+    "target-mutant/executions.json": "031bf70b2bb9230435e4308273e69e1af8c66ce02288ad5b4e4500eaec702dd1",
+    "target-mutant/harness.ir": "ea64fc9a3cb94f85de24d455ccaac2f0dc5a48021f966f987c0d8f63e02f255e",
+    "target-mutant.stderr": "3207cd1fd84ae2978461760fe07b646c7acc18c47d702484882691b06e1c86b9",
+    "target-mutant.stdout": "1f6de8946b9c5051c64d63b563fa80aed68fe0d2beaa59ae19b8dc95c6eb3e06",
+    "verity-comparison.json": "6ce8acc9dc2b991327bdabeadbd71d13ad3edfa219404b95d3cefe7e3d2fc96f",
+    "verity-comparison.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "verity-comparison.stdout": "312e7c9e209c3f99ae0961eb7a0c51d480988957b2350bb2beba17acc4d6d1ce",
+    "writer/acl.json": "eead965f0b8a411519c094634f57303e1e3265d41b0ae721fc890101fb9f45e5",
+    "writer/admission-name.json": "1a57e096e8ffafdf48a76b1fbe77b3c360aa7a921514dd02ca86bf0c12575621",
+    "writer/admission.json": "536f0e71a7c7b62a4bfff81ce256abccf3945d513002365828fae9b45da777a0",
+    "writer/complete-compiler-1-input.json": "71192adb8cdbd87867c44efe3848cba84df52cc4ab8376e51698871747ccdde6",
+    "writer/complete-compiler-1-output.json": "93bfafd99866b3846b94e1d9342bd5f07382e54f90022cfde0229a3d857a6563",
+    "writer/complete-compiler-1-receipt.json": "a14dd50d27ebd8d1df286f11238d84077f6594fbbc6f1b1053ca81fe02bc4a52",
+    "writer/deployments.json": "049decb0df8a12d2f3b6725a17735fa489c44b33745c70b3f9d870b8e55296b4",
+    "writer/enumeration-boundary.json": "c724d70f9861da72271aee662c662aa0325c525a95099c65819db230c239c60e",
+    "writer/initialization.json": "ec9b0ca69390eba5252df34057753a11f09816330bda08808cc16eab55ea54f5",
+    "writer/library.ir": "c4c51577e502a5f803599597f09239427579fa445183eb89a634f268fca2fa35",
+    "writer/parameters.json": "36036e25946966200f104a19f5dcdff7ec67343c672cfcceae1e010d5fe671af",
+    "writer/status.json": "7cbfa7a7dacfbcc1af83629b8064ce4035b067c9aa67cee62f091f894cca65d5",
+    "writer/writer-errors.json": "2c035635157fcac7edb39361c3e9bde4ce83b952563eccece8702bf2726c7ec8",
+    "writer/writer.ir": "f06fabaa4f7ad17e0dcd29dfe9bf0613830e3da39f273b632f798ccb6b513aef",
+    "writer/writer.json": "13d19a97cf14855e9c0f0bbb98ba53f081a767d2f0b079290779663decf20531",
+    "writer.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "writer.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "passed": true
+}

@@ -84,3 +84,10 @@ notification execution and empty-loop count derivation. The nonempty notificatio
 iteration, ACL revoke/renounce and proxy-deployment/lifecycle composition
 remain pending; FreshRecords preservation through empty-enumeration initialization is now proved,
 but these modules do not establish the complete lifecycle by themselves.
+
+Add ProxyGenesis to the owned production closure during integration. Its physical
+implementation-slot prefix removes the zero-storage-only starting-state restriction
+from the initializer invariant lemma; it does not complete proxy constructor
+semantics, ordinary-writer closure, migration or consumer composition. The
+remote-only RunFullValidation driver enumerates required build/test/static gates
+without modifying shared source roots in this branch.

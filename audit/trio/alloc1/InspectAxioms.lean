@@ -6,7 +6,7 @@ import LidoSRv3.Audit.Source.TrioAlloc1.WriterInvariant
 import LidoSRv3.Audit.Source.TrioAlloc1.AdmissionChecks
 import LidoSRv3.Audit.Source.TrioAlloc1.EnumerationWriter
 import LidoSRv3.Audit.Source.TrioAlloc1.AdmissionWriter
-import LidoSRv3.Audit.Source.TrioAlloc1.Initialization
+import LidoSRv3.Audit.Source.TrioAlloc1.ProxyGenesis
 import LidoSRv3.Audit.Source.TrioAlloc1.AllocationMemory
 import LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer
 import LidoSRv3.Tests.TrioAlloc1.Correspondence
@@ -49,3 +49,5 @@ import LidoSRv3.Tests.TrioAlloc1.Correspondence
 #print axioms LidoSRv3.Audit.Source.TrioAlloc1.Initialization.execute_from_empty
 
 #print axioms LidoSRv3.Audit.Source.TrioAlloc1.Initialization.execute_records
+
+#print axioms LidoSRv3.Audit.Source.TrioAlloc1.ProxyGenesis.initialization_invariants

@@ -16,7 +16,7 @@ function compile(compiler,file,settings,dependencyRoot){
 }
 const outputs={'*':{'*':['abi','evm.bytecode']}};
 const routerBuild=compile(solc,routerFile,{optimizer:{enabled:true,runs:200},viaIR:true,evmVersion:process.env.ALLOC1_EVM || 'shanghai',outputSelection:outputs},path.dirname(require.resolve('solc')));
-const proxyBuild=compile(proxySolc,proxyFile,{optimizer:{enabled:true,runs:200},evmVersion:'london',outputSelection:outputs},path.resolve(proxyTools));
+const proxyBuild=compile(proxySolc,proxyFile,{optimizer:{enabled:true,runs:200},evmVersion:process.env.ALLOC1_EVM === 'cancun' ? 'istanbul' : 'london',outputSelection:outputs},path.resolve(proxyTools));
 const hash=value=>require('node:crypto').createHash('sha256').update(value).digest('hex');
 const identities=build=>({compiler:build.compiler,settings:build.settings,sources:Object.fromEntries(Object.entries(build.sources).map(([name,text])=>[name,hash(text)]))});
 const words=(...xs)=>ethers.AbiCoder.defaultAbiCoder().encode(xs.map(()=> 'uint256'),xs);

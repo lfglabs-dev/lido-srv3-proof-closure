@@ -198,3 +198,22 @@ The first proxy-run attempt failed before compilation on a root-source JSON key
 (`contents` instead of `content`); the complete corrected rerun passed. The
 source-level initializer assignments may be combined by the optimizer into one
 SSTORE; the model does not claim equality of per-instruction write traces.
+
+## Production Cancun executions and proxy storage prefix
+
+See `cancun-validation.md` and the owned `validate-cancun.py` driver. Historical
+Shanghai receipts remain valid for their exact inputs and target. The new backend
+is Hardhat2.26.3 with Cancun and normal contract-size limits. Full compiler
+closures, creation/runtime objects, actual deployed code and each command's exit
+code are retained. Verity comparison to876649b reuses that older executed output.
+The new physical proxy-prefix proof passes 29 Init checks (`light-v26.json`) and
+fifteen selected axiom checks (`proxy-genesis-axioms.json`); this is not full remote
+production/trust validation.
+
+`RunFullValidation.lean` is a remote-only driver for the original four build
+roots plus the new producer/test closure, actual Verity execution, axiom inspection,
+make prove/test and static source gates. Invoke with the reviewed full-source
+wrapper only after checking no identical full build is live. It records all exits
+and fails if any gate fails. It must not run locally or overwrite the writer's
+canonical proof-report files. The local `make test` recheck still exits2 at
+`audit/ux2/index.json`; the owner/integrator must resolve this shared artifact.

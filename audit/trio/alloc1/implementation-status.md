@@ -81,8 +81,10 @@ count truncation or assumed callee success is introduced.
   monotonicity/limit on success, and a bounded allocation lemma. Integration of
   these primitives into the entire compiler execution remains open.
 
-Twenty-eight Init-only modules are included in the fresh light validation driver.
-All pass in `receipts/light-v25.json`.
+Twenty-nine Init-only modules are included in the fresh light validation driver.
+All pass in `receipts/light-v26.json`. Fifteen selected axiom checks, including
+`ProxyGenesis.initialization_invariants`, pass with only propext, Classical.choice
+and Quot.sound (`proxy-genesis-axioms.json`).
 The earlier five selected AdmissionFacts theorems use only propext, Classical.choice
 and Quot.sound (`admission-axioms-v1.json`).
 The six selected admission/history theorems use the same standard axioms
@@ -134,8 +136,11 @@ Pinned solc 0.8.25 via-IR/optimizer-200 Shanghai execution also checked:
 - Actual compiler storage layout and two executed parent-shaped mutants, plus
   formal witness theorems refuting the corresponding independent specification.
 
-The test harness uses Shanghai because its Ganache engine lacks Cancun support;
-these are pinned-source executions, not a production Cancun bytecode receipt.
+The preserved historical runs used Shanghai because Ganache lacks Cancun support.
+The added Hardhat 2.26.3 backend executes the production Cancun compiler target with
+normal contract-size limits. See `cancun-validation.md` for compiler/deployment
+receipts and the exact comparison boundary. Historical Shanghai evidence remains
+separate; Cancun execution does not close universal memory correspondence.
 
 ## Interface and coordination
 
@@ -192,3 +197,22 @@ then public grantRole/addStakingModule/updateModuleShares/setStakingModuleStatus
 reach a two-module state with checked physical identities/shares; duplicate
 admission rejects. This is actual reachable-state execution evidence, not the
 universal proxy-genesis/lifecycle theorem that remains required.
+
+`ProxyGenesis` now proves that the physical constructor implementation-slot prefix
+preserves empty enumeration and FreshRecords, and composes that state with
+initialization to derive both invariant predicates. It retains finite slot
+separation and excludes code-existence/dispatch/final-admin/lifecycle obligations.
+Those exclusions do not remove them from the original scope.
+
+Cancun source execution now passes the twelve capacity/error/memory vectors,
+nested callback case, complete public writer suite and both executed mutants
+(`cancun-suite.json`, archive `cancun-suite.tar.gz`). Hardhat2.26.3 enforces normal
+contract-size limits. The independent comparison reuses the exact Verity876649b
+outputs; it is not current-head full Lean validation. Compiler inputs/outputs and
+actual deployment code are included, with raw-byte deployment hashes.
+
+The fresh proxy lifecycle also passes with the pinned production compiler settings:
+solc0.8.9 Istanbul for OssifiableProxy and solc0.8.25 via-IR/optimizer200 Cancun for
+the router, both executed under Cancun with normal size limits. Exact source,
+compiler and deployed-bytecode receipts: `cancun-proxy-istanbul.json` and its archive.
+The earlier London proxy compatibility run is retained separately.

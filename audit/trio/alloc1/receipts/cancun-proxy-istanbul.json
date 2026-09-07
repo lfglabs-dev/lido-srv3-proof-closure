@@ -1,0 +1,34 @@
+{
+  "command": [
+    "node",
+    "solidity/trio-alloc1/check-proxy-initialization.cjs",
+    "/workspaces/mission-c01b16cf/output/cancun-proxy-istanbul",
+    "/workspaces/mission-c01b16cf/temp/proxy-tools"
+  ],
+  "exit_code": 0,
+  "source_sha256": {
+    "solidity/trio-alloc1/hardhat.config.cjs": "edff287d29e897b1ecb4559f1c7e697a4d8afbd1a1d45c510a8c21057b76b468",
+    "solidity/trio-alloc1/compiler-receipt.cjs": "9ee825fdd057e31322c7f82e7578f7935e1ea151b9534cdef1d325c72657a357",
+    "solidity/trio-alloc1/check-proxy-initialization.cjs": "b33527de428b7a8ed87f65d472d88bee7576df750adec80cc93ab08796d94a68",
+    "solidity/trio-alloc1/check-callback.cjs": "37521558d159c48d81e1530fd2105f479079fcc13005c6ac7ea5ce6f2e85842e",
+    "solidity/trio-alloc1/check-layout.cjs": "6e4142caa490a2c18f4886d72f5b867eaa0057b430d72281874e6a16422c35ad",
+    "solidity/trio-alloc1/run.cjs": "919200ea39abe9e5cf205d52994c9f770c152a2fa73a567402f976c05435b4f7",
+    "solidity/trio-alloc1/check-writer.cjs": "1b11d09071f92368746510032231d7a01458b54bf8b14612a264cba249f9f930",
+    "solidity/trio-alloc1/evm-backend.cjs": "cdc407d7d543211495e1860367b554aaf47c3809642c3b4753ec333fa307dfe4",
+    "solidity/trio-alloc1/package.json": "7b217d22bfa7e78faa32240197c791f58cf582844aa6a1202142f4ef7795caeb",
+    "solidity/trio-alloc1/package-lock.json": "46c419963d738706203b671f13fe11549db7ef35dca79ff39f4c85e1d52e93b5"
+  },
+  "source_unchanged": true,
+  "artifacts": {
+    "complete-compiler-2-receipt.json": "12ecfdb272281753dd254431bbc6d02adcc0f8d0aca695355ef12170174ce29d",
+    "deployments.json": "4f1a238878fff77219ac00eddc89d91779ed1542153b0a1d0c80cd55afd26407",
+    "complete-compiler-1-receipt.json": "1c2a26ca0168a4aa6e47651038244d30427e118ff23c1968caa19c5f140f801f",
+    "stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "complete-compiler-2-output.json": "be03d2253ebba22145f5bd56dcb8e9ffaa4055bd54b27c34c6896a5621b962f0",
+    "proxy-initialization.json": "2f21178474608b52149875e6c3fa4a02fa6a9e5438327ab6335fd054054e09b3",
+    "complete-compiler-1-input.json": "33b21f15cc009910d9e28a06c8778e8b5bf875302bac392fdf8cda8fe7d7ce68",
+    "complete-compiler-1-output.json": "d0d50ee5628746038f3c43b0d08a9bc7fde86eabc9514b8e2f446e2ac3a3bbbd",
+    "complete-compiler-2-input.json": "efd840f1e38515f11b8e6a92ee64ef0719e926424bae46ba9e1c51d72fd10245",
+    "stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}
