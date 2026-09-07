@@ -1,0 +1,49 @@
+[
+  {
+    "name": "mixed",
+    "actual": [
+      [
+        3,
+        3
+      ],
+      [
+        8,
+        3
+      ]
+    ],
+    "expected": [
+      [
+        3,
+        3
+      ],
+      [
+        8,
+        3
+      ]
+    ],
+    "calls": [
+      "0:9abddf09",
+      "1:9abddf09",
+      "1:0c852f5c"
+    ],
+    "expectedCalls": [
+      "0:9abddf09",
+      "1:9abddf09",
+      "1:0c852f5c"
+    ],
+    "transaction": "0xb21ec145b4c0db0d388e889f8164af5cd700574cc4256ea2097cbf193dddc508"
+  },
+  {
+    "name": "underflow-before-stake",
+    "actual": "0x0000000000000000000000000000000000000000000000000000000000000041",
+    "expected": "0x4e487b710000000000000000000000000000000000000000000000000000000000000011",
+    "calls": [
+      "0:9abddf09",
+      "0:0c852f5c"
+    ],
+    "expectedCalls": [
+      "0:9abddf09"
+    ],
+    "transaction": "0xb2e4b9e7f5be77dd14ca1ca0ab54570f7c816e35e8f7d6d34936cd1668a8de30"
+  }
+]

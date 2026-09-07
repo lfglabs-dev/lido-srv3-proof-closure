@@ -1,0 +1,355 @@
+{
+  "compiler": "0.8.25+commit.b61c2a91.Emscripten.clang",
+  "classification": "PINNED_COMPILER_LAYOUT_PASS",
+  "layout": {
+    "storage": [
+      {
+        "astId": 6,
+        "contract": "Layout.sol:LayoutWitness",
+        "label": "router",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_struct(RouterState)217_storage"
+      }
+    ],
+    "types": {
+      "t_address": {
+        "encoding": "inplace",
+        "label": "address",
+        "numberOfBytes": "20"
+      },
+      "t_array(t_bytes32)dyn_storage": {
+        "base": "t_bytes32",
+        "encoding": "dynamic_array",
+        "label": "bytes32[]",
+        "numberOfBytes": "32"
+      },
+      "t_bytes32": {
+        "encoding": "inplace",
+        "label": "bytes32",
+        "numberOfBytes": "32"
+      },
+      "t_enum(StakingModuleStatus)63": {
+        "encoding": "inplace",
+        "label": "enum StakingModuleStatus",
+        "numberOfBytes": "1"
+      },
+      "t_mapping(t_bytes32,t_uint256)": {
+        "encoding": "mapping",
+        "key": "t_bytes32",
+        "label": "mapping(bytes32 => uint256)",
+        "numberOfBytes": "32",
+        "value": "t_uint256"
+      },
+      "t_mapping(t_uint256,t_struct(ModuleState)199_storage)": {
+        "encoding": "mapping",
+        "key": "t_uint256",
+        "label": "mapping(uint256 => struct ModuleState)",
+        "numberOfBytes": "32",
+        "value": "t_struct(ModuleState)199_storage"
+      },
+      "t_string_storage": {
+        "encoding": "bytes",
+        "label": "string",
+        "numberOfBytes": "32"
+      },
+      "t_struct(ModuleState)199_storage": {
+        "encoding": "inplace",
+        "label": "struct ModuleState",
+        "members": [
+          {
+            "astId": 187,
+            "contract": "Layout.sol:LayoutWitness",
+            "label": "config",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_struct(ModuleStateConfig)157_storage"
+          },
+          {
+            "astId": 191,
+            "contract": "Layout.sol:LayoutWitness",
+            "label": "deposits",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_struct(ModuleStateDeposits)171_storage"
+          },
+          {
+            "astId": 195,
+            "contract": "Layout.sol:LayoutWitness",
+            "label": "accounting",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_struct(ModuleStateAccounting)179_storage"
+          },
+          {
+            "astId": 198,
+            "contract": "Layout.sol:LayoutWitness",
+            "label": "name",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_string_storage"
+          }
+        ],
+        "numberOfBytes": "128"
+      },
+      "t_struct(ModuleStateAccounting)179_storage": {
+        "encoding": "inplace",
+        "label": "struct ModuleStateAccounting",
+        "members": [
+          {
+            "astId": 175,
+            "contract": "Layout.sol:LayoutWitness",
+            "label": "validatorsBalanceGwei",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint64"
+          },
+          {
+            "astId": 178,
+            "contract": "Layout.sol:LayoutWitness",
+            "label": "exitedValidatorsCount",
+            "offset": 8,
+            "slot": "0",
+            "type": "t_uint64"
+          }
+        ],
+        "numberOfBytes": "32"
+      },
+      "t_struct(ModuleStateConfig)157_storage": {
+        "encoding": "inplace",
+        "label": "struct ModuleStateConfig",
+        "members": [
+          {
+            "astId": 137,
+            "contract": "Layout.sol:LayoutWitness",
+            "label": "moduleAddress",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_address"
+          },
+          {
+            "astId": 140,
+            "contract": "Layout.sol:LayoutWitness",
+            "label": "moduleFee",
+            "offset": 20,
+            "slot": "0",
+            "type": "t_uint16"
+          },
+          {
+            "astId": 143,
+            "contract": "Layout.sol:LayoutWitness",
+            "label": "treasuryFee",
+            "offset": 22,
+            "slot": "0",
+            "type": "t_uint16"
+          },
+          {
+            "astId": 146,
+            "contract": "Layout.sol:LayoutWitness",
+            "label": "stakeShareLimit",
+            "offset": 24,
+            "slot": "0",
+            "type": "t_uint16"
+          },
+          {
+            "astId": 149,
+            "contract": "Layout.sol:LayoutWitness",
+            "label": "priorityExitShareThreshold",
+            "offset": 26,
+            "slot": "0",
+            "type": "t_uint16"
+          },
+          {
+            "astId": 153,
+            "contract": "Layout.sol:LayoutWitness",
+            "label": "status",
+            "offset": 28,
+            "slot": "0",
+            "type": "t_enum(StakingModuleStatus)63"
+          },
+          {
+            "astId": 156,
+            "contract": "Layout.sol:LayoutWitness",
+            "label": "withdrawalCredentialsType",
+            "offset": 29,
+            "slot": "0",
+            "type": "t_uint8"
+          }
+        ],
+        "numberOfBytes": "32"
+      },
+      "t_struct(ModuleStateDeposits)171_storage": {
+        "encoding": "inplace",
+        "label": "struct ModuleStateDeposits",
+        "members": [
+          {
+            "astId": 161,
+            "contract": "Layout.sol:LayoutWitness",
+            "label": "lastDepositAt",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint64"
+          },
+          {
+            "astId": 164,
+            "contract": "Layout.sol:LayoutWitness",
+            "label": "lastDepositBlock",
+            "offset": 8,
+            "slot": "0",
+            "type": "t_uint64"
+          },
+          {
+            "astId": 167,
+            "contract": "Layout.sol:LayoutWitness",
+            "label": "maxDepositsPerBlock",
+            "offset": 16,
+            "slot": "0",
+            "type": "t_uint64"
+          },
+          {
+            "astId": 170,
+            "contract": "Layout.sol:LayoutWitness",
+            "label": "minDepositBlockDistance",
+            "offset": 24,
+            "slot": "0",
+            "type": "t_uint64"
+          }
+        ],
+        "numberOfBytes": "32"
+      },
+      "t_struct(RouterState)217_storage": {
+        "encoding": "inplace",
+        "label": "struct RouterState",
+        "members": [
+          {
+            "astId": 204,
+            "contract": "Layout.sol:LayoutWitness",
+            "label": "moduleStates",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_mapping(t_uint256,t_struct(ModuleState)199_storage)"
+          },
+          {
+            "astId": 207,
+            "contract": "Layout.sol:LayoutWitness",
+            "label": "moduleIds",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_struct(UintSet)785_storage"
+          },
+          {
+            "astId": 210,
+            "contract": "Layout.sol:LayoutWitness",
+            "label": "accounting",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_struct(RouterStateAccounting)183_storage"
+          },
+          {
+            "astId": 212,
+            "contract": "Layout.sol:LayoutWitness",
+            "label": "withdrawalCredentials",
+            "offset": 0,
+            "slot": "4",
+            "type": "t_bytes32"
+          },
+          {
+            "astId": 214,
+            "contract": "Layout.sol:LayoutWitness",
+            "label": "lastModuleId",
+            "offset": 0,
+            "slot": "5",
+            "type": "t_uint24"
+          },
+          {
+            "astId": 216,
+            "contract": "Layout.sol:LayoutWitness",
+            "label": "maxTopUpPerBlockGwei",
+            "offset": 3,
+            "slot": "5",
+            "type": "t_uint64"
+          }
+        ],
+        "numberOfBytes": "192"
+      },
+      "t_struct(RouterStateAccounting)183_storage": {
+        "encoding": "inplace",
+        "label": "struct RouterStateAccounting",
+        "members": [
+          {
+            "astId": 182,
+            "contract": "Layout.sol:LayoutWitness",
+            "label": "validatorsBalanceGwei",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint64"
+          }
+        ],
+        "numberOfBytes": "32"
+      },
+      "t_struct(Set)313_storage": {
+        "encoding": "inplace",
+        "label": "struct EnumerableSet.Set",
+        "members": [
+          {
+            "astId": 308,
+            "contract": "Layout.sol:LayoutWitness",
+            "label": "_values",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_array(t_bytes32)dyn_storage"
+          },
+          {
+            "astId": 312,
+            "contract": "Layout.sol:LayoutWitness",
+            "label": "_positions",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_mapping(t_bytes32,t_uint256)"
+          }
+        ],
+        "numberOfBytes": "64"
+      },
+      "t_struct(UintSet)785_storage": {
+        "encoding": "inplace",
+        "label": "struct EnumerableSet.UintSet",
+        "members": [
+          {
+            "astId": 784,
+            "contract": "Layout.sol:LayoutWitness",
+            "label": "_inner",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_struct(Set)313_storage"
+          }
+        ],
+        "numberOfBytes": "64"
+      },
+      "t_uint16": {
+        "encoding": "inplace",
+        "label": "uint16",
+        "numberOfBytes": "2"
+      },
+      "t_uint24": {
+        "encoding": "inplace",
+        "label": "uint24",
+        "numberOfBytes": "3"
+      },
+      "t_uint256": {
+        "encoding": "inplace",
+        "label": "uint256",
+        "numberOfBytes": "32"
+      },
+      "t_uint64": {
+        "encoding": "inplace",
+        "label": "uint64",
+        "numberOfBytes": "8"
+      },
+      "t_uint8": {
+        "encoding": "inplace",
+        "label": "uint8",
+        "numberOfBytes": "1"
+      }
+    }
+  }
+}
