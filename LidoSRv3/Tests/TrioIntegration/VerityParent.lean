@@ -1,17 +1,17 @@
 import LidoSRv3.Audit.Source.TrioComposition.VerityParent
 import LidoSRv3.Tests.TrioIntegration.ParentFixtures
-import LidoSRv3.Tests.TrioAlloc1.VerityVectors
+import LidoSRv3.Tests.TrioIntegration.VMFixtures
 
 namespace LidoSRv3.Tests.TrioIntegration.VerityParent
 open LidoSRv3.Audit.Source
 open TrioAlloc1 TrioComposition ParentFixtures
 
 private def check (name : String) (count status unit amount : Nat) (oracle : StaticOracle) : IO Unit := do
-  let world := LidoSRv3.Tests.TrioAlloc1.vmWorld (storage count status)
-  let actual := TrioComposition.VerityParent.execute layout (config unit) (word amount) false
-    (LidoSRv3.Tests.TrioAlloc1.vmAdversary oracle)
+  let world := VMFixtures.vmWorld (storage count status)
+  let actual := TrioComposition.VerityParent.execute ParentFixtures.layout (config unit) (word amount) false
+    (VMFixtures.vmAdversary oracle)
     { world, gasRemaining := 2^256-1 } []
-  let expected := getDepositAllocationsABI layout (storage count status) oracle
+  let expected := getDepositAllocationsABI ParentFixtures.layout (storage count status) oracle
     (config unit) (word amount) false []
   let sameResult := match actual.1.1, expected.1 with
     | .ok a, .ok b => decide (a = b)
