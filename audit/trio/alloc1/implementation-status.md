@@ -206,7 +206,7 @@ Those exclusions do not remove them from the original scope.
 
 Cancun source execution now passes the twelve capacity/error/memory vectors,
 nested callback case, complete public writer suite and both executed mutants
-(`cancun-suite.json`, archive `cancun-suite.tar.gz`). Hardhat2.26.3 enforces normal
+(`cancun-suite.json`, archive `cancun-suite.tar.xz`). Hardhat2.26.3 enforces normal
 contract-size limits. The independent comparison reuses the exact Verity876649b
 outputs; it is not current-head full Lean validation. Compiler inputs/outputs and
 actual deployment code are included, with raw-byte deployment hashes.

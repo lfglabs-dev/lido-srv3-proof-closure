@@ -56,7 +56,7 @@ transition and whole lifecycle relation are still open.
 `receipts/cancun-suite.json` records seven completed steps: capacity, callback,
 writer and London-proxy compatibility runs exit0; target-only and call-order
 mutants exit1 on recorded behavioral mismatches; the preserved-Verity comparison
-exits0. `receipts/cancun-suite.tar.gz` contains the complete compiler inputs,
+exits0. `receipts/cancun-suite.tar.xz` contains the complete compiler inputs,
 outputs, actual deployed code, transactions, per-case observations and command
 logs. Every member is hashed in the suite receipt. Durable job
 `1c4cbd90-04b4-4709-b7ec-8aa7e1dfb6e9` exited0.
@@ -67,6 +67,13 @@ steps and their executable sources are unchanged. Initial exploratory Cancun
 runs and all historical Shanghai receipts remain preserved.
 
 `receipts/cancun-proxy-istanbul.json` records exit0 for the corrected production
-compiler configuration. Its adjacent `.tar.gz` holds both compiler closures and
+compiler configuration. Its adjacent `.tar.xz` holds both compiler closures and
 all deployment/lifecycle evidence. Durable job
 `9f37466c-a88c-4569-8a98-ab9fe4724940` completed the run.
+
+The original gzip archives are preserved at db4a6fd. Their losslessly recompressed
+xz versions contain byte-identical uncompressed tar streams; hashes and sizes are
+in `receipts/cancun-lossless-recompression.json`. This saves 1,102,307 bytes while
+retaining every compiler input/output, deployment and execution observation, so
+the complete-source request fits the receiver's 16 MiB source limit. The receiver
+rejected the earlier larger snapshot before compilation; no source was omitted.
