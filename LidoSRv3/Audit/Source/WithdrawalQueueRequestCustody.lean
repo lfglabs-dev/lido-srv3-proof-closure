@@ -65,8 +65,8 @@ def applySteps (transfer : Address → Address → Address → State → Option 
 by recursion over the chain so the intermediate states are part of the claim:
 a hop's `fromAddr` is the owner of its pre-state (line 238), its caller is that
 same address (lines 241--245), it moves the request to a distinct nonzero
-recipient (lines 231--232), and whatever state the transfer returns, the rest
-of the chain is owner-operated from there.  A per-step conjunct that never
+recipient (lines 231--232), the returned state installs that recipient as
+owner (line 248), and the rest of the chain is owner-operated from there.  A per-step conjunct that never
 looked at the pre-state owner would let a transfer without the line-238 guard
 satisfy the parent, which is exactly what this definition forbids. -/
 def OwnerOperated (transfer : Address → Address → Address → State → Option State) :
@@ -76,7 +76,7 @@ def OwnerOperated (transfer : Address → Address → Address → State → Opti
       step.fromAddr = s.owner ∧ step.caller = step.fromAddr ∧
         step.to ≠ 0 ∧ step.to ≠ step.fromAddr ∧
         ∀ s', transfer step.caller step.fromAddr step.to s = some s' →
-          OwnerOperated transfer s' rest
+          s'.owner = step.to ∧ OwnerOperated transfer s' rest
 
 /-- **The P-TOKEN-1 parent predicate.**  Universal over the unmodeled minting
 function, the request inputs, and an arbitrary chain of later custody hops. -/
@@ -143,7 +143,7 @@ theorem custody_chain_preserved :
           intro s'' hs
           rw [hStep] at hs
           injection hs with hs
-          exact hs ▸ hRest
+          exact hs ▸ ⟨by rw [hState], hRest⟩
 
 /-- The created owner is never the zero address: the line-130 fallback selects
 a nonzero caller, and an explicitly supplied owner is nonzero by definition of

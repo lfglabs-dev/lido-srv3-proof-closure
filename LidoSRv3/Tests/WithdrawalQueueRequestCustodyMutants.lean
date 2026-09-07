@@ -3,7 +3,7 @@ import LidoSRv3.Audit.Source.WithdrawalQueueRequestCustody
 /-!
 # P-TOKEN-1 exact-parent kill-lines
 
-Each mutant below deletes exactly one guard of the pinned source at
+Each mutant below changes one guard or write of the bounded model mapped to
 `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b` and refutes the
 **same** `RequestOwnerCustodyInvariant` predicate proved for the honest
 composition, so the parent is not tautological on either leg.
@@ -110,5 +110,34 @@ theorem owner_fallback_drop_kill_line_refutes_exact_parent :
   have hStep := h witnessMint witnessMint_binds_owner 7 0 minStethWithdrawalAmount 0
     [] { owner := 0, approved := 0 } (by decide) (by decide) (by decide)
   exact hStep.2.2.2.1 rfl
+
+/-- Mutant E retains every modeled guard but omits the recipient ownership
+write. It clears approval just like the honest model. -/
+def sourceTransferOwnershipWriteDropped
+    (caller fromAddr to : Nat) (s : State) : Option State :=
+  if to = 0 then none
+  else if to = fromAddr then none
+  else if s.owner != fromAddr then none
+  else if caller != fromAddr then none
+  else some { owner := s.owner, approved := 0 }
+
+/-- Omitting the ownership handoff refutes the same registered parent. -/
+theorem ownership_write_drop_kill_line_refutes_exact_parent :
+    ¬ RequestOwnerCustodyInvariant
+        requestWithdrawalsSingleControl sourceTransferOwnershipWriteDropped := by
+  intro h
+  have hStep := h witnessMint witnessMint_binds_owner 7 0 minStethWithdrawalAmount 7
+    [⟨7, 7, 3⟩] { owner := 7, approved := 0 } (by decide) (by decide) (by decide)
+  have hOp := hStep.2.2.2.2
+  have hOwner := (hOp.2.2.2.2 { owner := 7, approved := 0 } (by decide)).1
+  exact absurd hOwner (by decide)
+
+/-- The mutant keeps the honest decision to accept or reject a hop. Only
+its successful ownership update differs. -/
+theorem ownership_write_mutant_preserves_admission (caller fromAddr to : Nat) (s : State) :
+    (sourceTransferOwnershipWriteDropped caller fromAddr to s).isSome =
+      (sourceTransfer caller fromAddr to s).isSome := by
+  simp only [sourceTransferOwnershipWriteDropped, sourceTransfer]
+  repeat' first | split | rfl
 
 end LidoSRv3.Tests.WithdrawalQueueRequestCustodyMutants

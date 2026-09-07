@@ -572,3 +572,6 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Common.BoundedAmount.checkedAdd_sound
 #print axioms LidoSRv3.Audit.Common.revert_rolls_back_state_and_committed_effects
 #print axioms LidoSRv3.Audit.Common.success_exposes_exact_committed_effects
+
+#print axioms LidoSRv3.Tests.WithdrawalQueueRequestCustodyMutants.ownership_write_drop_kill_line_refutes_exact_parent
+#print axioms LidoSRv3.Tests.WithdrawalQueueRequestCustodyMutants.ownership_write_mutant_preserves_admission
