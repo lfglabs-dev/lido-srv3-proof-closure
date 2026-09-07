@@ -1,0 +1,24 @@
+{
+  "classification": "SOLIDITY_WRITERS_PASS",
+  "durable_job": "6af28735-62ea-418b-8695-5f8fd20b95a3",
+  "command": "node solidity/trio-alloc1/check-writer.cjs /workspaces/mission-c01b16cf/output/admission-name-v2",
+  "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "sources": {
+    "solidity/trio-alloc1/check-writer.cjs": "fb4e1c424b197a9ad1f837eba70abe44fb9acdac846d2658da4ce63444b13176",
+    "solidity/trio-alloc1/WriterHarness.sol": "05975651d6d06e9fc8a88d5bf7127b30002d6dfd12c75b74ebc4cbb04987e691"
+  },
+  "outputs": {
+    "writer.ir": "374a20a586c9319a9c7b980d5360c7f0d526754990135f0d58f0b1c826bd9c1f",
+    "admission.json": "c372137ea9b6e7cc4a82a3c864a88cf104d85a042bdcae3a0b943cb07a152b67",
+    "writer-errors.json": "4205ce9992532ee46ccd06d533752da75029393f374de696745f6933c0208a84",
+    "admission-name.json": "15b448346a4216057d72fdc42decfb30ccc4168626df793397bf5703d8d709c8",
+    "writer.json": "be9866e2c64fdd89cf2889a20491acdcad096330fc913ef3d0392da6fea07624",
+    "parameters.json": "a694f24b6576b8d2dc079e4c4a508bd9ac9c044518c7045a5d315511f6e8763d",
+    "library.ir": "1bdafb949cdf3999cd44cc20fc608094a807966feecadc9f71c022e31b08e4fa"
+  },
+  "notes": [
+    "Solc 0.8.25, viaIR, optimizer 200, Shanghai; inherited public StakingRouter entry points.",
+    "Earlier admission-name-v1 failed in harness BigInt parsing of Ganache zero storage 0x; corrected reader and reran all cases.",
+    "String storage IR excerpt below preserves actual wrapped endpoint comparison; not a compiler memory/gas proof."
+  ]
+}

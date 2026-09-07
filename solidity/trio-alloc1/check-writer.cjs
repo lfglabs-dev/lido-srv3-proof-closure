@@ -9,6 +9,8 @@ assert.equal(pin,'17005714f151e5502c559932319a3f2f74ac2436');assert.match(solc.v
 const settings={optimizer:{enabled:true,runs:200},viaIR:true,evmVersion:'shanghai',outputSelection:{'*':{'*':['abi','evm.bytecode','irOptimized']}}};
 const compilation=JSON.parse(solc.compile(JSON.stringify({language:'Solidity',sources:{'WriterHarness.sol':{content:fs.readFileSync(path.join(__dirname,'WriterHarness.sol'),'utf8')}},settings}),{import:name=>{try{return {contents:fs.readFileSync(name.startsWith('@')?require.resolve(name):path.join(root,'lido-core',name),'utf8')}}catch(e){return {error:e.message}}}}));
 const errors=(compilation.errors||[]).filter(x=>x.severity==='error');assert.equal(errors.length,0,errors.map(x=>x.formattedMessage).join('\n'));
+fs.writeFileSync(path.join(out,'writer.ir'),compilation.contracts['WriterHarness.sol'].WriterHarness.irOptimized);
+fs.writeFileSync(path.join(out,'library.ir'),compilation.contracts['contracts/0.8.25/sr/SRLib.sol'].SRLib.irOptimized);
 const words=(...xs)=>ethers.AbiCoder.defaultAbiCoder().encode(xs.map(()=> 'uint256'),xs);
 async function main(){
  const rpc=ganache.provider({logging:{quiet:true},chain:{hardfork:'shanghai',allowUnlimitedContractSize:true},wallet:{deterministic:true}});
@@ -23,7 +25,7 @@ async function main(){
  const acl=BigInt('0x02dd7bc7dec4dceedda775e58dd541e08a116c6c53815c0bd028192f7b626800');
  const member=BigInt(ethers.keccak256(words(BigInt(caller),BigInt(ethers.keccak256(words(BigInt(role),acl))))));
  const slot=BigInt(ethers.keccak256(words(7n,base))),position=BigInt(ethers.keccak256(words(7n,base+2n)));
- const write=async(s,v)=>await(await h.writeSlot(s,v)).wait();const read=async s=>BigInt(await rpc.request({method:'eth_getStorageAt',params:[address,ethers.toBeHex(s),'latest']})||'0x0');
+ const write=async(s,v)=>await(await h.writeSlot(s,v)).wait();const read=async s=>{const raw=await rpc.request({method:'eth_getStorageAt',params:[address,ethers.toBeHex(s),'latest']});return raw==='0x'?0n:BigInt(raw||'0x0');};
  const original=(0xabcdefn<<232n)|(2n<<224n)|(9999n<<208n)|(9000n<<192n)|(0x12345678n<<160n)|21n;
  await write(slot,original);await write(position,1n);await write(member,1n);
  const tx=await h.updateModuleShares(7,5000,7000),receipt=await tx.wait();const actual=await read(slot);
@@ -134,6 +136,22 @@ async function main(){
  updated.logs.forEach((log,i)=>{assert.deepEqual([...log.topics],[ethers.id(expectedEvents[i][0]),ethers.toBeHex(1,32)]);assert.equal(log.data,words(...expectedEvents[i][1],BigInt(caller)));});
  parameterChecks.push({name:'parameter-success-packed-storage-and-events',status:1,config:ethers.toBeHex(configAfter,32),deposits:ethers.toBeHex(depositsAfter,32),events:updated.logs.map(x=>({topics:x.topics,data:x.data}))});
  fs.writeFileSync(path.join(out,'parameters.json'),JSON.stringify({pin,compiler:solc.version(),checks:parameterChecks},null,2));
+ const nameSlot=newSlot+3n,nameData=BigInt(ethers.keccak256(words(nameSlot)));
+ await write(base+1n,0n);await write(base+5n,0n);await write(newPosition,0n);await write(nameSlot,64n);
+ let malformed;try{await h.addStakingModule.staticCall('module',moduleAddress,config);assert.fail('expected malformed storage name');}catch(e){malformed=e.data;}
+ assert.equal(malformed,'0x4e487b71'+words(34).slice(2));
+ await write(nameSlot,65n);await write(nameData,0xdeadn);
+ const renamed=await(await h.addStakingModule('module',moduleAddress,config)).wait();
+ const nameWord=BigInt(ethers.hexlify(ethers.toUtf8Bytes('module')))<<208n|12n;
+ assert.equal(await read(nameSlot),nameWord);assert.equal(await read(nameData),0n);
+ const block=await provider.getBlock(renamed.blockNumber),depositWord=await read(newSlot+1n);
+ assert.equal(depositWord&((1n<<64n)-1n),BigInt(block.timestamp));
+ assert.equal((depositWord>>64n)&((1n<<64n)-1n),BigInt(renamed.blockNumber));
+ assert.equal(renamed.logs.length,6);
+ assert.equal(renamed.logs[0].data,ethers.AbiCoder.defaultAbiCoder().encode(['address','string','address'],[moduleAddress,'module',caller]));
+ assert.deepEqual([...renamed.logs[5].topics],[ethers.id('StakingRouterETHDeposited(uint256,uint256)'),ethers.toBeHex(1,32)]);
+ assert.equal(renamed.logs[5].data,words(0));
+ fs.writeFileSync(path.join(out,'admission-name.json'),JSON.stringify({pin,compiler:solc.version(),malformedOldNameRevert:malformed,longNameDataCleared:true,shortNameWord:ethers.toBeHex(nameWord,32),depositWord:ethers.toBeHex(depositWord,32),timestamp:block.timestamp,blockNumber:renamed.blockNumber,events:renamed.logs.map(x=>({topics:x.topics,data:x.data}))},null,2));
  }finally{await rpc.disconnect();}
 }
 main().catch(e=>{console.error(e);process.exitCode=1;});

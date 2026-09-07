@@ -38,11 +38,16 @@ count truncation or assumed callee success is introduced.
   preservation of one-based position consistency under finite slot separation.
   Consistency derives uniqueness of enumerated IDs; it is not yet composed with
   all admission/configuration/migration writes.
+- `StringStorage`, `AdmissionWriter`: complete public admission storage transition
+  and six committed events, including malformed-name panic 0x22, long-name cleanup
+  with wrapped range endpoints, uint24 ID, parameter helper, last-deposit fields,
+  and public-entry rollback. Successful execution derives entry count and freshness.
+  Reachable-state invariant induction through this transition remains open.
 - `AllocationMemory`: exact word rounding, oversized-array panic 0x41, allocation
   monotonicity/limit on success, and a bounded allocation lemma. Integration of
   these primitives into the entire compiler execution remains open.
 
-Twenty-one Init-only modules are included in the fresh light validation driver.
+Twenty-three Init-only modules are included in the fresh light validation driver.
 The full production/test/audit-trust/legacy build passed 1,505 jobs at
 `8269ac576cf119975a7e9954459cd4aa04d5cd82`, remote job
 `3ca9d1e4-e496-43f7-87f2-a5925a9bd083` on nippur. This is **STALE_SUCCESS** for
@@ -71,6 +76,11 @@ Pinned solc 0.8.25 via-IR/optimizer-200 Shanghai execution also checked:
 - Public parameter update: seven exact rejection-order cases (all before writes)
   and a successful two-word update preserving reserved/address/deposit-time bits,
   with all four event topics/data checked (`parameters.json`).
+- Admission name storage: panic 0x22 for malformed old encoding, cleanup of an old
+  long-name data slot, exact short-name word, timestamp/block fields and dynamic
+  added-event/final deposit-event ABI (`admission-name.json`). The final writer
+  rerun and source/output hashes are in `writer-validation.json`; the relevant
+  optimized compiler excerpt is in `string-storage.ir`.
 - Nested read callback and rejected mutation CALL under static context: expected
   three call sites, unchanged module storage, no events (`callback.json`).
 - Actual compiler storage layout and two executed parent-shaped mutants, plus
@@ -108,9 +118,9 @@ Infrastructure diagnostics and measured estimates are recorded in `reproduce.md`
 and `receipts/remote-admission-sizing.json`. The full build uses 5 GiB; the measured
 small Verity vector closure uses 2 GiB. The emergency disk floor is unchanged.
 
-Latest completed owned closure: remote job f31a614d-2f15-468e-866f-82865148a96a
-passed 49 jobs at 4aa9557e288b5ca0d6c4e4c41caffbcd213bdffd, inspected fifteen
+Latest completed owned closure: remote job 78ecbf4e-d80a-4142-ae21-e6d7ab976c37
+passed 50 jobs at 8691c7881a863715ab5ec9b39631ab41243e7c91, inspected eighteen
 critical theorems (only propext, Classical.choice, Quot.sound), and reran all twelve
 Verity fixtures. The independently executed Solidity comparison passed again.
-Receipts: verity-trust-4aa9557.json and solidity-verity-4aa9557.json. This closure
-does not yet include ParameterWriter and does not replace current-head full-suite validation.
+Receipts: verity-trust-8691c78.json and solidity-verity-8691c78.json. This closure
+does not yet include AdmissionWriter/StringStorage and does not replace current-head full-suite validation.
