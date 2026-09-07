@@ -4,7 +4,7 @@
 
 ## Decision
 
-Review basis: recorded input set (allocation disclosure and boundary amendment; no parent upgrade) `e85660ee15d16497810cc7321aaaaf8dd1fd0a22`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
+Review basis: normal merge of the landed source-fidelity-A input with the MinFirst boundary amendment (no parent upgrade) `6a2a91341ac83c8fbf93dfa274897387e5b8a188`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
 
 ## Architecture and evidence boundary
 
@@ -18,7 +18,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 | Claim | Abstract | Verity | Fidelity gaps | Classification |
 | --- | --- | --- | --- | --- |
-| [`P-ALLOC-1`](#p-alloc-1) | CHECKED | CHECKED | 3 open | **IMPLEMENTATION_PENDING** |
+| [`P-ALLOC-1`](#p-alloc-1) | CHECKED | CHECKED | 4 open | **IMPLEMENTATION_PENDING** |
 | [`P-ALLOC-2`](#p-alloc-2) | CHECKED | CHECKED | 4 open | **IMPLEMENTATION_PENDING** |
 | [`P-DEPOSIT-1`](#p-deposit-1) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
 | [`P-TOPUP-1`](#p-topup-1) | CHECKED | CHECKED | 1 open | **IMPLEMENTATION_PENDING** |
@@ -60,11 +60,12 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
 
-**Limitations — 3 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+**Limitations — 4 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
 - unique moduleAddress on addModule
 - getDepositAllocations / MinFirst fill (see P-ALLOC-2)
 - reachable-router CheckedBounds
+- Contract.run rollback after intermediate writes for AllocationTx.allocate; the cited revert_restores_snapshot theorem does not cover allocateLiveFromStorage
 
 **Classification.** **IMPLEMENTATION_PENDING** — Keep the checked execute parent and the live-summary/type-2-stake/packed-config transaction correspondence. Reachable-router CheckedBounds and unique moduleAddress remain strengthening obligations; do not widen to getDepositAllocations or P-ALLOC-2, and do not re-fold the min-clamp tautology.
 

@@ -23,8 +23,8 @@ import markdown_text  # noqa: E402  (sibling module, located above)
 
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
-R1_REVIEW_BASE = "e85660ee15d16497810cc7321aaaaf8dd1fd0a22"
-# The report records this commit as its allocation disclosure and boundary input basis.  Keep the exact
+R1_REVIEW_BASE = "6a2a91341ac83c8fbf93dfa274897387e5b8a188"
+# The report records the normal source-fidelity-A reconciliation merge as its input basis. Keep the exact
 # generator inputs bound both to that Git object and to their expected bytes:
 # a changed registry, source map, or Trust allowlist must not be presented as
 # if it had that review.
@@ -32,7 +32,7 @@ R1_REVIEW_BASE = "e85660ee15d16497810cc7321aaaaf8dd1fd0a22"
 # report.  A normal regeneration may never pair changed family content with a
 # stale certified basis.
 R1_REPORT_INPUT_SHA256 = {
-    "audit/guarantees.yaml": "19ad54e73791465cb8ebf3321ddb0a5a8338c1a04e9f2587ef3c5d197f0b8495",
+    "audit/guarantees.yaml": "22d2420714906d566f6250ddc5b0b50d0815567f0e8212ce37d4fd1ac34bed30",
     "audit/source-map.yaml": "2a89d6b67bf8ce9ec0ab9ad6782bee4cba5a904c5b337ea13f813cdde938ca74",
     "audit/trust-native-decide-allowlist.txt": "4874951cd0717f16756f3f644c424f06bdbbfcca1561173b32fd134b1fb6730c",
 }
@@ -780,7 +780,7 @@ def rendered(rows, source_map):
         gap_note = "No row is gap-free."
     report = [header + "# R1 final auditor report\n\n",
         "## Decision\n\n",
-        f"Review basis: recorded input set (allocation disclosure and boundary amendment; no parent upgrade) `{R1_REVIEW_BASE}`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.\n\n",
+        f"Review basis: normal merge of the landed source-fidelity-A input with the MinFirst boundary amendment (no parent upgrade) `{R1_REVIEW_BASE}`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.\n\n",
         "## Architecture and evidence boundary\n\n",
         "The evidence stack is: pinned Lido source spans → source-shaped/abstract Lean specifications → Verity Lean program and `Contract.run` transaction observables → named theorem and negative-mutant receipts. Revert theorems concern the modeled snapshot and journal. External calls, storage observations, and source correspondences have only the scope stated per row. Lean theorem names are authoritative; metadata records classification and fidelity, never proof progress.\n\n",
         "Pinned upstream source is `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`; Verity is pinned in `audit/artifacts.lock.json`; Lean is `leanprover/lean4:v4.31.0`. Canonical source anchors are immutable permalinks in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance. Supplemental rows deliberately have no independent source-map target unless their parent mapping says otherwise.\n\n",
