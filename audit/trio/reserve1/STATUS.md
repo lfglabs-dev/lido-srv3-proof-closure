@@ -16,8 +16,12 @@ recomputed partition and may reduce protection. These proofs do not cover ACL
 admission, enclosing report execution, queue-changing transitions or exhaustive
 parent failures. Their sequence constructors describe internal/committed effects;
 they are not a claim that every constructed sequence is externally executable.
-The new modules passed draft bounded elaboration; immutable checks follow the
-source commit. Runtime sources remain unchanged.
+At `e47b7d1720dffeb0d09a2aa52e0fd0a5335e0ecf`, SequenceSpec, PhysicalSequence
+and updated LiveTrust pass (3 selected checks), along with all seven baseline/import
+checks. The other 36 modules' source and olean hashes match prior receipts. Only
+standard axioms appear. `receipts/physical-sequence-summary.json` records exact
+evidence. Runtime sources remain unchanged; the 51-case execution is still tied
+to its original source commit. No new full remote gate receipt is claimed.
 
 ## Physical reserve preservation
 
