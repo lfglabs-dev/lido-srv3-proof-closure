@@ -1,5 +1,24 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Independent report accounting correspondence
+
+`ReportAccountingSpec` states ordered reward-add overflow, withdrawal-add overflow,
+subtraction underflow and successful post-buffer arithmetic without importing an
+executor. Its rules are total, deterministic and bound the successful full result.
+`ReportAccounting` proves bidirectional exact result/world/event correspondence
+and completeness for Report.afterCalls. The pure post-state projection preserves
+the packed companion, narrows buffer to low128, conditionally increases reserve
+and emits reserve/ETHDistributed in source order with the full computed amount.
+All arithmetic failures occur before writes/events and retain the stage world
+with no attempted calls; committed balances are unchanged.
+
+At source `227d440fea51aff838c3e689dc9536d042308cab`, three selected checks and seven baseline/import checks pass.
+The other 84 source/olean pairs and eleven dependency revisions match, with standard
+axioms only. See `receipts/report-accounting-summary.json`. Runtime source hashes
+are unchanged from the sixteen report EVM comparisons at `4f2b6867518337bc12acd8806fb1b463ff19c516`;
+no new runtime run is claimed. Independent parent sequencing/callee binding, other
+integration, full remote gates and independent certification remain open.
+
 ## Pinned report execution comparison and ABI correction
 
 Sixteen comparisons execute the unchanged inherited Solidity report body against

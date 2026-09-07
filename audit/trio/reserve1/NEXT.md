@@ -1,17 +1,17 @@
 # Continuation — not a completion claim
 
-Latest increment: sixteen pinned inherited report EVM/model comparisons pass.
-The first draft exposed mandatory reward-vault uint256 reply decoding despite its
-unused numeric value; Report.collect is corrected and short/trailing replies are
-covered. Failed drafts and compressed exact traces are retained. Continue with
-independent report specification/correspondence and concrete vault/queue finalization,
-entry dispatch, deployment/resource binding and remaining writer obligations.
-Current evidence: report-execution-summary.json, four selected checks plus 81
-unchanged source/olean pairs. It separates historical proof_only_changed_sources
-and executable_extensions, and retains the ACL runtime baseline separately from
-report_runtime_source_commit. Sixteen comparisons cover the report body with
-explicit boundary fixtures; do not claim production vault/queue execution.
-Full implementation and remote gates remain open. Previous turn was progress.
+Latest increment: ReportAccountingSpec/ReportAccounting prove the complete
+post-call arithmetic/write/event tail against independent ordered rules. Exact
+bidirectional correspondence covers all failures and success; failures precede
+writes/events and success preserves packed companion and full event amount.
+Continue with independent enclosing report sequencing, conditional calls/reward
+decoding and concrete vault/queue finalization. Do not reopen the proved arithmetic
+tail or treat boundary fixtures as deployed callees.
+Current evidence: report-accounting-summary.json, three selected checks plus 84
+unchanged source/olean pairs. Report executable source hashes match the sixteen
+EVM comparisons at 4f2b6867518337bc12acd8806fb1b463ff19c516; no rerun needed for
+these proof-only additions. Historical/executable-extension receipt fields remain
+separate. Full implementation and remote gates remain open. Previous turn was progress.
 
 
 Read STATUS, current git HEAD, and admission/ABI plus oracle/component receipts first. The previous

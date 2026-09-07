@@ -139,3 +139,13 @@ Exhaustive independent parent and upstream deployment/writer/world relations rem
   comparisons with explicit CallFixture boundaries; no production vault/queue claim.
   `report-execution-summary.json` retains the first failing ABI regression and the
   passing immutable source/command/artifact/trace evidence.
+
+
+## Independent report accounting
+
+`ReportAccountingSpec.Computes` defines executor-independent ordered arithmetic.
+`ReportAccounting.corresponds` and `complete` bind it to the exact result and
+physical world of `Report.afterCalls` (Lido.sol:1103-1119 and its packed/rebalance
+helpers). `failure_restores` is a stage-failure property before any tail write;
+root rollback of earlier external effects belongs to the enclosing report relation.
+See report-accounting-summary.json for immutable component and trust evidence.
