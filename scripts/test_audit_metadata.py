@@ -23,6 +23,7 @@ def invoke(root, ok, needle=None, command="generate"):
         raise AssertionError(f"missing {needle!r}:\n{result.stdout}")
 def reject_html_stage_a_families(reject, module):
     """A Stage A heading inside any CommonMark HTML block is invisible."""
+    table_then_type_7 = "| heading |\n| --- |\n| body |\n{}\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n\n"
     bodies = (
         "<pre>\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n</pre>\n\n",
         "<?stage-a\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n?>\n\n",
@@ -31,6 +32,7 @@ def reject_html_stage_a_families(reject, module):
         "<div>\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n\n",
         "<stage-a>\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n\n",
         "Prelude\n=======\n<span>\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n\n",
+        *(table_then_type_7.format(tag) for tag in ("<span>", "</span>", "<stage-a data-gap=\"68\">")),
     )
     for body in bodies:
         reject(body)
@@ -92,10 +94,8 @@ def main():
         lock = json.loads(lpath.read_text())
         source = json.loads(spath.read_text())
         manifest = json.loads(mpath.read_text())
-
         invoke(fixture, True)
         invoke(fixture, True, command="check")
-
         source_fidelity = fpath.read_text(encoding="utf-8")
         stale = re.sub(r"all\s+68\s+canonical\s+fidelity-gap\s+entries\s+remain\.", "all 67 canonical fidelity-gap entries remain.", source_fidelity)
         fpath.write_text(stale, encoding="utf-8"); invoke(fixture, False, "SOURCE-FIDELITY: Stage A disclosure lead paragraph must visibly disclose all canonical fidelity gaps")
