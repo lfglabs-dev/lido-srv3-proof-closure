@@ -35,7 +35,7 @@
     "LidoSRv3/Audit/Source/TrioAlloc2/Totality.lean": "335759eb0d05c1177705ed588d6341ad143bac8f6070271b18fb780c84cbd653",
     "LidoSRv3/Audit/Source/TrioAlloc2/Word.lean": "0d13d4c1e245bf01efdaad3a0a5c40a75a00f2b06c3ac22d6994c25e0ad8b786",
     "audit/trio/alloc2/byte-abi/lake-manifest.json": "00aea80a823559dba76ac247531cd9d7dc6a368ab4c24cdba61b4f795651a93b",
-    "audit/trio/alloc2/byte-abi/lakefile.lean": "79135d788c5db8f0b5a26ce93de4bd74be3652379bd074286114b123a1abce55",
+    "audit/trio/alloc2/byte-abi/lakefile.lean": "6c259cab7284ba899698d405f990048f428162637af937808dccc2b01e9ddf48",
     "audit/trio/alloc2/byte-memory/lakefile.lean": "c6a89adf7b959dac565341c1448b9f89da731c6c2f4a860d11e6080992383bda",
     "audit/trio/alloc2/byte-runtime/lake-manifest.json": "53970c0750429aca6bb29f295558ac40a093430995c2d650197e158b363ec174",
     "audit/trio/alloc2/byte-runtime/lakefile.lean": "703619eba5b186a4b3044b68f073a0c1e4a57dd9e71ced6525c10562da65bcb0",
@@ -60,6 +60,7 @@
     "audit/trio/alloc2/runtime/ByteInitialize.lean": "c2a8c4f23aebba8b8eb1a00af45920c03cbf04b2d4e5aa47ce59405585247a39",
     "audit/trio/alloc2/runtime/ByteLoop.lean": "7235a2d3233fa361dec31b5a0c92e43bc5b628e9deda47396825f2b5f9aa36d3",
     "audit/trio/alloc2/runtime/ByteMemory.lean": "05288531b4e2b6fa6bf365d83df84dc7c45bceacd14b818fb7696fa6170e3c9d",
-    "audit/trio/alloc2/runtime/ByteVectors.lean": "e1971839024964bbbef4a3dc08059a3a1c81a3a18269dce0d13b4f923af1ce09"
+    "audit/trio/alloc2/runtime/ByteVectors.lean": "e1971839024964bbbef4a3dc08059a3a1c81a3a18269dce0d13b4f923af1ce09",
+    "audit/trio/alloc2/runtime/ByteWordCopy.lean": "90a1ccd9c2a22b6c465cd1917e75e2b6676b7d1b8f5551930dbe7a9fd0fdd11e"
   }
 }

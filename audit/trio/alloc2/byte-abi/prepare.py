@@ -21,7 +21,7 @@ for path, expected in identity['files'].items():
     if hashlib.sha256(data).hexdigest() != expected:
         raise RuntimeError('stale byte source identity: '+path)
     sources[path] = data
-for path in ('audit/trio/alloc2/runtime/ByteABIFrame.lean', 'audit/trio/alloc2/runtime/ByteABIVectors.lean', 'audit/trio/alloc2/runtime/ByteABIProducer.lean', 'audit/trio/alloc2/composition/ProducerMemory.lean', 'audit/trio/alloc2/composition/AllocationMemoryBridge.lean', 'audit/trio/alloc2/composition/MemoryExtent.lean', 'audit/trio/alloc2/runtime/ByteABI.lean', 'audit/trio/alloc2/composition/LibraryABI.lean', 'audit/trio/alloc2/byte-abi/lakefile.lean', 'audit/trio/alloc2/byte-abi/lake-manifest.json'):
+for path in ('audit/trio/alloc2/runtime/ByteWordCopy.lean', 'audit/trio/alloc2/runtime/ByteABIFrame.lean', 'audit/trio/alloc2/runtime/ByteABIVectors.lean', 'audit/trio/alloc2/runtime/ByteABIProducer.lean', 'audit/trio/alloc2/composition/ProducerMemory.lean', 'audit/trio/alloc2/composition/AllocationMemoryBridge.lean', 'audit/trio/alloc2/composition/MemoryExtent.lean', 'audit/trio/alloc2/runtime/ByteABI.lean', 'audit/trio/alloc2/composition/LibraryABI.lean', 'audit/trio/alloc2/byte-abi/lakefile.lean', 'audit/trio/alloc2/byte-abi/lake-manifest.json'):
     sources[path] = (ROOT / path).read_bytes()
 for path, data in sources.items():
     target = DEST / path
