@@ -1,0 +1,42 @@
+# Public allocation wrapper integration
+
+`LidoSRv3/Audit/Source/TrioComposition/Parent.lean` adds the decoded
+`SRLib._getDepositAllocations` wrapper from pinned Solidity
+`17005714f151e5502c559932319a3f2f74ac2436`.
+
+The executor preserves the storage-count-zero branch before division, converts
+requested Ether to WC01 validator units, calls the actual producer even for zero
+demand when modules exist, uses the proportional consumer for positive demand,
+and performs checked total/delta/new-allocation Ether multiplication in source
+order. The original allocation list is retained across the interpreted external
+library call. This represents the required copy boundary; it is not yet a proof
+of solc's DELEGATECALL/ABI implementation or its concrete memory mutations.
+
+Theorems currently checked:
+
+- `getDepositAllocations_empty`: empty storage enumeration returns empty arrays
+  before division or any module call, even with zero initial-deposit unit.
+- `getDepositAllocations_zero_unit`: nonempty enumeration and zero unit fail
+  with panic 0x12 before any module call.
+- `convertPositive_refines` and `convertZero_refines`: successful per-row
+  conversions satisfy independent unbounded Ether equations, including the
+  zero-demand branch. These component theorems expose list-length premises.
+- `getDepositAllocations_total_bound`: every successful actual wrapper run
+  returns an Ether amount no larger than requested; no callee/consumer-success
+  hypothesis is supplied. The proof combines executed division, the consumer's
+  demand bound and the actual checked final multiplication.
+
+Nine execution checks cover empty enumeration, division priority, rounding down,
+zero-demand module reads and rejection, late Ether multiplication overflow,
+subtraction underflow, failure after an earlier row converted, and short arrays.
+They execute the Lean source model, not Solidity or Verity Contract.run. Test
+layout hashes are instrumentation, not actual keccak evidence.
+
+Still required: full public-wrapper all-outcome independent correspondence;
+discharge component lengths and subtraction premises using producer/consumer
+results; exact delegated library call and ABI return/revert bytes; concrete
+allocation/copy/mutation and panic precedence; caller/deployment binding;
+state/balance/event frames and recursive callback interpretation; actual Verity
+differential execution; registered-parent mutants; full gates and independent
+certification. The existing byte-memory bridge is a representation theorem, not
+compiler-memory execution evidence. No canonical guarantee is upgraded.
