@@ -1,0 +1,42 @@
+LidoSRv3/Audit/Source/TrioReserve1/ConsensusCalls.lean:153:2: error: Type mismatch: After simplification, term
+  hg
+ has type
+  getCurrentFrame
+      (OracleCalls.external keccak (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+        oc (Consensus.dispatch (consensusAddress c.oracle w) cc staticOther) other)
+      ctx w =
+    { outcome := Except.ok (reference, time % Verity.Core.UINT256_MODULUS), world := w,
+      attempts :=
+        [{
+            request :=
+              { caller := ctx.self,
+                target := Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val,
+                value := { val := 0, isLt := ⋯ }, payload := encode 4 1512059385 },
+            accepted := true, returned := encode 32 c.oracle.val },
+          {
+            request :=
+              { caller := ctx.self, target := c.oracle, value := { val := 0, isLt := ⋯ },
+                payload := encode 4 1928829715 },
+            accepted := true, returned := encode 32 reference ++ encode 32 time,
+            nested :=
+              [attempt c.oracle (consensusAddress c.oracle w) true (encode 32 reference ++ encode 32 deadline)] }] }
+but is expected to have type
+  getCurrentFrame
+      (OracleCalls.external keccak (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+        oc (Consensus.dispatch (consensusAddress c.oracle w) cc staticOther) other)
+      ctx w =
+    { outcome := Except.ok (reference, time), world := w,
+      attempts :=
+        [{
+            request :=
+              { caller := ctx.self,
+                target := Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val,
+                value := { val := 0, isLt := ⋯ }, payload := encode 4 1512059385 },
+            accepted := true, returned := encode 32 c.oracle.val },
+          {
+            request :=
+              { caller := ctx.self, target := c.oracle, value := { val := 0, isLt := ⋯ },
+                payload := encode 4 1928829715 },
+            accepted := true, returned := encode 32 reference ++ encode 32 time,
+            nested :=
+              [attempt c.oracle (consensusAddress c.oracle w) true (encode 32 reference ++ encode 32 deadline)] }] }

@@ -1,0 +1,1406 @@
+LidoSRv3/Audit/Source/TrioReserve1/QueueCalls.lean:41:99: error: unsolved goals
+case false
+keccak : Queue.Keccak
+c : Locator.Config
+other : External
+ctx : Context
+w : World
+hd : c.queue ≠ Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val
+hl : (w.core.codeSize (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val).val).val ≠ 0
+hq : (w.core.codeSize c.queue.val).val ≠ 0
+hb :
+  call (external keccak (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c other) ctx
+      c.queue 731232129 (word 0) w =
+    { outcome := Except.ok (bunkerBytes c.queue w), world := w,
+      attempts :=
+        [{ request := { caller := ctx.self, target := c.queue, value := word 0, payload := encode 4 731232129 },
+            accepted := true, returned := bunkerBytes c.queue w }] }
+hdecode :
+  decodeWord (bunkerBytes c.queue w) 0 w =
+    { outcome := Except.ok (word (if Queue.isBunkerModeActive c.queue w = true then 1 else 0)), world := w }
+hlookup :
+  withdrawalQueue
+      (external keccak (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c other) ctx
+      w =
+    { outcome := Except.ok c.queue, world := w,
+      attempts :=
+        [{
+            request :=
+              { caller := ctx.self,
+                target := Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val,
+                value := word 0, payload := encode 4 936771225 },
+            accepted := true, returned := encode 32 c.queue.val }] }
+hs : Queue.isBunkerModeActive c.queue w = false
+⊢ (match
+          (call
+              (external keccak (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                other)
+              ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).outcome with
+        | Except.error e =>
+          { outcome := Except.error e,
+            world :=
+              (call
+                  (external keccak (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                    other)
+                  ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world,
+            attempts :=
+              (call
+                  (external keccak (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                    other)
+                  ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).attempts }
+        | Except.ok a =>
+          {
+            outcome :=
+              (match
+                  (decodeWord a 0
+                      (call
+                          (external keccak
+                            (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c other)
+                          ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).outcome with
+                | Except.error e =>
+                  { outcome := Except.error e,
+                    world :=
+                      (decodeWord a 0
+                          (call
+                              (external keccak
+                                (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                other)
+                              ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world,
+                    attempts :=
+                      (decodeWord a 0
+                          (call
+                              (external keccak
+                                (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                other)
+                              ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).attempts }
+                | Except.ok a_1 =>
+                  {
+                    outcome :=
+                      ((if a_1.val = 0 then
+                            bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                          else pureExec false)
+                          (decodeWord a 0
+                              (call
+                                  (external keccak
+                                    (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                    other)
+                                  ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).outcome,
+                    world :=
+                      ((if a_1.val = 0 then
+                            bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                          else pureExec false)
+                          (decodeWord a 0
+                              (call
+                                  (external keccak
+                                    (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                    other)
+                                  ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).world,
+                    attempts :=
+                      (decodeWord a 0
+                            (call
+                                (external keccak
+                                  (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                  other)
+                                ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).attempts ++
+                        ((if a_1.val = 0 then
+                              bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                            else pureExec false)
+                            (decodeWord a 0
+                                (call
+                                    (external keccak
+                                      (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                      c other)
+                                    ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).attempts }).outcome,
+            world :=
+              (match
+                  (decodeWord a 0
+                      (call
+                          (external keccak
+                            (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c other)
+                          ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).outcome with
+                | Except.error e =>
+                  { outcome := Except.error e,
+                    world :=
+                      (decodeWord a 0
+                          (call
+                              (external keccak
+                                (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                other)
+                              ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world,
+                    attempts :=
+                      (decodeWord a 0
+                          (call
+                              (external keccak
+                                (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                other)
+                              ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).attempts }
+                | Except.ok a_1 =>
+                  {
+                    outcome :=
+                      ((if a_1.val = 0 then
+                            bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                          else pureExec false)
+                          (decodeWord a 0
+                              (call
+                                  (external keccak
+                                    (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                    other)
+                                  ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).outcome,
+                    world :=
+                      ((if a_1.val = 0 then
+                            bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                          else pureExec false)
+                          (decodeWord a 0
+                              (call
+                                  (external keccak
+                                    (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                    other)
+                                  ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).world,
+                    attempts :=
+                      (decodeWord a 0
+                            (call
+                                (external keccak
+                                  (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                  other)
+                                ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).attempts ++
+                        ((if a_1.val = 0 then
+                              bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                            else pureExec false)
+                            (decodeWord a 0
+                                (call
+                                    (external keccak
+                                      (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                      c other)
+                                    ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).attempts }).world,
+            attempts :=
+              (call
+                    (external keccak (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                      c other)
+                    ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).attempts ++
+                (match
+                    (decodeWord a 0
+                        (call
+                            (external keccak
+                              (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                              other)
+                            ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).outcome with
+                  | Except.error e =>
+                    { outcome := Except.error e,
+                      world :=
+                        (decodeWord a 0
+                            (call
+                                (external keccak
+                                  (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                  other)
+                                ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world,
+                      attempts :=
+                        (decodeWord a 0
+                            (call
+                                (external keccak
+                                  (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                  other)
+                                ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).attempts }
+                  | Except.ok a_1 =>
+                    {
+                      outcome :=
+                        ((if a_1.val = 0 then
+                              bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                            else pureExec false)
+                            (decodeWord a 0
+                                (call
+                                    (external keccak
+                                      (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                      c other)
+                                    ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).outcome,
+                      world :=
+                        ((if a_1.val = 0 then
+                              bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                            else pureExec false)
+                            (decodeWord a 0
+                                (call
+                                    (external keccak
+                                      (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                      c other)
+                                    ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).world,
+                      attempts :=
+                        (decodeWord a 0
+                              (call
+                                  (external keccak
+                                    (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                    other)
+                                  ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).attempts ++
+                          ((if a_1.val = 0 then
+                                bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                              else pureExec false)
+                              (decodeWord a 0
+                                  (call
+                                      (external keccak
+                                        (Verity.Core.Address.ofNat
+                                          (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                        c other)
+                                      ctx c.queue 731232129 { val := 0, isLt := ⋯ }
+                                      w).world).world).attempts }).attempts }).outcome =
+      Except.ok !decide ((w.core.readContractSlot ctx.self.val activeSlot).val = 0) ∧
+    (match
+            (call
+                (external keccak (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                  other)
+                ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).outcome with
+          | Except.error e =>
+            { outcome := Except.error e,
+              world :=
+                (call
+                    (external keccak (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                      c other)
+                    ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world,
+              attempts :=
+                (call
+                    (external keccak (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                      c other)
+                    ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).attempts }
+          | Except.ok a =>
+            {
+              outcome :=
+                (match
+                    (decodeWord a 0
+                        (call
+                            (external keccak
+                              (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                              other)
+                            ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).outcome with
+                  | Except.error e =>
+                    { outcome := Except.error e,
+                      world :=
+                        (decodeWord a 0
+                            (call
+                                (external keccak
+                                  (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                  other)
+                                ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world,
+                      attempts :=
+                        (decodeWord a 0
+                            (call
+                                (external keccak
+                                  (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                  other)
+                                ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).attempts }
+                  | Except.ok a_1 =>
+                    {
+                      outcome :=
+                        ((if a_1.val = 0 then
+                              bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                            else pureExec false)
+                            (decodeWord a 0
+                                (call
+                                    (external keccak
+                                      (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                      c other)
+                                    ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).outcome,
+                      world :=
+                        ((if a_1.val = 0 then
+                              bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                            else pureExec false)
+                            (decodeWord a 0
+                                (call
+                                    (external keccak
+                                      (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                      c other)
+                                    ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).world,
+                      attempts :=
+                        (decodeWord a 0
+                              (call
+                                  (external keccak
+                                    (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                    other)
+                                  ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).attempts ++
+                          ((if a_1.val = 0 then
+                                bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                              else pureExec false)
+                              (decodeWord a 0
+                                  (call
+                                      (external keccak
+                                        (Verity.Core.Address.ofNat
+                                          (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                        c other)
+                                      ctx c.queue 731232129 { val := 0, isLt := ⋯ }
+                                      w).world).world).attempts }).outcome,
+              world :=
+                (match
+                    (decodeWord a 0
+                        (call
+                            (external keccak
+                              (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                              other)
+                            ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).outcome with
+                  | Except.error e =>
+                    { outcome := Except.error e,
+                      world :=
+                        (decodeWord a 0
+                            (call
+                                (external keccak
+                                  (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                  other)
+                                ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world,
+                      attempts :=
+                        (decodeWord a 0
+                            (call
+                                (external keccak
+                                  (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                  other)
+                                ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).attempts }
+                  | Except.ok a_1 =>
+                    {
+                      outcome :=
+                        ((if a_1.val = 0 then
+                              bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                            else pureExec false)
+                            (decodeWord a 0
+                                (call
+                                    (external keccak
+                                      (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                      c other)
+                                    ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).outcome,
+                      world :=
+                        ((if a_1.val = 0 then
+                              bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                            else pureExec false)
+                            (decodeWord a 0
+                                (call
+                                    (external keccak
+                                      (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                      c other)
+                                    ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).world,
+                      attempts :=
+                        (decodeWord a 0
+                              (call
+                                  (external keccak
+                                    (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                    other)
+                                  ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).attempts ++
+                          ((if a_1.val = 0 then
+                                bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                              else pureExec false)
+                              (decodeWord a 0
+                                  (call
+                                      (external keccak
+                                        (Verity.Core.Address.ofNat
+                                          (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                        c other)
+                                      ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).attempts }).world,
+              attempts :=
+                (call
+                      (external keccak
+                        (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c other)
+                      ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).attempts ++
+                  (match
+                      (decodeWord a 0
+                          (call
+                              (external keccak
+                                (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                other)
+                              ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).outcome with
+                    | Except.error e =>
+                      { outcome := Except.error e,
+                        world :=
+                          (decodeWord a 0
+                              (call
+                                  (external keccak
+                                    (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                    other)
+                                  ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world,
+                        attempts :=
+                          (decodeWord a 0
+                              (call
+                                  (external keccak
+                                    (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                    other)
+                                  ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).attempts }
+                    | Except.ok a_1 =>
+                      {
+                        outcome :=
+                          ((if a_1.val = 0 then
+                                bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                              else pureExec false)
+                              (decodeWord a 0
+                                  (call
+                                      (external keccak
+                                        (Verity.Core.Address.ofNat
+                                          (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                        c other)
+                                      ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).outcome,
+                        world :=
+                          ((if a_1.val = 0 then
+                                bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                              else pureExec false)
+                              (decodeWord a 0
+                                  (call
+                                      (external keccak
+                                        (Verity.Core.Address.ofNat
+                                          (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                        c other)
+                                      ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).world,
+                        attempts :=
+                          (decodeWord a 0
+                                (call
+                                    (external keccak
+                                      (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                      c other)
+                                    ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).attempts ++
+                            ((if a_1.val = 0 then
+                                  bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                                else pureExec false)
+                                (decodeWord a 0
+                                    (call
+                                        (external keccak
+                                          (Verity.Core.Address.ofNat
+                                            (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                          c other)
+                                        ctx c.queue 731232129 { val := 0, isLt := ⋯ }
+                                        w).world).world).attempts }).attempts }).world =
+        w ∧
+      (match
+            (call
+                (external keccak (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                  other)
+                ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).outcome with
+          | Except.error e =>
+            { outcome := Except.error e,
+              world :=
+                (call
+                    (external keccak (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                      c other)
+                    ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world,
+              attempts :=
+                (call
+                    (external keccak (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                      c other)
+                    ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).attempts }
+          | Except.ok a =>
+            {
+              outcome :=
+                (match
+                    (decodeWord a 0
+                        (call
+                            (external keccak
+                              (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                              other)
+                            ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).outcome with
+                  | Except.error e =>
+                    { outcome := Except.error e,
+                      world :=
+                        (decodeWord a 0
+                            (call
+                                (external keccak
+                                  (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                  other)
+                                ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world,
+                      attempts :=
+                        (decodeWord a 0
+                            (call
+                                (external keccak
+                                  (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                  other)
+                                ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).attempts }
+                  | Except.ok a_1 =>
+                    {
+                      outcome :=
+                        ((if a_1.val = 0 then
+                              bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                            else pureExec false)
+                            (decodeWord a 0
+                                (call
+                                    (external keccak
+                                      (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                      c other)
+                                    ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).outcome,
+                      world :=
+                        ((if a_1.val = 0 then
+                              bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                            else pureExec false)
+                            (decodeWord a 0
+                                (call
+                                    (external keccak
+                                      (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                      c other)
+                                    ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).world,
+                      attempts :=
+                        (decodeWord a 0
+                              (call
+                                  (external keccak
+                                    (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                    other)
+                                  ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).attempts ++
+                          ((if a_1.val = 0 then
+                                bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                              else pureExec false)
+                              (decodeWord a 0
+                                  (call
+                                      (external keccak
+                                        (Verity.Core.Address.ofNat
+                                          (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                        c other)
+                                      ctx c.queue 731232129 { val := 0, isLt := ⋯ }
+                                      w).world).world).attempts }).outcome,
+              world :=
+                (match
+                    (decodeWord a 0
+                        (call
+                            (external keccak
+                              (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                              other)
+                            ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).outcome with
+                  | Except.error e =>
+                    { outcome := Except.error e,
+                      world :=
+                        (decodeWord a 0
+                            (call
+                                (external keccak
+                                  (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                  other)
+                                ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world,
+                      attempts :=
+                        (decodeWord a 0
+                            (call
+                                (external keccak
+                                  (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                  other)
+                                ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).attempts }
+                  | Except.ok a_1 =>
+                    {
+                      outcome :=
+                        ((if a_1.val = 0 then
+                              bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                            else pureExec false)
+                            (decodeWord a 0
+                                (call
+                                    (external keccak
+                                      (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                      c other)
+                                    ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).outcome,
+                      world :=
+                        ((if a_1.val = 0 then
+                              bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                            else pureExec false)
+                            (decodeWord a 0
+                                (call
+                                    (external keccak
+                                      (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                      c other)
+                                    ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).world,
+                      attempts :=
+                        (decodeWord a 0
+                              (call
+                                  (external keccak
+                                    (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                    other)
+                                  ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).attempts ++
+                          ((if a_1.val = 0 then
+                                bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                              else pureExec false)
+                              (decodeWord a 0
+                                  (call
+                                      (external keccak
+                                        (Verity.Core.Address.ofNat
+                                          (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                        c other)
+                                      ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).attempts }).world,
+              attempts :=
+                (call
+                      (external keccak
+                        (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c other)
+                      ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).attempts ++
+                  (match
+                      (decodeWord a 0
+                          (call
+                              (external keccak
+                                (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                other)
+                              ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).outcome with
+                    | Except.error e =>
+                      { outcome := Except.error e,
+                        world :=
+                          (decodeWord a 0
+                              (call
+                                  (external keccak
+                                    (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                    other)
+                                  ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world,
+                        attempts :=
+                          (decodeWord a 0
+                              (call
+                                  (external keccak
+                                    (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                    other)
+                                  ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).attempts }
+                    | Except.ok a_1 =>
+                      {
+                        outcome :=
+                          ((if a_1.val = 0 then
+                                bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                              else pureExec false)
+                              (decodeWord a 0
+                                  (call
+                                      (external keccak
+                                        (Verity.Core.Address.ofNat
+                                          (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                        c other)
+                                      ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).outcome,
+                        world :=
+                          ((if a_1.val = 0 then
+                                bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                              else pureExec false)
+                              (decodeWord a 0
+                                  (call
+                                      (external keccak
+                                        (Verity.Core.Address.ofNat
+                                          (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                        c other)
+                                      ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).world,
+                        attempts :=
+                          (decodeWord a 0
+                                (call
+                                    (external keccak
+                                      (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                      c other)
+                                    ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).attempts ++
+                            ((if a_1.val = 0 then
+                                  bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                                else pureExec false)
+                                (decodeWord a 0
+                                    (call
+                                        (external keccak
+                                          (Verity.Core.Address.ofNat
+                                            (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                          c other)
+                                        ctx c.queue 731232129 { val := 0, isLt := ⋯ }
+                                        w).world).world).attempts }).attempts }).attempts =
+        [{
+            request :=
+              { caller := ctx.self, target := c.queue, value := { val := 0, isLt := ⋯ },
+                payload := encode 4 731232129 },
+            accepted := true, returned := bunkerBytes c.queue w }]
+
+case true
+keccak : Queue.Keccak
+c : Locator.Config
+other : External
+ctx : Context
+w : World
+hd : c.queue ≠ Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val
+hl : (w.core.codeSize (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val).val).val ≠ 0
+hq : (w.core.codeSize c.queue.val).val ≠ 0
+hb :
+  call (external keccak (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c other) ctx
+      c.queue 731232129 (word 0) w =
+    { outcome := Except.ok (bunkerBytes c.queue w), world := w,
+      attempts :=
+        [{ request := { caller := ctx.self, target := c.queue, value := word 0, payload := encode 4 731232129 },
+            accepted := true, returned := bunkerBytes c.queue w }] }
+hdecode :
+  decodeWord (bunkerBytes c.queue w) 0 w =
+    { outcome := Except.ok (word (if Queue.isBunkerModeActive c.queue w = true then 1 else 0)), world := w }
+hlookup :
+  withdrawalQueue
+      (external keccak (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c other) ctx
+      w =
+    { outcome := Except.ok c.queue, world := w,
+      attempts :=
+        [{
+            request :=
+              { caller := ctx.self,
+                target := Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val,
+                value := word 0, payload := encode 4 936771225 },
+            accepted := true, returned := encode 32 c.queue.val }] }
+hs : Queue.isBunkerModeActive c.queue w = true
+⊢ (match
+          (call
+              (external keccak (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                other)
+              ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).outcome with
+        | Except.error e =>
+          { outcome := Except.error e,
+            world :=
+              (call
+                  (external keccak (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                    other)
+                  ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world,
+            attempts :=
+              (call
+                  (external keccak (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                    other)
+                  ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).attempts }
+        | Except.ok a =>
+          {
+            outcome :=
+              (match
+                  (decodeWord a 0
+                      (call
+                          (external keccak
+                            (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c other)
+                          ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).outcome with
+                | Except.error e =>
+                  { outcome := Except.error e,
+                    world :=
+                      (decodeWord a 0
+                          (call
+                              (external keccak
+                                (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                other)
+                              ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world,
+                    attempts :=
+                      (decodeWord a 0
+                          (call
+                              (external keccak
+                                (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                other)
+                              ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).attempts }
+                | Except.ok a_1 =>
+                  {
+                    outcome :=
+                      ((if a_1.val = 0 then
+                            bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                          else pureExec false)
+                          (decodeWord a 0
+                              (call
+                                  (external keccak
+                                    (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                    other)
+                                  ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).outcome,
+                    world :=
+                      ((if a_1.val = 0 then
+                            bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                          else pureExec false)
+                          (decodeWord a 0
+                              (call
+                                  (external keccak
+                                    (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                    other)
+                                  ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).world,
+                    attempts :=
+                      (decodeWord a 0
+                            (call
+                                (external keccak
+                                  (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                  other)
+                                ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).attempts ++
+                        ((if a_1.val = 0 then
+                              bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                            else pureExec false)
+                            (decodeWord a 0
+                                (call
+                                    (external keccak
+                                      (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                      c other)
+                                    ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).attempts }).outcome,
+            world :=
+              (match
+                  (decodeWord a 0
+                      (call
+                          (external keccak
+                            (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c other)
+                          ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).outcome with
+                | Except.error e =>
+                  { outcome := Except.error e,
+                    world :=
+                      (decodeWord a 0
+                          (call
+                              (external keccak
+                                (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                other)
+                              ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world,
+                    attempts :=
+                      (decodeWord a 0
+                          (call
+                              (external keccak
+                                (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                other)
+                              ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).attempts }
+                | Except.ok a_1 =>
+                  {
+                    outcome :=
+                      ((if a_1.val = 0 then
+                            bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                          else pureExec false)
+                          (decodeWord a 0
+                              (call
+                                  (external keccak
+                                    (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                    other)
+                                  ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).outcome,
+                    world :=
+                      ((if a_1.val = 0 then
+                            bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                          else pureExec false)
+                          (decodeWord a 0
+                              (call
+                                  (external keccak
+                                    (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                    other)
+                                  ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).world,
+                    attempts :=
+                      (decodeWord a 0
+                            (call
+                                (external keccak
+                                  (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                  other)
+                                ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).attempts ++
+                        ((if a_1.val = 0 then
+                              bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                            else pureExec false)
+                            (decodeWord a 0
+                                (call
+                                    (external keccak
+                                      (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                      c other)
+                                    ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).attempts }).world,
+            attempts :=
+              (call
+                    (external keccak (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                      c other)
+                    ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).attempts ++
+                (match
+                    (decodeWord a 0
+                        (call
+                            (external keccak
+                              (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                              other)
+                            ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).outcome with
+                  | Except.error e =>
+                    { outcome := Except.error e,
+                      world :=
+                        (decodeWord a 0
+                            (call
+                                (external keccak
+                                  (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                  other)
+                                ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world,
+                      attempts :=
+                        (decodeWord a 0
+                            (call
+                                (external keccak
+                                  (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                  other)
+                                ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).attempts }
+                  | Except.ok a_1 =>
+                    {
+                      outcome :=
+                        ((if a_1.val = 0 then
+                              bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                            else pureExec false)
+                            (decodeWord a 0
+                                (call
+                                    (external keccak
+                                      (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                      c other)
+                                    ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).outcome,
+                      world :=
+                        ((if a_1.val = 0 then
+                              bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                            else pureExec false)
+                            (decodeWord a 0
+                                (call
+                                    (external keccak
+                                      (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                      c other)
+                                    ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).world,
+                      attempts :=
+                        (decodeWord a 0
+                              (call
+                                  (external keccak
+                                    (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                    other)
+                                  ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).attempts ++
+                          ((if a_1.val = 0 then
+                                bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                              else pureExec false)
+                              (decodeWord a 0
+                                  (call
+                                      (external keccak
+                                        (Verity.Core.Address.ofNat
+                                          (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                        c other)
+                                      ctx c.queue 731232129 { val := 0, isLt := ⋯ }
+                                      w).world).world).attempts }).attempts }).outcome =
+      Except.ok false ∧
+    (match
+            (call
+                (external keccak (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                  other)
+                ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).outcome with
+          | Except.error e =>
+            { outcome := Except.error e,
+              world :=
+                (call
+                    (external keccak (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                      c other)
+                    ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world,
+              attempts :=
+                (call
+                    (external keccak (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                      c other)
+                    ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).attempts }
+          | Except.ok a =>
+            {
+              outcome :=
+                (match
+                    (decodeWord a 0
+                        (call
+                            (external keccak
+                              (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                              other)
+                            ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).outcome with
+                  | Except.error e =>
+                    { outcome := Except.error e,
+                      world :=
+                        (decodeWord a 0
+                            (call
+                                (external keccak
+                                  (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                  other)
+                                ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world,
+                      attempts :=
+                        (decodeWord a 0
+                            (call
+                                (external keccak
+                                  (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                  other)
+                                ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).attempts }
+                  | Except.ok a_1 =>
+                    {
+                      outcome :=
+                        ((if a_1.val = 0 then
+                              bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                            else pureExec false)
+                            (decodeWord a 0
+                                (call
+                                    (external keccak
+                                      (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                      c other)
+                                    ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).outcome,
+                      world :=
+                        ((if a_1.val = 0 then
+                              bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                            else pureExec false)
+                            (decodeWord a 0
+                                (call
+                                    (external keccak
+                                      (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                      c other)
+                                    ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).world,
+                      attempts :=
+                        (decodeWord a 0
+                              (call
+                                  (external keccak
+                                    (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                    other)
+                                  ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).attempts ++
+                          ((if a_1.val = 0 then
+                                bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                              else pureExec false)
+                              (decodeWord a 0
+                                  (call
+                                      (external keccak
+                                        (Verity.Core.Address.ofNat
+                                          (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                        c other)
+                                      ctx c.queue 731232129 { val := 0, isLt := ⋯ }
+                                      w).world).world).attempts }).outcome,
+              world :=
+                (match
+                    (decodeWord a 0
+                        (call
+                            (external keccak
+                              (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                              other)
+                            ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).outcome with
+                  | Except.error e =>
+                    { outcome := Except.error e,
+                      world :=
+                        (decodeWord a 0
+                            (call
+                                (external keccak
+                                  (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                  other)
+                                ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world,
+                      attempts :=
+                        (decodeWord a 0
+                            (call
+                                (external keccak
+                                  (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                  other)
+                                ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).attempts }
+                  | Except.ok a_1 =>
+                    {
+                      outcome :=
+                        ((if a_1.val = 0 then
+                              bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                            else pureExec false)
+                            (decodeWord a 0
+                                (call
+                                    (external keccak
+                                      (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                      c other)
+                                    ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).outcome,
+                      world :=
+                        ((if a_1.val = 0 then
+                              bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                            else pureExec false)
+                            (decodeWord a 0
+                                (call
+                                    (external keccak
+                                      (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                      c other)
+                                    ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).world,
+                      attempts :=
+                        (decodeWord a 0
+                              (call
+                                  (external keccak
+                                    (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                    other)
+                                  ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).attempts ++
+                          ((if a_1.val = 0 then
+                                bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                              else pureExec false)
+                              (decodeWord a 0
+                                  (call
+                                      (external keccak
+                                        (Verity.Core.Address.ofNat
+                                          (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                        c other)
+                                      ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).attempts }).world,
+              attempts :=
+                (call
+                      (external keccak
+                        (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c other)
+                      ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).attempts ++
+                  (match
+                      (decodeWord a 0
+                          (call
+                              (external keccak
+                                (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                other)
+                              ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).outcome with
+                    | Except.error e =>
+                      { outcome := Except.error e,
+                        world :=
+                          (decodeWord a 0
+                              (call
+                                  (external keccak
+                                    (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                    other)
+                                  ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world,
+                        attempts :=
+                          (decodeWord a 0
+                              (call
+                                  (external keccak
+                                    (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                    other)
+                                  ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).attempts }
+                    | Except.ok a_1 =>
+                      {
+                        outcome :=
+                          ((if a_1.val = 0 then
+                                bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                              else pureExec false)
+                              (decodeWord a 0
+                                  (call
+                                      (external keccak
+                                        (Verity.Core.Address.ofNat
+                                          (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                        c other)
+                                      ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).outcome,
+                        world :=
+                          ((if a_1.val = 0 then
+                                bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                              else pureExec false)
+                              (decodeWord a 0
+                                  (call
+                                      (external keccak
+                                        (Verity.Core.Address.ofNat
+                                          (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                        c other)
+                                      ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).world,
+                        attempts :=
+                          (decodeWord a 0
+                                (call
+                                    (external keccak
+                                      (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                      c other)
+                                    ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).attempts ++
+                            ((if a_1.val = 0 then
+                                  bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                                else pureExec false)
+                                (decodeWord a 0
+                                    (call
+                                        (external keccak
+                                          (Verity.Core.Address.ofNat
+                                            (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                          c other)
+                                        ctx c.queue 731232129 { val := 0, isLt := ⋯ }
+                                        w).world).world).attempts }).attempts }).world =
+        w ∧
+      (match
+            (call
+                (external keccak (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                  other)
+                ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).outcome with
+          | Except.error e =>
+            { outcome := Except.error e,
+              world :=
+                (call
+                    (external keccak (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                      c other)
+                    ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world,
+              attempts :=
+                (call
+                    (external keccak (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                      c other)
+                    ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).attempts }
+          | Except.ok a =>
+            {
+              outcome :=
+                (match
+                    (decodeWord a 0
+                        (call
+                            (external keccak
+                              (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                              other)
+                            ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).outcome with
+                  | Except.error e =>
+                    { outcome := Except.error e,
+                      world :=
+                        (decodeWord a 0
+                            (call
+                                (external keccak
+                                  (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                  other)
+                                ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world,
+                      attempts :=
+                        (decodeWord a 0
+                            (call
+                                (external keccak
+                                  (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                  other)
+                                ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).attempts }
+                  | Except.ok a_1 =>
+                    {
+                      outcome :=
+                        ((if a_1.val = 0 then
+                              bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                            else pureExec false)
+                            (decodeWord a 0
+                                (call
+                                    (external keccak
+                                      (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                      c other)
+                                    ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).outcome,
+                      world :=
+                        ((if a_1.val = 0 then
+                              bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                            else pureExec false)
+                            (decodeWord a 0
+                                (call
+                                    (external keccak
+                                      (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                      c other)
+                                    ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).world,
+                      attempts :=
+                        (decodeWord a 0
+                              (call
+                                  (external keccak
+                                    (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                    other)
+                                  ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).attempts ++
+                          ((if a_1.val = 0 then
+                                bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                              else pureExec false)
+                              (decodeWord a 0
+                                  (call
+                                      (external keccak
+                                        (Verity.Core.Address.ofNat
+                                          (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                        c other)
+                                      ctx c.queue 731232129 { val := 0, isLt := ⋯ }
+                                      w).world).world).attempts }).outcome,
+              world :=
+                (match
+                    (decodeWord a 0
+                        (call
+                            (external keccak
+                              (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                              other)
+                            ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).outcome with
+                  | Except.error e =>
+                    { outcome := Except.error e,
+                      world :=
+                        (decodeWord a 0
+                            (call
+                                (external keccak
+                                  (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                  other)
+                                ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world,
+                      attempts :=
+                        (decodeWord a 0
+                            (call
+                                (external keccak
+                                  (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                  other)
+                                ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).attempts }
+                  | Except.ok a_1 =>
+                    {
+                      outcome :=
+                        ((if a_1.val = 0 then
+                              bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                            else pureExec false)
+                            (decodeWord a 0
+                                (call
+                                    (external keccak
+                                      (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                      c other)
+                                    ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).outcome,
+                      world :=
+                        ((if a_1.val = 0 then
+                              bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                            else pureExec false)
+                            (decodeWord a 0
+                                (call
+                                    (external keccak
+                                      (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                      c other)
+                                    ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).world,
+                      attempts :=
+                        (decodeWord a 0
+                              (call
+                                  (external keccak
+                                    (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                    other)
+                                  ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).attempts ++
+                          ((if a_1.val = 0 then
+                                bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                              else pureExec false)
+                              (decodeWord a 0
+                                  (call
+                                      (external keccak
+                                        (Verity.Core.Address.ofNat
+                                          (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                        c other)
+                                      ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).attempts }).world,
+              attempts :=
+                (call
+                      (external keccak
+                        (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c other)
+                      ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).attempts ++
+                  (match
+                      (decodeWord a 0
+                          (call
+                              (external keccak
+                                (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                other)
+                              ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).outcome with
+                    | Except.error e =>
+                      { outcome := Except.error e,
+                        world :=
+                          (decodeWord a 0
+                              (call
+                                  (external keccak
+                                    (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                    other)
+                                  ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world,
+                        attempts :=
+                          (decodeWord a 0
+                              (call
+                                  (external keccak
+                                    (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c
+                                    other)
+                                  ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).attempts }
+                    | Except.ok a_1 =>
+                      {
+                        outcome :=
+                          ((if a_1.val = 0 then
+                                bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                              else pureExec false)
+                              (decodeWord a 0
+                                  (call
+                                      (external keccak
+                                        (Verity.Core.Address.ofNat
+                                          (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                        c other)
+                                      ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).outcome,
+                        world :=
+                          ((if a_1.val = 0 then
+                                bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                              else pureExec false)
+                              (decodeWord a 0
+                                  (call
+                                      (external keccak
+                                        (Verity.Core.Address.ofNat
+                                          (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                        c other)
+                                      ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).world).world,
+                        attempts :=
+                          (decodeWord a 0
+                                (call
+                                    (external keccak
+                                      (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                      c other)
+                                    ctx c.queue 731232129 { val := 0, isLt := ⋯ } w).world).attempts ++
+                            ((if a_1.val = 0 then
+                                  bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+                                else pureExec false)
+                                (decodeWord a 0
+                                    (call
+                                        (external keccak
+                                          (Verity.Core.Address.ofNat
+                                            (w.core.readContractSlot ctx.self.val locatorSlot).val)
+                                          c other)
+                                        ctx c.queue 731232129 { val := 0, isLt := ⋯ }
+                                        w).world).world).attempts }).attempts }).attempts =
+        [{
+            request :=
+              { caller := ctx.self, target := c.queue, value := { val := 0, isLt := ⋯ },
+                payload := encode 4 731232129 },
+            accepted := true, returned := bunkerBytes c.queue w }]
+LidoSRv3/Audit/Source/TrioReserve1/QueueCalls.lean:50:47: warning: This simp argument is unused:
+  hb
+
+Hint: Omit it from the simp argument list.
+  simp [canDeposit, bind, bindExec, hlookup, hb̵,̵ ̵h̵decode, hs, pure, pureExec,
+  ̵  ̵ ̵ ̵ ̵ ̵Live.read, word,
+  ̲  ̲ ̲ ̲ ̲ ̲Verity.Core.Uint256.ofNat, lookupAttempt]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/QueueCalls.lean:50:51: warning: This simp argument is unused:
+  hdecode
+
+Hint: Omit it from the simp argument list.
+  simp [canDeposit, bind, bindExec, hlookup, hb, hd̵e̵c̵o̵d̵e̵,̵ ̵h̵s, pure, pureExec,
+  ̵  ̵ ̵ ̵ ̵ ̵Live.read, word,
+  ̲  ̲ ̲ ̲ ̲ ̲Verity.Core.Uint256.ofNat, lookupAttempt]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/QueueCalls.lean:50:60: warning: This simp argument is unused:
+  hs
+
+Hint: Omit it from the simp argument list.
+  simp [canDeposit, bind, bindExec, hlookup, hb, hdecode, h̵s̵,̵ ̵pure, pureExec,
+  ̵  ̵ ̵ ̵ ̵ ̵Live.read, word,
+  ̲  ̲ ̲ ̲ ̲ ̲Verity.Core.Uint256.ofNat, lookupAttempt]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/QueueCalls.lean:50:70: warning: This simp argument is unused:
+  pureExec
+
+Hint: Omit it from the simp argument list.
+  simp [canDeposit, bind, bindExec, hlookup, hb, hdecode, hs, pure, p̵u̵r̵e̵E̵x̵e̵c̵,̵
+  ̵ ̵ ̵ ̵ ̵ ̵ ̵Live.read, word,
+  ̲  ̲ ̲ ̲ ̲ ̲Verity.Core.Uint256.ofNat, lookupAttempt]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/QueueCalls.lean:51:6: warning: This simp argument is unused:
+  Live.read
+
+Hint: Omit it from the simp argument list.
+  simp [canDeposit, bind, bindExec, hlookup, hb, hdecode, hs, pure, pureExec, ̲w̲o̲r̲d̲,̲
+        L̵i̵v̵e̵.̵r̵e̵a̵d̵,̵ ̵w̵o̵r̵d̵,̵ ̵Verity.Core.Uint256.ofNat, lookupAttempt]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

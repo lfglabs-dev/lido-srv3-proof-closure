@@ -1,0 +1,19 @@
+{
+  "source_commit": "2aa7917f6223628208dd06e835b1be263b7e584b",
+  "historical_execution_source": "0fde6481707ba16f63ff324547bc2761e1d7b136",
+  "changed_paths": [
+    "LidoSRv3/Audit/Source/TrioReserve1/ABI.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/Admission.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/AdmissionSpec.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/CallResults.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/OracleCalls.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/QueueCalls.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/Spending.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/SpendingSpec.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/WithdrawalComposition.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/WithdrawalTail.lean",
+    "LidoSRv3/Tests/TrioReserve1/LiveTrust.lean"
+  ],
+  "differential_runner_and_its_executed_source_unchanged": true,
+  "scope": "Source comparison; new composition helpers checked by Lean, not additional differential execution"
+}

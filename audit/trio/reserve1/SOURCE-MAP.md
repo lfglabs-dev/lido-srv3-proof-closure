@@ -15,7 +15,7 @@ No canonical source-map or guarantee entries are changed.
 | queue demand | `contracts/0.8.9/WithdrawalQueueBase.sol:143-146` | `Queue.unfinalized_corresponds` / `QueueSpec` | physical current ids/rows, numeric return/panic relation; cryptographic primitive parameter |
 | bunker getter | `contracts/0.8.9/WithdrawalQueue.sol:346-354` | `Queue.isBunkerModeActive`; inherited Solidity execution | actual timestamp/max sentinel; writer ACL closure open |
 | locator getters | `contracts/0.8.9/LidoLocator.sol:46-56,78-88` | Locator.dispatch/getter proofs; inherited 0.8.9 constructor/getters executed | queue/router/oracle immutable values; deployment binding remains explicit |
-| oracle frame | `contracts/0.8.9/oracle/AccountingOracle.sol:439-442,561-563`; `BaseOracle.sol:357-360` | `Oracle.frame_success`, `timestamp_corresponds`, `frame_preserves`; inherited source execution | actual physical consensus pointer, nested STATICCALL, malformed/rejected bytes and checked timestamp; full parent/ABI composition open |
+| oracle frame | `contracts/0.8.9/oracle/AccountingOracle.sol:439-442,561-563`; `BaseOracle.sol:357-360` | `Oracle.frame_success`, `timestamp_corresponds`, `frame_preserves`; inherited source execution | actual physical consensus pointer, nested STATICCALL, malformed/rejected bytes and checked timestamp; complete getter binding via ConsensusCalls; deployment/full parent open |
 | consensus frame | `contracts/0.8.9/oracle/HashConsensus.sol:307-312,644-719` | `Consensus.compute_success` / independent `FrameSpec`; compiler-derived physical frame slot | uint64 frame-span multiplication, uint256 remaining arithmetic, initial-epoch and divide-by-zero failures; raw writer setup is not production admission |
 | router receipt | `contracts/0.8.25/sr/StakingRouter.sol:665-669` | Router/RouterSpec auth, event and CALL theorems; inherited 0.8.25 Cancun execution | exact-selector receiver composition; full router parent/bytecode refinement open |
 
@@ -92,3 +92,18 @@ actual_receiver and tail_failure_rolls_back cover its concrete effects.
 overflow without assuming uint128 output bounds. `WithdrawalComposition.after_frame`
 composes actual allocation/frame executions through spending into the tail;
 spending_failure and late_failure retain full rollback and ordered traces.
+
+`QueueCalls.status`, `allocation_success` and `allocation_panic` compose the
+physical pointer and actual queue dispatch through returned bytes. `live_allocation_spec`
+uses the identical physical Queue.StateRel. CallResults covers router/oracle
+lookups too. OracleCalls binds Oracle.frame through the concrete dispatch chain
+to getCurrentFrame success or bubbled rejection, including nested attempts.
+Code-presence/address-separation and complete consensus/deployment bindings remain
+explicit obligations; no arbitrary successful-callee premise is substituted.
+
+`ConsensusCalls.static_success/static_rejection` bind the source getter to the
+actual STATICCALL. oracle_frame/rejection/overflow/no_code bind the physical
+consensus pointer and checked timestamp, preserving nested attempts. lido_frame
+composes both ABI decoders to exact reference/time values; independent_rules
+uses the same physical frame word and immutable source inputs. Constructor/layout
+and primitive relations remain explicit upstream deployment obligations.

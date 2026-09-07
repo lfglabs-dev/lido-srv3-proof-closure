@@ -1,0 +1,23 @@
+LidoSRv3/Audit/Source/TrioReserve1/QueueCalls.lean:77:2: error: Tactic `split` failed: Could not split an `if` or `match` expression in the type
+  (have last := Queue.getLastRequestId queue w;
+    have finalized := Queue.getLastFinalizedRequestId queue w;
+    have hi := Queue.cumulative keccak queue w last.val;
+    have lo := Queue.cumulative keccak queue w finalized.val;
+    if lo ≤ hi then Except.ok (hi - lo) else Except.error 17) =
+    Except.ok amount
+of `h`
+
+Hint: Use `set_option trace.split.failure true` to display additional diagnostic information
+
+keccak : Queue.Keccak
+queue : Address
+w : World
+amount : Nat
+h :
+  (have last := Queue.getLastRequestId queue w;
+    have finalized := Queue.getLastFinalizedRequestId queue w;
+    have hi := Queue.cumulative keccak queue w last.val;
+    have lo := Queue.cumulative keccak queue w finalized.val;
+    if lo ≤ hi then Except.ok (hi - lo) else Except.error 17) =
+    Except.ok amount
+⊢ amount < width

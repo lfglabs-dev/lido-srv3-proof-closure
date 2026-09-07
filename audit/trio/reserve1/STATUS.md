@@ -1,5 +1,55 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Consensus-to-Lido frame composition
+
+`ConsensusCalls` executes the actual HashConsensus dispatcher under STATICCALL,
+using block timestamp and the physical frame word. It derives uint64 reference/
+deadline bounds from FrameSpec, decodes the returned reference exactly, and binds
+AccountingOracle's checked timestamp to that result. Independent FrameSpec and
+OracleSpec relations use the same actual source inputs. Consensus rejection,
+missing code, and timestamp overflow preserve the exact nested-attempt distinction:
+a successful consensus call followed by oracle overflow remains an accepted
+nested attempt inside the outer rejection.
+
+`lido_frame` composes the complete getter path through Lido's physical locator,
+immutable oracle lookup, BaseOracle's consensus pointer, source consensus getter,
+and both ABI decoders. It returns exact natural reference/time values with the
+unchanged world, two direct attempts and one nested STATICCALL. Constructor,
+compiler-layout, code/address and primitive binding remain explicit obligations;
+this does not establish full deployment or whole-withdrawal specification closure.
+
+All 35 owned modules passed at `a5492850a01aefb8f188f9f172d7172348de1d38`.
+`receipts/consensus-binding-summary.json` links exact source/toolchain/commands/exits,
+standard-axiom inspection, six baseline checks and import-DAG validation (all 0),
+dependency/wrapper identity and source delta. The differential runner and its
+previously executed source remain unchanged. Full gates still lack terminal
+receipts and supported complete-source/dependency transport.
+
+## Concrete getter and callee binding
+
+`CallResults` now proves all three immutable locator lookups through physical
+pointer read, code guard, CALL, byte decoding and address cast. `QueueCalls`
+composes locator and actual queue source dispatch: status uses physical bunker/
+pause state; demand success and panic are exact; allocation receives the live
+physical row difference through ABI decoding. Successful demand is bounded by
+uint128 from physical extraction. The independent LiveDescribes relation uses
+the same physically related queue state, without cached-demand or monotone-row
+premises. These getters preserve the full world and exact direct-call trace.
+
+`OracleCalls` composes locator/queue/oracle dispatch and binds actual Oracle.frame
+success/rejection to the enclosing current-frame getter. Successful tuple decoding,
+bubbled failures and nested STATICCALL attempts are exact. Code presence and
+relevant address separation are explicit input/deployment obligations. Oracle.frame
+still takes the read-only consensus interpreter: complete concrete consensus
+input/deployment binding and independent whole-parent coverage remain open.
+
+All 34 owned modules passed at `2aa7917f6223628208dd06e835b1be263b7e584b`.
+`receipts/concrete-summary.json` links exact source/toolchain/commands/exit evidence,
+standard-axiom inspection, six baseline checks and import-DAG validation (all 0),
+dependency/wrapper identity and source delta. The differential runner and its
+previously executed source remain unchanged; new composition helpers are Lean-checked.
+Full gates still lack terminal receipts and a supported dependency transport.
+
 ## Spending specification and parent composition
 
 `SpendingSpec` independently relates admitted allocation to untruncated buffer,

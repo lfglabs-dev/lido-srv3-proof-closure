@@ -1,0 +1,63 @@
+{
+  "source_commit": "a5492850a01aefb8f188f9f172d7172348de1d38",
+  "checks": [
+    {
+      "argv": [
+        "python3",
+        "scripts/check_proof_escapes.py"
+      ],
+      "exit": 0,
+      "log": "consensus-binding-check_proof_escapes.txt"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/check_source_annotations.py"
+      ],
+      "exit": 0,
+      "log": "consensus-binding-check_source_annotations.txt"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/check_report_theorem_inventory.py"
+      ],
+      "exit": 0,
+      "log": "consensus-binding-check_report_theorem_inventory.txt"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/check_verity_provenance.py"
+      ],
+      "exit": 0,
+      "log": "consensus-binding-check_verity_provenance.txt"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/check_pinned_source.py"
+      ],
+      "exit": 0,
+      "log": "consensus-binding-check_pinned_source.txt"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/audit_metadata.py",
+        "check"
+      ],
+      "exit": 0,
+      "log": "consensus-binding-audit_metadata.txt"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/check_import_dag.py"
+      ],
+      "exit": 0,
+      "log": "consensus-binding-import-dag.txt"
+    }
+  ],
+  "scope": "Baseline checks, not full gates or new canonical registration"
+}

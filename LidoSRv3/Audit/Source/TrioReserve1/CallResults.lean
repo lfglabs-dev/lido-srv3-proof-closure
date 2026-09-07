@@ -55,6 +55,50 @@ theorem queue_lookup (ctx : Context) (w : World) (c : Locator.Config) (other : E
   have h := locator_reply _ ctx 0x37d5fe99 c.queue.val w w [] _ hc
   simpa only [address_word] using h
 
+theorem router_lookup (ctx : Context) (w : World) (c : Locator.Config) (other : External)
+    (hcode : (w.core.codeSize
+      (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val).val).val ≠ 0) :
+    let locator := Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val
+    stakingRouter (Locator.dispatch locator c other) ctx w =
+      ⟨.ok c.router, w,
+        [⟨⟨ctx.self, locator, word 0, encode 4 0xef6c064c⟩, true, encode 32 c.router.val, []⟩]⟩ := by
+  dsimp only
+  unfold stakingRouter
+  have hc : call (Locator.dispatch
+      (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c other)
+      ctx (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val)
+      0xef6c064c (word 0) w =
+      ⟨.ok (encode 32 c.router.val ++ []), w,
+        [⟨⟨ctx.self, Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val,
+          word 0, encode 4 0xef6c064c⟩, true, encode 32 c.router.val, []⟩]⟩ := by
+    simp only [Verity.Core.Address.val_ofNat] at hcode
+    have hsel : encode 4 0xef6c064c ≠ encode 4 0x37d5fe99 := by decide
+    simp [hsel, call, hcode, word, Verity.Core.Uint256.ofNat, transfer_zero, Locator.dispatch]
+  have h := locator_reply _ ctx 0xef6c064c c.router.val w w [] _ hc
+  simpa only [address_word] using h
+
+theorem oracle_lookup (ctx : Context) (w : World) (c : Locator.Config) (other : External)
+    (hcode : (w.core.codeSize
+      (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val).val).val ≠ 0) :
+    let locator := Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val
+    locatorAddress (Locator.dispatch locator c other) ctx 0x5a2031f9 w =
+      ⟨.ok c.oracle, w,
+        [⟨⟨ctx.self, locator, word 0, encode 4 0x5a2031f9⟩, true, encode 32 c.oracle.val, []⟩]⟩ := by
+  dsimp only
+  have hc : call (Locator.dispatch
+      (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c other)
+      ctx (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val)
+      0x5a2031f9 (word 0) w =
+      ⟨.ok (encode 32 c.oracle.val ++ []), w,
+        [⟨⟨ctx.self, Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val,
+          word 0, encode 4 0x5a2031f9⟩, true, encode 32 c.oracle.val, []⟩]⟩ := by
+    simp only [Verity.Core.Address.val_ofNat] at hcode
+    have hq : encode 4 0x5a2031f9 ≠ encode 4 0x37d5fe99 := by decide
+    have hr : encode 4 0x5a2031f9 ≠ encode 4 0xef6c064c := by decide
+    simp [hq, hr, call, hcode, word, Verity.Core.Uint256.ofNat, transfer_zero, Locator.dispatch]
+  have h := locator_reply _ ctx 0x5a2031f9 c.oracle.val w w [] _ hc
+  simpa only [address_word] using h
+
 theorem frame_reply (external : External) (ctx : Context) (oracle : Address)
     (w located after : World) (nonce time : Nat) (suffix : Bytes)
     (lookupTrace callTrace : List Attempt)

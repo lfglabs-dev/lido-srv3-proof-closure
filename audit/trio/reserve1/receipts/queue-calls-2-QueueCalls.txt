@@ -1,0 +1,106 @@
+LidoSRv3/Audit/Source/TrioReserve1/QueueCalls.lean:41:99: error: unsolved goals
+case false
+keccak : Queue.Keccak
+c : Locator.Config
+other : External
+ctx : Context
+w : World
+hd : c.queue ≠ Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val
+hl : (w.core.codeSize (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val).val).val ≠ 0
+hq : (w.core.codeSize c.queue.val).val ≠ 0
+hb :
+  call (external keccak (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c other) ctx
+      c.queue 731232129 (word 0) w =
+    { outcome := Except.ok (bunkerBytes c.queue w), world := w,
+      attempts :=
+        [{ request := { caller := ctx.self, target := c.queue, value := word 0, payload := encode 4 731232129 },
+            accepted := true, returned := bunkerBytes c.queue w }] }
+hdecode :
+  decodeWord (bunkerBytes c.queue w) 0 w =
+    { outcome := Except.ok (word (if Queue.isBunkerModeActive c.queue w = true then 1 else 0)), world := w }
+hlookup :
+  withdrawalQueue
+      (external keccak (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c other) ctx
+      w =
+    { outcome := Except.ok c.queue, world := w,
+      attempts :=
+        [{
+            request :=
+              { caller := ctx.self,
+                target := Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val,
+                value := word 0, payload := encode 4 936771225 },
+            accepted := true, returned := encode 32 c.queue.val }] }
+hs : Queue.isBunkerModeActive c.queue w = false
+⊢ (bindExec (Live.read ctx activeSlot) (fun active => pureExec !decide (active.val = 0)) w).outcome =
+      Except.ok !decide ((w.core.readContractSlot ctx.self.val activeSlot).val = 0) ∧
+    (bindExec (Live.read ctx activeSlot) (fun active => pureExec !decide (active.val = 0)) w).world = w ∧
+      (bindExec (Live.read ctx activeSlot) (fun active => pureExec !decide (active.val = 0)) w).attempts = []
+
+case true
+keccak : Queue.Keccak
+c : Locator.Config
+other : External
+ctx : Context
+w : World
+hd : c.queue ≠ Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val
+hl : (w.core.codeSize (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val).val).val ≠ 0
+hq : (w.core.codeSize c.queue.val).val ≠ 0
+hb :
+  call (external keccak (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c other) ctx
+      c.queue 731232129 (word 0) w =
+    { outcome := Except.ok (bunkerBytes c.queue w), world := w,
+      attempts :=
+        [{ request := { caller := ctx.self, target := c.queue, value := word 0, payload := encode 4 731232129 },
+            accepted := true, returned := bunkerBytes c.queue w }] }
+hdecode :
+  decodeWord (bunkerBytes c.queue w) 0 w =
+    { outcome := Except.ok (word (if Queue.isBunkerModeActive c.queue w = true then 1 else 0)), world := w }
+hlookup :
+  withdrawalQueue
+      (external keccak (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val) c other) ctx
+      w =
+    { outcome := Except.ok c.queue, world := w,
+      attempts :=
+        [{
+            request :=
+              { caller := ctx.self,
+                target := Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val,
+                value := word 0, payload := encode 4 936771225 },
+            accepted := true, returned := encode 32 c.queue.val }] }
+hs : Queue.isBunkerModeActive c.queue w = true
+⊢ ((if Verity.Core.Uint256.modulus = 1 then
+            bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+          else pureExec false)
+          w).outcome =
+      Except.ok false ∧
+    ((if Verity.Core.Uint256.modulus = 1 then
+              bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+            else pureExec false)
+            w).world =
+        w ∧
+      ((if Verity.Core.Uint256.modulus = 1 then
+              bindExec (Live.read ctx activeSlot) fun active => pureExec !decide (active.val = 0)
+            else pureExec false)
+            w).attempts =
+        []
+LidoSRv3/Audit/Source/TrioReserve1/QueueCalls.lean:51:10: warning: This simp argument is unused:
+  hs
+
+Hint: Omit it from the simp argument list.
+  simp [h̵s̵,̵ ̵pure, pureExec, Live.read, word, Verity.Core.Uint256.ofNat, lookupAttempt]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/QueueCalls.lean:51:20: warning: This simp argument is unused:
+  pureExec
+
+Hint: Omit it from the simp argument list.
+  simp [hs, pure, p̵u̵r̵e̵E̵x̵e̵c̵,̵ ̵Live.read, word, Verity.Core.Uint256.ofNat, lookupAttempt]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/QueueCalls.lean:51:30: warning: This simp argument is unused:
+  Live.read
+
+Hint: Omit it from the simp argument list.
+  simp [hs, pure, pureExec, L̵i̵v̵e̵.̵r̵e̵a̵d̵,̵ ̵word, Verity.Core.Uint256.ofNat, lookupAttempt]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
