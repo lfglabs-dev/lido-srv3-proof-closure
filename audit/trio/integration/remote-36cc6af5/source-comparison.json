@@ -1,0 +1,138 @@
+{
+  "classification": "REVIEWED_ADDITIVE_SOURCE_COMPARISON",
+  "base_commit": "0345a6146cd5cd10b55d318c48c2a4c578ae3bc8",
+  "head_commit": "36cc6af51c33461c2b8c5143d346a55a8638f0c6",
+  "base_tree": "6b90e0e273acffbfe649d119250cb44e771abbdb",
+  "head_tree": "73fbb92aaec86b749f82369e8b32a5d4cb09d205",
+  "existing_modified_paths": [
+    "lakefile.lean",
+    "audit/validation-receipt.txt"
+  ],
+  "existing_production_primary_metadata_scripts_unchanged": true,
+  "registration_delta": "Only four additive ByteABI leaf target registrations",
+  "changes": [
+    {
+      "status": "A",
+      "path": "audit/trio/alloc2/byte-abi/README.md",
+      "sha256": "77f97e05e42884f4f41c548af0cc56f5ad9be6c857c2964ca64126a82820fccb"
+    },
+    {
+      "status": "A",
+      "path": "audit/trio/alloc2/byte-abi/focused-validation.json",
+      "sha256": "797a647dba456bf5670c4c08c7857b8e385455b5bb7b33c7f42d927f35211f46"
+    },
+    {
+      "status": "A",
+      "path": "audit/trio/alloc2/byte-abi/lake-manifest.json",
+      "sha256": "00aea80a823559dba76ac247531cd9d7dc6a368ab4c24cdba61b4f795651a93b"
+    },
+    {
+      "status": "A",
+      "path": "audit/trio/alloc2/byte-abi/lakefile.lean",
+      "sha256": "79135d788c5db8f0b5a26ce93de4bd74be3652379bd074286114b123a1abce55"
+    },
+    {
+      "status": "A",
+      "path": "audit/trio/alloc2/byte-abi/mutant-before-citation.json",
+      "sha256": "3e9a9fc5dc38682ebbf8ad845c645a616193e998022b8b63c24b511355904517"
+    },
+    {
+      "status": "A",
+      "path": "audit/trio/alloc2/byte-abi/prepare.py",
+      "sha256": "c022a3bb1c42af567ae1e52ba82d758e777c0d42668cbe4e80d1fa2554a5ef12"
+    },
+    {
+      "status": "A",
+      "path": "audit/trio/alloc2/byte-abi/source-checks.json",
+      "sha256": "bb8c732d2dad735d9bdf2e300591c1fb9951cba3e8d889d60ae12e166437d347"
+    },
+    {
+      "status": "A",
+      "path": "audit/trio/alloc2/byte-abi/source-identity.json",
+      "sha256": "68193c03cb6c0d1e99d8898c8ece93b52c12c3ca24f25b40cfd3dfd332925bb9"
+    },
+    {
+      "status": "A",
+      "path": "audit/trio/alloc2/byte-copy-execution.json",
+      "sha256": "b8e40c8b4e0cb8221ef0f2b805187769083a5fd8c54077138de4da4bdfe55a16"
+    },
+    {
+      "status": "A",
+      "path": "audit/trio/alloc2/byte-copy-mutant.json",
+      "sha256": "31ace36e3f546052d99e1060e32ddb8ec26c40a5ab1032bd52ccb34b8d732eb1"
+    },
+    {
+      "status": "A",
+      "path": "audit/trio/alloc2/receipt-4862113d-74db-4a6f-80f4-06587ad189e9.json",
+      "sha256": "ab5e188b67e53915c4dc3b6c36f0c971562c8286523e0e278a181466372c95d7"
+    },
+    {
+      "status": "A",
+      "path": "audit/trio/alloc2/receipt-78df9909-b8d4-4268-88e9-c60eccc0d6a5.json",
+      "sha256": "1fea816e91003cc43f093a2c8dd9a9e96245cefc7fce683c0a99e59eea82e169"
+    },
+    {
+      "status": "A",
+      "path": "audit/trio/alloc2/receipt-8cd1cd92-c9eb-46c8-a515-31331d1141d3.json",
+      "sha256": "fd47b41bb26431e88bf5536ccf3da425b02155c0d560b5005db6243492e1478f"
+    },
+    {
+      "status": "A",
+      "path": "audit/trio/alloc2/receipt-b0faae30-98d7-49cd-ab1c-f3e53ec42d83.json",
+      "sha256": "6fe7a359945dc20081154deb106edf853172c186bd934f40999bf9cb78275ec3"
+    },
+    {
+      "status": "A",
+      "path": "audit/trio/alloc2/runtime/ByteABI.lean",
+      "sha256": "05e32aee289cc0f59d8de02352db9869b6acb3c42d0dae1d19cb3db320724d68"
+    },
+    {
+      "status": "A",
+      "path": "audit/trio/alloc2/runtime/ByteABIFrame.lean",
+      "sha256": "bd9595e353705690454f0c9616e4e3cf25d0a307cde89446229a2a25cb1627ec"
+    },
+    {
+      "status": "A",
+      "path": "audit/trio/alloc2/runtime/ByteABIProducer.lean",
+      "sha256": "aed60b7bae5cfd2ca27578f2e5b0869acfbdc970d7a1db2f992969f22f544fa3"
+    },
+    {
+      "status": "A",
+      "path": "audit/trio/alloc2/runtime/ByteABIVectors.lean",
+      "sha256": "730c21d5d4bd2444644c898295577276cad9c67cdbd224bf47b2f1f8898f485c"
+    },
+    {
+      "status": "A",
+      "path": "audit/trio/integration/RunByteABI.lean",
+      "sha256": "f1da243885818643c4a6007ebc25de9318434decf944a19923250558cde71326"
+    },
+    {
+      "status": "A",
+      "path": "audit/trio/integration/byte-abi-followup.md",
+      "sha256": "1916ca2bbebd7d38488a262731fd74f77c3d4d91f2eb833898a2718075fe7c96"
+    },
+    {
+      "status": "M",
+      "path": "audit/validation-receipt.txt",
+      "sha256": "797999d5e086fd1da49522a032642c6b14191f04953f75f03131ba9ee1243ffa"
+    },
+    {
+      "status": "M",
+      "path": "lakefile.lean",
+      "sha256": "5f6f84fc025ade37309677bdeab1dc1a9dce4f41aad52c89b0417405fc2967f6"
+    },
+    {
+      "status": "A",
+      "path": "solidity/trio-alloc2/ByteCopy.sol",
+      "sha256": "d1578a99e519a4838c1e88b0a7513eed4654db67a763107ed67a905b5c21cce8"
+    },
+    {
+      "status": "A",
+      "path": "solidity/trio-alloc2/byte-copy.mjs",
+      "sha256": "d0c5a8a3ed609729184241ecf9d83d1c145ee9f9046eda3c215b067ddf8fa8f3"
+    }
+  ],
+  "independent_review": "independent-review.json",
+  "validation_plan": "Full RunValidation at base plus focused RunByteABI at head; neither receipt certifies full RunValidation at head",
+  "scope": "Canonical byte-copy ABI and disjoint frame leaves; no expanded deployed VM, malformed-return or compiler guarantee"
+}

@@ -1,9 +1,11 @@
 # Trio composition delivery record
 
-Status: the final stored-parent composition passed full official validation at
-`9156db535a6a25d4c28bbe98689c1251607f1d78`, including the additive byte-memory
-and report modules. PR249 and PR245 are merged. The final byte-runtime, vault
-callback and queue-finalization follow-up awaits its combined validation and merge verdict. This document is not a deployment certificate.
+Status: the full composition at `0345a6146cd5cd10b55d318c48c2a4c578ae3bc8`
+passed all six official RunValidation gates. The final additive ABI-copy source
+at `36cc6af51c33461c2b8c5143d346a55a8638f0c6` passed its two focused root gates.
+Both source reviews are CLEAN and their validation prerequisites are satisfied.
+PR249 and PR245 are merged; PR251 (including PR244 and PR246) awaits the final
+archive review and merge at this historical snapshot. This is not a deployment certificate.
 The old primary guarantee declarations are preserved. The new source composition
 is registered separately in each trio target's `execution_review` in
 `audit/source-map.yaml` and printed by `LidoSRv3/Audit/Trust.lean`.
@@ -101,6 +103,11 @@ The complete passing receipt for the stored-parent composition is archived in
 match the pinned Solidity records (`remote-51037be4/parent-comparison.json`).
 
 Earlier failed full/targeted jobs remain under `remote-*` with their actual
-failure classification. Final source SHA, full receipt, independent approval,
-merge SHAs and aligned site pin must be recorded before claiming delivery.
+failure classification. The final receipts and source comparisons are archived in `remote-0345a614/`
+and `remote-36cc6af5/`. The source-comparison record documents why unchanged
+production uses the full0345 receipt while additive leaves use focused36cc.
+The archive commit only refreshes evidence, the UX source fingerprint and its
+canonical tree receipt. It is not represented as another fully built source.
+Final merge outcomes and the locally prepared site are recorded separately after
+this archive snapshot. The site source pin is36cc and distinguishes both gates.
 Publication or sending the dossier to Lido still requires Thomas's approval.
