@@ -1,5 +1,24 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Exhaustive withdrawal parent control relation
+
+`WithdrawalSpec.Executes` is independent of source executors. Its eight ordered
+rules cover status failure/denial, router failure, authorization denial, zero
+amount, spending failure, success and tail failure. Each stage starts in the
+actual prior stage's returned world, the looked-up router is retained, and
+unvisited stages need no derivation. Every failure restores the original world
+while ordered attempt traces survive. These facts include independent rollback
+and successful-nonzero theorems.
+
+`WithdrawalParent` gives soundness, completeness and bidirectional exact
+return/world/trace correspondence for the full parent, instantiated with actual
+status/router/spending/tail observations. This is exhaustive structural parent
+coverage, not discharged independent internals for every stage. Existing concrete
+callee/composition proofs must still discharge stage interfaces across all paths;
+deployed primitive/resource binding, remaining report/queue writers and canonical
+full remote integration gates remain open. Immutable validation follows checks.
+Runtime execution source and prior execution receipts are unchanged.
+
 ## Target continuation: exhaustive after authorization
 
 `TargetSpec.Completes` is an independent generic transaction rule with no source
