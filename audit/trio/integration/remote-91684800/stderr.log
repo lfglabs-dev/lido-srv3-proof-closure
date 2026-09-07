@@ -1,0 +1,7 @@
+From https://github.com/lfglabs-dev/lido-srv3-proof-closure
+ * branch            integration/trio-closure -> FETCH_HEAD
+HEAD is now at 9168480 Refresh audit source identity after producer checkpoint integration
+remote-lean-build: pinned tree contains submodules; using legacy runner fetch
+remote-lean-build: dispatching lake build LidoSRv3 LidoSRv3Test LidoSRv3Audit for 9168480096fe ...
+remote-lean-build: submitted job e380a57b-921d-46af-b2ea-38053f29ad72 on node 'dgx-spark'; receipt /root/.local/state/sandboxed-sh/remote-builds/56464fa2b4a1f3f96acaa05e5afb638dddf04a404d74202116514279aa5ba5d9.json
+remote-lean-build: job e380a57b-921d-46af-b2ea-38053f29ad72 on node 'dgx-spark' finished: succeeded (exit 0, 455s)
