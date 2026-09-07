@@ -108,6 +108,11 @@ async function main() {
   addresses.fullLocator = await fullLocator.getAddress();
   sourceLocators.push({locator:decimal(addresses.fullLocator),queue:decimal(addresses.queue),
     router:decimal(addresses.sourceRouter),oracle:decimal(addresses.sourceOracle)});
+  const rejectedLocator = await deploy('LocatorHarness','LocatorHarness',[
+    {...fullLocatorConfig,stakingRouter:addresses.wrongRouter}]);
+  addresses.rejectedLocator = await rejectedLocator.getAddress();
+  sourceLocators.push({locator:decimal(addresses.rejectedLocator),queue:decimal(addresses.queue),
+    router:decimal(addresses.wrongRouter),oracle:decimal(addresses.sourceOracle)});
   const send = async tx => (await tx).wait();
   for (const c of [sourceOracle,mulOverflowOracle,addOverflowOracle])
     await send(c.fixtureStore(consensusPointer,BigInt(addresses.consensus)));
@@ -307,6 +312,10 @@ async function main() {
   const sourceRun = (name,setup,success=true,check=()=>{})=>run(name,async()=>{await fullSource();await setup();},30n,2n,success,check,false,sourceRouter);
   await sourceRun('source oracle consensus frame and receiver compose',noop,true,
     after=>{assert.equal(after.balances.lido,'70');assert.equal(after.balances.sourceRouter,'30');});
+  await sourceRun('full pipeline ETH shortage after accounting and seeds',
+    ()=>backend.request({method:'hardhat_setBalance',params:[addresses.lido,'0x1']}),false);
+  await run('full pipeline source receiver rejects after accounting and seeds',
+    ()=>store('locator',BigInt(addresses.rejectedLocator)),30n,2n,false,()=>{},false,wrongRouter);
   await sourceRun('source consensus zero frame length panics',
     ()=>send(consensus.fixtureStore(ethers.toBeHex(frameSlot,32),1n)),false);
   await sourceRun('source consensus initial epoch not arrived',
