@@ -1,7 +1,7 @@
-verified_source_tree=d06df83696357693bd70a3abd65c64a256fbd9ec
+verified_source_tree=fea2b5afe4848e61c0ff28b7df5d8e2e9a30c54c
 lean_version=Lean (version 4.31.0, arm64-apple-darwin24.6.0, commit 68218e876d2a38b1985b8590fff244a83c321783, Release)
 proof_targets=LidoSRv3 LidoSRv3Legacy
-⚠ [11/172] Replayed Verity.Core
+⚠ [11/130] Replayed Verity.Core
 warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
@@ -11,7 +11,7 @@ Note: This linter can be disabled with `set_option linter.unnecessarySimpa false
 warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
-⚠ [1160/1415] Replayed Conform.Wheels
+⚠ [1156/1195] Replayed Conform.Wheels
 warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
 
 Note: The updated constant has a different type:
@@ -24,7 +24,7 @@ Note: The updated constant has a different type:
   {α : Sort u} → (α → α → Prop) → Prop
 instead of
   (α : Sort u_1) → (α → α → Prop) → Prop
-⚠ [1161/1415] Replayed EvmYul.Pretty
+⚠ [1168/1415] Replayed EvmYul.Pretty
 warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
 
 Note: The updated constant has a different type:
@@ -2482,7 +2482,7 @@ Hint: Omit it from the simp argument list.
   ̵  ̵ ̵ ̵ ̵ ̵Outcome.reverts, Outcome.pulled, Outcome.pushed, hrun] at hconserves ⊢
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1399/1415] Replayed LidoSRv3.Audit.Verity.ConsolidationFee
+⚠ [1400/1415] Replayed LidoSRv3.Audit.Verity.ConsolidationFee
 warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:446:5: Variable name `hsize` is not explicitly referenced.
 
 The binding can be removed (if unused) or named `_` (if used implicitly).
@@ -2536,13 +2536,13 @@ Hint: Omit it from the simp argument list.
   ̲  ̲ ̲ ̲hvalid₀, hinvalid₁,̵ ̵h̵r̵e̵q̵u̵e̵s̵t̵]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1400/1415] Replayed LidoSRv3.Audit.Verity.DepositLedgerTx
+⚠ [1401/1415] Replayed LidoSRv3.Audit.Verity.DepositLedgerTx
 warning: LidoSRv3/Audit/Verity/DepositLedgerTx.lean:140:35: Variable name `n` is not explicitly referenced.
 
 The binding can be removed (if unused) or named `_` (if used implicitly).
 
 Note: This linter can be disabled with `set_option linter.unusedVariables false`
-⚠ [1402/1415] Replayed LidoSRv3.Audit.Verity.DepositTx
+⚠ [1403/1415] Replayed LidoSRv3.Audit.Verity.DepositTx
 warning: LidoSRv3/Audit/Verity/DepositTx.lean:153:35: This simp argument is unused:
   Pure.pure
 
@@ -2557,12 +2557,11 @@ Hint: Omit it from the simp argument list.
   ̲  ̲ ̲ ̲Nat.mod_eq_of_lt hAmountLt]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1409/1415] Replayed LidoSRv3.Legacy.SpecProofs
+⚠ [1410/1415] Replayed LidoSRv3.Legacy.SpecProofs
 warning: LidoSRv3/Legacy/SpecProofs.lean:1631:2: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
-✔ [1411/1415] Built LidoSRv3.Audit.Model.EthWorld (594ms)
-✔ [1412/1415] Built LidoSRv3.Audit.Model.EthConfinement (268ms)
-✔ [1413/1415] Built LidoSRv3.Audit.Guarantees.PEthConfinement1 (247ms)
-✔ [1414/1415] Built LidoSRv3 (7.8s)
+✔ [1412/1415] Built LidoSRv3.Audit.Model.EthConfinement (630ms)
+✔ [1413/1415] Built LidoSRv3.Audit.Guarantees.PEthConfinement1 (388ms)
+✔ [1414/1415] Built LidoSRv3 (6.6s)
 Build completed successfully (1415 jobs).
