@@ -1,5 +1,32 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Continuation after recovery of fa377ac
+
+Recovered exact head `fa377ac1372733b8781255a5e47cfde80f92e9d6` and verified
+open draft PR #244 at that SHA. All eleven local dependency heads still match
+the pinned manifest. `receipts/continuation-recovery.json` retains the check.
+
+The installed remote wrapper's supported `REMOTE_BUILD_SOURCE_MODE=full`
+fails locally with exit 2 on the tracked `lido-core` gitlink: it requires a
+regular file. No job or bundle digest was produced. This wrapper also rejects
+`.lake` path components and exposes no dependency-bundle transport. The old
+remote authentication failure remains infrastructure evidence. Do not treat
+either failure as proof failure or completion, or silently omit dependencies.
+The wrapper's attempted `--help` was interpreted as build argv and rejected by
+the node with HTTP 422 (only lake/lean commands allowed); it was not a build.
+
+`AllocationSpec.lean` adds independent maximality/conservation allocation,
+uniqueness, and two-spend protection with separately related queue observations.
+Its lightweight Lean elaboration passed (`allocation-spec-2.exit` = 0), using
+existing imported oleans. This is not a clean/full-build receipt. The first
+elaboration failure is retained. Physical CALL/ABI and queue-writer composition
+are still required; this does not close the sequence or withdrawal parent.
+
+The old local gate runner is absent from the current process table; its retained
+log has no terminal exit receipt. It is interrupted/unverified, not a live wait
+or passing full gate. Heavy validation must use remote-lean-build with complete
+source and dependencies once that supported transport is available.
+
 Implementation checkpoint: `b06cf0dc0861b93592f1de80820b68ff10b6905f`.
 Own draft: https://github.com/lfglabs-dev/lido-srv3-proof-closure/pull/244
 Branch: `trio/reserve1-live-queue`; exact base:

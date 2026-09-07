@@ -1,0 +1,3 @@
+remote-lean-build: ignoring untracked non-Lean files: audit/trio/reserve1/receipts/complete-source-attempt.txt, audit/trio/reserve1/receipts/full-production-test-trust.txt, audit/trio/reserve1/receipts/remote-terminal-72e45c29-reconciliation.json, audit/trio/reserve1/receipts/remote-terminal-72e45c29.json
+source bundle path must be a regular file, not a symlink: lido-core
+remote-lean-build: failed to encode request
