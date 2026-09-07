@@ -1,3 +1,4 @@
+import LidoSRv3.Audit.Source.TrioAlloc2.ScanBounds
 import LidoSRv3.Audit.Source.TrioAlloc2.Conservation
 import LidoSRv3.Audit.Source.TrioAlloc2.Spec
 
@@ -19,3 +20,10 @@ open LidoSRv3.Audit.Source.TrioAlloc2
 #print axioms allocateLoop_conserves
 #print axioms allocate_conserves
 #print axioms allocate_twice_conserves
+
+#print axioms firstScan_count_bound
+#print axioms initialScan_count_bound
+#print axioms secondScan_upper_bound
+
+#print axioms firstScan_index_bound
+#print axioms initialScan_index_bound

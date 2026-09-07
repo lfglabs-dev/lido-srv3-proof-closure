@@ -11,6 +11,7 @@ lean_lib TrioAlloc2Slice where
   globs := #[
     .one `LidoSRv3.Audit.Source.TrioAlloc2.Word,
     .one `LidoSRv3.Audit.Source.TrioAlloc2.Step,
+    .one `LidoSRv3.Audit.Source.TrioAlloc2.ScanBounds,
     .one `LidoSRv3.Audit.Source.TrioAlloc2.Spec,
     .one `LidoSRv3.Audit.Source.TrioAlloc2.Loop,
     .one `LidoSRv3.Audit.Source.TrioAlloc2.StepBounds,
