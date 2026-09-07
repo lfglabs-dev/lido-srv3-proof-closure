@@ -1,5 +1,165 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## ERC721 queue finalization bytecode comparisons
+
+Fifteen comparisons now match the inherited pinned WithdrawalQueueERC721.finalize
+body against QueueFinalize, including physical pause and role-byte admission,
+checkpoint layout, observed storage, raw failure bytes, queue balance, sender value
+debit after transaction gas costs, events and the absence of nested calls. The
+recorded Keccak preimages cover executed 64-byte mapping hashes and model lookups.
+Cases include successful/trailing-data/zero-value calls, ordered admission and ID
+failures, amount/counter arithmetic failures, and late shares-underflow rollback.
+
+At source `7aa8c17fa03cab39749fabc4496c6cbbc4210793`, the new differential module and seven
+baseline checks pass; 110 unchanged source/olean pairs and eleven dependencies match.
+`receipts/queue-execution-summary.json` links immutable source/command/compiler and
+deployed code evidence plus compressed traces. A dedicated harness inherits the
+production finalizer unchanged; fixture helpers only set/read physical storage.
+The draft timestamp-cache runner failure and draft Lean failures are retained.
+
+These are fifteen finite local EVM cases, not independent finalization correspondence
+or report integration. Those remain open, along with deployment/entry/resource/
+codec/bounded-world and other accounting writer closure, full gates and independent
+review. The earlier composed vault runtime sources remain unchanged.
+
+## Physical queue finalization source model
+
+`QueueFinalize` models pinned ERC721 finalization and its base writer: physical
+pause timestamp and AccessControl membership admission, entry-first-ID arithmetic,
+ordered ID/amount guards, saved packed cumulative rows, checkpoint/locked/finalized
+writes, late cumulative-share subtraction and both finalization/metadata events.
+Its payable two-word dispatcher retains short-data rejection and trailing bytes.
+Thirteen Lean cases exercise successful live-demand reduction, guard failures,
+zero-value finalization and late full-world rollback. Mapping hashes are an explicit
+fixture in these model tests, not an implementation of Keccak.
+
+At source `e8d8c8964289fb1277c1dd8b8a220be781994c01`, two selected modules and seven baseline
+checks pass; 108 unchanged component source/olean pairs and eleven dependencies match.
+See `receipts/queue-finalize-summary.json` and selector/slot provenance. This is new
+source-model execution, not actual ERC721 finalization bytecode comparison. The
+prior vault suite's runtime sources remain unchanged. Actual queue EVM comparisons,
+independent finalization correspondence and report integration remain required,
+alongside the remaining deployment/entry/writer/resource/codec/world obligations.
+The remote wrapper hash and lack of exposed dependency transport remain unchanged;
+no new remote job or full-gate success is claimed. Independent review is required.
+
+## Composed report, vault and callback rules
+
+`CalleeRules` makes independent CALL semantics consume a relation describing callee
+replies. `ReportVaults` substitutes independent callback entries into vault CALLs,
+then independent vault entries into every report CALL, lookup and optional stage.
+Exact bidirectional whole-report outcome/world/attempt correspondence, completeness
+and root failure restoration are proved for the concrete composed interpreter.
+The expanded predicate contains no report/vault/callback source executor; delegated
+services, codecs and physical primitives remain explicit dependencies.
+
+The differential runner now uses this exact composed interpreter. At source
+`cd115f33e62b12e7253f0747860bfb16817a0a6e`, twelve fresh production-vault/inherited-Lido
+comparisons pass, including raw failure bytes, physical state, four balances,
+events and direct/nested CALL results. Four selected checks and seven baseline
+checks pass; 104 unchanged source/olean pairs and eleven dependencies match retained
+evidence, with standard inspected axioms. `receipts/report-vaults-summary.json`
+links new immutable commands and compressed traces. The unchanged compiled Lido
+and vault artifacts are reused with verified source/artifact provenance.
+
+Locator/queue and unhandled services are delegated. Actual queue finalization,
+remaining deployed/entry/resource/codec/bounded-world and accounting writer closure,
+full remote gates and independent review remain open.
+
+## Independent entry and reply correspondence
+
+`EntrySpec` specifies ordered two-entry selection and replies derived from complete
+transaction observations. `EntryRules` connects vault and callback specifications
+to their exact dispatcher replies, including selector priority, nonpayable/short
+vault calldata rejection, payable callbacks, fallback delegation, successful worlds
+and encoded failure/nested traces. Completeness covers every modeled request.
+ABI encoding helpers remain explicit dependencies rather than a new codec proof.
+
+Source `c7372c3e13804848bcf9740c3b996033410aebb3`: three selected checks and seven baseline
+checks pass; 103 unchanged source/olean pairs and eleven dependency revisions match.
+Inspected axioms are standard. See `receipts/entry-rules-summary.json`. The prior
+twelve production-vault runtime cases retain unchanged source hashes; no rerun.
+Enclosing callee/report composition, deployed primitive/resource/codec binding,
+actual queue finalization and other entry/writer/world obligations, full remote
+gates and independent review remain open.
+
+## Independent payable callback rules
+
+`CallbackSpec` orders fresh address lookup, sender admission and post-lookup
+updates. `CallbackRules` binds physical locator/independent CALL/ABI rules and
+proves exact bidirectional body/root outcome/world/attempt correspondence and
+existence for both Lido callbacks. Reward overflow precedes writes; success stores
+the full bounded sum and emits. The withdrawal update preserves core storage;
+both updates preserve balances relative to the lookup-returned world. Root
+failure restoration follows the independently specified transaction boundary.
+
+At source `e9003a9918662bab8f65228ddd4909120267da66`, three selected checks and seven
+baseline checks pass; 101 unchanged source/olean pairs and eleven dependencies
+match prior receipts. Inspected axioms are standard. See
+`receipts/callback-rules-summary.json`. Runtime sources retain their twelve-case
+production-vault EVM evidence with no new execution run. Dispatch and enclosing
+callee/report composition, actual queue finalization, remaining entry/proxy/resource/
+bounded-world and writer obligations, full gates and independent review stay open.
+
+## Independent vault body and transaction rules
+
+`VaultSpec` defines the greatest reward amount bounded by balance and maximum,
+ordered caller/zero/funds guards, skipped callbacks and callback success/failure.
+`VaultRules` substitutes independent CALL rules and proves exact bidirectional
+body outcome/world/attempt correspondence for both vaults, plus existence.
+Independent transaction rules commit successful worlds and restore the complete
+incoming world on error while retaining attempts; both root correspondences pass.
+
+At source `26a09e7a4872a317824aab3461d9696aec48b2eb`, three selected checks and seven
+baseline checks pass. The other 99 component source/olean pairs and eleven dependency
+revisions match retained receipts; inspected axioms are standard. See
+`receipts/vault-rules-summary.json`. Runtime source hashes match the twelve prior
+production-vault comparisons; no new execution run is claimed for these proofs.
+Remaining obligations include independent callback/dispatch binding and report
+composition, actual queue finalization, entry/proxy/resource/bounded-world and other
+writer closure, full remote gates and independent review.
+
+## Production vault execution comparisons
+
+Twelve comparisons now execute the unmodified pinned reward/withdrawal vaults and
+inherited Lido report/callback bodies against the composed Lean model. They compare
+raw root failure bytes, packed accounting, reward counter, reserve/target, all four
+balances, events and ordered direct/nested CALL values/payloads/results. Cases cover
+reward capping and an empty vault, insufficient withdrawals, cumulative reward
+counter overflow, zero amounts, pause/authorization, late queue rejection, report
+arithmetic failure and uint128 narrowing with actual incoming rewards.
+
+Source `86ec8bf257ad8244f1a7ef4ae6c194c22f3ba4b5` has one new selected component check and
+seven baseline checks passing. The other 99 component source/olean pairs and eleven
+dependency revisions match retained receipts. `receipts/vault-execution-summary.json`
+links exact source, compilation, constructor/deployed code, command and compressed
+trace evidence. Earlier draft evidence is retained. The unchanged Lido artifact is
+reused; both vaults were compiled directly with pinned solc 0.8.9, optimizer 200,
+Istanbul target, then executed on the local Hardhat Cancun backend.
+
+Locator and queue remain fixtures in this suite. Independent callee specification,
+all-path admission/ABI coverage, actual queue finalization, proxy/entry/resource and
+bounded-world binding, remaining writer sequences, full remote gates and independent
+review remain open. Twelve finite comparisons do not discharge those obligations.
+
+## Source vaults and Lido callbacks
+
+`Vaults` models pinned reward-vault balance capping, caller admission, zero/funds
+withdrawal guards, custom errors and nested value-bearing callbacks. `VaultCallbacks`
+uses fresh physical locator reads for callback admission, checked reward-counter
+updates and the production callback events. `ReplyABI` propagates ABI failure bytes
+and nested attempts. Nine composed Lean cases exercise transfers, cap/zero behavior,
+nested failure rollback, callback admission and calldata/value rejection.
+
+At source `80ae948313de296a267debed4a34792f823226a8`, five selected module checks and
+seven baseline checks pass; 94 unchanged source/olean pairs and eleven dependency
+revisions match retained evidence. Inspected axioms are standard. See
+`receipts/vault-source-summary.json` and `receipts/vault-source-selectors.json`.
+These are source-model executions, not real vault EVM comparisons. The previous
+sixteen report EVM cases still use explicit callee fixtures and unchanged runtime
+sources. Real vault/callback comparisons, independent callee correspondence, queue
+finalization, deployment/resource binding, full gates and independent review remain open.
+
 ## Fully expanded independent report relation
 
 `CallDataFlow` proves independent high-level CALL correspondence for arbitrary ABI

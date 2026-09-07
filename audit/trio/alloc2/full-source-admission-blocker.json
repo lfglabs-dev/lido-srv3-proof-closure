@@ -1,0 +1,56 @@
+{
+  "observed_at": "2026-09-07T19:50:02.694088+00:00",
+  "goal_status": "active, incomplete",
+  "turn_classification": "progress: committed and pushed ABI composition, fixed source citation, refreshed focused proof and differential receipts; verified remote size rejection",
+  "head": "e312a7472c32be8536c2284975eaee64d29251f5",
+  "tree": "ab3a9d54fee62136ac87b72e0386779530b45c08",
+  "branch": "trio/alloc2-proportional-composition",
+  "push_durable_job": "675f2529-2f84-45ee-b0e4-1467836963dc",
+  "push_exit": 0,
+  "blocker": {
+    "command": "REMOTE_BUILD_SOURCE_MODE=full REMOTE_BUILD_MAX_SOURCE_BUNDLE_BYTES=33554432 REMOTE_BUILD_NODE_ID=babylon /workspaces/mission-44053c4f/output/remote-lean-build-reviewed-d2 make prove test",
+    "durable_job": "c5928cd0-419e-4db2-ac3c-b5b044501caa",
+    "exit_code": 1,
+    "node_requested": "babylon",
+    "remote_job": null,
+    "accepted_complete_source_receipt": false,
+    "log": "remote-lean-build: ignoring untracked non-Lean files: audit/trio/alloc2/receipt-08d69897-eb59-4efb-9465-b9952997f0f6.json, audit/trio/alloc2/receipt-2070a763-609e-46d5-a245-a6d768a34fb6.json, audit/trio/alloc2/receipt-39885420-50ac-4c02-a00a-26aa0e73fdc2.json, audit/trio/alloc2/receipt-3a39de23-f9fc-4c22-b816-28138b44beed.json, audit/trio/alloc2/receipt-6ea792c7-3753-4ec1-9b33-7c68d720f696.json, audit/trio/alloc2/receipt-7ccde564-dab9-4224-8eee-3a5153646263.json, audit/trio/alloc2/receipt-914bf81e-1a3f-4c96-91a2-f0b4ac291f01.json, audit/trio/alloc2/receipt-960940c0-0cd5-4403-b4e3-d6b098580827.json\nremote-lean-build: dispatching make prove test for e312a7472c32 ...\nremote-lean-build: HTTP 422 from http://127.0.0.1:3000/api/remote-build:\nremote node 'babylon' did not accept the build: remote node rejected request with HTTP 422: source bundle is 16783561 bytes; maximum is 16777216\n",
+    "required_change": "Remote runner complete-source admission must accept the 21466155-byte tracked snapshot without omissions. Current runner cap is 16777216 bytes.",
+    "client_wrapper_sha256": "71ff31e88fbdb8fdfc0fdaf3872ac69a5dc98c6cd946cf4f3588149a0927fc93"
+  },
+  "local_complete_snapshot": {
+    "files": 1686,
+    "bytes": 21466155,
+    "content_digest": "4588d33ba0581ceb07c8a219e9ad51e7324007ce846a5000da763b1183b6d4f9",
+    "scope": "Locally recomputed complete tracked source manifest, including recursive submodule files; not a remote acceptance receipt"
+  },
+  "focused_receipt": {
+    "version": 1,
+    "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+    "commit": "c7adae04416704a839d56333efad003f0a0f46b7",
+    "base_tree_sha": "27834bd59a19f789b2fb9d06f9de01b47af123c2",
+    "cwd_rel_known": true,
+    "cwd_rel": "audit/trio/alloc2/byte-abi",
+    "command": [
+      "lake",
+      "build",
+      "audit.trio.alloc2.runtime.ByteABIVectors"
+    ],
+    "toolchain": "leanprover/lean4:v4.31.0",
+    "source_bundle_digest": "89d1ebee43c18812865d49ce92c9582eae2ef3063629f2477defa000b7603cd3",
+    "build_protocol_version": "1",
+    "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+  },
+  "focused_job": "b0faae30-98d7-49cd-ab1c-f3e53ec42d83",
+  "focused_content_digest": "5cca3fc8c15a41604b27180027cd0090f99b5c1fb376b9b4b8b25efdb8a843e9",
+  "differential_durable": "95ecd821-90cf-4ec8-91c3-431101e12e88",
+  "differential_exit": 0,
+  "mutant_durable": "40c60719-9bc5-46bf-ba71-bfe6724e41c0",
+  "mutant_exit": 1,
+  "remaining": [
+    "Complete compiler allocation/write/read/copy schedule and derived separation",
+    "Canonical enclosing producer-to-consumer entrypoint integration and lifecycle closure",
+    "Immutable-head complete-source full Lean, make prove test, native UX2 and trust gates"
+  ],
+  "live_jobs": []
+}

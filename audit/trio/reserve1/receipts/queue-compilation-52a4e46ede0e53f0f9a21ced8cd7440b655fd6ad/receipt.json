@@ -1,0 +1,136 @@
+{
+  "source_commit": "52a4e46ede0e53f0f9a21ced8cd7440b655fd6ad",
+  "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "utc": "2026-09-07T18:44:21.293Z",
+  "node": "v22.15.0",
+  "node_sha256": "c43f3f73f6917481d2364daf7b7bf8c4fc4a7643580b4626f13f003131ec8716",
+  "compiler": "0.8.9+commit.e5eed63a.Emscripten.clang",
+  "compiler_sha256": "5b25f987aae32a0275fdc6c1be36cc47cf126024a04dafd8e4be39a1d1d1422c",
+  "runner_sha256": "2c9acb3818890b80b751e9d3c9bf9e3f44e77b9416b77fb40858d36a675582f8",
+  "settings": {
+    "optimizer": {
+      "enabled": true,
+      "runs": 200
+    },
+    "evmVersion": "istanbul",
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode.object",
+          "evm.deployedBytecode.object",
+          "evm.deployedBytecode.immutableReferences",
+          "storageLayout"
+        ]
+      }
+    }
+  },
+  "sources": {
+    "solidity/trio-reserve1/QueueFinalizeHarness.sol": {
+      "sha256": "abe85b19b982a0e1a6bd9b23f2733f391ff119cd14f77716c5bca0e16383742b",
+      "resolved_path": "solidity/trio-reserve1/QueueFinalizeHarness.sol"
+    },
+    "contracts/0.8.9/WithdrawalQueueERC721.sol": {
+      "sha256": "f28f0974b484f26cc8b37672c6579fd05585d82e41c8e58aa4bdd6e0c0383542",
+      "resolved_path": "lido-core/contracts/0.8.9/WithdrawalQueueERC721.sol"
+    },
+    "@openzeppelin/contracts-v4.4/token/ERC721/IERC721.sol": {
+      "sha256": "a88e8e63c7a737436f7ec62542620609ab07bb9a772e77146ed4dc98539e03d3",
+      "resolved_path": "solidity/trio-reserve1/node_modules/@openzeppelin/contracts-v4.4/token/ERC721/IERC721.sol"
+    },
+    "@openzeppelin/contracts-v4.4/token/ERC721/IERC721Receiver.sol": {
+      "sha256": "08a4ad5b6e2723dbfbe7862453895397de6953769c54c227aedd02adf45b5ddc",
+      "resolved_path": "solidity/trio-reserve1/node_modules/@openzeppelin/contracts-v4.4/token/ERC721/IERC721Receiver.sol"
+    },
+    "@openzeppelin/contracts-v4.4/token/ERC721/extensions/IERC721Metadata.sol": {
+      "sha256": "f16b861aa1f623ccc5e173f1a82d8cf45b678a7fb81e05478fd17eb2ccb7b37e",
+      "resolved_path": "solidity/trio-reserve1/node_modules/@openzeppelin/contracts-v4.4/token/ERC721/extensions/IERC721Metadata.sol"
+    },
+    "@openzeppelin/contracts-v4.4/utils/introspection/IERC165.sol": {
+      "sha256": "701e025d13ec6be09ae892eb029cd83b3064325801d73654847a5fb11c58b1e5",
+      "resolved_path": "solidity/trio-reserve1/node_modules/@openzeppelin/contracts-v4.4/utils/introspection/IERC165.sol"
+    },
+    "contracts/0.8.9/interfaces/IERC4906.sol": {
+      "sha256": "a61a64cdb68aa429ad4ef10cc508b8735a8241acedcbf7d4850a283047b4deb6",
+      "resolved_path": "lido-core/contracts/0.8.9/interfaces/IERC4906.sol"
+    },
+    "@openzeppelin/contracts-v4.4/utils/structs/EnumerableSet.sol": {
+      "sha256": "42a618e7d36efd2319d1bf05fedb31f3042baf535cfb97e783128cc1fe326686",
+      "resolved_path": "solidity/trio-reserve1/node_modules/@openzeppelin/contracts-v4.4/utils/structs/EnumerableSet.sol"
+    },
+    "@openzeppelin/contracts-v4.4/utils/Address.sol": {
+      "sha256": "0228dd7c0a0d1342b88eab6e5a4a07ae4350818ba1650be0a374064b02218f37",
+      "resolved_path": "solidity/trio-reserve1/node_modules/@openzeppelin/contracts-v4.4/utils/Address.sol"
+    },
+    "@openzeppelin/contracts-v4.4/utils/Strings.sol": {
+      "sha256": "8597c62818dcbc6cf85c21179b90b714fb4f70a4347ca2eed23e88c87b08b8a1",
+      "resolved_path": "solidity/trio-reserve1/node_modules/@openzeppelin/contracts-v4.4/utils/Strings.sol"
+    },
+    "contracts/0.8.9/WithdrawalQueue.sol": {
+      "sha256": "efa5a32fbc99cafdb16a38d96a9bb5b29a62e60b5610e7c317711cc58402b131",
+      "resolved_path": "lido-core/contracts/0.8.9/WithdrawalQueue.sol"
+    },
+    "contracts/0.8.9/utils/access/AccessControlEnumerable.sol": {
+      "sha256": "e8fa2bc8e4c8046fd04b25ed4708be8159913cac4ca738cdc53022896e0566ce",
+      "resolved_path": "lido-core/contracts/0.8.9/utils/access/AccessControlEnumerable.sol"
+    },
+    "contracts/0.8.9/lib/UnstructuredRefStorage.sol": {
+      "sha256": "83b045f33e8f28351cbbe2e14f872526d02f95a6000728291ae436112d04423f",
+      "resolved_path": "lido-core/contracts/0.8.9/lib/UnstructuredRefStorage.sol"
+    },
+    "contracts/0.8.9/lib/UnstructuredStorage.sol": {
+      "sha256": "955bfcb0bf265db114248bdabeabebc39bddb3fbb756e2448f6aed59f1994f56",
+      "resolved_path": "lido-core/contracts/0.8.9/lib/UnstructuredStorage.sol"
+    },
+    "contracts/0.8.9/WithdrawalQueueBase.sol": {
+      "sha256": "68d8919f89198c3d39272b2259a3144bf87a4aa48c570624b025fd86da47d2bb",
+      "resolved_path": "lido-core/contracts/0.8.9/WithdrawalQueueBase.sol"
+    },
+    "@openzeppelin/contracts-v4.4/token/ERC20/IERC20.sol": {
+      "sha256": "6eacf8ca56b41b7636489c0996d8f9608b4d298879a1fd5d876f21ad7a6711f1",
+      "resolved_path": "solidity/trio-reserve1/node_modules/@openzeppelin/contracts-v4.4/token/ERC20/IERC20.sol"
+    },
+    "@openzeppelin/contracts-v4.4/token/ERC20/extensions/draft-IERC20Permit.sol": {
+      "sha256": "3e7aa0e0f69eec8f097ad664d525e7b3f0a3fda8dcdd97de5433ddb131db86ef",
+      "resolved_path": "solidity/trio-reserve1/node_modules/@openzeppelin/contracts-v4.4/token/ERC20/extensions/draft-IERC20Permit.sol"
+    },
+    "contracts/0.8.9/utils/PausableUntil.sol": {
+      "sha256": "afd11f5950050bbc8e9fad3cbea2a5bdbcc23048128c30f335a12b48084c8594",
+      "resolved_path": "lido-core/contracts/0.8.9/utils/PausableUntil.sol"
+    },
+    "contracts/0.8.9/utils/Versioned.sol": {
+      "sha256": "7f9ba0a2368d7531447a80e80ae28406964acf51ca0de8bfa985620e226340a8",
+      "resolved_path": "lido-core/contracts/0.8.9/utils/Versioned.sol"
+    },
+    "@openzeppelin/contracts-v4.4/access/IAccessControlEnumerable.sol": {
+      "sha256": "655ab8dc2a9617376734d04ca293e099cc24f8ce893997e68c29cfebc4a61d39",
+      "resolved_path": "solidity/trio-reserve1/node_modules/@openzeppelin/contracts-v4.4/access/IAccessControlEnumerable.sol"
+    },
+    "contracts/0.8.9/utils/access/AccessControl.sol": {
+      "sha256": "e399e266f9b0e8fe99708f3fb2f656a636fb432d69ca9c247f2e84f2e762f803",
+      "resolved_path": "lido-core/contracts/0.8.9/utils/access/AccessControl.sol"
+    },
+    "@openzeppelin/contracts-v4.4/access/IAccessControl.sol": {
+      "sha256": "d03c1257f2094da6c86efa7aa09c1c07ebd33dd31046480c5097bc2542140e45",
+      "resolved_path": "solidity/trio-reserve1/node_modules/@openzeppelin/contracts-v4.4/access/IAccessControl.sol"
+    },
+    "@openzeppelin/contracts-v4.4/utils/Context.sol": {
+      "sha256": "1458c260d010a08e4c20a4a517882259a23a4baa0b5bd9add9fb6d6a1549814a",
+      "resolved_path": "solidity/trio-reserve1/node_modules/@openzeppelin/contracts-v4.4/utils/Context.sol"
+    },
+    "@openzeppelin/contracts-v4.4/utils/introspection/ERC165.sol": {
+      "sha256": "8806a632d7b656cadb8133ff8f2acae4405b3a64d8709d93b0fa6a216a8a6154",
+      "resolved_path": "solidity/trio-reserve1/node_modules/@openzeppelin/contracts-v4.4/utils/introspection/ERC165.sol"
+    }
+  },
+  "artifacts": {
+    "QueueFinalizeHarness": {
+      "file": "QueueFinalizeHarness.json",
+      "sha256": "f4f0adbcd191c31682978ee60d90fa1130196614838ac31b0ca808e29e9df2d6",
+      "entry": "solidity/trio-reserve1/QueueFinalizeHarness.sol"
+    }
+  },
+  "errors": [],
+  "output_sha256": "f23bc569f20eeb6f5c944f7bd5a6d9c730981f0d956bd58483aa37c965bf2d21",
+  "scope": "Inherited pinned ERC721 queue compilation; no deployment, execution or Lean correspondence claim"
+}

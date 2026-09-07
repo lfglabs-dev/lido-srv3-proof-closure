@@ -1,0 +1,22 @@
+# ALLOC-2 completion audit (not a completion claim)
+
+The active objective remains the complete ALLOC-2 source/producer/consumer task.
+These entries separate proved boundaries from missing integration evidence.
+
+| Requirement | Current evidence | Remaining work |
+| --- | --- | --- |
+| Proportional source loop | TrioAlloc2 Step, LoopTotality, LoopCorrespondence and Errors prove the well-founded executor against independent Spec.Distributes, including short capacities and zero demand. | The canonical parent now adds the exact well-founded success domain, independent distribution, and short-capacity error. Final signature passed production/test/trust-import build c54d0852 (1529 jobs), with all 258 canonical source inputs checked against the receipt. |
+| Actual ALLOC-1 output establishes premises | Composition.producer_success_establishes_consumer_premises derives equal lengths and the word-width count bound from actual produce success and producer_router_order. ProducerMemory derives ABI extent from executed guards. | Connect the complete enclosing entrypoint and its source-memory/ABI schedule to the registered consumer. |
+| Physical memory | ByteMemory/ByteIndexed/ByteFrame prove indexed consecutive-byte stores, overlap behavior, whole-loop array and byte preservation. ByteInitialize/ByteProducer construct entry arrays from actual output. | The adjacent serialization adapter is not yet the complete compiler allocation/write/copy schedule. |
+| Verity memory | Indexed ContractState execution and rollback passed 62 jobs and six Solidity cases. ByteRuntime directly bridges pinned DenoteMemory readWord/writeWord to the physical loop; Final 48-file package e47f752f passed 74 jobs, including derived initializer coverage and whole-loop size preservation, followed by six exact Solidity comparisons and rejection of the reset mutant. | Account for every compiler read/copy and its bounds when connecting canonical execution. |
+| Lifecycle | DecodedConsumerPremises is proved for arbitrary Layout, Storage, StaticOracle, CapacityInput and Transcript, conditional only on actual producer success. It has no 32-cap, migration, uniqueness, active-row, or global arithmetic-success premise. | This discharges the need for those lifecycle assumptions at that specific consumer-premise boundary. It does not certify every router lifecycle operation. The canonical/enclosing claim must be checked against this boundary before broader lifecycle closure is asserted. |
+| +1 algorithm | Kept separate; no +1 model changes in this work. | Preserve separation in canonical registration and prose. |
+| UX2 | Generated artifacts pass consistency checks against the existing registered declarations. | Parent, assurance-detail digest, immutable report input basis, source map and generated surfaces are updated together. Metadata, claim-surface and inventory regressions passed; the Python size check passed after shortening a comment. Native full UX2 remains unverified. |
+| Differential evidence | Pinned Solidity compilation/deployed bytes, exact outputs and behaviorally rejected reset mutants are committed for byte and indexed word-memory paths. | The DenoteMemory overlap/msize suite is refreshed against successful exact-source receipt e47f752f. |
+| Full gates | Canonical production/test/trust-import build c54d0852 passed 1529 jobs on fixed base924891 plus the exact final canonical amendment. Source admission verifies all258 current canonical inputs. Scoped byte proofs passed74 jobs. | Final immutable-head full prove/test/UX2/trust remains unverified. Current remote-only protocol does not support the complete verification commands; do not use the trust script's internal local-execution override. |
+
+Compiler/linking provenance assumptions remain explicit. Deployment binding,
+gas equivalence and full consensus/primitive-crypto claims are not silently
+introduced into this task. A source/model result is not a deployed-bytecode
+refinement. Conversely, a scope exclusion must not hide a required source,
+producer-entry or canonical integration gap.

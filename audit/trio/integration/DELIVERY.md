@@ -1,8 +1,11 @@
 # Trio composition delivery record
 
-Status: the final stored-parent composition passed full official validation at
-`51037be4c0f518f8cb6b62c638aad454173d8bf1`. The integrated additive byte-memory
-and report modules await their final combined full validation and merge verdict. This document is not a deployment certificate.
+Status: the full composition at `0345a6146cd5cd10b55d318c48c2a4c578ae3bc8`
+passed all six official RunValidation gates. The final additive ABI/word-copy source
+at `00b0d739fa807f4e592cacbd41392aceb7bfc714` passed its three focused root gates.
+Both source reviews are CLEAN and their validation prerequisites are satisfied.
+PR249 and PR245 are merged; PR251 (including PR244 and PR246) awaits the final
+archive review and merge at this historical snapshot. This is not a deployment certificate.
 The old primary guarantee declarations are preserved. The new source composition
 is registered separately in each trio target's `execution_review` in
 `audit/source-map.yaml` and printed by `LidoSRv3/Audit/Trust.lean`.
@@ -100,6 +103,13 @@ The complete passing receipt for the stored-parent composition is archived in
 match the pinned Solidity records (`remote-51037be4/parent-comparison.json`).
 
 Earlier failed full/targeted jobs remain under `remote-*` with their actual
-failure classification. Final source SHA, full receipt, independent approval,
-merge SHAs and aligned site pin must be recorded before claiming delivery.
+failure classification. The final receipts and source comparisons are archived in `remote-0345a614/`
+and `remote-00b0d739/`; the earlier focused36cc archive is retained. The final
+source-comparison record documents why unchanged production uses full0345 while
+additive ABI/word-copy leaves use focused00b0. Historical worker admission
+blockers apply to their standalone snapshots, not these successful root gates.
+The archive commit only refreshes evidence, the UX source fingerprint and its
+canonical tree receipt. It is not represented as another fully built source.
+Final merge outcomes and the locally prepared site are recorded separately after
+this archive snapshot. The site source pin is00b0 and distinguishes full-base and focused-final gates.
 Publication or sending the dossier to Lido still requires Thomas's approval.

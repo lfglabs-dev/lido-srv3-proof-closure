@@ -1,0 +1,18 @@
+LidoSRv3/Audit/Source/TrioReserve1/Vaults.lean:50:78: error: unsolved goals
+balance : Nat
+maximum : Word
+hbound : min balance maximum.val < Verity.Core.UINT256_MODULUS
+⊢ min balance maximum.val % Verity.Core.Uint256.modulus = min balance maximum.val
+LidoSRv3/Audit/Source/TrioReserve1/Vaults.lean:52:18: error: Type mismatch
+  Nat.min_le_left balance maximum.val
+has type
+  min balance maximum.val ≤ balance
+but is expected to have type
+  (word (word (min balance maximum.val)).val).val ≤ balance
+LidoSRv3/Audit/Source/TrioReserve1/Vaults.lean:51:43: warning: This simp argument is unused:
+  Nat.mod_eq_of_lt hbound
+
+Hint: Omit it from the simp argument list.
+  simp [word, Verity.Core.Uint256.ofNat,̵ ̵N̵a̵t̵.̵m̵o̵d̵_̵e̵q̵_̵o̵f̵_̵l̵t̵ ̵h̵b̵o̵u̵n̵d̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

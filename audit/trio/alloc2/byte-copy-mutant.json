@@ -1,0 +1,13 @@
+{
+  "durable_job": "40c60719-9bc5-46bf-ba71-bfe6724e41c0",
+  "command": "ALLOC2_BYTE_COPY_MUTANT=shift node solidity/trio-alloc2/byte-copy.mjs audit/trio/alloc2/receipt-b0faae30-98d7-49cd-ab1c-f3e53ec42d83.json",
+  "exit_code": 1,
+  "expected_assertion": "31-bytes copyCalldata exact bytes",
+  "files": {
+    "solidity/trio-alloc2/ByteCopy.sol": "d1578a99e519a4838c1e88b0a7513eed4654db67a763107ed67a905b5c21cce8",
+    "solidity/trio-alloc2/byte-copy.mjs": "d0c5a8a3ed609729184241ecf9d83d1c145ee9f9046eda3c215b067ddf8fa8f3",
+    "solidity/trio-alloc2/package-lock.json": "049e852febbe6339fa8e09b7e0fff0b15f3cf6769a8ad9c4708583cebb6c866e",
+    "audit/trio/alloc2/receipt-b0faae30-98d7-49cd-ab1c-f3e53ec42d83.json": "6fe7a359945dc20081154deb106edf853172c186bd934f40999bf9cb78275ec3"
+  },
+  "log": "This version of \u00b5WS is not compatible with your Node.js build:\n\nError: Cannot find module '../binaries/uws_linux_x64_109.node'\nRequire stack:\n- /workspaces/mission-44053c4f/repo/solidity/trio-alloc2/node_modules/ganache/node_modules/@trufflesuite/uws-js-unofficial/src/uws.js\n- /workspaces/mission-44053c4f/repo/solidity/trio-alloc2/node_modules/ganache/dist/node/core.js\nFalling back to a NodeJS implementation; performance may be degraded.\n\n\nPASS empty copyCalldata\nPASS empty copyReturn\nnode:internal/process/esm_loader:40\n      internalBinding('errors').triggerUncaughtException(\n                                ^\n\nAssertionError [ERR_ASSERTION]: 31-bytes copyCalldata exact bytes\n    at file:///workspaces/mission-44053c4f/repo/solidity/trio-alloc2/byte-copy.mjs:59:14 {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: '0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000001f0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e0000',\n  expected: '0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000001f000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e00',\n  operator: 'strictEqual'\n}\n\nNode.js v18.19.1\n"
+}

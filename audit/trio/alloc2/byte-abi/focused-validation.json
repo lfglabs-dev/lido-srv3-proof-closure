@@ -1,0 +1,33 @@
+{
+  "receipt": "audit/trio/alloc2/receipt-b0faae30-98d7-49cd-ab1c-f3e53ec42d83.json",
+  "validation": {
+    "version": 1,
+    "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+    "commit": "c7adae04416704a839d56333efad003f0a0f46b7",
+    "base_tree_sha": "27834bd59a19f789b2fb9d06f9de01b47af123c2",
+    "cwd_rel_known": true,
+    "cwd_rel": "audit/trio/alloc2/byte-abi",
+    "command": [
+      "lake",
+      "build",
+      "audit.trio.alloc2.runtime.ByteABIVectors"
+    ],
+    "toolchain": "leanprover/lean4:v4.31.0",
+    "source_bundle_digest": "89d1ebee43c18812865d49ce92c9582eae2ef3063629f2477defa000b7603cd3",
+    "build_protocol_version": "1",
+    "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+  },
+  "source_content_digest": "5cca3fc8c15a41604b27180027cd0090f99b5c1fb376b9b4b8b25efdb8a843e9",
+  "current_source_files": 58,
+  "axiom_report_names": [
+    "copyFrom_readByte",
+    "copyFrom_frame",
+    "copied_bytes",
+    "calldata_arguments",
+    "returndata_output",
+    "producer_copied_abi",
+    "copyFrom_load_frame",
+    "copyFrom_array_frame"
+  ],
+  "scope": "Focused printed axiom reports; native full trust checker remains required"
+}

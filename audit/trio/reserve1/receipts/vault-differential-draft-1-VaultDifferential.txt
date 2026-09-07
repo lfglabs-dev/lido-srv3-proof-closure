@@ -1,0 +1,2 @@
+no such file or directory (error code: 4294967294)
+  file: LidoSRv3/Tests/TrioReserve1/VaultDifferential.lean.lean

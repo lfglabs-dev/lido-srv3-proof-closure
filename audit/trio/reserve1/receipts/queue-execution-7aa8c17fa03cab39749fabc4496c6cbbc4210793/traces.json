@@ -1,0 +1,137 @@
+[
+  {
+    "name": "finalization success",
+    "file": "trace-1.json.gz",
+    "sha256": "7befb0ba527c83deb636d7a00ed9557cdb605d403e0f4bf007c2675a897184a3",
+    "decompressed_sha256": "84704e638d4086563eea9820a8fa1e0cd9f5351a8776e586f51cfe0a2917a303",
+    "bytes": 1661061,
+    "transaction": "0x318b5b3c0f8f39635cba9d7316d1c6738ad0bdbe078276bebc5ac4165d875075",
+    "status": 1
+  },
+  {
+    "name": "late shares underflow",
+    "file": "trace-2.json.gz",
+    "sha256": "359f94e3856f4f6a01ed3fcdd8bad08d1951ad9a4547f8ae19efce91cb1569a5",
+    "decompressed_sha256": "87f52094879f61bc045af140a884cfd8681cbe4ef6447f8161ae5c24d1b3fcca",
+    "bytes": 1470386,
+    "transaction": "0xc853ee468f21a03ae3d01551a36c1d041fdb55fed7930f936e32f795b4991604",
+    "status": 0
+  },
+  {
+    "name": "paused",
+    "file": "trace-3.json.gz",
+    "sha256": "1603d1a5a55e38e81f971ff2d8a37b81d05eb9d4a7cca1edcd8261d9bcffd59f",
+    "decompressed_sha256": "7d34b85fcaa592f70359d925bcadc53540aa5d7cd944ee106f6c2d9522e9dd60",
+    "bytes": 81017,
+    "transaction": "0x5416de6b7fcfe2f649c71d017f4c252f54e001a49013540ba266ab6c8ab69aa1",
+    "status": 0
+  },
+  {
+    "name": "role low byte denied",
+    "file": "trace-4.json.gz",
+    "sha256": "88afde12d717a9d41125fd01c24391e69252f0a6979f72f2bded42c17d0f5090",
+    "decompressed_sha256": "3ae7f57f51ff84307e1258b5d6f93acee294c3f663ed8318c9145af46d2ce624",
+    "bytes": 15990378,
+    "transaction": "0x8a5a6bd8707791e52cdf5711f73ef046f4e6ab503ee81d686bbfb9763436beb2",
+    "status": 0
+  },
+  {
+    "name": "role noncanonical true byte",
+    "file": "trace-5.json.gz",
+    "sha256": "64f5e1217d7862d5ee25e02c072bdad515f002e5597524d44fa1c30b89e30fb9",
+    "decompressed_sha256": "a779b8018cc2f7d159f6f98d960c473b202f2ba963edbe999a0c893a705b5782",
+    "bytes": 1661068,
+    "transaction": "0xc4889c1304696db379917c30dd59214021c87467bee2db027579d1701cdaa011",
+    "status": 1
+  },
+  {
+    "name": "upper id invalid",
+    "file": "trace-6.json.gz",
+    "sha256": "50e9b8324e81810ed3cea3a60c7a5b61d46922a6eb8044cb597c09b8ca3fcfb4",
+    "decompressed_sha256": "04a7f8443df688c900742cf07e5705af01ff66950a256e37418327871171edd8",
+    "bytes": 220782,
+    "transaction": "0x6230d226ba7f973f87db8c9a6b3062967553d65f2d319c53ca65177fecbf1a00",
+    "status": 0
+  },
+  {
+    "name": "already finalized id",
+    "file": "trace-7.json.gz",
+    "sha256": "e846171cb3797bd8205cf39903d309041775a083630fafcc2f149ed7b197841e",
+    "decompressed_sha256": "1cbfc500e2a97062bbfea57f4da9fe54f46ec68e8179a7fab44d9f9e6f3a0182",
+    "bytes": 249117,
+    "transaction": "0x58cd0e6467439184368d3c5f21026841562be4dab67f26afc9ae0c249385c8f2",
+    "status": 0
+  },
+  {
+    "name": "too much ether",
+    "file": "trace-8.json.gz",
+    "sha256": "6ff2847ff80b308ebd58e8e720dd838e41740f1165ab022932f6e3e80fd13c36",
+    "decompressed_sha256": "8498bba0b6ac9af6151baa50ef25c2103110e21a59703d875110f45537f4d9a8",
+    "bytes": 823942,
+    "transaction": "0xd9ea5c9244d3e4553b28acdad2ef90d5358d851555eb76016418a5fbb1107ed7",
+    "status": 0
+  },
+  {
+    "name": "entry first id overflow",
+    "file": "trace-9.json.gz",
+    "sha256": "492332a104b778475c5915f54e84068be0202306c370de7cd472269c810f5d8c",
+    "decompressed_sha256": "eb4bd6109597edb4e352a885ea89aa18299a6141ed9be09f9150905fbf914310",
+    "bytes": 174054,
+    "transaction": "0x90472a1b6360501b37ff54ee996fca73d49f9d5a9486feabbd5724e093018b9d",
+    "status": 0
+  },
+  {
+    "name": "steth underflow",
+    "file": "trace-10.json.gz",
+    "sha256": "9071afc77be3f06c842ec481fea626c585fe252f7390684e6323bb33c750596a",
+    "decompressed_sha256": "22d0dd02fd17739037b9bfea952e37f75d7be67e7c268d6c0abb8f54e7f0ecdd",
+    "bytes": 728950,
+    "transaction": "0x4ce17f9e747af594b86772c69e3d2c51c3546463e5e4e351f3285bd63b6903e3",
+    "status": 0
+  },
+  {
+    "name": "checkpoint overflow",
+    "file": "trace-11.json.gz",
+    "sha256": "b142b1dfb036fcfd234e7a8cacb0622477984bde11fbc9300d73721b40b94a5e",
+    "decompressed_sha256": "6d27aa4d719479fe07bc125cdde989d87ea1a94d664153defd1dbb1fcf8cca52",
+    "bytes": 1001879,
+    "transaction": "0x9a5017d12b6e94668561133c9d800b3492dcc73bfe5aebbd9c7a1f559138ff81",
+    "status": 0
+  },
+  {
+    "name": "locked overflow",
+    "file": "trace-12.json.gz",
+    "sha256": "e227e147ee1c73119c6ceb467bdd56bfdcd8b132b9ce408775c429cd34297b05",
+    "decompressed_sha256": "333613645fe851e046436c3a6d358dd07b3e1a177f1b7f76fa24f6204411df31",
+    "bytes": 1264357,
+    "transaction": "0xf0c6c8756dbd20ac17812077f8556ea59ba6f73c1ca365833ce3eb7c5f2609dc",
+    "status": 0
+  },
+  {
+    "name": "zero value finalization",
+    "file": "trace-13.json.gz",
+    "sha256": "ec3379fb54904741a48d41789bbd38450b9e23cec022327ea8ce12fc8d1d0fb4",
+    "decompressed_sha256": "446a58d45e9ac92aefc07aa6b4d7b526f11a448773fd43cf079c4fc6fee2f30b",
+    "bytes": 1661062,
+    "transaction": "0xe85ebfc3bbabb2eb3db74b60d1ccb9b29d76d1ff0e55704cf00ad36e6de3a7e3",
+    "status": 1
+  },
+  {
+    "name": "short calldata before pause",
+    "file": "trace-14.json.gz",
+    "sha256": "82ec1031dba178cbfee8607164814fd5b3e84261bbd0be27c2b5abf95e9e87f4",
+    "decompressed_sha256": "6c7c56a99016d28249f9cfe5653d5ae492c23e2b028e9d70014d2c0376bc3dfe",
+    "bytes": 29592,
+    "transaction": "0x5b0916faf0b61b7e68c9d6424684a3d69680cd6172e45c21197a3cbeb2aec169",
+    "status": 0
+  },
+  {
+    "name": "trailing calldata accepted",
+    "file": "trace-15.json.gz",
+    "sha256": "edd4b22df7600d30de4d65e07875c0555bbf0e73e26eb3da345e666620ac2f93",
+    "decompressed_sha256": "5e34fc449bb6efc88aa498bdc0a677a88b966d78d2afd3a62d85ae03f8d0d0bc",
+    "bytes": 1661067,
+    "transaction": "0x1ee047b6710190a8954aadb85a9805e7a60770ad26e849ed6e75bc0fcfc28a5b",
+    "status": 1
+  }
+]

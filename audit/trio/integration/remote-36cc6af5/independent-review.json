@@ -1,0 +1,23 @@
+{
+  "head": "36cc6af51c33461c2b8c5143d346a55a8638f0c6",
+  "reviewer": "/root/independent_composition_review",
+  "verdict": "CLEAN_SOURCE_CONDITIONAL_ON_FULL_0345_AND_FOCUSED_36CC_VALIDATION",
+  "findings": [],
+  "checks": [
+    "All20 added files byte-identical to reviewed e312a747",
+    "Every existing production/primary/R1/script file byte-identical to0345",
+    "Four new leaves registered; focused driver builds then executes root target and fails on either error",
+    "Canonical receipt tree binding checked independently",
+    "Standalone wrapper equivalence reviewed; focused root validation remains required"
+  ],
+  "independent_artifact_review": {
+    "reviewer": "/root/memory_transport",
+    "source_files": 58,
+    "raw_evm_records": 14,
+    "lean_vectors": 7,
+    "official_component_receipt_sha256": "6fe7a359945dc20081154deb106edf853172c186bd934f40999bf9cb78275ec3",
+    "solidity_execution_sha256": "b8e40c8b4e0cb8221ef0f2b805187769083a5fd8c54077138de4da4bdfe55a16",
+    "scope": "Canonical copies, decoding, producer-derived result and disjoint array preservation; synthetic opcode harness, not deployed library execution or arbitrary malformed returndata"
+  },
+  "runtime_model_identity": "not independently attested"
+}
