@@ -6,8 +6,10 @@ Verity Executable Contract theorem (or honest partial state), and one actionable
 General Yul/EVM/deployment refinement is deliberately not an assurance lane.
 """
 
-import argparse, hashlib
-import json, re
+import argparse
+import hashlib
+import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -22,8 +24,8 @@ import markdown_text  # noqa: E402  (sibling module, located above)
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
 SOURCE_FIDELITY = AUDIT / "SOURCE-FIDELITY.md"
-R1_REVIEW_BASE = "aed5a18fa059a6907e89de59dbc1bb4434f73670"
-# The report records this commit as its Stage A disclosure input basis.  Keep the exact
+R1_REVIEW_BASE = "6a2a91341ac83c8fbf93dfa274897387e5b8a188"
+# The report records the normal source-fidelity-A reconciliation merge as its input basis. Keep the exact
 # generator inputs bound both to that Git object and to their expected bytes:
 # a changed registry, source map, or Trust allowlist must not be presented as
 # if it had that review.
@@ -32,7 +34,7 @@ R1_REVIEW_BASE = "aed5a18fa059a6907e89de59dbc1bb4434f73670"
 # stale certified basis.
 R1_REPORT_INPUT_SHA256 = {
     "audit/guarantees.yaml": "22d2420714906d566f6250ddc5b0b50d0815567f0e8212ce37d4fd1ac34bed30",
-    "audit/source-map.yaml": "e592f4e15e9d3ce8ffdcefdc87bb664ac404c6d0b7447e29e35d5c60611eaba6",
+    "audit/source-map.yaml": "2a89d6b67bf8ce9ec0ab9ad6782bee4cba5a904c5b337ea13f813cdde938ca74",
     "audit/trust-native-decide-allowlist.txt": "4874951cd0717f16756f3f644c424f06bdbbfcca1561173b32fd134b1fb6730c",
 }
 CANONICAL_IDS = [
@@ -126,24 +128,37 @@ DEPOSIT_CONSTRUCTOR_SPAN = {
     ),
 }
 
+
 def load(path):
     return json.loads(path.read_text(encoding="utf-8"))
+
+
 def require(condition, message):
     if not condition:
         raise SystemExit(f"audit metadata error: {message}")
+
+
 def markdown_table_cell(value):
     """Render metadata as one Markdown table cell, never as table syntax."""
     return str(value).replace("\\", "\\\\").replace("|", "\\|").replace("\r\n", "<br>").replace("\n", "<br>").replace("\r", "<br>")
+
+
 def canonical_metadata_bytes(value):
     """Ignore JSON whitespace while binding every metadata value and shape."""
     return json.dumps(json.loads(value), sort_keys=True, separators=(",", ":")).encode()
+
+
 def canonical_review_input_bytes(relative, value):
     """Normalize structured review inputs while retaining exact text inputs."""
     if relative.endswith((".yaml", ".json")):
         return canonical_metadata_bytes(value)
     return value
+
+
 def nonempty_strings(value):
     return isinstance(value, list) and all(isinstance(x, str) and x.strip() for x in value)
+
+
 def validate_deposit_constructor_fixture():
     require(DEPOSIT_CONSTRUCTOR_FIXTURE.is_file(), "pinned StakingRouter constructor fixture is missing")
     source = DEPOSIT_CONSTRUCTOR_FIXTURE.read_bytes()
@@ -488,23 +503,12 @@ README_UNRENDERED = re.compile(
 )
 
 def _mask_non_rendered_markdown(text):
-    """Position-preserving blank of non-rendered regions in Markdown.
-
-    A pipe line inside a code fence or HTML block is printed as raw text,
-    not as a table row.  Searching the raw README let a table wrapped in
-    `<!--` … `-->` or a code fence satisfy the headline-table gate while the
-    rendered page showed nothing.  Each masked character is replaced with a
-    space so every position in the result corresponds to the same position in
-    the original; this keeps the body-position range the stray-row detection
-    compares against consistent with `README_FIDELITY_ROW.finditer(readme)`.
-    """
+    """Mask invisible HTML and literal Markdown while preserving source offsets."""
     def blank(m):
         return "".join(" " if c != "\n" else "\n" for c in m.group(0))
 
     # Blank whole non-rendered elements first: a table wrapped in `<template>`
     # keeps every raw pipe character while the page shows no table at all.
-    # Positions are preserved here the same way, by writing spaces over the
-    # span rather than deleting it.
     held = list(text)
     for start, stop in markdown_text.non_rendered_spans(text):
         for i in range(start, stop):
@@ -515,9 +519,7 @@ def _mask_non_rendered_markdown(text):
     # Blank the remaining inline HTML constructs, preserving positions.
     masked = README_UNRENDERED.sub(blank, masked)
 
-    # Run the shared literal-region reader on the original source.
     literal = gfm_table.mask_literal_regions(text)
-    # A character hidden by either reader stays hidden.
     return "".join(" " if original != " " and " " in (literal_char, masked_char) else original
                    for original, literal_char, masked_char
                    in zip(text, literal, masked))
@@ -746,7 +748,7 @@ def rendered(rows, source_map):
         gap_note = "No row is gap-free."
     report = [header + "# R1 final auditor report\n\n",
         "## Decision\n\n",
-        f"Review basis: recorded input set (Stage A disclosure amendment; no proof-status upgrade) `{R1_REVIEW_BASE}`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.\n\n",
+        f"Review basis: normal merge of the landed source-fidelity-A input with the MinFirst boundary amendment (no parent upgrade) `{R1_REVIEW_BASE}`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.\n\n",
         "## Architecture and evidence boundary\n\n",
         "The evidence stack is: pinned Lido source spans → source-shaped/abstract Lean specifications → Verity Lean program and `Contract.run` transaction observables → named theorem and negative-mutant receipts. Revert theorems concern the modeled snapshot and journal. External calls, storage observations, and source correspondences have only the scope stated per row. Lean theorem names are authoritative; metadata records classification and fidelity, never proof progress.\n\n",
         "Pinned upstream source is `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`; Verity is pinned in `audit/artifacts.lock.json`; Lean is `leanprover/lean4:v4.31.0`. Canonical source anchors are immutable permalinks in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance. Supplemental rows deliberately have no independent source-map target unless their parent mapping says otherwise.\n\n",
@@ -832,8 +834,6 @@ def main():
         for name, content in views.items():
             require((AUDIT / name).read_text(encoding="utf-8") == content, f"{name} is stale; run scripts/audit_metadata.py generate")
         print(f"audit metadata v4 ok: {len(CANONICAL_IDS)} canonical guarantees + {len(SUBORDINATE_IDS)} subordinate evidence rows")
-
-
 
 
 if __name__ == "__main__":

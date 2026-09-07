@@ -158,7 +158,48 @@
           "end_line": 143,
           "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/package.json#L143-L143"
         }
-      ]
+      ],
+      "execution_review": {
+        "entrypoint": "StakingRouter.getDepositAllocations -> SRLib._getDepositAllocations",
+        "helpers": [
+          "SRLib._getModulesAllocationAndCapacity",
+          "SRLib._getStakingModuleSummary",
+          "SRStorage.getModulesCount/getModuleIdAt/getModuleState/getIStakingModule/getIStakingModuleV2",
+          "MinFirstAllocationStrategy.allocate"
+        ],
+        "modifiers": "public view; no authorization modifier on this selected view path",
+        "storage": "SRStorage.ROUTER_STORAGE_POSITION custom slot; RouterState.moduleStates mapping at offset 0, moduleIds at offsets 1/2; ModuleState.config at offset 0 and accounting at offset 2. Source layout facts are not a proved physical relation for AllocationTx slots 29-43.",
+        "calls_in_order": [
+          "For each module: read config, staticcall getStakingModuleSummary, checked active-count subtraction, for type 2 staticcall getTotalModuleStake then ceilDiv, store allocation in memory then checked total increment.",
+          "Only after the first loop succeeds: second capacity loop. SRLib then calls the external MinFirst library and converts results to wei."
+        ],
+        "deviations": [
+          {
+            "kind": "abstraction",
+            "detail": "bindLiveAll hoists calls ahead of arithmetic; no full-outcome or trace equivalence is proved. Arithmetic can prevent later source calls."
+          },
+          {
+            "kind": "added behavior",
+            "detail": "Model caps stored count at 32 instead of deriving the bound from initialization/update paths."
+          },
+          {
+            "kind": "instrumentation",
+            "detail": "Allocation columns and totals are persisted in synthetic observation storage; failAfterWrites is a model hook, not a Solidity branch."
+          },
+          {
+            "kind": "abstraction",
+            "detail": "ALLOC_ARITHMETIC merges distinct source panic identities; mapped call failures use model strings."
+          },
+          {
+            "kind": "omitted behavior",
+            "detail": "Physical custom-slot relation, capacity/distribution/wei-conversion composition, and reachable CheckedBounds remain open."
+          }
+        ],
+        "supplementary_evidence": [
+          "LidoSRv3.Audit.Verity.AllocationTx.live_revert_restores_snapshot"
+        ],
+        "correspondence_status": "OPEN for full named entrypoint; live rollback is only a Contract.run theorem."
+      }
     },
     {
       "id": "P-ALLOC-2",
@@ -200,7 +241,46 @@
           "end_line": 106,
           "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/common/lib/MinFirstAllocationStrategy.sol#L102-L106"
         }
-      ]
+      ],
+      "execution_review": {
+        "entrypoint": "MinFirstAllocationStrategy.allocate",
+        "helpers": [
+          "allocateToBestCandidate",
+          "Math256.min",
+          "Math256.ceilDiv"
+        ],
+        "modifiers": "public pure; no authorization modifier",
+        "storage": "No Solidity storage reads or writes in the pure library body; buckets is mutated in memory and returned. The external library ABI/delegatecall boundary is not modeled by allocateDecoded.",
+        "calls_in_order": [
+          "No external contract calls inside allocateToBestCandidate; internal min/ceilDiv only. Each iteration scans all buckets for the first minimum and count, scans all buckets for the upper bound, computes amount and mutates the selected bucket."
+        ],
+        "deviations": [
+          {
+            "kind": "added behavior",
+            "detail": "Legacy MinFirstDistributionTx.allocate eagerly requires equal lengths; this rejects source successes on zero demand and surplus capacities. It remains for compatibility."
+          },
+          {
+            "kind": "abstraction",
+            "detail": "MinFirstSourceEntry.allocateDecoded accepts decoded word lists, not ABI bytes. It uses the existing word loop, whose candidate/count/upper-bound scans and fuel sufficiency are not yet a full source-body correspondence proof."
+          },
+          {
+            "kind": "abstraction",
+            "detail": "The new decoded entry distinguishes the source Panic(0x32) bounds error from unresolved word-loop failure (arithmetic or fuel). The latter has no claimed source panic identity. Exact ABI error encoding and malformed calldata decoding remain outside its theorem."
+          },
+          {
+            "kind": "instrumentation",
+            "detail": "Legacy observation slots/failure hooks remain. The new pure entry has none and proves full ContractState preservation on success and rollback."
+          }
+        ],
+        "supplementary_evidence": [
+          "LidoSRv3.Audit.Verity.MinFirstSourceEntry.zero_demand",
+          "LidoSRv3.Audit.Verity.MinFirstSourceEntry.short_capacity",
+          "LidoSRv3.Audit.Verity.MinFirstSourceEntry.success_preserves_state",
+          "LidoSRv3.Audit.Verity.MinFirstSourceEntry.revert_restores_snapshot",
+          "LidoSRv3.Audit.Verity.MinFirstSourceEntry.success_refines_proportional_model"
+        ],
+        "correspondence_status": "OPEN for full source/ABI path; decoded-array boundary correction and conditional independent-model success refinement only."
+      }
     },
     {
       "id": "P-DEPOSIT-1",
@@ -973,5 +1053,24 @@
         }
       ]
     }
-  ]
+  ],
+  "fidelity_contract": {
+    "document": "audit/SOURCE-FIDELITY.md",
+    "observables": [
+      "success-or-revert identity",
+      "return values",
+      "relevant physical storage",
+      "balances",
+      "call kind/target/value/payload/order",
+      "events"
+    ],
+    "deviation_classes": [
+      "omitted behavior",
+      "abstraction",
+      "instrumentation",
+      "added behavior"
+    ],
+    "rule": "Named source spans and model theorems do not establish whole-entrypoint correspondence; every omitted observable and added premise must remain explicit.",
+    "inventory_status": "PARTIAL: execution review below covers the allocation paths only; remaining target inventories are open."
+  }
 }
