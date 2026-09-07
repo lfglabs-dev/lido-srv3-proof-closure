@@ -1,5 +1,22 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Complete spending rules substituted into withdrawal
+
+`SpendSpec` independently orders allocation, amount admission, prepared accounting,
+frame evaluation and commit. `Spend` proves bidirectional exact stage correspondence
+for allocation failure, insufficient funds, frame failure and success. Actual
+physical allocation bounds discharge intermediate checked uint256 arithmetic faults;
+uint128 narrowing is retained. Saved next-report accounting and the frame-returned
+world are distinct inputs to commit. The raw frame-failure world and ordered traces
+are preserved until the withdrawal parent performs full rollback.
+
+`Spend.Withdrawal` replaces spending in the already expanded status/lookup/tail
+parent relation with bidirectional exact correspondence. Allocation/current-frame
+semantics and CALL/deployed primitive interpretation remain explicit lower interfaces.
+Remaining report/queue writers, deployment/resource closure, canonical registration
+and full remote gates remain open. Immutable validation follows checks. Runtime
+execution source and historical receipts are unchanged.
+
 ## Complete seed/receiver tail rules substituted into withdrawal
 
 `TailSpec` independently describes zero seeds, checked seed update and overflow,

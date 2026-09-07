@@ -72,6 +72,8 @@ MODULES = [
     "Audit/Source/TrioReserve1/Lookup",
     "Audit/Source/TrioReserve1/TailSpec",
     "Audit/Source/TrioReserve1/Tail",
+    "Audit/Source/TrioReserve1/SpendSpec",
+    "Audit/Source/TrioReserve1/Spend",
     "Tests/TrioReserve1/Foundations",
     "Tests/TrioReserve1/OracleMutants",
     "Tests/TrioReserve1/Differential",
