@@ -1,8 +1,8 @@
 # Trio composition delivery record
 
 Status: the full composition at `0345a6146cd5cd10b55d318c48c2a4c578ae3bc8`
-passed all six official RunValidation gates. The final additive ABI-copy source
-at `36cc6af51c33461c2b8c5143d346a55a8638f0c6` passed its two focused root gates.
+passed all six official RunValidation gates. The final additive ABI/word-copy source
+at `00b0d739fa807f4e592cacbd41392aceb7bfc714` passed its three focused root gates.
 Both source reviews are CLEAN and their validation prerequisites are satisfied.
 PR249 and PR245 are merged; PR251 (including PR244 and PR246) awaits the final
 archive review and merge at this historical snapshot. This is not a deployment certificate.
@@ -104,10 +104,12 @@ match the pinned Solidity records (`remote-51037be4/parent-comparison.json`).
 
 Earlier failed full/targeted jobs remain under `remote-*` with their actual
 failure classification. The final receipts and source comparisons are archived in `remote-0345a614/`
-and `remote-36cc6af5/`. The source-comparison record documents why unchanged
-production uses the full0345 receipt while additive leaves use focused36cc.
+and `remote-00b0d739/`; the earlier focused36cc archive is retained. The final
+source-comparison record documents why unchanged production uses full0345 while
+additive ABI/word-copy leaves use focused00b0. Historical worker admission
+blockers apply to their standalone snapshots, not these successful root gates.
 The archive commit only refreshes evidence, the UX source fingerprint and its
 canonical tree receipt. It is not represented as another fully built source.
 Final merge outcomes and the locally prepared site are recorded separately after
-this archive snapshot. The site source pin is36cc and distinguishes both gates.
+this archive snapshot. The site source pin is00b0 and distinguishes full-base and focused-final gates.
 Publication or sending the dossier to Lido still requires Thomas's approval.
