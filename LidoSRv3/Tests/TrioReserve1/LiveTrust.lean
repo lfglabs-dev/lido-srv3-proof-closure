@@ -1,3 +1,5 @@
+import LidoSRv3.Audit.Source.TrioReserve1.Status
+import LidoSRv3.Audit.Source.TrioReserve1.WithdrawalParent
 import LidoSRv3.Audit.Source.TrioReserve1.Target
 import LidoSRv3.Audit.Source.TrioReserve1.ACLPermission
 import LidoSRv3.Audit.Source.TrioReserve1.ACLLeaf
@@ -262,3 +264,19 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms Target.complete
 #print axioms Target.prefix_denied
 #print axioms Target.kernel_no_code
+
+#print axioms WithdrawalSpec.failure_restores
+#print axioms WithdrawalSpec.success_nonzero
+#print axioms WithdrawalParent.of_spec
+#print axioms WithdrawalParent.exists_spec
+#print axioms WithdrawalParent.to_spec
+#print axioms WithdrawalParent.corresponds
+#print axioms WithdrawalParent.complete
+
+#print axioms Status.of_spec
+#print axioms Status.exists_spec
+#print axioms Status.to_spec
+#print axioms Status.corresponds
+#print axioms Status.withdrawal_denied
+#print axioms Status.withdrawal_failure
+#print axioms Status.withdrawal_corresponds

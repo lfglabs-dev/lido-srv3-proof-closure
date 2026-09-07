@@ -1,5 +1,40 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Complete status-stage rules substituted into withdrawal
+
+`StatusSpec` independently covers lookup/call failure, malformed ABI data, nonzero
+bunker denial, post-call pause denial and allowance. `Status` projects actual bytes
+and physical pause storage into these rules and proves soundness, completeness and
+bidirectional exact status outcome/world/trace correspondence. The active word is
+observed after the bunker call, and bunker denial requires no pause premise.
+Failures are stage failures retaining the actual returned world until root rollback.
+
+`Status.Withdrawal` replaces the parent's opaque status observation with these
+independent rules; `withdrawal_corresponds` retains bidirectional exact parent
+correspondence. Status denial/failure have explicit parent rollback corollaries.
+Lookup/CALL primitive and deployed callee binding remain explicit, as do remaining
+router/spending/tail interfaces, other writers and full remote integration gates.
+At source `17ad2454bfe2b6fea97b076a9f0f078b72ee370a`, three selected component checks and seven baseline/import checks pass. The other 60 source/olean pairs match earlier successful receipts. See `receipts/status-summary.json`; only standard axioms were printed. Eleven dependency revisions match the manifest. These are bounded checks, not full gates. Runtime execution source is unchanged.
+
+## Exhaustive withdrawal parent control relation
+
+`WithdrawalSpec.Executes` is independent of source executors. Its eight ordered
+rules cover status failure/denial, router failure, authorization denial, zero
+amount, spending failure, success and tail failure. Each stage starts in the
+actual prior stage's returned world, the looked-up router is retained, and
+unvisited stages need no derivation. Every failure restores the original world
+while ordered attempt traces survive. These facts include independent rollback
+and successful-nonzero theorems.
+
+`WithdrawalParent` gives soundness, completeness and bidirectional exact
+return/world/trace correspondence for the full parent, instantiated with actual
+status/router/spending/tail observations. This is exhaustive structural parent
+coverage, not discharged independent internals for every stage. Existing concrete
+callee/composition proofs must still discharge stage interfaces across all paths;
+deployed primitive/resource binding, remaining report/queue writers and canonical
+full remote integration gates remain open. At source `48c2b4c9d4dab0beadf6718353af3ff672a198ca`, three selected component checks and seven baseline/import checks pass. The other 58 source/olean pairs match earlier successful receipts. See `receipts/withdrawal-parent-summary.json`; only standard axioms were printed. Eleven dependency revisions match the manifest. These are bounded checks, not full gates.
+Runtime execution source and prior execution receipts are unchanged.
+
 ## Target continuation: exhaustive after authorization
 
 `TargetSpec.Completes` is an independent generic transaction rule with no source

@@ -23,7 +23,13 @@ physical kernel-no-code cases. Remaining target integration includes concrete
 authorization failure/deployment coverage,
 external sequence reachability and deployed primitive binding.
 
-1. Complete the independent withdrawal interaction specification and full
+1. WithdrawalSpec/WithdrawalParent now cover all eight parent paths with
+   bidirectional exact return/world/trace correspondence to actual stage
+   observations. Status.Withdrawal now substitutes independent complete
+   lookup/CALL/ABI/bunker/post-call pause rules for the status stage. Discharge
+   lookup/CALL deployed binding and the remaining router/spending/tail interfaces with
+   independent semantics and concrete deployed source across all paths. Complete
+   the independent withdrawal interaction specification and full
    return/revert/world/ordered-call/event correspondence. Allocation is now tied
    to actual queue CALL bytes and saved physical locals; compose through all
    guards, packed writes, frame call, seed update and ETH receiver.
