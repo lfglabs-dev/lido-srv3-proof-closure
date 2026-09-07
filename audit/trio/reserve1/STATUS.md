@@ -15,8 +15,11 @@ from each derivation and preserves the result for larger depths; related
 derivations agree on outcome and trace. No global cutoff or global acyclicity
 premise is inserted. This closes recursive structure correspondence, while the
 leaf premises, primitive/deployment relation and EVM resource binding remain open.
-Runtime implementations are unchanged. Draft checks pass; immutable evidence
-follows the source commit.
+At `35e5c6b1505236744d89ae21dfe81b887f6be266`, ACLTreeSpec, ACLTree
+and updated LiveTrust pass, along with all seven baseline/import checks. The other
+50 modules' source and olean hashes match prior receipts; inspected axioms are
+standard. `receipts/acl-tree-summary.json` links exact evidence. Runtime code is
+unchanged; prior executions retain their original source-commit attribution.
 
 ## Independent ACL logic control
 

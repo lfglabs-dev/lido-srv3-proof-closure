@@ -1,0 +1,39 @@
+LidoSRv3/Audit/Source/TrioReserve1/ACLTree.lean:71:8: error: Tactic `split` failed: Could not split an `if` or `match` expression in the type
+  (have p := ACL.param k self hash i w;
+    if p.id = 204 then
+      if p.op > 12 then ACLTreeSpec.Node.invalid
+      else ACLTreeSpec.Node.logic p.op (p.value % 2 ^ 32) (p.value / 2 ^ 32 % 2 ^ 32) (p.value / 2 ^ 64 % 2 ^ 32)
+    else ACLTreeSpec.Node.atom) =
+    ACLTreeSpec.Node.missing
+of `hn`
+
+Hint: Use `set_option trace.split.failure true` to display additional diagnostic information
+
+case isFalse
+k : Queue.Keccak
+external : StaticCall.External
+self : Address
+hash : Word
+who where_ : Address
+role : Word
+how : List Word
+w : World
+leaf : Nat → ACLTreeSpec.Outcome → List NestedAttempt → Prop
+leaf_source :
+  ∀ (index : Nat) (outcome : ACLTreeSpec.Outcome) (trace : List NestedAttempt),
+    node k self hash w index = ACLTreeSpec.Node.atom →
+      leaf index outcome trace →
+        ∃ fuel, ACL.eval k external self hash who where_ role how w fuel index = result outcome trace
+index : Nat
+outcome : ACLTreeSpec.Outcome
+trace : List NestedAttempt
+i : Nat
+h✝ : ¬i ≥ (w.core.readContractSlot self.val (ACL.paramsSlot k hash)).val
+hn :
+  (have p := ACL.param k self hash i w;
+    if p.id = 204 then
+      if p.op > 12 then ACLTreeSpec.Node.invalid
+      else ACLTreeSpec.Node.logic p.op (p.value % 2 ^ 32) (p.value / 2 ^ 32 % 2 ^ 32) (p.value / 2 ^ 64 % 2 ^ 32)
+    else ACLTreeSpec.Node.atom) =
+    ACLTreeSpec.Node.missing
+⊢ (w.core.readContractSlot self.val (ACL.paramsSlot k hash)).val ≤ i

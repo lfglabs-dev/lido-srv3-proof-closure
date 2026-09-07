@@ -1,0 +1,6 @@
+LidoSRv3/Audit/Source/TrioReserve1/ACLTree.lean:161:26: warning: Try `simp at he` instead of `simpa using he`
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+LidoSRv3/Audit/Source/TrioReserve1/ACLTree.lean:161:26: warning: Try `simp at he` instead of `simpa using he`
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
