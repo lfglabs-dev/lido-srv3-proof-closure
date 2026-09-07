@@ -1,5 +1,52 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Complete spending rules substituted into withdrawal
+
+`SpendSpec` independently orders allocation, amount admission, prepared accounting,
+frame evaluation and commit. `Spend` proves bidirectional exact stage correspondence
+for allocation failure, insufficient funds, frame failure and success. Actual
+physical allocation bounds discharge intermediate checked uint256 arithmetic faults;
+uint128 narrowing is retained. Saved next-report accounting and the frame-returned
+world are distinct inputs to commit. The raw frame-failure world and ordered traces
+are preserved until the withdrawal parent performs full rollback.
+
+`Spend.Withdrawal` replaces spending in the already expanded status/lookup/tail
+parent relation with bidirectional exact correspondence. Allocation/current-frame
+semantics and CALL/deployed primitive interpretation remain explicit lower interfaces.
+Remaining report/queue writers, deployment/resource closure, canonical registration
+and full remote gates remain open. At source `3e5611f7cc00c60015750ad4e865f3ae8f842042`, three selected component checks and seven baseline/import checks pass. The other 66 source/olean pairs match earlier successful receipts. See `receipts/spend-rules-summary.json`; only standard axioms were printed. Eleven dependency revisions match the manifest. These are bounded checks, not full gates. Runtime
+execution source and historical receipts are unchanged.
+
+## Complete seed/receiver tail rules substituted into withdrawal
+
+`TailSpec` independently describes zero seeds, checked seed update and overflow,
+then ordered seed/receiver composition. Seed overflow does not require a receiver
+observation; success discards returned receiver bytes. `Tail` binds seed arithmetic
+to the physical packed update and full-count event projection, and proves exact
+soundness/completeness for every tail outcome/world/trace. Stage worlds are retained
+until the withdrawal parent performs transaction rollback.
+
+`Tail.Withdrawal` replaces the opaque tail observation with these rules while
+retaining the expanded status/lookup relations and bidirectional exact parent
+correspondence. Spending internals and CALL/deployed primitive interpretation remain
+explicit direct boundaries; remaining report/queue writers and full integration
+obligations are unchanged. At source `f6356dcfdaa54baaf423dc492a5fd241427963c3`, three selected component checks and seven baseline/import checks pass. The other 64 source/olean pairs match earlier successful receipts. See `receipts/tail-rules-summary.json`; only standard axioms were printed. Eleven dependency revisions match the manifest. These are bounded checks, not full gates. Runtime source is
+unchanged, with prior executions still attributed to their tested commits.
+
+## Complete locator lookup rules substituted into status and withdrawal
+
+`LookupSpec` independently describes call failure, malformed typed replies and
+successful first-word decoding. `Lookup` binds these rules to the physical low-160
+locator pointer and explicit first-word/address narrowing, with bidirectional exact
+outcome/world/trace correspondence. Successful replies may contain trailing bytes;
+malformed replies retain the callee world until the parent performs rollback.
+
+`Lookup.Status` replaces queue lookup with these rules. `Lookup.Withdrawal` replaces
+both queue/status and router observations, with bidirectional parent correspondence.
+CALL/deployed locator and bunker binding remain explicit boundaries; spending/tail
+internals, report/queue writers, deployment/resource closure and full remote gates
+remain open. At source `610d88ca8b2fd6bc83a13d741e11fd80ae19d23e`, three selected component checks and seven baseline/import checks pass. The other 62 source/olean pairs match earlier successful receipts. See `receipts/lookup-summary.json`; only standard axioms were printed. Eleven dependency revisions match the manifest. These are bounded checks, not full gates. Runtime source is unchanged.
+
 ## Complete status-stage rules substituted into withdrawal
 
 `StatusSpec` independently covers lookup/call failure, malformed ABI data, nonzero

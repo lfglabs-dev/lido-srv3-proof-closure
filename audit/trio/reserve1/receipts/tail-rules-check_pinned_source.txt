@@ -1,0 +1,610 @@
+== 1. Pin consistency
+  source-map pinned_source : lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436
+  lido-core submodule HEAD : 17005714f151e5502c559932319a3f2f74ac2436
+  ok: submodule HEAD equals pin
+  spans: 96; spans whose source_sha/permalink differ from pin: 0
+
+== 2. Source-map spans (first line of each span)
+  P-ALLOC-1              contracts/0.8.25/sr/StakingRouter.sol:929-936  ok (`getDepositAllocations` in range)  | function getDepositAllocations(uint256 _depositAmount, bool _isTopUp)
+  P-ALLOC-1              contracts/0.8.25/sr/SRLib.sol:391-431  ok (`_getDepositAllocations` in range)  | function _getDepositAllocations(Config calldata _cfg, uint256 _allocateAmount, bool _isTop
+  P-ALLOC-1              contracts/0.8.25/sr/SRLib.sol:493-559  ok (`_getModulesAllocationAndCapacity` in range)  | function _getModulesAllocationAndCapacity(Config calldata _cfg, uint256 depositsToAllocate
+  P-ALLOC-1              contracts/0.8.25/sr/SRLib.sol:372-379  ok (`_getStakingModuleSummary` in range)  | /// @dev Optimizes contract deployment size by wrapping the 'stakingModule.getStakingModul
+  P-ALLOC-1              contracts/0.8.25/sr/SRStorage.sol:30-32  ok (`getModuleState` in range)  | function getModuleState(uint256 _moduleId) internal view returns (ModuleState storage) {
+  P-ALLOC-1              contracts/0.8.25/sr/SRStorage.sol:34-47  ok (`getIStakingModule` in range)  | function getIStakingModule(ModuleState storage $) internal view returns (IStakingModule) {
+  P-ALLOC-1              contracts/0.8.25/sr/SRStorage.sol:54-56  ok (`getModulesCount` in range)  | function getModulesCount() internal view returns (uint256) {
+  P-ALLOC-1              contracts/0.8.25/sr/SRStorage.sol:62-64  ok (`getModuleIdAt` in range)  | function getModuleIdAt(uint256 _idx) internal view returns (uint256) {
+  P-ALLOC-1              contracts/common/lib/WithdrawalCredentials.sol:47-49  ok (`isType2` in range)  | function isType2(uint256 wcType) internal pure returns (bool) {
+  P-ALLOC-1              contracts/0.8.25/sr/SRUtils.sol:17-17  ok (`TOTAL_BASIS_POINTS` in range)  | uint256 public constant TOTAL_BASIS_POINTS = 10000;
+  P-ALLOC-1              contracts/common/interfaces/IStakingModule.sol:71-81  ok (`getStakingModuleSummary` in range)  | /// @notice Returns all-validators summary in the staking module
+  P-ALLOC-1              contracts/common/interfaces/IStakingModuleV2.sol:28-29  ok (`getTotalModuleStake` in range)  | /// @notice returns the total amount of ETH staked in the module, in wei
+  P-ALLOC-1              package.json:143-143  ok  | "openzeppelin-solidity": "2.0.0",
+  P-ALLOC-2              contracts/common/lib/MinFirstAllocationStrategy.sol:30-44  ok (`allocate` in range)  | function allocate(
+  P-ALLOC-2              contracts/common/lib/MinFirstAllocationStrategy.sol:76-86  ok (`allocateToBestCandidate` declared at line 63, encloses range)  | for (uint256 i = 0; i < buckets.length; ++i) {
+  P-ALLOC-2              contracts/common/lib/MinFirstAllocationStrategy.sol:93-100  ok (`allocateToBestCandidate` declared at line 63, encloses range)  | uint256 allocationSizeUpperBound = MAX_UINT256;
+  P-ALLOC-2              contracts/common/lib/MinFirstAllocationStrategy.sol:102-106  ok (`allocateToBestCandidate` declared at line 63, encloses range)  | allocated = Math256.min(
+  P-DEPOSIT-1            contracts/0.8.25/sr/StakingRouter.sol:88-106  ok (`constructor` in range)  | constructor(
+  P-DEPOSIT-1            contracts/0.8.25/sr/StakingRouter.sol:63-66  ok (`MAX_EFFECTIVE_BALANCE_WC_TYPE_01` in range)  | /// @notice Max Effective Balance for Withdrawal Credentials types
+  P-DEPOSIT-1            contracts/0.8.25/sr/StakingRouter.sol:942-997  ok (`deposit` in range)  | function deposit(uint256 _stakingModuleId, bytes calldata _depositCalldata) external {
+  P-DEPOSIT-1            contracts/0.8.25/lib/BeaconChainDepositor.sol:24-25  ok (`DEPOSIT_SIZE` in range)  | uint256 internal constant DEPOSIT_SIZE = 32 ether;
+  P-DEPOSIT-1            contracts/0.4.24/Lido.sol:869-886  ok (`withdrawDepositableEther` in range)  | function withdrawDepositableEther(uint256 _amount, uint256 _seedDepositsCount) external {
+  P-DEPOSIT-1            contracts/0.4.24/Lido.sol:839-859  ok (`_spendDepositableEther` in range)  | function _spendDepositableEther(uint256 _depositAmount) internal {
+  P-DEPOSIT-1            contracts/0.8.25/lib/BeaconChainDepositor.sol:36-64  ok (`makeBeaconChainDeposits32ETH` in range)  | function makeBeaconChainDeposits32ETH(
+  P-TOPUP-1              contracts/0.8.25/sr/StakingRouter.sol:679-759  ok (`topUp` in range)  | function topUp(
+  P-TOPUP-1              contracts/0.8.25/sr/StakingRouter.sol:761-782  ok (`_validateTopUpInputs` in range)  | function _validateTopUpInputs(
+  P-TOPUP-1              contracts/0.8.25/sr/StakingRouter.sol:1177-1179  ok (`_checkAppAuth` in range)  | function _checkAppAuth(address app) internal view {
+  P-TOPUP-1              contracts/0.8.25/sr/StakingRouter.sol:1169-1171  ok (`_getTopUpGateway` in range)  | function _getTopUpGateway() internal view returns (address) {
+  P-TOPUP-1              contracts/0.8.25/sr/StakingRouter.sol:1099-1107  ok (`_getModuleState` in range)  | function _getModuleState(uint256 _moduleId)
+  P-TOPUP-1              contracts/0.8.25/sr/SRUtils.sol:41-43  ok (`_requireWCType2` in range)  | function _requireWCType2(uint256 _wcType) internal pure {
+  P-TOPUP-1              contracts/0.8.25/sr/SRUtils.sol:45-47  ok (`_requireModuleIdExists` in range)  | function _requireModuleIdExists(uint256 _moduleId) internal view {
+  P-TOPUP-1              contracts/0.8.25/sr/StakingRouter.sol:57-57  ok (`PUBKEY_LENGTH` in range)  | uint64 internal constant PUBKEY_LENGTH = 48;
+  P-TOPUP-1              contracts/0.8.25/lib/BeaconChainDepositor.sol:21-21  ok (`PUBLIC_KEY_LENGTH` in range)  | uint256 internal constant PUBLIC_KEY_LENGTH = 48;
+  P-TOPUP-1              contracts/0.8.25/lib/BeaconChainDepositor.sol:28-28  ok (`MIN_DEPOSIT` in range)  | uint256 internal constant MIN_DEPOSIT = 1 ether;
+  P-TOPUP-1              contracts/0.4.24/Lido.sol:869-886  ok (`withdrawDepositableEther` in range)  | function withdrawDepositableEther(uint256 _amount, uint256 _seedDepositsCount) external {
+  P-TOPUP-1              contracts/0.8.25/lib/BeaconChainDepositor.sol:66-108  ok (`makeBeaconChainTopUp` in range)  | function makeBeaconChainTopUp(
+  P-TOPUP-1              contracts/0.4.24/Lido.sol:839-859  ok (`_spendDepositableEther` in range)  | function _spendDepositableEther(uint256 _depositAmount) internal {
+  P-ACCOUNT-1            contracts/0.8.9/oracle/AccountingOracle.sol:360-366  ok (`submitReportData` in range)  | function submitReportData(ReportData calldata data, uint256 contractVersion) external {
+  P-ACCOUNT-1            contracts/0.8.9/oracle/AccountingOracle.sol:477-559  ok (`_handleConsensusReportData` in range)  | function _handleConsensusReportData(ReportData calldata data, uint256 prevRefSlot) interna
+  P-ACCOUNT-1            contracts/0.8.9/oracle/AccountingOracle.sol:609-619  ok (`_processStakingRouterValidatorBalancesByModule` in range)  | function _processStakingRouterValidatorBalancesByModule(
+  P-ACCOUNT-1            contracts/0.8.25/sr/StakingRouter.sol:285-290  ok (`reportValidatorBalancesByStakingModule` in range)  | function reportValidatorBalancesByStakingModule(
+  P-ACCOUNT-1            contracts/0.8.25/sr/SRLib.sol:853-870  ok (`_validateReportValidatorBalancesByStakingModule` in range)  | /// @dev report MUST include all modules in the same order as they are registered in the S
+  P-ACCOUNT-1            contracts/0.8.25/sr/SRLib.sol:872-892  ok (`_reportValidatorBalancesByStakingModule` in range)  | /// @dev report MUST include all modules in the same order as they are registered in the S
+  P-ACCOUNT-1            contracts/0.8.25/sr/SRUtils.sol:75-83  ok (`_ensureAmountGwei` in range)  | /// @dev checks if the amount not exceeds a reasonable limit and converts it to uint64
+  P-ACCOUNT-1            contracts/0.8.25/sr/SRUtils.sol:23-23  ok (`MAX_VALUE_GWEI` in range)  | uint256 internal constant MAX_VALUE_GWEI = 1_000_000_000 ether / 1 gwei; // i.e. 1B ETH
+  P-ACCOUNT-1            contracts/0.8.9/Accounting.sol:135-144  ok (`handleOracleReport` in range)  | /// @notice Updates accounting states, collects and distributes rewards, performs withdraw
+  P-ACCOUNT-1            contracts/0.8.9/Accounting.sol:263-303  ok (`_calculateProtocolFees` in range)  | /// @return sharesToMintAsFees total number of shares to be minted as Lido Core fee
+  P-ACCOUNT-1            contracts/0.8.9/Accounting.sol:359-428  ok (`_applyOracleReportContext` in range)  | /// @dev applies the precalculated changes to the protocol state
+  P-ACCOUNT-1            contracts/0.8.25/sr/StakingRouter.sol:802-874  ok (`getStakingRewardsDistribution` in range)  | /// @notice Return shares table.
+  P-ACCOUNT-1            contracts/0.8.25/sr/StakingRouter.sol:263-271  ok (`reportRewardsMinted` in range)  | /// @dev See {SRLib._reportRewardsMinted}.
+  P-ACCOUNT-1            contracts/0.8.25/sr/SRLib.sol:616-639  ok (`_reportRewardsMinted` in range)  | /// @notice Reports the minted rewards to the staking modules with the specified ids.
+  P-RESERVE-1            contracts/0.4.24/Lido.sol:605-616  ok (`_getBufferedEtherAllocation` in range)  | function _getBufferedEtherAllocation() internal view returns (BufferedEtherAllocation allo
+  P-RESERVE-1            contracts/0.4.24/Lido.sol:823-825  ok (`getDepositableEther` in range)  | function getDepositableEther() external view returns (uint256) {
+  P-RESERVE-1            contracts/0.4.24/Lido.sol:831-833  ok (`_getDepositableEther` in range)  | function _getDepositableEther(BufferedEtherAllocation allocation) internal pure returns (u
+  P-RESERVE-1            contracts/0.4.24/Lido.sol:839-859  ok (`_spendDepositableEther` in range)  | function _spendDepositableEther(uint256 _depositAmount) internal {
+  P-RESERVE-1            contracts/0.4.24/Lido.sol:869-886  ok (`withdrawDepositableEther` in range)  | function withdrawDepositableEther(uint256 _amount, uint256 _seedDepositsCount) external {
+  P-CONSOLIDATION-ETH-1  contracts/0.8.25/vaults/ValidatorConsolidationRequests.sol:24-25  ok (`CONSOLIDATION_REQUEST_PREDEPLOY_ADDRESS` in range)  | /// @notice EIP-7251 consolidation requests contract address.
+  P-CONSOLIDATION-ETH-1  contracts/0.8.25/consolidation/ConsolidationBus.sol:383-406  ok (`executeConsolidation` in range)  | function executeConsolidation(IConsolidationGateway.ConsolidationWitnessGroup[] calldata g
+  P-CONSOLIDATION-ETH-1  contracts/0.8.25/consolidation/ConsolidationGateway.sol:185-223  ok (`addConsolidationRequests` in range)  | function addConsolidationRequests(
+  P-CONSOLIDATION-ETH-1  contracts/0.8.25/consolidation/ConsolidationGateway.sol:295-307  ok (`_refundFee` in range)  | function _refundFee(uint256 refund, address recipient) internal {
+  P-CONSOLIDATION-ETH-1  contracts/0.8.9/WithdrawalVaultEIP7685.sol:113-121  ok (`_callAddConsolidationRequest` in range)  | function _callAddConsolidationRequest(bytes calldata sourcePubkey, bytes calldata targetPu
+  P-CONSOLIDATION-ETH-1  contracts/0.8.9/WithdrawalVaultEIP7685.sol:103-111  ok (`_callAddWithdrawalRequest` in range)  | function _callAddWithdrawalRequest(bytes calldata pubkey, uint64 amount, uint256 fee) inte
+  P-ADDRESS-1            contracts/0.8.9/WithdrawalQueueERC721.sol:218-220  ok (`transferFrom` in range)  | function transferFrom(address _from, address _to, uint256 _requestId) external override {
+  P-ADDRESS-1            contracts/0.8.9/WithdrawalQueue.sol:125-142  ok (`requestWithdrawals` in range)  | function requestWithdrawals(uint256[] calldata _amounts, address _owner)
+  P-ADDRESS-1            contracts/0.8.9/WithdrawalQueue.sol:244-264  ok (`claimWithdrawalsTo` in range)  | function claimWithdrawalsTo(uint256[] calldata _requestIds, uint256[] calldata _hints, add
+  P-ADDRESS-1            contracts/0.6.12/WstETH.sol:69-80  ok (`unwrap` in range)  | function unwrap(uint256 _wstETHAmount) external returns (uint256) {
+  P-TOPUP-2              contracts/0.8.25/TopUpGateway.sol:160-237  ok (`topUp` in range)  | function topUp(TopUpData calldata _topUps) external onlyRole(TOP_UP_ROLE) whenResumed {
+  P-TOPUP-2              contracts/0.8.25/TopUpGateway.sol:396-415  ok (`_evaluateTopUpLimit` in range)  | function _evaluateTopUpLimit(ValidatorWitness calldata _validator, uint256 _pendingBalance
+  P-TOPUP-2              contracts/0.8.25/CLValidatorVerifier.sol:44-57  ok (`_verifyValidator` in range)  | function _verifyValidator(
+  P-CONSOLIDATION-1      contracts/0.8.25/consolidation/ConsolidationBus.sol:325-370  ok (`addConsolidationRequests` in range)  | function addConsolidationRequests(ConsolidationGroup[] calldata groups) external onlyRole(
+  P-CONSOLIDATION-1      contracts/0.8.25/consolidation/ConsolidationBus.sol:383-406  ok (`executeConsolidation` in range)  | function executeConsolidation(IConsolidationGateway.ConsolidationWitnessGroup[] calldata g
+  P-CONSOLIDATION-1      contracts/0.8.25/consolidation/ConsolidationGateway.sol:185-223  ok (`addConsolidationRequests` in range)  | function addConsolidationRequests(
+  P-CONSOLIDATION-1      contracts/0.8.25/consolidation/ConsolidationGateway.sol:348-365  ok (`_prepareConsolidationPairs` in range)  | function _prepareConsolidationPairs(
+  P-CONSOLIDATION-1      contracts/0.8.9/WithdrawalVault.sol:63-78  ok (fn?)  | address _treasury,
+  P-CONSOLIDATION-1      contracts/0.8.9/WithdrawalVault.sol:81-85  ok (`preservesEthBalance` in range)  | modifier preservesEthBalance() {
+  P-CONSOLIDATION-1      contracts/0.8.9/WithdrawalVault.sol:199-208  ok (`addConsolidationRequests` in range)  | function addConsolidationRequests(
+  P-CONSOLIDATION-1      contracts/0.8.9/WithdrawalVaultEIP7685.sol:34-40  ok (`constructor` in range)  | constructor(address _withdrawalRequest, address _consolidationRequest) {
+  P-CONSOLIDATION-1      contracts/0.8.9/WithdrawalVaultEIP7685.sol:56-73  ok (`_addConsolidationRequests` in range)  | function _addConsolidationRequests(
+  P-CONSOLIDATION-1      contracts/0.8.9/WithdrawalVaultEIP7685.sol:113-121  ok (`_callAddConsolidationRequest` in range)  | function _callAddConsolidationRequest(bytes calldata sourcePubkey, bytes calldata targetPu
+  P-SSZ-1                contracts/common/lib/BeaconTypes.sol:8-17  ok (`Validator` in range)  | struct Validator {
+  P-SSZ-1                contracts/common/interfaces/ValidatorWitness.sol:13-24  ok (`ValidatorWitness` in range)  | struct ValidatorWitness {
+  P-SSZ-1                contracts/common/lib/GIndex.sol:72-89  ok (`concat` in range)  | return pack(i - n, pow(self));
+  P-SSZ-1                contracts/common/lib/SSZ.sol:89-175  ok (`hashTreeRoot` in range)  | function hashTreeRoot(Validator memory validator) internal view returns (bytes32 root) {
+  P-SSZ-1                contracts/common/lib/SSZ.sol:179-248  ok (`verifyProof` in range)  | function verifyProof(bytes32[] calldata proof, bytes32 root, bytes32 leaf, GIndex gI) inte
+  P-SSZ-1                contracts/0.8.25/CLValidatorVerifier.sol:44-57  ok (`_verifyValidator` in range)  | function _verifyValidator(
+  P-SSZ-1                contracts/0.8.25/vaults/predeposit_guarantee/CLProofVerifier.sol:150-175  ok (`_validatePubKeyWCProof` in range)  | function _validatePubKeyWCProof(
+  P-SSZ-1                contracts/0.8.25/consolidation/ConsolidationGateway.sol:185-223  ok (`addConsolidationRequests` in range)  | function addConsolidationRequests(
+  P-SSZ-1                contracts/0.8.25/lib/BeaconChainDepositor.sol:120-135  ok (`_computeDepositDataRootWithAmount` in range)  | function _computeDepositDataRootWithAmount(
+  P-SSZ-1                contracts/0.8.25/lib/BeaconChainDepositor.sol:110-118  ok (`_computeDepositDataRootWithAmount` in range)  | function _computeDepositDataRootWithAmount(
+  P-SSZ-1                contracts/0.8.25/lib/BeaconChainDepositor.sol:137-146  ok (`_computeSignatureRoot` in range)  | function _computeSignatureRoot(bytes memory _signature) private pure returns (bytes32) {
+  P-SSZ-1                contracts/0.8.25/lib/BeaconChainDepositor.sol:148-153  ok (`_toLittleEndian64` in range)  | function _toLittleEndian64(uint64 value) private pure returns (bytes8 ret) {
+  P-SSZ-1                contracts/0.8.25/lib/BeaconChainDepositor.sol:21-21  ok (`PUBLIC_KEY_LENGTH` in range)  | uint256 internal constant PUBLIC_KEY_LENGTH = 48;
+  P-SSZ-1                contracts/0.8.25/lib/BeaconChainDepositor.sol:22-22  ok (`SIGNATURE_LENGTH` in range)  | uint256 internal constant SIGNATURE_LENGTH = 96;
+  P-SSZ-1                contracts/0.8.25/lib/BeaconChainDepositor.sol:126-133  ok (fn?)  | bytes32 publicKeyRoot = sha256(abi.encodePacked(_publicKey, bytes16(0)));
+  P-SSZ-1                contracts/0.8.25/lib/BeaconChainDepositor.sol:120-135  ok (fn?)  | function _computeDepositDataRootWithAmount(
+  P-ADDRESS-1.transfer-owner-handoff contracts/0.8.9/WithdrawalQueueERC721.sol:218-253  ok (`transferFrom` in range)  | function transferFrom(address _from, address _to, uint256 _requestId) external override {
+
+== 3. Inline citations in Lean sources, reports and diagram README
+  citation                                     file (lido-core/)                                        status  [first occurrence]
+  0.8.25/sr/SRLib.sol:854-870                  contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Source/AccountingCorrespondence.lean:34]
+  0.8.25/sr/SRLib.sol:873-892                  contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Source/AccountingCorrespondence.lean:37]
+  0.8.9/Accounting.sol:403-413                 contracts/0.8.9/Accounting.sol                           ok  [LidoSRv3/Audit/Source/AccountingCorrespondence.lean:40]
+  Accounting.sol:135-144                       contracts/0.8.9/Accounting.sol                           ok  [LidoSRv3/Audit/Verity/HandleOracleReportTx.lean:203]
+  Accounting.sol:135–144                       contracts/0.8.9/Accounting.sol                           ident? `_calculateProtocolFees` not in range  [report/P-ACCOUNT-1.md:181]
+  Accounting.sol:137–139                       contracts/0.8.9/Accounting.sol                           ok  [report/P-ACCOUNT-1.md:211]
+  Accounting.sol:138-139                       contracts/0.8.9/Accounting.sol                           ok  [LidoSRv3/Audit/Verity/HandleOracleReportTx.lean:217]
+  Accounting.sol:250-261                       contracts/0.8.9/Accounting.sol                           ok  [LidoSRv3/Audit/Source/ReserveRelationalCorrespondence.lean:8]
+  Accounting.sol:263-303                       contracts/0.8.9/Accounting.sol                           ok (`_calculateProtocolFees` in range)  [LidoSRv3/Audit/Source/AccountingCorrespondence.lean:25]
+  Accounting.sol:277                           contracts/0.8.9/Accounting.sol                           ok  [LidoSRv3/Audit/Verity/HandleOracleReportTx.lean:55]
+  Accounting.sol:403                           contracts/0.8.9/Accounting.sol                           ok  [LidoSRv3/Audit/Verity/HandleOracleReportTx.lean:258]
+  Accounting.sol:403-413                       contracts/0.8.9/Accounting.sol                           ok  [LidoSRv3/Audit/Source/AccountingCorrespondence.lean:159]
+  Accounting.sol:403-413                       contracts/0.8.9/Accounting.sol                           ok (`sharesToMintAsFees` in range)  [LidoSRv3/Audit/Source/AccountingCorrespondence.lean:26]
+  Accounting.sol:403–412                       contracts/0.8.9/Accounting.sol                           ok (`_distributeFee` in range)  [report/P-ACCOUNT-1.md:167]
+  Accounting.sol:403–413                       contracts/0.8.9/Accounting.sol                           ok  [report/P-ACCOUNT-1.md:171]
+  Accounting.sol:409                           contracts/0.8.9/Accounting.sol                           ok  [LidoSRv3/Audit/Verity/HandleOracleReportTx.lean:57]
+  AccountingOracle.sol:360-366                 contracts/0.8.9/oracle/AccountingOracle.sol              ok  [LidoSRv3/Audit/Verity/SubmitReportEntryTx.lean:36]
+  AccountingOracle.sol:360–365                 contracts/0.8.9/oracle/AccountingOracle.sol              ok (`submitReportData` in range)  [report/P-ACCOUNT-1.md:164]
+  AccountingOracle.sol:361                     contracts/0.8.9/oracle/AccountingOracle.sol              ok  [LidoSRv3/Audit/Verity/SubmitReportEntryTx.lean:57]
+  AccountingOracle.sol:362                     contracts/0.8.9/oracle/AccountingOracle.sol              ok  [LidoSRv3/Audit/Verity/SubmitReportEntryTx.lean:40]
+  AccountingOracle.sol:363                     contracts/0.8.9/oracle/AccountingOracle.sol              ok  [LidoSRv3/Audit/Verity/SubmitReportEntryTx.lean:59]
+  AccountingOracle.sol:365                     contracts/0.8.9/oracle/AccountingOracle.sol              ok  [LidoSRv3/Audit/Verity/SubmitReportEntryTx.lean:61]
+  AccountingOracle.sol:439-442                 contracts/0.8.9/oracle/AccountingOracle.sol              ok  [LidoSRv3/Audit/Source/TrioReserve1/Oracle.lean:31]
+  AccountingOracle.sol:477-559                 contracts/0.8.9/oracle/AccountingOracle.sol              ok  [LidoSRv3/Audit/Verity/HandleOracleReportTx.lean:199]
+  AccountingOracle.sol:478-495                 contracts/0.8.9/oracle/AccountingOracle.sol              ok  [LidoSRv3/Audit/Verity/HandleOracleReportTx.lean:208]
+  AccountingOracle.sol:529                     contracts/0.8.9/oracle/AccountingOracle.sol              ok  [LidoSRv3/Audit/Verity/HandleOracleReportTx.lean:53]
+  AccountingOracle.sol:561-563                 contracts/0.8.9/oracle/AccountingOracle.sol              ok  [LidoSRv3/Audit/Source/TrioReserve1/Oracle.lean:15]
+  AccountingOracle.sol:609-619                 contracts/0.8.9/oracle/AccountingOracle.sol              ok  [LidoSRv3/Audit/Verity/HandleOracleReportTx.lean:201]
+  AccountingOracle.sol:614-616                 contracts/0.8.9/oracle/AccountingOracle.sol              ok  [LidoSRv3/Audit/Verity/HandleOracleReportTx.lean:213]
+  AccountingOracle.sol:618                     contracts/0.8.9/oracle/AccountingOracle.sol              ok  [diagram/README.md:21]
+  AccountingOracle.sol:69                      contracts/0.8.9/oracle/AccountingOracle.sol              ok (`BaseOracle` in range)  [diagram/README.md:49]
+  BaseOracle.sol:357-360                       contracts/0.8.9/oracle/BaseOracle.sol                    ok  [LidoSRv3/Audit/Source/TrioReserve1/Oracle.lean:31]
+  BaseOracle.sol:38                            contracts/0.8.9/oracle/BaseOracle.sol                    ok  [diagram/README.md:51]
+  BeaconChainDepositor.sol:106                 contracts/0.8.25/lib/BeaconChainDepositor.sol            ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:436]
+  BeaconChainDepositor.sol:24                  contracts/0.8.25/lib/BeaconChainDepositor.sol            ok  [LidoSRv3/Audit/Verity/DepositParentTx.lean:76]
+  BeaconChainDepositor.sol:36                  contracts/0.8.25/lib/BeaconChainDepositor.sol            ok  [LidoSRv3/Audit/Source/DepositCorrespondence.lean:216]
+  BeaconChainDepositor.sol:36-64               contracts/0.8.25/lib/BeaconChainDepositor.sol            ok  [LidoSRv3/Audit/Source/DepositCorrespondence.lean:201]
+  BeaconChainDepositor.sol:43-45               contracts/0.8.25/lib/BeaconChainDepositor.sol            ok  [LidoSRv3/Audit/Source/DepositCorrespondence.lean:320]
+  BeaconChainDepositor.sol:43-48               contracts/0.8.25/lib/BeaconChainDepositor.sol            ok  [LidoSRv3/Audit/Verity/DepositParentTx.lean:155]
+  BeaconChainDepositor.sol:46-48               contracts/0.8.25/lib/BeaconChainDepositor.sol            ok  [LidoSRv3/Audit/Source/DepositCorrespondence.lean:323]
+  BeaconChainDepositor.sol:50-51               contracts/0.8.25/lib/BeaconChainDepositor.sol            ok  [LidoSRv3/Audit/Source/DepositCorrespondence.lean:267]
+  BeaconChainDepositor.sol:53                  contracts/0.8.25/lib/BeaconChainDepositor.sol            ok  [LidoSRv3/Audit/Source/DepositCorrespondence.lean:211]
+  BeaconChainDepositor.sol:53-63               contracts/0.8.25/lib/BeaconChainDepositor.sol            ok  [LidoSRv3/Audit/Source/DepositCorrespondence.lean:203]
+  BeaconChainDepositor.sol:54-55               contracts/0.8.25/lib/BeaconChainDepositor.sol            ok  [LidoSRv3/Audit/Source/DepositCorrespondence.lean:207]
+  BeaconChainDepositor.sol:57                  contracts/0.8.25/lib/BeaconChainDepositor.sol            ok  [LidoSRv3/Audit/Source/DepositCorrespondence.lean:213]
+  BeaconChainDepositor.sol:57                  contracts/0.8.25/lib/BeaconChainDepositor.sol            ok (`DEPOSIT_SIZE` in range)  [LidoSRv3/Audit/Source/DepositCorrespondence.lean:204]
+  BeaconChainDepositor.sol:61                  contracts/0.8.25/lib/BeaconChainDepositor.sol            ok  [LidoSRv3/Audit/Verity/DepositParentTx.lean:51]
+  BeaconChainDepositor.sol:66                  contracts/0.8.25/lib/BeaconChainDepositor.sol            ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:509]
+  BeaconChainDepositor.sol:66-108              contracts/0.8.25/lib/BeaconChainDepositor.sol            ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:478]
+  BeaconChainDepositor.sol:73                  contracts/0.8.25/lib/BeaconChainDepositor.sol            ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:552]
+  BeaconChainDepositor.sol:74                  contracts/0.8.25/lib/BeaconChainDepositor.sol            ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:553]
+  BeaconChainDepositor.sol:79                  contracts/0.8.25/lib/BeaconChainDepositor.sol            ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:432]
+  BeaconChainDepositor.sol:79-107              contracts/0.8.25/lib/BeaconChainDepositor.sol            ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:556]
+  BeaconChainDepositor.sol:82-84               contracts/0.8.25/lib/BeaconChainDepositor.sol            ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:498]
+  BeaconChainDepositor.sol:89                  contracts/0.8.25/lib/BeaconChainDepositor.sol            ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:435]
+  BeaconChainDepositor.sol:92-94               contracts/0.8.25/lib/BeaconChainDepositor.sol            ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:502]
+  BeaconChainDepositor.sol:96-99               contracts/0.8.25/lib/BeaconChainDepositor.sol            ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:504]
+  CLValidatorVerifier.sol:104                  contracts/0.8.25/CLValidatorVerifier.sol                 ok (`staticcall` in range)  [diagram/README.md:54]
+  CLValidatorVerifier.sol:44                   contracts/0.8.25/CLValidatorVerifier.sol                 ok  [LidoSRv3/Audit/Ssz.lean:213]
+  CLValidatorVerifier.sol:44-57                contracts/0.8.25/CLValidatorVerifier.sol                 ok  [LidoSRv3/Audit/Ssz.lean:102]
+  CLValidatorVerifier.sol:54                   contracts/0.8.25/CLValidatorVerifier.sol                 ok  [report/P-SSZ-1.md:377]
+  CLValidatorVerifier.sol:56                   contracts/0.8.25/CLValidatorVerifier.sol                 ok  [LidoSRv3/Audit/Ssz.lean:191]
+  ConsolidationBus.sol:325-370                 contracts/0.8.25/consolidation/ConsolidationBus.sol      ok  [LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean:355]
+  ConsolidationBus.sol:361–363                 contracts/0.8.25/consolidation/ConsolidationBus.sol      ok  [report/P-CONSOLIDATION-ETH-1b.md:155]
+  ConsolidationBus.sol:383                     contracts/0.8.25/consolidation/ConsolidationBus.sol      ok  [LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTx.lean:163]
+  ConsolidationBus.sol:383-406                 contracts/0.8.25/consolidation/ConsolidationBus.sol      ok  [LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTx.lean:136]
+  ConsolidationBus.sol:403                     contracts/0.8.25/consolidation/ConsolidationBus.sol      ok  [LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTx.lean:159]
+  ConsolidationGateway.sol:185-223             contracts/0.8.25/consolidation/ConsolidationGateway.sol  ok  [LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean:355]
+  ConsolidationGateway.sol:185–223             contracts/0.8.25/consolidation/ConsolidationGateway.sol  ok (`addConsolidationRequests` in range)  [report/P-CONSOLIDATION-ETH-1a.md:152]
+  ConsolidationGateway.sol:189                 contracts/0.8.25/consolidation/ConsolidationGateway.sol  ident? `hGatewayAdmittedNonzero` not in range  [LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean:362]
+  ConsolidationGateway.sol:189                 contracts/0.8.25/consolidation/ConsolidationGateway.sol  ok  [LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean:269]
+  ConsolidationGateway.sol:194-199             contracts/0.8.25/consolidation/ConsolidationGateway.sol  ok  [LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTx.lean:120]
+  ConsolidationGateway.sol:194-199             contracts/0.8.25/consolidation/ConsolidationGateway.sol  ok (`requestsCount` in range)  [LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTx.lean:110]
+  ConsolidationGateway.sol:211                 contracts/0.8.25/consolidation/ConsolidationGateway.sol  ok (`fee` in range)  [LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTx.lean:111]
+  ConsolidationGateway.sol:211-212             contracts/0.8.25/consolidation/ConsolidationGateway.sol  ok  [LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTx.lean:210]
+  ConsolidationGateway.sol:212                 contracts/0.8.25/consolidation/ConsolidationGateway.sol  ok  [report/P-CONSOLIDATION-ETH-1.md:382]
+  ConsolidationGateway.sol:213                 contracts/0.8.25/consolidation/ConsolidationGateway.sol  ok  [LidoSRv3/Audit/Verity/PConsolidationEth1RefundTx.lean:110]
+  ConsolidationGateway.sol:220                 contracts/0.8.25/consolidation/ConsolidationGateway.sol  ok  [LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTx.lean:220]
+  ConsolidationGateway.sol:222                 contracts/0.8.25/consolidation/ConsolidationGateway.sol  ok  [LidoSRv3/Audit/Verity/PConsolidationEth1RefundTx.lean:123]
+  ConsolidationGateway.sol:286-293             contracts/0.8.25/consolidation/ConsolidationGateway.sol  ok  [LidoSRv3/Audit/Verity/PConsolidationEth1RefundTx.lean:54]
+  ConsolidationGateway.sol:286–292             contracts/0.8.25/consolidation/ConsolidationGateway.sol  ok  [report/P-CONSOLIDATION-ETH-1a.md:142]
+  ConsolidationGateway.sol:287-288             contracts/0.8.25/consolidation/ConsolidationGateway.sol  ok  [LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTx.lean:216]
+  ConsolidationGateway.sol:291                 contracts/0.8.25/consolidation/ConsolidationGateway.sol  ok  [LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTx.lean:218]
+  ConsolidationGateway.sol:295-307             contracts/0.8.25/consolidation/ConsolidationGateway.sol  ok  [LidoSRv3/Audit/Verity/PConsolidationEth1RefundTx.lean:69]
+  ConsolidationGateway.sol:296                 contracts/0.8.25/consolidation/ConsolidationGateway.sol  ok  [LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTx.lean:223]
+  ConsolidationGateway.sol:297–300             contracts/0.8.25/consolidation/ConsolidationGateway.sol  ok (`_refundFee` declared at line 295, encloses range)  [report/P-CONSOLIDATION-ETH-1a.md:117]
+  ConsolidationGateway.sol:298-300             contracts/0.8.25/consolidation/ConsolidationGateway.sol  ok  [LidoSRv3/Audit/Verity/PConsolidationEth1RefundTx.lean:48]
+  ConsolidationGateway.sol:302                 contracts/0.8.25/consolidation/ConsolidationGateway.sol  ok  [LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTx.lean:225]
+  ConsolidationGateway.sol:302-305             contracts/0.8.25/consolidation/ConsolidationGateway.sol  ok  [LidoSRv3/Audit/Verity/PConsolidationEth1RefundTx.lean:87]
+  ConsolidationGateway.sol:302–304             contracts/0.8.25/consolidation/ConsolidationGateway.sol  ok (`_refundFee` declared at line 295, encloses range)  [report/P-CONSOLIDATION-ETH-1.md:377]
+  DepositSecurityModule.sol:485                contracts/0.8.9/DepositSecurityModule.sol                ok  [diagram/README.md:20]
+  DepositSecurityModule.sol:88                 contracts/0.8.9/DepositSecurityModule.sol                ok  [diagram/README.md:79]
+  GIndex.sol:75                                contracts/common/lib/GIndex.sol                          ok  [LidoSRv3/Audit/Source/GIndexConcatCorrespondence.lean:86]
+  GIndex.sol:76                                contracts/common/lib/GIndex.sol                          ok  [LidoSRv3/Audit/Source/GIndexConcatCorrespondence.lean:81]
+  GIndex.sol:76-89                             contracts/common/lib/GIndex.sol                          ok  [LidoSRv3/Audit/Source/GIndexConcatCorrespondence.lean:50]
+  GIndex.sol:77                                contracts/common/lib/GIndex.sol                          ok  [LidoSRv3/Audit/Source/GIndexConcatCorrespondence.lean:63]
+  GIndex.sol:78                                contracts/common/lib/GIndex.sol                          ok  [LidoSRv3/Audit/Source/GIndexConcatCorrespondence.lean:65]
+  GIndex.sol:80                                contracts/common/lib/GIndex.sol                          ok  [LidoSRv3/Audit/Source/GIndexConcatCorrespondence.lean:67]
+  GIndex.sol:81                                contracts/common/lib/GIndex.sol                          ok  [LidoSRv3/Audit/Source/GIndexConcatCorrespondence.lean:69]
+  GIndex.sol:83-85                             contracts/common/lib/GIndex.sol                          ok  [LidoSRv3/Audit/Source/GIndexConcatCorrespondence.lean:71]
+  GIndex.sol:87-88                             contracts/common/lib/GIndex.sol                          ok  [LidoSRv3/Audit/Source/GIndexConcatCorrespondence.lean:74]
+  HashConsensus.sol:225                        contracts/0.8.9/oracle/HashConsensus.sol                 ok (`_quorum` in range)  [diagram/README.md:46]
+  HashConsensus.sol:644-719                    contracts/0.8.9/oracle/HashConsensus.sol                 ok  [LidoSRv3/Audit/Source/TrioReserve1/Consensus.lean:26]
+  Lido.sol:1125-1132                           contracts/0.4.24/Lido.sol                                ok  [LidoSRv3/Audit/Source/TrioReserve1/Live.lean:288]
+  Lido.sol:120-176                             contracts/0.4.24/Lido.sol                                ok  [LidoSRv3/Audit/Source/TrioReserve1/Live.lean:13]
+  Lido.sol:1398-1400                           contracts/0.4.24/Lido.sol                                ok  [LidoSRv3/Audit/Source/TrioReserve1/Live.lean:170]
+  Lido.sol:1557-1558                           contracts/0.4.24/Lido.sol                                ok  [LidoSRv3/Audit/Source/TrioReserve1/Live.lean:159]
+  Lido.sol:530–534                             contracts/0.4.24/Lido.sol                                ok  [report/P-CONSOLIDATION-ETH-1.md:422]
+  Lido.sol:605-616                             contracts/0.4.24/Lido.sol                                ok  [LidoSRv3/Audit/Source/ReserveCorrespondence.lean:202]
+  Lido.sol:605–608                             contracts/0.4.24/Lido.sol                                ok (`_getBufferedEtherAllocation` in range)  [report/P-RESERVE-1.md:132]
+  Lido.sol:606-607                             contracts/0.4.24/Lido.sol                                ok  [LidoSRv3/Audit/Source/ReserveCorrespondence.lean:224]
+  Lido.sol:609                                 contracts/0.4.24/Lido.sol                                ok  [LidoSRv3/Audit/Source/ReserveCorrespondence.lean:213]
+  Lido.sol:610                                 contracts/0.4.24/Lido.sol                                ident? `ALLOCATION_ARITHMETIC` not in range  [LidoSRv3/Audit/Source/ReserveCorrespondence.lean:42]
+  Lido.sol:610                                 contracts/0.4.24/Lido.sol                                ok  [LidoSRv3/Audit/Source/ReserveCorrespondence.lean:215]
+  Lido.sol:612                                 contracts/0.4.24/Lido.sol                                ok  [LidoSRv3/Audit/Source/ReserveCorrespondence.lean:218]
+  Lido.sol:613                                 contracts/0.4.24/Lido.sol                                ok  [LidoSRv3/Audit/Source/ReserveCorrespondence.lean:220]
+  Lido.sol:615                                 contracts/0.4.24/Lido.sol                                ok  [LidoSRv3/Audit/Source/ReserveCorrespondence.lean:228]
+  Lido.sol:670-680                             contracts/0.4.24/Lido.sol                                ok  [LidoSRv3/Audit/Source/TrioReserve1/Live.lean:281]
+  Lido.sol:795-804                             contracts/0.4.24/Lido.sol                                ok  [LidoSRv3/Audit/Source/TrioReserve1/Live.lean:234]
+  Lido.sol:796–803                             contracts/0.4.24/Lido.sol                                ok (`_getDepositedNextReportAdjusted` declared at line 795, encloses range)  [report/P-RESERVE-1.md:122]
+  Lido.sol:807-809                             contracts/0.4.24/Lido.sol                                ok  [LidoSRv3/Audit/Source/TrioReserve1/Live.lean:224]
+  Lido.sol:815-816                             contracts/0.4.24/Lido.sol                                ok  [LidoSRv3/Audit/Source/TrioReserve1/Live.lean:177]
+  Lido.sol:815–816                             contracts/0.4.24/Lido.sol                                ok  [report/P-RESERVE-1.md:109]
+  Lido.sol:823-825                             contracts/0.4.24/Lido.sol                                ok  [LidoSRv3/Audit/Source/ReserveCorrespondence.lean:289]
+  Lido.sol:824                                 contracts/0.4.24/Lido.sol                                ok  [LidoSRv3/Audit/Source/ReserveCorrespondence.lean:292]
+  Lido.sol:831-833                             contracts/0.4.24/Lido.sol                                ok  [LidoSRv3/Audit/Source/ReserveCorrespondence.lean:231]
+  Lido.sol:832                                 contracts/0.4.24/Lido.sol                                ident? `DEPOSITABLE_OVERFLOW` not in range  [LidoSRv3/Audit/Source/ReserveCorrespondence.lean:44]
+  Lido.sol:832                                 contracts/0.4.24/Lido.sol                                ok  [LidoSRv3/Audit/Source/ReserveCorrespondence.lean:235]
+  Lido.sol:839                                 contracts/0.4.24/Lido.sol                                ok  [LidoSRv3/Audit/Source/ReserveCorrespondence.lean:360]
+  Lido.sol:839-859                             contracts/0.4.24/Lido.sol                                ok  [LidoSRv3/Audit/Source/DepositCorrespondence.lean:249]
+  Lido.sol:840                                 contracts/0.4.24/Lido.sol                                ok  [LidoSRv3/Audit/Source/ReserveCorrespondence.lean:252]
+  Lido.sol:841                                 contracts/0.4.24/Lido.sol                                ok  [LidoSRv3/Audit/Source/ReserveCorrespondence.lean:256]
+  Lido.sol:842                                 contracts/0.4.24/Lido.sol                                ident? `amount` not in range  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:22]
+  Lido.sol:842                                 contracts/0.4.24/Lido.sol                                ok  [LidoSRv3/Audit/Source/DepositCorrespondence.lean:315]
+  Lido.sol:842                                 contracts/0.4.24/Lido.sol                                ok (`NOT_ENOUGH_ETHER` in range)  [LidoSRv3/Audit/Source/ReserveCorrespondence.lean:37]
+  Lido.sol:846                                 contracts/0.4.24/Lido.sol                                ident? `DEPOSITED_POST_REPORT_OVERFLOW` not in range  [LidoSRv3/Audit/Source/ReserveCorrespondence.lean:45]
+  Lido.sol:846                                 contracts/0.4.24/Lido.sol                                ok  [LidoSRv3/Audit/Source/ReserveCorrespondence.lean:262]
+  Lido.sol:847                                 contracts/0.4.24/Lido.sol                                ident? `BUFFER_UNDERFLOW` not in range  [LidoSRv3/Audit/Source/ReserveCorrespondence.lean:46]
+  Lido.sol:847                                 contracts/0.4.24/Lido.sol                                ok  [LidoSRv3/Audit/Source/ReserveCorrespondence.lean:133]
+  Lido.sol:848                                 contracts/0.4.24/Lido.sol                                ok  [LidoSRv3/Audit/Source/ReserveCorrespondence.lean:242]
+  Lido.sol:852                                 contracts/0.4.24/Lido.sol                                ident? `DEPOSITED_NEXT_REPORT_OVERFLOW` not in range  [LidoSRv3/Audit/Source/ReserveCorrespondence.lean:47]
+  Lido.sol:852                                 contracts/0.4.24/Lido.sol                                ok  [LidoSRv3/Audit/Source/ReserveCorrespondence.lean:270]
+  Lido.sol:855–858                             contracts/0.4.24/Lido.sol                                ok (`_spendDepositableEther` declared at line 839, encloses range)  [report/P-RESERVE-1.md:144]
+  Lido.sol:856                                 contracts/0.4.24/Lido.sol                                ok  [LidoSRv3/Audit/Source/ReserveCorrespondence.lean:275]
+  Lido.sol:857                                 contracts/0.4.24/Lido.sol                                ok  [LidoSRv3/Audit/Source/ReserveCorrespondence.lean:274]
+  Lido.sol:869                                 contracts/0.4.24/Lido.sol                                ident? `lidoCallOk` not in range  [LidoSRv3/Audit/Verity/DepositParentTx.lean:69]
+  Lido.sol:869                                 contracts/0.4.24/Lido.sol                                ok  [LidoSRv3/Audit/Source/ReserveCorrespondence.lean:357]
+  Lido.sol:869-886                             contracts/0.4.24/Lido.sol                                ok  [LidoSRv3/Audit/Source/DepositCorrespondence.lean:248]
+  Lido.sol:869–881                             contracts/0.4.24/Lido.sol                                ok  [report/P-RESERVE-1.md:152]
+  Lido.sol:870                                 contracts/0.4.24/Lido.sol                                ok  [LidoSRv3/Audit/Source/DepositCorrespondence.lean:307]
+  Lido.sol:871-872                             contracts/0.4.24/Lido.sol                                ok  [LidoSRv3/Audit/Source/DepositCorrespondence.lean:265]
+  Lido.sol:872                                 contracts/0.4.24/Lido.sol                                ok  [LidoSRv3/Audit/Source/DepositCorrespondence.lean:310]
+  Lido.sol:873                                 contracts/0.4.24/Lido.sol                                ok  [LidoSRv3/Audit/Source/DepositCorrespondence.lean:311]
+  Lido.sol:875                                 contracts/0.4.24/Lido.sol                                ok  [LidoSRv3/Audit/Source/DepositCorrespondence.lean:314]
+  Lido.sol:885                                 contracts/0.4.24/Lido.sol                                ok  [LidoSRv3/Audit/Source/DepositCorrespondence.lean:318]
+  MinFirstAllocationStrategy.sol:102-105       contracts/common/lib/MinFirstAllocationStrategy.sol      ok  [LidoSRv3/Audit/Verity/MinFirstAmountTx.lean:67]
+  MinFirstAllocationStrategy.sol:102-106       contracts/common/lib/MinFirstAllocationStrategy.sol      ok  [LidoSRv3/Audit/Verity/MinFirstAmountTx.lean:11]
+  MinFirstAllocationStrategy.sol:104           contracts/common/lib/MinFirstAllocationStrategy.sol      ok  [LidoSRv3/Audit/Verity/MinFirstAmountTx.lean:63]
+  MinFirstAllocationStrategy.sol:106           contracts/common/lib/MinFirstAllocationStrategy.sol      ok  [LidoSRv3/Audit/Verity/MinFirstAmountTx.lean:68]
+  MinFirstAllocationStrategy.sol:106           contracts/common/lib/MinFirstAllocationStrategy.sol      ok (`allocate` declared at line 30, encloses range)  [report/P-ALLOC-2.md:150]
+  MinFirstAllocationStrategy.sol:30-107        contracts/common/lib/MinFirstAllocationStrategy.sol      ok  [LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:11]
+  MinFirstAllocationStrategy.sol:30-44         contracts/common/lib/MinFirstAllocationStrategy.sol      ok  [LidoSRv3/Audit/Verity/MinFirstAmountTx.lean:23]
+  MinFirstAllocationStrategy.sol:31-32         contracts/common/lib/MinFirstAllocationStrategy.sol      ok  [LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:53]
+  MinFirstAllocationStrategy.sol:35-42         contracts/common/lib/MinFirstAllocationStrategy.sol      ok  [LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:237]
+  MinFirstAllocationStrategy.sol:36            contracts/common/lib/MinFirstAllocationStrategy.sol      ok  [LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:263]
+  MinFirstAllocationStrategy.sol:36–40         contracts/common/lib/MinFirstAllocationStrategy.sol      ok (`allocate` declared at line 30, encloses range)  [report/P-ALLOC-2.md:140]
+  MinFirstAllocationStrategy.sol:37            contracts/common/lib/MinFirstAllocationStrategy.sol      ok  [LidoSRv3/Audit/Verity/MinFirstAmountTx.lean:73]
+  MinFirstAllocationStrategy.sol:38-40         contracts/common/lib/MinFirstAllocationStrategy.sol      ok  [LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:175]
+  MinFirstAllocationStrategy.sol:41            contracts/common/lib/MinFirstAllocationStrategy.sol      ok  [LidoSRv3/Audit/Verity/MinFirstAmountTx.lean:70]
+  MinFirstAllocationStrategy.sol:43            contracts/common/lib/MinFirstAllocationStrategy.sol      ok  [LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:57]
+  MinFirstAllocationStrategy.sol:63-107        contracts/common/lib/MinFirstAllocationStrategy.sol      ok  [LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:108]
+  MinFirstAllocationStrategy.sol:67            contracts/common/lib/MinFirstAllocationStrategy.sol      ok  [LidoSRv3/Audit/Verity/MinFirstAmountTx.lean:76]
+  MinFirstAllocationStrategy.sol:72-74         contracts/common/lib/MinFirstAllocationStrategy.sol      ok  [LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:159]
+  MinFirstAllocationStrategy.sol:76            contracts/common/lib/MinFirstAllocationStrategy.sol      ok  [LidoSRv3/Audit/Source/MinFirstCorrespondence.lean:48]
+  MinFirstAllocationStrategy.sol:76-86         contracts/common/lib/MinFirstAllocationStrategy.sol      ok  [LidoSRv3/Audit/Source/MinFirstCorrespondence.lean:28]
+  MinFirstAllocationStrategy.sol:76-86         contracts/common/lib/MinFirstAllocationStrategy.sol      ok (`allocateToBestCandidate` declared at line 63, encloses range)  [LidoSRv3/Audit/Source/MinFirstCorrespondence.lean:8]
+  MinFirstAllocationStrategy.sol:77            contracts/common/lib/MinFirstAllocationStrategy.sol      ok  [LidoSRv3/Audit/Source/MinFirstCorrespondence.lean:30]
+  MinFirstAllocationStrategy.sol:77-78         contracts/common/lib/MinFirstAllocationStrategy.sol      ok  [LidoSRv3/Audit/Source/MinFirstCorrespondence.lean:52]
+  MinFirstAllocationStrategy.sol:79-82         contracts/common/lib/MinFirstAllocationStrategy.sol      ok  [LidoSRv3/Audit/Source/MinFirstCorrespondence.lean:54]
+  MinFirstAllocationStrategy.sol:88-90         contracts/common/lib/MinFirstAllocationStrategy.sol      ok  [LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:170]
+  MinFirstAllocationStrategy.sol:92-106        contracts/common/lib/MinFirstAllocationStrategy.sol      ok  [LidoSRv3/Audit/Source/MinFirstCorrespondence.lean:16]
+  MinFirstAllocationStrategy.sol:93-105        contracts/common/lib/MinFirstAllocationStrategy.sol      ok  [LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:173]
+  Pausable.sol:15-16                           contracts/0.4.24/utils/Pausable.sol                      ok  [LidoSRv3/Audit/Source/TrioReserve1/Live.lean:13]
+  SRLib.sol:391-431                            contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Verity/AllocationTx.lean:366]
+  SRLib.sol:391-431                            contracts/0.8.25/sr/SRLib.sol                            ok (`_getDepositAllocations` in range)  [LidoSRv3/Audit/Verity/AllocationTx.lean:26]
+  SRLib.sol:403-427                            contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Verity/AllocationTx.lean:24]
+  SRLib.sol:493                                contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Model/AllocCapacity.lean:178]
+  SRLib.sol:493--559                           contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Source/AllocCapacityCorrespondence.lean:6]
+  SRLib.sol:493-559                            contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Model/AllocCapacity.lean:58]
+  SRLib.sol:493-559                            contracts/0.8.25/sr/SRLib.sol                            ok (`_getModulesAllocationAndCapacity` in range)  [LidoSRv3/Audit/Verity/AllocationTx.lean:367]
+  SRLib.sol:496                                contracts/0.8.25/sr/SRLib.sol                            ok (`_getModulesAllocationAndCapacity` declared at line 493, encloses range)  [report/P-ALLOC-1.md:191]
+  SRLib.sol:498                                contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Verity/AllocationTx.lean:55]
+  SRLib.sol:498-503                            contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Model/AllocCapacity.lean:163]
+  SRLib.sol:498-522                            contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Verity/AllocationTx.lean:53]
+  SRLib.sol:499                                contracts/0.8.25/sr/SRLib.sol                            ident? `totalValidators` not in range  [LidoSRv3/Audit/Verity/AllocationTx.lean:73]
+  SRLib.sol:505-533                            contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Verity/AllocationTx.lean:305]
+  SRLib.sol:506                                contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Model/AllocCapacity.lean:172]
+  SRLib.sol:506                                contracts/0.8.25/sr/SRLib.sol                            ok (`depositsToAllocate` in range)  [LidoSRv3/Audit/Model/AllocCapacity.lean:82]
+  SRLib.sol:506-533                            contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Model/AllocCapacity.lean:81]
+  SRLib.sol:506-558                            contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Verity/AllocationTx.lean:339]
+  SRLib.sol:507                                contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Model/AllocCapacity.lean:40]
+  SRLib.sol:508                                contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Model/AllocCapacity.lean:87]
+  SRLib.sol:508-518                            contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Verity/AllocationTx.lean:337]
+  SRLib.sol:508-533                            contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Model/AllocCapacity.lean:173]
+  SRLib.sol:509                                contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Verity/AllocationTx.lean:58]
+  SRLib.sol:509-517                            contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Verity/AllocationTx.lean:171]
+  SRLib.sol:509-518                            contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Model/AllocCapacity.lean:84]
+  SRLib.sol:509-529                            contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Model/AllocCapacity.lean:24]
+  SRLib.sol:510-511                            contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Verity/AllocationTx.lean:176]
+  SRLib.sol:516-517                            contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Verity/AllocationTx.lean:372]
+  SRLib.sol:516-517                            contracts/0.8.25/sr/SRLib.sol                            ok (`_getStakingModuleSummary` in range)  [LidoSRv3/Audit/Verity/AllocationTx.lean:255]
+  SRLib.sol:521-522                            contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Model/AllocCapacity.lean:60]
+  SRLib.sol:521-525                            contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Model/AllocCapacity.lean:73]
+  SRLib.sol:521-531                            contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Model/AllocCapacity.lean:70]
+  SRLib.sol:521–522                            contracts/0.8.25/sr/SRLib.sol                            ok  [report/P-ALLOC-1.md:196]
+  SRLib.sol:522                                contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Verity/AllocationTx.lean:64]
+  SRLib.sol:527                                contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Model/AllocCapacity.lean:75]
+  SRLib.sol:529                                contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Model/AllocCapacity.lean:76]
+  SRLib.sol:531                                contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Model/AllocCapacity.lean:77]
+  SRLib.sol:532                                contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Model/AllocCapacity.lean:92]
+  SRLib.sol:534-558                            contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Model/AllocCapacity.lean:97]
+  SRLib.sol:537                                contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Model/AllocCapacity.lean:40]
+  SRLib.sol:539                                contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Model/AllocCapacity.lean:124]
+  SRLib.sol:539-558                            contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Model/AllocCapacity.lean:118]
+  SRLib.sol:541                                contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Model/AllocCapacity.lean:119]
+  SRLib.sol:542                                contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Model/AllocCapacity.lean:129]
+  SRLib.sol:543                                contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Model/AllocCapacity.lean:103]
+  SRLib.sol:543-549                            contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Model/AllocCapacity.lean:99]
+  SRLib.sol:546                                contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Model/AllocCapacity.lean:105]
+  SRLib.sol:548                                contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Model/AllocCapacity.lean:109]
+  SRLib.sol:552                                contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Model/AllocCapacity.lean:112]
+  SRLib.sol:554                                contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Model/AllocCapacity.lean:136]
+  SRLib.sol:557                                contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Model/AllocCapacity.lean:137]
+  SRLib.sol:854-870                            contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Source/AccountingCorrespondence.lean:81]
+  SRLib.sol:858–861                            contracts/0.8.25/sr/SRLib.sol                            ok  [report/P-ACCOUNT-1.md:201]
+  SRLib.sol:860                                contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Source/AccountingCorrespondence.lean:103]
+  SRLib.sol:861                                contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Source/AccountingCorrespondence.lean:89]
+  SRLib.sol:864-866                            contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Verity/HandleOracleReportTx.lean:167]
+  SRLib.sol:865                                contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Source/AccountingCorrespondence.lean:107]
+  SRLib.sol:866                                contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Source/AccountingCorrespondence.lean:92]
+  SRLib.sol:868                                contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Source/AccountingCorrespondence.lean:95]
+  SRLib.sol:873-892                            contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Source/AccountingCorrespondence.lean:114]
+  SRLib.sol:877                                contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Source/AccountingCorrespondence.lean:153]
+  SRLib.sol:880                                contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Source/AccountingCorrespondence.lean:59]
+  SRLib.sol:880-889                            contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Source/AccountingCorrespondence.lean:155]
+  SRLib.sol:881-889                            contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Verity/HandleOracleReportTx.lean:154]
+  SRLib.sol:883                                contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Verity/HandleOracleReportTx.lean:167]
+  SRLib.sol:884                                contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Source/AccountingCorrespondence.lean:59]
+  SRLib.sol:884–891                            contracts/0.8.25/sr/SRLib.sol                            ok  [report/P-ACCOUNT-1.md:206]
+  SRLib.sol:886                                contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Source/AccountingCorrespondence.lean:146]
+  SRLib.sol:888                                contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Source/AccountingCorrespondence.lean:116]
+  SRLib.sol:891                                contracts/0.8.25/sr/SRLib.sol                            ok  [LidoSRv3/Audit/Verity/HandleOracleReportTx.lean:51]
+  SRTypes.sol:118–136                          contracts/0.8.25/sr/SRTypes.sol                          ok (`ModuleStateConfig` in range)  [report/P-ALLOC-1.md:164]
+  SRTypes.sol:40–43                            contracts/0.8.25/sr/SRTypes.sol                          ok  [report/P-ALLOC-1.md:168]
+  SRUtils.sol:18                               contracts/0.8.25/sr/SRUtils.sol                          ident? `_addModule` not in range  [report/P-ALLOC-1.md:201]
+  SRUtils.sol:23                               contracts/0.8.25/sr/SRUtils.sol                          ok  [LidoSRv3/Audit/Source/AccountingCorrespondence.lean:50]
+  SRUtils.sol:23                               contracts/0.8.25/sr/SRUtils.sol                          ok (`MAX_VALUE_GWEI` in range)  [LidoSRv3/Audit/Source/AccountingCorrespondence.lean:97]
+  SRUtils.sol:42                               contracts/0.8.25/sr/SRUtils.sol                          ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:615]
+  SRUtils.sol:46                               contracts/0.8.25/sr/SRUtils.sol                          ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:609]
+  SRUtils.sol:79                               contracts/0.8.25/sr/SRUtils.sol                          ok  [LidoSRv3/Audit/Source/AccountingCorrespondence.lean:111]
+  SRUtils.sol:79-80                            contracts/0.8.25/sr/SRUtils.sol                          ok  [LidoSRv3/Audit/Source/AccountingCorrespondence.lean:96]
+  SSZ.sol:179                                  contracts/common/lib/SSZ.sol                             ok  [LidoSRv3/Audit/Source/SszVerifierProgram.lean:295]
+  SSZ.sol:179-248                              contracts/common/lib/SSZ.sol                             ok  [LidoSRv3/Audit/Source/SszVerifierProgram.lean:145]
+  SSZ.sol:180                                  contracts/common/lib/SSZ.sol                             ok  [LidoSRv3/Audit/Source/SszVerifierProgram.lean:276]
+  SSZ.sol:185-189                              contracts/common/lib/SSZ.sol                             ok  [LidoSRv3/Audit/Source/SszVerifierProgram.lean:278]
+  SSZ.sol:185-190                              contracts/common/lib/SSZ.sol                             ok  [LidoSRv3/Audit/Ssz.lean:186]
+  SSZ.sol:187                                  contracts/common/lib/SSZ.sol                             ok  [LidoSRv3/Audit/Source/SszVerifierProgram.lean:151]
+  SSZ.sol:190                                  contracts/common/lib/SSZ.sol                             ok  [LidoSRv3/Audit/Ssz.lean:149]
+  SSZ.sol:195-233                              contracts/common/lib/SSZ.sol                             ok  [LidoSRv3/Audit/Source/SszVerifierProgram.lean:239]
+  SSZ.sol:199                                  contracts/common/lib/SSZ.sol                             ident? `pathAux` not in range  [LidoSRv3/Audit/Ssz.lean:153]
+  SSZ.sol:199-200                              contracts/common/lib/SSZ.sol                             ok  [LidoSRv3/Audit/Ssz.lean:184]
+  SSZ.sol:200                                  contracts/common/lib/SSZ.sol                             ok  [LidoSRv3/Audit/Source/SszVerifierProgram.lean:247]
+  SSZ.sol:201                                  contracts/common/lib/SSZ.sol                             ok  [LidoSRv3/Audit/Ssz.lean:182]
+  SSZ.sol:201-205                              contracts/common/lib/SSZ.sol                             ok  [LidoSRv3/Audit/Source/SszVerifierProgram.lean:249]
+  SSZ.sol:203                                  contracts/common/lib/SSZ.sol                             ok  [LidoSRv3/Audit/Source/SszVerifierProgram.lean:155]
+  SSZ.sol:209-221                              contracts/common/lib/SSZ.sol                             ok  [LidoSRv3/Audit/Source/SszVerifierProgram.lean:252]
+  SSZ.sol:214-221                              contracts/common/lib/SSZ.sol                             ok  [LidoSRv3/Audit/Ssz.lean:165]
+  SSZ.sol:223-226                              contracts/common/lib/SSZ.sol                             ok  [LidoSRv3/Audit/Source/SszVerifierProgram.lean:165]
+  SSZ.sol:230-233                              contracts/common/lib/SSZ.sol                             ok  [LidoSRv3/Audit/Source/SszVerifierProgram.lean:256]
+  SSZ.sol:236-240                              contracts/common/lib/SSZ.sol                             ok  [LidoSRv3/Audit/Source/SszVerifierProgram.lean:288]
+  SSZ.sol:238                                  contracts/common/lib/SSZ.sol                             ok  [LidoSRv3/Audit/Source/SszVerifierProgram.lean:159]
+  SSZ.sol:242                                  contracts/common/lib/SSZ.sol                             ok  [LidoSRv3/Audit/Ssz.lean:188]
+  SSZ.sol:242-246                              contracts/common/lib/SSZ.sol                             ok  [LidoSRv3/Audit/Source/SszVerifierProgram.lean:290]
+  SSZ.sol:244                                  contracts/common/lib/SSZ.sol                             ok  [LidoSRv3/Audit/Source/SszVerifierProgram.lean:152]
+  StakingRouter.sol:1177-1179                  contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/TopupParentCorrespondence.lean:219]
+  StakingRouter.sol:665-669                    contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/TrioReserve1/RouterSpec.lean:1]
+  StakingRouter.sol:679                        contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:639]
+  StakingRouter.sol:679-759                    contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:334]
+  StakingRouter.sol:686                        contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:594]
+  StakingRouter.sol:686-715                    contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/TopupParentCorrespondence.lean:221]
+  StakingRouter.sol:686-718                    contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Verity/TopupTx.lean:172]
+  StakingRouter.sol:687                        contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:597]
+  StakingRouter.sol:689                        contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:609]
+  StakingRouter.sol:691                        contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:612]
+  StakingRouter.sol:694                        contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:615]
+  StakingRouter.sol:696                        contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:338]
+  StakingRouter.sol:696                        contracts/0.8.25/sr/StakingRouter.sol                    ok (`maxTopUpPerBlockWei` in range)  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:336]
+  StakingRouter.sol:697                        contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:583]
+  StakingRouter.sol:700                        contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:343]
+  StakingRouter.sol:700                        contracts/0.8.25/sr/StakingRouter.sol                    ok (`smDepositableEthAmount` in range)  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:341]
+  StakingRouter.sol:706                        contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:348]
+  StakingRouter.sol:706                        contracts/0.8.25/sr/StakingRouter.sol                    ok (`smDepositableEthAmountRounded` in range)  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:346]
+  StakingRouter.sol:713-715                    contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:621]
+  StakingRouter.sol:717-718                    contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:624]
+  StakingRouter.sol:717-732                    contracts/0.8.25/sr/StakingRouter.sol                    ok (`amount` in range)  [LidoSRv3/Audit/Verity/TopupTx.lean:31]
+  StakingRouter.sol:721                        contracts/0.8.25/sr/StakingRouter.sol                    ok (`amount` in range)  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:9]
+  StakingRouter.sol:721-734                    contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:351]
+  StakingRouter.sol:722-734                    contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:450]
+  StakingRouter.sol:722-756                    contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Verity/TopupTx.lean:166]
+  StakingRouter.sol:723                        contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:463]
+  StakingRouter.sol:724-726                    contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:466]
+  StakingRouter.sol:728                        contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:468]
+  StakingRouter.sol:728-730                    contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:473]
+  StakingRouter.sol:732                        contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:362]
+  StakingRouter.sol:737-739                    contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:629]
+  StakingRouter.sol:741                        contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:542]
+  StakingRouter.sol:741-756                    contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:514]
+  StakingRouter.sol:742                        contracts/0.8.25/sr/StakingRouter.sol                    ident? `lidoStub` not in range  [LidoSRv3/Audit/Verity/TopupTx.lean:148]
+  StakingRouter.sol:742-756                    contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:635]
+  StakingRouter.sol:744                        contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:536]
+  StakingRouter.sol:744                        contracts/0.8.25/sr/StakingRouter.sol                    ok (`LIDO` in range)  [LidoSRv3/Audit/Verity/TopupTx.lean:37]
+  StakingRouter.sol:750                        contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:550]
+  StakingRouter.sol:750                        contracts/0.8.25/sr/StakingRouter.sol                    ok (`DEPOSIT_CONTRACT` in range)  [LidoSRv3/Audit/Verity/TopupTx.lean:40]
+  StakingRouter.sol:752                        contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:447]
+  StakingRouter.sol:755                        contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:563]
+  StakingRouter.sol:761-782                    contracts/0.8.25/sr/StakingRouter.sol                    ok (`_validateTopUpInputs` in range)  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:574]
+  StakingRouter.sol:769                        contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:552]
+  StakingRouter.sol:769-771                    contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:598]
+  StakingRouter.sol:773-775                    contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:601]
+  StakingRouter.sol:777-781                    contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/TopupCorrespondence.lean:606]
+  StakingRouter.sol:929-936                    contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Verity/AllocationTx.lean:11]
+  StakingRouter.sol:942-997                    contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/DepositCorrespondence.lean:183]
+  StakingRouter.sol:943                        contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Verity/DepositNFrameTx.lean:127]
+  StakingRouter.sol:943-944                    contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/DepositCorrespondence.lean:259]
+  StakingRouter.sol:946                        contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/DepositCorrespondence.lean:283]
+  StakingRouter.sol:948-949                    contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Verity/DepositNFrameTx.lean:118]
+  StakingRouter.sol:952-953                    contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Verity/DepositParentTx.lean:116]
+  StakingRouter.sol:952-976                    contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Verity/DepositNFrameTx.lean:140]
+  StakingRouter.sol:954-957                    contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/DepositCorrespondence.lean:187]
+  StakingRouter.sol:954-957                    contracts/0.8.25/sr/StakingRouter.sol                    ok (`maxDepositsCount` in range)  [LidoSRv3/Audit/Source/DepositCorrespondence.lean:185]
+  StakingRouter.sol:954-969                    contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Verity/DepositNFrameTx.lean:131]
+  StakingRouter.sol:956                        contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/DepositCorrespondence.lean:286]
+  StakingRouter.sol:959                        contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/DepositCorrespondence.lean:289]
+  StakingRouter.sol:962-963                    contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Verity/DepositParentTx.lean:118]
+  StakingRouter.sol:966                        contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/DepositCorrespondence.lean:292]
+  StakingRouter.sol:966-972                    contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Verity/DepositParentTx.lean:109]
+  StakingRouter.sol:967                        contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/DepositCorrespondence.lean:190]
+  StakingRouter.sol:967                        contracts/0.8.25/sr/StakingRouter.sol                    ok (`actualDepositsCount` in range)  [LidoSRv3/Audit/Verity/DepositParentTx.lean:47]
+  StakingRouter.sol:969                        contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/DepositCorrespondence.lean:298]
+  StakingRouter.sol:972                        contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/DepositCorrespondence.lean:196]
+  StakingRouter.sol:976                        contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/DepositCorrespondence.lean:301]
+  StakingRouter.sol:976                        contracts/0.8.25/sr/StakingRouter.sol                    ok (`_updateModuleLastDepositState` in range)  [LidoSRv3/Audit/Verity/DepositParentTx.lean:34]
+  StakingRouter.sol:978                        contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/DepositCorrespondence.lean:302]
+  StakingRouter.sol:980                        contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Verity/DepositNFrameTx.lean:136]
+  StakingRouter.sol:983                        contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/DepositCorrespondence.lean:196]
+  StakingRouter.sol:985                        contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/DepositCorrespondence.lean:319]
+  StakingRouter.sol:985-991                    contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/DepositCorrespondence.lean:223]
+  StakingRouter.sol:993                        contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/DepositCorrespondence.lean:232]
+  StakingRouter.sol:996                        contracts/0.8.25/sr/StakingRouter.sol                    ident? `run` not in range  [LidoSRv3/Audit/Source/DepositCorrespondence.lean:610]
+  StakingRouter.sol:996                        contracts/0.8.25/sr/StakingRouter.sol                    ok  [LidoSRv3/Audit/Source/DepositCorrespondence.lean:330]
+  TopUpGateway.sol:160                         contracts/0.8.25/TopUpGateway.sol                        ok  [LidoSRv3/Audit/Source/Topup2Correspondence.lean:231]
+  TopUpGateway.sol:160-237                     contracts/0.8.25/TopUpGateway.sol                        ok  [LidoSRv3/Audit/Source/Topup2Correspondence.lean:118]
+  TopUpGateway.sol:163-164                     contracts/0.8.25/TopUpGateway.sol                        ok  [LidoSRv3/Audit/Source/Topup2Correspondence.lean:196]
+  TopUpGateway.sol:164                         contracts/0.8.25/TopUpGateway.sol                        ok  [LidoSRv3/Audit/Verity/Topup2DistributionTx.lean:192]
+  TopUpGateway.sol:174-175                     contracts/0.8.25/TopUpGateway.sol                        ok  [LidoSRv3/Audit/Verity/Topup2DistributionTx.lean:194]
+  TopUpGateway.sol:203–228                     contracts/0.8.25/TopUpGateway.sol                        ok  [report/P-TOPUP-2.md:169]
+  TopUpGateway.sol:204-228                     contracts/0.8.25/TopUpGateway.sol                        ok  [LidoSRv3/Audit/Source/Topup2Correspondence.lean:131]
+  TopUpGateway.sol:226                         contracts/0.8.25/TopUpGateway.sol                        ok  [LidoSRv3/Audit/Source/Topup2Correspondence.lean:16]
+  TopUpGateway.sol:226–232                     contracts/0.8.25/TopUpGateway.sol                        ok  [report/P-TOPUP-2.md:80]
+  TopUpGateway.sol:232                         contracts/0.8.25/TopUpGateway.sol                        ok  [diagram/README.md:21]
+  TopUpGateway.sol:234–236                     contracts/0.8.25/TopUpGateway.sol                        ok  [report/P-TOPUP-2.md:224]
+  TopUpGateway.sol:390–393                     contracts/0.8.25/TopUpGateway.sol                        ok (`_verifyValidatorWasActivated` in range)  [report/P-TOPUP-2.md:144]
+  TopUpGateway.sol:396                         contracts/0.8.25/TopUpGateway.sol                        ok  [LidoSRv3/Audit/Source/Topup2Correspondence.lean:115]
+  TopUpGateway.sol:396-415                     contracts/0.8.25/TopUpGateway.sol                        ok  [LidoSRv3/Audit/Source/Topup2Correspondence.lean:86]
+  TopUpGateway.sol:403–404                     contracts/0.8.25/TopUpGateway.sol                        ok (`_evaluateTopUpLimit` declared at line 396, encloses range)  [report/P-TOPUP-2.md:104]
+  TopUpGateway.sol:408                         contracts/0.8.25/TopUpGateway.sol                        ok  [LidoSRv3/Audit/Source/Topup2Correspondence.lean:103]
+  TopUpGateway.sol:409                         contracts/0.8.25/TopUpGateway.sol                        ok  [LidoSRv3/Audit/Source/Topup2Correspondence.lean:105]
+  TopUpGateway.sol:411                         contracts/0.8.25/TopUpGateway.sol                        ok  [LidoSRv3/Audit/Source/Topup2Correspondence.lean:108]
+  TopUpGateway.sol:412                         contracts/0.8.25/TopUpGateway.sol                        ok  [LidoSRv3/Audit/Source/Topup2Correspondence.lean:111]
+  TopUpGateway.sol:414                         contracts/0.8.25/TopUpGateway.sol                        ok  [LidoSRv3/Audit/Source/Topup2Correspondence.lean:112]
+  TriggerableWithdrawals.sol:51                contracts/common/lib/TriggerableWithdrawals.sol          ok  [diagram/README.md:55]
+  UnstructuredStorageExt.sol:20-46             contracts/0.4.24/utils/UnstructuredStorageExt.sol        ok  [LidoSRv3/Audit/Source/TrioReserve1/Packing.lean:4]
+  UnstructuredStorageExt.sol:44-46             contracts/0.4.24/utils/UnstructuredStorageExt.sol        ok  [LidoSRv3/Audit/Source/TrioReserve1/Live.lean:211]
+  UpgradeTemplate.sol:331                      contracts/upgrade/UpgradeTemplate.sol                    ok  [diagram/README.md:76]
+  UpgradeTemplate.sol:340-341                  contracts/upgrade/UpgradeTemplate.sol                    ok  [diagram/README.md:74]
+  UpgradeTemporaryAdmin.sol:68                 contracts/upgrade/UpgradeTemporaryAdmin.sol              ident? `EVMScriptExecutor` not in range  [diagram/README.md:73]
+  UpgradeTemporaryAdmin.sol:99                 contracts/upgrade/UpgradeTemporaryAdmin.sol              ok  [diagram/README.md:76]
+  ValidatorsExitBusOracle.sol:16               contracts/0.8.9/oracle/ValidatorsExitBusOracle.sol       ok  [diagram/README.md:50]
+  WithdrawalCredentials.sol:13–14              contracts/common/lib/WithdrawalCredentials.sol           ident? `withdrawalCredentialsType` not in range  [report/P-ALLOC-1.md:172]
+  WithdrawalQueue.sol:125                      contracts/0.8.9/WithdrawalQueue.sol                      ok (`_owner` in range)  [LidoSRv3/Audit/Source/AddressCorrespondence.lean:21]
+  WithdrawalQueue.sol:125-135                  contracts/0.8.9/WithdrawalQueue.sol                      ok  [LidoSRv3/Audit/Verity/AddressTx.lean:67]
+  WithdrawalQueue.sol:129                      contracts/0.8.9/WithdrawalQueue.sol                      ok  [LidoSRv3/Audit/Verity/AddressTx.lean:74]
+  WithdrawalQueue.sol:130                      contracts/0.8.9/WithdrawalQueue.sol                      ok  [LidoSRv3/Audit/Source/AddressCorrespondence.lean:29]
+  WithdrawalQueue.sol:133                      contracts/0.8.9/WithdrawalQueue.sol                      ok  [LidoSRv3/Audit/Verity/AddressTx.lean:77]
+  WithdrawalQueue.sol:346-354                  contracts/0.8.9/WithdrawalQueue.sol                      ok  [LidoSRv3/Audit/Source/TrioReserve1/Queue.lean:7]
+  WithdrawalQueue.sol:374                      contracts/0.8.9/WithdrawalQueue.sol                      ok  [LidoSRv3/Audit/Verity/AddressTx.lean:79]
+  WithdrawalQueueBase.sol:116-125              contracts/0.8.9/WithdrawalQueueBase.sol                  ok  [LidoSRv3/Audit/Source/TrioReserve1/Queue.lean:6]
+  WithdrawalQueueBase.sol:288-328              contracts/0.8.9/WithdrawalQueueBase.sol                  ok  [LidoSRv3/Audit/Source/ReserveRelationalCorrespondence.lean:9]
+  WithdrawalQueueBase.sol:330-359              contracts/0.8.9/WithdrawalQueueBase.sol                  ok  [LidoSRv3/Audit/Source/ReserveRelationalCorrespondence.lean:10]
+  WithdrawalQueueBase.sol:47–59                contracts/0.8.9/WithdrawalQueueBase.sol                  ok (`WithdrawalRequest` declared at line 46, encloses range)  [report/P-ADDRESS-1.denote-admission.md:139]
+  WithdrawalQueueERC721.sol:218                contracts/0.8.9/WithdrawalQueueERC721.sol                ok  [LidoSRv3/Audit/Verity/AddressTransferTx.lean:49]
+  WithdrawalQueueERC721.sol:218                contracts/0.8.9/WithdrawalQueueERC721.sol                ok (`_from` in range)  [LidoSRv3/Audit/Source/AddressCorrespondence.lean:19]
+  WithdrawalQueueERC721.sol:218                contracts/0.8.9/WithdrawalQueueERC721.sol                ok (`_to` in range)  [LidoSRv3/Audit/Source/AddressCorrespondence.lean:20]
+  WithdrawalQueueERC721.sol:218-220            contracts/0.8.9/WithdrawalQueueERC721.sol                ok  [LidoSRv3/Audit/Source/AddressTransferCorrespondence.lean:30]
+  WithdrawalQueueERC721.sol:230-254            contracts/0.8.9/WithdrawalQueueERC721.sol                ok  [LidoSRv3/Audit/Source/AddressTransferCorrespondence.lean:28]
+  WithdrawalQueueERC721.sol:231                contracts/0.8.9/WithdrawalQueueERC721.sol                ok  [LidoSRv3/Audit/Source/AddressTransferCorrespondence.lean:49]
+  WithdrawalQueueERC721.sol:232                contracts/0.8.9/WithdrawalQueueERC721.sol                ok  [LidoSRv3/Audit/Source/AddressTransferCorrespondence.lean:51]
+  WithdrawalQueueERC721.sol:233                contracts/0.8.9/WithdrawalQueueERC721.sol                ok  [LidoSRv3/Audit/Verity/AddressTx.lean:52]
+  WithdrawalQueueERC721.sol:233–236            contracts/0.8.9/WithdrawalQueueERC721.sol                ok (`_transfer` declared at line 230, encloses range)  [report/P-ADDRESS-1.denote-admission.md:129]
+  WithdrawalQueueERC721.sol:235-236            contracts/0.8.9/WithdrawalQueueERC721.sol                ok  [LidoSRv3/Audit/Verity/AddressTx.lean:54]
+  WithdrawalQueueERC721.sol:238                contracts/0.8.9/WithdrawalQueueERC721.sol                ok  [LidoSRv3/Audit/Source/AddressCorrespondence.lean:23]
+  WithdrawalQueueERC721.sol:240                contracts/0.8.9/WithdrawalQueueERC721.sol                ok  [LidoSRv3/Audit/Verity/AddressTx.lean:46]
+  WithdrawalQueueERC721.sol:241-245            contracts/0.8.9/WithdrawalQueueERC721.sol                ok  [LidoSRv3/Audit/Source/AddressTransferCorrespondence.lean:55]
+  WithdrawalQueueERC721.sol:241–245            contracts/0.8.9/WithdrawalQueueERC721.sol                ok (`_transfer` declared at line 230, encloses range)  [report/P-ADDRESS-1.denote-admission.md:109]
+  WithdrawalQueueERC721.sol:247-248            contracts/0.8.9/WithdrawalQueueERC721.sol                ok  [LidoSRv3/Audit/Source/AddressTransferCorrespondence.lean:58]
+  WithdrawalQueueERC721.sol:248                contracts/0.8.9/WithdrawalQueueERC721.sol                ok  [LidoSRv3/Audit/Verity/AddressTx.lean:64]
+  WithdrawalVault.sol:107–120                  contracts/0.8.9/WithdrawalVault.sol                      ok (`withdrawWithdrawals` in range)  [report/P-CONSOLIDATION-ETH-1a.md:112]
+  WithdrawalVault.sol:120                      contracts/0.8.9/WithdrawalVault.sol                      ok (`withdrawWithdrawals` declared at line 107, encloses range)  [report/P-CONSOLIDATION-ETH-1a.md:147]
+  WithdrawalVault.sol:199                      contracts/0.8.9/WithdrawalVault.sol                      ok  [LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean:257]
+  WithdrawalVault.sol:199-208                  contracts/0.8.9/WithdrawalVault.sol                      ok  [LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean:201]
+  WithdrawalVault.sol:200                      contracts/0.8.9/WithdrawalVault.sol                      ok  [LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean:126]
+  WithdrawalVault.sol:201                      contracts/0.8.9/WithdrawalVault.sol                      ok  [LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean:128]
+  WithdrawalVault.sol:201                      contracts/0.8.9/WithdrawalVault.sol                      ok (`addConsolidationRequests` declared at line 199, encloses range)  [report/P-CONSOLIDATION-1.md:28]
+  WithdrawalVault.sol:203                      contracts/0.8.9/WithdrawalVault.sol                      ok  [LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean:130]
+  WithdrawalVault.sol:203                      contracts/0.8.9/WithdrawalVault.sol                      ok (`CONSOLIDATION_GATEWAY` in range)  [LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean:132]
+  WithdrawalVault.sol:203-204                  contracts/0.8.9/WithdrawalVault.sol                      ok  [LidoSRv3/Audit/Verity/ConsolidationFee.lean:118]
+  WithdrawalVault.sol:204                      contracts/0.8.9/WithdrawalVault.sol                      ok  [LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean:254]
+  WithdrawalVault.sol:81--85                   contracts/0.8.9/WithdrawalVault.sol                      ok  [LidoSRv3/Audit/Verity/ConsolidationTx.lean:109]
+  WithdrawalVault.sol:81--85                   contracts/0.8.9/WithdrawalVault.sol                      ok (`preservesEthBalance` in range)  [LidoSRv3/Audit/Guarantees/PConsolidation1.lean:272]
+  WithdrawalVault.sol:81-85                    contracts/0.8.9/WithdrawalVault.sol                      ok  [LidoSRv3/Audit/Verity/ConsolidationFee.lean:75]
+  WithdrawalVault.sol:81-85                    contracts/0.8.9/WithdrawalVault.sol                      ok (`preservesEthBalance` in range)  [LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean:209]
+  WithdrawalVault.sol:82                       contracts/0.8.9/WithdrawalVault.sol                      ok  [LidoSRv3/Audit/Verity/ConsolidationFee.lean:113]
+  WithdrawalVault.sol:84                       contracts/0.8.9/WithdrawalVault.sol                      ok  [LidoSRv3/Audit/Verity/ConsolidationFee.lean:148]
+  WithdrawalVaultEIP7685.sol:103–110           contracts/0.8.9/WithdrawalVaultEIP7685.sol               ok (`_callAddWithdrawalRequest` in range)  [report/P-CONSOLIDATION-ETH-1b.md:138]
+  WithdrawalVaultEIP7685.sol:113–115           contracts/0.8.9/WithdrawalVaultEIP7685.sol               ok (`_callAddConsolidationRequest` in range)  [report/P-CONSOLIDATION-1.md:129]
+  WithdrawalVaultEIP7685.sol:114               contracts/0.8.9/WithdrawalVaultEIP7685.sol               ok  [LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean:73]
+  WithdrawalVaultEIP7685.sol:115               contracts/0.8.9/WithdrawalVaultEIP7685.sol               ok  [LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean:168]
+  WithdrawalVaultEIP7685.sol:115               contracts/0.8.9/WithdrawalVaultEIP7685.sol               ok (`CONSOLIDATION_REQUEST` in range)  [LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean:134]
+  WithdrawalVaultEIP7685.sol:116               contracts/0.8.9/WithdrawalVaultEIP7685.sol               ok  [LidoSRv3/Audit/Verity/ConsolidationFee.lean:371]
+  WithdrawalVaultEIP7685.sol:116-118           contracts/0.8.9/WithdrawalVaultEIP7685.sol               ok  [LidoSRv3/Audit/Verity/ConsolidationFee.lean:61]
+  WithdrawalVaultEIP7685.sol:120               contracts/0.8.9/WithdrawalVaultEIP7685.sol               ok  [LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean:173]
+  WithdrawalVaultEIP7685.sol:123–127           contracts/0.8.9/WithdrawalVaultEIP7685.sol               ok (`_requireExactFee` in range)  [report/P-CONSOLIDATION-ETH-1b.md:118]
+  WithdrawalVaultEIP7685.sol:124               contracts/0.8.9/WithdrawalVaultEIP7685.sol               ok  [LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean:246]
+  WithdrawalVaultEIP7685.sol:124-125           contracts/0.8.9/WithdrawalVaultEIP7685.sol               ok  [LidoSRv3/Audit/Verity/ConsolidationFee.lean:144]
+  WithdrawalVaultEIP7685.sol:20                contracts/0.8.9/WithdrawalVaultEIP7685.sol               ok  [LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean:44]
+  WithdrawalVaultEIP7685.sol:20                contracts/0.8.9/WithdrawalVaultEIP7685.sol               ok (`PUBLIC_KEY_LENGTH` in range)  [LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean:35]
+  WithdrawalVaultEIP7685.sol:40–54             contracts/0.8.9/WithdrawalVaultEIP7685.sol               ok (`_addWithdrawalRequests` in range)  [report/P-CONSOLIDATION-ETH-1b.md:143]
+  WithdrawalVaultEIP7685.sol:56-73             contracts/0.8.9/WithdrawalVaultEIP7685.sol               ok  [LidoSRv3/Audit/Verity/ConsolidationFee.lean:76]
+  WithdrawalVaultEIP7685.sol:60                contracts/0.8.9/WithdrawalVaultEIP7685.sol               ok  [LidoSRv3/Audit/Verity/ConsolidationFee.lean:121]
+  WithdrawalVaultEIP7685.sol:60-61             contracts/0.8.9/WithdrawalVaultEIP7685.sol               ok  [LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean:233]
+  WithdrawalVaultEIP7685.sol:61                contracts/0.8.9/WithdrawalVaultEIP7685.sol               ok  [LidoSRv3/Audit/Verity/ConsolidationFee.lean:123]
+  WithdrawalVaultEIP7685.sol:62-63             contracts/0.8.9/WithdrawalVaultEIP7685.sol               ok  [LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean:237]
+  WithdrawalVaultEIP7685.sol:65                contracts/0.8.9/WithdrawalVaultEIP7685.sol               ok  [LidoSRv3/Audit/Verity/ConsolidationFee.lean:128]
+  WithdrawalVaultEIP7685.sol:66                contracts/0.8.9/WithdrawalVaultEIP7685.sol               ok  [LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean:244]
+  WithdrawalVaultEIP7685.sol:68                contracts/0.8.9/WithdrawalVaultEIP7685.sol               ok  [LidoSRv3/Audit/Verity/ConsolidationFee.lean:146]
+  WithdrawalVaultEIP7685.sol:68-72             contracts/0.8.9/WithdrawalVaultEIP7685.sol               ok  [LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean:178]
+  WithdrawalVaultEIP7685.sol:69                contracts/0.8.9/WithdrawalVaultEIP7685.sol               ok  [LidoSRv3/Audit/Verity/ConsolidationFee.lean:48]
+  WithdrawalVaultEIP7685.sol:69-70             contracts/0.8.9/WithdrawalVaultEIP7685.sol               ok  [LidoSRv3/Audit/Verity/ConsolidationFee.lean:367]
+  WithdrawalVaultEIP7685.sol:70                contracts/0.8.9/WithdrawalVaultEIP7685.sol               ok  [LidoSRv3/Audit/Verity/ConsolidationFee.lean:51]
+  WithdrawalVaultEIP7685.sol:71                contracts/0.8.9/WithdrawalVaultEIP7685.sol               ok  [LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean:248]
+  WithdrawalVaultEIP7685.sol:84                contracts/0.8.9/WithdrawalVaultEIP7685.sol               ok  [LidoSRv3/Audit/Verity/ConsolidationFee.lean:353]
+  WithdrawalVaultEIP7685.sol:86                contracts/0.8.9/WithdrawalVaultEIP7685.sol               ok  [LidoSRv3/Audit/Verity/ConsolidationFee.lean:378]
+  WithdrawalVaultEIP7685.sol:86-88             contracts/0.8.9/WithdrawalVaultEIP7685.sol               ok  [LidoSRv3/Audit/Verity/ConsolidationFee.lean:133]
+  WithdrawalVaultEIP7685.sol:90                contracts/0.8.9/WithdrawalVaultEIP7685.sol               ok  [LidoSRv3/Audit/Verity/ConsolidationFee.lean:357]
+  WithdrawalVaultEIP7685.sol:90-92             contracts/0.8.9/WithdrawalVaultEIP7685.sol               ok  [LidoSRv3/Audit/Verity/ConsolidationFee.lean:135]
+  WithdrawalVaultEIP7685.sol:94                contracts/0.8.9/WithdrawalVaultEIP7685.sol               ok  [LidoSRv3/Audit/Verity/ConsolidationFee.lean:137]
+  WithdrawalVaultEIP7685.sol:97-101            contracts/0.8.9/WithdrawalVaultEIP7685.sol               ok (`_validatePublicKey` in range)  [LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean:63]
+  WithdrawalVaultEIP7685.sol:98                contracts/0.8.9/WithdrawalVaultEIP7685.sol               ok  [LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean:67]
+  WstETH.sol:69                                contracts/0.6.12/WstETH.sol                              ok  [LidoSRv3/Audit/Verity/AddressTx.lean:132]
+  WstETH.sol:69-75                             contracts/0.6.12/WstETH.sol                              ok  [LidoSRv3/Audit/Verity/AddressTx.lean:114]
+  WstETH.sol:70                                contracts/0.6.12/WstETH.sol                              ok  [LidoSRv3/Audit/Verity/AddressTx.lean:119]
+  WstETH.sol:72                                contracts/0.6.12/WstETH.sol                              ok  [LidoSRv3/Audit/Verity/AddressTx.lean:121]
+  WstETH.sol:73                                contracts/0.6.12/WstETH.sol                              ok  [LidoSRv3/Audit/Verity/AddressTx.lean:126]
+  contracts/0.8.9/WithdrawalQueue.sol:125-135  contracts/0.8.9/WithdrawalQueue.sol                      ok  [LidoSRv3/Audit/Source/WithdrawalQueueRequestAmount.lean:7]
+  contracts/common/lib/SSZ.sol:179-248         contracts/common/lib/SSZ.sol                             ok  [LidoSRv3/Audit/Ssz.lean:139]
+  citations checked: 475
+
+== 4. Release link: is the pin part of v4.0.0?
+  v4.0.0 -> 17005714f151e5502c559932319a3f2f74ac2436
+  ok: v4.0.0 points exactly at the pin
+  git diff --stat <pin> v4.0.0 -- contracts:
+    (no differences)
+
+== Summary
+  warning: P-CONSOLIDATION-1: function label 'constructor' not found in/around contracts/0.8.9/WithdrawalVault.sol:63-78
+  warning: P-SSZ-1: function label 'SHA256_DIGEST_LENGTH and zero padding literals' not found in/around contracts/0.8.25/lib/BeaconChainDepositor.sol:126-133
+  warning: P-SSZ-1: function label 'DEPOSIT_DATA_LENGTH ABI input shape' not found in/around contracts/0.8.25/lib/BeaconChainDepositor.sol:120-135
+  warning: LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean:362: ConsolidationGateway.sol:189: identifier 'hGatewayAdmittedNonzero' not within cited lines
+  warning: LidoSRv3/Audit/Source/DepositCorrespondence.lean:610: StakingRouter.sol:996: identifier 'run' not within cited lines
+  warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:42: Lido.sol:610: identifier 'ALLOCATION_ARITHMETIC' not within cited lines
+  warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:44: Lido.sol:832: identifier 'DEPOSITABLE_OVERFLOW' not within cited lines
+  warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:45: Lido.sol:846: identifier 'DEPOSITED_POST_REPORT_OVERFLOW' not within cited lines
+  warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:46: Lido.sol:847: identifier 'BUFFER_UNDERFLOW' not within cited lines
+  warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:47: Lido.sol:852: identifier 'DEPOSITED_NEXT_REPORT_OVERFLOW' not within cited lines
+  warning: LidoSRv3/Audit/Source/TopupCorrespondence.lean:22: Lido.sol:842: identifier 'amount' not within cited lines
+  warning: LidoSRv3/Audit/Ssz.lean:153: SSZ.sol:199: identifier 'pathAux' not within cited lines
+  warning: LidoSRv3/Audit/Verity/AllocationTx.lean:73: SRLib.sol:499: identifier 'totalValidators' not within cited lines
+  warning: LidoSRv3/Audit/Verity/DepositParentTx.lean:69: Lido.sol:869: identifier 'lidoCallOk' not within cited lines
+  warning: LidoSRv3/Audit/Verity/TopupTx.lean:148: StakingRouter.sol:742: identifier 'lidoStub' not within cited lines
+  warning: report/P-ACCOUNT-1.md:181: Accounting.sol:135–144: identifier '_calculateProtocolFees' not within cited lines
+  warning: report/P-ALLOC-1.md:172: WithdrawalCredentials.sol:13–14: identifier 'withdrawalCredentialsType' not within cited lines
+  warning: report/P-ALLOC-1.md:201: SRUtils.sol:18: identifier '_addModule' not within cited lines
+  warning: diagram/README.md:73: UpgradeTemporaryAdmin.sol:68: identifier 'EVMScriptExecutor' not within cited lines
+  RESULT: all checks passed (19 warning(s))

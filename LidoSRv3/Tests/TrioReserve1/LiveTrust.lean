@@ -1,3 +1,6 @@
+import LidoSRv3.Audit.Source.TrioReserve1.Spend
+import LidoSRv3.Audit.Source.TrioReserve1.Tail
+import LidoSRv3.Audit.Source.TrioReserve1.Lookup
 import LidoSRv3.Audit.Source.TrioReserve1.Status
 import LidoSRv3.Audit.Source.TrioReserve1.WithdrawalParent
 import LidoSRv3.Audit.Source.TrioReserve1.Target
@@ -280,3 +283,26 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms Status.withdrawal_denied
 #print axioms Status.withdrawal_failure
 #print axioms Status.withdrawal_corresponds
+
+#print axioms Lookup.address_narrowing
+#print axioms Lookup.of_spec
+#print axioms Lookup.exists_spec
+#print axioms Lookup.to_spec
+#print axioms Lookup.corresponds
+#print axioms Lookup.status_corresponds
+#print axioms Lookup.withdrawal_corresponds
+
+#print axioms Tail.seed_source
+#print axioms Tail.seed_exists
+#print axioms Tail.of_spec
+#print axioms Tail.exists_spec
+#print axioms Tail.to_spec
+#print axioms Tail.corresponds
+#print axioms Tail.withdrawal_corresponds
+
+#print axioms Spend.frame_failed
+#print axioms Spend.of_spec
+#print axioms Spend.exists_spec
+#print axioms Spend.to_spec
+#print axioms Spend.corresponds
+#print axioms Spend.withdrawal_corresponds
