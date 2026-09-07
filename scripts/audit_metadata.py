@@ -649,10 +649,9 @@ def validate_source_fidelity_gap_disclosure(rows):
     # reader sees.  Keep positions while masking it, so the body selected below
     # remains slice-compatible with the original source.
     masked_source = _mask_non_rendered_markdown(source_fidelity)
-    disclosure = re.search(r"^## Stage A disclosure\s*$\n(?P<body>.*?)(?=^## |\Z)",
-                           masked_source,
-                           re.MULTILINE | re.DOTALL)
-    require(disclosure is not None, "SOURCE-FIDELITY: no Stage A disclosure section")
+    disclosures = list(re.finditer(r"^## Stage A disclosure\s*$\n(?P<body>.*?)(?=^## |\Z)", masked_source, re.MULTILINE | re.DOTALL))
+    require(len(disclosures) == 1, "SOURCE-FIDELITY: require exactly one visible Stage A disclosure section")
+    disclosure = disclosures[0]
     lead = re.match(r"(?P<paragraph>[^\n]*(?:\n(?!\s*\n)[^\n]*)*)(?:\n\s*\n|\Z)",
                     disclosure.group("body"))
     require(lead is not None, "SOURCE-FIDELITY: Stage A disclosure has no lead paragraph")

@@ -127,6 +127,12 @@ CASES = (
     ("a type-7 tag after a table is literal",
      "| A | B |\n| --- | --- |\n| 1 | 2 |\n<span>\n## hidden\n\n",
      False, [(2, 1)], [(2, 1)]),
+    # The table reader deliberately declines list containers, but the literal
+    # tracker still must recognize this rendered table so a following type-7
+    # tag starts raw HTML rather than exposing its body to disclosure gates.
+    ("a list-marker table still starts type-7 raw HTML",
+     "- | A | B |\n  | --- | --- |\n  | 1 | 2 |\n<span>\n## hidden\n\n",
+     False, [], [(2, 1)]),
     ("an HTML comment ends the body",
      "| A | B |\n| --- | --- |\n| 1 | 2 |\n<!-- c -->\n| 3 | 4 |\n",
      False, [(2, 1)], [(2, 1)]),

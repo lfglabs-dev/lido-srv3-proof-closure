@@ -29,6 +29,7 @@ def reject_html_stage_a_families(reject, module):
         "<span>\n## Stage A disclosure\n\n"
         "All 68 canonical fidelity-gap entries remain.\n\n"
     )
+    list_marker_table_then_type_7 = "- | heading |\n  | --- |\n  | body |\n<span>\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n\n"
     table_then_indented_code_then_type_7 = (
         "| heading |\n| --- |\n| body |\n{}code\n"
         "<span>\n## Stage A disclosure\n\n"
@@ -45,6 +46,7 @@ def reject_html_stage_a_families(reject, module):
         *(table_then_type_7.format(tag) for tag in ("<span>", "</span>", "<stage-a data-gap=\"68\">")),
         *(nested_table_then_type_7.format(" " * indent, " " * indent, " " * indent)
           for indent in (4, 5)),
+        list_marker_table_then_type_7,
         *(table_then_indented_code_then_type_7.format(" " * indent)
           for indent in (4, 5)),
     )
@@ -114,13 +116,10 @@ def main():
         stale = re.sub(r"all\s+68\s+canonical\s+fidelity-gap\s+entries\s+remain\.", "all 67 canonical fidelity-gap entries remain.", source_fidelity)
         fpath.write_text(stale, encoding="utf-8"); invoke(fixture, False, "SOURCE-FIDELITY: Stage A disclosure lead paragraph must visibly disclose all canonical fidelity gaps")
         fpath.write_text(stale + "\n## Elsewhere\n\nAll 68 canonical fidelity-gap entries remain.\n", encoding="utf-8"); invoke(fixture, False, "SOURCE-FIDELITY: Stage A disclosure lead paragraph must visibly disclose all canonical fidelity gaps")
-        later_stage_a = stale.replace(
-            "and does not satisfy the source-model completion gates for B–F.\n",
-            "and does not satisfy the source-model completion gates for B–F.\n\n"
-            "A later Stage A paragraph says all 68 canonical fidelity-gap entries remain.\n",
-            1,
-        )
+        later_stage_a = stale.replace("and does not satisfy the source-model completion gates for B–F.\n", "and does not satisfy the source-model completion gates for B–F.\n\nA later Stage A paragraph says all 68 canonical fidelity-gap entries remain.\n", 1)
         fpath.write_text(later_stage_a, encoding="utf-8"); invoke(fixture, False, "SOURCE-FIDELITY: Stage A disclosure lead paragraph must visibly disclose all canonical fidelity gaps")
+        duplicate_stage_a = source_fidelity.replace("## Stage A disclosure\n", "## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n\n## Stage A disclosure\n", 1)
+        fpath.write_text(duplicate_stage_a, encoding="utf-8"); invoke(fixture, False, "SOURCE-FIDELITY: require exactly one visible Stage A disclosure section")
         def reject_hidden_stage_a(hidden):
             fpath.write_text(hidden + stale, encoding="utf-8")
             invoke(fixture, False, "SOURCE-FIDELITY: Stage A disclosure lead paragraph must visibly disclose all canonical fidelity gaps")
@@ -751,8 +750,5 @@ def main():
           "whole table relocated under a trailing appendix and under a later section "
           "rejected, since a gap count a reader reaches only after the CHECKED cells "
           "it was written to qualify no longer qualifies them")
-
-
-
 if __name__ == "__main__":
     main()

@@ -19,18 +19,17 @@ TAB_STOP = 4
 # An empty cell is not one, so `|     |     |` underlines nothing and the block
 # it sits under renders as paragraph text.
 DELIMITER_CELL = re.compile(r"^[ \t]*:?-+:?[ \t]*$")
-
 _ATX_HEADING = re.compile(r"^ {0,3}#{1,6}(?:[ \t]|$)")
 _THEMATIC_BREAK = re.compile(
     r"^ {0,3}(?:(?:\*[ \t]*){3,}|(?:-[ \t]*){3,}|(?:_[ \t]*){3,})$")
 _BLOCK_QUOTE = re.compile(r"^ {0,3}>")
 _LIST_ITEM = re.compile(r"^ {0,3}(?:[-+*]|\d{1,9}[.)])(?:[ \t]|$)")
+_LIST_ITEM_PREFIX = re.compile(r"^ {0,3}(?:[-+*]|\d{1,9}[.)])(?P<space>[ \t]+)")
 # A line of `-` or `=` alone underlines the paragraph above it as a setext
 # heading, and cmark-gfm resolves that before it looks for a table: `A` over
 # `---` is an `<h2>`, not a one-column table.  A delimiter row carrying a colon
 # or a pipe is not a setext underline, so a real table keeps rendering.
 _SETEXT_UNDERLINE = re.compile(r"^ {0,3}(?:=+|-+)[ \t]*$")
-
 # CommonMark's seven HTML block start conditions.  A table row is not a
 # paragraph, so condition 7 -- the lone complete tag, which may not interrupt a
 # paragraph -- still starts a block here and still breaks the table; cmark-gfm
@@ -59,7 +58,6 @@ _HTML_BLOCK_START = re.compile(
     rf")",
     re.IGNORECASE,
 )
-
 # The same start conditions again, paired with what closes each region, for the
 # interior scan.  `ends_table` refuses to continue a table across the line that
 # *opens* a literal region; these pairs are what stop a table being read out of
@@ -78,7 +76,6 @@ _HTML_BLOCK_STARTS = (
      _HTML_BLOCK_BLANK_END),
 )
 _HTML_BLOCK_BARE_TAG = re.compile(rf"^ {{0,3}}{_HTML_TAG}[ \t]*$")
-
 # Conditions 1-6 only: the HTML block starts that may interrupt a paragraph.
 # Condition 7 may not, which is why it is tested against the paragraph state in
 # `_literal_lines` rather than listed here.
@@ -91,7 +88,6 @@ _HTML_BLOCK_INTERRUPTING = re.compile(
     rf")",
     re.IGNORECASE,
 )
-
 
 class Row(NamedTuple):
     """One physical line of a rendered table, with its offsets in the source."""
@@ -236,8 +232,13 @@ def _opens_table(lines: list[Row], index: int) -> bool:
     """Whether this line and its successor begin a rendered GFM table."""
     if index + 1 == len(lines):
         return False
+    list_header = _LIST_ITEM_PREFIX.match(lines[index].text)
     def cells(position: int) -> list[str]:
         line = lines[position].text
+        if list_header is not None:
+            prefix = list_header.end()
+            if position == index or line[:prefix].strip(" \t") == "":
+                return split_cells(line[prefix:])
         if indent_width(line) < 4:
             return split_cells(line)
         for previous in range(position - 1, -1, -1):
