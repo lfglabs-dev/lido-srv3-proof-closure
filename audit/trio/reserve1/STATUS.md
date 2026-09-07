@@ -1,5 +1,23 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Independent payable callback rules
+
+`CallbackSpec` orders fresh address lookup, sender admission and post-lookup
+updates. `CallbackRules` binds physical locator/independent CALL/ABI rules and
+proves exact bidirectional body/root outcome/world/attempt correspondence and
+existence for both Lido callbacks. Reward overflow precedes writes; success stores
+the full bounded sum and emits. The withdrawal update preserves core storage;
+both updates preserve balances relative to the lookup-returned world. Root
+failure restoration follows the independently specified transaction boundary.
+
+At source `e9003a9918662bab8f65228ddd4909120267da66`, three selected checks and seven
+baseline checks pass; 101 unchanged source/olean pairs and eleven dependencies
+match prior receipts. Inspected axioms are standard. See
+`receipts/callback-rules-summary.json`. Runtime sources retain their twelve-case
+production-vault EVM evidence with no new execution run. Dispatch and enclosing
+callee/report composition, actual queue finalization, remaining entry/proxy/resource/
+bounded-world and writer obligations, full gates and independent review stay open.
+
 ## Independent vault body and transaction rules
 
 `VaultSpec` defines the greatest reward amount bounded by balance and maximum,

@@ -1,14 +1,15 @@
 # Continuation — not a completion claim
 
-Latest increment: VaultSpec/VaultRules independently specify and prove exact
-bidirectional reward/withdrawal body and root transaction correspondence, including
-ordered guards, greatest bounded reward cap, callback skipping/results, independent
-CALL rules and full-world error restoration with attempts retained.
-Source 26a09e7a4872a317824aab3461d9696aec48b2eb: three selected checks, seven baselines,
-99 unchanged source/olean pairs, standard axioms. See vault-rules-summary.json.
+Latest increment: CallbackSpec/CallbackRules now give independent fresh locator /
+CALL / ABI / sender admission and post-lookup counter rules for both Lido callbacks.
+Exact bidirectional body/root outcome/world/attempt correspondence and existence
+are proved. Reward commit stores the full bounded sum; withdrawal commit preserves
+core; both commits preserve balances relative to the post-lookup world.
+Source e9003a9918662bab8f65228ddd4909120267da66: three selected checks and seven baselines,
+101 unchanged source/olean pairs, standard axioms. See callback-rules-summary.json.
 The twelve production-vault EVM cases retain unchanged runtime sources; no rerun.
-Next discharge independent callback/dispatch binding and compose these concrete
-callee rules through the report. Actual queue finalization, deployment/entry/writer/
+Next bind entry dispatch/reply encoding and compose concrete callback/vault rules
+through the report. Actual queue finalization and remaining deployment/entry/writer/
 resource/bounded-world obligations and full remote gates remain open.
 
 Read STATUS, current git HEAD, and admission/ABI plus oracle/component receipts first. The previous

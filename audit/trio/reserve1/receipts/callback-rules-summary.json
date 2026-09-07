@@ -1,0 +1,778 @@
+{
+  "source_commit": "e9003a9918662bab8f65228ddd4909120267da66",
+  "time": "2026-09-07T18:25:09.136298+00:00",
+  "component_receipt": "audit/trio/reserve1/receipts/component-checks/e9003a9918662bab8f65228ddd4909120267da66/receipt.json",
+  "new_component_checks": 3,
+  "new_component_exits": [
+    0,
+    0,
+    0
+  ],
+  "revalidated_unchanged_components": [
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/Live.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/2e4b6a50f68077d65a3d716522f9818fafd50073/receipt.json",
+      "source_sha256": "f0479c959ca823fd95db8aab2a833ec8f7094abd0ada9a715f7e8c9052c468bb",
+      "olean_sha256": "32b8c6a1b6fa76fb7b707b4d4ba1a1a65e413f2844f8eeb20f6beefb58fdfc65"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/ABI.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/2e4b6a50f68077d65a3d716522f9818fafd50073/receipt.json",
+      "source_sha256": "07a7a120d8f50c630fbeb20c64b583ee41fe7f995d8b669ebf9d14fe220549c5",
+      "olean_sha256": "dcfa1d44e6f601542e7cd4f80a1f8d069ab6824b94ec68b5429437c658aba221"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/PartitionSpec.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/2e4b6a50f68077d65a3d716522f9818fafd50073/receipt.json",
+      "source_sha256": "36f1afa4bf2c60832bc7edc34c8c9623e492c3f8ab92a75d4bbd713442d8987b",
+      "olean_sha256": "3369f910e93b0e58ee52d4b8a40bbfb04ba771548b0640d02c53b3521f96da53"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/QueueSpec.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/2e4b6a50f68077d65a3d716522f9818fafd50073/receipt.json",
+      "source_sha256": "b9fe21bb34946a83565a61b298ab178ccff6adab6cc711ab3eb1e3672c7729e4",
+      "olean_sha256": "8aecb39ccc8ec56e5b6516d2dfa56120da167e32f502ffa0780098d7bd405149"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/Queue.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/2e4b6a50f68077d65a3d716522f9818fafd50073/receipt.json",
+      "source_sha256": "be75949b3843e55ce9cbe56ad20f54dcf95b8d0ed6dbe380778366863aac6890",
+      "olean_sha256": "69735c09ae7d10fa215225724e8a31f8a7c5e2ac788519d936ad2eb14f1fb0b8"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/Packing.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/2e4b6a50f68077d65a3d716522f9818fafd50073/receipt.json",
+      "source_sha256": "4b4dda2555af0a8977ce2185b851bd63ca3ddd9420d493d438c7abed31bf38f3",
+      "olean_sha256": "c22520ee43cb42c5c5b849a373ed8c1dc4201deb7f139d8e17b001289197c691"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/PhysicalPacking.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/2e4b6a50f68077d65a3d716522f9818fafd50073/receipt.json",
+      "source_sha256": "058f7d0641e27963179c02fa84e1c233960535e22f67ea1aa72835af6c89245e",
+      "olean_sha256": "2ce4a67376d9fc126ecbda890509eb5aec50ba31561bf3bc0c7c2db4ffa54c01"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/Erasure.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/2e4b6a50f68077d65a3d716522f9818fafd50073/receipt.json",
+      "source_sha256": "4e2765e782c2bfdb1c6691e82ab77d74fbc6795a7441c458f77d4a7c7b68e7e6",
+      "olean_sha256": "aaaecf81097a32d894c489c5a389177e47f2af0657c65c789547fcb9909d0af6"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/WriterSpec.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/2e4b6a50f68077d65a3d716522f9818fafd50073/receipt.json",
+      "source_sha256": "4d060c61f360d339e52c72eba03b8f1c6e06856f7f7c643d7945a05f2f51371e",
+      "olean_sha256": "3d9517fb118208c9c332b4ca219685ad4707162d3ec5c8df03fb8924321bea27"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/Writers.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/2e4b6a50f68077d65a3d716522f9818fafd50073/receipt.json",
+      "source_sha256": "463d563881d6433272f930ebf9d465a9c275a822b8b2e1ced66632246d89a7ba",
+      "olean_sha256": "ba4e514db1ed1e37bda691e2dd1ea6f27cb001f6ece2af5f7ea1d70056a6a46a"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/AllocationSpec.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/2e4b6a50f68077d65a3d716522f9818fafd50073/receipt.json",
+      "source_sha256": "0ac96b84013977f21dcb8bc3577650a720bc09ce0f36ce99a0da16d07f7e5ccf",
+      "olean_sha256": "0ed2eae57fb218e80e661f2dcfe655b10cb9ede6005c37b706f15401858906e0"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/Allocation.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/2e4b6a50f68077d65a3d716522f9818fafd50073/receipt.json",
+      "source_sha256": "4ca5c228218f30415badae67fb0373a98cff00851e4b09d1e0477fdcedf0f400",
+      "olean_sha256": "f760365dc27d390cbb47c537a4a5700800c70f45f0cd872d7e41f4d014157613"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/AdmissionSpec.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/2e4b6a50f68077d65a3d716522f9818fafd50073/receipt.json",
+      "source_sha256": "5700f877cb029fd1a648976002289fc1c9d720552b9728eb37228c3f2911cae1",
+      "olean_sha256": "ff1f72e11ab483b4546b4446477cebb0c19d4258d788ffc8fadc2cab1a515241"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/Admission.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/2e4b6a50f68077d65a3d716522f9818fafd50073/receipt.json",
+      "source_sha256": "6e7fae6f37e732b07041e458e07ded6a924ef004fad4eca219f3278cb5e132d8",
+      "olean_sha256": "a771b4d4a5b4cb0501f526e704ca50126d2663a0eb850827170209b1cc61acad"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/RouterSpec.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/2e4b6a50f68077d65a3d716522f9818fafd50073/receipt.json",
+      "source_sha256": "3893ba4c92ef3e0e3fcf347e05fef79cff230164e89be8b40210e1a945001181",
+      "olean_sha256": "56d96c755e49d8bbc104a34dae856f1cfda2daefe7ff12126349f2586a071496"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/Router.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/2e4b6a50f68077d65a3d716522f9818fafd50073/receipt.json",
+      "source_sha256": "b272e74a80bda456d4adaaf8006593f46822551162be97282918488f901e8470",
+      "olean_sha256": "72c486185ba2d59caa8edf92795a3e88076eba3379500718229bf1c32dfec309"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/Locator.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/2e4b6a50f68077d65a3d716522f9818fafd50073/receipt.json",
+      "source_sha256": "5e3a90aba1013cb65aa3306eacfe3122a84840e0138bc0d2496f34257bfb459f",
+      "olean_sha256": "126264f012fb02b5c0817ad9d24680e0bcdeb3109706bdb39105311af1a4220d"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/CallResults.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/2e4b6a50f68077d65a3d716522f9818fafd50073/receipt.json",
+      "source_sha256": "068aff6f28ceeb8906190c8ca96db25fc95f8ff80373a75b84ba629d01785849",
+      "olean_sha256": "2bac3d1ea17a82c815b626af302d8114eef9fd094ed564fa5fb83370b85f5ddb"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/QueueCalls.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/2e4b6a50f68077d65a3d716522f9818fafd50073/receipt.json",
+      "source_sha256": "a8cb6c2e9de88683731d9914d8a639d081b0054d374f4179c613bcff35f4cf39",
+      "olean_sha256": "bdb899d47b6432021afc55dbebcb3fe54c364d024d7da4ef6d96da3323bed8b9"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/WithdrawalTail.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/2e4b6a50f68077d65a3d716522f9818fafd50073/receipt.json",
+      "source_sha256": "fbc9b2345740d1c9eb4a5578421302f77a969c87d642093fc5aeccf8703ac135",
+      "olean_sha256": "07c4a26fb3899b86d26d447d8668ed31e052f62a2bb9b1789a9cc53b7811dacd"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/SpendingSpec.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/2e4b6a50f68077d65a3d716522f9818fafd50073/receipt.json",
+      "source_sha256": "a1512835b40d6632089ac50f09be55f67a8c6d2a791d34c8abce09f8ccfa8c2d",
+      "olean_sha256": "a276bfa1369bebd479e573cf5354962eb89137553f65efeb74ef84a64b4aa4d5"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/Spending.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/2e4b6a50f68077d65a3d716522f9818fafd50073/receipt.json",
+      "source_sha256": "03a308a26089fa1c41cc69fc88ca6d6e10f6956969b9344b91ea12d7ccddf677",
+      "olean_sha256": "1d3b035a160f75cc5555e3e08f84049a64467fe34d70c43fb16cfcf8a1a800c9"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/WithdrawalComposition.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/2e4b6a50f68077d65a3d716522f9818fafd50073/receipt.json",
+      "source_sha256": "f87f0ceed14dde280292ac086b9fba11d89c2f4846c3bbea6e034db291f831a1",
+      "olean_sha256": "242bbf2b740838e643ad8846bc6e236592664e451367abac4846c32014752bd6"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/Transfers.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/2e4b6a50f68077d65a3d716522f9818fafd50073/receipt.json",
+      "source_sha256": "358329ac4fda71fbbfbb6f46eb3b9100cd0b0a031fbc4f08d92ea31aae94dda0",
+      "olean_sha256": "9cbffa1d102584e0ecd7535aa9199cdd0203eb5ea0bdc6e22c3a0b8be3c26507"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/StaticCall.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/2e4b6a50f68077d65a3d716522f9818fafd50073/receipt.json",
+      "source_sha256": "e2e989cb1b07e14ca4d5d548f6e0dcaeac1eb903badb9b05871fd71ee41e6f52",
+      "olean_sha256": "3f09b8904960d1c1ec474a91c9db058fb4886acd0deea6362e6b285a2a579543"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/OracleSpec.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/2e4b6a50f68077d65a3d716522f9818fafd50073/receipt.json",
+      "source_sha256": "eacfde78139d66a7d2de260e5f70e46cd94991a534db30255ccd947690de8c10",
+      "olean_sha256": "ed3010b39ef1ed60bd967b87f677493217fe46cb8a1d9ffe40fbc1be98f13b65"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/Oracle.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/2e4b6a50f68077d65a3d716522f9818fafd50073/receipt.json",
+      "source_sha256": "bcd662f8f412864768a9f058464a217976b63dbdde2a35f474038e62b2e8fc6b",
+      "olean_sha256": "c4f18fc7c79aabc32fbe24c0ccb6abc6f7a375e046eb9eeafed798d741acbe27"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/OracleCalls.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/2e4b6a50f68077d65a3d716522f9818fafd50073/receipt.json",
+      "source_sha256": "fed5da04b0ec434f658bc6751bcc4e1de9a7306bbaad08426ec1930cbe09adfc",
+      "olean_sha256": "3115e123084d63e4c2998c4df9d997651b86a0a1e4a13fa6cb771eefebbab591"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/FrameSpec.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/2e4b6a50f68077d65a3d716522f9818fafd50073/receipt.json",
+      "source_sha256": "62d02f2ca38091687691a30124db9b9ca25260f4254daea1c1fcc445cc392102",
+      "olean_sha256": "cdd943f8ac385dca4faebaed1de8a04f128751dce38f558d5148cc6e607b6ba3"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/Consensus.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/2e4b6a50f68077d65a3d716522f9818fafd50073/receipt.json",
+      "source_sha256": "65b5ac3a8e80a9d2451a6969d4af5b42b6df084d2445a5794553ec684d079426",
+      "olean_sha256": "ee84508b542303a68b676b1c4b0b6e5b8f87dba923100f3ff21ee52469af722e"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/ConsensusCalls.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/2e4b6a50f68077d65a3d716522f9818fafd50073/receipt.json",
+      "source_sha256": "e8c91768ad643fe01b97d578bb33ae768130ca6dda5af58f66b9ca6553309c61",
+      "olean_sha256": "dfc2a23e540802e07d56beef5ee0b3d0fdf72b3138f4e4055d0bc92035079546"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/Pipeline.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/2e4b6a50f68077d65a3d716522f9818fafd50073/receipt.json",
+      "source_sha256": "1ede76ec371c8f87606aa29378fd10e2a93797e2cc7489d2157598f35d71b9c0",
+      "olean_sha256": "655c5dd7d353a5a7f7cb8078c0c30a5c788df62bd39f0467db4105bfe48a1c9f"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/PhysicalReserve.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/de68e309d6cef918e7153c971f2396aaa1ec8b2a/receipt.json",
+      "source_sha256": "62b88bf5a74b6f7f17795e7e50b8453fe9f8304b59cf8cc3b097299a6f240b00",
+      "olean_sha256": "dfd76981ec5598d52cf73c111ef38933692db4278c5e6957196af93137d66458"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/SequenceSpec.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/e47b7d1720dffeb0d09a2aa52e0fd0a5335e0ecf/receipt.json",
+      "source_sha256": "35e23d7b6836da3fa7391536f7b81db410860674604a15ba0d4b5bbb0037282a",
+      "olean_sha256": "117bc37fc17d054de75cb769cffe5c646dcfc316fb8ce7c298bced200b34850f"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/PhysicalSequence.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/e47b7d1720dffeb0d09a2aa52e0fd0a5335e0ecf/receipt.json",
+      "source_sha256": "81f55f77f9a371e937ea322107cd76870ada56e928b13871484ce5d3fce4e124",
+      "olean_sha256": "69765bbb38a3e260459fb311e40d0559600307a05eb2f60a87f4f2bbb042dd91"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/AragonSpec.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/5ff24074eb374d5b79287991ece3e5206da95bfc/receipt.json",
+      "source_sha256": "c9f4450e9b3553107f8bf102b089273e64f82d4ffc5466dd727ea703f786bf4f",
+      "olean_sha256": "64e038ee8544c236998aa28d5558e0d0efcddec6a2fa36fa509645fef98cf490"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/Aragon.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/5ff24074eb374d5b79287991ece3e5206da95bfc/receipt.json",
+      "source_sha256": "cec58360652885d3946f14470096537286792db6b37bb1bcab4cc1209e1f203e",
+      "olean_sha256": "f681a11be885d18ac2ca5b350d44b9364759727232139f35123fcad64be70fff"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/Kernel.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/c5858d1f0af9e2132982cce5067f4eceed42857c/receipt.json",
+      "source_sha256": "4f9727dd3cc3c1f441f2421e151bbe2de4172b6bd35e9cf4c62c8ace0121d2dc",
+      "olean_sha256": "031ce37fe4d797322a3844c00b23ac359edf876225340da08a291ba65e74b133"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/ACLSpec.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/c5858d1f0af9e2132982cce5067f4eceed42857c/receipt.json",
+      "source_sha256": "73aab3a7426e8690f43814b6b7e8363d9e413f395951d7de655b006183e744be",
+      "olean_sha256": "bea7612c4a78687559ec906c6d2e0b0be72a3700218b66b72aa186113ff96dbd"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/ACL.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/c5858d1f0af9e2132982cce5067f4eceed42857c/receipt.json",
+      "source_sha256": "4e26bbed3471d3ad0e360da3abeaa95f408f3d9e5517fe298937b40805a8786e",
+      "olean_sha256": "c614ff68bb01b7df8f870a1dd49367e575376cefd0e6a5cd02ba0d06fe102cc3"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/ACLCalls.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/c5858d1f0af9e2132982cce5067f4eceed42857c/receipt.json",
+      "source_sha256": "cbebc215591b495264c448374dc504c2e2b1908431a3ee05fe979685abe5d058",
+      "olean_sha256": "00b49f01af476f9d5ffb62fdc3cb9cf70d4279a0b6d00dba3a4670b18342d6e8"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/ACLBounds.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/0e632f4a369f23b918b832be62821cd9a86a8ce5/receipt.json",
+      "source_sha256": "c3b42e4184b9bb5c0f96a1d6c541f85fd12e0d5b85d2fe0c0eadef52fb14eb86",
+      "olean_sha256": "4f6373a287d7224e0f982695f30002b77c71a2654dec4c4395bfeb95933f86ab"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/ACLLogicSpec.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/bd6f7edb93070e808bda4f45fda54a86c93b8db5/receipt.json",
+      "source_sha256": "358e706589497ebed21f3fa7892e9368232fd105be01c206291888eaf74a6d4f",
+      "olean_sha256": "ec56ff91f2d55317012230d19270730102e9afc9becddc0915bb98131fce928a"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/ACLLogic.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/bd6f7edb93070e808bda4f45fda54a86c93b8db5/receipt.json",
+      "source_sha256": "c5b37f9cb59410e76fa4a30205d2591b1a04167544de840070a2cc7d9ebc6a2d",
+      "olean_sha256": "942acc6875584b6f83628eed79e8cd3a0d6495a7171385d8cf86fbe8a941729b"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/ACLTreeSpec.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/35e5c6b1505236744d89ae21dfe81b887f6be266/receipt.json",
+      "source_sha256": "61715a74502cd92d22b12cd032afd81c3a584ccb962aaec6519d7a9134fb120b",
+      "olean_sha256": "e3711ac73e6ff57b21fe0ad895419226fc04b90688591c452dbfa73a82e31256"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/ACLTree.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/35e5c6b1505236744d89ae21dfe81b887f6be266/receipt.json",
+      "source_sha256": "edb1f19781683acc84a6de09797d35ffa77bcaee2a4c6ddfddf015252325f5e8",
+      "olean_sha256": "2387a9b253a92409ed582db955e401df6499581303193beb4234bf2c6aef52ce"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/ACLLeafSpec.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/bb40d49e8fa6ce9b644e4134d933c752a3b70626/receipt.json",
+      "source_sha256": "aff6acc43cd49fd0b4638d34d9e236faab15e65438e3933d4ce6b2819dfb8948",
+      "olean_sha256": "b8e13065f17f9549625656407fe2364f87efcb56a65d086f9843d6a0de5fbc39"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/ACLLeaf.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/bb40d49e8fa6ce9b644e4134d933c752a3b70626/receipt.json",
+      "source_sha256": "bd099482aeed8aa237cd7ef600047b183d993cb2135f3ff53dd7466b4f7cd27e",
+      "olean_sha256": "ea75eced793f352b13c36a7cfcd9db1e2d0a381655e8f3f4bc962c336dbc164a"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/ACLPermissionSpec.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/7f431a39a4ba306a06b02dc273d4b1c79729b9c7/receipt.json",
+      "source_sha256": "7fa13d56240cf71cd4a4ff9b07615b842d79d0f78fbabef664476b43d40c49f9",
+      "olean_sha256": "27a0000b6cbee1aa9b084832907d8cda7166063abb6f4b5b30d52ca6616cb54a"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/ACLPermission.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/7f431a39a4ba306a06b02dc273d4b1c79729b9c7/receipt.json",
+      "source_sha256": "ddc371c222028092ecd91de4bc87fbfa9c5acaa065482fe96f176e66e1cb406f",
+      "olean_sha256": "41b3afe0caa54594a37e177713385a57aac5ddd4a4dff13c01d6327c8af6e6f1"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/TargetSpec.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/01cad617b9692f618a3fa869597967a23720f36f/receipt.json",
+      "source_sha256": "ef8fbb43a73f439a6f6d69d0d423e296cf4a4f9c1470fa8d53ea3965656d6ce2",
+      "olean_sha256": "1c8fe50f7f0b19b8c485ee3543e6e956e36c238978e1d98d37e60d1f1350b6f9"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/Target.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/01cad617b9692f618a3fa869597967a23720f36f/receipt.json",
+      "source_sha256": "526e24f3c8f71b193de36ed7548aa75514d8f85d357008af66257d2b4f0c05e1",
+      "olean_sha256": "d6009a0c8f28707d2c5ffc0f6ab7fba87b8edb83fedc692ba3877bf98682352a"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/WithdrawalSpec.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/48c2b4c9d4dab0beadf6718353af3ff672a198ca/receipt.json",
+      "source_sha256": "fe57761ff56e793dde3e8d68d8421ac1c4f04e52db75a29b7769cdf9c1db50ee",
+      "olean_sha256": "842e061573c013be1f4417788409a898d2f597c581c0bd5e6217a735be3063e3"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/WithdrawalParent.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/48c2b4c9d4dab0beadf6718353af3ff672a198ca/receipt.json",
+      "source_sha256": "1844fc5c2b349056ec6d12637579eee70ae70315dff1ffd9cde7945e2c9f54a5",
+      "olean_sha256": "f65f08b5d8a81b00710f6b0c1878cb7281b137246371fc1c8a59c0dd9d22b3c0"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/StatusSpec.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/17ad2454bfe2b6fea97b076a9f0f078b72ee370a/receipt.json",
+      "source_sha256": "2181496589bbb4da51d37d2c4f02005442a57fca162667dde685374f0ed28cc2",
+      "olean_sha256": "186c994fcaa1e25abec69c6b7bb40aae2e13f4477408da641f276aabf94fcb49"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/Status.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/17ad2454bfe2b6fea97b076a9f0f078b72ee370a/receipt.json",
+      "source_sha256": "35524487b5657340163f8327523e98682437f9ba4f1d56045218be76d102ab38",
+      "olean_sha256": "15a25c0c5766a44e31c8f709c94e12c7e05b98f0087b14d6b067e0ea99076814"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/LookupSpec.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/610d88ca8b2fd6bc83a13d741e11fd80ae19d23e/receipt.json",
+      "source_sha256": "25bdc3ff977ee35b10756490fe075fd4db714fc3da595606920da7965691c976",
+      "olean_sha256": "2c187a833c680f016d532336fbf7e25dec73837ed4729beaa1d380419d9cd71e"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/Lookup.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/610d88ca8b2fd6bc83a13d741e11fd80ae19d23e/receipt.json",
+      "source_sha256": "6f3a1e7ef063838f10ca5b0a951ff46c04376475c029b78a9318fab926a61aec",
+      "olean_sha256": "6f63f7a86757526cb4478f043fc4dc567b94b02a041cbd1cbb9ab83c8a95f2d4"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/TailSpec.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/f6356dcfdaa54baaf423dc492a5fd241427963c3/receipt.json",
+      "source_sha256": "55967f1fd74830cf72ba679bb175adea005277a4e3d1f613ccd99086ff804780",
+      "olean_sha256": "1aa786010066652fcad4ac2bfaf3ef5c53c792bef2d6320b62ba22f65fe22645"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/Tail.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/f6356dcfdaa54baaf423dc492a5fd241427963c3/receipt.json",
+      "source_sha256": "ea697ace85a0fa77ecad3a5306b0dfc0cd97ccad808d4baee582e14bf9b447b6",
+      "olean_sha256": "de51a6abf471d6ce7db63902dfae67bcb67719972fa29ba70808b4e112c79cf0"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/SpendSpec.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/3e5611f7cc00c60015750ad4e865f3ae8f842042/receipt.json",
+      "source_sha256": "c79eb4ed05147550a6264afa4117d89429d33b5276d3466afb81888dd9c7113c",
+      "olean_sha256": "c164b15bee456340a3d598e9a0785f78fd1752848650cb27aef4a1d7ce3dc9da"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/Spend.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/3e5611f7cc00c60015750ad4e865f3ae8f842042/receipt.json",
+      "source_sha256": "62979abd6b6ccc21582e8070214870115c1af9c6f238e98ad30a44a4f58ea371",
+      "olean_sha256": "27c0a1cff57b0363053da498a6eaaa976e0438084fe6899a78c56e5c5e90f0fe"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/FrameReadSpec.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/107c6310d6d917b14e564a33181e630b5521f2d0/receipt.json",
+      "source_sha256": "66a122d0c0ad3b804820141720d58d4f332ed21b380a551334520276743902f3",
+      "olean_sha256": "d9bd7c9bb95b32829e5ef59605cc29e920022ea8d4c5ac0d1ea2f2740744ce35"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/FrameRead.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/107c6310d6d917b14e564a33181e630b5521f2d0/receipt.json",
+      "source_sha256": "c5ee90958ab5045ae2f5204913331a50610f1c8f9941787f08e980cae8e6d0e5",
+      "olean_sha256": "af6617c9a0a31f6d0188396307fa3efd9a3608a8361c252d931aa16b0bd74be1"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/AllocationFlowSpec.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/7d40b232ff75cf8c2d98a046b91af743278d393a/receipt.json",
+      "source_sha256": "2ab14bbcc8bc114eb00a1c63c55adfbb42ff749af781481eaf072077c5109e72",
+      "olean_sha256": "fd0f9c6c25767fe30b806dcae389e7b49c72ce3501b895cc3822ac73696e46c6"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/AllocationFlow.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/7d40b232ff75cf8c2d98a046b91af743278d393a/receipt.json",
+      "source_sha256": "cb5d67055e515e193d2cd64207967df0e2a937cd95b05a901af2e7119f56682b",
+      "olean_sha256": "21dd1a5efdebc2101e3f1890795f467833ccc507e35e92c7533812b8642ded52"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/CallSpec.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/d2419a20db505dfde80c476407cd8b142c8e30a8/receipt.json",
+      "source_sha256": "5fa67fcb9a60b075be89338e9ab3974a7b13a7275d3a900c7e311f0cc25e70a7",
+      "olean_sha256": "e119d9bb630de714399fe879795deaf60440f6cbc05c064dfb2b957248b998c9"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/CallFlow.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/d2419a20db505dfde80c476407cd8b142c8e30a8/receipt.json",
+      "source_sha256": "02dbb2abe1326bcd2d29a75af4df615e54cc79c1425cfc899eb27ca2014280e0",
+      "olean_sha256": "73fb5eb515c95093f7348cb0158836fe7e3606cd814111aed00d618fdc1c8083"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/WithdrawalCalls.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/03e0f09fd4b228a20e85b592c2a09e107cd8071c/receipt.json",
+      "source_sha256": "9b915c0b978941a81add086b8134e92b16b0efe941aed2746a89bf71cdc3c634",
+      "olean_sha256": "5fcfbcaa78747932889cb8fb30d9071f66d659214c111e856f5b2eba60679eb2"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/BalanceSpec.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/103b65e5a730e0f46676c5646f94832b124e0697/receipt.json",
+      "source_sha256": "08323391ebd2af2fcc9530c2fa3d793a9dc270bd79583886a3cb3c4a9f1b5c4e",
+      "olean_sha256": "c9e2222936a83fa49bc2c9cede0208877cf9d9f936ee62e6f473601678aa3851"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/Balance.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/103b65e5a730e0f46676c5646f94832b124e0697/receipt.json",
+      "source_sha256": "3938834fef06bd5bfbcfeacf624e2a839aecac6f5ec5f3739151dec7616eb352",
+      "olean_sha256": "30d93b4e99e49c34fab0bac674235923790a7e66bcc577075022f1873ecd1eb8"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/CalleeBalance.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/c89787d5c6228afc04b4eb359ca66482c850144d/receipt.json",
+      "source_sha256": "738ea9a345723e7ec46d010d6188e0781f7e8176ed9b9fdfd1cfa0600d341ed3",
+      "olean_sha256": "a24d595c48ba27bebc5399b91933848196f6338ce19d7a830613f840a6120e65"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/WithdrawalBalance.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/e1fc0aebd77fe022a3548d86b6a174fdbf7e5d34/receipt.json",
+      "source_sha256": "e2791dddd533ee583dc599d6ce821f04a2ffaad5b74f8296e845a7d8106216c9",
+      "olean_sha256": "c981eae315d0288d91fe938f367fc06f244e0f4122c5025ce95239aa2f25e5e2"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/AuthorizationBalance.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/48a7fad44c41df1305e27c2245f3a46563b1da79/receipt.json",
+      "source_sha256": "0861f399fb64149f41376f345263b13f2b4d313ce16c4e99f363b621a82539a9",
+      "olean_sha256": "856ed27288db1b9c3ed4659dfd0e377b3a4ab1cd795719e9daef8a2e593e602d"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/CallData.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/e45d4d309cd0bdafe82be8ba8caeb550b93706ad/receipt.json",
+      "source_sha256": "182787dda65d6cc315048e89212e1ef1bdb9d4c6a2084dad5413c303485d65eb",
+      "olean_sha256": "eacbb505f61c83f7df1d318e924cbcc78c00420cd650b8494bce3e052237cb9e"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/Report.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/4f2b6867518337bc12acd8806fb1b463ff19c516/receipt.json",
+      "source_sha256": "a4e8e4feb5740819a87cb8d12553fe76fed13c0d251faaa80ff28f986db2745b",
+      "olean_sha256": "569d2c869ea7f6156376252366a9629dd2f7b3fa4e4299ea8856b88e7c2c3467"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/ReportAccountingSpec.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/227d440fea51aff838c3e689dc9536d042308cab/receipt.json",
+      "source_sha256": "fef546517872d51bba78f0e3c5e3612212641c29bda1c230ae715e8af9134688",
+      "olean_sha256": "cf8ec8a09d525e66eab0b64a1d717bde40cd76270f27bf36c83b509a18646a03"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/ReportAccounting.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/227d440fea51aff838c3e689dc9536d042308cab/receipt.json",
+      "source_sha256": "d7ebc44374ff94f5377af871fe54c0904bde49a046d68e4f91b57055b85e3648",
+      "olean_sha256": "3d313685aecff26264c735a9f0a53a0cc61db286a14654db941b695ca4b95d32"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/ReportStages.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/043a845b5db3ef538eff0cf4e6328f400375ccc8/receipt.json",
+      "source_sha256": "486880fccc242d1da1ae67e0609e97d01031f2038b24f5bf717739e5546abc65",
+      "olean_sha256": "d627807bc1477d637919e3fcb3bae0a76dad13f5ca0ec7fa0723833ac9609683"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/ReportSpec.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/043a845b5db3ef538eff0cf4e6328f400375ccc8/receipt.json",
+      "source_sha256": "2e0119257cd2f663ac1e6d61b876842ed9644e0346637210b3e5cfffedbe0045",
+      "olean_sha256": "1c2f699f5ec0bc0852d2ba7d136c296594d29a1d1844384a54cc054636119101"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/ReportParent.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/043a845b5db3ef538eff0cf4e6328f400375ccc8/receipt.json",
+      "source_sha256": "1073df45ae10e5b3817260a2796c545ddc34023d7c4b224c7824b47dbe7b4820",
+      "olean_sha256": "ac3e02cf3b4b48b6c2708755ce719e8230086ab9573cbc0128d84af96885f1eb"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/OptionalCallSpec.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/63502ce2fbd0083d84e7e131d71532dc58aa766a/receipt.json",
+      "source_sha256": "af41378a7e36c08a8eb2467a2534cb41a9b5d42b96dde54964333397ff883cbb",
+      "olean_sha256": "ee1345ebb7a1fa394d8e1b1d9b03abfd01559ec7b107083b3e252dbe40ed6fec"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/ReportCalls.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/63502ce2fbd0083d84e7e131d71532dc58aa766a/receipt.json",
+      "source_sha256": "d29d8a9151586bef1f02e941b6c67f671036d76b7677850c6866d1a91b71ebd6",
+      "olean_sha256": "bc7636860ceaf085b96b5bd7276a2f375c32f3581ec9d0431acbc776d7e32f42"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/CallDataFlow.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/2d357ae43ee340d38aa5189f6cab0e40604ab05e/receipt.json",
+      "source_sha256": "1a15f0a863475bcc7dac4786b936c3d7d407a376b69c69be8699ac872c4fcdb0",
+      "olean_sha256": "fba476ad0b26ae7b5956c13e7d227b8bd1cd84b432633714eb75622ee839ffd9"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/ReportLookup.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/2d357ae43ee340d38aa5189f6cab0e40604ab05e/receipt.json",
+      "source_sha256": "51aebca4d341069b4bb37b1c5ab52b83c167726d743e35d64e448749c71d9f6d",
+      "olean_sha256": "4ca5ac89fed6d27c941d361114733064f8a3bfee33090e3c5b253a3f96432ad7"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/ReportRules.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/2d357ae43ee340d38aa5189f6cab0e40604ab05e/receipt.json",
+      "source_sha256": "8f6a74f1392344e90f8658069aedc1e28b063e6040ca176b9318883b551a3878",
+      "olean_sha256": "696f4abf68fcf58f3a79e1b4cb6962f854491588575a29872bccf1c15402c682"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/ReplyABI.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/80ae948313de296a267debed4a34792f823226a8/receipt.json",
+      "source_sha256": "ba8648d9a837ce31560424f0b84db5b0e206abb40585137fcf6a7bd0c37e7544",
+      "olean_sha256": "29b113b92acbbd2616285d054fc28c98c3213070b110e397e0ccc201f0aa8b98"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/VaultCallbacks.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/80ae948313de296a267debed4a34792f823226a8/receipt.json",
+      "source_sha256": "e04c655bb801ee6bc19ba00a6f044fdc234e2bf29f6f4f2a066403ef6f7ce10a",
+      "olean_sha256": "4d0f8cfdd3310f8eff634cd042c27d494160854bd06f81082279cc2e03a62f6d"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/Vaults.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/80ae948313de296a267debed4a34792f823226a8/receipt.json",
+      "source_sha256": "7c3139f68b9c93d2e95f781fb946790371dced4475192b459979dc9eee503f78",
+      "olean_sha256": "fdc62ffd4e14674889623d41459afce8985528e6f7735a470d94a1f328ed7ef8"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/VaultSpec.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/26a09e7a4872a317824aab3461d9696aec48b2eb/receipt.json",
+      "source_sha256": "3672999a353ecf5768dda09060bc7b338b7fa0a0c8a358dd42957d1232a3bbab",
+      "olean_sha256": "ed0778c8bcc6d5c1f2934adcc883eef924c6d431090ae1f349379813e861539b"
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioReserve1/VaultRules.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/26a09e7a4872a317824aab3461d9696aec48b2eb/receipt.json",
+      "source_sha256": "c685c72c4446043df8e18772e6afafa0a272eb3b5d172f5d6e2e67499a598a70",
+      "olean_sha256": "918c47c25840a52ba9941e64194feb0c90da23510ad1b893ee34a206c5cf71de"
+    },
+    {
+      "source": "LidoSRv3/Tests/TrioReserve1/VaultCases.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/80ae948313de296a267debed4a34792f823226a8/receipt.json",
+      "source_sha256": "87bad9e46e6bacaa9842c9c3167b398f83b8dfaf6886a112da48f80a452e18c7",
+      "olean_sha256": "a49cc6b0b8af70b6014db661e1695d59e55989c289156ee7137b5a851d7baacb"
+    },
+    {
+      "source": "LidoSRv3/Tests/TrioReserve1/ReportCases.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/4f2b6867518337bc12acd8806fb1b463ff19c516/receipt.json",
+      "source_sha256": "767d083daca56305c379d75c5a1746409b5eba91b381e0eed27f631e2be56f28",
+      "olean_sha256": "0b62173b0aae1e54b08b095c4174b79f23f520277589dcfa02a0239cba3037e1"
+    },
+    {
+      "source": "LidoSRv3/Tests/TrioReserve1/ReportDifferential.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/4f2b6867518337bc12acd8806fb1b463ff19c516/receipt.json",
+      "source_sha256": "6f30f9638554047ef76ff858dc5b72b6057d03fe512d7ea039c2ee86950eb9a1",
+      "olean_sha256": "ed88d75310b04fd9af2412107a6baacf98a526fd2b10314ed7a26dcbe4adc92d"
+    },
+    {
+      "source": "LidoSRv3/Tests/TrioReserve1/VaultDifferential.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/86ec8bf257ad8244f1a7ef4ae6c194c22f3ba4b5/receipt.json",
+      "source_sha256": "127d66c679a4597e9fa1d92b5c2587994e4a6d32f4a1fc67b25caab020b01767",
+      "olean_sha256": "1807b2fd4be2188b4ada87db6403ebd2c9795382380fa11e6af62eacb3d9135d"
+    },
+    {
+      "source": "LidoSRv3/Tests/TrioReserve1/Foundations.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/2e4b6a50f68077d65a3d716522f9818fafd50073/receipt.json",
+      "source_sha256": "268fbe724132adf67e00bb6e6dd90f1063bd03c545c1749e52d94f69be77d1ab",
+      "olean_sha256": "397153e3add16521669f5e4e005c0229fc298de3c79841b146126135f80f99b2"
+    },
+    {
+      "source": "LidoSRv3/Tests/TrioReserve1/OracleMutants.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/2e4b6a50f68077d65a3d716522f9818fafd50073/receipt.json",
+      "source_sha256": "71456e3f7055cca8509052d588e3024066e8f69c71c226d3b91c764912657803",
+      "olean_sha256": "6101f4f5480c3c0299fea7bf6f22156a458048771246376085b2203eec6fa780"
+    },
+    {
+      "source": "LidoSRv3/Tests/TrioReserve1/Differential.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/2e4b6a50f68077d65a3d716522f9818fafd50073/receipt.json",
+      "source_sha256": "5f2bebe45f983bffc4e85095f536942780bf49c630a5ef3e271492c2fffa1fe5",
+      "olean_sha256": "b00c463072d68bedf913bcce7eb53a257c369e7842e7b0a2713f13a985bf422d"
+    },
+    {
+      "source": "LidoSRv3/Tests/TrioReserve1/AragonDifferential.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/5ff24074eb374d5b79287991ece3e5206da95bfc/receipt.json",
+      "source_sha256": "b25074caacb34973adff9458349e07c4d2168b3a887b474b857402bd90f08225",
+      "olean_sha256": "31054f6fa9c69b5cd92f975608d31f39cc4ea174dda6c386d0b84faab52bf2e2"
+    },
+    {
+      "source": "LidoSRv3/Tests/TrioReserve1/KernelDifferential.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/4917545c7aad3093bfdd6ddfa1dda4ff2cae2618/receipt.json",
+      "source_sha256": "617e29f139faaee264eca14526840ad34f5c6e403c290a1f8b8cf6243d74983d",
+      "olean_sha256": "433cf3234d2d27a6616508b3c839acea3db7b759896bdf7fa9b2f3c10e454a1c"
+    },
+    {
+      "source": "LidoSRv3/Tests/TrioReserve1/ACLDifferential.lean",
+      "receipt": "audit/trio/reserve1/receipts/component-checks/c5858d1f0af9e2132982cce5067f4eceed42857c/receipt.json",
+      "source_sha256": "b82fdb8ee9988a4ef7ef81f64880b4cb2398f7320d2abf5f2616b95c42bd7074",
+      "olean_sha256": "05bec9218776aa7d605913880e0678936a473ff59e4e3ed3eca86c9f4eeef3e2"
+    }
+  ],
+  "axioms": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "baseline_receipt": "callback-rules-baseline-checks.json",
+  "dependency_revisions": [
+    {
+      "name": "verity",
+      "rev": "e977aaad6e1a9e92e0132d41b3d33a14135a4d46"
+    },
+    {
+      "name": "evmyul",
+      "rev": "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9"
+    },
+    {
+      "name": "mathlib",
+      "rev": "fabf563a7c95a166b8d7b6efca11c8b4dc9d911f"
+    },
+    {
+      "name": "plausible",
+      "rev": "63045536fe95024e6c18fc7b48e03f506701c5bc"
+    },
+    {
+      "name": "LeanSearchClient",
+      "rev": "c5d5b8fe6e5158def25cd28eb94e4141ad97c843"
+    },
+    {
+      "name": "importGraph",
+      "rev": "5c7542ed018c78194f1e2b903eaf6a792b74c03d"
+    },
+    {
+      "name": "proofwidgets",
+      "rev": "24b0d9dc081c5423f8eec7e866c441e5184f29d9"
+    },
+    {
+      "name": "aesop",
+      "rev": "e3cb2f741431ce31bf73549fb52316a57368b06f"
+    },
+    {
+      "name": "Qq",
+      "rev": "f46324995fca5f0483b742e4eb4daec7f4ee50d2"
+    },
+    {
+      "name": "batteries",
+      "rev": "fa08db58b30eb033edcdab331bba000827f9f785"
+    },
+    {
+      "name": "Cli",
+      "rev": "92564e5770e4d09f2d86dfbf8ada1e9c715b384c"
+    }
+  ],
+  "runtime_source_commit": "c5858d1f0af9e2132982cce5067f4eceed42857c",
+  "runtime_receipt": "acl-summary.json",
+  "prior_runtime_tested_sources_unchanged": true,
+  "proof_only_changed_sources": [
+    "LidoSRv3/Audit/Source/TrioReserve1/ACLBounds.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/ACLLeaf.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/ACLLeafSpec.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/ACLLogic.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/ACLLogicSpec.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/ACLPermission.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/ACLPermissionSpec.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/ACLTree.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/ACLTreeSpec.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/AllocationFlow.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/AllocationFlowSpec.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/AuthorizationBalance.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/Balance.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/BalanceSpec.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/CallDataFlow.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/CallFlow.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/CallSpec.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/CalleeBalance.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/FrameRead.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/FrameReadSpec.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/Lookup.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/LookupSpec.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/OptionalCallSpec.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/ReportAccounting.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/ReportAccountingSpec.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/ReportCalls.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/ReportLookup.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/ReportParent.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/ReportRules.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/ReportSpec.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/ReportStages.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/Spend.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/SpendSpec.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/Status.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/StatusSpec.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/Tail.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/TailSpec.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/Target.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/TargetSpec.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/WithdrawalBalance.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/WithdrawalCalls.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/WithdrawalParent.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/WithdrawalSpec.lean",
+    "LidoSRv3/Tests/TrioReserve1/LiveTrust.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/VaultSpec.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/VaultRules.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/CallbackSpec.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/CallbackRules.lean"
+  ],
+  "executable_extensions": [
+    "LidoSRv3/Audit/Source/TrioReserve1/CallData.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/ReplyABI.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/Report.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/VaultCallbacks.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/Vaults.lean",
+    "LidoSRv3/Tests/TrioReserve1/ReportCases.lean",
+    "LidoSRv3/Tests/TrioReserve1/ReportDifferential.lean",
+    "LidoSRv3/Tests/TrioReserve1/VaultCases.lean",
+    "solidity/trio-reserve1/execute-report.cjs",
+    "solidity/trio-reserve1/compile-vaults.cjs",
+    "solidity/trio-reserve1/execute-vaults.cjs",
+    "LidoSRv3/Tests/TrioReserve1/VaultDifferential.lean"
+  ],
+  "report_runtime_source_commit": "4f2b6867518337bc12acd8806fb1b463ff19c516",
+  "report_execution": "audit/trio/reserve1/receipts/report-execution-4f2b6867518337bc12acd8806fb1b463ff19c516",
+  "report_runtime_sources_unchanged": true,
+  "report_runtime_rerun": false,
+  "report_runtime_receipt": "report-execution-summary.json",
+  "vault_evm_execution": true,
+  "vault_model_cases": [
+    "PASS nested-success-transfers-events",
+    "PASS reward-cap-and-report-input",
+    "PASS empty-reward-vault-skips-callback",
+    "PASS withdrawal-funds-error-root-rollback",
+    "PASS reward-counter-overflow-nested-rollback",
+    "PASS zero-withdrawal-guard",
+    "PASS callback-address-admission",
+    "PASS short-vault-calldata",
+    "PASS nonpayable-vault"
+  ],
+  "selector_receipt": "vault-source-selectors.json",
+  "scope": "Independent callback lookup/admission and post-lookup reward-counter update rules with physical fresh-locator and independent CALL/ABI observations. Exact bidirectional body/root outcome/world/attempt correspondence and existence for both callbacks. Reward commit stores the full bounded sum; withdrawal commit preserves core; both commits preserve incoming balances. Entry dispatch, primitive/deployment and enclosing callee/report composition remain open. Prior 12-case vault EVM receipt applies to unchanged runtime sources; no new EVM run claimed.",
+  "full_gates": "Missing; no supported complete-source/dependency transport; prior infrastructure receipts retained, no new submission",
+  "certification": "Independent review required; not self-certified",
+  "vault_runtime_source_commit": "86ec8bf257ad8244f1a7ef4ae6c194c22f3ba4b5",
+  "vault_execution": "audit/trio/reserve1/receipts/vault-execution-86ec8bf257ad8244f1a7ef4ae6c194c22f3ba4b5",
+  "vault_compilation": "audit/trio/reserve1/receipts/vault-compilation-14cbff3f33c18ee94120d64a94be54782a51f80d/receipt.json",
+  "vault_cases": [
+    "nested vault transfers",
+    "reward cap",
+    "empty reward vault",
+    "withdrawal insufficient funds",
+    "reward counter overflow",
+    "zero amounts",
+    "queue rejection after vault transfers",
+    "stopped",
+    "unauthorized",
+    "accounting overflow after transfers",
+    "accounting underflow after transfers",
+    "truncation with actual rewards"
+  ],
+  "vault_runtime_sources_unchanged": true,
+  "vault_runtime_rerun": false
+}

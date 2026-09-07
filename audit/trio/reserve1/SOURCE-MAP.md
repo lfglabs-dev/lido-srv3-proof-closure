@@ -217,3 +217,14 @@ success commit and original-world failure restoration independently of executors
 The raw callback interpreter and dispatch/deployment binding remain boundaries.
 Evidence: receipts/vault-rules-summary.json; unchanged runtime sources retain their
 twelve production-vault comparisons without a new EVM execution claim.
+
+## Independent Lido callback correspondence
+
+`CallbackSpec.Receives` gives fresh lookup, address admission and update ordering;
+`RewardUpdate` gives post-lookup checked addition and write/event commitment.
+`CallbackRules` binds these to Lido.sol:517-533 with physical locator, independent
+CALL and typed reply rules. Body and root correspondences and existence cover both
+callbacks. Counter/commit lemmas retain the full bounded sum and explicit core/
+balance preservation. Entry dispatch/reply encoding and enclosing report composition
+remain open. Evidence: receipts/callback-rules-summary.json; existing runtime suite
+sources remain unchanged, with no new execution run claimed.
