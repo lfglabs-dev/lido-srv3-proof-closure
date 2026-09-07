@@ -27,8 +27,10 @@ Tail.Withdrawal now substitutes independent seed arithmetic and ordered receiver
 tail rules, covering overflow before a call and every receiver outcome. Spend.Withdrawal now also substitutes complete spending control with physical
 arithmetic bounds, prepared writes, saved locals and exact frame-failure worlds.
 FrameRead.Withdrawal now substitutes physical oracle lookup and complete
-64-byte frame tuple rules through spending. Allocation semantics and CALL/deployed
-primitive binding remain the lower interfaces.
+64-byte frame tuple rules through spending. AllocationFlow.Withdrawal now substitutes exhaustive allocation rules using saved
+buffer/reserve observations and independent maximal-priority arithmetic. All major
+internal stages are expanded; CALL/deployed primitive binding remains the execution
+boundary.
 
 1. WithdrawalSpec/WithdrawalParent now cover all eight parent paths with
    bidirectional exact return/world/trace correspondence to actual stage
@@ -36,7 +38,7 @@ primitive binding remain the lower interfaces.
    lookup/CALL/ABI/bunker/post-call pause rules for the status stage. Discharge
    Lookup.Withdrawal now also substitutes physical locator/CALL/ABI/address rules
    for queue and router lookup. Discharge CALL/deployed binding and the remaining
-   allocation interface with
+   CALL/deployed interfaces with
    independent semantics and concrete deployed source across all paths. Complete
    the independent withdrawal interaction specification and full
    return/revert/world/ordered-call/event correspondence. Allocation is now tied

@@ -1,5 +1,21 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Complete allocation flow and internal withdrawal substitution
+
+`AllocationFlowSpec` independently orders lookup, queue CALL, demand decoding and
+allocation. Buffer/reserve observations are saved before calls. Success uses the
+existing maximal-priority allocation relation; uniqueness connects it to physical
+source allocation, without replacing the specification by the executor's min formula.
+`AllocationFlow` covers every allocation failure and success with exact returned
+world and ordered calls, including arbitrary callee storage changes.
+
+The rules are substituted through spending into `AllocationFlow.Withdrawal`, with
+bidirectional exact parent correspondence. All major internal stage interfaces are
+now expanded into independent control/arithmetic rules and physical projections.
+The remaining source execution boundaries are CALLs: primitive and deployed-callee
+binding, resource/world closure, other writers and full integration gates remain
+open. Immutable validation follows checks. Runtime execution source is unchanged.
+
 ## Complete frame getter rules substituted through spending
 
 `FrameReadSpec` independently orders oracle lookup, oracle CALL and complete
