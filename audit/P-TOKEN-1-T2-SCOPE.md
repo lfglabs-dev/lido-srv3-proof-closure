@@ -3,7 +3,7 @@
 ## Exact source anchor
 
 Pinned upstream source is
-[`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`](https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/WithdrawalQueue.sol):
+[`lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`](https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.9/WithdrawalQueue.sol):
 
 - `WithdrawalQueue.requestWithdrawals`, lines 125–135: `_owner == address(0)`
   selects `msg.sender` at line 130, then each amount is checked at line 133

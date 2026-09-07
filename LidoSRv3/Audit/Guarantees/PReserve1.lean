@@ -8,7 +8,12 @@ open LidoSRv3.Audit.SolidityReserve
 
 def guarantee : Guarantee := ⟨.pReserve1, [.model, .source, .verityTx]⟩
 
-/-- Registered Wave 1 parent for P-RESERVE-1. Strengthened along the three
+/-- **P-RESERVE-1, source plane.** Under a fresh withdrawal-queue cache, any
+committed `withdrawDepositableEther` spend passed the scoped guards, spent a
+nonzero amount, took it from the depositable partitions only, and left the live
+queue-facing withdrawals reserve unchanged.
+
+Registered Wave 1 parent for P-RESERVE-1. Strengthened along the three
 axes `report/P-RESERVE-1.md` calls out (issues #1, #2, #5):
 
 * the premise is `modelWithdrawDepositableEther`, the full wrapper
@@ -79,6 +84,10 @@ theorem source_spend_preserves_withdrawal_reserve
         · exact hAmt
 
 /--
+**P-RESERVE-1, Verity plane.** The executable `withdrawWithGuards` observes the
+abstract reserve transaction `specTx`, and every revert restores the pre-call
+snapshot.
+
 Faithful VERITY_TX closure for P-RESERVE-1. This theorem starts with the actual
 `Verity.Contract.run` result of the source-shaped reserve spend and proves that
 its committed/reverted observable transition is the abstract reserve

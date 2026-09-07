@@ -6,10 +6,8 @@ Verity Executable Contract theorem (or honest partial state), and one actionable
 General Yul/EVM/deployment refinement is deliberately not an assurance lane.
 """
 
-import argparse
-import hashlib
-import json
-import re
+import argparse, hashlib
+import json, re
 import subprocess
 import sys
 from pathlib import Path
@@ -23,8 +21,9 @@ import markdown_text  # noqa: E402  (sibling module, located above)
 
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
-R1_REVIEW_BASE = "25fbc6e0493948a866a49cda2962d3e897fa00e3"
-# The report calls this commit its certified review basis.  Keep the exact
+SOURCE_FIDELITY = AUDIT / "SOURCE-FIDELITY.md"
+R1_REVIEW_BASE = "aed5a18fa059a6907e89de59dbc1bb4434f73670"
+# The report records this commit as its Stage A disclosure input basis.  Keep the exact
 # generator inputs bound both to that Git object and to their expected bytes:
 # a changed registry, source map, or Trust allowlist must not be presented as
 # if it had that review.
@@ -32,8 +31,8 @@ R1_REVIEW_BASE = "25fbc6e0493948a866a49cda2962d3e897fa00e3"
 # report.  A normal regeneration may never pair changed family content with a
 # stale certified basis.
 R1_REPORT_INPUT_SHA256 = {
-    "audit/guarantees.yaml": "39fb757cbc896a2cbae21830a633e1cb6831fbcc993b832bce4ea1f5f4215948",
-    "audit/source-map.yaml": "ee8847bdf481fad77e8d99bad5be050d723eaa9e3287ec6930417b334d715857",
+    "audit/guarantees.yaml": "22d2420714906d566f6250ddc5b0b50d0815567f0e8212ce37d4fd1ac34bed30",
+    "audit/source-map.yaml": "e592f4e15e9d3ce8ffdcefdc87bb664ac404c6d0b7447e29e35d5c60611eaba6",
     "audit/trust-native-decide-allowlist.txt": "4874951cd0717f16756f3f644c424f06bdbbfcca1561173b32fd134b1fb6730c",
 }
 CANONICAL_IDS = [
@@ -64,7 +63,7 @@ ASSUMPTION_FIELDS = {
     "violation_impact", "validation", "removal_path",
 }
 PINNED = {
-    "lido_core": ("https://github.com/lidofinance/core.git", "af095e48bbc1c3841c2c9936219c8461af01056b"),
+    "lido_core": ("https://github.com/lidofinance/core.git", "17005714f151e5502c559932319a3f2f74ac2436"),
     "verity": ("https://github.com/lfglabs-dev/verity.git", "e977aaad6e1a9e92e0132d41b3d33a14135a4d46"),
     "evmyullean": ("https://github.com/lfglabs-dev/EVMYulLean.git", "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9"),
     "mathlib": ("https://github.com/leanprover-community/mathlib4.git", "fabf563a7c95a166b8d7b6efca11c8b4dc9d911f"),
@@ -72,20 +71,20 @@ PINNED = {
 EXPECTED_AUTHORITY = "Lean theorem statements and proofs are authoritative; metadata classifies but never closes evidence."
 EXPECTED_OBJECTIVE = "Prove an abstract Lean model, a Verity Lean library program, and a Verity Executable Contract for each guarantee, or classify the gap. General Yul/EVM/deployment closure is out of scope; SSZ alone carries a targeted Yul binding."
 EXPECTED_CANONICAL_CLAIMS = {
-    "P-ALLOC-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAlloc1.checked_execute", "CHECKED", "LidoSRv3.Audit.Guarantees.PAlloc1.verity_tx_simulates_allocation_count_from_storage", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
-    "P-ALLOC-2": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAlloc2.step_correspondence_and_full_loop_conservation", "CHECKED", "LidoSRv3.Audit.Guarantees.PAlloc2.verity_tx_simulates_min_first_distribution", "IMPLEMENTATION_PENDING", ("A-HANDWRITTEN-MINFIRST", "A-VERITY-SCAFFOLD")),
-    "P-DEPOSIT-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back", "CHECKED", "LidoSRv3.Audit.Guarantees.PDeposit1.NFrame.verity_tx_composes_nframe_deposit", "IMPLEMENTATION_PENDING", ("A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-DEPOSIT-CONTRACT", "A-DEPOSIT-32-ETHER")),
-    "P-TOPUP-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back", "CHECKED", "LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source_with_nonzero_wrap_close", "IMPLEMENTATION_PENDING", ("A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-TOPUP-NOWRAP", "A-VERITY-SCAFFOLD", "A-TOPUP-BEACON-ADDRESS")),
-    "P-ACCOUNT-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAccount1.mint_after_read_discipline", "CHECKED", "LidoSRv3.Audit.Guarantees.PAccount1.verity_tx_simulates_oracle_report", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
-    "P-RESERVE-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PReserve1.source_spend_preserves_withdrawal_reserve", "CHECKED", "LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
-    "P-CONSOLIDATION-ETH-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PConsolidationEth1.eth_flow_parent_at_canonical", "CHECKED", "LidoSRv3.Audit.Guarantees.PConsolidationEth1.verity_tx_success_and_revert_partition", "IMPLEMENTATION_PENDING", ("A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-CANONICAL-REQUEST-ADDRESS")),
-    "P-ADDRESS-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAddress1.universal_address_writer_equivariance", "CHECKED", "LidoSRv3.Audit.Guarantees.PAddress1.abstract_source_verity_tx_address_equivariance", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
-    "P-TOPUP-2": ("CHECKED", "LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap", "CHECKED", "LidoSRv3.Audit.Guarantees.PTopup2.verity_tx_simulates_topup2_spec", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
-    "P-CONSOLIDATION-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity", "CHECKED", "LidoSRv3.Audit.Guarantees.PConsolidation1.verity_tx_simulates_consolidation", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-CONSOLIDATION-GATEWAY-NONZERO")),
-    "P-SSZ-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.deposit_root_iff", "CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.verity_tx_simulates_ssz_encoding", "IMPLEMENTATION_PENDING", ("A-SHA256-FFI", "A-PERFECT-HASH", "A-MULTI-NODE-TRANSPORT", "A-SOLC-TRUSTED", "A-YUL-INTERFACE")),
+    "P-ALLOC-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAlloc1.checked_execute", "CHECKED", "LidoSRv3.Audit.Guarantees.PAlloc1.verity_tx_simulates_allocation_count_from_storage", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-SOLC-TRUSTED", "A-RUNTIME-PROVENANCE")),
+    "P-ALLOC-2": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAlloc2.step_correspondence_and_full_loop_conservation", "CHECKED", "LidoSRv3.Audit.Guarantees.PAlloc2.verity_tx_simulates_min_first_distribution", "IMPLEMENTATION_PENDING", ("A-HANDWRITTEN-MINFIRST", "A-VERITY-SCAFFOLD", "A-SOLC-TRUSTED", "A-RUNTIME-PROVENANCE")),
+    "P-DEPOSIT-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back", "CHECKED", "LidoSRv3.Audit.Guarantees.PDeposit1.NFrame.verity_tx_composes_nframe_deposit", "IMPLEMENTATION_PENDING", ("A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-DEPOSIT-CONTRACT", "A-DEPOSIT-32-ETHER", "A-SOLC-TRUSTED", "A-RUNTIME-PROVENANCE")),
+    "P-TOPUP-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back", "CHECKED", "LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source_with_nonzero_wrap_close", "IMPLEMENTATION_PENDING", ("A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-TOPUP-NOWRAP", "A-VERITY-SCAFFOLD", "A-TOPUP-BEACON-ADDRESS", "A-SOLC-TRUSTED", "A-RUNTIME-PROVENANCE")),
+    "P-ACCOUNT-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAccount1.mint_after_read_discipline", "CHECKED", "LidoSRv3.Audit.Guarantees.PAccount1.verity_tx_simulates_oracle_report", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-SOLC-TRUSTED", "A-RUNTIME-PROVENANCE")),
+    "P-RESERVE-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PReserve1.source_spend_preserves_withdrawal_reserve", "CHECKED", "LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-SOLC-TRUSTED", "A-RUNTIME-PROVENANCE")),
+    "P-CONSOLIDATION-ETH-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PConsolidationEth1.eth_flow_parent_at_canonical", "CHECKED", "LidoSRv3.Audit.Guarantees.PConsolidationEth1.verity_tx_success_and_revert_partition", "IMPLEMENTATION_PENDING", ("A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-CANONICAL-REQUEST-ADDRESS", "A-SOLC-TRUSTED", "A-RUNTIME-PROVENANCE")),
+    "P-ADDRESS-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAddress1.universal_address_writer_equivariance", "CHECKED", "LidoSRv3.Audit.Guarantees.PAddress1.abstract_source_verity_tx_address_equivariance", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-SOLC-TRUSTED", "A-RUNTIME-PROVENANCE")),
+    "P-TOPUP-2": ("CHECKED", "LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap", "CHECKED", "LidoSRv3.Audit.Guarantees.PTopup2.verity_tx_simulates_topup2_spec", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-SOLC-TRUSTED", "A-RUNTIME-PROVENANCE")),
+    "P-CONSOLIDATION-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity", "CHECKED", "LidoSRv3.Audit.Guarantees.PConsolidation1.verity_tx_simulates_consolidation", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-CONSOLIDATION-GATEWAY-NONZERO", "A-SOLC-TRUSTED", "A-RUNTIME-PROVENANCE")),
+    "P-SSZ-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.deposit_root_iff", "CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.verity_tx_simulates_ssz_encoding", "IMPLEMENTATION_PENDING", ("A-SHA256-FFI", "A-PERFECT-HASH", "A-MULTI-NODE-TRANSPORT", "A-SOLC-TRUSTED", "A-YUL-INTERFACE", "A-RUNTIME-PROVENANCE")),
 }
 EXPECTED_CANONICAL_DETAIL_SHA256 = {
-    "P-ALLOC-1": "c184a7c659c8ddbdc2af3461644eccce399496c51e9ab9beff1a0498124eab12",
+    "P-ALLOC-1": "9ad778510fac55548ab9b51cb802743fa33eabcc2908ffdbaae38bb59065a5f3",
     "P-ALLOC-2": "e5955a7a287a477ee8e21da15dabed644676f247d242035be35cf8db5f39f70e",
     "P-DEPOSIT-1": "768e8ca14a82e6185ec6cfaaa87365c708434f9a6281fa265eb332a8a10e8208",
     "P-TOPUP-1": "7097df87332a3b9f4996ae897b5619947c71d4bdc547dad407759174fa62212f",
@@ -93,7 +92,7 @@ EXPECTED_CANONICAL_DETAIL_SHA256 = {
     "P-RESERVE-1": "5b2e39b7d0f6ae09eabea8ee1f4ff5f02337921e576bb6786bb6b9063272b010",
     "P-CONSOLIDATION-ETH-1": "0bbd358a2b0ab770b4a88536e88ce9a32fa6bfdecbc83c70c519673505841017",
     "P-ADDRESS-1": "2aec78330a6f136e109160e4cca2c2da6e159dc2db719d28b260134d69e447aa",
-    "P-TOPUP-2": "ab0afa6dde459f2b29f0102aada3cd2df77e376b2c48a435b4081b32a9307c6e",
+    "P-TOPUP-2": "9fac92874b97a201f80be5b60508d84bedefdeed962c417aaa8b3323044b18dc",
     "P-CONSOLIDATION-1": "2fb9fc984cd8ded5ed7f11e749e5ba0356dc128ee8ea11ad59b30973778a0cdb",
     "P-SSZ-1": "34b6ab0e40f56dd44ffb44c1b37a090ffeb3880339d403022e172534a16cbb8a",
 }
@@ -104,6 +103,7 @@ EXPECTED_PRIORITIES = {
     "P-ADDRESS-1": "DONE", "P-TOPUP-2": "DONE", "P-CONSOLIDATION-1": "DONE",
     "P-SSZ-1": "DONE",
 }
+P_ALLOC1_LIVE_ROLLBACK_GAP = "Contract.run rollback after intermediate writes for AllocationTx.allocate; the cited revert_restores_snapshot theorem does not cover allocateLiveFromStorage"
 DEPOSIT_CONSTRUCTOR_FIXTURE = ROOT / "fixtures/solidity-reference/StakingRouter.constructor.L88-L106.sol"
 DEPOSIT_PROVENANCE_LEAN = ROOT / "LidoSRv3/Audit/Provenance/Deposit.lean"
 TRUST_NATIVE_DECIDE_ALLOWLIST = AUDIT / "trust-native-decide-allowlist.txt"
@@ -126,37 +126,24 @@ DEPOSIT_CONSTRUCTOR_SPAN = {
     ),
 }
 
-
 def load(path):
     return json.loads(path.read_text(encoding="utf-8"))
-
-
 def require(condition, message):
     if not condition:
         raise SystemExit(f"audit metadata error: {message}")
-
-
 def markdown_table_cell(value):
     """Render metadata as one Markdown table cell, never as table syntax."""
     return str(value).replace("\\", "\\\\").replace("|", "\\|").replace("\r\n", "<br>").replace("\n", "<br>").replace("\r", "<br>")
-
-
 def canonical_metadata_bytes(value):
     """Ignore JSON whitespace while binding every metadata value and shape."""
     return json.dumps(json.loads(value), sort_keys=True, separators=(",", ":")).encode()
-
-
 def canonical_review_input_bytes(relative, value):
     """Normalize structured review inputs while retaining exact text inputs."""
     if relative.endswith((".yaml", ".json")):
         return canonical_metadata_bytes(value)
     return value
-
-
 def nonempty_strings(value):
     return isinstance(value, list) and all(isinstance(x, str) and x.strip() for x in value)
-
-
 def validate_deposit_constructor_fixture():
     require(DEPOSIT_CONSTRUCTOR_FIXTURE.is_file(), "pinned StakingRouter constructor fixture is missing")
     source = DEPOSIT_CONSTRUCTOR_FIXTURE.read_bytes()
@@ -305,14 +292,27 @@ def validate_assumptions(data):
     ids = [row.get("id") for row in rows]
     require(len(ids) == len(set(ids)), "duplicate assumption id")
     for row in rows:
-        require(set(row) == ASSUMPTION_FIELDS, f"{row.get('id')}: assumption fields differ")
+        require(set(row) - {"scope"} == ASSUMPTION_FIELDS, f"{row.get('id')}: assumption fields differ")
+        require(row.get("scope", "global") == "global", f"{row.get('id')}: unknown assumption scope")
         require(re.fullmatch(r"A-[A-Z0-9-]+", row["id"]) is not None, f"{row['id']}: invalid assumption id")
         require(row["accepted"] is True, f"{row['id']}: assumption must be explicitly accepted")
         require(row["severity"] in {"LOW", "MEDIUM", "HIGH", "CRITICAL"}, f"{row['id']}: invalid severity")
         for field in ASSUMPTION_FIELDS - {"id", "accepted", "severity"}:
             require(isinstance(row[field], str) and row[field].strip(), f"{row['id']}: empty {field}")
     require("A-SOLC-TRUSTED" in ids and "A-SHA256-FFI" in ids, "explicit solc/SHA-256 trust boundaries are missing")
+    global_ids = {row["id"] for row in rows if row.get("scope") == "global"}
+    require(global_ids == {"A-SOLC-TRUSTED", "A-RUNTIME-PROVENANCE"}, "global assumptions differ from the compiler and deployment trust boundaries")
     return set(ids)
+
+
+def validate_global_assumptions(rows, assumptions_data):
+    """Every top-level guarantee row must carry every assumption scoped `global`."""
+    global_ids = {row["id"] for row in assumptions_data["assumptions"] if row.get("scope") == "global"}
+    for row in rows:
+        if row.get("parent_id") is not None:
+            continue
+        missing = sorted(global_ids - set(row["assumptions"]))
+        require(not missing, f"{row['id']}: global assumptions not linked: {', '.join(missing)}")
 
 
 def validate_classification(row, assumption_ids):
@@ -368,6 +368,7 @@ def validate_guarantees(data, assumption_ids):
         require(isinstance(row["next_gate"], str) and row["next_gate"].strip(), f"{row['id']}: empty next gate")
         require(set(row["reproduction"]) == {"command", "expected"} and all(isinstance(v, str) and v.strip() for v in row["reproduction"].values()), f"{row['id']}: reproduction record is incomplete")
         validate_classification(row, assumption_ids)
+        if row["id"] == "P-ALLOC-1": require(P_ALLOC1_LIVE_ROLLBACK_GAP in row["fidelity"]["missing"], "P-ALLOC-1: live rollback exclusion must be an open fidelity gap")
         if row["id"] in EXPECTED_CANONICAL_CLAIMS:
             require(row.get("roadmap_priority") == EXPECTED_PRIORITIES[row["id"]],
                     f"{row['id']}: roadmap priority differs")
@@ -486,24 +487,8 @@ README_UNRENDERED = re.compile(
     re.DOTALL | re.IGNORECASE,
 )
 
-# CommonMark type-6 HTML block openers: a line that starts with one of these
-# block-level element names causes everything until the next blank line to be
-# emitted as raw HTML, not parsed as Markdown.  Pipe characters on those
-# interior lines never render as table rows.
-_HTML_BLOCK_TAG = re.compile(
-    r"^ {0,3}</?(?:address|article|aside|base|basefont|blockquote|body|"
-    r"caption|center|col|colgroup|dd|details|dialog|dir|div|dl|dt|"
-    r"fieldset|figcaption|figure|footer|form|frame|frameset|h[1-6]|"
-    r"head|header|hr|html|iframe|legend|li|link|main|menu(?:item)?|"
-    r"meta|nav|noframes|ol|optgroup|option|p|param|section|source|"
-    r"summary|table|tbody|td|tfoot|th|thead|title|tr|track|ul)"
-    r"(?:[ \t>]|/>|$)",
-    re.IGNORECASE,
-)
-
-
-def _mask_readme(text):
-    """Position-preserving blank of non-rendered regions in the README.
+def _mask_non_rendered_markdown(text):
+    """Position-preserving blank of non-rendered regions in Markdown.
 
     A pipe line inside a code fence or HTML block is printed as raw text,
     not as a table row.  Searching the raw README let a table wrapped in
@@ -530,39 +515,12 @@ def _mask_readme(text):
     # Blank the remaining inline HTML constructs, preserving positions.
     masked = README_UNRENDERED.sub(blank, masked)
 
-    # Line-by-line pass: blank code fences and CommonMark type-6 HTML blocks.
-    # Code fences: a closing sequence repeats the opening character at least as
-    # many times; a backtick fence carries no backtick in its info string.
-    # Type-6 HTML blocks: a line whose first non-space token is a block-level
-    # element open/close tag causes everything until the next blank line to be
-    # raw HTML.  The detection uses the original line (before step 1 blanked
-    # the opening tag) so the block-tag pattern fires on the actual characters.
-    lines_m = masked.splitlines(True)   # output lines (positions preserved)
-    lines_o = text.splitlines(True)     # original lines (for HTML-block detection)
-    fence = None
-    html_block = False
-    for i, (ml, ol) in enumerate(zip(lines_m, lines_o)):
-        msk = ml.rstrip("\r\n")
-        orig = ol.rstrip("\r\n")
-        if fence is not None:
-            m = re.match(r"^ {0,3}(?P<seq>`{3,}|~{3,})[ \t]*$", msk)
-            if m and m.group("seq")[0] == fence[0] and len(m.group("seq")) >= fence[1]:
-                fence = None
-            lines_m[i] = "".join(" " if c not in "\r\n" else c for c in ml)
-        elif html_block:
-            if orig == "":  # blank line ends the HTML block
-                html_block = False
-            else:
-                lines_m[i] = "".join(" " if c not in "\r\n" else c for c in ml)
-        else:
-            m = re.match(r"^ {0,3}(?P<seq>`{3,}|~{3,})(?P<info>.*)$", msk)
-            if m and not (m.group("seq")[0] == "`" and "`" in m.group("info")):
-                fence = (m.group("seq")[0], len(m.group("seq")))
-                lines_m[i] = "".join(" " if c not in "\r\n" else c for c in ml)
-            elif _HTML_BLOCK_TAG.match(orig):
-                html_block = True
-                lines_m[i] = "".join(" " if c not in "\r\n" else c for c in ml)
-    return "".join(lines_m)
+    # Run the shared literal-region reader on the original source.
+    literal = gfm_table.mask_literal_regions(text)
+    # A character hidden by either reader stays hidden.
+    return "".join(" " if original != " " and " " in (literal_char, masked_char) else original
+                   for original, literal_char, masked_char
+                   in zip(text, literal, masked))
 
 
 def validate_readme_fidelity_disclosure(rows):
@@ -581,7 +539,7 @@ def validate_readme_fidelity_disclosure(rows):
     # nothing.  The masked version blanks every non-rendered region character-
     # for-character (preserving newlines), so positions in `masked_readme` are
     # identical to positions in `readme` and stray-row detection remains sound.
-    masked_readme = _mask_readme(readme)
+    masked_readme = _mask_non_rendered_markdown(readme)
     tables = [t for t in gfm_table.find_tables(masked_readme)
               if (t.header.cells[0].strip(), t.header.cells[1].strip(),
                   t.header.cells[-1].strip()) == README_HEADLINE_COLUMNS]
@@ -684,6 +642,26 @@ def validate_readme_fidelity_disclosure(rows):
             "comment or other unrendered markup, does not qualify the table above it")
 
 
+def validate_source_fidelity_gap_disclosure(rows):
+    total = sum(len(row["fidelity"]["missing"]) for row in rows[:len(CANONICAL_IDS)])
+    source_fidelity = SOURCE_FIDELITY.read_text(encoding="utf-8")
+    # A heading inside a fenced block or raw HTML comment is not a section a
+    # reader sees.  Keep positions while masking it, so the body selected below
+    # remains slice-compatible with the original source.
+    masked_source = _mask_non_rendered_markdown(source_fidelity)
+    disclosures = list(re.finditer(r"^## Stage A disclosure\s*$\n(?P<body>.*?)(?=^## |\Z)", masked_source, re.MULTILINE | re.DOTALL))
+    require(len(disclosures) == 1, "SOURCE-FIDELITY: require exactly one visible Stage A disclosure section")
+    disclosure = disclosures[0]
+    lead = re.match(r"(?P<paragraph>[^\n]*(?:\n(?!\s*\n)[^\n]*)*)(?:\n\s*\n|\Z)",
+                    disclosure.group("body"))
+    require(lead is not None, "SOURCE-FIDELITY: Stage A disclosure has no lead paragraph")
+    required = f"all {total} canonical fidelity-gap entries remain."
+    require(re.search(re.escape(required).replace(r"\ ", r"\s+"),
+                      markdown_text.rendered_text(lead.group("paragraph"))),
+            f"SOURCE-FIDELITY: Stage A disclosure lead paragraph must visibly disclose "
+            f"all canonical fidelity gaps as `{required}`")
+
+
 def validate():
     validate_deposit_constructor_fixture()
     registry = load(AUDIT / "guarantees.yaml")
@@ -694,8 +672,10 @@ def validate():
     assumption_ids = validate_assumptions(assumptions)
     validate_pins(lock, manifest, source_map)
     rows = validate_guarantees(registry, assumption_ids)
+    validate_global_assumptions(rows, assumptions)
     validate_r1_review_basis()
     validate_readme_fidelity_disclosure(rows)
+    validate_source_fidelity_gap_disclosure(rows)
     return rows
 
 
@@ -766,10 +746,10 @@ def rendered(rows, source_map):
         gap_note = "No row is gap-free."
     report = [header + "# R1 final auditor report\n\n",
         "## Decision\n\n",
-        f"Review basis: certified R1 input set `{R1_REVIEW_BASE}`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.\n\n",
+        f"Review basis: recorded input set (Stage A disclosure amendment; no proof-status upgrade) `{R1_REVIEW_BASE}`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.\n\n",
         "## Architecture and evidence boundary\n\n",
         "The evidence stack is: pinned Lido source spans → source-shaped/abstract Lean specifications → Verity Lean program and `Contract.run` transaction observables → named theorem and negative-mutant receipts. Revert theorems concern the modeled snapshot and journal. External calls, storage observations, and source correspondences have only the scope stated per row. Lean theorem names are authoritative; metadata records classification and fidelity, never proof progress.\n\n",
-        "Pinned upstream source is `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`; Verity is pinned in `audit/artifacts.lock.json`; Lean is `leanprover/lean4:v4.31.0`. Canonical source anchors are immutable permalinks in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance. Supplemental rows deliberately have no independent source-map target unless their parent mapping says otherwise.\n\n",
+        "Pinned upstream source is `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`; Verity is pinned in `audit/artifacts.lock.json`; Lean is `leanprover/lean4:v4.31.0`. Canonical source anchors are immutable permalinks in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance. Supplemental rows deliberately have no independent source-map target unless their parent mapping says otherwise.\n\n",
         "## Acceptance index — every registered claim\n\n",
         "One row per registered claim, with the number of fidelity gaps the "
         f"registry still records against it. {gap_note} The full "
@@ -852,6 +832,8 @@ def main():
         for name, content in views.items():
             require((AUDIT / name).read_text(encoding="utf-8") == content, f"{name} is stale; run scripts/audit_metadata.py generate")
         print(f"audit metadata v4 ok: {len(CANONICAL_IDS)} canonical guarantees + {len(SUBORDINATE_IDS)} subordinate evidence rows")
+
+
 
 
 if __name__ == "__main__":

@@ -6,7 +6,7 @@ import Mathlib.Data.Nat.Pairing
 
 This is a control-flow correspondence for
 `BeaconChainDepositor.sol` at
-`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`, functions
+`lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`, functions
 `_computeDepositDataRootWithAmount` (lines 110--135),
 `_computeSignatureRoot` (lines 137--146), and `_toLittleEndian64`
 (lines 148--153).  `sha256` is deliberately an opaque source-shape operation:

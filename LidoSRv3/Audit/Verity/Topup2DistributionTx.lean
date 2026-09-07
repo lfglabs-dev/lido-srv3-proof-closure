@@ -6,7 +6,7 @@ import Verity.Core.Model.Denote
 
 This transaction models the guarantee-relevant slice of
 `TopUpGateway.topUp` / `_evaluateTopUpLimit` at
-`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`
+`lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`
 (lines 160--237 and 396--415), composed with the StakingRouter share
 budget `min(moduleAllocation, maxTopUpPerBlock)` that
 `StakingRouter.topUp` applies at lines 696--700.
@@ -103,6 +103,8 @@ def sourceCandidatesIndependent : List Word → List Word → Option (List Word)
       some (minWord r limit :: rest)
   | _, _ => none
 
+/-- Independent copy of `Source.Topup2.sourceRun` (`TopUpGateway.sol:160-237
+topUp`); see that docstring for the line map. -/
 def sourceRunIndependent (effective pending requested topUpLimits : List Word)
     (target minTopUp remainingCap moduleLimit valueGwei : Word) :
     Option (List Word × Word × Word) :=
@@ -176,13 +178,20 @@ structure Result where
   allocated : Word
   deriving DecidableEq, Repr
 
-/-- Executable transaction.  Length / overflow / empty-batch failures revert
+/-- `TopUpGateway.sol:160-237 topUp(TopUpData calldata _topUps)` on the Verity
+plane: the two count guards (164, 174-175) then `Source.Topup2.sourceRun`
+(line map in its docstring).  Not transcribed / added: as for `sourceRun`,
+plus the memory-array decoding and the `failAfterWrites` hook.
+
+Executable transaction.  Length / overflow / empty-batch failures revert
 to the pre-call snapshot.  `failAfterWrites` is a test hook placed after the
 allocation and budget writes; it proves rollback even after intermediate
 effects. -/
 def allocate (count : Nat) (target minTopUp remainingCap moduleLimit valueGwei : Word)
     (failAfterWrites : Bool := false) : Contract Result := fun snapshot =>
+  -- TopUpGateway.sol:164  if (validatorsCount == 0) revert WrongArrayLength();
   if count == 0 then .revert "WrongArrayLength" snapshot else
+  -- TopUpGateway.sol:174-175  if (validatorsCount > $.maxValidatorsPerTopUp) { revert MaxValidatorsPerTopUpExceeded(); }
   if count > maxValidatorsPerTopUp then .revert "MaxValidatorsPerTopUpExceeded" snapshot else
   match readArray snapshot "effective" effectiveBase count,
       readArray snapshot "pending" pendingBase count,

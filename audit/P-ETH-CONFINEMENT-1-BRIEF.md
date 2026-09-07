@@ -1,12 +1,27 @@
-# P-ETH-CONFINEMENT-1 brief — candidate parent, blocked registration
+# P-ETH-CONFINEMENT-1 brief — unregistered inventory result
 
 `P-ETH-CONFINEMENT-1` is **not registered**. It is absent from
 `Guarantees.Id`, from `AllGuarantees.supplemental`, and from
 `audit/guarantees.yaml`. This brief records why, what is proved anyway, and
-the exact row that becomes registerable once the registry reopens.
+a historical candidate row. Updating an input pin alone would not justify
+registering an execution-level confinement guarantee.
 
 This is not a claim about all SRv3 ETH and it does not discharge any
 deployment-provenance assumption.
+
+## Current integration decision (2026-09-07)
+
+Integrate this as auxiliary, unregistered inventory evidence. It is not a
+prerequisite theorem for ALLOC-1, ALLOC-2, or RESERVE-1 and is outside the
+three-guarantee delivery. The theorem establishes table agreement and an
+explicit residual classification, not callee behavior or complete source
+coverage. The old registry-freeze discussion below records the historical
+branch context; a reviewed input-basis update is possible and is not an audit
+certificate. No row is promoted by this integration.
+
+The current merge preserves the already-landed Oracle #232 definitions and
+regressions. Candidate modules and mutants are built by the production/test
+targets; trust inspection is included separately.
 
 ## What is proved
 

@@ -27,6 +27,28 @@ tree="$(bash scripts/verified_source_tree.sh)"
 receipt_targets="$(bash scripts/write_proof_report.sh --targets)"
 [ -n "$receipt_targets" ] || fail 'write_proof_report.sh declares no receipt targets'
 
+# The checked-in receipt is a hash binding for its checked-in build log.  A
+# successful `make prove` writes both files, but this independent gate catches
+# a later commit that refreshes only the log (or only the report).
+python3 - <<'PY'
+import hashlib
+import json
+from pathlib import Path
+
+report_path = Path("proofs/logs/proof-report.json")
+report = json.loads(report_path.read_text(encoding="utf-8"))
+log_path = Path(report["build"]["log"])
+if not log_path.is_file():
+    raise SystemExit(
+        f"check_provenance_guards: receipt log '{log_path}' does not exist")
+recorded = report["build"]["log_sha256"]
+actual = hashlib.sha256(log_path.read_bytes()).hexdigest()
+if recorded != actual:
+    raise SystemExit(
+        "check_provenance_guards: receipt log_sha256 "
+        f"'{recorded}' does not match '{log_path}' ('{actual}')")
+PY
+
 printf 'verified_source_tree=%040d\nproof_targets=%s\nBuilt LidoSRv3\n' 0 "$receipt_targets" \
   > "$tmpdir/stale.log"
 if BUILD_STATUS=0 BUILD_LOG="$tmpdir/stale.log" \

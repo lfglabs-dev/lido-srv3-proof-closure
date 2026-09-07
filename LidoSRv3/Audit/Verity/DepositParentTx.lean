@@ -31,12 +31,26 @@ open _root_.Contracts
 
 abbrev Word := _root_.Verity.Core.Uint256
 
+/-- `_updateModuleLastDepositState` (`StakingRouter.sol:976`), collapsed to one
+counter; observation slot, no exact Solidity storage counterpart. -/
 def counterSlot : Nat := 0
+/-- Lido's depositable buffer as one slot (`Lido.sol:841` `_getDepositableEther`);
+observation slot standing in for Lido's own storage. -/
 def lidoDepositableSlot : Nat := 1
+/-- Observation slots, no Solidity storage counterpart: per-module allocation,
+dynamic deposit data and deposit-data root as committed words. -/
 def allocationSlot : Nat := 2
 def dynamicDataSlot : Nat := 3
 def depositRootSlot : Nat := 4
 
+/-- One module leg of the generalised transaction. `keys` is
+`actualDepositsCount` (`StakingRouter.sol:967`), `amount` is `depositsValue`
+(`StakingRouter.sol:972`). `dynamicDataCommitment`, `depositDataRoot`,
+`dataValid` and `rootValid` have no counterpart in the pinned span
+(`StakingRouter.sol:942-997` deposits one module per call and computes roots
+inside `BeaconChainDepositor.sol:61`); they are model probes for rollback after
+intermediate writes. `moduleCallOk`/`beaconCallOk` select Verity's failing
+callee for the `obtainDepositData` (line 963) and `deposit` (BCD line 57) frames. -/
 structure Batch where
   moduleId : Word
   keys : Word
@@ -49,13 +63,17 @@ structure Batch where
   beaconCallOk : Bool
   deriving Repr, DecidableEq
 
+/-- Transaction inputs. `authorized` is `_checkAppAuth(_getDepositSecurityModule())`
+(`StakingRouter.sol:943`), `moduleActive` is `stateConfig.status == Active`
+(`:946`), `allocationValid` abstracts the `maxDepositsCount`/pubkey guards of
+`:954-969`, `lidoCallOk` selects the failing callee for `Lido.sol:869`. -/
 structure Inputs where
   authorized : Bool
   moduleActive : Bool
   allocationValid : Bool
   lidoCallOk : Bool
   /-- The per-key wei the beacon leg sends; the executable stand-in for
-  `BeaconChainDepositor.DEPOSIT_SIZE`. -/
+  `BeaconChainDepositor.DEPOSIT_SIZE` (`BeaconChainDepositor.sol:24`). -/
   depositSize : Word
   lido : Address
   module : Address
@@ -83,51 +101,111 @@ def getState : Contract ContractState :=
 def creditRouter (amount : Word) : Contract Unit :=
   fun state => .success () { state with selfBalance := state.selfBalance + amount }
 
-/-- One module's leg: record the allocation, obtain deposit data through a real
-call frame, commit the dynamic data and the deposit-data root.  Both validity
-guards sit after their own storage write, so a failure has real state to undo. -/
+/-- One module's leg (`StakingRouter.sol:952-976` per batch): record the
+allocation, obtain deposit data through a real call frame, commit the dynamic
+data and the deposit-data root.  Both validity guards sit after their own
+storage write, so a failure has real state to undo.
+
+Not transcribed: the pubkey-length arithmetic of `StakingRouter.sol:966-972`
+(`allocationValid` in `execute` stands for those guards).
+
+Added by the model: the `dynamicDataSlot`/`depositRootSlot` writes and the
+`dataValid`/`rootValid` guards (no source counterpart, rollback probes);
+revert strings are model names. -/
 def processBatch (inputs : Inputs) (batch : Batch) : Contract Unit := do
+  -- StakingRouter.sol:952-953  stakingModuleDepositableEthAmount = _getModuleDepositAllocation(...)  (recorded as keys)
   writeMap allocationSlot batch.moduleId batch.keys
+  -- StakingRouter.sol:962-963  (publicKeysBatch, signaturesBatch) = IStakingModule(stakingModuleAddress).obtainDepositData(maxDepositsCount, _depositCalldata);
   externalCallBindTo inputs.module 0 [] (callName batch.moduleCallOk "obtainDepositData")
     [batch.moduleId, batch.keys]
+  -- Added by the model: dynamic-data and root commitments with their guards.
   writeMap dynamicDataSlot batch.moduleId batch.dynamicDataCommitment
   require batch.dataValid "INVALID_DYNAMIC_DEPOSIT_DATA"
   writeMap depositRootSlot batch.moduleId batch.depositDataRoot
   require batch.rootValid "INVALID_DEPOSIT_DATA_ROOT"
 
-/-- `externalCallBindTo` is a caller-side frame: it journals and debits, but
+/-- `StakingRouter.sol:983 LIDO.withdrawDepositableEther(depositsValue, actualDepositsCount)`
+with the callee `Lido.sol:869-886` and `Lido.sol:839-859` inlined.
+`externalCallBindTo` is a caller-side frame: it journals and debits, but
 callee-originated inflow lives in `Verity.MultiContract`, so the credit that
-`Lido.withdrawDepositableEther` performs is an explicit step. -/
+`Lido.withdrawDepositableEther` performs is an explicit step.
+
+Not transcribed: `Lido.sol:870` (`canDeposit`, folded into `lidoCallOk`),
+`:872` (`_auth`), `:873` (`ZERO_AMOUNT`, unreachable here, see
+`SolidityDeposit.lidoZeroAmount_unreachable`), `:851-858` (next-report and
+reserve accounting), `:877-881` (seed deposits counter and event).
+
+Added by the model: the buffer lives in `lidoDepositableSlot` of this contract. -/
 def pullFromLido (inputs : Inputs) (total : Word) : Contract Unit := do
+  -- StakingRouter.sol:983  LIDO.withdrawDepositableEther(depositsValue, actualDepositsCount);
   externalCallBindTo inputs.lido 0 [] (callName inputs.lidoCallOk "withdrawDepositableEther")
     [total]
   let state ← getState
+  -- Lido.sol:842  require(_depositAmount <= depositableEther, "NOT_ENOUGH_ETHER");
   require (total ≤ state.readSlot lidoDepositableSlot) "NOT_ENOUGH_ETHER"
+  -- Lido.sol:847  _setBufferedEtherAndDepositedPostReport(allocation.total.sub(_depositAmount), depositedPostReport);
   setStorage ⟨lidoDepositableSlot⟩ (state.readSlot lidoDepositableSlot - total)
+  -- Lido.sol:885  stakingRouter.receiveDepositableEther.value(_amount)();
   creditRouter total
 
+/-- `StakingRouter.sol:985-991 BeaconChainDepositor.makeBeaconChainDeposits32ETH(DEPOSIT_CONTRACT, actualDepositsCount, ...)`:
+the per-key loop of `BeaconChainDepositor.sol:53-63` is collapsed to one call
+frame per batch carrying the batch's whole `amount` (`keys * depositSize`).
+
+Not transcribed: `BeaconChainDepositor.sol:43-48` length guards (discharged by
+the router's alignment check, see
+`SolidityDeposit.publicKeysBatchLength_guard_discharged`), `:54-55, 61`
+(memory copies and SSZ root). -/
 def pushBatch (inputs : Inputs) (batch : Batch) : Contract Unit :=
+  -- BeaconChainDepositor.sol:57  _depositContract.deposit{value: DEPOSIT_SIZE}(...)  x keys, as one frame
   externalCallBindTo inputs.beacon batch.amount []
     (callName batch.beaconCallOk "depositToBeacon")
     [batch.moduleId, batch.keys, batch.dynamicDataCommitment, batch.depositDataRoot]
 
-/-- The complete bounded transaction.  The counter/allocation/data/root writes
-precede several possible failures, making rollback sensitivity executable. -/
+/-- `StakingRouter.sol:942-997 deposit(uint256 _stakingModuleId, bytes calldata _depositCalldata)`,
+generalised: the pinned function deposits for one module per call; this
+transaction processes two batches (`first`, `second`) around one aggregate Lido
+pull, so that rollback after intermediate writes is observable. The source
+control flow is the `SolidityDeposit.run` guard chain; the two-batch shape is
+the model's, not the contract's.
+
+Not transcribed: `StakingRouter.sol:948-949` (withdrawal credentials, module
+address), `:954-969` (`maxDepositsCount`/pubkey guards, abstracted to
+`allocationValid`), `:978` (empty-batch early return), `:980, 993` (balance
+snapshots are `state.selfBalance`/`after.selfBalance`).
+
+Added by the model: `Batch.dataValid`/`rootValid` and their slots (no
+counterpart in the span), the `"ALLOCATION_VALUE_MISMATCH"` guard (Solidity has
+`depositsValue = actualDepositsCount * MAX_EFFECTIVE_BALANCE_WC_TYPE_01` by
+construction, line 972), and all revert strings, which are model names rather
+than the Solidity custom errors. The counter/allocation/data/root writes precede
+several possible failures, making rollback sensitivity executable. -/
 def execute (inputs : Inputs) : Contract Unit := do
+  -- StakingRouter.sol:943  _checkAppAuth(_getDepositSecurityModule());
   require inputs.authorized "NOT_AUTHORIZED"
+  -- StakingRouter.sol:946  if (stateConfig.status != StakingModuleStatus.Active) revert StakingModuleNotActive();
   require inputs.moduleActive "MODULE_NOT_ACTIVE"
+  -- StakingRouter.sol:954-969  maxDepositsCount / ZeroDeposits / WrongPubkeyLength / ModuleReturnExceedTarget  (abstracted)
   require inputs.allocationValid "INVALID_ALLOCATION"
+  -- StakingRouter.sol:980  uint256 etherBalanceBeforeDeposits = address(this).balance;
   let state ← getState
+  -- StakingRouter.sol:976  _updateModuleLastDepositState(_stakingModuleId, depositsValue);
   setStorage ⟨counterSlot⟩ (state.readSlot counterSlot + 1)
+  -- StakingRouter.sol:952-976  per module leg (generalised to two batches)
   processBatch inputs inputs.first
   processBatch inputs inputs.second
+  -- StakingRouter.sol:972  uint256 depositsValue = actualDepositsCount * MAX_EFFECTIVE_BALANCE_WC_TYPE_01;  (checked as a guard)
   let total := inputs.first.amount + inputs.second.amount
   require (total == (inputs.first.keys + inputs.second.keys) * inputs.depositSize)
     "ALLOCATION_VALUE_MISMATCH"
+  -- StakingRouter.sol:983  LIDO.withdrawDepositableEther(depositsValue, actualDepositsCount);
   pullFromLido inputs total
+  -- StakingRouter.sol:985-991  BeaconChainDepositor.makeBeaconChainDeposits32ETH(...)  (one frame per batch)
   pushBatch inputs inputs.first
   pushBatch inputs inputs.second
+  -- StakingRouter.sol:993  uint256 etherBalanceAfterDeposits = address(this).balance;
   let after ← getState
+  -- StakingRouter.sol:996  assert(etherBalanceBeforeDeposits == etherBalanceAfterDeposits);
   require (after.selfBalance == state.selfBalance) "ASSERT_BALANCE_UNCHANGED"
 
 /-! ## The journal the transaction has to produce

@@ -6,13 +6,10 @@ import LidoSRv3.Audit.Guarantees.Registry
 
 `P-ETH-CONFINEMENT-1` is **not** registered.  It is absent from
 `Guarantees.Id`, from `AllGuarantees.supplemental`, and from
-`audit/guarantees.yaml`.  The canonical registry is frozen to the R1 review
-basis pinned as `R1_REVIEW_BASE` in `scripts/audit_metadata.py`, and the R1
-final auditor report published at that basis states that ETH confinement is
-`NOT YET`.  Adding a registry row would present a changed registry as though
-it carried the R1 review, which is exactly what that pin exists to prevent.
-`audit/P-ETH-CONFINEMENT-1-BRIEF.md` records the blocker and the exact row
-that becomes registerable once the registry reopens.
+`audit/guarantees.yaml`.  Registration is deliberately deferred: this is an inventory/table-agreement
+result, not an execution-level confinement guarantee. The recorded input basis
+may be updated with reviewed metadata; doing so is not an external audit and
+cannot establish the missing source coverage. The brief records those limits.
 
 This module therefore sits next to the registered guarantee modules but is
 imported by none of them: it conjoins the model-layer conjuncts of

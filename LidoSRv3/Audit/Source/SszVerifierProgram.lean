@@ -6,7 +6,7 @@ must expose before the pinned SSZ verifier and deposit-data-root routines can
 be refined.  It is deliberately not an interpreter and does not import or
 alias `Audit.Ssz` or `DepositDataRootCorrespondence`.
 
-Source anchors are `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`:
+Source anchors are `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`:
 
 * `SSZ.sol` lines 89--175 (`hashTreeRoot`) and 179--248 (`verifyProof`);
 * `BeaconChainDepositor.sol` lines 110--153 (deposit-data/signature roots);
@@ -142,6 +142,27 @@ theorem verifier_pair_preimage_exact (index step : Nat) :
   simp only [verifierPair]
   split <;> simp [piece]
 
+/-! ## Raw revert selectors of `SSZ.verifyProof` (SSZ.sol:179-248)
+
+The Yul body reverts with a 4-byte selector written to scratch
+(`mstore(0x00, <selector>)` then `revert(0x1c, 0x04)`). Recorded here as
+annotated constants; `RevertObservation` names the same outcomes. -/
+
+/-- `SSZ.sol:187  mstore(0x00, 0x09bde339)` (empty proof) and
+`SSZ.sol:244  mstore(0x00, 0x09bde339)` (`leaf != root`): `InvalidProof()`. -/
+def invalidProofSelector : Nat := 0x09bde339
+
+/-- `SSZ.sol:203  mstore(0x00, 0x5849603f)`: `BranchHasExtraItem()` when
+`index` reaches zero before the proof is exhausted. -/
+def branchHasExtraItemSelector : Nat := 0x5849603f
+
+/-- `SSZ.sol:238  mstore(0x00, 0x1b6661c3)`: `BranchHasMissingItem()` when
+the proof is exhausted with `index != 1`. -/
+def branchHasMissingItemSelector : Nat := 0x1b6661c3
+
+/-- Outcome tags. `invalidProof`, `branchHasExtraItem`, `branchHasMissingItem`
+correspond to the three selectors above; `shaCallFailed` is the bare
+`revert(0, 0)` of `SSZ.sol:223-226`; the others are harness gates. -/
 inductive RevertObservation
   | invalidAbi | invalidRoot | invalidIndex | invalidProof
   | branchHasExtraItem | branchHasMissingItem | shaCallFailed
@@ -212,7 +233,10 @@ structure VerifierControlInput where
   finalRootMatches : Bool
   deriving DecidableEq, Repr
 
+/-! ## SSZ.verifyProof (SSZ.sol:179-248), control-flow observation -/
+
 /--
+Loop body `SSZ.sol:195-233  for { } 1 { } { ... }` of `verifyProof`.
 First-failure-wins control flow of `SSZ.sol` lines 179--248.  Digest values and
 memory effects are intentionally absent: official Verity must later provide
 those semantics and connect them to this observation interface.
@@ -220,29 +244,56 @@ those semantics and connect them to this observation interface.
 def observeVerifierControlAux : Nat → Nat → List Bool → List ShaCallSpec → ProgramObservation
   | _, _, [], calls => .reverted .shaCallFailed calls
   | step, index, ok :: rest, calls =>
+      -- SSZ.sol:200  index := shr(1, index)
       let shifted := index / 2
+      -- SSZ.sol:201-205  if iszero(index) { mstore(0x00, 0x5849603f); revert(0x1c, 0x04) }  (BranchHasExtraItem)
       if shifted = 0 then .reverted .branchHasExtraItem calls
       else
+        -- SSZ.sol:209-221  mstore(scratch, leaf); mstore(xor(scratch, 0x20), calldataload(offset)); staticcall(gas(), 0x02, ...)
         let call := verifierShaCall step index
+        -- SSZ.sol:223-226  if iszero(result) { revert(0, 0) }
         if !ok then .reverted .shaCallFailed calls
+        -- SSZ.sol:230-233  offset := add(offset, 0x20); if iszero(lt(offset, end)) { break }
         else if rest.isEmpty then .verified (calls ++ [call])
         else observeVerifierControlAux (step + 1) shifted rest (calls ++ [call])
 
+/-- `SSZ.sol:179-248 verifyProof(bytes32[] calldata proof, bytes32 root, bytes32 leaf, GIndex gI)`,
+control-flow observation. Records which revert selector fires and how many
+SHA-256 boundaries were crossed; digests are not computed.
+
+Not transcribed: the scratch-memory contents, `calldataload(offset)`, the
+SHA-256 output (`leaf := mload(0x00)`, 229), and the final root comparison
+value (`finalRootMatches` is an input). Added by the model: the
+`officialSemanticsReady` gate, the `2^256` index bound (`invalidIndex`), and
+the `shaSucceeded` length check.
+
+The abstract-plane model of the same span is `LidoSRv3.Audit.Ssz.verifyProof`
+(pure checks on supplied pivot/path data with an opaque `combine`). The two
+are independent by design: neither module imports the other. -/
 def observeVerifierControl (caps : OfficialVerityCapabilities)
     (input : VerifierControlInput) : ProgramObservation :=
   gateOfficialSemantics caps <|
+    -- SSZ.sol:180  uint256 index = gI.index();  (word-sized; bound added by the model)
     if input.generalizedIndex >= 2 ^ 256 then .reverted .invalidIndex []
+    -- SSZ.sol:185-189  if iszero(proof.length) { mstore(0x00, 0x09bde339); revert(0x1c, 0x04) }  (InvalidProof)
     else if input.proofLength = 0 then .reverted .invalidProof []
+    -- (model consistency: one SHA-256 outcome per proof element)
     else if input.shaSucceeded.length != input.proofLength then
       .reverted .shaCallFailed []
     else
+      -- SSZ.sol:195-233  the for loop
       match observeVerifierControlAux 0 input.generalizedIndex input.shaSucceeded [] with
       | .verified calls =>
           let finalIndex := input.generalizedIndex / (2 ^ input.proofLength)
+          -- SSZ.sol:236-240  if iszero(eq(index, 1)) { mstore(0x00, 0x1b6661c3); revert(0x1c, 0x04) }  (BranchHasMissingItem)
           if finalIndex != 1 then .reverted .branchHasMissingItem calls
+          -- SSZ.sol:242-246  if iszero(eq(leaf, root)) { mstore(0x00, 0x09bde339); revert(0x1c, 0x04) }  (InvalidProof)
           else if !input.finalRootMatches then .reverted .invalidProof calls
           else .verified calls
       | failure => failure
+
+/-- Solidity-facing name, `SSZ.sol:179` (control-flow observation only). -/
+abbrev verifyProof := observeVerifierControl
 
 theorem missing_memory_fails_closed (caps : OfficialVerityCapabilities)
     (h : caps.byteAddressedMemory = false) (candidate : ProgramObservation) :

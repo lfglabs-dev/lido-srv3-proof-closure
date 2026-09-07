@@ -96,6 +96,6 @@ in `LidoSRv3/Audit/Source/SanityEnvelope.lean`. Its `audit/guarantees.yaml`
 row is deliberately absent: that file is byte-pinned to the certified R1
 review basis, and adding a row there would present unreviewed content as R1
 certified. -/
-example : POracleSanity1.guarantee.checkedLayers = [.model, .source] := by decide
+example : POracleSanity1.guarantee.checkedLayers = [.model] := by decide
 
 end LidoSRv3.Audit.Guarantees

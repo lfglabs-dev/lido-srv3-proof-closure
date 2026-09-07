@@ -8,7 +8,7 @@
   "pins": {
     "lido_core": {
       "repository": "https://github.com/lidofinance/core.git",
-      "commit": "af095e48bbc1c3841c2c9936219c8461af01056b"
+      "commit": "17005714f151e5502c559932319a3f2f74ac2436"
     },
     "verity": {
       "repository": "https://github.com/lfglabs-dev/verity.git",

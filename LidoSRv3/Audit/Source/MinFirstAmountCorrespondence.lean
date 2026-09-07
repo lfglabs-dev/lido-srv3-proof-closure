@@ -4,7 +4,7 @@ import LidoSRv3.Audit.MinFirstAllocation
 # Proportional allocation amount correspondence
 
 `MinFirstAllocationStrategy.allocateToBestCandidate` at
-`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`, lines 88--106:
+`lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`, lines 88--106:
 the best-candidate count, the next-level upper bound, and
 
 ```solidity

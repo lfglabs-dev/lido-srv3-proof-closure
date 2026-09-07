@@ -1,3 +1,5 @@
+import LidoSRv3.Audit.Guarantees.PEthConfinement1
+import LidoSRv3.Tests.EthConfinementMutants
 import LidoSRv3.Audit.Allocation
 import LidoSRv3.Audit.StrategyProofs
 import LidoSRv3.Audit.Common.Atomicity
@@ -562,3 +564,5 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Common.BoundedAmount.checkedAdd_sound
 #print axioms LidoSRv3.Audit.Common.revert_rolls_back_state_and_committed_effects
 #print axioms LidoSRv3.Audit.Common.success_exposes_exact_committed_effects
+
+#print axioms LidoSRv3.Audit.Guarantees.PEthConfinement1.modeled_positive_value_is_confined_or_residual

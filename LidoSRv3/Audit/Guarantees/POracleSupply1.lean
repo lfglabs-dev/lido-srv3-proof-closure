@@ -139,7 +139,7 @@ is absorbed: domain validity gives it when the fee is positive, and when the
 fee is zero both sides are trivially zero.
 
 `EntryDomainValid` captures the Solidity checked-arithmetic non-underflow
-conditions at `af095e48`; see the source module for the pinned source-span
+conditions at `17005714`; see the source module for the pinned source-span
 mapping.  uint256 overflow on intermediate products remains unmodeled. -/
 theorem oracle_supply_entry_source_domain
     (d : SubmitReportData) (maxShareRate : Nat) (state : ContractState)

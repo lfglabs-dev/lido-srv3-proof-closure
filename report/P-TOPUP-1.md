@@ -2,7 +2,7 @@
 
 > Round 2 (2026-08-21). Product note plus proof audit, arbitrated from GPT 5.6 Pro and Opus 5. Fable 5 was unavailable (data-retention gate). Kimi K3 was not an allowed Task model. No em dashes. Lean is authority.
 
-When the top-up gateway asks the router to raise existing type-2 validators above 32 ETH, `StakingRouter.topUp` (`lidofinance/core@af095e48`, lines 679-759) pulls one lump sum out of Lido and forwards it key by key to the beacon deposit contract. P-TOPUP-1 verifies that the lump and the forwarded total are the same wei, and that anything that fails takes the whole transaction with it.
+When the top-up gateway asks the router to raise existing type-2 validators above 32 ETH, `StakingRouter.topUp` (`lidofinance/core@17005714`, lines 679-759) pulls one lump sum out of Lido and forwards it key by key to the beacon deposit contract. P-TOPUP-1 verifies that the lump and the forwarded total are the same wei, and that anything that fails takes the whole transaction with it.
 
 The pull and the push are two readings of one array. The router sums `allocations` at line 732, inside the `unchecked` block, pulls that sum at line 744, and the depositor loop sends `_amounts[i]` per key:
 

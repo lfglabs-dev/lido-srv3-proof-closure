@@ -25,6 +25,12 @@ def ownersField : Field :=
 def approvalsField : Field :=
   { name := "approvals", ty := .mappingTyped (.simple .uint256), slot := some approvalsSlot }
 
+/-- `WithdrawalQueueERC721.sol:218-220 transferFrom` -> `230-254 _transfer`, the
+same owner-operated slice as `sourceTransfer`, as a deep-EDSL `FunctionSpec`.
+Line map: 231 `TransferToZeroAddress`, 232 `TransferToThemselves`, 238
+`TransferFromIncorrectOwner`, 241-245 `NotOwnerOrApproved` (owner disjunct
+only), 247 `delete _getTokenApprovals()[_requestId]`, 248 `request.owner = _to`.
+Not transcribed: 233, 235-236, 250-251, 253 (see `sourceTransfer`). -/
 def transfer : FunctionSpec :=
   { name := "transferFrom"
     params := [{ name := "from", ty := .address }, { name := "to", ty := .address },
@@ -39,6 +45,9 @@ def transfer : FunctionSpec :=
       , .setMappingUint "approvals" (.param "requestId") (.literal 0)
       , .setMappingUint "owners" (.param "requestId") (.param "to")
       , .stop ] }
+
+/-- Solidity-facing name, WithdrawalQueueERC721.sol:218. -/
+abbrev transferFrom := transfer
 
 def spec : CompilationModel :=
   { name := "WithdrawalQueueERC721TransferSlice"

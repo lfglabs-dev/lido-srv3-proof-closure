@@ -1,6 +1,6 @@
 # P-TOPUP-2 headroom/budget correspondence
 
-Pin: `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`.
+Pin: `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`.
 Slice: `TopUpGateway.topUp` 160–237, `_evaluateTopUpLimit` 396–415,
 `CLValidatorVerifier._verifyValidator` 44–57.
 

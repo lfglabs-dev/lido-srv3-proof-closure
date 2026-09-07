@@ -88,34 +88,68 @@ structure Healthy (batch : Batch) : Prop where
 def processBatch (inputs : Inputs) (batch : Batch) : Contract Unit :=
   DepositParentTx.processBatch (legacyInputs inputs) batch
 
+/-- `StakingRouter.sol:983 LIDO.withdrawDepositableEther(depositsValue, actualDepositsCount)`
+with `Lido.sol:869-886` and `Lido.sol:839-859` inlined; same shape as
+`DepositParentTx.pullFromLido` (see its docstring for the untranscribed Lido
+lines), restated here over the list total. -/
 def pullFromLido (inputs : Inputs) (total : Word) : Contract Unit := do
+  -- StakingRouter.sol:983  LIDO.withdrawDepositableEther(depositsValue, actualDepositsCount);
   externalCallBindTo inputs.lido 0 [] (DepositParentTx.callName inputs.lidoCallOk
     "withdrawDepositableEther") [total]
   let state ← DepositParentTx.getState
+  -- Lido.sol:842  require(_depositAmount <= depositableEther, "NOT_ENOUGH_ETHER");
   require (total ≤ state.readSlot lidoDepositableSlot) "NOT_ENOUGH_ETHER"
+  -- Lido.sol:847  _setBufferedEtherAndDepositedPostReport(allocation.total.sub(_depositAmount), depositedPostReport);
   setStorage ⟨lidoDepositableSlot⟩ (state.readSlot lidoDepositableSlot - total)
+  -- Lido.sol:885  stakingRouter.receiveDepositableEther.value(_amount)();
   DepositParentTx.creditRouter total
 
+/-- `BeaconChainDepositor.sol:53-63` collapsed to one frame per batch; see
+`DepositParentTx.pushBatch`. -/
 def pushBatch (inputs : Inputs) (batch : Batch) : Contract Unit :=
   DepositParentTx.pushBatch (legacyInputs inputs) batch
 
-/-- The exact bound is checked before either pass.  Therefore a wrapping list
-cannot leave a value-moving journal even when callers omit `Preconditions`. -/
+/-- `StakingRouter.sol:942-997 deposit(uint256 _stakingModuleId, bytes calldata _depositCalldata)`,
+generalised to a list of batches: the pinned function deposits for one module
+per call; this transaction runs `processBatch` over every batch, one aggregate
+Lido pull, then `pushBatch` over every batch. The guard chain is the one of
+`SolidityDeposit.run`; the list shape is the model's.
+
+Not transcribed: as for `DepositParentTx.execute` (`StakingRouter.sol:948-949,
+954-969, 978, 980, 993`).
+
+Added by the model: `Batch.dataValid`/`rootValid` (no counterpart in the span),
+the `"BATCH_TOTAL_OVERFLOW"` guard (the exact bound is checked before either
+pass, so a wrapping list cannot leave a value-moving journal even when callers
+omit `Preconditions`), the `"ALLOCATION_VALUE_MISMATCH"` guard, and all revert
+strings, which are model names rather than the Solidity custom errors. -/
 def execute (inputs : Inputs) : Contract Unit := do
+  -- StakingRouter.sol:943  _checkAppAuth(_getDepositSecurityModule());
   require inputs.authorized "NOT_AUTHORIZED"
+  -- StakingRouter.sol:946  if (stateConfig.status != StakingModuleStatus.Active) revert StakingModuleNotActive();
   require inputs.moduleActive "MODULE_NOT_ACTIVE"
+  -- StakingRouter.sol:954-969  maxDepositsCount / ZeroDeposits / WrongPubkeyLength / ModuleReturnExceedTarget  (abstracted)
   require inputs.allocationValid "INVALID_ALLOCATION"
+  -- Added by the model: word-overflow guard on the batch total.
   require (decide (exactTotal inputs.batches < _root_.Verity.Core.Uint256.modulus))
     "BATCH_TOTAL_OVERFLOW"
+  -- StakingRouter.sol:980  uint256 etherBalanceBeforeDeposits = address(this).balance;
   let state ← DepositParentTx.getState
+  -- StakingRouter.sol:976  _updateModuleLastDepositState(_stakingModuleId, depositsValue);
   setStorage ⟨counterSlot⟩ (state.readSlot counterSlot + 1)
+  -- StakingRouter.sol:952-976  per module leg (generalised to a list)
   let _ ← inputs.batches.mapM (processBatch inputs)
+  -- StakingRouter.sol:972  uint256 depositsValue = actualDepositsCount * MAX_EFFECTIVE_BALANCE_WC_TYPE_01;  (checked as a guard)
   let total := wordTotal inputs.batches
   require (total == wordKeys inputs.batches * inputs.depositSize)
     "ALLOCATION_VALUE_MISMATCH"
+  -- StakingRouter.sol:983  LIDO.withdrawDepositableEther(depositsValue, actualDepositsCount);
   pullFromLido inputs total
+  -- StakingRouter.sol:985-991  BeaconChainDepositor.makeBeaconChainDeposits32ETH(...)  (one frame per batch)
   let _ ← inputs.batches.mapM (pushBatch inputs)
+  -- StakingRouter.sol:993  uint256 etherBalanceAfterDeposits = address(this).balance;
   let after ← DepositParentTx.getState
+  -- StakingRouter.sol:996  assert(etherBalanceBeforeDeposits == etherBalanceAfterDeposits);
   require (after.selfBalance == state.selfBalance) "ASSERT_BALANCE_UNCHANGED"
 
 def moduleEntry (inputs : Inputs) (batch : Batch) : ExternalCall :=
