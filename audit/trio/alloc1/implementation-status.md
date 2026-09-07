@@ -23,6 +23,19 @@ The v0 `Interface.lean` types are unchanged. New additive modules:
 - `Bytes` and `Memory`: generic word encode/decode inverse, exact summary field
   order with trailing bytes, array element byte decoding, constructive byte-backed
   `MemoryArraysRelated`, and output lengths equal to the stored count.
+- `FirstPass`, `Relational`, and `Determinism`: least ceiling and active-count
+  conservation proofs, an independent relational two-pass specification, and exact
+  two-way executor correspondence for all modeled results and transcripts.
+- `CallTree`: response-dependent full producer program and universal interpreter
+  equivalence to the SOURCE executor.
+- `VerityProducer`: full call-tree translation to pinned Verity external-call
+  denotation and proposed correspondence/world-preservation proofs. Heavy remote
+  elaboration is pending; this module is not yet passing evidence.
+- `ShareWriter`: public role/membership/validation ordering, packed share updates,
+  derived admission/share bounds, and rejection snapshot restoration. Compiler
+  validation and full reachable-state preservation remain separate obligations.
+- `Tests/TrioAlloc1/Correspondence`: the prefetch and target-only parent shapes
+  cannot satisfy the independent producer specification on concrete witnesses.
 - `Tests/TrioAlloc1/Execution`: actual executor reductions for ordered mixed WC rows,
   top-up, below-allocation capacities, empty helper, underflow before stake, late
   rejection, raw revert preservation, malformed/trailing returndata, zero divisor,
@@ -39,8 +52,8 @@ production/test/trust or full-suite receipts.
 | --- | --- |
 | Physical storage | Slot formulas, width proofs and executed solc layout checks implemented. Deployment/hash primitive relation and physical writer-transition proofs remain open. |
 | Reachable bounds, address uniqueness | Width bounds derived. Count<=32, share<=10000, unique addresses, admission and migration reachability remain open; never imposed as read guards. |
-| Exact call and error behavior | Ordered executor and regressions implemented. Pinned Solidity executions confirm enum panic, malformed returndata and raw error bytes on the vectors. The universal all-outcome source relation remains open. |
-| Independent specification | Second-pass Nat spec and checked-total accumulation proofs implemented. First-pass/call-level independent relational specification still open. |
+| Exact call and error behavior | Ordered executor and regressions implemented. Pinned Solidity executions confirm enum panic, malformed returndata and raw error bytes on the vectors. The independent all-outcome relation and its equivalence to the SOURCE executor are proved; compiler realization remains open. |
+| Independent specification | Second-pass Nat spec and checked-total accumulation proofs implemented. First-pass/call-level relational specification, determinism, and two-way SOURCE correspondence implemented. |
 | Memory / ABI | Constructive byte-backed array relation and decoder inverses proved. Actual solc allocation sequencing/failures (including panic 0x41), complete compiler memory correspondence and consumer ABI bridge remain open. |
 | Rollback / sequential behavior | View executor has no state effects. This alone does not establish parent/writer rollback or callback realization; those proofs/tests remain open. |
 | ALLOC-2 interface | Messages sent to mission 44053c4f-2578-4df5-84f2-4f66bc73586a. v0 unchanged; agreement and composition consumer evidence pending. |
@@ -69,17 +82,26 @@ candidate source before they can support validation.
 ## Latest evidence
 
 The receipt packet under `receipts/` is partial validation evidence, with its scope
-and reproduction commands in `reproduce.md`. All nine owned Lean modules pass the
+and reproduction commands in `reproduce.md`. Fifteen Init-only owned Lean modules pass the
 bounded Init-only checker. The evaluated vector JSON is byte-identical after the
 encoding proof refinement (SHA-256
 `eaac1882ec16fe743d11fd4b2309910896fcffe7d285f72a33a697c373c4ecde`).
 Proof-escape, source-annotation, report-inventory and pinned Verity provenance
-checks pass. `make test` stops at shared UX2. Remote build requests are rejected by
-source request-size limits or the ashur node disk admission floor; exact messages
-are recorded in `reproduce.md` and the job diagnostics. No remote heavy validation
-succeeded during this continuation.
+checks pass. `make test` stops at shared UX2. Earlier remote requests were rejected by source request-size limits or the ashur
+node disk admission floor. A measured existing complete build uses 2.9 GiB for
+`.lake`, with a 283 MiB Git directory. A justified 5 GiB estimate admitted the full
+production/test/audit/legacy build at source `8269ac576cf119975a7e9954459cd4aa04d5cd82`
+on nippur: remote job `3ca9d1e4-e496-43f7-87f2-a5925a9bd083`, durable wrapper
+`b5419df7-2f52-485e-a96b-38687d1e65e8`. It remains running as of 12:38 UTC
+on 2026-09-07; admission is not a passing build receipt. The disk safety floor
+was unchanged. Newer uncommitted additions require separate final-source checks.
 
 ALLOC-2 remains authoritatively active/healthy, with its current run ID confirmed
 on 2026-09-07. Messages provide the producer declarations and draft PR. No explicit
 acceptance has been received in this mission, so mediated agreement remains pending.
 The interface has not been changed incompatibly.
+
+The actual inherited public share writer compiled and executed with solc 0.8.25
+(via IR, optimizer 200, Shanghai). The seeded packed word retained every bit
+outside the two share fields. The receipt is `writer-v1/writer.json` in mission
+output; expanded error-order/rollback vectors are running separately.
