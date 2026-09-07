@@ -1,9 +1,9 @@
 {
-  "head": "2bb0a7dc7bf009333ba925b2a3a2e02503297b76",
+  "head": "dee0456b3c84133a774fa3ce7e579a230c0b3989",
   "base": "bcfbb5f027a5c370594891c1a455fde137709941",
   "exit_code": 0,
   "command": "ELAN_HOME=/tmp/pr241-elan PATH=/tmp/pr241-elan/toolchains/leanprover--lean4---v4.31.0/bin:$PATH python3 scripts/test_ux2.py",
   "output": "ux2 artifact mutants ok: drift, stale, missing, unresolved/duplicate theorem, canonical order, unregistered assumption, missing source target, missing headline boundary, scope tracking, doc-comment and statement slicing, let/have binders, where-proofs, escaped identifier delimiters and ordinary delimiter controls, symlinked inputs and root, and the Lean source tree id\n",
   "scope": "UX2 regression suite including real pinned Lean equation-arm elaboration; not full make test",
-  "durable_job": "f129813e-a873-41bc-9cde-401e05f78f94"
+  "durable_job": "5e06b1d6-0426-45c8-8483-23115243baab"
 }

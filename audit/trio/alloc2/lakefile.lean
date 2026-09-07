@@ -30,6 +30,7 @@ lean_lib TrioAlloc2Slice where
     .one `LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion,
     .one `LidoSRv3.Audit.Source.TrioAlloc2.ParentArraySafety,
     .one `LidoSRv3.Audit.Source.TrioAlloc2.ParentValues,
+    .one `LidoSRv3.Audit.Source.TrioAlloc2.ParentSuccess,
     .one `LidoSRv3.Audit.Source.TrioAlloc2.LoopBounds,
     .one `LidoSRv3.Audit.Source.TrioAlloc2.Conservation,
     .one `LidoSRv3.Tests.TrioAlloc2.Step,
