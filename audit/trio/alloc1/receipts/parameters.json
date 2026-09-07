@@ -1,0 +1,91 @@
+{
+  "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "compiler": "0.8.25+commit.b61c2a91.Emscripten.clang",
+  "checks": [
+    {
+      "name": "parameter-role-first",
+      "revert": "0xe2517d3f00000000000000000000000090f8bf6a479f320ead074411a4b0e7944ea8c9c13105bcbf19d4417b73ae0e58d508a65ecf75665e46c2622d8521732de6080c48",
+      "status": 0,
+      "events": 0,
+      "attemptedWrites": 0
+    },
+    {
+      "name": "parameter-membership-first",
+      "revert": "0xd41d6282",
+      "status": 0,
+      "events": 0,
+      "attemptedWrites": 0
+    },
+    {
+      "name": "parameter-share-before-fees",
+      "revert": "0xde009d7a",
+      "status": 0,
+      "events": 0,
+      "attemptedWrites": 0
+    },
+    {
+      "name": "parameter-fees-before-distance",
+      "revert": "0xf15cd7e5",
+      "status": 0,
+      "events": 0,
+      "attemptedWrites": 0
+    },
+    {
+      "name": "parameter-other-enum-before-fees",
+      "revert": "0x4e487b710000000000000000000000000000000000000000000000000000000000000021",
+      "status": 0,
+      "events": 0,
+      "attemptedWrites": 0
+    },
+    {
+      "name": "parameter-distance-before-target-enum",
+      "revert": "0x4f3b93a8",
+      "status": 0,
+      "events": 0,
+      "attemptedWrites": 0
+    },
+    {
+      "name": "parameter-target-enum-last",
+      "revert": "0x4e487b710000000000000000000000000000000000000000000000000000000000000021",
+      "status": 0,
+      "events": 0,
+      "attemptedWrites": 0
+    },
+    {
+      "name": "parameter-success-packed-storage-and-events",
+      "status": 1,
+      "config": "0xabcd000017700fa000c800640000000000000000000000000000000000000029",
+      "deposits": "0x0000000000000003000000000000000b00123456789abcdef123456789abcdef",
+      "events": [
+        {
+          "topics": [
+            "0x1730859048adcce16559e75a58fd609e9dbf7d34f39bcb7a45ad388dfbba0e4e",
+            "0x0000000000000000000000000000000000000000000000000000000000000001"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000000000000000000fa0000000000000000000000000000000000000000000000000000000000000177000000000000000000000000090f8bf6a479f320ead074411a4b0e7944ea8c9c1"
+        },
+        {
+          "topics": [
+            "0x303c8ac43d1b1f9b898ddd2915a294efa01e9b07c322d7deeb7db332b66f0410",
+            "0x0000000000000000000000000000000000000000000000000000000000000001"
+          ],
+          "data": "0x000000000000000000000000000000000000000000000000000000000000006400000000000000000000000000000000000000000000000000000000000000c800000000000000000000000090f8bf6a479f320ead074411a4b0e7944ea8c9c1"
+        },
+        {
+          "topics": [
+            "0x72766c50f14fe492bd1281ceef0a57ad49a02b7e1042fb58723647bf38040f83",
+            "0x0000000000000000000000000000000000000000000000000000000000000001"
+          ],
+          "data": "0x000000000000000000000000000000000000000000000000000000000000000b00000000000000000000000090f8bf6a479f320ead074411a4b0e7944ea8c9c1"
+        },
+        {
+          "topics": [
+            "0x4d106b4a7aff347abccca2dd6855d8d59d6cf792f1fdbb272c9858433d94b328",
+            "0x0000000000000000000000000000000000000000000000000000000000000001"
+          ],
+          "data": "0x000000000000000000000000000000000000000000000000000000000000000300000000000000000000000090f8bf6a479f320ead074411a4b0e7944ea8c9c1"
+        }
+      ]
+    }
+  ]
+}

@@ -99,6 +99,41 @@ async function main(){
  assert.equal(await read(newSlot),BigInt(moduleAddress)|(5000n<<192n)|(7000n<<208n)|(1n<<232n));
  admissionChecks.push({name:'successful-first-admission',status:admitted.status,count:1,id:1,position:1,packedConfig:ethers.toBeHex(await read(newSlot),32),events:admitted.logs.map(x=>({topics:x.topics,data:x.data}))});
  fs.writeFileSync(path.join(out,'admission.json'),JSON.stringify({pin,compiler:solc.version(),checks:admissionChecks},null,2));
+ const parameterChecks=[];
+ const parameterCases=[
+  {name:'parameter-role-first',role:0n,position:0n,args:[10001,0,0,0,0,0],error:selector('AccessControlUnauthorizedAccount(address,bytes32)')+words(BigInt(caller),BigInt(manageRole)).slice(2)},
+  {name:'parameter-membership-first',position:0n,args:[10001,0,0,0,0,0],error:selector('StakingModuleUnregistered()')},
+  {name:'parameter-share-before-fees',args:[10001,0,ethers.MaxUint256,1,0,0],error:selector('InvalidStakeShareLimit()')},
+  {name:'parameter-fees-before-distance',args:[1,2,1,0,1,0],error:selector('InconsistentFeeSum()')},
+  {name:'parameter-other-enum-before-fees',other:255n<<224n,args:[1,2,1,0,1,0],error:'0x4e487b71'+words(33).slice(2)},
+  {name:'parameter-distance-before-target-enum',target:255n<<224n,args:[1,2,0,0,1,0],error:selector('InvalidMinDepositBlockDistance()')},
+  {name:'parameter-target-enum-last',target:255n<<224n,args:[1,2,0,0,1,1],error:'0x4e487b71'+words(33).slice(2)}
+ ];
+ for(const test of parameterCases){
+  await write(manageMember,test.role??1n);await write(newPosition,test.position??1n);
+  await write(base+1n,2n);await write(arrayBase,1n);await write(arrayBase+1n,7n);
+  await write(slot,test.other??0n);await write(newSlot,test.target??BigInt(moduleAddress));
+  let data;try{await h.updateStakingModule.staticCall(1,...test.args);assert.fail('expected parameter revert');}catch(e){data=e.data;}
+  assert.equal(data,test.error,test.name);
+  const before=await read(newSlot);let failed;
+  try{await(await h.updateStakingModule(1,...test.args,{gasLimit:1000000})).wait();assert.fail('expected parameter transaction revert');}catch(e){failed=e.receipt;}
+  assert(failed);assert.equal(failed.status,0);assert.equal(failed.logs.length,0);assert.equal(await read(newSlot),before);
+  const trace=await rpc.request({method:'debug_traceTransaction',params:[failed.hash,{disableMemory:true,disableStorage:true}]});
+  assert.equal(trace.structLogs.filter(x=>x.op==='SSTORE').length,0,test.name+' validation precedes writes');
+  parameterChecks.push({name:test.name,revert:data,status:0,events:0,attemptedWrites:0});
+ }
+ await write(manageMember,1n);await write(newPosition,1n);await write(base+1n,1n);
+ const configBefore=(0xabcdn<<240n)|BigInt(moduleAddress),depositsBefore=0x123456789abcdef123456789abcdefn;
+ await write(newSlot,configBefore);await write(newSlot+1n,depositsBefore);
+ const updated=await(await h.updateStakingModule(1,4000,6000,100,200,11,3)).wait();
+ const configAfter=configBefore|(100n<<160n)|(200n<<176n)|(4000n<<192n)|(6000n<<208n);
+ const depositsAfter=depositsBefore|(11n<<128n)|(3n<<192n);
+ assert.equal(await read(newSlot),configAfter);assert.equal(await read(newSlot+1n),depositsAfter);
+ const expectedEvents=[['StakingModuleShareLimitSet(uint256,uint256,uint256,address)',[4000,6000]],['StakingModuleFeesSet(uint256,uint256,uint256,address)',[100,200]],['StakingModuleMaxDepositsPerBlockSet(uint256,uint256,address)',[11]],['StakingModuleMinDepositBlockDistanceSet(uint256,uint256,address)',[3]]];
+ assert.equal(updated.logs.length,4);
+ updated.logs.forEach((log,i)=>{assert.deepEqual([...log.topics],[ethers.id(expectedEvents[i][0]),ethers.toBeHex(1,32)]);assert.equal(log.data,words(...expectedEvents[i][1],BigInt(caller)));});
+ parameterChecks.push({name:'parameter-success-packed-storage-and-events',status:1,config:ethers.toBeHex(configAfter,32),deposits:ethers.toBeHex(depositsAfter,32),events:updated.logs.map(x=>({topics:x.topics,data:x.data}))});
+ fs.writeFileSync(path.join(out,'parameters.json'),JSON.stringify({pin,compiler:solc.version(),checks:parameterChecks},null,2));
  }finally{await rpc.disconnect();}
 }
 main().catch(e=>{console.error(e);process.exitCode=1;});
