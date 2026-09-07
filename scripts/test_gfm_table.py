@@ -121,6 +121,12 @@ CASES = (
     ("a lone complete tag ends the body",
      "| A | B |\n| --- | --- |\n| 1 | 2 |\n<span>\n| 3 | 4 |\n",
      False, [(2, 1)], [(2, 1)]),
+    # The type-7 tag is raw HTML because a rendered table is a block, not a
+    # paragraph.  The literal-region state tracker shares that distinction so
+    # its callers cannot discover Markdown headings inside the HTML body.
+    ("a type-7 tag after a table is literal",
+     "| A | B |\n| --- | --- |\n| 1 | 2 |\n<span>\n## hidden\n\n",
+     False, [(2, 1)], [(2, 1)]),
     ("an HTML comment ends the body",
      "| A | B |\n| --- | --- |\n| 1 | 2 |\n<!-- c -->\n| 3 | 4 |\n",
      False, [(2, 1)], [(2, 1)]),
@@ -157,6 +163,9 @@ CASES = (
     # text is the failure the module exists to remove.
     ("declined: a table indented inside a list item",
      "- item\n\n  | A | B |\n  | --- | --- |\n  | 1 | 2 |\n",
+     False, [], [(2, 1)]),
+    ("a nested table still closes the paragraph before a dedented type-7 tag",
+     "- item\n\n    | A | B |\n    | --- | --- |\n    | 1 | 2 |\n<span>\n## hidden\n\n",
      False, [], [(2, 1)]),
     ("declined: a table inside a block quote",
      "> | A | B |\n> | --- | --- |\n> | 1 | 2 |\n",

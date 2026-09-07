@@ -126,6 +126,18 @@ def main():
             invoke(fixture, False, "SOURCE-FIDELITY: Stage A disclosure lead paragraph must visibly disclose all canonical fidelity gaps")
         reject_hidden_stage_a("```markdown\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n```\n\n")
         reject_hidden_stage_a("<!--\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n-->\n\n")
+        # A type-7 tag may not interrupt prose, but it does start raw HTML
+        # immediately after a table (including a list-contained table).  Each
+        # of these used to select the invisible heading as Stage A and borrow
+        # the visible sentence after its blank terminator.
+        for prefix in (
+            "| A | B |\n| --- | --- |\n| 1 | 2 |\n",
+            "- item\n\n    | A | B |\n    | --- | --- |\n    | 1 | 2 |\n",
+            "- item\n\n     | A | B |\n     | --- | --- |\n     | 1 | 2 |\n",
+        ):
+            reject_hidden_stage_a(
+                prefix + "<span>\n## Stage A disclosure\n\n"
+            )
         spec = importlib.util.spec_from_file_location("fixture_audit_metadata", audit_script)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)

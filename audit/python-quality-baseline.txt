@@ -24,8 +24,8 @@ generate_ux2.py:doc_comment 49
 generate_ux2.py:statement_end 31
 gfm_table.py:find_tables 32
 markdown_text.py:_closing_parenthesis 26
-test_audit_metadata.py 746
-test_audit_metadata.py:main 57
+test_audit_metadata.py 758
+test_audit_metadata.py:main 58
 test_diagram_taxonomy.py 965
 test_diagram_taxonomy.py:main 89
 test_report_theorem_inventory.py 1249

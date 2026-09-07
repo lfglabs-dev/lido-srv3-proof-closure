@@ -232,19 +232,27 @@ def _opens_fence(line: str) -> bool:
     opening = _FENCE_OPEN.match(line)
     return bool(opening) and not (opening.group("seq")[0] == "`"
                                   and "`" in opening.group("info"))
-
-
 def _opens_table(lines: list[Row], index: int) -> bool:
     """Whether this line and its successor begin a rendered GFM table."""
     if index + 1 == len(lines):
         return False
-    header, delimiter = split_cells(lines[index].text), split_cells(lines[index + 1].text)
+    def cells(position: int) -> list[str]:
+        line = lines[position].text
+        if indent_width(line) < 4:
+            return split_cells(line)
+        for previous in range(position - 1, -1, -1):
+            candidate = lines[previous].text
+            if _LIST_ITEM.match(candidate):
+                return split_cells(line.lstrip(" \t"))
+            if candidate.strip() and not candidate[:1].isspace():
+                break
+        return split_cells(line)
+
+    header, delimiter = cells(index), cells(index + 1)
     return bool(header and delimiter and is_delimiter_row(delimiter)
                 and len(header) == len(delimiter)
                 and not _SETEXT_UNDERLINE.match(lines[index + 1].text)
                 and not ends_table(lines[index + 1].text))
-
-
 def _next_table(table: bool, literal: bool, lines: list[Row], index: int, line: str) -> bool:
     """Whether table-block state survives this line or begins on it."""
     if literal or (table and ends_table(line)):
