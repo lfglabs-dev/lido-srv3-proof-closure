@@ -14,7 +14,7 @@ bidirectional exact parent correspondence. All major internal stage interfaces a
 now expanded into independent control/arithmetic rules and physical projections.
 The remaining source execution boundaries are CALLs: primitive and deployed-callee
 binding, resource/world closure, other writers and full integration gates remain
-open. Immutable validation follows checks. Runtime execution source is unchanged.
+open. At source `7d40b232ff75cf8c2d98a046b91af743278d393a`, three selected component checks and seven baseline/import checks pass. The other 70 source/olean pairs match earlier successful receipts. See `receipts/allocation-flow-rules-summary.json`; only standard axioms were printed. Eleven dependency revisions match the manifest. These are bounded checks, not full gates. Runtime execution source is unchanged.
 
 ## Complete frame getter rules substituted through spending
 
