@@ -1,0 +1,42 @@
+{
+  "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "compiler": "0.8.25+commit.b61c2a91.Emscripten.clang",
+  "checks": [
+    {
+      "name": "status-role-before-member-and-enum",
+      "revert": "0xe2517d3f00000000000000000000000090f8bf6a479f320ead074411a4b0e7944ea8c9c13105bcbf19d4417b73ae0e58d508a65ecf75665e46c2622d8521732de6080c48",
+      "storageUnchanged": true,
+      "events": 0
+    },
+    {
+      "name": "status-member-before-enum",
+      "revert": "0xd41d6282",
+      "storageUnchanged": true,
+      "events": 0
+    },
+    {
+      "name": "status-invalid-stored-enum",
+      "revert": "0x4e487b710000000000000000000000000000000000000000000000000000000000000021",
+      "storageUnchanged": true,
+      "events": 0
+    },
+    {
+      "name": "status-unchanged-rejects",
+      "revert": "0xb942df4e",
+      "storageUnchanged": true,
+      "events": 0
+    }
+  ],
+  "original": "0xabcdef02270f2328123456780000000000000000000000000000000000000015",
+  "expected": "0xabcdef01270f2328123456780000000000000000000000000000000000000015",
+  "actual": "0xabcdef01270f2328123456780000000000000000000000000000000000000015",
+  "events": [
+    {
+      "topics": [
+        "0xfd6f15fb2b48a21a60fe3d44d3c3a0433ca01e121b5124a63ec45c30ad925a17",
+        "0x0000000000000000000000000000000000000000000000000000000000000007"
+      ],
+      "data": "0x000000000000000000000000000000000000000000000000000000000000000100000000000000000000000090f8bf6a479f320ead074411a4b0e7944ea8c9c1"
+    }
+  ]
+}

@@ -164,6 +164,28 @@ async function main(){
  assert.equal(await read(base+1n),boundary);assert.equal(await read(insertPosition),boundary);
  assert.equal(await read((arrayBase+boundary-1n)&ethers.MaxUint256),insertId);
  fs.writeFileSync(path.join(out,'enumeration-boundary.json'),JSON.stringify({pin,compiler:solc.version(),oversizedRevert:oversized,existingIdNoop:true,lastPermittedLength:(boundary-1n).toString(),resultingLength:boundary.toString(),elementAndPositionMatch:true},null,2));
+ const statusCases=[
+  {name:'status-role-before-member-and-enum',role:0n,position:0n,packed:original|(255n<<224n),error:selector('AccessControlUnauthorizedAccount(address,bytes32)')+words(BigInt(caller),BigInt(manageRole)).slice(2)},
+  {name:'status-member-before-enum',role:1n,position:0n,packed:original|(255n<<224n),error:selector('StakingModuleUnregistered()')},
+  {name:'status-invalid-stored-enum',role:1n,position:1n,packed:original|(255n<<224n),error:'0x4e487b71'+words(33).slice(2)},
+  {name:'status-unchanged-rejects',role:1n,position:1n,packed:original,error:selector('StakingModuleStatusTheSame()')}
+ ];
+ const statusChecks=[];
+ for(const test of statusCases){
+  await write(manageMember,test.role);await write(position,test.position);await write(slot,test.packed);
+  let raw;try{await h.setStakingModuleStatus.staticCall(7,2);assert.fail('expected status rejection');}catch(e){raw=e.data;}
+  assert.equal(raw,test.error,test.name);
+  let failed;try{await(await h.setStakingModuleStatus(7,2,{gasLimit:1000000})).wait();assert.fail('expected failed status transaction');}catch(e){failed=e.receipt;}
+  assert(failed);assert.equal(failed.status,0);assert.equal(failed.logs.length,0);assert.equal(await read(slot),test.packed);
+  statusChecks.push({name:test.name,revert:raw,storageUnchanged:true,events:0});
+ }
+ await write(manageMember,1n);await write(position,1n);await write(slot,original);
+ const statusReceipt=await(await h.setStakingModuleStatus(7,1,{gasLimit:1000000})).wait();
+ const statusExpected=(original&~(255n<<224n))|(1n<<224n);
+ assert.equal(await read(slot),statusExpected);assert.equal(statusReceipt.logs.length,1);
+ assert.deepEqual([...statusReceipt.logs[0].topics],[ethers.id('StakingModuleStatusSet(uint256,uint8,address)'),ethers.toBeHex(7,32)]);
+ assert.equal(statusReceipt.logs[0].data,words(1,BigInt(caller)));
+ fs.writeFileSync(path.join(out,'status.json'),JSON.stringify({pin,compiler:solc.version(),checks:statusChecks,original:ethers.toBeHex(original,32),expected:ethers.toBeHex(statusExpected,32),actual:ethers.toBeHex(await read(slot),32),events:statusReceipt.logs.map(x=>({topics:x.topics,data:x.data}))},null,2));
  }finally{await rpc.disconnect();}
 }
 main().catch(e=>{console.error(e);process.exitCode=1;});
