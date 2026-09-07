@@ -1,0 +1,13 @@
+{
+  "source_commit": "52a4e46ede0e53f0f9a21ced8cd7440b655fd6ad",
+  "argv": [
+    "solidity/trio-reserve1/.tools/node-v22.15.0-linux-x64/bin/node",
+    "solidity/trio-reserve1/compile-queue-finalize.cjs"
+  ],
+  "receipt_dir": "audit/trio/reserve1/receipts/queue-compilation-52a4e46ede0e53f0f9a21ced8cd7440b655fd6ad",
+  "started": "2026-09-07T18:44:12.304650+00:00",
+  "ended": "2026-09-07T18:44:21.554504+00:00",
+  "exit": 0,
+  "log": "audit/trio/reserve1/receipts/queue-compilation-52a4e46ede0e53f0f9a21ced8cd7440b655fd6ad.txt",
+  "log_sha256": "57b776a50e18077de8ca417fbfded966f9770d2b99ab42ae1c321769bb5ef78a"
+}

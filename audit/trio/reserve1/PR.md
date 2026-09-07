@@ -23,9 +23,13 @@ Independent callee-reply relations now compose callback entries through vault CA
 
 The new queue-finalization source model covers physical pause/role admission, entry and internal guard ordering, checkpoint/locked/finalized writes, saved cumulative rows, late share-subtraction panic, both events and payable dispatch. Thirteen Lean model cases pass, using an explicit mapping-hash fixture. Actual ERC721 queue bytecode comparison, independent finalization correspondence and report integration remain open.
 
-At source `e8d8c8964289fb1277c1dd8b8a220be781994c01`, two selected queue source/test checks and seven baseline checks pass; 108 unchanged component source/olean pairs and eleven dependency revisions match retained receipts. [Queue source evidence](audit/trio/reserve1/receipts/queue-finalize-summary.json) includes model cases and selector/slot provenance. Prior composed-vault runtime sources remain unchanged; no new EVM run is claimed for queue finalization. Component checks use existing dependency oleans and are not a clean/full build or canonical registration.
+Fifteen comparisons now execute inherited production ERC721 queue finalization against QueueFinalize. They compare physical pause/role and checkpoint storage, raw failure bytes, queue balance and sender value debit after gas costs, events and zero nested calls. Recorded Keccak preimages cover executed 64-byte mapping hashes and model lookups. Independent finalization correspondence and report integration remain open.
+
+At source `7aa8c17fa03cab39749fabc4496c6cbbc4210793`, the new differential module and seven baseline checks pass; 110 unchanged component source/olean pairs and eleven dependency revisions match retained receipts. [Queue execution evidence](audit/trio/reserve1/receipts/queue-execution-summary.json) links immutable compilation, deployment, commands and compressed traces. Earlier composed-vault runtime sources remain unchanged. Component checks use existing dependency oleans and are not a clean/full build or canonical registration.
 
 Runtime evidence remains attributed to its tested commits:
+
+- `7aa8c17fa03cab39749fabc4496c6cbbc4210793`: 15 inherited ERC721 queue finalization comparisons with physical storage, Keccak rows, balance/debit, raw failures and events. [Queue evidence](audit/trio/reserve1/receipts/queue-execution-summary.json).
 
 - `cd115f33e62b12e7253f0747860bfb16817a0a6e`: 12 fresh production-vault/inherited-Lido comparisons using the exact interpreter covered by the composed report proof. [Composed report evidence](audit/trio/reserve1/receipts/report-vaults-summary.json).
 

@@ -263,3 +263,14 @@ storage byte, with fixed-width lowercase address/role failure text. `dispatch`
 models the payable two-word entry. Thirteen QueueFinalizeCases use explicit mapping
 hash fixtures; real bytecode/layout comparison and independent specification remain
 open. Slot/error provenance: receipts/queue-finalize-selectors.json.
+
+## ERC721 finalization runtime binding
+
+QueueFinalizeHarness inherits WithdrawalQueueERC721 with unchanged production
+finalization/pause/role methods and physical storage setup/read helpers. Its isolated
+solc 0.8.9 build and deployed runtime are retained. execute-queue-finalize.cjs compares
+15 actual transactions against QueueFinalizeDifferential, including raw revert bytes,
+observed storage, queue balance, sender value debit excluding gas costs and events.
+No nested CALLs occur. Recorded Keccak rows cover model lookups and executed 64-byte
+mapping SHA3 preimages. See receipts/queue-execution-summary.json. Independent
+finalization rules, report integration and proxy/resource/world closure remain open.

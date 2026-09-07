@@ -1,0 +1,2 @@
+LidoSRv3/Tests/TrioReserve1/QueueFinalizeDifferential.lean:23:73: error: unexpected identifier; expected '}'
+LidoSRv3/Tests/TrioReserve1/QueueFinalizeDifferential.lean:42:4: error: `main` has already been declared

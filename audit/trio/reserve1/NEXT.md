@@ -1,18 +1,16 @@
 # Continuation — not a completion claim
 
-Latest increment: QueueFinalize models physical ERC721/base finalization, pause and
-role membership, ordered guards/checkpoint writes/locked funds/finalized ID, saved
-packed rows and late shares-underflow rollback plus both events. Source
-e8d8c8964289fb1277c1dd8b8a220be781994c01 has two selected checks, thirteen executed Lean
-cases and seven baselines; 108 unchanged components match. See queue-finalize-summary.
-Next compile an inherited WithdrawalQueueERC721 harness without modifying historical
-QueueHarness/artifacts; compare real finalization bytecode against this model, including
-pause/role error bytes, checkpoint layout and late rollback. The old QueueHarness
-inherits WithdrawalQueue only and does not expose the production ERC721 finalize entry.
-Then prove independent finalization rules and integrate this callee into report
-composition. Model test hashing is an explicit fixture. Existing vault runtime sources
-remain unchanged and do not cover QueueFinalize. Full remote gates and remaining
-writer/deployment/entry/resource/codec/bounded-world obligations stay open.
+Latest increment: 15 inherited ERC721 queue finalization EVM comparisons match
+QueueFinalize at source 7aa8c17fa03cab39749fabc4496c6cbbc4210793. Physical pause/role rows,
+checkpoint layout, observed storage, raw failures, queue balance and gas-adjusted
+sender value debit, events and no nested calls are compared. Recorded Keccak rows
+cover model lookups and executed 64-byte mapping hashes. See queue-execution-summary.
+One selected module and seven baselines pass; 110 unchanged source/olean pairs match.
+New harness/compiler retain historical artifacts; failed timestamp-cache draft is kept.
+Next prove independent finalization specification and integrate the actual queue
+callee into the report/vault composition. Deployment/entry/writer/resource/codec/
+bounded-world and full remote gate obligations remain. Finite EVM cases do not
+substitute for independent source correspondence or full integration.
 
 Read STATUS, current git HEAD, and admission/ABI plus oracle/component receipts first. The previous
 goal turn was progress: source-callee implementations, checked specifications

@@ -1,0 +1,36 @@
+{
+  "source_commit": "52a4e46ede0e53f0f9a21ced8cd7440b655fd6ad",
+  "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "utc": "2026-09-07T18:49:01.458Z",
+  "node": "v22.15.0",
+  "node_sha256": "c43f3f73f6917481d2364daf7b7bf8c4fc4a7643580b4626f13f003131ec8716",
+  "ethers": "6.14.4",
+  "backend": "2.26.3",
+  "compilation": "/workspaces/mission-f19a12b3/reserve1-private/audit/trio/reserve1/receipts/queue-compilation-52a4e46ede0e53f0f9a21ced8cd7440b655fd6ad",
+  "compilation_receipt_sha256": "012e22e6b170e8ec2c352523eede03d3f6cb0e7e215e5e92b55beacfcd609b9e",
+  "artifact_sha256": "f4f0adbcd191c31682978ee60d90fa1130196614838ac31b0ca808e29e9df2d6",
+  "deployment_sha256": "f4c197b43956001f2e7dd0a51c4894ae033c7304ff93a6fc966a241f40b6411c",
+  "lean": "/workspaces/mission-f19a12b3/reserve1-private/audit/trio/reserve1/.local/lean4-v4.31.0/bin/lean",
+  "lean_sha256": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550",
+  "lean_version": "Lean (version 4.31.0, x86_64-unknown-linux-gnu, commit 68218e876d2a38b1985b8590fff244a83c321783, Release)",
+  "lean_path": "/workspaces/mission-f19a12b3/reserve1-private/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/verity/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/evmyul/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/mathlib/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/plausible/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/importGraph/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/aesop/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/Qq/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/batteries/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/Cli/.lake/build/lib/lean",
+  "argv": [
+    "--run",
+    "LidoSRv3/Tests/TrioReserve1/QueueFinalizeDifferential.lean",
+    "/workspaces/mission-f19a12b3/reserve1-private/audit/trio/reserve1/receipts/queue-evm-draft-2/input.json",
+    "/workspaces/mission-f19a12b3/reserve1-private/audit/trio/reserve1/receipts/queue-evm-draft-2/lean.json"
+  ],
+  "lean_exit": 0,
+  "source_hashes": {
+    "LidoSRv3/Audit/Source/TrioReserve1/QueueFinalize.lean": "2d80adef784e41c79c5dcbac0fc714bd772e9aff92a793fb7e5b869e7bf68038",
+    "LidoSRv3/Audit/Source/TrioReserve1/Queue.lean": "be75949b3843e55ce9cbe56ad20f54dcf95b8d0ed6dbe380778366863aac6890",
+    "LidoSRv3/Audit/Source/TrioReserve1/Live.lean": "f0479c959ca823fd95db8aab2a833ec8f7094abd0ada9a715f7e8c9052c468bb",
+    "LidoSRv3/Audit/Source/TrioReserve1/CallData.lean": "182787dda65d6cc315048e89212e1ef1bdb9d4c6a2084dad5413c303485d65eb",
+    "LidoSRv3/Audit/Source/TrioReserve1/ReplyABI.lean": "ba8648d9a837ce31560424f0b84db5b0e206abb40585137fcf6a7bd0c37e7544",
+    "LidoSRv3/Tests/TrioReserve1/QueueFinalizeDifferential.lean": "1bf4624aee7e6d5752acc6e13311c74642aafdbb7a985e6a7b2ba61d5fa74d24",
+    "LidoSRv3/Tests/TrioReserve1/ReportDifferential.lean": "6f30f9638554047ef76ff858dc5b72b6057d03fe512d7ea039c2ee86950eb9a1",
+    "solidity/trio-reserve1/execute-queue-finalize.cjs": "a6dc04db449f1ef1bfbc283e7fcce0d4b9326d49e4ff1e23ebbe3762d4864b5d",
+    "solidity/trio-reserve1/QueueFinalizeHarness.sol": "abe85b19b982a0e1a6bd9b23f2733f391ff119cd14f77716c5bca0e16383742b"
+  },
+  "scope": "Inherited production ERC721 queue finalize, physical setup and recorded Keccak rows; no proxy/resource or all-path claim"
+}

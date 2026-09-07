@@ -1,5 +1,27 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## ERC721 queue finalization bytecode comparisons
+
+Fifteen comparisons now match the inherited pinned WithdrawalQueueERC721.finalize
+body against QueueFinalize, including physical pause and role-byte admission,
+checkpoint layout, observed storage, raw failure bytes, queue balance, sender value
+debit after transaction gas costs, events and the absence of nested calls. The
+recorded Keccak preimages cover executed 64-byte mapping hashes and model lookups.
+Cases include successful/trailing-data/zero-value calls, ordered admission and ID
+failures, amount/counter arithmetic failures, and late shares-underflow rollback.
+
+At source `7aa8c17fa03cab39749fabc4496c6cbbc4210793`, the new differential module and seven
+baseline checks pass; 110 unchanged source/olean pairs and eleven dependencies match.
+`receipts/queue-execution-summary.json` links immutable source/command/compiler and
+deployed code evidence plus compressed traces. A dedicated harness inherits the
+production finalizer unchanged; fixture helpers only set/read physical storage.
+The draft timestamp-cache runner failure and draft Lean failures are retained.
+
+These are fifteen finite local EVM cases, not independent finalization correspondence
+or report integration. Those remain open, along with deployment/entry/resource/
+codec/bounded-world and other accounting writer closure, full gates and independent
+review. The earlier composed vault runtime sources remain unchanged.
+
 ## Physical queue finalization source model
 
 `QueueFinalize` models pinned ERC721 finalization and its base writer: physical

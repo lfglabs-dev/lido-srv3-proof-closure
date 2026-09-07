@@ -1,0 +1,11 @@
+[
+  {
+    "name": "finalization success",
+    "file": "trace-1.json.gz",
+    "sha256": "555331cbe9954495ec278e2b13937f52cf39f6c19b97ff09ff8d0bf0f846f863",
+    "decompressed_sha256": "aaac1afbd41eba8e5ba6fcec3aabf98b06926380cfebf27e26559c730402a830",
+    "bytes": 1661061,
+    "transaction": "0x318b5b3c0f8f39635cba9d7316d1c6738ad0bdbe078276bebc5ac4165d875075",
+    "status": 1
+  }
+]
