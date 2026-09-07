@@ -67,8 +67,21 @@ Observed remote diagnostics:
 - Published pinned-repository fetch: HTTP 422, `insufficient node disk: 86 GiB available, 32 GiB estimated plus 80 GiB emergency floor`.
 - Explicit `old-agent` also resolves to `ashur` and returns the same disk rejection.
 
-No rejected request is a successful remote build. No estimate was reduced, emergency
-floor bypassed, credential accessed, or heavy local fallback performed.
+No rejected request is a successful remote build. Initial requests retained the
+32 GiB estimate. On 2026-09-07, measurement of the existing complete pinned build
+showed 2.9 GiB `.lake`, 283 MiB Git data and 11 MiB Solidity source. With a revised
+5 GiB estimate, the unchanged emergency floor admitted the full build:
+
+```sh
+REMOTE_BUILD_ESTIMATED_DISK_GB=5 REMOTE_BUILD_SOURCE_MODE=overlay \
+  remote-lean-build lake build LidoSRv3 LidoSRv3Test LidoSRv3Audit LidoSRv3Legacy
+```
+
+Source SHA: `8269ac576cf119975a7e9954459cd4aa04d5cd82`. Remote job:
+`3ca9d1e4-e496-43f7-87f2-a5925a9bd083` on `nippur`. Durable wrapper:
+`b5419df7-2f52-485e-a96b-38687d1e65e8`. Running as of 12:38 UTC; not yet a
+passing receipt. No emergency floor bypass, credential access or heavy local
+fallback occurred.
 
 `make test` currently exits 2 at `scripts/generate_ux2.py check`: the shared
 `audit/ux2/index.json` differs from the registry/Lean sources. This branch does not
