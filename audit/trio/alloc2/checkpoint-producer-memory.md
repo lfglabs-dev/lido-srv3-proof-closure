@@ -75,3 +75,20 @@ this was a build-configuration failure, not a successful theorem check. The
 first guard-proof draft b063734a-7d67-4c0a-8acd-8991a0e98bc0 failed because the
 nested slot monad needed its own refinement lemma. Both terminal receipts are
 retained explicitly; only the corrected passing build is positive evidence.
+
+Corrected runtime validation d9223586-4000-475c-be23-8debf75a95dc passed all
+59 jobs on babylon. Runtime.producer_success_runtime elaborated and its axiom
+inspection lists only propext, Classical.choice and Quot.sound. It derives the
+pinned Verity Contract.run outcome for the actual producer arrays from successful
+interleaved producer execution, without a separate ABI length premise. The
+runtime Lake configuration explicitly lists the composition proof modules;
+recursive discovery incorrectly included lakefile.lean in the intermediate
+failed attempt e4eb51c1-20de-4926-88ee-b698c4eca8f9. That receipt is retained.
+
+Reproduce the complete runtime dependency build with:
+
+```
+python3 audit/trio/alloc2/runtime/prepare.py
+cd ../temp/alloc2-runtime/audit/trio/alloc2/runtime
+remote-lean-build lake build
+```
