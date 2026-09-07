@@ -61,13 +61,34 @@ a deployment, bytecode, or audit-certification claim.
 
 ## Reproduce
 
-Needs [elan](https://github.com/leanprover/elan) and Lean 4.31.0.
+Needs [elan](https://github.com/leanprover/elan), Lean 4.31.0, Python 3.10+
+and Bash 4+. The standard `make test` also executes Solidity/Verity differential
+tests: install Foundry (`forge`) and initialize the pinned `lido-core` submodule.
+Foundry must have Solidity 0.8.25 available (or network access to obtain that
+compiler on the first build). The differential harness uses FFI to invoke the
+local Lean runner. Put these tools on `PATH`; macOS's system Bash and Python
+may be older than the required versions.
+
+Before running the gates, provision and check their dependencies:
+
+```bash
+git submodule update --init --recursive
+python3 --version
+bash --version
+forge --version
+lake env lean --version
+FOUNDRY_PROFILE=minfirst_source forge build
+```
+
+The Forge build checks compiler availability without running the FFI tests.
+See [the differential harness scope](audit/MINFIRST-SOURCE-ENTRY.md) for its
+prerequisites, observables and exclusions.
 
 ```bash
 lake build         # production library (no Tests, Legacy, or Trust)
 lake build LidoSRv3Test   # mutants, vectors, nested Verity tests
 make audit-check   # registry, pins, source map, generated views
-make test          # metadata, trust, import DAG, then LidoSRv3Test
+make test          # Solidity/Verity differential tests, metadata, trust, import DAG, LidoSRv3Test
 make prove         # builds LidoSRv3 and LidoSRv3Legacy; writes proofs/logs/proof-report.json
 ```
 

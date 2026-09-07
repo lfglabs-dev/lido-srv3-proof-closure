@@ -256,10 +256,10 @@ Split loop: Solidity makes the `_getStakingModuleSummary` call (`SRLib.sol:516-5
 and the type-2 `getTotalModuleStake()` call (`SRLib.sol:529`) inside the first
 allocation loop (`SRLib.sol:508-533`), interleaved with the arithmetic of lines
 521-532. The Lean model runs all the calls first, in the same router order, and
-only then executes `sourceExecute` over the bound rows. The two orders are
-observationally equal because the calls are `staticcall`s (no state written
-between iterations) and the loop arithmetic does not feed back into the call
-arguments. -/
+only then executes `sourceExecute` over the bound rows. No equivalence is
+established for full outcomes or call traces: checked arithmetic can fail
+before a later call in Solidity. The successful-binding theorem observes rows;
+this hoisting remains a source-fidelity gap. -/
 def bindLiveAll
     (adversary : Compiler.CompilationModel.DenoteExternalCalls.AdversaryModel)
     (snapshot : ContractState) : Nat → Nat → Contract (List BoundModule)
@@ -516,5 +516,17 @@ def seedAll : Nat → List BoundModule → ContractState → ContractState
 def stateFor (modules : List BoundModule) (base : ContractState := defaultState) :
     ContractState :=
   seedAll 0 modules base
+
+/-- Rollback for the actual live wrapper, for arbitrary modeled callee results.
+This is a Contract.run property; it does not establish source call ordering or
+remove the wrapper's synthetic observation storage and failure hook. -/
+theorem live_revert_restores_snapshot
+    (adversary : Compiler.CompilationModel.DenoteExternalCalls.AdversaryModel)
+    (cfg : Config) (depositsToAllocate : Word) (isTopUp inject : Bool)
+    (state rollback : ContractState) (reason : String)
+    (h : (allocateLiveFromStorage adversary cfg depositsToAllocate isTopUp inject).run state =
+      .revert reason rollback) : rollback = state := by
+  unfold Contract.run at h
+  split at h <;> simp_all
 
 end LidoSRv3.Audit.Verity.AllocationTx

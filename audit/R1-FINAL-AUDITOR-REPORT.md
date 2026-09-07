@@ -4,7 +4,7 @@
 
 ## Decision
 
-Review basis: recorded input set (Stage A disclosure amendment; no proof-status upgrade) `aed5a18fa059a6907e89de59dbc1bb4434f73670`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
+Review basis: normal merge of the landed source-fidelity-A input with the MinFirst boundary amendment (no parent upgrade) `6a2a91341ac83c8fbf93dfa274897387e5b8a188`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
 
 ## Architecture and evidence boundary
 

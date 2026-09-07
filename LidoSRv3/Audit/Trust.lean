@@ -1,5 +1,6 @@
 import LidoSRv3.Audit.Guarantees.PEthConfinement1
 import LidoSRv3.Tests.EthConfinementMutants
+import LidoSRv3.Audit.Verity.MinFirstSourceEntry
 import LidoSRv3.Audit.Allocation
 import LidoSRv3.Audit.StrategyProofs
 import LidoSRv3.Audit.Common.Atomicity
@@ -566,3 +567,11 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Common.success_exposes_exact_committed_effects
 
 #print axioms LidoSRv3.Audit.Guarantees.PEthConfinement1.modeled_positive_value_is_confined_or_residual
+#print axioms LidoSRv3.Audit.Verity.MinFirstSourceEntry.zero_demand
+#print axioms LidoSRv3.Audit.Verity.MinFirstSourceEntry.short_capacity
+#print axioms LidoSRv3.Audit.Verity.MinFirstSourceEntry.success_preserves_state
+#print axioms LidoSRv3.Audit.Verity.MinFirstSourceEntry.revert_restores_snapshot
+#print axioms LidoSRv3.Audit.Verity.MinFirstSourceEntry.success_refines_proportional_model
+#print axioms LidoSRv3.Audit.Verity.AllocationTx.live_revert_restores_snapshot
+
+#print axioms LidoSRv3.Audit.Verity.MinFirstSourceEntry.eager_guard_disagrees_on_zero_demand
