@@ -15,7 +15,9 @@ lean_lib TrioAlloc2Slice where
     .one `LidoSRv3.Audit.Source.TrioAlloc2.Loop,
     .one `LidoSRv3.Audit.Source.TrioAlloc2.StepBounds,
     .one `LidoSRv3.Audit.Source.TrioAlloc2.LoopBounds,
+    .one `LidoSRv3.Audit.Source.TrioAlloc2.Conservation,
     .one `LidoSRv3.Tests.TrioAlloc2.Step,
     .one `LidoSRv3.Tests.TrioAlloc2.Loop,
+    .one `LidoSRv3.Tests.TrioAlloc2.Sequential,
     .one `LidoSRv3.Tests.TrioAlloc2.Axioms
   ]

@@ -1,0 +1,29 @@
+{
+  "job_id": "201e16b2-9c5e-463c-aa0e-e6db10697573",
+  "node_id": "ashur",
+  "state": "succeeded",
+  "receipt_state": "succeeded",
+  "exit_code": 0,
+  "created_at": "2026-09-07T09:43:45.429660617+00:00",
+  "started_at": "2026-09-07T09:43:45.440798046+00:00",
+  "finished_at": "2026-09-07T09:43:49.458015457+00:00",
+  "error": null,
+  "log_tail": "HEAD is now at c7adae0 audit: scope allocation rollback and single-call top-up claims (#242)\nRemoving LidoSRv3/Audit/Source/TrioAlloc2/\nRemoving LidoSRv3/Tests/TrioAlloc2/\nRemoving audit/trio/\nsource bundle verified sha256=66796ea55c47d0d58b593a22e64362007c58b30638fbdfcf8c4c170d26c7892a files=12 bytes=30645\ninfo: trioAlloc2Slice: no previous manifest, creating one from scratch\ninfo: toolchain not updated; no toolchain information found\n\u2714 [2/13] Built LidoSRv3.Audit.Source.TrioAlloc2.Word (333ms)\n\u2714 [3/13] Built LidoSRv3.Audit.Source.TrioAlloc2.Spec (303ms)\n\u2714 [4/13] Built LidoSRv3.Audit.Source.TrioAlloc2.Step (342ms)\n\u2714 [5/13] Built LidoSRv3.Tests.TrioAlloc2.Step (237ms)\n\u2714 [6/13] Built LidoSRv3.Audit.Source.TrioAlloc2.StepBounds (355ms)\n\u2714 [7/13] Built LidoSRv3.Audit.Source.TrioAlloc2.Loop (287ms)\n\u2714 [8/13] Built LidoSRv3.Audit.Source.TrioAlloc2.LoopBounds (395ms)\n\u2714 [9/13] Built LidoSRv3.Tests.TrioAlloc2.Loop (245ms)\n\u2714 [10/13] Built LidoSRv3.Audit.Source.TrioAlloc2.Conservation (502ms)\n\u2139 [11/13] Built LidoSRv3.Tests.TrioAlloc2.Axioms (178ms)\ninfo: ../../../LidoSRv3/Tests/TrioAlloc2/Axioms.lean:8:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocateLoop' depends on axioms: [propext, Quot.sound]\ninfo: ../../../LidoSRv3/Tests/TrioAlloc2/Axioms.lean:9:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocate_zero_demand' depends on axioms: [propext, Quot.sound]\ninfo: ../../../LidoSRv3/Tests/TrioAlloc2/Axioms.lean:10:0: 'LidoSRv3.Audit.Source.TrioAlloc2.step_invariants' depends on axioms: [propext, Quot.sound]\ninfo: ../../../LidoSRv3/Tests/TrioAlloc2/Axioms.lean:11:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocateLoop_amount_between' depends on axioms: [propext, Quot.sound]\ninfo: ../../../LidoSRv3/Tests/TrioAlloc2/Axioms.lean:12:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocate_amount_le_demand' depends on axioms: [propext, Quot.sound]\ninfo: ../../../LidoSRv3/Tests/TrioAlloc2/Axioms.lean:13:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocateLoop_preserves_length' depends on axioms: [propext, Quot.sound]\ninfo: ../../../LidoSRv3/Tests/TrioAlloc2/Axioms.lean:14:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocate_preserves_length' depends on axioms: [propext, Quot.sound]\ninfo: ../../../LidoSRv3/Tests/TrioAlloc2/Axioms.lean:15:0: 'LidoSRv3.Audit.Source.TrioAlloc2.Spec.Distributes.preserves_length' depends on axioms: [propext]\ninfo: ../../../LidoSRv3/Tests/TrioAlloc2/Axioms.lean:17:0: 'LidoSRv3.Audit.Source.TrioAlloc2.bucketTotal_set' depends on axioms: [propext]\ninfo: ../../../LidoSRv3/Tests/TrioAlloc2/Axioms.lean:18:0: 'LidoSRv3.Audit.Source.TrioAlloc2.step_conserves' depends on axioms: [propext]\ninfo: ../../../LidoSRv3/Tests/TrioAlloc2/Axioms.lean:19:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocateLoop_conserves' depends on axioms: [propext, Quot.sound]\ninfo: ../../../LidoSRv3/Tests/TrioAlloc2/Axioms.lean:20:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocate_conserves' depends on axioms: [propext, Quot.sound]\ninfo: ../../../LidoSRv3/Tests/TrioAlloc2/Axioms.lean:21:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocate_twice_conserves' depends on axioms: [propext, Quot.sound]\n\u2714 [12/13] Built LidoSRv3.Tests.TrioAlloc2.Sequential (267ms)\nBuild completed successfully (13 jobs).\n",
+  "validation": {
+    "version": 1,
+    "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+    "commit": "c7adae04416704a839d56333efad003f0a0f46b7",
+    "base_tree_sha": "27834bd59a19f789b2fb9d06f9de01b47af123c2",
+    "cwd_rel_known": true,
+    "cwd_rel": "audit/trio/alloc2",
+    "command": [
+      "lake",
+      "build"
+    ],
+    "toolchain": "leanprover/lean4:v4.31.0",
+    "source_bundle_digest": "7e4a48079be87f8f75536f8db4125a0069dacfdfa91430705e1f0f7a0d9a0992",
+    "build_protocol_version": "1",
+    "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+  },
+  "artifacts": []
+}

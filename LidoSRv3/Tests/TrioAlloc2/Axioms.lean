@@ -1,4 +1,4 @@
-import LidoSRv3.Audit.Source.TrioAlloc2.LoopBounds
+import LidoSRv3.Audit.Source.TrioAlloc2.Conservation
 import LidoSRv3.Audit.Source.TrioAlloc2.Spec
 
 /- Supplemental owned-slice inspection. This does not replace the shared
@@ -13,3 +13,9 @@ open LidoSRv3.Audit.Source.TrioAlloc2
 #print axioms allocateLoop_preserves_length
 #print axioms allocate_preserves_length
 #print axioms Spec.Distributes.preserves_length
+
+#print axioms bucketTotal_set
+#print axioms step_conserves
+#print axioms allocateLoop_conserves
+#print axioms allocate_conserves
+#print axioms allocate_twice_conserves
