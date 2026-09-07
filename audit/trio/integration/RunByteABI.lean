@@ -4,8 +4,9 @@ import Lake
 The earlier full RunValidation receipt remains bound to its own source commit. -/
 def main : IO Unit := do
   let commands : Array (String × Array String) := #[
-    ("lake", #["build", "audit.trio.alloc2.runtime.ByteABIVectors"]),
-    ("lake", #["env", "lean", "audit/trio/alloc2/runtime/ByteABIVectors.lean"])
+    ("lake", #["build", "audit.trio.alloc2.runtime.ByteABIVectors", "audit.trio.alloc2.runtime.ByteWordCopy"]),
+    ("lake", #["env", "lean", "audit/trio/alloc2/runtime/ByteABIVectors.lean"]),
+    ("lake", #["env", "lean", "audit/trio/alloc2/runtime/ByteWordCopy.lean"])
   ]
   for (cmd, args) in commands do
     let label := s!"{cmd} {String.intercalate " " args.toList}"

@@ -119,6 +119,7 @@ lean_lib «TrioIntegrationChecks» where
     .one `audit.trio.alloc2.runtime.ByteABIFrame,
     .one `audit.trio.alloc2.runtime.ByteABIProducer,
     .one `audit.trio.alloc2.runtime.ByteABIVectors,
+    .one `audit.trio.alloc2.runtime.ByteWordCopy,
     .one `audit.trio.alloc2.composition.ParentPostconditions,
     .one `audit.trio.alloc2.composition.ParentVectors,
     .one `audit.trio.alloc2.composition.MemoryVectors,
