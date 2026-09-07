@@ -1,15 +1,15 @@
 # Continuation — not a completion claim
 
-Latest increment: twelve production-vault/inherited-Lido EVM comparisons match the
-composed Lean model at source 86ec8bf257ad8244f1a7ef4ae6c194c22f3ba4b5. One new component
-check and seven baseline checks pass; 99 unchanged source/olean pairs match.
-See vault-execution-summary.json for compilation, immutable constructor/deployed
-code, raw failure bytes, all balances, nested CALL and compressed trace receipts.
-Locator and queue remain fixtures. Next close independent vault/callback callee
-specifications and remaining direct admission/ABI cases; implement actual queue
-finalization and remaining deployment/entry/writer/resource obligations. Current
-suite covers twelve finite report paths, not all vault entries or proxy deployment.
-Full remote gates remain missing; no new transport tool is exposed.
+Latest increment: VaultSpec/VaultRules independently specify and prove exact
+bidirectional reward/withdrawal body and root transaction correspondence, including
+ordered guards, greatest bounded reward cap, callback skipping/results, independent
+CALL rules and full-world error restoration with attempts retained.
+Source 26a09e7a4872a317824aab3461d9696aec48b2eb: three selected checks, seven baselines,
+99 unchanged source/olean pairs, standard axioms. See vault-rules-summary.json.
+The twelve production-vault EVM cases retain unchanged runtime sources; no rerun.
+Next discharge independent callback/dispatch binding and compose these concrete
+callee rules through the report. Actual queue finalization, deployment/entry/writer/
+resource/bounded-world obligations and full remote gates remain open.
 
 Read STATUS, current git HEAD, and admission/ABI plus oracle/component receipts first. The previous
 goal turn was progress: source-callee implementations, checked specifications

@@ -1,5 +1,23 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Independent vault body and transaction rules
+
+`VaultSpec` defines the greatest reward amount bounded by balance and maximum,
+ordered caller/zero/funds guards, skipped callbacks and callback success/failure.
+`VaultRules` substitutes independent CALL rules and proves exact bidirectional
+body outcome/world/attempt correspondence for both vaults, plus existence.
+Independent transaction rules commit successful worlds and restore the complete
+incoming world on error while retaining attempts; both root correspondences pass.
+
+At source `26a09e7a4872a317824aab3461d9696aec48b2eb`, three selected checks and seven
+baseline checks pass. The other 99 component source/olean pairs and eleven dependency
+revisions match retained receipts; inspected axioms are standard. See
+`receipts/vault-rules-summary.json`. Runtime source hashes match the twelve prior
+production-vault comparisons; no new execution run is claimed for these proofs.
+Remaining obligations include independent callback/dispatch binding and report
+composition, actual queue finalization, entry/proxy/resource/bounded-world and other
+writer closure, full remote gates and independent review.
+
 ## Production vault execution comparisons
 
 Twelve comparisons now execute the unmodified pinned reward/withdrawal vaults and

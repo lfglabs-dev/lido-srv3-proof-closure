@@ -205,3 +205,15 @@ Report/Vaults/VaultCallbacks model on the same twelve inputs. Comparison include
 raw failure bytes, nested CALL data/value/result, state, four balances and events.
 The locator and finalization receiver remain CallFixture boundaries. Evidence:
 receipts/vault-execution-summary.json. No all-path or proxy/resource claim follows.
+
+## Independent vault correspondence
+
+`VaultSpec.Capped` is the greatest quantity bounded by observed balance and caller
+maximum. Independent Rewards/Withdrawals relations specify source guard order,
+callback skipping and every callback outcome for the pinned vault bodies mapped
+above. `VaultRules` substitutes CallFlow.Describes, proving bidirectional body and
+root outcome/world/attempt correspondence plus existence. `VaultSpec.Root` gives
+success commit and original-world failure restoration independently of executors.
+The raw callback interpreter and dispatch/deployment binding remain boundaries.
+Evidence: receipts/vault-rules-summary.json; unchanged runtime sources retain their
+twelve production-vault comparisons without a new EVM execution claim.
