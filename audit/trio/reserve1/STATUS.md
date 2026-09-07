@@ -1,5 +1,28 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Production vault execution comparisons
+
+Twelve comparisons now execute the unmodified pinned reward/withdrawal vaults and
+inherited Lido report/callback bodies against the composed Lean model. They compare
+raw root failure bytes, packed accounting, reward counter, reserve/target, all four
+balances, events and ordered direct/nested CALL values/payloads/results. Cases cover
+reward capping and an empty vault, insufficient withdrawals, cumulative reward
+counter overflow, zero amounts, pause/authorization, late queue rejection, report
+arithmetic failure and uint128 narrowing with actual incoming rewards.
+
+Source `86ec8bf257ad8244f1a7ef4ae6c194c22f3ba4b5` has one new selected component check and
+seven baseline checks passing. The other 99 component source/olean pairs and eleven
+dependency revisions match retained receipts. `receipts/vault-execution-summary.json`
+links exact source, compilation, constructor/deployed code, command and compressed
+trace evidence. Earlier draft evidence is retained. The unchanged Lido artifact is
+reused; both vaults were compiled directly with pinned solc 0.8.9, optimizer 200,
+Istanbul target, then executed on the local Hardhat Cancun backend.
+
+Locator and queue remain fixtures in this suite. Independent callee specification,
+all-path admission/ABI coverage, actual queue finalization, proxy/entry/resource and
+bounded-world binding, remaining writer sequences, full remote gates and independent
+review remain open. Twelve finite comparisons do not discharge those obligations.
+
 ## Source vaults and Lido callbacks
 
 `Vaults` models pinned reward-vault balance capping, caller admission, zero/funds

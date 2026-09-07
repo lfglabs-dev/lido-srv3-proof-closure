@@ -1,0 +1,13 @@
+{
+  "source_commit": "86ec8bf257ad8244f1a7ef4ae6c194c22f3ba4b5",
+  "argv": [
+    "/workspaces/mission-f19a12b3/reserve1-private/solidity/trio-reserve1/.tools/node-v22.15.0-linux-x64/bin/node",
+    "solidity/trio-reserve1/execute-vaults.cjs"
+  ],
+  "cwd": "/workspaces/mission-f19a12b3/reserve1-private",
+  "started": "2026-09-07T18:13:06.018488+00:00",
+  "ended": "2026-09-07T18:13:13.019615+00:00",
+  "exit": 0,
+  "log": "audit/trio/reserve1/receipts/vault-execution-86ec8bf257ad8244f1a7ef4ae6c194c22f3ba4b5.txt",
+  "log_sha256": "2180a46572ad98507ba26b1d0bc59a97e7634769248c1fe380c2c69382ddf0d1"
+}

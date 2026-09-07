@@ -193,3 +193,15 @@ still requires concrete deployed vault/queue/callback and resource binding.
   `VaultCases`: nine composed model executions; real vault/callback bytecode
   correspondence and independent callee specification remain open. Selector
   provenance is in receipts/vault-source-selectors.json.
+
+## Production vault runtime comparison
+
+`compile-vaults.cjs` compiles the two unmodified pinned 0.8.9 vault entries and
+retains every resolved import hash, compiler/settings and artifact hashes in a
+new evidence directory. `execute-vaults.cjs` deploys them with explicit immutable
+constructor arguments alongside the unchanged inherited Lido artifact. Runtime
+code and constructor bindings are recorded. `VaultDifferential` runs the composed
+Report/Vaults/VaultCallbacks model on the same twelve inputs. Comparison includes
+raw failure bytes, nested CALL data/value/result, state, four balances and events.
+The locator and finalization receiver remain CallFixture boundaries. Evidence:
+receipts/vault-execution-summary.json. No all-path or proxy/resource claim follows.

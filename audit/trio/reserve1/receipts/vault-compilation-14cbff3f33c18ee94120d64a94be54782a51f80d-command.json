@@ -1,0 +1,13 @@
+{
+  "source_commit": "14cbff3f33c18ee94120d64a94be54782a51f80d",
+  "argv": [
+    "solidity/trio-reserve1/.tools/node-v22.15.0-linux-x64/bin/node",
+    "solidity/trio-reserve1/compile-vaults.cjs"
+  ],
+  "receipt_dir": "audit/trio/reserve1/receipts/vault-compilation-14cbff3f33c18ee94120d64a94be54782a51f80d",
+  "started": "2026-09-07T18:09:52.245730+00:00",
+  "ended": "2026-09-07T18:09:58.126002+00:00",
+  "exit": 0,
+  "log": "audit/trio/reserve1/receipts/vault-compilation-14cbff3f33c18ee94120d64a94be54782a51f80d.txt",
+  "log_sha256": "336ef2fc3a75d2886265b9fb58d4de75869e4cc7f5490c75e458a61ad591f954"
+}

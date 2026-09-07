@@ -1,16 +1,15 @@
 # Continuation — not a completion claim
 
-Latest increment: source reward/withdrawal vaults, fresh-locator Lido callbacks,
-ABI faults and nested value/trace propagation. Source 80ae948313de296a267debed4a34792f823226a8
-has five selected checks, nine executed Lean cases, seven baseline checks and 94
-revalidated unchanged source/olean pairs. See vault-source-summary.json.
-Next compare actual pinned vault bytecode and inherited Lido callbacks against the
-composed model. Reuse the unchanged Lido artifact, compile vault artifacts with a
-new scoped runner/receipt without overwriting historical compilation receipts, and
-retain exact nested CALL/value/return/rollback evidence. Independent callee rules,
-queue finalization and remaining deployment/entry/writer/resource obligations are
-still required. Existing sixteen report comparisons use callee fixtures; they do
-not cover the new vault implementations. Full remote gates remain missing.
+Latest increment: twelve production-vault/inherited-Lido EVM comparisons match the
+composed Lean model at source 86ec8bf257ad8244f1a7ef4ae6c194c22f3ba4b5. One new component
+check and seven baseline checks pass; 99 unchanged source/olean pairs match.
+See vault-execution-summary.json for compilation, immutable constructor/deployed
+code, raw failure bytes, all balances, nested CALL and compressed trace receipts.
+Locator and queue remain fixtures. Next close independent vault/callback callee
+specifications and remaining direct admission/ABI cases; implement actual queue
+finalization and remaining deployment/entry/writer/resource obligations. Current
+suite covers twelve finite report paths, not all vault entries or proxy deployment.
+Full remote gates remain missing; no new transport tool is exposed.
 
 Read STATUS, current git HEAD, and admission/ABI plus oracle/component receipts first. The previous
 goal turn was progress: source-callee implementations, checked specifications
