@@ -18,8 +18,9 @@ The harness inherits the complete pinned Lido and WithdrawalQueueBase bodies.
 Raw storage setters and internal-helper wrappers are fixture initialization
 surfaces, not production admissions. `CallFixture` supports arbitrary return
 bytes, arbitrary revert bytes and payable recipient rejection. No always-success
-assumption is made about these boundaries. Locator, oracle, recipient and bunker
-fixture behavior is NOT yet related to their production implementations.
+assumption is made about these boundaries. Locator, oracle and recipient fixture behavior is NOT yet related to their
+production implementations. The actual inherited bunker getter reads its pinned
+unstructured slot; its writer authorization is not modeled by fixture setup.
 
 Execution runs on a fresh local Ganache chain; no public chain or credentials
 are used. Unlimited contract size admits the fixture subclass; gas and deployment
@@ -28,8 +29,11 @@ written to `audit/trio/reserve1/receipts/solidity-compilation.json`.
 
 The execution receipt contains input case names, relevant physical slots,
 Lido/router/queue balances, ordered CALL/STATICCALL/DELEGATECALL targets, values,
-payloads and committed logs. These are **Solidity probes only**. A matching Verity
-executor, independent observation comparison and correspondence remain missing.
+payloads and committed logs. The driver also runs the handwritten Lean executor with pinned Verity words
+and physical storage on identical vectors, comparing exact return/revert bytes,
+selected physical slots, balances, directly Lido-issued calls and ABI logs.
+It runs two faulty executors as negative controls. Universal correspondence and
+full production locator/oracle/router composition remain missing.
 The trace contains attempted calls even when the transaction reverts; committed
 logs and state are separately checked for rollback. Do not conflate trace with
 contract storage or use these tests to claim the parent guarantee.

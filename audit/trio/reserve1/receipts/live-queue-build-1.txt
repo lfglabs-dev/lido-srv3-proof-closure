@@ -1,0 +1,202 @@
+⚠ [12/16] Replayed Verity.Core
+warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1041:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+✔ [13/16] Built LidoSRv3.Audit.Source.TrioReserve1.QueueSpec (2.1s)
+✔ [14/16] Built LidoSRv3.Audit.Source.TrioReserve1.Live (6.5s)
+✖ [15/16] Building LidoSRv3.Audit.Source.TrioReserve1.Erasure (4.0s)
+trace: .> LEAN_PATH=/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/Cli/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/batteries/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/Qq/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/aesop/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/importGraph/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/plausible/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/mathlib/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/evmyul/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/verity/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/build/lib/lean /workspaces/mission-5a294468/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean /workspaces/mission-f19a12b3/reserve1-private/LidoSRv3/Audit/Source/TrioReserve1/Erasure.lean -o /workspaces/mission-f19a12b3/reserve1-private/.lake/build/lib/lean/LidoSRv3/Audit/Source/TrioReserve1/Erasure.olean -i /workspaces/mission-f19a12b3/reserve1-private/.lake/build/lib/lean/LidoSRv3/Audit/Source/TrioReserve1/Erasure.ilean -c /workspaces/mission-f19a12b3/reserve1-private/.lake/build/ir/LidoSRv3/Audit/Source/TrioReserve1/Erasure.c --setup /workspaces/mission-f19a12b3/reserve1-private/.lake/build/ir/LidoSRv3/Audit/Source/TrioReserve1/Erasure.setup.json --json
+error: LidoSRv3/Audit/Source/TrioReserve1/Erasure.lean:30:30: Tactic `rfl` failed: The left-hand side
+  have r :=
+    have r := first w;
+    match r.outcome with
+    | Except.error e => { outcome := Except.error e, world := r.world, attempts := r.attempts }
+    | Except.ok a =>
+      have s := next a r.world;
+      { outcome := s.outcome, world := s.world, attempts := r.attempts ++ s.attempts };
+  (r.outcome, r.world)
+is not definitionally equal to the right-hand side
+  match
+    (fun w =>
+        have r := first w;
+        (r.outcome, r.world))
+      w with
+  | (Except.error e, after) => (Except.error e, after)
+  | (Except.ok a, after) =>
+    (fun a w =>
+        have r := next a w;
+        (r.outcome, r.world))
+      a after
+
+case error
+α β : Type
+first : Exec α
+next : α → Exec β
+w : World
+a✝ : Fault
+⊢ (have r :=
+      have r := first w;
+      match r.outcome with
+      | Except.error e => { outcome := Except.error e, world := r.world, attempts := r.attempts }
+      | Except.ok a =>
+        have s := next a r.world;
+        { outcome := s.outcome, world := s.world, attempts := r.attempts ++ s.attempts };
+    (r.outcome, r.world)) =
+    match
+      (fun w =>
+          have r := first w;
+          (r.outcome, r.world))
+        w with
+    | (Except.error e, after) => (Except.error e, after)
+    | (Except.ok a, after) =>
+      (fun a w =>
+          have r := next a w;
+          (r.outcome, r.world))
+        a after
+error: LidoSRv3/Audit/Source/TrioReserve1/Erasure.lean:30:30: Tactic `rfl` failed: The left-hand side
+  have r :=
+    have r := first w;
+    match r.outcome with
+    | Except.error e => { outcome := Except.error e, world := r.world, attempts := r.attempts }
+    | Except.ok a =>
+      have s := next a r.world;
+      { outcome := s.outcome, world := s.world, attempts := r.attempts ++ s.attempts };
+  (r.outcome, r.world)
+is not definitionally equal to the right-hand side
+  match
+    (fun w =>
+        have r := first w;
+        (r.outcome, r.world))
+      w with
+  | (Except.error e, after) => (Except.error e, after)
+  | (Except.ok a, after) =>
+    (fun a w =>
+        have r := next a w;
+        (r.outcome, r.world))
+      a after
+
+case ok
+α β : Type
+first : Exec α
+next : α → Exec β
+w : World
+a✝ : α
+⊢ (have r :=
+      have r := first w;
+      match r.outcome with
+      | Except.error e => { outcome := Except.error e, world := r.world, attempts := r.attempts }
+      | Except.ok a =>
+        have s := next a r.world;
+        { outcome := s.outcome, world := s.world, attempts := r.attempts ++ s.attempts };
+    (r.outcome, r.world)) =
+    match
+      (fun w =>
+          have r := first w;
+          (r.outcome, r.world))
+        w with
+    | (Except.error e, after) => (Except.error e, after)
+    | (Except.ok a, after) =>
+      (fun a w =>
+          have r := next a w;
+          (r.outcome, r.world))
+        a after
+error: LidoSRv3/Audit/Source/TrioReserve1/Erasure.lean:40:37: Tactic `rfl` failed: The left-hand side
+  ((have r := program before;
+      match r.outcome with
+      | Except.ok a => r
+      | Except.error e => { outcome := Except.error e, world := before, attempts := r.attempts }).outcome,
+    (have r := program before;
+      match r.outcome with
+      | Except.ok a => r
+      | Except.error e => { outcome := Except.error e, world := before, attempts := r.attempts }).world)
+is not definitionally equal to the right-hand side
+  match
+    have r := program before;
+    (r.outcome, r.world) with
+  | (Except.error e, snd) => (Except.error e, before)
+  | (Except.ok a, after) => (Except.ok a, after)
+
+case error
+α : Type
+program : Exec α
+before : World
+a✝ : Fault
+⊢ ((have r := program before;
+        match r.outcome with
+        | Except.ok a => r
+        | Except.error e => { outcome := Except.error e, world := before, attempts := r.attempts }).outcome,
+      (have r := program before;
+        match r.outcome with
+        | Except.ok a => r
+        | Except.error e => { outcome := Except.error e, world := before, attempts := r.attempts }).world) =
+    match
+      have r := program before;
+      (r.outcome, r.world) with
+    | (Except.error e, snd) => (Except.error e, before)
+    | (Except.ok a, after) => (Except.ok a, after)
+error: LidoSRv3/Audit/Source/TrioReserve1/Erasure.lean:40:37: Tactic `rfl` failed: The left-hand side
+  ((have r := program before;
+      match r.outcome with
+      | Except.ok a => r
+      | Except.error e => { outcome := Except.error e, world := before, attempts := r.attempts }).outcome,
+    (have r := program before;
+      match r.outcome with
+      | Except.ok a => r
+      | Except.error e => { outcome := Except.error e, world := before, attempts := r.attempts }).world)
+is not definitionally equal to the right-hand side
+  match
+    have r := program before;
+    (r.outcome, r.world) with
+  | (Except.error e, snd) => (Except.error e, before)
+  | (Except.ok a, after) => (Except.ok a, after)
+
+case ok
+α : Type
+program : Exec α
+before : World
+a✝ : α
+⊢ ((have r := program before;
+        match r.outcome with
+        | Except.ok a => r
+        | Except.error e => { outcome := Except.error e, world := before, attempts := r.attempts }).outcome,
+      (have r := program before;
+        match r.outcome with
+        | Except.ok a => r
+        | Except.error e => { outcome := Except.error e, world := before, attempts := r.attempts }).world) =
+    match
+      have r := program before;
+      (r.outcome, r.world) with
+    | (Except.error e, snd) => (Except.error e, before)
+    | (Except.ok a, after) => (Except.ok a, after)
+error: Lean exited with code 1
+✖ [16/16] Building LidoSRv3.Audit.Source.TrioReserve1.Queue (6.1s)
+trace: .> LEAN_PATH=/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/Cli/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/batteries/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/Qq/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/aesop/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/importGraph/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/plausible/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/mathlib/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/evmyul/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/verity/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/build/lib/lean /workspaces/mission-5a294468/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean /workspaces/mission-f19a12b3/reserve1-private/LidoSRv3/Audit/Source/TrioReserve1/Queue.lean -o /workspaces/mission-f19a12b3/reserve1-private/.lake/build/lib/lean/LidoSRv3/Audit/Source/TrioReserve1/Queue.olean -i /workspaces/mission-f19a12b3/reserve1-private/.lake/build/lib/lean/LidoSRv3/Audit/Source/TrioReserve1/Queue.ilean -c /workspaces/mission-f19a12b3/reserve1-private/.lake/build/ir/LidoSRv3/Audit/Source/TrioReserve1/Queue.c --setup /workspaces/mission-f19a12b3/reserve1-private/.lake/build/ir/LidoSRv3/Audit/Source/TrioReserve1/Queue.setup.json --json
+error: LidoSRv3/Audit/Source/TrioReserve1/Queue.lean:82:2: Tactic `split` failed: Could not split an `if` or `match` expression in the goal
+
+Hint: Use `set_option trace.split.failure true` to display additional diagnostic information
+
+keccak : Keccak
+queue : Address
+w : World
+s : QueueSpec.State
+hlast : s.last = (getLastRequestId queue w).val
+hfinal : s.finalized = (getLastFinalizedRequestId queue w).val
+hrows : ∀ (id : Nat), s.cumulative id = cumulative keccak queue w id
+⊢ QueueSpec.Describes s
+    (observe
+      (have last := getLastRequestId queue w;
+      have finalized := getLastFinalizedRequestId queue w;
+      have hi := cumulative keccak queue w last.val;
+      have lo := cumulative keccak queue w finalized.val;
+      if lo ≤ hi then Except.ok (hi - lo) else Except.error 17))
+error: Lean exited with code 1
+Some required targets logged failures:
+- LidoSRv3.Audit.Source.TrioReserve1.Erasure
+- LidoSRv3.Audit.Source.TrioReserve1.Queue
+error: build failed

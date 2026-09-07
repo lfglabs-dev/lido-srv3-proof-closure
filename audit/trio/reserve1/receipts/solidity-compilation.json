@@ -1,5 +1,6 @@
 {
   "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "node": "v22.15.0",
   "receipts": [
     {
       "entry": "LidoHarness.sol",
@@ -41,7 +42,8 @@
         "runs": 200
       },
       "contracts": [
-        "QueueHarness"
+        "QueueHarness",
+        "WstETHFixture"
       ],
       "warnings": [
         "Warning: SPDX license identifier not provided in source file. Before publishing, consider adding a comment containing \"SPDX-License-Identifier: <SPDX-License>\" to each source file. Use \"SPDX-License-Identifier: UNLICENSED\" for non-open-source code. Please see https://spdx.org for more information.\n--> solidity/trio-reserve1/QueueHarness.sol\n\n"
@@ -87,9 +89,22 @@
     "@aragon/os/contracts/acl/IACL.sol": "0d6092f108df51af376d55c64e482d514182a0fc1933f354c4afbd7a82160c01",
     "@aragon/os/contracts/common/TimeHelpers.sol": "09242e7e0f60a92d40a37c787a4d24c239c31eaf9ccbebf92bfc37e1d05e78a7",
     "@aragon/os/contracts/common/Uint256Helpers.sol": "5b545ff91be8d1d3a5f1c6b4fd45c6db4bc901cb6c503ad754361a475dce0d38",
-    "solidity/trio-reserve1/QueueHarness.sol": "6d78f7b59ea512654a5b03c5fe608599cc9e6b9e1876d243311872337205b880",
+    "solidity/trio-reserve1/QueueHarness.sol": "8dce70332e635d5c5a149432436212fda29f7e533a466f2d10a39767bd334d88",
+    "lido-core/contracts/0.8.9/WithdrawalQueue.sol": "efa5a32fbc99cafdb16a38d96a9bb5b29a62e60b5610e7c317711cc58402b131",
     "lido-core/contracts/0.8.9/WithdrawalQueueBase.sol": "68d8919f89198c3d39272b2259a3144bf87a4aa48c570624b025fd86da47d2bb",
+    "@openzeppelin/contracts-v4.4/token/ERC20/IERC20.sol": "6eacf8ca56b41b7636489c0996d8f9608b4d298879a1fd5d876f21ad7a6711f1",
+    "@openzeppelin/contracts-v4.4/token/ERC20/extensions/draft-IERC20Permit.sol": "3e7aa0e0f69eec8f097ad664d525e7b3f0a3fda8dcdd97de5433ddb131db86ef",
     "@openzeppelin/contracts-v4.4/utils/structs/EnumerableSet.sol": "42a618e7d36efd2319d1bf05fedb31f3042baf535cfb97e783128cc1fe326686",
-    "lido-core/contracts/0.8.9/lib/UnstructuredStorage.sol": "955bfcb0bf265db114248bdabeabebc39bddb3fbb756e2448f6aed59f1994f56"
+    "lido-core/contracts/0.8.9/utils/access/AccessControlEnumerable.sol": "e8fa2bc8e4c8046fd04b25ed4708be8159913cac4ca738cdc53022896e0566ce",
+    "lido-core/contracts/0.8.9/lib/UnstructuredStorage.sol": "955bfcb0bf265db114248bdabeabebc39bddb3fbb756e2448f6aed59f1994f56",
+    "lido-core/contracts/0.8.9/utils/PausableUntil.sol": "afd11f5950050bbc8e9fad3cbea2a5bdbcc23048128c30f335a12b48084c8594",
+    "lido-core/contracts/0.8.9/utils/Versioned.sol": "7f9ba0a2368d7531447a80e80ae28406964acf51ca0de8bfa985620e226340a8",
+    "@openzeppelin/contracts-v4.4/access/IAccessControlEnumerable.sol": "655ab8dc2a9617376734d04ca293e099cc24f8ce893997e68c29cfebc4a61d39",
+    "lido-core/contracts/0.8.9/utils/access/AccessControl.sol": "e399e266f9b0e8fe99708f3fb2f656a636fb432d69ca9c247f2e84f2e762f803",
+    "@openzeppelin/contracts-v4.4/access/IAccessControl.sol": "d03c1257f2094da6c86efa7aa09c1c07ebd33dd31046480c5097bc2542140e45",
+    "@openzeppelin/contracts-v4.4/utils/Context.sol": "1458c260d010a08e4c20a4a517882259a23a4baa0b5bd9add9fb6d6a1549814a",
+    "@openzeppelin/contracts-v4.4/utils/Strings.sol": "8597c62818dcbc6cf85c21179b90b714fb4f70a4347ca2eed23e88c87b08b8a1",
+    "@openzeppelin/contracts-v4.4/utils/introspection/ERC165.sol": "8806a632d7b656cadb8133ff8f2acae4405b3a64d8709d93b0fa6a216a8a6154",
+    "@openzeppelin/contracts-v4.4/utils/introspection/IERC165.sol": "701e025d13ec6be09ae892eb029cd83b3064325801d73654847a5fb11c58b1e5"
   }
 }

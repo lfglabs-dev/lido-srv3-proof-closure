@@ -1,0 +1,16 @@
+remote-lean-build: pinned tree contains submodules; using legacy runner fetch
+remote-lean-build: resuming job 72e45c29-b554-4616-9fd2-cd54a38dde96 on node 'old-agent' for c7adae044167 ...
+remote-lean-build: job 72e45c29-b554-4616-9fd2-cd54a38dde96 on node 'old-agent' finished: failed (exit 1, 7s)
+HEAD is now at c7adae0 audit: scope allocation rollback and single-call top-up claims (#242)
+Removing .lake/
+Removing LidoSRv3/Audit/Source/TrioAlloc2/
+Removing LidoSRv3/Tests/TrioAlloc2/
+source bundle verified sha256=4c3a74d902b835520c31ff648d6af4a4760d7d62e13e16d8c5abc004f8408eea files=1 bytes=1570
+info: verity: cloning https://github.com/lfglabs-dev/verity.git
+info: verity: checking out revision 'e977aaad6e1a9e92e0132d41b3d33a14135a4d46'
+info: evmyul: cloning https://github.com/lfglabs-dev/EVMYulLean.git
+info: stderr:
+Cloning into '/var/lib/sandboxed-node/work/checkouts/9acda983bdcdf557/c7adae04416704a839d56333efad003f0a0f46b7/.lake/packages/evmyul'...
+fatal: could not read Username for 'https://github.com': No such device or address
+fatal: the remote end hung up unexpectedly
+error: external command 'git' exited with code 128

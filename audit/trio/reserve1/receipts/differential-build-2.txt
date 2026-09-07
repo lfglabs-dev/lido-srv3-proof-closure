@@ -1,0 +1,20 @@
+⚠ [12/16] Replayed Verity.Core
+warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1041:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+✖ [16/16] Building LidoSRv3.Tests.TrioReserve1.Differential (3.6s)
+trace: .> LEAN_PATH=/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/Cli/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/batteries/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/Qq/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/aesop/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/importGraph/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/plausible/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/mathlib/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/evmyul/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/verity/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/build/lib/lean /workspaces/mission-5a294468/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean /workspaces/mission-f19a12b3/reserve1-private/LidoSRv3/Tests/TrioReserve1/Differential.lean -o /workspaces/mission-f19a12b3/reserve1-private/.lake/build/lib/lean/LidoSRv3/Tests/TrioReserve1/Differential.olean -i /workspaces/mission-f19a12b3/reserve1-private/.lake/build/lib/lean/LidoSRv3/Tests/TrioReserve1/Differential.ilean -c /workspaces/mission-f19a12b3/reserve1-private/.lake/build/ir/LidoSRv3/Tests/TrioReserve1/Differential.c --setup /workspaces/mission-f19a12b3/reserve1-private/.lake/build/ir/LidoSRv3/Tests/TrioReserve1/Differential.setup.json --json
+error: LidoSRv3/Tests/TrioReserve1/Differential.lean:77:5: failed to synthesize instance of type class
+  Inhabited Verity.ContractState
+
+Hint: Adding the command `deriving instance Inhabited for Verity.ContractState` may allow Lean to derive the missing instance.
+error: Lean exited with code 1
+Some required targets logged failures:
+- LidoSRv3.Tests.TrioReserve1.Differential
+error: build failed

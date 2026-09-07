@@ -1,6 +1,7 @@
-// Pinned Solidity execution probes, not differential or correspondence evidence.
+// Pinned Solidity execution and matching-input Lean/Verity differential probes.
 const fs = require('node:fs');
 const path = require('node:path');
+const cp = require('node:child_process');
 const assert = require('node:assert/strict');
 const ganache = require('ganache');
 const {ethers} = require('ethers');
@@ -14,6 +15,14 @@ const slots = {
   target:'0x3d3e9bd6e90e5d1f1c6839835bcbe5746a47c9a013d1eae6e80c248264c06a81',
   active:'0x644132c4ddd5bb6f0655d5fe2870dcec7870e6be4758890f366b83441f9fdece',
 };
+const queueSlots = {
+  last: ethers.id('lido.WithdrawalQueue.lastRequestId'),
+  finalized: ethers.id('lido.WithdrawalQueue.lastFinalizedRequestId'),
+  bunker: ethers.id('lido.WithdrawalQueue.bunkerModeSinceTimestamp'),
+};
+const queueMapping = ethers.id('lido.WithdrawalQueue.queue');
+const decimal = x => BigInt(x).toString();
+const bytes = x => Array.from(ethers.getBytes(x));
 const coder = ethers.AbiCoder.defaultAbiCoder();
 const selector = signature => ethers.id(signature).slice(0,10);
 const encode = (types, values) => coder.encode(types, values);
@@ -35,7 +44,13 @@ async function main() {
   const oracle = await deploy('LidoHarness','CallFixture');
   const addresses = {lido:await lido.getAddress(),queue:await queue.getAddress(),locator:await locator.getAddress(),router:await router.getAddress(),oracle:await oracle.getAddress()};
   const send = async tx => (await tx).wait();
-  const configure = (c, signature, data, reject=false) => send(c.configure(selector(signature),data,reject));
+  let fixtureRows = [];
+  const configure = async (c, signature, data, reject=false) => {
+    await send(c.configure(selector(signature),data,reject));
+    const target = decimal(await c.getAddress()), payload = bytes(selector(signature));
+    fixtureRows = fixtureRows.filter(f => !(f.target === target && JSON.stringify(f.payload) === JSON.stringify(payload)));
+    fixtureRows.push({target,payload,returned:bytes(data),reject});
+  };
   const store = (name, value) => send(lido.fixtureStore(slots[name],value));
   await configure(locator,'withdrawalQueue()',encode(['address'],[addresses.queue]));
   await configure(locator,'stakingRouter()',encode(['address'],[addresses.router]));
@@ -56,12 +71,38 @@ async function main() {
     for (const key of ['lido','router','queue']) balances[key] = BigInt(await backend.request({method:'eth_getBalance',params:[addresses[key],'latest']})).toString();
     return {storage,balances};
   }
-  const cases = [];
+  const cases = [], vectors = [], expected = [];
+  const rawCell = async (account, slot) => ({account:decimal(account),slot:decimal(slot),
+    value:decimal((await backend.request({method:'eth_getStorageAt',params:[account,ethers.toBeHex(BigInt(slot),32),'latest']})).replace(/^0x$/, '0x0'))});
+  async function input(name, amount, seeds, direct) {
+    const storage = [];
+    for (const slot of Object.values(slots)) storage.push(await rawCell(addresses.lido,slot));
+    for (const slot of Object.values(queueSlots)) storage.push(await rawCell(addresses.queue,slot));
+    const hashes = [];
+    for (const label of ['last','finalized']) {
+      const id = (await rawCell(addresses.queue,queueSlots[label])).value;
+      const preimage = encode(['uint256','bytes32'],[id,queueMapping]);
+      const hash = ethers.keccak256(preimage);
+      hashes.push({input:bytes(preimage),output:decimal(hash)});
+      storage.push(await rawCell(addresses.queue,hash));
+    }
+    const balances = [], code = [];
+    for (const account of Object.values(addresses)) {
+      balances.push({account:decimal(account),value:decimal(await backend.request({method:'eth_getBalance',params:[account,'latest']}))});
+      code.push({account:decimal(account),size:String(ethers.getBytes(await provider.getCode(account)).length)});
+    }
+    return {name,self:decimal(addresses.lido),sender:decimal(direct ? await signer.getAddress() : addresses.router),
+      queue:decimal(addresses.queue),storage,balances,code,hashes,fixtures:structuredClone(fixtureRows),
+      fixtureTargets:[addresses.locator,addresses.router,addresses.oracle].map(decimal),amount:String(amount),seeds:String(seeds)};
+  }
   async function run(name, setup, amount, seeds, expectedSuccess, check=()=>{}, direct=false) {
     const snapshot = await backend.request({method:'evm_snapshot',params:[]});
+    const savedFixtures = structuredClone(fixtureRows);
     try {
       await setup();
       const before = await observe();
+      const vector = await input(name,amount,seeds,direct);
+      vectors.push(vector);
       const payload = lido.interface.encodeFunctionData('withdrawDepositableEther',[amount,seeds]);
       let receipt;
       try {
@@ -82,8 +123,22 @@ async function main() {
         const memory=x.memory.join('');
         return {op:x.op,depth:x.depth,target:'0x'+s[s.length-2].slice(-40),value:x.op==='CALL'?'0x'+s[s.length-3]:'0x0',payload:'0x'+memory.slice(offset*2,(offset+size)*2)};
       });
+      const lidoDepth = direct ? 1 : 2;
+      const final = trace.structLogs.filter(x => x.depth === lidoDepth && ['RETURN','REVERT','STOP'].includes(x.op)).at(-1);
+      let returned = [];
+      if (final && final.op !== 'STOP') {
+        const offset = Number(BigInt('0x'+final.stack.at(-1))), size = Number(BigInt('0x'+final.stack.at(-2)));
+        returned = bytes('0x'+final.memory.join('').slice(offset*2,(offset+size)*2));
+      }
+      const actualStorage = [];
+      for (const c of vector.storage) actualStorage.push(await rawCell(ethers.toBeHex(BigInt(c.account),20),c.slot));
+      const actualBalances = [];
+      for (const c of vector.balances) actualBalances.push({account:c.account,value:decimal(await backend.request({method:'eth_getBalance',params:[ethers.toBeHex(BigInt(c.account),20),'latest']}))});
+      expected.push({name,success,returned,storage:actualStorage,balances:actualBalances,
+        calls:calls.filter(c=>c.depth===lidoDepth).map(c=>({target:decimal(c.target),value:decimal(c.value),payload:bytes(c.payload)})),
+        logs:receipt.logs.map(x=>({emitter:decimal(x.address),topics:x.topics.map(x=>x.toLowerCase()),data:x.data.toLowerCase()}))});
       cases.push({name,success,before,after,calls,logs:receipt.logs.map(x=>({address:x.address,topics:x.topics,data:x.data}))});
-    } finally { await backend.request({method:'evm_revert',params:[snapshot]}); }
+    } finally { await backend.request({method:'evm_revert',params:[snapshot]}); fixtureRows = savedFixtures; }
   }
   const noop=async()=>{};
   await run('live queue spend and frame reset',noop,30n,2n,true,after=>{
@@ -113,8 +168,75 @@ async function main() {
   await run('extra live queue return bytes',()=>queueAnswer(encode(['uint256','uint256'],[50n,999n])),30n,0n,true);
   await run('uint256 seed add overflow after effects',()=>store('seed',1n),30n,(1n<<256n)-1n,false);
   await run('current frame nonce truncation',()=>configure(oracle,'getCurrentFrame()',encode(['uint256','uint256'],[U128+11n,123n])),30n,0n,true,after=>assert.equal(BigInt(after.storage.next),30n+11n*U128));
-  fs.writeFileSync(path.resolve(__dirname,'../../audit/trio/reserve1/receipts/solidity-execution.json'),JSON.stringify({node:process.version,scope:'Pinned Solidity only; NOT differential/Verity correspondence. Full locator/oracle/router and bunker are fixture boundaries. Gas excluded.',addresses,cases},null,2)+'\n');
+  await run('reversed physical cumulative rows panic',()=>send(queue.fixtureStore(
+    ethers.keccak256(encode(['uint256','bytes32'],[0n,queueMapping])),51n)),30n,0n,false);
+  await run('queue finalization releases demand',()=>send(queue.fixtureFinalize(1n,50n,10n**27n)),100n,0n,true);
+  await run('uint256 amount rejected',noop,(1n<<256n)-1n,0n,false);
+  await run('noncanonical bunker bool is true',async()=>{
+    await queueAnswer(encode(['uint256'],[50n]));
+    await configure(oracle,'isBunkerModeActive()',encode(['uint256'],[2n]));
+  },30n,0n,false);
+  await run('paused still decodes bunker result',async()=>{
+    await store('active',0n);
+    await configure(locator,'withdrawalQueue()',encode(['address'],[addresses.oracle]));
+    await configure(oracle,'isBunkerModeActive()','0x01');
+  },30n,0n,false);
+  await run('queue address has no code',()=>configure(locator,'withdrawalQueue()',encode(['address'],[ethers.ZeroAddress])),30n,0n,false);
+  await run('uint256 live demand clamps',()=>queueAnswer(encode(['uint256'],[(1n<<256n)-1n])),20n,0n,true);
+  await run('dirty address upper bits truncate',()=>configure(locator,'stakingRouter()',encode(['uint256'],[(1n<<200n)+BigInt(addresses.router)])),30n,0n,true);
+  await run('same frame next accounting truncates',()=>store('next',11n*U128+U128-1n),30n,0n,true,
+    after=>assert.equal(BigInt(after.storage.next),11n*U128+29n));
+  await run('rebalance target above buffer then full spend',async()=>{
+    await send(lido.fixtureSetTarget(200n));
+    await send(lido.fixtureRebalance());
+  },100n,0n,true,after=>{assert.equal(after.storage.reserve,'100');assert.equal(after.balances.lido,'0');});
+  await run('lower target releases withdrawal protection',()=>send(lido.fixtureSetTarget(0n)),50n,0n,true);
+  await run('second spend uses current queue and accounting',async()=>{
+    await send(router.forward(addresses.lido,lido.interface.encodeFunctionData('withdrawDepositableEther',[20n,0n])));
+    await send(queue.fixtureEnqueue(10n,10n,signer.address));
+  },20n,0n,true,after=>assert.equal(BigInt(after.storage.next),11n*U128+40n));
+  fs.writeFileSync(path.resolve(__dirname,'../../audit/trio/reserve1/receipts/solidity-execution.json'),JSON.stringify({node:process.version,scope:'Pinned Solidity with matching Lean/Verity execution. Locator/oracle/router are fixture boundaries. Inherited live queue demand and bunker. Gas excluded; tests are not correspondence proofs.',addresses,cases},null,2)+'\n');
   console.log(`${cases.length} pinned Solidity cases executed; reverts checked against physical storage, balances and logs.`);
   await backend.disconnect();
+  const receiptDir = path.resolve(__dirname,'../../audit/trio/reserve1/receipts');
+  fs.writeFileSync(path.join(receiptDir,'differential-input.json'),JSON.stringify(vectors,null,2)+'\n');
+  fs.writeFileSync(path.join(receiptDir,'differential-solidity.json'),JSON.stringify(expected,null,2)+'\n');
+  cp.execFileSync('lake',['env','lean','--run','LidoSRv3/Tests/TrioReserve1/Differential.lean',
+    path.join(receiptDir,'differential-input.json'),path.join(receiptDir,'differential-verity.json')],
+    {cwd:path.resolve(__dirname,'../..'),stdio:'inherit'});
+  const actual = JSON.parse(fs.readFileSync(path.join(receiptDir,'differential-verity.json')));
+  function normalize(r) {
+    const f = r.result.fault;
+    const returned = !f || f.kind === 'empty' ? [] : f.kind === 'bubbled' ? f.data :
+      bytes(ethers.concat(['0x08c379a0',encode(['string'],[f.reason])]));
+    return {name:r.name,success:r.result.success,returned,storage:r.storage,balances:r.balances,calls:r.calls,
+      logs:r.logs.map(l=> {
+        const event = lido.interface.getEvent(l.name);
+        const encoded = lido.interface.encodeEventLog(event,l.values);
+        return {emitter:l.emitter,topics:encoded.topics.map(x=>x.toLowerCase()),data:encoded.data.toLowerCase()};
+      })};
+  }
+  const results = actual.map((r,i)=> {
+    assert.deepEqual(normalize(r),expected[i],r.name+' Solidity/Verity mismatch');
+    return {name:r.name,matched:true};
+  });
+  fs.writeFileSync(path.join(receiptDir,'differential-comparison.json'),JSON.stringify({
+    scope:'Matching finite boundary fixtures; not a universal correspondence proof. Root return/revert bytes, relevant storage/balances, ordered calls and ABI logs.',results},null,2)+'\n');
+  const mutationInputs = [
+    {...vectors.find(v=>v.name==='queue grows before spend'),mutation:'cached-demand'},
+    {...vectors.find(v=>v.name==='oracle rejection after packed write'),mutation:'omit-rollback'},
+  ];
+  fs.writeFileSync(path.join(receiptDir,'mutation-input.json'),JSON.stringify(mutationInputs,null,2)+'\n');
+  cp.execFileSync('lake',['env','lean','--run','LidoSRv3/Tests/TrioReserve1/Differential.lean',
+    path.join(receiptDir,'mutation-input.json'),path.join(receiptDir,'mutation-verity.json')],
+    {cwd:path.resolve(__dirname,'../..'),stdio:'inherit'});
+  const mutants = JSON.parse(fs.readFileSync(path.join(receiptDir,'mutation-verity.json')));
+  const kills = mutants.map((r,i)=> {
+    const wanted = expected.find(e=>e.name===r.name);
+    assert.notDeepEqual(normalize(r),wanted,mutationInputs[i].mutation+' survived');
+    return {name:r.name,mutation:mutationInputs[i].mutation,killed:true};
+  });
+  fs.writeFileSync(path.join(receiptDir,'mutation-comparison.json'),JSON.stringify(kills,null,2)+'\n');
+  console.log(`${results.length} matching Solidity/Verity cases passed; ${kills.length} executed mutants rejected.`);
 }
 main().catch(e=>{console.error(e);process.exitCode=1;});

@@ -1,0 +1,23 @@
+info: Version 4.2.4 of elan is available! Use `elan self update` to update.
+info: downloading https://releases.lean-lang.org/lean4/v4.31.0/lean-4.31.0-linux.tar.zst
+info: installing /workspaces/mission-5a294468/.elan/toolchains/leanprover--lean4---v4.31.0
+⚠ [12/17] Replayed Verity.Core
+warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1041:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+✔ [14/17] Built LidoSRv3.Audit.Source.TrioReserve1.Live (5.3s)
+✔ [15/17] Built LidoSRv3.Audit.Source.TrioReserve1.Erasure (6.6s)
+✔ [16/17] Built LidoSRv3.Audit.Source.TrioReserve1.Queue (8.3s)
+✖ [17/17] Building LidoSRv3.Tests.TrioReserve1.Differential (4.9s)
+trace: .> LEAN_PATH=/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/Cli/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/batteries/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/Qq/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/aesop/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/importGraph/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/plausible/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/mathlib/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/evmyul/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/verity/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/build/lib/lean /workspaces/mission-5a294468/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean /workspaces/mission-f19a12b3/reserve1-private/LidoSRv3/Tests/TrioReserve1/Differential.lean -o /workspaces/mission-f19a12b3/reserve1-private/.lake/build/lib/lean/LidoSRv3/Tests/TrioReserve1/Differential.olean -i /workspaces/mission-f19a12b3/reserve1-private/.lake/build/lib/lean/LidoSRv3/Tests/TrioReserve1/Differential.ilean -c /workspaces/mission-f19a12b3/reserve1-private/.lake/build/ir/LidoSRv3/Tests/TrioReserve1/Differential.c --setup /workspaces/mission-f19a12b3/reserve1-private/.lake/build/ir/LidoSRv3/Tests/TrioReserve1/Differential.setup.json --json
+error: LidoSRv3/Tests/TrioReserve1/Differential.lean:79:8: unexpected token '('; expected '}'
+error: Lean exited with code 1
+Some required targets logged failures:
+- LidoSRv3.Tests.TrioReserve1.Differential
+error: build failed

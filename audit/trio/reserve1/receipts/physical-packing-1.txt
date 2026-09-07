@@ -1,0 +1,13 @@
+⚠ [12/15] Replayed Verity.Core
+warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1041:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+✔ [14/15] Built LidoSRv3.Audit.Source.TrioReserve1.Packing (1.7s)
+✔ [15/15] Built LidoSRv3.Audit.Source.TrioReserve1.PhysicalPacking (3.9s)
+Build completed successfully (15 jobs).
