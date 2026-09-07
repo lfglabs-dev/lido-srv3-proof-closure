@@ -19,5 +19,6 @@ lean_lib TrioAlloc2Composition where
     .one `audit.trio.alloc2.composition.Parent,
     .one `audit.trio.alloc2.composition.ParentPostconditions,
     .one `audit.trio.alloc2.composition.ParentErrors,
+    .one `audit.trio.alloc2.composition.ParentInversion,
     .one `audit.trio.alloc2.composition.ParentVectors
   ]
