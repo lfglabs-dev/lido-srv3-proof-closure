@@ -18,8 +18,12 @@ relevant address separation are explicit input/deployment obligations. Oracle.fr
 still takes the read-only consensus interpreter: complete concrete consensus
 input/deployment binding and independent whole-parent coverage remain open.
 
-The component checker now contains 34 modules. Validation follows at an immutable
-source SHA; these additions do not change the historical differential runner.
+All 34 owned modules passed at `2aa7917f6223628208dd06e835b1be263b7e584b`.
+`receipts/concrete-summary.json` links exact source/toolchain/commands/exit evidence,
+standard-axiom inspection, six baseline checks and import-DAG validation (all 0),
+dependency/wrapper identity and source delta. The differential runner and its
+previously executed source remain unchanged; new composition helpers are Lean-checked.
+Full gates still lack terminal receipts and a supported dependency transport.
 
 ## Spending specification and parent composition
 
