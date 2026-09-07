@@ -1,3 +1,4 @@
+import LidoSRv3.Audit.Source.TrioReserve1.Vaults
 import LidoSRv3.Audit.Source.TrioReserve1.ReportRules
 import LidoSRv3.Audit.Source.TrioReserve1.ReportCalls
 import LidoSRv3.Audit.Source.TrioReserve1.ReportParent
@@ -442,3 +443,5 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms ReportRules.complete
 #print axioms ReportRules.failure_restores
 #print axioms ReportRules.success_active
+
+#print axioms Vaults.reward_amount_bound
