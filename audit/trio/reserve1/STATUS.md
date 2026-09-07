@@ -13,8 +13,11 @@ This closes capacity stability and completed-result uniqueness, not termination
 for arbitrary cyclic storage, independent parameter-tree correspondence, or the
 relation between host depth and EVM gas/stack resources. Runtime implementations
 are unchanged; the 28-case source execution remains tied to its original commit.
-The new module passed draft bounded elaboration; immutable checks follow the
-source commit.
+At `0e632f4a369f23b918b832be62821cd9a86a8ce5`, ACLBounds and updated
+LiveTrust pass, along with all seven baseline/import checks. The other 47 modules'
+source and olean hashes match prior receipts; inspected axioms are standard.
+`receipts/acl-bounds-summary.json` links exact evidence and confirms runtime
+sources are unchanged. No new execution, full remote gate or certification is claimed.
 
 ## Physical ACL evaluation and source composition
 
