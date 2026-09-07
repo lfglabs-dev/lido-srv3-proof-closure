@@ -15,6 +15,7 @@ import LidoSRv3.Audit.Source.TrioReserve1.WithdrawalTail
 import LidoSRv3.Audit.Source.TrioReserve1.WithdrawalComposition
 import LidoSRv3.Audit.Source.TrioReserve1.OracleCalls
 import LidoSRv3.Audit.Source.TrioReserve1.ConsensusCalls
+import LidoSRv3.Audit.Source.TrioReserve1.Pipeline
 
 /-! Owned inspection, pending coordinated canonical Trust registration. -/
 open LidoSRv3.Audit.Source.TrioReserve1
@@ -125,3 +126,21 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms ConsensusCalls.oracle_no_code
 #print axioms ConsensusCalls.independent_rules
 #print axioms ConsensusCalls.lido_frame
+
+#print axioms Pipeline.read_other_slot
+#print axioms Pipeline.prepared_locator
+#print axioms Pipeline.prepared_consensus
+#print axioms Pipeline.frame_result
+#print axioms Pipeline.status_result
+#print axioms Pipeline.router_result
+#print axioms Pipeline.allocation_result
+#print axioms Pipeline.before_tail
+#print axioms Pipeline.seed_result
+#print axioms Pipeline.final_code
+#print axioms Pipeline.final_balances
+#print axioms Pipeline.receiver
+#print axioms Pipeline.receiver_rejection
+#print axioms Pipeline.receiver_shortage
+#print axioms Pipeline.success
+#print axioms Pipeline.rejected
+#print axioms Pipeline.shortage

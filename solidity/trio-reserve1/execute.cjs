@@ -26,7 +26,7 @@ const coder = ethers.AbiCoder.defaultAbiCoder();
 const selector = signature => ethers.id(signature).slice(0,10);
 const encode = (types, values) => coder.encode(types, values);
 const artifacts = name => JSON.parse(fs.readFileSync(path.join(__dirname,'artifacts',name+'.sol.json')));
-const receiptDir = path.resolve(__dirname,'../../audit/trio/reserve1/receipts/oracle-composition');
+const receiptDir = process.env.RESERVE1_RECEIPT_DIR || path.resolve(__dirname,'../../audit/trio/reserve1/receipts/oracle-composition');
 async function main() {
   fs.mkdirSync(receiptDir,{recursive:true});
   process.env.HARDHAT_CONFIG = path.join(__dirname,'hardhat.config.cjs');
@@ -364,8 +364,9 @@ async function main() {
   }
   const results = actual.map((r,i)=> {
     assert.deepEqual(normalize(r),expected[i],r.name+' Solidity/Verity mismatch');
-    return {name:r.name,matched:true};
+    return {name:r.name,matched:true,sourcePipeline:r.sourcePipeline === true};
   });
+  assert(results.some(r=>r.sourcePipeline), 'concrete source pipeline was not executed');
   fs.writeFileSync(path.join(receiptDir,'differential-comparison.json'),JSON.stringify({
     scope:'Matching finite boundary fixtures; not a universal correspondence proof. Root return/revert bytes, relevant storage/balances, ordered calls and ABI logs.',results},null,2)+'\n');
   const mutationInputs = [

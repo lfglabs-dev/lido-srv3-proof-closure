@@ -107,3 +107,10 @@ consensus pointer and checked timestamp, preserving nested attempts. lido_frame
 composes both ABI decoders to exact reference/time values; independent_rules
 uses the same physical frame word and immutable source inputs. Constructor/layout
 and primitive relations remain explicit upstream deployment obligations.
+
+`Pipeline` composes the source callee chain into complete successful withdrawal
+and concrete receiver-rejection/ETH-shortage rollback. Pointer/code preservation
+across accounting writes is proved. Bound contains physical address/code inputs,
+not successful call flags; receiver immutable authorization is checked separately.
+The differential runner selects Pipeline.external for complete source configs.
+Exhaustive independent parent and upstream deployment/writer/world relations remain open.
