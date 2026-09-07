@@ -228,3 +228,14 @@ callbacks. Counter/commit lemmas retain the full bounded sum and explicit core/
 balance preservation. Entry dispatch/reply encoding and enclosing report composition
 remain open. Evidence: receipts/callback-rules-summary.json; existing runtime suite
 sources remain unchanged, with no new execution run claimed.
+
+## Entry selection and replies
+
+`EntrySpec.Dispatch` specifies ordered target/selector matches, shared admission,
+invalid replies and fallback. `EntrySpec.Returns` derives successful/rejected replies
+from complete transaction observations. `EntryRules` proves exact correspondence
+and completeness for Vaults.dispatch and VaultCallbacks.dispatch using the prior
+independent body/root specifications. These source-level dispatchers map the pinned
+vault one-word entries and Lido no-argument payable callback entries; ABI helper
+correctness and deployed compiler dispatch coverage remain explicit obligations.
+See receipts/entry-rules-summary.json. No new runtime execution is claimed.

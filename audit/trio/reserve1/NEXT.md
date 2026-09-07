@@ -1,15 +1,14 @@
 # Continuation — not a completion claim
 
-Latest increment: CallbackSpec/CallbackRules now give independent fresh locator /
-CALL / ABI / sender admission and post-lookup counter rules for both Lido callbacks.
-Exact bidirectional body/root outcome/world/attempt correspondence and existence
-are proved. Reward commit stores the full bounded sum; withdrawal commit preserves
-core; both commits preserve balances relative to the post-lookup world.
-Source e9003a9918662bab8f65228ddd4909120267da66: three selected checks and seven baselines,
-101 unchanged source/olean pairs, standard axioms. See callback-rules-summary.json.
-The twelve production-vault EVM cases retain unchanged runtime sources; no rerun.
-Next bind entry dispatch/reply encoding and compose concrete callback/vault rules
-through the report. Actual queue finalization and remaining deployment/entry/writer/
+Latest increment: EntrySpec/EntryRules bind independent vault/callback body and root
+rules through exact dispatcher replies. Ordered selectors, ABI/value rejection,
+payable callbacks, fallback and success/failure nested traces are covered, with
+completeness for every modeled request. Encoding helpers remain dependencies.
+Source c7372c3e13804848bcf9740c3b996033410aebb3: three selected checks, seven baselines,
+103 unchanged source/olean pairs, standard axioms. See entry-rules-summary.json.
+Existing twelve production-vault EVM cases retain unchanged runtime sources.
+Next compose concrete callback/vault entry rules through report CALL observations;
+actual queue finalization and remaining deployment/primitive/codec/entry/writer/
 resource/bounded-world obligations and full remote gates remain open.
 
 Read STATUS, current git HEAD, and admission/ABI plus oracle/component receipts first. The previous

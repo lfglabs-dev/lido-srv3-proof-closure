@@ -1,5 +1,22 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Independent entry and reply correspondence
+
+`EntrySpec` specifies ordered two-entry selection and replies derived from complete
+transaction observations. `EntryRules` connects vault and callback specifications
+to their exact dispatcher replies, including selector priority, nonpayable/short
+vault calldata rejection, payable callbacks, fallback delegation, successful worlds
+and encoded failure/nested traces. Completeness covers every modeled request.
+ABI encoding helpers remain explicit dependencies rather than a new codec proof.
+
+Source `c7372c3e13804848bcf9740c3b996033410aebb3`: three selected checks and seven baseline
+checks pass; 103 unchanged source/olean pairs and eleven dependency revisions match.
+Inspected axioms are standard. See `receipts/entry-rules-summary.json`. The prior
+twelve production-vault runtime cases retain unchanged source hashes; no rerun.
+Enclosing callee/report composition, deployed primitive/resource/codec binding,
+actual queue finalization and other entry/writer/world obligations, full remote
+gates and independent review remain open.
+
 ## Independent payable callback rules
 
 `CallbackSpec` orders fresh address lookup, sender admission and post-lookup
