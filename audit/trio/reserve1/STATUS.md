@@ -1,5 +1,28 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Spending specification and parent composition
+
+`SpendingSpec` independently relates admitted allocation to untruncated buffer,
+post-report, next-report and reserve quantities. `Spending` binds that relation
+to actual live queue bytes and the actual frame execution. Exact before/after
+worlds retain external effects, packed writes, event order and attempted calls.
+Bounds are derived from successful allocation and physical packed reads: admitted
+amounts and saved next values are below uint128; accounting additions fit uint256.
+Physical uint128 truncation is retained, not ruled out by an unproved invariant.
+Allocation failure, insufficiency and frame failure have exact rollback/trace
+results; the checked arithmetic cannot add another failure under derived bounds.
+
+`WithdrawalComposition.after_frame` replaces the former successful-spending
+premise with actual allocation and frame executions and preserves the router
+saved before spending. Spending and late-tail failure restore the original
+withdrawal world with the complete attempted-call prefix. This advances source
+composition; complete independent parent return/revert specification, full
+source-callee deployment/primitive binding, enclosing writers and sequential
+invariants remain required. No overall correspondence completion is claimed.
+
+The checker now includes 32 owned modules. Exact immutable validation follows
+this implementation commit; historical execution receipts retain their source.
+
 ## Getter and withdrawal-tail composition
 
 `CallResults` binds actual locator/frame CALL results to exact return values,

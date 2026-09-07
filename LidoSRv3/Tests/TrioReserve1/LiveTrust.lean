@@ -12,6 +12,7 @@ import LidoSRv3.Audit.Source.TrioReserve1.Admission
 import LidoSRv3.Audit.Source.TrioReserve1.ABI
 import LidoSRv3.Audit.Source.TrioReserve1.CallResults
 import LidoSRv3.Audit.Source.TrioReserve1.WithdrawalTail
+import LidoSRv3.Audit.Source.TrioReserve1.WithdrawalComposition
 
 /-! Owned inspection, pending coordinated canonical Trust registration. -/
 open LidoSRv3.Audit.Source.TrioReserve1
@@ -82,3 +83,17 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms WithdrawalTail.seed_failure_stops
 #print axioms WithdrawalTail.after_spend
 #print axioms WithdrawalTail.tail_failure_rolls_back
+
+#print axioms SpendingSpec.admitted_bound
+#print axioms SpendingSpec.accounting_corresponds
+#print axioms Spending.allocation_bounds
+#print axioms Spending.accounting_add_bound
+#print axioms Spending.adjusted_next_bound
+#print axioms Spending.success_world
+#print axioms Spending.success_corresponds
+#print axioms Spending.allocation_failure
+#print axioms Spending.insufficient
+#print axioms Spending.frame_failure
+#print axioms WithdrawalComposition.after_frame
+#print axioms WithdrawalComposition.late_failure
+#print axioms WithdrawalComposition.spending_failure
