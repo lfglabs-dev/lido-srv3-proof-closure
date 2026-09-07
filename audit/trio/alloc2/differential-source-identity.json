@@ -7,6 +7,7 @@
   "LidoSRv3/Audit/Source/TrioAlloc2/LoopBounds.lean": "f4862b07e0c08d4302ad291b9e16dd0dc6796fc45c5a37531b17c3e39420ff17",
   "LidoSRv3/Audit/Source/TrioAlloc2/LoopCorrespondence.lean": "82402ccea48e59c12090c408c578511d4c42d1c979c61b3f39a061b67ad06485",
   "LidoSRv3/Audit/Source/TrioAlloc2/LoopTotality.lean": "5006feb6b0bac67a23c87ee5223d2094a8403a66300164073919541ff1caa521",
+  "LidoSRv3/Audit/Source/TrioAlloc2/ParentArraySafety.lean": "cce29c04460f0365ee6a35c1fbb0ee71fcfe9a8a0288dc10cdbf566b998351f6",
   "LidoSRv3/Audit/Source/TrioAlloc2/ParentConversion.lean": "e9df24a1fe4e8b94f9c2d5f038ed42ee5ad46d544e91109b92c1280fd79e1c1b",
   "LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean": "6bd90551f9cb4a39c3384b98b2a6ff40c27b7eba6b491308c2bfa02ca1c5b025",
   "LidoSRv3/Audit/Source/TrioAlloc2/ScanBounds.lean": "2e998cf69f26826b8974d72eabf8f15638be9c02e8a2473f92148491af07b2e1",
@@ -24,5 +25,5 @@
   "LidoSRv3/Tests/TrioAlloc2/Loop.lean": "ea1bb1b9b94d8f01d03d49bffa3647b5afbbd39ef95bea01dc40630ba51f36f7",
   "LidoSRv3/Tests/TrioAlloc2/Sequential.lean": "c0588ccf143c18306ca4fadd4a9b6065f51e86dab2e7dca062c4cea805b0fcd3",
   "LidoSRv3/Tests/TrioAlloc2/Step.lean": "fe2ba4f63bfd6e2c962f47f56ffb6ff15f77711df9a9f47557aee3edd73c5404",
-  "audit/trio/alloc2/lakefile.lean": "7fad404342584b930b8cd33645601e8e3aadb2c0ce0d704f245a1c8b99bf503f"
+  "audit/trio/alloc2/lakefile.lean": "d52496e24bcfefa3ca852040530aee7dc4c2e74fc97c4ec55b7f9bcd171e1666"
 }

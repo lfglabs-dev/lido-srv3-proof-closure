@@ -1,7 +1,7 @@
 {
   "base": "c7adae04416704a839d56333efad003f0a0f46b7",
   "producer": "8269ac576cf119975a7e9954459cd4aa04d5cd82",
-  "accepted_interface": "2a4e9d2a91d257353470677c6101fd91293cf4e4",
+  "verity": "e977aaad6e1a9e92e0132d41b3d33a14135a4d46",
   "files": {
     "LidoSRv3/Audit/Source/TrioAlloc1/Bytes.lean": "80807f4a9a7894bf9bef06339eb7a50e59e715e2d77d508f07e19c847b70e5fb",
     "LidoSRv3/Audit/Source/TrioAlloc1/Execution.lean": "83ba3e3ad07068ef841ee743e2a975bc7bdb57e3f1855f535ada7c4426f64b11",
@@ -35,6 +35,10 @@
     "audit/trio/alloc2/composition/LibraryABIVectors.lean": "591809843b67addd13dd40053ee9a54b76c577f73d19b52dcbe7c2cae6b22018",
     "audit/trio/alloc2/composition/Parent.lean": "02519228eaba1bf17d313ea588f808211849e82c02e87ba29e07e3052385f985",
     "audit/trio/alloc2/composition/ParentVectors.lean": "f7b0f86ebed4c2cef668c26b92bf69eae45350e674a2c89f7e744423701a22ab",
-    "audit/trio/alloc2/composition/lakefile.lean": "96dd9e45597849163be3c317be961033e02cfd125522a35e460726569c7b5dcd"
+    "audit/trio/alloc2/composition/lakefile.lean": "96dd9e45597849163be3c317be961033e02cfd125522a35e460726569c7b5dcd",
+    "audit/trio/alloc2/runtime/Library.lean": "ea1d64ea15de49cf9ed34ad6497b43ea4b3a18131bd47ca8efcc48c460a1e362",
+    "audit/trio/alloc2/runtime/Vectors.lean": "87b3857a7aa4e0944dcefdca5342d5946c574c31b646f6fd6151dfae9cab64b4",
+    "audit/trio/alloc2/runtime/lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
+    "audit/trio/alloc2/runtime/lakefile.lean": "b2f264f10948f4a872efbbd1c5b21df4e7e4abfa09e878475e2c53d5bd104330"
   }
 }
