@@ -1,0 +1,59 @@
+LidoSRv3/Audit/Source/TrioReserve1/ACLPermission.lean:38:37: error: unsolved goals
+k : Queue.Keccak
+external : StaticCall.External
+self where_ : Address
+role : Word
+how : List Word
+w : World
+who : Address
+hp : (stored k self where_ role w who).val ≠ 0
+hu : (stored k self where_ role w who).val = ACL.emptyParams
+⊢ ¬ACL.emptyParams = 0
+LidoSRv3/Audit/Source/TrioReserve1/ACLPermission.lean:38:55: warning: This simp argument is unused:
+  hp
+
+Hint: Omit it from the simp argument list.
+  simp [attempt, h̵p̵,̵ ̵ACL.evalParams, hu, pure, ACLTree.result]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/ACLPermission.lean:53:8: error: Type mismatch: After simplification, term
+  hs
+ has type
+  (if ACL.emptyParams = 0 then { outcome := Except.ok false } else { outcome := Except.ok true }) =
+    {
+      outcome :=
+        match outcome with
+        | ACLTreeSpec.Outcome.value b => Except.ok b
+        | ACLTreeSpec.Outcome.invalidOpcode => Except.error ACL.Halt.invalidOpcode,
+      attempts := trace }
+but is expected to have type
+  (Except.ok true =
+      match outcome with
+      | ACLTreeSpec.Outcome.value b => Except.ok b
+      | ACLTreeSpec.Outcome.invalidOpcode => Except.error ACL.Halt.invalidOpcode) ∧
+    trace = []
+LidoSRv3/Audit/Source/TrioReserve1/ACLPermission.lean:84:76: error: unsolved goals
+case neg.ok.ok.isFalse
+k : Queue.Keccak
+external : StaticCall.External
+self : Address
+ctx : Context
+role : Word
+how : List Word
+w : World
+fuel : Nat
+hp : ¬(w.core.readContractSlot self.val (ACL.permissionSlot k ctx.sender ctx.self role)).val = 0
+hw : ¬(w.core.readContractSlot self.val (ACL.permissionSlot k ACL.anyEntity ctx.self role)).val = 0
+ft st : List NestedAttempt
+a✝¹ a✝ : Bool
+hs :
+  ACL.evalParams k external self (w.core.readContractSlot self.val (ACL.permissionSlot k ctx.sender ctx.self role))
+      ctx.sender ctx.self role how w fuel =
+    { outcome := Except.ok false, attempts := ft }
+ht :
+  ACL.evalParams k external self (w.core.readContractSlot self.val (ACL.permissionSlot k ACL.anyEntity ctx.self role))
+      ACL.anyEntity ctx.self role how w fuel =
+    { outcome := Except.ok a✝, attempts := st }
+h✝ : a✝¹ = false
+⊢ (if a✝ = true then { outcome := Except.ok true } else { outcome := Except.ok false }).outcome = Except.ok a✝ ∧
+    (if a✝ = true then { outcome := Except.ok true } else { outcome := Except.ok false }).attempts = []

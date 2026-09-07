@@ -7,6 +7,22 @@ remote wrapper still cannot encode the gitlink or carry Lake dependency sources.
 Do not substitute a narrow local check for full remote gates, fetch credentials,
 or duplicate the old terminal remote job. The old local full-gate handle is absent.
 
+The latest leaf extension discharges the abstract atomic premises in the recursive
+ACL theorem through independent scalar rules and a physical projection of raw
+static-call replies. Continue with primitive/deployment/resource binding and
+parent composition and deployment binding; do not reopen discharged leaf premises or treat
+the arbitrary static-call interpreter as deployed bytecode evidence.
+
+ACLPermission now gives bidirectional ordered permission correspondence and
+derives traced Lido/Kernel/ACL admission plus target allowance/denial from the
+independent rules. Target now gives the exact successful external post-state/return/events/trace,
+queue preservation and an instantiation of the physical sequence relation.
+The target continuation is now exhaustive after authorization (including arbitrary
+returned worlds and all propagated faults), with independent prefix denial and
+physical kernel-no-code cases. Remaining target integration includes concrete
+authorization failure/deployment coverage,
+external sequence reachability and deployed primitive binding.
+
 1. Complete the independent withdrawal interaction specification and full
    return/revert/world/ordered-call/event correspondence. Allocation is now tied
    to actual queue CALL bytes and saved physical locals; compose through all
@@ -80,8 +96,11 @@ or duplicate the old terminal remote job. The old local full-gate handle is abse
    full dispatcher stability, and uniqueness across any completed capacities.
    ACLLogicSpec/ACLLogic now give independent total/unique next-child control,
    exact source short-circuit/trace correspondence, and early logic failure rules.
-   Compose those node rules recursively and bind independent leaf/oracle rules.
-   Complete independent parameter-tree correspondence and termination/resource
+   ACLTreeSpec/ACLTree now prove bidirectional finite-graph/source correspondence
+   with exact traces, sufficient stable depths and agreement of derivations,
+   with atomic leaf soundness/completeness now discharged by ACLLeaf scalar
+   input/operator/oracle rules and physical primitive projection. Complete
+   deployed primitive correspondence and termination/resource
    binding: recursion exhaustion is a host limit, never source denial. Complete
    ACL mutation admission, deployment/proxy/primitive and callback binding; oracle
    interpreter fixtures still require binding to actual deployed source. Complete report/reward/withdrawal finalization,

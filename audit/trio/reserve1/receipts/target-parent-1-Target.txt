@@ -1,0 +1,68 @@
+LidoSRv3/Audit/Source/TrioReserve1/Target.lean:101:15: error: unsolved goals
+case ok.false
+external : External
+ctx : Context
+requested : Word
+before afterAuthorization : World
+calls : List Attempt
+outcome : Except Fault Unit
+after : World
+trace : List Attempt
+h :
+  Aragon.canPerform external ctx Aragon.bufferReserveManagerRole before =
+    { outcome := Except.ok false, world := afterAuthorization, attempts := calls }
+⊢ outcome = Except.error (Fault.reason "APP_AUTH_FAILED") ∧ before = after ∧ calls = trace ↔
+    { outcome := outcome, world := after, attempts := trace } =
+      match
+        (match (fail (Fault.reason "APP_AUTH_FAILED") afterAuthorization).outcome with
+          | Except.error e =>
+            { outcome := Except.error e, world := (fail (Fault.reason "APP_AUTH_FAILED") afterAuthorization).world,
+              attempts := (fail (Fault.reason "APP_AUTH_FAILED") afterAuthorization).attempts }
+          | Except.ok a =>
+            { outcome := Except.ok (),
+              world := committed ctx requested (fail (Fault.reason "APP_AUTH_FAILED") afterAuthorization).world,
+              attempts := (fail (Fault.reason "APP_AUTH_FAILED") afterAuthorization).attempts }).outcome with
+      | Except.ok a =>
+        {
+          outcome :=
+            (match (fail (Fault.reason "APP_AUTH_FAILED") afterAuthorization).outcome with
+              | Except.error e =>
+                { outcome := Except.error e, world := (fail (Fault.reason "APP_AUTH_FAILED") afterAuthorization).world,
+                  attempts := (fail (Fault.reason "APP_AUTH_FAILED") afterAuthorization).attempts }
+              | Except.ok a =>
+                { outcome := Except.ok (),
+                  world := committed ctx requested (fail (Fault.reason "APP_AUTH_FAILED") afterAuthorization).world,
+                  attempts := (fail (Fault.reason "APP_AUTH_FAILED") afterAuthorization).attempts }).outcome,
+          world :=
+            (match (fail (Fault.reason "APP_AUTH_FAILED") afterAuthorization).outcome with
+              | Except.error e =>
+                { outcome := Except.error e, world := (fail (Fault.reason "APP_AUTH_FAILED") afterAuthorization).world,
+                  attempts := (fail (Fault.reason "APP_AUTH_FAILED") afterAuthorization).attempts }
+              | Except.ok a =>
+                { outcome := Except.ok (),
+                  world := committed ctx requested (fail (Fault.reason "APP_AUTH_FAILED") afterAuthorization).world,
+                  attempts := (fail (Fault.reason "APP_AUTH_FAILED") afterAuthorization).attempts }).world,
+          attempts :=
+            calls ++
+              (match (fail (Fault.reason "APP_AUTH_FAILED") afterAuthorization).outcome with
+                | Except.error e =>
+                  { outcome := Except.error e,
+                    world := (fail (Fault.reason "APP_AUTH_FAILED") afterAuthorization).world,
+                    attempts := (fail (Fault.reason "APP_AUTH_FAILED") afterAuthorization).attempts }
+                | Except.ok a =>
+                  { outcome := Except.ok (),
+                    world := committed ctx requested (fail (Fault.reason "APP_AUTH_FAILED") afterAuthorization).world,
+                    attempts := (fail (Fault.reason "APP_AUTH_FAILED") afterAuthorization).attempts }).attempts }
+      | Except.error e =>
+        { outcome := Except.error e, world := before,
+          attempts :=
+            calls ++
+              (match (fail (Fault.reason "APP_AUTH_FAILED") afterAuthorization).outcome with
+                | Except.error e =>
+                  { outcome := Except.error e,
+                    world := (fail (Fault.reason "APP_AUTH_FAILED") afterAuthorization).world,
+                    attempts := (fail (Fault.reason "APP_AUTH_FAILED") afterAuthorization).attempts }
+                | Except.ok a =>
+                  { outcome := Except.ok (),
+                    world := committed ctx requested (fail (Fault.reason "APP_AUTH_FAILED") afterAuthorization).world,
+                    attempts := (fail (Fault.reason "APP_AUTH_FAILED") afterAuthorization).attempts }).attempts }

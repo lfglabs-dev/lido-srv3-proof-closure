@@ -1,0 +1,36 @@
+LidoSRv3/Audit/Source/TrioReserve1/ACLLeaf.lean:25:68: error: Tactic `simp` failed with a nested error:
+maximum recursion depth has been reached
+use `set_option maxRecDepth <num>` to increase limit
+use `set_option diagnostics true` to get diagnostic information
+LidoSRv3/Audit/Source/TrioReserve1/ACLLeaf.lean:25:103: warning: This simp argument is unused:
+  iff_false
+
+Hint: Omit it from the simp argument list.
+  simp_all only [Bool.false_eq_true,
+  ̲ i̵f̵f̵_̵f̵a̵l̵s̵e̵,̵  ̲ ̲ ̲ ̲ ̲ ̲iff_true, not_false_eq_true, not_true_eq_false]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/ACLLeaf.lean:25:114: warning: This simp argument is unused:
+  iff_true
+
+Hint: Omit it from the simp argument list.
+  simp_all only [Bool.false_eq_true,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲iff_false, i̵f̵f̵_̵t̵r̵u̵e̵,̵ ̵not_false_eq_true, not_true_eq_false]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/ACLLeaf.lean:25:124: warning: This simp argument is unused:
+  not_false_eq_true
+
+Hint: Omit it from the simp argument list.
+  simp_all only [Bool.false_eq_true,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲iff_false, iff_true, n̵o̵t̵_̵f̵a̵l̵s̵e̵_̵e̵q̵_̵t̵r̵u̵e̵,̵ ̵not_true_eq_false]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/ACLLeaf.lean:25:143: warning: This simp argument is unused:
+  not_true_eq_false
+
+Hint: Omit it from the simp argument list.
+  simp_all only [Bool.false_eq_true,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲iff_false, iff_true, n̵o̵t̵_̵f̵a̵l̵s̵e̵_̵e̵q̵_̵t̵r̵u̵e̵,̵ ̵n̵o̵t̵_̵t̵r̵u̵e̵_̵e̵q̵_̵f̵a̵l̵s̵e̵]̵n̲o̲t̲_̲f̲a̲l̲s̲e̲_̲e̲q̲_̲t̲r̲u̲e̲]̲
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

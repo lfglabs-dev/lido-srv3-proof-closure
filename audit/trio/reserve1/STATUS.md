@@ -1,5 +1,99 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Target continuation: exhaustive after authorization
+
+`TargetSpec.Completes` is an independent generic transaction rule with no source
+imports. It covers allowed writes against the actual post-authorization world,
+denial, and propagation of every authorization fault; both failing cases restore
+the original world and preserve attempted calls. `Target.after_authorization`
+proves a bidirectional exact result relation for every authorization result and
+arbitrary callback world. `Target.complete` instantiates it with the actual source
+query, without a successful-authorization premise. This closes the target parent
+continuation, while the authorization result remains a separately specified interface.
+`prefix_denied` derives exact APP_AUTH_FAILED/no-call rollback from the independent
+initialization/kernel-prefix denial rule. `kernel_no_code` derives exact empty-revert
+rollback from physical code absence. These supplement the concrete allowed/denied
+ACL composition rather than claiming all deployed authorization failures closed.
+
+At source `01cad617b9692f618a3fa869597967a23720f36f`, three selected component checks and seven baseline/import checks pass. The other 56 source/olean pairs match earlier successful receipts. See `receipts/target-parent-summary.json`; only standard axioms were printed. Eleven dependency revisions match the manifest. These are bounded checks, not full gates. Deployment/primitive/resource binding,
+remaining authorization failure paths, external sequence reachability, withdrawal
+parent coverage, report/queue writers and full remote integration gates remain open.
+
+## Exact external target success
+
+`Target.committed` describes the physical post-state without invoking an executor:
+the target write/event always occurs, reserve lowering/write/event is conditional,
+and all other world fields are retained. `Target.success` derives the exact complete
+successful external result from independent permission derivation through concrete
+Lido/Kernel/ACL dispatch, including the nested authorization trace. `accounting`
+connects this state to the independent scalar target rule; other-slot/account and
+queue preservation require only the stated distinctness, with no hash-injectivity
+assumption. The committed state instantiates the physical sequence relation.
+
+At source `e4858c718d7c3388f6f7f25ea7c251f723989f75`, two selected component checks and seven baseline/import checks pass. The other 56 source/olean pairs match earlier successful receipts. See `receipts/target-summary.json`; only standard axioms were printed. Eleven dependency revisions match the manifest. These are bounded checks, not full gates. Runtime implementations are unchanged.
+This closes the exact successful target composition under explicit initialization,
+code/pointer and primitive inputs. Exhaustive parent failures, external sequence
+reachability, remaining report/queue writers, deployed primitive/resource binding,
+canonical registration and full remote gates remain open.
+
+## Ordered ACL permission correspondence and target admission
+
+`ACLPermissionSpec` independently distinguishes absent, unconditional and graph
+permissions, then selects specific before wildcard permission. Specific success
+or invalid-opcode failure requires no wildcard derivation; only denial falls back,
+with ordered trace concatenation. `ACLPermission` projects actual permission slots,
+uses the original sender for specific evaluation and ANY_ENTITY for wildcard, and
+proves both directions against completed `ACL.hasPermission`. Finite derivations
+provide stable sufficient depth without assuming unvisited graphs terminate.
+
+`canPerform_traced` composes these rules through actual Lido→Kernel→ACL dispatch,
+retaining the exact nested trace and unchanged permission-call world. `target_allowed`
+derives the independent target accounting rule from permission derivation;
+`target_denied` derives APP_AUTH_FAILED with full original-world rollback and the
+same call trace. Physical initialization/code/pointers and raw static-call
+interpretation remain explicit; this is not deployed-bytecode/EVM gas certification.
+At source `7f431a39a4ba306a06b02dc273d4b1c79729b9c7`, three selected component checks and seven baseline/import checks pass. The other 54 source/olean pairs match earlier successful receipts. See `receipts/acl-permission-summary.json`; only standard axioms were printed. Eleven dependency revisions match the manifest. These are bounded checks, not full gates. Earlier receipts remain attributed
+to their original source commits. Full parent and writer coverage remains open.
+
+## Atomic ACL rules and recursive leaf discharge
+
+`ACLLeafSpec` independently describes block/timestamp/constant/uint240 argument
+selection, missing-argument denial before enum conversion, RET/comparison/invalid
+enum outcomes, and raw oracle acceptance. It imports no source evaluator.
+`ACLLeaf` proves both non-oracle and oracle atomic correspondence, including the
+oracle attempt before a later invalid enum and exact trace preservation.
+Its physical `Describes` projection invokes only the explicit static-call primitive,
+never `ACL.eval`. Soundness, existence and completeness discharge both atomic
+premises of `ACLTree.corresponds`; `ACLLeaf.tree_corresponds` now relates the full
+finite graph specification to completed source evaluations without a supplied
+leaf soundness/completeness assumption. Host exhaustion remains distinct.
+
+This is a proof-only extension. Deployed oracle/primitive interpretation, EVM gas,
+full parent coverage and the remaining writer/admission/integration obligations
+are still open. At source `bb40d49e8fa6ce9b644e4134d933c752a3b70626`, three selected component checks and seven baseline/import checks pass. The other 52 source/olean pairs match earlier successful receipts. See `receipts/acl-leaf-summary.json`; only standard axioms were printed. Eleven dependency revisions match the manifest. These are bounded checks, not full gates. The initial constructor-name guard failure and its successful fix are retained.
+The older conditional tree theorem and historical receipts remain valid.
+
+## Recursive ACL graph correspondence
+
+`ACLTreeSpec` defines finite evaluation of an indexed graph without a fuel
+parameter or executor imports. It includes missing/invalid nodes, first-child
+failure, short-circuit completion and selected-child success/failure with exact
+trace concatenation. Cycles in storage are allowed; only the evaluated paths
+need finite derivations. Leaf semantics are an explicit independent relation.
+
+`ACLTree.corresponds` proves both directions between those derivations and
+completed source evaluations of the physical graph, subject to stated leaf
+soundness/completeness premises. `of_spec_stable` constructs a sufficient depth
+from each derivation and preserves the result for larger depths; related
+derivations agree on outcome and trace. No global cutoff or global acyclicity
+premise is inserted. This closes recursive structure correspondence, while the
+leaf premises, primitive/deployment relation and EVM resource binding remain open.
+At `35e5c6b1505236744d89ae21dfe81b887f6be266`, ACLTreeSpec, ACLTree
+and updated LiveTrust pass, along with all seven baseline/import checks. The other
+50 modules' source and olean hashes match prior receipts; inspected axioms are
+standard. `receipts/acl-tree-summary.json` links exact evidence. Runtime code is
+unchanged; prior executions retain their original source-commit attribution.
+
 ## Independent ACL logic control
 
 `ACLLogicSpec` gives a total, unique control relation after the first child:

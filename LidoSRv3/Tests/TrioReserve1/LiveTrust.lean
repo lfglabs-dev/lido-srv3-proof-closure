@@ -1,3 +1,6 @@
+import LidoSRv3.Audit.Source.TrioReserve1.Target
+import LidoSRv3.Audit.Source.TrioReserve1.ACLPermission
+import LidoSRv3.Audit.Source.TrioReserve1.ACLLeaf
 import LidoSRv3.Audit.Source.TrioReserve1.Queue
 import LidoSRv3.Audit.Source.TrioReserve1.Erasure
 import LidoSRv3.Audit.Source.TrioReserve1.PhysicalPacking
@@ -23,6 +26,7 @@ import LidoSRv3.Audit.Source.TrioReserve1.Kernel
 import LidoSRv3.Audit.Source.TrioReserve1.ACLCalls
 import LidoSRv3.Audit.Source.TrioReserve1.ACLBounds
 import LidoSRv3.Audit.Source.TrioReserve1.ACLLogic
+import LidoSRv3.Audit.Source.TrioReserve1.ACLTree
 
 /-! Owned inspection, pending coordinated canonical Trust registration. -/
 open LidoSRv3.Audit.Source.TrioReserve1
@@ -216,3 +220,45 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms ACLLogic.out_of_bounds
 #print axioms ACLLogic.invalid_before_children
 #print axioms ACLLogic.first_failure
+
+#print axioms ACLTree.of_spec
+#print axioms ACLTree.of_spec_stable
+#print axioms ACLTree.derivations_agree
+#print axioms ACLTree.to_spec
+#print axioms ACLTree.corresponds
+
+#print axioms ACLLeafSpec.input_exists
+#print axioms ACLLeaf.finish_corresponds
+#print axioms ACLLeaf.input_source
+#print axioms ACLLeaf.nonoracle_corresponds
+#print axioms ACLLeaf.oracle_reply_source
+#print axioms ACLLeaf.oracle_corresponds
+#print axioms ACLLeaf.describes_source
+#print axioms ACLLeaf.describes_complete
+#print axioms ACLLeaf.tree_corresponds
+
+#print axioms ACLPermission.attempt_of_spec
+#print axioms ACLPermission.attempt_to_spec
+#print axioms ACLPermission.attempt_lift
+#print axioms ACLPermission.selection_source
+#print axioms ACLPermission.of_spec
+#print axioms ACLPermission.to_spec
+#print axioms ACLPermission.corresponds
+#print axioms ACLPermission.of_spec_stable
+#print axioms ACLPermission.canPerform_traced
+#print axioms ACLPermission.target_allowed
+#print axioms ACLPermission.target_denied
+
+#print axioms Target.writer_success
+#print axioms Target.accounting
+#print axioms Target.balances
+#print axioms Target.other_slot
+#print axioms Target.other_account
+#print axioms Target.success
+#print axioms Target.queue_preserved
+#print axioms Target.sequence_step
+
+#print axioms Target.after_authorization
+#print axioms Target.complete
+#print axioms Target.prefix_denied
+#print axioms Target.kernel_no_code

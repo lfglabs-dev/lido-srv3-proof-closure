@@ -1,0 +1,6 @@
+LidoSRv3/Audit/Source/TrioReserve1/ACLPermission.lean:53:8: error: Type mismatch: After simplification, term
+  hs
+ has type
+  @Eq (ACL.Result Bool) (pure true) (ACLTree.result outcome trace)
+but is expected to have type
+  @Eq (ACL.Result Bool) (ACLTree.result (ACLTreeSpec.Outcome.value true) []) (ACLTree.result outcome trace)
