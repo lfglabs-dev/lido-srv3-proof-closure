@@ -1,5 +1,20 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Physical reserve preservation
+
+`PhysicalReserve.success_preserves` connects the concrete `Pipeline.success`
+execution to final physical buffer/reserve subtraction and the independent
+`PartitionSpec.protectedReserve` equality. It derives admission from the actual
+allocation formula and proves every storage cell of a distinct contract survives
+the accounting, seed and receiver effects. The resulting live queue read therefore
+returns the same demand. No reserve <= buffer or mapping-hash injectivity premise
+is added. Queue/Lido namespace separation is explicit. This is forward successful
+withdrawal coverage, not an exhaustive parent specification or writer-sequence proof.
+
+The new module passed draft bounded elaboration. Immutable component/axiom
+receipts follow the source commit; existing 51-case runtime evidence remains tied
+to `4b82879f28d0e1d58a9972a3db92aa5ea225d898`. Runtime sources are unchanged.
+
 ## Concrete withdrawal pipeline
 
 `Pipeline` composes locator, queue, oracle, consensus and receiver implementations.
