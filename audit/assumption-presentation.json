@@ -1,0 +1,26 @@
+{
+  "schema": "lido-assumption-presentation-v1",
+  "groups": [
+    {
+      "id": "model-source",
+      "title": "The models represent the contract behaviour correctly.",
+      "parts": {
+        "A-SOURCE-SHAPED": "We assume the handwritten Lean models represent the Solidity behaviour described by this guarantee.",
+        "A-HANDWRITTEN-MINFIRST": "The independent min-first model is handwritten. Its full correspondence with Solidity and EVM execution remains open.",
+        "A-ABSTRACT-TX": "The model defines transaction success and failure without executing EVM bytecode.",
+        "A-VERITY-SCAFFOLD": "We also assume Verity correctly models the calls, storage and rollback used by these proofs.",
+        "A-YUL-INTERFACE": "The handwritten Yul and direct bytecode require a separate correspondence proof; this report does not connect them to Solidity."
+      },
+      "mitigation": "The linked code and correspondence notes let you review what is modeled and what remains open. Tests and mutations check specific cases; they do not establish full correspondence."
+    },
+    {
+      "id": "source-chain",
+      "title": "The deployed contracts correspond to the source we reviewed.",
+      "parts": {
+        "A-SOLC-TRUSTED": "We assume the compiler and compilation pipeline preserve the source behaviour.",
+        "A-RUNTIME-PROVENANCE": "We assume the deployed contracts and proxy implementations correspond to the pinned source."
+      },
+      "mitigation": "The verification guide provides external checks of implementation addresses, on-chain code and verified source bundles. Its --recompile option prints instructions; it does not run a local compilation. Compiler correctness remains trusted."
+    }
+  ]
+}
