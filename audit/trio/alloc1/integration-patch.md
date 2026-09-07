@@ -67,3 +67,12 @@ regenerate inventory/UX2 artifacts together. Run make prove/test and metadata,
 annotation, inventory, provenance and trust gates on that immutable integrated head.
 ALLOC-2 owns consumer composition and its shared UX2 integration. No website or
 guarantee-status update should present these partial gates as completed correspondence.
+
+StatusWriter extends the physical configuration writer coverage and history
+induction to public status changes. Remaining ordinary storage writers include
+the fee batch (SRLib 315-337), exited-validator/accounting reports (748-891),
+last-deposit updates (894-901), router top-up cap (StakingRouter 1023-1028),
+withdrawal credentials plus notification callbacks (1036-1043; SRLib 903-920),
+and inherited ACL/initialization writes. Each requires actual packed-field or
+other-slot preservation, including callback and rejection composition where
+present. A text assignment inventory is not a source-correspondence theorem.

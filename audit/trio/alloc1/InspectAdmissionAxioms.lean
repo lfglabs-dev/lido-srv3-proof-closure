@@ -1,4 +1,4 @@
-import LidoSRv3.Audit.Source.TrioAlloc1.RecordInvariant
+import LidoSRv3.Audit.Source.TrioAlloc1.StatusWriter
 
 -- Init-only inspection; the complete Verity/trust driver remains remote-only.
 #print axioms LidoSRv3.Audit.Source.TrioAlloc1.AdmissionFacts.success_witness
@@ -8,3 +8,6 @@ import LidoSRv3.Audit.Source.TrioAlloc1.RecordInvariant
 #print axioms LidoSRv3.Audit.Source.TrioAlloc1.AdmissionFacts.public_preserves
 
 #print axioms LidoSRv3.Audit.Source.TrioAlloc1.RecordInvariant.history_invariants
+
+#print axioms LidoSRv3.Audit.Source.TrioAlloc1.StatusWriter.history_invariants
+#print axioms LidoSRv3.Audit.Source.TrioAlloc1.StatusWriter.revert_restores

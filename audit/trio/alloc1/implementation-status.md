@@ -58,16 +58,23 @@ count truncation or assumed callee success is introduced.
   both count/share/address and fresh-record invariants for these three writer
   histories. It keeps finite uint24 slot-separation obligations explicit and does
   not represent initialization, migration or other writer families.
+- `StatusWriter`: models the public role/membership/helper order, stored-enum
+  panic before status equality, packed status byte and exact event ABI. It proves
+  rollback and both invariant predicates preserved, and extends the history
+  induction to four public writer families. ABI decoding of malformed input is
+  outside the typed entry relation.
 - `AllocationMemory`: exact word rounding, oversized-array panic 0x41, allocation
   monotonicity/limit on success, and a bounded allocation lemma. Integration of
   these primitives into the entire compiler execution remains open.
 
-Twenty-five Init-only modules are included in the fresh light validation driver.
-All pass in `receipts/light-v21.json`.
+Twenty-six Init-only modules are included in the fresh light validation driver.
+All pass in `receipts/light-v22.json`.
 The earlier five selected AdmissionFacts theorems use only propext, Classical.choice
 and Quot.sound (`admission-axioms-v1.json`).
 The six selected admission/history theorems use the same standard axioms
-(`admission-axioms-v2.json`). These new invariant proofs have not received remote
+(`admission-axioms-v2.json`). Eight selected theorems including status history and
+rollback pass in `admission-axioms-v3.json`; the full Solidity writer suite with
+five status cases passes in `status-writer-validation.json`. These new invariant proofs have not received remote
 closure validation.
 The full production/test/audit-trust/legacy build passed 1,505 jobs at
 `8269ac576cf119975a7e9954459cd4aa04d5cd82`, remote job
@@ -155,3 +162,9 @@ Its remote request was rejected before compilation: ashur reported 80 GiB free,
 2 GiB estimated plus the unchanged 80 GiB floor (HTTP 422). No remote success is
 claimed for the correction. Exact receipt: remote-rejected-43ae5e8.json; static
 gates: scoped-checks-43ae5e8.json. Integration requirements are in integration-patch.md.
+
+The zero-storage history constructors are an induction base, not an operating
+proxy initialization proof: zero storage also has no authorized role members.
+The unconditional transition-preservation lemmas cover nonzero entry states
+satisfying their stated predicates; connecting those states to actual deployment
+and ACL initialization is still required.
