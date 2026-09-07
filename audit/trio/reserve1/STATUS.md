@@ -14,7 +14,7 @@ independent rules; `withdrawal_corresponds` retains bidirectional exact parent
 correspondence. Status denial/failure have explicit parent rollback corollaries.
 Lookup/CALL primitive and deployed callee binding remain explicit, as do remaining
 router/spending/tail interfaces, other writers and full remote integration gates.
-Immutable validation follows checks. Runtime execution source is unchanged.
+At source `17ad2454bfe2b6fea97b076a9f0f078b72ee370a`, three selected component checks and seven baseline/import checks pass. The other 60 source/olean pairs match earlier successful receipts. See `receipts/status-summary.json`; only standard axioms were printed. Eleven dependency revisions match the manifest. These are bounded checks, not full gates. Runtime execution source is unchanged.
 
 ## Exhaustive withdrawal parent control relation
 
