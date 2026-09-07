@@ -578,9 +578,9 @@ structure Result where
 returning `(allocated, buckets)`, as an executable transaction over the two
 memory arrays. A length mismatch or checked-arithmetic failure reverts.
 
-Not transcribed: nothing in the span; Solidity has no length check (an
-out-of-range `capacities[i]` read at line 77 panics instead), the model's
-`"ARRAY_LENGTH_MISMATCH"` guard is that panic made explicit.
+Deviation: this earlier entry adds an eager equal-length guard. Solidity
+accepts unequal lengths for zero demand and ignores surplus capacities. See
+`MinFirstSourceEntry.allocateDecoded` for the additive boundary correction.
 
 Added by the model: revert strings `"ARRAY_LENGTH_MISMATCH"`,
 `"MIN_FIRST_ARITHMETIC"` (any `Panic(0x11)`), `"MEMORY_ARRAY_DECODE"`, the

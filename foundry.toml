@@ -9,3 +9,10 @@ optimizer_runs = 200
 via_ir = true
 evm_version = "cancun"
 
+
+# Runs the pinned library against the actual Lean/Verity executable.
+[profile.minfirst_source]
+src = "solidity/minfirst/src"
+test = "solidity/minfirst/test"
+out = "solidity/out/minfirst"
+cache_path = "solidity/cache/minfirst"

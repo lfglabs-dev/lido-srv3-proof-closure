@@ -47,7 +47,7 @@ Conjuncts 3 and 4 are genuinely stronger than the conjunction of the two
 pre-existing one-step slices: they are multi-step reachability statements that
 neither slice implies.
 
-### The `mint` argument is a caller obligation, not an assumption
+### The `mint` binding is an explicit hypothesis
 
 `_enqueue` and `_emitTransfer` (lines 378 and 380) are not modeled. Rather than
 silently assuming their effect, the parent quantifies over every `mint` and
