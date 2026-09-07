@@ -1,5 +1,25 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Concrete callee balance preservation
+
+`CalleeBalance` proves that the handled Locator, Queue, Oracle and Router paths
+preserve provisional balances on success. This covers malformed replies, arithmetic
+panic, nonpayable/authorization rejection and nested STATICCALL without assumptions
+on static reply bytes. Their dispatch composition retains a balance-preservation
+premise only for delegated code. The CALL theorem covers code/funds failure, success
+and rejection with either trace representation: every outcome conserves total
+balance and preserves the explicit finite aggregate bound. The resulting per-account
+uint256 bound specializes to the concrete pipeline.
+
+Initial aggregate reachability from EVM state, general delegated/callback behavior,
+deployed primitive/resource binding and remaining parent/writer integration are
+still open. At source `c89787d5c6228afc04b4eb359ca66482c850144d`, two selected component checks and seven baseline
+checks pass. The other 77 source/olean pairs match prior receipts; eleven dependency
+revisions match and axioms are standard. `receipts/callee-balance-summary.json`
+records these bounded checks. Runtime source is unchanged; no clean/full-gate or
+certification claim is made. The remote wrapper hash remains unchanged and no
+supported dependency-bundle tool was discovered.
+
 ## Finite aggregate balance preservation
 
 `BalanceSpec` defines a duplicate-free finite account support, zero balances outside

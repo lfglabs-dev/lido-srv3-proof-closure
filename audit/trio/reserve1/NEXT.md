@@ -1,12 +1,13 @@
 # Continuation — not a completion claim
 
-Latest increment: BalanceSpec/Balance prove finite aggregate support preservation
-and per-account uint256 bounds for funded provisional transfers, including fresh
-recipients and self-aliases. Continue by deriving the incoming aggregate invariant
-from the EVM world and proving callee preservation; do not treat the explicit
-invariant premise as established deployment reachability. Current evidence is
-balance-support-rules-summary.json, with three selected checks and 75 revalidated
-unchanged source/olean pairs. Full implementation and remote gates remain open.
+Latest increment: CalleeBalance proves balance preservation for concrete handled
+Locator/Queue/Oracle/Router paths and total conservation plus aggregate/uint256
+bounds for every CALL outcome. The composed dispatcher retains the premise only
+for delegated code. Continue with initial EVM aggregate reachability, general
+callbacks/delegated behavior, deployment/resource binding and parent/writer closure.
+Current evidence is callee-balance-summary.json: two selected checks and 77
+revalidated unchanged source/olean pairs. Full implementation and remote gates
+remain open. The prior turn changed source and published checked evidence.
 
 
 Read STATUS, current git HEAD, and admission/ABI plus oracle/component receipts first. The previous
