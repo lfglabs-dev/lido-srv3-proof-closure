@@ -1,0 +1,13 @@
+{
+  "source_commit": "7aa8c17fa03cab39749fabc4496c6cbbc4210793",
+  "argv": [
+    "/workspaces/mission-f19a12b3/reserve1-private/solidity/trio-reserve1/.tools/node-v22.15.0-linux-x64/bin/node",
+    "solidity/trio-reserve1/execute-queue-finalize.cjs"
+  ],
+  "cwd": "/workspaces/mission-f19a12b3/reserve1-private",
+  "started": "2026-09-07T18:50:27.658939+00:00",
+  "ended": "2026-09-07T18:50:35.180087+00:00",
+  "exit": 0,
+  "log": "audit/trio/reserve1/receipts/queue-execution-7aa8c17fa03cab39749fabc4496c6cbbc4210793.txt",
+  "log_sha256": "fd071b0494fd1a9ef56689cbfb7802ab55b05a5f0310a126bd6b87ac41c47b5a"
+}

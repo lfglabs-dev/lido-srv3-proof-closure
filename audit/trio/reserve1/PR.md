@@ -21,9 +21,15 @@ Independent entry and reply rules now bind both vault and callback specification
 
 Independent callee-reply relations now compose callback entries through vault CALLs and vault entries through every report CALL, lookup and optional stage. The complete composed report has exact bidirectional outcome/world/attempt correspondence, completeness and root failure restoration. Its expanded predicate contains no report/vault/callback source executor. Locator/queue services, unhandled selectors, codecs and physical primitives remain explicit boundaries.
 
-At source `cd115f33e62b12e7253f0747860bfb16817a0a6e`, four selected composition/test/trust checks and seven baseline checks pass; 104 unchanged component source/olean pairs and eleven dependency revisions match retained receipts, with standard inspected axioms. The differential runner now uses this exact composed interpreter, and twelve fresh production-vault/inherited-Lido comparisons pass. [Composed report evidence](audit/trio/reserve1/receipts/report-vaults-summary.json) links the immutable commands, source/artifact hashes and compressed traces. Component checks use existing dependency oleans and are not a clean/full build or canonical registration.
+The new queue-finalization source model covers physical pause/role admission, entry and internal guard ordering, checkpoint/locked/finalized writes, saved cumulative rows, late share-subtraction panic, both events and payable dispatch. Thirteen Lean model cases pass, using an explicit mapping-hash fixture. Actual ERC721 queue bytecode comparison, independent finalization correspondence and report integration remain open.
+
+Fifteen comparisons now execute inherited production ERC721 queue finalization against QueueFinalize. They compare physical pause/role and checkpoint storage, raw failure bytes, queue balance and sender value debit after gas costs, events and zero nested calls. Recorded Keccak preimages cover executed 64-byte mapping hashes and model lookups. Independent finalization correspondence and report integration remain open.
+
+At source `7aa8c17fa03cab39749fabc4496c6cbbc4210793`, the new differential module and seven baseline checks pass; 110 unchanged component source/olean pairs and eleven dependency revisions match retained receipts. [Queue execution evidence](audit/trio/reserve1/receipts/queue-execution-summary.json) links immutable compilation, deployment, commands and compressed traces. Earlier composed-vault runtime sources remain unchanged. Component checks use existing dependency oleans and are not a clean/full build or canonical registration.
 
 Runtime evidence remains attributed to its tested commits:
+
+- `7aa8c17fa03cab39749fabc4496c6cbbc4210793`: 15 inherited ERC721 queue finalization comparisons with physical storage, Keccak rows, balance/debit, raw failures and events. [Queue evidence](audit/trio/reserve1/receipts/queue-execution-summary.json).
 
 - `cd115f33e62b12e7253f0747860bfb16817a0a6e`: 12 fresh production-vault/inherited-Lido comparisons using the exact interpreter covered by the composed report proof. [Composed report evidence](audit/trio/reserve1/receipts/report-vaults-summary.json).
 

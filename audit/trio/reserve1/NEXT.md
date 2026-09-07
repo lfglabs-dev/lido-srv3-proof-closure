@@ -1,17 +1,16 @@
 # Continuation — not a completion claim
 
-Latest increment: CalleeRules/ReportVaults compose independent callback entries
-through vault CALLs and independent vault entries through all report stages.
-Exact bidirectional composed report outcome/world/attempt correspondence,
-completeness and root rollback pass. The differential runner now executes the exact
-composed interpreter: 12 fresh production-vault comparisons pass at source
-cd115f33e62b12e7253f0747860bfb16817a0a6e. Four selected checks, seven baselines and 104
-unchanged source/olean pairs pass; see report-vaults-summary.json for new traces.
-Next implement and bind actual queue finalization (currently delegated), then
-remaining deployment/entry/writer/resource/codec/bounded-world obligations. Full
-remote gates remain unavailable through supported complete-source transport.
-Do not reopen discharged vault/callback dispatch and report relation composition;
-that composition still has explicit delegated service and primitive boundaries.
+Latest increment: 15 inherited ERC721 queue finalization EVM comparisons match
+QueueFinalize at source 7aa8c17fa03cab39749fabc4496c6cbbc4210793. Physical pause/role rows,
+checkpoint layout, observed storage, raw failures, queue balance and gas-adjusted
+sender value debit, events and no nested calls are compared. Recorded Keccak rows
+cover model lookups and executed 64-byte mapping hashes. See queue-execution-summary.
+One selected module and seven baselines pass; 110 unchanged source/olean pairs match.
+New harness/compiler retain historical artifacts; failed timestamp-cache draft is kept.
+Next prove independent finalization specification and integrate the actual queue
+callee into the report/vault composition. Deployment/entry/writer/resource/codec/
+bounded-world and full remote gate obligations remain. Finite EVM cases do not
+substitute for independent source correspondence or full integration.
 
 Read STATUS, current git HEAD, and admission/ABI plus oracle/component receipts first. The previous
 goal turn was progress: source-callee implementations, checked specifications

@@ -251,3 +251,26 @@ completeness and failure restoration cover the full composed report. The modifie
 VaultDifferential uses that exact interpreter, with twelve fresh runtime comparisons
 in receipts/report-vaults-summary.json. Delegated locator/queue services and raw
 primitive/deployment/codec/resource obligations are not discharged by this step.
+
+## Queue finalization source path
+
+`QueueFinalize.finalize` maps WithdrawalQueueBase.sol:332-362, including both saved
+uint128 cumulative fields, checked arithmetic, checkpoint mapping layout and writes,
+locked/finalized state and late share-difference event argument. `entry` maps
+WithdrawalQueueERC721.sol:149-159 plus PausableUntil.sol:44-52 and
+utils/access/AccessControl.sol:94-119. Roles use the physical nested mapping and low
+storage byte, with fixed-width lowercase address/role failure text. `dispatch`
+models the payable two-word entry. Thirteen QueueFinalizeCases use explicit mapping
+hash fixtures; real bytecode/layout comparison and independent specification remain
+open. Slot/error provenance: receipts/queue-finalize-selectors.json.
+
+## ERC721 finalization runtime binding
+
+QueueFinalizeHarness inherits WithdrawalQueueERC721 with unchanged production
+finalization/pause/role methods and physical storage setup/read helpers. Its isolated
+solc 0.8.9 build and deployed runtime are retained. execute-queue-finalize.cjs compares
+15 actual transactions against QueueFinalizeDifferential, including raw revert bytes,
+observed storage, queue balance, sender value debit excluding gas costs and events.
+No nested CALLs occur. Recorded Keccak rows cover model lookups and executed 64-byte
+mapping SHA3 preimages. See receipts/queue-execution-summary.json. Independent
+finalization rules, report integration and proxy/resource/world closure remain open.
