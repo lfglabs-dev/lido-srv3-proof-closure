@@ -1,3 +1,4 @@
+import LidoSRv3.Audit.Source.TrioReserve1.ReportAccounting
 import LidoSRv3.Audit.Source.TrioReserve1.Report
 import LidoSRv3.Audit.Source.TrioReserve1.AuthorizationBalance
 import LidoSRv3.Audit.Source.TrioReserve1.WithdrawalBalance
@@ -391,3 +392,13 @@ open LidoSRv3.Audit.Source.TrioReserve1
 
 #print axioms CallData.selector_call
 #print axioms Report.stopped
+
+#print axioms ReportAccountingSpec.total
+#print axioms ReportAccountingSpec.unique
+#print axioms ReportAccountingSpec.success_bound
+#print axioms ReportAccounting.of_spec
+#print axioms ReportAccounting.exists_spec
+#print axioms ReportAccounting.corresponds
+#print axioms ReportAccounting.complete
+#print axioms ReportAccounting.failure_restores
+#print axioms ReportAccounting.committed_balances
