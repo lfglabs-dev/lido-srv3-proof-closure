@@ -1,3 +1,5 @@
+import LidoSRv3.Audit.Source.TrioAlloc2.Selection
+import LidoSRv3.Audit.Source.TrioAlloc2.ScanCorrespondence
 import LidoSRv3.Audit.Source.TrioAlloc2.ScanBounds
 import LidoSRv3.Audit.Source.TrioAlloc2.Conservation
 import LidoSRv3.Audit.Source.TrioAlloc2.Spec
@@ -27,3 +29,15 @@ open LidoSRv3.Audit.Source.TrioAlloc2
 
 #print axioms firstScan_index_bound
 #print axioms initialScan_index_bound
+
+#print axioms firstScan_minimum
+#print axioms secondScan_higher_minimum
+
+#print axioms firstScan_tie_count
+#print axioms initialScan_tie_count
+
+#print axioms firstScan_first_index
+#print axioms initialScan_first_index
+
+#print axioms initialScan_minimum_option
+#print axioms initialScan_no_candidate_iff

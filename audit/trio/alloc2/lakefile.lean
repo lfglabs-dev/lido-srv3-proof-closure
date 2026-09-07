@@ -12,6 +12,8 @@ lean_lib TrioAlloc2Slice where
     .one `LidoSRv3.Audit.Source.TrioAlloc2.Word,
     .one `LidoSRv3.Audit.Source.TrioAlloc2.Step,
     .one `LidoSRv3.Audit.Source.TrioAlloc2.ScanBounds,
+    .one `LidoSRv3.Audit.Source.TrioAlloc2.ScanCorrespondence,
+    .one `LidoSRv3.Audit.Source.TrioAlloc2.Selection,
     .one `LidoSRv3.Audit.Source.TrioAlloc2.Spec,
     .one `LidoSRv3.Audit.Source.TrioAlloc2.Loop,
     .one `LidoSRv3.Audit.Source.TrioAlloc2.StepBounds,
@@ -20,5 +22,6 @@ lean_lib TrioAlloc2Slice where
     .one `LidoSRv3.Tests.TrioAlloc2.Step,
     .one `LidoSRv3.Tests.TrioAlloc2.Loop,
     .one `LidoSRv3.Tests.TrioAlloc2.Sequential,
+    .one `LidoSRv3.Tests.TrioAlloc2.DifferentialVectors,
     .one `LidoSRv3.Tests.TrioAlloc2.Axioms
   ]
