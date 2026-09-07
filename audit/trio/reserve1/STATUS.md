@@ -14,8 +14,11 @@ Separate proofs cover out-of-bounds parameter indices, invalid logic opcodes bef
 any child evaluation, and propagation of first-child failure with its trace.
 These are logic-node correspondence rules; recursive whole-tree and independent
 leaf/primitive/resource correspondence remain required. Runtime code is unchanged.
-The two new modules passed draft bounded elaboration; immutable checks follow the
-source commit.
+At `bd6f7edb93070e808bda4f45fda54a86c93b8db5`, both new modules and
+updated LiveTrust pass, along with all seven baseline/import checks. The other
+48 modules' source and olean hashes match prior receipts; inspected axioms are
+standard. `receipts/acl-logic-summary.json` links exact evidence. Runtime sources
+are unchanged; no fresh execution or full remote gate is claimed.
 
 ## ACL capacity stability
 
