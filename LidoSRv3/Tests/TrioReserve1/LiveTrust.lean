@@ -1,3 +1,4 @@
+import LidoSRv3.Audit.Source.TrioReserve1.Target
 import LidoSRv3.Audit.Source.TrioReserve1.ACLPermission
 import LidoSRv3.Audit.Source.TrioReserve1.ACLLeaf
 import LidoSRv3.Audit.Source.TrioReserve1.Queue
@@ -247,3 +248,12 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms ACLPermission.canPerform_traced
 #print axioms ACLPermission.target_allowed
 #print axioms ACLPermission.target_denied
+
+#print axioms Target.writer_success
+#print axioms Target.accounting
+#print axioms Target.balances
+#print axioms Target.other_slot
+#print axioms Target.other_account
+#print axioms Target.success
+#print axioms Target.queue_preserved
+#print axioms Target.sequence_step

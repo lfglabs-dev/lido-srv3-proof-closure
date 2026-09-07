@@ -15,7 +15,9 @@ the arbitrary static-call interpreter as deployed bytecode evidence.
 
 ACLPermission now gives bidirectional ordered permission correspondence and
 derives traced Lido/Kernel/ACL admission plus target allowance/denial from the
-independent rules. Remaining target integration includes exhaustive parent faults,
+independent rules. Target now gives the exact successful external post-state/return/events/trace,
+queue preservation and an instantiation of the physical sequence relation.
+Remaining target integration includes exhaustive parent faults,
 external sequence reachability and deployed primitive binding.
 
 1. Complete the independent withdrawal interaction specification and full

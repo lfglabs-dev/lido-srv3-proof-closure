@@ -1,5 +1,22 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Exact external target success
+
+`Target.committed` describes the physical post-state without invoking an executor:
+the target write/event always occurs, reserve lowering/write/event is conditional,
+and all other world fields are retained. `Target.success` derives the exact complete
+successful external result from independent permission derivation through concrete
+Lido/Kernel/ACL dispatch, including the nested authorization trace. `accounting`
+connects this state to the independent scalar target rule; other-slot/account and
+queue preservation require only the stated distinctness, with no hash-injectivity
+assumption. The committed state instantiates the physical sequence relation.
+
+Immutable validation is recorded after checks. Runtime implementations are unchanged.
+This closes the exact successful target composition under explicit initialization,
+code/pointer and primitive inputs. Exhaustive parent failures, external sequence
+reachability, remaining report/queue writers, deployed primitive/resource binding,
+canonical registration and full remote gates remain open.
+
 ## Ordered ACL permission correspondence and target admission
 
 `ACLPermissionSpec` independently distinguishes absent, unconditional and graph
