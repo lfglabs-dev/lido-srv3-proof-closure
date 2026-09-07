@@ -9,7 +9,7 @@ From this directory:
 
 ```
 npm ci --ignore-scripts --no-audit --no-fund
-node differential.mjs ../../audit/trio/alloc2/receipt-60f2c38c-dce8-4ee6-8344-f300fec330b9.json
+node differential.mjs ../../audit/trio/alloc2/receipt-0af9fe87-bfdf-4fbc-ad93-7d5bf2dae555.json
 ```
 
 The source manifest `audit/trio/alloc2/differential-source-identity.json` must

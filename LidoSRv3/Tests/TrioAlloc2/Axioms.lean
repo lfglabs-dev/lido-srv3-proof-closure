@@ -1,3 +1,7 @@
+import LidoSRv3.Audit.Source.TrioAlloc2.Errors
+import LidoSRv3.Audit.Source.TrioAlloc2.LoopTotality
+import LidoSRv3.Audit.Source.TrioAlloc2.Totality
+import LidoSRv3.Audit.Source.TrioAlloc2.Arithmetic
 import LidoSRv3.Audit.Source.TrioAlloc2.Selection
 import LidoSRv3.Audit.Source.TrioAlloc2.ScanCorrespondence
 import LidoSRv3.Audit.Source.TrioAlloc2.ScanBounds
@@ -41,3 +45,23 @@ open LidoSRv3.Audit.Source.TrioAlloc2
 
 #print axioms initialScan_minimum_option
 #print axioms initialScan_no_candidate_iff
+
+#print axioms ceilDiv_success
+#print axioms ceilDiv_zero_denominator
+#print axioms ceilDiv_formula
+
+#print axioms initialScan_success
+#print axioms secondScan_success
+
+#print axioms initialScan_selected_row
+#print axioms secondScan_above_best
+
+#print axioms step_success
+
+#print axioms allocateLoop_success
+#print axioms allocate_success
+
+#print axioms firstScan_short_error
+#print axioms step_short_error
+#print axioms allocate_short_error
+#print axioms allocate_success_iff
