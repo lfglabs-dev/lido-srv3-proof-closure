@@ -1,5 +1,26 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Physical queue finalization source model
+
+`QueueFinalize` models pinned ERC721 finalization and its base writer: physical
+pause timestamp and AccessControl membership admission, entry-first-ID arithmetic,
+ordered ID/amount guards, saved packed cumulative rows, checkpoint/locked/finalized
+writes, late cumulative-share subtraction and both finalization/metadata events.
+Its payable two-word dispatcher retains short-data rejection and trailing bytes.
+Thirteen Lean cases exercise successful live-demand reduction, guard failures,
+zero-value finalization and late full-world rollback. Mapping hashes are an explicit
+fixture in these model tests, not an implementation of Keccak.
+
+At source `e8d8c8964289fb1277c1dd8b8a220be781994c01`, two selected modules and seven baseline
+checks pass; 108 unchanged component source/olean pairs and eleven dependencies match.
+See `receipts/queue-finalize-summary.json` and selector/slot provenance. This is new
+source-model execution, not actual ERC721 finalization bytecode comparison. The
+prior vault suite's runtime sources remain unchanged. Actual queue EVM comparisons,
+independent finalization correspondence and report integration remain required,
+alongside the remaining deployment/entry/writer/resource/codec/world obligations.
+The remote wrapper hash and lack of exposed dependency transport remain unchanged;
+no new remote job or full-gate success is claimed. Independent review is required.
+
 ## Composed report, vault and callback rules
 
 `CalleeRules` makes independent CALL semantics consume a relation describing callee

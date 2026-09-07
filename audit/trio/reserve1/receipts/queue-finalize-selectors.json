@@ -1,0 +1,26 @@
+{
+  "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "ethers": "6.14.4",
+  "node": "v22.15.0",
+  "utc": "2026-09-07T18:41:14.269Z",
+  "slots": {
+    "lido.WithdrawalQueue.checkpoints": "0x445f3cbbc114a35d080f2a1953516d74e74d5106860bc2317840ba265f03b51a",
+    "lido.WithdrawalQueue.lastCheckpointIndex": "0x9d8be19d6a54e40bd767aa61b0f462241f5562ef6967d7045485bccac825b240",
+    "lido.WithdrawalQueue.lockedEtherAmount": "0x0e27eaa2e71c8572ab988fef0b54cd45bbd1740de1e22343fb6cda7536edc12f",
+    "lido.PausableUntil.resumeSinceTimestamp": "0xe8b012900cb200ee5dfc3b895a32791b67d12891b09f117814f167a237783a02",
+    "openzeppelin.AccessControl._roles": "0x9a627a5d4aa7c17f87ff26e3fe9a42c2b6c559e8b41a42282d0ecebb17c0e4d3",
+    "FINALIZE_ROLE": "0x485191a2ef18512555bd4426d18a716ce8e98c80ec2de16394dcf86d7d91bc80"
+  },
+  "selectors": {
+    "finalize(uint256,uint256)": "0xb6013cef",
+    "ResumedExpected()": "0x14378398",
+    "InvalidRequestId(uint256)": "0xc969e0f2",
+    "TooMuchEtherToFinalize(uint256,uint256)": "0x252dfe81"
+  },
+  "source_hashes": {
+    "lido-core/contracts/0.8.9/WithdrawalQueueBase.sol": "68d8919f89198c3d39272b2259a3144bf87a4aa48c570624b025fd86da47d2bb",
+    "lido-core/contracts/0.8.9/WithdrawalQueueERC721.sol": "f28f0974b484f26cc8b37672c6579fd05585d82e41c8e58aa4bdd6e0c0383542",
+    "lido-core/contracts/0.8.9/utils/PausableUntil.sol": "afd11f5950050bbc8e9fad3cbea2a5bdbcc23048128c30f335a12b48084c8594",
+    "lido-core/contracts/0.8.9/utils/access/AccessControl.sol": "e399e266f9b0e8fe99708f3fb2f656a636fb432d69ca9c247f2e84f2e762f803"
+  }
+}

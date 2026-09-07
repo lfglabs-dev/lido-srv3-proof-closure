@@ -1,17 +1,18 @@
 # Continuation — not a completion claim
 
-Latest increment: CalleeRules/ReportVaults compose independent callback entries
-through vault CALLs and independent vault entries through all report stages.
-Exact bidirectional composed report outcome/world/attempt correspondence,
-completeness and root rollback pass. The differential runner now executes the exact
-composed interpreter: 12 fresh production-vault comparisons pass at source
-cd115f33e62b12e7253f0747860bfb16817a0a6e. Four selected checks, seven baselines and 104
-unchanged source/olean pairs pass; see report-vaults-summary.json for new traces.
-Next implement and bind actual queue finalization (currently delegated), then
-remaining deployment/entry/writer/resource/codec/bounded-world obligations. Full
-remote gates remain unavailable through supported complete-source transport.
-Do not reopen discharged vault/callback dispatch and report relation composition;
-that composition still has explicit delegated service and primitive boundaries.
+Latest increment: QueueFinalize models physical ERC721/base finalization, pause and
+role membership, ordered guards/checkpoint writes/locked funds/finalized ID, saved
+packed rows and late shares-underflow rollback plus both events. Source
+e8d8c8964289fb1277c1dd8b8a220be781994c01 has two selected checks, thirteen executed Lean
+cases and seven baselines; 108 unchanged components match. See queue-finalize-summary.
+Next compile an inherited WithdrawalQueueERC721 harness without modifying historical
+QueueHarness/artifacts; compare real finalization bytecode against this model, including
+pause/role error bytes, checkpoint layout and late rollback. The old QueueHarness
+inherits WithdrawalQueue only and does not expose the production ERC721 finalize entry.
+Then prove independent finalization rules and integrate this callee into report
+composition. Model test hashing is an explicit fixture. Existing vault runtime sources
+remain unchanged and do not cover QueueFinalize. Full remote gates and remaining
+writer/deployment/entry/resource/codec/bounded-world obligations stay open.
 
 Read STATUS, current git HEAD, and admission/ABI plus oracle/component receipts first. The previous
 goal turn was progress: source-callee implementations, checked specifications
