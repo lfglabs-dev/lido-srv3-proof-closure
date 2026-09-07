@@ -1,0 +1,28 @@
+{
+  "source_commit": "80ae948313de296a267debed4a34792f823226a8",
+  "time": "2026-09-07T18:01:21.013690+00:00",
+  "argv": [
+    "/workspaces/mission-f19a12b3/reserve1-private/solidity/trio-reserve1/.tools/node-v22.15.0-linux-x64/bin/node",
+    "-e",
+    "const {id,version}=require(\"ethers\"); const signatures=[\"receiveELRewards()\", \"receiveWithdrawals()\", \"NotLido()\", \"ZeroAmount()\", \"NotEnoughEther(uint256,uint256)\"]; console.log(JSON.stringify({version,selectors:Object.fromEntries(signatures.map(s=>[s,id(s).slice(0,10)]))}));"
+  ],
+  "cwd": "solidity/trio-reserve1",
+  "exit": 0,
+  "node_sha256": "c43f3f73f6917481d2364daf7b7bf8c4fc4a7643580b4626f13f003131ec8716",
+  "result": {
+    "version": "6.14.4",
+    "selectors": {
+      "receiveELRewards()": "0x4ad509b2",
+      "receiveWithdrawals()": "0x78ffcfe2",
+      "NotLido()": "0x25a81d75",
+      "ZeroAmount()": "0x1f2a2005",
+      "NotEnoughEther(uint256,uint256)": "0x41ba67b6"
+    }
+  },
+  "pinned_sources_sha256": {
+    "lido-core/contracts/0.4.24/Lido.sol": "3bf84b96fb155af2290e6b26bc0138de356442a9abe3ea0f5274497f9fbffc10",
+    "lido-core/contracts/0.8.9/LidoExecutionLayerRewardsVault.sol": "d538fc1c2ed79c26bdc7d23e2cd7d5b8cf833436d993540c975ef6de1b078665",
+    "lido-core/contracts/0.8.9/WithdrawalVault.sol": "0d13d6a75d690541a7cc2eb399a96dd87bfd908ae0411c80d93bd056d985d298"
+  },
+  "scope": "ABI signature hashing against model literals; not vault bytecode execution"
+}

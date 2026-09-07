@@ -179,3 +179,17 @@ reply decoding rules. `ReportRules.corresponds`/`complete` substitute both throu
 the report parent, conditional stages and accounting; the expanded predicate has
 no source stage executor or source CALL. The explicit raw external interpreter
 still requires concrete deployed vault/queue/callback and resource binding.
+
+## Vault and callback source models
+
+- `Vaults.rewards`: LidoExecutionLayerRewardsVault.sol:85-95, immutable LIDO
+  authorization, current balance cap, positive-only callback and uint256 result.
+- `Vaults.withdrawals`: WithdrawalVault.sol:107-122, NotLido/ZeroAmount/NotEnoughEther
+  guards and exact value callback. Dispatch preserves nonpayability and minimum
+  one-word calldata length while accepting trailing bytes.
+- `VaultCallbacks`: Lido.sol:517-533, fresh vault address lookups, payable callback
+  admission, checked cumulative reward write and callback events.
+- `ReplyABI`: Error(string)/custom/bubbled bytes and ordered nested trace conversion.
+  `VaultCases`: nine composed model executions; real vault/callback bytecode
+  correspondence and independent callee specification remain open. Selector
+  provenance is in receipts/vault-source-selectors.json.

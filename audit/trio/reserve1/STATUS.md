@@ -1,5 +1,23 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Source vaults and Lido callbacks
+
+`Vaults` models pinned reward-vault balance capping, caller admission, zero/funds
+withdrawal guards, custom errors and nested value-bearing callbacks. `VaultCallbacks`
+uses fresh physical locator reads for callback admission, checked reward-counter
+updates and the production callback events. `ReplyABI` propagates ABI failure bytes
+and nested attempts. Nine composed Lean cases exercise transfers, cap/zero behavior,
+nested failure rollback, callback admission and calldata/value rejection.
+
+At source `80ae948313de296a267debed4a34792f823226a8`, five selected module checks and
+seven baseline checks pass; 94 unchanged source/olean pairs and eleven dependency
+revisions match retained evidence. Inspected axioms are standard. See
+`receipts/vault-source-summary.json` and `receipts/vault-source-selectors.json`.
+These are source-model executions, not real vault EVM comparisons. The previous
+sixteen report EVM cases still use explicit callee fixtures and unchanged runtime
+sources. Real vault/callback comparisons, independent callee correspondence, queue
+finalization, deployment/resource binding, full gates and independent review remain open.
+
 ## Fully expanded independent report relation
 
 `CallDataFlow` proves independent high-level CALL correspondence for arbitrary ABI
