@@ -21,6 +21,7 @@
     "LidoSRv3/Audit/Source/TrioAlloc2/MemoryPrefix.lean": "67b1eeb206c2e0434d16d230f6de7d392fec7bd1401d473dbde6863b61168cf5",
     "LidoSRv3/Audit/Source/TrioAlloc2/ParentArraySafety.lean": "cce29c04460f0365ee6a35c1fbb0ee71fcfe9a8a0288dc10cdbf566b998351f6",
     "LidoSRv3/Audit/Source/TrioAlloc2/ParentConversion.lean": "e9df24a1fe4e8b94f9c2d5f038ed42ee5ad46d544e91109b92c1280fd79e1c1b",
+    "LidoSRv3/Audit/Source/TrioAlloc2/ParentSuccess.lean": "407fe1833b0f3f6c037cd5720126bb039ff5d26cf10a3d73952a28e34165bb0f",
     "LidoSRv3/Audit/Source/TrioAlloc2/ParentValues.lean": "05f961aa7be01e52435d8423863b69ac523ded850e08e0774f51626c7a1ee1d1",
     "LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean": "6bd90551f9cb4a39c3384b98b2a6ff40c27b7eba6b491308c2bfa02ca1c5b025",
     "LidoSRv3/Audit/Source/TrioAlloc2/ScanBounds.lean": "2e998cf69f26826b8974d72eabf8f15638be9c02e8a2473f92148491af07b2e1",
@@ -40,8 +41,9 @@
     "audit/trio/alloc2/composition/MemoryExtent.lean": "8d0fb17fd1f334c25fdda5bf1f64f381f33a52f6ffc6fa902322992bfe7dbf2e",
     "audit/trio/alloc2/composition/MemoryVectors.lean": "bada6c889da68f4adab6a1861549139303f0129c7fb283524226f134a5acf2bc",
     "audit/trio/alloc2/composition/Parent.lean": "02519228eaba1bf17d313ea588f808211849e82c02e87ba29e07e3052385f985",
+    "audit/trio/alloc2/composition/ParentErrors.lean": "3deeb4fa9c70a226047236a993910f2932fe7714380b6986597a2c88472d3ad3",
     "audit/trio/alloc2/composition/ParentPostconditions.lean": "906cf6a6d522a1068dfc8aafbe64a3817a849ff7ecacd3bbf11ba431e0ed3fb9",
     "audit/trio/alloc2/composition/ParentVectors.lean": "f7b0f86ebed4c2cef668c26b92bf69eae45350e674a2c89f7e744423701a22ab",
-    "audit/trio/alloc2/composition/lakefile.lean": "b72fd8e06fc56adf4826d258aff2b3d5a425e182b60c27e13ef440df1e64f93d"
+    "audit/trio/alloc2/composition/lakefile.lean": "47e72e6940e12bbd41cae4594a0b793a9f50ee198ec395a59f7b79be87ed18da"
   }
 }

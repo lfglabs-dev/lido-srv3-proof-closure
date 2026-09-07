@@ -9,7 +9,14 @@ const ganache = require('ganache');
 const {ethers} = require('ethers');
 const root = path.resolve(__dirname, '../../..');
 const pin = '17005714f151e5502c559932319a3f2f74ac2436';
-const output = path.join(root, 'audit/trio/alloc2/parent-execution.json');
+const {mutations, apply:applyMutation} = require('./mutations.cjs');
+const mutantName = process.argv[3]?.startsWith('--mutant=') ? process.argv[3].slice(9) : null;
+const mutation = mutantName ? mutations[mutantName] : null;
+const frame = process.argv[3] === '--frame' || !!mutation?.frame;
+assert.ok(process.argv.length <= 3 || (process.argv.length === 4 && (frame || mutation)), 'unknown runner option');
+const output = path.join(root, mutantName ? `audit/trio/alloc2/parent-mutant-${mutantName}.json`
+  : frame ? 'audit/trio/alloc2/parent-frame-execution.json' : 'audit/trio/alloc2/parent-execution.json');
+const mutatedSources = {};
 const sha = value => crypto.createHash('sha256').update(value).digest('hex');
 assert.ok(process.argv[2], 'usage: node run.cjs <successful parent Lean receipt>');
 const modelReceiptPath = path.resolve(process.argv[2]);
@@ -49,12 +56,18 @@ function imports(name) {
       assert.deepEqual(data, cp.execFileSync('git', ['-C', path.join(root, 'lido-core'), 'show', `${pin}:${name}`]), `dirty pinned source: ${name}`);
     }
     sources[name] = sha(data);
-    return {contents:data.toString()};
+    let contents=data.toString();
+    if(mutation?.source==='sr' && name==='contracts/0.8.25/sr/SRLib.sol') {
+      contents=applyMutation(contents,mutation);mutatedSources[name]=sha(contents);
+    }
+    return {contents};
   } catch(e) {return {error:e.message};}
 }
 const settings = {optimizer:{enabled:true,runs:200},viaIR:true,evmVersion:'shanghai',
   outputSelection:{'*':{'*':['abi','evm.bytecode']}}};
-const harnessSource = fs.readFileSync(path.join(__dirname, 'Harness.sol'), 'utf8');
+const originalHarness = fs.readFileSync(path.join(__dirname, 'Harness.sol'), 'utf8');
+const harnessSource = mutation?.source==='harness' ? applyMutation(originalHarness,mutation) : originalHarness;
+if(mutation?.source==='harness')mutatedSources['Harness.sol']=sha(harnessSource);
 const input = JSON.stringify({language:'Solidity',sources:{'Harness.sol':{content:harnessSource}},settings});
 const compilation = JSON.parse(solc.compile(input,{import:imports}));
 const errors = (compilation.errors||[]).filter(e=>e.severity==='error');
@@ -89,6 +102,8 @@ async function main() {
   const receipts=[], deployed=new Map(), linkedHashes={};
   try {
     const signer=await provider.getSigner();
+    const recipient=await (await provider.getSigner(1)).getAddress();
+    const marker=0x123456n;
     async function deploy(file,name) {
       const key=file+':'+name;
       if(deployed.has(key)) return deployed.get(key);
@@ -120,13 +135,17 @@ async function main() {
     const moduleSlots=ids.map(id=>BigInt(ethers.keccak256(words(id,base))));
     const write=async(slot,value)=>{await(await harness.writeSlot(slot,value)).wait();};
     for(let i=0;i<2;i++)await write(idsStart+BigInt(i),ids[i]);
-    const slots=[lengthSlot,idsStart,idsStart+1n,...moduleSlots,...moduleSlots.map(x=>x+2n)];
+    const slots=[...(frame?[marker]:[]),lengthSlot,idsStart,idsStart+1n,...moduleSlots,...moduleSlots.map(x=>x+2n)];
     async function state() {
       return {storage:await Promise.all(slots.map(slot=>rpc.request({method:'eth_getStorageAt',params:[harness.target,ethers.toQuantity(slot),'latest']}))),
-        balances:await Promise.all([harness.target,...modules.map(m=>m.target)].map(address=>rpc.request({method:'eth_getBalance',params:[address,'latest']})))};
+        balances:await Promise.all([harness.target,...modules.map(m=>m.target),...(frame?[recipient]:[])].map(address=>rpc.request({method:'eth_getBalance',params:[address,'latest']})))};
     }
-    for(const test of cases) {
+    for(const test of cases.filter(c=>!mutation || c.name===mutation.test)) {
       const c={...defaults,...test}; await write(lengthSlot,c.count);
+      if(frame) {
+        await write(marker,0);
+        await rpc.request({method:'evm_setAccountBalance',params:[harness.target,'0x2']});
+      }
       const model=(c.memory?memoryVectors:vectors).find(v=>v.name===c.name);assert.ok(model,'missing model '+c.name);
       assert.equal(BigInt(model.count),BigInt(c.count));
       if(!c.memory) assert.deepEqual(model.shares,c.shares);
@@ -139,7 +158,9 @@ async function main() {
         await write(moduleSlots[i]+2n,0);
         await(await modules[i].configure(c.responses[i],words(0),c.rejects[i],false)).wait();
       }
-      const data=harness.interface.encodeFunctionData('parent',[c.cfg,c.amount,false]);
+      const data=frame
+        ? harness.interface.encodeFunctionData('parentWithPriorEffects',[c.cfg,c.amount,false,recipient])
+        : harness.interface.encodeFunctionData('parent',[c.cfg,c.amount,false]);
       const before=await state(); let actual,reverted=false;
       try{actual=await rpc.request({method:'eth_call',params:[{to:harness.target,data,gas:'0x989680'},'latest']});}
       catch(e){reverted=true;actual=typeof e.data==='string'?e.data:e.data?.result;if(typeof actual!=='string')throw e;}
@@ -160,8 +181,10 @@ async function main() {
       const record={name:c.name,calldata:data,actual,reverted,calls,delegates,before,after,events:txReceipt.logs,
         storageWrites:trace.structLogs.filter(x=>x.op==='SSTORE').length};
       receipts.push(record);
-      fs.writeFileSync(output,JSON.stringify({scope:'pinned SRLib parent vs decoded producer/consumer/parent and early allocation-guard Lean executions; not full physical-memory proof',pin,compiler:solc.version(),settings,sources,
+      fs.writeFileSync(output,JSON.stringify({scope:frame ? 'actual enclosing Solidity transaction: prior storage, event and value transfer commit on success and roll back on parent failure; not a universal frame proof' : 'pinned SRLib parent vs decoded producer/consumer/parent and early allocation-guard Lean executions; not full physical-memory proof',pin,compiler:solc.version(),settings,sources,
         model:{job:modelReceipt.job_id,producer:identity.producer,overlay:sha(manifest),receiptSha256:sha(fs.readFileSync(modelReceiptPath))},
+        mutation:mutantName ? {name:mutantName,definition:mutation,mutatedSources} : null,
+        originalHarnessSha256:sha(originalHarness),mutationsSha256:sha(fs.readFileSync(path.join(__dirname,'mutations.cjs'))),
         harnessSha256:sha(harnessSource),runnerSha256:sha(fs.readFileSync(__filename)),lockSha256:sha(fs.readFileSync(path.join(__dirname,'package-lock.json'))),
         linkedHashes,receipts},null,2)+'\n');
       assert.equal(actual.toLowerCase(),c.expected.toLowerCase(),c.name+' return/revert bytes');
@@ -171,7 +194,27 @@ async function main() {
       assert.deepEqual(calls,c.calls,c.name+' static call order');
       assert.deepEqual(calls,model.calls,c.name+' Solidity/Lean static calls');
       assert.equal(delegates.filter(n=>n.endsWith(':MinFirstAllocationStrategy')).length,c.library?1:0,c.name+' allocation library call');
-      assert.deepEqual(after,before,c.name+' view state/balances');assert.equal(txReceipt.logs.length,0);assert.equal(record.storageWrites,0);
+      assert.equal(BigInt(txReceipt.status),reverted?0n:1n,c.name+' transaction status');
+      if(frame) {
+        assert.equal(record.storageWrites,1,c.name+' prior write executed');
+        assert.equal(trace.structLogs.filter(x=>x.op==='LOG1').length,1,c.name+' prior event executed');
+        assert.equal(trace.structLogs.filter(x=>x.op==='CALL').length,1,c.name+' prior value call executed');
+        if(reverted) {
+          assert.deepEqual(after,before,c.name+' enclosing transaction rollback');
+          assert.equal(txReceipt.logs.length,0,c.name+' reverted event discarded');
+        } else {
+          assert.equal(BigInt(after.storage[0]),42n,c.name+' prior storage committed');
+          assert.deepEqual(after.storage.slice(1),before.storage.slice(1),c.name+' parent storage unchanged');
+          assert.equal(BigInt(after.balances[0]),BigInt(before.balances[0])-1n,c.name+' prior debit committed');
+          assert.equal(BigInt(after.balances.at(-1)),BigInt(before.balances.at(-1))+1n,c.name+' prior credit committed');
+          assert.deepEqual(after.balances.slice(1,-1),before.balances.slice(1,-1),c.name+' module balances unchanged');
+          assert.equal(txReceipt.logs.length,1,c.name+' prior event committed');
+          assert.equal(txReceipt.logs[0].topics[0],ethers.id('BeforeParent(uint256)'));
+          assert.equal(txReceipt.logs[0].data,words(42));
+        }
+      } else {
+        assert.deepEqual(after,before,c.name+' view state/balances');assert.equal(txReceipt.logs.length,0);assert.equal(record.storageWrites,0);
+      }
       console.log('PASS '+c.name);
     }
   } finally {provider.destroy();await rpc.disconnect();}
