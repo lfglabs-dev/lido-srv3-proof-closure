@@ -24,7 +24,7 @@ import markdown_text  # noqa: E402  (sibling module, located above)
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
 SOURCE_FIDELITY = AUDIT / "SOURCE-FIDELITY.md"
-R1_REVIEW_BASE = "6a2a91341ac83c8fbf93dfa274897387e5b8a188"
+R1_REVIEW_BASE = "eda35b611f08879241411d12f943d011f748e5a4"
 # The report records the normal source-fidelity-A reconciliation merge as its input basis. Keep the exact
 # generator inputs bound both to that Git object and to their expected bytes:
 # a changed registry, source map, or Trust allowlist must not be presented as
@@ -33,8 +33,8 @@ R1_REVIEW_BASE = "6a2a91341ac83c8fbf93dfa274897387e5b8a188"
 # report.  A normal regeneration may never pair changed family content with a
 # stale certified basis.
 R1_REPORT_INPUT_SHA256 = {
-    "audit/guarantees.yaml": "22d2420714906d566f6250ddc5b0b50d0815567f0e8212ce37d4fd1ac34bed30",
-    "audit/source-map.yaml": "2a89d6b67bf8ce9ec0ab9ad6782bee4cba5a904c5b337ea13f813cdde938ca74",
+    "audit/guarantees.yaml": "b06ca4bb08a80fc528a1a1242083af58cfb589346dd6ce056b45fdcdfcc121a5",
+    "audit/source-map.yaml": "a0a09ba6b7e3737b67137825ee5456a307d7fd364b215ea48d0d5c22d5e343a7",
     "audit/trust-native-decide-allowlist.txt": "4874951cd0717f16756f3f644c424f06bdbbfcca1561173b32fd134b1fb6730c",
 }
 CANONICAL_IDS = [
