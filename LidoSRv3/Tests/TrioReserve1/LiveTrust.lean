@@ -1,3 +1,4 @@
+import LidoSRv3.Audit.Source.TrioReserve1.Report
 import LidoSRv3.Audit.Source.TrioReserve1.AuthorizationBalance
 import LidoSRv3.Audit.Source.TrioReserve1.WithdrawalBalance
 import LidoSRv3.Audit.Source.TrioReserve1.CalleeBalance
@@ -387,3 +388,6 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms AuthorizationBalance.can_perform
 #print axioms AuthorizationBalance.set_target
 #print axioms AuthorizationBalance.concrete_target
+
+#print axioms CallData.selector_call
+#print axioms Report.stopped
