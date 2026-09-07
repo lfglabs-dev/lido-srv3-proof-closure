@@ -15,7 +15,7 @@ leaf soundness/completeness assumption. Host exhaustion remains distinct.
 
 This is a proof-only extension. Deployed oracle/primitive interpretation, EVM gas,
 full parent coverage and the remaining writer/admission/integration obligations
-are still open. Current immutable receipts are recorded below after validation.
+are still open. At source `bb40d49e8fa6ce9b644e4134d933c752a3b70626`, three selected component checks and seven baseline/import checks pass. The other 52 source/olean pairs match earlier successful receipts. See `receipts/acl-leaf-summary.json`; only standard axioms were printed. Eleven dependency revisions match the manifest. These are bounded checks, not full gates. The initial constructor-name guard failure and its successful fix are retained.
 The older conditional tree theorem and historical receipts remain valid.
 
 ## Recursive ACL graph correspondence
