@@ -10,7 +10,13 @@ or duplicate the old terminal remote job. The old local full-gate handle is abse
 1. Complete the independent withdrawal interaction specification and full
    return/revert/world/ordered-call/event correspondence. Allocation is now tied
    to actual queue CALL bytes and saved physical locals; compose through all
-   guards, packed writes, frame call, seed update and ETH receiver. ABI.decode_encode and word/tuple decoding are now checked. Compose them
+   guards, packed writes, frame call, seed update and ETH receiver.
+   CallResults now binds locator/frame reply bytes, exact worlds and traces;
+   queue_lookup executes the concrete immutable locator. WithdrawalTail proves
+   seed outcomes, actual receiver composition and late full-world rollback.
+   Complete the independent spending specification and substitute actual
+   allocation/frame executions into after_spend; do not leave successful
+   spending as an unproved premise of the full parent. ABI.decode_encode and word/tuple decoding are now checked. Compose them
    with actual callee outputs and source inputs rather than assuming decoded replies.
 2. The source callee path now contains immutable Locator, live Queue,
    AccountingOracle/BaseOracle and HashConsensus frame getters, and the router

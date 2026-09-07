@@ -1,0 +1,1 @@
+report theorem inventory ok: 8 P-ALLOC-1 theorems, 2 registered

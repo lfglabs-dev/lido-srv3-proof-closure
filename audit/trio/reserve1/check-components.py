@@ -28,6 +28,8 @@ MODULES = [
     "Audit/Source/TrioReserve1/RouterSpec",
     "Audit/Source/TrioReserve1/Router",
     "Audit/Source/TrioReserve1/Locator",
+    "Audit/Source/TrioReserve1/CallResults",
+    "Audit/Source/TrioReserve1/WithdrawalTail",
     "Audit/Source/TrioReserve1/Transfers",
     "Audit/Source/TrioReserve1/StaticCall",
     "Audit/Source/TrioReserve1/OracleSpec",
