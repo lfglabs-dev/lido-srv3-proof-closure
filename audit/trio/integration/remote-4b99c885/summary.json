@@ -1,0 +1,15 @@
+{
+  "classification": "FAILED_FULL_VALIDATION",
+  "passed": [
+    "bootstrap including pinned ripgrep",
+    "production/test/trust/integration build",
+    "scoped make prove",
+    "producer VM",
+    "parent VM"
+  ],
+  "failed": "make test; this snapshot predates the corrected out-of-range Step.lean Solidity citation.",
+  "full_validation": false,
+  "source_head": "4b99c8854eb0865045abf7092b189726c5d5d13f",
+  "log_scope": "Authoritative terminal receipt with capped node log tail",
+  "independent_certification": false
+}

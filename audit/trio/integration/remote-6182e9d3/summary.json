@@ -1,0 +1,15 @@
+{
+  "classification": "FAILED_TARGETED_DRIVER",
+  "passed": [
+    "ReserveLeafSpend full closure",
+    "VerityParent.stored_correspondence",
+    "parent VM and twelve differential cases",
+    "nine memory-parent VM cases",
+    "sixteen stored-parent cases plus exact ABI/raw-copy check"
+  ],
+  "failed": "Driver passed --run to a #eval test file without main, after its checks passed. Remove --run for that file; revalidate driver.",
+  "full_validation": false,
+  "source_head": "6182e9d30572f7b9be1500e8fe30001b49132dd0",
+  "log_scope": "Authoritative terminal receipt with capped node log tail",
+  "independent_certification": false
+}
