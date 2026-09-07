@@ -1,5 +1,5 @@
 import LidoSRv3.Audit.Source.TrioComposition.MemoryParentCalls
-import LidoSRv3.Audit.Source.TrioAlloc1.AdmissionFacts
+import LidoSRv3.Audit.Source.TrioAlloc1.StatusWriter
 
 /-! Derive the producer's allocation budget from its physical writer invariant.
 The pointer bound and writer lifecycle/layout obligations remain explicit;
@@ -55,6 +55,32 @@ theorem after_admission (pointer : Word) (layout : Layout) (storage : Storage)
   from_invariant pointer layout _ config amount isTopUp
     (AdmissionFacts.public_preserves layout storage input invariant records separate) small
 
+/-- No post-state count/share premise is supplied: the actual covered history
+establishes it, including rejected public writes. Initialization, migration and
+uncaptured writer families remain outside this four-family history. -/
+theorem from_history (pointer : Word) (layout : Layout) (storage : Storage)
+    (config : Config) (amount : Word) (isTopUp : Bool)
+    (history : StatusWriter.History layout storage) (small : pointer.val ≤ 2^31) :
+    MemoryParentCalls.program pointer layout storage config amount isTopUp =
+      ParentCalls.program layout storage config amount isTopUp :=
+  from_invariant pointer layout storage config amount isTopUp
+    (StatusWriter.history_invariants layout storage history).1 small
+
+theorem history_public_iff (pointer : Word) (layout : Layout) (storage : Storage)
+    (oracle : StaticOracle) (config : Config) (amount : Word) (isTopUp : Bool)
+    (before after : Transcript) (result : Except Failure ParentOutput)
+    (history : StatusWriter.History layout storage) (small : pointer.val ≤ 2^31) :
+    ParentSpec.Public layout storage oracle config amount isTopUp before result after ↔
+      CallTree.evaluate oracle (MemoryParentCalls.program pointer layout storage config amount isTopUp)
+        before = (result,after) := by
+  rw [from_history pointer layout storage config amount isTopUp history small,
+    ParentCalls.correspondence]
+  exact public_abi_iff _ _ _ _ _ _ _ _ _
+    (MemoryParentCalls.abi_extent pointer layout storage oracle config amount isTopUp before
+      (budget pointer layout storage (StatusWriter.history_invariants layout storage history).1 small))
+
+#print axioms from_history
+#print axioms history_public_iff
 #print axioms from_invariant
 #print axioms after_share_writer
 #print axioms after_parameter_writer

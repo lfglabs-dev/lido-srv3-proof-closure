@@ -72,6 +72,7 @@ try:
     check('LidoSRv3.Audit.Source.TrioAlloc1.AdmissionWriter')
     check('LidoSRv3.Audit.Source.TrioAlloc1.AdmissionFacts')
     check('audit.trio.alloc2.composition.ParentErrors')
+    check('audit.trio.alloc2.composition.ParentInversion')
     check('audit.trio.alloc2.composition.ParentPostconditions')
     check('audit.trio.alloc2.composition.ParentVectors')
     check('audit.trio.alloc2.composition.MemoryVectors')

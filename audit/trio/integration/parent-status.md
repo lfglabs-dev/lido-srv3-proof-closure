@@ -425,3 +425,27 @@ standalone nested lakefile. The expanded 83-module bounded closure passes with
 matching source hashes in `staged-build-init-receipt.json`; import-layer checking
 also passes. A fresh remote full run must verify Lake scheduling and all gates.
 The already running `431e73ee` snapshot predates this scheduling fix.
+
+
+## Four-writer history composition
+
+Integrated published heads ALLOC-1 `b12979c6`, ALLOC-2 `2377d3fd`, and
+RESERVE-1 `0b758873`. The new source modules cover status-writer ordering,
+record invariants across actual writer histories, independent parent-outcome
+inversion, and ACL source/logic correspondence. They do not include the writers'
+unpublished initialization, producer-memory and recursive ACL-tree work observed
+at the latest checkpoint.
+
+`WriterMemory.from_history` and `history_public_iff` now derive the physical
+invariant and the memory/ABI parent correspondence from a history of the four
+covered public writer families. No post-state invariant or count is assumed
+separately. Finite-layout conditions and pointer <= 2^31 remain explicit;
+initialization, migration and other writer families are outside that history.
+`ParentInversion` is registered in the root Lake target and bounded closure.
+
+`history-parent-init-receipt.json` passes 86 modules with matching source hashes.
+The source metadata, proof-escape, source-annotation, import-DAG and Python checks
+pass. `history-parent-comparison.json` confirms that the new recorded Solidity
+baseline still matches all twelve actual parent VM cases at `3f22469d`; the VM
+source closure is unchanged. This does not certify the newly added writer or ACL
+modules. The running `f99ab36c` full build predates this writer integration.
