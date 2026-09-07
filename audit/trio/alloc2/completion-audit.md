@@ -20,3 +20,33 @@ gas equivalence and full consensus/primitive-crypto claims are not silently
 introduced into this task. A source/model result is not a deployed-bytecode
 refinement. Conversely, a scope exclusion must not hide a required source,
 producer-entry or canonical integration gap.
+
+## Decoder test continuation (2026-09-07)
+
+`solidity/trio-alloc2/parent/decoder-copy-reference.cjs` independently compiles
+and executes `DecoderCopy.sol` with solc 0.8.25, via IR, Shanghai semantics.
+Six successful return-byte comparisons cover zero, one, multiple, unaligned,
+and 129-word copies. Four additional cases check exact short-source, checked
+multiply/add overflow, and truncated-ABI revert bytes. The destination-stride
+mutant compiles, deploys, passes zero/one-word cases, and fails the two-word
+return-byte comparison. `word-copy-reference.json` records inputs, expected
+and actual bytes, compiler settings, deployed code, and source/harness hashes.
+Durable job `3911faed-064f-47fb-8a16-e642d1708ac2` completed with exit 0.
+
+The previously untracked `ByteWordCopyVectors.lean`, `DecoderCopy.sol` and
+`decoder-copy.cjs` are now retained as test sources. The vector module is
+included in the 60-file byte-ABI preparation manifest and Lake target list.
+The Lean/Solidity runner requires the matching successful vector target receipt
+and independently checks its Lean outputs against byte slicing before EVM
+comparison. No successful receipt exists for this new target yet; the updated
+manifest does not validate against the older 59-file receipt. The independent
+Solidity result does not discharge the pending Lean differential gate.
+
+The previous goal turn made progress by committing and pushing the decoder
+proof. This continuation adds executed independent test/mutant evidence, but
+the full goal remains incomplete. Rechecking durable admission job
+`c5928cd0-419e-4db2-ac3c-b5b044501caa` confirms terminal failure, exit 1;
+there is no admitted remote job to poll. No new submission was made against
+the known 16 MiB complete-source rejection. Full-source admission, complete
+compiler schedule and canonical entrypoint composition, and immutable-head
+full Lean/prove/test/native UX2/trust validation remain outstanding.

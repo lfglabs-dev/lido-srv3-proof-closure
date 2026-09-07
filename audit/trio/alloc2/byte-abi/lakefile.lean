@@ -26,6 +26,7 @@ lean_lib TrioAlloc2ByteABI where
     .one `audit.trio.alloc2.runtime.ByteABIVectors,
     .one `audit.trio.alloc2.runtime.ByteABIFrame,
     .one `audit.trio.alloc2.runtime.ByteWordCopy,
+    .one `audit.trio.alloc2.runtime.ByteWordCopyVectors,
     .one `audit.trio.alloc2.composition.ProducerMemory,
     .one `audit.trio.alloc2.composition.AllocationMemoryBridge,
     .one `audit.trio.alloc2.composition.MemoryExtent,
