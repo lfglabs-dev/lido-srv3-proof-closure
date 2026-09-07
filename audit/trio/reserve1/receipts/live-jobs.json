@@ -1,0 +1,9 @@
+{
+  "immutable_source": "b06cf0dc0861b93592f1de80820b68ff10b6905f",
+  "validation_worktree": "audit/trio/reserve1/.local/gates-b06cf0dc0861b93592f1de80820b68ff10b6905f",
+  "gate_runner_unified_session": 19187,
+  "gate_command": "audit/trio/reserve1/run-gates.sh",
+  "duplicate_guard": "receipts/gates-b06cf0dc0861b93592f1de80820b68ff10b6905f.lock",
+  "terminal_receipt": "receipts/gates-terminal.txt",
+  "instructions": "Do not relaunch while running. The runner writes per-command terminal .exit receipts and proceeds sequentially through production/test/trust, make prove, make test. Existing remote job is terminal failed; do not poll or duplicate it."
+}

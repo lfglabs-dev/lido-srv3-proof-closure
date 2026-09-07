@@ -51,7 +51,9 @@ The trace is outside contract state; erasure is checked compositionally.
 
 Nested callee traces, reentrancy/callback composition, production immutable
 locator binding, actual consensus/oracle interpretation, actual router receipt,
-Aragon ACL and complete report/writer composition remain open. The generic
+Aragon ACL and complete report/writer composition remain open. World balances
+use Nat; the bounded EVM account relation and credit behavior remain to be tied
+to source execution, not inferred from the finite small-balance cases. The generic
 external interpreter permits rejection, arbitrary bytes, and successful world
 effects; that permissiveness is not itself a proof of production behavior.
 Fixtures are finite test data, not successful-callee proof premises.

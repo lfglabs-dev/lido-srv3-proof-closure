@@ -1,180 +1,150 @@
-# P-RESERVE-1 delivery work in progress
+# P-RESERVE-1 — incomplete additive delivery
 
-Exact starting commit: `c7adae04416704a839d56333efad003f0a0f46b7`.
-Branch: `trio/reserve1-live-queue` in an independent persistent clone.
-Solidity submodule: `17005714f151e5502c559932319a3f2f74ac2436`.
+Implementation checkpoint: `b06cf0dc0861b93592f1de80820b68ff10b6905f`.
+Own draft: https://github.com/lfglabs-dev/lido-srv3-proof-closure/pull/244
+Branch: `trio/reserve1-live-queue`; exact base:
+`c7adae04416704a839d56333efad003f0a0f46b7`.
+Solidity: `17005714f151e5502c559932319a3f2f74ac2436`.
 Verity: `e977aaad6e1a9e92e0132d41b3d33a14135a4d46`.
 Lean: `leanprover/lean4:v4.31.0`.
 
-Resumed the preserved checkout and own draft PR #244. No existing closure or
-site branch was inspected or modified. The remote job has a terminal failure
-receipt; no duplicate remote build was submitted.
+No P-RESERVE-1 parent closure or integration readiness is claimed. All changes
+are under the four owned directories. Old declarations, shared Trust/build
+configuration, canonical YAML/manifests/reports, and the site remain unchanged.
+No other closure/site PR or branch was inspected or modified.
 
-## Evidence and unresolved obligations
+## Checked component properties
 
-`Packing.lean` is a checked numeric packing foundation; `PartitionSpec.lean`
-proves admitted spending preservation, reserve-lowering and demand monotonicity,
-and two-step spending for a fixed queue observation. These are mathematical
-lemmas, not live contract correspondence. It does not establish
-reachable untruncated accounting bounds, or the requested
-parent guarantee. No new reserve guarantee is registered or claimed complete.
+- `Live.lean`: handwritten executable with pinned Verity words and
+  contract-indexed physical storage, real caller equality against locator router
+  reply, live bunker/pause/queue calls, saved locals across external effects,
+  compact accounting, actual balances and ETH transfer. External replies may
+  reject, return arbitrary bytes, or produce successful world effects. This is
+  not yet a complete Verity EDSL/compiled Solidity refinement theorem.
+- Independent `QueueSpec.lean` and physical `Queue.StateRel`:
+  `Queue.unfinalized_corresponds` proves numeric success or panic 0x11 using
+  current last/finalized ids and packed cumulative rows, even malformed rows.
+  `cumulative_bound` derives the physical uint128 bound. Keccak is an explicit
+  primitive parameter; no freshness, monotonicity or injectivity assumption.
+- `PhysicalPacking.pack_matches_bitwise` proves the executor's numeric packing
+  equals the actual mask/shift/OR word expression for arbitrary inputs.
+  `low_pack`, `high_pack`, `physical_low_bound`, `physical_high_bound` prove
+  projections/truncation. They do not imply untruncated arithmetic sums.
+- `Erasure.erase_bind`, `erase_pure`, `erase_run` prove compositional erasure
+  and rollback commutation. `failure_restores_world` restores all modeled
+  storage, balances and committed logs after arbitrary intermediate failure.
+  These are interpreter properties, not full Solidity entrypoint correspondence.
+- Independent `WriterSpec`: `Writers.target_corresponds` proves buffer unchanged,
+  target=requested and reserve=min(old,requested); `rebalance_corresponds`
+  proves buffer/target unchanged and reserve=max(old,target). The separate
+  `target_observations` / `rebalance_observations` prove success, no external
+  calls, preserved balances and exact appended event order. These are INTERNAL
+  helper claims; Aragon ACL and report-parent correspondence are open.
+- Earlier independent `PartitionSpec.spend_preserves`, `lowering_reserve`,
+  `demand_monotone`, `two_spends` and numeric `Packing` lemmas remain. The
+  two-spend lemma is for fixed demand and does not prove queue-changing sequences.
 
-The implementation must preserve the following source facts:
+The physical reserve may exceed the buffer after rebalance. No global
+storedReserve <= buffer invariant is assumed or claimed. Detailed pinned spans,
+writer inventory and missing composition are in `SOURCE-MAP.md`.
 
-* Lido.sol:815-816 reads locator -> queue -> bunker before reading the local
-  active flag; a stopped contract does not skip the queue call.
-* Lido.sol:869-886 checks canDeposit, resolves router, checks caller equality,
-  then rejects zero amount, spends, updates seed count, and sends value.
-* Lido.sol:605-616 resolves the queue and calls unfinalizedStETH on each
-  allocation. A cached word/freshness premise is not a replacement.
-* Lido.sol:839-859 writes packed buffer/post-report and emits two events before
-  resolving the accounting oracle and reading the frame. A failure here must
-  restore storage and committed logs. Reserve is written after the frame pair.
-* UnstructuredStorageExt.sol:24-46 masks/shifts, silently truncating. Model
-  SafeMath uint256 checks separately from physical uint128 truncation.
-* WithdrawalQueueBase.sol:143-146 subtracts two uint128 cumulative values with
-  Solidity 0.8.9 checked arithmetic, read at current last/finalized request ids.
-* Lido.sol:670-680 immediately lowers reserve when target is below it, and emits
-  target first. Raising target does not increase reserve until report rebalance.
-* Lido.sol:1125-1132 raises reserve to target without capping it to buffer.
-  Therefore storedReserve <= buffer must NOT be a global invariant.
+## Executed evidence
 
-Outstanding: full withdrawal independent specification; explicit
-state/input and ordered observation relations; actual queue/locator/oracle
-storage semantics; malformed/rejected ABI behavior for the pinned compilers;
-all writer surfaces; spending/rebalance/queue sequences; ETH balances, rejection
-and callbacks; instrumentation erasure; full correspondence; mutations;
-pinned Solidity/Verity differential execution; production/test/trust gates;
-scoped draft PR and immutable SHA.
+Commands are from repository root; for current runs prepend the private binary
+directory `audit/trio/reserve1/.local/lean4-v4.31.0/bin` to PATH.
 
-## Integration notes (no shared patches applied)
+| Command | Exit / receipt | Scope |
+| --- | --- | --- |
+| `lake build LidoSRv3.Tests.TrioReserve1.LiveTrust` | 0, `live-trust-final.txt/.exit` | Component modules and owned axiom inspection |
+| `lake build LidoSRv3.Audit.Source.TrioReserve1.Writers` | 0, `writers-4.txt/.exit` | Scalar writer spec and observation proofs |
+| `lake build LidoSRv3.Audit.Source.TrioReserve1.PhysicalPacking` | 0, `physical-packing-1.txt/.exit` | Bitwise relation and projections |
+| `solidity/trio-reserve1/.tools/node-v22.15.0-linux-x64/bin/node solidity/trio-reserve1/compile.cjs` | 0, `solidity-full-queue-compile.txt/.exit` | Inherited pinned 0.4.24 Lido and 0.8.9 queue, source compiler settings |
+| Same Node binary, `solidity/trio-reserve1/execute.cjs` | 0, `differential-execute-2.txt/.exit` | 29 matching cases, 2 executed mutant kills |
+| Six baseline Python gates | all 0, `resumed-checks.json` | Escape, annotation, inventory, provenance, pin, metadata; not new registration |
+| `python3 scripts/check_proof_escapes.py` | 0, `checkpoint-proof-escape.txt/.exit` | After final component additions |
 
-Production and tests are already recursively globbed under Audit.Source and
-Tests in lakefile.lean. Explicit Trust imports/#print axioms and canonical
-source-map/guarantees/manifest inventories will need coordinated additions.
-Until then full registered trust/metadata coverage of this delivery is MISSING.
-Keep old declarations unchanged until replacements and consumers validate.
+`owned-trust-environment.txt/.exit` records exit 0: the repository dependency
+probe independently confirms all 16 new reports against the built
+`LidoSRv3.Tests.TrioReserve1.LiveTrust` environment. This is component evidence,
+not canonical Trust registration.
 
-`make prove` writes proofs/logs and the generated proof report. Run it only in
-an owned disposable validation copy, or coordinate its output destinations;
-do not write those shared paths in this additive checkout. The same applies
-to test scripts that generate fixtures or temporary tracked-tree mutations.
+Owned axiom inspection reports only standard `propext`, `Classical.choice`,
+`Quot.sound`. No new axiom declarations, native decision proofs, or proof escapes.
+Retained failed elaboration logs are diagnostics, superseded by named green
+receipts, not hidden or interpreted as passing.
 
-Compiler correctness and chosen EVM execution backend are explicit assumptions.
-Cryptographic slot derivation needs concrete keccak evaluation/binding evidence.
-No full bytecode, gas-cost, cryptographic binding or consensus-state claim.
-Callbacks are an open modeling obligation, not an assumed always-success callee.
+Matching inputs/outputs are in `differential-input.json`,
+`differential-solidity.json`, `differential-verity.json`; the comparison is in
+`differential-comparison.json`. Mutant inputs/outputs and killed comparisons have
+parallel `mutation-*` filenames. Source hashes/dependency identities are in
+`resumed-source-context.json`; source compiler hash inventory is in
+`solidity-compilation.json`.
 
-## Executed checkpoint validation
+The differential relation compares exact root return/revert bytes, seven Lido
+physical words, current queue ids/bunker/cumulative mapping words, five account
+balances, ordered directly Lido-issued target/value/payload calls, and ABI
+committed events. Current-row mapping preimages are computed by ethers keccak;
+missing preimages fail the Lean driver. Root forwarding/nested callee traces,
+gas and deployment size are excluded from this finite comparison.
 
-- All eleven Lake dependency Git revisions verified exactly, with separate
-  non-symlink package directories in this checkout's private `.lake`.
-- Lean 4.31.0 checks the two foundation modules. Owned test/trust inspection
-  prints only propext and Quot.sound for these lemmas; no native decision axiom.
-- Pinned Lido/queue-base compilation succeeded with solc 0.4.24/0.8.9 and source
-  optimizer/EVM settings. Node 22.15.0 was installed from the source `.nvmrc`
-  series and checked against upstream SHA256 sums. Initial Node 18 probes are
-  retained as preliminary evidence; Node 22 reran the expanded 17-case suite.
-- Seventeen pinned Solidity cases passed, with relevant physical slots and
-  balances checked after success, and rollback/log erasure checked on failure.
-  Trace records include ordered targets, values and payloads. These do NOT
-  execute a matching Verity model and are NOT differential evidence.
-- Initial proof-escape, source-annotation, theorem-inventory, Verity provenance,
-  and pinned-source checks exited 0. These checker scopes do not establish new
-  canonical registration. Pinned-source check retained 19 baseline warnings.
-- Remote build accepted job `72e45c29-b554-4616-9fd2-cd54a38dde96` on `old-agent`
-  for `lake build LidoSRv3 LidoSRv3Test LidoSRv3Audit`. Passive mode: no repeated
-  polling or duplicate build. This was submitted before PartitionSpec and the
-  owned tests were added; it is not a validation of this final checkpoint.
-  Its acceptance receipt is NOT a success receipt. Collect the existing job
-  when terminal before considering a build of the later source tree.
-- `make prove`, `make test`, final production/test/trust, canonical metadata,
-  comprehensive inventory and new provenance registration remain NOT VERIFIED.
+Cases include live enqueue/finalization, malformed physical cumulative underflow,
+unauthorized/zero/pause/bunker, malformed/trailing replies, dirty address/bool
+words, 128/256-bit bounds and truncation, stale/current frame, actual ETH shortage,
+recipient rejection, failures after writes, target lowering, rebalance above
+buffer, and a second spend after queue growth. The two executed mutants replace
+live demand with a cached word and omit rollback; both disagree with Solidity.
+These are tests, not replacements for correspondence or sequential proofs.
 
-The executed 0.4.24 trace uses CALL (not STATICCALL) for locator, queue and
-oracle view functions. The eventual executor must therefore not infer
-read-only/callback-free external behavior from the source `view` annotation.
-The current boundary fixtures do not close callback/reentrancy behavior.
+The harness inherits the ACTUAL bunker getter and unfinalized demand. Its raw
+setup/internal writer wrappers bypass production admission; locator/oracle/router
+fixtures are test boundaries, not production callees or success assumptions.
+Successful arbitrary callback effects are allowed by the generic interpreter but
+are not covered by the finite differential suite or a full composition proof.
 
-Remaining implementation: connect the physical-word executor to actual locator,
-locator and oracle call semantics (including arbitrary rejection/bytes); derive
-reachable accounting constraints from writers; prove full ordered observation
-correspondence to an independent state/input relation; replace Solidity-only
-probes with matching-input differential runs. Full writer authorization,
-report-time calls, queue finalization and callbacks remain open. The fixtures
-expose these gaps; they do not discharge them.
+## Toolchains and broader gates
 
-## Resumed implementation and checked evidence
+All eleven Lake dependency revisions were rechecked exactly in private,
+non-symlink package directories. A private Lean 4.31.0 copy now resides in the
+owned `.local/lean4-v4.31.0`; its version and binary hashes are recorded in
+`private-lean-toolchain.txt`. The inherited toolchain path vanished during
+mathlib cache extraction: `mathlib-cache.txt/.exit` retains that failure.
+`mathlib-unpack-private.exit` is 0 after unpacking the already-downloaded cache
+with the private toolchain. Node 22.15.0's upstream distribution hash was checked
+and retained in `node-toolchain.txt`.
 
-- `Live.lean` now executes the source function boundaries using pinned Verity
-  words and contract-indexed storage. It reads live queue replies on every
-  allocation, derives admission from caller/locator reply/local pause/live
-  bunker, preserves saved locals across calls, writes uint128 packed fields,
-  transfers actual balances, and accepts arbitrary rejection/bytes/world effects.
-  This is a handwritten executor, not a completed Verity EDSL/bytecode refinement.
-- `QueueSpec.lean` is independent of executable imports. `Queue.StateRel` binds
-  current request/finalized ids and every cumulative row to physical slots.
-  `Queue.unfinalized_corresponds` proves the numeric return or panic 0x11 for all
-  related states, including malformed rows. Mapping keccak is an explicit
-  primitive; no injectivity axiom or freshness premise is used.
-- `Erasure.erase_bind`, `erase_pure`, and `erase_run` prove compositional trace
-  erasure and rollback commutation. `failure_restores_world` covers arbitrary
-  failure after intermediate effects. This proves the defined interpreter's
-  rollback, not yet the complete Solidity entrypoint correspondence.
-- `PhysicalPacking.pack_matches_bitwise` proves numeric packing equals the
-  actual mask/shift/OR word expression. `low_pack` / `high_pack` prove physical
-  projections with truncation; `physical_low_bound` / `physical_high_bound`
-  hold for arbitrary stored words. They do not assert untruncated sums or a
-  global reserve <= buffer invariant.
-- Owned `LiveTrust.lean` inspection exits 0. New checked lemmas use only
-  propext, Quot.sound, and (bitwise library proof) Classical.choice; no new
-  axiom declarations, native decision proof, or proof escape.
-- The harness now inherits actual `WithdrawalQueue.isBunkerModeActive` as
-  well as `WithdrawalQueueBase.unfinalizedStETH`, using solc 0.8.9. Lido remains
-  inherited solc 0.4.24. Constructor token setup and raw initialization are
-  fixtures; their production authorization is not claimed.
-- `differential-execute-2.txt/.exit` records exit 0: 29 matching executions
-  compare root return/revert bytes, seven Lido physical words, current queue
-  ids/bunker/cumulative mapping words, five account balances, ordered directly
-  Lido-issued target/value/payload calls, and ABI committed events. Root router
-  forwarding and nested callee calls are excluded from this comparison.
-  `differential-input.json`, `differential-solidity.json`, and
-  `differential-verity.json` retain the matching inputs and independent outputs.
-  Locator/oracle/router fixtures are explicitly input boundaries; their success
-  is not a production theorem premise. Successful arbitrary callbacks are not
-  exercised in this finite suite and complete nested-call composition is open.
-- The 29 cases include 128/256-bit boundaries, malformed/trailing return bytes,
-  unauthorized, stopped, bunker, actual balance shortage, ETH rejection,
-  intermediate-effect failure, queue enqueue/finalization and malformed queue
-  underflow, stale/current frame counters, lowering targets, rebalance above
-  buffer, and a second spend after queue growth. Sequential full proofs remain
-  open; the independent fixed-demand `two_spends` lemma is still scoped.
-- Two actual mutant runs disagree with Solidity: cached demand permits a
-  queue-growth spend the source rejects; omitting rollback exposes oracle-failure
-  writes. `mutation-comparison.json` records both kills.
-- Baseline proof-escape, source annotation, inventory, provenance, pinned-source
-  and metadata checks exit 0 again (`resumed-checks.json`). These checks do not
-  establish new canonical registration. Full registration remains MISSING.
-- Earlier remote job `72e45c29-b554-4616-9fd2-cd54a38dde96` terminated FAILED
-  (exit 1): fetching pinned `evmyul` failed with Git exit 128 for missing remote
-  authentication. `remote-resume-original-env.txt` is the terminal receipt.
-  No credentials/security setting changes were attempted.
+Earlier remote job `72e45c29-b554-4616-9fd2-cd54a38dde96` terminated FAILED,
+exit 1: the pinned evmyul Git fetch failed with exit 128 for missing remote
+authentication. `remote-resume-original-env.txt` is the terminal receipt.
+No duplicate remote build, credential change or security-setting change.
 
-Live module, queue and erasure checks are now green after retained diagnostic
-failures. Full production/test/trust and `make prove` / `make test` remain pending;
-a private mathlib cache acquisition is in progress to enable those gates. The
-new internal writer scalar correspondence work is in progress and is not yet
-included in the checked claims above.
+`run-gates.sh` starts one isolated owned validation worktree per immutable SHA,
+with a separate copied mutable `.lake`, runs production/test/trust followed by
+`make prove` and `make test`, and records each command/exit externally in owned
+receipts. It prevents duplicate invocation for the same SHA. Generated proof
+reports and mutation-test outputs are confined to that disposable tree.
+Current checkpoint gates were launched; terminal outcomes belong in
+`full-production-test-trust`, `make-prove`, `make-test` receipts and
+`gates-terminal.txt`. Until those terminal receipts exist, these gates are PENDING.
 
-The internal writers now also compile: `Writers.target_corresponds` and
-`rebalance_corresponds` establish the independent `WriterSpec` scalar relations
-on physical projections. `target_observations` and `rebalance_observations`
-prove success, no external calls, preserved balances and exact appended event
-order for those internal helpers. External ACL/report-parent correspondence is
-still open. See `writers-4.txt/.exit` (0) and `SOURCE-MAP.md`.
+## Remaining required work
 
-The inherited toolchain path disappeared during cache extraction. The failed
-cache receipt is retained. A private Lean 4.31.0 copy is now installed under the
-owned `.local` directory, with version/binary hashes recorded in
-`private-lean-toolchain.txt`. `mathlib-unpack-private.exit` is 0; the downloaded
-pinned cache was unpacked without another download or shared toolchain changes.
+1. Full independent withdrawal state/input and return/revert/storage/balance/
+   ordered-call/event correspondence, including malformed/rejected results and
+   later failure. Component theorems do not discharge this parent.
+2. Actual immutable locator, AccountingOracle/BaseOracle/consensus frame, and
+   StakingRouter receiver composition (including receiver auth/event), and
+   callback/nested-call behavior. No unconditional successful callee premise.
+   World balances currently use Nat: relate EVM account-balance bounds and
+   value-credit behavior explicitly rather than infer them from small fixtures.
+3. Aragon target/pause admissions, initialization/migration, all report/buffer/
+   accounting and queue writer surfaces needed by invariants; derive untruncated
+   bounds where needed. Sequential queue/rebalance/spending proofs remain open.
+4. Complete full gates and retain actual failures. New canonical Trust imports,
+   guarantee/source-map/manifest/provenance registration are MISSING under the
+   additive-only boundary even if baseline checks pass. Put proposed shared
+   edits in owned notes; do not edit shared files without coordinated integration.
+5. Keep draft PR updated with immutable source and terminal evidence; no merge,
+   self-certification, publication, deployment or Lido contact.
+
+Compiler, runtime and primitive correctness are explicit assumptions. Full
+bytecode/gas/full consensus-state truth and cryptographic injectivity are excluded.
