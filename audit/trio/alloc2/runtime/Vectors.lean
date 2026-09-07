@@ -30,4 +30,34 @@ private def emit (name : String) (bytes : Bytes) : IO Unit := do
   let packet := encodeArguments ⟨[zero], [word 9], zero⟩
   emit "truncated-tail-zero-demand" (packet.take (packet.length-1))
 
+private def memorySequence (name : String) (ap cp : Nat) (bs cs : List Nat) (d1 d2 : Nat) : IO Unit := do
+  let buckets := bs.map word
+  let capacities := cs.map word
+  let initial := MemoryWrite.writeWords
+    (MemoryWrite.writeWords (fun _ => word 0xcafe) ap (word buckets.length :: buckets))
+    cp (word capacities.length :: capacities)
+  let initialState := installMemory state initial
+  match (memoryExecute ap cp (word d1)).run initialState with
+  | .revert reason _ => throw (IO.userError reason)
+  | .success firstAmount firstState =>
+    match (memoryExecute ap cp (word d2)).run firstState with
+    | .revert reason _ => throw (IO.userError reason)
+    | .success secondAmount secondState =>
+      let json := fun values : List Word => "[" ++ String.intercalate ","
+        (values.map fun x => "\"" ++ toString x.val ++ "\"") ++ "]"
+      if secondState.selfBalance ≠ initialState.selfBalance then throw (IO.userError "balance changed")
+      if secondState.memory 7 ≠ initialState.memory 7 then throw (IO.userError "frame changed")
+      if MemoryWrite.readArray (wordMemory secondState) cp ≠ capacities then throw (IO.userError "capacities changed")
+      IO.println ("ALLOC2_VERITY_MEMORY_SEQUENCE {\"name\":\"" ++ name ++ "\",\"firstAmount\":\"" ++
+        toString firstAmount.val ++ "\",\"secondAmount\":\"" ++ toString secondAmount.val ++
+        "\",\"first\":" ++ json (MemoryWrite.readArray (wordMemory firstState) ap) ++
+        ",\"second\":" ++ json (MemoryWrite.readArray (wordMemory secondState) ap) ++ "}")
+
+#eval do
+  memorySequence "two-calls" 128 512 [0,0] [100,100] 5 5
+  memorySequence "reverse-regions" 512 128 [0,0] [100,100] 5 5
+  memorySequence "below-capacity" 128 512 [7,0] [3,10] 3 20
+  memorySequence "zero-first" 128 512 [0,0] [100,100] 0 5
+  memorySequence "129-rows" 128 8192 (List.replicate 129 0) (List.replicate 129 2) 129 129
+
 end LidoSRv3.Audit.Source.TrioAlloc2.Runtime
