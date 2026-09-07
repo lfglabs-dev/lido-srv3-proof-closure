@@ -100,3 +100,10 @@ lookups too. OracleCalls binds Oracle.frame through the concrete dispatch chain
 to getCurrentFrame success or bubbled rejection, including nested attempts.
 Code-presence/address-separation and complete consensus/deployment bindings remain
 explicit obligations; no arbitrary successful-callee premise is substituted.
+
+`ConsensusCalls.static_success/static_rejection` bind the source getter to the
+actual STATICCALL. oracle_frame/rejection/overflow/no_code bind the physical
+consensus pointer and checked timestamp, preserving nested attempts. lido_frame
+composes both ABI decoders to exact reference/time values; independent_rules
+uses the same physical frame word and immutable source inputs. Constructor/layout
+and primitive relations remain explicit upstream deployment obligations.

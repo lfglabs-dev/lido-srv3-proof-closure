@@ -1,5 +1,26 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Consensus-to-Lido frame composition
+
+`ConsensusCalls` executes the actual HashConsensus dispatcher under STATICCALL,
+using block timestamp and the physical frame word. It derives uint64 reference/
+deadline bounds from FrameSpec, decodes the returned reference exactly, and binds
+AccountingOracle's checked timestamp to that result. Independent FrameSpec and
+OracleSpec relations use the same actual source inputs. Consensus rejection,
+missing code, and timestamp overflow preserve the exact nested-attempt distinction:
+a successful consensus call followed by oracle overflow remains an accepted
+nested attempt inside the outer rejection.
+
+`lido_frame` composes the complete getter path through Lido's physical locator,
+immutable oracle lookup, BaseOracle's consensus pointer, source consensus getter,
+and both ABI decoders. It returns exact natural reference/time values with the
+unchanged world, two direct attempts and one nested STATICCALL. Constructor,
+compiler-layout, code/address and primitive binding remain explicit obligations;
+this does not establish full deployment or whole-withdrawal specification closure.
+
+The immutable checker now covers 35 modules. The differential runner remains
+unchanged; these composition additions are validated through Lean elaboration.
+
 ## Concrete getter and callee binding
 
 `CallResults` now proves all three immutable locator lookups through physical

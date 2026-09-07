@@ -14,6 +14,7 @@ import LidoSRv3.Audit.Source.TrioReserve1.CallResults
 import LidoSRv3.Audit.Source.TrioReserve1.WithdrawalTail
 import LidoSRv3.Audit.Source.TrioReserve1.WithdrawalComposition
 import LidoSRv3.Audit.Source.TrioReserve1.OracleCalls
+import LidoSRv3.Audit.Source.TrioReserve1.ConsensusCalls
 
 /-! Owned inspection, pending coordinated canonical Trust registration. -/
 open LidoSRv3.Audit.Source.TrioReserve1
@@ -113,3 +114,14 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms OracleCalls.frame_rejection
 #print axioms OracleCalls.current_frame
 #print axioms OracleCalls.current_frame_rejection
+
+#print axioms ConsensusCalls.compute_bounds
+#print axioms ConsensusCalls.static_success
+#print axioms ConsensusCalls.static_rejection
+#print axioms ConsensusCalls.decode_reference
+#print axioms ConsensusCalls.oracle_frame
+#print axioms ConsensusCalls.oracle_rejection
+#print axioms ConsensusCalls.oracle_overflow
+#print axioms ConsensusCalls.oracle_no_code
+#print axioms ConsensusCalls.independent_rules
+#print axioms ConsensusCalls.lido_frame

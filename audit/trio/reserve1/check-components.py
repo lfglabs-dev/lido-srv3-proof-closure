@@ -41,6 +41,7 @@ MODULES = [
     "Audit/Source/TrioReserve1/OracleCalls",
     "Audit/Source/TrioReserve1/FrameSpec",
     "Audit/Source/TrioReserve1/Consensus",
+    "Audit/Source/TrioReserve1/ConsensusCalls",
     "Tests/TrioReserve1/Foundations",
     "Tests/TrioReserve1/OracleMutants",
     "Tests/TrioReserve1/Differential",
