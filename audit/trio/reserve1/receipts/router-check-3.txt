@@ -1,0 +1,17 @@
+LidoSRv3/Audit/Source/TrioReserve1/Router.lean:62:74: error: unsolved goals
+router lido : Address
+other : External
+ctx : Context
+w : World
+amount : Word
+hcaller : ctx.self = lido
+hcode : (w.core.codeSize router.val).val ≠ 0
+hfunds : amount.val ≤ w.balances ctx.self
+⊢ amount.val ≤ w.balances lido
+LidoSRv3/Audit/Source/TrioReserve1/Router.lean:63:56: warning: This simp argument is unused:
+  Nat.not_lt.mpr hfunds
+
+Hint: Omit it from the simp argument list.
+  simp [call, dispatch, receiveDepositableEther, hcode, N̵a̵t̵.̵n̵o̵t̵_̵l̵t̵.̵m̵p̵r̵ ̵h̵f̵u̵n̵d̵s̵,̵hcaller, transfer]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

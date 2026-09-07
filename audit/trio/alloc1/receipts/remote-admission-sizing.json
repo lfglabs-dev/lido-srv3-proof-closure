@@ -1,0 +1,27 @@
+{
+  "full_build_estimate_gib": 5,
+  "verity_vector_target_estimate_gib": 2,
+  "measured_git_kib": 154128,
+  "measured_dependencies_kib": 748620,
+  "measured_shared_verity_artifact_bytes": 35898373,
+  "shared_verity_pin": "e977aaad6e1a9e92e0132d41b3d33a14135a4d46",
+  "floor_gib_unchanged": 80,
+  "prior_rejected_commands": [
+    {
+      "durable_job": "a4c1a79c-d4fe-40b6-b6bf-adc04b1f2bf5",
+      "source": "550e795ce2dccee751be1704a1f1fcaea92590d6",
+      "free_gib": 84,
+      "estimated_gib": 5,
+      "http_status": 422
+    },
+    {
+      "durable_job": "09530a84-e86f-4dc7-b829-6209518d720e",
+      "source": "9923f9d6836a081d9c962846b898a52e44982af1",
+      "requested_node": "nippur",
+      "reported_node": "ashur",
+      "free_gib": 84,
+      "estimated_gib": 5,
+      "http_status": 422
+    }
+  ]
+}

@@ -1,0 +1,194 @@
+LidoSRv3/Audit/Source/TrioReserve1/Allocation.lean:17:22: error: Application type mismatch: The argument
+  he
+has type
+  (first w).outcome = Except.ok a
+but is expected to have type
+  Except.ok a = Except.ok a
+in the application
+  And.intro he
+LidoSRv3/Audit/Source/TrioReserve1/Allocation.lean:35:41: error: Invalid simp theorem: Expected a proposition, but found
+  Context → Nat → Exec Word
+LidoSRv3/Audit/Source/TrioReserve1/Allocation.lean:46:8: error: Tactic `subst` failed: did not find equation for eliminating 'a'
+
+case h_2
+external : External
+ctx : Context
+w : World
+a : Allocation
+x✝² : Except Fault Word
+queue : Word
+hqueue : (Live.read ctx bufferSlot w).outcome = Except.ok queue
+x✝¹ : Except Fault Word
+data : Word
+hdata : (Live.read ctx reserveSlot (Live.read ctx bufferSlot w).world).outcome = Except.ok data
+x✝ : Except Fault Address
+demand : Address
+hdemand :
+  (withdrawalQueue external ctx (Live.read ctx reserveSlot (Live.read ctx bufferSlot w).world).world).outcome =
+    Except.ok demand
+h :
+  (match
+        (call external ctx demand 3506144488 (word 0)
+            (withdrawalQueue external ctx
+                (Live.read ctx reserveSlot (Live.read ctx bufferSlot w).world).world).world).outcome with
+      | Except.error e =>
+        { outcome := Except.error e,
+          world :=
+            (call external ctx demand 3506144488 (word 0)
+                (withdrawalQueue external ctx
+                    (Live.read ctx reserveSlot (Live.read ctx bufferSlot w).world).world).world).world,
+          attempts :=
+            (call external ctx demand 3506144488 (word 0)
+                (withdrawalQueue external ctx
+                    (Live.read ctx reserveSlot (Live.read ctx bufferSlot w).world).world).world).attempts }
+      | Except.ok a =>
+        {
+          outcome :=
+            (match
+                (decodeWord a 0
+                    (call external ctx demand 3506144488 (word 0)
+                        (withdrawalQueue external ctx
+                            (Live.read ctx reserveSlot
+                                (Live.read ctx bufferSlot w).world).world).world).world).outcome with
+              | Except.error e =>
+                { outcome := Except.error e,
+                  world :=
+                    (decodeWord a 0
+                        (call external ctx demand 3506144488 (word 0)
+                            (withdrawalQueue external ctx
+                                (Live.read ctx reserveSlot
+                                    (Live.read ctx bufferSlot w).world).world).world).world).world,
+                  attempts :=
+                    (decodeWord a 0
+                        (call external ctx demand 3506144488 (word 0)
+                            (withdrawalQueue external ctx
+                                (Live.read ctx reserveSlot
+                                    (Live.read ctx bufferSlot w).world).world).world).world).attempts }
+              | Except.ok a_1 =>
+                {
+                  outcome :=
+                    Except.ok
+                      { total := queue.val % width, deposits := min (queue.val % width) data.val,
+                        withdrawals := min (queue.val % width - min (queue.val % width) data.val) a_1.val,
+                        unreserved :=
+                          queue.val % width - min (queue.val % width) data.val -
+                            min (queue.val % width - min (queue.val % width) data.val) a_1.val },
+                  world :=
+                    (decodeWord a 0
+                        (call external ctx demand 3506144488 (word 0)
+                            (withdrawalQueue external ctx
+                                (Live.read ctx reserveSlot
+                                    (Live.read ctx bufferSlot w).world).world).world).world).world,
+                  attempts :=
+                    (decodeWord a 0
+                          (call external ctx demand 3506144488 (word 0)
+                              (withdrawalQueue external ctx
+                                  (Live.read ctx reserveSlot
+                                      (Live.read ctx bufferSlot w).world).world).world).world).attempts ++
+                      [] }).outcome,
+          world :=
+            (match
+                (decodeWord a 0
+                    (call external ctx demand 3506144488 (word 0)
+                        (withdrawalQueue external ctx
+                            (Live.read ctx reserveSlot
+                                (Live.read ctx bufferSlot w).world).world).world).world).outcome with
+              | Except.error e =>
+                { outcome := Except.error e,
+                  world :=
+                    (decodeWord a 0
+                        (call external ctx demand 3506144488 (word 0)
+                            (withdrawalQueue external ctx
+                                (Live.read ctx reserveSlot
+                                    (Live.read ctx bufferSlot w).world).world).world).world).world,
+                  attempts :=
+                    (decodeWord a 0
+                        (call external ctx demand 3506144488 (word 0)
+                            (withdrawalQueue external ctx
+                                (Live.read ctx reserveSlot
+                                    (Live.read ctx bufferSlot w).world).world).world).world).attempts }
+              | Except.ok a_1 =>
+                {
+                  outcome :=
+                    Except.ok
+                      { total := queue.val % width, deposits := min (queue.val % width) data.val,
+                        withdrawals := min (queue.val % width - min (queue.val % width) data.val) a_1.val,
+                        unreserved :=
+                          queue.val % width - min (queue.val % width) data.val -
+                            min (queue.val % width - min (queue.val % width) data.val) a_1.val },
+                  world :=
+                    (decodeWord a 0
+                        (call external ctx demand 3506144488 (word 0)
+                            (withdrawalQueue external ctx
+                                (Live.read ctx reserveSlot
+                                    (Live.read ctx bufferSlot w).world).world).world).world).world,
+                  attempts :=
+                    (decodeWord a 0
+                          (call external ctx demand 3506144488 (word 0)
+                              (withdrawalQueue external ctx
+                                  (Live.read ctx reserveSlot
+                                      (Live.read ctx bufferSlot w).world).world).world).world).attempts ++
+                      [] }).world,
+          attempts :=
+            (call external ctx demand 3506144488 (word 0)
+                  (withdrawalQueue external ctx
+                      (Live.read ctx reserveSlot (Live.read ctx bufferSlot w).world).world).world).attempts ++
+              (match
+                  (decodeWord a 0
+                      (call external ctx demand 3506144488 (word 0)
+                          (withdrawalQueue external ctx
+                              (Live.read ctx reserveSlot
+                                  (Live.read ctx bufferSlot w).world).world).world).world).outcome with
+                | Except.error e =>
+                  { outcome := Except.error e,
+                    world :=
+                      (decodeWord a 0
+                          (call external ctx demand 3506144488 (word 0)
+                              (withdrawalQueue external ctx
+                                  (Live.read ctx reserveSlot
+                                      (Live.read ctx bufferSlot w).world).world).world).world).world,
+                    attempts :=
+                      (decodeWord a 0
+                          (call external ctx demand 3506144488 (word 0)
+                              (withdrawalQueue external ctx
+                                  (Live.read ctx reserveSlot
+                                      (Live.read ctx bufferSlot w).world).world).world).world).attempts }
+                | Except.ok a_1 =>
+                  {
+                    outcome :=
+                      Except.ok
+                        { total := queue.val % width, deposits := min (queue.val % width) data.val,
+                          withdrawals := min (queue.val % width - min (queue.val % width) data.val) a_1.val,
+                          unreserved :=
+                            queue.val % width - min (queue.val % width) data.val -
+                              min (queue.val % width - min (queue.val % width) data.val) a_1.val },
+                    world :=
+                      (decodeWord a 0
+                          (call external ctx demand 3506144488 (word 0)
+                              (withdrawalQueue external ctx
+                                  (Live.read ctx reserveSlot
+                                      (Live.read ctx bufferSlot w).world).world).world).world).world,
+                    attempts :=
+                      (decodeWord a 0
+                            (call external ctx demand 3506144488 (word 0)
+                                (withdrawalQueue external ctx
+                                    (Live.read ctx reserveSlot
+                                        (Live.read ctx bufferSlot w).world).world).world).world).attempts ++
+                        [] }).attempts }).outcome =
+    Except.ok a
+⊢ ∃ queue data demand,
+    (withdrawalQueue external ctx w).outcome = Except.ok queue ∧
+      (call external ctx queue 3506144488 (word 0) (withdrawalQueue external ctx w).world).outcome = Except.ok data ∧
+        (decodeWord data 0
+                (call external ctx queue 3506144488 (word 0) (withdrawalQueue external ctx w).world).world).outcome =
+            Except.ok demand ∧
+          a.total = (w.core.readContractSlot ctx.self.val bufferSlot).val % width ∧
+            AllocationSpec.Describes a.total (w.core.readContractSlot ctx.self.val reserveSlot).val demand.val
+              (observe a)
+LidoSRv3/Audit/Source/TrioReserve1/Allocation.lean:45:35: warning: This simp argument is unused:
+  Except.ok.injEq
+
+Hint: Omit it from the simp argument list.
+  simp only [pure, pureExec,̵ ̵E̵x̵c̵e̵p̵t̵.̵o̵k̵.̵i̵n̵j̵E̵q̵] at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

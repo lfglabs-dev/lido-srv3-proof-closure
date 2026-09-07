@@ -1,0 +1,41 @@
+⚠ [11/18] Replayed Verity.Core
+warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1041:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+✔ [16/21] Built LidoSRv3.Audit.Source.TrioReserve1.Live (4.3s)
+✔ [17/21] Built LidoSRv3.Audit.Source.TrioReserve1.Erasure (8.6s)
+✔ [18/21] Built LidoSRv3.Audit.Source.TrioReserve1.Queue (11s)
+✔ [19/21] Built LidoSRv3.Audit.Source.TrioReserve1.PhysicalPacking (12s)
+✔ [20/21] Built LidoSRv3.Audit.Source.TrioReserve1.Writers (12s)
+ℹ [21/21] Built LidoSRv3.Tests.TrioReserve1.LiveTrust (3.2s)
+info: LidoSRv3/Tests/TrioReserve1/LiveTrust.lean:8:0: 'LidoSRv3.Audit.Source.TrioReserve1.Queue.unfinalized_corresponds' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/TrioReserve1/LiveTrust.lean:9:0: 'LidoSRv3.Audit.Source.TrioReserve1.Queue.cumulative_bound' does not depend on any axioms
+info: LidoSRv3/Tests/TrioReserve1/LiveTrust.lean:10:0: 'LidoSRv3.Audit.Source.TrioReserve1.Erasure.erase_bind' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/TrioReserve1/LiveTrust.lean:11:0: 'LidoSRv3.Audit.Source.TrioReserve1.Erasure.erase_pure' does not depend on any axioms
+info: LidoSRv3/Tests/TrioReserve1/LiveTrust.lean:12:0: 'LidoSRv3.Audit.Source.TrioReserve1.Erasure.erase_run' depends on axioms: [propext]
+info: LidoSRv3/Tests/TrioReserve1/LiveTrust.lean:13:0: 'LidoSRv3.Audit.Source.TrioReserve1.Erasure.failure_restores_world' depends on axioms: [propext]
+info: LidoSRv3/Tests/TrioReserve1/LiveTrust.lean:14:0: 'LidoSRv3.Audit.Source.TrioReserve1.Erasure.replacing_attempts_preserves_observables' does not depend on any axioms
+info: LidoSRv3/Tests/TrioReserve1/LiveTrust.lean:15:0: 'LidoSRv3.Audit.Source.TrioReserve1.PhysicalPacking.pack_matches_bitwise' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TrioReserve1/LiveTrust.lean:16:0: 'LidoSRv3.Audit.Source.TrioReserve1.PhysicalPacking.physical_low_bound' does not depend on any axioms
+info: LidoSRv3/Tests/TrioReserve1/LiveTrust.lean:17:0: 'LidoSRv3.Audit.Source.TrioReserve1.PhysicalPacking.physical_high_bound' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/TrioReserve1/LiveTrust.lean:18:0: 'LidoSRv3.Audit.Source.TrioReserve1.PhysicalPacking.low_pack' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/TrioReserve1/LiveTrust.lean:19:0: 'LidoSRv3.Audit.Source.TrioReserve1.PhysicalPacking.high_pack' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/TrioReserve1/LiveTrust.lean:21:0: 'LidoSRv3.Audit.Source.TrioReserve1.Writers.target_corresponds' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TrioReserve1/LiveTrust.lean:22:0: 'LidoSRv3.Audit.Source.TrioReserve1.Writers.rebalance_corresponds' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TrioReserve1/LiveTrust.lean:23:0: 'LidoSRv3.Audit.Source.TrioReserve1.Writers.target_observations' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TrioReserve1/LiveTrust.lean:24:0: 'LidoSRv3.Audit.Source.TrioReserve1.Writers.rebalance_observations' depends on axioms: [propext]
+Build completed successfully (21 jobs).

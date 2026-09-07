@@ -1,0 +1,29 @@
+{
+  "job_id": "edbef81c-8f7a-4ad9-a64b-ecc082addc2b",
+  "node_id": "old-agent",
+  "state": "failed",
+  "receipt_state": "failed",
+  "exit_code": null,
+  "created_at": "2026-09-07T09:22:09.984672358+00:00",
+  "started_at": "2026-09-07T09:22:10.021541832+00:00",
+  "finished_at": "2026-09-07T09:22:10.838245676+00:00",
+  "error": "git fetch failed (command exited with Some(128), exit Some(128)); see job log",
+  "log_tail": "fatal: remote error: upload-pack: not our ref 3afa83de834c34c093722b00d1754e32de0529a9\n",
+  "validation": {
+    "version": 1,
+    "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+    "commit": "3afa83de834c34c093722b00d1754e32de0529a9",
+    "base_tree_sha": "3af6fd856be369bf1d7f27d20621dce1c3b7cca5",
+    "cwd_rel_known": true,
+    "cwd_rel": "audit/trio/alloc2",
+    "command": [
+      "lake",
+      "build"
+    ],
+    "toolchain": "leanprover/lean4:v4.31.0",
+    "source_bundle_digest": "f1c496e9b767dcf866a01c799a7756b65a10299822c7f00cf0766d8b4eaeb5a4",
+    "build_protocol_version": "1",
+    "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+  },
+  "artifacts": []
+}

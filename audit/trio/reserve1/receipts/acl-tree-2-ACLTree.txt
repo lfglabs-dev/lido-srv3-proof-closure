@@ -1,0 +1,22 @@
+LidoSRv3/Audit/Source/TrioReserve1/ACLTree.lean:67:79: error: don't know how to synthesize placeholder
+context:
+k : Queue.Keccak
+external : StaticCall.External
+self : Address
+hash : Word
+who where_ : Address
+role : Word
+how : List Word
+w : World
+leaf : Nat → ACLTreeSpec.Outcome → List NestedAttempt → Prop
+leaf_source :
+  ∀ (index : Nat) (outcome : ACLTreeSpec.Outcome) (trace : List NestedAttempt),
+    node k self hash w index = ACLTreeSpec.Node.atom →
+      leaf index outcome trace →
+        ∃ fuel, ACL.eval k external self hash who where_ role how w fuel index = result outcome trace
+index : Nat
+outcome : ACLTreeSpec.Outcome
+trace : List NestedAttempt
+i✝ : Nat
+hn : node k self hash w i✝ = ACLTreeSpec.Node.missing
+⊢ Nat

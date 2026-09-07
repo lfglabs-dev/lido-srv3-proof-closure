@@ -1,0 +1,6 @@
+Cloning into '/workspaces/lido-integration-validation-03f17085'...
+HEAD is now at 03f1708 Record executed parent VM differential and supply audit review base
+remote-lean-build: pinned tree contains submodules; using legacy runner fetch
+remote-lean-build: dispatching lake env lean --run audit/trio/integration/RunValidation.lean for 03f170850b5b ...
+remote-lean-build: submitted job c285693a-5b5a-495f-8751-031e9ef7caed on node 'nippur'; receipt /root/.local/state/sandboxed-sh/remote-builds/044e8a2d6ec524e4a638354519498e6a2600c142ff61469567d8633759713f0a.json
+remote-lean-build: job c285693a-5b5a-495f-8751-031e9ef7caed on node 'nippur' finished: failed (exit 1, 2521s)

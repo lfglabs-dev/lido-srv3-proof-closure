@@ -1,0 +1,36 @@
+{
+  "classification": "REMOTE_ADMISSION_REJECTED",
+  "source_sha": "43ae5e8face86528e199491fa9954f74a0bddd5b",
+  "status": {
+    "command": "remote-lean-build lake env lean --run audit/trio/alloc1/RunVerityVectors.lean",
+    "created_at": "2026-09-07T14:13:06.425075886Z",
+    "cwd": "/root/.sandboxed-sh/containers/verity-integration-a/workspaces/mission-c01b16cf/alloc1",
+    "deadline_at": "2026-09-07T16:13:06.425075886Z",
+    "exit_code": 1,
+    "heartbeat_at": "2026-09-07T14:13:06.592503786Z",
+    "id": "1b893089-10e0-4e57-b689-e4e4c5ccf96c",
+    "idempotency_key": null,
+    "owner_user_id": "prod",
+    "pid": 3684856,
+    "request_fingerprint": "6ffe7f5a73cbb115fa778c8ecb6bdc298d17574a42e6f36dceafb983112ce205",
+    "resource_class": null,
+    "scope_unit": "sandboxed-durable-sandboxed-verity-integration-a-ee44a8f4-1b89308910e04e57b689e4e4c5ccf96c",
+    "signal": null,
+    "spawn_accepted": true,
+    "started_by_mission_id": "c01b16cf-8eb0-444b-82a9-4310211c4847",
+    "status": "failed",
+    "status_file": "/root/.sandboxed-sh/containers/verity-integration-a/.sandboxed-sh/durable-jobs/1b893089-10e0-4e57-b689-e4e4c5ccf96c/exit.json",
+    "stderr_log": "/root/.sandboxed-sh/containers/verity-integration-a/.sandboxed-sh/durable-jobs/1b893089-10e0-4e57-b689-e4e4c5ccf96c/stderr.log",
+    "stdout_log": "/root/.sandboxed-sh/containers/verity-integration-a/.sandboxed-sh/durable-jobs/1b893089-10e0-4e57-b689-e4e4c5ccf96c/stdout.log",
+    "updated_at": "2026-09-07T14:13:07Z",
+    "workspace_id": "440ec9d3-b7f3-4188-9454-cda805bb6259"
+  },
+  "logs": {
+    "job_id": "1b893089-10e0-4e57-b689-e4e4c5ccf96c",
+    "stderr": "remote-lean-build: pinned tree contains submodules; using legacy runner fetch\nremote-lean-build: dispatching lake env lean --run audit/trio/alloc1/RunVerityVectors.lean for 43ae5e8face8 ...\nremote-lean-build: HTTP 422 from http://127.0.0.1:3000/api/remote-build:\nremote node 'ashur' did not accept the build: remote node rejected request with HTTP 422: insufficient node disk: 80 GiB available, 2 GiB estimated plus 80 GiB emergency floor\n",
+    "stdout": ""
+  },
+  "estimated_disk_gib": 2,
+  "emergency_floor_gib": 80,
+  "available_disk_gib": 80
+}

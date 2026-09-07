@@ -1,0 +1,52 @@
+[
+  {
+    "optimization": false,
+    "case": "valid",
+    "exit_code": 0
+  },
+  {
+    "optimization": false,
+    "case": "empty",
+    "exit_code": 1
+  },
+  {
+    "optimization": false,
+    "case": "truncated",
+    "exit_code": 1
+  },
+  {
+    "optimization": false,
+    "case": "duplicate",
+    "exit_code": 1
+  },
+  {
+    "optimization": false,
+    "case": "changed-result",
+    "exit_code": 1
+  },
+  {
+    "optimization": true,
+    "case": "valid",
+    "exit_code": 0
+  },
+  {
+    "optimization": true,
+    "case": "empty",
+    "exit_code": 1
+  },
+  {
+    "optimization": true,
+    "case": "truncated",
+    "exit_code": 1
+  },
+  {
+    "optimization": true,
+    "case": "duplicate",
+    "exit_code": 1
+  },
+  {
+    "optimization": true,
+    "case": "changed-result",
+    "exit_code": 1
+  }
+]

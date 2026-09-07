@@ -1,0 +1,1 @@
+proof-escape check ok: 246 project Lean files; no sorry/admit/axiom/constant/unsafe/Lean.ofReduceBool; native_decide inventory 46df09dbc9ae95a3196dc32ed3a6c0a2ea2369b13c3e7e910c78a73b9c701fb7

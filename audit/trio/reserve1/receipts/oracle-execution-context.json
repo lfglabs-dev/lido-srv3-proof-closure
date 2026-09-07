@@ -1,0 +1,116 @@
+{
+  "source_commit": "0fde6481707ba16f63ff324547bc2761e1d7b136",
+  "started_utc": "2026-09-07T12:18:30.930666+00:00",
+  "source_hashes": {
+    "LidoSRv3/Audit/Source/TrioReserve1/Allocation.lean": "4ca5c228218f30415badae67fb0373a98cff00851e4b09d1e0477fdcedf0f400",
+    "LidoSRv3/Audit/Source/TrioReserve1/AllocationSpec.lean": "0ac96b84013977f21dcb8bc3577650a720bc09ce0f36ce99a0da16d07f7e5ccf",
+    "LidoSRv3/Audit/Source/TrioReserve1/Consensus.lean": "65b5ac3a8e80a9d2451a6969d4af5b42b6df084d2445a5794553ec684d079426",
+    "LidoSRv3/Audit/Source/TrioReserve1/Erasure.lean": "4e2765e782c2bfdb1c6691e82ab77d74fbc6795a7441c458f77d4a7c7b68e7e6",
+    "LidoSRv3/Audit/Source/TrioReserve1/FrameSpec.lean": "62d02f2ca38091687691a30124db9b9ca25260f4254daea1c1fcc445cc392102",
+    "LidoSRv3/Audit/Source/TrioReserve1/Live.lean": "f0479c959ca823fd95db8aab2a833ec8f7094abd0ada9a715f7e8c9052c468bb",
+    "LidoSRv3/Audit/Source/TrioReserve1/Locator.lean": "5e3a90aba1013cb65aa3306eacfe3122a84840e0138bc0d2496f34257bfb459f",
+    "LidoSRv3/Audit/Source/TrioReserve1/Oracle.lean": "bcd662f8f412864768a9f058464a217976b63dbdde2a35f474038e62b2e8fc6b",
+    "LidoSRv3/Audit/Source/TrioReserve1/OracleSpec.lean": "eacfde78139d66a7d2de260e5f70e46cd94991a534db30255ccd947690de8c10",
+    "LidoSRv3/Audit/Source/TrioReserve1/Packing.lean": "4b4dda2555af0a8977ce2185b851bd63ca3ddd9420d493d438c7abed31bf38f3",
+    "LidoSRv3/Audit/Source/TrioReserve1/PartitionSpec.lean": "36f1afa4bf2c60832bc7edc34c8c9623e492c3f8ab92a75d4bbd713442d8987b",
+    "LidoSRv3/Audit/Source/TrioReserve1/PhysicalPacking.lean": "058f7d0641e27963179c02fa84e1c233960535e22f67ea1aa72835af6c89245e",
+    "LidoSRv3/Audit/Source/TrioReserve1/Queue.lean": "be75949b3843e55ce9cbe56ad20f54dcf95b8d0ed6dbe380778366863aac6890",
+    "LidoSRv3/Audit/Source/TrioReserve1/QueueSpec.lean": "b9fe21bb34946a83565a61b298ab178ccff6adab6cc711ab3eb1e3672c7729e4",
+    "LidoSRv3/Audit/Source/TrioReserve1/Router.lean": "b272e74a80bda456d4adaaf8006593f46822551162be97282918488f901e8470",
+    "LidoSRv3/Audit/Source/TrioReserve1/RouterSpec.lean": "3893ba4c92ef3e0e3fcf347e05fef79cff230164e89be8b40210e1a945001181",
+    "LidoSRv3/Audit/Source/TrioReserve1/StaticCall.lean": "e2e989cb1b07e14ca4d5d548f6e0dcaeac1eb903badb9b05871fd71ee41e6f52",
+    "LidoSRv3/Audit/Source/TrioReserve1/Transfers.lean": "358329ac4fda71fbbfbb6f46eb3b9100cd0b0a031fbc4f08d92ea31aae94dda0",
+    "LidoSRv3/Audit/Source/TrioReserve1/WriterSpec.lean": "4d060c61f360d339e52c72eba03b8f1c6e06856f7f7c643d7945a05f2f51371e",
+    "LidoSRv3/Audit/Source/TrioReserve1/Writers.lean": "463d563881d6433272f930ebf9d465a9c275a822b8b2e1ced66632246d89a7ba",
+    "LidoSRv3/Tests/TrioReserve1/Differential.lean": "04f970b5bf039ea1531528246f31fb2951e80ff49b9ad912a7bf3a631c2b909b",
+    "LidoSRv3/Tests/TrioReserve1/Foundations.lean": "268fbe724132adf67e00bb6e6dd90f1063bd03c545c1749e52d94f69be77d1ab",
+    "LidoSRv3/Tests/TrioReserve1/LiveTrust.lean": "c5e151c4dee6d3352bd6a19b4bf55f359bad0902836794ffbbd46d5f26416fb4",
+    "LidoSRv3/Tests/TrioReserve1/OracleMutants.lean": "71456e3f7055cca8509052d588e3024066e8f69c71c226d3b91c764912657803",
+    "solidity/trio-reserve1/.gitignore": "6e392fe11c0fcfca0c234e0bf4fd0820ebc03a0d85aa7c9b7abf8ec2414b77f6",
+    "solidity/trio-reserve1/ConsensusHarness.sol": "658d732787a0030ab0af1a4832fb25c3f752fad08e57fa4b3ad6e14d6ee14b15",
+    "solidity/trio-reserve1/LidoHarness.sol": "c91bc08a3f9cf324e3a530b8b41e99e74a5eb8f31e83d441f248518a965c3f37",
+    "solidity/trio-reserve1/LocatorHarness.sol": "12856d68d079b785bf5afa1cc0472ea47290219bce40275ccc4bb579190d97c0",
+    "solidity/trio-reserve1/OracleHarness.sol": "d1f6fef0e8b7acf7a2048f7719d221c82b92166fec7ebdb888efebc8fa1dbdca",
+    "solidity/trio-reserve1/QueueHarness.sol": "8dce70332e635d5c5a149432436212fda29f7e533a466f2d10a39767bd334d88",
+    "solidity/trio-reserve1/README.md": "59df7de596af8aefaae65a2d3d9633a74d60e42f2e9a7ea2e6274c6b615b5a12",
+    "solidity/trio-reserve1/RouterHarness.sol": "da5e776a3ec4274688242dd9e94645957a7abbc7ccb6ade7a930d278d7f46d77",
+    "solidity/trio-reserve1/compile-router.cjs": "c433bdeb713af0089c59e3ff612f3a9e882b254fed9bea59ea5050c17cbd2905",
+    "solidity/trio-reserve1/compile.cjs": "16095aac4a2071b5df27c38e031dda54546c9ffb76571fc504fee343eb404923",
+    "solidity/trio-reserve1/execute.cjs": "656fb544c18cb1c27d44eaf1f9ff025d994abe7d2f343eed32fd55ecd81f4ad4",
+    "solidity/trio-reserve1/hardhat.config.cjs": "9004d6906c70bdd9515215cfc0f30efd35a2e93f9b4d89a8c207cae2c5bdd332",
+    "solidity/trio-reserve1/package-lock.json": "f7e2e76e5ec8cc6e540a5be7260f37762087e966466ff604fb4737aacd329b68",
+    "solidity/trio-reserve1/package.json": "2fd121155bd9f47c6fa85688a291d4824299a1104b1a8957d391fad2aa7886c2"
+  },
+  "artifacts": {
+    "solidity/trio-reserve1/artifacts/OracleHarness.sol.json": "51cd29fc91f5cfa6791e058864f9865a218fa252c785a1ca1e39918f6709966f",
+    "solidity/trio-reserve1/artifacts/LidoHarness.sol.json": "106b8734ed3e3de196820a40a5abbadacd26265767a61b262fbdf0089a876292",
+    "solidity/trio-reserve1/artifacts/QueueHarness.sol.json": "fad0e7dd7c3e5de6527c2eaeb5317932f474fda36cd3b73c8d5bd6c47e671c8f",
+    "solidity/trio-reserve1/artifacts/router-linked.json": "6783f8452188385bc3d8072b699510ad1691932538d9a36247b487992ac061c3",
+    "solidity/trio-reserve1/artifacts/ConsensusHarness.sol.json": "a16cdb0350530f2c47046289378b1b501019c3e85ded49e4a0aa6639343038fd",
+    "solidity/trio-reserve1/artifacts/LocatorHarness.sol.json": "fe5854edf1e23ddaa2a55f78e4cf15267dd959e7ff11b8d45865145b82b43034"
+  },
+  "dependencies": [
+    {
+      "name": "verity",
+      "commit": "e977aaad6e1a9e92e0132d41b3d33a14135a4d46"
+    },
+    {
+      "name": "evmyul",
+      "commit": "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9"
+    },
+    {
+      "name": "mathlib",
+      "commit": "fabf563a7c95a166b8d7b6efca11c8b4dc9d911f"
+    },
+    {
+      "name": "plausible",
+      "commit": "63045536fe95024e6c18fc7b48e03f506701c5bc"
+    },
+    {
+      "name": "LeanSearchClient",
+      "commit": "c5d5b8fe6e5158def25cd28eb94e4141ad97c843"
+    },
+    {
+      "name": "importGraph",
+      "commit": "5c7542ed018c78194f1e2b903eaf6a792b74c03d"
+    },
+    {
+      "name": "proofwidgets",
+      "commit": "24b0d9dc081c5423f8eec7e866c441e5184f29d9"
+    },
+    {
+      "name": "aesop",
+      "commit": "e3cb2f741431ce31bf73549fb52316a57368b06f"
+    },
+    {
+      "name": "Qq",
+      "commit": "f46324995fca5f0483b742e4eb4daec7f4ee50d2"
+    },
+    {
+      "name": "batteries",
+      "commit": "fa08db58b30eb033edcdab331bba000827f9f785"
+    },
+    {
+      "name": "Cli",
+      "commit": "92564e5770e4d09f2d86dfbf8ada1e9c715b384c"
+    }
+  ],
+  "node_version": "v22.15.0",
+  "node_binary_sha256": "c43f3f73f6917481d2364daf7b7bf8c4fc4a7643580b4626f13f003131ec8716",
+  "lean_toolchain": "leanprover/lean4:v4.31.0",
+  "lean_binary_sha256": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550",
+  "solidity_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "wrapper_sha256": "83736ff6da600782680e9ce6f8d4e7b7e32f58acc5bbc6f0e127130088357d20",
+  "remote": {
+    "command": "REMOTE_BUILD_SOURCE_MODE=full remote-lean-build lake build LidoSRv3 LidoSRv3Test LidoSRv3Audit",
+    "job_id": null,
+    "node_id": null,
+    "bundle_digest": null,
+    "exit": 2,
+    "diagnostic": "source bundle path must be a regular file, not a symlink: lido-core; failed to encode request"
+  },
+  "command": "PATH=<private Lean 4.31.0 bin>:<private Node 22.15.0 bin>:$PATH node solidity/trio-reserve1/execute.cjs",
+  "backend": "Hardhat 2.26.3, in-process Cancun, no public network",
+  "exit_receipt": "oracle-execute-immutable.exit",
+  "scope": "finite matching execution, not full build or independent certification"
+}

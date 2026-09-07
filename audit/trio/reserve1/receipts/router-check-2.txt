@@ -1,0 +1,8 @@
+LidoSRv3/Audit/Source/TrioReserve1/Router.lean:49:18: error: Application type mismatch: The argument
+  he
+has type
+  req.caller.val = lido.val
+but is expected to have type
+  ↑?m.34 = ↑?m.35
+in the application
+  Fin.ext he

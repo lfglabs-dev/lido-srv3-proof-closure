@@ -1,0 +1,134 @@
+LidoSRv3/Audit/Source/TrioReserve1/BalanceSpec.lean:54:43: error: omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  d ≥ 0
+  c ≥ 0
+  b ≥ 0
+  b - c - d ≤ -1
+  a ≥ 0
+  a - b + c + d ≥ 0
+where
+ a := ↑(mass after rest)
+ b := ↑(after sender)
+ c := ↑(before sender)
+ d := ↑(if False then amount else 0)
+LidoSRv3/Audit/Source/TrioReserve1/BalanceSpec.lean:54:43: error: omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  d ≥ 0
+  c ≥ 0
+  b ≥ 0
+  b - c - d ≤ 0
+  b - d ≤ -1
+  a ≥ 0
+where
+ a := ↑(mass after rest)
+ b := ↑amount
+ c := ↑(before sender)
+ d := ↑(if False then amount else 0)
+LidoSRv3/Audit/Source/TrioReserve1/BalanceSpec.lean:54:43: error: omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  d ≥ 0
+  c ≥ 0
+  b ≥ 0
+  b - c - d ≤ -1
+  a ≥ 0
+  a - b + c + d ≥ 0
+where
+ a := ↑(mass after rest)
+ b := ↑(after sender)
+ c := ↑(before sender)
+ d := ↑(if False then amount else 0)
+LidoSRv3/Audit/Source/TrioReserve1/BalanceSpec.lean:54:43: error: omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  d ≥ 1
+  c ≥ 0
+  b ≥ 0
+  b - c - d ≤ 0
+  a ≥ 0
+  a + b - c - d ≥ 0
+where
+ a := ↑(mass after rest)
+ b := ↑(after sender)
+ c := ↑(before sender)
+ d := ↑(if False then amount else 0)
+LidoSRv3/Audit/Source/TrioReserve1/BalanceSpec.lean:54:43: error: omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  d ≥ 0
+  c ≥ 0
+  b ≥ 0
+  b - c - d ≤ 0
+  b - d ≥ 1
+  a ≥ 0
+where
+ a := ↑(mass after rest)
+ b := ↑amount
+ c := ↑(after recipient)
+ d := ↑(if sender = recipient then amount else 0)
+LidoSRv3/Audit/Source/TrioReserve1/BalanceSpec.lean:54:43: error: omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  d ≥ 1
+  c ≥ 0
+  b ≥ 0
+  b - c - d ≤ 0
+  a ≥ 0
+  a - b + c + d ≥ 0
+where
+ a := ↑(mass after rest)
+ b := ↑(before recipient)
+ c := ↑(after recipient)
+ d := ↑(if sender = recipient then amount else 0)
+LidoSRv3/Audit/Source/TrioReserve1/BalanceSpec.lean:54:43: error: omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  d ≥ 0
+  c ≥ 0
+  b ≥ 0
+  b - c - d ≤ -1
+  a ≥ 0
+  a + b - c - d ≥ 0
+where
+ a := ↑(mass after rest)
+ b := ↑(before recipient)
+ c := ↑(after recipient)
+ d := ↑(if sender = recipient then amount else 0)
+LidoSRv3/Audit/Source/TrioReserve1/BalanceSpec.lean:54:43: error: omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  d ≥ 1
+  c ≥ 0
+  b ≥ 0
+  a ≥ 0
+  a + b ≥ 0
+where
+ a := ↑(mass after rest)
+ b := ↑amount
+ c := ↑(after account)
+ d := ↑(if recipient = account then amount else 0)
+LidoSRv3/Audit/Source/TrioReserve1/BalanceSpec.lean:54:43: error: omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  d ≥ 1
+  c ≥ 0
+  b ≥ 0
+  a ≥ 0
+  a - b ≤ 0
+where
+ a := ↑amount
+ b := ↑(mass after rest)
+ c := ↑(after account)
+ d := ↑(if sender = account then amount else 0)
+LidoSRv3/Audit/Source/TrioReserve1/BalanceSpec.lean:54:43: error: omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  d ≥ 0
+  c ≥ 0
+  c - d ≥ 1
+  b ≥ 0
+  a ≥ 0
+where
+ a := ↑(mass after rest)
+ b := ↑(after account)
+ c := ↑(if sender = account then amount else 0)
+ d := ↑(if recipient = account then amount else 0)
+LidoSRv3/Audit/Source/TrioReserve1/BalanceSpec.lean:54:21: warning: This simp argument is unused:
+  List.not_mem_nil
+
+Hint: Omit it from the simp argument list.
+  simp_all only ̵[̵L̵i̵s̵t̵.̵n̵o̵t̵_̵m̵e̵m̵_̵n̵i̵l̵]̵
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

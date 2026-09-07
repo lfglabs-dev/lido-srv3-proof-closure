@@ -1,0 +1,23 @@
+{
+  "status": "PASS_RECORDED_RESERVE_COMPARISON",
+  "source_commit": "4b82879f28d0e1d58a9972a3db92aa5ea225d898",
+  "cases": 51,
+  "mutants": 7,
+  "event_topics": {
+    "DepositedPostReportUpdated": "0xd87d7ff193e5d1560bdbe21e4e14d13dde0de4e49a03812517640af0a2d5c42c",
+    "DepositedValidatorsChanged": "0xe0aacfc334457703148118055ec794ac17654c6f918d29638ba3b18003cee5ff",
+    "Unbuffered": "0x76a397bea5768d4fca97ef47792796e35f98dc81b16c1de84e28a818e1f97108",
+    "DepositsReserveSet": "0x257937ce49d8cbbe1d68a2be7297a18a6e2830528d9154a0f131e5094e894613",
+    "DepositableEthReceived": "0x1a2089079e5f59e6c0028a2215f6ef1c1a75a9b52f79830ca47c3977a7853081"
+  },
+  "source_pipeline_cases": 9,
+  "scope": "Independent comparison of recorded execution outputs, including ABI bytes/events. Not fresh VM execution, final-head validation, or universal correspondence.",
+  "files": {
+    "context.json": "df545298504ebbb28a20e280d596149d6f7a79711ae9be143b5e09d5444f0a3b",
+    "differential-input.json": "219956e0e8e3d2576e761d1ec1bc2ed98e4413a449c24d3ca04526375d3c9f28",
+    "differential-verity.json": "53e3c5b822d1f0e7fd9a321e5a91198db484ebe480b6d1b6909f6790c699d8d1",
+    "differential-solidity.json": "facf27daf83b8f2005291bf61246c4b08d1d83a2f7d700db7f244f4b1748ab33",
+    "mutation-input.json": "d1b117db5708baa80c62a791f5b775e4146096ca1330f634125e0034915b5d5c",
+    "mutation-verity.json": "11793de7c2306dcaa150378b64b875f12a5e722641054cebb4706d8250e86bce"
+  }
+}

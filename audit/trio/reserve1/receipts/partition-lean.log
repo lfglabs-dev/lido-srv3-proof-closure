@@ -1,0 +1,21 @@
+info: Version 4.2.4 of elan is available! Use `elan self update` to update.
+info: downloading https://releases.lean-lang.org/lean4/v4.31.0/lean-4.31.0-linux.tar.zst
+info: installing /workspaces/mission-5a294468/.elan/toolchains/leanprover--lean4---v4.31.0
+LidoSRv3/Audit/Source/TrioReserve1/PartitionSpec.lean:12:3: error: unexpected token 'protected'; expected identifier
+LidoSRv3/Audit/Source/TrioReserve1/PartitionSpec.lean:17:19: error: unexpected token 'protected'; expected term
+LidoSRv3/Audit/Source/TrioReserve1/PartitionSpec.lean:17:29: error: unexpected identifier; expected 'abbrev', 'axiom', 'builtin_initialize', 'class', 'coinductive', 'def', 'example', 'inductive', 'initialize', 'instance', 'opaque', 'register_option', 'structure' or 'theorem'
+LidoSRv3/Audit/Source/TrioReserve1/PartitionSpec.lean:22:59: error: unexpected token 'protected'; expected term
+LidoSRv3/Audit/Source/TrioReserve1/PartitionSpec.lean:23:13: error: unexpected token '('; expected 'abbrev', 'axiom', 'builtin_initialize', 'class', 'coinductive', 'def', 'example', 'inductive', 'initialize', 'instance', 'opaque', 'register_option', 'structure' or 'theorem'
+LidoSRv3/Audit/Source/TrioReserve1/PartitionSpec.lean:24:15: error: unexpected identifier; expected 'abbrev', 'axiom', 'builtin_initialize', 'class', 'coinductive', 'def', 'example', 'inductive', 'initialize', 'instance', 'opaque', 'register_option', 'structure' or 'theorem'
+LidoSRv3/Audit/Source/TrioReserve1/PartitionSpec.lean:25:31: error: unexpected token 'at'; expected 'abbrev', 'axiom', 'builtin_initialize', 'class', 'coinductive', 'def', 'example', 'inductive', 'initialize', 'instance', 'opaque', 'register_option', 'structure' or 'theorem'
+LidoSRv3/Audit/Source/TrioReserve1/PartitionSpec.lean:29:82: error: unexpected token 'protected'; expected term
+LidoSRv3/Audit/Source/TrioReserve1/PartitionSpec.lean:30:13: error: unexpected identifier; expected 'abbrev', 'axiom', 'builtin_initialize', 'class', 'coinductive', 'def', 'example', 'inductive', 'initialize', 'instance', 'opaque', 'register_option', 'structure' or 'theorem'
+LidoSRv3/Audit/Source/TrioReserve1/PartitionSpec.lean:30:46: error: unexpected identifier; expected 'abbrev', 'axiom', 'builtin_initialize', 'class', 'coinductive', 'def', 'example', 'inductive', 'initialize', 'instance', 'opaque', 'register_option', 'structure' or 'theorem'
+LidoSRv3/Audit/Source/TrioReserve1/PartitionSpec.lean:31:18: error: unexpected identifier; expected 'abbrev', 'axiom', 'builtin_initialize', 'class', 'coinductive', 'def', 'example', 'inductive', 'initialize', 'instance', 'opaque', 'register_option', 'structure' or 'theorem'
+LidoSRv3/Audit/Source/TrioReserve1/PartitionSpec.lean:37:33: error: unexpected token 'protected'; expected term
+LidoSRv3/Audit/Source/TrioReserve1/PartitionSpec.lean:38:13: error: unexpected identifier; expected 'abbrev', 'axiom', 'builtin_initialize', 'class', 'coinductive', 'def', 'example', 'inductive', 'initialize', 'instance', 'opaque', 'register_option', 'structure' or 'theorem'
+LidoSRv3/Audit/Source/TrioReserve1/PartitionSpec.lean:38:50: error: unexpected identifier; expected 'abbrev', 'axiom', 'builtin_initialize', 'class', 'coinductive', 'def', 'example', 'inductive', 'initialize', 'instance', 'opaque', 'register_option', 'structure' or 'theorem'
+LidoSRv3/Audit/Source/TrioReserve1/PartitionSpec.lean:39:18: error: unexpected identifier; expected 'abbrev', 'axiom', 'builtin_initialize', 'class', 'coinductive', 'def', 'example', 'inductive', 'initialize', 'instance', 'opaque', 'register_option', 'structure' or 'theorem'
+LidoSRv3/Audit/Source/TrioReserve1/PartitionSpec.lean:47:79: error: unexpected token 'protected'; expected term
+LidoSRv3/Audit/Source/TrioReserve1/PartitionSpec.lean:48:13: error: unexpected token '('; expected 'abbrev', 'axiom', 'builtin_initialize', 'class', 'coinductive', 'def', 'example', 'inductive', 'initialize', 'instance', 'opaque', 'register_option', 'structure' or 'theorem'
+LidoSRv3/Audit/Source/TrioReserve1/PartitionSpec.lean:49:15: error: unexpected identifier; expected 'abbrev', 'axiom', 'builtin_initialize', 'class', 'coinductive', 'def', 'example', 'inductive', 'initialize', 'instance', 'opaque', 'register_option', 'structure' or 'theorem'

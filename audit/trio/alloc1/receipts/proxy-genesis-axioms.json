@@ -1,0 +1,13 @@
+{
+  "command": [
+    "/root/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+    "audit/trio/alloc1/InspectAdmissionAxioms.lean"
+  ],
+  "exit_code": 0,
+  "stdout": "'LidoSRv3.Audit.Source.TrioAlloc1.AdmissionFacts.success_witness' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc1.AdmissionFacts.success_stored_share' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc1.AdmissionFacts.success_count_bound' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc1.AdmissionFacts.successful_record_freshness' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc1.AdmissionFacts.public_preserves' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc1.RecordInvariant.history_invariants' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc1.StatusWriter.history_invariants' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc1.StatusWriter.revert_restores' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc1.ACLWriter.grant_preserves' depends on axioms: [propext, Classical.choice, Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc1.ACLWriter.grant_hasRole' depends on axioms: [propext, Classical.choice, Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc1.ACLWriter.grant_revert_restores' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc1.Initialization.revert_restores' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc1.Initialization.execute_from_empty' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc1.Initialization.execute_records' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc1.ProxyGenesis.initialization_invariants' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n",
+  "stderr": "",
+  "source_sha256": {
+    "LidoSRv3/Audit/Source/TrioAlloc1/ProxyGenesis.lean": "367ce023a38ec4cfc7389df091cb01629637d670b991368e71d7811c47938860",
+    "audit/trio/alloc1/InspectAdmissionAxioms.lean": "11eac00ec54a6fbfdbfd90e5222d7575772f915e932f33286898e73536e00ece"
+  }
+}

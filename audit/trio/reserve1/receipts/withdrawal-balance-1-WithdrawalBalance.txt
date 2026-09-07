@@ -1,0 +1,156 @@
+LidoSRv3/Audit/Source/TrioReserve1/WithdrawalBalance.lean:67:25: error: unexpected token 'theorem'; expected '=>'
+LidoSRv3/Audit/Source/TrioReserve1/WithdrawalBalance.lean:54:110: error: unsolved goals
+case hf.hf.hf.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+⊢ Conserves (Live.read ctx locatorSlot)
+
+case hf.hf.hf.hn
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+⊢ ∀ (value : Word), Conserves (pure (Verity.Core.Address.ofNat value.val))
+
+case hf.hf.hn
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+⊢ ∀ (value : Address),
+    Conserves do
+      let data ← call external ctx value 936771225
+      let value ←
+        do
+          require (decide (0 + 32 ≤ List.length data)) Fault.empty
+          pure (word (decode (List.take 32 (List.drop 0 data))))
+      pure (Verity.Core.Address.ofNat value.val)
+
+case hf.hn
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+⊢ ∀ (value : Address),
+    Conserves do
+      let data ← call external ctx value 731232129
+      let bunker ←
+        do
+          require (decide (0 + 32 ≤ List.length data)) Fault.empty
+          pure (word (decode (List.take 32 (List.drop 0 data))))
+      if bunker.val ≠ 0 then pure false
+        else do
+          let active ← Live.read ctx activeSlot
+          pure (decide (active.val ≠ 0))
+
+case hn
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+⊢ ∀ (value : Bool),
+    Conserves do
+      require value (Fault.reason "CAN_NOT_DEPOSIT")
+      let router ←
+        do
+          let locator ←
+            do
+              let packed ← Live.read ctx locatorSlot
+              pure (Verity.Core.Address.ofNat packed.val)
+          let data ← call external ctx locator 4016834124
+          let value ←
+            do
+              require (decide (0 + 32 ≤ List.length data)) Fault.empty
+              pure (word (decode (List.take 32 (List.drop 0 data))))
+          pure (Verity.Core.Address.ofNat value.val)
+      require (decide (ctx.sender = router)) (Fault.reason "APP_AUTH_FAILED")
+      require (decide (amount.val ≠ 0)) (Fault.reason "ZERO_AMOUNT")
+      do
+        let allocation ←
+          do
+            let packed ← Live.read ctx bufferSlot
+            have total : Nat := packed.val % width
+            let reserve ← Live.read ctx reserveSlot
+            have deposits : Nat := min total reserve.val
+            have remaining : Nat := total - deposits
+            let queue ←
+              do
+                let locator ←
+                  do
+                    let packed ← Live.read ctx locatorSlot
+                    pure (Verity.Core.Address.ofNat packed.val)
+                let data ← call external ctx locator 936771225
+                let value ←
+                  do
+                    require (decide (0 + 32 ≤ List.length data)) Fault.empty
+                    pure (word (decode (List.take 32 (List.drop 0 data))))
+                pure (Verity.Core.Address.ofNat value.val)
+            let data ← call external ctx queue 3506144488
+            let demand ←
+              do
+                require (decide (0 + 32 ≤ List.length data)) Fault.empty
+                pure (word (decode (List.take 32 (List.drop 0 data))))
+            have withdrawals : Nat := min remaining demand.val
+            pure
+                { total := total, deposits := deposits, withdrawals := withdrawals,
+                  unreserved := remaining - withdrawals }
+        require (decide (amount.val ≤ (getDepositableEther allocation).val)) (Fault.reason "NOT_ENOUGH_ETHER")
+        let current ← Live.read ctx bufferSlot
+        let post ←
+          do
+            require (decide (current.val / width + amount.val < Verity.Core.UINT256_MODULUS))
+                (Fault.reason "MATH_ADD_OVERFLOW")
+            pure (current.val / width + amount.val)
+        let buffer ←
+          do
+            require (decide (amount.val ≤ allocation.total)) (Fault.reason "MATH_SUB_UNDERFLOW")
+            pure (allocation.total - amount.val)
+        write ctx bufferSlot (pack buffer post)
+        emit ctx "DepositedPostReportUpdated" [word post]
+        emit ctx "Unbuffered" [amount]
+        let __discr ←
+          do
+            let packed ← Live.read ctx nextSlot
+            have next : Nat := packed.val % width
+            have lastNonce : Nat := packed.val / width
+            let __discr ←
+              do
+                let oracle ← locatorAddress external ctx 1512059385
+                let data ← call external ctx oracle 1928829715
+                require (decide (64 ≤ List.length data)) Fault.empty
+                let nonce ← decodeWord data
+                let timestamp ← decodeWord data 32
+                pure (nonce.val, timestamp.val)
+            match __discr with
+              | (nonce, snd) => pure (if nonce ≠ lastNonce then 0 else next, nonce)
+        match __discr with
+          | (next, nonce) => do
+            let updatedNext ←
+              do
+                require (decide (next + amount.val < Verity.Core.UINT256_MODULUS)) (Fault.reason "MATH_ADD_OVERFLOW")
+                pure (next + amount.val)
+            write ctx nextSlot (pack updatedNext nonce)
+            let reserve ← Live.read ctx reserveSlot
+            if reserve.val > 0 then do
+                write ctx reserveSlot (word (if reserve.val > amount.val then reserve.val - amount.val else 0))
+                emit ctx "DepositsReserveSet" [word (if reserve.val > amount.val then reserve.val - amount.val else 0)]
+              else pure PUnit.unit
+      have __do_jp : Unit → Exec Unit := fun y => do
+        let __discr ← call external ctx router 330204256 amount
+        have x : Bytes := __discr
+        pure ()
+      if seeds.val > 0 then do
+          let packed ← Live.read ctx seedSlot
+          let count ←
+            do
+              require (decide (packed.val % width + seeds.val < Verity.Core.UINT256_MODULUS))
+                  (Fault.reason "MATH_ADD_OVERFLOW")
+              pure (packed.val % width + seeds.val)
+          write ctx seedSlot (pack count (packed.val / width))
+          let y ← emit ctx "DepositedValidatorsChanged" [word count]
+          __do_jp y
+        else do
+          let y ← pure PUnit.unit
+          __do_jp y

@@ -1,0 +1,26 @@
+{
+  "classification": "SOLIDITY_WRITERS_PASS",
+  "durable_job": "913a61e1-b3a6-4303-92f6-5a7a9a7038ac",
+  "command": "node solidity/trio-alloc1/check-writer.cjs /workspaces/mission-c01b16cf/output/enumeration-boundary-v2",
+  "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "sources": {
+    "solidity/trio-alloc1/check-writer.cjs": "561fc5fa06043d87a0c6f990331c3c43e5526b5f8433da1ccf5213671b87b8b5",
+    "solidity/trio-alloc1/WriterHarness.sol": "7292d6b607efac0eed50a234442f1a60451bb8bf8eadfcda21f82367f8905394"
+  },
+  "outputs": {
+    "enumeration-boundary.json": "c724d70f9861da72271aee662c662aa0325c525a95099c65819db230c239c60e",
+    "writer.ir": "03730b58fcdc266c04b67bf5022efdb6214df61672821d67d3840ad42f9183b6",
+    "admission.json": "c372137ea9b6e7cc4a82a3c864a88cf104d85a042bdcae3a0b943cb07a152b67",
+    "writer-errors.json": "4205ce9992532ee46ccd06d533752da75029393f374de696745f6933c0208a84",
+    "admission-name.json": "9f970ec1ba9e3274e6b76e104354c843079a80509bf64f73702701d08f3b35f9",
+    "writer.json": "be9866e2c64fdd89cf2889a20491acdcad096330fc913ef3d0392da6fea07624",
+    "parameters.json": "a694f24b6576b8d2dc079e4c4a508bd9ac9c044518c7045a5d315511f6e8763d",
+    "library.ir": "d93e9f3c9920cf802f554bdf9b08ffa8de48ff163ca9fd014f8637b7c8276961"
+  },
+  "notes": [
+    "Solc 0.8.25, viaIR, optimizer 200, Shanghai; inherited public StakingRouter writers and a test-only wrapper around original SRStorage.addModuleId.",
+    "Earlier admission-name-v1 failed on Ganache bare 0x zero storage; reader corrected.",
+    "Earlier enumeration-boundary-v1 insertion transaction failed after a no-op with a low apparent gas estimate. Explicit gas budget and successful static call added; entire rerun passed.",
+    "Compiler string cleanup and array-push IR excerpts are storage semantics evidence, not full memory/gas correspondence."
+  ]
+}

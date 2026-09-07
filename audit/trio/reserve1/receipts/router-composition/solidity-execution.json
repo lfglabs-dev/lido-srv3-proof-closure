@@ -1,0 +1,3583 @@
+{
+  "node": "v22.15.0",
+  "backend": "hardhat 2.26.3 in-process Cancun",
+  "scope": "Pinned Solidity with matching Lean/Verity execution. Three cases compose source immutable locator, live queue and router. Oracle and adversarial boundaries remain fixtures. Inherited router receiver/auth/event. Gas excluded; tests are not correspondence proofs.",
+  "addresses": {
+    "lido": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    "queue": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+    "locator": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
+    "router": "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9",
+    "oracle": "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9",
+    "sourceRouter": "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6",
+    "wrongRouter": "0x8A791620dd6260079BF849Dc5567aDC3F2FdC318",
+    "sourceLocator": "0x610178dA211FEF7D417bC0e6FeD39F05609AD788"
+  },
+  "locatorConfig": {
+    "accountingOracle": "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9",
+    "depositSecurityModule": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    "elRewardsVault": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    "lido": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    "oracleReportSanityChecker": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    "postTokenRebaseReceiver": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    "burner": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    "stakingRouter": "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6",
+    "treasury": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    "validatorsExitBusOracle": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    "withdrawalQueue": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+    "withdrawalVault": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    "oracleDaemonConfig": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    "validatorExitDelayVerifier": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    "triggerableWithdrawalsGateway": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    "consolidationGateway": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    "accounting": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    "predepositGuarantee": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    "wstETH": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    "vaultHub": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    "vaultFactory": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    "lazyOracle": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    "operatorGrid": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    "topUpGateway": "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+  },
+  "libraries": [
+    "contracts/0.8.25/lib/BeaconChainDepositor.sol:BeaconChainDepositor",
+    "contracts/common/lib/MinFirstAllocationStrategy.sol:MinFirstAllocationStrategy",
+    "contracts/0.8.25/sr/SRLib.sol:SRLib"
+  ],
+  "cases": [
+    {
+      "name": "live queue spend and frame reset",
+      "success": true,
+      "before": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "after": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "10208471007628153903901238222953046343750",
+          "next": "3743106036130323098097120681749450326046",
+          "seed": "2",
+          "reserve": "0",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "70",
+          "router": "30",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "calls": [
+        {
+          "op": "CALL",
+          "depth": 1,
+          "target": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2087400e000000000000000000000000000000000000000000000000000000000000001e0000000000000000000000000000000000000000000000000000000000000002"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2b95b781"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xef6c064c"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xd0fb84e8"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x5a2031f9"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xdc64a140aa3e981100a9beca4e685f962f0cf6c9",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x72f79b13"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9",
+          "value": "0x000000000000000000000000000000000000000000000000000000000000001e",
+          "payload": "0x13ae8460"
+        }
+      ],
+      "logs": [
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0xd87d7ff193e5d1560bdbe21e4e14d13dde0de4e49a03812517640af0a2d5c42c"
+          ],
+          "data": "0x000000000000000000000000000000000000000000000000000000000000001e"
+        },
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0x76a397bea5768d4fca97ef47792796e35f98dc81b16c1de84e28a818e1f97108"
+          ],
+          "data": "0x000000000000000000000000000000000000000000000000000000000000001e"
+        },
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0x257937ce49d8cbbe1d68a2be7297a18a6e2830528d9154a0f131e5094e894613"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0xe0aacfc334457703148118055ec794ac17654c6f918d29638ba3b18003cee5ff"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000000000000000000002"
+        }
+      ]
+    },
+    {
+      "name": "unauthorized caller",
+      "success": false,
+      "before": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "after": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "calls": [
+        {
+          "op": "CALL",
+          "depth": 1,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 1,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2b95b781"
+        },
+        {
+          "op": "CALL",
+          "depth": 1,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xef6c064c"
+        }
+      ],
+      "logs": []
+    },
+    {
+      "name": "zero amount",
+      "success": false,
+      "before": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "after": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "calls": [
+        {
+          "op": "CALL",
+          "depth": 1,
+          "target": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2087400e00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2b95b781"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xef6c064c"
+        }
+      ],
+      "logs": []
+    },
+    {
+      "name": "bunker",
+      "success": false,
+      "before": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "after": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "calls": [
+        {
+          "op": "CALL",
+          "depth": 1,
+          "target": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2087400e000000000000000000000000000000000000000000000000000000000000001e0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2b95b781"
+        }
+      ],
+      "logs": []
+    },
+    {
+      "name": "paused",
+      "success": false,
+      "before": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "0"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "after": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "0"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "calls": [
+        {
+          "op": "CALL",
+          "depth": 1,
+          "target": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2087400e000000000000000000000000000000000000000000000000000000000000001e0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2b95b781"
+        }
+      ],
+      "logs": []
+    },
+    {
+      "name": "queue grows before spend",
+      "success": false,
+      "before": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "after": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "calls": [
+        {
+          "op": "CALL",
+          "depth": 1,
+          "target": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2087400e000000000000000000000000000000000000000000000000000000000000001e0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2b95b781"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xef6c064c"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xd0fb84e8"
+        }
+      ],
+      "logs": []
+    },
+    {
+      "name": "oracle rejection after packed write",
+      "success": false,
+      "before": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "after": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "calls": [
+        {
+          "op": "CALL",
+          "depth": 1,
+          "target": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2087400e000000000000000000000000000000000000000000000000000000000000001e0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2b95b781"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xef6c064c"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xd0fb84e8"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x5a2031f9"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xdc64a140aa3e981100a9beca4e685f962f0cf6c9",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x72f79b13"
+        }
+      ],
+      "logs": []
+    },
+    {
+      "name": "short oracle result after packed write",
+      "success": false,
+      "before": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "after": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "calls": [
+        {
+          "op": "CALL",
+          "depth": 1,
+          "target": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2087400e000000000000000000000000000000000000000000000000000000000000001e0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2b95b781"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xef6c064c"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xd0fb84e8"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x5a2031f9"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xdc64a140aa3e981100a9beca4e685f962f0cf6c9",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x72f79b13"
+        }
+      ],
+      "logs": []
+    },
+    {
+      "name": "ETH recipient rejection after seed write",
+      "success": false,
+      "before": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "after": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "calls": [
+        {
+          "op": "CALL",
+          "depth": 1,
+          "target": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2087400e000000000000000000000000000000000000000000000000000000000000001e0000000000000000000000000000000000000000000000000000000000000002"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2b95b781"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xef6c064c"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xd0fb84e8"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x5a2031f9"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xdc64a140aa3e981100a9beca4e685f962f0cf6c9",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x72f79b13"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9",
+          "value": "0x000000000000000000000000000000000000000000000000000000000000001e",
+          "payload": "0x13ae8460"
+        }
+      ],
+      "logs": []
+    },
+    {
+      "name": "actual ETH balance insufficient",
+      "success": false,
+      "before": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "1",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "after": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "1",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "calls": [
+        {
+          "op": "CALL",
+          "depth": 1,
+          "target": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2087400e000000000000000000000000000000000000000000000000000000000000001e0000000000000000000000000000000000000000000000000000000000000002"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2b95b781"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xef6c064c"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xd0fb84e8"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x5a2031f9"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xdc64a140aa3e981100a9beca4e685f962f0cf6c9",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x72f79b13"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9",
+          "value": "0x000000000000000000000000000000000000000000000000000000000000001e",
+          "payload": "0x13ae8460"
+        }
+      ],
+      "logs": []
+    },
+    {
+      "name": "post report truncation",
+      "success": true,
+      "before": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "115792089237316195423570985008687907852929702298719625575994209400481361428580",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "after": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "9868188640707215440437863615521278132294",
+          "next": "3743106036130323098097120681749450326046",
+          "seed": "0",
+          "reserve": "0",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "70",
+          "router": "30",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "calls": [
+        {
+          "op": "CALL",
+          "depth": 1,
+          "target": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2087400e000000000000000000000000000000000000000000000000000000000000001e0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2b95b781"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xef6c064c"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xd0fb84e8"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x5a2031f9"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xdc64a140aa3e981100a9beca4e685f962f0cf6c9",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x72f79b13"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9",
+          "value": "0x000000000000000000000000000000000000000000000000000000000000001e",
+          "payload": "0x13ae8460"
+        }
+      ],
+      "logs": [
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0xd87d7ff193e5d1560bdbe21e4e14d13dde0de4e49a03812517640af0a2d5c42c"
+          ],
+          "data": "0x000000000000000000000000000000010000000000000000000000000000001d"
+        },
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0x76a397bea5768d4fca97ef47792796e35f98dc81b16c1de84e28a818e1f97108"
+          ],
+          "data": "0x000000000000000000000000000000000000000000000000000000000000001e"
+        },
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0x257937ce49d8cbbe1d68a2be7297a18a6e2830528d9154a0f131e5094e894613"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ]
+    },
+    {
+      "name": "seed truncation",
+      "success": true,
+      "before": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "340282366920938463463374607431768211455",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "after": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "10208471007628153903901238222953046343750",
+          "next": "3743106036130323098097120681749450326046",
+          "seed": "0",
+          "reserve": "0",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "70",
+          "router": "30",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "calls": [
+        {
+          "op": "CALL",
+          "depth": 1,
+          "target": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2087400e000000000000000000000000000000000000000000000000000000000000001e0000000000000000000000000000000000000000000000000000000000000001"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2b95b781"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xef6c064c"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xd0fb84e8"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x5a2031f9"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xdc64a140aa3e981100a9beca4e685f962f0cf6c9",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x72f79b13"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9",
+          "value": "0x000000000000000000000000000000000000000000000000000000000000001e",
+          "payload": "0x13ae8460"
+        }
+      ],
+      "logs": [
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0xd87d7ff193e5d1560bdbe21e4e14d13dde0de4e49a03812517640af0a2d5c42c"
+          ],
+          "data": "0x000000000000000000000000000000000000000000000000000000000000001e"
+        },
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0x76a397bea5768d4fca97ef47792796e35f98dc81b16c1de84e28a818e1f97108"
+          ],
+          "data": "0x000000000000000000000000000000000000000000000000000000000000001e"
+        },
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0x257937ce49d8cbbe1d68a2be7297a18a6e2830528d9154a0f131e5094e894613"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0xe0aacfc334457703148118055ec794ac17654c6f918d29638ba3b18003cee5ff"
+          ],
+          "data": "0x0000000000000000000000000000000100000000000000000000000000000000"
+        }
+      ]
+    },
+    {
+      "name": "empty live queue result",
+      "success": false,
+      "before": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "after": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "calls": [
+        {
+          "op": "CALL",
+          "depth": 1,
+          "target": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2087400e000000000000000000000000000000000000000000000000000000000000001e0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xdc64a140aa3e981100a9beca4e685f962f0cf6c9",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2b95b781"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xef6c064c"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xdc64a140aa3e981100a9beca4e685f962f0cf6c9",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xd0fb84e8"
+        }
+      ],
+      "logs": []
+    },
+    {
+      "name": "31 byte live queue result",
+      "success": false,
+      "before": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "after": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "calls": [
+        {
+          "op": "CALL",
+          "depth": 1,
+          "target": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2087400e000000000000000000000000000000000000000000000000000000000000001e0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xdc64a140aa3e981100a9beca4e685f962f0cf6c9",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2b95b781"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xef6c064c"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xdc64a140aa3e981100a9beca4e685f962f0cf6c9",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xd0fb84e8"
+        }
+      ],
+      "logs": []
+    },
+    {
+      "name": "extra live queue return bytes",
+      "success": true,
+      "before": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "after": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "10208471007628153903901238222953046343750",
+          "next": "3743106036130323098097120681749450326046",
+          "seed": "0",
+          "reserve": "0",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "70",
+          "router": "30",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "calls": [
+        {
+          "op": "CALL",
+          "depth": 1,
+          "target": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2087400e000000000000000000000000000000000000000000000000000000000000001e0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xdc64a140aa3e981100a9beca4e685f962f0cf6c9",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2b95b781"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xef6c064c"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xdc64a140aa3e981100a9beca4e685f962f0cf6c9",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xd0fb84e8"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x5a2031f9"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xdc64a140aa3e981100a9beca4e685f962f0cf6c9",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x72f79b13"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9",
+          "value": "0x000000000000000000000000000000000000000000000000000000000000001e",
+          "payload": "0x13ae8460"
+        }
+      ],
+      "logs": [
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0xd87d7ff193e5d1560bdbe21e4e14d13dde0de4e49a03812517640af0a2d5c42c"
+          ],
+          "data": "0x000000000000000000000000000000000000000000000000000000000000001e"
+        },
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0x76a397bea5768d4fca97ef47792796e35f98dc81b16c1de84e28a818e1f97108"
+          ],
+          "data": "0x000000000000000000000000000000000000000000000000000000000000001e"
+        },
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0x257937ce49d8cbbe1d68a2be7297a18a6e2830528d9154a0f131e5094e894613"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ]
+    },
+    {
+      "name": "uint256 seed add overflow after effects",
+      "success": false,
+      "before": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "1",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "after": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "1",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "calls": [
+        {
+          "op": "CALL",
+          "depth": 1,
+          "target": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2087400e000000000000000000000000000000000000000000000000000000000000001effffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2b95b781"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xef6c064c"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xd0fb84e8"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x5a2031f9"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xdc64a140aa3e981100a9beca4e685f962f0cf6c9",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x72f79b13"
+        }
+      ],
+      "logs": []
+    },
+    {
+      "name": "current frame nonce truncation",
+      "success": true,
+      "before": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "after": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "10208471007628153903901238222953046343750",
+          "next": "3743106036130323098097120681749450326046",
+          "seed": "0",
+          "reserve": "0",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "70",
+          "router": "30",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "calls": [
+        {
+          "op": "CALL",
+          "depth": 1,
+          "target": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2087400e000000000000000000000000000000000000000000000000000000000000001e0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2b95b781"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xef6c064c"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xd0fb84e8"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x5a2031f9"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xdc64a140aa3e981100a9beca4e685f962f0cf6c9",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x72f79b13"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9",
+          "value": "0x000000000000000000000000000000000000000000000000000000000000001e",
+          "payload": "0x13ae8460"
+        }
+      ],
+      "logs": [
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0xd87d7ff193e5d1560bdbe21e4e14d13dde0de4e49a03812517640af0a2d5c42c"
+          ],
+          "data": "0x000000000000000000000000000000000000000000000000000000000000001e"
+        },
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0x76a397bea5768d4fca97ef47792796e35f98dc81b16c1de84e28a818e1f97108"
+          ],
+          "data": "0x000000000000000000000000000000000000000000000000000000000000001e"
+        },
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0x257937ce49d8cbbe1d68a2be7297a18a6e2830528d9154a0f131e5094e894613"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ]
+    },
+    {
+      "name": "reversed physical cumulative rows panic",
+      "success": false,
+      "before": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "after": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "calls": [
+        {
+          "op": "CALL",
+          "depth": 1,
+          "target": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2087400e000000000000000000000000000000000000000000000000000000000000001e0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2b95b781"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xef6c064c"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xd0fb84e8"
+        }
+      ],
+      "logs": []
+    },
+    {
+      "name": "queue finalization releases demand",
+      "success": true,
+      "before": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "after": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "34028236692093846346337460743176821145600",
+          "next": "3743106036130323098097120681749450326116",
+          "seed": "0",
+          "reserve": "0",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "0",
+          "router": "100",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "calls": [
+        {
+          "op": "CALL",
+          "depth": 1,
+          "target": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2087400e00000000000000000000000000000000000000000000000000000000000000640000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2b95b781"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xef6c064c"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xd0fb84e8"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x5a2031f9"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xdc64a140aa3e981100a9beca4e685f962f0cf6c9",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x72f79b13"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000064",
+          "payload": "0x13ae8460"
+        }
+      ],
+      "logs": [
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0xd87d7ff193e5d1560bdbe21e4e14d13dde0de4e49a03812517640af0a2d5c42c"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000000000000000000064"
+        },
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0x76a397bea5768d4fca97ef47792796e35f98dc81b16c1de84e28a818e1f97108"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000000000000000000064"
+        },
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0x257937ce49d8cbbe1d68a2be7297a18a6e2830528d9154a0f131e5094e894613"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ]
+    },
+    {
+      "name": "uint256 amount rejected",
+      "success": false,
+      "before": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "after": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "calls": [
+        {
+          "op": "CALL",
+          "depth": 1,
+          "target": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2087400effffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2b95b781"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xef6c064c"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xd0fb84e8"
+        }
+      ],
+      "logs": []
+    },
+    {
+      "name": "noncanonical bunker bool is true",
+      "success": false,
+      "before": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "after": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "calls": [
+        {
+          "op": "CALL",
+          "depth": 1,
+          "target": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2087400e000000000000000000000000000000000000000000000000000000000000001e0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xdc64a140aa3e981100a9beca4e685f962f0cf6c9",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2b95b781"
+        }
+      ],
+      "logs": []
+    },
+    {
+      "name": "paused still decodes bunker result",
+      "success": false,
+      "before": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "0"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "after": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "0"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "calls": [
+        {
+          "op": "CALL",
+          "depth": 1,
+          "target": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2087400e000000000000000000000000000000000000000000000000000000000000001e0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xdc64a140aa3e981100a9beca4e685f962f0cf6c9",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2b95b781"
+        }
+      ],
+      "logs": []
+    },
+    {
+      "name": "queue address has no code",
+      "success": false,
+      "before": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "after": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "calls": [
+        {
+          "op": "CALL",
+          "depth": 1,
+          "target": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2087400e000000000000000000000000000000000000000000000000000000000000001e0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        }
+      ],
+      "logs": []
+    },
+    {
+      "name": "uint256 live demand clamps",
+      "success": true,
+      "before": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "after": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "6805647338418769269267492148635364229200",
+          "next": "3743106036130323098097120681749450326036",
+          "seed": "0",
+          "reserve": "0",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "80",
+          "router": "20",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "calls": [
+        {
+          "op": "CALL",
+          "depth": 1,
+          "target": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2087400e00000000000000000000000000000000000000000000000000000000000000140000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xdc64a140aa3e981100a9beca4e685f962f0cf6c9",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2b95b781"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xef6c064c"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xdc64a140aa3e981100a9beca4e685f962f0cf6c9",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xd0fb84e8"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x5a2031f9"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xdc64a140aa3e981100a9beca4e685f962f0cf6c9",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x72f79b13"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000014",
+          "payload": "0x13ae8460"
+        }
+      ],
+      "logs": [
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0xd87d7ff193e5d1560bdbe21e4e14d13dde0de4e49a03812517640af0a2d5c42c"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000000000000000000014"
+        },
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0x76a397bea5768d4fca97ef47792796e35f98dc81b16c1de84e28a818e1f97108"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000000000000000000014"
+        },
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0x257937ce49d8cbbe1d68a2be7297a18a6e2830528d9154a0f131e5094e894613"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ]
+    },
+    {
+      "name": "dirty address upper bits truncate",
+      "success": true,
+      "before": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "after": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "10208471007628153903901238222953046343750",
+          "next": "3743106036130323098097120681749450326046",
+          "seed": "0",
+          "reserve": "0",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "70",
+          "router": "30",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "calls": [
+        {
+          "op": "CALL",
+          "depth": 1,
+          "target": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2087400e000000000000000000000000000000000000000000000000000000000000001e0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2b95b781"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xef6c064c"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xd0fb84e8"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x5a2031f9"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xdc64a140aa3e981100a9beca4e685f962f0cf6c9",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x72f79b13"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9",
+          "value": "0x000000000000000000000000000000000000000000000000000000000000001e",
+          "payload": "0x13ae8460"
+        }
+      ],
+      "logs": [
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0xd87d7ff193e5d1560bdbe21e4e14d13dde0de4e49a03812517640af0a2d5c42c"
+          ],
+          "data": "0x000000000000000000000000000000000000000000000000000000000000001e"
+        },
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0x76a397bea5768d4fca97ef47792796e35f98dc81b16c1de84e28a818e1f97108"
+          ],
+          "data": "0x000000000000000000000000000000000000000000000000000000000000001e"
+        },
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0x257937ce49d8cbbe1d68a2be7297a18a6e2830528d9154a0f131e5094e894613"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ]
+    },
+    {
+      "name": "same frame next accounting truncates",
+      "success": true,
+      "before": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "4083388403051261561560495289181218537471",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "after": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "10208471007628153903901238222953046343750",
+          "next": "3743106036130323098097120681749450326045",
+          "seed": "0",
+          "reserve": "0",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "70",
+          "router": "30",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "calls": [
+        {
+          "op": "CALL",
+          "depth": 1,
+          "target": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2087400e000000000000000000000000000000000000000000000000000000000000001e0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2b95b781"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xef6c064c"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xd0fb84e8"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x5a2031f9"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xdc64a140aa3e981100a9beca4e685f962f0cf6c9",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x72f79b13"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9",
+          "value": "0x000000000000000000000000000000000000000000000000000000000000001e",
+          "payload": "0x13ae8460"
+        }
+      ],
+      "logs": [
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0xd87d7ff193e5d1560bdbe21e4e14d13dde0de4e49a03812517640af0a2d5c42c"
+          ],
+          "data": "0x000000000000000000000000000000000000000000000000000000000000001e"
+        },
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0x76a397bea5768d4fca97ef47792796e35f98dc81b16c1de84e28a818e1f97108"
+          ],
+          "data": "0x000000000000000000000000000000000000000000000000000000000000001e"
+        },
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0x257937ce49d8cbbe1d68a2be7297a18a6e2830528d9154a0f131e5094e894613"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ]
+    },
+    {
+      "name": "rebalance target above buffer then full spend",
+      "success": true,
+      "before": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "200",
+          "target": "200",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "after": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "34028236692093846346337460743176821145600",
+          "next": "3743106036130323098097120681749450326116",
+          "seed": "0",
+          "reserve": "100",
+          "target": "200",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "0",
+          "router": "100",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "calls": [
+        {
+          "op": "CALL",
+          "depth": 1,
+          "target": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2087400e00000000000000000000000000000000000000000000000000000000000000640000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2b95b781"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xef6c064c"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xd0fb84e8"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x5a2031f9"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xdc64a140aa3e981100a9beca4e685f962f0cf6c9",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x72f79b13"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000064",
+          "payload": "0x13ae8460"
+        }
+      ],
+      "logs": [
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0xd87d7ff193e5d1560bdbe21e4e14d13dde0de4e49a03812517640af0a2d5c42c"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000000000000000000064"
+        },
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0x76a397bea5768d4fca97ef47792796e35f98dc81b16c1de84e28a818e1f97108"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000000000000000000064"
+        },
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0x257937ce49d8cbbe1d68a2be7297a18a6e2830528d9154a0f131e5094e894613"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000000000000000000064"
+        }
+      ]
+    },
+    {
+      "name": "lower target releases withdrawal protection",
+      "success": true,
+      "before": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "0",
+          "target": "0",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "after": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "17014118346046923173168730371588410572850",
+          "next": "3743106036130323098097120681749450326066",
+          "seed": "0",
+          "reserve": "0",
+          "target": "0",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "50",
+          "router": "50",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "calls": [
+        {
+          "op": "CALL",
+          "depth": 1,
+          "target": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2087400e00000000000000000000000000000000000000000000000000000000000000320000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2b95b781"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xef6c064c"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xd0fb84e8"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x5a2031f9"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xdc64a140aa3e981100a9beca4e685f962f0cf6c9",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x72f79b13"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000032",
+          "payload": "0x13ae8460"
+        }
+      ],
+      "logs": [
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0xd87d7ff193e5d1560bdbe21e4e14d13dde0de4e49a03812517640af0a2d5c42c"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000000000000000000032"
+        },
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0x76a397bea5768d4fca97ef47792796e35f98dc81b16c1de84e28a818e1f97108"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000000000000000000032"
+        }
+      ]
+    },
+    {
+      "name": "second spend uses current queue and accounting",
+      "success": true,
+      "before": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "6805647338418769269267492148635364229200",
+          "next": "3743106036130323098097120681749450326036",
+          "seed": "0",
+          "reserve": "0",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "80",
+          "router": "20",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "after": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "13611294676837538538534984297270728458300",
+          "next": "3743106036130323098097120681749450326056",
+          "seed": "0",
+          "reserve": "0",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "60",
+          "router": "40",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "calls": [
+        {
+          "op": "CALL",
+          "depth": 1,
+          "target": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2087400e00000000000000000000000000000000000000000000000000000000000000140000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2b95b781"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xef6c064c"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xd0fb84e8"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x5a2031f9"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xdc64a140aa3e981100a9beca4e685f962f0cf6c9",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x72f79b13"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000014",
+          "payload": "0x13ae8460"
+        }
+      ],
+      "logs": [
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0xd87d7ff193e5d1560bdbe21e4e14d13dde0de4e49a03812517640af0a2d5c42c"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000000000000000000028"
+        },
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0x76a397bea5768d4fca97ef47792796e35f98dc81b16c1de84e28a818e1f97108"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000000000000000000014"
+        }
+      ]
+    },
+    {
+      "name": "source router receives ETH and emits event",
+      "success": true,
+      "before": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "after": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "10208471007628153903901238222953046343750",
+          "next": "3743106036130323098097120681749450326046",
+          "seed": "2",
+          "reserve": "0",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "70",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "30",
+          "wrongRouter": "0"
+        }
+      },
+      "calls": [
+        {
+          "op": "CALL",
+          "depth": 1,
+          "target": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2087400e000000000000000000000000000000000000000000000000000000000000001e0000000000000000000000000000000000000000000000000000000000000002"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2b95b781"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xef6c064c"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xd0fb84e8"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x5a2031f9"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xdc64a140aa3e981100a9beca4e685f962f0cf6c9",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x72f79b13"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x2279b7a0a67db372996a5fab50d91eaa73d2ebe6",
+          "value": "0x000000000000000000000000000000000000000000000000000000000000001e",
+          "payload": "0x13ae8460"
+        }
+      ],
+      "logs": [
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0xd87d7ff193e5d1560bdbe21e4e14d13dde0de4e49a03812517640af0a2d5c42c"
+          ],
+          "data": "0x000000000000000000000000000000000000000000000000000000000000001e"
+        },
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0x76a397bea5768d4fca97ef47792796e35f98dc81b16c1de84e28a818e1f97108"
+          ],
+          "data": "0x000000000000000000000000000000000000000000000000000000000000001e"
+        },
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0x257937ce49d8cbbe1d68a2be7297a18a6e2830528d9154a0f131e5094e894613"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0xe0aacfc334457703148118055ec794ac17654c6f918d29638ba3b18003cee5ff"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000000000000000000002"
+        },
+        {
+          "address": "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6",
+          "topics": [
+            "0x1a2089079e5f59e6c0028a2215f6ef1c1a75a9b52f79830ca47c3977a7853081"
+          ],
+          "data": "0x000000000000000000000000000000000000000000000000000000000000001e"
+        }
+      ]
+    },
+    {
+      "name": "source router immutable auth rejects after accounting and seed writes",
+      "success": false,
+      "before": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "after": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "calls": [
+        {
+          "op": "CALL",
+          "depth": 1,
+          "target": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2087400e000000000000000000000000000000000000000000000000000000000000001e0000000000000000000000000000000000000000000000000000000000000002"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2b95b781"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xef6c064c"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xd0fb84e8"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x5a2031f9"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xdc64a140aa3e981100a9beca4e685f962f0cf6c9",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x72f79b13"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x8a791620dd6260079bf849dc5567adc3f2fdc318",
+          "value": "0x000000000000000000000000000000000000000000000000000000000000001e",
+          "payload": "0x13ae8460"
+        }
+      ],
+      "logs": []
+    },
+    {
+      "name": "source router Lido admission rejects fixture caller",
+      "success": false,
+      "before": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "after": {
+        "storage": {
+          "locator": "912823093544680850579175995568783282090442467040",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "calls": [
+        {
+          "op": "CALL",
+          "depth": 1,
+          "target": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2087400e000000000000000000000000000000000000000000000000000000000000001e0000000000000000000000000000000000000000000000000000000000000002"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2b95b781"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xef6c064c"
+        }
+      ],
+      "logs": []
+    },
+    {
+      "name": "source locator queue and router compose",
+      "success": true,
+      "before": {
+        "storage": {
+          "locator": "553804933215009106951137646712543158016287627144",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "after": {
+        "storage": {
+          "locator": "553804933215009106951137646712543158016287627144",
+          "buffer": "10208471007628153903901238222953046343750",
+          "next": "3743106036130323098097120681749450326046",
+          "seed": "2",
+          "reserve": "0",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "70",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "30",
+          "wrongRouter": "0"
+        }
+      },
+      "calls": [
+        {
+          "op": "CALL",
+          "depth": 1,
+          "target": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2087400e000000000000000000000000000000000000000000000000000000000000001e0000000000000000000000000000000000000000000000000000000000000002"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x610178da211fef7d417bc0e6fed39f05609ad788",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2b95b781"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x610178da211fef7d417bc0e6fed39f05609ad788",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xef6c064c"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x610178da211fef7d417bc0e6fed39f05609ad788",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xd0fb84e8"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x610178da211fef7d417bc0e6fed39f05609ad788",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x5a2031f9"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xdc64a140aa3e981100a9beca4e685f962f0cf6c9",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x72f79b13"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x2279b7a0a67db372996a5fab50d91eaa73d2ebe6",
+          "value": "0x000000000000000000000000000000000000000000000000000000000000001e",
+          "payload": "0x13ae8460"
+        }
+      ],
+      "logs": [
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0xd87d7ff193e5d1560bdbe21e4e14d13dde0de4e49a03812517640af0a2d5c42c"
+          ],
+          "data": "0x000000000000000000000000000000000000000000000000000000000000001e"
+        },
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0x76a397bea5768d4fca97ef47792796e35f98dc81b16c1de84e28a818e1f97108"
+          ],
+          "data": "0x000000000000000000000000000000000000000000000000000000000000001e"
+        },
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0x257937ce49d8cbbe1d68a2be7297a18a6e2830528d9154a0f131e5094e894613"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "topics": [
+            "0xe0aacfc334457703148118055ec794ac17654c6f918d29638ba3b18003cee5ff"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000000000000000000002"
+        },
+        {
+          "address": "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6",
+          "topics": [
+            "0x1a2089079e5f59e6c0028a2215f6ef1c1a75a9b52f79830ca47c3977a7853081"
+          ],
+          "data": "0x000000000000000000000000000000000000000000000000000000000000001e"
+        }
+      ]
+    },
+    {
+      "name": "source locator queue growth blocks overspend",
+      "success": false,
+      "before": {
+        "storage": {
+          "locator": "553804933215009106951137646712543158016287627144",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "after": {
+        "storage": {
+          "locator": "553804933215009106951137646712543158016287627144",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "calls": [
+        {
+          "op": "CALL",
+          "depth": 1,
+          "target": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2087400e000000000000000000000000000000000000000000000000000000000000001e0000000000000000000000000000000000000000000000000000000000000002"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x610178da211fef7d417bc0e6fed39f05609ad788",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2b95b781"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x610178da211fef7d417bc0e6fed39f05609ad788",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xef6c064c"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x610178da211fef7d417bc0e6fed39f05609ad788",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xd0fb84e8"
+        }
+      ],
+      "logs": []
+    },
+    {
+      "name": "source locator caller authorization",
+      "success": false,
+      "before": {
+        "storage": {
+          "locator": "553804933215009106951137646712543158016287627144",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "after": {
+        "storage": {
+          "locator": "553804933215009106951137646712543158016287627144",
+          "buffer": "100",
+          "next": "3402823669209384634633746074317682114569",
+          "seed": "0",
+          "reserve": "20",
+          "target": "20",
+          "active": "1"
+        },
+        "balances": {
+          "lido": "100",
+          "router": "0",
+          "queue": "0",
+          "sourceRouter": "0",
+          "wrongRouter": "0"
+        }
+      },
+      "calls": [
+        {
+          "op": "CALL",
+          "depth": 1,
+          "target": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2087400e000000000000000000000000000000000000000000000000000000000000001e0000000000000000000000000000000000000000000000000000000000000002"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x610178da211fef7d417bc0e6fed39f05609ad788",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x37d5fe99"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0x2b95b781"
+        },
+        {
+          "op": "CALL",
+          "depth": 2,
+          "target": "0x610178da211fef7d417bc0e6fed39f05609ad788",
+          "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "payload": "0xef6c064c"
+        }
+      ],
+      "logs": []
+    }
+  ]
+}

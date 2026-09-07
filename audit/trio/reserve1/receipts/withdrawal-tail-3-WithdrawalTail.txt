@@ -1,0 +1,37 @@
+LidoSRv3/Audit/Source/TrioReserve1/WithdrawalTail.lean:29:50: error: unsolved goals
+external : External
+ctx : Context
+amount seeds : Word
+⊢ (do
+      let allowed ← canDeposit external ctx
+      require allowed (Fault.reason "CAN_NOT_DEPOSIT")
+      let router ← stakingRouter external ctx
+      require (decide (ctx.sender = router)) (Fault.reason "APP_AUTH_FAILED")
+      require (decide (amount.val ≠ 0)) (Fault.reason "ZERO_AMOUNT")
+      spendDepositableEther external ctx amount
+      if seeds.val > 0 then do
+          let packed ← Live.read ctx seedSlot
+          let count ← checkedAdd (packed.val % width) seeds.val
+          write ctx seedSlot (pack count (packed.val / width))
+          emit ctx "DepositedValidatorsChanged" [word count]
+          let _ ← call external ctx router 330204256 amount
+          pure ()
+        else do
+          pure PUnit.unit
+          let _ ← call external ctx router 330204256 amount
+          pure ()) =
+    do
+    let allowed ← canDeposit external ctx
+    require allowed (Fault.reason "CAN_NOT_DEPOSIT")
+    let router ← stakingRouter external ctx
+    require (decide (ctx.sender = router)) (Fault.reason "APP_AUTH_FAILED")
+    require (decide (amount.val ≠ 0)) (Fault.reason "ZERO_AMOUNT")
+    spendDepositableEther external ctx amount
+    if seeds.val > 0 then do
+        let packed ← Live.read ctx seedSlot
+        let count ← checkedAdd (packed.val % width) seeds.val
+        write ctx seedSlot (pack count (packed.val / width))
+        emit ctx "DepositedValidatorsChanged" [word count]
+      else pure PUnit.unit
+    let _ ← call external ctx router 330204256 amount
+    pure ()

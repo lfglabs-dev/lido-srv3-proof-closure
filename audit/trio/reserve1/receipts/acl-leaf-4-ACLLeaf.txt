@@ -1,0 +1,344 @@
+LidoSRv3/Audit/Source/TrioReserve1/ACLLeaf.lean:114:67: error: unsolved goals
+case pos
+k : Queue.Keccak
+external : StaticCall.External
+self : Address
+hash : Word
+who where_ : Address
+role : Word
+how : List Word
+w : World
+fuel index : Nat
+reply : StaticCall.Reply
+hb : index < (w.core.readContractSlot self.val (ACL.paramsSlot k hash)).val
+ho : (ACL.param k self hash index w).id = 203
+hp :
+  external
+      { caller := self, target := Verity.Core.Address.ofNat (ACL.param k self hash index w).value, value := word 0,
+        payload := ACL.oraclePayload who where_ role how }
+      w =
+    reply
+allowed✝ : Bool
+hs : OracleReply reply false
+hcall :
+  ACL.oracle external self (Verity.Core.Address.ofNat (ACL.param k self hash index w).value) who where_ role how w =
+    { outcome := Except.ok false,
+      attempts :=
+        oracleTrace
+          { caller := self, target := Verity.Core.Address.ofNat (ACL.param k self hash index w).value, value := word 0,
+            payload := ACL.oraclePayload who where_ role how }
+          reply }
+hv : 12 < (ACL.param k self hash index w).op
+⊢ ¬(if (w.core.readContractSlot self.val (ACL.paramsSlot k hash)).val ≤ index then { outcome := Except.ok false }
+      else
+        { outcome := Except.error ACL.Halt.invalidOpcode,
+          attempts :=
+            oracleTrace
+              { caller := self, target := Verity.Core.Address.ofNat (ACL.param k self hash index w).value,
+                value := word 0, payload := ACL.oraclePayload who where_ role how }
+              reply }) =
+      { outcome := Except.ok allowed✝,
+        attempts :=
+          oracleTrace
+            { caller := self, target := Verity.Core.Address.ofNat (ACL.param k self hash index w).value,
+              value := word 0, payload := ACL.oraclePayload who where_ role how }
+            reply }
+
+case neg
+k : Queue.Keccak
+external : StaticCall.External
+self : Address
+hash : Word
+who where_ : Address
+role : Word
+how : List Word
+w : World
+fuel index : Nat
+reply : StaticCall.Reply
+hb : index < (w.core.readContractSlot self.val (ACL.paramsSlot k hash)).val
+ho : (ACL.param k self hash index w).id = 203
+hp :
+  external
+      { caller := self, target := Verity.Core.Address.ofNat (ACL.param k self hash index w).value, value := word 0,
+        payload := ACL.oraclePayload who where_ role how }
+      w =
+    reply
+allowed✝ : Bool
+hs : OracleReply reply false
+hcall :
+  ACL.oracle external self (Verity.Core.Address.ofNat (ACL.param k self hash index w).value) who where_ role how w =
+    { outcome := Except.ok false,
+      attempts :=
+        oracleTrace
+          { caller := self, target := Verity.Core.Address.ofNat (ACL.param k self hash index w).value, value := word 0,
+            payload := ACL.oraclePayload who where_ role how }
+          reply }
+hv : (ACL.param k self hash index w).op ≤ 12
+⊢ (if 12 < (ACL.param k self hash index w).op then { outcome := Except.error ACL.Halt.invalidOpcode }
+      else
+        {
+          outcome :=
+            Except.ok
+              (!decide ((ACL.param k self hash index w).op = 7) &&
+                ACL.compare (ACL.param k self hash index w).op 0 1) }) =
+      { outcome := Except.ok allowed✝ } ↔
+    (if (w.core.readContractSlot self.val (ACL.paramsSlot k hash)).val ≤ index then { outcome := Except.ok false }
+      else
+        {
+          outcome :=
+            (if 12 < (ACL.param k self hash index w).op then { outcome := Except.error ACL.Halt.invalidOpcode }
+              else
+                {
+                  outcome :=
+                    Except.ok
+                      (!decide ((ACL.param k self hash index w).op = 7) &&
+                        ACL.compare (ACL.param k self hash index w).op 0 1) }).outcome,
+          attempts :=
+            oracleTrace
+                { caller := self, target := Verity.Core.Address.ofNat (ACL.param k self hash index w).value,
+                  value := word 0, payload := ACL.oraclePayload who where_ role how }
+                reply ++
+              (if 12 < (ACL.param k self hash index w).op then { outcome := Except.error ACL.Halt.invalidOpcode }
+                else
+                  {
+                    outcome :=
+                      Except.ok
+                        (!decide ((ACL.param k self hash index w).op = 7) &&
+                          ACL.compare (ACL.param k self hash index w).op 0 1) }).attempts }) =
+      { outcome := Except.ok allowed✝,
+        attempts :=
+          oracleTrace
+            { caller := self, target := Verity.Core.Address.ofNat (ACL.param k self hash index w).value,
+              value := word 0, payload := ACL.oraclePayload who where_ role how }
+            reply }
+
+case pos
+k : Queue.Keccak
+external : StaticCall.External
+self : Address
+hash : Word
+who where_ : Address
+role : Word
+how : List Word
+w : World
+fuel index : Nat
+reply : StaticCall.Reply
+hb : index < (w.core.readContractSlot self.val (ACL.paramsSlot k hash)).val
+ho : (ACL.param k self hash index w).id = 203
+hp :
+  external
+      { caller := self, target := Verity.Core.Address.ofNat (ACL.param k self hash index w).value, value := word 0,
+        payload := ACL.oraclePayload who where_ role how }
+      w =
+    reply
+allowed✝ : Bool
+hs : OracleReply reply true
+hcall :
+  ACL.oracle external self (Verity.Core.Address.ofNat (ACL.param k self hash index w).value) who where_ role how w =
+    { outcome := Except.ok true,
+      attempts :=
+        oracleTrace
+          { caller := self, target := Verity.Core.Address.ofNat (ACL.param k self hash index w).value, value := word 0,
+            payload := ACL.oraclePayload who where_ role how }
+          reply }
+hv : 12 < (ACL.param k self hash index w).op
+⊢ ¬(if (w.core.readContractSlot self.val (ACL.paramsSlot k hash)).val ≤ index then { outcome := Except.ok false }
+      else
+        { outcome := Except.error ACL.Halt.invalidOpcode,
+          attempts :=
+            oracleTrace
+              { caller := self, target := Verity.Core.Address.ofNat (ACL.param k self hash index w).value,
+                value := word 0, payload := ACL.oraclePayload who where_ role how }
+              reply }) =
+      { outcome := Except.ok allowed✝,
+        attempts :=
+          oracleTrace
+            { caller := self, target := Verity.Core.Address.ofNat (ACL.param k self hash index w).value,
+              value := word 0, payload := ACL.oraclePayload who where_ role how }
+            reply }
+
+case neg
+k : Queue.Keccak
+external : StaticCall.External
+self : Address
+hash : Word
+who where_ : Address
+role : Word
+how : List Word
+w : World
+fuel index : Nat
+reply : StaticCall.Reply
+hb : index < (w.core.readContractSlot self.val (ACL.paramsSlot k hash)).val
+ho : (ACL.param k self hash index w).id = 203
+hp :
+  external
+      { caller := self, target := Verity.Core.Address.ofNat (ACL.param k self hash index w).value, value := word 0,
+        payload := ACL.oraclePayload who where_ role how }
+      w =
+    reply
+allowed✝ : Bool
+hs : OracleReply reply true
+hcall :
+  ACL.oracle external self (Verity.Core.Address.ofNat (ACL.param k self hash index w).value) who where_ role how w =
+    { outcome := Except.ok true,
+      attempts :=
+        oracleTrace
+          { caller := self, target := Verity.Core.Address.ofNat (ACL.param k self hash index w).value, value := word 0,
+            payload := ACL.oraclePayload who where_ role how }
+          reply }
+hv : (ACL.param k self hash index w).op ≤ 12
+⊢ (if 12 < (ACL.param k self hash index w).op then { outcome := Except.error ACL.Halt.invalidOpcode }
+      else
+        {
+          outcome :=
+            Except.ok
+              (decide ((ACL.param k self hash index w).op = 7) ||
+                ACL.compare (ACL.param k self hash index w).op 1 1) }) =
+      { outcome := Except.ok allowed✝ } ↔
+    (if (w.core.readContractSlot self.val (ACL.paramsSlot k hash)).val ≤ index then { outcome := Except.ok false }
+      else
+        {
+          outcome :=
+            (if 12 < (ACL.param k self hash index w).op then { outcome := Except.error ACL.Halt.invalidOpcode }
+              else
+                {
+                  outcome :=
+                    Except.ok
+                      (decide ((ACL.param k self hash index w).op = 7) ||
+                        ACL.compare (ACL.param k self hash index w).op 1 1) }).outcome,
+          attempts :=
+            oracleTrace
+                { caller := self, target := Verity.Core.Address.ofNat (ACL.param k self hash index w).value,
+                  value := word 0, payload := ACL.oraclePayload who where_ role how }
+                reply ++
+              (if 12 < (ACL.param k self hash index w).op then { outcome := Except.error ACL.Halt.invalidOpcode }
+                else
+                  {
+                    outcome :=
+                      Except.ok
+                        (decide ((ACL.param k self hash index w).op = 7) ||
+                          ACL.compare (ACL.param k self hash index w).op 1 1) }).attempts }) =
+      { outcome := Except.ok allowed✝,
+        attempts :=
+          oracleTrace
+            { caller := self, target := Verity.Core.Address.ofNat (ACL.param k self hash index w).value,
+              value := word 0, payload := ACL.oraclePayload who where_ role how }
+            reply }
+
+case neg
+k : Queue.Keccak
+external : StaticCall.External
+self : Address
+hash : Word
+who where_ : Address
+role : Word
+how : List Word
+w : World
+fuel index : Nat
+reply : StaticCall.Reply
+hb : index < (w.core.readContractSlot self.val (ACL.paramsSlot k hash)).val
+ho : (ACL.param k self hash index w).id = 203
+hp :
+  external
+      { caller := self, target := Verity.Core.Address.ofNat (ACL.param k self hash index w).value, value := word 0,
+        payload := ACL.oraclePayload who where_ role how }
+      w =
+    reply
+hs : OracleReply reply false
+hcall :
+  ACL.oracle external self (Verity.Core.Address.ofNat (ACL.param k self hash index w).value) who where_ role how w =
+    { outcome := Except.ok false,
+      attempts :=
+        oracleTrace
+          { caller := self, target := Verity.Core.Address.ofNat (ACL.param k self hash index w).value, value := word 0,
+            payload := ACL.oraclePayload who where_ role how }
+          reply }
+hv : (ACL.param k self hash index w).op ≤ 12
+⊢ ¬(if (w.core.readContractSlot self.val (ACL.paramsSlot k hash)).val ≤ index then { outcome := Except.ok false }
+      else
+        {
+          outcome :=
+            (if 12 < (ACL.param k self hash index w).op then { outcome := Except.error ACL.Halt.invalidOpcode }
+              else
+                {
+                  outcome :=
+                    Except.ok
+                      (!decide ((ACL.param k self hash index w).op = 7) &&
+                        ACL.compare (ACL.param k self hash index w).op 0 1) }).outcome,
+          attempts :=
+            oracleTrace
+                { caller := self, target := Verity.Core.Address.ofNat (ACL.param k self hash index w).value,
+                  value := word 0, payload := ACL.oraclePayload who where_ role how }
+                reply ++
+              (if 12 < (ACL.param k self hash index w).op then { outcome := Except.error ACL.Halt.invalidOpcode }
+                else
+                  {
+                    outcome :=
+                      Except.ok
+                        (!decide ((ACL.param k self hash index w).op = 7) &&
+                          ACL.compare (ACL.param k self hash index w).op 0 1) }).attempts }) =
+      { outcome := Except.error ACL.Halt.invalidOpcode,
+        attempts :=
+          oracleTrace
+            { caller := self, target := Verity.Core.Address.ofNat (ACL.param k self hash index w).value,
+              value := word 0, payload := ACL.oraclePayload who where_ role how }
+            reply }
+
+case neg
+k : Queue.Keccak
+external : StaticCall.External
+self : Address
+hash : Word
+who where_ : Address
+role : Word
+how : List Word
+w : World
+fuel index : Nat
+reply : StaticCall.Reply
+hb : index < (w.core.readContractSlot self.val (ACL.paramsSlot k hash)).val
+ho : (ACL.param k self hash index w).id = 203
+hp :
+  external
+      { caller := self, target := Verity.Core.Address.ofNat (ACL.param k self hash index w).value, value := word 0,
+        payload := ACL.oraclePayload who where_ role how }
+      w =
+    reply
+hs : OracleReply reply true
+hcall :
+  ACL.oracle external self (Verity.Core.Address.ofNat (ACL.param k self hash index w).value) who where_ role how w =
+    { outcome := Except.ok true,
+      attempts :=
+        oracleTrace
+          { caller := self, target := Verity.Core.Address.ofNat (ACL.param k self hash index w).value, value := word 0,
+            payload := ACL.oraclePayload who where_ role how }
+          reply }
+hv : (ACL.param k self hash index w).op ≤ 12
+⊢ ¬(if (w.core.readContractSlot self.val (ACL.paramsSlot k hash)).val ≤ index then { outcome := Except.ok false }
+      else
+        {
+          outcome :=
+            (if 12 < (ACL.param k self hash index w).op then { outcome := Except.error ACL.Halt.invalidOpcode }
+              else
+                {
+                  outcome :=
+                    Except.ok
+                      (decide ((ACL.param k self hash index w).op = 7) ||
+                        ACL.compare (ACL.param k self hash index w).op 1 1) }).outcome,
+          attempts :=
+            oracleTrace
+                { caller := self, target := Verity.Core.Address.ofNat (ACL.param k self hash index w).value,
+                  value := word 0, payload := ACL.oraclePayload who where_ role how }
+                reply ++
+              (if 12 < (ACL.param k self hash index w).op then { outcome := Except.error ACL.Halt.invalidOpcode }
+                else
+                  {
+                    outcome :=
+                      Except.ok
+                        (decide ((ACL.param k self hash index w).op = 7) ||
+                          ACL.compare (ACL.param k self hash index w).op 1 1) }).attempts }) =
+      { outcome := Except.error ACL.Halt.invalidOpcode,
+        attempts :=
+          oracleTrace
+            { caller := self, target := Verity.Core.Address.ofNat (ACL.param k self hash index w).value,
+              value := word 0, payload := ACL.oraclePayload who where_ role how }
+            reply }

@@ -1,0 +1,425 @@
+{
+  "classification": "PASS_INIT_ONLY_COMPOSITION",
+  "compiler": "Lean (version 4.31.0, arm64-apple-darwin24.6.0, commit 68218e876d2a38b1985b8590fff244a83c321783, Release)",
+  "checks": [
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc1/Interface.lean",
+      "sha256": "17e1a11514fbe170f9b6402f2bc2edc24c853389e9b34add24c51305e3b4f674",
+      "command": [
+        "/Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/Users/thomas/work/lido/trio-validation/parent-composed-1/olean/LidoSRv3/Audit/Source/TrioAlloc1/Interface.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc1/Interface.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc1/Storage.lean",
+      "sha256": "f964606f020150deaeed389ce2605ee23d89a64ebc31967baf300e9149ba4496",
+      "command": [
+        "/Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/Users/thomas/work/lido/trio-validation/parent-composed-1/olean/LidoSRv3/Audit/Source/TrioAlloc1/Storage.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc1/Storage.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc1/Execution.lean",
+      "sha256": "83ba3e3ad07068ef841ee743e2a975bc7bdb57e3f1855f535ada7c4426f64b11",
+      "command": [
+        "/Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/Users/thomas/work/lido/trio-validation/parent-composed-1/olean/LidoSRv3/Audit/Source/TrioAlloc1/Execution.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc1/Execution.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc1/Properties.lean",
+      "sha256": "53729f579147896741da3ef532c67682a96a77c68b0b3127d95721751b54e64a",
+      "command": [
+        "/Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/Users/thomas/work/lido/trio-validation/parent-composed-1/olean/LidoSRv3/Audit/Source/TrioAlloc1/Properties.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc1/Properties.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc1/Bytes.lean",
+      "sha256": "80807f4a9a7894bf9bef06339eb7a50e59e715e2d77d508f07e19c847b70e5fb",
+      "command": [
+        "/Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/Users/thomas/work/lido/trio-validation/parent-composed-1/olean/LidoSRv3/Audit/Source/TrioAlloc1/Bytes.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc1/Bytes.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc1/Memory.lean",
+      "sha256": "955ddb2b118d7b47c12fd4ec0e6c54a197125d92f613316667ed1865fa0be52a",
+      "command": [
+        "/Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/Users/thomas/work/lido/trio-validation/parent-composed-1/olean/LidoSRv3/Audit/Source/TrioAlloc1/Memory.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc1/Memory.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc2/Word.lean",
+      "sha256": "0d13d4c1e245bf01efdaad3a0a5c40a75a00f2b06c3ac22d6994c25e0ad8b786",
+      "command": [
+        "/Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/Users/thomas/work/lido/trio-validation/parent-composed-1/olean/LidoSRv3/Audit/Source/TrioAlloc2/Word.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc2/Word.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc2/Arithmetic.lean",
+      "sha256": "188c43817b202b3b618c398634304f42d20b4733f4311d3d3e698fbf53003e7c",
+      "command": [
+        "/Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/Users/thomas/work/lido/trio-validation/parent-composed-1/olean/LidoSRv3/Audit/Source/TrioAlloc2/Arithmetic.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc2/Arithmetic.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc2/Step.lean",
+      "sha256": "6e2e97a6b2fb6279db6654b424d49d14464269f8c709fd3dfb3c11953a4c9d80",
+      "command": [
+        "/Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/Users/thomas/work/lido/trio-validation/parent-composed-1/olean/LidoSRv3/Audit/Source/TrioAlloc2/Step.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc2/Step.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc2/ScanBounds.lean",
+      "sha256": "2e998cf69f26826b8974d72eabf8f15638be9c02e8a2473f92148491af07b2e1",
+      "command": [
+        "/Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/Users/thomas/work/lido/trio-validation/parent-composed-1/olean/LidoSRv3/Audit/Source/TrioAlloc2/ScanBounds.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc2/ScanBounds.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc2/Spec.lean",
+      "sha256": "fe3bbee5cc73badac5ac54ad818480ee6f5cea32228d1c6e34e7c07d3ff2dc37",
+      "command": [
+        "/Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/Users/thomas/work/lido/trio-validation/parent-composed-1/olean/LidoSRv3/Audit/Source/TrioAlloc2/Spec.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc2/Spec.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc2/ScanCorrespondence.lean",
+      "sha256": "9fe0d714a57657508dc07351cd342f2e6aa4dd65b29801f4efc94b0b2ec28b4c",
+      "command": [
+        "/Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/Users/thomas/work/lido/trio-validation/parent-composed-1/olean/LidoSRv3/Audit/Source/TrioAlloc2/ScanCorrespondence.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc2/ScanCorrespondence.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc2/Selection.lean",
+      "sha256": "38cdf79f1564aa022b1084d65b64e5fe627cb04ecc0a89cd496d74cfd7accc60",
+      "command": [
+        "/Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/Users/thomas/work/lido/trio-validation/parent-composed-1/olean/LidoSRv3/Audit/Source/TrioAlloc2/Selection.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc2/Selection.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "LidoSRv3/Audit/Source/TrioAlloc2/Selection.lean:53:10: warning: This simp argument is unused:\n  levelsEq\n\nHint: Omit it from the simp argument list.\n  simp [l\u0335e\u0335v\u0335e\u0335l\u0335s\u0335E\u0335q\u0335,\u0335 \u0335Spec.minimum, countEq]\n\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`\nLidoSRv3/Audit/Source/TrioAlloc2/Selection.lean:70:10: warning: This simp argument is unused:\n  levelsEq\n\nHint: Omit it from the simp argument list.\n  simp [l\u0335e\u0335v\u0335e\u0335l\u0335s\u0335E\u0335q\u0335,\u0335 \u0335Spec.minimum, nonzero, minimumEq]\n\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`\n",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc2/Totality.lean",
+      "sha256": "335759eb0d05c1177705ed588d6341ad143bac8f6070271b18fb780c84cbd653",
+      "command": [
+        "/Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/Users/thomas/work/lido/trio-validation/parent-composed-1/olean/LidoSRv3/Audit/Source/TrioAlloc2/Totality.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc2/Totality.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc2/Loop.lean",
+      "sha256": "a717883f464a3e0acef64722a0f7fe222151ad98ba5b6b67049aab74f4ee0ea4",
+      "command": [
+        "/Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/Users/thomas/work/lido/trio-validation/parent-composed-1/olean/LidoSRv3/Audit/Source/TrioAlloc2/Loop.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc2/Loop.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc2/StepBounds.lean",
+      "sha256": "20d655b2720753ce76c4d650bd42b89655e2925eb588493d0a628c83bbae147b",
+      "command": [
+        "/Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/Users/thomas/work/lido/trio-validation/parent-composed-1/olean/LidoSRv3/Audit/Source/TrioAlloc2/StepBounds.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc2/StepBounds.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc2/LoopBounds.lean",
+      "sha256": "f4862b07e0c08d4302ad291b9e16dd0dc6796fc45c5a37531b17c3e39420ff17",
+      "command": [
+        "/Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/Users/thomas/work/lido/trio-validation/parent-composed-1/olean/LidoSRv3/Audit/Source/TrioAlloc2/LoopBounds.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc2/LoopBounds.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc2/LoopTotality.lean",
+      "sha256": "5006feb6b0bac67a23c87ee5223d2094a8403a66300164073919541ff1caa521",
+      "command": [
+        "/Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/Users/thomas/work/lido/trio-validation/parent-composed-1/olean/LidoSRv3/Audit/Source/TrioAlloc2/LoopTotality.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc2/LoopTotality.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc2/Errors.lean",
+      "sha256": "42130536c8d55720a2f5249e06f187c9e01c0fa35e17120babb895503c57efec",
+      "command": [
+        "/Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/Users/thomas/work/lido/trio-validation/parent-composed-1/olean/LidoSRv3/Audit/Source/TrioAlloc2/Errors.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc2/Errors.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc2/Conservation.lean",
+      "sha256": "5abfd99974099814330fccc405d90d5575557bbb389ed222ec26491f94b9ad65",
+      "command": [
+        "/Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/Users/thomas/work/lido/trio-validation/parent-composed-1/olean/LidoSRv3/Audit/Source/TrioAlloc2/Conservation.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc2/Conservation.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc2/ChoiceCorrespondence.lean",
+      "sha256": "bda52309f3a1618f5738b9ed7edf1331a6e122040d39687f293500c9f6e7d265",
+      "command": [
+        "/Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/Users/thomas/work/lido/trio-validation/parent-composed-1/olean/LidoSRv3/Audit/Source/TrioAlloc2/ChoiceCorrespondence.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc2/ChoiceCorrespondence.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc2/StepCorrespondence.lean",
+      "sha256": "f4a3f68e194a3282fcac20d89e847f6687c9389a0360a270794a555dae701755",
+      "command": [
+        "/Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/Users/thomas/work/lido/trio-validation/parent-composed-1/olean/LidoSRv3/Audit/Source/TrioAlloc2/StepCorrespondence.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc2/StepCorrespondence.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "LidoSRv3/Audit/Source/TrioAlloc2/StepCorrespondence.lean:16:71: warning: This simp argument is unused:\n  eq\n\nHint: Omit it from the simp argument list.\n  simp [decodedRows, List.getElem?_zipWith, List.getElem?_set_ne eq,\u0335 \u0335e\u0335q\u0335]\n\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`\n",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc2/SpecProgress.lean",
+      "sha256": "a4ec617e036124438832d5822d4a68e80c461ea63b93cd677b40c56c86f10f76",
+      "command": [
+        "/Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/Users/thomas/work/lido/trio-validation/parent-composed-1/olean/LidoSRv3/Audit/Source/TrioAlloc2/SpecProgress.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc2/SpecProgress.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc2/LoopCorrespondence.lean",
+      "sha256": "82402ccea48e59c12090c408c578511d4c42d1c979c61b3f39a061b67ad06485",
+      "command": [
+        "/Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/Users/thomas/work/lido/trio-validation/parent-composed-1/olean/LidoSRv3/Audit/Source/TrioAlloc2/LoopCorrespondence.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc2/LoopCorrespondence.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc2/Composition.lean",
+      "sha256": "dfad29f3e859430242012bb1a3472b0157a62ff73cdcb90934a131d96d2deead",
+      "command": [
+        "/Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/Users/thomas/work/lido/trio-validation/parent-composed-1/olean/LidoSRv3/Audit/Source/TrioAlloc2/Composition.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc2/Composition.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "'LidoSRv3.Audit.Source.TrioAlloc2.producer_success_establishes_consumer_premises' depends on axioms: [propext,\n Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc2.producer_then_consumer_succeeds' depends on axioms: [propext, Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc2.producer_then_consumer_distributes' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc2/MemoryComposition.lean",
+      "sha256": "2e906b20a852205565b49e146aef886d1f0d1298d03cce5a7611da6a2f8d6600",
+      "command": [
+        "/Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/Users/thomas/work/lido/trio-validation/parent-composed-1/olean/LidoSRv3/Audit/Source/TrioAlloc2/MemoryComposition.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc2/MemoryComposition.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "'LidoSRv3.Audit.Source.TrioAlloc2.producer_then_memory_consumer_distributes' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc2.producer_then_byte_consumer_distributes' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Tests/TrioIntegration/MemoryComposition.lean",
+      "sha256": "1f84986445ba2d970fc9c8c005e74bfc83975f1209c87d22e33ab79d245c8db0",
+      "command": [
+        "/Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/Users/thomas/work/lido/trio-validation/parent-composed-1/olean/LidoSRv3/Tests/TrioIntegration/MemoryComposition.olean",
+        "LidoSRv3/Tests/TrioIntegration/MemoryComposition.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc1/CapacitySpec.lean",
+      "sha256": "7005ebf63953d0bbc4c708885cc3572645e89c5ec0ee333b91a69ed7bea11131",
+      "command": [
+        "/Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/Users/thomas/work/lido/trio-validation/parent-composed-1/olean/LidoSRv3/Audit/Source/TrioAlloc1/CapacitySpec.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc1/CapacitySpec.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioComposition/Parent.lean",
+      "sha256": "e2c545692cbdab93d7a05518fcab3a8f4098cd21f59965e141e35a8ea965e5ab",
+      "command": [
+        "/Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/Users/thomas/work/lido/trio-validation/parent-composed-1/olean/LidoSRv3/Audit/Source/TrioComposition/Parent.olean",
+        "LidoSRv3/Audit/Source/TrioComposition/Parent.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "'LidoSRv3.Audit.Source.TrioComposition.getDepositAllocations_total_bound' depends on axioms: [propext, Quot.sound]\n'LidoSRv3.Audit.Source.TrioComposition.convertPositive_refines' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n'LidoSRv3.Audit.Source.TrioComposition.convertZero_refines' depends on axioms: [propext, Classical.choice, Quot.sound]\n",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Tests/TrioIntegration/Parent.lean",
+      "sha256": "89dcd29181d620670817ad33e7ed6910515f9f939d2362ed2c94a618e7a83276",
+      "command": [
+        "/Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/Users/thomas/work/lido/trio-validation/parent-composed-1/olean/LidoSRv3/Tests/TrioIntegration/Parent.olean",
+        "LidoSRv3/Tests/TrioIntegration/Parent.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean",
+      "sha256": "6bd90551f9cb4a39c3384b98b2a6ff40c27b7eba6b491308c2bfa02ca1c5b025",
+      "command": [
+        "/Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/Users/thomas/work/lido/trio-validation/parent-composed-1/olean/LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:171:20: warning: This simp argument is unused:\n  \u2193reduceDIte\n\nHint: Omit it from the simp argument list.\n  simp only [bound,\u0335 \u0335\u2193\u0335r\u0335e\u0335d\u0335u\u0335c\u0335e\u0335D\u0335I\u0335t\u0335e\u0335]\n\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`\n'LidoSRv3.Audit.Source.TrioAlloc2.step_row_bounds' depends on axioms: [propext, Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc2.allocateLoop_row_bounds' depends on axioms: [propext, Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc2.allocate_row_bounds' depends on axioms: [propext, Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc2.allocate_delta_success' depends on axioms: [propext, Quot.sound]\n",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioComposition/ParentComposition.lean",
+      "sha256": "6975dcef3387cc907a49c182ad6794220265e5b82c8e3eb3f3267c308b21d6ae",
+      "command": [
+        "/Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/Users/thomas/work/lido/trio-validation/parent-composed-1/olean/LidoSRv3/Audit/Source/TrioComposition/ParentComposition.olean",
+        "LidoSRv3/Audit/Source/TrioComposition/ParentComposition.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "'LidoSRv3.Audit.Source.TrioComposition.producer_consumer_conversion_refines' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n'LidoSRv3.Audit.Source.TrioComposition.producer_zero_conversion_refines' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n'LidoSRv3.Audit.Source.TrioComposition.producer_consumer_parent_subtraction' depends on axioms: [propext, Quot.sound]\n",
+      "stderr": ""
+    }
+  ],
+  "source_basis_head": "38c1b8f37aa009ca0e822c15807422edd3feb230",
+  "scope": "32-module Init-only transitive closure, including 16 execution checks; not full builds, Solidity/Verity differential or certification",
+  "source_identity": "Per-file SHA-256 values identify checked working-tree inputs; source_basis_head predates the new composition module."
+}

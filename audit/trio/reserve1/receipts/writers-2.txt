@@ -1,0 +1,347 @@
+LidoSRv3/Audit/Source/TrioReserve1/Writers.lean:44:83: error: unsolved goals
+ctx : Context
+before : World
+requested : Word
+⊢ ((match
+                    ((if
+                            requested.val <
+                              (before.core.readContractSlot ctx.self.val
+                                  98745094848219021845709341126137206087956476320004237627304564353676184972307).val then
+                          bindExec
+                            (write ctx 98745094848219021845709341126137206087956476320004237627304564353676184972307
+                              requested)
+                            fun x => emit ctx "DepositsReserveSet" [requested]
+                        else pureExec PUnit.unit)
+                        {
+                          core :=
+                            before.core.writeContractSlot ctx.self.val
+                              27701703846251521692080166008928748084862916315982263796574836279515025533569 requested,
+                          balances := before.balances,
+                          logs :=
+                            before.logs ++
+                              [{ emitter := ctx.self, name := "DepositsReserveTargetSet",
+                                  values := [requested] }] }).outcome with
+                  | Except.ok a =>
+                    {
+                      outcome :=
+                        ((if
+                                requested.val <
+                                  (before.core.readContractSlot ctx.self.val
+                                      98745094848219021845709341126137206087956476320004237627304564353676184972307).val then
+                              bindExec
+                                (write ctx 98745094848219021845709341126137206087956476320004237627304564353676184972307
+                                  requested)
+                                fun x => emit ctx "DepositsReserveSet" [requested]
+                            else pureExec PUnit.unit)
+                            {
+                              core :=
+                                before.core.writeContractSlot ctx.self.val
+                                  27701703846251521692080166008928748084862916315982263796574836279515025533569
+                                  requested,
+                              balances := before.balances,
+                              logs :=
+                                before.logs ++
+                                  [{ emitter := ctx.self, name := "DepositsReserveTargetSet",
+                                      values := [requested] }] }).outcome,
+                      world :=
+                        ((if
+                                requested.val <
+                                  (before.core.readContractSlot ctx.self.val
+                                      98745094848219021845709341126137206087956476320004237627304564353676184972307).val then
+                              bindExec
+                                (write ctx 98745094848219021845709341126137206087956476320004237627304564353676184972307
+                                  requested)
+                                fun x => emit ctx "DepositsReserveSet" [requested]
+                            else pureExec PUnit.unit)
+                            {
+                              core :=
+                                before.core.writeContractSlot ctx.self.val
+                                  27701703846251521692080166008928748084862916315982263796574836279515025533569
+                                  requested,
+                              balances := before.balances,
+                              logs :=
+                                before.logs ++
+                                  [{ emitter := ctx.self, name := "DepositsReserveTargetSet",
+                                      values := [requested] }] }).world,
+                      attempts :=
+                        ((if
+                                requested.val <
+                                  (before.core.readContractSlot ctx.self.val
+                                      98745094848219021845709341126137206087956476320004237627304564353676184972307).val then
+                              bindExec
+                                (write ctx 98745094848219021845709341126137206087956476320004237627304564353676184972307
+                                  requested)
+                                fun x => emit ctx "DepositsReserveSet" [requested]
+                            else pureExec PUnit.unit)
+                            {
+                              core :=
+                                before.core.writeContractSlot ctx.self.val
+                                  27701703846251521692080166008928748084862916315982263796574836279515025533569
+                                  requested,
+                              balances := before.balances,
+                              logs :=
+                                before.logs ++
+                                  [{ emitter := ctx.self, name := "DepositsReserveTargetSet",
+                                      values := [requested] }] }).attempts }
+                  | Except.error e =>
+                    { outcome := Except.error e, world := before,
+                      attempts :=
+                        ((if
+                                requested.val <
+                                  (before.core.readContractSlot ctx.self.val
+                                      98745094848219021845709341126137206087956476320004237627304564353676184972307).val then
+                              bindExec
+                                (write ctx 98745094848219021845709341126137206087956476320004237627304564353676184972307
+                                  requested)
+                                fun x => emit ctx "DepositsReserveSet" [requested]
+                            else pureExec PUnit.unit)
+                            {
+                              core :=
+                                before.core.writeContractSlot ctx.self.val
+                                  27701703846251521692080166008928748084862916315982263796574836279515025533569
+                                  requested,
+                              balances := before.balances,
+                              logs :=
+                                before.logs ++
+                                  [{ emitter := ctx.self, name := "DepositsReserveTargetSet",
+                                      values := [requested] }] }).attempts }).world.core.readContractSlot
+            ctx.self.val 58633038141160254931551461942745098930256005786588180041600420958536885799519).val %
+        width =
+      (before.core.readContractSlot ctx.self.val
+            58633038141160254931551461942745098930256005786588180041600420958536885799519).val %
+        width ∧
+    ((match
+                    ((if
+                            requested.val <
+                              (before.core.readContractSlot ctx.self.val
+                                  98745094848219021845709341126137206087956476320004237627304564353676184972307).val then
+                          bindExec
+                            (write ctx 98745094848219021845709341126137206087956476320004237627304564353676184972307
+                              requested)
+                            fun x => emit ctx "DepositsReserveSet" [requested]
+                        else pureExec PUnit.unit)
+                        {
+                          core :=
+                            before.core.writeContractSlot ctx.self.val
+                              27701703846251521692080166008928748084862916315982263796574836279515025533569 requested,
+                          balances := before.balances,
+                          logs :=
+                            before.logs ++
+                              [{ emitter := ctx.self, name := "DepositsReserveTargetSet",
+                                  values := [requested] }] }).outcome with
+                  | Except.ok a =>
+                    {
+                      outcome :=
+                        ((if
+                                requested.val <
+                                  (before.core.readContractSlot ctx.self.val
+                                      98745094848219021845709341126137206087956476320004237627304564353676184972307).val then
+                              bindExec
+                                (write ctx 98745094848219021845709341126137206087956476320004237627304564353676184972307
+                                  requested)
+                                fun x => emit ctx "DepositsReserveSet" [requested]
+                            else pureExec PUnit.unit)
+                            {
+                              core :=
+                                before.core.writeContractSlot ctx.self.val
+                                  27701703846251521692080166008928748084862916315982263796574836279515025533569
+                                  requested,
+                              balances := before.balances,
+                              logs :=
+                                before.logs ++
+                                  [{ emitter := ctx.self, name := "DepositsReserveTargetSet",
+                                      values := [requested] }] }).outcome,
+                      world :=
+                        ((if
+                                requested.val <
+                                  (before.core.readContractSlot ctx.self.val
+                                      98745094848219021845709341126137206087956476320004237627304564353676184972307).val then
+                              bindExec
+                                (write ctx 98745094848219021845709341126137206087956476320004237627304564353676184972307
+                                  requested)
+                                fun x => emit ctx "DepositsReserveSet" [requested]
+                            else pureExec PUnit.unit)
+                            {
+                              core :=
+                                before.core.writeContractSlot ctx.self.val
+                                  27701703846251521692080166008928748084862916315982263796574836279515025533569
+                                  requested,
+                              balances := before.balances,
+                              logs :=
+                                before.logs ++
+                                  [{ emitter := ctx.self, name := "DepositsReserveTargetSet",
+                                      values := [requested] }] }).world,
+                      attempts :=
+                        ((if
+                                requested.val <
+                                  (before.core.readContractSlot ctx.self.val
+                                      98745094848219021845709341126137206087956476320004237627304564353676184972307).val then
+                              bindExec
+                                (write ctx 98745094848219021845709341126137206087956476320004237627304564353676184972307
+                                  requested)
+                                fun x => emit ctx "DepositsReserveSet" [requested]
+                            else pureExec PUnit.unit)
+                            {
+                              core :=
+                                before.core.writeContractSlot ctx.self.val
+                                  27701703846251521692080166008928748084862916315982263796574836279515025533569
+                                  requested,
+                              balances := before.balances,
+                              logs :=
+                                before.logs ++
+                                  [{ emitter := ctx.self, name := "DepositsReserveTargetSet",
+                                      values := [requested] }] }).attempts }
+                  | Except.error e =>
+                    { outcome := Except.error e, world := before,
+                      attempts :=
+                        ((if
+                                requested.val <
+                                  (before.core.readContractSlot ctx.self.val
+                                      98745094848219021845709341126137206087956476320004237627304564353676184972307).val then
+                              bindExec
+                                (write ctx 98745094848219021845709341126137206087956476320004237627304564353676184972307
+                                  requested)
+                                fun x => emit ctx "DepositsReserveSet" [requested]
+                            else pureExec PUnit.unit)
+                            {
+                              core :=
+                                before.core.writeContractSlot ctx.self.val
+                                  27701703846251521692080166008928748084862916315982263796574836279515025533569
+                                  requested,
+                              balances := before.balances,
+                              logs :=
+                                before.logs ++
+                                  [{ emitter := ctx.self, name := "DepositsReserveTargetSet",
+                                      values := [requested] }] }).attempts }).world.core.readContractSlot
+            ctx.self.val 27701703846251521692080166008928748084862916315982263796574836279515025533569).val =
+        requested.val ∧
+      ((match
+                    ((if
+                            requested.val <
+                              (before.core.readContractSlot ctx.self.val
+                                  98745094848219021845709341126137206087956476320004237627304564353676184972307).val then
+                          bindExec
+                            (write ctx 98745094848219021845709341126137206087956476320004237627304564353676184972307
+                              requested)
+                            fun x => emit ctx "DepositsReserveSet" [requested]
+                        else pureExec PUnit.unit)
+                        {
+                          core :=
+                            before.core.writeContractSlot ctx.self.val
+                              27701703846251521692080166008928748084862916315982263796574836279515025533569 requested,
+                          balances := before.balances,
+                          logs :=
+                            before.logs ++
+                              [{ emitter := ctx.self, name := "DepositsReserveTargetSet",
+                                  values := [requested] }] }).outcome with
+                  | Except.ok a =>
+                    {
+                      outcome :=
+                        ((if
+                                requested.val <
+                                  (before.core.readContractSlot ctx.self.val
+                                      98745094848219021845709341126137206087956476320004237627304564353676184972307).val then
+                              bindExec
+                                (write ctx 98745094848219021845709341126137206087956476320004237627304564353676184972307
+                                  requested)
+                                fun x => emit ctx "DepositsReserveSet" [requested]
+                            else pureExec PUnit.unit)
+                            {
+                              core :=
+                                before.core.writeContractSlot ctx.self.val
+                                  27701703846251521692080166008928748084862916315982263796574836279515025533569
+                                  requested,
+                              balances := before.balances,
+                              logs :=
+                                before.logs ++
+                                  [{ emitter := ctx.self, name := "DepositsReserveTargetSet",
+                                      values := [requested] }] }).outcome,
+                      world :=
+                        ((if
+                                requested.val <
+                                  (before.core.readContractSlot ctx.self.val
+                                      98745094848219021845709341126137206087956476320004237627304564353676184972307).val then
+                              bindExec
+                                (write ctx 98745094848219021845709341126137206087956476320004237627304564353676184972307
+                                  requested)
+                                fun x => emit ctx "DepositsReserveSet" [requested]
+                            else pureExec PUnit.unit)
+                            {
+                              core :=
+                                before.core.writeContractSlot ctx.self.val
+                                  27701703846251521692080166008928748084862916315982263796574836279515025533569
+                                  requested,
+                              balances := before.balances,
+                              logs :=
+                                before.logs ++
+                                  [{ emitter := ctx.self, name := "DepositsReserveTargetSet",
+                                      values := [requested] }] }).world,
+                      attempts :=
+                        ((if
+                                requested.val <
+                                  (before.core.readContractSlot ctx.self.val
+                                      98745094848219021845709341126137206087956476320004237627304564353676184972307).val then
+                              bindExec
+                                (write ctx 98745094848219021845709341126137206087956476320004237627304564353676184972307
+                                  requested)
+                                fun x => emit ctx "DepositsReserveSet" [requested]
+                            else pureExec PUnit.unit)
+                            {
+                              core :=
+                                before.core.writeContractSlot ctx.self.val
+                                  27701703846251521692080166008928748084862916315982263796574836279515025533569
+                                  requested,
+                              balances := before.balances,
+                              logs :=
+                                before.logs ++
+                                  [{ emitter := ctx.self, name := "DepositsReserveTargetSet",
+                                      values := [requested] }] }).attempts }
+                  | Except.error e =>
+                    { outcome := Except.error e, world := before,
+                      attempts :=
+                        ((if
+                                requested.val <
+                                  (before.core.readContractSlot ctx.self.val
+                                      98745094848219021845709341126137206087956476320004237627304564353676184972307).val then
+                              bindExec
+                                (write ctx 98745094848219021845709341126137206087956476320004237627304564353676184972307
+                                  requested)
+                                fun x => emit ctx "DepositsReserveSet" [requested]
+                            else pureExec PUnit.unit)
+                            {
+                              core :=
+                                before.core.writeContractSlot ctx.self.val
+                                  27701703846251521692080166008928748084862916315982263796574836279515025533569
+                                  requested,
+                              balances := before.balances,
+                              logs :=
+                                before.logs ++
+                                  [{ emitter := ctx.self, name := "DepositsReserveTargetSet",
+                                      values := [requested] }] }).attempts }).world.core.readContractSlot
+            ctx.self.val 98745094848219021845709341126137206087956476320004237627304564353676184972307).val =
+        min
+          (before.core.readContractSlot ctx.self.val
+              98745094848219021845709341126137206087956476320004237627304564353676184972307).val
+          requested.val
+LidoSRv3/Audit/Source/TrioReserve1/Writers.lean:46:36: warning: This simp argument is unused:
+  pureExec
+
+Hint: Omit it from the simp argument list.
+  simp [run, setDepositsReserveTarget, setDepositsReserve, Live.write, emit, Live.read,
+  ̵  ̵ ̵ ̵Bind.bind,
+  ̲  ̲ ̲ ̲Pure.pure, bindExec, pu̵re̵E̵x̵e̵c̵,̵ ̵p̵r̵oject, WriterSpec.Target,
+  ̵  ̵ ̵ ̵read_write_other,
+  ̲  ̲ ̲ ̲Verity.ContractState.readContractSlot_writeContractSlot_same,
+  ̵  ̵ ̵ ̵targetSlot, reserveSlot,
+  ̲  ̲ ̲ ̲bufferSlot]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/Writers.lean:47:22: warning: This simp argument is unused:
+  Verity.ContractState.readContractSlot_writeContractSlot_same
+
+Hint: Omit it from the simp argument list.
+  simp [run, setDepositsReserveTarget, setDepositsReserve, Live.write, emit, Live.read, Bind.bind,
+  ̲  ̲ ̲ ̲Pure.pure, bindExec, pureExec, project, WriterSpec.Target, read_write_other, V̵e̵r̵i̵t̵y̵.̵C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵r̵e̵a̵d̵C̵o̵n̵t̵r̵a̵c̵t̵S̵l̵o̵t̵_̵w̵r̵i̵t̵e̵C̵o̵n̵t̵r̵a̵c̵t̵S̵l̵o̵t̵_̵s̵a̵m̵e̵,̵targetSlot,
+      reserveSlot, bufferSlot]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

@@ -1,0 +1,82 @@
+{
+  "time_utc": "2026-09-07T09:15:47.132690+00:00",
+  "cwd": "/workspaces/mission-f19a12b3/reserve1-private",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit": 0,
+      "stdout": "c7adae04416704a839d56333efad003f0a0f46b7\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "submodule",
+        "status"
+      ],
+      "exit": 0,
+      "stdout": " 17005714f151e5502c559932319a3f2f74ac2436 lido-core (v3.0.0-mainnet-deploy-1430-g17005714f)\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "df",
+        "-h",
+        "."
+      ],
+      "exit": 0,
+      "stdout": "Filesystem      Size  Used Avail Use% Mounted on\n/dev/md3        3.7T  1.7T  1.9T  47% /\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "free",
+        "-h"
+      ],
+      "exit": 0,
+      "stdout": "               total        used        free      shared  buff/cache   available\nMem:            62Gi        26Gi       1.0Gi        31Mi        35Gi        36Gi\nSwap:           15Gi       5.4Gi        10Gi\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "getconf",
+        "_NPROCESSORS_ONLN"
+      ],
+      "exit": 0,
+      "stdout": "12\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "node",
+        "--version"
+      ],
+      "exit": 0,
+      "stdout": "v18.19.1\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "forge",
+        "--version"
+      ],
+      "exit": 0,
+      "stdout": "forge Version: 1.5.0-v1.5.0\nCommit SHA: 1c57854462289b2e71ee7654cd6666217ed86ffd\nBuild Timestamp: 2025-11-24T06:05:14.965520784Z (1763964314)\nBuild Profile: maxperf\n",
+      "stderr": ""
+    }
+  ],
+  "sha256": {
+    "lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
+    "lean-toolchain": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee",
+    "verity/targets/audit-manifest.json": "990daa925991baf8ac3628a8bd9979f1baa058eb37a1a0b3dd80b49eb10e5cf4",
+    "lido-core/yarn.lock": "d17f979eed36218b0bed85cf560bdc2e5d182e0c67aff6eabf2c68be8597c921",
+    "lido-core/package.json": "5e6bd056082e23c6628aee085df5ce0743070d08d5a3e27496991e09f74b638e",
+    "lido-core/hardhat.config.ts": "29b3e91ff197c0ea1df5b6401cc12982d3f684e7bf3e68b380096fe33e43b223"
+  },
+  "private_lake": "/workspaces/mission-f19a12b3/reserve1-private/.lake",
+  "remote_build": "Not yet accepted; --help was treated as build argv and rejected HTTP 422, no job created."
+}

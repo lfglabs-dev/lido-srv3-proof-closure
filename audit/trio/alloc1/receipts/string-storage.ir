@@ -1,0 +1,36 @@
+            function extract_byte_array_length(data) -> length
+            {
+                length := shr(1, data)
+                let outOfPlaceEncoding := and(data, 1)
+                if iszero(outOfPlaceEncoding) { length := and(length, 0x7f) }
+                if eq(outOfPlaceEncoding, lt(length, 32))
+                {
+                    mstore(0, shl(224, 0x4e487b71))
+                    mstore(4, 0x22)
+                    revert(0, 0x24)
+                }
+            }
+            function clear_storage_range_bytes1(start, end)
+            {
+                for { } lt(start, end) { start := add(start, 1) }
+                {
+                    sstore(start, /** @src -1:-1:-1 */ 0)
+                }
+            }
+            /// @src 14:560:562  "32"
+            function clean_up_bytearray_end_slots_string_storage(array, len, startIndex)
+            {
+                if gt(len, 31)
+                {
+                    mstore(/** @src -1:-1:-1 */ 0, /** @src 14:560:562  "32" */ array)
+                    let data := keccak256(/** @src -1:-1:-1 */ 0, /** @src 14:560:562  "32" */ 0x20)
+                    let deleteStart := add(data, shr(5, add(startIndex, 31)))
+                    if lt(startIndex, 0x20) { deleteStart := data }
+                    clear_storage_range_bytes1(deleteStart, add(data, shr(5, add(len, 31))))
+                }
+            }
+            function extract_used_part_and_set_length_of_short_byte_array(data, len) -> used
+            {
+                used := or(and(data, not(shr(shl(3, len), not(0)))), shl(1, len))
+            }
+            /// @src 11:955:47234  "library SRLib {..."

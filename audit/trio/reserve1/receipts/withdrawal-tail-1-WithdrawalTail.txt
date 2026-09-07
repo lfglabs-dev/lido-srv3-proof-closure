@@ -1,0 +1,35 @@
+LidoSRv3/Audit/Source/TrioReserve1/WithdrawalTail.lean:21:0: error: (deterministic) timeout at `whnf`, maximum number of heartbeats (200000) has been reached
+
+Note: Use `set_option maxHeartbeats <num>` to set the limit.
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.
+LidoSRv3/Audit/Source/TrioReserve1/WithdrawalTail.lean:29:50: error: Type mismatch
+  rfl
+has type
+  ?m.39 = ?m.39
+but is expected to have type
+  withdrawDepositableEther external ctx amount seeds = do
+    let allowed ← canDeposit external ctx
+    require allowed (Fault.reason "CAN_NOT_DEPOSIT")
+    let router ← stakingRouter external ctx
+    require (decide (ctx.sender = router)) (Fault.reason "APP_AUTH_FAILED")
+    require (decide (amount.val ≠ 0)) (Fault.reason "ZERO_AMOUNT")
+    spendDepositableEther external ctx amount
+    finish external ctx router amount seeds
+LidoSRv3/Audit/Source/TrioReserve1/WithdrawalTail.lean:58:20: warning: This simp argument is unused:
+  pure
+
+Hint: Omit it from the simp argument list.
+  simp [updateSeeds, hn, Live.read, checkedAdd, require, Nat.not_lt.mpr hb,
+  ̵  ̵ ̵ ̵bind, bindExec,
+  ̲ p̵u̵r̵e̵,̵  ̲ ̲pureExec, fail]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/WithdrawalTail.lean:58:26: warning: This simp argument is unused:
+  pureExec
+
+Hint: Omit it from the simp argument list.
+  simp [updateSeeds, hn, Live.read, checkedAdd, require, Nat.not_lt.mpr hb, bind, bindExec, pure,
+  ̲  ̲ ̲ ̲p̵u̵r̵e̵E̵x̵e̵c̵,̵ ̵fail]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

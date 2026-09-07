@@ -88,6 +88,34 @@ lean_lib «LidoSRv3Test» where
 lean_lib «LidoSRv3Audit» where
   roots := #[`LidoSRv3.Audit.Trust]
 
+/-- Cross-check the staged indexed parent against the integrated source/ABI parent. -/
+lean_lib «TrioIntegrationChecks» where
+  globs := #[
+    .one `audit.trio.integration.IndexedParentBridge,
+    .one `audit.trio.alloc2.composition.Composition,
+    .one `audit.trio.alloc2.composition.LibraryABI,
+    .one `audit.trio.alloc2.composition.AllocationMemoryBridge,
+    .one `audit.trio.alloc2.composition.MemoryExtent,
+    .one `audit.trio.alloc2.composition.Parent,
+    .one `audit.trio.alloc2.composition.ParentErrors,
+    .one `audit.trio.alloc2.composition.ParentInversion,
+    .one `audit.trio.alloc2.composition.ProducerMemory,
+    .one `audit.trio.alloc2.composition.ProducerMemoryVectors,
+    .one `audit.trio.alloc2.composition.MemoryWrite,
+    .one `audit.trio.alloc2.composition.MemoryWriteVectors,
+    .one `audit.trio.alloc2.composition.IndexedMemory,
+    .one `audit.trio.alloc2.composition.ByteMemory,
+    .one `audit.trio.alloc2.composition.ByteFrame,
+    .one `audit.trio.alloc2.composition.ByteIndexed,
+    .one `audit.trio.alloc2.composition.ByteInitialize,
+    .one `audit.trio.alloc2.composition.ByteProducer,
+    .one `audit.trio.alloc2.composition.ByteVectors,
+    .one `audit.trio.alloc2.composition.ParentPostconditions,
+    .one `audit.trio.alloc2.composition.ParentVectors,
+    .one `audit.trio.alloc2.composition.MemoryVectors,
+    .one `audit.trio.alloc2.composition.LibraryABIVectors
+  ]
+
 /-- Superseded P1–P15 lane. Not a default target. -/
 lean_lib «LidoSRv3Legacy» where
   globs := #[.submodules `LidoSRv3.Legacy]

@@ -1,0 +1,44 @@
+{
+  "sha": "9168480096fe056c13b9d445c4052b20514c8bbf",
+  "command": "remote-lean-build lake build LidoSRv3 LidoSRv3Test LidoSRv3Audit",
+  "mission": "239f13eb-952d-495f-8341-a0c7319f6c0f",
+  "mission_mode": "command-only; no prompt or AI run",
+  "owner_user_id": "codex-lido-integration",
+  "workspace": "440ec9d3-b7f3-4188-9454-cda805bb6259",
+  "checkout": "/workspaces/lido-integration-validation-91684800",
+  "durable_job": "2eeec2f4-ab09-5940-9948-718b991b00a7",
+  "requested_node": "dgx-spark",
+  "remote_job": "e380a57b-921d-46af-b2ea-38053f29ad72",
+  "estimated_disk_gib": 5,
+  "earlier_terminal_admission_failures": [
+    "7a5af9b7-a603-5285-bcef-e1e24b326fe9",
+    "64c045f5-6cac-5485-8f5d-23068b2e4745",
+    "40329a95-2ab2-5472-85b0-9e2a6fb1d009"
+  ],
+  "earlier_failure": "ashur 84 GiB available; 5 GiB estimate plus unchanged 80 GiB floor. Workspace injection overwrote requested env routing. Latest command explicitly sets REMOTE_BUILD_NODE_ID=dgx-spark.",
+  "status": "succeeded",
+  "later_integration_head": "9d0bcdbe",
+  "later_integrated_checkpoints_not_covered_by_this_build": {
+    "alloc1": "9923f9d6",
+    "alloc2": "b279d572",
+    "reserve1": "1b3adaed"
+  },
+  "exit_code": 0,
+  "build_jobs": 1577,
+  "validation_scope": "Full production/test/audit lake build at 91684800 only; not make prove/test, later source, or independent certification",
+  "logs": {
+    "stdout.log": {
+      "sha256": "cb5795cdbeb80c205fafe34698981d5040171b14a6b61fbc804b367e9a9d099f",
+      "bytes": 65536
+    },
+    "stderr.log": {
+      "sha256": "1375c51052b82d060c4599cca1007eaa71549e2cf06f444e0237a02a22b4da16",
+      "bytes": 718
+    },
+    "exit.json": {
+      "sha256": "48975dc97b07b929b87b006fe7e02251c32b256bf058cc069081b71616a84b19",
+      "bytes": 67
+    }
+  },
+  "stdout_scope": "Remote runner terminal log tail, capped at 65536 bytes; not the complete compiler log"
+}

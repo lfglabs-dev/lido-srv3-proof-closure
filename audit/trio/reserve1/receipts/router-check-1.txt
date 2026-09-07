@@ -1,0 +1,42 @@
+LidoSRv3/Audit/Source/TrioReserve1/Router.lean:47:23: error(lean.invalidField): Invalid field `val`: The environment does not contain `LidoSRv3.Audit.Source.TrioReserve1.Live.Reply.val`, so it is not possible to project the field `val` from an expression
+  x✝
+of type `Reply`
+LidoSRv3/Audit/Source/TrioReserve1/Router.lean:47:11: error: Application type mismatch: The argument
+  congrArg (fun x => ?m.64) h
+has type
+  ?m.65
+      (if req.caller = lido then
+        Reply.success []
+          { core := w.core, balances := w.balances,
+            logs := w.logs ++ [{ emitter := router, name := "DepositableEthReceived", values := [req.value] }] }
+      else Reply.rejected notAuthorized) =
+    ?m.65 (Reply.success data✝ world✝)
+but is expected to have type
+  req.caller.val = lido.val
+in the application
+  And.intro (congrArg (fun x => ?m.64) h)
+LidoSRv3/Audit/Source/TrioReserve1/Router.lean:51:4: error: Tactic `apply` failed: could not unify the type of `h`
+  (if req.caller = lido then
+      Reply.success []
+        { core := w.core, balances := w.balances,
+          logs := w.logs ++ [{ emitter := router, name := "DepositableEthReceived", values := [req.value] }] }
+    else Reply.rejected notAuthorized) =
+    Reply.rejected data✝
+with the goal
+  False
+
+case h_2
+router lido : Address
+req : Request
+w : World
+x✝ : Reply
+data✝ : Bytes
+h :
+  (if req.caller = lido then
+      Reply.success []
+        { core := w.core, balances := w.balances,
+          logs := w.logs ++ [{ emitter := router, name := "DepositableEthReceived", values := [req.value] }] }
+    else Reply.rejected notAuthorized) =
+    Reply.rejected data✝
+he : req.caller.val = lido.val
+⊢ False

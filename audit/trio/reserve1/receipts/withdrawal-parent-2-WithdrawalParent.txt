@@ -1,0 +1,6 @@
+LidoSRv3/Audit/Source/TrioReserve1/WithdrawalParent.lean:47:17: warning: Local variable 'unit' resembles constructor 'PUnit.unit' - write '.unit' (with a dot) or 'PUnit.unit' to use the constructor.
+
+Note: This linter can be disabled with `set_option linter.constructorNameAsVariable false`
+LidoSRv3/Audit/Source/TrioReserve1/WithdrawalParent.lean:53:19: warning: Local variable 'unit' resembles constructor 'PUnit.unit' - write '.unit' (with a dot) or 'PUnit.unit' to use the constructor.
+
+Note: This linter can be disabled with `set_option linter.constructorNameAsVariable false`

@@ -1,0 +1,12 @@
+This version of µWS is not compatible with your Node.js build:
+
+Error: Cannot find module '../binaries/uws_linux_x64_127.node'
+Require stack:
+- /workspaces/mission-f19a12b3/reserve1-private/solidity/trio-reserve1/node_modules/ganache/node_modules/@trufflesuite/uws-js-unofficial/src/uws.js
+- /workspaces/mission-f19a12b3/reserve1-private/solidity/trio-reserve1/node_modules/ganache/dist/node/core.js
+- /workspaces/mission-f19a12b3/reserve1-private/solidity/trio-reserve1/execute.cjs
+Falling back to a NodeJS implementation; performance may be degraded.
+
+
+17 pinned Solidity cases executed; reverts checked against physical storage, balances and logs.
+17 matching Solidity/Verity cases passed.

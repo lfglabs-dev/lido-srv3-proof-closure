@@ -1,0 +1,111 @@
+{
+  "utc": "2026-09-07T11:21:18.415677+00:00",
+  "recovered_head": "fa377ac1372733b8781255a5e47cfde80f92e9d6",
+  "previous_turn_classification": "progress: retained terminal remote failure and PR reconciliation supplied new evidence",
+  "pr": {
+    "headRefOid": "fa377ac1372733b8781255a5e47cfde80f92e9d6",
+    "isDraft": true,
+    "number": 244,
+    "state": "OPEN",
+    "url": "https://github.com/lfglabs-dev/lido-srv3-proof-closure/pull/244"
+  },
+  "remote_complete_source": {
+    "command": "REMOTE_BUILD_SOURCE_MODE=full remote-lean-build lake build LidoSRv3 LidoSRv3Test LidoSRv3Audit",
+    "exit": 2,
+    "submitted": false,
+    "job_id": null,
+    "bundle_digest": null,
+    "diagnostic": "source bundle path must be a regular file, not a symlink: lido-core; failed to encode request",
+    "dependency_transport": "installed wrapper rejects .lake path components and has no dependency bundle argument",
+    "wrapper_sha256": "83736ff6da600782680e9ce6f8d4e7b7e32f58acc5bbc6f0e127130088357d20"
+  },
+  "dependencies": [
+    {
+      "name": "verity",
+      "expected": "e977aaad6e1a9e92e0132d41b3d33a14135a4d46",
+      "actual": "e977aaad6e1a9e92e0132d41b3d33a14135a4d46",
+      "exit": 0,
+      "matches": true
+    },
+    {
+      "name": "evmyul",
+      "expected": "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9",
+      "actual": "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9",
+      "exit": 0,
+      "matches": true
+    },
+    {
+      "name": "mathlib",
+      "expected": "fabf563a7c95a166b8d7b6efca11c8b4dc9d911f",
+      "actual": "fabf563a7c95a166b8d7b6efca11c8b4dc9d911f",
+      "exit": 0,
+      "matches": true
+    },
+    {
+      "name": "plausible",
+      "expected": "63045536fe95024e6c18fc7b48e03f506701c5bc",
+      "actual": "63045536fe95024e6c18fc7b48e03f506701c5bc",
+      "exit": 0,
+      "matches": true
+    },
+    {
+      "name": "LeanSearchClient",
+      "expected": "c5d5b8fe6e5158def25cd28eb94e4141ad97c843",
+      "actual": "c5d5b8fe6e5158def25cd28eb94e4141ad97c843",
+      "exit": 0,
+      "matches": true
+    },
+    {
+      "name": "importGraph",
+      "expected": "5c7542ed018c78194f1e2b903eaf6a792b74c03d",
+      "actual": "5c7542ed018c78194f1e2b903eaf6a792b74c03d",
+      "exit": 0,
+      "matches": true
+    },
+    {
+      "name": "proofwidgets",
+      "expected": "24b0d9dc081c5423f8eec7e866c441e5184f29d9",
+      "actual": "24b0d9dc081c5423f8eec7e866c441e5184f29d9",
+      "exit": 0,
+      "matches": true
+    },
+    {
+      "name": "aesop",
+      "expected": "e3cb2f741431ce31bf73549fb52316a57368b06f",
+      "actual": "e3cb2f741431ce31bf73549fb52316a57368b06f",
+      "exit": 0,
+      "matches": true
+    },
+    {
+      "name": "Qq",
+      "expected": "f46324995fca5f0483b742e4eb4daec7f4ee50d2",
+      "actual": "f46324995fca5f0483b742e4eb4daec7f4ee50d2",
+      "exit": 0,
+      "matches": true
+    },
+    {
+      "name": "batteries",
+      "expected": "fa08db58b30eb033edcdab331bba000827f9f785",
+      "actual": "fa08db58b30eb033edcdab331bba000827f9f785",
+      "exit": 0,
+      "matches": true
+    },
+    {
+      "name": "Cli",
+      "expected": "92564e5770e4d09f2d86dfbf8ada1e9c715b384c",
+      "actual": "92564e5770e4d09f2d86dfbf8ada1e9c715b384c",
+      "exit": 0,
+      "matches": true
+    }
+  ],
+  "lightweight_check": {
+    "command": "LEAN_PATH=.lake/build/lib/lean audit/trio/reserve1/.local/lean4-v4.31.0/bin/lean LidoSRv3/Audit/Source/TrioReserve1/AllocationSpec.lean",
+    "exit": 0,
+    "source_sha256": "0ac96b84013977f21dcb8bc3577650a720bc09ce0f36ce99a0da16d07f7e5ccf",
+    "lean_sha256": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550",
+    "toolchain": "Lean (version 4.31.0, x86_64-unknown-linux-gnu, commit 68218e876d2a38b1985b8590fff244a83c321783, Release)",
+    "scope": "AllocationSpec only, using existing imported oleans; not clean/full build"
+  },
+  "completion": false,
+  "independent_certification": false
+}

@@ -1,0 +1,13 @@
+{
+  "classification": "FAILED_FULL_VALIDATION_WITH_PASSED_COMPONENTS",
+  "source_commit": "03f170850b5b31feffe4b166b3e3d161c65b0767",
+  "remote_job": "c285693a-5b5a-495f-8751-031e9ef7caed",
+  "node": "nippur",
+  "full_build": "passed",
+  "make_prove": "passed (legacy scope, not trio certification)",
+  "make_test": "failed: stale validation-receipt tree",
+  "producer_vm_vectors": 12,
+  "parent_vm_checks": 6,
+  "parent_vm_differential_rows": 8,
+  "independent_certification": false
+}

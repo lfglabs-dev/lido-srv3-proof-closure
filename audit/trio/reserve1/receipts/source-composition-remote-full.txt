@@ -1,0 +1,3 @@
+remote-lean-build: ignoring untracked non-Lean files: audit/trio/reserve1/receipts/allocation-check-1.exit, audit/trio/reserve1/receipts/allocation-check-1.txt, audit/trio/reserve1/receipts/allocation-check-2.exit, audit/trio/reserve1/receipts/allocation-check-2.txt, audit/trio/reserve1/receipts/allocation-check-3.exit, audit/trio/reserve1/receipts/allocation-check-3.txt, audit/trio/reserve1/receipts/allocationspec-check-1.exit, audit/trio/reserve1/receipts/allocationspec-check-1.txt
+source bundle path must be a regular file, not a symlink: lido-core
+remote-lean-build: failed to encode request

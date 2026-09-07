@@ -1,0 +1,227 @@
+LidoSRv3/Audit/Source/TrioReserve1/ACLLeaf.lean:21:56: error: unsolved goals
+case true.false
+op compared value : Nat
+hv : op ≤ 12
+hr : ¬op = 7
+hs :
+  (op = 1 → ¬value = compared) ∧
+    (op = 2 → value = compared) ∧
+      (op = 3 → value ≤ compared) ∧
+        (op = 4 → compared ≤ value) ∧ (op = 5 → value < compared) ∧ (op = 6 → compared < value)
+hc :
+  op = 1 ∧ value = compared ∨
+    op = 2 ∧ ¬value = compared ∨
+      op = 3 ∧ compared < value ∨ op = 4 ∧ value < compared ∨ op = 5 ∧ compared ≤ value ∨ op = 6 ∧ value ≤ compared
+hh : ACL.compare op value compared = false
+⊢ False
+LidoSRv3/Audit/Source/TrioReserve1/ACLLeaf.lean:59:95: error: unsolved goals
+case block
+k : Queue.Keccak
+external : StaticCall.External
+self : Address
+hash : Word
+who where_ : Address
+role : Word
+how : List Word
+w : World
+fuel index : Nat
+hb : index < (w.core.readContractSlot self.val (ACL.paramsSlot k hash)).val
+h✝ : (ACL.param k self hash index w).id = 200
+⊢ (w.core.readContractSlot self.val (ACL.paramsSlot k hash)).val ≤ index →
+    Except.ok false =
+        (if 12 < (ACL.param k self hash index w).op then { outcome := Except.error ACL.Halt.invalidOpcode }
+          else
+            {
+              outcome :=
+                Except.ok
+                  (if (ACL.param k self hash index w).op = 7 then decide (0 < w.core.blockNumber.val)
+                  else
+                    ACL.compare (ACL.param k self hash index w).op w.core.blockNumber.val
+                      (ACL.param k self hash index w).value) }).outcome ∧
+      (if 12 < (ACL.param k self hash index w).op then { outcome := Except.error ACL.Halt.invalidOpcode }
+          else
+            {
+              outcome :=
+                Except.ok
+                  (if (ACL.param k self hash index w).op = 7 then decide (0 < w.core.blockNumber.val)
+                  else
+                    ACL.compare (ACL.param k self hash index w).op w.core.blockNumber.val
+                      (ACL.param k self hash index w).value) }).attempts =
+        []
+
+case time
+k : Queue.Keccak
+external : StaticCall.External
+self : Address
+hash : Word
+who where_ : Address
+role : Word
+how : List Word
+w : World
+fuel index : Nat
+hb : index < (w.core.readContractSlot self.val (ACL.paramsSlot k hash)).val
+h✝ : (ACL.param k self hash index w).id = 201
+⊢ (w.core.readContractSlot self.val (ACL.paramsSlot k hash)).val ≤ index →
+    Except.ok false =
+        (if 12 < (ACL.param k self hash index w).op then { outcome := Except.error ACL.Halt.invalidOpcode }
+          else
+            {
+              outcome :=
+                Except.ok
+                  (if (ACL.param k self hash index w).op = 7 then decide (0 < w.core.blockTimestamp.val)
+                  else
+                    ACL.compare (ACL.param k self hash index w).op w.core.blockTimestamp.val
+                      (ACL.param k self hash index w).value) }).outcome ∧
+      (if 12 < (ACL.param k self hash index w).op then { outcome := Except.error ACL.Halt.invalidOpcode }
+          else
+            {
+              outcome :=
+                Except.ok
+                  (if (ACL.param k self hash index w).op = 7 then decide (0 < w.core.blockTimestamp.val)
+                  else
+                    ACL.compare (ACL.param k self hash index w).op w.core.blockTimestamp.val
+                      (ACL.param k self hash index w).value) }).attempts =
+        []
+
+case constant
+k : Queue.Keccak
+external : StaticCall.External
+self : Address
+hash : Word
+who where_ : Address
+role : Word
+how : List Word
+w : World
+fuel index : Nat
+hb : index < (w.core.readContractSlot self.val (ACL.paramsSlot k hash)).val
+h✝ : (ACL.param k self hash index w).id = 205
+⊢ (w.core.readContractSlot self.val (ACL.paramsSlot k hash)).val ≤ index →
+    Except.ok false =
+        (if 12 < (ACL.param k self hash index w).op then { outcome := Except.error ACL.Halt.invalidOpcode }
+          else
+            {
+              outcome :=
+                Except.ok
+                  (if (ACL.param k self hash index w).op = 7 then decide (0 < (ACL.param k self hash index w).value)
+                  else
+                    ACL.compare (ACL.param k self hash index w).op (ACL.param k self hash index w).value
+                      (ACL.param k self hash index w).value) }).outcome ∧
+      (if 12 < (ACL.param k self hash index w).op then { outcome := Except.error ACL.Halt.invalidOpcode }
+          else
+            {
+              outcome :=
+                Except.ok
+                  (if (ACL.param k self hash index w).op = 7 then decide (0 < (ACL.param k self hash index w).value)
+                  else
+                    ACL.compare (ACL.param k self hash index w).op (ACL.param k self hash index w).value
+                      (ACL.param k self hash index w).value) }).attempts =
+        []
+
+case argument
+k : Queue.Keccak
+external : StaticCall.External
+self : Address
+hash : Word
+who where_ : Address
+role : Word
+how : List Word
+w : World
+fuel index : Nat
+hb : index < (w.core.readContractSlot self.val (ACL.paramsSlot k hash)).val
+hi✝¹ : (ACL.param k self hash index w).id < how.length
+hl : ¬(ACL.param k self hash index w).id = 204
+ho : ¬(ACL.param k self hash index w).id = 203
+hb✝ : ¬(ACL.param k self hash index w).id = 200
+ht✝ : ¬(ACL.param k self hash index w).id = 201
+hc✝ : ¬(ACL.param k self hash index w).id = 205
+hi✝ : (ACL.param k self hash index w).id < how.length
+⊢ (if (w.core.readContractSlot self.val (ACL.paramsSlot k hash)).val ≤ index then { outcome := Except.ok false }
+    else
+      {
+        outcome :=
+          (if how.length ≤ (ACL.param k self hash index w).id then { outcome := Except.ok false }
+            else
+              {
+                outcome :=
+                  (if 12 < (ACL.param k self hash index w).op then { outcome := Except.error ACL.Halt.invalidOpcode }
+                    else
+                      {
+                        outcome :=
+                          Except.ok
+                            (if (ACL.param k self hash index w).op = 7 then
+                              decide
+                                (0 <
+                                  how[(ACL.param k self hash index w).id].val %
+                                    1766847064778384329583297500742918515827483896875618958121606201292619776)
+                            else
+                              ACL.compare (ACL.param k self hash index w).op
+                                (how[(ACL.param k self hash index w).id].val %
+                                  1766847064778384329583297500742918515827483896875618958121606201292619776)
+                                (ACL.param k self hash index w).value) }).outcome,
+                attempts :=
+                  (if 12 < (ACL.param k self hash index w).op then { outcome := Except.error ACL.Halt.invalidOpcode }
+                    else
+                      {
+                        outcome :=
+                          Except.ok
+                            (if (ACL.param k self hash index w).op = 7 then
+                              decide
+                                (0 <
+                                  how[(ACL.param k self hash index w).id].val %
+                                    1766847064778384329583297500742918515827483896875618958121606201292619776)
+                            else
+                              ACL.compare (ACL.param k self hash index w).op
+                                (how[(ACL.param k self hash index w).id].val %
+                                  1766847064778384329583297500742918515827483896875618958121606201292619776)
+                                (ACL.param k self hash index w).value) }).attempts }).outcome,
+        attempts :=
+          (if how.length ≤ (ACL.param k self hash index w).id then { outcome := Except.ok false }
+            else
+              {
+                outcome :=
+                  (if 12 < (ACL.param k self hash index w).op then { outcome := Except.error ACL.Halt.invalidOpcode }
+                    else
+                      {
+                        outcome :=
+                          Except.ok
+                            (if (ACL.param k self hash index w).op = 7 then
+                              decide
+                                (0 <
+                                  how[(ACL.param k self hash index w).id].val %
+                                    1766847064778384329583297500742918515827483896875618958121606201292619776)
+                            else
+                              ACL.compare (ACL.param k self hash index w).op
+                                (how[(ACL.param k self hash index w).id].val %
+                                  1766847064778384329583297500742918515827483896875618958121606201292619776)
+                                (ACL.param k self hash index w).value) }).outcome,
+                attempts :=
+                  (if 12 < (ACL.param k self hash index w).op then { outcome := Except.error ACL.Halt.invalidOpcode }
+                    else
+                      {
+                        outcome :=
+                          Except.ok
+                            (if (ACL.param k self hash index w).op = 7 then
+                              decide
+                                (0 <
+                                  how[(ACL.param k self hash index w).id].val %
+                                    1766847064778384329583297500742918515827483896875618958121606201292619776)
+                            else
+                              ACL.compare (ACL.param k self hash index w).op
+                                (how[(ACL.param k self hash index w).id].val %
+                                  1766847064778384329583297500742918515827483896875618958121606201292619776)
+                                (ACL.param k self hash index w).value) }).attempts }).attempts }) =
+    if 12 < (ACL.param k self hash index w).op then { outcome := Except.error ACL.Halt.invalidOpcode }
+    else
+      {
+        outcome :=
+          Except.ok
+            (if (ACL.param k self hash index w).op = 7 then
+              decide
+                (0 <
+                  how[(ACL.param k self hash index w).id].val %
+                    1766847064778384329583297500742918515827483896875618958121606201292619776)
+            else
+              ACL.compare (ACL.param k self hash index w).op
+                (how[(ACL.param k self hash index w).id].val %
+                  1766847064778384329583297500742918515827483896875618958121606201292619776)
+                (ACL.param k self hash index w).value) }

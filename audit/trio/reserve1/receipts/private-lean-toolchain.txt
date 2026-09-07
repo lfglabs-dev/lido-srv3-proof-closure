@@ -1,0 +1,4 @@
+Lean (version 4.31.0, x86_64-unknown-linux-gnu, commit 68218e876d2a38b1985b8590fff244a83c321783, Release)
+e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550  audit/trio/reserve1/.local/lean4-v4.31.0/bin/lean
+60330ab6f07dce20f3fa9ebb08e8b984ea9549eac172afeb15d9d2227060e2b3  audit/trio/reserve1/.local/lean4-v4.31.0/bin/lake
+89ef0c3bd2c40e727191bcd406ef3dac95e0b9000ac93cb7f8c681031ad486be  audit/trio/reserve1/.local/lean4-v4.31.0/bin/leantar

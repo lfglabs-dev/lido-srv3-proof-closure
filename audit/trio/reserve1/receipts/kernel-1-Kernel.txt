@@ -1,0 +1,7 @@
+LidoSRv3/Audit/Source/TrioReserve1/Kernel.lean:78:41: warning: This simp argument is unused:
+  List.take_left
+
+Hint: Omit it from the simp argument list.
+  simp [decodedReply, ABI.encode_length, L̵i̵s̵t̵.̵t̵a̵k̵e̵_̵l̵e̵f̵t̵,̵ ̵ABI.decode_encode_bounded _ _ hv, Writers.word_val]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

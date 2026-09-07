@@ -1,0 +1,16 @@
+LidoSRv3.Audit.Source.TrioReserve1.Queue.unfinalized_corresponds
+LidoSRv3.Audit.Source.TrioReserve1.Queue.cumulative_bound
+LidoSRv3.Audit.Source.TrioReserve1.Erasure.erase_bind
+LidoSRv3.Audit.Source.TrioReserve1.Erasure.erase_pure
+LidoSRv3.Audit.Source.TrioReserve1.Erasure.erase_run
+LidoSRv3.Audit.Source.TrioReserve1.Erasure.failure_restores_world
+LidoSRv3.Audit.Source.TrioReserve1.Erasure.replacing_attempts_preserves_observables
+LidoSRv3.Audit.Source.TrioReserve1.PhysicalPacking.pack_matches_bitwise
+LidoSRv3.Audit.Source.TrioReserve1.PhysicalPacking.physical_low_bound
+LidoSRv3.Audit.Source.TrioReserve1.PhysicalPacking.physical_high_bound
+LidoSRv3.Audit.Source.TrioReserve1.PhysicalPacking.low_pack
+LidoSRv3.Audit.Source.TrioReserve1.PhysicalPacking.high_pack
+LidoSRv3.Audit.Source.TrioReserve1.Writers.target_corresponds
+LidoSRv3.Audit.Source.TrioReserve1.Writers.rebalance_corresponds
+LidoSRv3.Audit.Source.TrioReserve1.Writers.target_observations
+LidoSRv3.Audit.Source.TrioReserve1.Writers.rebalance_observations

@@ -1,0 +1,15 @@
+{
+  "classification": "PINNED_PROXY_INITIALIZATION_PASS",
+  "durable_job": "38c3b7eb-6bc7-4162-ab33-97ee5cf7e550",
+  "command": "node solidity/trio-alloc1/check-proxy-initialization.cjs /workspaces/mission-c01b16cf/output/proxy-initialization-v2 /workspaces/mission-c01b16cf/temp/proxy-tools",
+  "source_sha256": {
+    "solidity/trio-alloc1/check-proxy-initialization.cjs": "13c927c4dd35354219e3af74887acb9b0d6000977c90405380c51c4ff900d20c"
+  },
+  "output_sha256": "1e597d9032f018b22d6cbd413dec2b7322cd2241b289eba53f2743417f942a47",
+  "notes": [
+    "Original StakingRouter and OssifiableProxy sources, separate exact 0.8.25 and 0.8.9 compilers.",
+    "Fresh deployment and public API history, no writeSlot/test harness.",
+    "Proxy compile targets London, router compile targets Shanghai, Ganache Shanghai. This is execution evidence, not a universal deployment proof.",
+    "First proxy test failed before compilation because root Solidity source used contents instead of content. Corrected input; complete rerun passed."
+  ]
+}

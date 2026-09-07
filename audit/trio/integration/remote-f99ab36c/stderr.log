@@ -1,0 +1,6 @@
+Cloning into '/workspaces/lido-integration-validation-f99ab36c'...
+HEAD is now at f99ab36c Register complete staged composition dependency closure in Lake
+remote-lean-build: pinned tree contains submodules; using legacy runner fetch
+remote-lean-build: dispatching lake env lean --run audit/trio/integration/RunValidation.lean for f99ab36cb63a ...
+remote-lean-build: submitted job bd866a52-7706-4fca-bb76-1829aae7734e on node 'old-agent'; receipt /root/.local/state/sandboxed-sh/remote-builds/4b692cf83d1a9d63a549221efd23a385250759d2d9860b08de8ddf1397eedae3.json
+remote-lean-build: job bd866a52-7706-4fca-bb76-1829aae7734e on node 'old-agent' finished: failed (exit 1, 2982s)

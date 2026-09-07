@@ -1,0 +1,16 @@
+{
+  "classification": "INIT_ONLY_AXIOM_INSPECTION_PASS",
+  "scope": "Six selected admission/history theorems; not remote production/Verity/trust validation.",
+  "command": [
+    "/root/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+    "audit/trio/alloc1/InspectAdmissionAxioms.lean"
+  ],
+  "exit_code": 0,
+  "stdout": "'LidoSRv3.Audit.Source.TrioAlloc1.AdmissionFacts.success_witness' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc1.AdmissionFacts.success_stored_share' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc1.AdmissionFacts.success_count_bound' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc1.AdmissionFacts.successful_record_freshness' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc1.AdmissionFacts.public_preserves' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc1.RecordInvariant.history_invariants' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n",
+  "stderr": "",
+  "source_sha256": {
+    "LidoSRv3/Audit/Source/TrioAlloc1/RecordInvariant.lean": "95c1d15fdc6422524633da0800006e53b70f9134ae98a6e940dc06db714a1de4",
+    "audit/trio/alloc1/InspectAdmissionAxioms.lean": "9f514e14bbe8a701ab9e45adeaed427591d618be7b066ab4a5335eca02ed55d3"
+  },
+  "job_id": "f3d5f18e-4623-4a48-b700-978159bef762"
+}

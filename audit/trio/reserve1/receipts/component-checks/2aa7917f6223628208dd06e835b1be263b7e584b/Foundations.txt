@@ -1,0 +1,7 @@
+'LidoSRv3.Audit.Source.TrioReserve1.Packing.low_pack' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.Packing.high_pack' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.Packing.companion_preserved' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioReserve1.PartitionSpec.spend_preserves' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.PartitionSpec.lowering_reserve' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.PartitionSpec.demand_monotone' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioReserve1.PartitionSpec.two_spends' depends on axioms: [propext, Quot.sound]

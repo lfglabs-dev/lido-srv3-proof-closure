@@ -1,0 +1,235 @@
+⚠ [12/15] Replayed Verity.Core
+warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1041:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+✔ [14/15] Built LidoSRv3.Audit.Source.TrioReserve1.WriterSpec (8.1s)
+✖ [15/15] Building LidoSRv3.Audit.Source.TrioReserve1.Writers (14s)
+trace: .> LEAN_PATH=/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/Cli/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/batteries/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/Qq/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/aesop/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/importGraph/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/plausible/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/mathlib/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/evmyul/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/verity/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/build/lib/lean /workspaces/mission-5a294468/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean /workspaces/mission-f19a12b3/reserve1-private/LidoSRv3/Audit/Source/TrioReserve1/Writers.lean -o /workspaces/mission-f19a12b3/reserve1-private/.lake/build/lib/lean/LidoSRv3/Audit/Source/TrioReserve1/Writers.olean -i /workspaces/mission-f19a12b3/reserve1-private/.lake/build/lib/lean/LidoSRv3/Audit/Source/TrioReserve1/Writers.ilean -c /workspaces/mission-f19a12b3/reserve1-private/.lake/build/ir/LidoSRv3/Audit/Source/TrioReserve1/Writers.c --setup /workspaces/mission-f19a12b3/reserve1-private/.lake/build/ir/LidoSRv3/Audit/Source/TrioReserve1/Writers.setup.json --json
+error: LidoSRv3/Audit/Source/TrioReserve1/Writers.lean:45:72: Invalid simp theorem: Expected a proposition, but found
+  Context → Nat → Exec Word
+error: LidoSRv3/Audit/Source/TrioReserve1/Writers.lean:44:83: unsolved goals
+ctx : Context
+before : World
+requested : Word
+⊢ ((match
+                    ((write ctx 27701703846251521692080166008928748084862916315982263796574836279515025533569
+                            requested >>=
+                          fun x => do
+                          emit ctx "DepositsReserveTargetSet" [requested]
+                          let reserve ←
+                            Live.read ctx 98745094848219021845709341126137206087956476320004237627304564353676184972307
+                          if requested.val < reserve.val then do
+                              write ctx 98745094848219021845709341126137206087956476320004237627304564353676184972307
+                                  requested
+                              emit ctx "DepositsReserveSet" [requested]
+                            else pure PUnit.unit)
+                        before).outcome with
+                  | Except.ok a =>
+                    (write ctx 27701703846251521692080166008928748084862916315982263796574836279515025533569
+                          requested >>=
+                        fun x => do
+                        emit ctx "DepositsReserveTargetSet" [requested]
+                        let reserve ←
+                          Live.read ctx 98745094848219021845709341126137206087956476320004237627304564353676184972307
+                        if requested.val < reserve.val then do
+                            write ctx 98745094848219021845709341126137206087956476320004237627304564353676184972307
+                                requested
+                            emit ctx "DepositsReserveSet" [requested]
+                          else pure PUnit.unit)
+                      before
+                  | Except.error e =>
+                    { outcome := Except.error e, world := before,
+                      attempts :=
+                        ((write ctx 27701703846251521692080166008928748084862916315982263796574836279515025533569
+                                requested >>=
+                              fun x => do
+                              emit ctx "DepositsReserveTargetSet" [requested]
+                              let reserve ←
+                                Live.read ctx
+                                    98745094848219021845709341126137206087956476320004237627304564353676184972307
+                              if requested.val < reserve.val then do
+                                  write ctx
+                                      98745094848219021845709341126137206087956476320004237627304564353676184972307
+                                      requested
+                                  emit ctx "DepositsReserveSet" [requested]
+                                else pure PUnit.unit)
+                            before).attempts }).world.core.readContractSlot
+            ctx.self.val 58633038141160254931551461942745098930256005786588180041600420958536885799519).val %
+        width =
+      (before.core.readContractSlot ctx.self.val
+            58633038141160254931551461942745098930256005786588180041600420958536885799519).val %
+        width ∧
+    ((match
+                    ((write ctx 27701703846251521692080166008928748084862916315982263796574836279515025533569
+                            requested >>=
+                          fun x => do
+                          emit ctx "DepositsReserveTargetSet" [requested]
+                          let reserve ←
+                            Live.read ctx 98745094848219021845709341126137206087956476320004237627304564353676184972307
+                          if requested.val < reserve.val then do
+                              write ctx 98745094848219021845709341126137206087956476320004237627304564353676184972307
+                                  requested
+                              emit ctx "DepositsReserveSet" [requested]
+                            else pure PUnit.unit)
+                        before).outcome with
+                  | Except.ok a =>
+                    (write ctx 27701703846251521692080166008928748084862916315982263796574836279515025533569
+                          requested >>=
+                        fun x => do
+                        emit ctx "DepositsReserveTargetSet" [requested]
+                        let reserve ←
+                          Live.read ctx 98745094848219021845709341126137206087956476320004237627304564353676184972307
+                        if requested.val < reserve.val then do
+                            write ctx 98745094848219021845709341126137206087956476320004237627304564353676184972307
+                                requested
+                            emit ctx "DepositsReserveSet" [requested]
+                          else pure PUnit.unit)
+                      before
+                  | Except.error e =>
+                    { outcome := Except.error e, world := before,
+                      attempts :=
+                        ((write ctx 27701703846251521692080166008928748084862916315982263796574836279515025533569
+                                requested >>=
+                              fun x => do
+                              emit ctx "DepositsReserveTargetSet" [requested]
+                              let reserve ←
+                                Live.read ctx
+                                    98745094848219021845709341126137206087956476320004237627304564353676184972307
+                              if requested.val < reserve.val then do
+                                  write ctx
+                                      98745094848219021845709341126137206087956476320004237627304564353676184972307
+                                      requested
+                                  emit ctx "DepositsReserveSet" [requested]
+                                else pure PUnit.unit)
+                            before).attempts }).world.core.readContractSlot
+            ctx.self.val 27701703846251521692080166008928748084862916315982263796574836279515025533569).val =
+        requested.val ∧
+      ((match
+                    ((write ctx 27701703846251521692080166008928748084862916315982263796574836279515025533569
+                            requested >>=
+                          fun x => do
+                          emit ctx "DepositsReserveTargetSet" [requested]
+                          let reserve ←
+                            Live.read ctx 98745094848219021845709341126137206087956476320004237627304564353676184972307
+                          if requested.val < reserve.val then do
+                              write ctx 98745094848219021845709341126137206087956476320004237627304564353676184972307
+                                  requested
+                              emit ctx "DepositsReserveSet" [requested]
+                            else pure PUnit.unit)
+                        before).outcome with
+                  | Except.ok a =>
+                    (write ctx 27701703846251521692080166008928748084862916315982263796574836279515025533569
+                          requested >>=
+                        fun x => do
+                        emit ctx "DepositsReserveTargetSet" [requested]
+                        let reserve ←
+                          Live.read ctx 98745094848219021845709341126137206087956476320004237627304564353676184972307
+                        if requested.val < reserve.val then do
+                            write ctx 98745094848219021845709341126137206087956476320004237627304564353676184972307
+                                requested
+                            emit ctx "DepositsReserveSet" [requested]
+                          else pure PUnit.unit)
+                      before
+                  | Except.error e =>
+                    { outcome := Except.error e, world := before,
+                      attempts :=
+                        ((write ctx 27701703846251521692080166008928748084862916315982263796574836279515025533569
+                                requested >>=
+                              fun x => do
+                              emit ctx "DepositsReserveTargetSet" [requested]
+                              let reserve ←
+                                Live.read ctx
+                                    98745094848219021845709341126137206087956476320004237627304564353676184972307
+                              if requested.val < reserve.val then do
+                                  write ctx
+                                      98745094848219021845709341126137206087956476320004237627304564353676184972307
+                                      requested
+                                  emit ctx "DepositsReserveSet" [requested]
+                                else pure PUnit.unit)
+                            before).attempts }).world.core.readContractSlot
+            ctx.self.val 98745094848219021845709341126137206087956476320004237627304564353676184972307).val =
+        min
+          (before.core.readContractSlot ctx.self.val
+              98745094848219021845709341126137206087956476320004237627304564353676184972307).val
+          requested.val
+warning: LidoSRv3/Audit/Source/TrioReserve1/Writers.lean:45:59: This simp argument is unused:
+  write
+
+Hint: Omit it from the simp argument list.
+  simp [run, setDepositsReserveTarget, setDepositsReserve, w̵r̵i̵t̵e,̵ ̵e̵mit, read,
+  ̵  ̵ ̵ ̵bindExec, pureExec, project,
+  ̲  ̲ ̲ ̲WriterSpec.Target,
+  ̵  ̵ ̵ ̵read_write_other,
+  ̲  ̲ ̲ ̲Verity.ContractState.readContractSlot_writeContractSlot_same,
+  ̵  ̵ ̵ ̵targetSlot, reserveSlot,
+  ̲  ̲ ̲ ̲bufferSlot]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioReserve1/Writers.lean:45:66: This simp argument is unused:
+  emit
+
+Hint: Omit it from the simp argument list.
+  simp [run, setDepositsReserveTarget, setDepositsReserve, write, e̵m̵i̵t̵,̵ ̵read,
+  ̵  ̵ ̵ ̵bindExec, pureExec, project,
+  ̲  ̲ ̲ ̲WriterSpec.Target,
+  ̵  ̵ ̵ ̵read_write_other,
+  ̲  ̲ ̲ ̲Verity.ContractState.readContractSlot_writeContractSlot_same,
+  ̵  ̵ ̵ ̵targetSlot, reserveSlot,
+  ̲  ̲ ̲ ̲bufferSlot]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioReserve1/Writers.lean:46:4: This simp argument is unused:
+  bindExec
+
+Hint: Omit it from the simp argument list.
+  simp [run, setDepositsReserveTarget, setDepositsReserve, write, emit, read,
+  ̵  ̵ ̵ ̵b̵i̵n̵d̵E̵x̵e̵c̵,̵ ̵pureExec, project,
+  ̲  ̲ ̲ ̲WriterSpec.Target,
+  ̵  ̵ ̵ ̵read_write_other,
+  ̲  ̲ ̲ ̲Verity.ContractState.readContractSlot_writeContractSlot_same,
+  ̵  ̵ ̵ ̵targetSlot, reserveSlot,
+  ̲  ̲ ̲ ̲bufferSlot]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioReserve1/Writers.lean:46:14: This simp argument is unused:
+  pureExec
+
+Hint: Omit it from the simp argument list.
+  simp [run, setDepositsReserveTarget, setDepositsReserve, write, emit, read,
+  ̵  ̵ ̵ ̵bindExec, pu̵ro̲j̲eE̵x̵e̵ct̲,
+  ̲ p̵r̵o̵j̵e̵c̵t̵,̵  ̲ ̲WriterSpec.Target,
+  ̵  ̵ ̵ ̵read_write_other,
+  ̲  ̲ ̲ ̲Verity.ContractState.readContractSlot_writeContractSlot_same,
+  ̵  ̵ ̵ ̵targetSlot, reserveSlot,
+  ̲  ̲ ̲ ̲bufferSlot]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioReserve1/Writers.lean:47:4: This simp argument is unused:
+  read_write_other
+
+Hint: Omit it from the simp argument list.
+  simp [run, setDepositsReserveTarget, setDepositsReserve, write, emit, read,
+  ̵  ̵ ̵ ̵bindExec, pureExec,
+  ̲  ̲ ̲ ̲project, WriterSpec.Target,
+  ̵  ̵ ̵ ̵r̵e̵a̵d̵_̵w̵r̵i̵t̵e̵_̵o̵t̵h̵e̵r̵,̵ ̵Verity.ContractState.readContractSlot_writeContractSlot_same,
+      targetSlot, reserveSlot, bufferSlot]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioReserve1/Writers.lean:47:22: This simp argument is unused:
+  Verity.ContractState.readContractSlot_writeContractSlot_same
+
+Hint: Omit it from the simp argument list.
+  simp [run, setDepositsReserveTarget, setDepositsReserve, write, emit, read, bindExec, pureExec,
+  ̲  ̲ ̲ ̲project, WriterSpec.Target, read_write_other, V̵e̵r̵i̵t̵y̵.̵C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵r̵e̵a̵d̵C̵o̵n̵t̵r̵a̵c̵t̵S̵l̵o̵t̵_̵w̵r̵i̵t̵e̵C̵o̵n̵t̵r̵a̵c̵t̵S̵l̵o̵t̵_̵s̵a̵m̵e̵,̵targetSlot, reserveSlot, bufferSlot]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+error: Lean exited with code 1
+Some required targets logged failures:
+- LidoSRv3.Audit.Source.TrioReserve1.Writers
+error: build failed

@@ -1,0 +1,56 @@
+{
+  "classification": "SOLIDITY_VERITY_PASS",
+  "scope": "Decoded returns or raw errors, and ordered top-level calls; compiler memory, world preservation and nested callbacks have separate receipts/proofs.",
+  "solidity_sha256": "62f5dd2c41ea575d926d75b93d907aa36e5b9860839d8cd11eb3f5bc71de3e0e",
+  "verity_sha256": "d7716c9cc038e4a9d4d6e9252450a02113de78e32930a39eb3648769a8ecdd3a",
+  "checks": [
+    {
+      "name": "mixed",
+      "result_and_calls_equal": true
+    },
+    {
+      "name": "underflow-before-stake",
+      "result_and_calls_equal": true
+    },
+    {
+      "name": "late-rejection",
+      "result_and_calls_equal": true
+    },
+    {
+      "name": "short-summary",
+      "result_and_calls_equal": true
+    },
+    {
+      "name": "short-stake",
+      "result_and_calls_equal": true
+    },
+    {
+      "name": "trailing-summary",
+      "result_and_calls_equal": true
+    },
+    {
+      "name": "zero-ceil-divisor",
+      "result_and_calls_equal": true
+    },
+    {
+      "name": "invalid-enum-before-call",
+      "result_and_calls_equal": true
+    },
+    {
+      "name": "below-allocation",
+      "result_and_calls_equal": true
+    },
+    {
+      "name": "topup-product-before-division",
+      "result_and_calls_equal": true
+    },
+    {
+      "name": "empty-zero-divisor",
+      "result_and_calls_equal": true
+    },
+    {
+      "name": "total-overflow-before-next-row",
+      "result_and_calls_equal": true
+    }
+  ]
+}

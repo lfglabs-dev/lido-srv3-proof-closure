@@ -1,0 +1,65 @@
+LidoSRv3/Audit/Source/TrioReserve1/Admission.lean:45:39: error: Application type mismatch: The argument
+  h
+has type
+  (bindExec (Live.read ctx activeSlot) (fun active => pureExec (decide (active.val ≠ 0)))
+        (call external ctx queue 731232129 (word 0) (withdrawalQueue external ctx w).world).world).outcome =
+    Except.ok true
+but is expected to have type
+  decide ?m.207 = true
+in the application
+  of_decide_eq_true h
+LidoSRv3/Audit/Source/TrioReserve1/Admission.lean:44:21: warning: This simp argument is unused:
+  Live.read
+
+Hint: Omit it from the simp argument list.
+  simp only [L̵i̵v̵e̵.̵r̵e̵a̵d̵,̵ ̵pure, pureExec, decode_world, Except.ok.injEq] at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/Admission.lean:44:38: warning: This simp argument is unused:
+  pureExec
+
+Hint: Omit it from the simp argument list.
+  simp only [Live.read, pure, p̵u̵r̵e̵E̵x̵e̵c̵,̵ ̵decode_world, Except.ok.injEq] at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/Admission.lean:44:62: warning: This simp argument is unused:
+  Except.ok.injEq
+
+Hint: Omit it from the simp argument list.
+  simp only [Live.read, pure, pureExec, decode_world,̵ ̵E̵x̵c̵e̵p̵t̵.̵o̵k̵.̵i̵n̵j̵E̵q̵] at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/Admission.lean:63:49: error: Application type mismatch: The argument
+  h
+has type
+  ((stakingRouter external ctx >>= fun router => do
+          require (decide (ctx.sender = router)) (Fault.reason "APP_AUTH_FAILED")
+          require (decide (amount.val ≠ 0)) (Fault.reason "ZERO_AMOUNT")
+          spendDepositableEther external ctx amount
+          have __do_jp : Unit → Exec Unit := fun y => do
+            let __discr ← call external ctx router 330204256 amount
+            have x : Bytes := __discr
+            pure ()
+          if seeds.val > 0 then do
+              let packed ← Live.read ctx seedSlot
+              let count ← checkedAdd (packed.val % width) seeds.val
+              write ctx seedSlot (pack count (packed.val / width))
+              let y ← emit ctx "DepositedValidatorsChanged" [word count]
+              __do_jp y
+            else do
+              let y ← pure PUnit.unit
+              __do_jp y)
+        (require true (Fault.reason "CAN_NOT_DEPOSIT") (canDeposit external ctx w).world).world).outcome =
+    Except.ok ()
+but is expected to have type
+  (bindExec (require ?m.99 ?m.100) ?m.101 ?m.102).outcome = Except.ok ?m.103
+in the application
+  guard_success ?m.99 ?m.100 ?m.101 ?m.102 ?m.103 h
+LidoSRv3/Audit/Source/TrioReserve1/Admission.lean:64:49: error: Application type mismatch: The argument
+  h
+has type
+  Result.outcome (?m.101 () ?m.102) = Except.ok ?m.103
+but is expected to have type
+  (bindExec (require ?m.115 ?m.116) ?m.117 ?m.118).outcome = Except.ok ?m.119
+in the application
+  guard_success ?m.115 ?m.116 ?m.117 ?m.118 ?m.119 h

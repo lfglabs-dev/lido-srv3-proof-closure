@@ -1,0 +1,567 @@
+oms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [1510/1519] Replayed LidoSRv3.Audit.Source.TrioComposition.AllocationExtent
+info: LidoSRv3/Audit/Source/TrioComposition/AllocationExtent.lean:57:0: 'LidoSRv3.Audit.Source.TrioComposition.allocated_array_extent' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/AllocationExtent.lean:58:0: 'LidoSRv3.Audit.Source.TrioComposition.two_allocations_abi_extent' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [1511/1519] Replayed LidoSRv3.Audit.Source.TrioAlloc2.MemoryComposition
+info: LidoSRv3/Audit/Source/TrioAlloc2/MemoryComposition.lean:71:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_then_memory_consumer_distributes' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/MemoryComposition.lean:72:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_then_byte_consumer_distributes' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+⚠ [1512/1519] Replayed LidoSRv3.Audit.Source.TrioAlloc2.ParentArraySafety
+warning: LidoSRv3/Audit/Source/TrioAlloc2/ParentArraySafety.lean:27:46: This simp argument is unused:
+  Except.bind
+
+Hint: Omit it from the simp argument list.
+  simp only [checkedSub, sub, ↓reduceIte,̵ ̵E̵x̵c̵e̵p̵t̵.̵b̵i̵n̵d̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioAlloc2/ParentArraySafety.lean:29:51: This simp argument is unused:
+  Except.bind
+
+Hint: Omit it from the simp argument list.
+  simp only [checkedMul, delta, ↓reduceDIte, E̵x̵c̵e̵p̵t̵.̵b̵i̵n̵d̵,̵ ̵read_at _ _ newInside]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioAlloc2/ParentArraySafety.lean:29:64: This simp argument is unused:
+  read_at _ _ newInside
+
+Hint: Omit it from the simp argument list.
+  simp only [checkedMul, delta, ↓reduceDIte, Except.bind,̵ ̵r̵e̵a̵d̵_̵a̵t̵ ̵_̵ ̵_̵ ̵n̵e̵w̵I̵n̵s̵i̵d̵e̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioAlloc2/ParentArraySafety.lean:31:40: This simp argument is unused:
+  Except.bind
+
+Hint: Omit it from the simp argument list.
+  simp only [next, ↓reduceDIte,̵ ̵E̵x̵c̵e̵p̵t̵.̵b̵i̵n̵d̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioAlloc2/ParentArraySafety.lean:53:50: This simp argument is unused:
+  Except.bind
+
+Hint: Omit it from the simp argument list.
+  simp only [checkedMul, scaled, ↓reduceDIte, E̵x̵c̵e̵p̵t̵.̵b̵i̵n̵d̵,̵
+  ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵read_at _ _ oldInside, read_at _ _ newInside]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioAlloc2/ParentArraySafety.lean:54:8: This simp argument is unused:
+  read_at _ _ oldInside
+
+Hint: Omit it from the simp argument list.
+  simp only [checkedMul, scaled, ↓reduceDIte, Except.bind, read_at _ _ o̵l̵d̵I̵n̵s̵i̵d̵e̵,̵ ̵r̵e̵a̵d̵_̵a̵t̵ ̵_̵ ̵_̵ ̵newInside]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioAlloc2/ParentArraySafety.lean:54:31: This simp argument is unused:
+  read_at _ _ newInside
+
+Hint: Omit it from the simp argument list.
+  simp only [checkedMul, scaled, ↓reduceDIte, Except.bind, read_at _ _ o̵l̵d̵I̵n̵s̵i̵d̵e̵,̵ ̵r̵e̵a̵d̵_̵a̵t̵ ̵_̵ ̵_̵ ̵n̵e̵w̵I̵n̵s̵i̵d̵e̵]̵o̲l̲d̲I̲n̲s̲i̲d̲e̲]̲
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+info: LidoSRv3/Audit/Source/TrioAlloc2/ParentArraySafety.lean:61:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.positiveRows_array_safe' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/ParentArraySafety.lean:62:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.zeroRows_array_safe' depends on axioms: [propext, Quot.sound]
+⚠ [1513/1519] Replayed LidoSRv3.Audit.Source.TrioAlloc2.ParentSuccess
+warning: LidoSRv3/Audit/Source/TrioAlloc2/ParentSuccess.lean:54:31: This simp argument is unused:
+  readNew
+
+Hint: Omit it from the simp argument list.
+  simp [zeroRows, readOld, r̵e̵a̵d̵N̵e̵w̵,̵ ̵checkedMul, safe, bind, Except.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioAlloc2/ParentSuccess.lean:68:10: This simp argument is unused:
+  result
+
+Hint: Omit it from the simp argument list.
+  simp [̵r̵e̵s̵u̵l̵t̵,̵ ̵s̵u̵c̵c̵e̵s̵s̵]̵[̲s̲u̲c̲c̲e̲s̲s̲]̲
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioAlloc2/ParentSuccess.lean:71:10: This simp argument is unused:
+  result
+
+Hint: Omit it from the simp argument list.
+  simp [̵r̵e̵s̵u̵l̵t̵,̵ ̵s̵u̵c̵c̵e̵s̵s̵]̵[̲s̲u̲c̲c̲e̲s̲s̲]̲
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioAlloc2/ParentSuccess.lean:156:10: This simp argument is unused:
+  result
+
+Hint: Omit it from the simp argument list.
+  simp [̵r̵e̵s̵u̵l̵t̵,̵ ̵s̵u̵c̵c̵e̵s̵s̵]̵[̲s̲u̲c̲c̲e̲s̲s̲]̲
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioAlloc2/ParentSuccess.lean:159:10: This simp argument is unused:
+  result
+
+Hint: Omit it from the simp argument list.
+  simp [̵r̵e̵s̵u̵l̵t̵,̵ ̵s̵u̵c̵c̵e̵s̵s̵]̵[̲s̲u̲c̲c̲e̲s̲s̲]̲
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+info: LidoSRv3/Audit/Source/TrioAlloc2/ParentSuccess.lean:202:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.positive_success_iff' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/ParentSuccess.lean:203:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.positive_arithmetic_iff' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/ParentSuccess.lean:204:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.zeroDemand_success_iff' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/ParentSuccess.lean:205:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.zeroDemand_arithmetic_iff' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/ParentSuccess.lean:207:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.positiveRows_success_iff' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/ParentSuccess.lean:208:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.positiveRows_arithmetic_iff' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/ParentSuccess.lean:210:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.zeroRows_success_iff' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/ParentSuccess.lean:211:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.zeroRows_arithmetic_iff' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [1514/1519] Replayed LidoSRv3.Audit.Source.TrioAlloc2.ParentValues
+info: LidoSRv3/Audit/Source/TrioAlloc2/ParentValues.lean:150:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.positive_values' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/ParentValues.lean:151:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.zeroDemand_values' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/ParentValues.lean:153:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.positiveRows_values' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/ParentValues.lean:155:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.zeroRows_values' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+⚠ [1516/1519] Built LidoSRv3.Legacy.SpecProofs (3.9s)
+warning: LidoSRv3/Legacy/SpecProofs.lean:1631:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+ℹ [1518/1519] Replayed LidoSRv3.Audit.Source.TrioComposition.WriterMemory
+info: LidoSRv3/Audit/Source/TrioComposition/WriterMemory.lean:58:0: 'LidoSRv3.Audit.Source.TrioComposition.WriterMemory.from_invariant' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/WriterMemory.lean:59:0: 'LidoSRv3.Audit.Source.TrioComposition.WriterMemory.after_share_writer' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/WriterMemory.lean:60:0: 'LidoSRv3.Audit.Source.TrioComposition.WriterMemory.after_parameter_writer' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/WriterMemory.lean:61:0: 'LidoSRv3.Audit.Source.TrioComposition.WriterMemory.after_admission' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+Build completed successfully (1519 jobs).
+proof report written to proofs/logs/proof-report.json
+INTEGRATION_GATE_EXIT 0 make prove
+INTEGRATION_GATE_START make test
+⚠ [11/184] Replayed Verity.Core
+warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1041:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+⚠ [1136/1198] Replayed Conform.Wheels
+warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: Conform/Wheels.lean:106:70: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1137/1198] Replayed EvmYul.Pretty
+warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: EvmYul/Pretty.lean:36:32: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1184/1198] Replayed EvmYul.Semantics
+warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1185/1198] Replayed EvmYul.EVM.Semantics
+warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1210/1211] Replayed LidoSRv3.Audit.Verity.MinFirstDistributionTx
+warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:142:52: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:485:22: This simp argument is unused:
+  modelAllocateLoop
+
+Hint: Omit it from the simp argument list.
+  simp [m̵o̵d̵e̵l̵A̵l̵l̵o̵c̵a̵t̵e̵L̵o̵o̵p̵,̵ ̵hModelStep, hzv]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:485:53: This simp argument is unused:
+  hzv
+
+Hint: Omit it from the simp argument list.
+  simp [modelAllocateLoop, hModelStep,̵ ̵h̵z̵v̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:492:25: This simp argument is unused:
+  modelAllocateLoop
+
+Hint: Omit it from the simp argument list.
+  simp only [m̵o̵d̵e̵l̵A̵l̵l̵o̵c̵a̵t̵e̵L̵o̵o̵p̵,̵ ̵if_neg hzv, hModelStep, if_neg hav]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:492:44: This simp argument is unused:
+  if_neg hzv
+
+Hint: Omit it from the simp argument list.
+  simp only [modelAllocateLoop, i̵f̵_̵n̵e̵g̵ ̵h̵z̵v̵,̵ ̵hModelStep, if_neg hav]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+Build completed successfully (1211 jobs).
+Compiling 3 files with Solc 0.8.25
+Solc 0.8.25 finished in 2.58s
+Compiler run successful!
+
+Ran 4 tests for solidity/minfirst/test/MinFirstDifferential.t.sol:MinFirstDifferentialTest
+[PASS] testEagerLengthGuardMutationProducesMismatch() (gas: 34824)
+[PASS] testEmptyAndZeroBoundaries() (gas: 75608)
+[PASS] testSurplusCapacitiesAndExactCaps() (gas: 117852)
+[PASS] testWordBoundaries() (gas: 75678)
+Suite result: ok. 4 passed; 0 failed; 0 skipped; finished in 20.14s (60.13s CPU time)
+
+Ran 1 test suite in 20.15s (20.14s CPU time): 4 tests passed, 0 failed, 0 skipped (4 total tests)
+MinFirst guard mutation rejected by the zero_demand theorem
+audit metadata v4 ok: 11 canonical guarantees + 19 subordinate evidence rows
+ux2 artifacts ok: 11 guarantee records match the registry and the Lean declarations
+ux2 artifact mutants ok: drift, stale, missing, unresolved/duplicate theorem, canonical order, unregistered assumption, missing source target, missing headline boundary, scope tracking, doc-comment and statement slicing, let/have binders, where-proofs, escaped identifier delimiters and ordinary delimiter controls, symlinked inputs and root, and the Lean source tree id
+python-quality ok: 382 executable scopes under cyclomatic 22 and 28 scripts under 500 lines, except pinned baseline debt (blob 315a8ed5253e8c4d8987aa509dc45789927005b2) which did not grow
+python-quality mutants ok: pinned baseline, new dense function, new long script, growth past baseline, stale row, retired-but-listed row, malformed row, missing baseline, baseline rewrite, nested directories, an un-pinned improvement, scope-qualified and nested definitions, module-level lambdas, body-only traversal, and the branch metric
+gfm table reader ok: 41 pinned cmark-gfm cases (5 deliberately declined), body-window offsets, and the cell split; no cmark-gfm installed; the pinned expectations above are the renderer's own answers, recorded when they were taken
+markdown text reducer ok: 26 pinned cases, 15 shapes that publish the sentence to no reader and 11 that do; 6 inline-HTML cases where an attribute is markup and a bare `<` is not a tag; 31 element-body cases over 8 non-rendered elements, 22 bodies a reader never meets and 9 controls a reader plainly does
+optimized assurance-v4 mutants rejected: objective, canonical claims, classifications, assumptions, SSZ-only binding, pins, source spans, proof policy, README fidelity-gap disclosure, duplicate headline rows, and stale views; and every one of 11 headline rows re-filed into a later table, re-filed into loose prose, and dropped outright, plus a non-canonical row printed inside the table, a second table claiming the headline's own columns, the gap column repainted so the table cannot be located, the table wrapped in an HTML comment, and the table wrapped in a block-level HTML element (`<div>`); and each headline qualification re-filed into an appendix, into prose above the table, into a later blockquote and dropped outright, and spelled inside the block by each of 20 constructs that publish no visible text (single- and multi-line comments, a processing instruction, CDATA, a declaration, the body of every one of the eight elements the shared reader holds to be non-rendered — with an attributed and an upper-case opener and a nested `template` whose close the body runs past, since naming three of them and stopping at the first end tag let `<template>` publish a qualification to no reader — `title`/`alt` attribute values, Markdown link reference definition titles, inline link destination/title fields, and six inline-link shapes whose destination carries balanced or angle-bracketed parentheses — the form a `[^)]*` pattern stopped short of, leaving the title standing as ordinary text, including one hidden in a nested label, and a full reference link whose second bracket group names a definition that renders as nothing), with a collapsed reference link still read because it renders its own label, with the opening blockquote demoted to prose, pushed below an introduction, deleted, unheaded and its title demoted all rejected, while a renamed title, a longer block, a redundant restatement, and each qualification restated through inline markup that still renders it, and each carried in a link label or beside an unterminated link, and each printed on either side of a non-rendered element, beside one of a different name, inside two whose names only look like one, or inside the `xmp` a browser paints — text a reader is shown — stay accepted; and the delimiter row that makes the headline a table deleted, blanked to pipes and spaces, narrowed, widened, and indented into a four-column chunk all rejected, with alignment colons and up to three columns of indentation on the delimiter, the header and a row all still located as the table they render; the escaped pipe that delimits no cell driven through every header cell in three spellings under a delimiter widened to match its characters — the shape that rendered no table on the page while every gap count below was checked against it — rejected, with the same header at its own true width still located when the escape is in a free-text column and rejected when it rewords the index, the ID or the gap-count column; and the whole table relocated under a trailing appendix and under a later section rejected, since a gap count a reader reaches only after the CHECKED cells it was written to qualify no longer qualifies them
+validation receipt ok: final tracked content tree excluding receipt 457384f830c88d6fe7fe7990a626fe89de3616a5
+validation receipt regression ok: P-ORACLE-SANITY-1 source-layer mutant fails closed
+proof-escape check ok: 358 project Lean files; no sorry/admit/axiom/constant/unsafe/Lean.ofReduceBool; native_decide inventory 46df09dbc9ae95a3196dc32ed3a6c0a2ea2369b13c3e7e910c78a73b9c701fb7
+proof-escape negative regressions rejected imported, library-root, and Trust project Lean mutations
+trust-axiom negative regressions rejected injected opaque dependencies (printed, registered, laundered through disclosure, and laundered by wearing generated native-decision spelling), elaborator-minted axioms carrying no literal generated spelling (mistyped and type-shaped with a forged declaration range), an axiom registered at a genuine native_decide site whose re-evaluated claim is false, a false claim affirmed by a macro that shadows the evaluator, a registered theorem disclosed only by a commented-out #print axioms command, a fabricated report hiding a real opaque dependency, a report invented for an unprinted theorem, a report hiding a dependency behind a macro that shadows the collector in every spelling, an unnamed report, and an unprinted registered theorem
+trust-axiom check ok: 29 exact axioms (23 test/mutant-only native-decision axioms + 3 production exceptions (Phase-3 capacity, consolidation flow, SSZ digest) + foundations); dependencies recomputed from the built environment; native-decision claims re-evaluated
+check_no_python_evidence regressions ok: missing rg fails closed; exact prerequisites allowed; stale evidence rejected
+public claim surfaces match canonical faithful-Verity claims
+public claim surface regressions ok: allowed declarations pass; ASCII/quoted/Unicode/escaped/whitespace/attribute/import-modifier/multiline-import/registry/README/missing-file mutants fail closed; a column inserted before `Verity Executable Contract` with the real cells set to OPEN is rejected, the same insertion with the real cells intact is still read, and a header that names that column zero or twice is refused
+report theorem inventory ok: 8 P-ALLOC-1 theorems, 2 registered
+report theorem inventory mutants rejected: dropped row, undisclosed theorem (column-zero, indented, tabbed, attributed, private, protected, nonrec, `lemma`, and combined), a name wrapped onto the line after its keyword (bare, `lemma`, blank-line-separated, prefixed, escaped and letter-like) with the wrapped form cited at its keyword's line, a line or block comment standing as the whitespace between a keyword and its name (bare, `lemma`, doubled, mixed, behind a modifier, behind an attribute, combined, escaped and letter-like) with that form cited at its keyword's line and neither the comment's newline nor a keyword written only as comment prose allowed to splice a declaration, letter-like/subscript/`!`/`?`/escaped/dotted Lean identifiers, declaration after a nested comment, `/-` in a line comment and in a string literal, unterminated comment, report-only promotion, registry drift, stale line, missing plane, a row repeated with each checked cell falsified in one copy (REGISTERED, line, plane, and a verbatim repeat) in either order; commented-out declarations, theorem-like identifiers (ASCII and letter-like), and prose inside nested block comments not miscounted; a letter-like name round-trips to a row; each of the 3 modifiers Lean elaborates on a theorem driven end to end and the 5 kept only as parser widening asserted to still read the name behind them, both from the checker's own table; comment markers inside escaped identifiers (`/-`, `-/`, `--`, `"`, `/--`) kept as name text, a balancing pair of them not allowed to blank the declarations in between, a stray `«` and a `«` inside a real comment not allowed to swallow code, and an escaped name carrying `/-` round-trips to a row; a row re-rendered in each of 6 whitespace layouts still read, with a repeat and a Lean-absent row in each rejected rather than slipping past the parser on padding; same-leaf theorems in sibling namespaces demanded as distinct qualified names, qualified and sectioned names round-tripping to rows (including named namespaces and named sections closed with a bare `end`), and mis-nested, dangling and stray scope commands rejected; each REGISTERED row bound to the registry field and the plane it prints, with the registrations exchanged, the plane labels exchanged, both exchanged, two rows filed under one field, and a registration naming no field all rejected, driven from the checker's own plane table; each registered row widened to each of the 1 plane column(s) its own label is spelled inside, and the composite row promoted to each field in turn, rejected while the composite column stays printable by an unregistered row; every one of 8 rows printed with each of 16 Registered-column lookalikes — case variants of both markers, a bare `REGISTERED`, a negated and a hyphenated spelling, a trailing stop, and a lower- or mixed-cased registration naming each plane — rejected rather than skipped as an unrecognized cell, so the two markers are matched case-sensitively as the whole cell and a lookalike cannot promote a theorem the registry does not record; and every one of 8 rows relocated out of the `## Theorems` section and copied outside it, a second inventory filed further down, and the section heading renamed, demoted and unheaded all rejected; and every one of those rows hidden in each of 23 constructs Markdown does not render as a row (backtick, info-string, tilde, indented, over-long and over-closed fences, space- and tab-indented code, and all seven HTML block conditions: raw-text elements, processing instructions, declarations, CDATA, inline, block and reopened comments, named blocks plain, attributed, uppercased, indented and closing-tag-first, and a bare tag after a blank line) rejected, with each of the 64 named-block spellings the checker's own list carries driven once, an unterminated comment and an unclosed raw-text element each hiding the rows below them, a heading quoted in a fence or an HTML block not allowed to relocate the section, a row quoted in either outside it not counted as a stray claim, and 16 look-alike openers — 13 above the section and 3 directly above the first row, where a block would blank the whole inventory — asserted to leave the real table rendered while a complete tag alone on its line, which is HTML block condition 7 and does end a table body, is rejected as the eight rows it takes out of the inventory; every row hidden mid-table asserted to take the rows below it out of the rendered table too; and the one delimiter row that makes the header and its rows a table deleted, blanked to pipes and spaces, narrowed, widened, and indented into a four-column chunk all rejected, with alignment colons and up to three columns of indentation on the delimiter, the header and a row all still read as the table they render; and the escaped pipe that delimits no cell driven through every header cell in three spellings under a delimiter widened to match its characters — the shape that rendered no table at all while the gate reported eight theorems — rejected, with the same header at its own true width still read when the escape is in the free-text column and rejected when it rewords a bound column label, a legitimate escaped pipe inside a role cell still read as the five-cell row it renders, and an escape that removes a real cell boundary rejected as the four-cell row it renders
+diagram taxonomy ok: 22 nodes, 23 cards, 6 legend classes, 10 entities bound to their class and to the label they are published under, in the full address form on the canvas and the abbreviated form on the notes cards, 2 proof-gated boxes bound per surface, 4 gateway boxes bound to the verifier they inherit, 14 taxonomy names still drawn
+diagram taxonomy mutants rejected: predeploy as consensus layer (card and node), oracle as quorum-held, HashConsensus demoted, guardian veto (the banned spelling, the same claim retypeset with a curly apostrophe, and a reattribution no banned list names, rejected per surface), 5/9 constant, EasyTrack veto, conflated verifiers, untooltipped node, undocumented class; a taxonomy intro miscounted to each of the other 10 words the checker knows, and one that drops the count instead of misstating it, rejected while every class stays documented, and the count shown bound to the enforced set by growing CLASSES; relabelled node and card repaints and a dropped entity still caught by address; an entity dropped from one surface only (canvas node deleted with its card kept, card deleted with its node kept, and a multi-address predeploy node deleted) rejected per surface; `bot` compromise collapsed to a class-wide invariant rejected on the README entry and on the rendered legend pill (restated, stripped, and with the slashable consequence dropped); every one of 10 address-bound entities relabel-repainted and deleted per surface, every one comment-wrapped per surface (entity inside <!-- … --> is invisible to a reader and must not be counted as present), every one rewritten on each surface into the form the other surface publishes — a canvas tooltip elided to the card's `0x852d…3Cee`, a card expanded to the full forty digits — rejected, since a surface that owes one form and prints the other leaves a reader who goes to it for an address holding a spelling that looks up no contract, and every one with its address extended per surface by each of 8 trailing characters — hex and non-hex alike — applied to both forms together and to the full and abbreviated form alone, plus a leading character on each form (a malformed address must not satisfy a token-boundary check via substring containment, and the extension is not always a hex digit); every one extended per surface by each of 3 character references — decimal and hex — again on both forms together and on each alone (a reference is punctuation in the source and a letter on the page, so `…3Cee&#103;` publishes `0x852d…3Ceeg` while the raw boundary reads clean); and every one published per surface in both forms as an intact token beside a corrupted copy of itself (`0x852d…3Cee · 0x852d…3Ceeg`), which a check asking only whether some standalone occurrence exists excuses — an intact form must not vouch for a corrupted one beside it; 12 same-class address exchanges — every pair the table carries whose entities are drawn under different labels on that surface — rejected on each surface alone (both boxes keep their class, so only binding the address to the entity it names can see the swap), with the two oracles also exchanged on both surfaces at once; a taxonomy name whose rename is followed through IDENTITY still rejected for no longer being drawn, and an IDENTITY entry that binds only one surface refused at load; every proof-gated box repainted, deleted and merely reworded per surface (the combined `Consolidation pipeline` canvas node and the `ConsolidationGateway` card bound independently), and a rename that keeps its address and colour still rejected for retiring its taxonomy rule; the addressless consensus-layer box repainted to each of the 5 other classes, deleted, and merely reworded, rejected in both directions of the one-genuine-`cl`-entity rule; each of the 4 gateway boxes had the verifier it inherits relocated off the box, exchanged for its sibling's, claimed alongside its sibling's, and hidden in an HTML comment (each rejected separately per surface), and the README `proof` entry had the pairing swapped, either half of it dropped, and a verifier named with no gateway to attribute it to; the README class-count sentence and the README `proof` entry hidden in HTML comments each rejected, and each also hidden in an inline link's title through both quote delimiters and through balanced and angle-bracketed destinations — the shapes a `[^)]*` pattern stops short of — with a reference definition rejected where it starts its own line and accepted mid-sentence, where it is literal text, and the same claim carried in a visible link label still read, and each moved into an HTML attribute — a `title=`, a `data-` note and an `alt=` — rejected, since an attribute is markup and never content; every required phrase moved off the canvas and into its `<script>` and its `<style>` body rejected, with the same phrase restored to a node tooltip still read, since on this SVG a `<title>` is the hover text a reader is shown and is where every address is cited; and each README claim buried in the body of every one of 8 non-rendered elements — plus an attributed and an upper-case opener, a nested `template` whose close the body runs past, an opener that never closes, and the three shapes that carry an outer end tag as text — a raw-text child, a comment, and HTML's own script double-escape — rejected, since a tag is not an element and a body a browser never draws is not prose; with 7 controls holding the other edge of that rule, where the same sentence sits on either side of such an element, beside one of a different name, inside one whose name only looks like one, or inside one a browser does paint, and must still be read
+Verity provenance mutants rejected: exact lakefile request, request uniqueness, manifest rev/inputRev/uniqueness, canonical artifact/audit/source-map pins, lockfile Verity pin (HTML comment, unclosed-HTML-comment-to-EOF, equal fence, indented opener, longer closer, unclosed-at-EOF, backtick-code-span-suppressor, exact-close-4bt-code-span, inline-exact-close-3bt-code-span, unequal-3bt-info-backtick-inline-span, unequal-4bt-info-backtick-inline-span, unequal-inline-run-info-backtick-span, script-html-block, div-html-block-to-EOF, multiline-code-span, type-7-html-block, whole-line-closer-code-span, escaped-backtick-html-comment, type-7-quoted-angle-bracket, unicode-whitespace-fence-close, multiline-inline-html-tag, invalid-tag-before-comment, double-backslash-comment, comment-synthesis, span-synthesis, multiline-link-title, unterminated-quoted-tag-wrong-pin, escaped-link-title-delimiter, unterminated-link-title-wrong-pin, escaped-close-paren-link-title, escaped-open-paren-link-title, blank-line-closed-link-title-wrong-pin, backslash-terminated-title-line-wrong-pin, backslash-newline-multiline-title, escaped-bracket-link-title, unopened-label-wrong-pin, cross-block-label-opener-wrong-pin, same-block-label-opener-title, nested-link-outer-opener-wrong-pin, unnested-outer-link-title, nested-image-outer-link-title-family, nonblank-boundary-opener-wrong-pin, no-space-hash-same-block-opener-title, block-quote-continuation-title, non-table-pipe-lines-title, table-row-wrong-pin, indented-delimiter-row-title-family, indented-header-row-title, table-closing-newline-opener-family, table-closing-newline-opener-shape-family, unpiped-row-opener-depth-family, unpiped-row-after-delimiter-opener, stripped-block-boundary-family); positive gates: baseline, fenced-literal-unclosed-HTML-comment, html-comment-in-1bt-code-span, html-comment-in-2bt-code-span, after-closed-script-block, after-blank-line-div-block, after-closed-multiline-span, after-blank-line-type-7-block, whitespace-blank-type-6, whitespace-blank-type-7, same-line-opener-closer-code-span, double-backslash-backtick-code-span, after-blank-line-type-7-quoted-angle, ascii-space-fence-close, after-single-line-inline-html-tag, valid-inline-tag-within-text, backslash-escaped-comment-opener, single-line-comment-in-verity-row, after-multiline-link-title, unterminated-quoted-tag-real-pin, after-escaped-link-title-delimiter, unterminated-link-title-real-pin, after-escaped-paren-link-title, blank-line-closed-quoted-title-real-pin, blank-line-closed-single-quoted-title, blank-line-closed-paren-title, unescaped-paren-in-paren-title, backslash-terminated-title-line, backslash-terminated-single-quoted-title, backslash-terminated-paren-title, unopened-link-label-family, cross-block-label-opener, whitespace-blank-cross-block-label-opener, nested-link-outer-deactivation-family, nested-image-outer-link-row-after, nonblank-leaf-boundary-opener-family, block-quote-interrupt-family, block-quote-title-row-after, gfm-table-row-boundary, gfm-table-cell-boundary, short-indent-delimiter-row-family, over-indented-row-closes-table, table-closing-newline-row-after, after-table-multiline-title, unpiped-row-opener-row-after, stripped-block-boundary-row-after-family, type-7-keeps-paragraph-inline; checkout identity agree
+receipt target derivation ok: all 109 lean_checked theorems are compiled by declared targets ['LidoSRv3', 'LidoSRv3Legacy']
+provenance guards ok: untracked/ignored Lean inputs, stale-tree logs, untargeted logs, and logs omitting any of 'LidoSRv3 LidoSRv3Legacy' rejected; emitted Verity pin equals manifest e977aaad6e1a9e92e0132d41b3d33a14135a4d46 (current tree a455bb37f9a0cfaa04481a36b7d919fdafc7bb84)
+import-dag ok: production ↛ test/legacy/Trust; globs cover production; layer debt did not grow past immutable baseline blob 62ce9c6132d4902cc5e4f1150ffde6fc286d81b7 or return after retirement tombstone blob f10e32c7b942d3f896911d814ae430234291e098
+import-dag mutants ok
+make: *** [Makefile:63: test] Error 1
+INTEGRATION_GATE_EXIT 2 make test
+INTEGRATION_GATE_START lake env lean --run audit/trio/alloc1/RunVerityVectors.lean
+⚠ [19/53] Replayed Verity.Core
+warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1041:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+Build completed successfully (53 jobs).
+'LidoSRv3.Audit.Source.TrioAlloc1.producer_router_order' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.producer_total_bound' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.outputBytes_related' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.Relational.producer_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.CallTree.producer_correspondence' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.world_producer_correspondence' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.ShareWriter.execute_revert_restores' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.ShareWriter.execute_stored_share_bound' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.WriterInvariant.share_writer_preserves' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.WriterInvariant.parameter_writer_preserves' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.ParameterWriter.helper_stored_share_bound' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.ParameterWriter.execute_revert_restores' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.AdmissionChecks.check_success' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.AdmissionChecks.nextId_success' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.AdmissionWriter.revert_restores' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.AdmissionFacts.success_stored_share' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.AdmissionFacts.public_preserves' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.AdmissionWriter.successful_entry_bound_and_freshness' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.StringStorage.writeShort_stored' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.EnumerationWriter.insertion_preserves_consistency' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.EnumerationWriter.oversized_absent' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioAlloc1.AllocationMemory.bounded_array_allocates' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Tests.TrioAlloc1.prefetch_trace_refutes_relational_parent' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Tests.TrioAlloc1.target_only_refutes_relational_parent' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+[{"name":"mixed","actual":[[3,3],[8,3]],"calls":["0:9abddf09","1:9abddf09","1:0c852f5c"]},{"name":"underflow-before-stake","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000011","calls":["0:9abddf09"]},{"name":"late-rejection","actual":"0xdead","calls":["0:9abddf09","1:9abddf09"]},{"name":"short-summary","actual":"0x","calls":["0:9abddf09"]},{"name":"short-stake","actual":"0x","calls":["0:9abddf09","0:0c852f5c"]},{"name":"trailing-summary","actual":[[1],[2]],"calls":["0:9abddf09"]},{"name":"zero-ceil-divisor","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000012","calls":["0:9abddf09","0:0c852f5c"]},{"name":"invalid-enum-before-call","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000021","calls":[]},{"name":"below-allocation","actual":[[1],[0]],"calls":["0:9abddf09"]},{"name":"topup-product-before-division","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000011","calls":["0:9abddf09","0:0c852f5c"]},{"name":"empty-zero-divisor","actual":[[],[]],"calls":[]},{"name":"total-overflow-before-next-row","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000011","calls":["0:9abddf09"]}]
+INTEGRATION_GATE_EXIT 0 lake env lean --run audit/trio/alloc1/RunVerityVectors.lean
+INTEGRATION_GATE_START lake env lean --run audit/trio/integration/RunVerityParent.lean
+ℹ [8/83] Replayed LidoSRv3.Audit.Source.TrioComposition.ReturnMemory
+info: LidoSRv3/Audit/Source/TrioComposition/ReturnMemory.lean:132:0: 'LidoSRv3.Audit.Source.TrioComposition.ReturnMemory.summary_correspondence' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ReturnMemory.lean:133:0: 'LidoSRv3.Audit.Source.TrioComposition.ReturnMemory.stake_correspondence' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ReturnMemory.lean:134:0: 'LidoSRv3.Audit.Source.TrioComposition.ReturnMemory.summary_allocation_failure' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ReturnMemory.lean:136:0: 'LidoSRv3.Audit.Source.TrioComposition.ReturnMemory.summary_take' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ReturnMemory.lean:137:0: 'LidoSRv3.Audit.Source.TrioComposition.ReturnMemory.allocation_failure' depends on axioms: [propext]
+info: LidoSRv3/Audit/Source/TrioComposition/ReturnMemory.lean:138:0: 'LidoSRv3.Audit.Source.TrioComposition.ReturnMemory.bounded_summary_projection' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ReturnMemory.lean:139:0: 'LidoSRv3.Audit.Source.TrioComposition.ReturnMemory.bounded_stake_projection' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [9/83] Replayed LidoSRv3.Audit.Source.TrioComposition.RowMemory
+info: LidoSRv3/Audit/Source/TrioComposition/RowMemory.lean:215:0: 'LidoSRv3.Audit.Source.TrioComposition.RowMemory.firstLoop_exact' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/RowMemory.lean:216:0: 'LidoSRv3.Audit.Source.TrioComposition.RowMemory.endPointer_bound' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/RowMemory.lean:217:0: 'LidoSRv3.Audit.Source.TrioComposition.RowMemory.firstRow_exact' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/RowMemory.lean:218:0: 'LidoSRv3.Audit.Source.TrioComposition.RowMemory.firstRow_erasure' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/RowMemory.lean:219:0: 'LidoSRv3.Audit.Source.TrioComposition.RowMemory.config_failure' depends on axioms: [propext, Quot.sound]
+ℹ [11/83] Replayed LidoSRv3.Audit.Source.TrioAlloc2.MemoryPrefix
+info: LidoSRv3/Audit/Source/TrioAlloc2/MemoryPrefix.lean:148:0: 'LidoSRv3.Audit.Source.TrioAlloc2.MemoryPrefix.execute_success_iff' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/MemoryPrefix.lean:149:0: 'LidoSRv3.Audit.Source.TrioAlloc2.MemoryPrefix.execute_overflow_iff' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/MemoryPrefix.lean:151:0: 'LidoSRv3.Audit.Source.TrioAlloc2.MemoryPrefix.reserve_success' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/MemoryPrefix.lean:152:0: 'LidoSRv3.Audit.Source.TrioAlloc2.MemoryPrefix.execute_extent' depends on axioms: [propext, Quot.sound]
+ℹ [12/83] Replayed LidoSRv3.Audit.Source.TrioComposition.MemoryGuard
+info: LidoSRv3/Audit/Source/TrioComposition/MemoryGuard.lean:38:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryGuard.run_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/MemoryGuard.lean:39:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryGuard.check_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [13/83] Replayed LidoSRv3.Audit.Source.TrioComposition.MemoryProducer
+info: LidoSRv3/Audit/Source/TrioComposition/MemoryProducer.lean:79:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryProducer.afterPrefix_exact' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/MemoryProducer.lean:80:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryProducer.producer_exact' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/MemoryProducer.lean:81:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryProducer.prefix_failure' depends on axioms: [propext]
+⚠ [21/83] Replayed LidoSRv3.Audit.Source.TrioAlloc2.Selection
+warning: LidoSRv3/Audit/Source/TrioAlloc2/Selection.lean:53:10: This simp argument is unused:
+  levelsEq
+
+Hint: Omit it from the simp argument list.
+  simp [l̵e̵v̵e̵l̵s̵E̵q̵,̵ ̵Spec.minimum, countEq]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioAlloc2/Selection.lean:70:10: This simp argument is unused:
+  levelsEq
+
+Hint: Omit it from the simp argument list.
+  simp [l̵e̵v̵e̵l̵s̵E̵q̵,̵ ̵Spec.minimum, nonzero, minimumEq]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [30/83] Replayed LidoSRv3.Audit.Source.TrioAlloc2.StepCorrespondence
+warning: LidoSRv3/Audit/Source/TrioAlloc2/StepCorrespondence.lean:16:71: This simp argument is unused:
+  eq
+
+Hint: Omit it from the simp argument list.
+  simp [decodedRows, List.getElem?_zipWith, List.getElem?_set_ne eq,̵ ̵e̵q̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+ℹ [33/83] Replayed LidoSRv3.Audit.Source.TrioAlloc2.Composition
+info: LidoSRv3/Audit/Source/TrioAlloc2/Composition.lean:53:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_success_establishes_consumer_premises' depends on axioms: [propext,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/Composition.lean:54:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_then_consumer_succeeds' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/Composition.lean:71:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_then_consumer_distributes' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [34/83] Replayed LidoSRv3.Audit.Source.TrioComposition.Parent
+info: LidoSRv3/Audit/Source/TrioComposition/Parent.lean:252:0: 'LidoSRv3.Audit.Source.TrioComposition.getDepositAllocations_total_bound' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/Parent.lean:253:0: 'LidoSRv3.Audit.Source.TrioComposition.convertPositive_refines' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/Parent.lean:254:0: 'LidoSRv3.Audit.Source.TrioComposition.convertZero_refines' depends on axioms: [propext, Classical.choice, Quot.sound]
+⚠ [36/83] Replayed LidoSRv3.Audit.Source.TrioAlloc2.RowBounds
+warning: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:171:20: This simp argument is unused:
+  ↓reduceDIte
+
+Hint: Omit it from the simp argument list.
+  simp only [bound,̵ ̵↓̵r̵e̵d̵u̵c̵e̵D̵I̵t̵e̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+info: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:174:0: 'LidoSRv3.Audit.Source.TrioAlloc2.step_row_bounds' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:175:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocateLoop_row_bounds' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:176:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocate_row_bounds' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:177:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocate_delta_success' depends on axioms: [propext, Quot.sound]
+ℹ [37/83] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentComposition
+info: LidoSRv3/Audit/Source/TrioComposition/ParentComposition.lean:65:0: 'LidoSRv3.Audit.Source.TrioComposition.producer_consumer_conversion_refines' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ParentComposition.lean:66:0: 'LidoSRv3.Audit.Source.TrioComposition.producer_zero_conversion_refines' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ParentComposition.lean:67:0: 'LidoSRv3.Audit.Source.TrioComposition.producer_consumer_parent_subtraction' depends on axioms: [propext, Quot.sound]
+ℹ [40/83] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentRelational
+info: LidoSRv3/Audit/Source/TrioComposition/ParentRelational.lean:185:0: 'LidoSRv3.Audit.Source.TrioComposition.ParentSpec.public_all_outcomes' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [42/83] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentDeterminism
+info: LidoSRv3/Audit/Source/TrioComposition/ParentDeterminism.lean:155:0: 'LidoSRv3.Audit.Source.TrioComposition.ParentSpec.public_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [43/83] Replayed LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI
+info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:169:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.decodeArray_encoded' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:170:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.decodeArguments_encoded' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:171:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.decodeReturn_encoded' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:172:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.run_encoded' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:173:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.run_short' depends on axioms: [propext, Quot.sound]
+ℹ [44/83] Replayed LidoSRv3.Audit.Source.TrioAlloc2.ABIComposition
+info: LidoSRv3/Audit/Source/TrioAlloc2/ABIComposition.lean:46:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_then_abi_distributes' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [45/83] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentABI
+info: LidoSRv3/Audit/Source/TrioComposition/ParentABI.lean:110:0: 'LidoSRv3.Audit.Source.TrioComposition.public_abi_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [46/83] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentCalls
+info: LidoSRv3/Audit/Source/TrioComposition/ParentCalls.lean:45:0: 'LidoSRv3.Audit.Source.TrioComposition.ParentCalls.correspondence' depends on axioms: [propext, Quot.sound]
+⚠ [47/83] Replayed LidoSRv3.Audit.Source.TrioComposition.AllocationParentCalls
+warning: LidoSRv3/Audit/Source/TrioComposition/AllocationParentCalls.lean:31:12: This simp argument is unused:
+  divided
+
+Hint: Omit it from the simp argument list.
+  simp [d̵i̵v̵i̵d̵e̵d̵,̵ ̵success, CallTree.check, bind, CallTree.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+info: LidoSRv3/Audit/Source/TrioComposition/AllocationParentCalls.lean:82:0: 'LidoSRv3.Audit.Source.TrioComposition.AllocationParentCalls.successful_prefix_extent' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/AllocationParentCalls.lean:84:0: 'LidoSRv3.Audit.Source.TrioComposition.AllocationParentCalls.successful_prefix_correspondence' depends on axioms: [propext,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/AllocationParentCalls.lean:85:0: 'LidoSRv3.Audit.Source.TrioComposition.AllocationParentCalls.empty_memory_failure' depends on axioms: [propext,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/AllocationParentCalls.lean:86:0: 'LidoSRv3.Audit.Source.TrioComposition.AllocationParentCalls.division_failure' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/AllocationParentCalls.lean:87:0: 'LidoSRv3.Audit.Source.TrioComposition.AllocationParentCalls.memory_failure' depends on axioms: [propext, Quot.sound]
+ℹ [48/83] Replayed LidoSRv3.Audit.Source.TrioComposition.MemoryParentCalls
+info: LidoSRv3/Audit/Source/TrioComposition/MemoryParentCalls.lean:59:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryParentCalls.program_eq' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/MemoryParentCalls.lean:60:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryParentCalls.correspondence' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/MemoryParentCalls.lean:61:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryParentCalls.abi_extent' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+⚠ [59/83] Replayed Verity.Core
+warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1041:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+ℹ [77/83] Replayed LidoSRv3.Audit.Source.TrioComposition.VerityParent
+info: LidoSRv3/Audit/Source/TrioComposition/VerityParent.lean:78:0: 'LidoSRv3.Audit.Source.TrioComposition.VerityParent.memory_correspondence' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/VerityParent.lean:79:0: 'LidoSRv3.Audit.Source.TrioComposition.VerityParent.memory_public_iff' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/VerityParent.lean:81:0: 'LidoSRv3.Audit.Source.TrioComposition.VerityParent.correspondence' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/VerityParent.lean:82:0: 'LidoSRv3.Audit.Source.TrioComposition.VerityParent.public_iff' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+Build completed successfully (83 jobs).
+VERITY_PARENT_VECTOR_PASS empty-before-division calls=0 result=Except.ok { totalAllocated := 0, allocated := [], newAllocations := [] }
+VERITY_PARENT_VECTOR_PASS division-before-calls calls=0 result=Except.error (LidoSRv3.Audit.Source.TrioAlloc1.Failure.panic 18)
+VERITY_PARENT_VECTOR_PASS positive-rounded-demand calls=1 result=Except.ok { totalAllocated := 64, allocated := [64], newAllocations := [96] }
+VERITY_PARENT_VECTOR_PASS zero-demand-still-calls calls=1 result=Except.ok { totalAllocated := 0, allocated := [0], newAllocations := [32] }
+VERITY_PARENT_VECTOR_PASS module-rejection calls=1 result=Except.error (LidoSRv3.Audit.Source.TrioAlloc1.Failure.revertData [171])
+VERITY_PARENT_VECTOR_PASS late-conversion-overflow calls=1 result=Except.error (LidoSRv3.Audit.Source.TrioAlloc1.Failure.panic 17)
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"normal","actual":"0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000040","reverted":false,"count":1,"shares":[10000,10000],"unit":"32","amount":"320","summaries":["0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001","0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"],"reject1":false,"calls":["0:9abddf09"]}
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"zero-demand","actual":"0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000020","reverted":false,"count":1,"shares":[10000,10000],"unit":"32","amount":"31","summaries":["0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001","0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"],"reject1":false,"calls":["0:9abddf09"]}
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"empty-zero-divisor","actual":"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000","reverted":false,"count":0,"shares":[10000,10000],"unit":"0","amount":"320","summaries":["0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001","0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"],"reject1":false,"calls":[]}
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"division-before-producer","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000012","reverted":true,"count":1,"shares":[10000,10000],"unit":"0","amount":"320","summaries":["0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001","0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"],"reject1":false,"calls":[]}
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"zero-demand-overflow","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000011","reverted":true,"count":1,"shares":[10000,10000],"unit":"1048576","amount":"0","summaries":["0x000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000","0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"],"reject1":false,"calls":["0:9abddf09"]}
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"late-second-row-overflow","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000011","reverted":true,"count":2,"shares":[0,10000],"unit":"1048576","amount":"1048576","summaries":["0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000","0x000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001"],"reject1":false,"calls":["0:9abddf09","1:9abddf09"]}
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"zero-demand-late-rejection","actual":"0xdead","reverted":true,"count":2,"shares":[10000,10000],"unit":"32","amount":"0","summaries":["0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001","0xdead"],"reject1":true,"calls":["0:9abddf09","1:9abddf09"]}
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"malformed-summary","actual":"0x","reverted":true,"count":1,"shares":[10000,10000],"unit":"32","amount":"320","summaries":["0xdead","0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"],"reject1":false,"calls":["0:9abddf09"]}
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"memory-max-count","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000041","reverted":true,"count":115792089237316195423570985008687907853269984665640564039457584007913129639935,"shares":[10000,10000],"unit":"32","amount":"0","summaries":["0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001","0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"],"reject1":false,"calls":[]}
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"memory-length-limit","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000041","reverted":true,"count":18446744073709551616,"shares":[10000,10000],"unit":"32","amount":"0","summaries":["0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001","0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"],"reject1":false,"calls":[]}
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"memory-size-limit","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000041","reverted":true,"count":576460752303423488,"shares":[10000,10000],"unit":"32","amount":"0","summaries":["0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001","0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"],"reject1":false,"calls":[]}
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"division-before-memory-limit","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000012","reverted":true,"count":18446744073709551616,"shares":[10000,10000],"unit":"0","amount":"320","summaries":["0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001","0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"],"reject1":false,"calls":[]}
+VERITY_RETURN_MEMORY_PASS short-safe
+VERITY_RETURN_MEMORY_PASS allocation-before-short-decode
+VERITY_RETURN_MEMORY_PASS empty-response-no-growth
+VERITY_RETURN_MEMORY_PASS rejection-before-allocation
+VERITY_RETURN_MEMORY_PASS exception-before-allocation
+VERITY_RETURN_MEMORY_PASS summary-copy-cap
+VERITY_RETURN_MEMORY_PASS stake-copy-cap
+VERITY_MEMORY_PARENT_PASS one-row calls=1
+VERITY_MEMORY_PARENT_PASS scratch-before-call calls=0
+VERITY_MEMORY_PARENT_PASS capacity-after-call calls=1
+VERITY_MEMORY_PARENT_PASS first-pass-before-capacity calls=1
+VERITY_MEMORY_PARENT_PASS capacity-before-second-pass calls=1
+VERITY_MEMORY_PARENT_PASS second-pass-overflow calls=1
+VERITY_MEMORY_PARENT_PASS prefix-before-call calls=0
+VERITY_MEMORY_PARENT_PASS two-rows calls=2
+INTEGRATION_GATE_EXIT 0 lake env lean --run audit/trio/integration/RunVerityParent.lean
+INTEGRATION_GATE_SUMMARY 0 bash scripts/prepare_trio_validation.sh
+INTEGRATION_GATE_SUMMARY 0 lake build LidoSRv3 LidoSRv3Test LidoSRv3Audit TrioIntegrationChecks
+INTEGRATION_GATE_SUMMARY 0 make prove
+INTEGRATION_GATE_SUMMARY 2 make test
+INTEGRATION_GATE_SUMMARY 0 lake env lean --run audit/trio/alloc1/RunVerityVectors.lean
+INTEGRATION_GATE_SUMMARY 0 lake env lean --run audit/trio/integration/RunVerityParent.lean
+uncaught exception: integration gates failed: make test: exit 2

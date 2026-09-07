@@ -1,0 +1,50 @@
+{
+  "reconciled_at_utc": "2026-09-07T10:40:41.286939+00:00",
+  "receipt": {
+    "job_id": "72e45c29-b554-4616-9fd2-cd54a38dde96",
+    "node_id": "old-agent",
+    "state": "failed",
+    "exit_code": 1,
+    "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+    "commit": "c7adae04416704a839d56333efad003f0a0f46b7",
+    "command": [
+      "lake",
+      "build",
+      "LidoSRv3",
+      "LidoSRv3Test",
+      "LidoSRv3Audit"
+    ],
+    "toolchain": "leanprover/lean4:v4.31.0"
+  },
+  "source_bundle_digest": "619d710e28d6120d28c56af6f1db4ea17cb8e890d5156c364a0b34d5ff26c3a2",
+  "source_bundle_sha256": "4c3a74d902b835520c31ff648d6af4a4760d7d62e13e16d8c5abc004f8408eea",
+  "digest_note": "Validation source_bundle_digest and archive source_bundle_sha256 are distinct recorded fields; the requested validation digest matches exactly.",
+  "terminal_receipt_file": "remote-terminal-72e45c29.json",
+  "terminal_receipt_sha256": "16c1f36ce6552783061f9b8a36d9f636251cd552f31cd2280132dda47f0125bd",
+  "live_pr_query": [
+    "gh",
+    "pr",
+    "view",
+    "244",
+    "--repo",
+    "lfglabs-dev/lido-srv3-proof-closure",
+    "--json",
+    "number,url,headRefName,headRefOid,state,isDraft"
+  ],
+  "live_pr_query_exit": 0,
+  "live_pr": {
+    "headRefName": "trio/reserve1-live-queue",
+    "headRefOid": "fa377ac1372733b8781255a5e47cfde80f92e9d6",
+    "isDraft": true,
+    "number": 244,
+    "state": "OPEN",
+    "url": "https://github.com/lfglabs-dev/lido-srv3-proof-closure/pull/244"
+  },
+  "head_matches_receipt_commit": false,
+  "classification": "FAILED",
+  "receipt_is_for_older_head": true,
+  "integration_gate_satisfied": false,
+  "failure_reason": "Dependency bootstrap failed: EVMYulLean Git fetch could not read GitHub Username; nested git exit 128, lake job exit 1.",
+  "success_policy": "A successful receipt with a nonmatching older head is STALE_SUCCESS and cannot satisfy an integration gate.",
+  "new_submissions": 0
+}

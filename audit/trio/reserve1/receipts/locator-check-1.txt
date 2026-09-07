@@ -1,0 +1,46 @@
+LidoSRv3/Audit/Source/TrioReserve1/Locator.lean:40:45: error: unsolved goals
+locator : Address
+c : Config
+other : External
+caller : Address
+w : World
+⊢ (match
+      if
+          ∀ (a : Nat),
+            a < 4 → UInt8.ofNat (4016834124 / 256 ^ (3 - a) % 256) = UInt8.ofNat (936771225 / 256 ^ (3 - a) % 256) then
+        some c.queue
+      else some c.router with
+    | none =>
+      other
+        { caller := caller, target := locator, value := { val := 0, isLt := ⋯ },
+          payload := List.map (fun i => UInt8.ofNat (4016834124 / 256 ^ (3 - i) % 256)) (List.range 4) }
+        w
+    | some value =>
+      Reply.success (List.map (fun i => UInt8.ofNat (value.val / 256 ^ (31 - i) % 256)) (List.range 32)) w) =
+    Reply.success (List.map (fun i => UInt8.ofNat (c.router.val / 256 ^ (31 - i) % 256)) (List.range 32)) w
+LidoSRv3/Audit/Source/TrioReserve1/Locator.lean:46:45: error: unsolved goals
+locator : Address
+c : Config
+other : External
+caller : Address
+w : World
+⊢ (match
+      if
+          ∀ (a : Nat),
+            a < 4 → UInt8.ofNat (1512059385 / 256 ^ (3 - a) % 256) = UInt8.ofNat (936771225 / 256 ^ (3 - a) % 256) then
+        some c.queue
+      else
+        if
+            ∀ (a : Nat),
+              a < 4 →
+                UInt8.ofNat (1512059385 / 256 ^ (3 - a) % 256) = UInt8.ofNat (4016834124 / 256 ^ (3 - a) % 256) then
+          some c.router
+        else some c.oracle with
+    | none =>
+      other
+        { caller := caller, target := locator, value := { val := 0, isLt := ⋯ },
+          payload := List.map (fun i => UInt8.ofNat (1512059385 / 256 ^ (3 - i) % 256)) (List.range 4) }
+        w
+    | some value =>
+      Reply.success (List.map (fun i => UInt8.ofNat (value.val / 256 ^ (31 - i) % 256)) (List.range 32)) w) =
+    Reply.success (List.map (fun i => UInt8.ofNat (c.oracle.val / 256 ^ (31 - i) % 256)) (List.range 32)) w

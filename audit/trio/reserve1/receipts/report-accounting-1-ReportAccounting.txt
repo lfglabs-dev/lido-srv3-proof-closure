@@ -1,0 +1,31 @@
+LidoSRv3/Audit/Source/TrioReserve1/ReportAccounting.lean:18:89: error: unexpected identifier; expected '}'
+LidoSRv3/Audit/Source/TrioReserve1/ReportAccounting.lean:41:4: error: `simp` failed: maximum number of steps exceeded
+LidoSRv3/Audit/Source/TrioReserve1/ReportAccounting.lean:34:0: error: (deterministic) timeout at `whnf`, maximum number of heartbeats (200000) has been reached
+
+Note: Use `set_option maxHeartbeats <num>` to set the limit.
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.
+LidoSRv3/Audit/Source/TrioReserve1/ReportAccounting.lean:41:49: warning: declaration uses `sorry`
+LidoSRv3/Audit/Source/TrioReserve1/ReportAccounting.lean:41:49: warning: This simp argument is unused:
+  committed
+
+Hint: Omit it from the simp argument list.
+  simp_all [Report.afterCalls, buffer, result, co̵m̵m̵i̵t̵t̵e̵d̵,̵ ̵c̵heckedAdd, checkedSub,
+  ̵  ̵ ̵ ̵ ̵ ̵require, fail, pure,
+  ̲  ̲ ̲ ̲ ̲ ̲pureExec, bind, bindExec, Live.read, Live.write, emit,
+  ̵  ̵ ̵ ̵ ̵ ̵updateBufferedEtherAllocation,
+  ̲  ̲ ̲ ̲ ̲ ̲setDepositsReserve, Writers.read_write_other]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/ReportAccounting.lean:42:15: warning: This simp argument is unused:
+  fail
+
+Hint: Omit it from the simp argument list.
+  simp_all [Report.afterCalls, buffer, result, committed, checkedAdd, checkedSub,
+  ̵  ̵ ̵ ̵ ̵ ̵require, f̵a̵i̵l̵,̵ ̵pure,
+  ̲  ̲ ̲ ̲ ̲ ̲pureExec, bind, bindExec, Live.read, Live.write, emit,
+  ̵  ̵ ̵ ̵ ̵ ̵updateBufferedEtherAllocation,
+  ̲  ̲ ̲ ̲ ̲ ̲setDepositsReserve, Writers.read_write_other]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/ReportAccounting.lean:51:8: error: (kernel) unknown constant 'LidoSRv3.Audit.Source.TrioReserve1.ReportAccounting.of_spec'

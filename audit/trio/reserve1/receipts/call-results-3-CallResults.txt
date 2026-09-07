@@ -1,0 +1,14 @@
+LidoSRv3/Audit/Source/TrioReserve1/CallResults.lean:52:78: error: unsolved goals
+ctx : Context
+w : World
+c : Locator.Config
+other : External
+hcode : (w.core.codeSize (Verity.Core.Address.ofNat (w.core.readContractSlot ctx.self.val locatorSlot).val).val).val ≠ 0
+⊢ ¬(w.core.codeSize ((w.core.readContractSlot ctx.self.val locatorSlot).val % Verity.Core.Address.modulus)).val = 0
+LidoSRv3/Audit/Source/TrioReserve1/CallResults.lean:53:16: warning: This simp argument is unused:
+  hcode
+
+Hint: Omit it from the simp argument list.
+  simp [call, h̵c̵o̵d̵e̵,̵ ̵word, Verity.Core.Uint256.ofNat, transfer_zero, Locator.dispatch]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

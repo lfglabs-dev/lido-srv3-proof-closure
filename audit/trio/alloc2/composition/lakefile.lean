@@ -1,0 +1,29 @@
+import Lake
+open Lake DSL
+
+/- Candidate composition against a pinned producer snapshot. Not the root build. -/
+package trioAlloc2Composition where
+  srcDir := "../../../.."
+
+@[default_target]
+lean_lib TrioAlloc2Composition where
+  globs := #[
+    .submodules `LidoSRv3.Audit.Source.TrioAlloc1,
+    .submodules `LidoSRv3.Audit.Source.TrioAlloc2,
+    .one `audit.trio.alloc2.composition.Composition,
+    .one `audit.trio.alloc2.composition.MemoryWrite,
+    .one `audit.trio.alloc2.composition.IndexedMemory,
+    .one `audit.trio.alloc2.composition.MemoryWriteVectors,
+    .one `audit.trio.alloc2.composition.LibraryABI,
+    .one `audit.trio.alloc2.composition.MemoryExtent,
+    .one `audit.trio.alloc2.composition.AllocationMemoryBridge,
+    .one `audit.trio.alloc2.composition.MemoryVectors,
+    .one `audit.trio.alloc2.composition.LibraryABIVectors,
+    .one `audit.trio.alloc2.composition.Parent,
+    .one `audit.trio.alloc2.composition.ParentPostconditions,
+    .one `audit.trio.alloc2.composition.ParentErrors,
+    .one `audit.trio.alloc2.composition.ParentInversion,
+    .one `audit.trio.alloc2.composition.ProducerMemory,
+    .one `audit.trio.alloc2.composition.ProducerMemoryVectors,
+    .one `audit.trio.alloc2.composition.ParentVectors
+  ]

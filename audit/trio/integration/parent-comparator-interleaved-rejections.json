@@ -1,0 +1,127 @@
+{
+  "classification": "PARENT_COMPARATOR_REGRESSION_PASS",
+  "real_vm_source": "3f22469d5be4c5f77732ca59406726f46cca4895",
+  "real_vm_job": "526f3902-a6e4-47b1-a3ed-611b8441ae10",
+  "tests": [
+    {
+      "name": "baseline",
+      "optimized": false,
+      "exit_code": 0,
+      "output": "SOLIDITY_PARENT_VERITY_PASS: 12 cases"
+    },
+    {
+      "name": "mutated-baseline",
+      "optimized": false,
+      "exit_code": 1,
+      "output": "mutated Solidity cannot establish the baseline"
+    },
+    {
+      "name": "changed-original-harness",
+      "optimized": false,
+      "exit_code": 1,
+      "output": "baseline harness differs from the original input"
+    },
+    {
+      "name": "changed-mutation-input",
+      "optimized": false,
+      "exit_code": 1,
+      "output": "Solidity harness changed since execution: mutations.cjs"
+    },
+    {
+      "name": "empty-solidity",
+      "optimized": false,
+      "exit_code": 1,
+      "output": "incomplete Solidity cases"
+    },
+    {
+      "name": "duplicate-solidity",
+      "optimized": false,
+      "exit_code": 1,
+      "output": "incomplete Solidity cases"
+    },
+    {
+      "name": "changed-observation",
+      "optimized": false,
+      "exit_code": 1,
+      "output": "normal: different observation actual"
+    },
+    {
+      "name": "truncated-vm",
+      "optimized": false,
+      "exit_code": 1,
+      "output": "VERITY_PARENT_DIFFERENTIAL_VECTOR: missing or truncated vectors"
+    },
+    {
+      "name": "wrong-repository",
+      "optimized": false,
+      "exit_code": 1,
+      "output": "wrong VM repository"
+    },
+    {
+      "name": "nonterminal-vm",
+      "optimized": false,
+      "exit_code": 1,
+      "output": "VM job must have an authoritative terminal result"
+    },
+    {
+      "name": "baseline",
+      "optimized": true,
+      "exit_code": 0,
+      "output": "SOLIDITY_PARENT_VERITY_PASS: 12 cases"
+    },
+    {
+      "name": "mutated-baseline",
+      "optimized": true,
+      "exit_code": 1,
+      "output": "mutated Solidity cannot establish the baseline"
+    },
+    {
+      "name": "changed-original-harness",
+      "optimized": true,
+      "exit_code": 1,
+      "output": "baseline harness differs from the original input"
+    },
+    {
+      "name": "changed-mutation-input",
+      "optimized": true,
+      "exit_code": 1,
+      "output": "Solidity harness changed since execution: mutations.cjs"
+    },
+    {
+      "name": "empty-solidity",
+      "optimized": true,
+      "exit_code": 1,
+      "output": "incomplete Solidity cases"
+    },
+    {
+      "name": "duplicate-solidity",
+      "optimized": true,
+      "exit_code": 1,
+      "output": "incomplete Solidity cases"
+    },
+    {
+      "name": "changed-observation",
+      "optimized": true,
+      "exit_code": 1,
+      "output": "normal: different observation actual"
+    },
+    {
+      "name": "truncated-vm",
+      "optimized": true,
+      "exit_code": 1,
+      "output": "VERITY_PARENT_DIFFERENTIAL_VECTOR: missing or truncated vectors"
+    },
+    {
+      "name": "wrong-repository",
+      "optimized": true,
+      "exit_code": 1,
+      "output": "wrong VM repository"
+    },
+    {
+      "name": "nonterminal-vm",
+      "optimized": true,
+      "exit_code": 1,
+      "output": "VM job must have an authoritative terminal result"
+    }
+  ]
+}

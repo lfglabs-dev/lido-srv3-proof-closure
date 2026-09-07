@@ -1,0 +1,156 @@
+LidoSRv3/Audit/Source/TrioReserve1/Aragon.lean:69:18: warning: This simp argument is unused:
+  h
+
+Hint: Omit it from the simp argument list.
+  simp ̵[̵h̵]̵
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/Aragon.lean:90:80: error: unsolved goals
+case isTrue
+external : External
+ctx : Context
+requested : Word
+w after : World
+trace : List Attempt
+ht :
+  WriterSpec.Target (Writers.project ctx after) requested.val
+    (Writers.project ctx
+      (match (setDepositsReserveTarget ctx requested after).outcome with
+        | Except.ok a => setDepositsReserveTarget ctx requested after
+        | Except.error e =>
+          { outcome := Except.error e, world := after,
+            attempts := (setDepositsReserveTarget ctx requested after).attempts }).world)
+h✝ : requested.val < (after.core.readContractSlot ctx.self.val reserveSlot).val
+hs :
+  (match (setDepositsReserveTarget ctx requested after).outcome with
+        | Except.ok a => setDepositsReserveTarget ctx requested after
+        | Except.error e =>
+          { outcome := Except.error e, world := after,
+            attempts := (setDepositsReserveTarget ctx requested after).attempts }).outcome =
+      Except.ok () ∧
+    (match (setDepositsReserveTarget ctx requested after).outcome with
+          | Except.ok a => setDepositsReserveTarget ctx requested after
+          | Except.error e =>
+            { outcome := Except.error e, world := after,
+              attempts := (setDepositsReserveTarget ctx requested after).attempts }).attempts =
+        [] ∧
+      (match (setDepositsReserveTarget ctx requested after).outcome with
+              | Except.ok a => setDepositsReserveTarget ctx requested after
+              | Except.error e =>
+                { outcome := Except.error e, world := after,
+                  attempts := (setDepositsReserveTarget ctx requested after).attempts }).world.balances =
+          after.balances ∧
+        (match (setDepositsReserveTarget ctx requested after).outcome with
+              | Except.ok a => setDepositsReserveTarget ctx requested after
+              | Except.error e =>
+                { outcome := Except.error e, world := after,
+                  attempts := (setDepositsReserveTarget ctx requested after).attempts }).world.logs =
+          after.logs ++
+            [{ emitter := ctx.self, name := "DepositsReserveTargetSet", values := [requested] },
+              { emitter := ctx.self, name := "DepositsReserveSet", values := [requested] }]
+⊢ WriterSpec.Target (Writers.project ctx after) requested.val
+    (Writers.project ctx
+      (match
+          (bindExec (canPerform external ctx bufferReserveManagerRole)
+              (fun allowed =>
+                bindExec (if allowed = true then pureExec () else fail (Fault.reason "APP_AUTH_FAILED")) fun x =>
+                  setDepositsReserveTarget ctx requested)
+              w).outcome with
+        | Except.ok a =>
+          bindExec (canPerform external ctx bufferReserveManagerRole)
+            (fun allowed =>
+              bindExec (if allowed = true then pureExec () else fail (Fault.reason "APP_AUTH_FAILED")) fun x =>
+                setDepositsReserveTarget ctx requested)
+            w
+        | Except.error e =>
+          { outcome := Except.error e, world := w,
+            attempts :=
+              (bindExec (canPerform external ctx bufferReserveManagerRole)
+                  (fun allowed =>
+                    bindExec (if allowed = true then pureExec () else fail (Fault.reason "APP_AUTH_FAILED")) fun x =>
+                      setDepositsReserveTarget ctx requested)
+                  w).attempts }).world)
+
+case isFalse
+external : External
+ctx : Context
+requested : Word
+w after : World
+trace : List Attempt
+ht :
+  WriterSpec.Target (Writers.project ctx after) requested.val
+    (Writers.project ctx
+      (match (setDepositsReserveTarget ctx requested after).outcome with
+        | Except.ok a => setDepositsReserveTarget ctx requested after
+        | Except.error e =>
+          { outcome := Except.error e, world := after,
+            attempts := (setDepositsReserveTarget ctx requested after).attempts }).world)
+h✝ : (after.core.readContractSlot ctx.self.val reserveSlot).val ≤ requested.val
+hs :
+  (match (setDepositsReserveTarget ctx requested after).outcome with
+        | Except.ok a => setDepositsReserveTarget ctx requested after
+        | Except.error e =>
+          { outcome := Except.error e, world := after,
+            attempts := (setDepositsReserveTarget ctx requested after).attempts }).outcome =
+      Except.ok () ∧
+    (match (setDepositsReserveTarget ctx requested after).outcome with
+          | Except.ok a => setDepositsReserveTarget ctx requested after
+          | Except.error e =>
+            { outcome := Except.error e, world := after,
+              attempts := (setDepositsReserveTarget ctx requested after).attempts }).attempts =
+        [] ∧
+      (match (setDepositsReserveTarget ctx requested after).outcome with
+              | Except.ok a => setDepositsReserveTarget ctx requested after
+              | Except.error e =>
+                { outcome := Except.error e, world := after,
+                  attempts := (setDepositsReserveTarget ctx requested after).attempts }).world.balances =
+          after.balances ∧
+        (match (setDepositsReserveTarget ctx requested after).outcome with
+              | Except.ok a => setDepositsReserveTarget ctx requested after
+              | Except.error e =>
+                { outcome := Except.error e, world := after,
+                  attempts := (setDepositsReserveTarget ctx requested after).attempts }).world.logs =
+          after.logs ++ [{ emitter := ctx.self, name := "DepositsReserveTargetSet", values := [requested] }]
+⊢ WriterSpec.Target (Writers.project ctx after) requested.val
+    (Writers.project ctx
+      (match
+          (bindExec (canPerform external ctx bufferReserveManagerRole)
+              (fun allowed =>
+                bindExec (if allowed = true then pureExec () else fail (Fault.reason "APP_AUTH_FAILED")) fun x =>
+                  setDepositsReserveTarget ctx requested)
+              w).outcome with
+        | Except.ok a =>
+          bindExec (canPerform external ctx bufferReserveManagerRole)
+            (fun allowed =>
+              bindExec (if allowed = true then pureExec () else fail (Fault.reason "APP_AUTH_FAILED")) fun x =>
+                setDepositsReserveTarget ctx requested)
+            w
+        | Except.error e =>
+          { outcome := Except.error e, world := w,
+            attempts :=
+              (bindExec (canPerform external ctx bufferReserveManagerRole)
+                  (fun allowed =>
+                    bindExec (if allowed = true then pureExec () else fail (Fault.reason "APP_AUTH_FAILED")) fun x =>
+                      setDepositsReserveTarget ctx requested)
+                  w).attempts }).world)
+LidoSRv3/Audit/Source/TrioReserve1/Aragon.lean:93:30: warning: This simp argument is unused:
+  bindExec
+
+Hint: Omit it from the simp argument list.
+  simp only [setTarget, bind, b̵i̵n̵d̵E̵x̵e̵c̵,̵ ̵h, require, pure, pureExec, List.nil_append] at *
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/Aragon.lean:93:58: warning: This simp argument is unused:
+  pureExec
+
+Hint: Omit it from the simp argument list.
+  simp only [setTarget, bind, bindExec, h, require, pure, p̵u̵r̵e̵E̵x̵e̵c̵,̵ ̵List.nil_append] at *
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/Aragon.lean:93:68: warning: This simp argument is unused:
+  List.nil_append
+
+Hint: Omit it from the simp argument list.
+  simp only [setTarget, bind, bindExec, h, require, pure, pureExec,̵ ̵L̵i̵s̵t̵.̵n̵i̵l̵_̵a̵p̵p̵e̵n̵d̵] at *
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

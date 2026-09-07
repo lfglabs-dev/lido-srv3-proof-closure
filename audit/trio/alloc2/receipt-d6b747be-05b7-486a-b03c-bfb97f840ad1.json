@@ -1,0 +1,29 @@
+{
+  "job_id": "d6b747be-05b7-486a-b03c-bfb97f840ad1",
+  "node_id": "old-agent",
+  "state": "succeeded",
+  "receipt_state": "succeeded",
+  "exit_code": 0,
+  "created_at": "2026-09-07T11:59:36.560147568+00:00",
+  "started_at": "2026-09-07T11:59:36.605926028+00:00",
+  "finished_at": "2026-09-07T11:59:44.802527530+00:00",
+  "error": null,
+  "log_tail": "HEAD is now at c7adae0 audit: scope allocation rollback and single-call top-up claims (#242)\nRemoving LidoSRv3/Audit/Source/TrioAlloc2/\nRemoving LidoSRv3/Tests/TrioAlloc2/\nRemoving audit/trio/\nsource bundle verified sha256=de0080083dc6b002c6205b82440b1304960c27a6cdb20dc3b60c331ff56a70ae files=20 bytes=88069\ninfo: trioAlloc2Composition: no previous manifest, creating one from scratch\ninfo: toolchain not updated; no toolchain information found\n\u2714 [2/21] Built LidoSRv3.Audit.Source.TrioAlloc1.Interface (444ms)\n\u2714 [3/21] Built LidoSRv3.Audit.Source.TrioAlloc2.Word (353ms)\n\u2714 [4/21] Built LidoSRv3.Audit.Source.TrioAlloc2.Spec (312ms)\n\u2714 [5/21] Built LidoSRv3.Audit.Source.TrioAlloc1.Storage (334ms)\n\u2714 [6/21] Built LidoSRv3.Audit.Source.TrioAlloc2.Step (356ms)\n\u2714 [7/21] Built LidoSRv3.Audit.Source.TrioAlloc2.Arithmetic (402ms)\n\u2714 [8/21] Built LidoSRv3.Audit.Source.TrioAlloc1.Execution (569ms)\n\u2714 [9/21] Built LidoSRv3.Audit.Source.TrioAlloc2.StepBounds (362ms)\n\u2714 [10/21] Built LidoSRv3.Audit.Source.TrioAlloc2.Loop (294ms)\n\u2714 [11/21] Built LidoSRv3.Audit.Source.TrioAlloc2.ScanBounds (573ms)\n\u2714 [12/21] Built LidoSRv3.Audit.Source.TrioAlloc1.Properties (436ms)\n\u2714 [13/21] Built LidoSRv3.Audit.Source.TrioAlloc2.LoopBounds (397ms)\n\u2714 [14/21] Built LidoSRv3.Audit.Source.TrioAlloc2.ScanCorrespondence (598ms)\n\u2714 [15/21] Built LidoSRv3.Audit.Source.TrioAlloc2.Conservation (520ms)\n\u26a0 [16/21] Built LidoSRv3.Audit.Source.TrioAlloc2.Selection (312ms)\nwarning: ../../../../LidoSRv3/Audit/Source/TrioAlloc2/Selection.lean:53:10: This simp argument is unused:\n  levelsEq\n\nHint: Omit it from the simp argument list.\n  simp [l\u0335e\u0335v\u0335e\u0335l\u0335s\u0335E\u0335q\u0335,\u0335 \u0335Spec.minimum, countEq]\n\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`\nwarning: ../../../../LidoSRv3/Audit/Source/TrioAlloc2/Selection.lean:70:10: This simp argument is unused:\n  levelsEq\n\nHint: Omit it from the simp argument list.\n  simp [l\u0335e\u0335v\u0335e\u0335l\u0335s\u0335E\u0335q\u0335,\u0335 \u0335Spec.minimum, nonzero, minimumEq]\n\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`\n\u2714 [17/21] Built LidoSRv3.Audit.Source.TrioAlloc2.Totality (425ms)\n\u2714 [18/21] Built LidoSRv3.Audit.Source.TrioAlloc2.LoopTotality (355ms)\n\u2714 [19/21] Built LidoSRv3.Audit.Source.TrioAlloc2.Errors (329ms)\n\u2139 [20/21] Built audit.trio.alloc2.composition.Composition (221ms)\ninfo: ../../../../audit/trio/alloc2/composition/Composition.lean:52:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_success_establishes_consumer_premises' depends on axioms: [propext,\n Quot.sound]\ninfo: ../../../../audit/trio/alloc2/composition/Composition.lean:53:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_then_consumer_succeeds' depends on axioms: [propext, Quot.sound]\nBuild completed successfully (21 jobs).\n",
+  "validation": {
+    "version": 1,
+    "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+    "commit": "c7adae04416704a839d56333efad003f0a0f46b7",
+    "base_tree_sha": "27834bd59a19f789b2fb9d06f9de01b47af123c2",
+    "cwd_rel_known": true,
+    "cwd_rel": "audit/trio/alloc2/composition",
+    "command": [
+      "lake",
+      "build"
+    ],
+    "toolchain": "leanprover/lean4:v4.31.0",
+    "source_bundle_digest": "b58e03944f2d89cecf974861b96cf7103b293d45d1d5dc51ee04d5046fd7f77c",
+    "build_protocol_version": "1",
+    "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+  },
+  "artifacts": []
+}

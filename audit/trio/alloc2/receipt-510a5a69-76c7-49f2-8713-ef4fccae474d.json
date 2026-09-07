@@ -1,0 +1,29 @@
+{
+  "job_id": "510a5a69-76c7-49f2-8713-ef4fccae474d",
+  "node_id": "old-agent",
+  "state": "failed",
+  "receipt_state": "failed",
+  "exit_code": 1,
+  "created_at": "2026-09-07T09:24:55.819013452+00:00",
+  "started_at": "2026-09-07T09:24:55.863085936+00:00",
+  "finished_at": "2026-09-07T09:24:57.126202638+00:00",
+  "error": "command exited with Some(1)",
+  "log_tail": "HEAD is now at c7adae0 audit: scope allocation rollback and single-call top-up claims (#242)\nRemoving LidoSRv3/Audit/Source/TrioAlloc2/\nRemoving LidoSRv3/Tests/TrioAlloc2/\nRemoving audit/trio/\nsource bundle verified sha256=ebf16af09d1b643479e6583dd2c13b06fd0d76dddce61c625f60e3c0b5185c97 files=7 bytes=13400\ninfo: trioAlloc2Slice: no previous manifest, creating one from scratch\ninfo: toolchain not updated; no toolchain information found\n\u2716 [2/8] Building LidoSRv3.Audit.Source.TrioAlloc2.Word (342ms)\ntrace: .> LEAN_PATH=/var/lib/sandboxed-node/work/checkouts/9acda983bdcdf557/c7adae04416704a839d56333efad003f0a0f46b7/audit/trio/alloc2/.lake/build/lib/lean /var/lib/sandboxed-node/work/caches/elan/toolchains/leanprover--lean4---v4.31.0/bin/lean /var/lib/sandboxed-node/work/checkouts/9acda983bdcdf557/c7adae04416704a839d56333efad003f0a0f46b7/audit/trio/alloc2/../../../LidoSRv3/Audit/Source/TrioAlloc2/Word.lean -o /var/lib/sandboxed-node/work/checkouts/9acda983bdcdf557/c7adae04416704a839d56333efad003f0a0f46b7/audit/trio/alloc2/.lake/build/lib/lean/LidoSRv3/Audit/Source/TrioAlloc2/Word.olean -i /var/lib/sandboxed-node/work/checkouts/9acda983bdcdf557/c7adae04416704a839d56333efad003f0a0f46b7/audit/trio/alloc2/.lake/build/lib/lean/LidoSRv3/Audit/Source/TrioAlloc2/Word.ilean -c /var/lib/sandboxed-node/work/checkouts/9acda983bdcdf557/c7adae04416704a839d56333efad003f0a0f46b7/audit/trio/alloc2/.lake/build/ir/LidoSRv3/Audit/Source/TrioAlloc2/Word.c --setup /var/lib/sandboxed-node/work/checkouts/9acda983bdcdf557/c7adae04416704a839d56333efad003f0a0f46b7/audit/trio/alloc2/.lake/build/ir/LidoSRv3/Audit/Source/TrioAlloc2/Word.setup.json --json\nerror: ../../../LidoSRv3/Audit/Source/TrioAlloc2/Word.lean:94:14: unsolved goals\ncase neg.error\na b out : Word\nhz : \u00ac\u2191a = 0\ne : Panic\nhs : checkedSub a one = Except.error e\nh :\n  (match pure PUnit.unit with\n    | Except.error err => Except.error err\n    | Except.ok v => Except.error e) =\n    Except.ok out\n\u22a2 \u2191out \u2264 \u2191a\nerror: ../../../LidoSRv3/Audit/Source/TrioAlloc2/Word.lean:97:16: unsolved goals\ncase neg.ok.error\na b out : Word\nhz : \u00ac\u2191a = 0\ndecremented : Word\nhs : checkedSub a one = Except.ok decremented\ne : Panic\nhd : checkedDiv decremented b = Except.error e\nh :\n  (match pure PUnit.unit with\n    | Except.error err => Except.error err\n    | Except.ok v => Except.error e) =\n    Except.ok out\n\u22a2 \u2191out \u2264 \u2191a\nerror: ../../../LidoSRv3/Audit/Source/TrioAlloc2/Word.lean:99:60: Type mismatch: After simplification, term\n  h\n has type\n  @Eq (Except Panic Word)\n    (match pure PUnit.unit with\n    | Except.error err => Except.error err\n    | Except.ok v => checkedAdd quotient one)\n    (Except.ok out)\nbut is expected to have type\n  @Eq (Except Panic Word) (checkedAdd quotient one) (Except.ok out)\nerror: Lean exited with code 1\n\u2714 [4/8] Built LidoSRv3.Audit.Source.TrioAlloc2.Spec (307ms)\nSome required targets logged failures:\n- LidoSRv3.Audit.Source.TrioAlloc2.Word\nerror: build failed\n",
+  "validation": {
+    "version": 1,
+    "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+    "commit": "c7adae04416704a839d56333efad003f0a0f46b7",
+    "base_tree_sha": "27834bd59a19f789b2fb9d06f9de01b47af123c2",
+    "cwd_rel_known": true,
+    "cwd_rel": "audit/trio/alloc2",
+    "command": [
+      "lake",
+      "build"
+    ],
+    "toolchain": "leanprover/lean4:v4.31.0",
+    "source_bundle_digest": "afefeaab291adbad5eca194f6c35b5509111dba3da65c2b5a3faf4515fc37431",
+    "build_protocol_version": "1",
+    "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+  },
+  "artifacts": []
+}

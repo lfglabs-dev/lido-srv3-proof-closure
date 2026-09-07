@@ -1,0 +1,984 @@
+r can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:366:33: This simp argument is unused:
+  _root_.Verity.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [_root_.Verity.Contract.run, _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵b̵i̵n̵d̵,̵ ̵Bind.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:366:53: This simp argument is unused:
+  Bind.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[_root_.Verity.Contract.run, _root_.Verity.bind,̵ ̵B̵i̵n̵d̵.̵b̵i̵n̵d̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:368:5: This simp argument is unused:
+  hone
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[h̵o̵n̵e̵,̵ ̵_root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:368:11: This simp argument is unused:
+  _root_.Verity.Contract.run
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 }) [hone,
+  ̲  ̲ ̲ ̲_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵C̵o̵n̵t̵r̵a̵c̵t̵.̵r̵u̵n̵,̵ ̵_root_.Verity.bind, Bind.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:368:39: This simp argument is unused:
+  _root_.Verity.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 }) [hone,
+  ̲  ̲ ̲ ̲_root_.Verity.Contract.run, _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵b̵i̵n̵d̵,̵ ̵Bind.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:368:59: This simp argument is unused:
+  Bind.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[hone,
+  ̲  ̲ ̲ ̲_root_.Verity.Contract.run, _root_.Verity.bind,̵ ̵B̵i̵n̵d̵.̵b̵i̵n̵d̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:370:5: This simp argument is unused:
+  _root_.Verity.Contract.run
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵C̵o̵n̵t̵r̵a̵c̵t̵.̵r̵u̵n̵,̵ ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵b̵i̵n̵d̵,̵[̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲b̲i̲n̲d̲,̲ Bind.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:370:33: This simp argument is unused:
+  _root_.Verity.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [_root_.Verity.Contract.run, _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵b̵i̵n̵d̵,̵ ̵Bind.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:370:53: This simp argument is unused:
+  Bind.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[_root_.Verity.Contract.run, _root_.Verity.bind,̵ ̵B̵i̵n̵d̵.̵b̵i̵n̵d̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:372:5: This simp argument is unused:
+  _root_.Verity.Contract.run
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵C̵o̵n̵t̵r̵a̵c̵t̵.̵r̵u̵n̵,̵ ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵b̵i̵n̵d̵,̵[̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲b̲i̲n̲d̲,̲ Bind.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:372:33: This simp argument is unused:
+  _root_.Verity.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [_root_.Verity.Contract.run, _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵b̵i̵n̵d̵,̵ ̵Bind.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:372:53: This simp argument is unused:
+  Bind.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[_root_.Verity.Contract.run, _root_.Verity.bind,̵ ̵B̵i̵n̵d̵.̵b̵i̵n̵d̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:376:8: This simp argument is unused:
+  _root_.Verity.Contract.run
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲ ̲ ̲{
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲maxSteps :=
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲1000000 }) [show inp.requestOwner = inp.caller ↔ inp.caller = inp.requestOwner from
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲eq_comm,
+        _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵C̵o̵n̵t̵r̵a̵c̵t̵.̵r̵u̵n̵,̵ ̵_root_.Verity.bind, Bind.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:376:36: This simp argument is unused:
+  _root_.Verity.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲ ̲ ̲{
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲maxSteps :=
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲1000000 }) [show inp.requestOwner = inp.caller ↔ inp.caller = inp.requestOwner from
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲eq_comm,
+        _root_.Verity.Contract.run, _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵b̵i̵n̵d̵,̵ ̵Bind.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:376:56: This simp argument is unused:
+  Bind.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲ ̲ ̲{
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲maxSteps :=
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲1000000 }) [show inp.requestOwner = inp.caller ↔ inp.caller = inp.requestOwner from
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲eq_comm,
+        _root_.Verity.Contract.run, _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵b̵i̵n̵d̵,̵ ̵B̵i̵n̵d̵.̵b̵i̵n̵d̵]̵_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲b̲i̲n̲d̲]̲
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:378:5: This simp argument is unused:
+  _root_.Verity.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵b̵i̵n̵d̵,̵ ̵B̵i̵n̵d̵.̵b̵i̵n̵d̵,̵[̲B̲i̲n̲d̲.̲b̲i̲n̲d̲,̲ _root_.Verity.setMappingUint, ContractState.writeMapUint,
+  ̲  ̲ ̲ ̲ContractState.readMapUint, ContractState.storageMapUint]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:378:25: This simp argument is unused:
+  Bind.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[_root_.Verity.bind, B̵i̵n̵d̵.̵b̵i̵n̵d̵,̵ ̵_root_.Verity.setMappingUint,
+       ̵ ̵ContractState.writeMapUint, ContractState.readMapUint,
+  ̵  ̵ ̵ ̵ ̵ ̵ContractState.storageMapUint]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:378:36: This simp argument is unused:
+  _root_.Verity.setMappingUint
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [_root_.Verity.bind, Bind.bind, _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵s̵e̵t̵M̵a̵p̵p̵i̵n̵g̵U̵i̵n̵t̵,̵ContractState.writeMapUint,
+      ContractState.readMapUint, ContractState.storageMapUint]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:379:6: This simp argument is unused:
+  ContractState.writeMapUint
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [_root_.Verity.bind, Bind.bind, _root_.Verity.setMappingUint,
+      C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵w̵r̵i̵t̵e̵M̵a̵p̵U̵i̵n̵t̵,̵ ̵ContractState.readMapUint, ContractState.storageMapUint]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:379:34: This simp argument is unused:
+  ContractState.readMapUint
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [_root_.Verity.bind, Bind.bind, _root_.Verity.setMappingUint,
+      ContractState.writeMapUint, C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵r̵e̵a̵d̵M̵a̵p̵U̵i̵n̵t̵,̵ContractState.storageMapUint]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:380:6: This simp argument is unused:
+  ContractState.storageMapUint
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [_root_.Verity.bind, Bind.bind, _root_.Verity.setMappingUint,
+      ContractState.writeMapUint, C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵r̵e̵a̵d̵M̵a̵p̵U̵i̵n̵t̵,̵
+  ̵ ̵ ̵ ̵ ̵ ̵ ̵C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵s̵t̵o̵r̵a̵g̵e̵M̵a̵p̵U̵i̵n̵t̵]̵C̲o̲n̲t̲r̲a̲c̲t̲S̲t̲a̲t̲e̲.̲r̲e̲a̲d̲M̲a̲p̲U̲i̲n̲t̲]̲
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:398:6: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:405:4: This simp argument is unused:
+  AddressTxContract.paused
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.redeem, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getMapping,
+  ̵  ̵ ̵ ̵_root_.Verity.setMapping,
+  ̲  ̲ ̲ ̲_root_.Verity.setMappingUint,
+  ̵  ̵ ̵ ̵AddressTxContract.p̵a̵u̵s̵e̵d̵,̵ ̵A̵d̵d̵r̵e̵s̵s̵T̵x̵C̵o̵n̵t̵r̵a̵c̵t̵.̵balances,
+  ̵  ̵ ̵ ̵AddressTxContract.allowances,
+  ̲  ̲ ̲ ̲AddressTxContract.owners,
+  ̵  ̵ ̵ ̵AddressTxContract.claimed, AddressTxContract.recipients,
+      ContractState.readSlot, ContractState.writeSlot,
+  ̵  ̵ ̵ ̵ContractState.readMap, ContractState.writeMap,
+      ContractState.readMap2, ContractState.writeMap2,
+  ̵  ̵ ̵ ̵ContractState.readMapUint,
+  ̲  ̲ ̲ ̲ContractState.writeMapUint,
+  ̵  ̵ ̵ ̵ContractState.storage, ContractState.storageMap,
+      ContractState.storageMap2, ContractState.storageMapUint,
+  ̵  ̵ ̵ ̵Verity.Core.Uint256.ofNat, hzero]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:406:4: This simp argument is unused:
+  AddressTxContract.allowances
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.redeem, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getMapping,
+  ̵  ̵ ̵ ̵_root_.Verity.setMapping,
+  ̲  ̲ ̲ ̲_root_.Verity.setMappingUint,
+  ̵  ̵ ̵ ̵AddressTxContract.paused, AddressTxContract.balances,
+      AddressTxContract.a̵l̵l̵owa̵nc̵es̵,̵ ̵A̵d̵d̵re̵ss̵T̵x̵C̵o̵n̵t̵r̵a̵c̵t̵.̵o̵w̵n̵e̵r̵s̵,
+  ̵  ̵ ̵ ̵AddressTxContract.claimed, AddressTxContract.recipients,
+      ContractState.readSlot, ContractState.writeSlot,
+  ̵  ̵ ̵ ̵ContractState.readMap, ContractState.writeMap,
+      ContractState.readMap2, ContractState.writeMap2,
+  ̵  ̵ ̵ ̵ContractState.readMapUint,
+  ̲  ̲ ̲ ̲ContractState.writeMapUint,
+  ̵  ̵ ̵ ̵ContractState.storage, ContractState.storageMap,
+      ContractState.storageMap2, ContractState.storageMapUint,
+  ̵  ̵ ̵ ̵Verity.Core.Uint256.ofNat, hzero]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:406:34: This simp argument is unused:
+  AddressTxContract.owners
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.redeem, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getMapping,
+  ̵  ̵ ̵ ̵_root_.Verity.setMapping,
+  ̲  ̲ ̲ ̲_root_.Verity.setMappingUint,
+  ̵  ̵ ̵ ̵AddressTxContract.paused, AddressTxContract.balances,
+      AddressTxContract.allowances, AddressTxContract.o̵w̵n̵e̵r̵s̵,̵
+  ̵ ̵ ̵ ̵ ̵A̵d̵d̵r̵e̵s̵s̵T̵x̵C̵o̵n̵t̵r̵a̵ct̵.̵c̵laimed, AddressTxContract.recipients,
+      ContractState.readSlot, ContractState.writeSlot,
+  ̵  ̵ ̵ ̵ContractState.readMap, ContractState.writeMap,
+      ContractState.readMap2, ContractState.writeMap2,
+  ̵  ̵ ̵ ̵ContractState.readMapUint,
+  ̲  ̲ ̲ ̲ContractState.writeMapUint,
+  ̵  ̵ ̵ ̵ContractState.storage, ContractState.storageMap,
+      ContractState.storageMap2, ContractState.storageMapUint,
+  ̵  ̵ ̵ ̵Verity.Core.Uint256.ofNat, hzero]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:407:4: This simp argument is unused:
+  AddressTxContract.claimed
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.redeem, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getMapping,
+  ̵  ̵ ̵ ̵_root_.Verity.setMapping,
+  ̲  ̲ ̲ ̲_root_.Verity.setMappingUint,
+  ̵  ̵ ̵ ̵AddressTxContract.paused, AddressTxContract.balances,
+      AddressTxContract.allowances, AddressTxContract.owners,
+  ̵  ̵ ̵ ̵AddressTxContract.c̵l̵a̵i̵m̵e̵d̵,̵ ̵A̵d̵d̵res̵s̵T̵x̵C̵o̵n̵t̵r̵a̵ct̵.̵r̵e̵c̵ipients,
+      ContractState.readSlot, ContractState.writeSlot,
+  ̵  ̵ ̵ ̵ContractState.readMap, ContractState.writeMap,
+      ContractState.readMap2, ContractState.writeMap2,
+  ̵  ̵ ̵ ̵ContractState.readMapUint,
+  ̲  ̲ ̲ ̲ContractState.writeMapUint,
+  ̵  ̵ ̵ ̵ContractState.storage, ContractState.storageMap,
+      ContractState.storageMap2, ContractState.storageMapUint,
+  ̵  ̵ ̵ ̵Verity.Core.Uint256.ofNat, hzero]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:408:4: This simp argument is unused:
+  ContractState.readSlot
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.redeem, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getMapping,
+  ̵  ̵ ̵ ̵_root_.Verity.setMapping,
+  ̲  ̲ ̲ ̲_root_.Verity.setMappingUint,
+  ̵  ̵ ̵ ̵AddressTxContract.paused, AddressTxContract.balances,
+      AddressTxContract.allowances, AddressTxContract.owners,
+  ̵  ̵ ̵ ̵AddressTxContract.claimed,
+  ̲  ̲ ̲ ̲AddressTxContract.recipients,
+  ̵  ̵ ̵ ̵ContractState.r̵e̵a̵d̵S̵l̵o̵t̵,̵ ̵C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵writeSlot,
+  ̵  ̵ ̵ ̵ContractState.readMap,
+  ̲  ̲ ̲ ̲ContractState.writeMap,
+  ̵  ̵ ̵ ̵ContractState.readMap2, ContractState.writeMap2,
+      ContractState.readMapUint, ContractState.writeMapUint,
+  ̵  ̵ ̵ ̵ContractState.storage,
+  ̲  ̲ ̲ ̲ContractState.storageMap,
+  ̵  ̵ ̵ ̵ContractState.storageMap2, ContractState.storageMapUint,
+      Verity.Core.Uint256.ofNat, hzero]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:410:4: This simp argument is unused:
+  ContractState.readMap2
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.redeem, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getMapping,
+  ̵  ̵ ̵ ̵_root_.Verity.setMapping,
+  ̲  ̲ ̲ ̲_root_.Verity.setMappingUint,
+  ̵  ̵ ̵ ̵AddressTxContract.paused, AddressTxContract.balances,
+      AddressTxContract.allowances, AddressTxContract.owners,
+  ̵  ̵ ̵ ̵AddressTxContract.claimed,
+  ̲  ̲ ̲ ̲AddressTxContract.recipients,
+  ̵  ̵ ̵ ̵ContractState.readSlot, ContractState.writeSlot,
+      ContractState.readMap, ContractState.writeMap,
+  ̵  ̵ ̵ ̵ContractState.r̵e̵a̵d̵M̵a̵p̵2̵,̵ ̵C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵writeMap2,
+      ContractState.readMapUint, ContractState.writeMapUint,
+  ̵  ̵ ̵ ̵ContractState.storage,
+  ̲  ̲ ̲ ̲ContractState.storageMap,
+  ̵  ̵ ̵ ̵ContractState.storageMap2, ContractState.storageMapUint,
+      Verity.Core.Uint256.ofNat, hzero]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:412:4: This simp argument is unused:
+  ContractState.storage
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.redeem, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getMapping,
+  ̵  ̵ ̵ ̵_root_.Verity.setMapping,
+  ̲  ̲ ̲ ̲_root_.Verity.setMappingUint,
+  ̵  ̵ ̵ ̵AddressTxContract.paused, AddressTxContract.balances,
+      AddressTxContract.allowances, AddressTxContract.owners,
+  ̵  ̵ ̵ ̵AddressTxContract.claimed,
+  ̲  ̲ ̲ ̲AddressTxContract.recipients,
+  ̵  ̵ ̵ ̵ContractState.readSlot, ContractState.writeSlot,
+      ContractState.readMap, ContractState.writeMap,
+  ̵  ̵ ̵ ̵ContractState.readMap2, ContractState.writeMap2,
+      ContractState.readMapUint, ContractState.writeMapUint,
+  ̵  ̵ ̵ ̵ContractState.storage,̵ ̵C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵s̵t̵o̵r̵a̵g̵e̵Map,
+      ContractState.storageMap2, ContractState.storageMapUint,
+  ̵  ̵ ̵ ̵Verity.Core.Uint256.ofNat, hzero]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:413:4: This simp argument is unused:
+  ContractState.storageMap2
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.redeem, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getMapping,
+  ̵  ̵ ̵ ̵_root_.Verity.setMapping,
+  ̲  ̲ ̲ ̲_root_.Verity.setMappingUint,
+  ̵  ̵ ̵ ̵AddressTxContract.paused, AddressTxContract.balances,
+      AddressTxContract.allowances, AddressTxContract.owners,
+  ̵  ̵ ̵ ̵AddressTxContract.claimed,
+  ̲  ̲ ̲ ̲AddressTxContract.recipients,
+  ̵  ̵ ̵ ̵ContractState.readSlot, ContractState.writeSlot,
+      ContractState.readMap, ContractState.writeMap,
+  ̵  ̵ ̵ ̵ContractState.readMap2, ContractState.writeMap2,
+      ContractState.readMapUint, ContractState.writeMapUint,
+  ̵  ̵ ̵ ̵ContractState.storage, ̵C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵s̵t̵o̵r̵a̵g̵e̵M̵a̵p̵,̵
+      ContractState.storageMap2̵, ContractState.storageMapUint,
+  ̵  ̵ ̵ ̵Verity.Core.Uint256.ofNat, hzero]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:414:31: This simp argument is unused:
+  hzero
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.redeem, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getMapping,
+  ̵  ̵ ̵ ̵_root_.Verity.setMapping,
+  ̲  ̲ ̲ ̲_root_.Verity.setMappingUint,
+  ̵  ̵ ̵ ̵AddressTxContract.paused, AddressTxContract.balances,
+      AddressTxContract.allowances, AddressTxContract.owners,
+  ̵  ̵ ̵ ̵AddressTxContract.claimed,
+  ̲  ̲ ̲ ̲AddressTxContract.recipients,
+  ̵  ̵ ̵ ̵ContractState.readSlot, ContractState.writeSlot,
+      ContractState.readMap, ContractState.writeMap,
+  ̵  ̵ ̵ ̵ContractState.readMap2, ContractState.writeMap2,
+      ContractState.readMapUint, ContractState.writeMapUint,
+  ̵  ̵ ̵ ̵ContractState.storage,
+  ̲  ̲ ̲ ̲ContractState.storageMap,
+  ̵  ̵ ̵ ̵ContractState.storageMap2, ContractState.storageMapUint,
+      Verity.Core.Uint256.ofNat,̵ ̵h̵z̵e̵r̵o̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:418:5: This simp argument is unused:
+  _root_.Verity.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵b̵i̵n̵d̵,̵ ̵B̵i̵n̵d̵.̵b̵i̵n̵d̵,̵[̲B̲i̲n̲d̲.̲b̲i̲n̲d̲,̲ _root_.Verity.setMappingUint, ContractState.writeMapUint,
+  ̲  ̲ ̲ ̲ContractState.readMapUint, ContractState.storageMapUint]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:418:25: This simp argument is unused:
+  Bind.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[_root_.Verity.bind, B̵i̵n̵d̵.̵b̵i̵n̵d̵,̵ ̵_root_.Verity.setMappingUint,
+       ̵ ̵ContractState.writeMapUint, ContractState.readMapUint,
+  ̵  ̵ ̵ ̵ ̵ ̵ContractState.storageMapUint]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:418:36: This simp argument is unused:
+  _root_.Verity.setMappingUint
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [_root_.Verity.bind, Bind.bind, _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵s̵e̵t̵M̵a̵p̵p̵i̵n̵g̵U̵i̵n̵t̵,̵ContractState.writeMapUint,
+      ContractState.readMapUint, ContractState.storageMapUint]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:419:6: This simp argument is unused:
+  ContractState.writeMapUint
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [_root_.Verity.bind, Bind.bind, _root_.Verity.setMappingUint,
+      C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵w̵r̵i̵t̵e̵M̵a̵p̵U̵i̵n̵t̵,̵ ̵ContractState.readMapUint, ContractState.storageMapUint]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:419:34: This simp argument is unused:
+  ContractState.readMapUint
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [_root_.Verity.bind, Bind.bind, _root_.Verity.setMappingUint,
+      ContractState.writeMapUint, C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵r̵e̵a̵d̵M̵a̵p̵U̵i̵n̵t̵,̵ContractState.storageMapUint]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:420:6: This simp argument is unused:
+  ContractState.storageMapUint
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [_root_.Verity.bind, Bind.bind, _root_.Verity.setMappingUint,
+      ContractState.writeMapUint, C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵r̵e̵a̵d̵M̵a̵p̵U̵i̵n̵t̵,̵
+  ̵ ̵ ̵ ̵ ̵ ̵ ̵C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵s̵t̵o̵r̵a̵g̵e̵M̵a̵p̵U̵i̵n̵t̵]̵C̲o̲n̲t̲r̲a̲c̲t̲S̲t̲a̲t̲e̲.̲r̲e̲a̲d̲M̲a̲p̲U̲i̲n̲t̲]̲
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [1344/1473] Replayed LidoSRv3.Audit.SszDepositEquivalence
+warning: LidoSRv3/Audit/SszDepositEquivalence.lean:93:4: This simp argument is unused:
+  Ssz.traverseBranch
+
+Hint: Omit it from the simp argument list.
+  simp [structuralEncoding, structuralWitness, structuralCombine, Ssz.validatorRoot,̵
+  ̵ ̵ ̵ ̵ ̵S̵s̵z̵.̵t̵r̵a̵v̵e̵r̵s̵e̵B̵r̵a̵n̵c̵h̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/SszDepositEquivalence.lean:213:12: This simp argument is unused:
+  sourceWitness
+
+Hint: Omit it from the simp argument list.
+  simp [̵s̵o̵u̵r̵c̵e̵W̵i̵t̵n̵e̵s̵s̵,̵ ̵s̵t̵r̵u̵c̵t̵u̵r̵a̵l̵W̵i̵t̵n̵e̵s̵s̵]̵[̲s̲t̲r̲u̲c̲t̲u̲r̲a̲l̲W̲i̲t̲n̲e̲s̲s̲]̲
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/SszDepositEquivalence.lean:213:27: This simp argument is unused:
+  structuralWitness
+
+Hint: Omit it from the simp argument list.
+  simp [sourceWitness,̵ ̵s̵t̵r̵u̵c̵t̵u̵r̵a̵l̵W̵i̵t̵n̵e̵s̵s̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [1347/1473] Replayed LidoSRv3.Audit.Verity.SszTxSimulation
+warning: LidoSRv3/Audit/Verity/SszTxSimulation.lean:317:8: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+info: LidoSRv3/Audit/Verity/SszTxSimulation.lean:346:0: LidoSRv3.Audit.Verity.SszTxSimulation.ssz_tx_simulation_correct {State : Type} (input : TxInputs) (before after : State)
+  (attempts : List CallAttempt) (trace : CommitTrace) (hwidths : exactTxWidths input) :
+  exactTxWidths input ∧
+    (digestPreimages input.toInputs).length = 7 ∧
+      (runVerification input = VerificationOutcome.accept ↔ computedRoot input = input.expectedDepositDataRoot) ∧
+        (runVerification input = VerificationOutcome.revertRootMismatch →
+          (transactionObservation input before after attempts trace).committedState = before)
+info: LidoSRv3/Audit/Verity/SszTxSimulation.lean:347:0: LidoSRv3.Audit.Verity.SszTxSimulation.sha256_call_world_rollback (input : Inputs) (adversary : AdversaryModel)
+  (state : CallState) : (DenoteExternalCalls.denote (sha256Calls input) adversary state).snd.world = state.world
+info: LidoSRv3/Audit/Verity/SszTxSimulation.lean:348:0: Compiler.CompilationModel.Denote.Sha256.denote_success_compose (oracle : StaticCallOracle)
+  (fipsSha256 : ByteArray → ByteArray) (world : Verity.ContractState) (inputOffset inputSize outputOffset : Nat)
+  (digest : Digest) (sha256_correct : sha256_correct oracle fipsSha256)
+  (hcall : oracle (request world.memory inputOffset inputSize outputOffset) = StaticCallResult.success digest) :
+  Denote.Sha256.denote oracle world inputOffset inputSize outputOffset =
+    Outcome.success (digestWord (fipsSha256 (memorySlice world.memory inputOffset inputSize)))
+      (writeDigest world outputOffset (fipsSha256 (memorySlice world.memory inputOffset inputSize)))
+⚠ [1353/1473] Replayed LidoSRv3.Audit.Verity.ReserveRelationalTx
+warning: LidoSRv3/Audit/Verity/ReserveRelationalTx.lean:303:44: This simp argument is unused:
+  memory_writeSlot
+
+Hint: Omit it from the simp argument list.
+  simp [readBatchEnd, arrayState, evalExpr,̵ ̵m̵e̵m̵o̵r̵y̵_̵w̵r̵i̵t̵e̵S̵l̵o̵t̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [1388/1473] Replayed LidoSRv3.Audit.Verity.TopupHybrid
+warning: LidoSRv3/Audit/Verity/TopupHybrid.lean:157:26: This simp argument is unused:
+  _root_.Verity.pure
+
+Hint: Omit it from the simp argument list.
+  simp [executeSource, sourceTx, observeVerity, withCalls, topupCallJournal,
+        TopupTxContract.executeTopup,
+  ̵  ̵ ̵ ̵ ̵ ̵TopupTxContract.executeNoTopup,
+  ̲  ̲ ̲ ̲ ̲ ̲TopupTxContract.executePullRevert,
+  ̵  ̵ ̵ ̵ ̵ ̵TopupTxContract.executePushRevert, _root_.Verity.require,
+        _root_.Contracts.externalCallBind, _root_.Contracts.externalCallStubSuccess,
+        _root_.Contracts.linkedCallEntry, _root_.Verity.Contract.run,
+  ̵  ̵ ̵ ̵ ̵ ̵_root_.Verity.bind, _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵p̵u̵r̵e̵,̵ ̵Bind.bind,
+  ̲  ̲ ̲ ̲ ̲ ̲Pure.pure,
+  ̵  ̵ ̵ ̵ ̵ ̵Outcome.reverts, Outcome.pulled, Outcome.pushed, hrun] at hconserves ⊢
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [1445/1473] Replayed LidoSRv3.Audit.Source.TrioAlloc2.Selection
+warning: LidoSRv3/Audit/Source/TrioAlloc2/Selection.lean:53:10: This simp argument is unused:
+  levelsEq
+
+Hint: Omit it from the simp argument list.
+  simp [l̵e̵v̵e̵l̵s̵E̵q̵,̵ ̵Spec.minimum, countEq]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioAlloc2/Selection.lean:70:10: This simp argument is unused:
+  levelsEq
+
+Hint: Omit it from the simp argument list.
+  simp [l̵e̵v̵e̵l̵s̵E̵q̵,̵ ̵Spec.minimum, nonzero, minimumEq]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [1454/1473] Replayed LidoSRv3.Audit.Source.TrioAlloc2.StepCorrespondence
+warning: LidoSRv3/Audit/Source/TrioAlloc2/StepCorrespondence.lean:16:71: This simp argument is unused:
+  eq
+
+Hint: Omit it from the simp argument list.
+  simp [decodedRows, List.getElem?_zipWith, List.getElem?_set_ne eq,̵ ̵e̵q̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+ℹ [1457/1473] Replayed LidoSRv3.Audit.Source.TrioAlloc2.Composition
+info: LidoSRv3/Audit/Source/TrioAlloc2/Composition.lean:53:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_success_establishes_consumer_premises' depends on axioms: [propext,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/Composition.lean:54:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_then_consumer_succeeds' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/Composition.lean:71:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_then_consumer_distributes' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [1458/1473] Replayed LidoSRv3.Audit.Source.TrioComposition.Parent
+info: LidoSRv3/Audit/Source/TrioComposition/Parent.lean:252:0: 'LidoSRv3.Audit.Source.TrioComposition.getDepositAllocations_total_bound' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/Parent.lean:253:0: 'LidoSRv3.Audit.Source.TrioComposition.convertPositive_refines' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/Parent.lean:254:0: 'LidoSRv3.Audit.Source.TrioComposition.convertZero_refines' depends on axioms: [propext, Classical.choice, Quot.sound]
+⚠ [1459/1473] Replayed LidoSRv3.Audit.Source.TrioAlloc2.RowBounds
+warning: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:171:20: This simp argument is unused:
+  ↓reduceDIte
+
+Hint: Omit it from the simp argument list.
+  simp only [bound,̵ ̵↓̵r̵e̵d̵u̵c̵e̵D̵I̵t̵e̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+info: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:174:0: 'LidoSRv3.Audit.Source.TrioAlloc2.step_row_bounds' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:175:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocateLoop_row_bounds' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:176:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocate_row_bounds' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:177:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocate_delta_success' depends on axioms: [propext, Quot.sound]
+ℹ [1460/1473] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentComposition
+info: LidoSRv3/Audit/Source/TrioComposition/ParentComposition.lean:65:0: 'LidoSRv3.Audit.Source.TrioComposition.producer_consumer_conversion_refines' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ParentComposition.lean:66:0: 'LidoSRv3.Audit.Source.TrioComposition.producer_zero_conversion_refines' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ParentComposition.lean:67:0: 'LidoSRv3.Audit.Source.TrioComposition.producer_consumer_parent_subtraction' depends on axioms: [propext, Quot.sound]
+ℹ [1461/1473] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentRelational
+info: LidoSRv3/Audit/Source/TrioComposition/ParentRelational.lean:185:0: 'LidoSRv3.Audit.Source.TrioComposition.ParentSpec.public_all_outcomes' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [1462/1473] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentDeterminism
+info: LidoSRv3/Audit/Source/TrioComposition/ParentDeterminism.lean:155:0: 'LidoSRv3.Audit.Source.TrioComposition.ParentSpec.public_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1463/1473] Replayed LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI
+info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:169:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.decodeArray_encoded' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:170:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.decodeArguments_encoded' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:171:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.decodeReturn_encoded' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:172:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.run_encoded' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:173:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.run_short' depends on axioms: [propext, Quot.sound]
+ℹ [1464/1473] Replayed LidoSRv3.Audit.Source.TrioAlloc2.ABIComposition
+info: LidoSRv3/Audit/Source/TrioAlloc2/ABIComposition.lean:46:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_then_abi_distributes' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [1465/1473] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentABI
+info: LidoSRv3/Audit/Source/TrioComposition/ParentABI.lean:110:0: 'LidoSRv3.Audit.Source.TrioComposition.public_abi_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1466/1473] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentCalls
+info: LidoSRv3/Audit/Source/TrioComposition/ParentCalls.lean:37:0: 'LidoSRv3.Audit.Source.TrioComposition.ParentCalls.correspondence' depends on axioms: [propext, Quot.sound]
+ℹ [1467/1473] Replayed LidoSRv3.Audit.Source.TrioComposition.AllocationExtent
+info: LidoSRv3/Audit/Source/TrioComposition/AllocationExtent.lean:57:0: 'LidoSRv3.Audit.Source.TrioComposition.allocated_array_extent' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/AllocationExtent.lean:58:0: 'LidoSRv3.Audit.Source.TrioComposition.two_allocations_abi_extent' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [1468/1473] Replayed LidoSRv3.Audit.Source.TrioComposition.VerityParent
+info: LidoSRv3/Audit/Source/TrioComposition/VerityParent.lean:45:0: 'LidoSRv3.Audit.Source.TrioComposition.VerityParent.correspondence' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/VerityParent.lean:46:0: 'LidoSRv3.Audit.Source.TrioComposition.VerityParent.public_iff' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [1469/1473] Replayed LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion
+info: LidoSRv3/Audit/Source/TrioAlloc2/ParentConversion.lean:128:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.rowArithmetic_success_iff' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/ParentConversion.lean:129:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.rowArithmetic_values' depends on axioms: [propext]
+info: LidoSRv3/Audit/Source/TrioAlloc2/ParentConversion.lean:130:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.positive_total_error_first' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/ParentConversion.lean:131:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.zeroDemand_overflow' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/ParentConversion.lean:132:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.allocated_total_mul_success' depends on axioms: [propext, Quot.sound]
+ℹ [1470/1473] Replayed LidoSRv3.Audit.Source.TrioAlloc2.MemoryComposition
+info: LidoSRv3/Audit/Source/TrioAlloc2/MemoryComposition.lean:71:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_then_memory_consumer_distributes' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/MemoryComposition.lean:72:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_then_byte_consumer_distributes' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+⚠ [1477/1489] Replayed LidoSRv3.Audit.Verity.ConsolidationFee
+warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:446:5: Variable name `hsize` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:446:35: Variable name `hdecode` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:447:5: Variable name `hvalue` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:452:70: This simp argument is unused:
+  hsize
+
+Hint: Omit it from the simp argument list.
+  simp [batchCalls, batchCalls.loop, ObservedCalls, denoteCall, hfee, hs̵i̵z̵e̵,̵ ̵h̵decode,
+  ̵  ̵ ̵ ̵hvalue, hkey]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:452:77: This simp argument is unused:
+  hdecode
+
+Hint: Omit it from the simp argument list.
+  simp [batchCalls, batchCalls.loop, ObservedCalls, denoteCall, hfee, hsize, hd̵e̵c̵o̵d̵e̵,̵
+  ̵ ̵ ̵ ̵ ̵h̵value, hkey]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:453:4: This simp argument is unused:
+  hvalue
+
+Hint: Omit it from the simp argument list.
+  simp [batchCalls, batchCalls.loop, ObservedCalls, denoteCall, hfee, hsize, hdecode,
+  ̵  ̵ ̵ ̵hv̵a̵l̵u̵e̵,̵ ̵h̵key]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:466:5: Variable name `hrequest` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:477:32: This simp argument is unused:
+  hrequest
+
+Hint: Omit it from the simp argument list.
+  simp [batchCalls, batchCalls.loop, ObservedCalls, denoteCall, hfee, hsize, hdecode,
+  ̵  ̵ ̵ ̵hbound,
+  ̲  ̲ ̲ ̲hvalid₀, hinvalid₁,̵ ̵h̵r̵e̵q̵u̵e̵s̵t̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [1478/1489] Replayed LidoSRv3.Audit.Verity.DepositLedgerTx
+warning: LidoSRv3/Audit/Verity/DepositLedgerTx.lean:140:35: Variable name `n` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+⚠ [1480/1489] Replayed LidoSRv3.Audit.Verity.DepositTx
+warning: LidoSRv3/Audit/Verity/DepositTx.lean:153:35: This simp argument is unused:
+  Pure.pure
+
+Hint: Omit it from the simp argument list.
+  simp [executeOutcome, executeCalls, hRun, observe, DepositTxContract.execute,
+      _root_.Contracts.externalCallBind, _root_.Contracts.externalCallStubSuccess,
+      _root_.Verity.require,
+  ̵  ̵ ̵ ̵_root_.Verity.Contract.run, _root_.Verity.bind,
+  ̵  ̵ ̵ ̵_root_.Verity.pure,
+  ̲  ̲ ̲ ̲Bind.bind, P̵u̵r̵e̵.̵p̵u̵r̵e̵,̵ ̵committedBalances, Nat.sub_add_cancel hFunds,
+  ̵  ̵ ̵ ̵Core.Uint256.ofNat,
+  ̲  ̲ ̲ ̲Nat.mod_eq_of_lt hAmountLt]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [1488/1489] Built LidoSRv3.Legacy.SpecProofs (1.6s)
+warning: LidoSRv3/Legacy/SpecProofs.lean:1631:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+Build completed successfully (1489 jobs).
+proof report written to proofs/logs/proof-report.json
+INTEGRATION_GATE_EXIT 0 make prove
+INTEGRATION_GATE_START make test
+⚠ [11/573] Replayed Verity.Core
+warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1041:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+⚠ [1137/1211] Replayed Conform.Wheels
+warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: Conform/Wheels.lean:106:70: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1138/1211] Replayed EvmYul.Pretty
+warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: EvmYul/Pretty.lean:36:32: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1185/1211] Replayed EvmYul.Semantics
+warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1186/1211] Replayed EvmYul.EVM.Semantics
+warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1210/1211] Replayed LidoSRv3.Audit.Verity.MinFirstDistributionTx
+warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:142:52: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:485:22: This simp argument is unused:
+  modelAllocateLoop
+
+Hint: Omit it from the simp argument list.
+  simp [m̵o̵d̵e̵l̵A̵l̵l̵o̵c̵a̵t̵e̵L̵o̵o̵p̵,̵ ̵hModelStep, hzv]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:485:53: This simp argument is unused:
+  hzv
+
+Hint: Omit it from the simp argument list.
+  simp [modelAllocateLoop, hModelStep,̵ ̵h̵z̵v̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:492:25: This simp argument is unused:
+  modelAllocateLoop
+
+Hint: Omit it from the simp argument list.
+  simp only [m̵o̵d̵e̵l̵A̵l̵l̵o̵c̵a̵t̵e̵L̵o̵o̵p̵,̵ ̵if_neg hzv, hModelStep, if_neg hav]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:492:44: This simp argument is unused:
+  if_neg hzv
+
+Hint: Omit it from the simp argument list.
+  simp only [modelAllocateLoop, i̵f̵_̵n̵e̵g̵ ̵h̵z̵v̵,̵ ̵hModelStep, if_neg hav]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+Build completed successfully (1211 jobs).
+Compiling 3 files with Solc 0.8.25
+Solc 0.8.25 finished in 1.21s
+Compiler run successful!
+
+Ran 4 tests for solidity/minfirst/test/MinFirstDifferential.t.sol:MinFirstDifferentialTest
+[PASS] testEagerLengthGuardMutationProducesMismatch() (gas: 34824)
+[PASS] testEmptyAndZeroBoundaries() (gas: 75608)
+[PASS] testSurplusCapacitiesAndExactCaps() (gas: 117852)
+[PASS] testWordBoundaries() (gas: 75678)
+Suite result: ok. 4 passed; 0 failed; 0 skipped; finished in 10.60s (31.44s CPU time)
+
+Ran 1 test suite in 10.60s (10.60s CPU time): 4 tests passed, 0 failed, 0 skipped (4 total tests)
+MinFirst guard mutation rejected by the zero_demand theorem
+audit metadata error: R1 review basis cannot read eda35b611f08879241411d12f943d011f748e5a4:audit/guarantees.yaml
+make: *** [Makefile:37: test] Error 1
+INTEGRATION_GATE_EXIT 2 make test
+INTEGRATION_GATE_START lake env lean --run audit/trio/alloc1/RunVerityVectors.lean
+⚠ [19/46] Replayed Verity.Core
+warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1041:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+Build completed successfully (46 jobs).
+'LidoSRv3.Audit.Source.TrioAlloc1.producer_router_order' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.producer_total_bound' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.outputBytes_related' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.Relational.producer_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.CallTree.producer_correspondence' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.world_producer_correspondence' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.ShareWriter.execute_revert_restores' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.ShareWriter.execute_stored_share_bound' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.AllocationMemory.bounded_array_allocates' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Tests.TrioAlloc1.prefetch_trace_refutes_relational_parent' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Tests.TrioAlloc1.target_only_refutes_relational_parent' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+[{"name":"mixed","actual":[[3,3],[8,3]],"calls":["0:9abddf09","1:9abddf09","1:0c852f5c"]},{"name":"underflow-before-stake","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000011","calls":["0:9abddf09"]},{"name":"late-rejection","actual":"0xdead","calls":["0:9abddf09","1:9abddf09"]},{"name":"short-summary","actual":"0x","calls":["0:9abddf09"]},{"name":"short-stake","actual":"0x","calls":["0:9abddf09","0:0c852f5c"]},{"name":"trailing-summary","actual":[[1],[2]],"calls":["0:9abddf09"]},{"name":"zero-ceil-divisor","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000012","calls":["0:9abddf09","0:0c852f5c"]},{"name":"invalid-enum-before-call","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000021","calls":[]},{"name":"below-allocation","actual":[[1],[0]],"calls":["0:9abddf09"]},{"name":"topup-product-before-division","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000011","calls":["0:9abddf09","0:0c852f5c"]},{"name":"empty-zero-divisor","actual":[[],[]],"calls":[]},{"name":"total-overflow-before-next-row","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000011","calls":["0:9abddf09"]}]
+INTEGRATION_GATE_EXIT 0 lake env lean --run audit/trio/alloc1/RunVerityVectors.lean
+INTEGRATION_GATE_START lake env lean --run audit/trio/integration/RunVerityParent.lean
+⚠ [13/73] Replayed LidoSRv3.Audit.Source.TrioAlloc2.Selection
+warning: LidoSRv3/Audit/Source/TrioAlloc2/Selection.lean:53:10: This simp argument is unused:
+  levelsEq
+
+Hint: Omit it from the simp argument list.
+  simp [l̵e̵v̵e̵l̵s̵E̵q̵,̵ ̵Spec.minimum, countEq]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioAlloc2/Selection.lean:70:10: This simp argument is unused:
+  levelsEq
+
+Hint: Omit it from the simp argument list.
+  simp [l̵e̵v̵e̵l̵s̵E̵q̵,̵ ̵Spec.minimum, nonzero, minimumEq]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [22/73] Replayed LidoSRv3.Audit.Source.TrioAlloc2.StepCorrespondence
+warning: LidoSRv3/Audit/Source/TrioAlloc2/StepCorrespondence.lean:16:71: This simp argument is unused:
+  eq
+
+Hint: Omit it from the simp argument list.
+  simp [decodedRows, List.getElem?_zipWith, List.getElem?_set_ne eq,̵ ̵e̵q̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+ℹ [25/73] Replayed LidoSRv3.Audit.Source.TrioAlloc2.Composition
+info: LidoSRv3/Audit/Source/TrioAlloc2/Composition.lean:53:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_success_establishes_consumer_premises' depends on axioms: [propext,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/Composition.lean:54:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_then_consumer_succeeds' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/Composition.lean:71:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_then_consumer_distributes' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [26/73] Replayed LidoSRv3.Audit.Source.TrioComposition.Parent
+info: LidoSRv3/Audit/Source/TrioComposition/Parent.lean:252:0: 'LidoSRv3.Audit.Source.TrioComposition.getDepositAllocations_total_bound' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/Parent.lean:253:0: 'LidoSRv3.Audit.Source.TrioComposition.convertPositive_refines' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/Parent.lean:254:0: 'LidoSRv3.Audit.Source.TrioComposition.convertZero_refines' depends on axioms: [propext, Classical.choice, Quot.sound]
+⚠ [29/73] Replayed LidoSRv3.Audit.Source.TrioAlloc2.RowBounds
+warning: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:171:20: This simp argument is unused:
+  ↓reduceDIte
+
+Hint: Omit it from the simp argument list.
+  simp only [bound,̵ ̵↓̵r̵e̵d̵u̵c̵e̵D̵I̵t̵e̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+info: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:174:0: 'LidoSRv3.Audit.Source.TrioAlloc2.step_row_bounds' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:175:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocateLoop_row_bounds' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:176:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocate_row_bounds' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:177:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocate_delta_success' depends on axioms: [propext, Quot.sound]
+ℹ [30/73] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentComposition
+info: LidoSRv3/Audit/Source/TrioComposition/ParentComposition.lean:65:0: 'LidoSRv3.Audit.Source.TrioComposition.producer_consumer_conversion_refines' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ParentComposition.lean:66:0: 'LidoSRv3.Audit.Source.TrioComposition.producer_zero_conversion_refines' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ParentComposition.lean:67:0: 'LidoSRv3.Audit.Source.TrioComposition.producer_consumer_parent_subtraction' depends on axioms: [propext, Quot.sound]
+ℹ [33/73] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentRelational
+info: LidoSRv3/Audit/Source/TrioComposition/ParentRelational.lean:185:0: 'LidoSRv3.Audit.Source.TrioComposition.ParentSpec.public_all_outcomes' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [35/73] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentDeterminism
+info: LidoSRv3/Audit/Source/TrioComposition/ParentDeterminism.lean:155:0: 'LidoSRv3.Audit.Source.TrioComposition.ParentSpec.public_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [36/73] Replayed LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI
+info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:169:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.decodeArray_encoded' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:170:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.decodeArguments_encoded' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:171:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.decodeReturn_encoded' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:172:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.run_encoded' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:173:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.run_short' depends on axioms: [propext, Quot.sound]
+ℹ [37/73] Replayed LidoSRv3.Audit.Source.TrioAlloc2.ABIComposition
+info: LidoSRv3/Audit/Source/TrioAlloc2/ABIComposition.lean:46:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_then_abi_distributes' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [38/73] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentABI
+info: LidoSRv3/Audit/Source/TrioComposition/ParentABI.lean:110:0: 'LidoSRv3.Audit.Source.TrioComposition.public_abi_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [40/73] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentCalls
+info: LidoSRv3/Audit/Source/TrioComposition/ParentCalls.lean:37:0: 'LidoSRv3.Audit.Source.TrioComposition.ParentCalls.correspondence' depends on axioms: [propext, Quot.sound]
+⚠ [51/73] Replayed Verity.Core
+warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1041:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+ℹ [69/73] Replayed LidoSRv3.Audit.Source.TrioComposition.VerityParent
+info: LidoSRv3/Audit/Source/TrioComposition/VerityParent.lean:45:0: 'LidoSRv3.Audit.Source.TrioComposition.VerityParent.correspondence' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/VerityParent.lean:46:0: 'LidoSRv3.Audit.Source.TrioComposition.VerityParent.public_iff' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+Build completed successfully (73 jobs).
+VERITY_PARENT_VECTOR_PASS empty-before-division calls=0 result=Except.ok { totalAllocated := 0, allocated := [], newAllocations := [] }
+VERITY_PARENT_VECTOR_PASS division-before-calls calls=0 result=Except.error (LidoSRv3.Audit.Source.TrioAlloc1.Failure.panic 18)
+VERITY_PARENT_VECTOR_PASS positive-rounded-demand calls=1 result=Except.ok { totalAllocated := 64, allocated := [64], newAllocations := [96] }
+VERITY_PARENT_VECTOR_PASS zero-demand-still-calls calls=1 result=Except.ok { totalAllocated := 0, allocated := [0], newAllocations := [32] }
+VERITY_PARENT_VECTOR_PASS module-rejection calls=1 result=Except.error (LidoSRv3.Audit.Source.TrioAlloc1.Failure.revertData [171])
+VERITY_PARENT_VECTOR_PASS late-conversion-overflow calls=1 result=Except.error (LidoSRv3.Audit.Source.TrioAlloc1.Failure.panic 17)
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"normal","actual":"0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000040","reverted":false,"count":1,"shares":[10000,10000],"unit":"32","amount":"320","summaries":["0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001","0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"],"reject1":false,"calls":["0:9abddf09"]}
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"zero-demand","actual":"0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000020","reverted":false,"count":1,"shares":[10000,10000],"unit":"32","amount":"31","summaries":["0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001","0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"],"reject1":false,"calls":["0:9abddf09"]}
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"empty-zero-divisor","actual":"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000","reverted":false,"count":0,"shares":[10000,10000],"unit":"0","amount":"320","summaries":["0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001","0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"],"reject1":false,"calls":[]}
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"division-before-producer","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000012","reverted":true,"count":1,"shares":[10000,10000],"unit":"0","amount":"320","summaries":["0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001","0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"],"reject1":false,"calls":[]}
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"zero-demand-overflow","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000011","reverted":true,"count":1,"shares":[10000,10000],"unit":"1048576","amount":"0","summaries":["0x000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000","0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"],"reject1":false,"calls":["0:9abddf09"]}
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"late-second-row-overflow","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000011","reverted":true,"count":2,"shares":[0,10000],"unit":"1048576","amount":"1048576","summaries":["0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000","0x000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001"],"reject1":false,"calls":["0:9abddf09","1:9abddf09"]}
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"zero-demand-late-rejection","actual":"0xdead","reverted":true,"count":2,"shares":[10000,10000],"unit":"32","amount":"0","summaries":["0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001","0xdead"],"reject1":true,"calls":["0:9abddf09","1:9abddf09"]}
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"malformed-summary","actual":"0x","reverted":true,"count":1,"shares":[10000,10000],"unit":"32","amount":"320","summaries":["0xdead","0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"],"reject1":false,"calls":["0:9abddf09"]}
+INTEGRATION_GATE_EXIT 0 lake env lean --run audit/trio/integration/RunVerityParent.lean
+uncaught exception: integration gates failed: make test: exit 2

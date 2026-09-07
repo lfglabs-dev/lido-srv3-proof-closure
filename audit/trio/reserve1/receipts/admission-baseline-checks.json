@@ -1,0 +1,56 @@
+{
+  "source_commit": "1a56fc36b89d4acb0368471639f5d89648e8864f",
+  "time": "2026-09-07T12:44:22.751972+00:00",
+  "scope": "Baseline scopes; not new canonical registration or full gates",
+  "checks": [
+    {
+      "argv": [
+        "python3",
+        "scripts/check_proof_escapes.py"
+      ],
+      "exit": 0,
+      "log": "admission-check_proof_escapes.txt"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/check_source_annotations.py"
+      ],
+      "exit": 0,
+      "log": "admission-check_source_annotations.txt"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/check_report_theorem_inventory.py"
+      ],
+      "exit": 0,
+      "log": "admission-check_report_theorem_inventory.txt"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/check_verity_provenance.py"
+      ],
+      "exit": 0,
+      "log": "admission-check_verity_provenance.txt"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/check_pinned_source.py"
+      ],
+      "exit": 0,
+      "log": "admission-check_pinned_source.txt"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/audit_metadata.py",
+        "check"
+      ],
+      "exit": 0,
+      "log": "admission-audit_metadata.txt"
+    }
+  ]
+}

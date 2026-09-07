@@ -1,0 +1,10 @@
+2026-09-07T09:57:08Z
+source_commit=b06cf0dc0861b93592f1de80820b68ff10b6905f
+validation=/workspaces/mission-f19a12b3/reserve1-private/audit/trio/reserve1/.local/gates-b06cf0dc0861b93592f1de80820b68ff10b6905f
+ 17005714f151e5502c559932319a3f2f74ac2436 lido-core (v3.0.0-mainnet-deploy-1430-g17005714f)
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/md3        3.7T  1.7T  1.9T  47% /
+               total        used        free      shared  buff/cache   available
+Mem:            62Gi        25Gi       5.6Gi        30Mi        32Gi        37Gi
+Swap:           15Gi       5.9Gi        10Gi
+Lean (version 4.31.0, x86_64-unknown-linux-gnu, commit 68218e876d2a38b1985b8590fff244a83c321783, Release)

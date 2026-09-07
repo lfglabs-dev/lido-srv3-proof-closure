@@ -1,0 +1,107 @@
+{
+  "source_commit": "df5a6b52d561ffa6014d6cf4cdae48481b398a3f",
+  "started_utc": "2026-09-07T11:42:10.979064+00:00",
+  "toolchain": "leanprover/lean4:v4.31.0",
+  "lean_version": "Lean (version 4.31.0, x86_64-unknown-linux-gnu, commit 68218e876d2a38b1985b8590fff244a83c321783, Release)",
+  "lean_sha256": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550",
+  "lean_path": "/workspaces/mission-f19a12b3/reserve1-private/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/Cli/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/Qq/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/aesop/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/batteries/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/evmyul/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/importGraph/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/mathlib/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/plausible/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/verity/.lake/build/lib/lean",
+  "scope": "Eight component modules using existing imported oleans; not a clean/full build or certification",
+  "checks": [
+    {
+      "command": [
+        "/workspaces/mission-f19a12b3/reserve1-private/audit/trio/reserve1/.local/lean4-v4.31.0/bin/lean",
+        "-o",
+        "/workspaces/mission-f19a12b3/reserve1-private/.lake/build/lib/lean/LidoSRv3/Audit/Source/TrioReserve1/AllocationSpec.olean",
+        "LidoSRv3/Audit/Source/TrioReserve1/AllocationSpec.lean"
+      ],
+      "exit": 0,
+      "source_sha256": "0ac96b84013977f21dcb8bc3577650a720bc09ce0f36ce99a0da16d07f7e5ccf",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "olean_sha256": "0ed2eae57fb218e80e661f2dcfe655b10cb9ede6005c37b706f15401858906e0"
+    },
+    {
+      "command": [
+        "/workspaces/mission-f19a12b3/reserve1-private/audit/trio/reserve1/.local/lean4-v4.31.0/bin/lean",
+        "-o",
+        "/workspaces/mission-f19a12b3/reserve1-private/.lake/build/lib/lean/LidoSRv3/Audit/Source/TrioReserve1/Allocation.olean",
+        "LidoSRv3/Audit/Source/TrioReserve1/Allocation.lean"
+      ],
+      "exit": 0,
+      "source_sha256": "4ca5c228218f30415badae67fb0373a98cff00851e4b09d1e0477fdcedf0f400",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "olean_sha256": "f760365dc27d390cbb47c537a4a5700800c70f45f0cd872d7e41f4d014157613"
+    },
+    {
+      "command": [
+        "/workspaces/mission-f19a12b3/reserve1-private/audit/trio/reserve1/.local/lean4-v4.31.0/bin/lean",
+        "-o",
+        "/workspaces/mission-f19a12b3/reserve1-private/.lake/build/lib/lean/LidoSRv3/Audit/Source/TrioReserve1/RouterSpec.olean",
+        "LidoSRv3/Audit/Source/TrioReserve1/RouterSpec.lean"
+      ],
+      "exit": 0,
+      "source_sha256": "3893ba4c92ef3e0e3fcf347e05fef79cff230164e89be8b40210e1a945001181",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "olean_sha256": "56d96c755e49d8bbc104a34dae856f1cfda2daefe7ff12126349f2586a071496"
+    },
+    {
+      "command": [
+        "/workspaces/mission-f19a12b3/reserve1-private/audit/trio/reserve1/.local/lean4-v4.31.0/bin/lean",
+        "-o",
+        "/workspaces/mission-f19a12b3/reserve1-private/.lake/build/lib/lean/LidoSRv3/Audit/Source/TrioReserve1/Router.olean",
+        "LidoSRv3/Audit/Source/TrioReserve1/Router.lean"
+      ],
+      "exit": 0,
+      "source_sha256": "c284ec5e980fa9b3771e55da64f7f02a69a6a35f897c6358d5b15752814f2a8a",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "olean_sha256": "b62760b81c5f5b79821b530e7e4560c10095cb824d32092e9ef97d79b3734c3a"
+    },
+    {
+      "command": [
+        "/workspaces/mission-f19a12b3/reserve1-private/audit/trio/reserve1/.local/lean4-v4.31.0/bin/lean",
+        "-o",
+        "/workspaces/mission-f19a12b3/reserve1-private/.lake/build/lib/lean/LidoSRv3/Audit/Source/TrioReserve1/Locator.olean",
+        "LidoSRv3/Audit/Source/TrioReserve1/Locator.lean"
+      ],
+      "exit": 0,
+      "source_sha256": "5e3a90aba1013cb65aa3306eacfe3122a84840e0138bc0d2496f34257bfb459f",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "olean_sha256": "126264f012fb02b5c0817ad9d24680e0bcdeb3109706bdb39105311af1a4220d"
+    },
+    {
+      "command": [
+        "/workspaces/mission-f19a12b3/reserve1-private/audit/trio/reserve1/.local/lean4-v4.31.0/bin/lean",
+        "-o",
+        "/workspaces/mission-f19a12b3/reserve1-private/.lake/build/lib/lean/LidoSRv3/Audit/Source/TrioReserve1/Transfers.olean",
+        "LidoSRv3/Audit/Source/TrioReserve1/Transfers.lean"
+      ],
+      "exit": 0,
+      "source_sha256": "358329ac4fda71fbbfbb6f46eb3b9100cd0b0a031fbc4f08d92ea31aae94dda0",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "olean_sha256": "9917b7e1b0ab4e6db7976151ca0bcd5e40f5475d797d3d316fe68435f580041b"
+    },
+    {
+      "command": [
+        "/workspaces/mission-f19a12b3/reserve1-private/audit/trio/reserve1/.local/lean4-v4.31.0/bin/lean",
+        "-o",
+        "/workspaces/mission-f19a12b3/reserve1-private/.lake/build/lib/lean/LidoSRv3/Tests/TrioReserve1/Differential.olean",
+        "LidoSRv3/Tests/TrioReserve1/Differential.lean"
+      ],
+      "exit": 0,
+      "source_sha256": "67836c05c75d7ba937e1b5dbd46307a769fe69191b25023762e5b65516ad0542",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "olean_sha256": "387677dd31364ff4aa698d4838d32877e2472c4fd5788758758e9c2ff44431da"
+    },
+    {
+      "command": [
+        "/workspaces/mission-f19a12b3/reserve1-private/audit/trio/reserve1/.local/lean4-v4.31.0/bin/lean",
+        "-o",
+        "/workspaces/mission-f19a12b3/reserve1-private/.lake/build/lib/lean/LidoSRv3/Tests/TrioReserve1/LiveTrust.olean",
+        "LidoSRv3/Tests/TrioReserve1/LiveTrust.lean"
+      ],
+      "exit": 0,
+      "source_sha256": "b2b9bc8a80398e1fc32041071535dc3cbe1542c96fd35d98bcdba4bf4a1f1aa7",
+      "log_sha256": "f591e585d2c4daf69e0e6ca72e36f4ab25464907039f46a3e493a9a9f1e0ec37",
+      "olean_sha256": "632b29b74ed66298dbe4197eb47110245beb02b3b6be9f07e474de27b5d82778"
+    }
+  ]
+}

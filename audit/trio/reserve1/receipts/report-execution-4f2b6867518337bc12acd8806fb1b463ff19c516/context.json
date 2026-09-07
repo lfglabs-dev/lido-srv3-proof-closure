@@ -1,0 +1,31 @@
+{
+  "source_commit": "4f2b6867518337bc12acd8806fb1b463ff19c516",
+  "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "node": "v22.15.0",
+  "node_sha256": "c43f3f73f6917481d2364daf7b7bf8c4fc4a7643580b4626f13f003131ec8716",
+  "ethers": "6.14.4",
+  "compilation_receipt_sha256": "ac4ad8406a7074b65e2c6adcfc54d61dc177a5790054acc642acc65502d72a0c",
+  "lean_version": "Lean (version 4.31.0, x86_64-unknown-linux-gnu, commit 68218e876d2a38b1985b8590fff244a83c321783, Release)",
+  "backend": "2.26.3",
+  "artifact_sha256": "106b8734ed3e3de196820a40a5abbadacd26265767a61b262fbdf0089a876292",
+  "lean": "/workspaces/mission-f19a12b3/reserve1-private/audit/trio/reserve1/.local/lean4-v4.31.0/bin/lean",
+  "argv": [
+    "--run",
+    "LidoSRv3/Tests/TrioReserve1/ReportDifferential.lean",
+    "/workspaces/mission-f19a12b3/reserve1-private/audit/trio/reserve1/receipts/report-execution-4f2b6867518337bc12acd8806fb1b463ff19c516/input.json",
+    "/workspaces/mission-f19a12b3/reserve1-private/audit/trio/reserve1/receipts/report-execution-4f2b6867518337bc12acd8806fb1b463ff19c516/lean.json"
+  ],
+  "lean_exit": 0,
+  "lean_sha256": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550",
+  "lean_path": "/workspaces/mission-f19a12b3/reserve1-private/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/Cli/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/Qq/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/aesop/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/batteries/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/evmyul/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/importGraph/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/mathlib/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/plausible/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/verity/.lake/build/lib/lean",
+  "utc": "2026-09-07T17:19:38.147Z",
+  "scope": "Inherited pinned report body against explicit callee fixtures, not concrete vault/queue implementations",
+  "source_hashes": {
+    "LidoSRv3/Audit/Source/TrioReserve1/Report.lean": "a4e8e4feb5740819a87cb8d12553fe76fed13c0d251faaa80ff28f986db2745b",
+    "LidoSRv3/Audit/Source/TrioReserve1/CallData.lean": "182787dda65d6cc315048e89212e1ef1bdb9d4c6a2084dad5413c303485d65eb",
+    "LidoSRv3/Tests/TrioReserve1/ReportDifferential.lean": "6f30f9638554047ef76ff858dc5b72b6057d03fe512d7ea039c2ee86950eb9a1",
+    "solidity/trio-reserve1/execute-report.cjs": "1ffb116ac406f882973a2c617ef206b9bed2f69551d66d91d687b22cb311e2cb",
+    "solidity/trio-reserve1/LidoHarness.sol": "c91bc08a3f9cf324e3a530b8b41e99e74a5eb8f31e83d441f248518a965c3f37",
+    "lido-core/contracts/0.4.24/Lido.sol": "3bf84b96fb155af2290e6b26bc0138de356442a9abe3ea0f5274497f9fbffc10"
+  }
+}

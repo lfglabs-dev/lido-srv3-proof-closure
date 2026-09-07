@@ -1,0 +1,15 @@
+{
+  "classification": "FAILED_FULL_VALIDATION",
+  "source_head": "f99ab36cb63a7aefb8b40bcfbfad4706c7551252",
+  "passed_gates": [
+    "bootstrap",
+    "production/test/trust/integration Lake build",
+    "make prove (declared legacy scope)",
+    "actual producer VM",
+    "actual parent VM"
+  ],
+  "failed_gate": "make test",
+  "failure": "check_pinned_source.py rejects TrioAlloc2/Step.lean source citation64-116: pinned contract has108 lines; actual function spans63-107. Reproduced locally and corrected citation; no theorem body changed.",
+  "log_scope": "Complete durable wrapper logs, capped node output; receipt contains terminal node tail.",
+  "independent_certification": false
+}

@@ -1,0 +1,16 @@
+LidoSRv3/Audit/Source/TrioReserve1/ACL.lean:151:75: error: unsolved goals
+k : Queue.Keccak
+external : StaticCall.External
+self : Address
+ctx : Context
+role : Word
+how : List Word
+w : World
+fuel : Nat
+hs : (w.core.readContractSlot self.val (permissionSlot k ctx.sender ctx.self role)).val = 0
+ha : (w.core.readContractSlot self.val (permissionSlot k anyEntity ctx.self role)).val = 0
+⊢ (do
+      { outcome := Except.ok PUnit.unit }
+      { outcome := Except.ok PUnit.unit }
+      { outcome := Except.ok false }) =
+    { outcome := Except.ok false }

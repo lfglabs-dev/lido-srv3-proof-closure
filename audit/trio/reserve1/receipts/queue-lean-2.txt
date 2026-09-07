@@ -1,0 +1,16 @@
+LidoSRv3/Audit/Source/TrioReserve1/Queue.lean:91:6: error: Tactic `rfl` failed: Expected the goal to be a binary relation
+
+Hint: Reflexivity tactics can only be used on goals of the form `x ~ x` or `R x x`
+
+case isFalse.right
+keccak : Keccak
+queue : Address
+w : World
+s : QueueSpec.State
+hlast : s.last = (getLastRequestId queue w).val
+hfinal : s.finalized = (getLastFinalizedRequestId queue w).val
+hrows : ∀ (id : Nat), s.cumulative id = cumulative keccak queue w id
+h✝ :
+  ¬cumulative keccak queue w (getLastFinalizedRequestId queue w).val ≤
+      cumulative keccak queue w (getLastRequestId queue w).val
+⊢ True

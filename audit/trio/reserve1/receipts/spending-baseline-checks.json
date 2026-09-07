@@ -1,0 +1,63 @@
+{
+  "source_commit": "53878264fd7d2030afcf176d398dfe0fa5114271",
+  "checks": [
+    {
+      "argv": [
+        "python3",
+        "scripts/check_proof_escapes.py"
+      ],
+      "exit": 0,
+      "log": "spending-check_proof_escapes.txt"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/check_source_annotations.py"
+      ],
+      "exit": 0,
+      "log": "spending-check_source_annotations.txt"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/check_report_theorem_inventory.py"
+      ],
+      "exit": 0,
+      "log": "spending-check_report_theorem_inventory.txt"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/check_verity_provenance.py"
+      ],
+      "exit": 0,
+      "log": "spending-check_verity_provenance.txt"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/check_pinned_source.py"
+      ],
+      "exit": 0,
+      "log": "spending-check_pinned_source.txt"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/audit_metadata.py",
+        "check"
+      ],
+      "exit": 0,
+      "log": "spending-audit_metadata.txt"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/check_import_dag.py"
+      ],
+      "exit": 0,
+      "log": "spending-import-dag.txt"
+    }
+  ],
+  "scope": "Baseline checks, not full gates or new canonical registration"
+}
