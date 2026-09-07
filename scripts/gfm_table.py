@@ -275,6 +275,13 @@ def _closes_paragraph(line: str) -> bool:
     )
 
 
+def _continues_paragraph(paragraph: bool, literal: bool, table: bool, line: str) -> bool:
+    """Whether this line leaves a paragraph open for the next line."""
+    return (not literal and not _closes_paragraph(line)
+            and (paragraph or indent_width(line) < 4)
+            and not (table and ends_table(line)))
+
+
 def _lines(text: str) -> list[Row]:
     rows: list[Row] = []
     offset = 0
@@ -332,13 +339,12 @@ def _literal_lines(lines: list[Row]) -> list[bool]:
                     if (not paragraph or table) and _HTML_BLOCK_BARE_TAG.match(line):
                         literal[index] = True
                         html_end = _HTML_BLOCK_BLANK_END
-        table = _next_table(table, literal[index], lines, index, line)
         # An indented chunk cannot interrupt an existing paragraph (where it is
         # a lazy continuation), but after a block boundary it starts its own
         # block rather than a paragraph.  Keeping the latter as paragraph text
-        # made a following type-7 tag look inline after a list-contained table.
-        paragraph = (not literal[index] and not _closes_paragraph(line)
-                     and (paragraph or indent_width(line) < 4))
+        # made a following type-7 tag look inline after a table-ended code block.
+        paragraph = _continues_paragraph(paragraph, literal[index], table, line)
+        table = _next_table(table, literal[index], lines, index, line)
     return literal
 def mask_literal_regions(text: str) -> str:
     """Blank literal regions, preserving offsets and line endings."""
