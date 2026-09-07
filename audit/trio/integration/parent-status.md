@@ -250,4 +250,33 @@ Full remote job `7d446706-1b44-4950-82ef-3537bd3e6f66` on old-agent is
 running at `8bf49588`, under durable job
 `b6ea9946-055f-5a46-9072-885ed6cc56d1`. It includes the VM guard translation
 and twelve-case suite, but predates the empty-branch correction. The earlier
-Nippur job at `03f17085` remains live. Neither is final-head certification.
+Nippur job at `03f17085` failed `make test` on the stale canonical receipt tree
+after passing the full build and proof gate. Neither is final-head certification.
+
+
+## Response allocation and decoding
+
+`ReturnMemory` models the pinned compiler's successful STATICCALL response
+allocation before decoding. Its all-outcome decoder projections prove that
+clipping to 96 summary bytes or 32 stake bytes preserves the decoded result.
+The call-tree correspondence theorems derive allocation safety from an explicit
+pointer bound of 2^32, for arbitrary response length, and preserve attempted
+calls. Allocation failure precedes short-return decoding; reverted and
+exceptional calls bypass successful-response allocation.
+
+`return-memory-init-receipt.json` checks 70 Init-only modules with matching
+source hashes. Seven source cases cover short/empty responses, allocation
+failure priority, rejection/exception priority, and both copy caps. Seven
+corresponding VM cases are wired into `RunVerityParent` but have not yet been
+compiled or executed remotely. These helpers are not yet threaded through the
+whole producer; physical memory stores/copies, initial pointer provenance and
+gas remain outside these proofs. The compiler inspection now preserves the
+stake-response span as well as the summary-response span.
+
+`remote-03f17085` archives the authoritative failed receipt and complete durable
+logs. Its full build and `make prove` passed, along with 12 producer vectors,
+six parent VM checks and eight emitted parent differential records. `make test`
+stopped at the stale canonical validation-receipt tree. Its recorded scope
+predates the guarded parent and does not establish a twelve-case comparison.
+The canonical tree binding must be refreshed after staging each complete
+integration checkpoint; refreshing that binding does not certify the new code.
