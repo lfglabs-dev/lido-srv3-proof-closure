@@ -39,7 +39,9 @@ name storage, _updateModuleParams, last-ID, _updateModuleLastDepositState
 Their role/membership guards read physical storage. WriterInvariant covers the
 share and parameter updates. AdmissionFacts covers public admission invariant
 preservation under finite layout and the FreshRecords storage predicate; the
-lifecycle induction establishing and preserving FreshRecords is pending.
+RecordInvariant now establishes both predicates for histories of admission, share
+and parameter writers from zero storage. Full lifecycle induction, including
+initialization and migration, remains pending.
 
 Migration `_migrateStorage`, all-fee updates, status/credential updates, and writes
 to adjacent packed/accounting/deposit fields still need their frame/reachability

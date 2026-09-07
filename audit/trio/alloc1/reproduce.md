@@ -157,3 +157,10 @@ The full four-target build later passed 1,505 jobs at8269ac (STALE_SUCCESS for
 newer heads). The corrected Verity runner passed 37 jobs and actual execution at
 03abaac, using a separately measured 2 GiB estimate. Full build estimate remains
 5 GiB; no emergency-floor override was used. Exact receipts identify source SHAs.
+
+The three-writer history extension passes 25 fresh bounded Init-only checks
+(`light-v21.json`, durable job e328e992-edea-46a4-a3e2-8084ddac7be6) and six
+selected axiom inspections (`admission-axioms-v2.json`). Proof-escape and source
+annotation checks also pass (durable job 791c0fe0-aaf1-43b9-a433-d875d15f434d):
+244 project Lean files, 735 checked citations, no escapes or quote mismatches.
+These checks do not replace current-head remote production/test/trust validation.

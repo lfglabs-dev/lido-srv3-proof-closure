@@ -45,22 +45,30 @@ count truncation or assumed callee success is introduced.
   and six committed events, including malformed-name panic 0x22, long-name cleanup
   with wrapped range endpoints, uint24 ID, parameter helper, last-deposit fields,
   and public-entry rollback. Successful execution derives entry count and freshness.
-  Reachable-state invariant induction through this transition remains open.
+  Its transition is included in the three-writer induction below.
 - `AdmissionFacts`: derives actual intermediate successful states, final stored
   share bound and ID range, count growth/bound, old-row preservation and the new
   address. The full public admission preserves count/share/unique-address under
   finite layout and `FreshRecords` storage obligations. `FreshRecords` derives
   absent-ID/fresh-name from checked next-ID and holds in zero storage; preservation
-  of this stronger predicate across the lifecycle is still required. No proposed
+  of this stronger predicate across the complete lifecycle is still required. No proposed
   address freshness, successful parameter helper or final bound is assumed.
+- `RecordInvariant`: preserves fresh records through actual public admission, share
+  and parameter executions, including rejection. Induction from zero storage derives
+  both count/share/address and fresh-record invariants for these three writer
+  histories. It keeps finite uint24 slot-separation obligations explicit and does
+  not represent initialization, migration or other writer families.
 - `AllocationMemory`: exact word rounding, oversized-array panic 0x41, allocation
   monotonicity/limit on success, and a bounded allocation lemma. Integration of
   these primitives into the entire compiler execution remains open.
 
-Twenty-four Init-only modules are included in the fresh light validation driver.
-All pass in `receipts/light-v20.json`. The five selected AdmissionFacts theorems
-use only propext, Classical.choice and Quot.sound (`admission-axioms-v1.json`).
-These new conditional invariant proofs have not received remote closure validation.
+Twenty-five Init-only modules are included in the fresh light validation driver.
+All pass in `receipts/light-v21.json`.
+The earlier five selected AdmissionFacts theorems use only propext, Classical.choice
+and Quot.sound (`admission-axioms-v1.json`).
+The six selected admission/history theorems use the same standard axioms
+(`admission-axioms-v2.json`). These new invariant proofs have not received remote
+closure validation.
 The full production/test/audit-trust/legacy build passed 1,505 jobs at
 `8269ac576cf119975a7e9954459cd4aa04d5cd82`, remote job
 `3ca9d1e4-e496-43f7-87f2-a5925a9bd083` on nippur. This is **STALE_SUCCESS** for
@@ -118,7 +126,7 @@ pins producer8269ac and has its own receipts; it is not silently integrated here
 
 | Requirement | Remaining work |
 | --- | --- |
-| Physical state reachability | All admission/update/migration writer transitions, count<=32 and unique-address derivations; explicit finite storage separation and deployment/hash relation. One share writer is not all-writer reachability. |
+| Physical state reachability | All admission/update/migration writer transitions, count<=32 and unique-address derivations; explicit finite storage separation and deployment/hash relation. Three-writer history induction is not all-writer reachability. |
 | Compiler memory and ABI | Universal allocation schedule and array-write refinement, allocation panic precedence, live producer byte extent and consumer ABI composition. Executed snapshots and constructive codec lemmas are not the whole proof. |
 | Transaction composition | Parent checked wei conversions, sequential behavior, complete nested-call observation relation and rollback composition with ALLOC-2. |
 | Integration and full validation | Current-head production/test/trust, make prove/test, canonical source inventory/metadata integration and independent certification. The shared UX2 gate is consumer-owned; no shared file is regenerated here. |
