@@ -180,3 +180,47 @@ is not certification-ready, and this update does not certify the consumer bridge
 Coordination recording only: Git inspection and JSON parsing exited 0; existing
 working changes were preserved. No PR mutation, dependency change, canonical
 edit, build submission or broader implementation work was performed.
+
+
+## Public admission invariant update reported 2026-09-07
+
+The user reports published producer head
+`56787713037c736aea4593f36b5907aa1e81551a`, a clean checkout and verified
+draft PR245. Local Git inspection confirms this commit and its AdmissionFacts
+source. Publication, draft status and producer checkout cleanliness are attributed
+to the user's verification; no live PR query was performed for this update.
+Interface.lean has blob `d6eb95cceeb42421011acd1a5d7f9de7fea4a43d`, identical
+to accepted v0 at `2a4e9d2a91d257353470677c6101fd91293cf4e4`.
+The existing agreement and composition dependency pin remain unchanged.
+
+Inspected `AdmissionFacts.public_preserves` establishes
+`WriterInvariant.Holds` on the public execute result for both success and
+rejection, given the entry invariant, `FreshRecords`, and finite
+`AppendSeparation` obligations for actual successful stages. Its supporting
+proofs derive final stored share, checked uint24 new ID, count growth/bound,
+new element/address and old-row preservation. `successful_record_freshness`
+derives absent ID and zero fresh name from FreshRecords and successful checked
+next-ID computation; `zero_fresh_records` establishes FreshRecords in zero
+storage. These are conditional physical-storage invariant results, not a
+completed reachable-state induction or a new consumer composition certificate.
+Initialization, migration and other-writer preservation of FreshRecords remain
+open. Migration success/version alone still cannot establish legacy bounds.
+
+Inspected committed `light-v20.json`: LIGHT_INIT_ONLY_PASS, 24 checks, all
+exit_code 0. Inspected `admission-axioms-v1.json`: exit_code 0 and five named
+inspections (success_witness, success_stored_share, success_count_bound,
+successful_record_freshness, public_preserves), each listing only propext,
+Classical.choice and Quot.sound. Both source hashes recorded in the axiom
+receipt match files at this exact producer commit. These are inspected producer
+receipts, not locally rerun builds or independent certification. Source-escape
+and annotation passes, and unchanged runtime, are reported by the user.
+
+New proofs have no remote production/Verity/trust validation. The prior remote
+PASS remains stale for this source. Known admission rejection remains HTTP 422:
+ashur 80 GiB free versus 2 GiB estimate plus 80 GiB emergency floor, with no
+compilation. No retry or floor change was performed. Full lifecycle, memory and
+integration obligations remain open; neither producer nor consumer is certified.
+
+This coordination update only changes this owned note. Git source inspection,
+receipt JSON parsing and axiom-source hash verification exited 0. Existing work
+is preserved; no repin, PR mutation or remote build submission occurred.
