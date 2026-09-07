@@ -33,9 +33,9 @@ internal stages are expanded; CALL/deployed primitive binding remains the execut
 boundary.
 
 CallSpec/CallFlow now provide independent code/funds/transfer/reply/rollback rules
-with exact source CALL correspondence and pointwise transfer accounting. Substitute
-these rules into all expanded stage predicates, then bind raw primitive/deployed
-callee behavior and resource/world constraints.
+with exact source CALL correspondence and pointwise transfer accounting. WithdrawalCalls now substitutes
+these rules throughout all expanded stage predicates. Bind raw primitive/deployed
+callee behavior and resource/world constraints next.
 
 1. WithdrawalSpec/WithdrawalParent now cover all eight parent paths with
    bidirectional exact return/world/trace correspondence to actual stage

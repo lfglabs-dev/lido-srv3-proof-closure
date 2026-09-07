@@ -1,3 +1,4 @@
+import LidoSRv3.Audit.Source.TrioReserve1.WithdrawalCalls
 import LidoSRv3.Audit.Source.TrioReserve1.CallFlow
 import LidoSRv3.Audit.Source.TrioReserve1.AllocationFlow
 import LidoSRv3.Audit.Source.TrioReserve1.FrameRead
@@ -334,3 +335,9 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms CallFlow.exists_spec
 #print axioms CallFlow.to_spec
 #print axioms CallFlow.corresponds
+
+#print axioms WithdrawalCalls.call_observations
+#print axioms WithdrawalCalls.corresponds
+#print axioms WithdrawalCalls.complete
+#print axioms WithdrawalCalls.failure_restores
+#print axioms WithdrawalCalls.success_nonzero

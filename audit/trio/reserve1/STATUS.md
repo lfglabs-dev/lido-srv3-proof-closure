@@ -1,5 +1,21 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## CALL rules substituted throughout withdrawal
+
+`WithdrawalCalls` threads a relational CALL observer through every locator lookup,
+status read, allocation query, frame query and receiver. Its final `Describes`
+instantiates independent code/funds/transfer/reply rules, with no source stage
+executor or Live.call in the expanded relation. Bidirectional exact correspondence
+and completeness preserve full return/fault, physical world and direct/nested
+attempts. Independent parent consequences still give failure restoration and
+successful nonzero amount.
+
+The remaining external boundary is the explicit raw callee interpreter, which must
+still be bound to deployed bytecode/primitive behavior and resource/bounded-world
+constraints. Other writers, proxy/initialization/report/queue paths, canonical gates
+and independent review remain open. Immutable validation follows checks. Runtime
+execution source and historical receipts are unchanged.
+
 ## Independent high-level CALL correspondence
 
 `CallSpec` independently orders target-code validation, balance admission and
