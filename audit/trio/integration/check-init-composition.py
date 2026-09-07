@@ -89,6 +89,8 @@ try:
     check('LidoSRv3.Audit.Source.TrioComposition.LifecycleHistory')
     check('LidoSRv3.Audit.Source.TrioComposition.CacheRepresentation')
     check('audit.trio.alloc2.composition.ProducerMemoryVectors')
+    check('audit.trio.alloc2.composition.MemoryWriteVectors')
+    check('LidoSRv3.Tests.TrioIntegration.FinalMemoryStoredParent')
     receipt['classification'] = 'PASS_INIT_ONLY_COMPOSITION'
 finally:
     (out / 'receipt.json').write_text(json.dumps(receipt, indent=2) + '\n')

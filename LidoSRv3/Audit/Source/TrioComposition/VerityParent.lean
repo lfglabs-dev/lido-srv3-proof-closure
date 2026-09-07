@@ -1,3 +1,4 @@
+import LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredParent
 import LidoSRv3.Audit.Source.TrioComposition.FinalMemoryParent
 import LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer
 
@@ -72,6 +73,28 @@ theorem memory_public_iff (pointer : Word) (layout : Layout) (config : Config)
       (executeWithMemory pointer layout config amount isTopUp adversary state before).1 = (result, after) := by
   rw [(memory_correspondence pointer layout config amount isTopUp adversary state before).1]
   exact FinalMemoryParent.public_iff pointer layout _ _ _ _ _ before after result countBound space
+
+/-- The module-call VM and the complete stored source parent have identical
+returns/reverts and module transcripts. The separately recorded closed-library
+event is a source observable; this theorem does not execute a linked delegatecall
+in the VM. The VM external world remains unchanged on every result. -/
+theorem stored_correspondence (target : Address) (memory : MemoryWords) (pointer : Word)
+    (layout : Layout) (config : Config) (amount : Word) (isTopUp : Bool)
+    (adversary : DenoteExternalCalls.AdversaryModel) (state : DenoteExternalCalls.CallState)
+    (before : Transcript) (trace : MemoryTransportCall.Trace)
+    (countBound : (VerityProducer.worldStorage state.world (countSlot layout)).val ≤ 32)
+    (space : pointer.val+1184*(VerityProducer.worldStorage state.world (countSlot layout)).val+704 ≤ 2^32) :
+    (executeWithMemory pointer layout config amount isTopUp adversary state before).1 =
+      FinalMemoryStoredParent.project (FinalMemoryStoredParent.program target memory pointer layout
+        (VerityProducer.worldStorage state.world) (VerityProducer.sourceOracle adversary state.world)
+        config amount isTopUp before trace) ∧
+    (executeWithMemory pointer layout config amount isTopUp adversary state before).2.world = state.world := by
+  have vm := memory_correspondence pointer layout config amount isTopUp adversary state before
+  exact ⟨vm.1.trans (FinalMemoryStoredParent.projection target memory pointer layout
+    (VerityProducer.worldStorage state.world) (VerityProducer.sourceOracle adversary state.world)
+    config amount isTopUp before trace countBound space).symm, vm.2⟩
+
+#print axioms stored_correspondence
 
 #print axioms memory_correspondence
 #print axioms memory_public_iff

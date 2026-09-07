@@ -1,6 +1,6 @@
 import LidoSRv3.Audit.Source.TrioAlloc1.ProxyGenesis
 import LidoSRv3.Audit.Source.TrioComposition.WriterMemory
-import LidoSRv3.Audit.Source.TrioComposition.FinalMemoryParent
+import LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredParent
 
 /-! Histories rooted in the actual modeled proxy initialization prefix. Public
 ACL grants permit the subsequent four writer families to become authorized.
@@ -98,6 +98,23 @@ theorem final_parent_iff (pointer : Word) (l : Layout) (s : Storage)
   FinalMemoryParent.public_iff pointer l s oracle config amount isTopUp before after result
     (invariants l s history).1.1
     (FinalMemoryParent.budget_from_small_entry pointer (s (countSlot l)) small (invariants l s history).1.1)
+
+/-- The same actual initialization/writer history supplies the count and
+allocation budget of the single memory-storing and library-observing parent. -/
+theorem stored_parent_iff (target : Address) (memory : MemoryWords) (pointer : Word)
+    (l : Layout) (s : Storage) (oracle : StaticOracle) (config : Config)
+    (amount : Word) (isTopUp : Bool) (before after : Transcript)
+    (trace : MemoryTransportCall.Trace) (result : Except Failure ParentOutput)
+    (history : History l s) (small : pointer.val ≤ 2^31) :
+    ParentSpec.Public l s oracle config amount isTopUp before result after ↔
+      FinalMemoryStoredParent.project
+        (FinalMemoryStoredParent.program target memory pointer l s oracle config amount isTopUp before trace) =
+        (result,after) :=
+  FinalMemoryStoredParent.public_iff target memory pointer l s oracle config amount isTopUp
+    before after trace result (invariants l s history).1.1
+    (FinalMemoryParent.budget_from_small_entry pointer (s (countSlot l)) small (invariants l s history).1.1)
+
+#print axioms stored_parent_iff
 
 #print axioms final_parent_iff
 

@@ -1,3 +1,14 @@
+import LidoSRv3.Audit.Source.TrioAlloc1.Determinism
+import LidoSRv3.Audit.Source.TrioAlloc1.CapacitySpec
+import LidoSRv3.Audit.Source.TrioAlloc2.LoopCorrespondence
+import LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredParent
+import LidoSRv3.Audit.Source.TrioComposition.LifecycleHistory
+import LidoSRv3.Audit.Source.TrioComposition.VerityParent
+import LidoSRv3.Audit.Source.TrioComposition.ReserveLeafSpend
+import LidoSRv3.Audit.Source.TrioReserve1.PhysicalReserve
+import LidoSRv3.Audit.Source.TrioReserve1.PhysicalSequence
+import LidoSRv3.Audit.Source.TrioReserve1.AllocationFlow
+import LidoSRv3.Audit.Source.TrioReserve1.Transfers
 import LidoSRv3.Audit.Guarantees.PEthConfinement1
 import LidoSRv3.Tests.EthConfinementMutants
 import LidoSRv3.Audit.Verity.MinFirstSourceEntry
@@ -593,3 +604,21 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.EthConfinementMutants.kill_exact_assignment_parent_swap
 #print axioms LidoSRv3.Tests.EthConfinementMutants.kill_exact_assignment_approval_swap
 #print axioms LidoSRv3.Tests.EthConfinementMutants.kill_exact_assignment_destination_swap
+
+-- Trio source/word-memory and explicit VM-plane composition.
+#print axioms LidoSRv3.Audit.Source.TrioAlloc1.Relational.producer_iff
+#print axioms LidoSRv3.Audit.Source.TrioAlloc1.producer_math_view
+#print axioms LidoSRv3.Audit.Source.TrioAlloc2.allocate_refines
+#print axioms LidoSRv3.Audit.Source.TrioAlloc2.distribution_exists
+#print axioms LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredProducer.success
+#print axioms LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredParent.public_iff
+#print axioms LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredParent.success
+#print axioms LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredParent.positive_calls
+#print axioms LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredParent.trace_shape
+#print axioms LidoSRv3.Audit.Source.TrioComposition.LifecycleHistory.stored_parent_iff
+#print axioms LidoSRv3.Audit.Source.TrioComposition.VerityParent.stored_correspondence
+#print axioms LidoSRv3.Audit.Source.TrioComposition.ReserveLeafSpend.withdrawal_corresponds
+#print axioms LidoSRv3.Audit.Source.TrioReserve1.AllocationFlow.withdrawal_corresponds
+#print axioms LidoSRv3.Audit.Source.TrioReserve1.PhysicalReserve.success_preserves
+#print axioms LidoSRv3.Audit.Source.TrioReserve1.PhysicalSequence.corresponds
+#print axioms LidoSRv3.Audit.Source.TrioReserve1.Transfers.credit_bound_from_aggregate

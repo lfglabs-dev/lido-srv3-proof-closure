@@ -1,0 +1,18 @@
+{
+  "classification": "FAILED_TARGETED_COMPONENT_VALIDATION",
+  "source_head": "f3678802dc5ab89b53bab453c210d4eb35f06383",
+  "passed": [
+    "ReserveLeafFrame",
+    "VerityParent including memory_public_iff",
+    "MemoryParentVM compilation"
+  ],
+  "failed": [
+    "ReserveLeafAllocation.partition_unique: total equality projection not simplified"
+  ],
+  "not_executed": [
+    "MemoryParentVM runtime (driver stopped after aggregate build failure)"
+  ],
+  "repair": "Expose actual = buffer before rewriting the structure equality; next official build required.",
+  "log_scope": "Authoritative terminal receipt with capped runner log tail",
+  "independent_certification": false
+}

@@ -493,3 +493,39 @@ RESERVE-1's new Verity-dependent composition still requires full remote validati
 The latest read-only writer checkpoint observed ALLOC-1 local HEAD equal to remote
 with a clean workspace; ALLOC-2 and RESERVE-1 still had unpublished work. No final
 three-writer checkpoint or final certification is claimed.
+
+
+## Final memory and independent reserve components (2026-09-07)
+
+Integration checkpoint `f3678802dc5ab89b53bab453c210d4eb35f06383` adds the
+ordered allocation guards, a single producer with executed per-row output
+stores, memory-fed library calls, return copies, checked in-place conversion
+components and a lifecycle bridge from modeled proxy initialization and public
+writers. `final-stores-init-receipt.json` records 109 passing bounded Init-only
+modules with exact file hashes. This is not a full Verity validation receipt.
+
+`ReserveLeafAllocation`, `ReserveLeafFrame` and `ReserveLeafSpend` replace the
+last high-level executable interfaces in the independent reserve relation with
+exhaustive lookup, raw-call, ABI and partition rules. Their first official
+remote elaboration is pending in targeted job
+`2e260062-2f46-476b-a137-4a3a7eefdc4f` on old-agent, at `f3678802`. The same
+job checks the corrected memory-parent VM failure priorities.
+
+The round-4 independent source review accepts these corrections, with per-file
+hashes in `final-independent-review-round4.md`. It requires the final combined
+observable stored parent and exact-candidate gates before approving completion.
+Private compiler byte/word, cache/frame and linked-library representation are
+explicit primitive boundaries; they are not assumed final allocation results.
+
+The complete `f99ab36c` remote run finished: production/test/trust/integration
+compilation, scoped `make prove`, producer VM and parent VM passed. `make test`
+failed on an out-of-range Solidity citation in `TrioAlloc2/Step.lean`; that
+reference is corrected at `f3678802`, and the pinned-source check passes locally.
+The failure is archived under `remote-f99ab36c`. The full `4b99c885` snapshot
+still runs and predates this fix and the newest composition.
+
+Published successors ALLOC-2 `37d36ab0` and RESERVE-1 `a7b7c16c` are also merged
+locally: existing-memory sequential execution evidence and the writer's own
+independent frame/allocation flow. Their published heads were verified; ALLOC-2
+still had unpublished files and RESERVE-1 one untracked receipt. No final
+all-writer checkpoint, final registration or GitHub merge is claimed.

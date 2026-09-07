@@ -20,15 +20,14 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import gfm_table  # noqa: E402  (sibling module, located above)
 import markdown_text  # noqa: E402  (sibling module, located above)
+import trio_report  # noqa: E402  (sibling module, located above)
 
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
 SOURCE_FIDELITY = AUDIT / "SOURCE-FIDELITY.md"
 R1_REVIEW_BASE = "eda35b611f08879241411d12f943d011f748e5a4"
-# The report records the normal source-fidelity-A reconciliation merge as its input basis. Keep the exact
-# generator inputs bound both to that Git object and to their expected bytes:
-# a changed registry, source map, or Trust allowlist must not be presented as
-# if it had that review.
+# Bind the report inputs to the recorded Git object and exact bytes.
+# Changed inputs must never inherit an earlier source review.
 # This exact family is every structured input used to render the R1 review
 # report.  A normal regeneration may never pair changed family content with a
 # stale certified basis.
@@ -748,7 +747,7 @@ def rendered(rows, source_map):
         gap_note = "No row is gap-free."
     report = [header + "# R1 final auditor report\n\n",
         "## Decision\n\n",
-        f"Review basis: recorded input set (bounded token ownership amendment; no canonical status upgrade) `{R1_REVIEW_BASE}`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.\n\n",
+        f"Review basis: recorded structured input set (legacy primary registrations preserved; trio composition scoped separately) `{R1_REVIEW_BASE}`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.\n\n",
         "## Architecture and evidence boundary\n\n",
         "The evidence stack is: pinned Lido source spans → source-shaped/abstract Lean specifications → Verity Lean program and `Contract.run` transaction observables → named theorem and negative-mutant receipts. Revert theorems concern the modeled snapshot and journal. External calls, storage observations, and source correspondences have only the scope stated per row. Lean theorem names are authoritative; metadata records classification and fidelity, never proof progress.\n\n",
         "Pinned upstream source is `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`; Verity is pinned in `audit/artifacts.lock.json`; Lean is `leanprover/lean4:v4.31.0`. Canonical source anchors are immutable permalinks in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance. Supplemental rows deliberately have no independent source-map target unless their parent mapping says otherwise.\n\n",
@@ -795,6 +794,7 @@ def rendered(rows, source_map):
         report.append(f"**Limitations — {len(missing)} open fidelity gap(s).** "
                       f"Surfaces the accepted theorems above do *not* cover:\n\n")
         report.extend(f"- {item}\n" for item in missing)
+        report.extend(trio_report.source_composition_review(source))
         classification = row["classification"]
         remaining = classification.get("work")
         report.append(f"\n**Classification.** **{classification['kind']}**"

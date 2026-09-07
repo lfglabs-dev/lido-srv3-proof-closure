@@ -53,6 +53,7 @@ theorem partition_unique (buffer reserve queued : Nat) (a : Live.Allocation)
   rcases a with ⟨actual,deposits,withdrawals,unreserved⟩
   simp only [TrioReserve1.Allocation.observe,AllocationSpec.Allocation.mk.injEq] at unique
   obtain ⟨hd,hw,hu⟩ := unique
+  change actual = buffer at total
   simp only [total,hd,hw,hu]
 
 theorem of_spec (external : External) (ctx : Context) (before after : World)
