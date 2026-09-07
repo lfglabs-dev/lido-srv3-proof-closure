@@ -228,3 +228,26 @@ This executes proved guard arithmetic in the source call tree, not EVM MSTORE
 or solc's whole allocation schedule. Pointer provenance, compiler placement,
 zeroing/stores, return-data allocation, delegated call memory and gas remain
 open. The original eight-case receipt does not validate this changed VM source.
+
+## Empty-branch allocation and exact compiler evidence
+
+Read-only retrieval of the complete optimized SRLib IR matched the writer's
+recorded SHA-256. `compiler-memory/SRLib.ir.yul` preserves it, and
+`compiler-memory/inspection.json` identifies five relevant source spans. The
+empty branch emits two 32-byte allocations before returning; it skips division,
+but does not skip allocation. The guarded parent now models their possible
+panic 0x41 under its explicit pointer input. Four source execution checks cover
+empty failure/success and nonempty division/allocation/call precedence. The
+68-module bounded closure passes; see `allocation-parent-empty-init-receipt.json`.
+
+The IR also shows a further 224-byte scratch configuration allocation after the
+array/cache prefix, 224-byte configuration allocations within the producer loop,
+and response allocation before short-return decoding. Those interleaved effects
+are not yet in the guarded parent. The archived inspection is evidence directing
+that remaining work, not a refinement theorem.
+
+Full remote job `7d446706-1b44-4950-82ef-3537bd3e6f66` on old-agent is
+running at `8bf49588`, under durable job
+`b6ea9946-055f-5a46-9072-885ed6cc56d1`. It includes the VM guard translation
+and twelve-case suite, but predates the empty-branch correction. The earlier
+Nippur job at `03f17085` remains live. Neither is final-head certification.

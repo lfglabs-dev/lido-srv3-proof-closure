@@ -1,0 +1,79 @@
+{
+  "classification": "COMPILER_IR_INSPECTION_NOT_REFINEMENT_PROOF",
+  "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "compiler": "0.8.25+commit.b61c2a91.Emscripten.clang",
+  "settings": {
+    "optimizer": {
+      "enabled": true,
+      "runs": 200
+    },
+    "viaIR": true,
+    "evmVersion": "shanghai",
+    "outputSelection": {
+      "*": {
+        "*": [
+          "irOptimized"
+        ]
+      }
+    }
+  },
+  "ir_sha256": "30d20f448233d6d51ecff8339f360444d9d3e1754566da6322cb4c8e87ed0d61",
+  "upstream_inspection": "audit/trio/alloc2/parent-memory-inspection.json",
+  "upstream_inspection_sha256": "5a424df0eee7bca5d474fac4f75ecbba0486f295ec11381f576c8704afafe230",
+  "source_hashes": {
+    "contracts/0.8.25/sr/SRLib.sol": "2a53ec2d183f3c3d8b6257f18dc7143e8afbc8d3d2f8a48bd0e5e0580b5b47ab",
+    "@openzeppelin/contracts-v5.2/utils/math/Math.sol": "68cf79a637995d5ed243c4a5856b42a5e134ee8786a05034e24d75927fc40ebc",
+    "@openzeppelin/contracts-v5.2/utils/StorageSlot.sol": "75704538dcb223239280c6726d9a31cf769a7816718517c997fc7d63bdb70778",
+    "contracts/common/lib/MinFirstAllocationStrategy.sol": "90aae2101a74b1aec03470da771f673dc4310ae415e31391d81c589403166b9c",
+    "contracts/common/lib/WithdrawalCredentials.sol": "cf5e77be0c5d522d853d19a4c5284e53fa0fb149a9902f77648a8f6d5584636c",
+    "contracts/common/interfaces/IStakingModule.sol": "4a98e89e763d19b45cb1ea422cec1c554fbd43c9f39c6bcc7a18aad64d46e193",
+    "contracts/0.8.25/sr/SRStorage.sol": "62e922f76a1db7756684d73db3151a02f6d8f0de51fac27922f0a4095ceb9d95",
+    "contracts/0.8.25/sr/SRUtils.sol": "1f59e455e510e5eb9c19bdf64dd7357c3e4a8c445c5baaa2f3691ecb7115d295",
+    "contracts/0.8.25/sr/SRTypes.sol": "22c28be7ceaf6ed841f18fc19296372ab246b1cfecc87902d49ee1670ed4aed6",
+    "contracts/0.8.25/sr/ISRBase.sol": "63466ac2f70f94c6b1045c628a7b677975aad56b95d7b8634758e97bdbebeb64",
+    "@openzeppelin/contracts-v5.2/utils/Panic.sol": "270fc8401c1a13fae6a7a4a2dd6e381b95d658896701e51f0d3e2688acab3dec",
+    "@openzeppelin/contracts-v5.2/utils/math/SafeCast.sol": "9769274bf53f26a7c7896c526ea1980dc9bea5bf5c2a5fd04870008c4afc1de9",
+    "@openzeppelin/contracts-v5.2/utils/structs/EnumerableSet.sol": "ed0804f9dcff9d2dceba8cc83f31669a84491dfcfe510050c9371aa7c48db09c",
+    "contracts/common/interfaces/IStakingModuleV2.sol": "eacc19c668dd2ad94c7c0cffc5957181b8bf1ed2321c14c34c9845ea054a64ce",
+    "contracts/common/lib/Math256.sol": "028e9b0c87fea3ec6fd5aac9e7a5724a18b4a175d5ab70159f24428dd28ea6b6"
+  },
+  "findings": [
+    {
+      "finding": "empty branch allocates two empty arrays",
+      "first_line": 2363,
+      "last_line": 2387,
+      "excerpt": "            function fun_getDepositAllocations(var_allocateAmount, var_isTopUp) -> var_totalAllocated, var_allocated_mpos, var_newAllocations_mpos\n            {\n                /// @src 6:17829:17851  \"uint256 totalAllocated\"\n                var_totalAllocated := /** @src 6:955:47234  \"library SRLib {...\" */ 0\n                let length := sload(/** @src 7:1957:1983  \"getRouterState().moduleIds\" */ add(/** @src 7:874:897  \"ROUTER_STORAGE_POSITION\" */ constant_ROUTER_STORAGE_POSITION(), /** @src 7:1957:1983  \"getRouterState().moduleIds\" */ 1))\n                /// @src 6:17988:18082  \"if (modulesCount == 0) {...\"\n                if /** @src 6:17992:18009  \"modulesCount == 0\" */ iszero(length)\n                /// @src 6:17988:18082  \"if (modulesCount == 0) {...\"\n                {\n                    /// @src 6:955:47234  \"library SRLib {...\"\n                    let memPtr := mload(64)\n                    finalize_allocation_47073(memPtr)\n                    mstore(memPtr, 0)\n                    let memPtr_1 := mload(64)\n                    finalize_allocation_47073(memPtr_1)\n                    mstore(memPtr_1, 0)\n                    calldatacopy(0, calldatasize(), 0)\n                    /// @src 6:18025:18071  \"return (0, new uint256[](0), new uint256[](0))\"\n                    var_totalAllocated := /** @src 6:955:47234  \"library SRLib {...\" */ 0\n                    /// @src 6:18025:18071  \"return (0, new uint256[](0), new uint256[](0))\"\n                    var_allocated_mpos := memPtr\n                    var_newAllocations_mpos := memPtr_1\n                    leave\n                }\n                /// @src 6:18252:18284  \"_allocateAmount / initialDeposit\""
+    },
+    {
+      "finding": "division and array/cache prefix",
+      "first_line": 2388,
+      "last_line": 2412,
+      "excerpt": "                let expr := checked_div_uint256(var_allocateAmount, /** @src 9:560:562  \"32\" */ calldataload(/** @src 6:955:47234  \"library SRLib {...\" */ 4))\n                let length_1 := sload(/** @src 7:1957:1983  \"getRouterState().moduleIds\" */ add(/** @src 7:874:897  \"ROUTER_STORAGE_POSITION\" */ constant_ROUTER_STORAGE_POSITION(), /** @src 7:1957:1983  \"getRouterState().moduleIds\" */ 1))\n                /// @src 6:23169:23211  \"_allocations = new uint256[](modulesCount)\"\n                let var_allocations_mpos := /** @src 6:23184:23211  \"new uint256[](modulesCount)\" */ allocate_and_zero_memory_array_array_uint256_dyn(length_1)\n                /// @src 6:955:47234  \"library SRLib {...\"\n                let _1 := array_allocation_size_array_uint256_dyn(length_1)\n                let memPtr_2 := mload(64)\n                finalize_allocation(memPtr_2, _1)\n                mstore(memPtr_2, length_1)\n                let _2 := add(array_allocation_size_array_uint256_dyn(length_1), /** @src 9:560:562  \"32\" */ not(31))\n                /// @src 6:955:47234  \"library SRLib {...\"\n                let i := 0\n                for { } lt(i, _2) { i := add(i, 32) }\n                {\n                    let memPtr_3 := mload(64)\n                    finalize_allocation_31499(memPtr_3)\n                    mstore(memPtr_3, 0)\n                    let _3 := 32\n                    mstore(add(memPtr_3, _3), 0)\n                    mstore(add(memPtr_3, 64), 0)\n                    mstore(add(memPtr_3, 96), 0)\n                    mstore(add(memPtr_3, 128), 0)\n                    mstore(add(add(memPtr_2, i), _3), memPtr_3)\n                }\n                let memPtr_4 := mload(64)"
+    },
+    {
+      "finding": "additional scratch config allocation",
+      "first_line": 2413,
+      "last_line": 2422,
+      "excerpt": "                finalize_allocation_31435(memPtr_4)\n                mstore(memPtr_4, 0)\n                mstore(add(memPtr_4, 32), 0)\n                mstore(add(memPtr_4, 64), 0)\n                mstore(add(memPtr_4, 96), 0)\n                mstore(add(memPtr_4, 128), 0)\n                mstore(add(memPtr_4, 160), 0)\n                mstore(add(memPtr_4, 192), 0)\n                /// @src 6:23447:23491  \"uint256 totalValidators = depositsToAllocate\"\n                let var_totalValidators := expr"
+    },
+    {
+      "finding": "config record allocation and enum validation",
+      "first_line": 2747,
+      "last_line": 2769,
+      "excerpt": "            function read_from_storage_reference_type_struct_ModuleStateConfig(slot) -> value\n            {\n                /// @src 6:955:47234  \"library SRLib {...\"\n                let memPtr := mload(64)\n                finalize_allocation_31435(memPtr)\n                /// @src 9:497:502  \"10000\"\n                value := memPtr\n                /// @src 9:560:562  \"32\"\n                let _1 := sload(/** @src 9:497:502  \"10000\" */ slot)\n                mstore(memPtr, /** @src 6:955:47234  \"library SRLib {...\" */ and(_1, sub(shl(160, 1), 1)))\n                /// @src 9:497:502  \"10000\"\n                let _2 := 0xffff\n                mstore(add(memPtr, 32), and(shr(160, _1), _2))\n                mstore(add(memPtr, /** @src 6:955:47234  \"library SRLib {...\" */ 64), /** @src 9:497:502  \"10000\" */ and(shr(176, _1), _2))\n                mstore(add(memPtr, 96), and(shr(192, _1), _2))\n                mstore(add(memPtr, 128), and(shr(208, _1), _2))\n                write_to_memory_enum_StakingModuleStatus(add(memPtr, 160), /** @src 9:560:562  \"32\" */ and(/** @src 6:955:47234  \"library SRLib {...\" */ shr(/** @src 9:497:502  \"10000\" */ 224, /** @src 6:955:47234  \"library SRLib {...\" */ _1), /** @src 9:560:562  \"32\" */ 0xff))\n                /// @src 9:497:502  \"10000\"\n                mstore(add(memPtr, 192), /** @src 9:560:562  \"32\" */ and(/** @src 9:497:502  \"10000\" */ shr(232, _1), /** @src 9:560:562  \"32\" */ 0xff))\n            }\n            /// @src 9:497:502  \"10000\"\n            function update_storage_value_offsett_uint64_to_uint64(slot, value)\n            {"
+    },
+    {
+      "finding": "summary call response allocation before decoding",
+      "first_line": 3341,
+      "last_line": 3385,
+      "excerpt": "            function fun_getStakingModuleSummary(var_module_address) -> var_exitedValidators, var_depositedValidators, var_depositableValidators\n            {\n                /// @src 6:16809:16841  \"module.getStakingModuleSummary()\"\n                let _1 := /** @src 6:955:47234  \"library SRLib {...\" */ mload(64)\n                /// @src 6:16809:16841  \"module.getStakingModuleSummary()\"\n                mstore(_1, /** @src 6:955:47234  \"library SRLib {...\" */ shl(224, 0x9abddf09))\n                /// @src 6:16809:16841  \"module.getStakingModuleSummary()\"\n                let _2 := staticcall(gas(), /** @src 6:955:47234  \"library SRLib {...\" */ and(/** @src 6:16809:16839  \"module.getStakingModuleSummary\" */ var_module_address, /** @src 6:955:47234  \"library SRLib {...\" */ sub(shl(160, 1), 1)), /** @src 6:16809:16841  \"module.getStakingModuleSummary()\" */ _1, 4, _1, 96)\n                if iszero(_2)\n                {\n                    /// @src 6:955:47234  \"library SRLib {...\"\n                    let pos := mload(64)\n                    returndatacopy(pos, /** @src 6:16809:16841  \"module.getStakingModuleSummary()\" */ 0, /** @src 6:955:47234  \"library SRLib {...\" */ returndatasize())\n                    revert(pos, returndatasize())\n                }\n                /// @src 6:16809:16841  \"module.getStakingModuleSummary()\"\n                let expr_component := 0\n                let expr_component_1 := 0\n                let expr_component_2 := 0\n                if _2\n                {\n                    let _3 := 96\n                    if gt(96, returndatasize()) { _3 := returndatasize() }\n                    finalize_allocation(_1, _3)\n                    /// @src 6:955:47234  \"library SRLib {...\"\n                    if slt(sub(/** @src 6:16809:16841  \"module.getStakingModuleSummary()\" */ add(_1, _3), /** @src 6:955:47234  \"library SRLib {...\" */ _1), /** @src 6:16809:16841  \"module.getStakingModuleSummary()\" */ 96)\n                    /// @src 6:955:47234  \"library SRLib {...\"\n                    {\n                        revert(/** @src 6:16809:16841  \"module.getStakingModuleSummary()\" */ 0, 0)\n                    }\n                    /// @src 6:955:47234  \"library SRLib {...\"\n                    let value := mload(_1)\n                    let value_1 := mload(add(_1, 32))\n                    let value_2 := mload(add(_1, 64))\n                    /// @src 6:16809:16841  \"module.getStakingModuleSummary()\"\n                    expr_component := value\n                    expr_component_1 := value_1\n                    expr_component_2 := value_2\n                }\n                /// @src 6:16802:16841  \"return module.getStakingModuleSummary()\"\n                var_exitedValidators := expr_component\n                var_depositedValidators := expr_component_1\n                var_depositableValidators := expr_component_2\n            }\n            /// @ast-id 640 @src 6:10129:10624  \"function _validateShareParams(uint256 _stakeShareLimit, uint256 _priorityExitShareThreshold) private pure {...\""
+    }
+  ],
+  "remaining": [
+    "Initial free-pointer provenance at each entry",
+    "Complete interleaved allocations/stores including 224-byte config records",
+    "Return-data allocation and decoder-error precedence",
+    "Capacity/return arrays and library argument/return copies",
+    "Compiler instruction-level refinement and gas boundary"
+  ]
+}

@@ -11,6 +11,7 @@ def program (pointer : Word) (layout : Layout) (storage : Storage) (config : Con
     (amount : Word) (isTopUp : Bool) : CallTree.Program ParentOutput := do
   let count := storage (countSlot layout)
   if count.val = 0 then
+    let _ ← CallTree.check (MemoryGuard.check pointer count)
     pure ⟨word 0, [], []⟩
   else
     let demand ← CallTree.check (checkedDiv amount config.maxEBType1)
@@ -24,10 +25,18 @@ theorem successful_prefix (pointer : Word) (layout : Layout) (storage : Storage)
       ParentCalls.program layout storage config amount isTopUp := by
   unfold program ParentCalls.program
   by_cases empty : (storage (countSlot layout)).val = 0
-  · simp [empty]
+  · simp [empty, success, CallTree.check, bind, CallTree.bind]
   · simp only [empty, ↓reduceIte]
     cases divided : checkedDiv amount config.maxEBType1 <;>
       simp [divided, success, CallTree.check, bind, CallTree.bind]
+
+/-- The compiled empty branch allocates two empty arrays before returning. -/
+theorem empty_memory_failure (pointer : Word) (layout : Layout) (storage : Storage)
+    (config : Config) (amount : Word) (isTopUp : Bool) (reason : Failure)
+    (empty : (storage (countSlot layout)).val = 0)
+    (failed : MemoryGuard.check pointer (storage (countSlot layout)) = .error reason) :
+    program pointer layout storage config amount isTopUp = .done (.error reason) := by
+  simp [program, empty, failed, CallTree.check, bind, CallTree.bind]
 
 theorem division_failure (pointer : Word) (layout : Layout) (storage : Storage)
     (config : Config) (amount : Word) (isTopUp : Bool) (reason : Failure)
@@ -73,6 +82,7 @@ theorem successful_prefix_extent (pointer : Word) (layout : Layout) (storage : S
 #print axioms successful_prefix_extent
 
 #print axioms successful_prefix_correspondence
+#print axioms empty_memory_failure
 #print axioms division_failure
 #print axioms memory_failure
 end LidoSRv3.Audit.Source.TrioComposition.AllocationParentCalls
