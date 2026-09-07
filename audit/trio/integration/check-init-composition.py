@@ -66,6 +66,8 @@ try:
     check('LidoSRv3.Audit.Source.TrioComposition.WriterExtent')
     check('LidoSRv3.Audit.Source.TrioAlloc2.ParentValues')
     check('LidoSRv3.Audit.Source.TrioAlloc1.AdmissionWriter')
+    check('LidoSRv3.Audit.Source.TrioAlloc1.AdmissionFacts')
+    check('audit.trio.alloc2.composition.ParentErrors')
     check('audit.trio.integration.IndexedParentBridge')
     receipt['classification'] = 'PASS_INIT_ONLY_COMPOSITION'
 finally:

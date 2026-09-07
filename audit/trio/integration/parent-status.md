@@ -280,3 +280,26 @@ stopped at the stale canonical validation-receipt tree. Its recorded scope
 predates the guarded parent and does not establish a twelve-case comparison.
 The canonical tree binding must be refreshed after staging each complete
 integration checkpoint; refreshing that binding does not certify the new code.
+
+
+## Published writer integration at 2026-09-07 14:43 UTC
+
+Integrated ALLOC-1 `56787713`, ALLOC-2 `5b40ce1d`, and RESERVE-1
+`a102dae0`. The readonly checkpoint found each local HEAD equal to its remote
+branch, but ALLOC-1 had an unpublished `RecordInvariant.lean` and RESERVE-1
+had unpublished `ACL.lean` and receipts. This is not an all-work-pushed checkpoint.
+
+ALLOC-1 now proves public admission preserves the physical producer invariant
+under explicit lifecycle-record and finite storage-separation obligations.
+ALLOC-2 characterizes exact conversion success/arithmetic failure and supplies
+actual enclosing Solidity rollback cases plus six source mutants. RESERVE-1
+adds physical sequence refinement and concrete Aragon/Kernel permission
+forwarding. Those component results retain their documented assumptions and
+are not final-head independent certification.
+
+The combined Init-only check passes 73 modules including `AdmissionFacts` and
+`ParentErrors`; `writer-admission-parent-init-receipt.json` binds every checked
+source hash. The full remote target now also includes staged `ParentErrors`.
+The canonical metadata, proof-escape, source-annotation, import-DAG and Python
+quality checks passed on the combined source. Full remote validation of this
+integration remains required, including the new response-memory VM cases.
