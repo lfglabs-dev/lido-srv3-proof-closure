@@ -79,3 +79,10 @@ pins producer8269ac and has its own receipts; it is not silently integrated here
 Infrastructure diagnostics and measured estimates are recorded in `reproduce.md`
 and `receipts/remote-admission-sizing.json`. The full build uses 5 GiB; the measured
 small Verity vector closure uses 2 GiB. The emergency disk floor is unchanged.
+
+Latest owned closure: remote job a80e40c0-3f5d-40a4-9c02-1cccf8a8f635
+passed 46 jobs at fcfa841970ef7dc690083f59c58b30a722185039, inspected eleven
+critical theorems (only propext, Classical.choice, Quot.sound), and reran all twelve
+Verity fixtures. The independently executed Solidity comparison passed again.
+Receipts: verity-trust-fcfa841.json and solidity-verity-fcfa841.json. This closure
+receipt does not replace current-head full-suite validation.
