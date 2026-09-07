@@ -42,3 +42,14 @@ checks pass. Proof-escape, import layering, annotations and metadata checks pass
 UX2 artifacts were regenerated after the new declarations. This does not complete
 bytecode/source fidelity, parent callbacks/rollback, Verity differentials or full
 validation. The three remote writer heads remained unchanged when rechecked.
+
+## Public wrapper and row-bound integration
+
+Local integration now includes ALLOC-2 successor `4dce12b7`, the public allocation
+wrapper, independent per-row Ether conversion equations, and the universal
+successful-return Ether bound. `ParentComposition.lean` discharges the conversion
+length/subtraction premises from real producer/consumer outcomes. The bounded
+check covers 32 Init-only modules and 16 executed memory/parent cases. See
+`parent-status.md` for exact remaining obligations. UX2 passed on `b5dff873`;
+newer source heads require their own gate. No full or independent certification
+has been claimed, and the original final-delivery scope remains open.

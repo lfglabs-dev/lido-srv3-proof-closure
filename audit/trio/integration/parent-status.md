@@ -33,10 +33,24 @@ They execute the Lean source model, not Solidity or Verity Contract.run. Test
 layout hashes are instrumentation, not actual keccak evidence.
 
 Still required: full public-wrapper all-outcome independent correspondence;
-discharge component lengths and subtraction premises using producer/consumer
-results; exact delegated library call and ABI return/revert bytes; concrete
+exact delegated library call and ABI return/revert bytes; concrete
 allocation/copy/mutation and panic precedence; caller/deployment binding;
 state/balance/event frames and recursive callback interpretation; actual Verity
 differential execution; registered-parent mutants; full gates and independent
 certification. The existing byte-memory bridge is a representation theorem, not
 compiler-memory execution evidence. No canonical guarantee is upgraded.
+
+## Composition with ALLOC-2 row bounds
+
+ALLOC-2 `4dce12b799ae9950901a680b4ac976210f786929` is integrated locally.
+`ParentComposition.lean` discharges the conversion length premises using actual
+producer storage-count correspondence and actual consumer length preservation.
+It also derives success of the exact `TrioAlloc1.checkedSub` called by the parent
+from the new consumer row bound. Later Ether products remain checked operations,
+with executed overflow tests; their success is not assumed or asserted globally.
+
+The 32-module Init-only closure passes, including all 16 memory/parent execution
+checks. `parent-composition-init-receipt.json` records the checked file hashes.
+Metadata, proof-escape and import-DAG checks pass. The UX2 regression also passed
+on the previous committed memory-composition head `b5dff873`; that result is not
+a gate for subsequent parent or row-bound changes.
