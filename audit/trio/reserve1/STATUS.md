@@ -15,7 +15,10 @@ bounded exact round trips, and actual `decodeWord` results for the first and
 second 32-byte words with arbitrary trailing bytes. This closes the arithmetic
 byte-conversion lemma, not full deployment or caller/callee composition.
 `LiveTrust` inspects these new theorems. The immutable component checker now
-contains 27 modules; terminal evidence will identify the checked source SHA.
+contains 27 modules, all exit 0 at `1a56fc36b89d4acb0368471639f5d89648e8864f`.
+`receipts/admission-summary.json` links the terminal component, six baseline and
+import-DAG checks (all 0), dependency/wrapper identity, and proof-only source delta.
+Axiom inspection reports only propext, Classical.choice and Quot.sound.
 Historical 49-case/seven-mutant execution below belongs to source `0fde648`;
 this proof-only continuation does not relabel it as current-head execution.
 

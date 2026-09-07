@@ -1,0 +1,12 @@
+LidoSRv3/Audit/Source/TrioReserve1/ABI.lean:22:33: error(lean.unknownIdentifier): Unknown constant `Nat.div_div`
+LidoSRv3/Audit/Source/TrioReserve1/ABI.lean:18:2: error: unsolved goals
+case e_a
+size n i : Nat
+hi : i ∈ List.range size
+hi' : i < size
+he : size + 1 - 1 - i = size - 1 - i + 1
+⊢ UInt8.ofNat (n / (256 * 256 ^ (size - 1 - i)) % 256) = UInt8.ofNat (n / 256 / 256 ^ (size - 1 - i) % 256)
+LidoSRv3/Audit/Source/TrioReserve1/ABI.lean:33:9: error: unsolved goals
+case zero
+n : Nat
+⊢ 0 = n % 1

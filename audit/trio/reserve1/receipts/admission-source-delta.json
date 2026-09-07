@@ -1,0 +1,12 @@
+{
+  "historical_execution_source": "0fde6481707ba16f63ff324547bc2761e1d7b136",
+  "current_source": "1a56fc36b89d4acb0368471639f5d89648e8864f",
+  "changed_implementation_paths": [
+    "LidoSRv3/Audit/Source/TrioReserve1/ABI.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/Admission.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/AdmissionSpec.lean",
+    "LidoSRv3/Tests/TrioReserve1/LiveTrust.lean"
+  ],
+  "runtime_source_unchanged": true,
+  "scope": "Git source comparison only; 49-case runtime receipt remains attributed to its historical source, not rerun at current HEAD"
+}
