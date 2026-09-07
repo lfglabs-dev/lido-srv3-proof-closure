@@ -1,0 +1,6 @@
+LidoSRv3/Tests/TrioReserve1/ACLDifferential.lean:73:2: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Decidable
+    ((ACL.hasPermission k staticExternal selfACL ctx Aragon.bufferReserveManagerRole [] w 64).outcome =
+      Except.error ACL.Halt.exhausted)
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.

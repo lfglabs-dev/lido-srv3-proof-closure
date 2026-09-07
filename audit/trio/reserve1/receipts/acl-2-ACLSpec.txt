@@ -1,0 +1,4 @@
+LidoSRv3/Audit/Source/TrioReserve1/ACLSpec.lean:16:67: error: failed to synthesize
+  Decidable (Grants false false false false false)
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.

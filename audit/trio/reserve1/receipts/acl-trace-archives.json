@@ -1,0 +1,20 @@
+[
+  {
+    "original": "audit/trio/reserve1/receipts/acl-draft-execution-1/traces.json",
+    "original_bytes": 135989243,
+    "original_sha256": "a1e26343b5aba56ad37d8ad0e006f9ab35ef1bcb9deecced9ab77771f9d69f0e",
+    "archive": "audit/trio/reserve1/receipts/acl-draft-execution-1/traces.json.gz",
+    "archive_bytes": 1739618,
+    "archive_sha256": "573ac8dfe386ee3c9664791a39223a73df7f56d57935fdc61e07b581a92b293d",
+    "decompressed_sha256_verified": true
+  },
+  {
+    "original": "audit/trio/reserve1/receipts/acl-execution-c5858d1f0af9e2132982cce5067f4eceed42857c/traces.json",
+    "original_bytes": 135989243,
+    "original_sha256": "11b79a2b01084c9cb88a225236b1ddfe658e1a040e81f05c7ee8de6320d6235d",
+    "archive": "audit/trio/reserve1/receipts/acl-execution-c5858d1f0af9e2132982cce5067f4eceed42857c/traces.json.gz",
+    "archive_bytes": 1740011,
+    "archive_sha256": "3a77998836cec2afad6c541f5c4bf21469f9d791236cb20f2bc2736d008a6c1c",
+    "decompressed_sha256_verified": true
+  }
+]

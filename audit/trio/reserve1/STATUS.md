@@ -19,10 +19,15 @@ composes a terminating source ACL evaluation through Kernel and Aragon; its
 unconditional-specific theorem derives admission solely from physical/configuration
 conditions, without a supplied ACL or kernel reply.
 
-28 draft comparisons against actual inherited ACL/Kernel/Aragon/Lido code pass,
-including physical layout, logic short-circuiting, wildcard oracle arguments,
-malformed oracle replies, static writes and invalid enum values. Exact immutable
-component/compiler/runtime receipts follow the source commit. This does not
+At `c5858d1f0af9e2132982cce5067f4eceed42857c`, 28 fresh comparisons against
+actual inherited ACL/Kernel/Aragon/Lido code pass, including physical layout,
+logic short-circuiting, wildcard oracle arguments, malformed oracle replies,
+static writes and invalid enum values. Six selected Lean checks, seven baseline/
+import checks and pinned ACL compilation pass. The other 42 modules' source and
+olean hashes match prior receipts; inspected axioms are standard.
+`receipts/acl-summary.json` links exact component/compiler/toolchain/runtime
+receipts. Large traces are losslessly archived with verified decompressed hashes;
+draft failures and the earlier draft execution remain preserved. This does not
 close ACL mutation admission, proxy/deployment/primitive binding, recursive
 callback interpretation, all writer sequences or the exhaustive parent relation.
 
@@ -37,9 +42,9 @@ and deeper trace depths. Callee world effects remain explicit.
 
 `aragon_from_acl` and `target_from_acl` compose that source behavior through the
 Lido role decoder and external target writer. The kernel response is derived;
-ACL evaluation remains the explicit boundary. This is specialized to the complete
-argument tuple sent by Lido._auth, with other calls delegated. Concrete ACL
-permission rows, parameter logic and oracle recursion still require implementation.
+ACL evaluation is an explicit interpreter boundary in this component, now filled
+by ACLCalls for the source path above. The dispatcher is specialized to the complete
+argument tuple sent by Lido._auth, with other calls delegated.
 At `4917545c7aad3093bfdd6ddfa1dda4ff2cae2618`, ten fresh pinned
 Kernel/Aragon/Lido comparisons pass, checking the physical mapping against
 Kernel.acl(), final storage/events and direct/nested targets, values, payloads,
@@ -65,8 +70,9 @@ are not silently discarded. `AragonSpec` independently describes the prefix.
 Ten comparisons against pinned inherited Lido/Aragon bytecode match, covering
 all these cases plus noncanonical nonzero bool and trailing return bytes. The
 executed call opcode is CALL. Kernel replies are explicit boundary fixtures;
-this does not implement Kernel.hasPermission, ACL permission evaluation or its
-oracle recursion. Full ACL and callback binding remain required.
+these historical ten cases do not cover Kernel/ACL source evaluation. The new
+ACLCalls composition and 28-case suite above supply that implementation coverage;
+parameter-tree/resource, deployment and callback correspondence remain required.
 
 At `5ff24074eb374d5b79287991ece3e5206da95bfc`, all four selected Lean checks,
 all seven baseline/import checks and the fresh ten-case execution pass. The other
