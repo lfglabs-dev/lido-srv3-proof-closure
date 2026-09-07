@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Source.TrioAlloc1.ShareWriter
+import LidoSRv3.Audit.Source.TrioAlloc1.ParameterWriter
 
 /-!
 Physical enumeration invariants and their preservation by the public share writer.
@@ -77,6 +78,46 @@ theorem share_writer_preserves (l : Layout) (s : Storage) (input : ShareWriter.I
     have right := identity_preserved l s input j (idsSeparate j hj)
     rw [left, right] at equal
     exact unique i j hi hj equal
+
+structure ParameterSeparation (l : Layout) (s : Storage) (input : ParameterWriter.Input) : Prop where
+  count_config : countSlot l ≠ moduleSlot l input.moduleId
+  count_deposit : countSlot l ≠ word ((moduleSlot l input.moduleId).val+1)
+  id_config : ∀ i, i < (s (countSlot l)).val → idSlot l i ≠ moduleSlot l input.moduleId
+  id_deposit : ∀ i, i < (s (countSlot l)).val →
+    idSlot l i ≠ word ((moduleSlot l input.moduleId).val+1)
+  row_deposit : ∀ i, i < (s (countSlot l)).val →
+    moduleSlot l (s (idSlot l i)) ≠ word ((moduleSlot l input.moduleId).val+1)
+
+theorem parameter_helper_preserves (l : Layout) (s : Storage) (input : ParameterWriter.Input)
+    (before : Holds l s) (separate : ParameterSeparation l s input) :
+    Holds l (ParameterWriter.executeHelper l s input).storage := by
+  have count := ParameterWriter.helper_other_slot l s input (countSlot l)
+    separate.count_config separate.count_deposit
+  rcases before with ⟨bound, shares, unique⟩
+  refine ⟨?_, ?_, ?_⟩
+  · simpa only [count] using bound
+  · intro i hi
+    rw [count] at hi
+    exact ParameterWriter.helper_row_share_bound l s input i (separate.id_config i hi)
+      (separate.id_deposit i hi) (separate.row_deposit i hi) (shares i hi)
+  · intro i j hi hj equal
+    rw [count] at hi hj
+    have left := ParameterWriter.helper_identity l s input i (separate.id_config i hi)
+      (separate.id_deposit i hi) (separate.row_deposit i hi)
+    have right := ParameterWriter.helper_identity l s input j (separate.id_config j hj)
+      (separate.id_deposit j hj) (separate.row_deposit j hj)
+    rw [left, right] at equal
+    exact unique i j hi hj equal
+
+theorem parameter_writer_preserves (l : Layout) (s : Storage) (input : ParameterWriter.Input)
+    (before : Holds l s) (separate : ParameterSeparation l s input) :
+    Holds l (ParameterWriter.execute l s input).storage := by
+  unfold ParameterWriter.execute
+  split
+  · exact before
+  · split
+    · exact before
+    · exact parameter_helper_preserves l s input before separate
 
 end WriterInvariant
 end LidoSRv3.Audit.Source.TrioAlloc1

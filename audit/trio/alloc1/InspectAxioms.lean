@@ -18,6 +18,9 @@ import LidoSRv3.Tests.TrioAlloc1.Correspondence
 #print axioms LidoSRv3.Audit.Source.TrioAlloc1.ShareWriter.execute_revert_restores
 #print axioms LidoSRv3.Audit.Source.TrioAlloc1.ShareWriter.execute_stored_share_bound
 #print axioms LidoSRv3.Audit.Source.TrioAlloc1.WriterInvariant.share_writer_preserves
+#print axioms LidoSRv3.Audit.Source.TrioAlloc1.WriterInvariant.parameter_writer_preserves
+#print axioms LidoSRv3.Audit.Source.TrioAlloc1.ParameterWriter.helper_stored_share_bound
+#print axioms LidoSRv3.Audit.Source.TrioAlloc1.ParameterWriter.execute_revert_restores
 #print axioms LidoSRv3.Audit.Source.TrioAlloc1.AdmissionChecks.check_success
 #print axioms LidoSRv3.Audit.Source.TrioAlloc1.AdmissionChecks.nextId_success
 #print axioms LidoSRv3.Audit.Source.TrioAlloc1.EnumerationWriter.insertion_preserves_consistency

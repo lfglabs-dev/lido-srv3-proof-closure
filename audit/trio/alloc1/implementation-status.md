@@ -25,7 +25,11 @@ count truncation or assumed callee success is introduced.
 - `ShareWriter`: public role/membership/guard order, packed update, derived stored
   share bound, other-slot preservation, and rejection snapshot restoration.
 - `WriterInvariant`: empty-state count/share/address invariant and preservation
-  through the public share writer, with finite slot separation explicit.
+  through the public share and parameter writers, with finite slot separation explicit.
+- `ParameterWriter`: full public role/membership order and helper validation,
+  forward fee-consistency scan with enum checks, checked fee-sum precedence,
+  packed configuration/deposit writes, four event encodings, derived stored share
+  bound, identity preservation, and rejected-snapshot restoration.
 - `AdmissionChecks`: physical role and ordered admission guards, address freshness
   derived from the complete duplicate scan, count below 32 on success, and checked
   uint24 last-ID increment. This is the prefix before admission writes.
@@ -38,7 +42,7 @@ count truncation or assumed callee success is introduced.
   monotonicity/limit on success, and a bounded allocation lemma. Integration of
   these primitives into the entire compiler execution remains open.
 
-Twenty Init-only modules are included in the fresh light validation driver.
+Twenty-one Init-only modules are included in the fresh light validation driver.
 The full production/test/audit-trust/legacy build passed 1,505 jobs at
 `8269ac576cf119975a7e9954459cd4aa04d5cd82`, remote job
 `3ca9d1e4-e496-43f7-87f2-a5925a9bd083` on nippur. This is **STALE_SUCCESS** for
@@ -64,6 +68,9 @@ Pinned solc 0.8.25 via-IR/optimizer-200 Shanghai execution also checked:
   every attempted slot is compared before/after the reverted transaction and is
   restored, with no committed events. Includes uint24 last-ID overflow, fee-sum
   arithmetic panic, and duplicate/credential/count/name/role precedence.
+- Public parameter update: seven exact rejection-order cases (all before writes)
+  and a successful two-word update preserving reserved/address/deposit-time bits,
+  with all four event topics/data checked (`parameters.json`).
 - Nested read callback and rejected mutation CALL under static context: expected
   three call sites, unchanged module storage, no events (`callback.json`).
 - Actual compiler storage layout and two executed parent-shaped mutants, plus
@@ -101,9 +108,9 @@ Infrastructure diagnostics and measured estimates are recorded in `reproduce.md`
 and `receipts/remote-admission-sizing.json`. The full build uses 5 GiB; the measured
 small Verity vector closure uses 2 GiB. The emergency disk floor is unchanged.
 
-Latest owned closure: remote job a80e40c0-3f5d-40a4-9c02-1cccf8a8f635
-passed 46 jobs at fcfa841970ef7dc690083f59c58b30a722185039, inspected eleven
+Latest completed owned closure: remote job f31a614d-2f15-468e-866f-82865148a96a
+passed 49 jobs at 4aa9557e288b5ca0d6c4e4c41caffbcd213bdffd, inspected fifteen
 critical theorems (only propext, Classical.choice, Quot.sound), and reran all twelve
 Verity fixtures. The independently executed Solidity comparison passed again.
-Receipts: verity-trust-fcfa841.json and solidity-verity-fcfa841.json. This closure
-receipt does not replace current-head full-suite validation.
+Receipts: verity-trust-4aa9557.json and solidity-verity-4aa9557.json. This closure
+does not yet include ParameterWriter and does not replace current-head full-suite validation.
