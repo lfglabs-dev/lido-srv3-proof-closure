@@ -179,3 +179,75 @@ reply decoding rules. `ReportRules.corresponds`/`complete` substitute both throu
 the report parent, conditional stages and accounting; the expanded predicate has
 no source stage executor or source CALL. The explicit raw external interpreter
 still requires concrete deployed vault/queue/callback and resource binding.
+
+## Vault and callback source models
+
+- `Vaults.rewards`: LidoExecutionLayerRewardsVault.sol:85-95, immutable LIDO
+  authorization, current balance cap, positive-only callback and uint256 result.
+- `Vaults.withdrawals`: WithdrawalVault.sol:107-122, NotLido/ZeroAmount/NotEnoughEther
+  guards and exact value callback. Dispatch preserves nonpayability and minimum
+  one-word calldata length while accepting trailing bytes.
+- `VaultCallbacks`: Lido.sol:517-533, fresh vault address lookups, payable callback
+  admission, checked cumulative reward write and callback events.
+- `ReplyABI`: Error(string)/custom/bubbled bytes and ordered nested trace conversion.
+  `VaultCases`: nine composed model executions; real vault/callback bytecode
+  correspondence and independent callee specification remain open. Selector
+  provenance is in receipts/vault-source-selectors.json.
+
+## Production vault runtime comparison
+
+`compile-vaults.cjs` compiles the two unmodified pinned 0.8.9 vault entries and
+retains every resolved import hash, compiler/settings and artifact hashes in a
+new evidence directory. `execute-vaults.cjs` deploys them with explicit immutable
+constructor arguments alongside the unchanged inherited Lido artifact. Runtime
+code and constructor bindings are recorded. `VaultDifferential` runs the composed
+Report/Vaults/VaultCallbacks model on the same twelve inputs. Comparison includes
+raw failure bytes, nested CALL data/value/result, state, four balances and events.
+The locator and finalization receiver remain CallFixture boundaries. Evidence:
+receipts/vault-execution-summary.json. No all-path or proxy/resource claim follows.
+
+## Independent vault correspondence
+
+`VaultSpec.Capped` is the greatest quantity bounded by observed balance and caller
+maximum. Independent Rewards/Withdrawals relations specify source guard order,
+callback skipping and every callback outcome for the pinned vault bodies mapped
+above. `VaultRules` substitutes CallFlow.Describes, proving bidirectional body and
+root outcome/world/attempt correspondence plus existence. `VaultSpec.Root` gives
+success commit and original-world failure restoration independently of executors.
+The raw callback interpreter and dispatch/deployment binding remain boundaries.
+Evidence: receipts/vault-rules-summary.json; unchanged runtime sources retain their
+twelve production-vault comparisons without a new EVM execution claim.
+
+## Independent Lido callback correspondence
+
+`CallbackSpec.Receives` gives fresh lookup, address admission and update ordering;
+`RewardUpdate` gives post-lookup checked addition and write/event commitment.
+`CallbackRules` binds these to Lido.sol:517-533 with physical locator, independent
+CALL and typed reply rules. Body and root correspondences and existence cover both
+callbacks. Counter/commit lemmas retain the full bounded sum and explicit core/
+balance preservation. Entry dispatch/reply encoding and enclosing report composition
+remain open. Evidence: receipts/callback-rules-summary.json; existing runtime suite
+sources remain unchanged, with no new execution run claimed.
+
+## Entry selection and replies
+
+`EntrySpec.Dispatch` specifies ordered target/selector matches, shared admission,
+invalid replies and fallback. `EntrySpec.Returns` derives successful/rejected replies
+from complete transaction observations. `EntryRules` proves exact correspondence
+and completeness for Vaults.dispatch and VaultCallbacks.dispatch using the prior
+independent body/root specifications. These source-level dispatchers map the pinned
+vault one-word entries and Lido no-argument payable callback entries; ABI helper
+correctness and deployed compiler dispatch coverage remain explicit obligations.
+See receipts/entry-rules-summary.json. No new runtime execution is claimed.
+
+## Composed independent callee/report relation
+
+`CalleeRules.Calls` uses independent code/funds/provisional-transfer/response rules
+with a callee reply witness only on invoked paths. `ReportVaults.CallbackReplies`
+uses independent callback entry rules; RewardBody/WithdrawalBody substitute those
+through their CALL observations. VaultReplies then supplies independent vault entry
+observations to every enclosing report CALL/lookup/optional stage. Correspondence,
+completeness and failure restoration cover the full composed report. The modified
+VaultDifferential uses that exact interpreter, with twelve fresh runtime comparisons
+in receipts/report-vaults-summary.json. Delegated locator/queue services and raw
+primitive/deployment/codec/resource obligations are not discharged by this step.

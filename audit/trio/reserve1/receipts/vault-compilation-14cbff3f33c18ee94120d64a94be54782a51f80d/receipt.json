@@ -1,0 +1,85 @@
+{
+  "source_commit": "14cbff3f33c18ee94120d64a94be54782a51f80d",
+  "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "utc": "2026-09-07T18:09:57.186Z",
+  "node": "v22.15.0",
+  "node_sha256": "c43f3f73f6917481d2364daf7b7bf8c4fc4a7643580b4626f13f003131ec8716",
+  "compiler": "0.8.9+commit.e5eed63a.Emscripten.clang",
+  "compiler_sha256": "5b25f987aae32a0275fdc6c1be36cc47cf126024a04dafd8e4be39a1d1d1422c",
+  "runner_sha256": "cbe0e84aa0469547d081ba6c8ffe132d3ca53fc00c075ac26e8f71ca0beb6273",
+  "settings": {
+    "optimizer": {
+      "enabled": true,
+      "runs": 200
+    },
+    "evmVersion": "istanbul",
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode.object",
+          "evm.deployedBytecode.object",
+          "evm.deployedBytecode.immutableReferences",
+          "storageLayout"
+        ]
+      }
+    }
+  },
+  "sources": {
+    "contracts/0.8.9/LidoExecutionLayerRewardsVault.sol": {
+      "sha256": "d538fc1c2ed79c26bdc7d23e2cd7d5b8cf833436d993540c975ef6de1b078665",
+      "resolved_path": "lido-core/contracts/0.8.9/LidoExecutionLayerRewardsVault.sol"
+    },
+    "contracts/0.8.9/WithdrawalVault.sol": {
+      "sha256": "0d13d6a75d690541a7cc2eb399a96dd87bfd908ae0411c80d93bd056d985d298",
+      "resolved_path": "lido-core/contracts/0.8.9/WithdrawalVault.sol"
+    },
+    "@openzeppelin/contracts-v4.4/token/ERC20/IERC20.sol": {
+      "sha256": "6eacf8ca56b41b7636489c0996d8f9608b4d298879a1fd5d876f21ad7a6711f1",
+      "resolved_path": "solidity/trio-reserve1/node_modules/@openzeppelin/contracts-v4.4/token/ERC20/IERC20.sol"
+    },
+    "@openzeppelin/contracts-v4.4/token/ERC721/IERC721.sol": {
+      "sha256": "a88e8e63c7a737436f7ec62542620609ab07bb9a772e77146ed4dc98539e03d3",
+      "resolved_path": "solidity/trio-reserve1/node_modules/@openzeppelin/contracts-v4.4/token/ERC721/IERC721.sol"
+    },
+    "@openzeppelin/contracts-v4.4/token/ERC20/utils/SafeERC20.sol": {
+      "sha256": "b5a1340c5232f387b15592574f27eef78f6017bdc66542a1cea512ad4f78a0d2",
+      "resolved_path": "solidity/trio-reserve1/node_modules/@openzeppelin/contracts-v4.4/token/ERC20/utils/SafeERC20.sol"
+    },
+    "contracts/0.8.9/utils/Versioned.sol": {
+      "sha256": "7f9ba0a2368d7531447a80e80ae28406964acf51ca0de8bfa985620e226340a8",
+      "resolved_path": "lido-core/contracts/0.8.9/utils/Versioned.sol"
+    },
+    "contracts/0.8.9/WithdrawalVaultEIP7685.sol": {
+      "sha256": "e7dad85a284b7c07038bff8e936fb677a79b1fa9d2e8b9d628d3a107d9b79489",
+      "resolved_path": "lido-core/contracts/0.8.9/WithdrawalVaultEIP7685.sol"
+    },
+    "@openzeppelin/contracts-v4.4/utils/Address.sol": {
+      "sha256": "0228dd7c0a0d1342b88eab6e5a4a07ae4350818ba1650be0a374064b02218f37",
+      "resolved_path": "solidity/trio-reserve1/node_modules/@openzeppelin/contracts-v4.4/utils/Address.sol"
+    },
+    "@openzeppelin/contracts-v4.4/utils/introspection/IERC165.sol": {
+      "sha256": "701e025d13ec6be09ae892eb029cd83b3064325801d73654847a5fb11c58b1e5",
+      "resolved_path": "solidity/trio-reserve1/node_modules/@openzeppelin/contracts-v4.4/utils/introspection/IERC165.sol"
+    },
+    "contracts/0.8.9/lib/UnstructuredStorage.sol": {
+      "sha256": "955bfcb0bf265db114248bdabeabebc39bddb3fbb756e2448f6aed59f1994f56",
+      "resolved_path": "lido-core/contracts/0.8.9/lib/UnstructuredStorage.sol"
+    }
+  },
+  "artifacts": {
+    "LidoExecutionLayerRewardsVault": {
+      "file": "LidoExecutionLayerRewardsVault.json",
+      "sha256": "1dd705369e7f939f099f2600a1eac6dee2fc7a45499e053ff3dcf23791cfd178",
+      "entry": "contracts/0.8.9/LidoExecutionLayerRewardsVault.sol"
+    },
+    "WithdrawalVault": {
+      "file": "WithdrawalVault.json",
+      "sha256": "590571212fa09ee566d3691ef0185580ba82470a7c3ba4e03e19035701f5c189",
+      "entry": "contracts/0.8.9/WithdrawalVault.sol"
+    }
+  },
+  "errors": [],
+  "output_sha256": "26abe433fb04ada6e118defc125b6aab2e84eca082705fa2d96dd665a357d08c",
+  "scope": "Unmodified pinned vault compilation; no deployment, execution or Lean correspondence claim"
+}

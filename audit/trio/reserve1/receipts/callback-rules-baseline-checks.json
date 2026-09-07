@@ -1,0 +1,70 @@
+{
+  "source_commit": "e9003a9918662bab8f65228ddd4909120267da66",
+  "time": "2026-09-07T18:24:17.189005+00:00",
+  "checks": [
+    {
+      "argv": [
+        "python3",
+        "scripts/check_proof_escapes.py"
+      ],
+      "exit": 0,
+      "log": "callback-rules-check_proof_escapes.txt",
+      "log_sha256": "76fef248594ba6b04a69d0611644021eaeeb02d180bdaa26b9c4d6a882804bbe"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/check_source_annotations.py"
+      ],
+      "exit": 0,
+      "log": "callback-rules-check_source_annotations.txt",
+      "log_sha256": "640f8483c008828de9b394f9466e2dfb7da19cbb01559580dedac05f38a7c829"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/check_report_theorem_inventory.py"
+      ],
+      "exit": 0,
+      "log": "callback-rules-check_report_theorem_inventory.txt",
+      "log_sha256": "24496dab715f87ca62d387da3938cf4794d4a3b2790fdd904c31112f394f5858"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/check_verity_provenance.py"
+      ],
+      "exit": 0,
+      "log": "callback-rules-check_verity_provenance.txt",
+      "log_sha256": "aea2cb071c02ac6bdfa43b976fe9edcf4af79ffd59be32bdafdc08b6085e50a6"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/check_pinned_source.py"
+      ],
+      "exit": 0,
+      "log": "callback-rules-check_pinned_source.txt",
+      "log_sha256": "369bc8aa26e9e6570f021932aa3a8743323a599a22d508f75399975376f35f97"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/audit_metadata.py",
+        "check"
+      ],
+      "exit": 0,
+      "log": "callback-rules-audit_metadata.txt",
+      "log_sha256": "36235c9e5d4b905de075f273253bf4fef1b64715c32a42a6d15310a62e5a1254"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/check_import_dag.py"
+      ],
+      "exit": 0,
+      "log": "callback-rules-check_import_dag.txt",
+      "log_sha256": "45c3eaadcb1b9c3c68618893e3f1c2bd725c9ce8e7515e59d638783a5f561a63"
+    }
+  ]
+}

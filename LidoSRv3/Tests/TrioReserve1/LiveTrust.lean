@@ -1,3 +1,8 @@
+import LidoSRv3.Audit.Source.TrioReserve1.ReportVaults
+import LidoSRv3.Audit.Source.TrioReserve1.EntryRules
+import LidoSRv3.Audit.Source.TrioReserve1.CallbackRules
+import LidoSRv3.Audit.Source.TrioReserve1.VaultRules
+import LidoSRv3.Audit.Source.TrioReserve1.Vaults
 import LidoSRv3.Audit.Source.TrioReserve1.ReportRules
 import LidoSRv3.Audit.Source.TrioReserve1.ReportCalls
 import LidoSRv3.Audit.Source.TrioReserve1.ReportParent
@@ -442,3 +447,49 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms ReportRules.complete
 #print axioms ReportRules.failure_restores
 #print axioms ReportRules.success_active
+
+#print axioms Vaults.reward_amount_bound
+
+#print axioms VaultSpec.capped_iff
+#print axioms VaultSpec.root_failure_restores
+#print axioms VaultRules.call_observations
+#print axioms VaultRules.rewards_of_spec
+#print axioms VaultRules.withdrawals_of_spec
+#print axioms VaultRules.rewards_exists
+#print axioms VaultRules.withdrawals_exists
+#print axioms VaultRules.rewards_corresponds
+#print axioms VaultRules.withdrawals_corresponds
+#print axioms VaultRules.root_corresponds
+#print axioms VaultRules.rewards_root_corresponds
+#print axioms VaultRules.withdrawals_root_corresponds
+
+#print axioms CallbackRules.lookup_observations
+#print axioms CallbackRules.rewards_of_spec
+#print axioms CallbackRules.withdrawals_of_spec
+#print axioms CallbackRules.rewards_exists
+#print axioms CallbackRules.withdrawals_exists
+#print axioms CallbackRules.rewards_corresponds
+#print axioms CallbackRules.withdrawals_corresponds
+#print axioms CallbackRules.rewards_root_corresponds
+#print axioms CallbackRules.withdrawals_root_corresponds
+#print axioms CallbackRules.reward_commit_total
+#print axioms CallbackRules.reward_commit_balances
+#print axioms CallbackRules.withdrawal_commit_core
+#print axioms CallbackRules.withdrawal_commit_balances
+
+#print axioms EntryRules.returns_corresponds
+#print axioms EntryRules.dispatch_corresponds
+#print axioms EntryRules.callbacks_corresponds
+#print axioms EntryRules.vaults_corresponds
+#print axioms EntryRules.callbacks_complete
+#print axioms EntryRules.vaults_complete
+
+#print axioms CalleeRules.calls_observations
+#print axioms CalleeRules.selector_observations
+#print axioms ReportVaults.callback_observations
+#print axioms ReportVaults.reward_observations
+#print axioms ReportVaults.withdrawal_observations
+#print axioms ReportVaults.vault_observations
+#print axioms ReportVaults.corresponds
+#print axioms ReportVaults.complete
+#print axioms ReportVaults.failure_restores

@@ -1,0 +1,40 @@
+LidoSRv3/Audit/Source/TrioReserve1/CalleeRules.lean:23:105: error: unsolved goals
+replies : Replies
+external : External
+hr : ∀ (req : Request) (w : World) (reply : Reply), replies req w reply ↔ external req w = reply
+ctx : Context
+target : Address
+payload : Bytes
+value : Word
+before : World
+outcome : Except Fault Bytes
+after : World
+trace : List Attempt
+⊢ CallSpec.Invokes Fault.empty Fault.bubbled []
+      (fun accepted data nested =>
+        { request := { caller := ctx.self, target := target, value := value, payload := payload }, accepted := accepted,
+          returned := data, nested := nested })
+      (before.core.codeSize target.val).val (before.balances ctx.self) value.val before
+      (transfer before ctx.self target value.val)
+      (fun w accepted data after children =>
+        ∃ reply,
+          external { caller := ctx.self, target := target, value := value, payload := payload } w = reply ∧
+            CallFlow.ReplyDescribes reply w accepted data after children)
+      outcome after trace =
+    CallSpec.Invokes Fault.empty Fault.bubbled []
+      (fun accepted data nested =>
+        { request := { caller := ctx.self, target := target, value := value, payload := payload }, accepted := accepted,
+          returned := data, nested := nested })
+      (before.core.codeSize target.val).val (before.balances ctx.self) value.val before
+      (transfer before ctx.self target value.val)
+      (fun w =>
+        CallFlow.ReplyDescribes
+          (external { caller := ctx.self, target := target, value := value, payload := payload } w) w)
+      outcome after trace
+LidoSRv3/Audit/Source/TrioReserve1/CalleeRules.lean:26:17: warning: This simp argument is unused:
+  exists_eq_right
+
+Hint: Omit it from the simp argument list.
+  simp only [hr,̵ ̵e̵x̵i̵s̵t̵s̵_̵e̵q̵_̵r̵i̵g̵h̵t̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

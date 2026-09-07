@@ -1,0 +1,260 @@
+LidoSRv3/Audit/Source/TrioReserve1/EntryRules.lean:90:127: error: unsolved goals
+case pos
+external : External
+rewardVault withdrawalVault lido : Address
+other : External
+req : Request
+before : World
+reply : Reply
+hf : withdrawalVault = rewardVault ∧ encode 4 831804042 = encode 4 2470627572
+hs : req.target = rewardVault ∧ List.take 4 req.payload = encode 4 2470627572
+hv : req.value.val = 0 ∧ 36 ≤ List.length req.payload
+⊢ ReplyABI.reply (fun value => encode 32 value.val)
+        (Vaults.rewards external { self := rewardVault, sender := req.caller } lido
+          (word (decode (List.take 32 (List.drop 4 req.payload)))))
+        before =
+      reply ↔
+    (if List.length req.payload < 36 then Reply.rejected []
+      else
+        ReplyABI.reply (fun value => encode 32 value.val)
+          (Vaults.rewards external { self := rewardVault, sender := req.caller } lido
+            (word (decode (List.take 32 (List.drop 4 req.payload)))))
+          before) =
+      reply
+
+case neg
+external : External
+rewardVault withdrawalVault lido : Address
+other : External
+req : Request
+before : World
+reply : Reply
+hf : withdrawalVault = rewardVault ∧ encode 4 831804042 = encode 4 2470627572
+hs : req.target = rewardVault ∧ List.take 4 req.payload = encode 4 2470627572
+hv : req.value.val = 0 → List.length req.payload < 36
+⊢ (if req.value.val = 0 ∧ 36 ≤ List.length req.payload then
+        ReplyABI.reply (fun value => encode 32 value.val)
+          (Vaults.rewards external { self := rewardVault, sender := req.caller } lido
+            (word (decode (List.take 32 (List.drop 4 req.payload)))))
+          before
+      else Reply.rejected []) =
+      reply ↔
+    (if ¬req.value.val = 0 ∨ List.length req.payload < 36 then Reply.rejected []
+      else
+        ReplyABI.reply (fun value => encode 32 value.val)
+          (Vaults.rewards external { self := rewardVault, sender := req.caller } lido
+            (word (decode (List.take 32 (List.drop 4 req.payload)))))
+          before) =
+      reply
+
+case pos
+external : External
+rewardVault withdrawalVault lido : Address
+other : External
+req : Request
+before : World
+reply : Reply
+hf : req.target = rewardVault ∧ List.take 4 req.payload = encode 4 2470627572
+hs : rewardVault = withdrawalVault → ¬encode 4 2470627572 = encode 4 831804042
+hv : req.value.val = 0 ∧ 36 ≤ List.length req.payload
+⊢ ReplyABI.reply (fun value => encode 32 value.val)
+        (Vaults.rewards external { self := rewardVault, sender := req.caller } lido
+          (word (decode (List.take 32 (List.drop 4 req.payload)))))
+        before =
+      reply ↔
+    (if List.length req.payload < 36 then Reply.rejected []
+      else
+        ReplyABI.reply (fun value => encode 32 value.val)
+          (Vaults.rewards external { self := rewardVault, sender := req.caller } lido
+            (word (decode (List.take 32 (List.drop 4 req.payload)))))
+          before) =
+      reply
+
+case neg
+external : External
+rewardVault withdrawalVault lido : Address
+other : External
+req : Request
+before : World
+reply : Reply
+hf : req.target = rewardVault ∧ List.take 4 req.payload = encode 4 2470627572
+hs : rewardVault = withdrawalVault → ¬encode 4 2470627572 = encode 4 831804042
+hv : req.value.val = 0 → List.length req.payload < 36
+⊢ (if req.value.val = 0 ∧ 36 ≤ List.length req.payload then
+        ReplyABI.reply (fun value => encode 32 value.val)
+          (Vaults.rewards external { self := rewardVault, sender := req.caller } lido
+            (word (decode (List.take 32 (List.drop 4 req.payload)))))
+          before
+      else Reply.rejected []) =
+      reply ↔
+    (if ¬req.value.val = 0 ∨ List.length req.payload < 36 then Reply.rejected []
+      else
+        ReplyABI.reply (fun value => encode 32 value.val)
+          (Vaults.rewards external { self := rewardVault, sender := req.caller } lido
+            (word (decode (List.take 32 (List.drop 4 req.payload)))))
+          before) =
+      reply
+
+case pos
+external : External
+rewardVault withdrawalVault lido : Address
+other : External
+req : Request
+before : World
+reply : Reply
+hf : withdrawalVault = rewardVault → ¬encode 4 831804042 = encode 4 2470627572
+hs : req.target = withdrawalVault ∧ List.take 4 req.payload = encode 4 831804042
+hv : req.value.val = 0 ∧ 36 ≤ List.length req.payload
+⊢ (if withdrawalVault = rewardVault ∧ encode 4 831804042 = encode 4 2470627572 then
+        ReplyABI.reply (fun value => encode 32 value.val)
+          (Vaults.rewards external { self := rewardVault, sender := req.caller } lido
+            (word (decode (List.take 32 (List.drop 4 req.payload)))))
+          before
+      else
+        ReplyABI.reply (fun x => [])
+          (Vaults.withdrawals external { self := withdrawalVault, sender := req.caller } lido
+            (word (decode (List.take 32 (List.drop 4 req.payload)))))
+          before) =
+      reply ↔
+    (if withdrawalVault = rewardVault ∧ encode 4 831804042 = encode 4 2470627572 then
+        if List.length req.payload < 36 then Reply.rejected []
+        else
+          ReplyABI.reply (fun value => encode 32 value.val)
+            (Vaults.rewards external { self := rewardVault, sender := req.caller } lido
+              (word (decode (List.take 32 (List.drop 4 req.payload)))))
+            before
+      else
+        if List.length req.payload < 36 then Reply.rejected []
+        else
+          ReplyABI.reply (fun x => [])
+            (Vaults.withdrawals external { self := withdrawalVault, sender := req.caller } lido
+              (word (decode (List.take 32 (List.drop 4 req.payload)))))
+            before) =
+      reply
+
+case neg
+external : External
+rewardVault withdrawalVault lido : Address
+other : External
+req : Request
+before : World
+reply : Reply
+hf : withdrawalVault = rewardVault → ¬encode 4 831804042 = encode 4 2470627572
+hs : req.target = withdrawalVault ∧ List.take 4 req.payload = encode 4 831804042
+hv : req.value.val = 0 → List.length req.payload < 36
+⊢ (if withdrawalVault = rewardVault ∧ encode 4 831804042 = encode 4 2470627572 then
+        if req.value.val = 0 ∧ 36 ≤ List.length req.payload then
+          ReplyABI.reply (fun value => encode 32 value.val)
+            (Vaults.rewards external { self := rewardVault, sender := req.caller } lido
+              (word (decode (List.take 32 (List.drop 4 req.payload)))))
+            before
+        else Reply.rejected []
+      else
+        if req.value.val = 0 ∧ 36 ≤ List.length req.payload then
+          ReplyABI.reply (fun x => [])
+            (Vaults.withdrawals external { self := withdrawalVault, sender := req.caller } lido
+              (word (decode (List.take 32 (List.drop 4 req.payload)))))
+            before
+        else Reply.rejected []) =
+      reply ↔
+    (if withdrawalVault = rewardVault ∧ encode 4 831804042 = encode 4 2470627572 then
+        if ¬req.value.val = 0 ∨ List.length req.payload < 36 then Reply.rejected []
+        else
+          ReplyABI.reply (fun value => encode 32 value.val)
+            (Vaults.rewards external { self := rewardVault, sender := req.caller } lido
+              (word (decode (List.take 32 (List.drop 4 req.payload)))))
+            before
+      else
+        if ¬req.value.val = 0 ∨ List.length req.payload < 36 then Reply.rejected []
+        else
+          ReplyABI.reply (fun x => [])
+            (Vaults.withdrawals external { self := withdrawalVault, sender := req.caller } lido
+              (word (decode (List.take 32 (List.drop 4 req.payload)))))
+            before) =
+      reply
+
+case pos
+external : External
+rewardVault withdrawalVault lido : Address
+other : External
+req : Request
+before : World
+reply : Reply
+hf : req.target = rewardVault → ¬List.take 4 req.payload = encode 4 2470627572
+hs : req.target = withdrawalVault → ¬List.take 4 req.payload = encode 4 831804042
+hv : req.value.val = 0 ∧ 36 ≤ List.length req.payload
+⊢ (if req.target = rewardVault ∧ List.take 4 req.payload = encode 4 2470627572 then
+        ReplyABI.reply (fun value => encode 32 value.val)
+          (Vaults.rewards external { self := rewardVault, sender := req.caller } lido
+            (word (decode (List.take 32 (List.drop 4 req.payload)))))
+          before
+      else
+        if req.target = withdrawalVault ∧ List.take 4 req.payload = encode 4 831804042 then
+          ReplyABI.reply (fun x => [])
+            (Vaults.withdrawals external { self := withdrawalVault, sender := req.caller } lido
+              (word (decode (List.take 32 (List.drop 4 req.payload)))))
+            before
+        else other req before) =
+      reply ↔
+    (if req.target = rewardVault ∧ List.take 4 req.payload = encode 4 2470627572 then
+        if List.length req.payload < 36 then Reply.rejected []
+        else
+          ReplyABI.reply (fun value => encode 32 value.val)
+            (Vaults.rewards external { self := rewardVault, sender := req.caller } lido
+              (word (decode (List.take 32 (List.drop 4 req.payload)))))
+            before
+      else
+        if req.target = withdrawalVault ∧ List.take 4 req.payload = encode 4 831804042 then
+          if List.length req.payload < 36 then Reply.rejected []
+          else
+            ReplyABI.reply (fun x => [])
+              (Vaults.withdrawals external { self := withdrawalVault, sender := req.caller } lido
+                (word (decode (List.take 32 (List.drop 4 req.payload)))))
+              before
+        else other req before) =
+      reply
+
+case neg
+external : External
+rewardVault withdrawalVault lido : Address
+other : External
+req : Request
+before : World
+reply : Reply
+hf : req.target = rewardVault → ¬List.take 4 req.payload = encode 4 2470627572
+hs : req.target = withdrawalVault → ¬List.take 4 req.payload = encode 4 831804042
+hv : req.value.val = 0 → List.length req.payload < 36
+⊢ (if req.target = rewardVault ∧ List.take 4 req.payload = encode 4 2470627572 then
+        if req.value.val = 0 ∧ 36 ≤ List.length req.payload then
+          ReplyABI.reply (fun value => encode 32 value.val)
+            (Vaults.rewards external { self := rewardVault, sender := req.caller } lido
+              (word (decode (List.take 32 (List.drop 4 req.payload)))))
+            before
+        else Reply.rejected []
+      else
+        if req.target = withdrawalVault ∧ List.take 4 req.payload = encode 4 831804042 then
+          if req.value.val = 0 ∧ 36 ≤ List.length req.payload then
+            ReplyABI.reply (fun x => [])
+              (Vaults.withdrawals external { self := withdrawalVault, sender := req.caller } lido
+                (word (decode (List.take 32 (List.drop 4 req.payload)))))
+              before
+          else Reply.rejected []
+        else other req before) =
+      reply ↔
+    (if req.target = rewardVault ∧ List.take 4 req.payload = encode 4 2470627572 then
+        if ¬req.value.val = 0 ∨ List.length req.payload < 36 then Reply.rejected []
+        else
+          ReplyABI.reply (fun value => encode 32 value.val)
+            (Vaults.rewards external { self := rewardVault, sender := req.caller } lido
+              (word (decode (List.take 32 (List.drop 4 req.payload)))))
+            before
+      else
+        if req.target = withdrawalVault ∧ List.take 4 req.payload = encode 4 831804042 then
+          if ¬req.value.val = 0 ∨ List.length req.payload < 36 then Reply.rejected []
+          else
+            ReplyABI.reply (fun x => [])
+              (Vaults.withdrawals external { self := withdrawalVault, sender := req.caller } lido
+                (word (decode (List.take 32 (List.drop 4 req.payload)))))
+              before
+        else other req before) =
+      reply

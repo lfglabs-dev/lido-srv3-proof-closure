@@ -1,0 +1,9 @@
+PASS nested-success-transfers-events
+PASS reward-cap-and-report-input
+PASS empty-reward-vault-skips-callback
+PASS withdrawal-funds-error-root-rollback
+PASS reward-counter-overflow-nested-rollback
+PASS zero-withdrawal-guard
+PASS callback-address-admission
+PASS short-vault-calldata
+PASS nonpayable-vault
