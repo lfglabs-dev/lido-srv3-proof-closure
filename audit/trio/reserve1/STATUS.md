@@ -16,7 +16,7 @@ status/router/spending/tail observations. This is exhaustive structural parent
 coverage, not discharged independent internals for every stage. Existing concrete
 callee/composition proofs must still discharge stage interfaces across all paths;
 deployed primitive/resource binding, remaining report/queue writers and canonical
-full remote integration gates remain open. Immutable validation follows checks.
+full remote integration gates remain open. At source `48c2b4c9d4dab0beadf6718353af3ff672a198ca`, three selected component checks and seven baseline/import checks pass. The other 58 source/olean pairs match earlier successful receipts. See `receipts/withdrawal-parent-summary.json`; only standard axioms were printed. Eleven dependency revisions match the manifest. These are bounded checks, not full gates.
 Runtime execution source and prior execution receipts are unchanged.
 
 ## Target continuation: exhaustive after authorization
