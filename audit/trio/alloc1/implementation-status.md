@@ -130,3 +130,10 @@ critical theorems (only propext, Classical.choice, Quot.sound), and reran all tw
 Verity fixtures. The independently executed Solidity comparison passed again.
 Receipts: verity-trust-876649b.json and solidity-verity-876649b.json. This closure
 predates the unrestricted array-push correction and does not replace current-head full-suite validation.
+
+The corrected implementation at 43ae5e8face86528e199491fa9954f74a0bddd5b passes
+23 fresh Init checks, all executed writer cases and six refreshed static gates.
+Its remote request was rejected before compilation: ashur reported 80 GiB free,
+2 GiB estimated plus the unchanged 80 GiB floor (HTTP 422). No remote success is
+claimed for the correction. Exact receipt: remote-rejected-43ae5e8.json; static
+gates: scoped-checks-43ae5e8.json. Integration requirements are in integration-patch.md.

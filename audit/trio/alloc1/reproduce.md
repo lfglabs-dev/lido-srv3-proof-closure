@@ -3,6 +3,11 @@
 These are implementation receipts, not independent certification. The full original
 scope is tracked in `implementation-status.md` and remains open.
 
+Latest remote admission attempt at corrected source 43ae5e8face86528e199491fa9954f74a0bddd5b
+was rejected with HTTP 422: `insufficient node disk: 80 GiB available, 2 GiB estimated
+plus 80 GiB emergency floor`. Durable wrapper 1b893089-10e0-4e57-b689-e4e4c5ccf96c
+exited without compiling. The floor was not lowered; no heavy local fallback was used.
+
 ## Lightweight Lean
 
 With Lean 4.31.0 available, run from the repository root:
