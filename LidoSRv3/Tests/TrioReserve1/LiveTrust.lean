@@ -10,6 +10,8 @@ import LidoSRv3.Audit.Source.TrioReserve1.Oracle
 import LidoSRv3.Audit.Source.TrioReserve1.Consensus
 import LidoSRv3.Audit.Source.TrioReserve1.Admission
 import LidoSRv3.Audit.Source.TrioReserve1.ABI
+import LidoSRv3.Audit.Source.TrioReserve1.CallResults
+import LidoSRv3.Audit.Source.TrioReserve1.WithdrawalTail
 
 /-! Owned inspection, pending coordinated canonical Trust registration. -/
 open LidoSRv3.Audit.Source.TrioReserve1
@@ -64,3 +66,19 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms ABI.decode_encode_bounded
 #print axioms ABI.decode_word
 #print axioms ABI.decode_second_word
+
+#print axioms CallResults.locator_reply
+#print axioms CallResults.queue_lookup
+#print axioms CallResults.frame_reply
+#print axioms CallResults.adjusted_frame
+#print axioms CallResults.frame_call_failure
+#print axioms CallResults.frame_short_reply
+#print axioms WithdrawalTail.source_decomposition
+#print axioms WithdrawalTail.seeds_zero
+#print axioms WithdrawalTail.seeds_success
+#print axioms WithdrawalTail.seeds_overflow
+#print axioms WithdrawalTail.actual_receiver
+#print axioms WithdrawalTail.finish_rejection
+#print axioms WithdrawalTail.seed_failure_stops
+#print axioms WithdrawalTail.after_spend
+#print axioms WithdrawalTail.tail_failure_rolls_back

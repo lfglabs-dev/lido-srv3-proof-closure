@@ -79,3 +79,10 @@ A separate case executes uint64 deadline narrowing after a valid span product.
 `ABI.decode_encode` proves arbitrary-width byte reduction; `decode_word` and
 `decode_second_word` bind actual word decoding with trailing bytes. These are
 conversion proofs over Live.encode/decodeWord, not compiler/bytecode refinement.
+
+`CallResults.queue_lookup` composes the physical locator pointer, code guard,
+immutable getter and ABI address cast. `frame_reply`, `adjusted_frame`,
+`frame_call_failure` and `frame_short_reply` retain actual call worlds/traces.
+`WithdrawalTail.source_decomposition` binds the source final block; seed outcomes,
+actual_receiver and tail_failure_rolls_back cover its concrete effects.
+`after_spend` still needs the full independent spending correspondence upstream.

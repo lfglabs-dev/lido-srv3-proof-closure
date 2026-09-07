@@ -1,5 +1,26 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Getter and withdrawal-tail composition
+
+`CallResults` binds actual locator/frame CALL results to exact return values,
+worlds and traces using the ABI lemmas. The concrete queue lookup executes the
+immutable locator getter from the physical pointer and its code guard. Frame
+adjustment preserves the packed value saved before external calls; short/rejected
+frame replies preserve exact failure and attempted-call prefixes.
+
+`WithdrawalTail` factors the final seed/receiver block with a checked source
+identity and sequencing law. Zero seeds, successful checked addition, overflow,
+physical packing and the seed event are explicit. The successful tail executes
+Router.dispatch with its immutable authorization, ETH transfer and receiver event.
+After-spend composition retains the previously looked-up router and ordered
+prefix traces. Tail failure restores the original withdrawal world, including
+earlier callee effects and spending writes/events. Actual prefix executions are
+premises of this composition lemma; the independent spending/whole-withdrawal
+specification still must discharge them. This is not full parent completion.
+
+The checker now includes 29 owned modules. Current terminal evidence is recorded
+separately from historical runtime receipts; no runtime implementation changed.
+
 ## Admission and ABI continuation
 
 `AdmissionSpec` independently specifies ordered status, caller and nonzero-amount
