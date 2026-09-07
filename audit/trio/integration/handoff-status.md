@@ -172,3 +172,18 @@ mutation identities. These check-only changes require fresh execution before a
 new harness receipt can be claimed; historical receipts remain tied to their
 original runner hash. The remote full run at `03f17085` is still pending and
 predates all changes in this section.
+
+## 14:12 UTC checkpoint and successor integration
+
+Read-only snapshots found ALLOC-1 clean at `bab36c3e` and ALLOC-2 clean at
+`dee0456b`, with local HEAD equal to upstream in each. RESERVE-1 matched upstream
+`91c7b92a` but retained an untracked `full-production-test-trust.txt`. These
+three published heads are now integrated. The checkpoint is not a final
+all-writer attestation or track-completion claim.
+
+The successors add the compiler storage-array push panic boundary, executed
+producer allocation-prefix bounds, and physical reserve preservation for the
+concrete successful withdrawal pipeline. The integrator connected the prefix
+bounds to indexed-parent ABI equivalence. The remote full run remains live at
+`03f17085`; it predates these successor changes and expanded integration target.
+The UX2 regression completed successfully before these latest three merges.

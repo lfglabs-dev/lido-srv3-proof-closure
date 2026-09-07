@@ -1,6 +1,7 @@
 import LidoSRv3.Audit.Source.TrioComposition.ParentABI
 import LidoSRv3.Audit.Source.TrioComposition.ConversionBridge
 import audit.trio.alloc2.composition.Parent
+import audit.trio.alloc2.composition.MemoryExtent
 
 namespace LidoSRv3.Audit.Source.TrioComposition
 open TrioAlloc1
@@ -80,6 +81,21 @@ theorem indexed_parent_abi_eq (layout : Layout) (storage : Storage) (oracle : St
     indexedParent layout storage oracle config amount topup before =
       getDepositAllocationsABI layout storage oracle config amount topup before := by
   rw [indexed_parent_eq, getDepositAllocationsABI_eq _ _ _ _ _ _ _ extent]
+
+/-- Executed producer allocation guards supply the extent used above; the
+prefix's placement in the compiler schedule is still a separate obligation. -/
+theorem memory_prefix_indexed_abi_eq (layout : Layout) (storage : Storage)
+    (oracle : StaticOracle) (config : Config) (amount : Word) (topup : Bool)
+    (before : Transcript) (pointer next : Word)
+    (memory : TrioAlloc2.MemoryPrefix.producerPrefix pointer (storage (countSlot layout)) = .ok next) :
+    indexedParent layout storage oracle config amount topup before =
+      getDepositAllocationsABI layout storage oracle config amount topup before := by
+  apply indexed_parent_abi_eq
+  intro demand produced middle _ producer _
+  exact TrioAlloc2.producer_memory_establishes_byte_extent layout storage oracle
+    ⟨config,demand,topup⟩ before middle produced pointer next producer memory
+
+#print axioms memory_prefix_indexed_abi_eq
 
 #print axioms indexed_parent_iff
 #print axioms indexed_parent_abi_eq

@@ -187,3 +187,23 @@ All 58 Init-only modules pass; `indexed-parent-init-receipt.json` records source
 hashes and standard-axiom output. The new `TrioIntegrationChecks` Lake target
 wires the staged-parent bridge into the remote full-validation driver. That
 expanded full target still requires a fresh remote run.
+
+## Executed allocation-prefix extent composition
+
+Writer checkpoints ALLOC-1 `bab36c3e`, ALLOC-2 `dee0456b`, and RESERVE-1
+`91c7b92a` are integrated. `memory_prefix_indexed_abi_eq` now derives the
+indexed-parent ABI equality's extent premise from executed producer allocation
+guards, using ALLOC-2's primitive bridge. The placement and effects of those
+guards in the concrete compiler schedule remain unproved at this boundary.
+
+The bounded closure checks 65 modules, including public admission and
+string storage, indexed/recursive parent equivalence, the producer allocation
+primitive bridge and the byte-extent composition. Every checked source hash
+matches the integrated tree; see `memory-indexed-parent-init-receipt.json`.
+These changes still need full remote validation.
+
+The latest ALLOC-2 Solidity record adds four early memory-limit cases to the
+original eight parent cases. The existing VM parent suite executes the original
+eight only. The original recorded comparison remains valid for its recorded
+source and case set; it does not establish VM coverage of the four new memory
+cases. They require the compiler allocation prefix in the VM parent path.
