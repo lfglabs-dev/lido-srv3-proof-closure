@@ -11,7 +11,7 @@ With Lean 4.31.0 available, run from the repository root:
 python3 audit/trio/alloc1/validate-light.py --lean /path/to/lean --output /fresh/output/light
 ```
 
-The script checks the 16 Init-only owned modules (including the interface and test entry)
+The script checks the 17 Init-only owned modules (including the interface and test entry)
 with private oleans, rejects non-Init/non-owned imports, bounds each check to 30
 seconds, and records each source SHA-256, exact command, output and exit status.
 `vectors.json` is produced by actually evaluating `produce`, not by printing expected
@@ -48,9 +48,10 @@ execution evidence, not a production Cancun bytecode receipt. The optional µWS
 native binary is unavailable on this Node build; Ganache falls back to its JS
 implementation and the EVM runs complete normally.
 
-The paired Lean side is the new **SOURCE executor**, not a Verity `Contract.run`
-execution. The required Solidity/Verity comparison and all-outcome correspondence
-remain open. Passing these vectors cannot substitute for those obligations.
+The ordinary light runner evaluates the SOURCE executor. The separate remote
+Verity runner below executes the complete call tree in pinned Verity external-call
+denotation. Its 12 results/raw errors and top-level call lists match independently
+executed Solidity; this is not a complete bytecode/compiler correspondence claim.
 
 ## Heavy Lean and infrastructure
 
@@ -112,3 +113,18 @@ The writer harness inherits the unmodified public StakingRouter entry point. The
 packed-word test and six error-order/rejection-rollback cases passed; receipts
 `writer-storage.json` and `writer-errors.json` include exact words and raw errors.
 These writer vectors do not establish all-writer reachability.
+
+Current differential receipt: `receipts/solidity-verity-comparison.json`. Recheck
+the independently produced outputs without reevaluating either model:
+
+```sh
+python3 audit/trio/alloc1/compare-executions.py \
+  audit/trio/alloc1/receipts/solidity-memory.json \
+  audit/trio/alloc1/receipts/verity-vectors-03abaac.json /fresh/comparison.json
+node solidity/trio-alloc1/check-callback.cjs /fresh/output/callback
+```
+
+The full four-target build later passed 1,505 jobs at8269ac (STALE_SUCCESS for
+newer heads). The corrected Verity runner passed 37 jobs and actual execution at
+03abaac, using a separately measured 2 GiB estimate. Full build estimate remains
+5 GiB; no emergency-floor override was used. Exact receipts identify source SHAs.
