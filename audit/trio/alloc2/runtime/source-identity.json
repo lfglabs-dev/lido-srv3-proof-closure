@@ -51,8 +51,8 @@
     "audit/trio/alloc2/composition/ProducerMemory.lean": "e0d3e4367f35de46f9569020bcb1b1c63a592c4fb6d7793c90d830e09763f5ae",
     "audit/trio/alloc2/composition/ProducerMemoryVectors.lean": "656b1ff992bc9a91a8ff55552d74337d1e0cdec55c1553855aeed1acbbcfa0dd",
     "audit/trio/alloc2/composition/lakefile.lean": "16545b395915a5364f20f84acacae0ad9549d03f1abffcdaa568d67249a21ea2",
-    "audit/trio/alloc2/runtime/Library.lean": "b16e096ebc3a102d84c9ba50338ff20603b12c5bdf5e16ff004648726bfa98c6",
-    "audit/trio/alloc2/runtime/Vectors.lean": "19d894ad7cb867340124672ef23958d7029b7e3a7ac170cd915e5f07ee61b253",
+    "audit/trio/alloc2/runtime/Library.lean": "db7d308d1594d65a7a3959f4c87ba7f404d0cada487b7bc18067f49c1c6621aa",
+    "audit/trio/alloc2/runtime/Vectors.lean": "100f4cb6ae1b340bc613f1c3f099a211ed87ccbe86716445beb59618cae78967",
     "audit/trio/alloc2/runtime/lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
     "audit/trio/alloc2/runtime/lakefile.lean": "c08ee40056c101f185258f83aa7f4359de3abf37b020ab81a762fdf397ae0be5"
   }

@@ -117,14 +117,14 @@ theorem indexed_memory_run_success (state : _root_.Verity.ContractState) (ap cp 
       related executed address outside
 
 /-- A proved indexing failure rolls back all effects of an executed enclosing
-prefix, including arbitrary changes to storage, balances, events and memory. -/
-theorem indexed_after_prefix_reverts (prefix : _root_.Verity.Contract Unit)
+enclosing, including arbitrary changes to storage, balances, events and memory. -/
+theorem indexed_after_prefix_reverts (enclosing : _root_.Verity.Contract Unit)
     (entry intermediate : _root_.Verity.ContractState) (ap cp : Nat)
     (buckets capacities : List Word) (demand : Word)
-    (prefixExecuted : prefix entry = .success () intermediate)
+    (prefixExecuted : enclosing entry = .success () intermediate)
     (related : MemoryWrite.ArraysAt (wordMemory intermediate) ap cp buckets capacities)
     (positive : demand.val ≠ 0) (short : capacities.length < buckets.length) :
-    (_root_.Verity.bind prefix (fun _ => indexedMemoryExecute ap cp demand)).run entry =
+    (_root_.Verity.bind enclosing (fun _ => indexedMemoryExecute ap cp demand)).run entry =
       .revert (reprStr Panic.arrayBounds) entry := by
   have failed := IndexedMemory.run_short_error (wordMemory intermediate) ap cp buckets capacities demand
     related positive short

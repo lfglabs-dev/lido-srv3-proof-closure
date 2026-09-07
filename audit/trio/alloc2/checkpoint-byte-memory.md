@@ -23,8 +23,10 @@ This advances the physical-store boundary but does not complete the full task.
 Memory addresses here are natural numbers. EVM address bounds, expansion gas,
 compiler allocation/copy scheduling, producer-created array bytes, lifecycle
 composition, the final Verity runtime integration and full gates remain separate.
-In particular, ArrayAt at byte-loop entry is still a premise; no claim is made
-that producer success already constructs this physical memory.
+ByteIndexed itself takes ArrayAt at entry. The subsequent ByteProducer bridge
+derives it from actual ALLOC-1 success and an executed serialization adapter;
+that adjacent-layout adapter is not yet connected to compiler write scheduling.
+See checkpoint-byte-entry.md.
 
 The byte-memory package and preparation manifest are separate so the already
 queued indexed Verity runtime source bundle remains unchanged.
@@ -45,23 +47,17 @@ cd ../temp/alloc2-bytes/audit/trio/alloc2/byte-memory
 REMOTE_BUILD_NODE_ID=ashur remote-lean-build lake build
 ```
 
-The current receipt passed the runner's exact 38-file source-overlay admission.
-All five sequences matched the pinned public Solidity library's complete return
-bytes, including unchanged original caller arrays and capacities. Results and
-full compiler/deployed-code evidence are in byte-sequence-execution.json.
-Durable job e577d93b-456f-4397-8219-c1ca682fc111 exited 0. The reset mutant
-exited 1 at `two-calls exact bytes`, not at source admission; its complete failure
-and hashes are in byte-sequence-mutant.json (job
-5894ec48-e4e9-4b19-ace7-86f3f51291a9).
+The original physical-source/EVM comparisons passed against receipt d36a873d
+at the previous source identity. The byte-entry extension now has a successful
+42-job receipt, 3f3d1147-45f4-4140-a493-ae09c0d0c3ca, for 41 files.
+The refreshed differential commands use that receipt:
 
 ```
-node solidity/trio-alloc2/byte-sequence.mjs audit/trio/alloc2/receipt-d36a873d-c8f9-4604-bd20-b039c005a877.json
-ALLOC2_BYTE_SEQUENCE_MUTANT=reset node solidity/trio-alloc2/byte-sequence.mjs audit/trio/alloc2/receipt-d36a873d-c8f9-4604-bd20-b039c005a877.json
+node solidity/trio-alloc2/byte-sequence.mjs audit/trio/alloc2/receipt-3f3d1147-45f4-4140-a493-ae09c0d0c3ca.json
+ALLOC2_BYTE_SEQUENCE_MUTANT=reset node solidity/trio-alloc2/byte-sequence.mjs audit/trio/alloc2/receipt-3f3d1147-45f4-4140-a493-ae09c0d0c3ca.json
 ```
 
-These are physical-source/EVM comparisons, not a claim that the pending indexed
-Verity runtime has passed. That job87bd remains queued on nippur. The root build
-04ef92f0-4338-4fd0-abfb-587bdf0bdd36 passed 1531 jobs at
-b9da6107262e32b7e6d0f960d696fbf1ce4886db, before the byte-memory files were
-committed; it is not final-head root validation. Full make prove/test and the
-remaining composition obligations above are unfinished.
+The indexed Verity runtime has separately passed 62 jobs and six Solidity cases
+against receipt 25bab09b-edbd-47a0-b8af-071531fe598c. These observations do not
+establish a byte-backed Verity representation or compiler store-trace refinement.
+See checkpoint-byte-entry.md for the exact completed slice and remaining gaps.

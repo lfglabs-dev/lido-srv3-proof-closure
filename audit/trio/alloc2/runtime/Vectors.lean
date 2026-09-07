@@ -63,16 +63,16 @@ private def memorySequence (name : String) (ap cp : Nat) (bs cs : List Nat) (d1 
 #eval do
   let shortMemory := MemoryWrite.writeWords
     (MemoryWrite.writeWords (fun _ => word 0xcafe) 128 [word 1, zero]) 512 [zero]
-  let prefix : _root_.Verity.Contract Unit := fun before =>
+  let enclosing : _root_.Verity.Contract Unit := fun before =>
     .success () (installMemory { before.writeSlot 77 (_root_.Verity.Core.Uint256.ofNat 42) with
       selfBalance := _root_.Verity.Core.Uint256.ofNat 0 } shortMemory)
-  match (_root_.Verity.bind prefix (fun _ => indexedMemoryExecute 128 512 (word 1))).run state with
+  match (_root_.Verity.bind enclosing (fun _ => indexedMemoryExecute 128 512 (word 1))).run state with
   | .success _ _ => throw (IO.userError "short capacities unexpectedly succeeded")
   | .revert reason restored =>
     if reason ≠ reprStr Panic.arrayBounds then throw (IO.userError "wrong indexing error")
-    if restored.readSlot 77 ≠ state.readSlot 77 then throw (IO.userError "storage prefix committed")
-    if restored.selfBalance ≠ state.selfBalance then throw (IO.userError "balance prefix committed")
-    if restored.memory 128 ≠ state.memory 128 then throw (IO.userError "memory prefix committed")
+    if restored.readSlot 77 ≠ state.readSlot 77 then throw (IO.userError "storage enclosing committed")
+    if restored.selfBalance ≠ state.selfBalance then throw (IO.userError "balance enclosing committed")
+    if restored.memory 128 ≠ state.memory 128 then throw (IO.userError "memory enclosing committed")
     IO.println "ALLOC2_INDEXED_PREFIX_ROLLBACK {\"panic\":50,\"storageRestored\":true,\"balanceRestored\":true,\"memoryRestored\":true}"
 
 end LidoSRv3.Audit.Source.TrioAlloc2.Runtime

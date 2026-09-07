@@ -1,4 +1,4 @@
-import audit.trio.alloc2.composition.ByteIndexed
+import audit.trio.alloc2.composition.ByteInitialize
 
 namespace LidoSRv3.Audit.Source.TrioAlloc2.ByteVectors
 open ByteIndexed
@@ -11,8 +11,7 @@ private def w := TrioAlloc1.word
 private def json (values : List Word) : String :=
   "[" ++ String.intercalate "," (values.map fun x => "\"" ++ toString x.val ++ "\"") ++ "]"
 private def seed (ap cp : Nat) (buckets capacities : List Word) : ByteMemory.Memory :=
-  writeWords (writeWords (fun _ => TrioAlloc1.byte 0xa5) ap (w buckets.length :: buckets))
-    cp (w capacities.length :: capacities)
+  ByteMemory.constructArrays (fun _ => TrioAlloc1.byte 0xa5) ap cp buckets capacities
 private def emit (name : String) (ap cp : Nat) (bs cs : List Nat) (d1 d2 : Nat) : IO Unit := do
   let buckets := bs.map w
   let capacities := cs.map w

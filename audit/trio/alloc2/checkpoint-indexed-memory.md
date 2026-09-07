@@ -39,19 +39,20 @@ Public-library ABI copies are preserved; no claim is made that the library
 mutates the caller's original arrays. The second sequence call uses the first
 returned array.
 
-The indexed Lean proofs also passed in byte-memory job
-caec8506-fa63-424c-83be-5a80ccbb04f1 (38 jobs), followed by
-d36a873d-c8f9-4604-bd20-b039c005a877 (39 jobs). Validation of the indexed
-Verity runtime remains pending. Earlier draft builds failed with
-Lean proof-script errors; none is positive evidence. Job
-87bd283a-a145-41c4-833d-dc31f64a2a24 on nippur was re-polled and is queued, not
-terminal. Do not replace it merely because observation expires. An intervening
-auto-placement request was rejected before compilation on old-agent: 258 GiB
-free versus 12 GiB estimate plus 250 GiB emergency floor. No floor was changed.
+The indexed Lean proofs passed in byte-memory jobs
+caec8506-fa63-424c-83be-5a80ccbb04f1 (38 jobs) and
+d36a873d-c8f9-4604-bd20-b039c005a877 (39 jobs). Runtime job87bd eventually
+failed on the reserved Lean identifier prefix. Renaming it to enclosing yielded
+62 passing jobs in 25bab09b-edbd-47a0-b8af-071531fe598c, including the rollback
+theorem and vector. memory-sequence-execution.json now records all six passing
+Solidity/Verity cases against that receipt; memory-sequence-mutant.json records
+the reset mutant's expected exact-output assertion failure.
 
-The prior root build bc88cbaa-3898-4c3b-8d1b-0fdc345a2966 is now succeeded:
-1531 jobs at 3e254f729300dde1d41089bbade6eb244bd1036d. It is earlier-head
-evidence, not current indexed-source or final-head validation.
+The root build 04ef92f0-4338-4fd0-abfb-587bdf0bdd36 passed 1531 jobs at
+b9da6107262e32b7e6d0f960d696fbf1ce4886db. Root job
+e327ddb0-19e3-47c0-9741-c51974a34331 is running at byte-proof head
+924891ed58bbd9f424f298dae57b8982a82aad24. Neither is final-head validation
+of the subsequent byte-entry changes. See checkpoint-byte-entry.md.
 
 Reproduction after materializing the manifests:
 
@@ -62,8 +63,13 @@ cd ../temp/alloc2-runtime/audit/trio/alloc2/runtime
 REMOTE_BUILD_NODE_ID=nippur remote-lean-build lake build
 ```
 
-Once a matching successful runtime receipt exists, run the positive and reset
-mutant memory-sequence.mjs commands. Old receipts must fail admission because
-both source and harness have changed. Complete UX2/full prove/test gates,
-producer-created memory contents, byte-store/copy correspondence and the open
-lifecycle/integration requirements remain unfinished. The +1 model is unchanged.
+Current differential reproduction:
+
+```
+node solidity/trio-alloc2/memory-sequence.mjs audit/trio/alloc2/receipt-25bab09b-edbd-47a0-b8af-071531fe598c.json
+ALLOC2_SEQUENCE_MUTANT=reset node solidity/trio-alloc2/memory-sequence.mjs audit/trio/alloc2/receipt-25bab09b-edbd-47a0-b8af-071531fe598c.json
+```
+
+Complete UX2/full prove/test gates, actual producer/compiler memory writes and
+copies, and lifecycle/integration requirements remain unfinished. The +1 model
+is unchanged.

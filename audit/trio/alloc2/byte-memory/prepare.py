@@ -19,7 +19,7 @@ for name in ('Interface', 'Storage', 'Execution', 'Properties', 'Bytes', 'Memory
     sources[path] = subprocess.check_output(['git', '-C', str(ROOT), 'show', f'{PRODUCER}:{path}'])
 for source in sorted(ROOT.glob('LidoSRv3/Audit/Source/TrioAlloc2/*.lean')):
     sources[str(source.relative_to(ROOT))] = source.read_bytes()
-for path in ('audit/trio/alloc2/composition/Composition.lean', 'audit/trio/alloc2/composition/MemoryWrite.lean', 'audit/trio/alloc2/composition/IndexedMemory.lean', 'audit/trio/alloc2/composition/ByteMemory.lean', 'audit/trio/alloc2/composition/ByteIndexed.lean', 'audit/trio/alloc2/composition/ByteVectors.lean', 'audit/trio/alloc2/byte-memory/lakefile.lean'):
+for path in ('audit/trio/alloc2/composition/Composition.lean', 'audit/trio/alloc2/composition/MemoryWrite.lean', 'audit/trio/alloc2/composition/IndexedMemory.lean', 'audit/trio/alloc2/composition/ByteMemory.lean', 'audit/trio/alloc2/composition/ByteIndexed.lean', 'audit/trio/alloc2/composition/ByteFrame.lean', 'audit/trio/alloc2/composition/ByteInitialize.lean', 'audit/trio/alloc2/composition/ByteProducer.lean', 'audit/trio/alloc2/composition/ByteVectors.lean', 'audit/trio/alloc2/byte-memory/lakefile.lean'):
     sources[path] = (ROOT / path).read_bytes()
 for path, data in sources.items():
     target = DEST / path

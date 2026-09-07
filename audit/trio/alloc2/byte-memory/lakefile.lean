@@ -11,4 +11,7 @@ lean_lib TrioAlloc2ByteMemory where
     .one `audit.trio.alloc2.composition.IndexedMemory,
     .one `audit.trio.alloc2.composition.ByteMemory,
     .one `audit.trio.alloc2.composition.ByteIndexed,
+    .one `audit.trio.alloc2.composition.ByteFrame,
+    .one `audit.trio.alloc2.composition.ByteInitialize,
+    .one `audit.trio.alloc2.composition.ByteProducer,
     .one `audit.trio.alloc2.composition.ByteVectors]
