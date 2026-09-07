@@ -36,10 +36,10 @@
     "contracts/common/lib/Math256.sol": "028e9b0c87fea3ec6fd5aac9e7a5724a18b4a175d5ab70159f24428dd28ea6b6"
   },
   "model": {
-    "job": "a0f555d7-81b0-4478-8b1a-b880b7131b6e",
+    "job": "8b45612f-72ab-422e-be2f-3488195f6399",
     "producer": "8269ac576cf119975a7e9954459cd4aa04d5cd82",
-    "overlay": "8a5c40f036f4370334f2a2cfcbe61a876535d1f69161d169ee99dccfc2e611e8",
-    "receiptSha256": "5296e9131788ab976788c6b7128bd468f313da6b5cbf2c34c518f8a438b25b25"
+    "overlay": "ef09e9e3d07416f7139013ec2db57ec4a369f8bc0187252c9765a2e6e4db7ff1",
+    "receiptSha256": "bf105a371d707b4bdbedf937b038d0b29439b976fd408cdd6bffca66fa8fa0c8"
   },
   "harnessSha256": "fadd19aaf5b4304a2a8d93087a149d732c8273171b62481a475a200757554e73",
   "runnerSha256": "8140f423af7dc3ee88af7aad8913b1ee6b091cd3b07c86c3ee7b6d3742b878da",
