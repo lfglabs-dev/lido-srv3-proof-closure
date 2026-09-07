@@ -12,7 +12,7 @@ import subprocess
 ROOT = Path(__file__).resolve().parents[4]
 DEST = ROOT.parent / "temp" / "alloc2-composition"
 BASE = "c7adae04416704a839d56333efad003f0a0f46b7"
-PRODUCER = "8269ac576cf119975a7e9954459cd4aa04d5cd82"
+PRODUCER = "8691c7881a863715ab5ec9b39631ab41243e7c91"
 ACCEPTED_INTERFACE = "2a4e9d2a91d257353470677c6101fd91293cf4e4"
 
 
@@ -25,14 +25,14 @@ def main():
     if head != BASE:
         raise RuntimeError("unexpected verification base")
     producer_files = [f"LidoSRv3/Audit/Source/TrioAlloc1/{name}.lean"
-                      for name in ("Interface", "Storage", "Execution", "Properties", "Bytes", "Memory")]
+                      for name in ("Interface", "Storage", "Execution", "Properties", "Bytes", "Memory", "AllocationMemory")]
     interface = producer_files[0]
     if blob(PRODUCER, interface) != blob(ACCEPTED_INTERFACE, interface):
         raise RuntimeError("producer interface differs from accepted v0")
     sources = {path: blob(PRODUCER, path) for path in producer_files}
     for path in sorted(ROOT.glob("LidoSRv3/Audit/Source/TrioAlloc2/*.lean")):
         sources[str(path.relative_to(ROOT))] = path.read_bytes()
-    for name in ("Composition.lean", "LibraryABI.lean", "LibraryABIVectors.lean", "Parent.lean", "ParentVectors.lean", "ParentPostconditions.lean", "lakefile.lean"):
+    for name in ("Composition.lean", "LibraryABI.lean", "LibraryABIVectors.lean", "Parent.lean", "ParentVectors.lean", "ParentPostconditions.lean", "MemoryExtent.lean", "MemoryVectors.lean", "AllocationMemoryBridge.lean", "lakefile.lean"):
         path = Path(__file__).parent / name
         sources[str(path.relative_to(ROOT))] = path.read_bytes()
     hashes = {}
