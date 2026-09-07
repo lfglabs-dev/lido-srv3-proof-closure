@@ -67,3 +67,11 @@ public dispatch refinement, lifecycle/migration reachability, complete consumer
 integration, exact-current-head full prove/test gates and independent review.
 Successful migration/version must not be used to infer legacy admission bounds.
 No certification, merge, rebase or force-push is claimed.
+
+The first runtime build 8e26bf4e-7ef5-4b74-93c7-e63067f192cd failed because
+the runtime Lake target did not register the imported composition modules
+(ProducerMemory.olean missing). The target now includes that dependency closure;
+this was a build-configuration failure, not a successful theorem check. The
+first guard-proof draft b063734a-7d67-4c0a-8acd-8991a0e98bc0 failed because the
+nested slot monad needed its own refinement lemma. Both terminal receipts are
+retained explicitly; only the corrected passing build is positive evidence.

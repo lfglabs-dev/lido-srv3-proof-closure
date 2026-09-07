@@ -51,6 +51,6 @@
     "audit/trio/alloc2/runtime/Library.lean": "2dfc6e2e04d1ae5bc0ac7e70b29f760352b2b2bb5e975e17a3e1846036bec574",
     "audit/trio/alloc2/runtime/Vectors.lean": "87b3857a7aa4e0944dcefdca5342d5946c574c31b646f6fd6151dfae9cab64b4",
     "audit/trio/alloc2/runtime/lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
-    "audit/trio/alloc2/runtime/lakefile.lean": "b2f264f10948f4a872efbbd1c5b21df4e7e4abfa09e878475e2c53d5bd104330"
+    "audit/trio/alloc2/runtime/lakefile.lean": "d81e975a84808502d02d546cb8b2f330232ae1e56e931c9acaf39caa05c02617"
   }
 }
