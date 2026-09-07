@@ -1,0 +1,6 @@
+Cloning into '/workspaces/lido-integration-parent-3f22469d'...
+HEAD is now at 3f22469d Compose interleaved producer allocation guards through parent and writers
+remote-lean-build: pinned tree contains submodules; using legacy runner fetch
+remote-lean-build: dispatching lake env lean --run audit/trio/integration/RunVerityParent.lean for 3f22469d5be4 ...
+remote-lean-build: submitted job 526f3902-a6e4-47b1-a3ed-611b8441ae10 on node 'ashur'; receipt /root/.local/state/sandboxed-sh/remote-builds/0eb7f510d749fd6900f1b18cade252e02b9159e9f4f4222200a36ad1fb3bdfda.json
+remote-lean-build: job 526f3902-a6e4-47b1-a3ed-611b8441ae10 on node 'ashur' finished: succeeded (exit 0, 123s)

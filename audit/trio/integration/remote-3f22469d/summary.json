@@ -1,0 +1,16 @@
+{
+  "classification": "PASSED_TARGETED_PARENT_VM_AND_RECORDED_SOLIDITY_COMPARISON",
+  "source_commit": "3f22469d5be4c5f77732ca59406726f46cca4895",
+  "remote_job": "526f3902-a6e4-47b1-a3ed-611b8441ae10",
+  "node": "ashur",
+  "receipt_sha256": "438df63d74291237e601e075b4eaf37d8f0d03f2db5189c142f8420a51ff48fd",
+  "counts": {
+    "VERITY_PARENT_VECTOR_PASS": 6,
+    "VERITY_PARENT_DIFFERENTIAL_VECTOR": 12,
+    "VERITY_RETURN_MEMORY_PASS": 7,
+    "VERITY_MEMORY_PARENT_PASS": 8
+  },
+  "solidity_comparison": "12 identical inputs, raw return/revert bytes and ordered module calls",
+  "scope": "Executed pinned Verity call VM with interleaved source producer allocation guards and canonical ABI interpreter. Pointer is an explicit source input. Full suite, final-SHA certification and deployment/compilation assumptions are separate.",
+  "independent_certification": false
+}

@@ -374,3 +374,35 @@ Consumer/deployed-call memory, returndata copies, pointer provenance, gas,
 recursive callback/deployment binding and final independent certification remain
 open. The numeric budget is a derived sufficient bound under the stated writer
 invariant; arbitrary storage is still executed and may fail in the modeled order.
+
+
+## Executed interleaved parent VM and twelve-case comparison
+
+Remote job `526f3902-a6e4-47b1-a3ed-611b8441ae10` on Ashur completed
+successfully at `3f22469d5be4c5f77732ca59406726f46cca4895` on 2026-09-07.
+`RunVerityParent` compiled the changed VM correspondence theorems and executed
+six parent checks, twelve differential records, seven response-memory checks
+and eight interleaved memory-parent checks. `remote-3f22469d` archives the
+terminal receipt, complete durable logs and exact twelve-case Solidity comparison.
+Inputs, return/revert bytes and ordered module calls match the recorded pinned
+Solidity execution. This is actual Verity call-VM execution, not transcript replay.
+
+The comparator regression uses that real VM receipt in a separate clean checkout.
+Both normal and optimized Python accept the unchanged baseline and reject nine
+corruptions each: mutated Solidity baseline, changed original harness, changed
+mutation input, empty/duplicate Solidity cases, changed result bytes, truncated
+VM records, wrong repository and nonterminal receipt. See
+`parent-comparator-interleaved-rejections.json` and `test-parent-comparator.py`.
+The disposable checkout's modified reference artifact is restored even on failure.
+
+The original brief permits explicit compilation/cryptographic/consensus
+assumptions and excludes gas, migration to the compilable DSL and full deployed
+bytecode. Those are scope boundaries rather than extra completion requirements.
+Remaining required work is source-level memory/ABI and observable correspondence
+under explicit justified relations, all stated writer/authorization/accounting
+obligations, final-SHA full gates, independent source/composition review, sequential
+merges, final writer checkpoints and the aligned dossier/site. This targeted
+protocol-1 runner receipt is execution evidence, not independent certification.
+
+The full `8bf49588` and `431e73ee` jobs remain separately tracked. They validate
+older source snapshots and cannot certify the changed interleaved producer.

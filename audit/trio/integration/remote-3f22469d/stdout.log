@@ -1,0 +1,298 @@
+Submodule 'lido-core' (https://github.com/lidofinance/core.git) registered for path 'lido-core'
+Cloning into '/var/lib/sandboxed-node/checkouts/9acda983bdcdf557/.tmp-95041ce4-e758-4969-9881-bbec591aee7c/lido-core'...
+From https://github.com/lidofinance/core
+ * branch            17005714f151e5502c559932319a3f2f74ac2436 -> FETCH_HEAD
+Submodule path 'lido-core': checked out '17005714f151e5502c559932319a3f2f74ac2436'
+HEAD is now at 3f22469 Compose interleaved producer allocation guards through parent and writers
+info: verity: cloning https://github.com/lfglabs-dev/verity.git
+info: verity: checking out revision 'e977aaad6e1a9e92e0132d41b3d33a14135a4d46'
+info: evmyul: cloning https://github.com/lfglabs-dev/EVMYulLean.git
+info: evmyul: checking out revision 'f7e4ee0dc8f8d5265ce822a937ab5be771f182e9'
+info: mathlib: cloning https://github.com/leanprover-community/mathlib4.git
+info: mathlib: checking out revision 'fabf563a7c95a166b8d7b6efca11c8b4dc9d911f'
+info: plausible: cloning https://github.com/leanprover-community/plausible
+info: plausible: checking out revision '63045536fe95024e6c18fc7b48e03f506701c5bc'
+info: LeanSearchClient: cloning https://github.com/leanprover-community/LeanSearchClient
+info: LeanSearchClient: checking out revision 'c5d5b8fe6e5158def25cd28eb94e4141ad97c843'
+info: importGraph: cloning https://github.com/leanprover-community/import-graph
+info: importGraph: checking out revision '5c7542ed018c78194f1e2b903eaf6a792b74c03d'
+info: proofwidgets: cloning https://github.com/leanprover-community/ProofWidgets4
+info: proofwidgets: checking out revision '24b0d9dc081c5423f8eec7e866c441e5184f29d9'
+info: aesop: cloning https://github.com/leanprover-community/aesop
+info: aesop: checking out revision 'e3cb2f741431ce31bf73549fb52316a57368b06f'
+info: Qq: cloning https://github.com/leanprover-community/quote4
+info: Qq: checking out revision 'f46324995fca5f0483b742e4eb4daec7f4ee50d2'
+info: batteries: cloning https://github.com/leanprover-community/batteries
+info: batteries: checking out revision 'fa08db58b30eb033edcdab331bba000827f9f785'
+info: Cli: cloning https://github.com/leanprover/lean4-cli
+info: Cli: checking out revision '92564e5770e4d09f2d86dfbf8ada1e9c715b384c'
+✔ [1/9] Built LidoSRv3.Audit.Source.TrioAlloc1.Interface (468ms)
+✔ [2/9] Built LidoSRv3.Audit.Source.TrioAlloc1.Storage (363ms)
+✔ [3/9] Built LidoSRv3.Audit.Source.TrioAlloc1.Execution (606ms)
+✔ [4/9] Built LidoSRv3.Audit.Source.TrioAlloc1.CallTree (443ms)
+✔ [5/13] Built LidoSRv3.Audit.Source.TrioAlloc1.AllocationMemory (395ms)
+✔ [6/13] Built LidoSRv3.Audit.Source.TrioAlloc1.Bytes (338ms)
+✔ [7/13] Built LidoSRv3.Audit.Source.TrioAlloc2.Word (376ms)
+ℹ [8/13] Built LidoSRv3.Audit.Source.TrioComposition.ReturnMemory (445ms)
+info: LidoSRv3/Audit/Source/TrioComposition/ReturnMemory.lean:132:0: 'LidoSRv3.Audit.Source.TrioComposition.ReturnMemory.summary_correspondence' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ReturnMemory.lean:133:0: 'LidoSRv3.Audit.Source.TrioComposition.ReturnMemory.stake_correspondence' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ReturnMemory.lean:134:0: 'LidoSRv3.Audit.Source.TrioComposition.ReturnMemory.summary_allocation_failure' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ReturnMemory.lean:136:0: 'LidoSRv3.Audit.Source.TrioComposition.ReturnMemory.summary_take' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ReturnMemory.lean:137:0: 'LidoSRv3.Audit.Source.TrioComposition.ReturnMemory.allocation_failure' depends on axioms: [propext]
+info: LidoSRv3/Audit/Source/TrioComposition/ReturnMemory.lean:138:0: 'LidoSRv3.Audit.Source.TrioComposition.ReturnMemory.bounded_summary_projection' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ReturnMemory.lean:139:0: 'LidoSRv3.Audit.Source.TrioComposition.ReturnMemory.bounded_stake_projection' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [9/13] Built LidoSRv3.Audit.Source.TrioAlloc2.MemoryPrefix (674ms)
+info: LidoSRv3/Audit/Source/TrioAlloc2/MemoryPrefix.lean:148:0: 'LidoSRv3.Audit.Source.TrioAlloc2.MemoryPrefix.execute_success_iff' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/MemoryPrefix.lean:149:0: 'LidoSRv3.Audit.Source.TrioAlloc2.MemoryPrefix.execute_overflow_iff' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/MemoryPrefix.lean:151:0: 'LidoSRv3.Audit.Source.TrioAlloc2.MemoryPrefix.reserve_success' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/MemoryPrefix.lean:152:0: 'LidoSRv3.Audit.Source.TrioAlloc2.MemoryPrefix.execute_extent' depends on axioms: [propext, Quot.sound]
+ℹ [10/13] Built LidoSRv3.Audit.Source.TrioComposition.RowMemory (758ms)
+info: LidoSRv3/Audit/Source/TrioComposition/RowMemory.lean:215:0: 'LidoSRv3.Audit.Source.TrioComposition.RowMemory.firstLoop_exact' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/RowMemory.lean:216:0: 'LidoSRv3.Audit.Source.TrioComposition.RowMemory.endPointer_bound' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/RowMemory.lean:217:0: 'LidoSRv3.Audit.Source.TrioComposition.RowMemory.firstRow_exact' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/RowMemory.lean:218:0: 'LidoSRv3.Audit.Source.TrioComposition.RowMemory.firstRow_erasure' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/RowMemory.lean:219:0: 'LidoSRv3.Audit.Source.TrioComposition.RowMemory.config_failure' depends on axioms: [propext, Quot.sound]
+ℹ [11/13] Built LidoSRv3.Audit.Source.TrioComposition.MemoryGuard (306ms)
+info: LidoSRv3/Audit/Source/TrioComposition/MemoryGuard.lean:38:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryGuard.run_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/MemoryGuard.lean:39:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryGuard.check_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [12/15] Built LidoSRv3.Audit.Source.TrioComposition.MemoryProducer (423ms)
+info: LidoSRv3/Audit/Source/TrioComposition/MemoryProducer.lean:79:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryProducer.afterPrefix_exact' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/MemoryProducer.lean:80:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryProducer.producer_exact' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/MemoryProducer.lean:81:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryProducer.prefix_failure' depends on axioms: [propext]
+✔ [13/15] Built LidoSRv3.Audit.Source.TrioAlloc1.Properties (473ms)
+✔ [14/16] Built LidoSRv3.Audit.Source.TrioAlloc1.CapacitySpec (529ms)
+✔ [15/22] Built LidoSRv3.Audit.Source.TrioAlloc2.Arithmetic (441ms)
+✔ [16/22] Built LidoSRv3.Audit.Source.TrioAlloc2.Step (382ms)
+✔ [17/22] Built LidoSRv3.Audit.Source.TrioAlloc2.Spec (349ms)
+✔ [18/23] Built LidoSRv3.Audit.Source.TrioAlloc2.ScanBounds (618ms)
+✔ [19/27] Built LidoSRv3.Audit.Source.TrioAlloc2.ScanCorrespondence (636ms)
+✔ [20/27] Built LidoSRv3.Audit.Source.TrioAlloc2.Loop (332ms)
+⚠ [21/28] Built LidoSRv3.Audit.Source.TrioAlloc2.Selection (361ms)
+warning: LidoSRv3/Audit/Source/TrioAlloc2/Selection.lean:53:10: This simp argument is unused:
+  levelsEq
+
+Hint: Omit it from the simp argument list.
+  simp [l̵e̵v̵e̵l̵s̵E̵q̵,̵ ̵Spec.minimum, countEq]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioAlloc2/Selection.lean:70:10: This simp argument is unused:
+  levelsEq
+
+Hint: Omit it from the simp argument list.
+  simp [l̵e̵v̵e̵l̵s̵E̵q̵,̵ ̵Spec.minimum, nonzero, minimumEq]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+✔ [22/28] Built LidoSRv3.Audit.Source.TrioAlloc2.StepBounds (404ms)
+✔ [23/28] Built LidoSRv3.Audit.Source.TrioAlloc2.Totality (460ms)
+✔ [24/28] Built LidoSRv3.Audit.Source.TrioAlloc2.LoopBounds (422ms)
+✔ [25/30] Built LidoSRv3.Audit.Source.TrioAlloc2.LoopTotality (391ms)
+✔ [26/34] Built LidoSRv3.Audit.Source.TrioAlloc2.Conservation (545ms)
+✔ [27/34] Built LidoSRv3.Audit.Source.TrioAlloc2.Errors (369ms)
+✔ [28/35] Built LidoSRv3.Audit.Source.TrioAlloc2.ChoiceCorrespondence (413ms)
+✔ [29/35] Built LidoSRv3.Audit.Source.TrioAlloc2.SpecProgress (382ms)
+⚠ [30/37] Built LidoSRv3.Audit.Source.TrioAlloc2.StepCorrespondence (562ms)
+warning: LidoSRv3/Audit/Source/TrioAlloc2/StepCorrespondence.lean:16:71: This simp argument is unused:
+  eq
+
+Hint: Omit it from the simp argument list.
+  simp [decodedRows, List.getElem?_zipWith, List.getElem?_set_ne eq,̵ ̵e̵q̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+✔ [31/37] Built LidoSRv3.Audit.Source.TrioAlloc1.Memory (449ms)
+✔ [32/37] Built LidoSRv3.Audit.Source.TrioAlloc2.LoopCorrespondence (577ms)
+⚠ [33/37] Built LidoSRv3.Audit.Source.TrioAlloc2.RowBounds (704ms)
+warning: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:171:20: This simp argument is unused:
+  ↓reduceDIte
+
+Hint: Omit it from the simp argument list.
+  simp only [bound,̵ ̵↓̵r̵e̵d̵u̵c̵e̵D̵I̵t̵e̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+info: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:174:0: 'LidoSRv3.Audit.Source.TrioAlloc2.step_row_bounds' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:175:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocateLoop_row_bounds' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:176:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocate_row_bounds' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:177:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocate_delta_success' depends on axioms: [propext, Quot.sound]
+ℹ [34/40] Built LidoSRv3.Audit.Source.TrioAlloc2.Composition (268ms)
+info: LidoSRv3/Audit/Source/TrioAlloc2/Composition.lean:53:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_success_establishes_consumer_premises' depends on axioms: [propext,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/Composition.lean:54:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_then_consumer_succeeds' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/Composition.lean:71:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_then_consumer_distributes' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [35/42] Built LidoSRv3.Audit.Source.TrioComposition.Parent (584ms)
+info: LidoSRv3/Audit/Source/TrioComposition/Parent.lean:252:0: 'LidoSRv3.Audit.Source.TrioComposition.getDepositAllocations_total_bound' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/Parent.lean:253:0: 'LidoSRv3.Audit.Source.TrioComposition.convertPositive_refines' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/Parent.lean:254:0: 'LidoSRv3.Audit.Source.TrioComposition.convertZero_refines' depends on axioms: [propext, Classical.choice, Quot.sound]
+✔ [36/42] Built LidoSRv3.Audit.Source.TrioAlloc1.FirstPass (514ms)
+ℹ [37/42] Built LidoSRv3.Audit.Source.TrioComposition.ParentComposition (311ms)
+info: LidoSRv3/Audit/Source/TrioComposition/ParentComposition.lean:65:0: 'LidoSRv3.Audit.Source.TrioComposition.producer_consumer_conversion_refines' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ParentComposition.lean:66:0: 'LidoSRv3.Audit.Source.TrioComposition.producer_zero_conversion_refines' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ParentComposition.lean:67:0: 'LidoSRv3.Audit.Source.TrioComposition.producer_consumer_parent_subtraction' depends on axioms: [propext, Quot.sound]
+✔ [38/48] Built LidoSRv3.Audit.Source.TrioAlloc1.Relational (462ms)
+ℹ [39/49] Built LidoSRv3.Audit.Source.TrioComposition.ParentRelational (389ms)
+info: LidoSRv3/Audit/Source/TrioComposition/ParentRelational.lean:185:0: 'LidoSRv3.Audit.Source.TrioComposition.ParentSpec.public_all_outcomes' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+✔ [40/49] Built LidoSRv3.Audit.Source.TrioAlloc1.Determinism (347ms)
+ℹ [41/49] Built LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI (1.5s)
+info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:169:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.decodeArray_encoded' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:170:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.decodeArguments_encoded' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:171:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.decodeReturn_encoded' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:172:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.run_encoded' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:173:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.run_short' depends on axioms: [propext, Quot.sound]
+ℹ [43/49] Built LidoSRv3.Audit.Source.TrioComposition.ParentDeterminism (307ms)
+info: LidoSRv3/Audit/Source/TrioComposition/ParentDeterminism.lean:155:0: 'LidoSRv3.Audit.Source.TrioComposition.ParentSpec.public_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [44/49] Built LidoSRv3.Audit.Source.TrioAlloc2.ABIComposition (283ms)
+info: LidoSRv3/Audit/Source/TrioAlloc2/ABIComposition.lean:46:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_then_abi_distributes' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [45/49] Built LidoSRv3.Audit.Source.TrioComposition.ParentABI (784ms)
+info: LidoSRv3/Audit/Source/TrioComposition/ParentABI.lean:110:0: 'LidoSRv3.Audit.Source.TrioComposition.public_abi_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [46/49] Built LidoSRv3.Audit.Source.TrioComposition.ParentCalls (305ms)
+info: LidoSRv3/Audit/Source/TrioComposition/ParentCalls.lean:45:0: 'LidoSRv3.Audit.Source.TrioComposition.ParentCalls.correspondence' depends on axioms: [propext, Quot.sound]
+⚠ [47/50] Built LidoSRv3.Audit.Source.TrioComposition.AllocationParentCalls (332ms)
+warning: LidoSRv3/Audit/Source/TrioComposition/AllocationParentCalls.lean:31:12: This simp argument is unused:
+  divided
+
+Hint: Omit it from the simp argument list.
+  simp [d̵i̵v̵i̵d̵e̵d̵,̵ ̵success, CallTree.check, bind, CallTree.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+info: LidoSRv3/Audit/Source/TrioComposition/AllocationParentCalls.lean:82:0: 'LidoSRv3.Audit.Source.TrioComposition.AllocationParentCalls.successful_prefix_extent' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/AllocationParentCalls.lean:84:0: 'LidoSRv3.Audit.Source.TrioComposition.AllocationParentCalls.successful_prefix_correspondence' depends on axioms: [propext,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/AllocationParentCalls.lean:85:0: 'LidoSRv3.Audit.Source.TrioComposition.AllocationParentCalls.empty_memory_failure' depends on axioms: [propext,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/AllocationParentCalls.lean:86:0: 'LidoSRv3.Audit.Source.TrioComposition.AllocationParentCalls.division_failure' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/AllocationParentCalls.lean:87:0: 'LidoSRv3.Audit.Source.TrioComposition.AllocationParentCalls.memory_failure' depends on axioms: [propext, Quot.sound]
+ℹ [48/50] Built LidoSRv3.Audit.Source.TrioComposition.MemoryParentCalls (309ms)
+info: LidoSRv3/Audit/Source/TrioComposition/MemoryParentCalls.lean:59:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryParentCalls.program_eq' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/MemoryParentCalls.lean:60:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryParentCalls.correspondence' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/MemoryParentCalls.lean:61:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryParentCalls.abi_extent' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+✔ [49/53] Built Verity.Core.Address (300ms)
+✔ [50/54] Built Verity.Core.Uint256 (719ms)
+✔ [51/55] Built Verity.Core.Int256 (460ms)
+✔ [52/55] Built Verity.Core.Uint16 (295ms)
+✔ [53/55] Built Verity.Core.NarrowTypes (435ms)
+✔ [54/59] Built Verity.Core.FiniteSet (487ms)
+✔ [55/60] Built Verity.Core.Model.Yul.Ast (563ms)
+✔ [56/60] Built Verity.Core.StorageAttr (904ms)
+✔ [57/60] Built Verity.Core.Intrinsics (679ms)
+✔ [58/60] Built Verity.Core.Model.Constants (243ms)
+⚠ [59/64] Built Verity.Core (2.0s)
+warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1041:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+✔ [60/64] Built Compiler.Keccak.Circuit (535ms)
+✔ [61/66] Built Compiler.Keccak.CircuitData (1.0s)
+✔ [62/68] Built Compiler.Keccak.Sponge (530ms)
+✔ [63/68] Built Verity.Core.Model.ProofStatus (256ms)
+✔ [64/68] Built Verity.Core.Model.CodeData (376ms)
+✔ [65/68] Built Verity.Core.Model.Identifier (254ms)
+✔ [66/77] Built Verity.Core.Model.ECM (417ms)
+✔ [67/78] Built Verity.Core.Model.Types (6.0s)
+✔ [68/80] Built Compiler.Yul.Ast (230ms)
+✔ [69/80] Built LidoSRv3.Tests.TrioIntegration.ParentFixtures (262ms)
+✔ [70/81] Built Compiler.IR (427ms)
+✔ [71/82] Built Compiler.CompilationModel.Types (243ms)
+✔ [73/83] Built Compiler.CompilationModel.AbiTypeLayout (667ms)
+✔ [74/83] Built Verity.Core.Model.DynamicAbi (1.0s)
+✔ [75/83] Built Verity.Core.Model.Denote (2.4s)
+✔ [76/83] Built Verity.Core.Model.DenoteExternalCalls (1.3s)
+✔ [77/83] Built LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer (970ms)
+✔ [78/83] Built LidoSRv3.Tests.TrioIntegration.VMFixtures (929ms)
+ℹ [79/83] Built LidoSRv3.Audit.Source.TrioComposition.VerityParent (955ms)
+info: LidoSRv3/Audit/Source/TrioComposition/VerityParent.lean:78:0: 'LidoSRv3.Audit.Source.TrioComposition.VerityParent.memory_correspondence' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/VerityParent.lean:79:0: 'LidoSRv3.Audit.Source.TrioComposition.VerityParent.memory_public_iff' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/VerityParent.lean:81:0: 'LidoSRv3.Audit.Source.TrioComposition.VerityParent.correspondence' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/VerityParent.lean:82:0: 'LidoSRv3.Audit.Source.TrioComposition.VerityParent.public_iff' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+✔ [80/83] Built LidoSRv3.Tests.TrioIntegration.ReturnMemoryVM (1.0s)
+✔ [81/83] Built LidoSRv3.Tests.TrioIntegration.MemoryParentVM (1.0s)
+✔ [82/83] Built LidoSRv3.Tests.TrioIntegration.ParentDifferential (1.2s)
+✔ [83/83] Built LidoSRv3.Tests.TrioIntegration.VerityParent (968ms)
+Build completed successfully (83 jobs).
+VERITY_PARENT_VECTOR_PASS empty-before-division calls=0 result=Except.ok { totalAllocated := 0, allocated := [], newAllocations := [] }
+VERITY_PARENT_VECTOR_PASS division-before-calls calls=0 result=Except.error (LidoSRv3.Audit.Source.TrioAlloc1.Failure.panic 18)
+VERITY_PARENT_VECTOR_PASS positive-rounded-demand calls=1 result=Except.ok { totalAllocated := 64, allocated := [64], newAllocations := [96] }
+VERITY_PARENT_VECTOR_PASS zero-demand-still-calls calls=1 result=Except.ok { totalAllocated := 0, allocated := [0], newAllocations := [32] }
+VERITY_PARENT_VECTOR_PASS module-rejection calls=1 result=Except.error (LidoSRv3.Audit.Source.TrioAlloc1.Failure.revertData [171])
+VERITY_PARENT_VECTOR_PASS late-conversion-overflow calls=1 result=Except.error (LidoSRv3.Audit.Source.TrioAlloc1.Failure.panic 17)
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"normal","actual":"0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000040","reverted":false,"count":1,"shares":[10000,10000],"unit":"32","amount":"320","summaries":["0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001","0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"],"reject1":false,"calls":["0:9abddf09"]}
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"zero-demand","actual":"0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000020","reverted":false,"count":1,"shares":[10000,10000],"unit":"32","amount":"31","summaries":["0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001","0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"],"reject1":false,"calls":["0:9abddf09"]}
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"empty-zero-divisor","actual":"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000","reverted":false,"count":0,"shares":[10000,10000],"unit":"0","amount":"320","summaries":["0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001","0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"],"reject1":false,"calls":[]}
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"division-before-producer","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000012","reverted":true,"count":1,"shares":[10000,10000],"unit":"0","amount":"320","summaries":["0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001","0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"],"reject1":false,"calls":[]}
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"zero-demand-overflow","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000011","reverted":true,"count":1,"shares":[10000,10000],"unit":"1048576","amount":"0","summaries":["0x000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000","0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"],"reject1":false,"calls":["0:9abddf09"]}
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"late-second-row-overflow","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000011","reverted":true,"count":2,"shares":[0,10000],"unit":"1048576","amount":"1048576","summaries":["0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000","0x000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001"],"reject1":false,"calls":["0:9abddf09","1:9abddf09"]}
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"zero-demand-late-rejection","actual":"0xdead","reverted":true,"count":2,"shares":[10000,10000],"unit":"32","amount":"0","summaries":["0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001","0xdead"],"reject1":true,"calls":["0:9abddf09","1:9abddf09"]}
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"malformed-summary","actual":"0x","reverted":true,"count":1,"shares":[10000,10000],"unit":"32","amount":"320","summaries":["0xdead","0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"],"reject1":false,"calls":["0:9abddf09"]}
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"memory-max-count","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000041","reverted":true,"count":115792089237316195423570985008687907853269984665640564039457584007913129639935,"shares":[10000,10000],"unit":"32","amount":"0","summaries":["0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001","0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"],"reject1":false,"calls":[]}
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"memory-length-limit","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000041","reverted":true,"count":18446744073709551616,"shares":[10000,10000],"unit":"32","amount":"0","summaries":["0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001","0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"],"reject1":false,"calls":[]}
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"memory-size-limit","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000041","reverted":true,"count":576460752303423488,"shares":[10000,10000],"unit":"32","amount":"0","summaries":["0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001","0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"],"reject1":false,"calls":[]}
+VERITY_PARENT_DIFFERENTIAL_VECTOR {"name":"division-before-memory-limit","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000012","reverted":true,"count":18446744073709551616,"shares":[10000,10000],"unit":"0","amount":"320","summaries":["0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001","0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"],"reject1":false,"calls":[]}
+VERITY_RETURN_MEMORY_PASS short-safe
+VERITY_RETURN_MEMORY_PASS allocation-before-short-decode
+VERITY_RETURN_MEMORY_PASS empty-response-no-growth
+VERITY_RETURN_MEMORY_PASS rejection-before-allocation
+VERITY_RETURN_MEMORY_PASS exception-before-allocation
+VERITY_RETURN_MEMORY_PASS summary-copy-cap
+VERITY_RETURN_MEMORY_PASS stake-copy-cap
+VERITY_MEMORY_PARENT_PASS one-row calls=1
+VERITY_MEMORY_PARENT_PASS scratch-before-call calls=0
+VERITY_MEMORY_PARENT_PASS capacity-after-call calls=1
+VERITY_MEMORY_PARENT_PASS first-pass-before-capacity calls=1
+VERITY_MEMORY_PARENT_PASS capacity-before-second-pass calls=1
+VERITY_MEMORY_PARENT_PASS second-pass-overflow calls=1
+VERITY_MEMORY_PARENT_PASS prefix-before-call calls=0
+VERITY_MEMORY_PARENT_PASS two-rows calls=2
