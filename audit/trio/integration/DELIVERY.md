@@ -1,8 +1,9 @@
 # Trio composition delivery record
 
 Status: the final stored-parent composition passed full official validation at
-`51037be4c0f518f8cb6b62c638aad454173d8bf1`. The integrated additive byte-memory
-and report modules await their final combined full validation and merge verdict. This document is not a deployment certificate.
+`9156db535a6a25d4c28bbe98689c1251607f1d78`, including the additive byte-memory
+and report modules. PR249 and PR245 are merged. The final byte-runtime, vault
+callback and queue-finalization follow-up awaits its combined validation and merge verdict. This document is not a deployment certificate.
 The old primary guarantee declarations are preserved. The new source composition
 is registered separately in each trio target's `execution_review` in
 `audit/source-map.yaml` and printed by `LidoSRv3/Audit/Trust.lean`.
