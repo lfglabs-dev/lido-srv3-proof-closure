@@ -1,13 +1,14 @@
 # Continuation — not a completion claim
 
-Latest increment: WithdrawalBalance carries total conservation and finite aggregate
-bounds through the complete withdrawal program, intermediate failures and root
-rollback, with a concrete pipeline specialization. Internal target/rebalance writers
-also conserve balances. Continue with initial EVM aggregate reachability, delegated
-callbacks, deployment/resource binding and the remaining parent/writer obligations.
-Do not reopen balance propagation through the modeled withdrawal or claim the
-incoming invariant and delegated-callee premise are deployment facts.
-Current evidence: withdrawal-balance-summary.json, two selected checks plus 78
+Latest increment: AuthorizationBalance carries aggregate conservation through
+ACL/Kernel dispatch, the argument-complete permission CALL, physical authorization
+prefix and every external target-setter outcome including rollback. The concrete
+ACLCalls specialization leaves explicit premises for unhandled requests and host
+exhaustion fallback. Withdrawal balance propagation was already completed.
+Continue with initial EVM aggregate reachability, delegated callbacks and exhaustion,
+deployment/resource binding and remaining parent/writer obligations. Do not treat
+callee preservation or the incoming aggregate as established deployment facts.
+Current evidence: authorization-balance-summary.json, two selected checks plus 79
 revalidated unchanged source/olean pairs. Full implementation and remote gates
 remain open. The prior turn changed source and published checked evidence.
 

@@ -1,5 +1,23 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Authorization and external target balance invariant
+
+`AuthorizationBalance` proves provisional balance preservation for completed ACL
+evaluation and Kernel permission dispatch, including nested oracle traces and
+malformed reply decoding. Argument-complete permission CALLs and the physical
+initialization/kernel prefix propagate aggregate conservation. Every external
+target-setter outcome, including denial/fault and root rollback, retains the total
+and incoming finite aggregate bound. Concrete ACLCalls specialization leaves
+premises for unhandled requests and the explicit host-exhaustion fallback.
+
+No host exhaustion is turned into denial, and no EVM gas, initial aggregate
+reachability or general delegated/deployed execution claim is made. At source
+`48a7fad44c41df1305e27c2245f3a46563b1da79`, two selected checks and seven baseline/import checks pass. The other
+79 source/olean pairs and eleven dependency revisions match; axioms are standard.
+See `receipts/authorization-balance-summary.json`. Runtime source and prior runtime
+receipts are unchanged. Full implementation, remote gates and independent review
+remain incomplete.
+
 ## Complete withdrawal balance invariant
 
 `WithdrawalBalance` carries exact total conservation and the finite aggregate bound

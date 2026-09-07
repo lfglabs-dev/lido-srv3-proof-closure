@@ -1,0 +1,101 @@
+LidoSRv3/Audit/Source/TrioReserve1/AuthorizationBalance.lean:44:8: error: Tactic `assumption` failed
+
+case h_2
+k : Queue.Keccak
+external : External
+self : Address
+ctx : Context
+role : Word
+before : World
+he : Preserves external
+h✝¹ : ¬(Kernel.acl k self before).val = 0
+h✝ : ¬(before.core.codeSize (Kernel.acl k self before).val).val = 0
+x✝ : Reply
+data✝ : Bytes
+after✝ : World
+hp : after✝.balances = before.balances
+heq✝ :
+  external
+      { caller := self, target := Kernel.acl k self before, value := word 0,
+        payload := Aragon.permissionPayload ctx role }
+      before =
+    Reply.success data✝ after✝
+⊢ match
+    Kernel.decodedReply
+      { caller := self, target := Kernel.acl k self before, value := word 0,
+        payload := Aragon.permissionPayload ctx role }
+      data✝ after✝ with
+  | Reply.success data after => after.balances = before.balances
+  | Reply.successWithTrace data after nested => after.balances = before.balances
+  | Reply.rejected data => True
+  | Reply.rejectedWithTrace data nested => True
+LidoSRv3/Audit/Source/TrioReserve1/AuthorizationBalance.lean:46:6: error: No goals to be solved
+LidoSRv3/Audit/Source/TrioReserve1/AuthorizationBalance.lean:80:4: error: No goals to be solved
+LidoSRv3/Audit/Source/TrioReserve1/AuthorizationBalance.lean:110:102: error: unsolved goals
+case hn.hn.hf
+external : External
+he : Preserves external
+ctx : Context
+requested : Word
+x✝⁴ : Bool
+x✝³ : Unit
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ ∃ support,
+    BalanceSpec.Bounded (write ctx targetSlot requested x✝²).world.balances support x✝ ∧
+      BalanceSpec.mass (write ctx targetSlot requested x✝²).world.balances support = BalanceSpec.mass x✝².balances x✝¹
+
+case hn.hn.hn.hf
+external : External
+he : Preserves external
+ctx : Context
+requested : Word
+x✝⁵ : Bool
+x✝⁴ x✝³ : Unit
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ ∃ support,
+    BalanceSpec.Bounded (emit ctx "DepositsReserveTargetSet" [requested] x✝²).world.balances support x✝ ∧
+      BalanceSpec.mass (emit ctx "DepositsReserveTargetSet" [requested] x✝²).world.balances support =
+        BalanceSpec.mass x✝².balances x✝¹
+
+case hn.hn.hn.hn.hf
+external : External
+he : Preserves external
+ctx : Context
+requested : Word
+x✝⁶ : Bool
+x✝⁵ x✝⁴ x✝³ : Unit
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ ∃ support,
+    BalanceSpec.Bounded (Live.read ctx reserveSlot x✝²).world.balances support x✝ ∧
+      BalanceSpec.mass (Live.read ctx reserveSlot x✝²).world.balances support = BalanceSpec.mass x✝².balances x✝¹
+
+case hn.hn.hn.hn.hn
+external : External
+he : Preserves external
+ctx : Context
+requested : Word
+x✝⁷ : Bool
+x✝⁶ x✝⁵ x✝⁴ : Unit
+x✝³ : Word
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ ∃ support,
+    BalanceSpec.Bounded
+        ((if requested.val < x✝³.val then setDepositsReserve ctx requested.val else pure PUnit.unit) x✝²).world.balances
+        support x✝ ∧
+      BalanceSpec.mass
+          ((if requested.val < x✝³.val then setDepositsReserve ctx requested.val else pure PUnit.unit)
+                x✝²).world.balances
+          support =
+        BalanceSpec.mass x✝².balances x✝¹
