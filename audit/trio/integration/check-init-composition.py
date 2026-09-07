@@ -50,6 +50,8 @@ def check(module):
         raise RuntimeError(run.stdout + run.stderr)
 
 try:
+    check('LidoSRv3.Tests.TrioIntegration.LibraryABI')
+    check('LidoSRv3.Audit.Source.TrioAlloc2.ABIComposition')
     check('LidoSRv3.Tests.TrioIntegration.MemoryComposition')
     check('LidoSRv3.Tests.TrioIntegration.Parent')
     check('LidoSRv3.Audit.Source.TrioComposition.ParentDeterminism')

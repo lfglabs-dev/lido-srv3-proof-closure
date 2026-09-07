@@ -50,10 +50,23 @@ its receipt is in `audit/trio/integration/composition-init-receipt.json`. This i
 not a production/test/trust build, make-prove/test result, or certification.
 
 `prepare.py` and `source-identity.json` retain the isolated ABI candidate setup
-against producer `8269ac576cf119975a7e9954459cd4aa04d5cd82`. They do not validate
-the integrated producer. `LibraryABI.lean` and its vectors remain staged outside
-the production glob; the decoded and memory compositions above are integrated.
-Use the root build for complete validation.
+against producer `8269ac576cf119975a7e9954459cd4aa04d5cd82`. The historical manifest
+and receipts do not validate the integrated producer or the new production paths.
+`LibraryABI.lean` now lives in the production source tree, and its eleven vectors
+live in `LidoSRv3/Tests/TrioIntegration/LibraryABI.lean`. The staged files are
+compatibility imports. The isolated preparation and differential verifier include
+the new paths and require a fresh source manifest and remote receipt; old receipts
+fail closed. Use the root build for complete validation.
+
+`TrioAlloc2.producer_then_abi_distributes` connects actual successful producer
+execution through canonical argument decoding, the proportional consumer, return
+encoding and return decoding to the independent distribution relation. It derives
+consumer success and return-array size from producer/consumer theorems. The encoded
+argument extent remains an explicit premise, pending compiler allocation and
+reachable-state proof. It does not certify deployed DELEGATECALL or the enclosing
+parent. The 40-module Init-only integration check passes, including eleven emitted
+ABI vectors, sixteen existing vectors and four existing parent mutants. The receipt
+is `audit/trio/integration/abi-integration-init-receipt.json`.
 
 Historical job `d6b747be-05b7-486a-b03c-bfb97f840ad1` against producer
 `5f1683eaf753ff73aec6f1e787cb7f68bedcf056`, old-agent, exit 0, 21 jobs,
@@ -83,4 +96,3 @@ the model's exact input and output bytes with the pinned public library.
 
 Coordination remains pending: ask_worker again returned writer_identity_stale
 for the producer's existing PR #245 / trio-alloc1 writer. No tags were changed.
-

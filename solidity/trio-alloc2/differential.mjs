@@ -45,13 +45,15 @@ if (process.argv[3]) {
   assert.equal(abiReceipt.validation.toolchain, 'leanprover/lean4:v4.31.0');
   const abiIdentity = JSON.parse(readFileSync(resolve(root, 'audit/trio/alloc2/composition/source-identity.json')));
   for (const path of ['audit/trio/alloc2/composition/LibraryABI.lean',
-    'audit/trio/alloc2/composition/LibraryABIVectors.lean', 'LidoSRv3/Audit/Source/TrioAlloc1/Bytes.lean']) {
+    'audit/trio/alloc2/composition/LibraryABIVectors.lean',
+    'LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean',
+    'LidoSRv3/Tests/TrioIntegration/LibraryABI.lean', 'LidoSRv3/Audit/Source/TrioAlloc1/Bytes.lean']) {
     assert.ok(Object.hasOwn(abiIdentity.files, path), `missing ABI source: ${path}`);
   }
   assert.match(abiIdentity.producer, /^[0-9a-f]{40}$/);
   let abiManifest = 'sandboxed-source-bundle-v1\n';
   for (const path of Object.keys(abiIdentity.files).sort()) {
-    assert.match(path, /^(LidoSRv3\/Audit\/Source\/TrioAlloc[12]\/[^/]+\.lean|audit\/trio\/alloc2\/composition\/[^/]+\.lean)$/);
+    assert.match(path, /^(LidoSRv3\/Audit\/Source\/TrioAlloc[12]\/[^/]+\.lean|LidoSRv3\/Tests\/TrioIntegration\/LibraryABI\.lean|audit\/trio\/alloc2\/composition\/[^/]+\.lean)$/);
     const bytes = path.startsWith('LidoSRv3/Audit/Source/TrioAlloc1/')
       ? execFileSync('git', ['-C', root, 'show', `${abiIdentity.producer}:${path}`])
       : readFileSync(resolve(root, path));

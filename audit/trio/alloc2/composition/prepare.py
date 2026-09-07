@@ -35,6 +35,8 @@ def main():
     for name in ("Composition.lean", "LibraryABI.lean", "LibraryABIVectors.lean", "lakefile.lean"):
         path = Path(__file__).parent / name
         sources[str(path.relative_to(ROOT))] = path.read_bytes()
+    vectors = Path("LidoSRv3/Tests/TrioIntegration/LibraryABI.lean")
+    sources[str(vectors)] = (ROOT / vectors).read_bytes()
     hashes = {}
     for path, data in sorted(sources.items()):
         target = DEST / path
