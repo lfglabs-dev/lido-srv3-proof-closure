@@ -77,3 +77,24 @@ or erase failure transcripts. All produce mismatches; the generic
 VM mutants. The original 16 execution vectors also pass. The receipt is
 `parent-iff-init-receipt.json`; all checked source hashes were compared with the
 working tree before recording it.
+
+## Executed canonical library ABI in the parent
+
+`ParentABI.lean` adds `getDepositAllocationsABI`, which executes argument encoding, library byte
+decoding, proportional allocation, return encoding and caller-side return
+decoding before the checked Ether conversions. `public_abi_iff` transfers the
+independent all-outcome parent relation to this executor, preserving module-call
+transcripts. Consumer success and return size are derived from producer results.
+
+The `ReachableABIExtent` premise applies only to positive-demand producer
+outcomes reached after the actual division. It is still an unproved compiler
+allocation/reachability obligation. The theorem is not deployed DELEGATECALL,
+physical memory, or concrete EVM world correspondence. The explicit bound is
+not removed by the finite vectors.
+
+The 41-module Init-only closure passes with standard axioms only. Six existing
+parent scenarios now also execute the ABI wrapper and compare exact results and
+complete module transcripts, alongside eleven byte vectors, the original sixteen
+vectors, and four SOURCE parent mutants. The receipt is
+`parent-abi-init-receipt.json`. No canonical guarantee or certification status is
+upgraded. UX2 passed on the earlier ABI integration head `2d8e182e`.
