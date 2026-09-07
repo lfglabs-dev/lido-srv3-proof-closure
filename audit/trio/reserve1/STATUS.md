@@ -20,8 +20,11 @@ composition; complete independent parent return/revert specification, full
 source-callee deployment/primitive binding, enclosing writers and sequential
 invariants remain required. No overall correspondence completion is claimed.
 
-The checker now includes 32 owned modules. Exact immutable validation follows
-this implementation commit; historical execution receipts retain their source.
+All 32 owned modules passed at `53878264fd7d2030afcf176d398dfe0fa5114271`.
+`receipts/spending-summary.json` links exact commands/toolchain/source hashes,
+standard-axiom inspection, six baseline checks and import-DAG validation (all 0),
+dependency/wrapper identity and the proof-only source delta. Historical runtime
+receipts retain their original source. Full remote gates remain missing.
 
 ## Getter and withdrawal-tail composition
 
