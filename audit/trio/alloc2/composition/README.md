@@ -104,3 +104,5 @@ Parent.run executes the actual producer followed by the decoded proportional
 consumer and ordered wei conversion; eight paired parent vectors include late
 conversion overflow and producer rejection. See ../checkpoint-parent.md for the
 remaining universal, physical-memory, Verity and review obligations.
+
+Current memory-prefix candidate pins producer 8691c7881a863715ab5ec9b39631ab41243e7c91 and includes its AllocationMemory module. The interface and prior six modules are unchanged. See ../checkpoint-memory-prefix.md for the exact guard/prefix equivalence and derived byte extent, and for the remaining compiler-schedule and memory-copy obligations.

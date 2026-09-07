@@ -10,6 +10,7 @@ package trioAlloc2Slice where
 lean_lib TrioAlloc2Slice where
   globs := #[
     .one `LidoSRv3.Audit.Source.TrioAlloc2.Word,
+    .one `LidoSRv3.Audit.Source.TrioAlloc2.MemoryPrefix,
     .one `LidoSRv3.Audit.Source.TrioAlloc2.Arithmetic,
     .one `LidoSRv3.Audit.Source.TrioAlloc2.Step,
     .one `LidoSRv3.Audit.Source.TrioAlloc2.ScanBounds,

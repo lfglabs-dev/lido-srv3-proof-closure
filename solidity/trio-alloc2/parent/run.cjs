@@ -35,6 +35,10 @@ const vectors=modelReceipt.log_tail.split('\n').map(line=>line.match(/(?:^|: )AL
   .filter(Boolean).map(match=>JSON.parse(match[1]));
 assert.equal(vectors.length,8,'missing or truncated parent execution output');
 assert.equal(new Set(vectors.map(v=>v.name)).size,8);
+const memoryVectors=modelReceipt.log_tail.split('\n').map(line=>line.match(/(?:^|: )ALLOC2_MEMORY_VECTOR (.+)$/))
+  .filter(Boolean).map(match=>JSON.parse(match[1]));
+assert.equal(memoryVectors.length,4,'missing allocation-guard executions');
+assert.equal(new Set(memoryVectors.map(v=>v.name)).size,4);
 assert.match(solc.version(), /^0\.8\.25\+/);
 const sources = {};
 function imports(name) {
@@ -70,7 +74,14 @@ const cases = [
   {name:'late-second-row-overflow',count:2,shares:[0,10000],cfg:[unit,2048],amount:unit,
     responses:[words(0,1,0),words(0,huge,1)],expected:panic(17),reverted:true,calls:['0:9abddf09','1:9abddf09'],library:true},
   {name:'zero-demand-late-rejection',count:2,amount:0,rejects:[false,true],responses:[words(0,1,1),'0xdead'],expected:'0xdead',reverted:true,calls:['0:9abddf09','1:9abddf09'],library:false},
-  {name:'malformed-summary',responses:['0xdead',words(0,1,1)],expected:'0x',reverted:true,calls:['0:9abddf09'],library:false}
+  {name:'malformed-summary',responses:['0xdead',words(0,1,1)],expected:'0x',reverted:true,calls:['0:9abddf09'],library:false},
+  ...[
+    {name:'memory-max-count',count:(1n<<256n)-1n},
+    {name:'memory-length-limit',count:1n<<64n},
+    {name:'memory-size-limit',count:1n<<59n}
+  ].map(c=>({...c,memory:true,amount:0,expected:panic(65),reverted:true,calls:[],library:false})),
+  {name:'division-before-memory-limit',count:1n<<64n,cfg:[0,2048],amount:320,memory:true,
+    expected:panic(18),reverted:true,calls:[],library:false}
 ];
 async function main() {
   const rpc = ganache.provider({logging:{quiet:true},chain:{hardfork:'shanghai'},wallet:{deterministic:true},miner:{blockGasLimit:100000000}});
@@ -116,11 +127,13 @@ async function main() {
     }
     for(const test of cases) {
       const c={...defaults,...test}; await write(lengthSlot,c.count);
-      const model=vectors.find(v=>v.name===c.name);assert.ok(model,'missing parent model '+c.name);
-      assert.equal(model.count,c.count);assert.deepEqual(model.shares,c.shares);
+      const model=(c.memory?memoryVectors:vectors).find(v=>v.name===c.name);assert.ok(model,'missing model '+c.name);
+      assert.equal(BigInt(model.count),BigInt(c.count));
+      if(!c.memory) assert.deepEqual(model.shares,c.shares);
+      else assert.notEqual(BigInt(c.count),0n,'memory-prefix vectors require nonempty parent');
       assert.equal(model.unit,BigInt(c.cfg[0]).toString());assert.equal(model.amount,BigInt(c.amount).toString());
       assert.equal(BigInt(c.cfg[1]),2048n);assert.equal(c.rejects[0],false);
-      assert.deepEqual(model.summaries,c.responses);assert.equal(model.reject1,c.rejects[1]);
+      if(!c.memory) {assert.deepEqual(model.summaries,c.responses);assert.equal(model.reject1,c.rejects[1]);}
       for(let i=0;i<2;i++) {
         await write(moduleSlots[i],BigInt(modules[i].target)+(BigInt(c.shares[i])<<192n)+(1n<<232n));
         await write(moduleSlots[i]+2n,0);
@@ -147,7 +160,7 @@ async function main() {
       const record={name:c.name,calldata:data,actual,reverted,calls,delegates,before,after,events:txReceipt.logs,
         storageWrites:trace.structLogs.filter(x=>x.op==='SSTORE').length};
       receipts.push(record);
-      fs.writeFileSync(output,JSON.stringify({scope:'pinned SRLib parent vs executed decoded producer/consumer/parent Lean; not Verity runtime or physical-memory proof',pin,compiler:solc.version(),settings,sources,
+      fs.writeFileSync(output,JSON.stringify({scope:'pinned SRLib parent vs decoded producer/consumer/parent and early allocation-guard Lean executions; not full physical-memory proof',pin,compiler:solc.version(),settings,sources,
         model:{job:modelReceipt.job_id,producer:identity.producer,overlay:sha(manifest),receiptSha256:sha(fs.readFileSync(modelReceiptPath))},
         harnessSha256:sha(harnessSource),runnerSha256:sha(fs.readFileSync(__filename)),lockSha256:sha(fs.readFileSync(path.join(__dirname,'package-lock.json'))),
         linkedHashes,receipts},null,2)+'\n');
