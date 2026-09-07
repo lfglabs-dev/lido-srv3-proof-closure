@@ -1,7 +1,6 @@
 {
   "base": "c7adae04416704a839d56333efad003f0a0f46b7",
   "producer": "8691c7881a863715ab5ec9b39631ab41243e7c91",
-  "verity": "e977aaad6e1a9e92e0132d41b3d33a14135a4d46",
   "files": {
     "LidoSRv3/Audit/Source/TrioAlloc1/AllocationMemory.lean": "4c5a39cc5f93c6057e31b06803d463a5594b26610bb58a458e1542c8f387b573",
     "LidoSRv3/Audit/Source/TrioAlloc1/Bytes.lean": "80807f4a9a7894bf9bef06339eb7a50e59e715e2d77d508f07e19c847b70e5fb",
@@ -34,26 +33,15 @@
     "LidoSRv3/Audit/Source/TrioAlloc2/StepCorrespondence.lean": "f4a3f68e194a3282fcac20d89e847f6687c9389a0360a270794a555dae701755",
     "LidoSRv3/Audit/Source/TrioAlloc2/Totality.lean": "335759eb0d05c1177705ed588d6341ad143bac8f6070271b18fb780c84cbd653",
     "LidoSRv3/Audit/Source/TrioAlloc2/Word.lean": "0d13d4c1e245bf01efdaad3a0a5c40a75a00f2b06c3ac22d6994c25e0ad8b786",
-    "audit/trio/alloc2/composition/AllocationMemoryBridge.lean": "75a2ee708bf1e34044291600663d3569945120e09afd1555de44a58d6f2adfe7",
+    "audit/trio/alloc2/byte-memory/lakefile.lean": "c6a89adf7b959dac565341c1448b9f89da731c6c2f4a860d11e6080992383bda",
+    "audit/trio/alloc2/composition/ByteFrame.lean": "4f3ac88486022647fadecd53a15c4c0c33f3e9508aa2660f1ef2b9d459af0320",
+    "audit/trio/alloc2/composition/ByteIndexed.lean": "f889aeefb24f175fb3c2ce36943e79f989d8def0261d3cd132a591e7315cd02c",
+    "audit/trio/alloc2/composition/ByteInitialize.lean": "d3a3f008169bce351d94a26c56cbbe4e13992fde711f63806a2a36849154c308",
+    "audit/trio/alloc2/composition/ByteMemory.lean": "168c37a5020ae94233e553129de54bbe98c65aaedb8f0cfdd6c3082196b6e2bc",
+    "audit/trio/alloc2/composition/ByteProducer.lean": "0832c9b75a4ee1330108acfbd487d1a0e74936ee839d20e4c910b596e6d3ae34",
+    "audit/trio/alloc2/composition/ByteVectors.lean": "f7fc3a462f3b3273c53fec850ab63b5f1e40137010f6a39ab598134bf8825011",
     "audit/trio/alloc2/composition/Composition.lean": "c12061b0bbfd7ced775d879ad95fe43ca31c068b22e05b9198589464ce3718a5",
     "audit/trio/alloc2/composition/IndexedMemory.lean": "e797794d01ab9788e88a96aa7f79bc4870e744701231c8692e3c5ae24b1a1c0d",
-    "audit/trio/alloc2/composition/LibraryABI.lean": "b2f7d6085d8fa79f57acb3d0d710bf0b9037bcebc04ea9acb4f92418072abd57",
-    "audit/trio/alloc2/composition/LibraryABIVectors.lean": "591809843b67addd13dd40053ee9a54b76c577f73d19b52dcbe7c2cae6b22018",
-    "audit/trio/alloc2/composition/MemoryExtent.lean": "8d0fb17fd1f334c25fdda5bf1f64f381f33a52f6ffc6fa902322992bfe7dbf2e",
-    "audit/trio/alloc2/composition/MemoryVectors.lean": "bada6c889da68f4adab6a1861549139303f0129c7fb283524226f134a5acf2bc",
-    "audit/trio/alloc2/composition/MemoryWrite.lean": "af353bf2995c212fde257c43f402de10b5eae1fb651b2791b611a8b49963d4b1",
-    "audit/trio/alloc2/composition/MemoryWriteVectors.lean": "62fb8050f1d42e9f87645ccc0739e010a79270d4d37e1ddac999d300a140370a",
-    "audit/trio/alloc2/composition/Parent.lean": "02519228eaba1bf17d313ea588f808211849e82c02e87ba29e07e3052385f985",
-    "audit/trio/alloc2/composition/ParentErrors.lean": "3deeb4fa9c70a226047236a993910f2932fe7714380b6986597a2c88472d3ad3",
-    "audit/trio/alloc2/composition/ParentInversion.lean": "ef2fb114b452981cfd7b8eea1c47471487e1de8273ff913e9fbf8725c5f8973e",
-    "audit/trio/alloc2/composition/ParentPostconditions.lean": "906cf6a6d522a1068dfc8aafbe64a3817a849ff7ecacd3bbf11ba431e0ed3fb9",
-    "audit/trio/alloc2/composition/ParentVectors.lean": "cbd9f7eee683bccc360d23b45433f26e731f30ee4b36f7d8f54510c5772fbcd4",
-    "audit/trio/alloc2/composition/ProducerMemory.lean": "e0d3e4367f35de46f9569020bcb1b1c63a592c4fb6d7793c90d830e09763f5ae",
-    "audit/trio/alloc2/composition/ProducerMemoryVectors.lean": "656b1ff992bc9a91a8ff55552d74337d1e0cdec55c1553855aeed1acbbcfa0dd",
-    "audit/trio/alloc2/composition/lakefile.lean": "16545b395915a5364f20f84acacae0ad9549d03f1abffcdaa568d67249a21ea2",
-    "audit/trio/alloc2/runtime/Library.lean": "db7d308d1594d65a7a3959f4c87ba7f404d0cada487b7bc18067f49c1c6621aa",
-    "audit/trio/alloc2/runtime/Vectors.lean": "100f4cb6ae1b340bc613f1c3f099a211ed87ccbe86716445beb59618cae78967",
-    "audit/trio/alloc2/runtime/lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
-    "audit/trio/alloc2/runtime/lakefile.lean": "c08ee40056c101f185258f83aa7f4359de3abf37b020ab81a762fdf397ae0be5"
+    "audit/trio/alloc2/composition/MemoryWrite.lean": "af353bf2995c212fde257c43f402de10b5eae1fb651b2791b611a8b49963d4b1"
   }
 }
