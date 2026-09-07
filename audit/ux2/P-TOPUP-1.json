@@ -66,11 +66,11 @@
     {
       "id": "A-TOPUP-NOWRAP",
       "severity": "HIGH",
-      "risk": "The unbounded-Nat top-up model reads the unchecked uint256 accumulation at StakingRouter.sol line 732 only under the assumption that the allocation sum stays below 2^256; the bound originates outside the pinned P-TOPUP-1 spans.",
-      "justification": "Lean Nat accumulation matches Solidity unchecked uint256 only when the source sum does not wrap.",
-      "violation_impact": "Top-up conservation and guard reachability can be false after a 2^256 wrap.",
-      "validation": "Exercise boundary mutants and retain the explicit NoUncheckedWrap premise in every consuming theorem.",
-      "removal_path": "Prove an upstream bound on key count and per-key amounts that implies the sum is below 2^256."
+      "risk": "An exact natural-number sum equals its unchecked uint256 reading only below 2^256. This registry condition is retained for results that use that equality; the current P-TOPUP-1 parent explicitly models wrapping and does not require a general no-wrap premise.",
+      "justification": "The current parent proves that a wrapping total moves no value: a nonzero wrapped total reverts, while a total wrapping to zero can finish without moving ETH.",
+      "violation_impact": "Wrapping invalidates an unqualified exact-sum interpretation, not the current parent’s explicit wrapping result.",
+      "validation": "Check the current parent and its nonzero-wrap and zero-wrap results. Retain NoUncheckedWrap only where a consuming theorem actually requires it.",
+      "removal_path": "Review each consuming theorem before removing this registry identifier; retain the explicit wrapping behavior in the current parent."
     },
     {
       "id": "A-VERITY-SCAFFOLD",
