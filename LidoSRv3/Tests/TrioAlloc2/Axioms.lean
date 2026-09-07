@@ -1,3 +1,7 @@
+import LidoSRv3.Audit.Source.TrioAlloc2.LoopCorrespondence
+import LidoSRv3.Audit.Source.TrioAlloc2.SpecProgress
+import LidoSRv3.Audit.Source.TrioAlloc2.StepCorrespondence
+import LidoSRv3.Audit.Source.TrioAlloc2.ChoiceCorrespondence
 import LidoSRv3.Audit.Source.TrioAlloc2.Errors
 import LidoSRv3.Audit.Source.TrioAlloc2.LoopTotality
 import LidoSRv3.Audit.Source.TrioAlloc2.Totality
@@ -65,3 +69,13 @@ open LidoSRv3.Audit.Source.TrioAlloc2
 #print axioms step_short_error
 #print axioms allocate_short_error
 #print axioms allocate_success_iff
+
+#print axioms choose_of_scans
+
+#print axioms step_refines
+
+#print axioms Spec.choose_positive
+
+#print axioms allocateLoop_refines
+#print axioms allocate_refines
+#print axioms distribution_exists

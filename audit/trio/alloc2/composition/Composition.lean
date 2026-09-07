@@ -1,6 +1,7 @@
 import LidoSRv3.Audit.Source.TrioAlloc1.Properties
 import LidoSRv3.Audit.Source.TrioAlloc2.Errors
 import LidoSRv3.Audit.Source.TrioAlloc2.Conservation
+import LidoSRv3.Audit.Source.TrioAlloc2.LoopCorrespondence
 
 /-! Consumer-owned composition against the exact candidate producer executor.
 This is the decoded boundary: byte-memory/ABI, public entry conversion, and trace
@@ -51,4 +52,21 @@ theorem producer_then_consumer_succeeds
 
 #print axioms producer_success_establishes_consumer_premises
 #print axioms producer_then_consumer_succeeds
+
+/-- Actual producer outputs admit an execution satisfying the independent
+proportional distribution relation, with no assumed consumer success. -/
+theorem producer_then_consumer_distributes
+    (layout : TrioAlloc1.Layout) (storage : TrioAlloc1.Storage) (oracle : TrioAlloc1.StaticOracle)
+    (input : TrioAlloc1.CapacityInput) (before after : TrioAlloc1.Transcript)
+    (output : TrioAlloc1.CapacityOutput)
+    (executed : TrioAlloc1.produce layout storage oracle input before = (.ok output, after)) :
+    ∃ result, allocate output.allocations output.capacities input.depositsToAllocate = .ok result ∧
+      Spec.Distributes (decodedRows output.allocations output.capacities)
+        input.depositsToAllocate.val result.amount.val (decodedRows result.buckets output.capacities) := by
+  have premises := producer_success_establishes_consumer_premises
+    layout storage oracle input before after output executed
+  exact distribution_exists output.allocations output.capacities input.depositsToAllocate
+    (Nat.le_of_eq premises.lengths) premises.length_representable
+
+#print axioms producer_then_consumer_distributes
 end LidoSRv3.Audit.Source.TrioAlloc2
