@@ -26,7 +26,8 @@ def check(module):
     if module == 'Init' or module in visited:
         return
     if not module.startswith(('LidoSRv3.Audit.Source.TrioAlloc1.',
-                              'LidoSRv3.Audit.Source.TrioAlloc2.')):
+                              'LidoSRv3.Audit.Source.TrioAlloc2.',
+                              'LidoSRv3.Tests.TrioIntegration.')):
         raise RuntimeError(f'Non-Init closure requires full validation: {module}')
     visited.add(module)
     relative = Path(*module.split('.')).with_suffix('.lean')
@@ -48,7 +49,7 @@ def check(module):
         raise RuntimeError(run.stdout + run.stderr)
 
 try:
-    check('LidoSRv3.Audit.Source.TrioAlloc2.Composition')
+    check('LidoSRv3.Tests.TrioIntegration.MemoryComposition')
     receipt['classification'] = 'PASS_INIT_ONLY_COMPOSITION'
 finally:
     (out / 'receipt.json').write_text(json.dumps(receipt, indent=2) + '\n')

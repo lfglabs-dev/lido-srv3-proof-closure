@@ -15,7 +15,24 @@ allocation with conservation and demand bounds, and the independent proportional
 distribution relation from actual producer success. They pass the same demand and
 actual output arrays to the consumer. No consumer-success assumption is added.
 
-The boundary remains decoded arrays. Compiler memory allocation, byte-memory/ABI
+`MemoryComposition.lean` additionally makes the consumer read the stored array
+lengths and byte-addressed elements through `allocateMemory`. `readMemoryArray_eq`
+proves those reads recover the arrays under `ArrayAt`; `allocateMemory_eq` transfers
+all decoded outcomes. The producer-to-memory and producer-to-byte distribution
+theorems derive successful independent distribution without assuming consumer
+success. The byte theorem derives the memory relation from `outputBytes` and an
+explicit nonwrapping extent bound.
+
+The execution checks cover prefixes/gaps, proportional ties, empty arrays,
+zero-demand precedence over short capacity arrays, short-capacity failure,
+already-over-capacity rows, and a wrong-capacity-pointer negative control. They
+execute the memory consumer, not Solidity or Verity Contract.run. The complete
+Init-only closure now contains 27 modules; its receipt is
+`audit/trio/integration/memory-composition-init-receipt.json`.
+
+This still does not derive the compiler's concrete allocation or memory mutations.
+The encoded bytes are a proved representation of producer outputs, not evidence
+that an EVM execution constructed them. Compiler memory allocation, byte-memory/ABI
 execution, parent conversion, source refinement, callbacks and rollback remain
 required. The separate +1 algorithm is unchanged.
 

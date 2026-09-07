@@ -31,3 +31,14 @@ Thomas's approval. No delivery status has been upgraded.
 
 Next: collect final writer checkpoints, integrate their successor heads, complete
 shared composition and full validation, and obtain independent certification.
+
+## Integrated memory bridge
+
+The consumer now reads length-prefixed memory arrays. Producer-to-consumer
+distribution is proved through the memory relation and through the existing byte
+encoding theorem. The memory extent bound is explicit and not yet derived from
+compiler allocation. All 27 modules in the Init-only closure and seven execution
+checks pass. Proof-escape, import layering, annotations and metadata checks pass;
+UX2 artifacts were regenerated after the new declarations. This does not complete
+bytecode/source fidelity, parent callbacks/rollback, Verity differentials or full
+validation. The three remote writer heads remained unchanged when rechecked.
