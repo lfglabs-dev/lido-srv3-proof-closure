@@ -23,6 +23,7 @@ import markdown_text  # noqa: E402  (sibling module, located above)
 
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
+SOURCE_FIDELITY = AUDIT / "SOURCE-FIDELITY.md"
 R1_REVIEW_BASE = "6a2a91341ac83c8fbf93dfa274897387e5b8a188"
 # The report records the normal source-fidelity-A reconciliation merge as its input basis. Keep the exact
 # generator inputs bound both to that Git object and to their expected bytes:
@@ -104,6 +105,7 @@ EXPECTED_PRIORITIES = {
     "P-ADDRESS-1": "DONE", "P-TOPUP-2": "DONE", "P-CONSOLIDATION-1": "DONE",
     "P-SSZ-1": "DONE",
 }
+P_ALLOC1_LIVE_ROLLBACK_GAP = "Contract.run rollback after intermediate writes for AllocationTx.allocate; the cited revert_restores_snapshot theorem does not cover allocateLiveFromStorage"
 DEPOSIT_CONSTRUCTOR_FIXTURE = ROOT / "fixtures/solidity-reference/StakingRouter.constructor.L88-L106.sol"
 DEPOSIT_PROVENANCE_LEAN = ROOT / "LidoSRv3/Audit/Provenance/Deposit.lean"
 TRUST_NATIVE_DECIDE_ALLOWLIST = AUDIT / "trust-native-decide-allowlist.txt"
@@ -381,6 +383,7 @@ def validate_guarantees(data, assumption_ids):
         require(isinstance(row["next_gate"], str) and row["next_gate"].strip(), f"{row['id']}: empty next gate")
         require(set(row["reproduction"]) == {"command", "expected"} and all(isinstance(v, str) and v.strip() for v in row["reproduction"].values()), f"{row['id']}: reproduction record is incomplete")
         validate_classification(row, assumption_ids)
+        if row["id"] == "P-ALLOC-1": require(P_ALLOC1_LIVE_ROLLBACK_GAP in row["fidelity"]["missing"], "P-ALLOC-1: live rollback exclusion must be an open fidelity gap")
         if row["id"] in EXPECTED_CANONICAL_CLAIMS:
             require(row.get("roadmap_priority") == EXPECTED_PRIORITIES[row["id"]],
                     f"{row['id']}: roadmap priority differs")
@@ -499,40 +502,13 @@ README_UNRENDERED = re.compile(
     re.DOTALL | re.IGNORECASE,
 )
 
-# CommonMark type-6 HTML block openers: a line that starts with one of these
-# block-level element names causes everything until the next blank line to be
-# emitted as raw HTML, not parsed as Markdown.  Pipe characters on those
-# interior lines never render as table rows.
-_HTML_BLOCK_TAG = re.compile(
-    r"^ {0,3}</?(?:address|article|aside|base|basefont|blockquote|body|"
-    r"caption|center|col|colgroup|dd|details|dialog|dir|div|dl|dt|"
-    r"fieldset|figcaption|figure|footer|form|frame|frameset|h[1-6]|"
-    r"head|header|hr|html|iframe|legend|li|link|main|menu(?:item)?|"
-    r"meta|nav|noframes|ol|optgroup|option|p|param|section|source|"
-    r"summary|table|tbody|td|tfoot|th|thead|title|tr|track|ul)"
-    r"(?:[ \t>]|/>|$)",
-    re.IGNORECASE,
-)
-
-
-def _mask_readme(text):
-    """Position-preserving blank of non-rendered regions in the README.
-
-    A pipe line inside a code fence or HTML block is printed as raw text,
-    not as a table row.  Searching the raw README let a table wrapped in
-    `<!--` … `-->` or a code fence satisfy the headline-table gate while the
-    rendered page showed nothing.  Each masked character is replaced with a
-    space so every position in the result corresponds to the same position in
-    the original; this keeps the body-position range the stray-row detection
-    compares against consistent with `README_FIDELITY_ROW.finditer(readme)`.
-    """
+def _mask_non_rendered_markdown(text):
+    """Mask invisible HTML and literal Markdown while preserving source offsets."""
     def blank(m):
         return "".join(" " if c != "\n" else "\n" for c in m.group(0))
 
     # Blank whole non-rendered elements first: a table wrapped in `<template>`
     # keeps every raw pipe character while the page shows no table at all.
-    # Positions are preserved here the same way, by writing spaces over the
-    # span rather than deleting it.
     held = list(text)
     for start, stop in markdown_text.non_rendered_spans(text):
         for i in range(start, stop):
@@ -543,39 +519,10 @@ def _mask_readme(text):
     # Blank the remaining inline HTML constructs, preserving positions.
     masked = README_UNRENDERED.sub(blank, masked)
 
-    # Line-by-line pass: blank code fences and CommonMark type-6 HTML blocks.
-    # Code fences: a closing sequence repeats the opening character at least as
-    # many times; a backtick fence carries no backtick in its info string.
-    # Type-6 HTML blocks: a line whose first non-space token is a block-level
-    # element open/close tag causes everything until the next blank line to be
-    # raw HTML.  The detection uses the original line (before step 1 blanked
-    # the opening tag) so the block-tag pattern fires on the actual characters.
-    lines_m = masked.splitlines(True)   # output lines (positions preserved)
-    lines_o = text.splitlines(True)     # original lines (for HTML-block detection)
-    fence = None
-    html_block = False
-    for i, (ml, ol) in enumerate(zip(lines_m, lines_o)):
-        msk = ml.rstrip("\r\n")
-        orig = ol.rstrip("\r\n")
-        if fence is not None:
-            m = re.match(r"^ {0,3}(?P<seq>`{3,}|~{3,})[ \t]*$", msk)
-            if m and m.group("seq")[0] == fence[0] and len(m.group("seq")) >= fence[1]:
-                fence = None
-            lines_m[i] = "".join(" " if c not in "\r\n" else c for c in ml)
-        elif html_block:
-            if orig == "":  # blank line ends the HTML block
-                html_block = False
-            else:
-                lines_m[i] = "".join(" " if c not in "\r\n" else c for c in ml)
-        else:
-            m = re.match(r"^ {0,3}(?P<seq>`{3,}|~{3,})(?P<info>.*)$", msk)
-            if m and not (m.group("seq")[0] == "`" and "`" in m.group("info")):
-                fence = (m.group("seq")[0], len(m.group("seq")))
-                lines_m[i] = "".join(" " if c not in "\r\n" else c for c in ml)
-            elif _HTML_BLOCK_TAG.match(orig):
-                html_block = True
-                lines_m[i] = "".join(" " if c not in "\r\n" else c for c in ml)
-    return "".join(lines_m)
+    literal = gfm_table.mask_literal_regions(text)
+    return "".join(" " if original != " " and " " in (literal_char, masked_char) else original
+                   for original, literal_char, masked_char
+                   in zip(text, literal, masked))
 
 
 def validate_readme_fidelity_disclosure(rows):
@@ -594,7 +541,7 @@ def validate_readme_fidelity_disclosure(rows):
     # nothing.  The masked version blanks every non-rendered region character-
     # for-character (preserving newlines), so positions in `masked_readme` are
     # identical to positions in `readme` and stray-row detection remains sound.
-    masked_readme = _mask_readme(readme)
+    masked_readme = _mask_non_rendered_markdown(readme)
     tables = [t for t in gfm_table.find_tables(masked_readme)
               if (t.header.cells[0].strip(), t.header.cells[1].strip(),
                   t.header.cells[-1].strip()) == README_HEADLINE_COLUMNS]
@@ -697,6 +644,26 @@ def validate_readme_fidelity_disclosure(rows):
             "comment or other unrendered markup, does not qualify the table above it")
 
 
+def validate_source_fidelity_gap_disclosure(rows):
+    total = sum(len(row["fidelity"]["missing"]) for row in rows[:len(CANONICAL_IDS)])
+    source_fidelity = SOURCE_FIDELITY.read_text(encoding="utf-8")
+    # A heading inside a fenced block or raw HTML comment is not a section a
+    # reader sees.  Keep positions while masking it, so the body selected below
+    # remains slice-compatible with the original source.
+    masked_source = _mask_non_rendered_markdown(source_fidelity)
+    disclosures = list(re.finditer(r"^## Stage A disclosure\s*$\n(?P<body>.*?)(?=^## |\Z)", masked_source, re.MULTILINE | re.DOTALL))
+    require(len(disclosures) == 1, "SOURCE-FIDELITY: require exactly one visible Stage A disclosure section")
+    disclosure = disclosures[0]
+    lead = re.match(r"(?P<paragraph>[^\n]*(?:\n(?!\s*\n)[^\n]*)*)(?:\n\s*\n|\Z)",
+                    disclosure.group("body"))
+    require(lead is not None, "SOURCE-FIDELITY: Stage A disclosure has no lead paragraph")
+    required = f"all {total} canonical fidelity-gap entries remain."
+    require(re.search(re.escape(required).replace(r"\ ", r"\s+"),
+                      markdown_text.rendered_text(lead.group("paragraph"))),
+            f"SOURCE-FIDELITY: Stage A disclosure lead paragraph must visibly disclose "
+            f"all canonical fidelity gaps as `{required}`")
+
+
 def validate():
     validate_deposit_constructor_fixture()
     registry = load(AUDIT / "guarantees.yaml")
@@ -710,6 +677,7 @@ def validate():
     validate_global_assumptions(rows, assumptions)
     validate_r1_review_basis()
     validate_readme_fidelity_disclosure(rows)
+    validate_source_fidelity_gap_disclosure(rows)
     return rows
 
 
