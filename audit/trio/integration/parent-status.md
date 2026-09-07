@@ -406,3 +406,22 @@ protocol-1 runner receipt is execution evidence, not independent certification.
 
 The full `8bf49588` and `431e73ee` jobs remain separately tracked. They validate
 older source snapshots and cannot certify the changed interleaved producer.
+
+
+## Full-build dependency failure and corrected Lake coverage
+
+The `8bf49588` run terminated with two failed gates. Its combined build could
+not find `audit.trio.alloc2.composition.Parent.olean`: the integration library
+listed only its root, so Lake did not own or schedule the staged dependencies.
+`make prove` passed in its legacy scope; `make test` failed the old canonical
+receipt tree binding. The parent VM gate passed and its twelve-case comparison
+was independently rerun in a clean isolated checkout at the executed SHA.
+`remote-8bf49588` preserves that scoped comparison, authoritative failed receipt,
+durable wrapper logs and the complete node log containing the actual build error.
+
+The root `TrioIntegrationChecks` target now explicitly owns all ten staged
+composition/proof/vector modules plus `IndexedParentBridge`. It excludes the
+standalone nested lakefile. The expanded 83-module bounded closure passes with
+matching source hashes in `staged-build-init-receipt.json`; import-layer checking
+also passes. A fresh remote full run must verify Lake scheduling and all gates.
+The already running `431e73ee` snapshot predates this scheduling fix.

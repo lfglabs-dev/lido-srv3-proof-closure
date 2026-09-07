@@ -1,0 +1,12 @@
+{
+  "classification": "FAILED_FULL_VALIDATION_WITH_PASSED_COMPONENTS",
+  "source_commit": "8bf49588a3de0ea0c22b58e16376cecdb03e69c5",
+  "remote_job": "7d446706-1b44-4950-82ef-3537bd3e6f66",
+  "node": "old-agent",
+  "full_build": "failed: Lake did not schedule staged audit.trio.alloc2.composition.Parent dependency",
+  "make_prove": "passed; legacy scope, not trio certification",
+  "make_test": "failed: stale canonical validation receipt tree",
+  "parent_vm_comparison": "12 identical cases, evaluated in an isolated checkout at the executed SHA",
+  "independent_certification": false,
+  "log_boundary": "remote-full.log contains the complete node log; durable stdout.log is the wrapper-emitted tail"
+}

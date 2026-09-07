@@ -90,8 +90,19 @@ lean_lib «LidoSRv3Audit» where
 
 /-- Cross-check the staged indexed parent against the integrated source/ABI parent. -/
 lean_lib «TrioIntegrationChecks» where
-  roots := #[`audit.trio.integration.IndexedParentBridge,
-    `audit.trio.alloc2.composition.ParentErrors]
+  globs := #[
+    .one `audit.trio.integration.IndexedParentBridge,
+    .one `audit.trio.alloc2.composition.Composition,
+    .one `audit.trio.alloc2.composition.LibraryABI,
+    .one `audit.trio.alloc2.composition.AllocationMemoryBridge,
+    .one `audit.trio.alloc2.composition.MemoryExtent,
+    .one `audit.trio.alloc2.composition.Parent,
+    .one `audit.trio.alloc2.composition.ParentErrors,
+    .one `audit.trio.alloc2.composition.ParentPostconditions,
+    .one `audit.trio.alloc2.composition.ParentVectors,
+    .one `audit.trio.alloc2.composition.MemoryVectors,
+    .one `audit.trio.alloc2.composition.LibraryABIVectors
+  ]
 
 /-- Superseded P1–P15 lane. Not a default target. -/
 lean_lib «LidoSRv3Legacy» where

@@ -72,6 +72,10 @@ try:
     check('LidoSRv3.Audit.Source.TrioAlloc1.AdmissionWriter')
     check('LidoSRv3.Audit.Source.TrioAlloc1.AdmissionFacts')
     check('audit.trio.alloc2.composition.ParentErrors')
+    check('audit.trio.alloc2.composition.ParentPostconditions')
+    check('audit.trio.alloc2.composition.ParentVectors')
+    check('audit.trio.alloc2.composition.MemoryVectors')
+    check('audit.trio.alloc2.composition.LibraryABIVectors')
     check('audit.trio.integration.IndexedParentBridge')
     receipt['classification'] = 'PASS_INIT_ONLY_COMPOSITION'
 finally:

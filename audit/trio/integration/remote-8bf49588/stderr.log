@@ -1,0 +1,6 @@
+Cloning into '/workspaces/lido-integration-validation-8bf49588'...
+HEAD is now at 8bf4958 Execute proved allocation guards before parent VM module calls
+remote-lean-build: pinned tree contains submodules; using legacy runner fetch
+remote-lean-build: dispatching lake env lean --run audit/trio/integration/RunValidation.lean for 8bf49588a3de ...
+remote-lean-build: submitted job 7d446706-1b44-4950-82ef-3537bd3e6f66 on node 'old-agent'; receipt /root/.local/state/sandboxed-sh/remote-builds/f09c8ea691f5739ac69a244c09a17e35ba677f71832d11ce9feb71389714d9a2.json
+remote-lean-build: job 7d446706-1b44-4950-82ef-3537bd3e6f66 on node 'old-agent' finished: failed (exit 1, 3112s)
