@@ -1,16 +1,15 @@
 # Continuation — not a completion claim
 
-Latest increment: AuthorizationBalance carries aggregate conservation through
-ACL/Kernel dispatch, the argument-complete permission CALL, physical authorization
-prefix and every external target-setter outcome including rollback. The concrete
-ACLCalls specialization leaves explicit premises for unhandled requests and host
-exhaustion fallback. Withdrawal balance propagation was already completed.
-Continue with initial EVM aggregate reachability, delegated callbacks and exhaustion,
-deployment/resource binding and remaining parent/writer obligations. Do not treat
-callee preservation or the incoming aggregate as established deployment facts.
-Current evidence: authorization-balance-summary.json, two selected checks plus 79
-revalidated unchanged source/olean pairs. Full implementation and remote gates
-remain open. The prior turn changed source and published checked evidence.
+Latest increment: Report.collect implements the pinned enclosing report body with
+captured locator, accounting-address authorization, conditional vault/queue calls,
+post-call packed buffer arithmetic, reserve rebalance and ETHDistributed. CallData
+supports full ABI payloads. Seven source-model cases execute; independent report
+specification/correspondence, actual report EVM comparison, entry dispatch and
+concrete vault/queue finalization remain open. Continue these report obligations.
+Current evidence: report-source-summary.json, four selected checks plus 80 unchanged
+source/olean pairs. It now separates executable_extensions from the historical
+proof_only_changed_sources; do not claim report runtime coverage from the old ACL
+suite. Full implementation and remote gates remain open. Previous turn was progress.
 
 
 Read STATUS, current git HEAD, and admission/ABI plus oracle/component receipts first. The previous

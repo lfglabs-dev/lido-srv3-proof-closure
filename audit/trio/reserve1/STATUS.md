@@ -1,5 +1,28 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Enclosing report source body
+
+`Report.collect` now models pinned Lido.collectRewardsAndProcessWithdrawals:
+physical pause check, one captured locator, accounting-address authorization,
+conditional reward-vault and withdrawal-vault calls, conditional value-bearing
+queue finalization, then buffer accounting and reserve rebalance. `CallData.invoke`
+retains complete argument bytes and has exact equality with Live.call for selector-only
+payloads. Buffer arithmetic reads the post-call world, checks both additions and
+subtraction, narrows only the low packed half and emits the full computed amount.
+
+Seven executed Lean model cases cover saved locator under callback mutation,
+post-call buffer/high-half changes, argument bytes/order/value, queue rejection and
+rollback, skipped zero amounts, arithmetic overflow/underflow, authorization and
+malformed accounting data. These fixtures are not EVM report execution. Independent
+report correspondence, vault/queue implementations, entry dispatch and deployment
+binding remain open. Historical runtime suites cover their prior sources only.
+
+At source `e45d4d309cd0bdafe82be8ba8caeb550b93706ad`, four selected Lean checks and seven baseline checks pass;
+80 unchanged source/olean pairs and eleven dependency revisions match. Axioms are
+standard. See `receipts/report-source-summary.json` and selector hashing provenance
+in `receipts/report-source-selectors.json`. Full remote gates and certification are
+still missing; this is implementation progress, not completion.
+
 ## Authorization and external target balance invariant
 
 `AuthorizationBalance` proves provisional balance preservation for completed ACL

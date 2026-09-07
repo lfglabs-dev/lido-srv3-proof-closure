@@ -114,3 +114,17 @@ across accounting writes is proved. Bound contains physical address/code inputs,
 not successful call flags; receiver immutable authorization is checked separately.
 The differential runner selects Pipeline.external for complete source configs.
 Exhaustive independent parent and upstream deployment/writer/world relations remain open.
+
+
+## Enclosing report body (source implementation, correspondence open)
+
+- `Report.collect`: pinned Lido.sol:1072-1119, including `_whenNotStopped`
+  (utils/Pausable.sol:18-19), address `_auth` (Lido.sol:1394-1395), captured
+  locator getters and conditional calls. Nonpayable/ABI entry dispatch remains open.
+- `Report.afterCalls`: Lido.sol:1103-1119, `_setBufferedEther` at 1499-1501,
+  packed low-half update and `_updateBufferedEtherAllocation` at 1125-1132.
+- `CallData.invoke`: argument-complete variant of the existing high-level CALL
+  model, with selector-only equality checked. Deployed primitive binding remains open.
+- `receipts/report-source-selectors.json`: ethers 6.14.4 signature hashes and
+  pinned source hashes for report getter/vault/finalize selector literals.
+- `ReportCases`: seven executed source-interpreter cases; no report EVM claim.

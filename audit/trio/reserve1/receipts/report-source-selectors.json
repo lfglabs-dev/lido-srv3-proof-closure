@@ -1,0 +1,26 @@
+{
+  "source_commit": "e45d4d309cd0bdafe82be8ba8caeb550b93706ad",
+  "time": "2026-09-07T17:11:07.913365+00:00",
+  "argv": [
+    "/workspaces/mission-f19a12b3/reserve1-private/solidity/trio-reserve1/.tools/node-v22.15.0-linux-x64/bin/node",
+    "-e",
+    "const {id,version}=require(\"ethers\"); const signatures=[\"accounting()\", \"elRewardsVault()\", \"withdrawalVault()\", \"withdrawRewards(uint256)\", \"withdrawWithdrawals(uint256)\", \"finalize(uint256,uint256)\"]; console.log(JSON.stringify({version,selectors:Object.fromEntries(signatures.map(s=>[s,id(s).slice(0,10)]))}));"
+  ],
+  "cwd": "solidity/trio-reserve1",
+  "exit": 0,
+  "node_sha256": "c43f3f73f6917481d2364daf7b7bf8c4fc4a7643580b4626f13f003131ec8716",
+  "result": {
+    "version": "6.14.4",
+    "selectors": {
+      "accounting()": "0x9624e83e",
+      "elRewardsVault()": "0xe441d25f",
+      "withdrawalVault()": "0x69d42148",
+      "withdrawRewards(uint256)": "0x9342c8f4",
+      "withdrawWithdrawals(uint256)": "0x3194528a",
+      "finalize(uint256,uint256)": "0xb6013cef"
+    }
+  },
+  "pinned_lido_sha256": "3bf84b96fb155af2290e6b26bc0138de356442a9abe3ea0f5274497f9fbffc10",
+  "pinned_locator_interface_sha256": "cc65faee8789012cbb58c0073c770bddb37c9a7fc2594ff2e200fc7894a2dc7a",
+  "scope": "ABI signature hashing against report literals; not bytecode execution"
+}
