@@ -334,3 +334,43 @@ Full job `592f6ed2-a8ee-4af8-8e5e-6887ab80aa86` on Nippur validates
 the published writer integrations and seven response-memory VM cases, but
 predates `RowMemory`. Both it and old-agent job `7d446706` were authoritatively
 running at the latest check; neither is final-head certification.
+
+
+## Complete producer guard sequence in the parent
+
+`MemoryProducer` composes the array/cache prefix, 224-byte scratch allocation,
+interleaved first-pass allocations, capacity array and second-pass arithmetic.
+Its `producer_exact` theorem derives their success from count <= 32 and one
+budget: pointer + 608*count + 320 <= 2^32. It equals the original producer call
+tree plus the final pointer on success, while retaining every source failure.
+Eight source cases cover success, early scratch failure, late capacity failure,
+and arithmetic/allocation precedence on both sides of the capacity allocation.
+
+`MemoryParentCalls.program_eq` connects that producer to canonical consumer ABI
+and checked Ether conversion. `ParentCalls.afterProducer` shares the existing
+conversion code. `WriterMemory` derives the budget from the physical invariant
+and pointer <= 2^31, including every outcome of the public share, parameter and
+admission writers. Existing finite-layout, lifecycle-record and initial invariant
+premises remain explicit; all-writer reachability and entry-pointer provenance
+are not newly asserted.
+
+The combined Init-only closure passes 79 modules with matching source hashes;
+see `writer-memory-init-receipt.json`. `producer-memory-init-receipt.json` records
+the 78-module checkpoint before the writer bridge. Source metadata, proof-escape,
+annotation, import-DAG and Python quality checks pass. No new project axiom was
+introduced.
+
+`VerityParent.executeWithMemory` now executes this larger producer guard tree,
+and its conditional public relation uses the derived whole-producer budget.
+Eight additional actual call-VM parent cases are wired into `RunVerityParent`.
+These changed VM proofs and cases require a fresh remote compile/run; both
+currently running older jobs predate this change. Prior receipts remain scoped
+to their exact source. The comparator now also rejects mutated Solidity baseline
+artifacts and binds the mutation-definition input hash.
+
+These are compiler allocation guards in the source call tree, not physical
+MSTORE/MLOAD, a proof of memory aliasing, or the whole parent ABI-copy schedule.
+Consumer/deployed-call memory, returndata copies, pointer provenance, gas,
+recursive callback/deployment binding and final independent certification remain
+open. The numeric budget is a derived sufficient bound under the stated writer
+invariant; arbitrary storage is still executed and may fail in the modeled order.

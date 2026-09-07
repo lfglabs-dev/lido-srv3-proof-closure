@@ -62,7 +62,7 @@ theorem config_failure (pointer : Word) (l : Layout) (s : Storage) (input : Capa
     firstRow pointer l s input i total = .done (.error reason) := by
   simp [firstRow, failed, CallTree.check, bind, CallTree.bind]
 
-private theorem bind_assoc (p : CallTree.Program α) (f : α → CallTree.Program β)
+theorem bind_assoc (p : CallTree.Program α) (f : α → CallTree.Program β)
     (g : β → CallTree.Program γ) :
     (p >>= f) >>= g = p >>= (fun a => f a >>= g) := by
   induction p with
@@ -79,10 +79,10 @@ private theorem check_map_bind (result : Except Failure α) (f : α → β)
       (CallTree.check result >>= fun value => next (f value)) := by
   cases result <;> rfl
 
-private theorem check_ok_bind (value : α) (next : α → CallTree.Program β) :
+theorem check_ok_bind (value : α) (next : α → CallTree.Program β) :
     (CallTree.check (.ok value) >>= next) = next value := rfl
 
-private theorem pure_bind (value : α) (next : α → CallTree.Program β) :
+theorem pure_bind (value : α) (next : α → CallTree.Program β) :
     ((pure value : CallTree.Program α) >>= next) = next value := rfl
 
 private theorem error_bind (reason : Failure) (next : α → CallTree.Program β) :

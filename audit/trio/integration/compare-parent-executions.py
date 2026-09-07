@@ -72,8 +72,11 @@ def main():
     actual = vectors(receipt['log_tail'], 'VERITY_PARENT_DIFFERENTIAL_VECTOR', 12)
     solidity_path = root / 'audit/trio/alloc2/parent-execution.json'
     solidity = json.loads(solidity_path.read_text())
+    require(solidity['mutation'] is None, 'mutated Solidity cannot establish the baseline')
+    require(solidity['originalHarnessSha256'] == solidity['harnessSha256'],
+            'baseline harness differs from the original input')
     for field, filename in [('harnessSha256', 'Harness.sol'), ('runnerSha256', 'run.cjs'),
-                            ('lockSha256', 'package-lock.json')]:
+                            ('lockSha256', 'package-lock.json'), ('mutationsSha256', 'mutations.cjs')]:
         require(digest((root / 'solidity/trio-alloc2/parent' / filename).read_bytes()) == solidity[field],
                 f'Solidity harness changed since execution: {filename}')
     model_path = root / f"audit/trio/alloc2/receipt-{solidity['model']['job']}.json"
@@ -110,7 +113,7 @@ def main():
         'vm_job': receipt['job_id'], 'vm_receipt_sha256': digest(args.vm_receipt.read_bytes()),
         'solidity_receipt_sha256': digest(solidity_path.read_bytes()),
         'scope': 'Twelve matched parent inputs, raw return/revert bytes and ordered module calls, '
-                 'including four early allocation/division failures. The modeled prefix uses pointer 128. '
+                 'including four early allocation/division failures. The modeled producer guards use pointer 128. '
                  'Compiler memory, deployed delegatecall and recursive world observations remain separate.',
         'cases': sorted(actual), 'vm_source_hashes': checked,
     }, indent=2) + '\n')
