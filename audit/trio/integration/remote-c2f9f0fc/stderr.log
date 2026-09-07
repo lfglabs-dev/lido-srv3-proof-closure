@@ -1,0 +1,8 @@
+Cloning into '/workspaces/lido-integration-validation-c2f9f0fc'...
+From https://github.com/lfglabs-dev/lido-srv3-proof-closure
+ * branch            integration/trio-closure -> FETCH_HEAD
+HEAD is now at c2f9f0f Include terminal remote build logs referenced by receipt
+remote-lean-build: pinned tree contains submodules; using legacy runner fetch
+remote-lean-build: dispatching lake env lean --run audit/trio/integration/RunValidation.lean for c2f9f0fc724e ...
+remote-lean-build: submitted job 1a3ffae2-3854-4335-beee-dbf883bd76f3 on node 'dgx-spark'; receipt /root/.local/state/sandboxed-sh/remote-builds/078ad3285ad79bdc6f5d389bed953da566af2da23063bff3777bb745f82c6648.json
+remote-lean-build: job 1a3ffae2-3854-4335-beee-dbf883bd76f3 on node 'dgx-spark' finished: failed (exit 1, 449s)

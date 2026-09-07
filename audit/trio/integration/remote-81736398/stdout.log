@@ -1,0 +1,202 @@
+Submodule 'lido-core' (https://github.com/lidofinance/core.git) registered for path 'lido-core'
+Cloning into '/var/lib/sandboxed-node/checkouts/9acda983bdcdf557/.tmp-9009eaac-b3e0-41ff-98ea-2eb51c76317f/lido-core'...
+From https://github.com/lidofinance/core
+ * branch            17005714f151e5502c559932319a3f2f74ac2436 -> FETCH_HEAD
+Submodule path 'lido-core': checked out '17005714f151e5502c559932319a3f2f74ac2436'
+HEAD is now at 8173639 Connect deferred parent call tree to Verity VM and add execution cases
+info: verity: cloning https://github.com/lfglabs-dev/verity.git
+info: verity: checking out revision 'e977aaad6e1a9e92e0132d41b3d33a14135a4d46'
+info: evmyul: cloning https://github.com/lfglabs-dev/EVMYulLean.git
+info: evmyul: checking out revision 'f7e4ee0dc8f8d5265ce822a937ab5be771f182e9'
+info: mathlib: cloning https://github.com/leanprover-community/mathlib4.git
+info: mathlib: checking out revision 'fabf563a7c95a166b8d7b6efca11c8b4dc9d911f'
+info: plausible: cloning https://github.com/leanprover-community/plausible
+info: plausible: checking out revision '63045536fe95024e6c18fc7b48e03f506701c5bc'
+info: LeanSearchClient: cloning https://github.com/leanprover-community/LeanSearchClient
+info: LeanSearchClient: checking out revision 'c5d5b8fe6e5158def25cd28eb94e4141ad97c843'
+info: importGraph: cloning https://github.com/leanprover-community/import-graph
+info: importGraph: checking out revision '5c7542ed018c78194f1e2b903eaf6a792b74c03d'
+info: proofwidgets: cloning https://github.com/leanprover-community/ProofWidgets4
+info: proofwidgets: checking out revision '24b0d9dc081c5423f8eec7e866c441e5184f29d9'
+info: aesop: cloning https://github.com/leanprover-community/aesop
+info: aesop: checking out revision 'e3cb2f741431ce31bf73549fb52316a57368b06f'
+info: Qq: cloning https://github.com/leanprover-community/quote4
+info: Qq: checking out revision 'f46324995fca5f0483b742e4eb4daec7f4ee50d2'
+info: batteries: cloning https://github.com/leanprover-community/batteries
+info: batteries: checking out revision 'fa08db58b30eb033edcdab331bba000827f9f785'
+info: Cli: cloning https://github.com/leanprover/lean4-cli
+info: Cli: checking out revision '92564e5770e4d09f2d86dfbf8ada1e9c715b384c'
+✔ [1/8] Built LidoSRv3.Audit.Source.TrioAlloc2.Word (559ms)
+✔ [2/8] Built LidoSRv3.Audit.Source.TrioAlloc1.Interface (689ms)
+✔ [3/14] Built LidoSRv3.Audit.Source.TrioAlloc2.Arithmetic (596ms)
+✔ [4/14] Built LidoSRv3.Audit.Source.TrioAlloc1.Storage (516ms)
+✔ [5/15] Built LidoSRv3.Audit.Source.TrioAlloc2.Step (549ms)
+✔ [6/15] Built LidoSRv3.Audit.Source.TrioAlloc2.Spec (511ms)
+✔ [7/19] Built LidoSRv3.Audit.Source.TrioAlloc1.Execution (890ms)
+✔ [8/19] Built LidoSRv3.Audit.Source.TrioAlloc2.ScanBounds (930ms)
+✔ [9/20] Built LidoSRv3.Audit.Source.TrioAlloc2.Loop (476ms)
+✔ [10/20] Built LidoSRv3.Audit.Source.TrioAlloc1.Properties (716ms)
+✔ [11/20] Built LidoSRv3.Audit.Source.TrioAlloc2.StepBounds (573ms)
+✔ [12/20] Built LidoSRv3.Audit.Source.TrioAlloc2.ScanCorrespondence (1.0s)
+✔ [13/22] Built LidoSRv3.Audit.Source.TrioAlloc1.CapacitySpec (900ms)
+⚠ [14/26] Built LidoSRv3.Audit.Source.TrioAlloc2.Selection (502ms)
+warning: LidoSRv3/Audit/Source/TrioAlloc2/Selection.lean:53:10: This simp argument is unused:
+  levelsEq
+
+Hint: Omit it from the simp argument list.
+  simp [l̵e̵v̵e̵l̵s̵E̵q̵,̵ ̵Spec.minimum, countEq]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioAlloc2/Selection.lean:70:10: This simp argument is unused:
+  levelsEq
+
+Hint: Omit it from the simp argument list.
+  simp [l̵e̵v̵e̵l̵s̵E̵q̵,̵ ̵Spec.minimum, nonzero, minimumEq]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+✔ [15/26] Built LidoSRv3.Audit.Source.TrioAlloc2.LoopBounds (625ms)
+✔ [16/26] Built LidoSRv3.Audit.Source.TrioAlloc2.SpecProgress (574ms)
+✔ [17/30] Built LidoSRv3.Audit.Source.TrioAlloc2.Conservation (773ms)
+✔ [18/33] Built LidoSRv3.Audit.Source.TrioAlloc2.Totality (729ms)
+✔ [19/33] Built LidoSRv3.Audit.Source.TrioAlloc1.Bytes (529ms)
+✔ [20/33] Built LidoSRv3.Audit.Source.TrioAlloc1.Memory (651ms)
+✔ [21/35] Built LidoSRv3.Audit.Source.TrioAlloc2.ChoiceCorrespondence (626ms)
+⚠ [22/35] Built LidoSRv3.Audit.Source.TrioAlloc2.RowBounds (1.2s)
+warning: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:171:20: This simp argument is unused:
+  ↓reduceDIte
+
+Hint: Omit it from the simp argument list.
+  simp only [bound,̵ ̵↓̵r̵e̵d̵u̵c̵e̵D̵I̵t̵e̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+info: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:174:0: 'LidoSRv3.Audit.Source.TrioAlloc2.step_row_bounds' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:175:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocateLoop_row_bounds' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:176:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocate_row_bounds' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:177:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocate_delta_success' depends on axioms: [propext, Quot.sound]
+✔ [23/35] Built LidoSRv3.Audit.Source.TrioAlloc2.LoopTotality (553ms)
+✔ [24/38] Built LidoSRv3.Audit.Source.TrioAlloc1.FirstPass (759ms)
+✔ [25/41] Built LidoSRv3.Audit.Source.TrioAlloc2.Errors (575ms)
+⚠ [26/41] Built LidoSRv3.Audit.Source.TrioAlloc2.StepCorrespondence (850ms)
+warning: LidoSRv3/Audit/Source/TrioAlloc2/StepCorrespondence.lean:16:71: This simp argument is unused:
+  eq
+
+Hint: Omit it from the simp argument list.
+  simp [decodedRows, List.getElem?_zipWith, List.getElem?_set_ne eq,̵ ̵e̵q̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+✔ [27/41] Built LidoSRv3.Audit.Source.TrioAlloc1.Relational (680ms)
+✔ [28/41] Built LidoSRv3.Audit.Source.TrioAlloc1.CallTree (677ms)
+✔ [30/42] Built LidoSRv3.Audit.Source.TrioAlloc1.Determinism (525ms)
+✔ [31/44] Built LidoSRv3.Audit.Source.TrioAlloc2.LoopCorrespondence (842ms)
+✔ [32/45] Built Verity.Core.Address (418ms)
+ℹ [33/45] Built LidoSRv3.Audit.Source.TrioAlloc2.Composition (385ms)
+info: LidoSRv3/Audit/Source/TrioAlloc2/Composition.lean:53:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_success_establishes_consumer_premises' depends on axioms: [propext,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/Composition.lean:54:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_then_consumer_succeeds' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/Composition.lean:71:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_then_consumer_distributes' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+✔ [34/46] Built Verity.Core.Uint256 (1.1s)
+ℹ [35/47] Built LidoSRv3.Audit.Source.TrioComposition.Parent (888ms)
+info: LidoSRv3/Audit/Source/TrioComposition/Parent.lean:252:0: 'LidoSRv3.Audit.Source.TrioComposition.getDepositAllocations_total_bound' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/Parent.lean:253:0: 'LidoSRv3.Audit.Source.TrioComposition.convertPositive_refines' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/Parent.lean:254:0: 'LidoSRv3.Audit.Source.TrioComposition.convertZero_refines' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [36/47] Built LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI (2.3s)
+info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:169:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.decodeArray_encoded' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:170:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.decodeArguments_encoded' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:171:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.decodeReturn_encoded' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:172:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.run_encoded' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:173:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.run_short' depends on axioms: [propext, Quot.sound]
+✔ [37/47] Built Verity.Core.Uint16 (425ms)
+✔ [38/47] Built Verity.Core.Int256 (664ms)
+ℹ [39/47] Built LidoSRv3.Audit.Source.TrioComposition.ParentComposition (408ms)
+info: LidoSRv3/Audit/Source/TrioComposition/ParentComposition.lean:65:0: 'LidoSRv3.Audit.Source.TrioComposition.producer_consumer_conversion_refines' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ParentComposition.lean:66:0: 'LidoSRv3.Audit.Source.TrioComposition.producer_zero_conversion_refines' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ParentComposition.lean:67:0: 'LidoSRv3.Audit.Source.TrioComposition.producer_consumer_parent_subtraction' depends on axioms: [propext, Quot.sound]
+ℹ [40/49] Built LidoSRv3.Audit.Source.TrioAlloc2.ABIComposition (439ms)
+info: LidoSRv3/Audit/Source/TrioAlloc2/ABIComposition.lean:46:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_then_abi_distributes' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+✔ [41/51] Built Verity.Core.FiniteSet (710ms)
+ℹ [42/51] Built LidoSRv3.Audit.Source.TrioComposition.ParentRelational (572ms)
+info: LidoSRv3/Audit/Source/TrioComposition/ParentRelational.lean:185:0: 'LidoSRv3.Audit.Source.TrioComposition.ParentSpec.public_all_outcomes' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+✔ [43/52] Built Verity.Core.NarrowTypes (651ms)
+✔ [44/52] Built Verity.Core.Model.Yul.Ast (809ms)
+ℹ [45/52] Built LidoSRv3.Audit.Source.TrioComposition.ParentDeterminism (429ms)
+info: LidoSRv3/Audit/Source/TrioComposition/ParentDeterminism.lean:155:0: 'LidoSRv3.Audit.Source.TrioComposition.ParentSpec.public_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+✔ [46/52] Built Verity.Core.StorageAttr (1.2s)
+✔ [47/52] Built Verity.Core.Model.Constants (330ms)
+✔ [48/52] Built Verity.Core.Intrinsics (980ms)
+ℹ [49/52] Built LidoSRv3.Audit.Source.TrioComposition.ParentABI (1.1s)
+info: LidoSRv3/Audit/Source/TrioComposition/ParentABI.lean:110:0: 'LidoSRv3.Audit.Source.TrioComposition.public_abi_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [50/56] Built LidoSRv3.Audit.Source.TrioComposition.ParentCalls (422ms)
+info: LidoSRv3/Audit/Source/TrioComposition/ParentCalls.lean:37:0: 'LidoSRv3.Audit.Source.TrioComposition.ParentCalls.correspondence' depends on axioms: [propext, Quot.sound]
+✔ [51/56] Built Compiler.Keccak.Circuit (809ms)
+⚠ [52/60] Built Verity.Core (4.6s)
+warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1041:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+✔ [53/60] Built Verity.Core.Model.ProofStatus (346ms)
+✔ [54/60] Built Verity.Core.Model.Identifier (334ms)
+✔ [55/69] Built Compiler.Keccak.CircuitData (3.6s)
+✔ [56/70] Built Verity.Core.Model.ECM (597ms)
+✔ [57/70] Built Compiler.Keccak.Sponge (764ms)
+✔ [58/70] Built Compiler.Yul.Ast (305ms)
+✔ [59/70] Built LidoSRv3.Tests.TrioIntegration.ParentFixtures (365ms)
+✔ [61/74] Built Verity.Core.Model.CodeData (555ms)
+✔ [62/74] Built Compiler.IR (651ms)
+✔ [63/74] Built LidoSRv3.Tests.TrioAlloc1.Execution (3.7s)
+✔ [64/74] Built LidoSRv3.Tests.TrioAlloc1.VectorCases (459ms)
+✔ [65/74] Built Verity.Core.Model.Types (10s)
+✔ [66/74] Built Compiler.CompilationModel.Types (305ms)
+✔ [67/74] Built Compiler.CompilationModel.AbiTypeLayout (875ms)
+✔ [68/74] Built Verity.Core.Model.DynamicAbi (1.4s)
+✔ [69/74] Built Verity.Core.Model.Denote (3.3s)
+✔ [70/74] Built Verity.Core.Model.DenoteExternalCalls (1.7s)
+✔ [71/74] Built LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer (1.2s)
+ℹ [72/74] Built LidoSRv3.Audit.Source.TrioComposition.VerityParent (1.2s)
+info: LidoSRv3/Audit/Source/TrioComposition/VerityParent.lean:45:0: 'LidoSRv3.Audit.Source.TrioComposition.VerityParent.correspondence' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/VerityParent.lean:46:0: 'LidoSRv3.Audit.Source.TrioComposition.VerityParent.public_iff' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+✔ [73/74] Built LidoSRv3.Tests.TrioAlloc1.VerityVectors (1.2s)
+✖ [74/74] Building LidoSRv3.Tests.TrioIntegration.VerityParent (1.2s)
+trace: .> LEAN_PATH=/var/lib/sandboxed-node/checkouts/9acda983bdcdf557/817363984b65a7127c4418585f41c26a159257c6/.lake/packages/Cli/.lake/build/lib/lean:/var/lib/sandboxed-node/checkouts/9acda983bdcdf557/817363984b65a7127c4418585f41c26a159257c6/.lake/packages/batteries/.lake/build/lib/lean:/var/lib/sandboxed-node/checkouts/9acda983bdcdf557/817363984b65a7127c4418585f41c26a159257c6/.lake/packages/Qq/.lake/build/lib/lean:/var/lib/sandboxed-node/checkouts/9acda983bdcdf557/817363984b65a7127c4418585f41c26a159257c6/.lake/packages/aesop/.lake/build/lib/lean:/var/lib/sandboxed-node/checkouts/9acda983bdcdf557/817363984b65a7127c4418585f41c26a159257c6/.lake/packages/proofwidgets/.lake/build/lib/lean:/var/lib/sandboxed-node/checkouts/9acda983bdcdf557/817363984b65a7127c4418585f41c26a159257c6/.lake/packages/importGraph/.lake/build/lib/lean:/var/lib/sandboxed-node/checkouts/9acda983bdcdf557/817363984b65a7127c4418585f41c26a159257c6/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/var/lib/sandboxed-node/checkouts/9acda983bdcdf557/817363984b65a7127c4418585f41c26a159257c6/.lake/packages/plausible/.lake/build/lib/lean:/var/lib/sandboxed-node/checkouts/9acda983bdcdf557/817363984b65a7127c4418585f41c26a159257c6/.lake/packages/mathlib/.lake/build/lib/lean:/var/lib/sandboxed-node/checkouts/9acda983bdcdf557/817363984b65a7127c4418585f41c26a159257c6/.lake/packages/evmyul/.lake/build/lib/lean:/var/lib/sandboxed-node/checkouts/9acda983bdcdf557/817363984b65a7127c4418585f41c26a159257c6/.lake/packages/verity/.lake/build/lib/lean:/var/lib/sandboxed-node/checkouts/9acda983bdcdf557/817363984b65a7127c4418585f41c26a159257c6/.lake/build/lib/lean /var/lib/sandboxed-node/caches/elan/toolchains/leanprover--lean4---v4.31.0/bin/lean /var/lib/sandboxed-node/checkouts/9acda983bdcdf557/817363984b65a7127c4418585f41c26a159257c6/LidoSRv3/Tests/TrioIntegration/VerityParent.lean -o /var/lib/sandboxed-node/checkouts/9acda983bdcdf557/817363984b65a7127c4418585f41c26a159257c6/.lake/build/lib/lean/LidoSRv3/Tests/TrioIntegration/VerityParent.olean -i /var/lib/sandboxed-node/checkouts/9acda983bdcdf557/817363984b65a7127c4418585f41c26a159257c6/.lake/build/lib/lean/LidoSRv3/Tests/TrioIntegration/VerityParent.ilean -c /var/lib/sandboxed-node/checkouts/9acda983bdcdf557/817363984b65a7127c4418585f41c26a159257c6/.lake/build/ir/LidoSRv3/Tests/TrioIntegration/VerityParent.c --setup /var/lib/sandboxed-node/checkouts/9acda983bdcdf557/817363984b65a7127c4418585f41c26a159257c6/.lake/build/ir/LidoSRv3/Tests/TrioIntegration/VerityParent.setup.json --json
+error: LidoSRv3/Tests/TrioIntegration/VerityParent.lean:11:53: Ambiguous term
+  layout
+Possible interpretations:
+  ParentFixtures.layout : Layout
+  
+  TrioAlloc1.layout : Layout
+error: LidoSRv3/Tests/TrioIntegration/VerityParent.lean:14:43: Ambiguous term
+  layout
+Possible interpretations:
+  ParentFixtures.layout : Layout
+  
+  TrioAlloc1.layout : Layout
+error: LidoSRv3/Tests/TrioIntegration/VerityParent.lean:36:4: `main` has already been declared
+error: Lean exited with code 1
+Some required targets logged failures:
+- LidoSRv3.Tests.TrioIntegration.VerityParent
+error: build failed
+uncaught exception: VM parent validation failed: 1

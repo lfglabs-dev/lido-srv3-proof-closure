@@ -20,6 +20,10 @@
     "exit.json": {
       "sha256": "a264d0777b77aba748b692d899b218a4187e282a37fee526486a55c88c1c8374",
       "bytes": 67
+    },
+    "stdout.log": {
+      "sha256": "2b785c98f2a93e6a4a5a4b2cab21b9bbbed2376f91d41601e697b654599934a8",
+      "bytes": 16120
     }
   }
 }

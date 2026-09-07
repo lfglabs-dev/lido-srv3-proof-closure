@@ -1,0 +1,8 @@
+Cloning into '/workspaces/lido-integration-validation-81736398'...
+From https://github.com/lfglabs-dev/lido-srv3-proof-closure
+ * branch            integration/trio-closure -> FETCH_HEAD
+HEAD is now at 8173639 Connect deferred parent call tree to Verity VM and add execution cases
+remote-lean-build: pinned tree contains submodules; using legacy runner fetch
+remote-lean-build: dispatching lake env lean --run audit/trio/integration/RunVerityParent.lean for 817363984b65 ...
+remote-lean-build: submitted job dec7c452-5959-4b01-aff5-7a6256fe552c on node 'nippur'; receipt /root/.local/state/sandboxed-sh/remote-builds/443e5d24182cb625c135bf465c674cdaf987f762b073ab014f01a00ee78f7808.json
+remote-lean-build: job dec7c452-5959-4b01-aff5-7a6256fe552c on node 'nippur' finished: failed (exit 1, 117s)
