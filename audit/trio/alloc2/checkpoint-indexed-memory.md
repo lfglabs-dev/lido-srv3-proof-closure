@@ -39,7 +39,10 @@ Public-library ABI copies are preserved; no claim is made that the library
 mutates the caller's original arrays. The second sequence call uses the first
 returned array.
 
-Validation is pending for the latest source. Earlier draft builds failed with
+The indexed Lean proofs also passed in byte-memory job
+caec8506-fa63-424c-83be-5a80ccbb04f1 (38 jobs), followed by
+d36a873d-c8f9-4604-bd20-b039c005a877 (39 jobs). Validation of the indexed
+Verity runtime remains pending. Earlier draft builds failed with
 Lean proof-script errors; none is positive evidence. Job
 87bd283a-a145-41c4-833d-dc31f64a2a24 on nippur was re-polled and is queued, not
 terminal. Do not replace it merely because observation expires. An intervening

@@ -1,0 +1,29 @@
+{
+  "job_id": "f7e51878-f278-4e33-aaa6-72d417af8cd7",
+  "node_id": "ashur",
+  "state": "succeeded",
+  "receipt_state": "succeeded",
+  "exit_code": 0,
+  "created_at": "2026-09-07T17:08:03.669736167+00:00",
+  "started_at": "2026-09-07T17:08:03.683173243+00:00",
+  "finished_at": "2026-09-07T17:08:07.853196640+00:00",
+  "error": null,
+  "log_tail": "HEAD is now at c7adae0 audit: scope allocation rollback and single-call top-up claims (#242)\nRemoving LidoSRv3/Audit/Source/TrioAlloc1/\nRemoving audit/trio/\nsource bundle verified sha256=b6827fae01ef92dc92dd086e57a661d60cf6ec2e90884813cc02bb3fc1353d28 files=9 bytes=35165\ninfo: trioAlloc2ByteMemory: no previous manifest, creating one from scratch\ninfo: toolchain not updated; no toolchain information found\n\u2714 [2/10] Built LidoSRv3.Audit.Source.TrioAlloc1.Interface (448ms)\n\u2714 [3/10] Built LidoSRv3.Audit.Source.TrioAlloc1.Storage (337ms)\n\u2714 [4/10] Built LidoSRv3.Audit.Source.TrioAlloc1.Execution (598ms)\n\u2714 [5/10] Built LidoSRv3.Audit.Source.TrioAlloc1.Properties (454ms)\n\u2714 [6/10] Built LidoSRv3.Audit.Source.TrioAlloc1.Bytes (317ms)\n\u2714 [7/10] Built LidoSRv3.Audit.Source.TrioAlloc1.AllocationMemory (374ms)\n\u2714 [8/10] Built LidoSRv3.Audit.Source.TrioAlloc1.Memory (434ms)\n\u2139 [9/10] Built audit.trio.alloc2.composition.ByteMemory (685ms)\ninfo: ../../../../audit/trio/alloc2/composition/ByteMemory.lean:80:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ByteMemory.store_array' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: ../../../../audit/trio/alloc2/composition/ByteMemory.lean:81:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ByteMemory.store_other_array' depends on axioms: [propext, Quot.sound]\ninfo: ../../../../audit/trio/alloc2/composition/ByteMemory.lean:82:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ByteMemory.bytes_store' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: ../../../../audit/trio/alloc2/composition/ByteMemory.lean:83:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ByteMemory.load_store' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: ../../../../audit/trio/alloc2/composition/ByteMemory.lean:84:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ByteMemory.store_outside' depends on axioms: [propext, Quot.sound]\ninfo: ../../../../audit/trio/alloc2/composition/ByteMemory.lean:85:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ByteMemory.load_store_disjoint' depends on axioms: [propext, Quot.sound]\nBuild completed successfully (10 jobs).\n",
+  "validation": {
+    "version": 1,
+    "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+    "commit": "c7adae04416704a839d56333efad003f0a0f46b7",
+    "base_tree_sha": "27834bd59a19f789b2fb9d06f9de01b47af123c2",
+    "cwd_rel_known": true,
+    "cwd_rel": "audit/trio/alloc2/byte-memory",
+    "command": [
+      "lake",
+      "build"
+    ],
+    "toolchain": "leanprover/lean4:v4.31.0",
+    "source_bundle_digest": "09c429a3ba7b23dd32a95bda6eb13cf8f42d576eb6042d3a9a249f11a9dbf35d",
+    "build_protocol_version": "1",
+    "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+  },
+  "artifacts": []
+}
