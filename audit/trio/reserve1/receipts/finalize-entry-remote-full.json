@@ -1,0 +1,19 @@
+{
+  "source_commit": "f087ea773ab9a8624939e8c1c88051bdeb15ba7c",
+  "command": [
+    "remote-lean-build",
+    "lake",
+    "build",
+    "LidoSRv3",
+    "LidoSRv3Test",
+    "LidoSRv3Audit"
+  ],
+  "environment": {
+    "REMOTE_BUILD_SOURCE_MODE": "full",
+    "REMOTE_BUILD_MAX_SOURCE_BUNDLE_BYTES": "268435456"
+  },
+  "exit": 2,
+  "output": "remote-lean-build: ignoring untracked non-Lean files: audit/trio/reserve1/receipts/component-checks/f087ea773ab9a8624939e8c1c88051bdeb15ba7c/FinalizeEntry.txt, audit/trio/reserve1/receipts/component-checks/f087ea773ab9a8624939e8c1c88051bdeb15ba7c/receipt.json, audit/trio/reserve1/receipts/finalize-entry-1.exit, audit/trio/reserve1/receipts/finalize-entry-1.txt, audit/trio/reserve1/receipts/finalize-entry-2.exit, audit/trio/reserve1/receipts/finalize-entry-2.txt, audit/trio/reserve1/receipts/finalize-entry-3.exit, audit/trio/reserve1/receipts/finalize-entry-3.txt\nsource bundle path must be a regular file, not a symlink: lido-core\nremote-lean-build: failed to encode request\n",
+  "wrapper_sha256": "83736ff6da600782680e9ce6f8d4e7b7e32f58acc5bbc6f0e127130088357d20",
+  "gitlink": "160000 17005714f151e5502c559932319a3f2f74ac2436 0\tlido-core"
+}

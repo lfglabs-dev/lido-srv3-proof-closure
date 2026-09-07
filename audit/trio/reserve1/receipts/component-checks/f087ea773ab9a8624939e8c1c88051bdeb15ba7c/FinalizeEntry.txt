@@ -1,0 +1,51 @@
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeEntry.lean:79:6: warning: This simp argument is unused:
+  pure
+
+Hint: Omit it from the simp argument list.
+  simp [Describes, ha, QueueFinalize.entry, Live.read, require, bind, bindExec,
+  ̵  ̵ ̵ ̵ ̵ ̵pure,̵ ̵p̵u̵r̵e̵Exec, fail,
+  ̲  ̲ ̲ ̲ ̲ ̲Active] at *
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeEntry.lean:79:12: warning: This simp argument is unused:
+  pureExec
+
+Hint: Omit it from the simp argument list.
+  simp [Describes, ha, QueueFinalize.entry, Live.read, require, bind, bindExec, pure, p̵u̵r̵e̵E̵x̵e̵c̵,̵ ̵fail,
+  ̲  ̲ ̲ ̲ ̲ ̲Active] at *
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeEntry.lean:126:2: error: unsolved goals
+case neg
+keccak : Queue.Keccak
+queue : Address
+other : External
+req : Request
+before : World
+reply : Reply
+hs : ¬(req.target = queue ∧ List.take 4 req.payload = encode 4 3053534447)
+⊢ (queue = req.target → ¬List.take 4 req.payload = encode 4 3053534447) ∧ reply = other req before ∨
+      (queue = req.target ∧ List.take 4 req.payload = encode 4 3053534447) ∧
+          List.length req.payload < 68 ∧ reply = Reply.rejected [] ∨
+        (queue = req.target ∧ List.take 4 req.payload = encode 4 3053534447) ∧
+          68 ≤ List.length req.payload ∧
+            Replies keccak { self := queue, sender := req.caller }
+              (word (decode (List.take 32 (List.drop 4 req.payload)))) req.value
+              (word (decode (List.take 32 (List.drop 36 req.payload)))) before reply ↔
+    reply =
+      if queue = req.target ∧ List.take 4 req.payload = encode 4 3053534447 then
+        if List.length req.payload < 68 then Reply.rejected []
+        else
+          ReplyABI.reply (fun x => [])
+            (QueueFinalize.entry keccak { self := queue, sender := req.caller }
+              (word (decode (List.take 32 (List.drop 4 req.payload)))) req.value
+              (word (decode (List.take 32 (List.drop 36 req.payload)))))
+            before
+      else other req before
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeEntry.lean:126:46: warning: This simp argument is unused:
+  hs
+
+Hint: Omit it from the simp argument list.
+  simp [Dispatches, QueueFinalize.dispatch, h̵s̵,̵ ̵eq_comm]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

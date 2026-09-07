@@ -1,5 +1,30 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Independent ERC721 finalization entry and payable dispatch
+
+Source `41104fb` extends independent base-body observations with ordered physical
+pause admission, role-byte authorization and first-ID overflow rejection.
+Successful bodies append metadata using the saved first ID and the post-body tail;
+failed bodies preserve their intermediate observations without metadata. Exact
+bidirectional entry, root transaction and ABI reply/dispatch correspondence pass,
+including short calldata rejection, payable amount, trailing bytes and fallback.
+The final relation contains no source entry/body executor. Encoding/decoding,
+physical primitives and Keccak remain explicit dependencies.
+
+Two selected component checks and seven baseline checks pass; see
+`receipts/finalize-entry-summary.json` for complete source/olean matching,
+dependency identities, unchanged runtime-source hashes and the final remote
+attempt. New theorem axioms are standard. Draft failures remain retained.
+The prior fifteen EVM comparisons were not rerun for unchanged runtime sources.
+Report-finalizer composition, remaining writer/deployment/resource/world/codec
+obligations, canonical integration, full gates and independent review remain open.
+
+The exact remote transport blocker is again reproduced at this source: full-source
+encoding rejects the tracked lido-core gitlink as a non-regular file, exit 2 before
+job creation, including with the supported larger source-size setting. This is
+corroborated by wrapper-source hashing and Git index metadata, not an inferred
+proof failure. All WIP and receipts are preserved; no completion is claimed.
+
 ## Independent finalization base-body correspondence
 
 At source `b09e004b5f7a9654912d4dfe45a4d746a29af54f`, FinalizeSpec,

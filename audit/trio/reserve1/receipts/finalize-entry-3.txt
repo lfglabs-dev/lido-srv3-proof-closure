@@ -1,0 +1,17 @@
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeEntry.lean:78:6: warning: This simp argument is unused:
+  pure
+
+Hint: Omit it from the simp argument list.
+  simp [Describes, ha, QueueFinalize.entry, Live.read, require, bind, bindExec,
+  ̵  ̵ ̵ ̵ ̵ ̵pure,̵ ̵p̵u̵r̵e̵Exec, fail,
+  ̲  ̲ ̲ ̲ ̲ ̲Active] at *
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/FinalizeEntry.lean:78:12: warning: This simp argument is unused:
+  pureExec
+
+Hint: Omit it from the simp argument list.
+  simp [Describes, ha, QueueFinalize.entry, Live.read, require, bind, bindExec, pure, p̵u̵r̵e̵E̵x̵e̵c̵,̵ ̵fail,
+  ̲  ̲ ̲ ̲ ̲ ̲Active] at *
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
