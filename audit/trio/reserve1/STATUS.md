@@ -1,5 +1,30 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Pinned report execution comparison and ABI correction
+
+Sixteen comparisons execute the unchanged inherited Solidity report body against
+explicit locator/vault/queue fixtures and compare it with Report.collect. They
+check fault/rejection bytes, exact direct CALL target/value/payload/acceptance/return
+bytes, packed buffer/reserve/target storage, ordered logs and Lido/queue ETH balances.
+Cases include all/zero calls, pause/auth, malformed getter and reward returns,
+each external rejection, checked arithmetic failures, low128 narrowing/full event,
+reserve already above target, trailing reward bytes, no-code queue and insufficient
+CALL funds. These fixtures do not implement production vault or queue finalization.
+
+The first draft found a model defect: withdrawRewards returns uint256 (Lido.sol:40),
+so Solidity validates at least 32 return bytes even when ignoring its value.
+Report.collect now decodes that word. The original failed comparison is retained;
+the corrected source ignores the returned number for its report-input arithmetic.
+
+At source `4f2b6867518337bc12acd8806fb1b463ff19c516`, all sixteen immutable EVM/model comparisons, four selected
+Lean checks and seven baseline/import checks pass. The other 81 source/olean pairs
+and eleven dependency revisions match; axioms are standard. All sixteen compressed
+traces verify against compressed and decompressed hashes. See
+`receipts/report-execution-summary.json`. The existing Lido artifact hash is checked,
+and exact toolchain/command/source/exit context is retained. Independent report
+correspondence, concrete callees, broader integration and full remote gates remain
+open; this is not independent certification.
+
 ## Enclosing report source body
 
 `Report.collect` now models pinned Lido.collectRewardsAndProcessWithdrawals:

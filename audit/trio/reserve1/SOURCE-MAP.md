@@ -128,3 +128,14 @@ Exhaustive independent parent and upstream deployment/writer/world relations rem
 - `receipts/report-source-selectors.json`: ethers 6.14.4 signature hashes and
   pinned source hashes for report getter/vault/finalize selector literals.
 - `ReportCases`: seven executed source-interpreter cases; no report EVM claim.
+
+
+## Report EVM comparisons and ignored-return decoding
+
+- `Report.collect` also decodes the reward-vault return word: Lido.sol:40 declares
+  `withdrawRewards(uint256) returns (uint256 amount)`. Its value is ignored by the
+  report arithmetic, but short replies revert in the inherited compiler output.
+- `ReportDifferential` / `execute-report.cjs`: sixteen inherited pinned report-body
+  comparisons with explicit CallFixture boundaries; no production vault/queue claim.
+  `report-execution-summary.json` retains the first failing ABI regression and the
+  passing immutable source/command/artifact/trace evidence.
