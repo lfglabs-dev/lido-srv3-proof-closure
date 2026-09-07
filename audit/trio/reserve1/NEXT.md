@@ -17,7 +17,10 @@ ACLPermission now gives bidirectional ordered permission correspondence and
 derives traced Lido/Kernel/ACL admission plus target allowance/denial from the
 independent rules. Target now gives the exact successful external post-state/return/events/trace,
 queue preservation and an instantiation of the physical sequence relation.
-Remaining target integration includes exhaustive parent faults,
+The target continuation is now exhaustive after authorization (including arbitrary
+returned worlds and all propagated faults), with independent prefix denial and
+physical kernel-no-code cases. Remaining target integration includes concrete
+authorization failure/deployment coverage,
 external sequence reachability and deployed primitive binding.
 
 1. Complete the independent withdrawal interaction specification and full

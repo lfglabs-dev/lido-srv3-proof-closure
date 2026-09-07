@@ -1,3 +1,4 @@
+import LidoSRv3.Audit.Source.TrioReserve1.TargetSpec
 import LidoSRv3.Audit.Source.TrioReserve1.ACLPermission
 import LidoSRv3.Audit.Source.TrioReserve1.PhysicalSequence
 
@@ -82,5 +83,57 @@ theorem sequence_step (k : Queue.Keccak) (queue : Address) (ctx : Context) (requ
       (run (setDepositsReserveTarget ctx requested) before).world :=
     .target requested (.refl _)
   simpa [run, writer_success] using h
+
+/-- Exhaustive target-parent correspondence after authorization, including
+arbitrary callee state changes. Authorization semantics is an explicit interface;
+`success` and ACLPermission's admission results discharge concrete paths. -/
+theorem after_authorization (external : External) (ctx : Context) (requested : Word)
+    (before afterAuthorization : World) (authorization : Except Fault Bool) (calls : List Attempt)
+    (h : Aragon.canPerform external ctx Aragon.bufferReserveManagerRole before =
+      ⟨authorization, afterAuthorization, calls⟩) (result : Result Unit) :
+    TargetSpec.Completes (.reason "APP_AUTH_FAILED") (committed ctx requested) before
+      authorization afterAuthorization calls result.outcome result.world result.attempts ↔
+      run (Aragon.setTarget external ctx requested) before = result := by
+  rcases result with ⟨outcome, after, trace⟩
+  cases authorization with
+  | error fault =>
+    simp [TargetSpec.Completes, run, Aragon.setTarget, bind, bindExec, h, Result.mk.injEq, eq_comm]
+  | ok allowed =>
+    cases allowed <;>
+      simp [TargetSpec.Completes, run, Aragon.setTarget, bind, bindExec, h, require,
+        pure, pureExec, fail, writer_success, Result.mk.injEq, eq_comm]
+
+/-- Every source target transaction satisfies the independent parent rule for
+its actual authorization outcome/world/trace. No successful-call assumption is
+used, and no authorization side effect is silently erased before an allowed write. -/
+theorem complete (external : External) (ctx : Context) (requested : Word) (before : World) :
+    let admission := Aragon.canPerform external ctx Aragon.bufferReserveManagerRole before
+    let result := run (Aragon.setTarget external ctx requested) before
+    TargetSpec.Completes (.reason "APP_AUTH_FAILED") (committed ctx requested) before
+      admission.outcome admission.world admission.attempts result.outcome result.world result.attempts := by
+  apply (after_authorization external ctx requested before _ _ _ (by rfl) _).mpr
+  rfl
+
+theorem prefix_denied (external : External) (ctx : Context) (requested : Word) (before : World)
+    (hs : AragonSpec.Describes (before.core.readContractSlot ctx.self.val Aragon.initializationSlot).val
+      before.core.blockNumber.val (Aragon.kernel ctx before).val .deny) :
+    run (Aragon.setTarget external ctx requested) before = ⟨.error (.reason "APP_AUTH_FAILED"), before, []⟩ := by
+  have ha : Aragon.canPerform external ctx Aragon.bufferReserveManagerRole before = ⟨.ok false, before, []⟩ := by
+    rcases hs with hz | ht | hk
+    · apply Aragon.uninitialized
+      simp [Aragon.initialized, hz]
+    · apply Aragon.uninitialized
+      simp [Aragon.initialized, show ¬(before.core.readContractSlot ctx.self.val Aragon.initializationSlot).val ≤
+        before.core.blockNumber.val by omega]
+    · exact Aragon.absent_kernel external ctx _ before hk
+  exact Aragon.denied external ctx requested before before [] ha
+
+theorem kernel_no_code (external : External) (ctx : Context) (requested : Word) (before : World)
+    (hi : Aragon.initialized ctx before = true) (hk : (Aragon.kernel ctx before).val ≠ 0)
+    (hc : (before.core.codeSize (Aragon.kernel ctx before).val).val = 0) :
+    run (Aragon.setTarget external ctx requested) before = ⟨.error .empty, before, []⟩ := by
+  apply (after_authorization external ctx requested before before (.error .empty) []
+    (Aragon.kernel_no_code external ctx _ before hi hk hc) _).mp
+  simp [TargetSpec.Completes]
 
 end LidoSRv3.Audit.Source.TrioReserve1.Target

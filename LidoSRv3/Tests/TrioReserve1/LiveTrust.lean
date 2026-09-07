@@ -257,3 +257,8 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms Target.success
 #print axioms Target.queue_preserved
 #print axioms Target.sequence_step
+
+#print axioms Target.after_authorization
+#print axioms Target.complete
+#print axioms Target.prefix_denied
+#print axioms Target.kernel_no_code

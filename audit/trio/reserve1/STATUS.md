@@ -1,5 +1,24 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Target continuation: exhaustive after authorization
+
+`TargetSpec.Completes` is an independent generic transaction rule with no source
+imports. It covers allowed writes against the actual post-authorization world,
+denial, and propagation of every authorization fault; both failing cases restore
+the original world and preserve attempted calls. `Target.after_authorization`
+proves a bidirectional exact result relation for every authorization result and
+arbitrary callback world. `Target.complete` instantiates it with the actual source
+query, without a successful-authorization premise. This closes the target parent
+continuation, while the authorization result remains a separately specified interface.
+`prefix_denied` derives exact APP_AUTH_FAILED/no-call rollback from the independent
+initialization/kernel-prefix denial rule. `kernel_no_code` derives exact empty-revert
+rollback from physical code absence. These supplement the concrete allowed/denied
+ACL composition rather than claiming all deployed authorization failures closed.
+
+Immutable validation is recorded after checks. Deployment/primitive/resource binding,
+remaining authorization failure paths, external sequence reachability, withdrawal
+parent coverage, report/queue writers and full remote integration gates remain open.
+
 ## Exact external target success
 
 `Target.committed` describes the physical post-state without invoking an executor:
