@@ -15,11 +15,12 @@ open ShareWriter (write modulePositionSlot)
 /-- `EnumerableSet._add`, retaining checked dynamic-array length growth. -/
 def insert (l : Layout) (s : Storage) (id : Word) : Except Failure Storage :=
   if (s (modulePositionSlot l id)).val ≠ 0 then .ok s
-  else do
-    let size ← checked ((s (countSlot l)).val+1)
+  else if (s (countSlot l)).val ≥ 2^64 then .error (.panic 0x41)
+  else
+    let size := word ((s (countSlot l)).val+1)
     let lengthWritten := write s (countSlot l) size
     let elementWritten := write lengthWritten (idSlot l (s (countSlot l)).val) id
-    pure (write elementWritten (modulePositionSlot l id) (elementWritten (countSlot l)))
+    .ok (write elementWritten (modulePositionSlot l id) (elementWritten (countSlot l)))
 
 theorem idSlot_injective (l : Layout) (i j : Nat) (hi : i < 2^256) (hj : j < 2^256)
     (equal : idSlot l i = idSlot l j) : i = j := by
@@ -40,12 +41,15 @@ theorem absent_insert (l : Layout) (s : Storage) (id : Word)
       let first := write s (countSlot l) (word ((s (countSlot l)).val+1))
       let second := write first (idSlot l (s (countSlot l)).val) id
       write second (modulePositionSlot l id) (second (countSlot l))) := by
-  have safe : (s (countSlot l)).val+1 < 2^256 := by omega
-  have growth : checked ((s (countSlot l)).val+1) =
-      .ok (word ((s (countSlot l)).val+1)) := by
-    simp [checked, word, safe, Nat.mod_eq_of_lt safe]
-  simp [insert, absent, growth]
-  rfl
+  have safe : ¬ (s (countSlot l)).val ≥ 2^64 := by omega
+  simp [insert, absent, safe]
+
+/-- The pinned compiler's storage-array push limit, before any write. -/
+theorem oversized_absent (l : Layout) (s : Storage) (id : Word)
+    (absent : (s (modulePositionSlot l id)).val = 0)
+    (large : (s (countSlot l)).val ≥ 2^64) :
+    insert l s id = .error (.panic 0x41) := by
+  simp [insert, absent, large]
 
 theorem absent_count (l : Layout) (s after : Storage) (id : Word)
     (absent : (s (modulePositionSlot l id)).val = 0)

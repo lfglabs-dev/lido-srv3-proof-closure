@@ -38,6 +38,9 @@ count truncation or assumed callee success is introduced.
   preservation of one-based position consistency under finite slot separation.
   Consistency derives uniqueness of enumerated IDs; it is not yet composed with
   all admission/configuration/migration writes.
+  The compiler push guard rejects physical length>=2^64 with panic 0x41, after
+  the existing-ID no-op branch (`enumeration-insert.ir`). This corrects the older
+  unrestricted primitive's uint256 overflow guard; the admitted <32 domain is unchanged.
 - `StringStorage`, `AdmissionWriter`: complete public admission storage transition
   and six committed events, including malformed-name panic 0x22, long-name cleanup
   with wrapped range endpoints, uint24 ID, parameter helper, last-deposit fields,
@@ -81,6 +84,9 @@ Pinned solc 0.8.25 via-IR/optimizer-200 Shanghai execution also checked:
   added-event/final deposit-event ABI (`admission-name.json`). The final writer
   rerun and source/output hashes are in `writer-validation.json`; the relevant
   optimized compiler excerpt is in `string-storage.ir`.
+- Original insertion helper at the physical array boundary: absent ID at 2^64
+  reverts with panic 0x41; existing ID is a no-op; length 2^64-1 grows successfully
+  with matching element and position (`enumeration-boundary.json`).
 - Nested read callback and rejected mutation CALL under static context: expected
   three call sites, unchanged module storage, no events (`callback.json`).
 - Actual compiler storage layout and two executed parent-shaped mutants, plus
@@ -118,9 +124,9 @@ Infrastructure diagnostics and measured estimates are recorded in `reproduce.md`
 and `receipts/remote-admission-sizing.json`. The full build uses 5 GiB; the measured
 small Verity vector closure uses 2 GiB. The emergency disk floor is unchanged.
 
-Latest completed owned closure: remote job 78ecbf4e-d80a-4142-ae21-e6d7ab976c37
-passed 50 jobs at 8691c7881a863715ab5ec9b39631ab41243e7c91, inspected eighteen
+Latest completed owned closure: remote job 8bbc56d6-6b62-4ce6-8098-192809354ab9
+passed 52 jobs at 876649be54e17e04febf0d1070a7e1e835826bac, inspected twenty-one
 critical theorems (only propext, Classical.choice, Quot.sound), and reran all twelve
 Verity fixtures. The independently executed Solidity comparison passed again.
-Receipts: verity-trust-8691c78.json and solidity-verity-8691c78.json. This closure
-does not yet include AdmissionWriter/StringStorage and does not replace current-head full-suite validation.
+Receipts: verity-trust-876649b.json and solidity-verity-876649b.json. This closure
+predates the unrestricted array-push correction and does not replace current-head full-suite validation.

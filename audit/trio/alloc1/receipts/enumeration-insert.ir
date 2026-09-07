@@ -1,0 +1,40 @@
+            function fun_add(var_set_slot, var_value) -> var
+            {
+                /// @src 7:2320:2641  "if (!_contains(set, value)) {..."
+                switch /** @src 7:2324:2346  "!_contains(set, value)" */ iszero(/** @src 7:2325:2346  "_contains(set, value)" */ fun_contains(var_set_slot, var_value))
+                case /** @src 7:2320:2641  "if (!_contains(set, value)) {..." */ 0 {
+                    /// @src 7:2618:2630  "return false"
+                    var := /** @src -1:-1:-1 */ 0
+                    /// @src 7:2618:2630  "return false"
+                    leave
+                }
+                default /// @src 7:2320:2641  "if (!_contains(set, value)) {..."
+                {
+                    /// @src 11:955:47234  "library SRLib {..."
+                    let oldLen := sload(var_set_slot)
+                    if iszero(lt(oldLen, 18446744073709551616))
+                    {
+                        mstore(/** @src -1:-1:-1 */ 0, /** @src 14:560:562  "32" */ shl(224, 0x4e487b71))
+                        /// @src 11:955:47234  "library SRLib {..."
+                        mstore(4, 0x41)
+                        revert(/** @src -1:-1:-1 */ 0, /** @src 11:955:47234  "library SRLib {..." */ 0x24)
+                    }
+                    sstore(var_set_slot, add(oldLen, 1))
+                    let slot, offset := storage_array_index_access_bytes32_dyn(var_set_slot, oldLen)
+                    /// @src 14:560:562  "32"
+                    let _1 := sload(slot)
+                    let shiftBits := shl(3, offset)
+                    sstore(slot, or(and(_1, not(shl(shiftBits, not(0)))), shl(shiftBits, var_value)))
+                    /// @src 11:955:47234  "library SRLib {..."
+                    let _2 := sload(/** @src 7:2544:2562  "set._values.length" */ var_set_slot)
+                    /// @src 11:955:47234  "library SRLib {..."
+                    mstore(/** @src -1:-1:-1 */ 0, /** @src 11:955:47234  "library SRLib {..." */ var_value)
+                    mstore(0x20, /** @src 7:2520:2534  "set._positions" */ add(var_set_slot, /** @src 11:955:47234  "library SRLib {..." */ 1))
+                    sstore(keccak256(/** @src -1:-1:-1 */ 0, /** @src 11:955:47234  "library SRLib {..." */ 0x40), _2)
+                    /// @src 7:2576:2587  "return true"
+                    var := /** @src 11:955:47234  "library SRLib {..." */ 1
+                    /// @src 7:2576:2587  "return true"
+                    leave
+                }
+            }
+            /// @ast-id 11919 @src 7:4264:4393  "function _contains(Set storage set, bytes32 value) private view returns (bool) {..."

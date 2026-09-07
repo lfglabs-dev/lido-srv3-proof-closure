@@ -28,6 +28,7 @@ import LidoSRv3.Tests.TrioAlloc1.Correspondence
 #print axioms LidoSRv3.Audit.Source.TrioAlloc1.AdmissionWriter.successful_entry_bound_and_freshness
 #print axioms LidoSRv3.Audit.Source.TrioAlloc1.StringStorage.writeShort_stored
 #print axioms LidoSRv3.Audit.Source.TrioAlloc1.EnumerationWriter.insertion_preserves_consistency
+#print axioms LidoSRv3.Audit.Source.TrioAlloc1.EnumerationWriter.oversized_absent
 #print axioms LidoSRv3.Audit.Source.TrioAlloc1.AllocationMemory.bounded_array_allocates
 #print axioms LidoSRv3.Tests.TrioAlloc1.prefetch_trace_refutes_relational_parent
 #print axioms LidoSRv3.Tests.TrioAlloc1.target_only_refutes_relational_parent

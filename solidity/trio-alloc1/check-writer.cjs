@@ -152,6 +152,18 @@ async function main(){
  assert.deepEqual([...renamed.logs[5].topics],[ethers.id('StakingRouterETHDeposited(uint256,uint256)'),ethers.toBeHex(1,32)]);
  assert.equal(renamed.logs[5].data,words(0));
  fs.writeFileSync(path.join(out,'admission-name.json'),JSON.stringify({pin,compiler:solc.version(),malformedOldNameRevert:malformed,longNameDataCleared:true,shortNameWord:ethers.toBeHex(nameWord,32),depositWord:ethers.toBeHex(depositWord,32),timestamp:block.timestamp,blockNumber:renamed.blockNumber,events:renamed.logs.map(x=>({topics:x.topics,data:x.data}))},null,2));
+ const boundary=1n<<64n,insertId=19n,insertPosition=BigInt(ethers.keccak256(words(insertId,base+2n)));
+ await write(base+1n,boundary);await write(insertPosition,0n);
+ let oversized;try{await h.insertModuleId.staticCall(insertId);assert.fail('expected storage array push limit');}catch(e){oversized=e.data;}
+ assert.equal(oversized,'0x4e487b71'+words(65).slice(2));
+ await write(insertPosition,1n);await(await h.insertModuleId(insertId,{gasLimit:1000000})).wait();
+ assert.equal(await read(base+1n),boundary);assert.equal(await read(insertPosition),1n);
+ await write(insertPosition,0n);await write(base+1n,boundary-1n);
+ await h.insertModuleId.staticCall(insertId);
+ await(await h.insertModuleId(insertId,{gasLimit:1000000})).wait();
+ assert.equal(await read(base+1n),boundary);assert.equal(await read(insertPosition),boundary);
+ assert.equal(await read((arrayBase+boundary-1n)&ethers.MaxUint256),insertId);
+ fs.writeFileSync(path.join(out,'enumeration-boundary.json'),JSON.stringify({pin,compiler:solc.version(),oversizedRevert:oversized,existingIdNoop:true,lastPermittedLength:(boundary-1n).toString(),resultingLength:boundary.toString(),elementAndPositionMatch:true},null,2));
  }finally{await rpc.disconnect();}
 }
 main().catch(e=>{console.error(e);process.exitCode=1;});

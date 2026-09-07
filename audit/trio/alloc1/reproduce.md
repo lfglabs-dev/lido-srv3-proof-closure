@@ -127,6 +127,12 @@ state/event (`admission-name.json`). The storage reader treats Ganache's bare
 `receipts/writer-validation.json`; `receipts/string-storage.ir` is the relevant
 compiler excerpt, with full IR hash in that receipt.
 
+The test-only `insertModuleId` wrapper invokes original SRStorage.addModuleId to
+exercise the compiler storage-array push boundary independently of public admission's
+count<32 guard. `enumeration-boundary.json` checks absent-ID panic at 2^64,
+existing-ID no-op and growth from 2^64-1. Those transactions use an explicit gas
+budget to avoid reusing a lower estimate from the preceding no-op.
+
 Current differential receipt: `receipts/solidity-verity-comparison.json`. Recheck
 the independently produced outputs without reevaluating either model:
 
