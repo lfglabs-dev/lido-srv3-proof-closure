@@ -1,0 +1,1320 @@
+LidoSRv3/Audit/Source/TrioReserve1/Report.lean:67:22: error: Invalid simp theorem: Expected a proposition, but found
+  Context → Nat → Exec Word
+LidoSRv3/Audit/Source/TrioReserve1/Report.lean:66:102: error: unsolved goals
+external : External
+ctx : Context
+input : Inputs
+before : World
+h : (before.core.readContractSlot ctx.self.val activeSlot).val = 0
+⊢ (match
+      (match (Live.read ctx activeSlot before).outcome with
+        | ⋯ =>
+          { outcome := Except.error e, world := (Live.read ctx activeSlot before).world,
+            attempts := (Live.read ctx activeSlot before).attempts }
+        | ⋯ =>
+          {
+            outcome :=
+              (match
+                  ((if a.val = 0 then fail (Fault.reason "CONTRACT_IS_STOPPED") else pure ())
+                      (Live.read ctx activeSlot before).world).outcome with
+                | ⋯ =>
+                  { outcome := Except.error e,
+                    world :=
+                      ((if a.val = 0 then fail (Fault.reason "CONTRACT_IS_STOPPED") else pure ())
+                          (Live.read ctx activeSlot before).world).world,
+                    attempts :=
+                      ((if a.val = 0 then fail (Fault.reason "CONTRACT_IS_STOPPED") else pure ())
+                          (Live.read ctx activeSlot before).world).attempts }
+                | ⋯ =>
+                  {
+                    outcome :=
+                      (match
+                          (getLidoLocator ctx
+                              ((if a.val = 0 then fail (Fault.reason "CONTRACT_IS_STOPPED") else pure ())
+                                  (Live.read ctx activeSlot before).world).world).outcome with
+                        | ⋯ =>
+                          { outcome := Except.error e,
+                            world :=
+                              (getLidoLocator ctx
+                                  ((if a.val = 0 then fail (Fault.reason "CONTRACT_IS_STOPPED") else pure ())
+                                      (Live.read ctx activeSlot before).world).world).world,
+                            attempts :=
+                              (getLidoLocator ctx
+                                  ((if a.val = 0 then fail (Fault.reason "CONTRACT_IS_STOPPED") else pure ())
+                                      (Live.read ctx activeSlot before).world).world).attempts }
+                        | ⋯ =>
+                          {
+                            outcome :=
+                              (match
+                                  (lookup external ctx a_2 2519001150
+                                      (getLidoLocator ctx
+                                          ((if a.val = 0 then fail (Fault.reason "CONTRACT_IS_STOPPED") else pure ())
+                                              (Live.read ctx activeSlot before).world).world).world).outcome with
+                                | Except.error e =>
+                                  { outcome := Except.error e,
+                                    world :=
+                                      (lookup external ctx a_2 2519001150
+                                          (getLidoLocator ctx
+                                              ((if a.val = 0 then fail (Fault.reason "CONTRACT_IS_STOPPED")
+                                                  else pure ())
+                                                  (Live.read ctx activeSlot before).world).world).world).world,
+                                    attempts :=
+                                      (lookup external ctx a_2 2519001150
+                                          (getLidoLocator ctx
+                                              ((if a.val = 0 then fail (Fault.reason "CONTRACT_IS_STOPPED")
+                                                  else pure ())
+                                                  (Live.read ctx activeSlot before).world).world).world).attempts }
+                                | Except.ok a_3 =>
+                                  {
+                                    outcome :=
+                                      (match
+                                          ((if ctx.sender = a_3 then pure () else fail (Fault.reason "APP_AUTH_FAILED"))
+                                              (lookup external ctx a_2 2519001150
+                                                  (getLidoLocator ctx
+                                                      ((if a.val = 0 then fail (Fault.reason "CONTRACT_IS_STOPPED")
+                                                          else pure ())
+                                                          (Live.read ctx activeSlot
+                                                              before).world).world).world).world).outcome with
+                                        | Except.error e =>
+                                          { outcome := Except.error e,
+                                            world :=
+                                              ((if ctx.sender = a_3 then pure ()
+                                                  else fail (Fault.reason "APP_AUTH_FAILED"))
+                                                  (lookup external ctx a_2 2519001150
+                                                      (getLidoLocator ctx
+                                                          ((if a.val = 0 then fail (Fault.reason "CONTRACT_IS_STOPPED")
+                                                              else pure ())
+                                                              (Live.read ctx activeSlot
+                                                                  before).world).world).world).world).world,
+                                            attempts :=
+                                              ((if ctx.sender = a_3 then pure ()
+                                                  else fail (Fault.reason "APP_AUTH_FAILED"))
+                                                  (lookup external ctx a_2 2519001150
+                                                      (getLidoLocator ctx
+                                                          ((if a.val = 0 then fail (Fault.reason "CONTRACT_IS_STOPPED")
+                                                              else pure ())
+                                                              (Live.read ctx activeSlot
+                                                                  before).world).world).world).world).attempts }
+                                        | Except.ok a_4 =>
+                                          {
+                                            outcome :=
+                                              ((if 0 < input.rewards.val then
+                                                    bindExec (lookup external ctx a_2 3829518943) fun vault =>
+                                                      bindExec
+                                                        (CallData.invoke external ctx vault
+                                                          (encode 4 2470627572 ++ encode 32 input.rewards.val))
+                                                        fun __discr =>
+                                                        bindExec (pure ()) fun y =>
+                                                          if 0 < input.withdrawals.val then
+                                                            bindExec (lookup external ctx a_2 1775509832) fun vault =>
+                                                              bindExec
+                                                                (CallData.invoke external ctx vault
+                                                                  (encode 4 831804042 ++
+                                                                    encode 32 input.withdrawals.val))
+                                                                fun __discr =>
+                                                                bindExec (pure ()) fun y =>
+                                                                  if 0 < input.lockAmount.val then
+                                                                    bindExec (lookup external ctx a_2 936771225)
+                                                                      fun queue =>
+                                                                      bindExec
+                                                                        (CallData.invoke external ctx queue
+                                                                          (encode 4 3053534447 ++
+                                                                            (encode 32 input.lastRequest.val ++
+                                                                              encode 32 input.shareRate.val))
+                                                                          input.lockAmount)
+                                                                        fun __discr =>
+                                                                        bindExec (pure ()) fun y => afterCalls ctx input
+                                                                  else
+                                                                    bindExec (pure PUnit.unit) fun y =>
+                                                                      afterCalls ctx input
+                                                          else
+                                                            bindExec (pure PUnit.unit) fun y =>
+                                                              if 0 < input.lockAmount.val then
+                                                                bindExec (lookup external ctx a_2 936771225)
+                                                                  fun queue =>
+                                                                  bindExec
+                                                                    (CallData.invoke external ctx queue
+                                                                      (encode 4 3053534447 ++
+                                                                        (encode 32 input.lastRequest.val ++
+                                                                          encode 32 input.shareRate.val))
+                                                                      input.lockAmount)
+                                                                    fun __discr =>
+                                                                    bindExec (pure ()) fun y => afterCalls ctx input
+                                                              else
+                                                                bindExec (pure PUnit.unit) fun y => afterCalls ctx input
+                                                  else
+                                                    bindExec (pure PUnit.unit) fun y =>
+                                                      if 0 < input.withdrawals.val then
+                                                        bindExec (lookup external ctx a_2 1775509832) fun vault =>
+                                                          bindExec
+                                                            (CallData.invoke external ctx vault
+                                                              (encode 4 831804042 ++ encode 32 input.withdrawals.val))
+                                                            fun __discr =>
+                                                            bindExec (pure ()) fun y =>
+                                                              if 0 < input.lockAmount.val then
+                                                                bindExec (lookup external ctx a_2 936771225)
+                                                                  fun queue =>
+                                                                  bindExec
+                                                                    (CallData.invoke external ctx queue
+                                                                      (encode 4 3053534447 ++
+                                                                        (encode 32 input.lastRequest.val ++
+                                                                          encode 32 input.shareRate.val))
+                                                                      input.lockAmount)
+                                                                    fun __discr =>
+                                                                    bindExec (pure ()) fun y => afterCalls ctx input
+                                                              else
+                                                                bindExec (pure PUnit.unit) fun y => afterCalls ctx input
+                                                      else
+                                                        bindExec (pure PUnit.unit) fun y =>
+                                                          if 0 < input.lockAmount.val then
+                                                            bindExec (lookup external ctx a_2 936771225) fun queue =>
+                                                              bindExec
+                                                                (CallData.invoke external ctx queue
+                                                                  (encode 4 3053534447 ++
+                                                                    (encode 32 input.lastRequest.val ++
+                                                                      encode 32 input.shareRate.val))
+                                                                  input.lockAmount)
+                                                                fun __discr =>
+                                                                bindExec (pure ()) fun y => afterCalls ctx input
+                                                          else bindExec (pure PUnit.unit) fun y => afterCalls ctx input)
+                                                  ((if ctx.sender = a_3 then pure ()
+                                                      else fail (Fault.reason "APP_AUTH_FAILED"))
+                                                      (lookup external ctx a_2 2519001150
+                                                          (getLidoLocator ctx
+                                                              ((if a.val = 0 then
+                                                                    fail (Fault.reason "CONTRACT_IS_STOPPED")
+                                                                  else pure ())
+                                                                  (Live.read ctx activeSlot
+                                                                      before).world).world).world).world).world).outcome,
+                                            world :=
+                                              ((if 0 < input.rewards.val then
+                                                    bindExec (lookup external ctx a_2 3829518943) fun vault =>
+                                                      bindExec
+                                                        (CallData.invoke external ctx vault
+                                                          (encode 4 2470627572 ++ encode 32 input.rewards.val))
+                                                        fun __discr =>
+                                                        bindExec (pure ()) fun y =>
+                                                          if 0 < input.withdrawals.val then
+                                                            bindExec (lookup external ctx a_2 1775509832) fun vault =>
+                                                              bindExec
+                                                                (CallData.invoke external ctx vault
+                                                                  (encode 4 831804042 ++
+                                                                    encode 32 input.withdrawals.val))
+                                                                fun __discr =>
+                                                                bindExec (pure ()) fun y =>
+                                                                  if 0 < input.lockAmount.val then
+                                                                    bindExec (lookup external ctx a_2 936771225)
+                                                                      fun queue =>
+                                                                      bindExec
+                                                                        (CallData.invoke external ctx queue
+                                                                          (encode 4 3053534447 ++
+                                                                            (encode 32 input.lastRequest.val ++
+                                                                              encode 32 input.shareRate.val))
+                                                                          input.lockAmount)
+                                                                        fun __discr =>
+                                                                        bindExec (pure ()) fun y => afterCalls ctx input
+                                                                  else
+                                                                    bindExec (pure PUnit.unit) fun y =>
+                                                                      afterCalls ctx input
+                                                          else
+                                                            bindExec (pure PUnit.unit) fun y =>
+                                                              if 0 < input.lockAmount.val then
+                                                                bindExec (lookup external ctx a_2 936771225)
+                                                                  fun queue =>
+                                                                  bindExec
+                                                                    (CallData.invoke external ctx queue
+                                                                      (encode 4 3053534447 ++
+                                                                        (encode 32 input.lastRequest.val ++
+                                                                          encode 32 input.shareRate.val))
+                                                                      input.lockAmount)
+                                                                    fun __discr =>
+                                                                    bindExec (pure ()) fun y => afterCalls ctx input
+                                                              else
+                                                                bindExec (pure PUnit.unit) fun y => afterCalls ctx input
+                                                  else
+                                                    bindExec (pure PUnit.unit) fun y =>
+                                                      if 0 < input.withdrawals.val then
+                                                        bindExec (lookup external ctx a_2 1775509832) fun vault =>
+                                                          bindExec
+                                                            (CallData.invoke external ctx vault
+                                                              (encode 4 831804042 ++ encode 32 input.withdrawals.val))
+                                                            fun __discr =>
+                                                            bindExec (pure ()) fun y =>
+                                                              if 0 < input.lockAmount.val then
+                                                                bindExec (lookup external ctx a_2 936771225)
+                                                                  fun queue =>
+                                                                  bindExec
+                                                                    (CallData.invoke external ctx queue
+                                                                      (encode 4 3053534447 ++
+                                                                        (encode 32 input.lastRequest.val ++
+                                                                          encode 32 input.shareRate.val))
+                                                                      input.lockAmount)
+                                                                    fun __discr =>
+                                                                    bindExec (pure ()) fun y => afterCalls ctx input
+                                                              else
+                                                                bindExec (pure PUnit.unit) fun y => afterCalls ctx input
+                                                      else
+                                                        bindExec (pure PUnit.unit) fun y =>
+                                                          if 0 < input.lockAmount.val then
+                                                            bindExec (lookup external ctx a_2 936771225) fun queue =>
+                                                              bindExec
+                                                                (CallData.invoke external ctx queue
+                                                                  (encode 4 3053534447 ++
+                                                                    (encode 32 input.lastRequest.val ++
+                                                                      encode 32 input.shareRate.val))
+                                                                  input.lockAmount)
+                                                                fun __discr =>
+                                                                bindExec (pure ()) fun y => afterCalls ctx input
+                                                          else bindExec (pure PUnit.unit) fun y => afterCalls ctx input)
+                                                  ((if ctx.sender = a_3 then pure ()
+                                                      else fail (Fault.reason "APP_AUTH_FAILED"))
+                                                      (lookup external ctx a_2 2519001150
+                                                          (getLidoLocator ctx
+                                                              ((if a.val = 0 then
+                                                                    fail (Fault.reason "CONTRACT_IS_STOPPED")
+                                                                  else pure ())
+                                                                  (Live.read ctx activeSlot
+                                                                      before).world).world).world).world).world).world,
+                                            attempts :=
+                                              ((if ctx.sender = a_3 then pure ()
+                                                    else fail (Fault.reason "APP_AUTH_FAILED"))
+                                                    (lookup external ctx a_2 2519001150
+                                                        (getLidoLocator ctx
+                                                            ((if a.val = 0 then
+                                                                  fail (Fault.reason "CONTRACT_IS_STOPPED")
+                                                                else pure ())
+                                                                (Live.read ctx activeSlot
+                                                                    before).world).world).world).world).attempts ++
+                                                ((if 0 < input.rewards.val then
+                                                      bindExec (lookup external ctx a_2 3829518943) fun vault =>
+                                                        bindExec
+                                                          (CallData.invoke external ctx vault
+                                                            (encode 4 2470627572 ++ encode 32 input.rewards.val))
+                                                          fun __discr =>
+                                                          bindExec (pure ()) fun y =>
+                                                            if 0 < input.withdrawals.val then
+                                                              bindExec (lookup external ctx a_2 1775509832) fun vault =>
+                                                                bindExec
+                                                                  (CallData.invoke external ctx vault
+                                                                    (encode 4 831804042 ++
+                                                                      encode 32 input.withdrawals.val))
+                                                                  fun __discr =>
+                                                                  bindExec (pure ()) fun y =>
+                                                                    if 0 < input.lockAmount.val then
+                                                                      bindExec (lookup external ctx a_2 936771225)
+                                                                        fun queue =>
+                                                                        bindExec
+                                                                          (CallData.invoke external ctx queue
+                                                                            (encode 4 3053534447 ++
+                                                                              (encode 32 input.lastRequest.val ++
+                                                                                encode 32 input.shareRate.val))
+                                                                            input.lockAmount)
+                                                                          fun __discr =>
+                                                                          bindExec (pure ()) fun y =>
+                                                                            afterCalls ctx input
+                                                                    else
+                                                                      bindExec (pure PUnit.unit) fun y =>
+                                                                        afterCalls ctx input
+                                                            else
+                                                              bindExec (pure PUnit.unit) fun y =>
+                                                                if 0 < input.lockAmount.val then
+                                                                  bindExec (lookup external ctx a_2 936771225)
+                                                                    fun queue =>
+                                                                    bindExec
+                                                                      (CallData.invoke external ctx queue
+                                                                        (encode 4 3053534447 ++
+                                                                          (encode 32 input.lastRequest.val ++
+                                                                            encode 32 input.shareRate.val))
+                                                                        input.lockAmount)
+                                                                      fun __discr =>
+                                                                      bindExec (pure ()) fun y => afterCalls ctx input
+                                                                else
+                                                                  bindExec (pure PUnit.unit) fun y =>
+                                                                    afterCalls ctx input
+                                                    else
+                                                      bindExec (pure PUnit.unit) fun y =>
+                                                        if 0 < input.withdrawals.val then
+                                                          bindExec (lookup external ctx a_2 1775509832) fun vault =>
+                                                            bindExec
+                                                              (CallData.invoke external ctx vault
+                                                                (encode 4 831804042 ++ encode 32 input.withdrawals.val))
+                                                              fun __discr =>
+                                                              bindExec (pure ()) fun y =>
+                                                                if 0 < input.lockAmount.val then
+                                                                  bindExec (lookup external ctx a_2 936771225)
+                                                                    fun queue =>
+                                                                    bindExec
+                                                                      (CallData.invoke external ctx queue
+                                                                        (encode 4 3053534447 ++
+                                                                          (encode 32 input.lastRequest.val ++
+                                                                            encode 32 input.shareRate.val))
+                                                                        input.lockAmount)
+                                                                      fun __discr =>
+                                                                      bindExec (pure ()) fun y => afterCalls ctx input
+                                                                else
+                                                                  bindExec (pure PUnit.unit) fun y =>
+                                                                    afterCalls ctx input
+                                                        else
+                                                          bindExec (pure PUnit.unit) fun y =>
+                                                            if 0 < input.lockAmount.val then
+                                                              bindExec (lookup external ctx a_2 936771225) fun queue =>
+                                                                bindExec
+                                                                  (CallData.invoke external ctx queue
+                                                                    (encode 4 3053534447 ++
+                                                                      (encode 32 input.lastRequest.val ++
+                                                                        encode 32 input.shareRate.val))
+                                                                    input.lockAmount)
+                                                                  fun __discr =>
+                                                                  bindExec (pure ()) fun y => afterCalls ctx input
+                                                            else
+                                                              bindExec (pure PUnit.unit) fun y => afterCalls ctx input)
+                                                    ((if ctx.sender = a_3 then pure ()
+                                                        else fail (Fault.reason "APP_AUTH_FAILED"))
+                                                        (lookup external ctx a_2 2519001150
+                                                            (getLidoLocator ctx
+                                                                ((if a.val = 0 then
+                                                                      fail (Fault.reason "CONTRACT_IS_STOPPED")
+                                                                    else pure ())
+                                                                    (Live.read ctx activeSlot
+                                                                        before).world).world).world).world).world).attempts }).outcome,
+                                    world :=
+                                      (match
+                                          ((if ctx.sender = a_3 then pure () else fail (Fault.reason "APP_AUTH_FAILED"))
+                                              (lookup external ctx a_2 2519001150
+                                                  (getLidoLocator ctx
+                                                      ((if a.val = 0 then fail (Fault.reason "CONTRACT_IS_STOPPED")
+                                                          else pure ())
+                                                          (Live.read ctx activeSlot
+                                                              before).world).world).world).world).outcome with
+                                        | Except.error e =>
+                                          { outcome := Except.error e,
+                                            world :=
+                                              ((if ctx.sender = a_3 then pure ()
+                                                  else fail (Fault.reason "APP_AUTH_FAILED"))
+                                                  (lookup external ctx a_2 2519001150
+                                                      (getLidoLocator ctx
+                                                          ((if a.val = 0 then fail (Fault.reason "CONTRACT_IS_STOPPED")
+                                                              else pure ())
+                                                              (Live.read ctx activeSlot
+                                                                  before).world).world).world).world).world,
+                                            attempts :=
+                                              ((if ctx.sender = a_3 then pure ()
+                                                  else fail (Fault.reason "APP_AUTH_FAILED"))
+                                                  (lookup external ctx a_2 2519001150
+                                                      (getLidoLocator ctx
+                                                          ((if a.val = 0 then fail (Fault.reason "CONTRACT_IS_STOPPED")
+                                                              else pure ())
+                                                              (Live.read ctx activeSlot
+                                                                  before).world).world).world).world).attempts }
+                                        | Except.ok a_4 =>
+                                          {
+                                            outcome :=
+                                              ((if 0 < input.rewards.val then
+                                                    bindExec (lookup external ctx a_2 3829518943) fun vault =>
+                                                      bindExec
+                                                        (CallData.invoke external ctx vault
+                                                          (encode 4 2470627572 ++ encode 32 input.rewards.val))
+                                                        fun __discr =>
+                                                        bindExec (pure ()) fun y =>
+                                                          if 0 < input.withdrawals.val then
+                                                            bindExec (lookup external ctx a_2 1775509832) fun vault =>
+                                                              bindExec
+                                                                (CallData.invoke external ctx vault
+                                                                  (encode 4 831804042 ++
+                                                                    encode 32 input.withdrawals.val))
+                                                                fun __discr =>
+                                                                bindExec (pure ()) fun y =>
+                                                                  if 0 < input.lockAmount.val then
+                                                                    bindExec (lookup external ctx a_2 936771225)
+                                                                      fun queue =>
+                                                                      bindExec
+                                                                        (CallData.invoke external ctx queue
+                                                                          (encode 4 3053534447 ++
+                                                                            (encode 32 input.lastRequest.val ++
+                                                                              encode 32 input.shareRate.val))
+                                                                          input.lockAmount)
+                                                                        fun __discr =>
+                                                                        bindExec (pure ()) fun y => afterCalls ctx input
+                                                                  else
+                                                                    bindExec (pure PUnit.unit) fun y =>
+                                                                      afterCalls ctx input
+                                                          else
+                                                            bindExec (pure PUnit.unit) fun y =>
+                                                              if 0 < input.lockAmount.val then
+                                                                bindExec (lookup external ctx a_2 936771225)
+                                                                  fun queue =>
+                                                                  bindExec
+                                                                    (CallData.invoke external ctx queue
+                                                                      (encode 4 3053534447 ++
+                                                                        (encode 32 input.lastRequest.val ++
+                                                                          encode 32 input.shareRate.val))
+                                                                      input.lockAmount)
+                                                                    fun __discr =>
+                                                                    bindExec (pure ()) fun y => afterCalls ctx input
+                                                              else
+                                                                bindExec (pure PUnit.unit) fun y => afterCalls ctx input
+                                                  else
+                                                    bindExec (pure PUnit.unit) fun y =>
+                                                      if 0 < input.withdrawals.val then
+                                                        bindExec (lookup external ctx a_2 1775509832) fun vault =>
+                                                          bindExec
+                                                            (CallData.invoke external ctx vault
+                                                              (encode 4 831804042 ++ encode 32 input.withdrawals.val))
+                                                            fun __discr =>
+                                                            bindExec (pure ()) fun y =>
+                                                              if 0 < input.lockAmount.val then
+                                                                bindExec (lookup external ctx a_2 936771225)
+                                                                  fun queue =>
+                                                                  bindExec
+                                                                    (CallData.invoke external ctx queue
+                                                                      (encode 4 3053534447 ++
+                                                                        (encode 32 input.lastRequest.val ++
+                                                                          encode 32 input.shareRate.val))
+                                                                      input.lockAmount)
+                                                                    fun __discr =>
+                                                                    bindExec (pure ()) fun y => afterCalls ctx input
+                                                              else
+                                                                bindExec (pure PUnit.unit) fun y => afterCalls ctx input
+                                                      else
+                                                        bindExec (pure PUnit.unit) fun y =>
+                                                          if 0 < input.lockAmount.val then
+                                                            bindExec (lookup external ctx a_2 936771225) fun queue =>
+                                                              bindExec
+                                                                (CallData.invoke external ctx queue
+                                                                  (encode 4 3053534447 ++
+                                                                    (encode 32 input.lastRequest.val ++
+                                                                      encode 32 input.shareRate.val))
+                                                                  input.lockAmount)
+                                                                fun __discr =>
+                                                                bindExec (pure ()) fun y => afterCalls ctx input
+                                                          else bindExec (pure PUnit.unit) fun y => afterCalls ctx input)
+                                                  ((if ctx.sender = a_3 then pure ()
+                                                      else fail (Fault.reason "APP_AUTH_FAILED"))
+                                                      (lookup external ctx a_2 2519001150
+                                                          (getLidoLocator ctx
+                                                              ((if a.val = 0 then
+                                                                    fail (Fault.reason "CONTRACT_IS_STOPPED")
+                                                                  else pure ())
+                                                                  (Live.read ctx activeSlot
+                                                                      before).world).world).world).world).world).outcome,
+                                            world :=
+                                              ((if 0 < input.rewards.val then
+                                                    bindExec (lookup external ctx a_2 3829518943) fun vault =>
+                                                      bindExec
+                                                        (CallData.invoke external ctx vault
+                                                          (encode 4 2470627572 ++ encode 32 input.rewards.val))
+                                                        fun __discr =>
+                                                        bindExec (pure ()) fun y =>
+                                                          if 0 < input.withdrawals.val then
+                                                            bindExec (lookup external ctx a_2 1775509832) fun vault =>
+                                                              bindExec
+                                                                (CallData.invoke external ctx vault
+                                                                  (encode 4 831804042 ++
+                                                                    encode 32 input.withdrawals.val))
+                                                                fun __discr =>
+                                                                bindExec (pure ()) fun y =>
+                                                                  if 0 < input.lockAmount.val then
+                                                                    bindExec (lookup external ctx a_2 936771225)
+                                                                      fun queue =>
+                                                                      bindExec
+                                                                        (CallData.invoke external ctx queue
+                                                                          (encode 4 3053534447 ++
+                                                                            (encode 32 input.lastRequest.val ++
+                                                                              encode 32 input.shareRate.val))
+                                                                          input.lockAmount)
+                                                                        fun __discr =>
+                                                                        bindExec (pure ()) fun y => afterCalls ctx input
+                                                                  else
+                                                                    bindExec (pure PUnit.unit) fun y =>
+                                                                      afterCalls ctx input
+                                                          else
+                                                            bindExec (pure PUnit.unit) fun y =>
+                                                              if 0 < input.lockAmount.val then
+                                                                bindExec (lookup external ctx a_2 936771225)
+                                                                  fun queue =>
+                                                                  bindExec
+                                                                    (CallData.invoke external ctx queue
+                                                                      (encode 4 3053534447 ++
+                                                                        (encode 32 input.lastRequest.val ++
+                                                                          encode 32 input.shareRate.val))
+                                                                      input.lockAmount)
+                                                                    fun __discr =>
+                                                                    bindExec (pure ()) fun y => afterCalls ctx input
+                                                              else
+                                                                bindExec (pure PUnit.unit) fun y => afterCalls ctx input
+                                                  else
+                                                    bindExec (pure PUnit.unit) fun y =>
+                                                      if 0 < input.withdrawals.val then
+                                                        bindExec (lookup external ctx a_2 1775509832) fun vault =>
+                                                          bindExec
+                                                            (CallData.invoke external ctx vault
+                                                              (encode 4 831804042 ++ encode 32 input.withdrawals.val))
+                                                            fun __discr =>
+                                                            bindExec (pure ()) fun y =>
+                                                              if 0 < input.lockAmount.val then
+                                                                bindExec (lookup external ctx a_2 936771225)
+                                                                  fun queue =>
+                                                                  bindExec
+                                                                    (CallData.invoke external ctx queue
+                                                                      (encode 4 3053534447 ++
+                                                                        (encode 32 input.lastRequest.val ++
+                                                                          encode 32 input.shareRate.val))
+                                                                      input.lockAmount)
+                                                                    fun __discr =>
+                                                                    bindExec (pure ()) fun y => afterCalls ctx input
+                                                              else
+                                                                bindExec (pure PUnit.unit) fun y => afterCalls ctx input
+                                                      else
+                                                        bindExec (pure PUnit.unit) fun y =>
+                                                          if 0 < input.lockAmount.val then
+                                                            bindExec (lookup external ctx a_2 936771225) fun queue =>
+                                                              bindExec
+                                                                (CallData.invoke external ctx queue
+                                                                  (encode 4 3053534447 ++
+                                                                    (encode 32 input.lastRequest.val ++
+                                                                      encode 32 input.shareRate.val))
+                                                                  input.lockAmount)
+                                                                fun __discr =>
+                                                                bindExec (pure ()) fun y => afterCalls ctx input
+                                                          else bindExec (pure PUnit.unit) fun y => afterCalls ctx input)
+                                                  ((if ctx.sender = a_3 then pure ()
+                                                      else fail (Fault.reason "APP_AUTH_FAILED"))
+                                                      (lookup external ctx a_2 2519001150
+                                                          (getLidoLocator ctx
+                                                              ((if a.val = 0 then
+                                                                    fail (Fault.reason "CONTRACT_IS_STOPPED")
+                                                                  else pure ())
+                                                                  (Live.read ctx activeSlot
+                                                                      before).world).world).world).world).world).world,
+                                            attempts :=
+                                              ((if ctx.sender = a_3 then pure ()
+                                                    else fail (Fault.reason "APP_AUTH_FAILED"))
+                                                    (lookup external ctx a_2 2519001150
+                                                        (getLidoLocator ctx
+                                                            ((if a.val = 0 then
+                                                                  fail (Fault.reason "CONTRACT_IS_STOPPED")
+                                                                else pure ())
+                                                                (Live.read ctx activeSlot
+                                                                    before).world).world).world).world).attempts ++
+                                                ((if 0 < input.rewards.val then
+                                                      bindExec (lookup external ctx a_2 3829518943) fun vault =>
+                                                        bindExec
+                                                          (CallData.invoke external ctx vault
+                                                            (encode 4 2470627572 ++ encode 32 input.rewards.val))
+                                                          fun __discr =>
+                                                          bindExec (pure ()) fun y =>
+                                                            if 0 < input.withdrawals.val then
+                                                              bindExec (lookup external ctx a_2 1775509832) fun vault =>
+                                                                bindExec
+                                                                  (CallData.invoke external ctx vault
+                                                                    (encode 4 831804042 ++
+                                                                      encode 32 input.withdrawals.val))
+                                                                  fun __discr =>
+                                                                  bindExec (pure ()) fun y =>
+                                                                    if 0 < input.lockAmount.val then
+                                                                      bindExec (lookup external ctx a_2 936771225)
+                                                                        fun queue =>
+                                                                        bindExec
+                                                                          (CallData.invoke external ctx queue
+                                                                            (encode 4 3053534447 ++
+                                                                              (encode 32 input.lastRequest.val ++
+                                                                                encode 32 input.shareRate.val))
+                                                                            input.lockAmount)
+                                                                          fun __discr =>
+                                                                          bindExec (pure ()) fun y =>
+                                                                            afterCalls ctx input
+                                                                    else
+                                                                      bindExec (pure PUnit.unit) fun y =>
+                                                                        afterCalls ctx input
+                                                            else
+                                                              bindExec (pure PUnit.unit) fun y =>
+                                                                if 0 < input.lockAmount.val then
+                                                                  bindExec (lookup external ctx a_2 936771225)
+                                                                    fun queue =>
+                                                                    bindExec
+                                                                      (CallData.invoke external ctx queue
+                                                                        (encode 4 3053534447 ++
+                                                                          (encode 32 input.lastRequest.val ++
+                                                                            encode 32 input.shareRate.val))
+                                                                        input.lockAmount)
+                                                                      fun __discr =>
+                                                                      bindExec (pure ()) fun y => afterCalls ctx input
+                                                                else
+                                                                  bindExec (pure PUnit.unit) fun y =>
+                                                                    afterCalls ctx input
+                                                    else
+                                                      bindExec (pure PUnit.unit) fun y =>
+                                                        if 0 < input.withdrawals.val then
+                                                          bindExec (lookup external ctx a_2 1775509832) fun vault =>
+                                                            bindExec
+                                                              (CallData.invoke external ctx vault
+                                                                (encode 4 831804042 ++ encode 32 input.withdrawals.val))
+                                                              fun __discr =>
+                                                              bindExec (pure ()) fun y =>
+                                                                if 0 < input.lockAmount.val then
+                                                                  bindExec (lookup external ctx a_2 936771225)
+                                                                    fun queue =>
+                                                                    bindExec
+                                                                      (CallData.invoke external ctx queue
+                                                                        (encode 4 3053534447 ++
+                                                                          (encode 32 input.lastRequest.val ++
+                                                                            encode 32 input.shareRate.val))
+                                                                        input.lockAmount)
+                                                                      fun __discr =>
+                                                                      bindExec (pure ()) fun y => afterCalls ctx input
+                                                                else
+                                                                  bindExec (pure PUnit.unit) fun y =>
+                                                                    afterCalls ctx input
+                                                        else
+                                                          bindExec (pure PUnit.unit) fun y =>
+                                                            if 0 < input.lockAmount.val then
+                                                              bindExec (lookup external ctx a_2 936771225) fun queue =>
+                                                                bindExec
+                                                                  (CallData.invoke external ctx queue
+                                                                    (encode 4 3053534447 ++
+                                                                      (encode 32 input.lastRequest.val ++
+                                                                        encode 32 input.shareRate.val))
+                                                                    input.lockAmount)
+                                                                  fun __discr =>
+                                                                  bindExec (pure ()) fun y => afterCalls ctx input
+                                                            else
+                                                              bindExec (pure PUnit.unit) fun y => afterCalls ctx input)
+                                                    ((if ctx.sender = a_3 then pure ()
+                                                        else fail (Fault.reason "APP_AUTH_FAILED"))
+                                                        (lookup external ctx a_2 2519001150
+                                                            (getLidoLocator ctx
+                                                                ((if a.val = 0 then
+                                                                      fail (Fault.reason "CONTRACT_IS_STOPPED")
+                                                                    else pure ())
+                                                                    (Live.read ctx activeSlot
+                                                                        before).world).world).world).world).world).attempts }).world,
+                                    attempts :=
+                                      (lookup external ctx a_2 2519001150
+                                            (getLidoLocator ctx
+                                                ((if a.val = 0 then fail (Fault.reason "CONTRACT_IS_STOPPED")
+                                                    else pure ())
+                                                    (Live.read ctx activeSlot before).world).world).world).attempts ++
+                                        (match
+                                            ((if ctx.sender = a_3 then pure ()
+                                                else fail (Fault.reason "APP_AUTH_FAILED"))
+                                                (lookup external ctx a_2 2519001150
+                                                    (getLidoLocator ctx
+                                                        ((if a.val = 0 then fail (Fault.reason "CONTRACT_IS_STOPPED")
+                                                            else pure ())
+                                                            (Live.read ctx activeSlot
+                                                                before).world).world).world).world).outcome with
+                                          | Except.error e =>
+                                            { outcome := Except.error e,
+                                              world :=
+                                                ((if ctx.sender = a_3 then pure ()
+                                                    else fail (Fault.reason "APP_AUTH_FAILED"))
+                                                    (lookup external ctx a_2 2519001150
+                                                        (getLidoLocator ctx
+                                                            ((if a.val = 0 then
+                                                                  fail (Fault.reason "CONTRACT_IS_STOPPED")
+                                                                else pure ())
+                                                                (Live.read ctx activeSlot
+                                                                    before).world).world).world).world).world,
+                                              attempts :=
+                                                ((if ctx.sender = a_3 then pure ()
+                                                    else fail (Fault.reason "APP_AUTH_FAILED"))
+                                                    (lookup external ctx a_2 2519001150
+                                                        (getLidoLocator ctx
+                                                            ((if a.val = 0 then
+                                                                  fail (Fault.reason "CONTRACT_IS_STOPPED")
+                                                                else pure ())
+                                                                (Live.read ctx activeSlot
+                                                                    before).world).world).world).world).attempts }
+                                          | Except.ok a_4 =>
+                                            {
+                                              outcome :=
+                                                ((if 0 < input.rewards.val then
+                                                      bindExec (lookup external ctx a_2 3829518943) fun vault =>
+                                                        bindExec
+                                                          (CallData.invoke external ctx vault
+                                                            (encode 4 2470627572 ++ encode 32 input.rewards.val))
+                                                          fun __discr =>
+                                                          bindExec (pure ()) fun y =>
+                                                            if 0 < input.withdrawals.val then
+                                                              bindExec (lookup external ctx a_2 1775509832) fun vault =>
+                                                                bindExec
+                                                                  (CallData.invoke external ctx vault
+                                                                    (encode 4 831804042 ++
+                                                                      encode 32 input.withdrawals.val))
+                                                                  fun __discr =>
+                                                                  bindExec (pure ()) fun y =>
+                                                                    if 0 < input.lockAmount.val then
+                                                                      bindExec (lookup external ctx a_2 936771225)
+                                                                        fun queue =>
+                                                                        bindExec
+                                                                          (CallData.invoke external ctx queue
+                                                                            (encode 4 3053534447 ++
+                                                                              (encode 32 input.lastRequest.val ++
+                                                                                encode 32 input.shareRate.val))
+                                                                            input.lockAmount)
+                                                                          fun __discr =>
+                                                                          bindExec (pure ()) fun y =>
+                                                                            afterCalls ctx input
+                                                                    else
+                                                                      bindExec (pure PUnit.unit) fun y =>
+                                                                        afterCalls ctx input
+                                                            else
+                                                              bindExec (pure PUnit.unit) fun y =>
+                                                                if 0 < input.lockAmount.val then
+                                                                  bindExec (lookup external ctx a_2 936771225)
+                                                                    fun queue =>
+                                                                    bindExec
+                                                                      (CallData.invoke external ctx queue
+                                                                        (encode 4 3053534447 ++
+                                                                          (encode 32 input.lastRequest.val ++
+                                                                            encode 32 input.shareRate.val))
+                                                                        input.lockAmount)
+                                                                      fun __discr =>
+                                                                      bindExec (pure ()) fun y => afterCalls ctx input
+                                                                else
+                                                                  bindExec (pure PUnit.unit) fun y =>
+                                                                    afterCalls ctx input
+                                                    else
+                                                      bindExec (pure PUnit.unit) fun y =>
+                                                        if 0 < input.withdrawals.val then
+                                                          bindExec (lookup external ctx a_2 1775509832) fun vault =>
+                                                            bindExec
+                                                              (CallData.invoke external ctx vault
+                                                                (encode 4 831804042 ++ encode 32 input.withdrawals.val))
+                                                              fun __discr =>
+                                                              bindExec (pure ()) fun y =>
+                                                                if 0 < input.lockAmount.val then
+                                                                  bindExec (lookup external ctx a_2 936771225)
+                                                                    fun queue =>
+                                                                    bindExec
+                                                                      (CallData.invoke external ctx queue
+                                                                        (encode 4 3053534447 ++
+                                                                          (encode 32 input.lastRequest.val ++
+                                                                            encode 32 input.shareRate.val))
+                                                                        input.lockAmount)
+                                                                      fun __discr =>
+                                                                      bindExec (pure ()) fun y => afterCalls ctx input
+                                                                else
+                                                                  bindExec (pure PUnit.unit) fun y =>
+                                                                    afterCalls ctx input
+                                                        else
+                                                          bindExec (pure PUnit.unit) fun y =>
+                                                            if 0 < input.lockAmount.val then
+                                                              bindExec (lookup external ctx a_2 936771225) fun queue =>
+                                                                bindExec
+                                                                  (CallData.invoke external ctx queue
+                                                                    (encode 4 3053534447 ++
+                                                                      (encode 32 input.lastRequest.val ++
+                                                                        encode 32 input.shareRate.val))
+                                                                    input.lockAmount)
+                                                                  fun __discr =>
+                                                                  bindExec (pure ()) fun y => afterCalls ctx input
+                                                            else
+                                                              bindExec (pure PUnit.unit) fun y => afterCalls ctx input)
+                                                    ((if ctx.sender = a_3 then pure ()
+                                                        else fail (Fault.reason "APP_AUTH_FAILED"))
+                                                        (lookup external ctx a_2 2519001150
+                                                            (getLidoLocator ctx
+                                                                ((if a.val = 0 then
+                                                                      fail (Fault.reason "CONTRACT_IS_STOPPED")
+                                                                    else pure ())
+                                                                    (Live.read ctx activeSlot
+                                                                        before).world).world).world).world).world).outcome,
+                                              world :=
+                                                ((if 0 < input.rewards.val then
+                                                      bindExec (lookup external ctx a_2 3829518943) fun vault =>
+                                                        bindExec
+                                                          (CallData.invoke external ctx vault
+                                                            (encode 4 2470627572 ++ encode 32 input.rewards.val))
+                                                          fun __discr =>
+                                                          bindExec (pure ()) fun y =>
+                                                            if 0 < input.withdrawals.val then
+                                                              bindExec (lookup external ctx a_2 1775509832) fun vault =>
+                                                                bindExec
+                                                                  (CallData.invoke external ctx vault
+                                                                    (encode 4 831804042 ++
+                                                                      encode 32 input.withdrawals.val))
+                                                                  fun __discr =>
+                                                                  bindExec (pure ()) fun y =>
+                                                                    if 0 < input.lockAmount.val then
+                                                                      bindExec (lookup external ctx a_2 936771225)
+                                                                        fun queue =>
+                                                                        bindExec
+                                                                          (CallData.invoke external ctx queue
+                                                                            (encode 4 3053534447 ++
+                                                                              (encode 32 input.lastRequest.val ++
+                                                                                encode 32 input.shareRate.val))
+                                                                            input.lockAmount)
+                                                                          fun __discr =>
+                                                                          bindExec (pure ()) fun y =>
+                                                                            afterCalls ctx input
+                                                                    else
+                                                                      bindExec (pure PUnit.unit) fun y =>
+                                                                        afterCalls ctx input
+                                                            else
+                                                              bindExec (pure PUnit.unit) fun y =>
+                                                                if 0 < input.lockAmount.val then
+                                                                  bindExec (lookup external ctx a_2 936771225)
+                                                                    fun queue =>
+                                                                    bindExec
+                                                                      (CallData.invoke external ctx queue
+                                                                        (encode 4 3053534447 ++
+                                                                          (encode 32 input.lastRequest.val ++
+                                                                            encode 32 input.shareRate.val))
+                                                                        input.lockAmount)
+                                                                      fun __discr =>
+                                                                      bindExec (pure ()) fun y => afterCalls ctx input
+                                                                else
+                                                                  bindExec (pure PUnit.unit) fun y =>
+                                                                    afterCalls ctx input
+                                                    else
+                                                      bindExec (pure PUnit.unit) fun y =>
+                                                        if 0 < input.withdrawals.val then
+                                                          bindExec (lookup external ctx a_2 1775509832) fun vault =>
+                                                            bindExec
+                                                              (CallData.invoke external ctx vault
+                                                                (encode 4 831804042 ++ encode 32 input.withdrawals.val))
+                                                              fun __discr =>
+                                                              bindExec (pure ()) fun y =>
+                                                                if 0 < input.lockAmount.val then
+                                                                  bindExec (lookup external ctx a_2 936771225)
+                                                                    fun queue =>
+                                                                    bindExec
+                                                                      (CallData.invoke external ctx queue
+                                                                        (encode 4 3053534447 ++
+                                                                          (encode 32 input.lastRequest.val ++
+                                                                            encode 32 input.shareRate.val))
+                                                                        input.lockAmount)
+                                                                      fun __discr =>
+                                                                      bindExec (pure ()) fun y => afterCalls ctx input
+                                                                else
+                                                                  bindExec (pure PUnit.unit) fun y =>
+                                                                    afterCalls ctx input
+                                                        else
+                                                          bindExec (pure PUnit.unit) fun y =>
+                                                            if 0 < input.lockAmount.val then
+                                                              bindExec (lookup external ctx a_2 936771225) fun queue =>
+                                                                bindExec
+                                                                  (CallData.invoke external ctx queue
+                                                                    (encode 4 3053534447 ++
+                                                                      (encode 32 input.lastRequest.val ++
+                                                                        encode 32 input.shareRate.val))
+                                                                    input.lockAmount)
+                                                                  fun __discr =>
+                                                                  bindExec (pure ()) fun y => afterCalls ctx input
+                                                            else
+                                                              bindExec (pure PUnit.unit) fun y => afterCalls ctx input)
+                                                    ((if ctx.sender = a_3 then pure ()
+                                                        else fail (Fault.reason "APP_AUTH_FAILED"))
+                                                        (lookup external ctx a_2 2519001150
+                                                            (getLidoLocator ctx
+                                                                ((if a.val = 0 then
+                                                                      fail (Fault.reason "CONTRACT_IS_STOPPED")
+                                                                    else pure ())
+                                                                    (Live.read ctx activeSlot
+                                                                        before).world).world).world).world).world).world,
+                                              attempts :=
+                                                ((if ctx.sender = a_3 then pure ()
+                                                      else fail (Fault.reason "APP_AUTH_FAILED"))
+                                                      (lookup external ctx a_2 2519001150
+                                                          (getLidoLocator ctx
+                                                              ((if a.val = 0 then
+                                                                    fail (Fault.reason "CONTRACT_IS_STOPPED")
+                                                                  else pure ())
+                                                                  (Live.read ctx activeSlot
+                                                                      before).world).world).world).world).attempts ++
+                                                  ((if 0 < input.rewards.val then
+                                                        bindExec (lookup external ctx a_2 3829518943) fun vault =>
+                                                          bindExec
+                                                            (CallData.invoke external ctx vault
+                                                              (encode 4 2470627572 ++ encode 32 input.rewards.val))
+                                                            fun __discr =>
+                                                            bindExec (pure ()) fun y =>
+                                                              if 0 < input.withdrawals.val then
+                                                                bindExec (lookup external ctx a_2 1775509832)
+                                                                  fun vault =>
+                                                                  bindExec
+                                                                    (CallData.invoke external ctx vault
+                                                                      (encode 4 831804042 ++
+                                                                        encode 32 input.withdrawals.val))
+                                                                    fun __discr =>
+                                                                    bindExec (pure ()) fun y =>
+                                                                      if 0 < input.lockAmount.val then
+                                                                        bindExec (lookup external ctx a_2 936771225)
+                                                                          fun queue =>
+                                                                          bindExec
+                                                                            (CallData.invoke external ctx queue
+                                                                              (encode 4 3053534447 ++
+                                                                                (encode 32 input.lastRequest.val ++
+                                                                                  encode 32 input.shareRate.val))
+                                                                              input.lockAmount)
+                                                                            fun __discr =>
+                                                                            bindExec (pure ()) fun y =>
+                                                                              afterCalls ctx input
+                                                                      else
+                                                                        bindExec (pure PUnit.unit) fun y =>
+                                                                          afterCalls ctx input
+                                                              else
+                                                                bindExec (pure PUnit.unit) fun y =>
+                                                                  if 0 < input.lockAmount.val then
+                                                                    bindExec (lookup external ctx a_2 936771225)
+                                                                      fun queue =>
+                                                                      bindExec
+                                                                        (CallData.invoke external ctx queue
+                                                                          (encode 4 3053534447 ++
+                                                                            (encode 32 input.lastRequest.val ++
+                                                                              encode 32 input.shareRate.val))
+                                                                          input.lockAmount)
+                                                                        fun __discr =>
+                                                                        bindExec (pure ()) fun y => afterCalls ctx input
+                                                                  else
+                                                                    bindExec (pure PUnit.unit) fun y =>
+                                                                      afterCalls ctx input
+                                                      else
+                                                        bindExec (pure PUnit.unit) fun y =>
+                                                          if 0 < input.withdrawals.val then
+                                                            bindExec (lookup external ctx a_2 1775509832) fun vault =>
+                                                              bindExec
+                                                                (CallData.invoke external ctx vault
+                                                                  (encode 4 831804042 ++
+                                                                    encode 32 input.withdrawals.val))
+                                                                fun __discr =>
+                                                                bindExec (pure ()) fun y =>
+                                                                  if 0 < input.lockAmount.val then
+                                                                    bindExec (lookup external ctx a_2 936771225)
+                                                                      fun queue =>
+                                                                      bindExec
+                                                                        (CallData.invoke external ctx queue
+                                                                          (encode 4 3053534447 ++
+                                                                            (encode 32 input.lastRequest.val ++
+                                                                              encode 32 input.shareRate.val))
+                                                                          input.lockAmount)
+                                                                        fun __discr =>
+                                                                        bindExec (pure ()) fun y => afterCalls ctx input
+                                                                  else
+                                                                    bindExec (pure PUnit.unit) fun y =>
+                                                                      afterCalls ctx input
+                                                          else
+                                                            bindExec (pure PUnit.unit) fun y =>
+                                                              if 0 < input.lockAmount.val then
+                                                                bindExec (lookup external ctx a_2 936771225)
+                                                                  fun queue =>
+                                                                  bindExec
+                                                                    (CallData.invoke external ctx queue
+                                                                      (encode 4 3053534447 ++
+                                                                        (encode 32 input.lastRequest.val ++
+                                                                          encode 32 input.shareRate.val))
+                                                                      input.lockAmount)
+                                                                    fun __discr =>
+                                                                    bindExec (pure ()) fun y => afterCalls ctx input
+                                                              else
+                                                                bindExec (pure PUnit.unit) fun y =>
+                                                                  afterCalls ctx input)
+                                                      ((if ctx.sender = a_3 then pure ()
+                                                          else fail (Fault.reason "APP_AUTH_FAILED"))
+                                                          (lookup external ctx a_2 2519001150
+                                                              (getLidoLocator ctx
+                                                                  ((if a.val = 0 then
+                                                                        fail (Fault.reason "CONTRACT_IS_STOPPED")
+                                                                      else pure ())
+                                                                      (Live.read ctx activeSlot
+                                                                          before).world).world).world).world).world).attempts }).attempts }).outcome,
+                            world :=
+                              (match
+                                  (lookup external ctx a_2 2519001150
+                                      (getLidoLocator ctx
+                                          ((if a.val = 0 then fail (Fault.reason "CONTRACT_IS_STOPPED") else pure ())
+                                              (Live.read ctx activeSlot before).world).world).world).outcome with
+                                | ⋯ =>
+                                  { outcome := Except.error e,
+                                    world :=
+                                      (lookup external ctx a_2 2519001150
+                                          (getLidoLocator ctx
+                                              ((if a.val = 0 then fail (Fault.reason "CONTRACT_IS_STOPPED")
+                                                  else pure ())
+                                                  (Live.read ctx activeSlot before).world).world).world).world,
+                                    attempts :=
+                                      (lookup external ctx a_2 2519001150
+                                          (getLidoLocator ctx
+                                              ((if a.val = 0 then fail (Fault.reason "CONTRACT_IS_STOPPED")
+                                                  else pure ())
+                                                  (Live.read ctx activeSlot before).world).world).world).attempts }
+                                | ⋯ =>
+                                  {
+                                    outcome :=
+                                      (match
+                                          ((if ctx.sender = a_3 then pure () else fail (Fault.reason "APP_AUTH_FAILED"))
+                                              (lookup external ctx a_2 2519001150
+                                                  (getLidoLocator ctx
+                                                      ((if a.val = 0 then fail (Fault.reason "CONTRACT_IS_STOPPED")
+                                                          else pure ())
+                                                          (Live.read ctx activeSlot
+                                                              before).world).world).world).world).outcome with
+                                        | ⋯ =>
+                                          { outcome := Except.error e,
+                                            world :=
+                                              ((if ctx.sender = a_3 then pure ()
+                                                  else fail (Fault.reason "APP_AUTH_FAILED"))
+                                                  (lookup external ctx a_2 2519001150
+                                                      (getLidoLocator ctx
+                                                          ((if a.val = 0 then fail (Fault.reason "CONTRACT_IS_STOPPED")
+                                                              else pure ())
+                                                              (Live.read ctx activeSlot
+                                                                  before).world).world).world).world).world,
+                                            attempts :=
+                                              ((if ctx.sender = a_3 then pure ()
+                                                  else fail (Fault.reason "APP_AUTH_FAILED"))
+                                                  (lookup external ctx a_2 2519001150
+                                                      (getLidoLocator ctx
+                                                          ((if a.val = 0 then fail (Fault.reason "CONTRACT_IS_STOPPED")
+                                                              else pure ())
+                                                              (Live.read ctx activeSlot
+                                                                  before).world).world).world).world).attempts }
+                                        | ⋯ =>
+                                          {
+                                            outcome :=
+                                              ((if 0 < input.rewards.val then
+                                                    bindExec (lookup external ctx a_2 3829518943) fun vault =>
+                                                      bindExec
+                                                        (CallData.invoke external ctx vault
+                                                          (encode 4 2470627572 ++ encode 32 input.rewards.val))
+                                                        fun __discr =>
+                                                        bindExec (pure ()) fun y =>
+                                                          if 0 < input.withdrawals.val then
+                                                            bindExec (lookup external ctx a_2 1775509832) fun vault =>
+                                                              bindExec
+                                                                (CallData.invoke external ctx vault
+                                                                  (encode 4 831804042 ++
+                                                                    encode 32 input.withdrawals.val))
+                                                                fun __discr =>
+                                                                bindExec (pure ()) fun y =>
+                                                                  if 0 < input.lockAmount.val then
+                                                                    bindExec (lookup external ctx a_2 936771225)
+                                                                      fun queue =>
+                                                                      bindExec
+                                                                        (CallData.invoke external ctx queue
+                                                                          (encode 4 3053534447 ++
+                                                                            (encode 32 input.lastRequest.val ++
+                                                                              encode 32 input.shareRate.val))
+                                                                          input.lockAmount)
+                                                                        fun __discr =>
+                                                                        bindExec (pure ()) fun y => afterCalls ctx input
+                                                                  else
+                                                                    bindExec (pure PUnit.unit) fun y =>
+                                                                      afterCalls ctx input
+                                                          else
+                                                            bindExec (pure PUnit.unit) fun y =>
+                                                              if 0 < input.lockAmount.val then
+                                                                bindExec (lookup external ctx a_2 936771225)
+                                                                  fun queue =>
+                                                                  bindExec
+                                                                    (CallData.invoke external ctx queue
+                                                                      (encode 4 3053534447 ++
+                                                                        (encode 32 input.lastRequest.val ++
+                                                                          encode 32 input.shareRate.val))
+                                                                      input.lockAmount)
+                                                                    fun __discr =>
+                                                                    bindExec (pure ()) fun y => afterCalls ctx input
+                                                              else
+                                                                bindExec (pure PUnit.unit) fun y => afterCalls ctx input
+                                                  else
+                                                    bindExec (pure PUnit.unit) fun y =>
+                                                      if 0 < input.withdrawals.val then
+                                                        bindExec (lookup external ctx a_2 1775509832) fun vault =>
+                                                          bindExec
+                                                            (CallData.invoke external ctx vault
+                                                              (encode 4 831804042 ++ encode 32 input.withdrawals.val))
+                                                            fun __discr =>
+                                                            bindExec (pure ()) fun y =>
+                                                              if 0 < input.lockAmount.val then
+                                                                bindExec (lookup external ctx a_2 936771225)
+                                                                  fun queue =>
+                                                                  bindExec
+                                                                    (CallData.invoke external ctx queue
+                                                                      (encode 4 3053534447 ++
+                                                                        (encode 32 input.lastRequest.val ++
+                                                                          encode 32 input.shareRate.val))
+                                                                      input.lockAmount)
+                                                                    fun __discr =>
+                                                                    bindExec (pure ()) fun y => afterCalls ctx input
+                                                              else
+                                                                bindExec (pure PUnit.unit) fun y => afterCalls ctx input
+                                                      else
+                                                        bindExec (pure PUnit.unit) fun y =>
+                                                          if 0 < input.lockAmount.val then
+                                                            bindExec (lookup external ctx a_2 936771225) fun queue =>
+                                                              bindExec
+                                                                (CallData.invoke external ctx queue
+                                                                  (encode 4 3053534447 ++
+                                                                    (encode 32 input.lastRequest.val ++
+                                                                      encode 32 input.shareRate.val))
+                                                                  input.lockAmount)
+                                                                fun __discr =>
+                                                                bindExec (pure ()) fun y => afterCalls ctx input
+                                                          else bindExec (pure PUnit.unit) fun y => afterCalls ctx input)
+                                                  ((if ctx.sender = a_3 then pure ()
+                                                      else fail (Fault.reason "APP_AUTH_FAILED"))
+                                                      (lookup external ctx a_2 2519001150
+                                                          (getLidoLocator ctx
+                                                              ((if a.val = 0 then
+                                                                    fail (Fault.reason "CONTRACT_IS_STOPPED")
+                                                                  else pure ())
+                                                                  (Live.read ctx activeSlot
+                                                                      before).world).world).world).world).world).outcome,
+                                            world :=
+                                              ((if 0 < input.rewards.val then
+                                                    bindExec (lookup external ctx a_2 3829518943) fun vault =>
+                                                      bindExec
+                                                        (CallData.invoke external ctx vault
+                                                          (encode 4 2470627572 ++ encode 32 input.rewards.val))
+                                                        fun __discr =>
+                                                        bindExec (pure ()) fun y =>
+                                                          if 0 < input.withdrawals.val then
+                                                            bindExec (lookup external ctx a_2 1775509832) fun vault =>
+                                                              bindExec
+                                                                (CallData.invoke external ctx vault
+                                                                  (encode 4 831804042 ++
+                                                                    encode 32 input.withdrawals.val))
+                                                                fun __discr =>
+                                                                bindExec (pure ()) fun y =>
+                                                                  if 0 < input.lockAmount.val then
+                                                                    bindExec (lookup external ctx a_2 936771225)
+                                                                      fun queue =>
+                                                                      bindExec
+                                                                        (CallData.invoke external ctx queue
+                                                                          (encode 4 3053534447 ++
+                                                                            (encode 32 input.lastRequest.val ++
+                                                                              encode 32 input.shareRate.val))
+                                                                          input.lockAmount)
+                                                                        fun __discr =>
+                                                                        bindExec (pure ()) fun y => afterCalls ctx input
+                                                                  else
+                                                                    bindExec (pure PUnit.unit) fun y =>
+                                                                      afterCalls ctx input
+                                                          else
+                                                            bindExec (pure PUnit.unit) fun y =>
+                                                              if 0 < input.lockAmount.val then
+                                                                bindExec (lookup external ctx a_2 936771225)
+                                                                  fun queue =>
+                                                                  bindExec
+                                                                    (CallData.invoke external ctx queue
+                                                                      (encode 4 3053534447 ++
+                                                                        (encode 32 input.lastRequest.val ++
+                                                                          encode 32 input.shareRate.val))
+                                                                      input.lockAmount)
+                                                                    fun __discr =>
+                                                                    bindExec (pure ()) fun y => afterCalls ctx input
+                                                              else
+                                                                bindExec (pure PUnit.unit) fun y => afterCalls ctx input
+                                                  else
+                                                    bindExec (pure PUnit.unit) fun y =>
+                                                      if 0 < input.withdrawals.val then
+                                                        bindExec (lookup external ctx a_2 1775509832) fun vault =>
+                                                          bindExec
+                                                            (CallData.invoke external ctx vault
+                                                              (encode 4 831804042 ++ encode 32 input.withdrawals.val))
+                                                            fun __discr =>
+                                                            bindExec (pure ()) fun y =>
+                                                              if 0 < input.lockAmount.val then
+                                                                bindExec (lookup external ctx a_2 936771225)
+                                                                  fun queue =>
+                                                                  bindExec
+                                                                    (CallData.invoke external ctx queue
+                                                                      (encode 4 3053534447 ++
+                                                                        (encode 32 input.lastRequest.val ++
+                                                                          encode 32 input.shareRate.val))
+                                                                      input.lockAmount)
+                                                                    fun __discr =>
+                                                                    bindExec (pure ()) fun y => afterCalls ctx input
+                                                              else
+                                                                bindExec (pure PUnit.unit) fun y => afterCalls ctx input
+                                                      else
+                                                        bindExec (pure PUnit.unit) fun y =>
+                                                          if 0 < input.lockAmount.val then
+                                                            bindExec (lookup external ctx a_2 936771225) fun queue =>
+                                                              bindExec
+                                                                (CallData.invoke external ctx queue
+                                                                  (encode 4 3053534447 ++
+                                                                    (encode 32 input.lastRequest.val ++
+                                                                      encode 32 input.shareRate.val))
+                                                                  input.lockAmount)
+                                                                fun __discr =>
+                                                                bindExec (pure ()) fun y => afterCalls ctx input
+                                                          else bindExec (pure PUnit.unit) fun y => afterCalls ctx input)
+                                                  ((if ctx.sender = a_3 then pure ()
+                                                      else fail (Fault.reason "APP_AUTH_FAILED"))
+                                                      (lookup external ctx a_2 2519001150
+                                                          (getLidoLocator ctx
+                                                              ((if a.val = 0 then
+                                                                    fail (Fault.reason "CONTRACT_IS_STOPPED")
+                                                                  else pure ())
+                                                                  (Live.read ctx activeSlot
+                                                                      before).world).world).world).world).world).world,
+                                            attempts :=
+                                              ((if ctx.sender = a_3 then pure ()
+                                                    else fail (Fault.reason "APP_AUTH_FAILED"))
+                                                    (lookup external ctx a_2 2519001150
+                                                        (getLidoLocator ctx
+                                                            ((if a.val = 0 then
+                                                                  fail (Fault.reason "CONTRACT_IS_STOPPED")
+                                                                else pure ())
+                                                                (Live.read ctx activeSlot
+                                                                    before).world).world).world).world).attempts ++
+                                                ((if 0 < input.rewards.val then
+                                                      bindExec (lookup external ctx a_2 3829518943) fun vault =>
+                                                        bindExec
+                                                          (CallData.invoke external ctx vault
+                                                            (encode 4 2470627572 ++ encode 32 input.rewards.val))
+                                                          fun __discr =>
+                                                          bindExec (pure ()) fun y =>
+                                                            if 0 < input.withdrawals.val then
+                                                              bindExec (lookup external ctx a_2 1775509832) fun vault =>
+                                                                bindExec
+                                                                  (CallData.invoke external ctx vault
+                                                                    (encode 4 831804042 ++
+                                                                      encode 32 input.withdrawals.val))
+                                                                  fun __discr =>
+                                                                  bindExec (pure ()) fun y =>
+                                                                    if 0 < input.lockAmount.val then
+                                                                      bindExec (lookup external ctx a_2 936771225)
+                                                                        fun queue =>
+                                                                        bindExec
+                                                                          (CallData.invoke external ctx queue
+                                                                            (encode 4 3053534447 ++
+                                                                              (encode 32 input.lastRequest.val ++
+                                                                                encode 32 input.shareRate.val))
+                                                                            input.lockAmount)
+                                                                          fun __discr =>
+                                                                          bindExec (pure ()) fun y =>
+                                                                            afterCalls ctx input
+                                                                    else
+                                                                      bindExec (pure PUnit.unit) fun y =>
+                                                                        afterCalls ctx input
+                                                            else
+                                                              bindExec (pure PUnit.unit) fun y =>
+                                                                if 0 < input.lockAmount.val then
+                                                                  bindExec (lookup ⋯ ⋯ ⋯ ⋯) ⋯
+                                                                else ⋯
+                                                    else ⋯)
+                                                    ⋯).attempts }).outcome,
+                                    world := ⋯, attempts := ⋯ }).world,
+                            attempts := ⋯ }).outcome,
+                    world := ⋯, attempts := ⋯ }).outcome,
+            world := ⋯, attempts := ⋯ }).outcome with
+    | ⋯ => ⋯
+    | ⋯ => ⋯) =
+    ⋯
+LidoSRv3/Audit/Source/TrioReserve1/Report.lean:67:53: warning: This simp argument is unused:
+  fail
+
+Hint: Omit it from the simp argument list.
+  simp [collect, run, read, require, bind, bindExec, f̵a̵i̵l̵,̵ ̵h]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/Report.lean:67:59: warning: This simp argument is unused:
+  h
+
+Hint: Omit it from the simp argument list.
+  simp [collect, run, read, require, bind, bindExec, fail,̵ ̵h̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

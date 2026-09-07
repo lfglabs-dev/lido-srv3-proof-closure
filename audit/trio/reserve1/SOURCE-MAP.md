@@ -114,3 +114,68 @@ across accounting writes is proved. Bound contains physical address/code inputs,
 not successful call flags; receiver immutable authorization is checked separately.
 The differential runner selects Pipeline.external for complete source configs.
 Exhaustive independent parent and upstream deployment/writer/world relations remain open.
+
+
+## Enclosing report body (source implementation, correspondence open)
+
+- `Report.collect`: pinned Lido.sol:1072-1119, including `_whenNotStopped`
+  (utils/Pausable.sol:18-19), address `_auth` (Lido.sol:1394-1395), captured
+  locator getters and conditional calls. Nonpayable/ABI entry dispatch remains open.
+- `Report.afterCalls`: Lido.sol:1103-1119, `_setBufferedEther` at 1499-1501,
+  packed low-half update and `_updateBufferedEtherAllocation` at 1125-1132.
+- `CallData.invoke`: argument-complete variant of the existing high-level CALL
+  model, with selector-only equality checked. Deployed primitive binding remains open.
+- `receipts/report-source-selectors.json`: ethers 6.14.4 signature hashes and
+  pinned source hashes for report getter/vault/finalize selector literals.
+- `ReportCases`: seven executed source-interpreter cases; no report EVM claim.
+
+
+## Report EVM comparisons and ignored-return decoding
+
+- `Report.collect` also decodes the reward-vault return word: Lido.sol:40 declares
+  `withdrawRewards(uint256) returns (uint256 amount)`. Its value is ignored by the
+  report arithmetic, but short replies revert in the inherited compiler output.
+- `ReportDifferential` / `execute-report.cjs`: sixteen inherited pinned report-body
+  comparisons with explicit CallFixture boundaries; no production vault/queue claim.
+  `report-execution-summary.json` retains the first failing ABI regression and the
+  passing immutable source/command/artifact/trace evidence.
+
+
+## Independent report accounting
+
+`ReportAccountingSpec.Computes` defines executor-independent ordered arithmetic.
+`ReportAccounting.corresponds` and `complete` bind it to the exact result and
+physical world of `Report.afterCalls` (Lido.sol:1103-1119 and its packed/rebalance
+helpers). `failure_restores` is a stage-failure property before any tail write;
+root rollback of earlier external effects belongs to the enclosing report relation.
+See report-accounting-summary.json for immutable component and trust evidence.
+
+
+## Independent enclosing report order
+
+`ReportStages.source_decomposition` factors Lido.sol:1072-1119 without changing the
+captured locator or reward-return validation order. `ReportSpec.Executes` states
+executor-independent parent transaction rules. `ReportParent.corresponds` and
+`complete` bind every source outcome/world/ordered attempt list to those rules,
+using independent report accounting. Conditional callee-stage internals remain
+explicit source observations for subsequent independent expansion.
+
+
+## Independent conditional report stages
+
+`OptionalCallSpec.Executes` describes amount-based skipping, lookup and CALL
+failures, optional return-word validation and success independently of executors.
+`ReportCalls` binds these rules to the three report stages (Lido.sol:1089-1101)
+and substitutes them into the parent. Reward decoding retains the Lido.sol:40
+return-type requirement. Saved-locator decoding and raw primitive CALL observation
+are the remaining stage boundaries; concrete vault/queue binding is not claimed.
+
+
+## Report primitive observation expansion
+
+`CallDataFlow` gives independent CALL correspondence for full ABI bytes.
+`ReportLookup` relates saved-locator getter results to independent call and typed
+reply decoding rules. `ReportRules.corresponds`/`complete` substitute both through
+the report parent, conditional stages and accounting; the expanded predicate has
+no source stage executor or source CALL. The explicit raw external interpreter
+still requires concrete deployed vault/queue/callback and resource binding.

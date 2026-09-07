@@ -1,0 +1,68 @@
+LidoSRv3/Audit/Source/TrioReserve1/CallFlow.lean:54:60: error: unsolved goals
+external : External
+ctx : Context
+target : Address
+selector : Nat
+value : Word
+before : World
+hc : ¬(before.core.codeSize target.val).val = 0
+hb : ¬before.balances ctx.self < value.val
+hf : value.val ≤ before.balances ctx.self
+bytes : Bytes
+w : World
+hr :
+  external { caller := ctx.self, target := target, value := value, payload := encode 4 selector }
+      (transfer before ctx.self target value.val) =
+    Reply.success bytes w
+⊢ ?m.144 = bytes ∧ ?m.145 = w ∧ ?m.146 = []
+LidoSRv3/Audit/Source/TrioReserve1/CallFlow.lean:55:76: error: unsolved goals
+external : External
+ctx : Context
+target : Address
+selector : Nat
+value : Word
+before : World
+hc : ¬(before.core.codeSize target.val).val = 0
+hb : ¬before.balances ctx.self < value.val
+hf : value.val ≤ before.balances ctx.self
+bytes : Bytes
+w : World
+nested : List NestedAttempt
+hr :
+  external { caller := ctx.self, target := target, value := value, payload := encode 4 selector }
+      (transfer before ctx.self target value.val) =
+    Reply.successWithTrace bytes w nested
+⊢ ?m.185 = bytes ∧ ?m.186 = w ∧ ?m.187 = nested
+LidoSRv3/Audit/Source/TrioReserve1/CallFlow.lean:56:59: error: unsolved goals
+external : External
+ctx : Context
+target : Address
+selector : Nat
+value : Word
+before : World
+hc : ¬(before.core.codeSize target.val).val = 0
+hb : ¬before.balances ctx.self < value.val
+hf : value.val ≤ before.balances ctx.self
+bytes : Bytes
+hr :
+  external { caller := ctx.self, target := target, value := value, payload := encode 4 selector }
+      (transfer before ctx.self target value.val) =
+    Reply.rejected bytes
+⊢ ?m.226 = bytes ∧ ?m.227 = transfer before ctx.self target value.val ∧ ?m.228 = []
+LidoSRv3/Audit/Source/TrioReserve1/CallFlow.lean:57:75: error: unsolved goals
+external : External
+ctx : Context
+target : Address
+selector : Nat
+value : Word
+before : World
+hc : ¬(before.core.codeSize target.val).val = 0
+hb : ¬before.balances ctx.self < value.val
+hf : value.val ≤ before.balances ctx.self
+bytes : Bytes
+nested : List NestedAttempt
+hr :
+  external { caller := ctx.self, target := target, value := value, payload := encode 4 selector }
+      (transfer before ctx.self target value.val) =
+    Reply.rejectedWithTrace bytes nested
+⊢ ?m.267 = bytes ∧ ?m.268 = transfer before ctx.self target value.val ∧ ?m.269 = nested

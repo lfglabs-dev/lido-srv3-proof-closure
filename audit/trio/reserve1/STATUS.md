@@ -1,5 +1,242 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Fully expanded independent report relation
+
+`CallDataFlow` proves independent high-level CALL correspondence for arbitrary ABI
+payloads, preserving exact supplied bytes and traced/untraced primitive replies.
+`ReportLookup` binds the captured locator's actual reply to independent minimum
+length, first-word decoding and address narrowing rules. `ReportRules` substitutes
+these rules throughout accounting authorization and all conditional report stages.
+Its expanded predicate contains no source report stage executor or source CALL.
+Exact bidirectional root outcome/world/attempt correspondence, completeness,
+original-world failure restoration and successful active-state admission are proved.
+
+The semantic boundary is now the raw external reply interpreter, including vault,
+queue and callback behavior. Concrete implementation/deployment/resource binding,
+other writers/entry paths, full remote gates and independent review remain open.
+At source `2d357ae43ee340d38aa5189f6cab0e40604ab05e`, four selected checks and seven baseline checks pass; 91
+unchanged source/olean pairs and eleven dependency revisions match. Axioms are
+standard. See `receipts/report-primitives-summary.json`. Report runtime hashes are
+unchanged from its sixteen EVM comparisons. The remote wrapper hash is unchanged
+and no dependency-bundle tool was discovered; no new remote job is claimed.
+
+## Independent conditional report calls
+
+`OptionalCallSpec` independently specifies zero-amount skipping, lookup failure,
+CALL failure, short required-word return and success. The reward stage alone
+validates a return word; withdrawal/finalization accept successful void replies.
+No observations are required for a skipped stage. `ReportCalls` proves exact
+bidirectional stage correspondence, including returned stage worlds and ordered
+lookup/CALL attempts, then substitutes these rules throughout the report parent.
+Full root outcome/world/trace correspondence, completeness and rollback remain.
+
+Locator lookup internals and primitive CALL observations are still explicit
+boundaries. Concrete vault/queue, entry dispatch, deployment/resource and other
+integration obligations remain open. At source `63502ce2fbd0083d84e7e131d71532dc58aa766a`, three selected checks
+and seven baseline/import checks pass. The other 89 source/olean pairs and eleven
+dependency revisions match, with standard axioms only. See
+`receipts/report-calls-summary.json`. Runtime hashes are unchanged from the sixteen
+report EVM comparisons. Full gates and independent review are still required.
+
+## Independent enclosing report sequence
+
+`ReportSpec.Executes` independently orders the physical pause guard, accounting
+lookup/address authorization, reward stage, withdrawal stage, queue-finalization
+stage and accounting tail. Unvisited stages need no observations. Every failure
+restores the original transaction world while preserving all visited attempts in
+order. `ReportStages.source_decomposition` retains one captured locator across
+all later getters and keeps reward return decoding before subsequent stages.
+
+`ReportParent` proves exact bidirectional outcome/world/attempt correspondence and
+completeness for the whole modeled report. Its accounting observation is replaced
+with ReportAccounting's independent rules. Conditional external-stage internals
+still use explicit source observations; their independent expansion and concrete
+callee/deployment binding remain open.
+
+At source `043a845b5db3ef538eff0cf4e6328f400375ccc8`, four selected checks and seven baseline/import checks pass.
+The other 86 source/olean pairs and eleven dependency revisions match, with only
+standard axioms. See `receipts/report-parent-summary.json`. Report executable
+source hashes are unchanged from its sixteen EVM comparisons, which remain tied
+to their original source SHA. Full implementation, remote gates and independent
+review remain incomplete.
+
+## Independent report accounting correspondence
+
+`ReportAccountingSpec` states ordered reward-add overflow, withdrawal-add overflow,
+subtraction underflow and successful post-buffer arithmetic without importing an
+executor. Its rules are total, deterministic and bound the successful full result.
+`ReportAccounting` proves bidirectional exact result/world/event correspondence
+and completeness for Report.afterCalls. The pure post-state projection preserves
+the packed companion, narrows buffer to low128, conditionally increases reserve
+and emits reserve/ETHDistributed in source order with the full computed amount.
+All arithmetic failures occur before writes/events and retain the stage world
+with no attempted calls; committed balances are unchanged.
+
+At source `227d440fea51aff838c3e689dc9536d042308cab`, three selected checks and seven baseline/import checks pass.
+The other 84 source/olean pairs and eleven dependency revisions match, with standard
+axioms only. See `receipts/report-accounting-summary.json`. Runtime source hashes
+are unchanged from the sixteen report EVM comparisons at `4f2b6867518337bc12acd8806fb1b463ff19c516`;
+no new runtime run is claimed. Independent parent sequencing/callee binding, other
+integration, full remote gates and independent certification remain open.
+
+## Pinned report execution comparison and ABI correction
+
+Sixteen comparisons execute the unchanged inherited Solidity report body against
+explicit locator/vault/queue fixtures and compare it with Report.collect. They
+check fault/rejection bytes, exact direct CALL target/value/payload/acceptance/return
+bytes, packed buffer/reserve/target storage, ordered logs and Lido/queue ETH balances.
+Cases include all/zero calls, pause/auth, malformed getter and reward returns,
+each external rejection, checked arithmetic failures, low128 narrowing/full event,
+reserve already above target, trailing reward bytes, no-code queue and insufficient
+CALL funds. These fixtures do not implement production vault or queue finalization.
+
+The first draft found a model defect: withdrawRewards returns uint256 (Lido.sol:40),
+so Solidity validates at least 32 return bytes even when ignoring its value.
+Report.collect now decodes that word. The original failed comparison is retained;
+the corrected source ignores the returned number for its report-input arithmetic.
+
+At source `4f2b6867518337bc12acd8806fb1b463ff19c516`, all sixteen immutable EVM/model comparisons, four selected
+Lean checks and seven baseline/import checks pass. The other 81 source/olean pairs
+and eleven dependency revisions match; axioms are standard. All sixteen compressed
+traces verify against compressed and decompressed hashes. See
+`receipts/report-execution-summary.json`. The existing Lido artifact hash is checked,
+and exact toolchain/command/source/exit context is retained. Independent report
+correspondence, concrete callees, broader integration and full remote gates remain
+open; this is not independent certification.
+
+## Enclosing report source body
+
+`Report.collect` now models pinned Lido.collectRewardsAndProcessWithdrawals:
+physical pause check, one captured locator, accounting-address authorization,
+conditional reward-vault and withdrawal-vault calls, conditional value-bearing
+queue finalization, then buffer accounting and reserve rebalance. `CallData.invoke`
+retains complete argument bytes and has exact equality with Live.call for selector-only
+payloads. Buffer arithmetic reads the post-call world, checks both additions and
+subtraction, narrows only the low packed half and emits the full computed amount.
+
+Seven executed Lean model cases cover saved locator under callback mutation,
+post-call buffer/high-half changes, argument bytes/order/value, queue rejection and
+rollback, skipped zero amounts, arithmetic overflow/underflow, authorization and
+malformed accounting data. These fixtures are not EVM report execution. Independent
+report correspondence, vault/queue implementations, entry dispatch and deployment
+binding remain open. Historical runtime suites cover their prior sources only.
+
+At source `e45d4d309cd0bdafe82be8ba8caeb550b93706ad`, four selected Lean checks and seven baseline checks pass;
+80 unchanged source/olean pairs and eleven dependency revisions match. Axioms are
+standard. See `receipts/report-source-summary.json` and selector hashing provenance
+in `receipts/report-source-selectors.json`. Full remote gates and certification are
+still missing; this is implementation progress, not completion.
+
+## Authorization and external target balance invariant
+
+`AuthorizationBalance` proves provisional balance preservation for completed ACL
+evaluation and Kernel permission dispatch, including nested oracle traces and
+malformed reply decoding. Argument-complete permission CALLs and the physical
+initialization/kernel prefix propagate aggregate conservation. Every external
+target-setter outcome, including denial/fault and root rollback, retains the total
+and incoming finite aggregate bound. Concrete ACLCalls specialization leaves
+premises for unhandled requests and the explicit host-exhaustion fallback.
+
+No host exhaustion is turned into denial, and no EVM gas, initial aggregate
+reachability or general delegated/deployed execution claim is made. At source
+`48a7fad44c41df1305e27c2245f3a46563b1da79`, two selected checks and seven baseline/import checks pass. The other
+79 source/olean pairs and eleven dependency revisions match; axioms are standard.
+See `receipts/authorization-balance-summary.json`. Runtime source and prior runtime
+receipts are unchanged. Full implementation, remote gates and independent review
+remain incomplete.
+
+## Complete withdrawal balance invariant
+
+`WithdrawalBalance` carries exact total conservation and the finite aggregate bound
+through the entire source withdrawal program, including failed intermediate stages
+and root rollback. The proof composes balance-preserving reads, writes, events,
+guards, decoders and actual CALLs. It needs no successful-path, authorization,
+ABI-validity or packed-accounting premise. Every resulting account is uint256-bounded
+when the explicit incoming aggregate is below UINT256_MODULUS. The concrete pipeline
+specialization discharges its handled callees; delegated code retains its premise.
+Internal target and report-rebalance writers also conserve the aggregate.
+
+This closes balance propagation through the modeled withdrawal, not initial EVM
+aggregate reachability or general delegated/callback/deployment/resource behavior.
+Other parent/writer obligations, canonical full gates and independent review remain
+open. At source `e1fc0aebd77fe022a3548d86b6a174fdbf7e5d34`, two selected checks and seven baseline/import checks
+pass; 78 unchanged source/olean pairs and eleven dependency revisions are verified.
+Axioms are standard. See `receipts/withdrawal-balance-summary.json`. Runtime code
+and its prior execution evidence are unchanged. These are bounded checks only.
+
+## Concrete callee balance preservation
+
+`CalleeBalance` proves that the handled Locator, Queue, Oracle and Router paths
+preserve provisional balances on success. This covers malformed replies, arithmetic
+panic, nonpayable/authorization rejection and nested STATICCALL without assumptions
+on static reply bytes. Their dispatch composition retains a balance-preservation
+premise only for delegated code. The CALL theorem covers code/funds failure, success
+and rejection with either trace representation: every outcome conserves total
+balance and preserves the explicit finite aggregate bound. The resulting per-account
+uint256 bound specializes to the concrete pipeline.
+
+Initial aggregate reachability from EVM state, general delegated/callback behavior,
+deployed primitive/resource binding and remaining parent/writer integration are
+still open. At source `c89787d5c6228afc04b4eb359ca66482c850144d`, two selected component checks and seven baseline
+checks pass. The other 77 source/olean pairs match prior receipts; eleven dependency
+revisions match and axioms are standard. `receipts/callee-balance-summary.json`
+records these bounded checks. Runtime source is unchanged; no clean/full-gate or
+certification claim is made. The remote wrapper hash remains unchanged and no
+supported dependency-bundle tool was discovered.
+
+## Finite aggregate balance preservation
+
+`BalanceSpec` defines a duplicate-free finite account support, zero balances outside
+that support and a strict aggregate bound. Its conservation theorem sums the
+independent pointwise CALL balance rule, including aliased sender/recipient.
+Support can grow to include previously absent accounts without changing initial
+mass. `Balance` applies these rules to every funded provisional source transfer:
+total balance is preserved, and every resulting account is below the aggregate
+limit. With limit UINT256_MODULUS, this justifies unsaturated receiver credit,
+including fresh recipients and self-transfers.
+
+This is conditional on an explicit incoming aggregate invariant. Derivation from
+EVM state, preservation through arbitrary callees and complete bounded-world
+closure remain open. No transfer implementation or runtime fixture changed.
+At source `103b65e5a730e0f46676c5646f94832b124e0697`, three selected component checks and seven baseline/import
+checks pass; the other 75 source/olean pairs match prior receipts. All eleven
+dependency revisions match the manifest and printed axioms are standard.
+See `receipts/balance-support-rules-summary.json`. These bounded component checks
+are not a clean/full build, canonical registration or independent certification.
+
+## CALL rules substituted throughout withdrawal
+
+`WithdrawalCalls` threads a relational CALL observer through every locator lookup,
+status read, allocation query, frame query and receiver. Its final `Describes`
+instantiates independent code/funds/transfer/reply rules, with no source stage
+executor or Live.call in the expanded relation. Bidirectional exact correspondence
+and completeness preserve full return/fault, physical world and direct/nested
+attempts. Independent parent consequences still give failure restoration and
+successful nonzero amount.
+
+The remaining external boundary is the explicit raw callee interpreter, which must
+still be bound to deployed bytecode/primitive behavior and resource/bounded-world
+constraints. Other writers, proxy/initialization/report/queue paths, canonical gates
+and independent review remain open. At source `03e0f09fd4b228a20e85b592c2a09e107cd8071c`, two selected component checks and seven baseline/import checks pass. The other 74 source/olean pairs match earlier successful receipts. See `receipts/withdrawal-calls-rules-summary.json`; only standard axioms were printed. Eleven dependency revisions match the manifest. These are bounded checks, not full gates. Runtime
+execution source and historical receipts are unchanged.
+
+## Independent high-level CALL correspondence
+
+`CallSpec` independently orders target-code validation, balance admission and
+execution in the provisionally credited world. No-code and insufficient-funds
+paths need no callee observation; only the latter records a failed attempt.
+Success retains the callee-returned world and nested calls; rejection restores
+the incoming CALL world and preserves rejection bytes/nested attempts. Independent
+consequences establish failed-call restoration and successful-call funding/code.
+
+`CallFlow` proves bidirectional exact source CALL outcome/world/trace correspondence
+against explicit raw primitive replies, normalizing traced/untraced variants.
+Independent pointwise transfer accounting covers aliased self-calls, and the
+provisional transfer preserves storage and committed logs. These CALL rules must
+still be threaded into all expanded stage predicates; deployed primitive/bytecode
+and EVM resource/bounded-world binding remain open, along with other writers and
+full integration gates. At source `d2419a20db505dfde80c476407cd8b142c8e30a8`, three selected component checks and seven baseline/import checks pass. The other 72 source/olean pairs match earlier successful receipts. See `receipts/call-flow-rules-summary.json`; only standard axioms were printed. Eleven dependency revisions match the manifest. These are bounded checks, not full gates. Runtime source unchanged.
+
 ## Complete allocation flow and internal withdrawal substitution
 
 `AllocationFlowSpec` independently orders lookup, queue CALL, demand decoding and

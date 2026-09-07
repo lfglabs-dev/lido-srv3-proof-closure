@@ -1,0 +1,16 @@
+LidoSRv3/Audit/Source/TrioReserve1/ReportCalls.lean:51:59: error: Application type mismatch: The argument
+  hw
+has type
+  checkWord = false
+but is expected to have type
+  false = false
+in the application
+  Or.inl hw
+LidoSRv3/Audit/Source/TrioReserve1/ReportCalls.lean:55:48: error: Application type mismatch: The argument
+  hw
+has type
+  checkWord = true
+but is expected to have type
+  true = true
+in the application
+  OptionalCallSpec.Executes.malformed hn hl hc hw

@@ -1,0 +1,13 @@
+{
+  "source_commit": "4f2b6867518337bc12acd8806fb1b463ff19c516",
+  "argv": [
+    "/workspaces/mission-f19a12b3/reserve1-private/solidity/trio-reserve1/.tools/node-v22.15.0-linux-x64/bin/node",
+    "solidity/trio-reserve1/execute-report.cjs"
+  ],
+  "cwd": "/workspaces/mission-f19a12b3/reserve1-private",
+  "started_utc": "2026-09-07T17:19:30.225186+00:00",
+  "finished_utc": "2026-09-07T17:19:38.192754+00:00",
+  "exit": 0,
+  "log": "audit/trio/reserve1/receipts/report-execution.txt",
+  "log_sha256": "c3bf4e9dcc3719def68533c8f1e937310d2dfcce9e1b108aaf37e7386b0b7fe5"
+}

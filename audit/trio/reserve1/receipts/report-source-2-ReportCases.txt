@@ -1,0 +1,18 @@
+LidoSRv3/Tests/TrioReserve1/ReportCases.lean:38:2: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  BEq (Except Fault Unit)
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+LidoSRv3/Tests/TrioReserve1/ReportCases.lean:50:2: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  BEq (Except Fault Unit)
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+LidoSRv3/Tests/TrioReserve1/ReportCases.lean:58:2: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  BEq (Except Fault Unit)
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+LidoSRv3/Tests/TrioReserve1/ReportCases.lean:64:2: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  BEq (Except Fault Unit)
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+LidoSRv3/Tests/TrioReserve1/ReportCases.lean:70:2: error: failed to synthesize instance for 'for_in%' notation
+  ForIn ?m.26 (List (String × Bool)) ?m.28

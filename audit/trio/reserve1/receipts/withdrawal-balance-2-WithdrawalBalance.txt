@@ -1,0 +1,1550 @@
+LidoSRv3/Audit/Source/TrioReserve1/WithdrawalBalance.lean:54:110: error: unsolved goals
+case hf.hf.hf.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hf.hf.hf.hn
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds x✝³ : Word
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hf.hf.hn.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝³ : Address
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hf.hf.hn.hn.hf.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝⁴ : Address
+x✝³ : Bytes
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hf.hf.hn.hn.hf.hn
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝⁵ : Address
+x✝⁴ : Bytes
+x✝³ : Unit
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hf.hf.hn.hn.hn
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝⁵ : Address
+x✝⁴ : Bytes
+x✝³ : Word
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hf.hn.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝³ : Address
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hf.hn.hn.hf.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝⁴ : Address
+x✝³ : Bytes
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hf.hn.hn.hf.hn
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝⁵ : Address
+x✝⁴ : Bytes
+x✝³ : Unit
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hf.hn.hn.hn.hl
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝⁹ : Address
+x✝⁸ : Bytes
+x✝⁷ : Word
+x✝⁶ : World
+x✝⁵ : List Address
+x✝⁴ : Nat
+x✝³ : BalanceSpec.Bounded x✝⁶.balances x✝⁵ x✝⁴
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hf.hn.hn.hn.hr.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝⁹ : Address
+x✝⁸ : Bytes
+x✝⁷ : Word
+x✝⁶ : World
+x✝⁵ : List Address
+x✝⁴ : Nat
+x✝³ : BalanceSpec.Bounded x✝⁶.balances x✝⁵ x✝⁴
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hf.hn.hn.hn.hr.hn
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹⁰ : Address
+x✝⁹ : Bytes
+x✝⁸ : Word
+x✝⁷ : World
+x✝⁶ : List Address
+x✝⁵ : Nat
+x✝⁴ : BalanceSpec.Bounded x✝⁷.balances x✝⁶ x✝⁵
+x✝³ : Word
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case a
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝⁵ : Address
+x✝⁴ : Bytes
+x✝³ : Word
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝³ : Bool
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hf.hf.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝⁴ : Bool
+x✝³ : Unit
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hf.hf.hn
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝⁵ : Bool
+x✝⁴ : Unit
+x✝³ : Word
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hf.hn.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝⁵ : Bool
+x✝⁴ : Unit
+x✝³ : Address
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hf.hn.hn.hf.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝⁶ : Bool
+x✝⁵ : Unit
+x✝⁴ : Address
+x✝³ : Bytes
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hf.hn.hn.hf.hn
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝⁷ : Bool
+x✝⁶ : Unit
+x✝⁵ : Address
+x✝⁴ : Bytes
+x✝³ : Unit
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hf.hn.hn.hn
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝⁷ : Bool
+x✝⁶ : Unit
+x✝⁵ : Address
+x✝⁴ : Bytes
+x✝³ : Word
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝⁵ : Bool
+x✝⁴ : Unit
+x✝³ : Address
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝⁶ : Bool
+x✝⁵ : Unit
+x✝⁴ : Address
+x✝³ : Unit
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hf.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝⁷ : Bool
+x✝⁶ : Unit
+x✝⁵ : Address
+x✝⁴ x✝³ : Unit
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hf.hn.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝⁸ : Bool
+x✝⁷ : Unit
+x✝⁶ : Address
+x✝⁵ x✝⁴ : Unit
+x✝³ : Word
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hf.hn.hn.hf.hf.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝⁹ : Bool
+x✝⁸ : Unit
+x✝⁷ : Address
+x✝⁶ x✝⁵ : Unit
+x✝⁴ x✝³ : Word
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hf.hn.hn.hf.hf.hn
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹⁰ : Bool
+x✝⁹ : Unit
+x✝⁸ : Address
+x✝⁷ x✝⁶ : Unit
+x✝⁵ x✝⁴ x✝³ : Word
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hf.hn.hn.hf.hn.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹⁰ : Bool
+x✝⁹ : Unit
+x✝⁸ : Address
+x✝⁷ x✝⁶ : Unit
+x✝⁵ x✝⁴ : Word
+x✝³ : Address
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hf.hn.hn.hf.hn.hn.hf.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹¹ : Bool
+x✝¹⁰ : Unit
+x✝⁹ : Address
+x✝⁸ x✝⁷ : Unit
+x✝⁶ x✝⁵ : Word
+x✝⁴ : Address
+x✝³ : Bytes
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hf.hn.hn.hf.hn.hn.hf.hn
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹² : Bool
+x✝¹¹ : Unit
+x✝¹⁰ : Address
+x✝⁹ x✝⁸ : Unit
+x✝⁷ x✝⁶ : Word
+x✝⁵ : Address
+x✝⁴ : Bytes
+x✝³ : Unit
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hf.hn.hn.hf.hn.hn.hn
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹² : Bool
+x✝¹¹ : Unit
+x✝¹⁰ : Address
+x✝⁹ x✝⁸ : Unit
+x✝⁷ x✝⁶ : Word
+x✝⁵ : Address
+x✝⁴ : Bytes
+x✝³ : Word
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hf.hn.hn.hn.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹⁰ : Bool
+x✝⁹ : Unit
+x✝⁸ : Address
+x✝⁷ x✝⁶ : Unit
+x✝⁵ x✝⁴ : Word
+x✝³ : Address
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hf.hn.hn.hn.hn.hf.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹¹ : Bool
+x✝¹⁰ : Unit
+x✝⁹ : Address
+x✝⁸ x✝⁷ : Unit
+x✝⁶ x✝⁵ : Word
+x✝⁴ : Address
+x✝³ : Bytes
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hf.hn.hn.hn.hn.hf.hn
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹² : Bool
+x✝¹¹ : Unit
+x✝¹⁰ : Address
+x✝⁹ x✝⁸ : Unit
+x✝⁷ x✝⁶ : Word
+x✝⁵ : Address
+x✝⁴ : Bytes
+x✝³ : Unit
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hf.hn.hn.hn.hn.hn
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹² : Bool
+x✝¹¹ : Unit
+x✝¹⁰ : Address
+x✝⁹ x✝⁸ : Unit
+x✝⁷ x✝⁶ : Word
+x✝⁵ : Address
+x✝⁴ : Bytes
+x✝³ : Word
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hn.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝⁸ : Bool
+x✝⁷ : Unit
+x✝⁶ : Address
+x✝⁵ x✝⁴ : Unit
+x✝³ : Allocation
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hn.hn.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝⁹ : Bool
+x✝⁸ : Unit
+x✝⁷ : Address
+x✝⁶ x✝⁵ : Unit
+x✝⁴ : Allocation
+x✝³ : Unit
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hn.hn.hn.hf.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹⁰ : Bool
+x✝⁹ : Unit
+x✝⁸ : Address
+x✝⁷ x✝⁶ : Unit
+x✝⁵ : Allocation
+x✝⁴ : Unit
+x✝³ : Word
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hn.hn.hn.hf.hn
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹¹ : Bool
+x✝¹⁰ : Unit
+x✝⁹ : Address
+x✝⁸ x✝⁷ : Unit
+x✝⁶ : Allocation
+x✝⁵ : Unit
+x✝⁴ : Word
+x✝³ : Unit
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hn.hn.hn.hn.hf.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹¹ : Bool
+x✝¹⁰ : Unit
+x✝⁹ : Address
+x✝⁸ x✝⁷ : Unit
+x✝⁶ : Allocation
+x✝⁵ : Unit
+x✝⁴ : Word
+x✝³ : Nat
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hn.hn.hn.hn.hf.hn
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹² : Bool
+x✝¹¹ : Unit
+x✝¹⁰ : Address
+x✝⁹ x✝⁸ : Unit
+x✝⁷ : Allocation
+x✝⁶ : Unit
+x✝⁵ : Word
+x✝⁴ : Nat
+x✝³ : Unit
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹² : Bool
+x✝¹¹ : Unit
+x✝¹⁰ : Address
+x✝⁹ x✝⁸ : Unit
+x✝⁷ : Allocation
+x✝⁶ : Unit
+x✝⁵ : Word
+x✝⁴ x✝³ : Nat
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded
+    { core := x✝².core.writeContractSlot ctx.self.val bufferSlot (pack x✝³ x✝⁴), balances := x✝².balances,
+        logs := x✝².logs }.balances
+    x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹³ : Bool
+x✝¹² : Unit
+x✝¹¹ : Address
+x✝¹⁰ x✝⁹ : Unit
+x✝⁸ : Allocation
+x✝⁷ : Unit
+x✝⁶ : Word
+x✝⁵ x✝⁴ : Nat
+x✝³ : Unit
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded
+    { core := x✝².core, balances := x✝².balances,
+        logs :=
+          x✝².logs ++ [{ emitter := ctx.self, name := "DepositedPostReportUpdated", values := [word x✝⁵] }] }.balances
+    x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹⁴ : Bool
+x✝¹³ : Unit
+x✝¹² : Address
+x✝¹¹ x✝¹⁰ : Unit
+x✝⁹ : Allocation
+x✝⁸ : Unit
+x✝⁷ : Word
+x✝⁶ x✝⁵ : Nat
+x✝⁴ x✝³ : Unit
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded
+    { core := x✝².core, balances := x✝².balances,
+        logs := x✝².logs ++ [{ emitter := ctx.self, name := "Unbuffered", values := [amount] }] }.balances
+    x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hf.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹⁵ : Bool
+x✝¹⁴ : Unit
+x✝¹³ : Address
+x✝¹² x✝¹¹ : Unit
+x✝¹⁰ : Allocation
+x✝⁹ : Unit
+x✝⁸ : Word
+x✝⁷ x✝⁶ : Nat
+x✝⁵ x✝⁴ x✝³ : Unit
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hf.hn.hf.hf.hf.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹⁶ : Bool
+x✝¹⁵ : Unit
+x✝¹⁴ : Address
+x✝¹³ x✝¹² : Unit
+x✝¹¹ : Allocation
+x✝¹⁰ : Unit
+x✝⁹ : Word
+x✝⁸ x✝⁷ : Nat
+x✝⁶ x✝⁵ x✝⁴ : Unit
+x✝³ : Word
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hf.hn.hf.hf.hf.hn
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹⁷ : Bool
+x✝¹⁶ : Unit
+x✝¹⁵ : Address
+x✝¹⁴ x✝¹³ : Unit
+x✝¹² : Allocation
+x✝¹¹ : Unit
+x✝¹⁰ : Word
+x✝⁹ x✝⁸ : Nat
+x✝⁷ x✝⁶ x✝⁵ : Unit
+x✝⁴ x✝³ : Word
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hf.hn.hf.hf.hn.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹⁷ : Bool
+x✝¹⁶ : Unit
+x✝¹⁵ : Address
+x✝¹⁴ x✝¹³ : Unit
+x✝¹² : Allocation
+x✝¹¹ : Unit
+x✝¹⁰ : Word
+x✝⁹ x✝⁸ : Nat
+x✝⁷ x✝⁶ x✝⁵ : Unit
+x✝⁴ : Word
+x✝³ : Address
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hf.hn.hf.hf.hn.hn.hf.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹⁸ : Bool
+x✝¹⁷ : Unit
+x✝¹⁶ : Address
+x✝¹⁵ x✝¹⁴ : Unit
+x✝¹³ : Allocation
+x✝¹² : Unit
+x✝¹¹ : Word
+x✝¹⁰ x✝⁹ : Nat
+x✝⁸ x✝⁷ x✝⁶ : Unit
+x✝⁵ : Word
+x✝⁴ : Address
+x✝³ : Bytes
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hf.hn.hf.hf.hn.hn.hf.hn
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹⁹ : Bool
+x✝¹⁸ : Unit
+x✝¹⁷ : Address
+x✝¹⁶ x✝¹⁵ : Unit
+x✝¹⁴ : Allocation
+x✝¹³ : Unit
+x✝¹² : Word
+x✝¹¹ x✝¹⁰ : Nat
+x✝⁹ x✝⁸ x✝⁷ : Unit
+x✝⁶ : Word
+x✝⁵ : Address
+x✝⁴ : Bytes
+x✝³ : Unit
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hf.hn.hf.hf.hn.hn.hn
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹⁹ : Bool
+x✝¹⁸ : Unit
+x✝¹⁷ : Address
+x✝¹⁶ x✝¹⁵ : Unit
+x✝¹⁴ : Allocation
+x✝¹³ : Unit
+x✝¹² : Word
+x✝¹¹ x✝¹⁰ : Nat
+x✝⁹ x✝⁸ x✝⁷ : Unit
+x✝⁶ : Word
+x✝⁵ : Address
+x✝⁴ : Bytes
+x✝³ : Word
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hf.hn.hf.hn.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹⁷ : Bool
+x✝¹⁶ : Unit
+x✝¹⁵ : Address
+x✝¹⁴ x✝¹³ : Unit
+x✝¹² : Allocation
+x✝¹¹ : Unit
+x✝¹⁰ : Word
+x✝⁹ x✝⁸ : Nat
+x✝⁷ x✝⁶ x✝⁵ : Unit
+x✝⁴ : Word
+x✝³ : Address
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hf.hn.hf.hn.hn.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹⁸ : Bool
+x✝¹⁷ : Unit
+x✝¹⁶ : Address
+x✝¹⁵ x✝¹⁴ : Unit
+x✝¹³ : Allocation
+x✝¹² : Unit
+x✝¹¹ : Word
+x✝¹⁰ x✝⁹ : Nat
+x✝⁸ x✝⁷ x✝⁶ : Unit
+x✝⁵ : Word
+x✝⁴ : Address
+x✝³ : Bytes
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hf.hn.hf.hn.hn.hn.hf.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹⁹ : Bool
+x✝¹⁸ : Unit
+x✝¹⁷ : Address
+x✝¹⁶ x✝¹⁵ : Unit
+x✝¹⁴ : Allocation
+x✝¹³ : Unit
+x✝¹² : Word
+x✝¹¹ x✝¹⁰ : Nat
+x✝⁹ x✝⁸ x✝⁷ : Unit
+x✝⁶ : Word
+x✝⁵ : Address
+x✝⁴ : Bytes
+x✝³ : Unit
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hf.hn.hf.hn.hn.hn.hf.hn
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝²⁰ : Bool
+x✝¹⁹ : Unit
+x✝¹⁸ : Address
+x✝¹⁷ x✝¹⁶ : Unit
+x✝¹⁵ : Allocation
+x✝¹⁴ : Unit
+x✝¹³ : Word
+x✝¹² x✝¹¹ : Nat
+x✝¹⁰ x✝⁹ x✝⁸ : Unit
+x✝⁷ : Word
+x✝⁶ : Address
+x✝⁵ : Bytes
+x✝⁴ x✝³ : Unit
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hf.hn.hf.hn.hn.hn.hn.hf.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝²⁰ : Bool
+x✝¹⁹ : Unit
+x✝¹⁸ : Address
+x✝¹⁷ x✝¹⁶ : Unit
+x✝¹⁵ : Allocation
+x✝¹⁴ : Unit
+x✝¹³ : Word
+x✝¹² x✝¹¹ : Nat
+x✝¹⁰ x✝⁹ x✝⁸ : Unit
+x✝⁷ : Word
+x✝⁶ : Address
+x✝⁵ : Bytes
+x✝⁴ : Unit
+x✝³ : Word
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hf.hn.hf.hn.hn.hn.hn.hf.hn
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝²¹ : Bool
+x✝²⁰ : Unit
+x✝¹⁹ : Address
+x✝¹⁸ x✝¹⁷ : Unit
+x✝¹⁶ : Allocation
+x✝¹⁵ : Unit
+x✝¹⁴ : Word
+x✝¹³ x✝¹² : Nat
+x✝¹¹ x✝¹⁰ x✝⁹ : Unit
+x✝⁸ : Word
+x✝⁷ : Address
+x✝⁶ : Bytes
+x✝⁵ : Unit
+x✝⁴ : Word
+x✝³ : Unit
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hf.hn.hf.hn.hn.hn.hn.hn
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝²¹ : Bool
+x✝²⁰ : Unit
+x✝¹⁹ : Address
+x✝¹⁸ x✝¹⁷ : Unit
+x✝¹⁶ : Allocation
+x✝¹⁵ : Unit
+x✝¹⁴ : Word
+x✝¹³ x✝¹² : Nat
+x✝¹¹ x✝¹⁰ x✝⁹ : Unit
+x✝⁸ : Word
+x✝⁷ : Address
+x✝⁶ : Bytes
+x✝⁵ : Unit
+x✝⁴ x✝³ : Word
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hf.hn.hn
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹⁷ : Bool
+x✝¹⁶ : Unit
+x✝¹⁵ : Address
+x✝¹⁴ x✝¹³ : Unit
+x✝¹² : Allocation
+x✝¹¹ : Unit
+x✝¹⁰ : Word
+x✝⁹ x✝⁸ : Nat
+x✝⁷ x✝⁶ x✝⁵ : Unit
+x✝⁴ : Word
+x✝³ : Nat × Nat
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hn.hf.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹⁶ : Bool
+x✝¹⁵ : Unit
+x✝¹⁴ : Address
+x✝¹³ x✝¹² : Unit
+x✝¹¹ : Allocation
+x✝¹⁰ : Unit
+x✝⁹ : Word
+x✝⁸ x✝⁷ : Nat
+x✝⁶ x✝⁵ x✝⁴ : Unit
+x✝³ : Nat × Nat
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hn.hf.hn
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹⁷ : Bool
+x✝¹⁶ : Unit
+x✝¹⁵ : Address
+x✝¹⁴ x✝¹³ : Unit
+x✝¹² : Allocation
+x✝¹¹ : Unit
+x✝¹⁰ : Word
+x✝⁹ x✝⁸ : Nat
+x✝⁷ x✝⁶ x✝⁵ : Unit
+x✝⁴ : Nat × Nat
+x✝³ : Unit
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹⁷ : Bool
+x✝¹⁶ : Unit
+x✝¹⁵ : Address
+x✝¹⁴ x✝¹³ : Unit
+x✝¹² : Allocation
+x✝¹¹ : Unit
+x✝¹⁰ : Word
+x✝⁹ x✝⁸ : Nat
+x✝⁷ x✝⁶ x✝⁵ : Unit
+x✝⁴ : Nat × Nat
+x✝³ : Nat
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded
+    { core := x✝².core.writeContractSlot ctx.self.val nextSlot (pack x✝³ x✝⁴.snd), balances := x✝².balances,
+        logs := x✝².logs }.balances
+    x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹⁸ : Bool
+x✝¹⁷ : Unit
+x✝¹⁶ : Address
+x✝¹⁵ x✝¹⁴ : Unit
+x✝¹³ : Allocation
+x✝¹² : Unit
+x✝¹¹ : Word
+x✝¹⁰ x✝⁹ : Nat
+x✝⁸ x✝⁷ x✝⁶ : Unit
+x✝⁵ : Nat × Nat
+x✝⁴ : Nat
+x✝³ : Unit
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hl.hf.isTrue
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝²³ : Bool
+x✝²² : Unit
+x✝²¹ : Address
+x✝²⁰ x✝¹⁹ : Unit
+x✝¹⁸ : Allocation
+x✝¹⁷ : Unit
+x✝¹⁶ : Word
+x✝¹⁵ x✝¹⁴ : Nat
+x✝¹³ x✝¹² x✝¹¹ : Unit
+x✝¹⁰ : Nat × Nat
+x✝⁹ : Nat
+x✝⁸ : Unit
+x✝⁷ : Word
+x✝⁶ : World
+x✝⁵ : List Address
+x✝⁴ : Nat
+x✝³ : BalanceSpec.Bounded x✝⁶.balances x✝⁵ x✝⁴
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+h✝ : x✝⁷.val > amount.val
+⊢ BalanceSpec.Bounded
+    { core := x✝².core.writeContractSlot ctx.self.val reserveSlot (word (x✝⁷.val - amount.val)),
+        balances := x✝².balances, logs := x✝².logs }.balances
+    x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hl.hf.isFalse
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝²³ : Bool
+x✝²² : Unit
+x✝²¹ : Address
+x✝²⁰ x✝¹⁹ : Unit
+x✝¹⁸ : Allocation
+x✝¹⁷ : Unit
+x✝¹⁶ : Word
+x✝¹⁵ x✝¹⁴ : Nat
+x✝¹³ x✝¹² x✝¹¹ : Unit
+x✝¹⁰ : Nat × Nat
+x✝⁹ : Nat
+x✝⁸ : Unit
+x✝⁷ : Word
+x✝⁶ : World
+x✝⁵ : List Address
+x✝⁴ : Nat
+x✝³ : BalanceSpec.Bounded x✝⁶.balances x✝⁵ x✝⁴
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+h✝ : ¬x✝⁷.val > amount.val
+⊢ BalanceSpec.Bounded
+    { core := x✝².core.writeContractSlot ctx.self.val reserveSlot (word 0), balances := x✝².balances,
+        logs := x✝².logs }.balances
+    x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hl.hn.isTrue
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝²⁴ : Bool
+x✝²³ : Unit
+x✝²² : Address
+x✝²¹ x✝²⁰ : Unit
+x✝¹⁹ : Allocation
+x✝¹⁸ : Unit
+x✝¹⁷ : Word
+x✝¹⁶ x✝¹⁵ : Nat
+x✝¹⁴ x✝¹³ x✝¹² : Unit
+x✝¹¹ : Nat × Nat
+x✝¹⁰ : Nat
+x✝⁹ : Unit
+x✝⁸ : Word
+x✝⁷ : World
+x✝⁶ : List Address
+x✝⁵ : Nat
+x✝⁴ : BalanceSpec.Bounded x✝⁷.balances x✝⁶ x✝⁵
+x✝³ : Unit
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+h✝ : x✝⁸.val > amount.val
+⊢ BalanceSpec.Bounded
+    { core := x✝².core, balances := x✝².balances,
+        logs :=
+          x✝².logs ++
+            [{ emitter := ctx.self, name := "DepositsReserveSet", values := [word (x✝⁸.val - amount.val)] }] }.balances
+    x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hl.hn.isFalse
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝²⁴ : Bool
+x✝²³ : Unit
+x✝²² : Address
+x✝²¹ x✝²⁰ : Unit
+x✝¹⁹ : Allocation
+x✝¹⁸ : Unit
+x✝¹⁷ : Word
+x✝¹⁶ x✝¹⁵ : Nat
+x✝¹⁴ x✝¹³ x✝¹² : Unit
+x✝¹¹ : Nat × Nat
+x✝¹⁰ : Nat
+x✝⁹ : Unit
+x✝⁸ : Word
+x✝⁷ : World
+x✝⁶ : List Address
+x✝⁵ : Nat
+x✝⁴ : BalanceSpec.Bounded x✝⁷.balances x✝⁶ x✝⁵
+x✝³ : Unit
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+h✝ : ¬x✝⁸.val > amount.val
+⊢ BalanceSpec.Bounded
+    { core := x✝².core, balances := x✝².balances,
+        logs := x✝².logs ++ [{ emitter := ctx.self, name := "DepositsReserveSet", values := [word 0] }] }.balances
+    x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hf.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hn.hr
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝²³ : Bool
+x✝²² : Unit
+x✝²¹ : Address
+x✝²⁰ x✝¹⁹ : Unit
+x✝¹⁸ : Allocation
+x✝¹⁷ : Unit
+x✝¹⁶ : Word
+x✝¹⁵ x✝¹⁴ : Nat
+x✝¹³ x✝¹² x✝¹¹ : Unit
+x✝¹⁰ : Nat × Nat
+x✝⁹ : Nat
+x✝⁸ : Unit
+x✝⁷ : Word
+x✝⁶ : World
+x✝⁵ : List Address
+x✝⁴ : Nat
+x✝³ : BalanceSpec.Bounded x✝⁶.balances x✝⁵ x✝⁴
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case a
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹⁹ : Bool
+x✝¹⁸ : Unit
+x✝¹⁷ : Address
+x✝¹⁶ x✝¹⁵ : Unit
+x✝¹⁴ : Allocation
+x✝¹³ : Unit
+x✝¹² : Word
+x✝¹¹ x✝¹⁰ : Nat
+x✝⁹ x✝⁸ x✝⁷ : Unit
+x✝⁶ : Nat × Nat
+x✝⁵ : Nat
+x✝⁴ : Unit
+x✝³ : Word
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hn.hl.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹² : Bool
+x✝¹¹ : Unit
+x✝¹⁰ : Address
+x✝⁹ x✝⁸ x✝⁷ : Unit
+x✝⁶ : World
+x✝⁵ : List Address
+x✝⁴ : Nat
+x✝³ : BalanceSpec.Bounded x✝⁶.balances x✝⁵ x✝⁴
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hn.hl.hn.hf.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹³ : Bool
+x✝¹² : Unit
+x✝¹¹ : Address
+x✝¹⁰ x✝⁹ x✝⁸ : Unit
+x✝⁷ : World
+x✝⁶ : List Address
+x✝⁵ : Nat
+x✝⁴ : BalanceSpec.Bounded x✝⁷.balances x✝⁶ x✝⁵
+x✝³ : Word
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hn.hl.hn.hf.hn
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹⁴ : Bool
+x✝¹³ : Unit
+x✝¹² : Address
+x✝¹¹ x✝¹⁰ x✝⁹ : Unit
+x✝⁸ : World
+x✝⁷ : List Address
+x✝⁶ : Nat
+x✝⁵ : BalanceSpec.Bounded x✝⁸.balances x✝⁷ x✝⁶
+x✝⁴ : Word
+x✝³ : Unit
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hn.hl.hn.hn.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹⁴ : Bool
+x✝¹³ : Unit
+x✝¹² : Address
+x✝¹¹ x✝¹⁰ x✝⁹ : Unit
+x✝⁸ : World
+x✝⁷ : List Address
+x✝⁶ : Nat
+x✝⁵ : BalanceSpec.Bounded x✝⁸.balances x✝⁷ x✝⁶
+x✝⁴ : Word
+x✝³ : Nat
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded
+    { core := x✝².core.writeContractSlot ctx.self.val seedSlot (pack x✝³ (x✝⁴.val / width)), balances := x✝².balances,
+        logs := x✝².logs }.balances
+    x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hn.hl.hn.hn.hn.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹⁵ : Bool
+x✝¹⁴ : Unit
+x✝¹³ : Address
+x✝¹² x✝¹¹ x✝¹⁰ : Unit
+x✝⁹ : World
+x✝⁸ : List Address
+x✝⁷ : Nat
+x✝⁶ : BalanceSpec.Bounded x✝⁹.balances x✝⁸ x✝⁷
+x✝⁵ : Word
+x✝⁴ : Nat
+x✝³ : Unit
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded
+    { core := x✝².core, balances := x✝².balances,
+        logs :=
+          x✝².logs ++ [{ emitter := ctx.self, name := "DepositedValidatorsChanged", values := [word x✝⁴] }] }.balances
+    x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hn.hl.hn.hn.hn.hn.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹⁶ : Bool
+x✝¹⁵ : Unit
+x✝¹⁴ : Address
+x✝¹³ x✝¹² x✝¹¹ : Unit
+x✝¹⁰ : World
+x✝⁹ : List Address
+x✝⁸ : Nat
+x✝⁷ : BalanceSpec.Bounded x✝¹⁰.balances x✝⁹ x✝⁸
+x✝⁶ : Word
+x✝⁵ : Nat
+x✝⁴ x✝³ : Unit
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hn.hl.hn.hn.hn.hn.hn
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹⁷ : Bool
+x✝¹⁶ : Unit
+x✝¹⁵ : Address
+x✝¹⁴ x✝¹³ x✝¹² : Unit
+x✝¹¹ : World
+x✝¹⁰ : List Address
+x✝⁹ : Nat
+x✝⁸ : BalanceSpec.Bounded x✝¹¹.balances x✝¹⁰ x✝⁹
+x✝⁷ : Word
+x✝⁶ : Nat
+x✝⁵ x✝⁴ : Unit
+x✝³ : Bytes
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hn.hr.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹² : Bool
+x✝¹¹ : Unit
+x✝¹⁰ : Address
+x✝⁹ x✝⁸ x✝⁷ : Unit
+x✝⁶ : World
+x✝⁵ : List Address
+x✝⁴ : Nat
+x✝³ : BalanceSpec.Bounded x✝⁶.balances x✝⁵ x✝⁴
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hn.hr.hn.hf
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹³ : Bool
+x✝¹² : Unit
+x✝¹¹ : Address
+x✝¹⁰ x✝⁹ x✝⁸ : Unit
+x✝⁷ : World
+x✝⁶ : List Address
+x✝⁵ : Nat
+x✝⁴ : BalanceSpec.Bounded x✝⁷.balances x✝⁶ x✝⁵
+x✝³ : PUnit
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case hn.hn.hn.hn.hn.hn.hr.hn.hn
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝¹⁴ : Bool
+x✝¹³ : Unit
+x✝¹² : Address
+x✝¹¹ x✝¹⁰ x✝⁹ : Unit
+x✝⁸ : World
+x✝⁷ : List Address
+x✝⁶ : Nat
+x✝⁵ : BalanceSpec.Bounded x✝⁸.balances x✝⁷ x✝⁶
+x✝⁴ : PUnit
+x✝³ : Bytes
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝
+
+case a
+external : External
+he : CalleeBalance.Preserves external
+ctx : Context
+amount seeds : Word
+x✝⁸ : Bool
+x✝⁷ : Unit
+x✝⁶ : Address
+x✝⁵ x✝⁴ x✝³ : Unit
+x✝² : World
+x✝¹ : List Address
+x✝ : Nat
+x : BalanceSpec.Bounded x✝².balances x✝¹ x✝
+⊢ BalanceSpec.Bounded x✝².balances x✝¹ x✝

@@ -1,0 +1,27 @@
+{
+  "source_commit": "bb78522de5d91a339a1fad8148d1e6a9063b5cfd",
+  "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "node": "v22.15.0",
+  "backend": "2.26.3",
+  "artifact_sha256": "106b8734ed3e3de196820a40a5abbadacd26265767a61b262fbdf0089a876292",
+  "lean": "/workspaces/mission-f19a12b3/reserve1-private/audit/trio/reserve1/.local/lean4-v4.31.0/bin/lean",
+  "argv": [
+    "--run",
+    "LidoSRv3/Tests/TrioReserve1/ReportDifferential.lean",
+    "/workspaces/mission-f19a12b3/reserve1-private/audit/trio/reserve1/receipts/report-draft-execution-1/input.json",
+    "/workspaces/mission-f19a12b3/reserve1-private/audit/trio/reserve1/receipts/report-draft-execution-1/lean.json"
+  ],
+  "lean_exit": 0,
+  "lean_sha256": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550",
+  "lean_path": "/workspaces/mission-f19a12b3/reserve1-private/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/Cli/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/Qq/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/aesop/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/batteries/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/evmyul/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/importGraph/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/mathlib/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/plausible/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspaces/mission-f19a12b3/reserve1-private/.lake/packages/verity/.lake/build/lib/lean",
+  "utc": "2026-09-07T17:16:32.493Z",
+  "scope": "Inherited pinned report body against explicit callee fixtures, not concrete vault/queue implementations",
+  "source_hashes": {
+    "LidoSRv3/Audit/Source/TrioReserve1/Report.lean": "52dea76722915603a5732411af412508e70ea9debe1703d98d1e72b6e2c90cc1",
+    "LidoSRv3/Audit/Source/TrioReserve1/CallData.lean": "182787dda65d6cc315048e89212e1ef1bdb9d4c6a2084dad5413c303485d65eb",
+    "LidoSRv3/Tests/TrioReserve1/ReportDifferential.lean": "6f30f9638554047ef76ff858dc5b72b6057d03fe512d7ea039c2ee86950eb9a1",
+    "solidity/trio-reserve1/execute-report.cjs": "34bc3284fbd0e2936e38a496ed90afabf328b7a529efb9b85e270ff5f08eba37",
+    "solidity/trio-reserve1/LidoHarness.sol": "c91bc08a3f9cf324e3a530b8b41e99e74a5eb8f31e83d441f248518a965c3f37",
+    "lido-core/contracts/0.4.24/Lido.sol": "3bf84b96fb155af2290e6b26bc0138de356442a9abe3ea0f5274497f9fbffc10"
+  }
+}

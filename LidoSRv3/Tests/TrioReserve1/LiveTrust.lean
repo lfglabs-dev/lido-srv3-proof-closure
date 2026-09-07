@@ -1,3 +1,14 @@
+import LidoSRv3.Audit.Source.TrioReserve1.ReportRules
+import LidoSRv3.Audit.Source.TrioReserve1.ReportCalls
+import LidoSRv3.Audit.Source.TrioReserve1.ReportParent
+import LidoSRv3.Audit.Source.TrioReserve1.ReportAccounting
+import LidoSRv3.Audit.Source.TrioReserve1.Report
+import LidoSRv3.Audit.Source.TrioReserve1.AuthorizationBalance
+import LidoSRv3.Audit.Source.TrioReserve1.WithdrawalBalance
+import LidoSRv3.Audit.Source.TrioReserve1.CalleeBalance
+import LidoSRv3.Audit.Source.TrioReserve1.Balance
+import LidoSRv3.Audit.Source.TrioReserve1.WithdrawalCalls
+import LidoSRv3.Audit.Source.TrioReserve1.CallFlow
 import LidoSRv3.Audit.Source.TrioReserve1.AllocationFlow
 import LidoSRv3.Audit.Source.TrioReserve1.FrameRead
 import LidoSRv3.Audit.Source.TrioReserve1.Spend
@@ -324,3 +335,110 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms AllocationFlow.corresponds
 #print axioms AllocationFlow.spending_corresponds
 #print axioms AllocationFlow.withdrawal_corresponds
+
+#print axioms CallSpec.failure_restores
+#print axioms CallSpec.success_funded
+#print axioms CallFlow.transfer_balances
+#print axioms CallFlow.transfer_frame
+#print axioms CallFlow.of_spec
+#print axioms CallFlow.exists_spec
+#print axioms CallFlow.to_spec
+#print axioms CallFlow.corresponds
+
+#print axioms WithdrawalCalls.call_observations
+#print axioms WithdrawalCalls.corresponds
+#print axioms WithdrawalCalls.complete
+#print axioms WithdrawalCalls.failure_restores
+#print axioms WithdrawalCalls.success_nonzero
+
+#print axioms BalanceSpec.member_bound
+#print axioms BalanceSpec.account_bound
+#print axioms BalanceSpec.mass_equation
+#print axioms BalanceSpec.include_member
+#print axioms BalanceSpec.include_retains
+#print axioms BalanceSpec.include_bounded
+#print axioms BalanceSpec.preserves
+#print axioms Balance.transfer_preserves
+#print axioms Balance.transfer_uint256
+#print axioms Balance.transfer_finite
+#print axioms Balance.transfer_finite_uint256
+
+#print axioms CalleeBalance.locator
+#print axioms CalleeBalance.queue
+#print axioms CalleeBalance.router
+#print axioms CalleeBalance.oracle_frame
+#print axioms CalleeBalance.oracle
+#print axioms CalleeBalance.pipeline
+#print axioms CalleeBalance.call_conserves
+#print axioms CalleeBalance.call_uint256
+#print axioms CalleeBalance.pipeline_call_uint256
+
+#print axioms WithdrawalBalance.unchanged
+#print axioms WithdrawalBalance.bind_preserves
+#print axioms WithdrawalBalance.call_preserves
+#print axioms WithdrawalBalance.withdrawal
+#print axioms WithdrawalBalance.root_preserves
+#print axioms WithdrawalBalance.withdrawal_uint256
+#print axioms WithdrawalBalance.pipeline_withdrawal
+#print axioms WithdrawalBalance.target
+#print axioms WithdrawalBalance.rebalance
+
+#print axioms AuthorizationBalance.acl
+#print axioms AuthorizationBalance.decoded
+#print axioms AuthorizationBalance.kernel_permission
+#print axioms AuthorizationBalance.kernel
+#print axioms AuthorizationBalance.external
+#print axioms AuthorizationBalance.permission_call
+#print axioms AuthorizationBalance.can_perform
+#print axioms AuthorizationBalance.set_target
+#print axioms AuthorizationBalance.concrete_target
+
+#print axioms CallData.selector_call
+#print axioms Report.stopped
+
+#print axioms ReportAccountingSpec.total
+#print axioms ReportAccountingSpec.unique
+#print axioms ReportAccountingSpec.success_bound
+#print axioms ReportAccounting.of_spec
+#print axioms ReportAccounting.exists_spec
+#print axioms ReportAccounting.corresponds
+#print axioms ReportAccounting.complete
+#print axioms ReportAccounting.failure_restores
+#print axioms ReportAccounting.committed_balances
+
+#print axioms ReportStages.source_decomposition
+#print axioms ReportSpec.failure_restores
+#print axioms ReportSpec.success_active
+#print axioms ReportParent.accounting_observations
+#print axioms ReportParent.of_spec
+#print axioms ReportParent.exists_spec
+#print axioms ReportParent.to_spec
+#print axioms ReportParent.corresponds
+#print axioms ReportParent.complete
+#print axioms ReportParent.failure_restores
+
+#print axioms ReportCalls.of_spec
+#print axioms ReportCalls.exists_spec
+#print axioms ReportCalls.corresponds
+#print axioms ReportCalls.rewards_corresponds
+#print axioms ReportCalls.withdrawals_corresponds
+#print axioms ReportCalls.finalize_corresponds
+#print axioms ReportCalls.parent_corresponds
+#print axioms ReportCalls.complete
+#print axioms ReportCalls.failure_restores
+
+#print axioms CallDataFlow.of_spec
+#print axioms CallDataFlow.exists_spec
+#print axioms CallDataFlow.to_spec
+#print axioms CallDataFlow.corresponds
+#print axioms ReportLookup.getter_observations
+#print axioms ReportLookup.of_spec
+#print axioms ReportLookup.exists_spec
+#print axioms ReportLookup.corresponds
+#print axioms ReportRules.lookup_observations
+#print axioms ReportRules.call_observations
+#print axioms ReportRules.stage_observations
+#print axioms ReportRules.corresponds
+#print axioms ReportRules.complete
+#print axioms ReportRules.failure_restores
+#print axioms ReportRules.success_active

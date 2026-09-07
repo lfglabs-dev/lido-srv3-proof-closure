@@ -1,0 +1,110 @@
+[
+  {
+    "name": "all ordered calls",
+    "file": "trace-1.json.gz",
+    "sha256": "ebb39a8192e70779d7be7a7b73ef855f7b3ff5b8227e3382b5bf394a761756e9",
+    "decompressed_sha256": "ce10b147e2c749eed564ec55b351b2be2c12ab7fe816519b96323491c29111bb",
+    "bytes": 1077974,
+    "transaction": "0x81e01c1a48422795901a41d502bbe9e968e028b5d4bc5acbc737645d95d53d38",
+    "status": 0
+  },
+  {
+    "name": "zero amounts",
+    "file": "trace-2.json.gz",
+    "sha256": "66903c4e5eb04c7a52f6aefba85f2296f36508ed3155c8878ee87ce680858f3d",
+    "decompressed_sha256": "48421a5507e003d2a0c018fb83e29195f3fb4e1c0e0b33f65cc849ea4c4567f4",
+    "bytes": 1363721,
+    "transaction": "0x1e1fa9f6c4a664f1ee2d24d6a4c6e47caa2b6d41f512d932fe015f92a6094101",
+    "status": 1
+  },
+  {
+    "name": "stopped",
+    "file": "trace-3.json.gz",
+    "sha256": "12e62ad1e658037732a38fb69d05bffab7c9c9644193a17ebb6d3eb390b3dc69",
+    "decompressed_sha256": "3d3e1487b31d7c8ca9d2bcb238af1cc601dbaa87cb463df7bfc8ba712517dcf9",
+    "bytes": 239964,
+    "transaction": "0x860708aad74341742c6141a165499c6383d50192191a9f6afb02dd818f4392d8",
+    "status": 0
+  },
+  {
+    "name": "unauthorized",
+    "file": "trace-4.json.gz",
+    "sha256": "92ee7c5058ed7fb9c1f4bb3a1c56796d8df47a3dc7bf4bae710c0d2e908d8247",
+    "decompressed_sha256": "b763b3ef8bb2b1fb412fd4d8504c78cc3688d3661b14ea9b8d78ebb797d91e7b",
+    "bytes": 619829,
+    "transaction": "0x9d9f1d54be02d0efd568fc6bbc420856bf46804a178d8a11687ba391cb4289d8",
+    "status": 0
+  },
+  {
+    "name": "malformed accounting",
+    "file": "trace-5.json.gz",
+    "sha256": "8c6530cf6e43ed4ae47561a160ceaffdb7f1a3c8b1990f81744502eb49d127b2",
+    "decompressed_sha256": "2f5f7c81929b4f2730cc4f3ac7addca91072790d26d5f44ac6049c03d4ee4bfb",
+    "bytes": 510416,
+    "transaction": "0x025b84bb95432b1535bd7729f8fbc9758e586ec64e3475fceb1a97ada823d220",
+    "status": 0
+  },
+  {
+    "name": "reward rejection",
+    "file": "trace-6.json.gz",
+    "sha256": "75003bc42a2b8134c5eaab7f52a7094a588e3ea6465f77059f8b70ddf788f39b",
+    "decompressed_sha256": "6b36740fa8cbe87c9a12ee5b581cb65fa09d7fec11526aa25077519f490b1bfd",
+    "bytes": 1088346,
+    "transaction": "0xc43e2d88461437cae65a30698aba10e13bf52c79255e217f82c14c5ee6357558",
+    "status": 0
+  },
+  {
+    "name": "withdrawal rejection",
+    "file": "trace-7.json.gz",
+    "sha256": "81d99b1dd089ae1584d76590dcbcbe1683cfb1772572b93ca1dfcfd5cbdbbab8",
+    "decompressed_sha256": "8ee855368b74e43b5e871db5dcd10137872609e76b0d8c59964e00a092ae60f7",
+    "bytes": 1077977,
+    "transaction": "0x726486038b206e3c220539b2e1e481d938b7d3117f61f34d4eb2f170c8cabc70",
+    "status": 0
+  },
+  {
+    "name": "queue rejection",
+    "file": "trace-8.json.gz",
+    "sha256": "2783d150544e9b56f97e74f0e0c36132d1b06244448584d0019ca332265e3c22",
+    "decompressed_sha256": "c47d3dbc120cbc06f6375bab1461754b0628f4bf167924fda4c8e524d2c2dab0",
+    "bytes": 1077972,
+    "transaction": "0xf0f5cccd329966f24055fbd6bf07c95b330d12e181d3e1c331aae1a74c7049a8",
+    "status": 0
+  },
+  {
+    "name": "checked addition overflow",
+    "file": "trace-9.json.gz",
+    "sha256": "95180684f93471fb316b36028d273ad8b92e700c4cb83fbcef359d945b528032",
+    "decompressed_sha256": "735693ed7f54c2f8839de9b9b80bd133bb0a02350800a24609e11afc6fd64095",
+    "bytes": 1077982,
+    "transaction": "0x33b63b3c3417008c6a2cb767d2f7ad0bc663748746b80f42aff1a755de4fd264",
+    "status": 0
+  },
+  {
+    "name": "checked subtraction underflow",
+    "file": "trace-10.json.gz",
+    "sha256": "4840ec4263040a7fbcfbb31993519f1316fa5eb2930834c8edd1ac03062ded65",
+    "decompressed_sha256": "c807403cc49429e6c1864a29a65f5653a2dfd3672a830e0876f945f86b93407a",
+    "bytes": 1077986,
+    "transaction": "0xaf243ef3afb60e3e075c062959468923da9b6f8ea79519ab399754e7b27ed71a",
+    "status": 0
+  },
+  {
+    "name": "low128 narrowing and full event",
+    "file": "trace-11.json.gz",
+    "sha256": "d0ac2c9eb8842c80dc8d06e0fa801570ebc0be355c303d991cca90c29c62bd35",
+    "decompressed_sha256": "b93e2a93581469df6300f3aec1d444b88e171fee39c94e1a853231fbaec67ec8",
+    "bytes": 1077988,
+    "transaction": "0x2eb176ca560dd95b8c5544c47ee4563eee7ea020e588d01d77acdff13f3b51ac",
+    "status": 0
+  },
+  {
+    "name": "reserve above target",
+    "file": "trace-12.json.gz",
+    "sha256": "313ffe51706bdc0beeb70545d50d4f64c7f4112ce421e9ad53fb18234fb9971d",
+    "decompressed_sha256": "10aa735a343955d4c5eea20a500d3a4461d42074243f2e6d404acf77fe8a8631",
+    "bytes": 1077977,
+    "transaction": "0x8c8d24aee09b3caae91371397615290f1208b2f6496b937b5da0dd9dcfcca5d3",
+    "status": 0
+  }
+]

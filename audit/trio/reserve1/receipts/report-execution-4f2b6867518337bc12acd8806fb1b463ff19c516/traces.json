@@ -1,0 +1,146 @@
+[
+  {
+    "name": "all ordered calls",
+    "file": "trace-1.json.gz",
+    "sha256": "c2010953c16038a40b815222eb5edd9de59669cddd719a3b9a9438f932023383",
+    "decompressed_sha256": "902e9079c8a438e206ddfb57a9de00cdfdb83ac031a99740ee9166357774e5a9",
+    "bytes": 2932561,
+    "transaction": "0xc0b5d82eae5df98158f09900edb2b9e09b234810d71d0cf852bad6489739f3fd",
+    "status": 1
+  },
+  {
+    "name": "zero amounts",
+    "file": "trace-2.json.gz",
+    "sha256": "03e32772c4c499620a3b67bc82f51ceaa16bdc430bf95f7d5d1b229ae3d8984b",
+    "decompressed_sha256": "00e62d161efa1b4782c8eefec443578f415dc9113b5df44d011e4b99d8ea82e1",
+    "bytes": 1363721,
+    "transaction": "0x51228134246035239a58b4dfafd86597957985ab0f76716d1de3d948c20614ce",
+    "status": 1
+  },
+  {
+    "name": "stopped",
+    "file": "trace-3.json.gz",
+    "sha256": "41ee05cc4e328c168843fe5a23d3ba34500554f1d88a67033fe7c8dc4b4bb126",
+    "decompressed_sha256": "9be72ab65da8b91d8ea3ae33370030a84d3e9f33a19c218644d01ab4c83f6f40",
+    "bytes": 239964,
+    "transaction": "0x5188253a3ed51f9b0e8339ce1e9e8466086233cec778e9712c9e2524d9f3d84f",
+    "status": 0
+  },
+  {
+    "name": "unauthorized",
+    "file": "trace-4.json.gz",
+    "sha256": "94fcf6083e0ab583a0ebd025ce47d989e6ce1d381947155cd5cb8d9d7cf06390",
+    "decompressed_sha256": "a76eabc0b53ef9a8cb0018a2d79198115ee50bec00009132f73bef2d3277a90b",
+    "bytes": 619829,
+    "transaction": "0xfc2c15d82d2974beebc84a05ab8a270a410766d661180f6c28a80e475e7cb76a",
+    "status": 0
+  },
+  {
+    "name": "malformed accounting",
+    "file": "trace-5.json.gz",
+    "sha256": "7cd47f94845b1eabe4beb21f5017f3062a6a1e1d96ef088e3a87e6da29a23f9a",
+    "decompressed_sha256": "f13d491f91c7dbf2ab6749eb23ee899f3351449c643d8b44cc6c417bb459f3e0",
+    "bytes": 510416,
+    "transaction": "0x36ca035c31259b53a2bbcae9aef7eadc88d9de21152104eb1cc56b1a87002497",
+    "status": 0
+  },
+  {
+    "name": "reward rejection",
+    "file": "trace-6.json.gz",
+    "sha256": "b72ee83a5090e9e0269b32e695ff92d047c85eb16a43b142a07a2f81ec570bde",
+    "decompressed_sha256": "253377242097a1badd6fbaa83c1bff92b16004b645a99ec630d862d19805a7c7",
+    "bytes": 1088346,
+    "transaction": "0xcc5aeae05bb4f49ecb5b5ae48b487226f69df9dd2dd7facfb7956d0871e31541",
+    "status": 0
+  },
+  {
+    "name": "withdrawal rejection",
+    "file": "trace-7.json.gz",
+    "sha256": "965cb994f35a3ade8de71ce33305bd8bbf3e573bfd8d4c561619892559b02ad5",
+    "decompressed_sha256": "4f53eec52bddc110f3865558729f3d8b4f0153a1cee1e862eae0b0e7eef2f392",
+    "bytes": 1653871,
+    "transaction": "0x0b5c9a1f43199bc734bd80d362e02e23dbd56623314434c0595ec5474720a6b3",
+    "status": 0
+  },
+  {
+    "name": "queue rejection",
+    "file": "trace-8.json.gz",
+    "sha256": "503f40a08dd94f3e842c41cdbe94800f33994e3831d28a3b7529ea7a581cefc5",
+    "decompressed_sha256": "aba2527e785b51d9bb414e7a4b651c0a6a077ebcb894c4c64e7b7a6dc126d6e4",
+    "bytes": 2176280,
+    "transaction": "0xf0f5cccd329966f24055fbd6bf07c95b330d12e181d3e1c331aae1a74c7049a8",
+    "status": 0
+  },
+  {
+    "name": "checked addition overflow",
+    "file": "trace-9.json.gz",
+    "sha256": "b5219abc2759f1c8867e1c32ee61088a95ecaff6bd64aece40169e57f4f239c5",
+    "decompressed_sha256": "2ba2ccda20b3760d3ac883a5ab0ac102924651bd55c141fcc813cf5d9d34534b",
+    "bytes": 2612996,
+    "transaction": "0x33b63b3c3417008c6a2cb767d2f7ad0bc663748746b80f42aff1a755de4fd264",
+    "status": 0
+  },
+  {
+    "name": "checked subtraction underflow",
+    "file": "trace-10.json.gz",
+    "sha256": "d7a9cafec21d7209c08bf80229af523381e7faab59304ec5c2438ccd13043e1d",
+    "decompressed_sha256": "2fc79441e073a2ee2c8c5a65dc8e869ea0e7e06cab4f127274167315771af96a",
+    "bytes": 2771978,
+    "transaction": "0xaf243ef3afb60e3e075c062959468923da9b6f8ea79519ab399754e7b27ed71a",
+    "status": 0
+  },
+  {
+    "name": "low128 narrowing and full event",
+    "file": "trace-11.json.gz",
+    "sha256": "bd2d04f2935b7b67862cac36da45d8fd161893b882b3d7d294ee8d867f31067a",
+    "decompressed_sha256": "4c340246d9d8bbf706b3698190e503f026bed3febfd61ce19bf210dde820bfca",
+    "bytes": 1919167,
+    "transaction": "0x2eb176ca560dd95b8c5544c47ee4563eee7ea020e588d01d77acdff13f3b51ac",
+    "status": 1
+  },
+  {
+    "name": "reserve above target",
+    "file": "trace-12.json.gz",
+    "sha256": "c44dd85f5b5a5588808de5d6cc3cb49e728ec13265f2d9bbb6e5bf89bff5ea6d",
+    "decompressed_sha256": "c9c1266a67652abf14d653a4dec30849f588bbf9be00db5166c47bdd7972c23a",
+    "bytes": 2836621,
+    "transaction": "0x8c8d24aee09b3caae91371397615290f1208b2f6496b937b5da0dd9dcfcca5d3",
+    "status": 1
+  },
+  {
+    "name": "malformed reward return",
+    "file": "trace-13.json.gz",
+    "sha256": "3eee004f7526d4254ee8a1a8c2544d10b4a7749fd4c925af6932bcf2aadb9d88",
+    "decompressed_sha256": "1138ea7ba698beb647d28cbae81e3a5eb9146d2b98836c1898599b7a535fed8d",
+    "bytes": 1077980,
+    "transaction": "0x87f164562cf7cebfa9f6a98359947c607db6bb377e69caaacba23e68bff48577",
+    "status": 0
+  },
+  {
+    "name": "trailing reward bytes",
+    "file": "trace-14.json.gz",
+    "sha256": "742dfb0e1ba7fd22a86c1ec1a2a05f215086638c6d2c7ac9a80c1168e659bbf5",
+    "decompressed_sha256": "b15e7f767761599a1802e8286a7da2bde6157c45ee197798198e2086feca59c0",
+    "bytes": 2955365,
+    "transaction": "0xc268e824a4536fc61d3c25691e0b45f1f40fbeaef1067d1c1ed8110c399fed40",
+    "status": 1
+  },
+  {
+    "name": "queue no code",
+    "file": "trace-15.json.gz",
+    "sha256": "901e182b6b47fedb8692dd954a7dec1dfb56e7ede973e760144ecf8797545aef",
+    "decompressed_sha256": "7c4ca1ffbf761e9ce5335bc74817ba033524b9de88b05b159e3d9fd9a12c82b7",
+    "bytes": 2018833,
+    "transaction": "0xf1aa3ccc3f2b2fb9f2b3253775fefbd8b5fadfb1032036e7ec75e16634a4d00f",
+    "status": 0
+  },
+  {
+    "name": "insufficient queue funds",
+    "file": "trace-16.json.gz",
+    "sha256": "c9dda71e9d677f8c9ed1691b2e3cefddee1c55b4a0de623ef8ed6e7583d3f963",
+    "decompressed_sha256": "4da7c480220dc14bfe8b227f83b6204def349f3a9538d76200e1866b34176fe3",
+    "bytes": 2041866,
+    "transaction": "0xbad336183b35afb04df4e2cf8439ab78f99f328997dd14138af0774b012b79c8",
+    "status": 0
+  }
+]

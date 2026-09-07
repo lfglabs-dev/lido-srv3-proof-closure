@@ -1,5 +1,20 @@
 # Continuation — not a completion claim
 
+Latest increment: CallDataFlow/ReportLookup/ReportRules substitute independent
+full-payload CALL and captured-locator decoding rules throughout the report.
+The expanded report relation has no source stage executor or source CALL, with
+exact bidirectional outcome/world/attempt correspondence and completeness.
+Continue concrete vault/queue/callback implementations and deployed primitive,
+entry/resource/bounded-world binding plus remaining writer obligations. Do not
+reopen discharged report lookup/CALL substitution or call the raw interpreter
+production bytecode evidence.
+Current evidence: report-primitives-summary.json, four selected checks plus 91
+unchanged source/olean pairs. Report runtime hashes match its sixteen EVM
+comparisons; no rerun claimed for proof-only additions. Remote wrapper hash and
+missing dependency transport are unchanged. Full implementation and full gates
+remain open. Previous turn changed source and published evidence.
+
+
 Read STATUS, current git HEAD, and admission/ABI plus oracle/component receipts first. The previous
 goal turn was progress: source-callee implementations, checked specifications
 and executed differential receipts changed authoritative state. The installed
@@ -31,6 +46,11 @@ FrameRead.Withdrawal now substitutes physical oracle lookup and complete
 buffer/reserve observations and independent maximal-priority arithmetic. All major
 internal stages are expanded; CALL/deployed primitive binding remains the execution
 boundary.
+
+CallSpec/CallFlow now provide independent code/funds/transfer/reply/rollback rules
+with exact source CALL correspondence and pointwise transfer accounting. WithdrawalCalls now substitutes
+these rules throughout all expanded stage predicates. Bind raw primitive/deployed
+callee behavior and resource/world constraints next.
 
 1. WithdrawalSpec/WithdrawalParent now cover all eight parent paths with
    bidirectional exact return/world/trace correspondence to actual stage
