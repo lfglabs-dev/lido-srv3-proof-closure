@@ -44,8 +44,14 @@ or duplicate the old terminal remote job. The old local full-gate handle is abse
    queue demand after successful concrete withdrawal. Every queue storage cell
    is preserved under explicit queue/Lido namespace separation. No reserve <=
    buffer or cryptographic injectivity assumption is used. Next connect physical
-   writer and queue transitions into sequence invariants, and complete the
+   queue-changing transitions into sequence invariants, and complete the
    exhaustive parent/error relation and enclosing source admission obligations.
+   SequenceSpec/PhysicalSequence now cover finite internal target/rebalance and
+   committed-withdrawal interleavings, each spend tied to its incoming live queue,
+   with independent state refinement and distinct-account storage preservation.
+   Concrete successful withdrawal instantiates the spend transition. Rebalance
+   recomputes protection rather than preserving it. External ACL/report admission,
+   reachability of whole sequences and queue writers remain open.
    Latest execution is 51 matched cases / seven mutant kills at 4b82879, with
    nine explicitly flagged Pipeline.external cases. Lean source hashes match
    the 36-module component check at parent 2e4b6a5; only test cases changed. ABI.decode_encode and word/tuple decoding are now checked. Compose them

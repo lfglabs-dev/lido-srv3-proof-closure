@@ -1,5 +1,24 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Internal writer and committed withdrawal sequences
+
+`SequenceSpec` independently distinguishes target min, rebalance max, and admitted
+spending with buffer conservation, saturating reserve debit and unchanged target.
+`PhysicalSequence.corresponds` relates arbitrary finite interleavings of the
+internal target/rebalance writers and committed withdrawal worlds to this relation.
+Each spend reads demand from its incoming physical queue. All storage of distinct
+contracts is preserved throughout, so queue IDs, rows and live demand survive.
+`concrete_success_step` derives the independent spend transition from the actual
+Pipeline withdrawal execution and its raw configuration/numeric conditions.
+
+Target lowering cannot reduce protection; rebalance establishes the explicitly
+recomputed partition and may reduce protection. These proofs do not cover ACL
+admission, enclosing report execution, queue-changing transitions or exhaustive
+parent failures. Their sequence constructors describe internal/committed effects;
+they are not a claim that every constructed sequence is externally executable.
+The new modules passed draft bounded elaboration; immutable checks follow the
+source commit. Runtime sources remain unchanged.
+
 ## Physical reserve preservation
 
 `PhysicalReserve.success_preserves` connects the concrete `Pipeline.success`
