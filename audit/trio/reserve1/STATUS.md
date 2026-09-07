@@ -13,7 +13,7 @@ successful nonzero amount.
 The remaining external boundary is the explicit raw callee interpreter, which must
 still be bound to deployed bytecode/primitive behavior and resource/bounded-world
 constraints. Other writers, proxy/initialization/report/queue paths, canonical gates
-and independent review remain open. Immutable validation follows checks. Runtime
+and independent review remain open. At source `03e0f09fd4b228a20e85b592c2a09e107cd8071c`, two selected component checks and seven baseline/import checks pass. The other 74 source/olean pairs match earlier successful receipts. See `receipts/withdrawal-calls-rules-summary.json`; only standard axioms were printed. Eleven dependency revisions match the manifest. These are bounded checks, not full gates. Runtime
 execution source and historical receipts are unchanged.
 
 ## Independent high-level CALL correspondence
