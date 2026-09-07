@@ -1,0 +1,250 @@
+{
+  "scope": "Matching finite boundary fixtures; not a universal correspondence proof. Root return/revert bytes, relevant storage/balances, ordered calls and ABI logs.",
+  "results": [
+    {
+      "name": "live queue spend and frame reset",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "unauthorized caller",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "zero amount",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "bunker",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "paused",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "queue grows before spend",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "oracle rejection after packed write",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "short oracle result after packed write",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "ETH recipient rejection after seed write",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "actual ETH balance insufficient",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "post report truncation",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "seed truncation",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "empty live queue result",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "31 byte live queue result",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "extra live queue return bytes",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "uint256 seed add overflow after effects",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "current frame nonce truncation",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "reversed physical cumulative rows panic",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "queue finalization releases demand",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "uint256 amount rejected",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "noncanonical bunker bool is true",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "paused still decodes bunker result",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "queue address has no code",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "uint256 live demand clamps",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "dirty address upper bits truncate",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "same frame next accounting truncates",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "rebalance target above buffer then full spend",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "lower target releases withdrawal protection",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "second spend uses current queue and accounting",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "source router receives ETH and emits event",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "source router immutable auth rejects after accounting and seed writes",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "source router Lido admission rejects fixture caller",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "source locator queue and router compose",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "source locator queue growth blocks overspend",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "source locator caller authorization",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "source oracle consensus frame and receiver compose",
+      "matched": true,
+      "sourcePipeline": true
+    },
+    {
+      "name": "source consensus zero frame length panics",
+      "matched": true,
+      "sourcePipeline": true
+    },
+    {
+      "name": "source consensus initial epoch not arrived",
+      "matched": true,
+      "sourcePipeline": true
+    },
+    {
+      "name": "source consensus timestamp before genesis panics",
+      "matched": true,
+      "sourcePipeline": true
+    },
+    {
+      "name": "source consensus uint64 frame span overflow panics",
+      "matched": true,
+      "sourcePipeline": true
+    },
+    {
+      "name": "source consensus deadline narrows after valid uint64 span",
+      "matched": true,
+      "sourcePipeline": true
+    },
+    {
+      "name": "source oracle malformed STATICCALL tuple",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "source oracle rejected STATICCALL bubbles bytes",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "source oracle no-code consensus",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "source oracle STATICCALL rejects SSTORE",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "source oracle accepts trailing consensus bytes",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "source oracle timestamp multiply overflow after accounting",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "source oracle timestamp add overflow after accounting",
+      "matched": true,
+      "sourcePipeline": false
+    },
+    {
+      "name": "source frame boundary resets next accounting",
+      "matched": true,
+      "sourcePipeline": true
+    }
+  ]
+}

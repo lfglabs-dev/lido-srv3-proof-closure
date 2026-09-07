@@ -1,3 +1,4 @@
+import LidoSRv3.Audit.Source.TrioReserve1.Pipeline
 import LidoSRv3.Audit.Source.TrioReserve1.Queue
 import LidoSRv3.Audit.Source.TrioReserve1.Router
 import LidoSRv3.Audit.Source.TrioReserve1.Locator
@@ -173,6 +174,23 @@ private def execute (j : Json) : Except String Json := do
   let oracleExternal := sourceOracles.foldr (fun (oracle, config) other =>
     Oracle.dispatch oracle config staticExternal other) locatorExternal
   let external := Queue.dispatch keccak queue oracleExternal
+  -- Complete source configurations execute the same dispatcher used by the
+  -- concrete Pipeline proofs. Other configurations retain adversarial fixtures.
+  let sourcePipeline : Option Pipeline.Config := do
+    let locator := Verity.Core.Address.ofNat (before.core.readContractSlot ctx.self.val locatorSlot).val
+    let (_, config) ← sourceLocators.find? (fun row => row.1 = locator)
+    if config.queue ≠ queue then none else do
+      let (_, lido) ← sourceRouters.find? (fun row => row.1 = config.router)
+      let (_, oracleConfig) ← sourceOracles.find? (fun row => row.1 = config.oracle)
+      let consensus := ConsensusCalls.consensusAddress config.oracle before
+      let (_, frameConfig) ← sourceConsensus.find? (fun row => row.1 = consensus)
+      pure ⟨locator, config, oracleConfig, consensus, frameConfig, lido⟩
+  let usesPipeline := mutation = "none" && sourcePipeline.isSome
+  let external := if mutation = "none" then
+    match sourcePipeline with
+    | some config => Pipeline.external keccak config staticExternal external
+    | none => external
+    else external
   -- Executed negative control: replace the live queue body by a cached word.
   let external : External := if mutation = "cached-demand" then
     fun req w => if req.payload = encode 4 0xd0fb84e8 then .success (encode 32 50) w
@@ -188,7 +206,7 @@ private def execute (j : Json) : Except String Json := do
     | .ok _ => Json.mkObj [("success", .bool true)]
     | .error e => Json.mkObj [("success", .bool false), ("fault", faultJson e)]
   pure (Json.mkObj [
-    ("name", ← field j "name"), ("result", result),
+    ("name", ← field j "name"), ("result", result), ("sourcePipeline", .bool usesPipeline),
     ("storage", .arr (cells.map fun c => Json.mkObj [
       ("account", jnat c.account.val), ("slot", jnat c.slot),
       ("value", jnat (r.world.core.readContractSlot c.account.val c.slot).val)]).toArray),

@@ -1,5 +1,37 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Concrete withdrawal pipeline
+
+`Pipeline` composes locator, queue, oracle, consensus and receiver implementations.
+Physical pointer and code preservation are proved across accounting writes. Its
+prefix theorem derives status, immutable router lookup, live allocation, frame
+calls and spending from explicit physical/configuration inputs and numeric
+checks, with no successful-callee-result premise. The successful withdrawal
+returns the exact world including accounting/seed writes, logs, actual ETH
+transfer and receiver event. Source receiver rejection and ETH shortage restore
+the original transaction world and retain the complete attempted-call trace.
+Receiver immutable authorization and code are separate from prefix bindings.
+
+The independent component specifications remain separate from an exhaustive
+whole-parent return/revert relation. Constructor/layout/code-body/primitive and
+bounded-EVM-world binding, remaining failure coverage, enclosing writers and
+sequence invariants remain required. This is a concrete forward source theorem,
+not a full certification claim.
+
+The differential runner now uses Pipeline.external for complete unmutated source
+configurations and records sourcePipeline per case. Incomplete/adversarial
+configurations retain their explicit fixtures. The execution script accepts an
+owned receipt directory so fresh evidence cannot overwrite historical receipts.
+All 36 Lean modules passed at `2e4b6a50f68077d65a3d716522f9818fafd50073`.
+A subsequent test-only commit `4b82879f28d0e1d58a9972a3db92aa5ea225d898` added
+full-pipeline receiver rejection and ETH shortage. Every checked Lean source hash
+was revalidated unchanged. Fresh execution at that commit passed 51 comparisons
+and seven mutant kills; nine cases use Pipeline.external.
+`receipts/pipeline-summary.json` links exact source/toolchain/component/execution
+evidence, six baseline checks and import-DAG validation (all 0). The earlier
+49-case pipeline run and original historical runs remain retained separately.
+Full remote gates remain missing; no remote bundle/node/job was created.
+
 ## Consensus-to-Lido frame composition
 
 `ConsensusCalls` executes the actual HashConsensus dispatcher under STATICCALL,
