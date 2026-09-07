@@ -1,5 +1,23 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Independent conditional report calls
+
+`OptionalCallSpec` independently specifies zero-amount skipping, lookup failure,
+CALL failure, short required-word return and success. The reward stage alone
+validates a return word; withdrawal/finalization accept successful void replies.
+No observations are required for a skipped stage. `ReportCalls` proves exact
+bidirectional stage correspondence, including returned stage worlds and ordered
+lookup/CALL attempts, then substitutes these rules throughout the report parent.
+Full root outcome/world/trace correspondence, completeness and rollback remain.
+
+Locator lookup internals and primitive CALL observations are still explicit
+boundaries. Concrete vault/queue, entry dispatch, deployment/resource and other
+integration obligations remain open. At source `63502ce2fbd0083d84e7e131d71532dc58aa766a`, three selected checks
+and seven baseline/import checks pass. The other 89 source/olean pairs and eleven
+dependency revisions match, with standard axioms only. See
+`receipts/report-calls-summary.json`. Runtime hashes are unchanged from the sixteen
+report EVM comparisons. Full gates and independent review are still required.
+
 ## Independent enclosing report sequence
 
 `ReportSpec.Executes` independently orders the physical pause guard, accounting

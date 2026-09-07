@@ -1,16 +1,17 @@
 # Continuation — not a completion claim
 
-Latest increment: ReportSpec/ReportStages/ReportParent establish independent
-whole-report ordering and exact bidirectional root result/world/attempt
-correspondence, including all early exits and transaction rollback. The original
-locator stays captured and accounting uses its independent arithmetic/write rules.
-Continue by expanding conditional reward/withdrawal/finalization stage observations
-and accounting lookup into independent CALL/decoding rules, then concrete callees,
-entry dispatch, deployment/resource binding and remaining writer obligations.
-Current evidence: report-parent-summary.json, four selected checks plus 86 unchanged
-source/olean pairs. Report runtime hashes still match its sixteen EVM comparisons.
-No new runtime run is claimed for proof-only additions. Full implementation and
-remote gates remain open. Previous turn changed source and published evidence.
+Latest increment: OptionalCallSpec/ReportCalls expand all three conditional report
+stages into independent zero-skip, lookup/CALL failure, word-validation and success
+rules. Exact stage correspondence is substituted throughout the report parent,
+retaining exact outcomes/worlds/attempts and root rollback. Rewards validate the
+unused return word; withdrawals/finalization are void-return stages.
+Continue by expanding saved-locator getter decoding and argument-complete CALL
+observations, then concrete callees, entry dispatch, deployment/resource binding
+and remaining writer obligations. Do not reopen the proved conditional sequencing.
+Current evidence: report-calls-summary.json, three selected checks plus 89 unchanged
+source/olean pairs. Report runtime hashes match its sixteen EVM comparisons; no
+rerun is claimed for proof-only additions. Full implementation and remote gates
+remain open. Previous turn changed source and published evidence.
 
 
 Read STATUS, current git HEAD, and admission/ABI plus oracle/component receipts first. The previous

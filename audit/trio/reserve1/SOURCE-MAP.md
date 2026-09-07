@@ -159,3 +159,13 @@ executor-independent parent transaction rules. `ReportParent.corresponds` and
 `complete` bind every source outcome/world/ordered attempt list to those rules,
 using independent report accounting. Conditional callee-stage internals remain
 explicit source observations for subsequent independent expansion.
+
+
+## Independent conditional report stages
+
+`OptionalCallSpec.Executes` describes amount-based skipping, lookup and CALL
+failures, optional return-word validation and success independently of executors.
+`ReportCalls` binds these rules to the three report stages (Lido.sol:1089-1101)
+and substitutes them into the parent. Reward decoding retains the Lido.sol:40
+return-type requirement. Saved-locator decoding and raw primitive CALL observation
+are the remaining stage boundaries; concrete vault/queue binding is not claimed.
