@@ -14,8 +14,9 @@ list. Join those parts in catalog order. Omit empty groups. Keep other assumptio
 separate, including hashing, arithmetic bounds and deployment constants. Do not
 use the text of a complete group for a partial match.
 
-The default view shows the short explanation. Expandable details retain the
-individual IDs and their explanations. In particular, ALLOC-2 keeps its handwritten
+Show the explanation once, with the applicable assumption IDs spaced underneath.
+Do not repeat the individual explanations in an expandable block. The catalog
+retains the separate parts for traceability. In particular, ALLOC-2 keeps its handwritten
 min-first limitation, and SSZ keeps its Yul/interface limitation without acquiring
 a Verity-runtime or Solidity-transcription premise it does not declare.
 
