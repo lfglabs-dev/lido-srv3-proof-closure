@@ -12,7 +12,7 @@ malformed replies retain the callee world until the parent performs rollback.
 both queue/status and router observations, with bidirectional parent correspondence.
 CALL/deployed locator and bunker binding remain explicit boundaries; spending/tail
 internals, report/queue writers, deployment/resource closure and full remote gates
-remain open. Immutable validation follows checks. Runtime source is unchanged.
+remain open. At source `610d88ca8b2fd6bc83a13d741e11fd80ae19d23e`, three selected component checks and seven baseline/import checks pass. The other 62 source/olean pairs match earlier successful receipts. See `receipts/lookup-summary.json`; only standard axioms were printed. Eleven dependency revisions match the manifest. These are bounded checks, not full gates. Runtime source is unchanged.
 
 ## Complete status-stage rules substituted into withdrawal
 
