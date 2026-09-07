@@ -14,9 +14,14 @@ or duplicate the old terminal remote job. The old local full-gate handle is abse
    CallResults now binds locator/frame reply bytes, exact worlds and traces;
    queue_lookup executes the concrete immutable locator. WithdrawalTail proves
    seed outcomes, actual receiver composition and late full-world rollback.
-   Complete the independent spending specification and substitute actual
-   allocation/frame executions into after_spend; do not leave successful
-   spending as an unproved premise of the full parent. ABI.decode_encode and word/tuple decoding are now checked. Compose them
+   SpendingSpec/Spending now provide independent arithmetic and exact source
+   success plus allocation/insufficient/frame failure results. Derived bounds
+   discharge uint256 accounting overflow under admission, retaining uint128
+   truncation. WithdrawalComposition.after_frame substitutes actual allocation
+   and frame executions for the former successful-spending premise. Assemble
+   the complete independent parent return/revert relation and close concrete
+   callee/input/deployment binding; do not equate forward composition with full
+   source specification coverage. ABI.decode_encode and word/tuple decoding are now checked. Compose them
    with actual callee outputs and source inputs rather than assuming decoded replies.
 2. The source callee path now contains immutable Locator, live Queue,
    AccountingOracle/BaseOracle and HashConsensus frame getters, and the router

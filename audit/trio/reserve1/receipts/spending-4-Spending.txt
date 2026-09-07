@@ -1,0 +1,129 @@
+LidoSRv3/Audit/Source/TrioReserve1/Spending.lean:78:90: error: unsolved goals
+external : External
+ctx : Context
+amount : Word
+w allocated framed : World
+a : Allocation
+next nonce : Nat
+allocationTrace frameTrace : List Attempt
+ha :
+  getBufferedEtherAllocation external ctx w =
+    { outcome := Except.ok a, world := allocated, attempts := allocationTrace }
+hamount : amount.val ≤ a.deposits + a.unreserved
+hf :
+  getDepositedNextReportAdjusted external ctx
+      {
+        core :=
+          allocated.core.writeContractSlot ctx.self.val bufferSlot
+            (pack (a.total - amount.val)
+              ((allocated.core.readContractSlot ctx.self.val bufferSlot).val / width + amount.val)),
+        balances := allocated.balances,
+        logs :=
+          allocated.logs ++
+            [{ emitter := ctx.self, name := "DepositedPostReportUpdated",
+                values := [word ((allocated.core.readContractSlot ctx.self.val bufferSlot).val / width + amount.val)] },
+              { emitter := ctx.self, name := "Unbuffered", values := [amount] }] } =
+    { outcome := Except.ok (next, nonce), world := framed, attempts := frameTrace }
+hao : (getBufferedEtherAllocation external ctx w).outcome = Except.ok a
+htotal : a.total < width
+hsum : a.deposits + a.unreserved ≤ a.total
+hword : (getDepositableEther a).val = a.deposits + a.unreserved
+hsmall : amount.val < width
+hsub : amount.val ≤ a.total
+hpost : (allocated.core.readContractSlot ctx.self.val bufferSlot).val / width + amount.val < Verity.Core.UINT256_MODULUS
+hnext : next < width
+haddnext : next + amount.val < Verity.Core.UINT256_MODULUS
+hreserve : ∀ (reserve : Nat), (if reserve > amount.val then reserve - amount.val else 0) = reserve - amount.val
+⊢ ((if
+              0 <
+                ((framed.core.writeContractSlot ctx.self.val nextSlot (pack (next + amount.val) nonce)).readContractSlot
+                    ctx.self.val reserveSlot).val then
+            bindExec
+              (write ctx reserveSlot
+                (word
+                  (((framed.core.writeContractSlot ctx.self.val nextSlot
+                            (pack (next + amount.val) nonce)).readContractSlot
+                        ctx.self.val reserveSlot).val -
+                    amount.val)))
+              fun x =>
+              emit ctx "DepositsReserveSet"
+                [word
+                    (((framed.core.writeContractSlot ctx.self.val nextSlot
+                              (pack (next + amount.val) nonce)).readContractSlot
+                          ctx.self.val reserveSlot).val -
+                      amount.val)]
+          else pureExec PUnit.unit)
+          { core := framed.core.writeContractSlot ctx.self.val nextSlot (pack (next + amount.val) nonce),
+            balances := framed.balances, logs := framed.logs }).outcome =
+      Except.ok () ∧
+    (((if
+                0 <
+                  ((framed.core.writeContractSlot ctx.self.val nextSlot
+                          (pack (next + amount.val) nonce)).readContractSlot
+                      ctx.self.val reserveSlot).val then
+              bindExec
+                (write ctx reserveSlot
+                  (word
+                    (((framed.core.writeContractSlot ctx.self.val nextSlot
+                              (pack (next + amount.val) nonce)).readContractSlot
+                          ctx.self.val reserveSlot).val -
+                      amount.val)))
+                fun x =>
+                emit ctx "DepositsReserveSet"
+                  [word
+                      (((framed.core.writeContractSlot ctx.self.val nextSlot
+                                (pack (next + amount.val) nonce)).readContractSlot
+                            ctx.self.val reserveSlot).val -
+                        amount.val)]
+            else pureExec PUnit.unit)
+            { core := framed.core.writeContractSlot ctx.self.val nextSlot (pack (next + amount.val) nonce),
+              balances := framed.balances, logs := framed.logs }).world =
+        if
+            0 <
+              ((framed.core.writeContractSlot ctx.self.val nextSlot (pack (next + amount.val) nonce)).readContractSlot
+                  ctx.self.val reserveSlot).val then
+          {
+            core :=
+              (framed.core.writeContractSlot ctx.self.val nextSlot (pack (next + amount.val) nonce)).writeContractSlot
+                ctx.self.val reserveSlot
+                (word
+                  (((framed.core.writeContractSlot ctx.self.val nextSlot
+                            (pack (next + amount.val) nonce)).readContractSlot
+                        ctx.self.val reserveSlot).val -
+                    amount.val)),
+            balances := framed.balances,
+            logs :=
+              framed.logs ++
+                [{ emitter := ctx.self, name := "DepositsReserveSet",
+                    values :=
+                      [word
+                          (((framed.core.writeContractSlot ctx.self.val nextSlot
+                                    (pack (next + amount.val) nonce)).readContractSlot
+                                ctx.self.val reserveSlot).val -
+                            amount.val)] }] }
+        else
+          { core := framed.core.writeContractSlot ctx.self.val nextSlot (pack (next + amount.val) nonce),
+            balances := framed.balances, logs := framed.logs }) ∧
+      ((if
+                0 <
+                  ((framed.core.writeContractSlot ctx.self.val nextSlot
+                          (pack (next + amount.val) nonce)).readContractSlot
+                      ctx.self.val reserveSlot).val then
+              bindExec
+                (write ctx reserveSlot
+                  (word
+                    (((framed.core.writeContractSlot ctx.self.val nextSlot
+                              (pack (next + amount.val) nonce)).readContractSlot
+                          ctx.self.val reserveSlot).val -
+                      amount.val)))
+                fun x =>
+                emit ctx "DepositsReserveSet"
+                  [word
+                      (((framed.core.writeContractSlot ctx.self.val nextSlot
+                                (pack (next + amount.val) nonce)).readContractSlot
+                            ctx.self.val reserveSlot).val -
+                        amount.val)]
+            else pureExec PUnit.unit)
+            { core := framed.core.writeContractSlot ctx.self.val nextSlot (pack (next + amount.val) nonce),
+              balances := framed.balances, logs := framed.logs }).attempts =
+        []

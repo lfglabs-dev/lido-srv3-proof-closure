@@ -1,0 +1,1 @@
+LidoSRv3/Audit/Source/TrioReserve1/Spending.lean:65:112: error: unexpected identifier; expected '}'

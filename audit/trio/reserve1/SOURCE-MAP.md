@@ -7,7 +7,7 @@ No canonical source-map or guarantee entries are changed.
 | --- | --- | --- | --- |
 | allocation | `contracts/0.4.24/Lido.sol:605-616` | `Live.getBufferedEtherAllocation` | Allocation.successful_queue_observation relates maximality to actual CALL bytes and saved physical locals; full withdrawal composition open |
 | canDeposit | `Lido.sol:815-816` | `Live.canDeposit` | Admission.live_status/live_status_false bind bunker bytes and post-call pause read; enclosing writer admission remains open |
-| spending | `Lido.sol:839-859` | `Live.spendDepositableEther` | packed writes/events before frame CALL; full correspondence open |
+| spending | `Lido.sol:839-859` | `Live.spendDepositableEther` | Spending.success_corresponds/SpendingSpec; exact worlds, events and failures around frame CALL; whole-parent specification open |
 | withdrawal | `Lido.sol:869-886` | `Live.withdrawDepositableEther` | Admission.success_corresponds and exact early-stop proofs; seeds/ETH and full correspondence open |
 | target writer | `Lido.sol:670-680` | `Live.setDepositsReserveTarget`, `Writers` | internal helper; external ACL at 656-659 remains open |
 | report rebalance | `Lido.sol:1125-1132` | `Live.updateBufferedEtherAllocation`, `Writers` | internal helper; report parent at 1072-1121 remains open |
@@ -86,3 +86,9 @@ immutable getter and ABI address cast. `frame_reply`, `adjusted_frame`,
 `WithdrawalTail.source_decomposition` binds the source final block; seed outcomes,
 actual_receiver and tail_failure_rolls_back cover its concrete effects.
 `after_spend` still needs the full independent spending correspondence upstream.
+
+`Spending.allocation_bounds` derives admission bounds from actual allocation;
+`accounting_add_bound` and `adjusted_next_bound` discharge uint256 accounting
+overflow without assuming uint128 output bounds. `WithdrawalComposition.after_frame`
+composes actual allocation/frame executions through spending into the tail;
+spending_failure and late_failure retain full rollback and ordered traces.
