@@ -5,14 +5,34 @@
 - Branch: `codex/topup-ssz-closure`
 - Toolchain observed: `Lake version 5.0.0-src+68218e8 (Lean version 4.31.0)`.
 
-Executed in the clean worktree, all with exit 0:
+Executed after the source-provenance counterexample change, all with exit 0:
 
 ```text
-lake env lean LidoSRv3/Audit/Verity/TopupTx.lean
-lake env lean LidoSRv3/Audit/Guarantees/PTopup1.lean
-lake env lean LidoSRv3/Tests/TopupTxMutants.lean
-lake build LidoSRv3.Audit.Guarantees.PTopup1
+/root/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lake build LidoSRv3.Audit.Verity.TopupTx
 ```
 
-The beacon literal remains a source pin only. `A-TOPUP-BEACON-ADDRESS`
-remains OPEN: this closure does not model a deployment constructor assignment.
+## Result: TOPUP remains OPEN
+
+This revision does **not** claim TOPUP delivered. It proves a concrete block on
+the current derivation: `TopupTx.scheduledDeposit_not_sourceDerived` constructs
+a byte-valid source deposit input with a nonzero public-key commitment, while
+the legacy `scheduledDeposit 0 0` necessarily emits public-key word zero. The
+current executable accepts only allocation amounts and therefore cannot derive
+the public key, withdrawal credentials, signature, or SSZ deposit-data root
+that `BeaconChainDepositor.makeBeaconChainTopUp` passes to `deposit`.
+
+The module `allocateDeposits` journal is also deliberately a length-prefixed
+word abstraction, not canonical Solidity ABI encoding with a selector, heads,
+and dynamic offsets. No ABI-fidelity conclusion is made from it.
+
+The beacon literal remains a source pin only. `A-TOPUP-BEACON-ADDRESS` remains
+OPEN: the supplied constructor fixture shows assignment from `_depositContract`,
+but this proof has no deployment input or constructor execution that derives
+the runtime address. SSZ field/root provenance remains OPEN for the same reason:
+the source-shaped SSZ model can construct a field-derived call value, but the
+executed TOPUP transaction does not consume that input.
+
+To close these items, replace the allocation-only transaction input with a
+source-byte deposit batch, implement canonical ABI calldata, execute the
+source-derived field/root construction through the beacon frame, and supply a
+deployment/constructor provenance path for `DEPOSIT_CONTRACT`.

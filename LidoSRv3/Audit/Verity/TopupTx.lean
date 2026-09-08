@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Source.TopupCorrespondence
+import LidoSRv3.Audit.Source.DepositDataRootCorrespondence
 import Contracts.Common
 
 /-!
@@ -26,6 +27,7 @@ namespace LidoSRv3.Audit.Verity.TopupTx
 open _root_.Verity
 open _root_.Contracts
 open LidoSRv3.Audit.SolidityTopup
+open LidoSRv3.Audit.Source.DepositDataRootCorrespondence
 
 /-- Observation slots, no Solidity storage counterpart: `allocations[i]`,
 `amount` (`StakingRouter.sol:717-732`, memory and stack) and the pulled total
@@ -132,6 +134,70 @@ is not a source of provenance or SSZ data.  The faithful call constructor is
 def scheduledDeposit (index amount : Nat) : BeaconDepositCall :=
   { pubkey := index, withdrawalCredentials := 0, signature := 0,
     depositDataRoot := amount }
+
+/-! ### Why the legacy schedule cannot be promoted to a source derivation
+
+`makeBeaconChainTopUp` receives byte strings, not validator indices.  The
+source-shaped deposit-data-root model consequently gives us enough information
+to build a call value directly from those bytes (and from the source root), but
+the older `execute` slice has only an allocation list.  The following small
+counterexample is deliberately executable evidence of that loss of information:
+at allocation index zero the legacy schedule always emits public-key word zero,
+whereas a valid pinned-source input can carry a nonzero first public-key byte.
+
+This does not add a premise to the legacy theorem.  It records the obstruction
+instead: `execute`/`executeGuarded` cannot be claimed to derive SSZ calldata
+until their input surface is extended with the source byte inputs and the
+withdrawal-credentials derivation. -/
+
+/-- A word-level commitment to a Solidity `bytes` argument for this model.
+Unlike `scheduledDeposit`, every field comes from the pinned-source input; the
+root is the source model's `_computeDepositDataRootWithAmount` result.  This is
+not canonical ABI encoding (dynamic bytes require offsets and byte layout), so
+it is only used to demonstrate the missing provenance boundary. -/
+def sourceByteCommitment (bytes : List Nat) : Nat :=
+  bytes.foldl (fun acc byte => acc * 256 + byte) 0
+
+def sourceDerivedDeposit (input : SourceDepositDataRootInput) : BeaconDepositCall :=
+  { pubkey := sourceByteCommitment input.publicKey
+    withdrawalCredentials := sourceByteCommitment input.withdrawalCredentials
+    signature := sourceByteCommitment input.signature
+    depositDataRoot := sourceNode input }
+
+private def nonzeroPubkeySourceInput : SourceDepositDataRootInput :=
+  { withdrawalCredentials := List.replicate 32 0
+    publicKey := 1 :: List.replicate 47 0
+    signature := List.replicate 96 0
+    amountGwei := 0
+    withdrawalCredentialsBounded := by simp
+    publicKeyBounded := by
+      intro byte h
+      simp only [List.mem_cons, List.mem_replicate] at h
+      rcases h with h | h
+      · subst byte; decide
+      · simpa [h.2]
+    signatureBounded := by simp
+    amountGweiBounded := by decide }
+
+set_option maxRecDepth 100000 in
+/-- Concrete source-derived counterexample to replacing the legacy placeholder
+with a derivation without changing the transaction input. -/
+theorem scheduledDeposit_not_sourceDerived :
+    (scheduledDeposit 0 0).pubkey ≠
+      (sourceDerivedDeposit nonzeroPubkeySourceInput).pubkey := by
+  have fold_zeros_positive : ∀ n acc : Nat, 0 < acc →
+      0 < List.foldl (fun acc byte => acc * 256 + byte) acc (List.replicate n 0) := by
+    intro n acc hacc
+    induction n generalizing acc with
+    | zero => simpa
+    | succ n ih =>
+        simp only [List.replicate_succ, List.foldl_cons]
+        exact ih (acc * 256) (Nat.mul_pos hacc (by decide))
+  have hpositive : 0 <
+      List.foldl (fun acc byte => acc * 256 + byte) 1 (List.replicate 47 0) :=
+    fold_zeros_positive 47 1 (by decide)
+  change 0 ≠ List.foldl (fun acc byte => acc * 256 + byte) 1 (List.replicate 47 0)
+  exact Nat.ne_of_lt hpositive
 
 /-- The *value/journal* push loop of `BeaconChainDepositor.sol:79-107` (reached
 from `StakingRouter.sol:750`): one real `externalCallBindTo` frame per nonzero

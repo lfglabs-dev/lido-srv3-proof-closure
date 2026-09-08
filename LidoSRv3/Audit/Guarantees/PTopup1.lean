@@ -670,7 +670,18 @@ surface has no callee, so the returned words are supplied by whoever
 instantiates the frame rather than computed by an executed module.  Quantifying
 over all returndata is the honest reading of an untrusted module, but it is not
 an executed callee and nothing here claims otherwise; the module-side
-allocation algorithm stays P-ALLOC-1/P-ALLOC-2. -/
+allocation algorithm stays P-ALLOC-1/P-ALLOC-2.
+
+There is a separate, stricter TOPUP boundary: this parent still invokes the
+legacy `execute` value loop, whose beacon fields come from
+`TopupTx.scheduledDeposit`, and its `allocateDeposits` journal uses a
+length-prefixed word abstraction rather than canonical Solidity ABI offsets.
+`TopupTx.scheduledDeposit_not_sourceDerived` is a concrete source-byte
+counterexample: an index/amount-only run cannot derive a nonzero source public
+key.  Therefore this theorem is not an end-to-end source-derived SSZ/beacon
+calldata claim and must not be read as TOPUP delivered.  Closing it requires a
+transaction input carrying the pinned public-key, withdrawal-credentials and
+signature bytes, canonical ABI encoding, and their source derivation. -/
 def VerityGuardedReturndataSimulation (cfg : SourceTopupConfig)
     (call : Verity.TopupTx.TopupCall) (state : Verity.ContractState) : Prop :=
   let before := Verity.TopupTx.entryFrame state
