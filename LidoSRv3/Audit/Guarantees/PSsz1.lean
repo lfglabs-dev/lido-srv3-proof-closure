@@ -852,7 +852,6 @@ theorem real_gindex_fits_248bit (vi : Nat) (hBound : vi < 2 ^ 40) :
 theorem validatorGIndex_lower_bound (vi : Nat) :
     150 * 2 ^ 40 ≤ validatorGIndex vi := by
   simp [validatorGIndex, productionValidatorGIndexBase]
-  omega
 
 /-! ## Blocker 1 discharge: SHA-256 sequential acceptance — universal closure
 
@@ -922,7 +921,6 @@ private theorem log2_eq_of_le_lt : ∀ (k n : Nat),
     rw [Nat.log2_def, if_pos hge2]
     congr 1
     exact log2_eq_of_le_lt k (n / 2) (by omega) (by omega)
-  termination_by k
 
 theorem validatorGIndex_in_production_band (vi : Nat) (hBound : vi < 2 ^ 40) :
     2 ^ 47 ≤ validatorGIndex vi ∧ validatorGIndex vi < 2 ^ 48 := by
@@ -969,59 +967,64 @@ theorem production_base_path_depth_47 :
     productionPath.length = 47 :=
   production_path_length
 
-theorem validatorGI_branchPath_length (vi : Nat) (hBound : vi < 2 ^ 40) :
-    (Ssz.branchPath ⟨validatorGIndex vi, validatorGIndex_positive vi⟩).length = 47 := by
-  simp [Ssz.branchPath, validatorGI_pivot vi hBound, validatorGIndex_log2_47 vi hBound]
-
 private theorem pathAux_length : ∀ (d v : Nat),
     1 < v → Nat.log2 v ≤ d →
     (Ssz.pathAux d v).length = Nat.log2 v
-  | 0, v, hv, hd => by omega
+  | 0, v, hv, hd => by
+    exfalso
+    have h2 : 2 ≤ v := by omega
+    have : Nat.log2 v = Nat.log2 (v / 2) + 1 := by rw [Nat.log2_def, if_pos h2]
+    omega
   | d + 1, v, hv, hd => by
     have hv2 : 2 ≤ v := hv
     have hlog : Nat.log2 v = Nat.log2 (v / 2) + 1 := by
       rw [Nat.log2_def, if_pos hv2]
     unfold Ssz.pathAux
-    simp only [show ¬(v ≤ 1) from by omega]
-    simp only [List.length_cons]
-    cases Nat.decEq (v % 2) 0 with
-    | isTrue h => simp [h]
-    | isFalse h => simp [h]
-    all_goals (
+    split
+    · omega
+    · simp only [List.length_cons]
       rw [hlog]; congr 1
       by_cases hv2' : 1 < v / 2
       · exact pathAux_length d (v / 2) hv2' (by omega)
       · have : v / 2 = 1 := by omega
-        rw [this]; simp [Ssz.pathAux]; omega
-    )
-  termination_by d
+        rw [this]; cases d <;> simp [Ssz.pathAux, Nat.log2_def]
+
+private theorem log2_pow2_eq (k : Nat) : Nat.log2 (2 ^ k) = k :=
+  log2_eq_of_le_lt k (2 ^ k) (le_refl _)
+    (by rw [Nat.pow_succ 2]; have := Nat.two_pow_pos k; omega)
+
+theorem validatorGI_branchPath_length (vi : Nat) (hBound : vi < 2 ^ 40) :
+    (Ssz.branchPath ⟨validatorGIndex vi, validatorGIndex_positive vi⟩).length = 47 := by
+  have hgt : 1 < validatorGIndex vi := by
+    have := (validatorGIndex_in_production_band vi hBound).1; omega
+  simp only [Ssz.branchPath, Ssz.pivot, Nat.shiftLeft_eq', Nat.shiftLeft_eq, Nat.one_mul,
+             validatorGIndex_log2_47 vi hBound, log2_pow2_eq]
+  rw [pathAux_length 47 (validatorGIndex vi) hgt
+        (by rw [validatorGIndex_log2_47 vi hBound]),
+      validatorGIndex_log2_47 vi hBound]
 
 private theorem pathOffset_pathAux_add_pivot : ∀ (d v : Nat),
     v < 2 ^ (d + 1) → 0 < v →
     Ssz.pathOffset (Ssz.pathAux d v) + 2 ^ Nat.log2 v = v
   | 0, v, hlt, hpos => by
     have : v = 1 := by omega
-    subst this; simp [Ssz.pathAux, Ssz.pathOffset]
+    subst this; native_decide
   | d + 1, v, hlt, hpos => by
     by_cases hle : v ≤ 1
     · have : v = 1 := by omega
-      subst this; simp [Ssz.pathAux, Ssz.pathOffset]
+      subst this; simp [Ssz.pathAux, Ssz.pathOffset]; decide
     · have hv2 : 2 ≤ v := by omega
       have hlog : Nat.log2 v = Nat.log2 (v / 2) + 1 := by
         rw [Nat.log2_def, if_pos hv2]
       have hrec := pathOffset_pathAux_add_pivot d (v / 2) (by omega) (by omega)
       unfold Ssz.pathAux
-      simp only [show ¬(v ≤ 1) from by omega]
-      by_cases hmod : v % 2 = 0
-      · simp only [if_pos hmod, Ssz.pathOffset, hlog, Nat.pow_succ 2 (Nat.log2 (v / 2))]
-        omega
-      · simp only [if_neg hmod, Ssz.pathOffset, hlog, Nat.pow_succ 2 (Nat.log2 (v / 2))]
-        omega
-  termination_by d
-
-private theorem log2_pow2_eq (k : Nat) : Nat.log2 (2 ^ k) = k :=
-  log2_eq_of_le_lt k (2 ^ k) (le_refl _)
-    (by rw [Nat.pow_succ 2]; have := Nat.two_pow_pos k; omega)
+      split
+      · omega
+      · split
+        · change 2 * Ssz.pathOffset (Ssz.pathAux d (v / 2)) + 2 ^ Nat.log2 v = v
+          rw [hlog, Nat.pow_succ]; omega
+        · change 1 + 2 * Ssz.pathOffset (Ssz.pathAux d (v / 2)) + 2 ^ Nat.log2 v = v
+          rw [hlog, Nat.pow_succ]; omega
 
 private theorem lt_pow_succ_log2 (n : Nat) (hn : 0 < n) : n < 2 ^ (Nat.log2 n + 1) := by
   by_cases h : n ≤ 1
@@ -1047,7 +1050,7 @@ theorem validatorGI_hasGeneralizedIndex (vi : Nat) (hBound : vi < 2 ^ 40) :
     Ssz.HasGeneralizedIndex gi (2 ^ 47) (Ssz.branchPath gi) := by
   simp only [Ssz.HasGeneralizedIndex]
   refine ⟨(validatorGI_pivot vi hBound).symm, ?_, ?_⟩
-  · rw [validatorGI_pivot vi hBound, validatorGIndex_log2_47 vi hBound]
+  · simp only [log2_pow2_eq]
     exact validatorGI_branchPath_length vi hBound
   · rw [← validatorGI_pivot vi hBound]
     exact branchPath_reconstructs ⟨validatorGIndex vi, validatorGIndex_positive vi⟩
