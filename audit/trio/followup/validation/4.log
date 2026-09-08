@@ -1,0 +1,90 @@
+⚠ [19/53] Replayed Verity.Core
+warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1041:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+Build completed successfully (53 jobs).
+'LidoSRv3.Audit.Source.TrioAlloc1.producer_router_order' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.producer_total_bound' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.outputBytes_related' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.Relational.producer_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.CallTree.producer_correspondence' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.world_producer_correspondence' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.ShareWriter.execute_revert_restores' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.ShareWriter.execute_stored_share_bound' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.WriterInvariant.share_writer_preserves' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.WriterInvariant.parameter_writer_preserves' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.ParameterWriter.helper_stored_share_bound' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.ParameterWriter.execute_revert_restores' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.AdmissionChecks.check_success' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.AdmissionChecks.nextId_success' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.AdmissionWriter.revert_restores' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.AdmissionFacts.success_stored_share' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.AdmissionFacts.public_preserves' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.AdmissionWriter.successful_entry_bound_and_freshness' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.StringStorage.writeShort_stored' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.EnumerationWriter.insertion_preserves_consistency' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.EnumerationWriter.oversized_absent' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TrioAlloc1.AllocationMemory.bounded_array_allocates' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Tests.TrioAlloc1.prefetch_trace_refutes_relational_parent' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Tests.TrioAlloc1.target_only_refutes_relational_parent' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.RecordInvariant.history_invariants' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.StatusWriter.history_invariants' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.StatusWriter.revert_restores' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.ACLWriter.grant_preserves' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.ACLWriter.grant_hasRole' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.ACLWriter.grant_revert_restores' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.Initialization.revert_restores' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.Initialization.execute_from_empty' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.Initialization.execute_records' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TrioAlloc1.ProxyGenesis.initialization_invariants' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+[{"name":"mixed","actual":[[3,3],[8,3]],"calls":["0:9abddf09","1:9abddf09","1:0c852f5c"]},{"name":"underflow-before-stake","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000011","calls":["0:9abddf09"]},{"name":"late-rejection","actual":"0xdead","calls":["0:9abddf09","1:9abddf09"]},{"name":"short-summary","actual":"0x","calls":["0:9abddf09"]},{"name":"short-stake","actual":"0x","calls":["0:9abddf09","0:0c852f5c"]},{"name":"trailing-summary","actual":[[1],[2]],"calls":["0:9abddf09"]},{"name":"zero-ceil-divisor","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000012","calls":["0:9abddf09","0:0c852f5c"]},{"name":"invalid-enum-before-call","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000021","calls":[]},{"name":"below-allocation","actual":[[1],[0]],"calls":["0:9abddf09"]},{"name":"topup-product-before-division","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000011","calls":["0:9abddf09","0:0c852f5c"]},{"name":"empty-zero-divisor","actual":[[],[]],"calls":[]},{"name":"total-overflow-before-next-row","actual":"0x4e487b710000000000000000000000000000000000000000000000000000000000000011","calls":["0:9abddf09"]}]
