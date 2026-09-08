@@ -33,7 +33,8 @@
         "A-RUNTIME-PROVENANCE"
       ],
       "outside": [
-        "Compiled and deployed bytecode, gas costs and full consensus-state truth."
+        "Compiled and deployed bytecode, gas costs and full consensus-state truth.",
+        "Distribution of the produced lists is covered by the composed P-ALLOC-2 result under its own conditions."
       ]
     },
     "P-ALLOC-2": {

@@ -91,6 +91,7 @@ lean_lib «LidoSRv3Audit» where
 /-- Cross-check the staged indexed parent against the integrated source/ABI parent. -/
 lean_lib «TrioIntegrationChecks» where
   globs := #[
+    .one `audit.trio.MainGuaranteeChecks,
     .one `audit.trio.integration.IndexedParentBridge,
     .one `audit.trio.alloc2.composition.Composition,
     .one `audit.trio.alloc2.composition.LibraryABI,
