@@ -1,0 +1,107 @@
+{
+  "schema": 1,
+  "authority": "Main website claims registered against existing composed source-model theorems. The historical abstract/verity pairs remain available; they do not establish these new claims. No proof status or deployment claim is promoted by this registry.",
+  "guarantees": {
+    "P-ALLOC-1": {
+      "description": "The modeled router calculates each active module’s capacity from its target share and available headroom. Inactive modules receive no additional capacity. For successful execution under the stated storage, memory and arithmetic conditions, the resulting allocation and capacity lists match the independent mathematical specification.",
+      "model": "Source execution model with a Verity external-call interpretation",
+      "theorems": [
+        "LidoSRv3.Audit.Source.TrioAlloc1.Relational.producer_iff",
+        "LidoSRv3.Audit.Source.TrioAlloc1.producer_math_view",
+        "LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredProducer.success",
+        "LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.world_producer_correspondence"
+      ],
+      "covered": [
+        "Storage-backed module reads, response-dependent calls and checked calculations follow the modeled source order.",
+        "Successful capacity calculations match the independent capacity specification and produce the corresponding memory arrays.",
+        "The Verity call interpreter matches the producer’s return or error and module-call observations; static calls preserve its world."
+      ],
+      "missing": [
+        "The compiler interpretation of memory operations and the effects of omitted internal writes remain assumptions.",
+        "The bound of 32 modules is derived only for the modeled initialization and update histories; migration and other histories remain outside that result.",
+        "The result does not establish equivalence with compiled or deployed bytecode."
+      ],
+      "conditions": [
+        "Compiler interpretation of aligned, non-overlapping observed word loads/stores and copies; omitted private cache/configuration/scratch writes obey the stated frame and cache-field relations.",
+        "Configured linked library identity, storage/hash interpretation, entry pointer provenance and primitive crypto/consensus bindings are explicit; general compiled/deployed-code and gas verification are excluded.",
+        "count <=32; pointer +1184*count+704 <=2^32, or modeled initialization/writer history with pointer <=2^31 and finite storage separation; migration and other writer histories excluded."
+      ],
+      "assumptions": [
+        "A-SOURCE-SHAPED",
+        "A-VERITY-SCAFFOLD",
+        "A-SOLC-TRUSTED",
+        "A-RUNTIME-PROVENANCE"
+      ],
+      "outside": [
+        "Compiled and deployed bytecode, gas costs and full consensus-state truth."
+      ]
+    },
+    "P-ALLOC-2": {
+      "description": "The modeled router calculates module capacities, distributes the requested deposits using the proportional allocation algorithm and converts the resulting allocations to wei. Under the stated conditions, the complete modeled calculation matches the independent mathematical specification.",
+      "model": "Source execution model with a Verity module-call interpretation; the linked library call is recorded, not executed in the VM",
+      "theorems": [
+        "LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredParent.public_iff",
+        "LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredParent.success",
+        "LidoSRv3.Audit.Source.TrioComposition.VerityParent.stored_correspondence"
+      ],
+      "covered": [
+        "One execution connects the capacity producer, array encoding and copying, proportional distribution and checked conversion to wei.",
+        "All modeled outcomes correspond to the independent public specification under the stated count and memory bounds.",
+        "The Verity interpreter matches return or error and module-call observations; the library request remains a separate source-model observation."
+      ],
+      "missing": [
+        "The configured library call is modeled, but its deployed code is not executed by the Verity interpreter.",
+        "The compiler interpretation of memory operations, pointer provenance and the effects of omitted internal writes remain assumptions.",
+        "Cross-call behavior covers only the stated interpreters and histories, not arbitrary callbacks or deployed code."
+      ],
+      "conditions": [
+        "Compiler interpretation of aligned, non-overlapping observed word loads/stores and copies; omitted private cache/configuration/scratch writes obey the stated frame and cache-field relations.",
+        "Configured linked library identity, storage/hash interpretation, entry pointer provenance and primitive crypto/consensus bindings are explicit; general compiled/deployed-code and gas verification are excluded.",
+        "count <=32; pointer +1184*count+704 <=2^32, or modeled initialization/writer history with pointer <=2^31 and finite storage separation; migration and other writer histories excluded."
+      ],
+      "assumptions": [
+        "A-SOURCE-SHAPED",
+        "A-VERITY-SCAFFOLD",
+        "A-SOLC-TRUSTED",
+        "A-RUNTIME-PROVENANCE"
+      ],
+      "outside": [
+        "Compiled and deployed bytecode, gas costs and full consensus-state truth.",
+        "The separate +1 allocation algorithm."
+      ]
+    },
+    "P-RESERVE-1": {
+      "description": "For the specified queue and recipient behavior, successful withdrawals in the modeled Lido path preserve the withdrawal reserve. Failed withdrawals restore the modeled transaction state. These results depend on the stated configuration, storage, arithmetic and funding conditions.",
+      "model": "Source transaction interpreter using Verity physical contract storage; not a full Verity EVM execution theorem",
+      "theorems": [
+        "LidoSRv3.Audit.Source.TrioReserve1.PhysicalReserve.success_preserves",
+        "LidoSRv3.Audit.Source.TrioComposition.ReserveLeafSpend.withdrawal_corresponds",
+        "LidoSRv3.Audit.Source.TrioReserve1.WithdrawalSpec.failure_restores"
+      ],
+      "covered": [
+        "Withdrawal correspondence covers ordered status and permission checks, live queue and frame reads, partition arithmetic and recipient effects.",
+        "The specified physical queue, consensus and recipient pipeline preserves the independent protected reserve on success.",
+        "The withdrawal specification restores the pre-transaction world on failure; attempted calls remain observable."
+      ],
+      "missing": [
+        "Reserve protection does not cover arbitrary successful callbacks.",
+        "The transaction interpreter uses Verity contract storage, but full correspondence with Verity EVM execution and deployed callees is not established.",
+        "Sequence results cover only the modeled transitions, not every queue writer, migration or report path."
+      ],
+      "conditions": [
+        "Compiler interpretation of aligned, non-overlapping observed word loads/stores and copies; omitted private cache/configuration/scratch writes obey the stated frame and cache-field relations.",
+        "Configured linked library identity, storage/hash interpretation, entry pointer provenance and primitive crypto/consensus bindings are explicit; general compiled/deployed-code and gas verification are excluded.",
+        "Concrete-pipeline protection takes physical address/code bindings, admitted amount, queue/frame computations, seed arithmetic, funding and queue/Lido separation. Balance credit bounds use an explicit aggregate-world bound. Sequence claims cover the modeled internal/committed transitions only."
+      ],
+      "assumptions": [
+        "A-SOURCE-SHAPED",
+        "A-VERITY-SCAFFOLD",
+        "A-SOLC-TRUSTED",
+        "A-RUNTIME-PROVENANCE"
+      ],
+      "outside": [
+        "Compiled and deployed bytecode, gas costs and full consensus-state truth."
+      ]
+    }
+  }
+}

@@ -1,14 +1,10 @@
 #!/usr/bin/env python3
 """Generate and check the UX2 per-guarantee display artifacts in `audit/ux2/`.
 
-One JSON record per canonical guarantee, derived only from checked-in inputs:
-the assurance registry (`audit/guarantees.yaml`), the source map, the
-assumption registry, the README headline boundary, the pinned toolchain, and
-the exact Lean declaration of each registered theorem. A record carries what a
-reader needs to see one guarantee on its own: the registry wording, the two
-registered theorems with their role, plane, file, line span and statement text,
-the assumptions with their recorded risk, the open fidelity gaps, the pinned
-source spans, and the model-vs-deployed boundary.
+Each record derives from the assurance and main-result registries, source map,
+assumptions, README boundary, toolchain and exact Lean declarations. It carries
+theorem roles, statements and spans, assumptions, gaps and source references.
+The original registered pairs remain present for older consumers.
 
 `generate` writes the records; `check` re-derives them and fails closed on any
 difference, so a record can never say more than the registry and the Lean
@@ -28,6 +24,7 @@ from typing import NoReturn
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+from main_guarantees import main_record, load_main
 import audit_metadata  # noqa: E402  (sibling module, located above)
 import check_proof_escapes  # noqa: E402  (sibling module, located above)
 
@@ -38,6 +35,7 @@ OUTPUT = Path("audit/ux2")
 LEAN_ROOT = Path("LidoSRv3/Audit")
 LEAN_INPUTS = ("LidoSRv3.lean", "lakefile.lean", "lake-manifest.json", "lean-toolchain")
 ROLES = {
+    "source": "registered main source-model result (audit/trio/main-guarantees.json)",
     "abstract": "registered abstract Lean parent (audit/guarantees.yaml abstract.theorem)",
     "verity": "registered Verity Executable Contract parent (audit/guarantees.yaml verity.theorem)",
 }
@@ -894,6 +892,7 @@ def kill_line_modules(command: str) -> list[str]:
 def build_record(row: dict, position: int, context: dict) -> dict:
     return {
         "schema": SCHEMA,
+        **main_record(row["id"], context, theorem_record, fail),
         "id": row["id"],
         "position": position,
         "summary": row["summary"],
@@ -1003,6 +1002,7 @@ def generate(root: Path) -> dict[str, str]:
     source_map = load_json(root, "audit/source-map.yaml")
     assumptions = load_json(root, "audit/assumptions.yaml")
     context = {
+        "main_results": load_main(root),
         "declarations": declarations(root),
         "assumptions": {row["id"]: row for row in assumptions["assumptions"]},
         "source_map": source_map,

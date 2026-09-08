@@ -1,5 +1,72 @@
 {
   "schema": "lido-srv3-ux2-guarantee-v1",
+  "main_result": {
+    "description": "The modeled router calculates module capacities, distributes the requested deposits using the proportional allocation algorithm and converts the resulting allocations to wei. Under the stated conditions, the complete modeled calculation matches the independent mathematical specification.",
+    "model": "Source execution model with a Verity module-call interpretation; the linked library call is recorded, not executed in the VM",
+    "theorems": [
+      {
+        "plane": "source",
+        "role": "registered main source-model result (audit/trio/main-guarantees.json)",
+        "status": "CHECKED",
+        "name": "LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredParent.public_iff",
+        "module": "LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredParent",
+        "file": "LidoSRv3/Audit/Source/TrioComposition/FinalMemoryStoredParent.lean",
+        "start_line": 138,
+        "end_line": 144,
+        "doc": "",
+        "statement": "theorem public_iff (target : Address) (memory : MemoryWords) (pointer : Word)\n    (layout : Layout) (storage : Storage) (oracle : StaticOracle) (config : Config)\n    (amount : Word) (isTopUp : Bool) (before after : Transcript) (trace : MemoryTransportCall.Trace)\n    (result : Except Failure ParentOutput) (hc : (storage (countSlot layout)).val ≤ 32)\n    (space : pointer.val+1184*(storage (countSlot layout)).val+704 ≤ 2^32) :\n    ParentSpec.Public layout storage oracle config amount isTopUp before result after ↔\n      project (program target memory pointer layout storage oracle config amount isTopUp before trace) = (result,after)"
+      },
+      {
+        "plane": "source",
+        "role": "registered main source-model result (audit/trio/main-guarantees.json)",
+        "status": "CHECKED",
+        "name": "LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredParent.success",
+        "module": "LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredParent",
+        "file": "LidoSRv3/Audit/Source/TrioComposition/FinalMemoryStoredParent.lean",
+        "start_line": 150,
+        "end_line": 159,
+        "doc": "/-- Successful output is read from the actual resulting memory. Its public\nspecification and both array relations follow; no expected output is supplied. -/",
+        "statement": "theorem success (target : Address) (memory : MemoryWords) (pointer : Word)\n    (layout : Layout) (storage : Storage) (oracle : StaticOracle) (config : Config)\n    (amount : Word) (isTopUp : Bool) (before : Transcript) (trace : MemoryTransportCall.Trace)\n    (out : Output) (hc : (storage (countSlot layout)).val ≤ 32)\n    (space : pointer.val+1184*(storage (countSlot layout)).val+704 ≤ 2^32)\n    (executed : (program target memory pointer layout storage oracle config amount isTopUp before trace).result = .ok out) :\n    ParentSpec.Public layout storage oracle config amount isTopUp before (.ok (observe out))\n      (program target memory pointer layout storage oracle config amount isTopUp before trace).modules ∧\n    ArrayAt out.memory out.ap.val (observe out).allocated ∧\n    ArrayAt out.memory out.rp.val (observe out).newAllocations"
+      },
+      {
+        "plane": "source",
+        "role": "registered main source-model result (audit/trio/main-guarantees.json)",
+        "status": "CHECKED",
+        "name": "LidoSRv3.Audit.Source.TrioComposition.VerityParent.stored_correspondence",
+        "module": "LidoSRv3.Audit.Source.TrioComposition.VerityParent",
+        "file": "LidoSRv3/Audit/Source/TrioComposition/VerityParent.lean",
+        "start_line": 81,
+        "end_line": 91,
+        "doc": "/-- The module-call VM and the complete stored source parent have identical\nreturns/reverts and module transcripts. The separately recorded closed-library\nevent is a source observable; this theorem does not execute a linked delegatecall\nin the VM. The VM external world remains unchanged on every result. -/",
+        "statement": "theorem stored_correspondence (target : Address) (memory : MemoryWords) (pointer : Word)\n    (layout : Layout) (config : Config) (amount : Word) (isTopUp : Bool)\n    (adversary : DenoteExternalCalls.AdversaryModel) (state : DenoteExternalCalls.CallState)\n    (before : Transcript) (trace : MemoryTransportCall.Trace)\n    (countBound : (VerityProducer.worldStorage state.world (countSlot layout)).val ≤ 32)\n    (space : pointer.val+1184*(VerityProducer.worldStorage state.world (countSlot layout)).val+704 ≤ 2^32) :\n    (executeWithMemory pointer layout config amount isTopUp adversary state before).1 =\n      FinalMemoryStoredParent.project (FinalMemoryStoredParent.program target memory pointer layout\n        (VerityProducer.worldStorage state.world) (VerityProducer.sourceOracle adversary state.world)\n        config amount isTopUp before trace) ∧\n    (executeWithMemory pointer layout config amount isTopUp adversary state before).2.world = state.world"
+      }
+    ],
+    "covered": [
+      "One execution connects the capacity producer, array encoding and copying, proportional distribution and checked conversion to wei.",
+      "All modeled outcomes correspond to the independent public specification under the stated count and memory bounds.",
+      "The Verity interpreter matches return or error and module-call observations; the library request remains a separate source-model observation."
+    ],
+    "missing": [
+      "The configured library call is modeled, but its deployed code is not executed by the Verity interpreter.",
+      "The compiler interpretation of memory operations, pointer provenance and the effects of omitted internal writes remain assumptions.",
+      "Cross-call behavior covers only the stated interpreters and histories, not arbitrary callbacks or deployed code."
+    ],
+    "conditions": [
+      "Compiler interpretation of aligned, non-overlapping observed word loads/stores and copies; omitted private cache/configuration/scratch writes obey the stated frame and cache-field relations.",
+      "Configured linked library identity, storage/hash interpretation, entry pointer provenance and primitive crypto/consensus bindings are explicit; general compiled/deployed-code and gas verification are excluded.",
+      "count <=32; pointer +1184*count+704 <=2^32, or modeled initialization/writer history with pointer <=2^31 and finite storage separation; migration and other writer histories excluded."
+    ],
+    "assumptions": [
+      "A-SOURCE-SHAPED",
+      "A-VERITY-SCAFFOLD",
+      "A-SOLC-TRUSTED",
+      "A-RUNTIME-PROVENANCE"
+    ],
+    "outside": [
+      "Compiled and deployed bytecode, gas costs and full consensus-state truth.",
+      "The separate +1 allocation algorithm."
+    ]
+  },
   "id": "P-ALLOC-2",
   "position": 2,
   "summary": "step_correspondence_and_full_loop_conservation is the registered parent. Its first conjunct retains the explicit-∀ independent Model/Source candidate correspondence, Model.amount equality, positivity, demand bound, and capacity bound. Its second conjunct proves exact request conservation for every successful fuel-bounded sourceAllocateLoop run. Its third conjunct proves that the independently defined proportional Nat modelAllocateLoop has a matching successful run with equal mathematical totals and RowsCorrespond final rows; the proof lifts the relation across every successful mutation. The sourceAllocateLoop_eq_allocateLoop bridge still connects conservation to the Verity executor. The distinct +1 Nat model remains a separate child, and no Solidity equivalence is claimed.",
