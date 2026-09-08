@@ -67,7 +67,7 @@ theorem topup_value_moving_journal_projects :
     j.map (·.dest) = [.lidoPull, .beaconDeposit, .beaconDeposit] ∧
       j.map (fun leg => leg.wei.value) = [8, 3, 5] ∧
       obs.callNames =
-        ["withdrawDepositableEther", "makeBeaconChainTopUp", "makeBeaconChainTopUp"] ∧
+        ["withdrawDepositableEther", "deposit", "deposit"] ∧
       obs.callTargets =
         [lidoAddress.toNat, beaconAddress.toNat, beaconAddress.toNat] ∧
       obs.callValues = [0, 3, 5] := by

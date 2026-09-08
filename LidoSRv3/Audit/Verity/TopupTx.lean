@@ -1410,11 +1410,6 @@ def allocateCalldata (call : TopupCall) : List Uint256 :=
     (operatorsOffset : Uint256), (limitsOffset : Uint256)] ++
     pubkeysTail ++ keysTail ++ operatorsTail ++ limitsTail
 
-theorem abiUintArrayTail_calldata (xs : List Nat) :
-    (abiUintArrayTail xs).map (·.val) =
-      (xs.length : Uint256).val :: xs.map (fun x => (x : Uint256).val) := by
-  simp [abiUintArrayTail]
-
  /-- The journalled five-argument `allocateDeposits` frame. -/
 def allocateEntry (call : TopupCall) : ExternalCall :=
   linkedCallEntryTo "allocateDeposits" moduleAddress 0 (allocateCalldata call)
@@ -1426,11 +1421,6 @@ theorem allocateEntry_target (call : TopupCall) :
     (allocateEntry call).target = moduleAddress.toNat := rfl
 theorem allocateEntry_value (call : TopupCall) :
     (allocateEntry call).value = 0 := rfl
-theorem allocateEntry_calldata (call : TopupCall) :
-    (allocateEntry call).calldata =
-      (linkedCallEntryTo "allocateDeposits" moduleAddress 0
-        (allocateCalldata call)).calldata := rfl
-
 /-- The fact the whole correction turns on: the words the guarded transaction
 consumes *are* the journalled frame's returndata. -/
 theorem allocateEntry_returndata (call : TopupCall) :

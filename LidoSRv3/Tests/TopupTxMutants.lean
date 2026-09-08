@@ -1011,7 +1011,7 @@ private def mutantExecuteGuarded (m : GuardMutation) (cfg : SourceTopupConfig)
     mutantGuardedStage m cfg call returned failure
 
 /-- The unmutated mutant *is* the corrected transaction. -/
-theorem guard_mutant_none_reproduces_executeGuarded :
+theorem mutant_none_reproduces_execute :
     (mutantExecuteGuarded .none guardCfg honestCall .none).run frame
       = (executeGuarded guardCfg honestCall .none).run frame := by rfl
 
