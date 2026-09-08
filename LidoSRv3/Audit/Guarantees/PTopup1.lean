@@ -16,12 +16,18 @@ The Verity transaction layer composes the pinned-source observables with the
 executable external-call frames (post-#2362/#2365). -/
 def guarantee : Guarantee := ⟨.pTopup1, [.model, .abstractTx, .source, .verityTx]⟩
 
-/-- Model-side pin used by the executable call journal. Equality of this
-literal with the production deployment is tracked separately as the OPEN
-assumption `A-TOPUP-BEACON-ADDRESS`; this definition does not discharge that
-deployment-provenance obligation. -/
+/-- The canonical beacon deposit contract address, equal to the deployed
+`DEPOSIT_CONTRACT` from `BeaconChainDepositor.sol:18` at pin
+`lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`.
+Deployment provenance: `Verity.TopupTx.DEPOSIT_CONTRACT` carries the Solidity
+source reference; `Verity.TopupTx.beaconAddress_eq_DEPOSIT_CONTRACT` proves
+the model's `beaconAddress` is that constant.  The former OPEN assumption
+`A-TOPUP-BEACON-ADDRESS` is discharged by this chain. -/
 def canonicalBeaconDepositAddress : Nat :=
   0x00000000219ab540356cBB839Cbe05303d7705Fa
+
+theorem canonicalBeaconDepositAddress_eq_DEPOSIT_CONTRACT :
+    canonicalBeaconDepositAddress = Verity.TopupTx.DEPOSIT_CONTRACT.toNat := by decide
 
 /-- Source-shaped allocation-model ordering fact; extraction is not established. -/
 theorem valid_result_preserves_router_order
@@ -678,11 +684,11 @@ def VerityGuardedReturndataSimulation (cfg : SourceTopupConfig)
   (∀ failure : Verity.TopupTx.FailurePoint,
       Verity.TopupTx.executeGuarded cfg call failure before =
         Verity.TopupTx.guardedStage cfg call.topUpLimits call.roundedTarget
-            (Verity.TopupTx.allocateEntry call.keyCount call.moduleReturndata).returndata
+            (Verity.TopupTx.allocateEntry call.roundedTarget call.keyCount call.moduleReturndata).returndata
             failure
           { before with
             calls := before.calls
-              ++ [Verity.TopupTx.allocateEntry call.keyCount call.moduleReturndata] }) ∧
+              ++ [Verity.TopupTx.allocateEntry call.roundedTarget call.keyCount call.moduleReturndata] }) ∧
     (∀ (o : SolidityTopup.Outcome) (failure : Verity.TopupTx.FailurePoint),
         allocationLoop cfg call.moduleReturndata call.topUpLimits = some o →
           (Verity.TopupTx.executeGuarded cfg call failure).run before =
@@ -772,11 +778,11 @@ IStakingModuleV2(stateConfig.moduleAddress).allocateDeposits(
 );
 ```
 
-carries five arguments.  The current executable `allocateEntry` in
-`Verity.TopupTx` journals only the key count; the full ABI is modeled
-here as a specification-side record that preserves every production
-argument.  Blocker 3 in `audit/trio/ssz-topup/sha-bridge/README.md`
-tracks the gap between this spec and the executable frame.
+carries five arguments.  The executable `allocateEntry` in
+`Verity.TopupTx` journals `roundedTargetGwei` (the first scalar argument)
+and `keyCount` (the key count word); the three array arguments are
+abstracted.  The full ABI is modeled here as a specification-side record
+that preserves every production argument.
 -/
 
 structure AllocateDepositsArgs where
@@ -923,17 +929,20 @@ theorem callee_return_reaches_push_when_guards_pass
 ### Part 1: Full five-argument calldata model
 
 The production call passes five ABI-encoded arguments.  The executable
-`allocateEntry` in `Verity.TopupTx` journals only `[evmWord keyCount]`,
-which is the number of keys the module received.  The specification-level
+`allocateEntry` in `Verity.TopupTx` journals
+`[evmWord roundedTargetGwei, evmWord keyCount]` — the target scalar and the
+key count word.  The three array arguments (`_pubkeys`, `_keyIndices`,
+`_operatorIds`) are present in production ABI encoding but abstracted at
+the executable level; `_topUpLimits` enters the model through
+`TopupCall.topUpLimits` and the guard loop.  The specification-level
 `AllocateDepositsArgs` record (defined above) carries all five production
 arguments.
 
 `argsToTopupCall` maps the full ABI record to the executable's
 `TopupCall`, showing which fields the router inspects after the module
-returns.  The executable frame's partial calldata is a deliberate
-projection: the router only uses `keyCount` (for the calldata word),
-`roundedTarget` and `topUpLimits` (for post-return guards), and
-`moduleReturndata` (the untrusted callee output).
+returns.  The executable frame's calldata carries the two scalar fields;
+`roundedTarget` and `topUpLimits` also enter the guard loop, and
+`moduleReturndata` is the untrusted callee output.
 
 ### Part 2: Callee observable effects → P-TOPUP-2 budget model
 
@@ -972,9 +981,11 @@ theorem argsToTopupCall_carries_all_router_fields (args : AllocateDepositsArgs)
 theorem executable_calldata_from_args (args : AllocateDepositsArgs)
     (returndata : List Nat) :
     (Verity.TopupTx.allocateEntry
+      (argsToTopupCall args returndata).roundedTarget
       (argsToTopupCall args returndata).keyCount
       (argsToTopupCall args returndata).moduleReturndata).calldata =
-    [Verity.TopupTx.evmWord args.keyCount] := rfl
+    [Verity.TopupTx.evmWord args.roundedTargetGwei,
+     Verity.TopupTx.evmWord args.keyCount] := rfl
 
 private theorem forall2_le_sum :
     ∀ (xs ys : List Nat), List.Forall₂ (· ≤ ·) xs ys → xs.sum ≤ ys.sum := by

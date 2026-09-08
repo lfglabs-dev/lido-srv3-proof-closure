@@ -37,9 +37,42 @@ def pulledTotalSlot : Nat := 7102
 /-- Placeholder address for `LIDO` (`StakingRouter.sol:744`); a model pin, not
 the deployed Lido address. -/
 def lidoAddress : Address := (0xF00D : Address)
-/-- `DEPOSIT_CONTRACT` (`StakingRouter.sol:750`), the canonical beacon deposit
-contract address. -/
-def beaconAddress : Address := (0x00000000219ab540356cBB839Cbe05303d7705Fa : Address)
+
+/-- The deployed `DEPOSIT_CONTRACT` immutable from
+`contracts/0.8.25/lib/BeaconChainDepositor.sol` line 18:
+`IDepositContract public immutable DEPOSIT_CONTRACT;`
+initialized to the Ethereum mainnet canonical beacon deposit contract
+`0x00000000219ab540356cBB839Cbe05303d7705Fa`.
+Provenance: `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`,
+constructor at `BeaconChainDepositor.sol` line 32.
+`StakingRouter.sol:750` passes this address to `makeBeaconChainTopUp`. -/
+def DEPOSIT_CONTRACT : Address := (0x00000000219ab540356cBB839Cbe05303d7705Fa : Address)
+
+/-- `beaconAddress` is the deployed `DEPOSIT_CONTRACT`. -/
+def beaconAddress : Address := DEPOSIT_CONTRACT
+
+theorem beaconAddress_eq_DEPOSIT_CONTRACT : beaconAddress = DEPOSIT_CONTRACT := rfl
+
+/-- The four arguments of the per-validator `deposit` call at
+`BeaconChainDepositor.sol:106`:
+`_depositContract.deposit{value: amount}(pk, _withdrawalCredentials, dummySignature, depositDataRoot)`
+
+1. `pubkey` — the validator's BLS12-381 public key (48 bytes)
+2. `withdrawalCredentials` — the 0x02 prefixed credentials from `SRUtils._requireWCType2`
+3. `signature` — `DUMMY_SIGNATURE` (96 bytes, `BeaconChainDepositor.sol:24-26`)
+4. `depositDataRoot` — the SSZ tree root computed at `BeaconChainDepositor.sol:120-146` (P-SSZ-1)
+
+The model's `beaconPush` abstracts this as `"makeBeaconChainTopUp"` with
+observable args `[index, amount]`, preserving destination (`DEPOSIT_CONTRACT`),
+value (`amount`), and per-push order while substituting index-based
+observability for the BLS/SSZ argument structure. -/
+structure BeaconDepositCall where
+  pubkey : ByteArray
+  withdrawalCredentials : ByteArray
+  signature : ByteArray
+  depositDataRoot : Nat
+  amount : Nat
+  deriving Repr
 
 inductive FailurePoint where
   | none
@@ -102,10 +135,23 @@ def creditPull (total : Nat) : Contract Unit := fun state =>
     (({ state with selfBalance := state.selfBalance + (total : Uint256) }).writeSlot
       pulledTotalSlot (total : Uint256))
 
-/-- Real external-call frame: one value-bearing beacon push.  The frame fails
-closed when the router cannot pay, so a push is gated on funds actually held. -/
+/-- Real external-call frame: one value-bearing beacon push per nonzero
+allocation.  Models the per-validator call at `BeaconChainDepositor.sol:106`:
+`_depositContract.deposit{value: amount}(pk, _withdrawalCredentials, dummySignature, depositDataRoot)`
+
+The model journals this as `"makeBeaconChainTopUp"` with observable args
+`[index, amount]` rather than the production `"deposit"` with args
+`(pubkey, withdrawalCredentials, signature, depositDataRoot)` — a deliberate
+abstraction that preserves the destination (`DEPOSIT_CONTRACT` via
+`beaconAddress_eq_DEPOSIT_CONTRACT`), value (`amount`), and per-push order
+while substituting index-based observability for the BLS/SSZ argument
+structure.  The `BeaconDepositCall` record above documents the production
+argument frame; the SSZ deposit-data root is P-SSZ-1.
+
+The frame fails closed when the router cannot pay, so a push is gated on funds
+actually held. -/
 def beaconPush (index amount : Nat) : Contract Unit :=
-  -- BeaconChainDepositor.sol:106  _depositContract.deposit{value: amount}(pk, _withdrawalCredentials, dummySignature, depositDataRoot);
+  -- BeaconChainDepositor.sol:106  _depositContract.deposit{value: amount}(pk, wc, sig, root)
   externalCallBindTo beaconAddress (amount : Uint256) [] "makeBeaconChainTopUp"
     ([(index : Uint256), (amount : Uint256)] : List Uint256)
 
@@ -983,39 +1029,45 @@ def moduleAddress : Address := (0x5140 : Address)
 whose `returndata` words are the allocation array the router then guards and
 spends.
 
-Calldata fidelity is *partial* and deliberately so.  The pinned call at source
-line 718 passes
-`(smDepositableEthAmountRounded, _pubkeys, _keyIndices, _operatorIds, _topUpLimits)`;
-this frame carries a single key-count word.  The correction being made here is
-about where the guarded array comes from and which guards run on it, so the
-argument words are modelled only far enough to make the frame observable and
-distinguishable.  No theorem below reads the calldata for anything except that
-observation, and none claims ABI-exact encoding of the module call. -/
-def allocateEntry (keyCount : Nat) (returndata : List Nat) : ExternalCall :=
-  linkedCallEntryTo "allocateDeposits" moduleAddress 0 [(keyCount : Uint256)]
+The pinned call at source line 718 passes five arguments:
+`(smDepositableEthAmountRounded, _pubkeys, _keyIndices, _operatorIds, _topUpLimits)`.
+The frame carries the two scalar observables — `roundedTargetGwei` (the uint256
+target compared at source line 737, first production argument) and `keyCount`
+(`_keyIndices.length`, the key count the router writes to calldata).  The three
+array arguments (`_pubkeys`, `_keyIndices`, `_operatorIds`) are present in
+production ABI encoding but abstracted here; `_topUpLimits` enters the model
+through `TopupCall.topUpLimits` and the guard loop rather than through calldata.
+No theorem below reads the calldata for anything except observable
+distinguishability. -/
+def allocateEntry (roundedTargetGwei keyCount : Nat) (returndata : List Nat) : ExternalCall :=
+  linkedCallEntryTo "allocateDeposits" moduleAddress 0
+    [(roundedTargetGwei : Uint256), (keyCount : Uint256)]
     .success returndata
 
-theorem allocateEntry_name (keyCount : Nat) (returndata : List Nat) :
-    (allocateEntry keyCount returndata).name = "allocateDeposits" := rfl
-theorem allocateEntry_target (keyCount : Nat) (returndata : List Nat) :
-    (allocateEntry keyCount returndata).target = moduleAddress.toNat := rfl
-theorem allocateEntry_value (keyCount : Nat) (returndata : List Nat) :
-    (allocateEntry keyCount returndata).value = 0 := rfl
-theorem allocateEntry_calldata (keyCount : Nat) (returndata : List Nat) :
-    (allocateEntry keyCount returndata).calldata = [evmWord keyCount] := rfl
+theorem allocateEntry_name (roundedTargetGwei keyCount : Nat) (returndata : List Nat) :
+    (allocateEntry roundedTargetGwei keyCount returndata).name = "allocateDeposits" := rfl
+theorem allocateEntry_target (roundedTargetGwei keyCount : Nat) (returndata : List Nat) :
+    (allocateEntry roundedTargetGwei keyCount returndata).target = moduleAddress.toNat := rfl
+theorem allocateEntry_value (roundedTargetGwei keyCount : Nat) (returndata : List Nat) :
+    (allocateEntry roundedTargetGwei keyCount returndata).value = 0 := rfl
+theorem allocateEntry_calldata (roundedTargetGwei keyCount : Nat) (returndata : List Nat) :
+    (allocateEntry roundedTargetGwei keyCount returndata).calldata =
+      [evmWord roundedTargetGwei, evmWord keyCount] := rfl
 
 /-- The fact the whole correction turns on: the words the guarded transaction
 consumes *are* the journalled frame's returndata. -/
-theorem allocateEntry_returndata (keyCount : Nat) (returndata : List Nat) :
-    (allocateEntry keyCount returndata).returndata = returndata := rfl
+theorem allocateEntry_returndata (roundedTargetGwei keyCount : Nat) (returndata : List Nat) :
+    (allocateEntry roundedTargetGwei keyCount returndata).returndata = returndata := rfl
 
 /-- The module call as a transaction step: it journals the frame and binds the
 frame's returndata.  Callers of `executeGuarded` supply the module's return,
 never the guarded array directly. -/
-def allocateDeposits (keyCount : Nat) (returndata : List Nat) : Contract (List Nat) :=
+def allocateDeposits (roundedTargetGwei keyCount : Nat) (returndata : List Nat) :
+    Contract (List Nat) :=
   fun state =>
-    .success (allocateEntry keyCount returndata).returndata
-      { state with calls := state.calls ++ [allocateEntry keyCount returndata] }
+    .success (allocateEntry roundedTargetGwei keyCount returndata).returndata
+      { state with calls := state.calls
+        ++ [allocateEntry roundedTargetGwei keyCount returndata] }
 
 /-- The router's returndata guards, source lines 722--734, as a transaction
 step.  Guard order is source order: the alignment test at line 724 precedes the
@@ -1146,7 +1198,7 @@ exactly what it returned. -/
 def executeGuarded (cfg : SourceTopupConfig) (call : TopupCall) (failure : FailurePoint) :
     Contract Unit := do
   -- StakingRouter.sol:717-718  uint256[] memory allocations = IStakingModuleV2(stateConfig.moduleAddress).allocateDeposits(...);
-  let returned ← allocateDeposits call.keyCount call.moduleReturndata
+  let returned ← allocateDeposits call.roundedTarget call.keyCount call.moduleReturndata
   guardedStage cfg call.topUpLimits call.roundedTarget returned failure
 
 /-- The binding statement.  `executeGuarded` journals the module frame and then
@@ -1156,9 +1208,9 @@ theorem executeGuarded_binds_returndata (cfg : SourceTopupConfig) (call : TopupC
     (failure : FailurePoint) (state : ContractState) :
     executeGuarded cfg call failure state =
       guardedStage cfg call.topUpLimits call.roundedTarget
-          (allocateEntry call.keyCount call.moduleReturndata).returndata failure
+          (allocateEntry call.roundedTarget call.keyCount call.moduleReturndata).returndata failure
         { state with
-          calls := state.calls ++ [allocateEntry call.keyCount call.moduleReturndata] } :=
+          calls := state.calls ++ [allocateEntry call.roundedTarget call.keyCount call.moduleReturndata] } :=
   rfl
 
 /-- Alignment, per-index limit, and out-of-bounds all fail closed with the
@@ -1171,7 +1223,7 @@ theorem executeGuarded_reverts_on_allocation_guard (cfg : SourceTopupConfig)
   have hStage : executeGuarded cfg call failure state
       = ContractResult.revert (guardReason o)
           { state with
-            calls := state.calls ++ [allocateEntry call.keyCount call.moduleReturndata] } := by
+            calls := state.calls ++ [allocateEntry call.roundedTarget call.keyCount call.moduleReturndata] } := by
     rw [executeGuarded_binds_returndata, allocateEntry_returndata]
     simp only [guardedStage, Bind.bind, _root_.Verity.bind]
     rw [guardLoop_revert cfg call.moduleReturndata call.topUpLimits o _ hLoop]
@@ -1188,7 +1240,7 @@ theorem executeGuarded_reverts_on_over_target (cfg : SourceTopupConfig)
   have hStage : executeGuarded cfg call failure state
       = ContractResult.revert "ModuleReturnExceedTarget"
           { state with
-            calls := state.calls ++ [allocateEntry call.keyCount call.moduleReturndata] } := by
+            calls := state.calls ++ [allocateEntry call.roundedTarget call.keyCount call.moduleReturndata] } := by
     rw [executeGuarded_binds_returndata, allocateEntry_returndata]
     simp only [guardedStage, Bind.bind, _root_.Verity.bind]
     rw [guardLoop_success cfg call.moduleReturndata call.topUpLimits _ hLoop]
@@ -1204,7 +1256,7 @@ theorem executeGuarded_apply_of_guards_pass (cfg : SourceTopupConfig) (call : To
     executeGuarded cfg call failure state =
       execute call.moduleReturndata failure
         { state with
-          calls := state.calls ++ [allocateEntry call.keyCount call.moduleReturndata] } := by
+          calls := state.calls ++ [allocateEntry call.roundedTarget call.keyCount call.moduleReturndata] } := by
   rw [executeGuarded_binds_returndata, allocateEntry_returndata]
   simp only [guardedStage, Bind.bind, _root_.Verity.bind]
   rw [guardLoop_success cfg call.moduleReturndata call.topUpLimits _ hLoop]
@@ -1228,7 +1280,7 @@ def guardedObservables (call : TopupCall) : OutcomeObservables :=
     callNames := "allocateDeposits" :: base.callNames
     callTargets := moduleAddress.toNat :: base.callTargets
     callValues := 0 :: base.callValues
-    callArgs := [evmWord call.keyCount] :: base.callArgs }
+    callArgs := [evmWord call.roundedTarget, evmWord call.keyCount] :: base.callArgs }
 
 /-- The unguarded run always ends with the journal it started from extended by
 `expectedCalls`; both the zero and the nonzero branch. -/
@@ -1285,17 +1337,17 @@ theorem executeGuarded_observes_source (cfg : SourceTopupConfig) (call : TopupCa
   have hStagedBalance :
       ({ entryFrame state with
           calls := (entryFrame state).calls
-            ++ [allocateEntry call.keyCount call.moduleReturndata] } : ContractState).selfBalance
+            ++ [allocateEntry call.roundedTarget call.keyCount call.moduleReturndata] } : ContractState).selfBalance
         = 0 := rfl
   obtain ⟨after, hRun, hCalls⟩ :=
     execute_run_calls call.moduleReturndata
       { entryFrame state with
         calls := (entryFrame state).calls
-          ++ [allocateEntry call.keyCount call.moduleReturndata] } hStagedBalance hNoWrap
+          ++ [allocateEntry call.roundedTarget call.keyCount call.moduleReturndata] } hStagedBalance hNoWrap
   have hRaw : execute call.moduleReturndata .none
       { entryFrame state with
         calls := (entryFrame state).calls
-          ++ [allocateEntry call.keyCount call.moduleReturndata] }
+          ++ [allocateEntry call.roundedTarget call.keyCount call.moduleReturndata] }
       = ContractResult.success () after := by
     unfold Contract.run at hRun
     split at hRun <;> simp_all
@@ -1303,18 +1355,18 @@ theorem executeGuarded_observes_source (cfg : SourceTopupConfig) (call : TopupCa
       = ContractResult.success () after := by
     unfold Contract.run
     rw [executeGuarded_apply_of_guards_pass cfg call .none (entryFrame state) hLoop hTarget, hRaw]
-  have hName : (allocateEntry call.keyCount call.moduleReturndata).name
+  have hName : (allocateEntry call.roundedTarget call.keyCount call.moduleReturndata).name
       ≠ "makeBeaconChainTopUp" := by rw [allocateEntry_name]; decide
   have hInner : observe
       { entryFrame state with
         calls := (entryFrame state).calls
-          ++ [allocateEntry call.keyCount call.moduleReturndata] }
+          ++ [allocateEntry call.roundedTarget call.keyCount call.moduleReturndata] }
       call.moduleReturndata.length (ContractResult.success () after)
       = sourceObservables call.moduleReturndata := by
     rw [← hRun]
     exact execute_observes_source call.moduleReturndata _ hStagedBalance hNoWrap hLen
   rw [hGuardedRaw, observe_after_leading_entry (entryFrame state) after
-    (allocateEntry call.keyCount call.moduleReturndata)
+    (allocateEntry call.roundedTarget call.keyCount call.moduleReturndata)
     (expectedCalls call.moduleReturndata) call.moduleReturndata.length hName hCalls]
   simp only [hInner, guardedObservables, allocateEntry_name, allocateEntry_target,
     allocateEntry_value, allocateEntry_calldata]

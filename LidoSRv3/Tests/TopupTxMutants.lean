@@ -988,7 +988,7 @@ private def mutantExecuteGuarded (m : GuardMutation) (cfg : SourceTopupConfig)
   if m = .noModuleFrame then
     mutantGuardedStage m cfg call.topUpLimits call.roundedTarget call.moduleReturndata failure
   else do
-    let returned ← allocateDeposits call.keyCount call.moduleReturndata
+    let returned ← allocateDeposits call.roundedTarget call.keyCount call.moduleReturndata
     mutantGuardedStage m cfg call.topUpLimits call.roundedTarget returned failure
 
 /-- The unmutated mutant *is* the corrected transaction. -/
@@ -1020,13 +1020,13 @@ theorem guarded_journal_starts_with_the_module_call :
       = guardedObservables honestCall ∧
     (guardedObservables honestCall).callNames
       = ["allocateDeposits", "withdrawDepositableEther", "makeBeaconChainTopUp"] ∧
-    (allocateEntry honestCall.keyCount honestCall.moduleReturndata).returndata
+    (allocateEntry honestCall.roundedTarget honestCall.keyCount honestCall.moduleReturndata).returndata
       = honestCall.moduleReturndata :=
   ⟨((LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source_with_nonzero_wrap_close
         guardCfg honestInput defaultState (by decide) (by decide) (by decide)).2.2
       honestCall).2.2.2 (by decide) (by decide) (by decide) (by decide),
    by decide,
-   allocateEntry_returndata _ _⟩
+   allocateEntry_returndata _ _ _⟩
 
 /-- KILL-LINE for the registered parent's Verity conjunct (2), the executable
 dual of the source allocation-loop kill-line.  Each single-guard mutant COMMITS
@@ -1082,10 +1082,10 @@ statement. -/
 theorem dropped_module_frame_kill_line_refutes_parent :
     mutantExecuteGuarded .noModuleFrame guardCfg honestCall .none frame
         ≠ guardedStage guardCfg honestCall.topUpLimits honestCall.roundedTarget
-            (allocateEntry honestCall.keyCount honestCall.moduleReturndata).returndata .none
+            (allocateEntry honestCall.roundedTarget honestCall.keyCount honestCall.moduleReturndata).returndata .none
           { frame with
             calls := frame.calls
-              ++ [allocateEntry honestCall.keyCount honestCall.moduleReturndata] } ∧
+              ++ [allocateEntry honestCall.roundedTarget honestCall.keyCount honestCall.moduleReturndata] } ∧
       observe frame honestCall.moduleReturndata.length
           ((mutantExecuteGuarded .noModuleFrame guardCfg honestCall .none).run frame)
         ≠ guardedObservables honestCall :=

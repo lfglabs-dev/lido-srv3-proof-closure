@@ -39,7 +39,8 @@
     {
       "id": "A-TOPUP-BEACON-ADDRESS",
       "accepted": true,
-      "risk": "The model-local beacon deposit target is not proved equal to the immutable/deployed production beacon deposit contract.",
+      "discharged": true,
+      "risk": "DISCHARGED. The model's beaconAddress is now defined as DEPOSIT_CONTRACT with provenance to BeaconChainDepositor.sol:18 at pin 17005714. beaconAddress_eq_DEPOSIT_CONTRACT and canonicalBeaconDepositAddress_eq_DEPOSIT_CONTRACT establish the chain.",
       "justification": "Call-target correctness and deployment provenance are separate obligations.",
       "severity": "HIGH",
       "violation_impact": "Conserved top-up value could be sent to the wrong address.",
