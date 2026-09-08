@@ -3,7 +3,8 @@ import audit.trio.consolidation.Spec
 /-!
 # Bounded consolidation source execution
 
-An independent bounded model of the remaining external-control surface in the
+An independent, hand-authored bounded model component for part of the external
+control surface in the
 vault path pinned at `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`:
 
 * `WithdrawalVault` constructor, lines 63--78 (both immutable addresses are
@@ -13,22 +14,63 @@ vault path pinned at `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`
   may fail and reverts the whole entrypoint); and
 * `preservesEthBalance`, `WithdrawalVault.sol` lines 81--85.
 
+The constructors are deployment-time checks, not guards rerun by the runtime
+entrypoint.  The runtime model below therefore takes an explicit deployment
+witness and checks the caller before the inherited body. `feeRead` and
+`callResults` are supplied outcomes: this file
+does not interpret real `STATICCALL`/`CALL`, returndata, revert propagation,
+events, EVM rollback, code identity, or deployment provenance.
+
+At that pin, runtime error precedence is `NotConsolidationGateway`, then
+`ZeroArgument`, `ArraysLengthMismatch`, `FeeReadFailed`/`FeeInvalidData`,
+checked fee-multiplication overflow, `IncorrectFee`, source/target
+`InvalidPublicKeyLength`, and finally `RequestAdditionFailed`. The supplied
+`feeRead : ExternalResult Word` starts after the returndata-shape check, so its
+failure arm represents `FeeReadFailed`; `FeeInvalidData` remains outside this
+component rather than being silently claimed.
+
+The model is intentionally not an error-faithful interpreter. In particular,
+it consumes `feeRead` before calling the separately defined pure guard model,
+whereas Solidity checks the empty and array-length guards before the
+`STATICCALL`. Also, its synthetic final-balance mismatch is represented with a
+`VaultError.incorrectFee`; pinned Solidity would fail the modifier's `assert`
+with a panic after the body. These guard-order and modifier-failure differences
+are residuals, not correspondence claims.
+
 `requireClosedExit` is deliberately named: a finite result list and fuel bound
 are evidence that every external request reached a success/failure response.
 It is an obligation, not an axiom or a trust-manifest escape.
+
+Consequently, the theorem in this file is only an invariant of this bounded
+model component. It is not real source-level execution correspondence and does
+not identify this model with the independent specification in `Spec.lean`, nor
+does it close the remaining execution or Bus/Gateway/Vault composition
+obligations.
 -/
 
 namespace audit.trio.consolidation
 
 structure ConstructorArgs where
   lido : Word
+  treasury : Word
+  triggerableWithdrawalsGateway : Word
   consolidationGateway : Word
+  withdrawalRequest : Word
   consolidationRequest : Word
   deriving DecidableEq, Repr
 
 def constructorConditions (args : ConstructorArgs) : Bool :=
-  args.lido.val != 0 && args.consolidationGateway.val != 0 &&
-    args.consolidationRequest.val != 0
+  -- Solidity runs the base constructor first, then the derived constructor.
+  args.withdrawalRequest.val != 0 && args.consolidationRequest.val != 0 &&
+    args.lido.val != 0 && args.treasury.val != 0 &&
+    args.triggerableWithdrawalsGateway.val != 0 &&
+    args.consolidationGateway.val != 0
+
+/-- Successful construction is a premise of runtime execution. This witness
+does not establish which bytecode was deployed at any address. -/
+structure DeployedVault where
+  args : ConstructorArgs
+  constructorAccepted : constructorConditions args = true
 
 inductive ExternalResult (α : Type) where
   | success (value : α)
@@ -36,7 +78,7 @@ inductive ExternalResult (α : Type) where
   deriving DecidableEq, Repr
 
 inductive SourceExecutionError where
-  | invalidConstructor
+  | notConsolidationGateway
   | staticcallFailed
   | vaultGuard (error : VaultError)
   | callFailed (index : Nat)
@@ -56,16 +98,19 @@ private def firstCallFailure : Nat → List (ExternalResult Unit) → Option Nat
   | index, .failure :: _ => some index
   | index, .success _ :: rest => firstCallFailure (index + 1) rest
 
-/-- Bounded execution of the pinned vault entrypoint. `initialBalance` is the
+/-- Bounded component for the pinned runtime entrypoint. `initialBalance` is the
 balance before the payable frame credit. Revert arms therefore expose exactly
-that snapshot. On success, exact-fee validation makes the total CALL debit
-equal `msg.value`; the explicit equality check is the modifier assertion. -/
-def executeSourceBounded (fuel : Nat) (args : ConstructorArgs)
+that supplied snapshot. This representation of rollback is definitional, not a
+proof about EVM rollback. On success, exact-fee validation makes the modeled
+CALL debit equal `msg.value`; the explicit equality check represents the
+modifier assertion. -/
+def executeSourceBounded (fuel : Nat) (deployment : DeployedVault)
+    (caller : Word)
     (feeRead : ExternalResult Word) (callResults : List (ExternalResult Unit))
     (msgValue : Word) (sources targets : List Pubkey)
     (initialBalance : Nat) : SourceExecutionOutcome :=
-  if !constructorConditions args then
-    .reverted .invalidConstructor initialBalance
+  if caller != deployment.args.consolidationGateway then
+    .reverted .notConsolidationGateway initialBalance
   else match feeRead with
     | .failure => .reverted .staticcallFailed initialBalance
     | .success fee =>
@@ -89,67 +134,73 @@ def executeSourceBounded (fuel : Nat) (args : ConstructorArgs)
 /-- Named environmental obligation for the bounded model: execution reaches a
 closed committed or reverted source exit, rather than exhausting fuel or an
 underspecified CALL-result prefix. -/
-def requireClosedExit (fuel : Nat) (args : ConstructorArgs)
+def requireClosedExit (fuel : Nat) (deployment : DeployedVault) (caller : Word)
     (feeRead : ExternalResult Word) (callResults : List (ExternalResult Unit))
     (msgValue : Word) (sources targets : List Pubkey)
     (initialBalance : Nat) : Prop :=
-  executeSourceBounded fuel args feeRead callResults msgValue sources targets
+  executeSourceBounded fuel deployment caller feeRead callResults msgValue sources targets
     initialBalance ≠ .openExit
 
-theorem constructor_failure_closes (fuel : Nat) (args : ConstructorArgs)
-    (feeRead : ExternalResult Word) (callResults : List (ExternalResult Unit))
-    (msgValue : Word) (sources targets : List Pubkey) (initialBalance : Nat)
-    (h : constructorConditions args = false) :
-    executeSourceBounded fuel args feeRead callResults msgValue sources targets
-      initialBalance = .reverted .invalidConstructor initialBalance := by
-  simp [executeSourceBounded, h]
-
-theorem staticcall_failure_closes (fuel : Nat) (args : ConstructorArgs)
+theorem unauthorized_caller_closes (fuel : Nat) (deployment : DeployedVault)
+    (caller : Word) (feeRead : ExternalResult Word)
     (callResults : List (ExternalResult Unit)) (msgValue : Word)
     (sources targets : List Pubkey) (initialBalance : Nat)
-    (h : constructorConditions args = true) :
-    executeSourceBounded fuel args .failure callResults msgValue sources targets
+    (h : caller ≠ deployment.args.consolidationGateway) :
+    executeSourceBounded fuel deployment caller feeRead callResults msgValue
+      sources targets initialBalance =
+        .reverted .notConsolidationGateway initialBalance := by
+  simp [executeSourceBounded, h]
+
+theorem staticcall_failure_closes (fuel : Nat) (deployment : DeployedVault)
+    (caller : Word)
+    (callResults : List (ExternalResult Unit)) (msgValue : Word)
+    (sources targets : List Pubkey) (initialBalance : Nat)
+    (h : caller = deployment.args.consolidationGateway) :
+    executeSourceBounded fuel deployment caller .failure callResults msgValue sources targets
       initialBalance = .reverted .staticcallFailed initialBalance := by
   simp [executeSourceBounded, h]
 
-/-- Constructor rejection and fee `STATICCALL` failure discharge the named
+/-- Caller rejection and fee `STATICCALL` failure discharge the named
 closure obligation without consuming loop fuel or requiring any CALL results.
 This keeps the two pre-loop source failures visibly distinct from an open
 bounded exit. -/
 theorem preloop_failures_requireClosedExit (fuel : Nat)
-    (args : ConstructorArgs) (callResults : List (ExternalResult Unit))
+    (deployment : DeployedVault) (caller : Word)
+    (callResults : List (ExternalResult Unit))
     (msgValue : Word) (sources targets : List Pubkey) (initialBalance : Nat) :
-    (constructorConditions args = false →
-      requireClosedExit fuel args (.success (word 0)) callResults msgValue
+    (caller ≠ deployment.args.consolidationGateway →
+      requireClosedExit fuel deployment caller (.success (word 0)) callResults msgValue
         sources targets initialBalance) ∧
-    (constructorConditions args = true →
-      requireClosedExit fuel args .failure callResults msgValue sources targets
+    (caller = deployment.args.consolidationGateway →
+      requireClosedExit fuel deployment caller .failure callResults msgValue sources targets
         initialBalance) := by
   constructor
   · intro hconstructor
     unfold requireClosedExit
-    rw [constructor_failure_closes (h := hconstructor)]
+    rw [unauthorized_caller_closes (h := hconstructor)]
     simp
   · intro hconstructor
     unfold requireClosedExit
     rw [staticcall_failure_closes (h := hconstructor)]
     simp
 
-/-- The named closed-exit obligation yields the source-level atomicity and
-`preservesEthBalance` correspondence: every closed failure restores the entry
-snapshot, while every commit satisfies the modifier's balance equality. -/
-theorem closed_exit_atomicity_and_preservesEthBalance
-    (fuel : Nat) (args : ConstructorArgs) (feeRead : ExternalResult Word)
+/-- The named closed-exit obligation yields a bounded-model invariant: every
+modeled failure contains the supplied entry snapshot, while every modeled
+commit satisfies the represented final-balance equality. It establishes no
+Solidity/EVM execution correspondence or rollback fact. -/
+theorem closed_exit_bounded_model_balance_invariant
+    (fuel : Nat) (deployment : DeployedVault) (caller : Word)
+    (feeRead : ExternalResult Word)
     (callResults : List (ExternalResult Unit)) (msgValue : Word)
     (sources targets : List Pubkey) (initialBalance : Nat)
-    (hclosed : requireClosedExit fuel args feeRead callResults msgValue sources
+    (hclosed : requireClosedExit fuel deployment caller feeRead callResults msgValue sources
       targets initialBalance) :
-    (∃ error, executeSourceBounded fuel args feeRead callResults msgValue sources
+    (∃ error, executeSourceBounded fuel deployment caller feeRead callResults msgValue sources
         targets initialBalance = .reverted error initialBalance) ∨
-      (∃ pairs, executeSourceBounded fuel args feeRead callResults msgValue
+      (∃ pairs, executeSourceBounded fuel deployment caller feeRead callResults msgValue
           sources targets initialBalance = .committed pairs initialBalance) := by
   unfold requireClosedExit at hclosed
-  cases hrun : executeSourceBounded fuel args feeRead callResults msgValue sources
+  cases hrun : executeSourceBounded fuel deployment caller feeRead callResults msgValue sources
       targets initialBalance with
   | openExit => exact False.elim (hclosed hrun)
   | reverted error balance =>
