@@ -66,6 +66,7 @@ test:
 	@python3 scripts/check_pinned_source.py >/dev/null && printf '%s\n' 'pinned source ok: cited Solidity spans and inline citations exist in lido-core at the pin'
 	@python3 scripts/check_source_annotations.py
 	@lake build LidoSRv3Test
+	@lake build AccountAddressChecks
 	@printf '%s\n' 'LidoSRv3Test: mutants, vectors, nested Verity tests, and regressions compiled'
 	@test -s fixtures/solidity-reference/stakingRouter.getDepositAllocations.test.ts
 	@test -s fixtures/solidity-reference/stakingRouter.rewards.test.ts

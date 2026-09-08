@@ -88,6 +88,12 @@ lean_lib «LidoSRv3Test» where
 lean_lib «LidoSRv3Audit» where
   roots := #[`LidoSRv3.Audit.Trust]
 
+/-- Isolated accounting/address slices, with kernel-checked regression proofs. -/
+lean_lib «AccountAddressChecks» where
+  srcDir := "audit/trio/account-address"
+  roots := #[`PAccount1, `PAddress1, `Tests.Verity.PAccount1Test,
+    `Tests.Verity.PAddress1Test]
+
 /-- Cross-check the staged indexed parent against the integrated source/ABI parent. -/
 lean_lib «TrioIntegrationChecks» where
   globs := #[

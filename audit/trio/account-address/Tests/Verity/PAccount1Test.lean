@@ -13,13 +13,13 @@ def valid : Input :=
 
 example : reportValidatorBalances valid before = .committed
     { modules := [{ word := 7 * two64 + 20 }, { word := 9 * two64 + 30 }]
-      router := { word := 11 * two64 + 50 } } := by native_decide
+      router := { word := 11 * two64 + 50 } } := by decide
 
 example : reportValidatorBalances { valid with reportedModuleIds := [1, 5] } before =
-    .reverted (.unexpectedModuleId 4 5) before := by native_decide
+    .reverted (.unexpectedModuleId 4 5) before := by decide
 
 example : reportValidatorBalances { valid with balancesGwei := [20, maxValueGwei + 1] } before =
-    .reverted (.invalidAmountGwei (maxValueGwei + 1)) before := by native_decide
+    .reverted (.invalidAmountGwei (maxValueGwei + 1)) before := by decide
 
 /-- Dropping the uint64 checked-add guard admits a value the source rejects. -/
 def uncheckedAdd64 (a b : Nat) : Nat := (a + b) % two64

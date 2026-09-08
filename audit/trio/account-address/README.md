@@ -16,3 +16,26 @@ rollback, packing, and mutant witnesses.
 
 This is source-level Lean evidence. It is not a compiler, EVM, bytecode, or
 deployment correspondence claim.
+
+Integrated from `p-account-1-address-1` at `e04136dd` and the bounded
+address changes at `39991771`. The bounded version uses `Fin (2^160)`
+for packed owners and checks out-of-range conversions. Regression proofs
+use kernel-checked `decide`; they do not add native-decision trust axioms.
+Run `lake build AccountAddressChecks` from the repository root.
+
+These are supplementary slices, not replacements for the registered parents.
+ACCOUNT models balance writes, not the complete oracle report or subsequent
+fee calculation. Registered IDs and module-word correspondence are supplied;
+the list model needs distinct IDs to describe distinct physical records.
+Packed words are natural numbers; matching physical storage also needs the
+uint256 bounds and slot relation. Rollback is defined in this isolated model,
+not derived from executing EVM calls.
+
+ADDRESS supplies approval, set-operation, transfer and quote results. It does
+not compute them from deployed contracts or prove general account-renaming
+symmetry. Requests and claims cover one item only. The unsupported empty or
+multi-item claim result is model-specific, not Solidity behavior. Assertion
+failures and some callee errors are grouped; exact ABI error bytes, uint256
+request-ID increment bounds, arbitrary callbacks, events, enumerable sets and
+the full batch storage relation remain outside these slices. The packing
+lemmas are useful independently of those execution boundaries.

@@ -106,20 +106,19 @@ aligned, every key is 48 bytes, the product fits `uint256`, and
 `msg.value` equals `count * fee` (`_requireExactFee`). In isolation `fee = 0`
 with `msg.value = 0` commits `sourceRun`; under the caller-supplied
 `hGatewayAdmittedNonzero` premise this parent additionally derives
-`inputs.fee.val ≠ 0` for every committed run (the gateway entrypoint rejects
-`msg.value = 0` before this vault call is ever reached, and the committed
-branch's own `msg.value = count * fee` equality then forces a nonzero fee).
+`inputs.fee.val ≠ 0` for every committed run (the premise concerns the vault input, and the committed branch's own
+`msg.value = count * fee` equality then forces a nonzero fee).
 A revert implies the un-strengthened conjunction is false. Not beacon
 eligibility and not the Bus.
 
-**Outer-gateway premise, recorded as `A-CONSOLIDATION-GATEWAY-NONZERO`.**
+**Vault-input premise, recorded as `A-CONSOLIDATION-GATEWAY-NONZERO`.**
 `hGatewayAdmittedNonzero` is forwarded to the source theorem and used to
-derive the `inputs.fee.val ≠ 0` conjunct above, so the premise excludes the
-free-batch arm from this parent's committed case. The premise nevertheless
-names the **outer gateway `msg.value` surface** (and the
-`P-CONSOLIDATION-ETH-1` fee/refund plane), not the vault's forwarded
-`totalFee` call. It is therefore classified at that boundary rather than
-presented as a vault-local fact. Two kill-lines pin the present claim:
+derive the `inputs.fee.val ≠ 0` conjunct above. It requires an authorized
+vault call to carry nonzero `msg.value`. The gateway forwards `count * fee`,
+not its entire outer payment; a positive outer payment can therefore coexist
+with zero forwarded value. Discharging the premise requires a justified
+positive forwarded fee as well as the composed argument/value path.
+Two kill-lines pin the present claim:
 `gateway_admitted_nonzero_kill_line` is premise-necessity evidence (dropped,
 the same conjunct is false of `sourceRun` on a concrete free batch that
 violates the premise), and `fee_blind_commit_kill_line_refutes_parent` is

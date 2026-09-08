@@ -10,18 +10,32 @@ timestamp in 208..247. No earlier address model is imported.
 
 namespace AccountAddress.PAddress1
 
-abbrev Address := Nat
-
 def two160 : Nat := 2 ^ 160
 def two200 : Nat := 2 ^ 200
 def two201 : Nat := 2 ^ 201
 
+instance : NeZero two160 := ⟨by simp [two160]⟩
+
+/-- Solidity `address`: exactly the values representable in 160 bits. -/
+abbrev Address := Fin two160
+
 def addressPart (word : Nat) : Nat := word % two160
 def claimedPart (word : Nat) : Bool := (word / two200) % 2 = 1
 
+/-- ABI-facing conversion rejects integers which are not Solidity addresses. -/
+def addressOfNat? (value : Nat) : Option Address :=
+  if h : value < two160 then some ⟨value, h⟩ else none
+
+def storedOwner (word : Nat) : Address :=
+  ⟨addressPart word, Nat.mod_lt _ (by simp [two160])⟩
+
 /-- Packed assignment `request.owner = _to`; all bits at and above 160 stay. -/
 def writeOwner (word : Nat) (owner : Address) : Nat :=
-  (word / two160) * two160 + owner
+  (word / two160) * two160 + owner.val
+
+/-- Checked boundary for callers starting with an untyped natural number. -/
+def writeOwnerChecked (word owner : Nat) : Option Nat :=
+  (addressOfNat? owner).map (writeOwner word)
 
 /-- Packed assignment `request.claimed = true`; all fields other than bit 200
 stay unchanged. -/
@@ -82,9 +96,9 @@ def transferFrom (i : TransferInput) (before : TransferState) :
     .reverted (.invalidRequestId i.requestId) before
   else if claimedPart before.requestWord then
     .reverted (.requestAlreadyClaimed i.requestId) before
-  else if i.fromAddr != addressPart before.requestWord then
+  else if i.fromAddr != storedOwner before.requestWord then
     .reverted (.transferFromIncorrectOwner i.fromAddr
-      (addressPart before.requestWord)) before
+      (storedOwner before.requestWord)) before
   else if !(i.fromAddr = i.caller || i.approvedForAll ||
       before.tokenApproval = i.caller) then
     .reverted (.notOwnerOrApproved i.caller) before
@@ -178,8 +192,8 @@ def claimOne (i : ClaimInput) (id hint : Nat) (before : ClaimState) :
     .reverted (.requestNotFoundOrNotFinalized id) before
   else if claimedPart before.requestWord then
     .reverted (.requestAlreadyClaimed id) before
-  else if addressPart before.requestWord != i.caller then
-    .reverted (.notOwner i.caller (addressPart before.requestWord)) before
+  else if storedOwner before.requestWord != i.caller then
+    .reverted (.notOwner i.caller (storedOwner before.requestWord)) before
   else if !before.ownerSetRemoveSucceeds then
     .reverted .queueArithmeticOverflow before
   else if hint = 0 || hint > i.lastCheckpointIndex || id < i.checkpointFrom ||
@@ -226,16 +240,22 @@ def unwrap (i : UnwrapInput) (before : UnwrapState) : Result UnwrapState Nat :=
   else .committed (UnwrapState.mk (before.wstBalance - i.amount)
       (before.stEthBalance + i.stEthQuote)) i.stEthQuote
 
-theorem addressPart_writeOwner (word owner : Nat) (h : owner < two160) :
-    addressPart (writeOwner word owner) = owner := by
-  change owner < 1461501637330902918203684832716283019655932542976 at h
+theorem addressPart_writeOwner (word : Nat) (owner : Address) :
+    addressPart (writeOwner word owner) = owner.val := by
+  have h := owner.isLt
+  change owner.val < 1461501637330902918203684832716283019655932542976 at h
   simp [addressPart, writeOwner, two160, Nat.mod_eq_of_lt h]
 
-theorem upper_writeOwner (word owner : Nat) (h : owner < two160) :
+theorem upper_writeOwner (word : Nat) (owner : Address) :
     writeOwner word owner / two160 = word / two160 := by
-  change owner < 1461501637330902918203684832716283019655932542976 at h
+  have h := owner.isLt
+  change owner.val < 1461501637330902918203684832716283019655932542976 at h
   simp only [writeOwner, two160]
   omega
+
+theorem writeOwnerChecked_rejects_out_of_range (word owner : Nat)
+    (h : two160 ≤ owner) : writeOwnerChecked word owner = none := by
+  simp [writeOwnerChecked, addressOfNat?, Nat.not_lt.mpr h]
 
 theorem setClaimed_preserves_owner (word : Nat) :
     addressPart (setClaimed word) = addressPart word := by
