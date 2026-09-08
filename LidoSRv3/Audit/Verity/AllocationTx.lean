@@ -529,4 +529,26 @@ theorem live_revert_restores_snapshot
   unfold Contract.run at h
   split at h <;> simp_all
 
+/-- The live entry point has an executable late-failure path: after every
+summary/stake call has bound its row and after the allocation, capacity,
+address, and total observation writes have been constructed, the injected
+failure is evaluated by `Contract.run` and restores the entry snapshot.
+
+This is deliberately stronger than an observation-only freshness claim.  The
+premises expose the successful live storage/call binding and arithmetic pass;
+the conclusion is the concrete transaction result after the intermediate
+writes have been requested. -/
+theorem live_injected_after_writes_rolls_back
+    (adversary : Compiler.CompilationModel.DenoteExternalCalls.AdversaryModel)
+    (cfg : Config) (modules : List BoundModule) (depositsToAllocate : Word)
+    (isTopUp : Bool) (state : ContractState)
+    (hLength : modules.length = min (state.readSlot modulesCountSlot).val 32)
+    (hBind : (bindLiveAll adversary state 0 modules.length) state = .success modules state)
+    (rows : List Row) (total : Word)
+    (hExecute : sourceExecute cfg modules depositsToAllocate isTopUp = some (rows, total)) :
+    (allocateLiveFromStorage adversary cfg depositsToAllocate isTopUp true).run state =
+      .revert "INJECTED_AFTER_WRITES" state := by
+  unfold Contract.run allocateLiveFromStorage
+  simp [← hLength, hBind, hExecute]
+
 end LidoSRv3.Audit.Verity.AllocationTx
