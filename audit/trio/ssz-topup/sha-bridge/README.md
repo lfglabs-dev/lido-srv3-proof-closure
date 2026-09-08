@@ -8,7 +8,7 @@ Solidity pin: `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`.
 
 ## Blocker 1: SHA-256 sequential acceptance (P-SSZ-1)
 
-**Status: OPEN — awaiting lake build verification**
+**Status: DISCHARGED — lake build EXIT_CODE=0, pipefail, no sorry/admit**
 
 `PSsz1.verity_tx_with_sequential_digest_acceptance` composes the
 universal `sequential_digest_acceptance` (proved for ALL `Inputs`, not
@@ -21,7 +21,7 @@ implication.
 
 ## Blocker 2: Production SSZ gindex encoding (P-SSZ-1)
 
-**Status: OPEN — awaiting lake build verification**
+**Status: DISCHARGED — lake build EXIT_CODE=0, pipefail, no sorry/admit**
 
 **Part 1 — General log2 characterization:**
 `PSsz1.log2_eq_of_le_lt` provides `2^k ≤ n → n < 2^(k+1) → Nat.log2 n = k`,
@@ -59,7 +59,7 @@ packed 0x2B00.
 
 ## Blocker 3: allocateDeposits ABI fidelity (P-TOPUP-1)
 
-**Status: OPEN — awaiting lake build verification**
+**Status: DISCHARGED — lake build EXIT_CODE=0, pipefail, no sorry/admit**
 
 **Part 1 — Full five-argument calldata model:**
 `AllocateDepositsArgs` carries all five production arguments
