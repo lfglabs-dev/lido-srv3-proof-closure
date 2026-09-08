@@ -674,14 +674,22 @@ allocation algorithm stays P-ALLOC-1/P-ALLOC-2.
 
 There is a separate, stricter TOPUP boundary: this parent still invokes the
 legacy `execute` value loop, whose beacon fields come from
-`TopupTx.scheduledDeposit`, and its `allocateDeposits` journal uses a
-length-prefixed word abstraction rather than canonical Solidity ABI offsets.
-`TopupTx.scheduledDeposit_not_sourceDerived` is a concrete source-byte
-counterexample: an index/amount-only run cannot derive a nonzero source public
-key.  Therefore this theorem is not an end-to-end source-derived SSZ/beacon
-calldata claim and must not be read as TOPUP delivered.  Closing it requires a
-transaction input carrying the pinned public-key, withdrawal-credentials and
-signature bytes, canonical ABI encoding, and their source derivation. -/
+`TopupTx.scheduledDeposit`. `TopupTx.executeSourceDerived` now supplies the
+other executable plane: it takes `SourceDepositDataRootInput`s, rejects a
+missing/extra key or a gwei/root amount mismatch, and invokes
+`TopupTx.beaconPush` with canonical `deposit(bytes,bytes,bytes,bytes32)` ABI
+words whose root is `_computeDepositDataRootWithAmount` of that same input.
+Likewise the `allocateDeposits` journal now has selector, five-word head and
+canonical dynamic offsets/tails (including `bytes[]` element offsets).
+
+The planes have intentionally not been joined by a stronger premise: the
+registered parent has not yet derived its source-byte batch from the pinned
+router/top-up-gateway inputs, nor proved its module returndata corresponds to
+that batch. `TopupTx.scheduledDeposit_not_sourceDerived` remains the concrete
+counterexample for the legacy slice. Therefore this theorem is not an
+end-to-end TOPUP delivery claim. `A-TOPUP-BEACON-ADDRESS` also remains OPEN:
+the constructor's `_depositContract` assignment/deployment provenance is not
+modeled here. -/
 def VerityGuardedReturndataSimulation (cfg : SourceTopupConfig)
     (call : Verity.TopupTx.TopupCall) (state : Verity.ContractState) : Prop :=
   let before := Verity.TopupTx.entryFrame state

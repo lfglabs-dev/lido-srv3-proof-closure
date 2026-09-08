@@ -50,8 +50,8 @@ private def mutantPush (m : Mutation) (index amount : Nat) : Contract Unit :=
   | .misroutePush =>
       externalCallBindTo lidoAddress ((amount : Nat) : Uint256) [] "makeBeaconChainTopUp"
         ([((index : Nat) : Uint256), ((amount : Nat) : Uint256)] : List Uint256)
-  | .corruptAmount => beaconPush (scheduledDeposit index amount) (amount - 1)
-  | _ => beaconPush (scheduledDeposit index amount) amount
+  | .corruptAmount => scheduledBeaconPush (scheduledDeposit index amount) (amount - 1)
+  | _ => scheduledBeaconPush (scheduledDeposit index amount) amount
 
 /-- Sequence mutations of the push schedule `pushLoop` walks. -/
 private def mutantSchedule (m : Mutation) (allocations : List Nat) : List (Nat × Nat) :=
@@ -934,19 +934,19 @@ theorem dropped_over_target_guard_kill_line_refutes_parent :
 
 /-- Five-argument module-call witnesses plus the untrusted returndata. -/
 private def misalignedCall : TopupCall :=
-  { roundedTarget := 3000000000, pubkeys := [48], keyIndices := [0], operatorIds := [0],
+  { roundedTarget := 3000000000, pubkeys := [[48]], keyIndices := [0], operatorIds := [0],
     topUpLimits := [2000000000], moduleReturndata := [1000000001] }
 private def overLimitCall : TopupCall :=
-  { roundedTarget := 3000000000, pubkeys := [48], keyIndices := [0], operatorIds := [0],
+  { roundedTarget := 3000000000, pubkeys := [[48]], keyIndices := [0], operatorIds := [0],
     topUpLimits := [1000000000], moduleReturndata := [2000000000] }
 private def overLongCall : TopupCall :=
-  { roundedTarget := 5000000000, pubkeys := [48], keyIndices := [0], operatorIds := [0],
+  { roundedTarget := 5000000000, pubkeys := [[48]], keyIndices := [0], operatorIds := [0],
     topUpLimits := [2000000000], moduleReturndata := [1000000000, 1000000000] }
 private def overTargetCall : TopupCall :=
-  { roundedTarget := 1000000000, pubkeys := [48], keyIndices := [0], operatorIds := [0],
+  { roundedTarget := 1000000000, pubkeys := [[48]], keyIndices := [0], operatorIds := [0],
     topUpLimits := [3000000000], moduleReturndata := [2000000000] }
 private def honestCall : TopupCall :=
-  { roundedTarget := 3000000000, pubkeys := [48], keyIndices := [0], operatorIds := [0],
+  { roundedTarget := 3000000000, pubkeys := [[48]], keyIndices := [0], operatorIds := [0],
     topUpLimits := [2000000000], moduleReturndata := [1000000000] }
 
 /-- Single-edit mutations of the corrected executable transaction. -/

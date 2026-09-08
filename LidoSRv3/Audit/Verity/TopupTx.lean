@@ -122,7 +122,7 @@ def creditPull (total : Nat) : Contract Unit := fun state =>
 
 /-- Real external-call frame: one value-bearing beacon push.  The frame fails
 closed when the router cannot pay, so a push is gated on funds actually held. -/
-def beaconPush (deposit : BeaconDepositCall) (amount : Nat) : Contract Unit :=
+def scheduledBeaconPush (deposit : BeaconDepositCall) (amount : Nat) : Contract Unit :=
   -- BeaconChainDepositor.sol:106  _depositContract.deposit{value: amount}(pk, _withdrawalCredentials, dummySignature, depositDataRoot);
   externalCallBindTo beaconAddress (amount : Uint256) [] "deposit"
     ([(deposit.pubkey : Uint256), (deposit.withdrawalCredentials : Uint256),
@@ -130,7 +130,7 @@ def beaconPush (deposit : BeaconDepositCall) (amount : Nat) : Contract Unit :=
 
 /-- Compatibility schedule used by the allocation-only executable slice.  It
 is not a source of provenance or SSZ data.  The faithful call constructor is
-`beaconPush`, whose journal takes all four pinned deposit fields directly. -/
+`scheduledBeaconPush`, whose journal takes all four pinned deposit fields directly. -/
 def scheduledDeposit (index amount : Nat) : BeaconDepositCall :=
   { pubkey := index, withdrawalCredentials := 0, signature := 0,
     depositDataRoot := amount }
@@ -150,11 +150,9 @@ instead: `execute`/`executeGuarded` cannot be claimed to derive SSZ calldata
 until their input surface is extended with the source byte inputs and the
 withdrawal-credentials derivation. -/
 
-/-- A word-level commitment to a Solidity `bytes` argument for this model.
-Unlike `scheduledDeposit`, every field comes from the pinned-source input; the
-root is the source model's `_computeDepositDataRootWithAmount` result.  This is
-not canonical ABI encoding (dynamic bytes require offsets and byte layout), so
-it is only used to demonstrate the missing provenance boundary. -/
+/-- A word-level commitment to a Solidity `bytes` argument for the legacy
+word-journal.  It is retained only for the diagnostic counterexample below;
+the executable source-byte path uses `sourceBeaconCalldata` instead. -/
 def sourceByteCommitment (bytes : List Nat) : Nat :=
   bytes.foldl (fun acc byte => acc * 256 + byte) 0
 
@@ -162,7 +160,110 @@ def sourceDerivedDeposit (input : SourceDepositDataRootInput) : BeaconDepositCal
   { pubkey := sourceByteCommitment input.publicKey
     withdrawalCredentials := sourceByteCommitment input.withdrawalCredentials
     signature := sourceByteCommitment input.signature
-    depositDataRoot := sourceNode input }
+    depositDataRoot := sourceByteCommitment (computeDepositDataRootWithAmount input).bytes }
+
+/-! ### Source-byte beacon call plane
+
+The legacy `BeaconDepositCall` is a four-word observation and is intentionally
+not used below.  Solidity passes three dynamic `bytes` arguments to
+`IDepositContract.deposit`; the following encoding retains their bytes and the
+root bytes derived by `_computeDepositDataRootWithAmount`.
+
+`ExternalCall.calldata` is a word journal, so the selector occupies one
+distinguished journal word and every subsequent word is a 32-byte ABI word.
+This is an executable representation of the canonical ABI byte stream, not a
+projection to validator indices or allocation amounts. -/
+
+def abiWordOfBytes (bytes : List Nat) : Uint256 :=
+  let chunk := bytes.take 32
+  let padded : Nat := sourceByteCommitment chunk * 256 ^ (32 - chunk.length)
+  (padded : Uint256)
+
+def abiByteWords (bytes : List Nat) : List Uint256 :=
+  (List.range ((bytes.length + 31) / 32)).map
+    (fun index => abiWordOfBytes (bytes.drop (index * 32)))
+
+def abiBytesTail (bytes : List Nat) : List Uint256 :=
+  (bytes.length : Uint256) :: abiByteWords bytes
+
+/-- Canonical tail of a `bytes[]`: an array length, element offsets relative
+to the word after that length, then each length-and-padded-bytes element. -/
+def abiBytesArrayOffsets : List (List Uint256) → Nat → List Uint256
+  | [], _ => []
+  | tail :: tails, offset => (offset : Uint256) ::
+      abiBytesArrayOffsets tails (offset + tail.length * 32)
+
+def abiBytesArrayTail (values : List (List Nat)) : List Uint256 :=
+  let tails := values.map abiBytesTail
+  (values.length : Uint256) ::
+    abiBytesArrayOffsets tails (values.length * 32) ++ tails.flatten
+
+/-- `deposit(bytes,bytes,bytes,bytes32)` (the precompile interface at the
+pinned BeaconChainDepositor call site). -/
+def beaconDepositSelector : Uint256 := (0x22895118 : Uint256)
+
+/-- Canonical ABI words for the source call at `BeaconChainDepositor.sol:106`.
+The three head offsets are byte offsets from the first head word; the final
+head is the derived `bytes32` root. -/
+def sourceBeaconCalldata (input : SourceDepositDataRootInput) : List Uint256 :=
+  let pkTail := abiBytesTail input.publicKey
+  let wcTail := abiBytesTail input.withdrawalCredentials
+  let sigTail := abiBytesTail input.signature
+  let headBytes := 4 * 32
+  let pkOffset := headBytes
+  let wcOffset := pkOffset + pkTail.length * 32
+  let sigOffset := wcOffset + wcTail.length * 32
+  [beaconDepositSelector, (pkOffset : Uint256), (wcOffset : Uint256),
+    (sigOffset : Uint256),
+    abiWordOfBytes (computeDepositDataRootWithAmount input).bytes] ++
+    pkTail ++ wcTail ++ sigTail
+
+/-- Faithful beacon frame: all deposit arguments are read from one pinned
+source deposit input, and the root is computed from that same input. -/
+def beaconPush (input : SourceDepositDataRootInput) (amount : Nat) : Contract Unit :=
+  externalCallBindTo beaconAddress (amount : Uint256) [] "deposit"
+    (sourceBeaconCalldata input)
+
+/-- The source-byte beacon constructor does not consult the legacy allocation
+schedule.  In particular its three dynamic fields and computed root are
+definitionally those of the one source input supplied to the call. -/
+theorem beaconPush_binds_source_ssz_fields (input : SourceDepositDataRootInput)
+    (amount : Nat) :
+    beaconPush input amount =
+      externalCallBindTo beaconAddress (amount : Uint256) [] "deposit"
+        (sourceBeaconCalldata input) := rfl
+
+/-- `BeaconChainDepositor.sol:79-107` with its source-byte inputs retained.
+An allocation can reach `deposit` only when it has a corresponding source
+input and its source `amountGwei` is exactly the allocation divided by the
+pinned `1 gwei` unit.  Extra or missing keys fail closed, matching the
+source's array-length boundary rather than inventing a scheduled deposit. -/
+def sourcePushLoop : List SourceDepositDataRootInput → List Nat → Contract Unit
+  | [], [] => Verity.pure ()
+  | [], _ :: _ => require false "SourceDepositLengthMismatch"
+  | _ :: _, [] => require false "SourceDepositLengthMismatch"
+  | input :: inputs, amount :: amounts => do
+      require (decide (amount = input.amountGwei * 1000000000))
+        "SourceDepositAmountMismatch"
+      if amount = 0 then sourcePushLoop inputs amounts
+      else do
+        beaconPush input amount
+        sourcePushLoop inputs amounts
+
+/-- Source-derived executable value tail. This is deliberately separate from
+the allocation-only legacy `execute`: its deposit frames consume the source
+bytes and source-computed root, never `scheduledDeposit`. -/
+def executeSourceDerived (deposits : List SourceDepositDataRootInput)
+    (allocations : List Nat) (failure : FailurePoint) : Contract Unit := do
+  allocationStage allocations
+  require (decide (failure ≠ .afterAllocationWrite)) "FAIL_AFTER_ALLOCATION_WRITE"
+  let total := allocSumUnchecked allocations
+  if total = 0 then Verity.pure ()
+  else do
+    lidoPull total
+    creditPull total
+    require (decide (failure ≠ .afterLidoPull)) "FAIL_AFTER_LIDO_PULL"
+    sourcePushLoop deposits allocations
 
 private def nonzeroPubkeySourceInput : SourceDepositDataRootInput :=
   { withdrawalCredentials := List.replicate 32 0
@@ -220,7 +321,7 @@ def pushLoop (stopAfterFirst : Bool) : List Nat → Nat → Contract Unit
       if amount = 0 then pushLoop stopAfterFirst rest (index + 1)
       else do
         -- BeaconChainDepositor.sol:106  _depositContract.deposit{value: amount}(...)
-        beaconPush (scheduledDeposit index amount) amount
+        scheduledBeaconPush (scheduledDeposit index amount) amount
         -- Added by the model: failure hook after the first real frame.
         require (!stopAfterFirst) "FAIL_AFTER_FIRST_BEACON_PUSH"
         pushLoop stopAfterFirst rest (index + 1)
@@ -507,13 +608,13 @@ theorem lidoStub : externalCallStubSuccess "withdrawDepositableEther" = true := 
 by exactly the allocation, and the frame appends exactly `pushEntry`. -/
 theorem beaconPush_run (deposit : BeaconDepositCall) (amount : Nat) (state : ContractState)
     (hle : ((amount : Uint256)) ≤ state.selfBalance) :
-    beaconPush deposit amount state =
+    scheduledBeaconPush deposit amount state =
       ContractResult.success () { state with
         selfBalance := state.selfBalance - (amount : Uint256),
         calls := state.calls ++ [linkedCallEntryTo "deposit" beaconAddress (amount : Uint256)
           [(deposit.pubkey : Uint256), (deposit.withdrawalCredentials : Uint256),
             (deposit.signature : Uint256), (deposit.depositDataRoot : Uint256)]] } := by
-  simp [beaconPush, externalCallBindTo, hle, beaconStub, linkedCallEntryTo,
+  simp [scheduledBeaconPush, externalCallBindTo, hle, beaconStub, linkedCallEntryTo,
     linkedCallEntry, ExternalArg.toWords]
 
 /-- The zero-value pull frame always passes the balance check and appends
@@ -634,9 +735,9 @@ theorem pushLoop_reverts_of_insufficient (l : List Nat) :
           refine ⟨"insufficient balance", state, ?_⟩
           rw [pushLoop, if_neg ha]
           have hpush :
-              beaconPush (scheduledDeposit index a) a state =
+              scheduledBeaconPush (scheduledDeposit index a) a state =
                 ContractResult.revert "insufficient balance" state := by
-            simp [beaconPush, Contracts.externalCallBindTo, hle]
+            simp [scheduledBeaconPush, Contracts.externalCallBindTo, hle]
           simp only [Bind.bind, _root_.Verity.bind, hpush]
 
 /-- Pulling a word-sized wrapped total cannot fund allocations whose exact sum
@@ -954,7 +1055,7 @@ theorem execute_nonzero_wrap_witness_reverts (state : ContractState) :
   have hmod : Core.Uint256.modulus = uint256Modulus := by decide
   simp [execute, Contract.run, allocationStage, allocSumUnchecked,
     pushStage, Bind.bind, _root_.Verity.bind, _root_.Verity.require,
-    lidoPull_run, creditPull, pushLoop, beaconPush, externalCallBindTo,
+    lidoPull_run, creditPull, pushLoop, scheduledBeaconPush, externalCallBindTo,
     allocationPass_selfBalance, entryFrame, hmod, uint256Modulus]
 
 /-- The witness is observably a non-commit as well as a state rollback. -/
@@ -1090,8 +1191,8 @@ router must guard whatever it returns. -/
 structure TopupCall where
   /-- `smDepositableEthAmountRounded`. -/
   roundedTarget : Nat
-  /-- `_pubkeys`. -/
-  pubkeys : List Nat
+  /-- `_pubkeys`, retained as source ABI bytes rather than key-length words. -/
+  pubkeys : List (List Nat)
   /-- `_keyIndices`. -/
   keyIndices : List Nat
   /-- `_operatorIds`. -/
@@ -1101,21 +1202,41 @@ structure TopupCall where
   moduleReturndata : List Nat
   deriving Repr, DecidableEq
 
-/-- The journal represents dynamic ABI arguments by their length-prefixed word
-payload.  Thus all five source parameters remain distinct in the Verity call
-frame instead of collapsing to a key-count projection. -/
-def abiDynamic (xs : List Nat) : List Uint256 :=
+/-- Canonical tail of a dynamic `uint256[]`: its length followed by its ABI
+words.  Unlike the former flattened abstraction, offsets are emitted by
+`allocateCalldata` below. -/
+def abiUintArrayTail (xs : List Nat) : List Uint256 :=
   (xs.length : Uint256) :: xs.map (fun x => (x : Uint256))
 
-def allocateCalldata (call : TopupCall) : List Uint256 :=
-  [(call.roundedTarget : Uint256)] ++ abiDynamic call.pubkeys ++
-    abiDynamic call.keyIndices ++ abiDynamic call.operatorIds ++
-      abiDynamic call.topUpLimits
+/-- The four-byte selector for
+`allocateDeposits(uint256,bytes[],uint256[],uint256[],uint256[])`, derived
+from that pinned interface signature. It is retained as a distinguished leading
+journal word; the remaining list is the exact 32-byte-word ABI body. -/
+def allocateDepositsSelector : Uint256 := (0x783b8a65 : Uint256)
 
-theorem abiDynamic_calldata (xs : List Nat) :
-    (abiDynamic xs).map (·.val) =
+/-- Canonical ABI encoding for all five source arguments at
+`StakingRouter.sol:717-718`, including the selector, five-word head, dynamic
+offsets, `bytes[]` element offsets/lengths/padding, and three `uint256[]`
+tails. -/
+def allocateCalldata (call : TopupCall) : List Uint256 :=
+  let pubkeysTail := abiBytesArrayTail call.pubkeys
+  let keysTail := abiUintArrayTail call.keyIndices
+  let operatorsTail := abiUintArrayTail call.operatorIds
+  let limitsTail := abiUintArrayTail call.topUpLimits
+  let headBytes := 5 * 32
+  let pubkeysOffset := headBytes
+  let keysOffset := pubkeysOffset + pubkeysTail.length * 32
+  let operatorsOffset := keysOffset + keysTail.length * 32
+  let limitsOffset := operatorsOffset + operatorsTail.length * 32
+  [allocateDepositsSelector, (call.roundedTarget : Uint256),
+    (pubkeysOffset : Uint256), (keysOffset : Uint256),
+    (operatorsOffset : Uint256), (limitsOffset : Uint256)] ++
+    pubkeysTail ++ keysTail ++ operatorsTail ++ limitsTail
+
+theorem abiUintArrayTail_calldata (xs : List Nat) :
+    (abiUintArrayTail xs).map (·.val) =
       (xs.length : Uint256).val :: xs.map (fun x => (x : Uint256).val) := by
-  simp [abiDynamic]
+  simp [abiUintArrayTail]
 
  /-- The journalled five-argument `allocateDeposits` frame. -/
 def allocateEntry (call : TopupCall) : ExternalCall :=
