@@ -1307,11 +1307,14 @@ theorem beaconPush_binds_source_ssz_fields (call : TopupCall) (pk : List Nat)
     (hpkLen : pk.length = 48) (hpk : ∀ b ∈ pk, b < 256)
     (hamount : amount < uint256Modulus) :
     let input := sourceDepositInput call pk amount hwcLen ht hwc hpk hamount
-    PinnedMakeBeaconChainTopUpFields call pk amount input ∧
+    beaconPush input amount =
+        externalCallBindTo beaconAddress (amount : Uint256) [] "deposit"
+          (sourceBeaconCalldata input) ∧
+      PinnedMakeBeaconChainTopUpFields call pk amount input ∧
       input.withdrawalCredentials.length = 32 ∧
       input.publicKey.length = 48 ∧ input.signature.length = 96 := by
   dsimp [PinnedMakeBeaconChainTopUpFields, sourceDepositInput]
-  refine ⟨⟨rfl, rfl, ?_, rfl, ?_⟩,
+  refine ⟨rfl, ⟨rfl, rfl, ?_, rfl, ?_⟩,
     routerWithdrawalCredentials_length call hwcLen, hpkLen, ?_⟩
   · simp [dummySignature]
   · exact (computeDepositDataRootWithAmount
@@ -1341,6 +1344,38 @@ def sourceDeposits (call : TopupCall) (h : SourceTopupCallWellFormed call) :
     ((pubkeysPinned_iff call.pubkeys).mp h.2.2.2.1)
     (by simpa using h.2.2.2.2.2) h.1 h.2.1
     ((bytesBounded_iff call.routerWithdrawalCredentials).mp h.2.2.1)
+
+theorem sourceDepositsOf_length (call : TopupCall) :
+    ∀ (pubkeys : List (List Nat)) (amounts : List Nat)
+      (hpks : ∀ pk ∈ pubkeys, pk.length = 48 ∧ ∀ b ∈ pk, b < 256)
+      (hamounts : ∀ amount ∈ amounts, amount < uint256Modulus)
+      (hwcLen : call.routerWithdrawalCredentials.length = 32)
+      (ht : call.withdrawalCredentialsType < 256)
+      (hwc : ∀ b ∈ call.routerWithdrawalCredentials, b < 256),
+      pubkeys.length = amounts.length →
+      (sourceDepositsOf call pubkeys amounts hpks hamounts hwcLen ht hwc).length =
+        pubkeys.length := by
+  intro pubkeys
+  induction pubkeys with
+  | nil => intro amounts hpks hamounts hwcLen ht hwc hlen; simp [sourceDepositsOf]
+  | cons pk pks ih =>
+      intro amounts hpks hamounts hwcLen ht hwc hlen
+      cases amounts with
+      | nil => simp at hlen
+      | cons amount amounts =>
+          have htail : pks.length = amounts.length := by simpa using hlen
+          simp only [sourceDepositsOf, List.length_cons]
+          simpa using ih amounts (fun key hkey => hpks key (by simp [hkey]))
+            (fun value hvalue => hamounts value (by simp [hvalue])) hwcLen ht hwc htail
+
+theorem sourceDeposits_length (call : TopupCall) (h : SourceTopupCallWellFormed call) :
+    (sourceDeposits call h).length = call.moduleReturndata.length := by
+  rw [← h.2.2.2.2.1]
+  exact sourceDepositsOf_length call call.pubkeys call.moduleReturndata
+    ((pubkeysPinned_iff call.pubkeys).mp h.2.2.2.1)
+    (by simpa using h.2.2.2.2.2) h.1 h.2.1
+    ((bytesBounded_iff call.routerWithdrawalCredentials).mp h.2.2.1)
+    h.2.2.2.2.1
 
 /-- Canonical tail of a dynamic `uint256[]`: its length followed by its ABI
 words.  Unlike the former flattened abstraction, offsets are emitted by
