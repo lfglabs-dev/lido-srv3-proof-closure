@@ -810,7 +810,7 @@ structure CalleeEffects where
 
 private theorem forall2_le_index :
     ∀ (xs ys : List Nat), List.Forall₂ (· ≤ ·) xs ys →
-      ∀ i a lim, xs[i]? = some a → ys[i]? = some lim → a ≤ lim
+      ∀ (i : Nat) (a lim : Nat), xs[i]? = some a → ys[i]? = some lim → a ≤ lim
   | _, _, .nil, _, _, _, ha, _ => by simp at ha
   | _, _, .cons hHead hTail, 0, _, _, ha, hlim => by
       simp at ha hlim; rw [← ha, ← hlim]; exact hHead
@@ -818,7 +818,7 @@ private theorem forall2_le_index :
       forall2_le_index _ _ hTail i a lim (by simpa using ha) (by simpa using hlim)
 
 theorem calleeEffects_per_index_bound (eff : CalleeEffects) :
-    ∀ i : Nat, ∀ a lim : Nat,
+    ∀ (i : Nat) (a lim : Nat),
       eff.result.allocations[i]? = some a →
       eff.args.topUpLimits[i]? = some lim →
       a ≤ lim :=
