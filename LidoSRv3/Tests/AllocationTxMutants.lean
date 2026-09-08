@@ -90,6 +90,38 @@ private def summaryBytes (exited deposited depositable : Nat) : List Nat :=
   List.replicate 31 0 ++ [deposited] ++
   List.replicate 31 0 ++ [depositable]
 
+/-- A concrete honest transcript for the two type-1 rows.  The test below
+uses the live entry point rather than the legacy planted-summary sibling. -/
+private def liveSummaryAdversary :
+    Compiler.CompilationModel.DenoteExternalCalls.AdversaryModel :=
+  { stateTransition := fun _ world => world
+    result := fun _ _ => .success (summaryBytes 0 10 90)
+    gasUsed := fun _ _ => 0 }
+
+private def liveState : ContractState :=
+  (stateFor modules).writeSlot modulesCountSlot (w 2)
+
+/- The rollback path is executable at the live storage/call entry point.
+Before `Contract.run` restores `liveState`, the injected branch contains the
+allocation and capacity arrays, bound addresses, and total written after both
+live summary decodes. -/
+#guard match (allocateLiveFromStorage liveSummaryAdversary cfg (w 10) false true) liveState with
+  | .revert "INJECTED_AFTER_WRITES" dirty =>
+      dirty.readArray allocationSlot == [w 10, w 10] &&
+      dirty.readArray capacitySlot == [w 15, w 15] &&
+      dirty.readArray boundAddressSlot == [w 17, w 18] &&
+      dirty.readSlot totalSlot == w 30 &&
+      dirty.readArray allocationSlot != liveState.readArray allocationSlot
+  | _ => false
+
+#guard match (allocateLiveFromStorage liveSummaryAdversary cfg (w 10) false true).run liveState with
+  | .revert "INJECTED_AFTER_WRITES" rollback =>
+      rollback.readArray allocationSlot == liveState.readArray allocationSlot &&
+      rollback.readArray capacitySlot == liveState.readArray capacitySlot &&
+      rollback.readArray boundAddressSlot == liveState.readArray boundAddressSlot &&
+      rollback.readSlot totalSlot == liveState.readSlot totalSlot
+  | _ => false
+
 /-- Decoder mutant: swap the first two ABI return words. -/
 private def decodeSummarySwapped (data : List Nat) : Option DecodedSummary :=
   if 96 ≤ data.length then
