@@ -42,3 +42,16 @@ was added.
   `git diff --quiet 60a5bca6 HEAD -- '*.yml' '*.yaml'`.
 - Confirm linear history with
   `test "$(git rev-list --min-parents=2 60a5bca6..HEAD)" = ""`.
+
+## Validation outcome
+
+`lake build` was submitted by durable job
+`8e7c8f71-8a67-40f2-a90d-b2e9f61feed0` at integrated commit
+`bfdc845f`. The remote builder rejected the request before compilation with
+HTTP 422: 257 GiB was available, but the requested 12 GiB plus the 250 GiB
+emergency floor required 262 GiB. This is an infrastructure rejection, not a
+passing build receipt.
+
+The metadata gate completed successfully with
+`python3 scripts/audit_metadata.py check` and reported 11 canonical guarantees
+plus 19 subordinate evidence rows.
