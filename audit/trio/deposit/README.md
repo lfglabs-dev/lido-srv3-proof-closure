@@ -7,7 +7,9 @@ Pinned Solidity source: `lidofinance/core@17005714f151e5502c559932319a3f2f74ac24
 
 This first slice consumes the accepted ABI parent, keeps the independently
 returned deposit-key link explicit, and derives Lido-pull and beacon-push values
-with their distinct source units. It accepts the documented trio limitations
+with their distinct source units. The residual link proves that the Lido pull is
+bounded by the selected ALLOC output; it is not a decorative composition premise.
+It accepts the documented trio limitations
 and does not claim compiler-memory, deployed-bytecode, or deployment identity.
 
 Pinned constructor source admits arbitrary nonzero caller-supplied values. The

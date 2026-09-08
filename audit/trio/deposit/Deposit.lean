@@ -85,12 +85,18 @@ theorem linked_values (allocation : ParentOutput) (config : TrioAlloc1.Config)
     (selection : SelectedAllocation allocation moduleIndex)
     (_link : LinksSource config moduleData selection) :
     let values := composeValues selection.selected config moduleData depositSize
-    values.selectedAllocationWei = selection.selected.val ∧
+    values.lidoPullWei ≤ values.selectedAllocationWei ∧
+      values.selectedAllocationWei = selection.selected.val ∧
       values.actualKeys = moduleData.actualKeys ∧
       values.lidoPullWei = moduleData.actualKeys * config.maxEBType1.val ∧
       values.beaconPerKeyWei = depositSize ∧
       values.beaconTotalWei = moduleData.actualKeys * depositSize := by
-  simp [composeValues]
+  dsimp [composeValues]
+  constructor
+  · exact Nat.le_trans
+      (Nat.mul_le_mul_right config.maxEBType1.val _link.moduleReturnWithinTarget)
+      (Nat.div_mul_le_self selection.selected.val config.maxEBType1.val)
+  · simp
 
 /-- Consume the accepted ABI success without strengthening it. The module-key
 link remains caller-supplied because the module call occurs afterwards. -/
@@ -100,14 +106,20 @@ theorem abi_success_composes_deposit_values
     (amount : Word) (before after : TrioAlloc1.Transcript)
     (allocation : ParentOutput) (moduleIndex : Nat)
     (moduleData : ModuleDepositData) (depositSize : Nat)
-    (_executed : getDepositAllocationsABI layout storage oracle config amount false before =
+    (executed : getDepositAllocationsABI layout storage oracle config amount false before =
       (.ok allocation, after))
     (selection : SelectedAllocation allocation moduleIndex)
     (_link : LinksSource config moduleData selection) :
-    (composeValues selection.selected config moduleData depositSize).lidoPullWei =
-        moduleData.actualKeys * config.maxEBType1.val ∧
+    getDepositAllocationsABI layout storage oracle config amount false before =
+        (.ok allocation, after) ∧
+      allocation.allocated[moduleIndex]? = some selection.selected ∧
+      (composeValues selection.selected config moduleData depositSize).lidoPullWei ≤
+        selection.selected.val ∧
       (composeValues selection.selected config moduleData depositSize).beaconTotalWei =
         moduleData.actualKeys * depositSize := by
-  simp [composeValues]
+  refine ⟨executed, selection.selected_eq, ?_, by simp [composeValues]⟩
+  exact Nat.le_trans
+    (Nat.mul_le_mul_right config.maxEBType1.val _link.moduleReturnWithinTarget)
+    (Nat.div_mul_le_self selection.selected.val config.maxEBType1.val)
 
 end audit.trio.deposit

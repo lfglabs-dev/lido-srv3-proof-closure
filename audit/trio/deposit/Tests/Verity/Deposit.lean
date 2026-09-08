@@ -16,7 +16,8 @@ def link : LinksSource config moduleData selection where
   moduleReturnWithinTarget := by native_decide
 
 example :
-    (composeValues selection.selected config moduleData 32).lidoPullWei = 64 ∧
+    (composeValues selection.selected config moduleData 32).lidoPullWei ≤
+      (composeValues selection.selected config moduleData 32).selectedAllocationWei ∧
     (composeValues selection.selected config moduleData 32).beaconTotalWei = 64 := by
   native_decide
 
