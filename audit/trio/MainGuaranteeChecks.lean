@@ -1,3 +1,5 @@
+import LidoSRv3.Audit.Verity.AllocationTx
+import LidoSRv3.Audit.Source.TrioComposition.CacheStores
 import LidoSRv3.Audit.Source.TrioAlloc1.CapacitySpec
 import LidoSRv3.Audit.Source.TrioAlloc1.Determinism
 import LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer
@@ -20,3 +22,5 @@ import LidoSRv3.Audit.Source.TrioReserve1.WithdrawalSpec
 #print axioms LidoSRv3.Audit.Source.TrioReserve1.PhysicalReserve.success_preserves
 #print axioms LidoSRv3.Audit.Source.TrioComposition.ReserveLeafSpend.withdrawal_corresponds
 #print axioms LidoSRv3.Audit.Source.TrioReserve1.WithdrawalSpec.failure_restores
+
+#print axioms LidoSRv3.Audit.Verity.AllocationTx.live_injected_after_writes_rolls_back

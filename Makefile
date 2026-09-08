@@ -35,6 +35,7 @@ check: test
 test:
 	@bash scripts/test_minfirst_source_differential.sh
 	@python3 scripts/test_minfirst_guard_mutation.py
+	@python3 scripts/test_cache_store_mutations.py
 	@python3 scripts/audit_metadata.py check
 	@python3 scripts/generate_ux2.py check
 	@python3 scripts/check_assumption_presentation.py
