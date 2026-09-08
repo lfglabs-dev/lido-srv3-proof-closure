@@ -35,10 +35,12 @@ check: test
 test:
 	@bash scripts/test_minfirst_source_differential.sh
 	@python3 scripts/test_minfirst_guard_mutation.py
+	@python3 scripts/test_cache_store_mutations.py
 	@python3 scripts/audit_metadata.py check
 	@python3 scripts/generate_ux2.py check
 	@python3 scripts/check_assumption_presentation.py
 	@python3 scripts/test_ux2.py
+	@python3 scripts/test_main_guarantees.py
 	@python3 scripts/check_python_quality.py
 	@python3 scripts/test_python_quality.py
 	@python3 scripts/test_gfm_table.py
@@ -65,6 +67,7 @@ test:
 	@python3 scripts/check_pinned_source.py >/dev/null && printf '%s\n' 'pinned source ok: cited Solidity spans and inline citations exist in lido-core at the pin'
 	@python3 scripts/check_source_annotations.py
 	@lake build LidoSRv3Test
+	@lake build AccountAddressChecks
 	@printf '%s\n' 'LidoSRv3Test: mutants, vectors, nested Verity tests, and regressions compiled'
 	@test -s fixtures/solidity-reference/stakingRouter.getDepositAllocations.test.ts
 	@test -s fixtures/solidity-reference/stakingRouter.rewards.test.ts

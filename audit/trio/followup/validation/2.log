@@ -3403,3 +3403,4 @@ warning: LidoSRv3/Legacy/SpecProofs.lean:1631:2: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
 Build completed successfully (1607 jobs).
+proof report written to proofs/logs/proof-report.json

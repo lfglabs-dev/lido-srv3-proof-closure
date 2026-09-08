@@ -21,6 +21,17 @@
         "A-RUNTIME-PROVENANCE": "We assume the deployed contracts and proxy implementations correspond to the pinned source."
       },
       "mitigation": "The verification guide provides external checks of implementation addresses, on-chain code and verified source bundles. Its --recompile option prints instructions; it does not run a local compilation. Compiler correctness remains trusted."
+    },
+    {
+      "id": "deployment-constants",
+      "title": "The configured addresses and deposit amounts match the deployment.",
+      "parts": {
+        "A-DEPOSIT-CONTRACT": "We assume the configured deposit recipient is the deployed beacon deposit contract.",
+        "A-TOPUP-BEACON-ADDRESS": "We assume the configured top-up recipient is the deployed beacon deposit contract.",
+        "A-CANONICAL-REQUEST-ADDRESS": "We assume the configured consolidation request target matches the canonical deployed predeploy.",
+        "A-DEPOSIT-32-ETHER": "We assume both per-validator deposit amounts equal 32 ETH in the deployment."
+      },
+      "mitigation": "Compare constructor arguments and immutables with deployment artifacts. The verification guide does not establish all of these identities; matching the amounts alone does not identify the recipient."
     }
   ]
 }

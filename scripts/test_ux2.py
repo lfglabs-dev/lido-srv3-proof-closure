@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """Negative regressions for the UX2 per-guarantee artifact generator."""
-
 from __future__ import annotations
 
 import contextlib
@@ -19,6 +18,7 @@ import check_proof_escapes  # noqa: E402  (sibling module, located above)
 import generate_ux2  # noqa: E402  (sibling module, located above)
 
 FILES = (
+    "audit/trio/main-guarantees.json",
     "README.md",
     "lean-toolchain",
     "lakefile.lean",

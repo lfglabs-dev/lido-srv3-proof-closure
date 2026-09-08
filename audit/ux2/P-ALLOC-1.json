@@ -1,5 +1,84 @@
 {
   "schema": "lido-srv3-ux2-guarantee-v1",
+  "main_result": {
+    "description": "The modeled router calculates each active module’s capacity from its target share and available headroom. Inactive modules receive no additional capacity. For successful execution under the stated storage, memory and arithmetic conditions, the resulting allocation and capacity lists match the independent mathematical specification.",
+    "model": "Source execution model with a Verity external-call interpretation",
+    "theorems": [
+      {
+        "plane": "source",
+        "role": "registered main source-model result (audit/trio/main-guarantees.json)",
+        "status": "CHECKED",
+        "name": "LidoSRv3.Audit.Source.TrioAlloc1.Relational.producer_iff",
+        "module": "LidoSRv3.Audit.Source.TrioAlloc1.Determinism",
+        "file": "LidoSRv3/Audit/Source/TrioAlloc1/Determinism.lean",
+        "start_line": 203,
+        "end_line": 206,
+        "doc": "/-- Exact two-way correspondence at the SOURCE helper layer, for success and error.\nThe actual Solidity compiler/memory and Verity refinement obligations remain separate. -/",
+        "statement": "theorem producer_iff (l : Layout) (storage : Storage) (oracle : StaticOracle) (input : CapacityInput)\n    (before after : Transcript) (result : CapacityResult) :\n    Producer l storage oracle input before result after ↔\n      produce l storage oracle input before = (result, after)"
+      },
+      {
+        "plane": "source",
+        "role": "registered main source-model result (audit/trio/main-guarantees.json)",
+        "status": "CHECKED",
+        "name": "LidoSRv3.Audit.Source.TrioAlloc1.producer_math_view",
+        "module": "LidoSRv3.Audit.Source.TrioAlloc1.CapacitySpec",
+        "file": "LidoSRv3/Audit/Source/TrioAlloc1/CapacitySpec.lean",
+        "start_line": 177,
+        "end_line": 185,
+        "doc": "",
+        "statement": "theorem producer_math_view (l : Layout) (s : Storage) (oracle : StaticOracle)\n    (input : CapacityInput) (before after : Transcript) (output : CapacityOutput)\n    (h : produce l s oracle input before = (.ok output, after)) :\n    ∃ rows total middle,\n      firstLoop l s oracle input (s (countSlot l)).val 0 input.depositsToAllocate before =\n        (.ok (rows, total), middle) ∧\n      total.val = input.depositsToAllocate.val + (rows.map (fun r => r.allocation.val)).sum ∧\n      output.capacities.map Fin.val = rows.map (CapacitySpec.capacity input total) ∧\n      RouterOrderRelated (routerOrder l s) output"
+      },
+      {
+        "plane": "source",
+        "role": "registered main source-model result (audit/trio/main-guarantees.json)",
+        "status": "CHECKED",
+        "name": "LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredProducer.success",
+        "module": "LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredProducer",
+        "file": "LidoSRv3/Audit/Source/TrioComposition/FinalMemoryStoredProducer.lean",
+        "start_line": 270,
+        "end_line": 278,
+        "doc": "/-- A successful actual execution supplies the original execution and physical\narray pointer relation, with separation and finite extents derived here. -/",
+        "statement": "theorem success (memory : MemoryWords) (pointer : Word) (l : Layout) (s : Storage)\n    (oracle : StaticOracle) (input : CapacityInput) (before after : Transcript) (out : Output)\n    (executed : CallTree.evaluate oracle (producer memory pointer l s input) before = (.ok out,after))\n    (hc : (s (countSlot l)).val ≤ 32)\n    (space : pointer.val+1120*(s (countSlot l)).val+448 ≤ 2^32) :\n    produce l s oracle input before = (.ok out.produced,after) ∧\n    MemoryArraysRelated out.memory out.allocationPointer.val out.capacityPointer.val out.produced ∧\n    out.allocationPointer = allocationPointer pointer ∧\n    out.capacityPointer = capacityPointer pointer l s ∧ out.pointer = finalPointer pointer l s"
+      },
+      {
+        "plane": "source",
+        "role": "registered main source-model result (audit/trio/main-guarantees.json)",
+        "status": "CHECKED",
+        "name": "LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.world_producer_correspondence",
+        "module": "LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer",
+        "file": "LidoSRv3/Audit/Source/TrioAlloc1/VerityProducer.lean",
+        "start_line": 75,
+        "end_line": 80,
+        "doc": "",
+        "statement": "theorem world_producer_correspondence (l : Layout) (input : CapacityInput)\n    (adversary : DenoteExternalCalls.AdversaryModel) (state : DenoteExternalCalls.CallState)\n    (before : Transcript) :\n    (executeWorld l input adversary state before).1 =\n      produce l (worldStorage state.world) (sourceOracle adversary state.world) input before ∧\n    (executeWorld l input adversary state before).2.world = state.world"
+      }
+    ],
+    "covered": [
+      "Storage-backed module reads, response-dependent calls and checked calculations follow the modeled source order.",
+      "Successful capacity calculations match the independent capacity specification and produce the corresponding memory arrays.",
+      "The Verity call interpreter matches the producer’s return or error and module-call observations; static calls preserve its world."
+    ],
+    "missing": [
+      "The compiler interpretation of memory operations and the effects of omitted internal writes remain assumptions.",
+      "The bound of 32 modules is derived only for the modeled initialization and update histories; migration and other histories remain outside that result.",
+      "The result does not establish equivalence with compiled or deployed bytecode."
+    ],
+    "conditions": [
+      "Compiler interpretation of aligned, non-overlapping observed word loads/stores and copies; omitted private cache/configuration/scratch writes obey the stated frame and cache-field relations.",
+      "Configured linked library identity, storage/hash interpretation, entry pointer provenance and primitive crypto/consensus bindings are explicit; general compiled/deployed-code and gas verification are excluded.",
+      "count <=32; pointer +1184*count+704 <=2^32, or modeled initialization/writer history with pointer <=2^31 and finite storage separation; migration and other writer histories excluded."
+    ],
+    "assumptions": [
+      "A-SOURCE-SHAPED",
+      "A-VERITY-SCAFFOLD",
+      "A-SOLC-TRUSTED",
+      "A-RUNTIME-PROVENANCE"
+    ],
+    "outside": [
+      "Compiled and deployed bytecode, gas costs and full consensus-state truth.",
+      "Distribution of the produced lists is covered by the composed P-ALLOC-2 result under its own conditions."
+    ]
+  },
   "id": "P-ALLOC-1",
   "position": 1,
   "summary": "checked_execute: under CheckedBounds the source executor succeeds and its capacity column equals MathView. The named capacity kill-line remains parent-shaped; active_capacity_bounded remains an unregistered Nat.min child. Verity: allocateLiveFromStorage reads and 32-caps the router count, decodes packed ModuleStateConfig fields, executes the source-derived mapped getStakingModuleSummary staticcall for each row, decodes the 96-byte (exited, deposited, depositable) ABI tuple, and for type-2 rows executes the distinct pinned getTotalModuleStake staticcall (selector 0x0c852f5c) and fail-closed 32-byte uint256 decode before allocation. It persists the computed arrays, and observe equals sourceView when those adversarial call observations decode to the expected source rows. Reachable-router CheckedBounds remains explicitly open.",

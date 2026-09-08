@@ -1,0 +1,48 @@
+{
+  "validatedCommit": "541f468f36f0b8f188bda0b8fc799b5e5806985e",
+  "status": "passed",
+  "started": 1788856538.4906912,
+  "commands": [
+    "lake build LidoSRv3 LidoSRv3Test LidoSRv3Audit TrioIntegrationChecks",
+    "make prove",
+    "make test",
+    "lake env lean --run audit/trio/alloc1/RunVerityVectors.lean",
+    "lake env lean --run audit/trio/integration/RunVerityParent.lean"
+  ],
+  "results": [
+    {
+      "command": "lake build LidoSRv3 LidoSRv3Test LidoSRv3Audit TrioIntegrationChecks",
+      "exitCode": 0,
+      "seconds": 4.712626934051514
+    },
+    {
+      "command": "make prove",
+      "exitCode": 0,
+      "seconds": 3.11152720451355
+    },
+    {
+      "command": "make test",
+      "exitCode": 0,
+      "seconds": 1639.3157360553741
+    },
+    {
+      "command": "lake env lean --run audit/trio/alloc1/RunVerityVectors.lean",
+      "exitCode": 0,
+      "seconds": 61.351743936538696
+    },
+    {
+      "command": "lake env lean --run audit/trio/integration/RunVerityParent.lean",
+      "exitCode": 0,
+      "seconds": 14.134648084640503
+    }
+  ],
+  "exitCode": 0,
+  "finished": 1788858261.186931,
+  "logs": {
+    "1.log": "8ce9d1e5651cf3d709a9b9cf8802326c448eae5d361cc8c50903c20bfdf51930",
+    "2.log": "698de36b74b42b0b8a5f2a60ea667b1d3faa399f315d80de33da53654ef3316b",
+    "3.log": "27d07d56945e797c4b11999c31132aaf0e7943d155fd26a315a0344c0253bd3d",
+    "4.log": "9d1e60f8deaef5e21c5dd4aedb7ccd2f6753c4119d3309cc23006d07e3bfbd8a",
+    "5.log": "7d4659218d9127ac916d0deb8f9a521bd11c4e2ceb8c22f006e14ad1b7a04102"
+  }
+}
