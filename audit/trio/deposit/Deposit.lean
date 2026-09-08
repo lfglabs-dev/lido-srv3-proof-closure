@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Source.TrioComposition.ParentABI
+import LidoSRv3.Audit.Source.TrioAlloc1.ShareWriter
 
 /-! First DEPOSIT-1 composition slice over the accepted ALLOC-1/ALLOC-2 ABI.
 Pinned source: lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436,
@@ -45,10 +46,24 @@ theorem pinned_constructor_does_not_discharge_artifact_identities :
         canonicalDepositContract := by native_decide
     exact wrong h.A_DEPOSIT_CONTRACT
 
-/-- Deposit data independently returned by the selected staking module. -/
+/-- Deposit data independently returned by the selected staking module.  The
+key count is deliberately not stored: the deposit entry point derives it from
+the returned byte length after the 48-byte alignment guard. -/
 structure ModuleDepositData where
-  actualKeys : Nat
+  publicKeysBatchLength : Nat
   deriving DecidableEq, Repr
+
+/-- Named per-module limit read by `StakingRouter.deposit` before the call. -/
+structure DepositLimits where
+  maxDepositsPerBlock : Nat
+  deriving DecidableEq, Repr
+
+/-- `StakingRouter.PUBKEY_LENGTH`, pinned at source line 57. -/
+def pubkeyLength : Nat := 48
+
+/-- Executable boundary for `IStakingModule.obtainDepositData(target, data)`.
+The argument is the actual `maxDepositsCount` sent by the router. -/
+abbrev ObtainDepositData := Nat → Except Failure ModuleDepositData
 
 /-- Source-shaped values at the ALLOC/deposit join. -/
 structure DepositValues where
@@ -60,66 +75,122 @@ structure DepositValues where
   deriving DecidableEq, Repr
 
 def composeValues (selected : Word) (config : TrioAlloc1.Config)
-    (moduleData : ModuleDepositData) (depositSize : Nat) : DepositValues :=
+    (actualKeys depositSize : Nat) : DepositValues :=
   { selectedAllocationWei := selected.val
-    actualKeys := moduleData.actualKeys
-    lidoPullWei := moduleData.actualKeys * config.maxEBType1.val
+    actualKeys := actualKeys
+    lidoPullWei := actualKeys * config.maxEBType1.val
     beaconPerKeyWei := depositSize
-    beaconTotalWei := moduleData.actualKeys * depositSize }
+    beaconTotalWei := actualKeys * depositSize }
+
+/-- `SRUtils._getModuleIndexById`: load the one-based inner position and
+subtract one with Solidity checked arithmetic. -/
+def getModuleIndexById (layout : TrioAlloc1.Layout) (storage : TrioAlloc1.Storage)
+    (moduleId : Word) : Except Failure Word :=
+  checkedSub (storage (TrioAlloc1.ShareWriter.modulePositionSlot layout moduleId)).val 1
 
 /-- A data-carrying selection from the ALLOC router-order output. -/
-structure SelectedAllocation (allocation : ParentOutput) (moduleIndex : Nat) where
+structure SelectedAllocation (layout : TrioAlloc1.Layout) (storage : TrioAlloc1.Storage)
+    (allocation : ParentOutput) (moduleId : Word) where
+  moduleIndex : Word
+  moduleIndex_eq : getModuleIndexById layout storage moduleId = .ok moduleIndex
   selected : Word
-  selected_eq : allocation.allocated[moduleIndex]? = some selected
+  selected_eq : allocation.allocated[moduleIndex.val]? = some selected
 
-/-- Residual source link. ALLOC supplies the selected maximum; the later module
-call independently supplies `actualKeys`. No post-state conclusion is assumed. -/
-structure LinksSource (config : TrioAlloc1.Config) (moduleData : ModuleDepositData)
-    (selection : SelectedAllocation allocation moduleIndex) : Prop where
-  nonzeroUnit : config.maxEBType1.val ≠ 0
-  moduleReturnWithinTarget :
-    moduleData.actualKeys ≤ selection.selected.val / config.maxEBType1.val
+/-- Deposit-specific failures after the accepted ALLOC parent. -/
+inductive DepositFailure where
+  | allocation (reason : Failure)
+  | moduleIndex (reason : Failure)
+  | allocationIndexOutOfBounds
+  | divisionByZero
+  | zeroDeposits
+  | moduleCall (reason : Failure)
+  | wrongPubkeyLength
+  | moduleReturnExceedTarget
+  deriving DecidableEq, Repr
 
-theorem linked_values (allocation : ParentOutput) (config : TrioAlloc1.Config)
-    (moduleIndex : Nat) (moduleData : ModuleDepositData) (depositSize : Nat)
-    (selection : SelectedAllocation allocation moduleIndex)
-    (_link : LinksSource config moduleData selection) :
-    let values := composeValues selection.selected config moduleData depositSize
-    values.lidoPullWei ≤ values.selectedAllocationWei ∧
-      values.selectedAllocationWei = selection.selected.val ∧
-      values.actualKeys = moduleData.actualKeys ∧
-      values.lidoPullWei = moduleData.actualKeys * config.maxEBType1.val ∧
-      values.beaconPerKeyWei = depositSize ∧
-      values.beaconTotalWei = moduleData.actualKeys * depositSize := by
-  dsimp [composeValues]
-  constructor
-  · exact Nat.le_trans
-      (Nat.mul_le_mul_right config.maxEBType1.val _link.moduleReturnWithinTarget)
-      (Nat.div_mul_le_self selection.selected.val config.maxEBType1.val)
-  · simp
+def maxDepositsCount (limits : DepositLimits) (selected : Word)
+    (config : TrioAlloc1.Config) : Except DepositFailure Nat :=
+  if config.maxEBType1.val = 0 then .error .divisionByZero
+  else .ok (min limits.maxDepositsPerBlock
+    (selected.val / config.maxEBType1.val))
 
-/-- Consume the accepted ABI success without strengthening it. The module-key
-link remains caller-supplied because the module call occurs afterwards. -/
+/-- Source-ordered execution through the module-return guard.  In particular,
+this function executes both the delivered ALLOC ABI and `obtainDepositData`;
+successful `DepositValues` are not assembled from an assumed link. -/
+def depositValuesABI
+    (layout : TrioAlloc1.Layout) (storage : TrioAlloc1.Storage)
+    (oracle : TrioAlloc1.StaticOracle) (config : TrioAlloc1.Config)
+    (amount : Word) (before : TrioAlloc1.Transcript) (moduleId : Word)
+    (limits : DepositLimits) (obtainDepositData : ObtainDepositData)
+    (depositSize : Nat) : Except DepositFailure DepositValues × TrioAlloc1.Transcript :=
+  match getDepositAllocationsABI layout storage oracle config amount false before with
+  | (.error reason, after) => (.error (.allocation reason), after)
+  | (.ok allocation, after) =>
+    match getModuleIndexById layout storage moduleId with
+    | .error reason => (.error (.moduleIndex reason), after)
+    | .ok moduleIndex =>
+      match allocation.allocated[moduleIndex.val]? with
+      | none => (.error .allocationIndexOutOfBounds, after)
+      | some selected =>
+        match maxDepositsCount limits selected config with
+        | .error reason => (.error reason, after)
+        | .ok target =>
+          if target = 0 then (.error .zeroDeposits, after)
+          else match obtainDepositData target with
+          | .error reason => (.error (.moduleCall reason), after)
+          | .ok moduleData =>
+            if moduleData.publicKeysBatchLength % pubkeyLength ≠ 0 then
+              (.error .wrongPubkeyLength, after)
+            else
+              let actualKeys := moduleData.publicKeysBatchLength / pubkeyLength
+              if actualKeys > target then (.error .moduleReturnExceedTarget, after)
+              else (.ok (composeValues selected config actualKeys depositSize), after)
+
+/-- A successful execution derives the pull bound from the source cap and the
+post-call over-target guard. -/
 theorem abi_success_composes_deposit_values
     (layout : TrioAlloc1.Layout) (storage : TrioAlloc1.Storage)
     (oracle : TrioAlloc1.StaticOracle) (config : TrioAlloc1.Config)
     (amount : Word) (before after : TrioAlloc1.Transcript)
-    (allocation : ParentOutput) (moduleIndex : Nat)
-    (moduleData : ModuleDepositData) (depositSize : Nat)
-    (executed : getDepositAllocationsABI layout storage oracle config amount false before =
-      (.ok allocation, after))
-    (selection : SelectedAllocation allocation moduleIndex)
-    (_link : LinksSource config moduleData selection) :
-    getDepositAllocationsABI layout storage oracle config amount false before =
-        (.ok allocation, after) ∧
-      allocation.allocated[moduleIndex]? = some selection.selected ∧
-      (composeValues selection.selected config moduleData depositSize).lidoPullWei ≤
-        selection.selected.val ∧
-      (composeValues selection.selected config moduleData depositSize).beaconTotalWei =
-        moduleData.actualKeys * depositSize := by
-  refine ⟨executed, selection.selected_eq, ?_, by simp [composeValues]⟩
-  exact Nat.le_trans
-    (Nat.mul_le_mul_right config.maxEBType1.val _link.moduleReturnWithinTarget)
-    (Nat.div_mul_le_self selection.selected.val config.maxEBType1.val)
+    (moduleId : Word) (limits : DepositLimits)
+    (obtainDepositData : ObtainDepositData) (depositSize : Nat)
+    (values : DepositValues)
+    (executed : depositValuesABI layout storage oracle config amount before moduleId
+      limits obtainDepositData depositSize = (.ok values, after)) :
+    values.lidoPullWei ≤ values.selectedAllocationWei ∧
+      values.beaconTotalWei = values.actualKeys * depositSize := by
+  unfold depositValuesABI at executed
+  split at executed <;> try simp_all
+  next allocation allocAfter allocEq =>
+    split at executed <;> try simp_all
+    next moduleIndex indexEq =>
+      split at executed <;> try simp_all
+      next selected selectedEq =>
+        unfold maxDepositsCount at executed
+        split at executed <;> try simp_all
+        next nonzero =>
+          split at executed <;> try simp_all
+          next target targetEq =>
+            split at executed <;> try simp_all
+            next nonzeroTarget =>
+              split at executed <;> try simp_all
+              next moduleData moduleEq =>
+                split at executed <;> try simp_all
+                next aligned =>
+                  rcases executed with ⟨rfl, rfl⟩
+                  constructor
+                  · dsimp [composeValues]
+                    have targetBound : target ≤ selected.val / config.maxEBType1.val := by
+                      by_cases unitZero : config.maxEBType1 = 0
+                      · simp [unitZero] at nonzero
+                      · simp [unitZero] at nonzero
+                        rw [← nonzero]
+                        exact Nat.min_le_right _ _
+                    apply Nat.le_trans
+                      (Nat.mul_le_mul_right config.maxEBType1.val
+                        (Nat.le_trans aligned targetBound))
+                    exact Nat.div_mul_le_self selected.val config.maxEBType1.val
+                  · simp [composeValues]
 
+#print axioms abi_success_composes_deposit_values
 end audit.trio.deposit

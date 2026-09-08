@@ -5,10 +5,14 @@ exact repository base `caad1ef5e297202636e6fe643afa88fe8a62d618`.
 
 Pinned Solidity source: `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`.
 
-This first slice consumes the accepted ABI parent, keeps the independently
-returned deposit-key link explicit, and derives Lido-pull and beacon-push values
-with their distinct source units. The residual link proves that the Lido pull is
-bounded by the selected ALLOC output; it is not a decorative composition premise.
+This first slice consumes the accepted ABI parent and executes the deposit join
+through `_getModuleIndexById`, `allocated[moduleIdx]`, the named per-block/key
+limits, and the independently supplied `obtainDepositData` interface.  It derives
+the returned key count only after the pinned 48-byte alignment check, rejects a
+module result above `min(maxDepositsPerBlock, allocation/maxEBType1)`, and derives
+the Lido-pull bound from those executed guards rather than from a link premise.
+The success theorem is stated over the composed executor, so it cannot be proved
+by restating an ALLOC equality without running the module call.
 It accepts the documented trio limitations
 and does not claim compiler-memory, deployed-bytecode, or deployment identity.
 
