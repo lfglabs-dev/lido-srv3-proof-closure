@@ -60,7 +60,7 @@ Date: 2026-09-08
 - Composed well-formedness
   - `well_formed_batch_composition`: freshness ∧ inter-call ∧ cap ∧ value budget
 
-## Structural blockers (DISCHARGED)
+## Structural blockers (OPEN — awaiting lake build verification)
 
 See `sha-bridge/README.md` for details. All three are now discharged from code:
 1. SHA-256 sequential acceptance — `verity_tx_with_sequential_digest_acceptance` (universal closure)
