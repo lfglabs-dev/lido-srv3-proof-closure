@@ -14,6 +14,8 @@ def two160 : Nat := 2 ^ 160
 def two200 : Nat := 2 ^ 200
 def two201 : Nat := 2 ^ 201
 
+instance : NeZero two160 := ⟨by simp [two160]⟩
+
 /-- Solidity `address`: exactly the values representable in 160 bits. -/
 abbrev Address := Fin two160
 
