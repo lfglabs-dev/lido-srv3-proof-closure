@@ -1,5 +1,6 @@
 import audit.trio.consolidation.Bus
 import LidoSRv3.Audit.Verity.TrioConsolidation.Correspondence
+import LidoSRv3.Audit.Verity.TrioConsolidation.Memory
 
 /-! Lane-local trust inspection. This is intentionally not wired into global Trust. -/
 
@@ -10,3 +11,5 @@ import LidoSRv3.Audit.Verity.TrioConsolidation.Correspondence
 #print axioms audit.trio.consolidation.execute_revert_restores
 #print axioms audit.trio.consolidation.execute_committed_deletes
 #print axioms LidoSRv3.Audit.Verity.TrioConsolidation.Correspondence.zipRequests_prepared
+#print axioms LidoSRv3.Audit.Verity.TrioConsolidation.Memory.decode_stateForGroups
+#print axioms LidoSRv3.Audit.Verity.TrioConsolidation.Memory.grouped_tx_simulates
