@@ -190,4 +190,24 @@ theorem reverted_outcome_restores_snapshot (error : SourceExecutionError)
     (entry : Verity.ContractState) (gas : Nat) (data : List Nat) :
     (SourceExecutionOutcome.reverted error entry gas data).state.world = entry := rfl
 
+/-- Gateway authorization rejects before any adversarial external call and
+restores the transaction-entry world. -/
+theorem unauthorized_caller_reverts_before_calls (fuel : Nat)
+    (deployment : DeployedVault) (caller msgValue : Word)
+    (sources targets : List Pubkey) (adversary : AdversaryModel)
+    (state : CallState) (h : caller ≠ deployment.args.consolidationGateway) :
+    executeSourceBounded fuel deployment caller msgValue sources targets adversary state =
+      .reverted .notConsolidationGateway state.world state.gasRemaining state.returndata := by
+  simp [executeSourceBounded, h, rollback]
+
+/-- With an authorized caller, the empty-array guard is still resolved before
+the fee STATICCALL and restores the transaction-entry world. -/
+theorem empty_sources_revert_before_fee_call (fuel : Nat)
+    (deployment : DeployedVault) (msgValue : Word) (targets : List Pubkey)
+    (adversary : AdversaryModel) (state : CallState) :
+    executeSourceBounded fuel deployment deployment.args.consolidationGateway msgValue
+        [] targets adversary state =
+      .reverted .zeroArgument state.world state.gasRemaining state.returndata := by
+  simp [executeSourceBounded, rollback]
+
 end audit.trio.consolidation
