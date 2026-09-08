@@ -46,6 +46,7 @@ lean_lib «LidoSRv3» where
     .one `LidoSRv3.Audit.Verity.ConsolidationOfficialDenoteSuccess,
     .one `LidoSRv3.Audit.Verity.ConsolidationTx,
     .one `LidoSRv3.Audit.Verity.ConsolidationValueTx,
+    .submodules `LidoSRv3.Audit.Verity.TrioConsolidation,
     .one `LidoSRv3.Audit.Verity.DepositLedgerTx,
     .one `LidoSRv3.Audit.Verity.DepositNFrameTx,
     .one `LidoSRv3.Audit.Verity.DepositParentTx,
@@ -97,6 +98,7 @@ lean_lib «AccountAddressChecks» where
 /-- Cross-check the staged indexed parent against the integrated source/ABI parent. -/
 lean_lib «TrioIntegrationChecks» where
   globs := #[
+    .submodules `audit.trio.consolidation,
     .one `audit.trio.MainGuaranteeChecks,
     .one `audit.trio.integration.IndexedParentBridge,
     .one `audit.trio.alloc2.composition.Composition,
