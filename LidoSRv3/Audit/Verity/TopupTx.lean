@@ -38,41 +38,19 @@ def pulledTotalSlot : Nat := 7102
 the deployed Lido address. -/
 def lidoAddress : Address := (0xF00D : Address)
 
-/-- The deployed `DEPOSIT_CONTRACT` immutable from
-`contracts/0.8.25/lib/BeaconChainDepositor.sol` line 18:
-`IDepositContract public immutable DEPOSIT_CONTRACT;`
-initialized to the Ethereum mainnet canonical beacon deposit contract
-`0x00000000219ab540356cBB839Cbe05303d7705Fa`.
-Provenance: `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`,
-constructor at `BeaconChainDepositor.sol` line 32.
-`StakingRouter.sol:750` passes this address to `makeBeaconChainTopUp`. -/
+/-- Model pin for the `DEPOSIT_CONTRACT` immutable at `StakingRouter.sol:59`,
+assigned from constructor parameter `_depositContract` at lines 88--99
+(`fixtures/solidity-reference/StakingRouter.constructor.L88-L106.sol` line 12).
+Pin: `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`.
+`StakingRouter.sol:750` passes this address to `makeBeaconChainTopUp`.
+Model-literal only; `A-TOPUP-BEACON-ADDRESS` remains OPEN. -/
 def DEPOSIT_CONTRACT : Address := (0x00000000219ab540356cBB839Cbe05303d7705Fa : Address)
 
-/-- `beaconAddress` is the deployed `DEPOSIT_CONTRACT`. -/
+/-- `beaconAddress` equals `DEPOSIT_CONTRACT`.  Model-literal agreement, not
+deployed-immutable identity. -/
 def beaconAddress : Address := DEPOSIT_CONTRACT
 
 theorem beaconAddress_eq_DEPOSIT_CONTRACT : beaconAddress = DEPOSIT_CONTRACT := rfl
-
-/-- The four arguments of the per-validator `deposit` call at
-`BeaconChainDepositor.sol:106`:
-`_depositContract.deposit{value: amount}(pk, _withdrawalCredentials, dummySignature, depositDataRoot)`
-
-1. `pubkey` — the validator's BLS12-381 public key (48 bytes)
-2. `withdrawalCredentials` — the 0x02 prefixed credentials from `SRUtils._requireWCType2`
-3. `signature` — `DUMMY_SIGNATURE` (96 bytes, `BeaconChainDepositor.sol:24-26`)
-4. `depositDataRoot` — the SSZ tree root computed at `BeaconChainDepositor.sol:120-146` (P-SSZ-1)
-
-The model's `beaconPush` abstracts this as `"makeBeaconChainTopUp"` with
-observable args `[index, amount]`, preserving destination (`DEPOSIT_CONTRACT`),
-value (`amount`), and per-push order while substituting index-based
-observability for the BLS/SSZ argument structure. -/
-structure BeaconDepositCall where
-  pubkey : ByteArray
-  withdrawalCredentials : ByteArray
-  signature : ByteArray
-  depositDataRoot : Nat
-  amount : Nat
-  deriving Repr
 
 inductive FailurePoint where
   | none
@@ -137,16 +115,15 @@ def creditPull (total : Nat) : Contract Unit := fun state =>
 
 /-- Real external-call frame: one value-bearing beacon push per nonzero
 allocation.  Models the per-validator call at `BeaconChainDepositor.sol:106`:
-`_depositContract.deposit{value: amount}(pk, _withdrawalCredentials, dummySignature, depositDataRoot)`
+`_depositContract.deposit{value: amount}(pk, wc, sig, root)`.
 
-The model journals this as `"makeBeaconChainTopUp"` with observable args
-`[index, amount]` rather than the production `"deposit"` with args
-`(pubkey, withdrawalCredentials, signature, depositDataRoot)` — a deliberate
-abstraction that preserves the destination (`DEPOSIT_CONTRACT` via
-`beaconAddress_eq_DEPOSIT_CONTRACT`), value (`amount`), and per-push order
-while substituting index-based observability for the BLS/SSZ argument
-structure.  The `BeaconDepositCall` record above documents the production
-argument frame; the SSZ deposit-data root is P-SSZ-1.
+The model journals `"makeBeaconChainTopUp"` with observable args
+`[index, amount]` rather than `"deposit"` with `(pubkey, withdrawalCredentials,
+signature, depositDataRoot)` — a deliberate abstraction that preserves the
+destination (`DEPOSIT_CONTRACT` via `beaconAddress_eq_DEPOSIT_CONTRACT`),
+value (`amount`), and per-push order while substituting index-based
+observability for the BLS/SSZ argument structure.  The SSZ deposit-data root
+is P-SSZ-1.
 
 The frame fails closed when the router cannot pay, so a push is gated on funds
 actually held. -/
@@ -1031,14 +1008,14 @@ spends.
 
 The pinned call at source line 718 passes five arguments:
 `(smDepositableEthAmountRounded, _pubkeys, _keyIndices, _operatorIds, _topUpLimits)`.
-The frame carries the two scalar observables — `roundedTargetGwei` (the uint256
-target compared at source line 737, first production argument) and `keyCount`
-(`_keyIndices.length`, the key count the router writes to calldata).  The three
-array arguments (`_pubkeys`, `_keyIndices`, `_operatorIds`) are present in
-production ABI encoding but abstracted here; `_topUpLimits` enters the model
-through `TopupCall.topUpLimits` and the guard loop rather than through calldata.
-No theorem below reads the calldata for anything except observable
-distinguishability. -/
+`roundedTargetGwei` is the first production argument (the uint256 target
+compared at source line 737).  `keyCount` is `_keyIndices.length` — a
+model-internal observable derived from the array dimension, not a top-level
+production ABI word.  The three array arguments (`_pubkeys`, `_keyIndices`,
+`_operatorIds`) are present in production ABI encoding but abstracted here;
+`_topUpLimits` enters the model through `TopupCall.topUpLimits` and the guard
+loop.  The two-word projection `[roundedTargetGwei, keyCount]` is for frame
+distinguishability only; no theorem below reads calldata for ABI fidelity. -/
 def allocateEntry (roundedTargetGwei keyCount : Nat) (returndata : List Nat) : ExternalCall :=
   linkedCallEntryTo "allocateDeposits" moduleAddress 0
     [(roundedTargetGwei : Uint256), (keyCount : Uint256)]
@@ -1171,7 +1148,8 @@ theorem guardLoop_revert (cfg : SourceTopupConfig) :
 to the module, the words the module returns, the per-index limits it is held
 to, and the rounded module target of source line 737. -/
 structure TopupCall where
-  /-- `n = _keyIndices.length`, the argument word at source lines 717--718. -/
+  /-- `_keyIndices.length`, derived from the array dimension at source lines
+  717--718.  Not a top-level production ABI argument. -/
   keyCount : Nat
   /-- The words `IStakingModuleV2.allocateDeposits` returns at source lines
   717--718.  Unconstrained: the module is untrusted. -/

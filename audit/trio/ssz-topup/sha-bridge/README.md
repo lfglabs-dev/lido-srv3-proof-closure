@@ -69,8 +69,9 @@ inputs with pubkeys threaded explicitly.
 `argsToTopupCall` maps the full ABI record to the executable's
 `TopupCall`, showing which fields the router inspects after the module
 returns.  `executable_calldata_from_args` confirms the executable frame's
-`[evmWord roundedTargetGwei, evmWord keyCount]` calldata is the expected
-projection.
+two-word projection `[evmWord roundedTargetGwei, evmWord keyCount]` where
+`keyCount` is `_keyIndices.length` (a derived array dimension, not a
+top-level production ABI word).
 
 **Part 2 — Callee observable effects → P-TOPUP-2 budget model:**
 `CalleeEffects` captures the per-index bound (`alloc[i] ≤ limit[i]`).

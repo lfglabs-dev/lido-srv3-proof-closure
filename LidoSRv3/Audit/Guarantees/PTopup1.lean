@@ -16,16 +16,15 @@ The Verity transaction layer composes the pinned-source observables with the
 executable external-call frames (post-#2362/#2365). -/
 def guarantee : Guarantee := ⟨.pTopup1, [.model, .abstractTx, .source, .verityTx]⟩
 
-/-- The canonical beacon deposit contract address, equal to the deployed
-`DEPOSIT_CONTRACT` from `BeaconChainDepositor.sol:18` at pin
-`lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`.
-Deployment provenance: `Verity.TopupTx.DEPOSIT_CONTRACT` carries the Solidity
-source reference; `Verity.TopupTx.beaconAddress_eq_DEPOSIT_CONTRACT` proves
-the model's `beaconAddress` is that constant.  The former OPEN assumption
-`A-TOPUP-BEACON-ADDRESS` is discharged by this chain. -/
+/-- Model pin for the canonical beacon deposit contract address.
+`Verity.TopupTx.DEPOSIT_CONTRACT` carries the `StakingRouter.sol:59` source
+reference at pin `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`.
+Equality of these model literals is not the deployed-immutable identity;
+`A-TOPUP-BEACON-ADDRESS` remains OPEN. -/
 def canonicalBeaconDepositAddress : Nat :=
   0x00000000219ab540356cBB839Cbe05303d7705Fa
 
+/-- Model-literal agreement only; does not discharge `A-TOPUP-BEACON-ADDRESS`. -/
 theorem canonicalBeaconDepositAddress_eq_DEPOSIT_CONTRACT :
     canonicalBeaconDepositAddress = Verity.TopupTx.DEPOSIT_CONTRACT.toNat := by decide
 
@@ -779,10 +778,11 @@ IStakingModuleV2(stateConfig.moduleAddress).allocateDeposits(
 ```
 
 carries five arguments.  The executable `allocateEntry` in
-`Verity.TopupTx` journals `roundedTargetGwei` (the first scalar argument)
-and `keyCount` (the key count word); the three array arguments are
-abstracted.  The full ABI is modeled here as a specification-side record
-that preserves every production argument.
+`Verity.TopupTx` journals a two-word projection: `roundedTargetGwei`
+(the first production argument) and `keyCount` (`_keyIndices.length`,
+a derived array dimension, not a top-level production ABI word); the
+three array arguments are abstracted.  The full ABI is modeled here as a
+specification-side record that preserves every production argument.
 -/
 
 structure AllocateDepositsArgs where
@@ -929,20 +929,21 @@ theorem callee_return_reaches_push_when_guards_pass
 ### Part 1: Full five-argument calldata model
 
 The production call passes five ABI-encoded arguments.  The executable
-`allocateEntry` in `Verity.TopupTx` journals
-`[evmWord roundedTargetGwei, evmWord keyCount]` — the target scalar and the
-key count word.  The three array arguments (`_pubkeys`, `_keyIndices`,
-`_operatorIds`) are present in production ABI encoding but abstracted at
-the executable level; `_topUpLimits` enters the model through
-`TopupCall.topUpLimits` and the guard loop.  The specification-level
-`AllocateDepositsArgs` record (defined above) carries all five production
-arguments.
+`allocateEntry` in `Verity.TopupTx` journals a two-word projection
+`[evmWord roundedTargetGwei, evmWord keyCount]`.  `roundedTargetGwei` is
+the first production argument (the uint256 target compared at source line
+737).  `keyCount` is `_keyIndices.length` — a derived array dimension, not
+a top-level production ABI word.  The three array arguments (`_pubkeys`,
+`_keyIndices`, `_operatorIds`) are present in production ABI encoding but
+abstracted; `_topUpLimits` enters the model through `TopupCall.topUpLimits`
+and the guard loop.  The specification-level `AllocateDepositsArgs` record
+(defined above) carries all five production arguments.
 
 `argsToTopupCall` maps the full ABI record to the executable's
 `TopupCall`, showing which fields the router inspects after the module
-returns.  The executable frame's calldata carries the two scalar fields;
-`roundedTarget` and `topUpLimits` also enter the guard loop, and
-`moduleReturndata` is the untrusted callee output.
+returns.  The executable frame's two-word calldata is a projection for
+frame distinguishability; `roundedTarget` and `topUpLimits` also enter the
+guard loop, and `moduleReturndata` is the untrusted callee output.
 
 ### Part 2: Callee observable effects → P-TOPUP-2 budget model
 
