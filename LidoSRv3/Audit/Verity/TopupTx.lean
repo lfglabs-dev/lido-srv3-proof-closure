@@ -1287,12 +1287,13 @@ def sourceDepositInput (call : TopupCall) (pk : List Nat) (amount : Nat)
 `BeaconChainDepositor.makeBeaconChainTopUp` lines 76-106.  It deliberately
 does not mention `sourceBeaconCalldata` or any ABI encoder. -/
 def PinnedMakeBeaconChainTopUpFields (call : TopupCall) (pk : List Nat)
-    (amount : Nat) (input : SourceDepositDataRootInput) : Prop :=
+    (amount : Nat) (input : SourceDepositDataRootInput) (depositDataRoot : Sha256Digest) : Prop :=
   input.withdrawalCredentials = routerWithdrawalCredentials call ∧
   input.publicKey = pk ∧
   input.signature = List.replicate 96 0 ∧
   input.amountGwei = amount / 1000000000 ∧
-  (computeDepositDataRootWithAmount input).bytes.length = 32
+  depositDataRoot = computeDepositDataRootWithAmount input ∧
+  depositDataRoot.bytes.length = 32
 
 /-- The input consumed by the executed beacon frame is exactly the pinned
 Solidity field selection, including router-derived WC, the corresponding
@@ -1310,11 +1311,12 @@ theorem beaconPush_binds_source_ssz_fields (call : TopupCall) (pk : List Nat)
     beaconPush input amount =
         externalCallBindTo beaconAddress (amount : Uint256) [] "deposit"
           (sourceBeaconCalldata input) ∧
-      PinnedMakeBeaconChainTopUpFields call pk amount input ∧
+      PinnedMakeBeaconChainTopUpFields call pk amount input
+        (computeDepositDataRootWithAmount input) ∧
       input.withdrawalCredentials.length = 32 ∧
       input.publicKey.length = 48 ∧ input.signature.length = 96 := by
   dsimp [PinnedMakeBeaconChainTopUpFields, sourceDepositInput]
-  refine ⟨rfl, ⟨rfl, rfl, ?_, rfl, ?_⟩,
+  refine ⟨rfl, ⟨rfl, rfl, ?_, rfl, rfl, ?_⟩,
     routerWithdrawalCredentials_length call hwcLen, hpkLen, ?_⟩
   · simp [dummySignature]
   · exact (computeDepositDataRootWithAmount
