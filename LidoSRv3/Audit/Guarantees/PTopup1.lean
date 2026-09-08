@@ -695,9 +695,8 @@ def VerityGuardedReturndataSimulation (cfg : SourceTopupConfig)
   let before := Verity.TopupTx.entryFrame state
   (∀ failure : Verity.TopupTx.FailurePoint,
       Verity.TopupTx.executeGuarded cfg call failure before =
-        Verity.TopupTx.guardedStage cfg call.topUpLimits call.roundedTarget
-            (Verity.TopupTx.allocateEntry call).returndata
-            failure
+        Verity.TopupTx.guardedSourceStage cfg call
+            (Verity.TopupTx.allocateEntry call).returndata failure
           { before with
             calls := before.calls
               ++ [Verity.TopupTx.allocateEntry call] }) ∧
@@ -710,13 +709,16 @@ def VerityGuardedReturndataSimulation (cfg : SourceTopupConfig)
           call.roundedTarget < allocSumUnchecked call.moduleReturndata →
           (Verity.TopupTx.executeGuarded cfg call failure).run before =
             Verity.ContractResult.revert "ModuleReturnExceedTarget" before) ∧
-    (allocationLoop cfg call.moduleReturndata call.topUpLimits = none →
+    (∀ (failure : Verity.TopupTx.FailurePoint),
+      allocationLoop cfg call.moduleReturndata call.topUpLimits = none →
       ¬ call.roundedTarget < allocSumUnchecked call.moduleReturndata →
-      allocSum call.moduleReturndata < uint256Modulus →
-      call.moduleReturndata.length ≤ uint256Modulus →
-      Verity.TopupTx.observe before call.moduleReturndata.length
-          ((Verity.TopupTx.executeGuarded cfg call .none).run before) =
-        Verity.TopupTx.guardedObservables call)
+      ∀ hSource : Verity.TopupTx.SourceTopupCallWellFormed call,
+        Verity.TopupTx.executeGuarded cfg call failure before =
+          Verity.TopupTx.executeSourceDerived
+              (Verity.TopupTx.sourceDeposits call hSource)
+              call.moduleReturndata failure
+            { before with
+              calls := before.calls ++ [Verity.TopupTx.allocateEntry call] })
 
 /-! ## Vocabulary for the registered Verity statement -/
 
@@ -772,8 +774,8 @@ theorem verity_tx_simulates_source_with_nonzero_wrap_close
           Verity.TopupTx.executeGuarded_reverts_on_allocation_guard cfg call o failure _ hLoop,
         fun failure hLoop hOver =>
           Verity.TopupTx.executeGuarded_reverts_on_over_target cfg call failure _ hLoop hOver,
-        fun hLoop hTarget hNoWrap hLenRd =>
-          Verity.TopupTx.executeGuarded_observes_source cfg call state hLoop hTarget
-            hNoWrap hLenRd⟩⟩
+        fun failure hLoop hTarget hSource =>
+          Verity.TopupTx.executeGuarded_apply_of_guards_pass cfg call failure _ hLoop hTarget
+            hSource⟩⟩
 
 end LidoSRv3.Audit.Guarantees.PTopup1

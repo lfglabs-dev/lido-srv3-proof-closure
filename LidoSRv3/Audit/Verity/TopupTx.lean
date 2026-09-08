@@ -202,6 +202,21 @@ def abiBytesArrayTail (values : List (List Nat)) : List Uint256 :=
 pinned BeaconChainDepositor call site). -/
 def beaconDepositSelector : Uint256 := (0x22895118 : Uint256)
 
+/-- The value constructed by `new bytes(SIGNATURE_LENGTH)` at pinned
+`BeaconChainDepositor.sol:76`.  Keeping this constructor separate from the
+ABI encoder prevents a caller-selected signature from entering the top-up
+call plane. -/
+def dummySignature : List Nat := List.replicate 96 0
+
+/-- Exact source widths checked by `_validateTopUpInputs` and
+`makeBeaconChainTopUp`, plus the fixed dummy signature created by the latter.
+This is intentionally stronger than the byte-range proofs carried by
+`SourceDepositDataRootInput`. -/
+def PinnedTopupFields (input : SourceDepositDataRootInput) : Prop :=
+  input.withdrawalCredentials.length = 32 ∧
+  input.publicKey.length = 48 ∧
+  input.signature = dummySignature
+
 /-- Canonical ABI words for the source call at `BeaconChainDepositor.sol:106`.
 The three head offsets are byte offsets from the first head word; the final
 head is the derived `bytes32` root. -/
@@ -223,15 +238,6 @@ source deposit input, and the root is computed from that same input. -/
 def beaconPush (input : SourceDepositDataRootInput) (amount : Nat) : Contract Unit :=
   externalCallBindTo beaconAddress (amount : Uint256) [] "deposit"
     (sourceBeaconCalldata input)
-
-/-- The source-byte beacon constructor does not consult the legacy allocation
-schedule.  In particular its three dynamic fields and computed root are
-definitionally those of the one source input supplied to the call. -/
-theorem beaconPush_binds_source_ssz_fields (input : SourceDepositDataRootInput)
-    (amount : Nat) :
-    beaconPush input amount =
-      externalCallBindTo beaconAddress (amount : Uint256) [] "deposit"
-        (sourceBeaconCalldata input) := rfl
 
 /-- `BeaconChainDepositor.sol:79-107` with its source-byte inputs retained.
 An allocation can reach `deposit` only when it has a corresponding source
@@ -1191,6 +1197,11 @@ router must guard whatever it returns. -/
 structure TopupCall where
   /-- `smDepositableEthAmountRounded`. -/
   roundedTarget : Nat
+  /-- `getWithdrawalCredentials()`, the bytes32 router-state value read by
+  `_getWithdrawalCredentialsWithType` at pinned StakingRouter.sol:1046-1049. -/
+  routerWithdrawalCredentials : List Nat
+  /-- `stateConfig.withdrawalCredentialsType`, passed to `wc.setType(...)`. -/
+  withdrawalCredentialsType : Nat
   /-- `_pubkeys`, retained as source ABI bytes rather than key-length words. -/
   pubkeys : List (List Nat)
   /-- `_keyIndices`. -/
@@ -1201,6 +1212,137 @@ structure TopupCall where
   topUpLimits : List Nat
   moduleReturndata : List Nat
   deriving Repr, DecidableEq
+
+/-- Pinned `bytes32 wc = getWithdrawalCredentials(); return wc.setType(type)`.
+For a Solidity `bytes32`, the credential type is its first byte. -/
+def routerWithdrawalCredentials (call : TopupCall) : List Nat :=
+  call.withdrawalCredentialsType :: call.routerWithdrawalCredentials.drop 1
+
+def bytesBounded (bytes : List Nat) : Bool := bytes.all (· < 256)
+
+def pubkeysPinned (pubkeys : List (List Nat)) : Bool :=
+  pubkeys.all (fun pk => pk.length == 48 && bytesBounded pk)
+
+/-- The source inputs admitted to `makeBeaconChainTopUp`.  These conditions
+are executable guards below, not informal side conditions: bytes32 WC,
+48-byte keys, octet ranges, and a one-byte credential type. -/
+def SourceTopupCallWellFormed (call : TopupCall) : Prop :=
+  call.routerWithdrawalCredentials.length = 32 ∧
+  call.withdrawalCredentialsType < 256 ∧
+  bytesBounded call.routerWithdrawalCredentials = true ∧
+  pubkeysPinned call.pubkeys = true ∧
+  call.pubkeys.length = call.moduleReturndata.length ∧
+  call.moduleReturndata.all (· < uint256Modulus) = true
+
+instance sourceTopupCallWellFormedDecidable (call : TopupCall) :
+    Decidable (SourceTopupCallWellFormed call) := by
+  unfold SourceTopupCallWellFormed
+  infer_instance
+
+theorem bytesBounded_iff (bytes : List Nat) :
+    bytesBounded bytes = true ↔ ∀ b ∈ bytes, b < 256 := by
+  simp [bytesBounded]
+
+theorem pubkeysPinned_iff (pubkeys : List (List Nat)) :
+    pubkeysPinned pubkeys = true ↔
+      ∀ pk ∈ pubkeys, pk.length = 48 ∧ ∀ b ∈ pk, b < 256 := by
+  simp [pubkeysPinned, bytesBounded, Bool.and_eq_true]
+
+theorem routerWithdrawalCredentials_length (call : TopupCall)
+    (h : call.routerWithdrawalCredentials.length = 32) :
+    (routerWithdrawalCredentials call).length = 32 := by
+  simp [routerWithdrawalCredentials, h]
+
+theorem routerWithdrawalCredentials_bounded (call : TopupCall)
+    (ht : call.withdrawalCredentialsType < 256)
+    (hwc : ∀ b ∈ call.routerWithdrawalCredentials, b < 256) :
+    ∀ b ∈ routerWithdrawalCredentials call, b < 256 := by
+  intro b hb
+  simp only [routerWithdrawalCredentials, List.mem_cons] at hb
+  rcases hb with rfl | hb
+  · exact ht
+  · exact hwc b (List.mem_of_mem_drop hb)
+
+/-- One SSZ input exactly as the pinned loop constructs it: WC is router
+state after `setType`, pubkey is the corresponding `_pubkeys[i]`, signature
+is the local 96-byte zero allocation, and amount is the guarded wei value in
+gwei. -/
+def sourceDepositInput (call : TopupCall) (pk : List Nat) (amount : Nat)
+    (hwcLen : call.routerWithdrawalCredentials.length = 32)
+    (ht : call.withdrawalCredentialsType < 256)
+    (hwc : ∀ b ∈ call.routerWithdrawalCredentials, b < 256)
+    (hpk : ∀ b ∈ pk, b < 256)
+    (hamount : amount < uint256Modulus) : SourceDepositDataRootInput :=
+  { withdrawalCredentials := routerWithdrawalCredentials call
+    publicKey := pk
+    signature := dummySignature
+    amountGwei := amount / 1000000000
+    withdrawalCredentialsBounded := routerWithdrawalCredentials_bounded call ht hwc
+    publicKeyBounded := hpk
+    signatureBounded := by simp [dummySignature]
+    amountGweiBounded := by
+      have hle : amount / 1000000000 ≤ amount := Nat.div_le_self _ _
+      exact lt_of_le_of_lt hle (by simpa [uint256Modulus] using hamount) }
+
+/-- Independent transcription of the values selected by pinned
+`StakingRouter.topUp` lines 746-750 and
+`BeaconChainDepositor.makeBeaconChainTopUp` lines 76-106.  It deliberately
+does not mention `sourceBeaconCalldata` or any ABI encoder. -/
+def PinnedMakeBeaconChainTopUpFields (call : TopupCall) (pk : List Nat)
+    (amount : Nat) (input : SourceDepositDataRootInput) : Prop :=
+  input.withdrawalCredentials = routerWithdrawalCredentials call ∧
+  input.publicKey = pk ∧
+  input.signature = List.replicate 96 0 ∧
+  input.amountGwei = amount / 1000000000 ∧
+  (computeDepositDataRootWithAmount input).bytes.length = 32
+
+/-- The input consumed by the executed beacon frame is exactly the pinned
+Solidity field selection, including router-derived WC, the corresponding
+`_pubkeys[i]`, and the locally allocated zero signature.  This theorem is
+against `PinnedMakeBeaconChainTopUpFields`, not definitional equality to the
+call encoder. -/
+theorem beaconPush_binds_source_ssz_fields (call : TopupCall) (pk : List Nat)
+    (amount : Nat)
+    (hwcLen : call.routerWithdrawalCredentials.length = 32)
+    (ht : call.withdrawalCredentialsType < 256)
+    (hwc : ∀ b ∈ call.routerWithdrawalCredentials, b < 256)
+    (hpkLen : pk.length = 48) (hpk : ∀ b ∈ pk, b < 256)
+    (hamount : amount < uint256Modulus) :
+    let input := sourceDepositInput call pk amount hwcLen ht hwc hpk hamount
+    PinnedMakeBeaconChainTopUpFields call pk amount input ∧
+      input.withdrawalCredentials.length = 32 ∧
+      input.publicKey.length = 48 ∧ input.signature.length = 96 := by
+  dsimp [PinnedMakeBeaconChainTopUpFields, sourceDepositInput]
+  refine ⟨⟨rfl, rfl, ?_, rfl, ?_⟩,
+    routerWithdrawalCredentials_length call hwcLen, hpkLen, ?_⟩
+  · simp [dummySignature]
+  · exact (computeDepositDataRootWithAmount
+      (sourceDepositInput call pk amount hwcLen ht hwc hpk hamount)).widthPinned
+  · simp [dummySignature]
+
+def sourceDepositsOf (call : TopupCall) :
+    (pubkeys : List (List Nat)) → (amounts : List Nat) →
+    (∀ pk ∈ pubkeys, pk.length = 48 ∧ ∀ b ∈ pk, b < 256) →
+    (∀ amount ∈ amounts, amount < uint256Modulus) →
+    call.routerWithdrawalCredentials.length = 32 →
+    call.withdrawalCredentialsType < 256 →
+    (∀ b ∈ call.routerWithdrawalCredentials, b < 256) →
+    List SourceDepositDataRootInput
+  | [], _, _, _, _, _, _ => []
+  | _, [], _, _, _, _, _ => []
+  | pk :: pks, amount :: amounts, hpks, hamounts, hwcLen, ht, hwc =>
+      sourceDepositInput call pk amount hwcLen ht hwc
+          (hpks pk (by simp)).2 (hamounts amount (by simp)) ::
+        sourceDepositsOf call pks amounts
+          (fun key hkey => hpks key (by simp [hkey]))
+          (fun value hvalue => hamounts value (by simp [hvalue])) hwcLen ht hwc
+
+def sourceDeposits (call : TopupCall) (h : SourceTopupCallWellFormed call) :
+    List SourceDepositDataRootInput :=
+  sourceDepositsOf call call.pubkeys call.moduleReturndata
+    ((pubkeysPinned_iff call.pubkeys).mp h.2.2.2.1)
+    (by simpa using h.2.2.2.2.2) h.1 h.2.1
+    ((bytesBounded_iff call.routerWithdrawalCredentials).mp h.2.2.1)
 
 /-- Canonical tail of a dynamic `uint256[]`: its length followed by its ABI
 words.  Unlike the former flattened abstraction, offsets are emitted by
@@ -1376,13 +1518,28 @@ def guardedStage (cfg : SourceTopupConfig) (limits : List Nat) (roundedTarget : 
   -- StakingRouter.sol:722-756  accumulate, pull, push
   execute returned failure
 
+/-- The live guarded value path.  After the module-return guards, it admits
+only the exact router/source byte shape and invokes the source-derived
+executor.  Thus no successful registered execution can reach
+`scheduledDeposit` or `scheduledBeaconPush`. -/
+def guardedSourceStage (cfg : SourceTopupConfig) (call : TopupCall)
+    (returned : List Nat) (failure : FailurePoint) : Contract Unit := do
+  guardLoop cfg returned call.topUpLimits
+  require (decide (allocSumUnchecked returned ≤ call.roundedTarget))
+    "ModuleReturnExceedTarget"
+  require (decide (returned = call.moduleReturndata)) "ModuleReturnBindingMismatch"
+  if h : SourceTopupCallWellFormed call then
+    executeSourceDerived (sourceDeposits call h) returned failure
+  else
+    require false "InvalidSourceTopupFields"
+
 /-- The corrected executable top-up: call the module, then guard and spend
 exactly what it returned. -/
 def executeGuarded (cfg : SourceTopupConfig) (call : TopupCall) (failure : FailurePoint) :
     Contract Unit := do
   -- StakingRouter.sol:717-718  uint256[] memory allocations = IStakingModuleV2(stateConfig.moduleAddress).allocateDeposits(...);
   let returned ← allocateDeposits call
-  guardedStage cfg call.topUpLimits call.roundedTarget returned failure
+  guardedSourceStage cfg call returned failure
 
 /-- The binding statement.  `executeGuarded` journals the module frame and then
 runs the guard-and-spend stage on *that frame's returndata*; the allocation
@@ -1390,8 +1547,7 @@ array is not a free argument of the guarded transaction. -/
 theorem executeGuarded_binds_returndata (cfg : SourceTopupConfig) (call : TopupCall)
     (failure : FailurePoint) (state : ContractState) :
     executeGuarded cfg call failure state =
-      guardedStage cfg call.topUpLimits call.roundedTarget
-          (allocateEntry call).returndata failure
+      guardedSourceStage cfg call (allocateEntry call).returndata failure
         { state with
           calls := state.calls ++ [allocateEntry call] } :=
   rfl
@@ -1408,7 +1564,7 @@ theorem executeGuarded_reverts_on_allocation_guard (cfg : SourceTopupConfig)
           { state with
             calls := state.calls ++ [allocateEntry call] } := by
     rw [executeGuarded_binds_returndata, allocateEntry_returndata]
-    simp only [guardedStage, Bind.bind, _root_.Verity.bind]
+    simp only [guardedSourceStage, Bind.bind, _root_.Verity.bind]
     rw [guardLoop_revert cfg call.moduleReturndata call.topUpLimits o _ hLoop]
   simp [Contract.run, hStage]
 
@@ -1425,7 +1581,7 @@ theorem executeGuarded_reverts_on_over_target (cfg : SourceTopupConfig)
           { state with
             calls := state.calls ++ [allocateEntry call] } := by
     rw [executeGuarded_binds_returndata, allocateEntry_returndata]
-    simp only [guardedStage, Bind.bind, _root_.Verity.bind]
+    simp only [guardedSourceStage, Bind.bind, _root_.Verity.bind]
     rw [guardLoop_success cfg call.moduleReturndata call.topUpLimits _ hLoop]
     simp [_root_.Verity.require, Nat.not_le.mpr hOver]
   simp [Contract.run, hStage]
@@ -1435,15 +1591,16 @@ unguarded one run on the module's returndata from the post-frame state. -/
 theorem executeGuarded_apply_of_guards_pass (cfg : SourceTopupConfig) (call : TopupCall)
     (failure : FailurePoint) (state : ContractState)
     (hLoop : allocationLoop cfg call.moduleReturndata call.topUpLimits = none)
-    (hTarget : ¬ call.roundedTarget < allocSumUnchecked call.moduleReturndata) :
+    (hTarget : ¬ call.roundedTarget < allocSumUnchecked call.moduleReturndata)
+    (hSource : SourceTopupCallWellFormed call) :
     executeGuarded cfg call failure state =
-      execute call.moduleReturndata failure
+      executeSourceDerived (sourceDeposits call hSource) call.moduleReturndata failure
         { state with
           calls := state.calls ++ [allocateEntry call] } := by
   rw [executeGuarded_binds_returndata, allocateEntry_returndata]
-  simp only [guardedStage, Bind.bind, _root_.Verity.bind]
+  simp only [guardedSourceStage, Bind.bind, _root_.Verity.bind]
   rw [guardLoop_success cfg call.moduleReturndata call.topUpLimits _ hLoop]
-  simp [_root_.Verity.require, Nat.not_lt.mp hTarget]
+  simp [_root_.Verity.require, Nat.not_lt.mp hTarget, hSource]
 
 /-- Whatever the guarded transaction mutated, `Contract.run` hands back the
 entry snapshot. -/
@@ -1504,54 +1661,5 @@ theorem observe_after_leading_entry (before after : ContractState) (entry : Exte
     rw [hCalls, List.drop_left]
   simp only [observe, hOuter, hInner, callValueOf, beq_iff_eq, hName, if_false,
     Nat.zero_add, List.map_cons]
-
-/-- The corrected transaction, run through `Contract.run` with every
-returndata guard passed, produces exactly the pinned source schedule *plus*
-the `allocateDeposits` frame it read its allocations from. -/
-theorem executeGuarded_observes_source (cfg : SourceTopupConfig) (call : TopupCall)
-    (state : ContractState)
-    (hLoop : allocationLoop cfg call.moduleReturndata call.topUpLimits = none)
-    (hTarget : ¬ call.roundedTarget < allocSumUnchecked call.moduleReturndata)
-    (hNoWrap : allocSum call.moduleReturndata < uint256Modulus)
-    (hLen : call.moduleReturndata.length ≤ uint256Modulus) :
-    observe (entryFrame state) call.moduleReturndata.length
-        ((executeGuarded cfg call .none).run (entryFrame state))
-      = guardedObservables call := by
-  have hStagedBalance :
-      ({ entryFrame state with
-          calls := (entryFrame state).calls
-            ++ [allocateEntry call] } : ContractState).selfBalance
-        = 0 := rfl
-  obtain ⟨after, hRun, hCalls⟩ :=
-    execute_run_calls call.moduleReturndata
-      { entryFrame state with
-        calls := (entryFrame state).calls
-          ++ [allocateEntry call] } hStagedBalance hNoWrap
-  have hRaw : execute call.moduleReturndata .none
-      { entryFrame state with
-        calls := (entryFrame state).calls
-          ++ [allocateEntry call] }
-      = ContractResult.success () after := by
-    unfold Contract.run at hRun
-    split at hRun <;> simp_all
-  have hGuardedRaw : (executeGuarded cfg call .none).run (entryFrame state)
-      = ContractResult.success () after := by
-    unfold Contract.run
-    rw [executeGuarded_apply_of_guards_pass cfg call .none (entryFrame state) hLoop hTarget, hRaw]
-  have hName : (allocateEntry call).name
-      ≠ "deposit" := by rw [allocateEntry_name]; decide
-  have hInner : observe
-      { entryFrame state with
-        calls := (entryFrame state).calls
-          ++ [allocateEntry call] }
-      call.moduleReturndata.length (ContractResult.success () after)
-      = sourceObservables call.moduleReturndata := by
-    rw [← hRun]
-    exact execute_observes_source call.moduleReturndata _ hStagedBalance hNoWrap hLen
-  rw [hGuardedRaw, observe_after_leading_entry (entryFrame state) after
-    (allocateEntry call)
-    (expectedCalls call.moduleReturndata) call.moduleReturndata.length hName hCalls]
-  simp only [hInner, guardedObservables, allocateEntry_name, allocateEntry_target,
-    allocateEntry_value, allocateEntry_calldata]
 
 end LidoSRv3.Audit.Verity.TopupTx
