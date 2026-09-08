@@ -1,54 +1,37 @@
 import audit.trio.consolidation.Spec
+import LidoSRv3.Audit.Verity.ConsolidationFee
+import Verity.Core.Model.CallProgramRollback
 
 /-!
-# Bounded consolidation source execution
+# Executed consolidation source bridge
 
-An independent, hand-authored bounded model component for part of the external
-control surface in the
-vault path pinned at `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`:
+This module connects bounded vault control flow to the external-call
+denotation used by the pinned Solidity scaffold at
+`lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`.
 
-* `WithdrawalVault` constructor, lines 63--78 (both immutable addresses are
-  nonzero), and `WithdrawalVaultEIP7685` constructor, lines 34--40;
-* `_getFeeFromContract`, lines 83--95 (the fee `STATICCALL` may fail);
-* `_callAddConsolidationRequest`, lines 113--121 (any value-bearing `CALL`
-  may fail and reverts the whole entrypoint); and
-* `preservesEthBalance`, `WithdrawalVault.sol` lines 81--85.
+Unlike the independent pure specification in `Spec.lean`, execution here asks
+an `AdversaryModel` for the result of the actual `feeSite` STATICCALL and each
+actual `requestSite` CALL. Every response is evaluated against the world at
+that call boundary, and successful mutable calls thread their world transition
+into the following iteration.
 
-The constructors are deployment-time checks, not guards rerun by the runtime
-entrypoint.  The runtime model below therefore takes an explicit deployment
-witness and checks the caller before the inherited body. `feeRead` and
-`callResults` are supplied outcomes: this file
-does not interpret real `STATICCALL`/`CALL`, returndata, revert propagation,
-events, EVM rollback, code identity, or deployment provenance.
+The decision tree follows pinned source order: payable frame credit and the
+modifier snapshot, gateway authorization, empty/length guards, fee STATICCALL
+and returndata shape, checked multiplication, exact fee, per-iteration key
+checks and CALLs, then
+the modifier assertion. Construction is separate: runtime execution requires
+a `DeployedVault` witness and never reruns constructor guards.
 
-At that pin, runtime error precedence is `NotConsolidationGateway`, then
-`ZeroArgument`, `ArraysLengthMismatch`, `FeeReadFailed`/`FeeInvalidData`,
-checked fee-multiplication overflow, `IncorrectFee`, source/target
-`InvalidPublicKeyLength`, and finally `RequestAdditionFailed`. The supplied
-`feeRead : ExternalResult Word` starts after the returndata-shape check, so its
-failure arm represents `FeeReadFailed`; `FeeInvalidData` remains outside this
-component rather than being silently claimed.
-
-The model is intentionally not an error-faithful interpreter. In particular,
-it consumes `feeRead` before calling the separately defined pure guard model,
-whereas Solidity checks the empty and array-length guards before the
-`STATICCALL`. Also, its synthetic final-balance mismatch is represented with a
-`VaultError.incorrectFee`; pinned Solidity would fail the modifier's `assert`
-with a panic after the body. These guard-order and modifier-failure differences
-are residuals, not correspondence claims.
-
-`requireClosedExit` is deliberately named: a finite result list and fuel bound
-are evidence that every external request reached a success/failure response.
-It is an obligation, not an axiom or a trust-manifest escape.
-
-Consequently, the theorem in this file is only an invariant of this bounded
-model component. It is not real source-level execution correspondence and does
-not identify this model with the independent specification in `Spec.lean`, nor
-does it close the remaining execution or Bus/Gateway/Vault composition
-obligations.
+Revert is a transaction boundary, not an outcome containing a caller-supplied
+balance. `rollback` restores the complete entry world after any guard, call,
+or modifier failure while retaining gas consumption and returndata. The
+modifier assertion has its pinned `Panic(0x01)` result; it is not represented
+as `IncorrectFee`.
 -/
 
 namespace audit.trio.consolidation
+
+open Compiler.CompilationModel.DenoteExternalCalls
 
 structure ConstructorArgs where
   lido : Word
@@ -60,184 +43,151 @@ structure ConstructorArgs where
   deriving DecidableEq, Repr
 
 def constructorConditions (args : ConstructorArgs) : Bool :=
-  -- Solidity runs the base constructor first, then the derived constructor.
   args.withdrawalRequest.val != 0 && args.consolidationRequest.val != 0 &&
     args.lido.val != 0 && args.treasury.val != 0 &&
     args.triggerableWithdrawalsGateway.val != 0 &&
     args.consolidationGateway.val != 0
 
-/-- Successful construction is a premise of runtime execution. This witness
-does not establish which bytecode was deployed at any address. -/
+/-- Runtime code can only be entered after successful construction. -/
 structure DeployedVault where
   args : ConstructorArgs
   constructorAccepted : constructorConditions args = true
 
-inductive ExternalResult (α : Type) where
-  | success (value : α)
-  | failure
-  deriving DecidableEq, Repr
-
 inductive SourceExecutionError where
   | notConsolidationGateway
-  | staticcallFailed
-  | vaultGuard (error : VaultError)
-  | callFailed (index : Nat)
+  | zeroArgument
+  | arraysLengthMismatch
+  | feeReadFailed (returndata : List Nat)
+  | feeInvalidData (returndata : List Nat)
+  | feeMultiplicationPanic
+  | incorrectFee (required provided : Nat)
+  | invalidSourceLength (index actual : Nat)
+  | invalidTargetLength (index actual : Nat)
+  | requestAdditionFailed (index : Nat) (returndata : List Nat)
+  | modifierAssertionPanic
+  deriving DecidableEq, Repr
+
+inductive SourceExecutionExit where
+  | openExit
+  | reverted (error : SourceExecutionError)
+  | committed (pairs : List (Pubkey × Pubkey))
   deriving DecidableEq, Repr
 
 inductive SourceExecutionOutcome where
-  /-- The bound or supplied external-result prefix did not close the loop. -/
-  | openExit
-  /-- All source failures roll the payable credit and prior calls back. -/
-  | reverted (error : SourceExecutionError) (vaultBalance : Nat)
-  /-- The modifier accepted the final balance. -/
-  | committed (pairs : List (Pubkey × Pubkey)) (vaultBalance : Nat)
-  deriving DecidableEq, Repr
+  | openExit (state : CallState)
+  | reverted (error : SourceExecutionError) (entryWorld : Verity.ContractState)
+      (gasRemaining : Nat) (returndata : List Nat)
+  | committed (pairs : List (Pubkey × Pubkey)) (state : CallState)
 
-private def firstCallFailure : Nat → List (ExternalResult Unit) → Option Nat
-  | _, [] => none
-  | index, .failure :: _ => some index
-  | index, .success _ :: rest => firstCallFailure (index + 1) rest
+def SourceExecutionOutcome.exit : SourceExecutionOutcome → SourceExecutionExit
+  | .openExit _ => .openExit
+  | .reverted error _ _ _ => .reverted error
+  | .committed pairs _ => .committed pairs
 
-/-- Bounded component for the pinned runtime entrypoint. `initialBalance` is the
-balance before the payable frame credit. Revert arms therefore expose exactly
-that supplied snapshot. This representation of rollback is definitional, not a
-proof about EVM rollback. On success, exact-fee validation makes the modeled
-CALL debit equal `msg.value`; the explicit equality check represents the
-modifier assertion. -/
+def SourceExecutionOutcome.state : SourceExecutionOutcome → CallState
+  | .openExit state | .committed _ state => state
+  | .reverted _ entryWorld gasRemaining returndata =>
+      { world := entryWorld, gasRemaining, returndata }
+
+private def rollback (entry post : CallState) (error : SourceExecutionError) :
+    SourceExecutionOutcome :=
+  .reverted error entry.world post.gasRemaining post.returndata
+
+private def asBytes (key : Pubkey) :
+    LidoSRv3.Audit.Verity.ConsolidationFee.Pubkey :=
+  List.replicate key.length
+    ⟨key.identity % 256, Nat.mod_lt _ (by decide)⟩
+
+private def asRequest (source target : Pubkey) :
+    LidoSRv3.Audit.Verity.ConsolidationFee.MemoryRequest :=
+  LidoSRv3.Audit.Verity.ConsolidationFee.encodeRequest
+    { source := asBytes source, target := asBytes target }
+
+private def executeRequests : Nat → Nat → Nat → Nat →
+    List (Pubkey × Pubkey) → AdversaryModel → CallState → CallState →
+    Word → SourceExecutionOutcome
+  | _, _, _, _, [], _, entry, post, balanceBefore =>
+      if post.world.selfBalance = balanceBefore then
+        .committed [] post
+      else rollback entry post .modifierAssertionPanic
+  | 0, _, _, _, _ :: _, _, _, post, _ =>
+      .openExit post
+  | fuel + 1, index, requestTarget, fee, (source, target) :: rest,
+      adversary, entry, post, balanceBefore =>
+      if source.length != pubkeyLength then
+        rollback entry post (.invalidSourceLength index source.length)
+      else if target.length != pubkeyLength then
+        rollback entry post (.invalidTargetLength index target.length)
+      else
+        let site := LidoSRv3.Audit.Verity.ConsolidationFee.requestSite
+          requestTarget fee index (asRequest source target)
+        let observation := denoteCall adversary site post
+        match observation.result with
+        | .success _ =>
+            let result := executeRequests fuel (index + 1) requestTarget fee rest
+              adversary entry observation.state balanceBefore
+            match result with
+            | .committed pairs resultState =>
+                .committed ((source, target) :: pairs) resultState
+            | _ => result
+        | .failure data | .revert data =>
+            rollback entry observation.state (.requestAdditionFailed index data)
+
+/-- Execute the pinned runtime path from the transaction-entry snapshot.
+`runtimeState` applies the payable frame credit before the modifier reads the
+balance. Thus every revert restores the genuinely earlier `state.world`, while
+a commit retains the world produced by successful CALLs. As in the EVM,
+reachable account balances are assumed not to overflow the 256-bit word when
+the frame credit is applied. -/
 def executeSourceBounded (fuel : Nat) (deployment : DeployedVault)
-    (caller : Word)
-    (feeRead : ExternalResult Word) (callResults : List (ExternalResult Unit))
-    (msgValue : Word) (sources targets : List Pubkey)
-    (initialBalance : Nat) : SourceExecutionOutcome :=
+    (caller : Word) (msgValue : Word) (sources targets : List Pubkey)
+    (adversary : AdversaryModel) (state : CallState) : SourceExecutionOutcome :=
+  let balanceBefore := state.world.selfBalance
+  let runtimeState : CallState :=
+    { state with world := { state.world with
+        selfBalance := word (state.world.selfBalance.val + msgValue.val)
+        msgValue := msgValue } }
   if caller != deployment.args.consolidationGateway then
-    .reverted .notConsolidationGateway initialBalance
-  else match feeRead with
-    | .failure => .reverted .staticcallFailed initialBalance
-    | .success fee =>
-        match validateVaultAdd fee msgValue sources targets with
-        | .error error => .reverted (.vaultGuard error) initialBalance
-        | .ok pairs =>
-            if pairs.length > fuel || callResults.length < pairs.length then
-              .openExit
+      rollback state runtimeState .notConsolidationGateway
+    else if sources.isEmpty then
+      rollback state runtimeState .zeroArgument
+    else if sources.length != targets.length then
+      rollback state runtimeState .arraysLengthMismatch
+    else
+      let feeObservation := denoteCall adversary
+        (LidoSRv3.Audit.Verity.ConsolidationFee.feeSite
+          deployment.args.consolidationRequest.val) runtimeState
+      match feeObservation.result with
+      | .failure data | .revert data =>
+          rollback state feeObservation.state (.feeReadFailed data)
+      | .success data =>
+          if data.length != 32 then
+            rollback state feeObservation.state (.feeInvalidData data)
+          else
+            let fee := LidoSRv3.Audit.Verity.ConsolidationFee.decodeWord data
+            let required := sources.length * fee
+            if Verity.Core.MAX_UINT256 < required then
+              rollback state feeObservation.state .feeMultiplicationPanic
+            else if msgValue.val != required then
+              rollback state feeObservation.state (.incorrectFee required msgValue.val)
             else
-              match firstCallFailure 0 (callResults.take pairs.length) with
-              | some index => .reverted (.callFailed index) initialBalance
-              | none =>
-                  let finalBalance := initialBalance + msgValue.val -
-                    pairs.length * fee.val
-                  if finalBalance = initialBalance then
-                    .committed pairs finalBalance
-                  else .reverted (.vaultGuard
-                    (.incorrectFee (word (pairs.length * fee.val)) msgValue))
-                    initialBalance
+              executeRequests fuel 0 deployment.args.consolidationRequest.val fee
+                (sources.zip targets) adversary state feeObservation.state balanceBefore
 
-/-- Named environmental obligation for the bounded model: execution reaches a
-closed committed or reverted source exit, rather than exhausting fuel or an
-underspecified CALL-result prefix. -/
-def requireClosedExit (fuel : Nat) (deployment : DeployedVault) (caller : Word)
-    (feeRead : ExternalResult Word) (callResults : List (ExternalResult Unit))
-    (msgValue : Word) (sources targets : List Pubkey)
-    (initialBalance : Nat) : Prop :=
-  executeSourceBounded fuel deployment caller feeRead callResults msgValue sources targets
-    initialBalance ≠ .openExit
+/-- Constructor rejection is deployment-time: rejected arguments cannot
+produce the witness required by runtime execution. -/
+theorem rejected_constructor_has_no_deployment (args : ConstructorArgs)
+    (h : constructorConditions args = false) :
+    ¬ ∃ deployment : DeployedVault, deployment.args = args := by
+  rintro ⟨deployment, rfl⟩
+  have accepted := deployment.constructorAccepted
+  rw [h] at accepted
+  contradiction
 
-theorem unauthorized_caller_closes (fuel : Nat) (deployment : DeployedVault)
-    (caller : Word) (feeRead : ExternalResult Word)
-    (callResults : List (ExternalResult Unit)) (msgValue : Word)
-    (sources targets : List Pubkey) (initialBalance : Nat)
-    (h : caller ≠ deployment.args.consolidationGateway) :
-    executeSourceBounded fuel deployment caller feeRead callResults msgValue
-      sources targets initialBalance =
-        .reverted .notConsolidationGateway initialBalance := by
-  simp [executeSourceBounded, h]
-
-theorem staticcall_failure_closes (fuel : Nat) (deployment : DeployedVault)
-    (caller : Word)
-    (callResults : List (ExternalResult Unit)) (msgValue : Word)
-    (sources targets : List Pubkey) (initialBalance : Nat)
-    (h : caller = deployment.args.consolidationGateway) :
-    executeSourceBounded fuel deployment caller .failure callResults msgValue sources targets
-      initialBalance = .reverted .staticcallFailed initialBalance := by
-  simp [executeSourceBounded, h]
-
-/-- Caller rejection and fee `STATICCALL` failure discharge the named
-closure obligation without consuming loop fuel or requiring any CALL results.
-This keeps the two pre-loop source failures visibly distinct from an open
-bounded exit. -/
-theorem preloop_failures_requireClosedExit (fuel : Nat)
-    (deployment : DeployedVault) (caller : Word)
-    (callResults : List (ExternalResult Unit))
-    (msgValue : Word) (sources targets : List Pubkey) (initialBalance : Nat) :
-    (caller ≠ deployment.args.consolidationGateway →
-      requireClosedExit fuel deployment caller (.success (word 0)) callResults msgValue
-        sources targets initialBalance) ∧
-    (caller = deployment.args.consolidationGateway →
-      requireClosedExit fuel deployment caller .failure callResults msgValue sources targets
-        initialBalance) := by
-  constructor
-  · intro hconstructor
-    unfold requireClosedExit
-    rw [unauthorized_caller_closes (h := hconstructor)]
-    simp
-  · intro hconstructor
-    unfold requireClosedExit
-    rw [staticcall_failure_closes (h := hconstructor)]
-    simp
-
-/-- The named closed-exit obligation yields a bounded-model invariant: every
-modeled failure contains the supplied entry snapshot, while every modeled
-commit satisfies the represented final-balance equality. It establishes no
-Solidity/EVM execution correspondence or rollback fact. -/
-theorem closed_exit_bounded_model_balance_invariant
-    (fuel : Nat) (deployment : DeployedVault) (caller : Word)
-    (feeRead : ExternalResult Word)
-    (callResults : List (ExternalResult Unit)) (msgValue : Word)
-    (sources targets : List Pubkey) (initialBalance : Nat)
-    (hclosed : requireClosedExit fuel deployment caller feeRead callResults msgValue sources
-      targets initialBalance) :
-    (∃ error, executeSourceBounded fuel deployment caller feeRead callResults msgValue sources
-        targets initialBalance = .reverted error initialBalance) ∨
-      (∃ pairs, executeSourceBounded fuel deployment caller feeRead callResults msgValue
-          sources targets initialBalance = .committed pairs initialBalance) := by
-  unfold requireClosedExit at hclosed
-  cases hrun : executeSourceBounded fuel deployment caller feeRead callResults msgValue sources
-      targets initialBalance with
-  | openExit => exact False.elim (hclosed hrun)
-  | reverted error balance =>
-      left
-      refine ⟨error, ?_⟩
-      have hbalance : balance = initialBalance := by
-        unfold executeSourceBounded at hrun
-        split at hrun <;> simp_all
-        next hconstructor =>
-          cases feeRead <;> simp_all
-          next fee =>
-            cases hguard : validateVaultAdd fee msgValue sources targets <;>
-              simp_all
-            next pairs =>
-              split at hrun <;> simp_all
-              next hbound =>
-                cases hfailure : firstCallFailure 0
-                    (callResults.take pairs.length) <;> simp_all
-                next => split at hrun <;> simp_all
-      simp [hbalance] at hrun ⊢
-  | committed pairs balance =>
-      right
-      refine ⟨pairs, ?_⟩
-      have hbalance : balance = initialBalance := by
-        unfold executeSourceBounded at hrun
-        split at hrun <;> simp_all
-        next hconstructor =>
-          cases feeRead <;> simp_all
-          next fee =>
-            cases hguard : validateVaultAdd fee msgValue sources targets <;>
-              simp_all
-            next accepted =>
-              split at hrun <;> simp_all
-              next hbound =>
-                cases hfailure : firstCallFailure 0
-                    (callResults.take accepted.length) <;> simp_all
-                next => split at hrun <;> simp_all
-      simp [hbalance] at hrun ⊢
+/-- Revert outcomes restore their stored transaction-entry snapshot by
+construction; they cannot carry an invented `initialBalance`. -/
+theorem reverted_outcome_restores_snapshot (error : SourceExecutionError)
+    (entry : Verity.ContractState) (gas : Nat) (data : List Nat) :
+    (SourceExecutionOutcome.reverted error entry gas data).state.world = entry := rfl
 
 end audit.trio.consolidation
