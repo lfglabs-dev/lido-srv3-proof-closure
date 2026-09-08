@@ -124,7 +124,7 @@ inductive VaultError where
   | invalidTargetLength (index actual : Nat)
   deriving DecidableEq, Repr
 
-private def checkedMulWord (a : Nat) (b : Word) : Option Word :=
+def checkedMulWord (a : Nat) (b : Word) : Option Word :=
   if h : a * b.val < 2 ^ 256 then
     some ⟨a * b.val, h⟩
   else none
@@ -138,6 +138,21 @@ private def validateVaultPairs : Nat → List (Pubkey × Pubkey) →
       else if pair.2.length != pubkeyLength then
         .error (.invalidTargetLength index pair.2.length)
       else validateVaultPairs (index + 1) rest
+
+private theorem validateVaultPairs_ok (index : Nat)
+    (pairs : List (Pubkey × Pubkey))
+    (hvalid : ∀ pair ∈ pairs,
+      pair.1.length = pubkeyLength ∧ pair.2.length = pubkeyLength) :
+    validateVaultPairs index pairs = .ok () := by
+  induction pairs generalizing index with
+  | nil => rfl
+  | cons pair rest ih =>
+      have hp := hvalid pair (by simp)
+      have hr : ∀ p ∈ rest,
+          p.1.length = pubkeyLength ∧ p.2.length = pubkeyLength := by
+        intro p hmem
+        exact hvalid p (by simp [hmem])
+      simp [validateVaultPairs, hp.1, hp.2, ih (index := index + 1) hr]
 
 /-- Pure guards of `_addConsolidationRequests`, including checked fee
 multiplication and the exact-fee check before per-pair key validation. -/
@@ -189,5 +204,39 @@ theorem prepared_zip (groups : List WitnessGroup) :
     (preparedSources groups).zip (preparedTargets groups) = preparePairs groups := by
   rw [← preparePairs_sources, ← preparePairs_targets]
   simpa [List.unzip_eq_map] using List.zip_unzip (preparePairs groups)
+
+theorem prepared_lengths_eq (groups : List WitnessGroup) :
+    (preparedSources groups).length = (preparedTargets groups).length := by
+  rw [← preparePairs_sources, ← preparePairs_targets]
+  simp
+
+/-- End-to-end pure correspondence for the gateway/vault boundary. Under the
+conditions established before the pinned gateway calls the vault (a nonempty,
+valid flattened batch and a word-sized exact fee), the independently modeled
+vault guards accept exactly the pairs produced by `_prepareConsolidationPairs`.
+-/
+theorem validateVaultAdd_prepared (groups : List WitnessGroup)
+    (fee msgValue : Word)
+    (hnonempty : preparedSources groups ≠ [])
+    (hvalid : ∀ pair ∈ preparePairs groups,
+      pair.1.length = pubkeyLength ∧ pair.2.length = pubkeyLength)
+    (hfit : (preparedSources groups).length * fee.val < 2 ^ 256)
+    (hvalue : msgValue.val = (preparedSources groups).length * fee.val) :
+    validateVaultAdd fee msgValue (preparedSources groups)
+      (preparedTargets groups) = .ok (preparePairs groups) := by
+  have hmul : checkedMulWord (preparedSources groups).length fee = some msgValue := by
+    unfold checkedMulWord
+    simp only [hfit, ↓reduceDIte]
+    congr 1
+    apply Verity.Core.Uint256.ext
+    exact hvalue.symm
+  have hmulTargets :
+      checkedMulWord (preparedTargets groups).length fee = some msgValue := by
+    rw [← prepared_lengths_eq groups]
+    exact hmul
+  unfold validateVaultAdd
+  simp [hnonempty, prepared_lengths_eq groups, hmulTargets, prepared_zip,
+    validateVaultPairs_ok 0 (preparePairs groups) hvalid]
+  rfl
 
 end audit.trio.consolidation

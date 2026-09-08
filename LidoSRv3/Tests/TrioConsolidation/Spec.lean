@@ -42,6 +42,15 @@ example : validateVaultAdd (word 3) (word 9)
     .ok [(key 11, key 21), (key 12, key 21), (key 13, key 22)] := by
   rfl
 
+example : validateVaultAdd (word 3) (word 9)
+    (preparedSources witnesses) (preparedTargets witnesses) =
+    .ok (preparePairs witnesses) := by
+  apply validateVaultAdd_prepared
+  · decide
+  · decide
+  · decide
+  · rfl
+
 /-- Exact fee is checked before the vault loop validates key lengths. -/
 example : validateVaultAdd (word 3) (word 5) [key 11 47] [key 21] =
     .error (.incorrectFee (word 3) (word 5)) := by
