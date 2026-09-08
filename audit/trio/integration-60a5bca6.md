@@ -52,6 +52,12 @@ HTTP 422: 257 GiB was available, but the requested 12 GiB plus the 250 GiB
 emergency floor required 262 GiB. This is an infrastructure rejection, not a
 passing build receipt.
 
+The durable task later reported completion without captured output. A direct
+retry at receipt commit `b22cd075` reproduced the same pre-compilation failure:
+`lake build` exited 1 after the remote endpoint returned HTTP 422 with 257 GiB
+available against the same 262 GiB capacity requirement. Consequently there
+is still no successful compilation receipt to claim.
+
 The metadata gate completed successfully with
 `python3 scripts/audit_metadata.py check` and reported 11 canonical guarantees
 plus 19 subordinate evidence rows.
