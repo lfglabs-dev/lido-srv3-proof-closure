@@ -10,7 +10,7 @@
   identified contradictory vault-premise descriptions in the canonical registry
   and theorem docstring. Those now consistently require positive value received
   by the vault; positive outer payment is insufficient. The registry review
-  basis is advanced to the exact editorial correction commit `db7d515b` and the
+  basis is advanced to the exact editorial correction commit `ffd6ae4d` and the
   generated report explicitly disclaims new independent certification. Original
   registrations, theorem statements, statuses and trust allowances are retained.
 - `p-account-1-address-1` at `e04136dd` and its bounded successor at `39991771`:

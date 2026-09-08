@@ -25,14 +25,14 @@ import trio_report  # noqa: E402  (sibling module, located above)
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
 SOURCE_FIDELITY = AUDIT / "SOURCE-FIDELITY.md"
-R1_REVIEW_BASE = "db7d515b24f189f606f6851bf883585fc22e783a"
+R1_REVIEW_BASE = "ffd6ae4d5be0a5e1e7d1be335700e58ca90771f5"
 # Bind the report inputs to the recorded Git object and exact bytes.
 # Changed inputs must never inherit an earlier source review.
 # This exact family is every structured input used to render the R1 review
 # report.  A normal regeneration may never pair changed family content with a
 # stale certified basis.
 R1_REPORT_INPUT_SHA256 = {
-    "audit/guarantees.yaml": "b135338693cbe54ced3415f7605ed9af461ff3cb096a2b16dd7539d6f7285f50",
+    "audit/guarantees.yaml": "30cae9ec654561f7320a3bd2031989868e6e530d00a36a63b5bc470ec3212189",
     "audit/source-map.yaml": "b390faebf0eb8ccea9e149c92f421e8f0bb1dca16c0dffa843489c31b52c5f32",
     "audit/trust-native-decide-allowlist.txt": "4874951cd0717f16756f3f644c424f06bdbbfcca1561173b32fd134b1fb6730c",
 }
@@ -94,7 +94,7 @@ EXPECTED_CANONICAL_DETAIL_SHA256 = {
     "P-CONSOLIDATION-ETH-1": "0bbd358a2b0ab770b4a88536e88ce9a32fa6bfdecbc83c70c519673505841017",
     "P-ADDRESS-1": "2aec78330a6f136e109160e4cca2c2da6e159dc2db719d28b260134d69e447aa",
     "P-TOPUP-2": "9fac92874b97a201f80be5b60508d84bedefdeed962c417aaa8b3323044b18dc",
-    "P-CONSOLIDATION-1": "173b46451ff26fa7e575d6cca40378417e5edc3a1fc068c63e2e98fe86f5d674",
+    "P-CONSOLIDATION-1": "59d625c0e561cc5f7b12535f3ba899c6f7a906d04a8a1db26d7959401d444c73",
     "P-SSZ-1": "34b6ab0e40f56dd44ffb44c1b37a090ffeb3880339d403022e172534a16cbb8a",
 }
 EXPECTED_PRIORITIES = {

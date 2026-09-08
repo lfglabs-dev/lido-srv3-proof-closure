@@ -107,9 +107,9 @@
       "beacon eligibility, quota, witness, and gateway grouping",
       "96-byte packed pubkey calldata and real request-contract calls",
       "Bus publisher/executor path",
+      "keccak memory-array oracle",
       "A-CONSOLIDATION-GATEWAY-NONZERO is a caller-supplied premise on the vault input: an authorized call carries nonzero forwarded msg.value. Positive outer gateway payment alone does not derive it.",
       "Composition with P-CONSOLIDATION-ETH-1 requires the ABI/interpreter bridge and a justified positive forwarded fee; the bridge alone does not discharge the nonzero-value premise.",
-      "composition with P-CONSOLIDATION-ETH-1 requires ABI/interpreter bridge (groups, fee fetch, failing refund, value-bearing CALLs); fence remains until then",
       "preservesEthBalance counterparty credit: the vault-side forwarding invariant is CHECKED on the executed plane, but the request predeploy's own balance credit is another contract's state; the multi-contract side stays with P-CONSOLIDATION-VALUE-1 / P-CONSOLIDATION-ETH-1"
     ],
     "open_gap_count": 7
@@ -208,9 +208,9 @@
       "beacon eligibility, quota, witness, and gateway grouping",
       "96-byte packed pubkey calldata and real request-contract calls",
       "Bus publisher/executor path",
+      "keccak memory-array oracle",
       "A-CONSOLIDATION-GATEWAY-NONZERO is a caller-supplied premise on the vault input: an authorized call carries nonzero forwarded msg.value. Positive outer gateway payment alone does not derive it.",
       "Composition with P-CONSOLIDATION-ETH-1 requires the ABI/interpreter bridge and a justified positive forwarded fee; the bridge alone does not discharge the nonzero-value premise.",
-      "composition with P-CONSOLIDATION-ETH-1 requires ABI/interpreter bridge (groups, fee fetch, failing refund, value-bearing CALLs); fence remains until then",
       "preservesEthBalance counterparty credit: the vault-side forwarding invariant is CHECKED on the executed plane, but the request predeploy's own balance credit is another contract's state; the multi-contract side stays with P-CONSOLIDATION-VALUE-1 / P-CONSOLIDATION-ETH-1"
     ]
   }

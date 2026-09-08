@@ -4,7 +4,7 @@
 
 ## Decision
 
-Review basis: structured inputs after the PR250 vault-premise editorial correction (theorem registrations and statuses unchanged; this revision is not a new independent certification; prior input history remains in Git; trio composition scoped separately) `db7d515b24f189f606f6851bf883585fc22e783a`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
+Review basis: structured inputs after the PR250 vault-premise editorial correction (theorem registrations and statuses unchanged; this revision is not a new independent certification; prior input history remains in Git; trio composition scoped separately) `ffd6ae4d5be0a5e1e7d1be335700e58ca90771f5`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
 
 ## Architecture and evidence boundary
 
@@ -298,9 +298,9 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 - beacon eligibility, quota, witness, and gateway grouping
 - 96-byte packed pubkey calldata and real request-contract calls
 - Bus publisher/executor path
+- keccak memory-array oracle
 - A-CONSOLIDATION-GATEWAY-NONZERO is a caller-supplied premise on the vault input: an authorized call carries nonzero forwarded msg.value. Positive outer gateway payment alone does not derive it.
 - Composition with P-CONSOLIDATION-ETH-1 requires the ABI/interpreter bridge and a justified positive forwarded fee; the bridge alone does not discharge the nonzero-value premise.
-- composition with P-CONSOLIDATION-ETH-1 requires ABI/interpreter bridge (groups, fee fetch, failing refund, value-bearing CALLs); fence remains until then
 - preservesEthBalance counterparty credit: the vault-side forwarding invariant is CHECKED on the executed plane, but the request predeploy's own balance credit is another contract's state; the multi-contract side stays with P-CONSOLIDATION-VALUE-1 / P-CONSOLIDATION-ETH-1
 
 **Classification.** **IMPLEMENTATION_PENDING** — Keep the checked vault-loop and value-bearing CALL theorems. Derive hGatewayAdmittedNonzero for the vault input from a justified positive forwarded total fee and a composed gateway path, or revise the positive-fee claim. A positive outer payment alone is insufficient. Keep the checked entry-credit overflow guard and its boundary regressions.

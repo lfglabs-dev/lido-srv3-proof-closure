@@ -1,7 +1,7 @@
-verified_source_tree=475a59b8486e163310340a6391c5beacce224daf
+verified_source_tree=2e6e53d58358b06d8d3f50be3843696406540528
 lean_version=Lean (version 4.31.0, arm64-apple-darwin24.6.0, commit 68218e876d2a38b1985b8590fff244a83c321783, Release)
 proof_targets=LidoSRv3 LidoSRv3Legacy
-⚠ [11/490] Replayed Verity.Core
+⚠ [11/155] Replayed Verity.Core
 warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
@@ -11,7 +11,7 @@ Note: This linter can be disabled with `set_option linter.unnecessarySimpa false
 warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
-⚠ [1159/1170] Replayed Conform.Wheels
+⚠ [1168/1607] Replayed Conform.Wheels
 warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
 
 Note: The updated constant has a different type:
@@ -24,7 +24,7 @@ Note: The updated constant has a different type:
   {α : Sort u} → (α → α → Prop) → Prop
 instead of
   (α : Sort u_1) → (α → α → Prop) → Prop
-⚠ [1160/1170] Replayed EvmYul.Pretty
+⚠ [1169/1607] Replayed EvmYul.Pretty
 warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
 
 Note: The updated constant has a different type:
@@ -37,15 +37,15 @@ Note: The updated constant has a different type:
   {α : Sort u} → (α → α → Prop) → Prop
 instead of
   (α : Sort u_1) → (α → α → Prop) → Prop
-⚠ [1208/1606] Replayed EvmYul.Semantics
+⚠ [1208/1607] Replayed EvmYul.Semantics
 warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
 
 import Mathlib.Init
-⚠ [1209/1606] Replayed EvmYul.EVM.Semantics
+⚠ [1209/1607] Replayed EvmYul.EVM.Semantics
 warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
 
 import Mathlib.Init
-⚠ [1254/1606] Replayed LidoSRv3.Audit.Verity.MinFirstDistributionTx
+⚠ [1254/1607] Replayed LidoSRv3.Audit.Verity.MinFirstDistributionTx
 warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:142:52: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
@@ -77,7 +77,7 @@ Hint: Omit it from the simp argument list.
   simp only [modelAllocateLoop, i̵f̵_̵n̵e̵g̵ ̵h̵z̵v̵,̵ ̵hModelStep, if_neg hav]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1259/1606] Replayed LidoSRv3.Audit.Verity.DepositNFrameTx
+⚠ [1259/1607] Replayed LidoSRv3.Audit.Verity.DepositNFrameTx
 warning: LidoSRv3/Audit/Verity/DepositNFrameTx.lean:299:26: This simp argument is unused:
   Nat.add_assoc
 
@@ -170,7 +170,7 @@ Hint: Omit it from the simp argument list.
   ̵ ̵ ̵ ̵ ̵ ̵ ̵L̵i̵s̵t̵.̵d̵r̵o̵p̵_̵l̵e̵f̵t̵]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1266/1606] Replayed LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTxUniversalRevert
+⚠ [1266/1607] Replayed LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTxUniversalRevert
 warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:75:66: This simp argument is unused:
   evalExprList
 
@@ -645,7 +645,7 @@ Hint: Omit it from the simp argument list.
       hstorageW, mul_ofNat_val, hdiv, hle]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1285/1606] Replayed LidoSRv3.Audit.Verity.ConsolidationTx
+⚠ [1285/1607] Replayed LidoSRv3.Audit.Verity.ConsolidationTx
 warning: LidoSRv3/Audit/Verity/ConsolidationTx.lean:726:36: This simp argument is unused:
   requestCall
 
@@ -667,15 +667,15 @@ Hint: Omit it from the simp argument list.
   simp ̵[̵i̵h̵]̵
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1286/1606] Replayed LidoSRv3.Audit.Guarantees.PConsolidation1
-warning: LidoSRv3/Audit/Guarantees/PConsolidation1.lean:241:41: This simp argument is unused:
+⚠ [1286/1607] Replayed LidoSRv3.Audit.Guarantees.PConsolidation1
+warning: LidoSRv3/Audit/Guarantees/PConsolidation1.lean:240:41: This simp argument is unused:
   List.mem_nil_iff
 
 Hint: Omit it from the simp argument list.
   simp [List.mem_cons,̵ ̵L̵i̵s̵t̵.̵m̵e̵m̵_̵n̵i̵l̵_̵i̵f̵f̵] at hx
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1308/1606] Replayed LidoSRv3.Audit.Source.ReserveCorrespondence
+⚠ [1308/1607] Replayed LidoSRv3.Audit.Source.ReserveCorrespondence
 warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:410:53: This simp argument is unused:
   setStorage
 
@@ -1073,7 +1073,7 @@ Hint: Omit it from the simp argument list.
   ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hunreserved, hdepositable, henough]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1319/1606] Replayed LidoSRv3.Audit.Verity.VaultEthTx
+⚠ [1319/1607] Replayed LidoSRv3.Audit.Verity.VaultEthTx
 warning: LidoSRv3/Audit/Verity/VaultEthTx.lean:94:23: This simp argument is unused:
   hRoute
 
@@ -1109,7 +1109,7 @@ Hint: Omit it from the simp argument list.
   simp [execute, hR̵o̵u̵t̵e̵,̵ ̵h̵Source, Contract.run] at hExecute
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1341/1606] Replayed LidoSRv3.Audit.Verity.AddressTx
+⚠ [1341/1607] Replayed LidoSRv3.Audit.Verity.AddressTx
 warning: LidoSRv3/Audit/Verity/AddressTx.lean:277:34: This simp argument is unused:
   AddressTxContract.paused
 
@@ -2414,7 +2414,7 @@ Hint: Omit it from the simp argument list.
   ̵ ̵ ̵ ̵ ̵ ̵ ̵C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵s̵t̵o̵r̵a̵g̵e̵M̵a̵p̵U̵i̵n̵t̵]̵C̲o̲n̲t̲r̲a̲c̲t̲S̲t̲a̲t̲e̲.̲r̲e̲a̲d̲M̲a̲p̲U̲i̲n̲t̲]̲
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1345/1606] Replayed LidoSRv3.Audit.SszDepositEquivalence
+⚠ [1345/1607] Replayed LidoSRv3.Audit.SszDepositEquivalence
 warning: LidoSRv3/Audit/SszDepositEquivalence.lean:93:4: This simp argument is unused:
   Ssz.traverseBranch
 
@@ -2437,7 +2437,7 @@ Hint: Omit it from the simp argument list.
   simp [sourceWitness,̵ ̵s̵t̵r̵u̵c̵t̵u̵r̵a̵l̵W̵i̵t̵n̵e̵s̵s̵]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1348/1606] Replayed LidoSRv3.Audit.Verity.SszTxSimulation
+⚠ [1348/1607] Replayed LidoSRv3.Audit.Verity.SszTxSimulation
 warning: LidoSRv3/Audit/Verity/SszTxSimulation.lean:317:8: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
@@ -2457,7 +2457,7 @@ info: LidoSRv3/Audit/Verity/SszTxSimulation.lean:348:0: Compiler.CompilationMode
   Denote.Sha256.denote oracle world inputOffset inputSize outputOffset =
     Outcome.success (digestWord (fipsSha256 (memorySlice world.memory inputOffset inputSize)))
       (writeDigest world outputOffset (fipsSha256 (memorySlice world.memory inputOffset inputSize)))
-⚠ [1354/1606] Replayed LidoSRv3.Audit.Verity.ReserveRelationalTx
+⚠ [1354/1607] Replayed LidoSRv3.Audit.Verity.ReserveRelationalTx
 warning: LidoSRv3/Audit/Verity/ReserveRelationalTx.lean:303:44: This simp argument is unused:
   memory_writeSlot
 
@@ -2465,7 +2465,7 @@ Hint: Omit it from the simp argument list.
   simp [readBatchEnd, arrayState, evalExpr,̵ ̵m̵e̵m̵o̵r̵y̵_̵w̵r̵i̵t̵e̵S̵l̵o̵t̵]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1389/1606] Replayed LidoSRv3.Audit.Verity.TopupHybrid
+⚠ [1389/1607] Replayed LidoSRv3.Audit.Verity.TopupHybrid
 warning: LidoSRv3/Audit/Verity/TopupHybrid.lean:157:26: This simp argument is unused:
   _root_.Verity.pure
 
@@ -2482,7 +2482,7 @@ Hint: Omit it from the simp argument list.
   ̵  ̵ ̵ ̵ ̵ ̵Outcome.reverts, Outcome.pulled, Outcome.pushed, hrun] at hconserves ⊢
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1430/1606] Replayed LidoSRv3.Audit.Source.TrioAlloc2.Selection
+⚠ [1430/1607] Replayed LidoSRv3.Audit.Source.TrioAlloc2.Selection
 warning: LidoSRv3/Audit/Source/TrioAlloc2/Selection.lean:53:10: This simp argument is unused:
   levelsEq
 
@@ -2497,7 +2497,7 @@ Hint: Omit it from the simp argument list.
   simp [l̵e̵v̵e̵l̵s̵E̵q̵,̵ ̵Spec.minimum, nonzero, minimumEq]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1439/1606] Replayed LidoSRv3.Audit.Source.TrioAlloc2.StepCorrespondence
+⚠ [1439/1607] Replayed LidoSRv3.Audit.Source.TrioAlloc2.StepCorrespondence
 warning: LidoSRv3/Audit/Source/TrioAlloc2/StepCorrespondence.lean:16:71: This simp argument is unused:
   eq
 
@@ -2505,20 +2505,20 @@ Hint: Omit it from the simp argument list.
   simp [decodedRows, List.getElem?_zipWith, List.getElem?_set_ne eq,̵ ̵e̵q̵]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-ℹ [1442/1606] Replayed LidoSRv3.Audit.Source.TrioAlloc2.Composition
+ℹ [1442/1607] Replayed LidoSRv3.Audit.Source.TrioAlloc2.Composition
 info: LidoSRv3/Audit/Source/TrioAlloc2/Composition.lean:53:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_success_establishes_consumer_premises' depends on axioms: [propext,
  Quot.sound]
 info: LidoSRv3/Audit/Source/TrioAlloc2/Composition.lean:54:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_then_consumer_succeeds' depends on axioms: [propext, Quot.sound]
 info: LidoSRv3/Audit/Source/TrioAlloc2/Composition.lean:71:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_then_consumer_distributes' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-ℹ [1443/1606] Replayed LidoSRv3.Audit.Source.TrioComposition.Parent
+ℹ [1443/1607] Replayed LidoSRv3.Audit.Source.TrioComposition.Parent
 info: LidoSRv3/Audit/Source/TrioComposition/Parent.lean:252:0: 'LidoSRv3.Audit.Source.TrioComposition.getDepositAllocations_total_bound' depends on axioms: [propext, Quot.sound]
 info: LidoSRv3/Audit/Source/TrioComposition/Parent.lean:253:0: 'LidoSRv3.Audit.Source.TrioComposition.convertPositive_refines' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
 info: LidoSRv3/Audit/Source/TrioComposition/Parent.lean:254:0: 'LidoSRv3.Audit.Source.TrioComposition.convertZero_refines' depends on axioms: [propext, Classical.choice, Quot.sound]
-⚠ [1444/1606] Replayed LidoSRv3.Audit.Source.TrioAlloc2.RowBounds
+⚠ [1444/1607] Replayed LidoSRv3.Audit.Source.TrioAlloc2.RowBounds
 warning: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:171:20: This simp argument is unused:
   ↓reduceDIte
 
@@ -2530,7 +2530,7 @@ info: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:174:0: 'LidoSRv3.Audit.Sou
 info: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:175:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocateLoop_row_bounds' depends on axioms: [propext, Quot.sound]
 info: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:176:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocate_row_bounds' depends on axioms: [propext, Quot.sound]
 info: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:177:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocate_delta_success' depends on axioms: [propext, Quot.sound]
-ℹ [1445/1606] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentComposition
+ℹ [1445/1607] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentComposition
 info: LidoSRv3/Audit/Source/TrioComposition/ParentComposition.lean:65:0: 'LidoSRv3.Audit.Source.TrioComposition.producer_consumer_conversion_refines' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
@@ -2538,13 +2538,13 @@ info: LidoSRv3/Audit/Source/TrioComposition/ParentComposition.lean:66:0: 'LidoSR
  Classical.choice,
  Quot.sound]
 info: LidoSRv3/Audit/Source/TrioComposition/ParentComposition.lean:67:0: 'LidoSRv3.Audit.Source.TrioComposition.producer_consumer_parent_subtraction' depends on axioms: [propext, Quot.sound]
-ℹ [1446/1606] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentRelational
+ℹ [1446/1607] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentRelational
 info: LidoSRv3/Audit/Source/TrioComposition/ParentRelational.lean:185:0: 'LidoSRv3.Audit.Source.TrioComposition.ParentSpec.public_all_outcomes' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-ℹ [1447/1606] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentDeterminism
+ℹ [1447/1607] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentDeterminism
 info: LidoSRv3/Audit/Source/TrioComposition/ParentDeterminism.lean:155:0: 'LidoSRv3.Audit.Source.TrioComposition.ParentSpec.public_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
-ℹ [1448/1606] Replayed LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI
+ℹ [1448/1607] Replayed LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI
 info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:169:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.decodeArray_encoded' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
@@ -2556,25 +2556,25 @@ info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:171:0: 'LidoSRv3.Audit.So
  Quot.sound]
 info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:172:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.run_encoded' depends on axioms: [propext, Classical.choice, Quot.sound]
 info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:173:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.run_short' depends on axioms: [propext, Quot.sound]
-ℹ [1449/1606] Replayed LidoSRv3.Audit.Source.TrioAlloc2.ABIComposition
+ℹ [1449/1607] Replayed LidoSRv3.Audit.Source.TrioAlloc2.ABIComposition
 info: LidoSRv3/Audit/Source/TrioAlloc2/ABIComposition.lean:46:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_then_abi_distributes' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-ℹ [1450/1606] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentABI
+ℹ [1450/1607] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentABI
 info: LidoSRv3/Audit/Source/TrioComposition/ParentABI.lean:110:0: 'LidoSRv3.Audit.Source.TrioComposition.public_abi_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
-ℹ [1451/1606] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentCalls
+ℹ [1451/1607] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentCalls
 info: LidoSRv3/Audit/Source/TrioComposition/ParentCalls.lean:45:0: 'LidoSRv3.Audit.Source.TrioComposition.ParentCalls.correspondence' depends on axioms: [propext, Quot.sound]
-ℹ [1452/1606] Replayed LidoSRv3.Audit.Source.TrioAlloc2.MemoryPrefix
+ℹ [1452/1607] Replayed LidoSRv3.Audit.Source.TrioAlloc2.MemoryPrefix
 info: LidoSRv3/Audit/Source/TrioAlloc2/MemoryPrefix.lean:148:0: 'LidoSRv3.Audit.Source.TrioAlloc2.MemoryPrefix.execute_success_iff' depends on axioms: [propext, Quot.sound]
 info: LidoSRv3/Audit/Source/TrioAlloc2/MemoryPrefix.lean:149:0: 'LidoSRv3.Audit.Source.TrioAlloc2.MemoryPrefix.execute_overflow_iff' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
 info: LidoSRv3/Audit/Source/TrioAlloc2/MemoryPrefix.lean:151:0: 'LidoSRv3.Audit.Source.TrioAlloc2.MemoryPrefix.reserve_success' depends on axioms: [propext, Quot.sound]
 info: LidoSRv3/Audit/Source/TrioAlloc2/MemoryPrefix.lean:152:0: 'LidoSRv3.Audit.Source.TrioAlloc2.MemoryPrefix.execute_extent' depends on axioms: [propext, Quot.sound]
-ℹ [1453/1606] Replayed LidoSRv3.Audit.Source.TrioComposition.MemoryGuard
+ℹ [1453/1607] Replayed LidoSRv3.Audit.Source.TrioComposition.MemoryGuard
 info: LidoSRv3/Audit/Source/TrioComposition/MemoryGuard.lean:38:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryGuard.run_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
 info: LidoSRv3/Audit/Source/TrioComposition/MemoryGuard.lean:39:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryGuard.check_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
-⚠ [1454/1606] Replayed LidoSRv3.Audit.Source.TrioComposition.AllocationParentCalls
+⚠ [1454/1607] Replayed LidoSRv3.Audit.Source.TrioComposition.AllocationParentCalls
 warning: LidoSRv3/Audit/Source/TrioComposition/AllocationParentCalls.lean:31:12: This simp argument is unused:
   divided
 
@@ -2591,7 +2591,7 @@ info: LidoSRv3/Audit/Source/TrioComposition/AllocationParentCalls.lean:85:0: 'Li
  Quot.sound]
 info: LidoSRv3/Audit/Source/TrioComposition/AllocationParentCalls.lean:86:0: 'LidoSRv3.Audit.Source.TrioComposition.AllocationParentCalls.division_failure' depends on axioms: [propext, Quot.sound]
 info: LidoSRv3/Audit/Source/TrioComposition/AllocationParentCalls.lean:87:0: 'LidoSRv3.Audit.Source.TrioComposition.AllocationParentCalls.memory_failure' depends on axioms: [propext, Quot.sound]
-ℹ [1455/1606] Replayed LidoSRv3.Audit.Source.TrioComposition.ReturnMemory
+ℹ [1455/1607] Replayed LidoSRv3.Audit.Source.TrioComposition.ReturnMemory
 info: LidoSRv3/Audit/Source/TrioComposition/ReturnMemory.lean:132:0: 'LidoSRv3.Audit.Source.TrioComposition.ReturnMemory.summary_correspondence' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
@@ -2609,7 +2609,7 @@ info: LidoSRv3/Audit/Source/TrioComposition/ReturnMemory.lean:138:0: 'LidoSRv3.A
 info: LidoSRv3/Audit/Source/TrioComposition/ReturnMemory.lean:139:0: 'LidoSRv3.Audit.Source.TrioComposition.ReturnMemory.bounded_stake_projection' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-ℹ [1456/1606] Replayed LidoSRv3.Audit.Source.TrioComposition.RowMemory
+ℹ [1456/1607] Replayed LidoSRv3.Audit.Source.TrioComposition.RowMemory
 info: LidoSRv3/Audit/Source/TrioComposition/RowMemory.lean:215:0: 'LidoSRv3.Audit.Source.TrioComposition.RowMemory.firstLoop_exact' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
@@ -2621,7 +2621,7 @@ info: LidoSRv3/Audit/Source/TrioComposition/RowMemory.lean:218:0: 'LidoSRv3.Audi
  Classical.choice,
  Quot.sound]
 info: LidoSRv3/Audit/Source/TrioComposition/RowMemory.lean:219:0: 'LidoSRv3.Audit.Source.TrioComposition.RowMemory.config_failure' depends on axioms: [propext, Quot.sound]
-ℹ [1457/1606] Replayed LidoSRv3.Audit.Source.TrioComposition.FinalMemoryRows
+ℹ [1457/1607] Replayed LidoSRv3.Audit.Source.TrioComposition.FinalMemoryRows
 info: LidoSRv3/Audit/Source/TrioComposition/FinalMemoryRows.lean:164:0: 'LidoSRv3.Audit.Source.TrioComposition.FinalMemoryRows.slot_exact' depends on axioms: [propext, Quot.sound]
 info: LidoSRv3/Audit/Source/TrioComposition/FinalMemoryRows.lean:165:0: 'LidoSRv3.Audit.Source.TrioComposition.FinalMemoryRows.firstRow_exact' depends on axioms: [propext,
  Classical.choice,
@@ -2630,14 +2630,14 @@ info: LidoSRv3/Audit/Source/TrioComposition/FinalMemoryRows.lean:166:0: 'LidoSRv
  Classical.choice,
  Quot.sound]
 info: LidoSRv3/Audit/Source/TrioComposition/FinalMemoryRows.lean:167:0: 'LidoSRv3.Audit.Source.TrioComposition.FinalMemoryRows.endPointer_bound' depends on axioms: [propext, Quot.sound]
-ℹ [1458/1606] Replayed LidoSRv3.Audit.Source.TrioAlloc2.MemoryComposition
+ℹ [1458/1607] Replayed LidoSRv3.Audit.Source.TrioAlloc2.MemoryComposition
 info: LidoSRv3/Audit/Source/TrioAlloc2/MemoryComposition.lean:71:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_then_memory_consumer_distributes' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
 info: LidoSRv3/Audit/Source/TrioAlloc2/MemoryComposition.lean:72:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_then_byte_consumer_distributes' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-ℹ [1459/1606] Replayed LidoSRv3.Audit.Source.TrioComposition.MemoryTransport
+ℹ [1459/1607] Replayed LidoSRv3.Audit.Source.TrioComposition.MemoryTransport
 info: LidoSRv3/Audit/Source/TrioComposition/MemoryTransport.lean:169:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryTransport.storeArray_related' depends on axioms: [propext, Quot.sound]
 info: LidoSRv3/Audit/Source/TrioComposition/MemoryTransport.lean:170:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryTransport.storeElement_related' depends on axioms: [propext,
  Classical.choice,
@@ -2648,13 +2648,13 @@ info: LidoSRv3/Audit/Source/TrioComposition/MemoryTransport.lean:171:0: 'LidoSRv
 info: LidoSRv3/Audit/Source/TrioComposition/MemoryTransport.lean:172:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryTransport.storeElement_frame' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-ℹ [1460/1606] Replayed LidoSRv3.Audit.Source.TrioComposition.MemoryTransportCopy
+ℹ [1460/1607] Replayed LidoSRv3.Audit.Source.TrioComposition.MemoryTransportCopy
 info: LidoSRv3/Audit/Source/TrioComposition/MemoryTransportCopy.lean:138:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryTransport.copyArray_related' depends on axioms: [propext, Quot.sound]
 info: LidoSRv3/Audit/Source/TrioComposition/MemoryTransportCopy.lean:139:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryTransport.copyWordsLive_eq' depends on axioms: [propext, Quot.sound]
 info: LidoSRv3/Audit/Source/TrioComposition/MemoryTransportCopy.lean:140:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryTransport.importReturn_preserves' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-ℹ [1461/1606] Replayed LidoSRv3.Audit.Source.TrioComposition.MemoryTransportABI
+ℹ [1461/1607] Replayed LidoSRv3.Audit.Source.TrioComposition.MemoryTransportABI
 info: LidoSRv3/Audit/Source/TrioComposition/MemoryTransportABI.lean:79:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryTransport.libraryFromMemory_exact' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
@@ -2664,11 +2664,11 @@ info: LidoSRv3/Audit/Source/TrioComposition/MemoryTransportABI.lean:80:0: 'LidoS
 info: LidoSRv3/Audit/Source/TrioComposition/MemoryTransportABI.lean:81:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryTransport.producer_memory_library_distributes' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-ℹ [1462/1606] Replayed LidoSRv3.Audit.Source.TrioComposition.MemoryTransportReturn
+ℹ [1462/1607] Replayed LidoSRv3.Audit.Source.TrioComposition.MemoryTransportReturn
 info: LidoSRv3/Audit/Source/TrioComposition/MemoryTransportReturn.lean:89:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryTransport.staged_return_arrays' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-⚠ [1463/1606] Replayed LidoSRv3.Audit.Source.TrioComposition.ProducerStores
+⚠ [1463/1607] Replayed LidoSRv3.Audit.Source.TrioComposition.ProducerStores
 warning: LidoSRv3/Audit/Source/TrioComposition/ProducerStores.lean:114:5: Variable name `cend` is not explicitly referenced.
 
 The binding can be removed (if unused) or named `_` (if used implicitly).
@@ -2680,12 +2680,12 @@ info: LidoSRv3/Audit/Source/TrioComposition/ProducerStores.lean:194:0: 'LidoSRv3
  Quot.sound]
 info: LidoSRv3/Audit/Source/TrioComposition/ProducerStores.lean:196:0: 'LidoSRv3.Audit.Source.TrioComposition.ProducerStores.firstLoop_exact' depends on axioms: [propext, Quot.sound]
 info: LidoSRv3/Audit/Source/TrioComposition/ProducerStores.lean:197:0: 'LidoSRv3.Audit.Source.TrioComposition.ProducerStores.secondLoop_exact' depends on axioms: [propext, Quot.sound]
-ℹ [1464/1606] Replayed LidoSRv3.Audit.Source.TrioComposition.CallerMemory
+ℹ [1464/1607] Replayed LidoSRv3.Audit.Source.TrioComposition.CallerMemory
 info: LidoSRv3/Audit/Source/TrioComposition/CallerMemory.lean:87:0: 'LidoSRv3.Audit.Source.TrioComposition.CallerMemory.zero_exact' depends on axioms: [propext, Quot.sound]
 info: LidoSRv3/Audit/Source/TrioComposition/CallerMemory.lean:88:0: 'LidoSRv3.Audit.Source.TrioComposition.CallerMemory.zero_allocation_failure' depends on axioms: [propext]
 info: LidoSRv3/Audit/Source/TrioComposition/CallerMemory.lean:89:0: 'LidoSRv3.Audit.Source.TrioComposition.CallerMemory.canonicalReturn_exact' depends on axioms: [propext, Quot.sound]
 info: LidoSRv3/Audit/Source/TrioComposition/CallerMemory.lean:90:0: 'LidoSRv3.Audit.Source.TrioComposition.CallerMemory.library_success' depends on axioms: [propext, Quot.sound]
-ℹ [1465/1606] Replayed LidoSRv3.Audit.Source.TrioComposition.FinalMemoryCaller
+ℹ [1465/1607] Replayed LidoSRv3.Audit.Source.TrioComposition.FinalMemoryCaller
 info: LidoSRv3/Audit/Source/TrioComposition/FinalMemoryCaller.lean:135:0: 'LidoSRv3.Audit.Source.TrioComposition.FinalMemoryCaller.canonicalReply_exact' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
@@ -2698,7 +2698,7 @@ info: LidoSRv3/Audit/Source/TrioComposition/FinalMemoryCaller.lean:137:0: 'LidoS
 info: LidoSRv3/Audit/Source/TrioComposition/FinalMemoryCaller.lean:138:0: 'LidoSRv3.Audit.Source.TrioComposition.FinalMemoryCaller.afterProducer_exact' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-ℹ [1466/1606] Replayed LidoSRv3.Audit.Source.TrioComposition.MemoryTransportCall
+ℹ [1466/1607] Replayed LidoSRv3.Audit.Source.TrioComposition.MemoryTransportCall
 info: LidoSRv3/Audit/Source/TrioComposition/MemoryTransportCall.lean:226:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryTransportCall.attempted_trace' depends on axioms: [propext, Quot.sound]
 info: LidoSRv3/Audit/Source/TrioComposition/MemoryTransportCall.lean:227:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryTransportCall.evaluate_prefix_drop' depends on axioms: [propext]
 info: LidoSRv3/Audit/Source/TrioComposition/MemoryTransportCall.lean:228:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryTransportCall.nonempty_before_no_duplication' depends on axioms: [propext,
@@ -2710,7 +2710,7 @@ info: LidoSRv3/Audit/Source/TrioComposition/MemoryTransportCall.lean:230:0: 'Lid
 info: LidoSRv3/Audit/Source/TrioComposition/MemoryTransportCall.lean:231:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryTransportCall.observed_return_preserves_original' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-ℹ [1467/1606] Replayed LidoSRv3.Audit.Source.TrioComposition.MemoryProducer
+ℹ [1467/1607] Replayed LidoSRv3.Audit.Source.TrioComposition.MemoryProducer
 info: LidoSRv3/Audit/Source/TrioComposition/MemoryProducer.lean:79:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryProducer.afterPrefix_exact' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
@@ -2718,7 +2718,7 @@ info: LidoSRv3/Audit/Source/TrioComposition/MemoryProducer.lean:80:0: 'LidoSRv3.
  Classical.choice,
  Quot.sound]
 info: LidoSRv3/Audit/Source/TrioComposition/MemoryProducer.lean:81:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryProducer.prefix_failure' depends on axioms: [propext]
-ℹ [1468/1606] Replayed LidoSRv3.Audit.Source.TrioComposition.MemoryParentCalls
+ℹ [1468/1607] Replayed LidoSRv3.Audit.Source.TrioComposition.MemoryParentCalls
 info: LidoSRv3/Audit/Source/TrioComposition/MemoryParentCalls.lean:59:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryParentCalls.program_eq' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
@@ -2728,7 +2728,7 @@ info: LidoSRv3/Audit/Source/TrioComposition/MemoryParentCalls.lean:60:0: 'LidoSR
 info: LidoSRv3/Audit/Source/TrioComposition/MemoryParentCalls.lean:61:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryParentCalls.abi_extent' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-ℹ [1469/1606] Replayed LidoSRv3.Audit.Source.TrioComposition.WriterMemory
+ℹ [1469/1607] Replayed LidoSRv3.Audit.Source.TrioComposition.WriterMemory
 info: LidoSRv3/Audit/Source/TrioComposition/WriterMemory.lean:82:0: 'LidoSRv3.Audit.Source.TrioComposition.WriterMemory.from_history' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
@@ -2747,7 +2747,7 @@ info: LidoSRv3/Audit/Source/TrioComposition/WriterMemory.lean:86:0: 'LidoSRv3.Au
 info: LidoSRv3/Audit/Source/TrioComposition/WriterMemory.lean:87:0: 'LidoSRv3.Audit.Source.TrioComposition.WriterMemory.after_admission' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-ℹ [1470/1606] Replayed LidoSRv3.Audit.Source.TrioComposition.FinalMemoryProducer
+ℹ [1470/1607] Replayed LidoSRv3.Audit.Source.TrioComposition.FinalMemoryProducer
 info: LidoSRv3/Audit/Source/TrioComposition/FinalMemoryProducer.lean:117:0: 'LidoSRv3.Audit.Source.TrioComposition.FinalMemoryProducer.afterPrefix_exact' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
@@ -2758,7 +2758,7 @@ info: LidoSRv3/Audit/Source/TrioComposition/FinalMemoryProducer.lean:119:0: 'Lid
  Classical.choice,
  Quot.sound]
 info: LidoSRv3/Audit/Source/TrioComposition/FinalMemoryProducer.lean:120:0: 'LidoSRv3.Audit.Source.TrioComposition.FinalMemoryProducer.endPointer_bound' depends on axioms: [propext, Quot.sound]
-ℹ [1471/1606] Replayed LidoSRv3.Audit.Source.TrioComposition.FinalMemoryParent
+ℹ [1471/1607] Replayed LidoSRv3.Audit.Source.TrioComposition.FinalMemoryParent
 info: LidoSRv3/Audit/Source/TrioComposition/FinalMemoryParent.lean:123:0: 'LidoSRv3.Audit.Source.TrioComposition.FinalMemoryParent.correspondence' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
@@ -2769,14 +2769,14 @@ info: LidoSRv3/Audit/Source/TrioComposition/FinalMemoryParent.lean:125:0: 'LidoS
  Quot.sound]
 info: LidoSRv3/Audit/Source/TrioComposition/FinalMemoryParent.lean:126:0: 'LidoSRv3.Audit.Source.TrioComposition.FinalMemoryParent.budget_from_small_entry' depends on axioms: [propext,
  Quot.sound]
-ℹ [1472/1606] Replayed LidoSRv3.Audit.Source.TrioComposition.AllocationExtent
+ℹ [1472/1607] Replayed LidoSRv3.Audit.Source.TrioComposition.AllocationExtent
 info: LidoSRv3/Audit/Source/TrioComposition/AllocationExtent.lean:57:0: 'LidoSRv3.Audit.Source.TrioComposition.allocated_array_extent' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
 info: LidoSRv3/Audit/Source/TrioComposition/AllocationExtent.lean:58:0: 'LidoSRv3.Audit.Source.TrioComposition.two_allocations_abi_extent' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-⚠ [1473/1606] Replayed audit.trio.alloc2.composition.AllocationMemoryBridge
+⚠ [1473/1607] Replayed audit.trio.alloc2.composition.AllocationMemoryBridge
 warning: audit/trio/alloc2/composition/AllocationMemoryBridge.lean:71:28: This simp argument is unused:
   hr
 
@@ -2811,7 +2811,7 @@ info: audit/trio/alloc2/composition/AllocationMemoryBridge.lean:102:0: 'LidoSRv3
 info: audit/trio/alloc2/composition/AllocationMemoryBridge.lean:103:0: 'LidoSRv3.Audit.Source.TrioAlloc2.MemoryPrefix.array_eq_producer' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-ℹ [1474/1606] Replayed LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredProducer
+ℹ [1474/1607] Replayed LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredProducer
 info: LidoSRv3/Audit/Source/TrioComposition/FinalMemoryStoredProducer.lean:297:0: 'LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredProducer.producer_exact' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
@@ -2827,13 +2827,13 @@ info: LidoSRv3/Audit/Source/TrioComposition/FinalMemoryStoredProducer.lean:301:0
  Quot.sound]
 info: LidoSRv3/Audit/Source/TrioComposition/FinalMemoryStoredProducer.lean:302:0: 'LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredProducer.scratch_store_frame' depends on axioms: [propext,
  Quot.sound]
-ℹ [1475/1606] Replayed LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion
+ℹ [1475/1607] Replayed LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion
 info: LidoSRv3/Audit/Source/TrioAlloc2/ParentConversion.lean:128:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.rowArithmetic_success_iff' depends on axioms: [propext, Quot.sound]
 info: LidoSRv3/Audit/Source/TrioAlloc2/ParentConversion.lean:129:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.rowArithmetic_values' depends on axioms: [propext]
 info: LidoSRv3/Audit/Source/TrioAlloc2/ParentConversion.lean:130:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.positive_total_error_first' depends on axioms: [propext, Quot.sound]
 info: LidoSRv3/Audit/Source/TrioAlloc2/ParentConversion.lean:131:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.zeroDemand_overflow' depends on axioms: [propext, Quot.sound]
 info: LidoSRv3/Audit/Source/TrioAlloc2/ParentConversion.lean:132:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.allocated_total_mul_success' depends on axioms: [propext, Quot.sound]
-⚠ [1476/1606] Replayed LidoSRv3.Audit.Source.TrioComposition.ConversionBridge
+⚠ [1476/1607] Replayed LidoSRv3.Audit.Source.TrioComposition.ConversionBridge
 warning: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:21:32: This simp argument is unused:
   hn
 
@@ -3080,7 +3080,7 @@ info: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:196:0: 'LidoSR
 info: LidoSRv3/Audit/Source/TrioComposition/ConversionBridge.lean:197:0: 'LidoSRv3.Audit.Source.TrioComposition.ConversionBridge.zero_equiv' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-ℹ [1477/1606] Replayed LidoSRv3.Audit.Source.TrioComposition.MemoryTransportConversion
+ℹ [1477/1607] Replayed LidoSRv3.Audit.Source.TrioComposition.MemoryTransportConversion
 info: LidoSRv3/Audit/Source/TrioComposition/MemoryTransportConversion.lean:290:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryTransportConversion.positiveRows_related' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
@@ -3099,7 +3099,7 @@ info: LidoSRv3/Audit/Source/TrioComposition/MemoryTransportConversion.lean:294:0
 info: LidoSRv3/Audit/Source/TrioComposition/MemoryTransportConversion.lean:295:0: 'LidoSRv3.Audit.Source.TrioComposition.MemoryTransportConversion.zero_equiv' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-ℹ [1478/1606] Replayed LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredParentMemory
+ℹ [1478/1607] Replayed LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredParentMemory
 info: LidoSRv3/Audit/Source/TrioComposition/FinalMemoryStoredParentMemory.lean:158:0: 'LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredParentMemory.receive_canonical' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
@@ -3111,7 +3111,7 @@ info: LidoSRv3/Audit/Source/TrioComposition/FinalMemoryStoredParentMemory.lean:1
  Quot.sound]
 info: LidoSRv3/Audit/Source/TrioComposition/FinalMemoryStoredParentMemory.lean:161:0: 'LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredParentMemory.observed_memory' depends on axioms: [propext,
  Quot.sound]
-ℹ [1479/1606] Replayed LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredParentCaller
+ℹ [1479/1607] Replayed LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredParentCaller
 info: LidoSRv3/Audit/Source/TrioComposition/FinalMemoryStoredParentCaller.lean:161:0: 'LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredParentCaller.zeroReply_projection' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
@@ -3126,7 +3126,7 @@ info: LidoSRv3/Audit/Source/TrioComposition/FinalMemoryStoredParentCaller.lean:1
  Quot.sound]
 info: LidoSRv3/Audit/Source/TrioComposition/FinalMemoryStoredParentCaller.lean:165:0: 'LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredParentCaller.afterProducer_trace' depends on axioms: [propext,
  Quot.sound]
-ℹ [1480/1606] Replayed LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredParent
+ℹ [1480/1607] Replayed LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredParent
 info: LidoSRv3/Audit/Source/TrioComposition/FinalMemoryStoredParent.lean:224:0: 'LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredParent.projection' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
@@ -3138,7 +3138,7 @@ info: LidoSRv3/Audit/Source/TrioComposition/FinalMemoryStoredParent.lean:226:0: 
  Quot.sound]
 info: LidoSRv3/Audit/Source/TrioComposition/FinalMemoryStoredParent.lean:227:0: 'LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredParent.positive_calls' depends on axioms: [propext, Quot.sound]
 info: LidoSRv3/Audit/Source/TrioComposition/FinalMemoryStoredParent.lean:228:0: 'LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredParent.trace_shape' depends on axioms: [propext, Quot.sound]
-ℹ [1481/1606] Replayed LidoSRv3.Audit.Source.TrioComposition.VerityParent
+ℹ [1481/1607] Replayed LidoSRv3.Audit.Source.TrioComposition.VerityParent
 info: LidoSRv3/Audit/Source/TrioComposition/VerityParent.lean:97:0: 'LidoSRv3.Audit.Source.TrioComposition.VerityParent.stored_correspondence' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
@@ -3150,30 +3150,30 @@ info: LidoSRv3/Audit/Source/TrioComposition/VerityParent.lean:102:0: 'LidoSRv3.A
 info: LidoSRv3/Audit/Source/TrioComposition/VerityParent.lean:103:0: 'LidoSRv3.Audit.Source.TrioComposition.VerityParent.public_iff' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-ℹ [1482/1606] Replayed LidoSRv3.Audit.Source.TrioComposition.CacheRepresentation
+ℹ [1482/1607] Replayed LidoSRv3.Audit.Source.TrioComposition.CacheRepresentation
 info: LidoSRv3/Audit/Source/TrioComposition/CacheRepresentation.lean:82:0: 'LidoSRv3.Audit.Source.TrioComposition.CacheRepresentation.preserves_array' depends on axioms: [propext, Quot.sound]
 info: LidoSRv3/Audit/Source/TrioComposition/CacheRepresentation.lean:84:0: 'LidoSRv3.Audit.Source.TrioComposition.CacheRepresentation.write_related' depends on axioms: [propext, Quot.sound]
 info: LidoSRv3/Audit/Source/TrioComposition/CacheRepresentation.lean:85:0: 'LidoSRv3.Audit.Source.TrioComposition.CacheRepresentation.write_then_capacity' depends on axioms: [propext, Quot.sound]
 info: LidoSRv3/Audit/Source/TrioComposition/CacheRepresentation.lean:86:0: 'LidoSRv3.Audit.Source.TrioComposition.CacheRepresentation.outside' depends on axioms: [propext, Quot.sound]
-ℹ [1483/1606] Replayed LidoSRv3.Audit.Source.TrioComposition.WriterExtent
+ℹ [1483/1607] Replayed LidoSRv3.Audit.Source.TrioComposition.WriterExtent
 info: LidoSRv3/Audit/Source/TrioComposition/WriterExtent.lean:47:0: 'LidoSRv3.Audit.Source.TrioComposition.share_writer_abi_extent' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
 info: LidoSRv3/Audit/Source/TrioComposition/WriterExtent.lean:61:0: 'LidoSRv3.Audit.Source.TrioComposition.parameter_writer_abi_extent' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-ℹ [1506/1606] Replayed LidoSRv3.Audit.Source.TrioComposition.ReserveLeafAllocation
+ℹ [1506/1607] Replayed LidoSRv3.Audit.Source.TrioComposition.ReserveLeafAllocation
 info: LidoSRv3/Audit/Source/TrioComposition/ReserveLeafAllocation.lean:117:0: 'LidoSRv3.Audit.Source.TrioComposition.ReserveLeafAllocation.corresponds' depends on axioms: [propext, Quot.sound]
-ℹ [1507/1606] Replayed LidoSRv3.Audit.Source.TrioComposition.ReserveLeafFrame
+ℹ [1507/1607] Replayed LidoSRv3.Audit.Source.TrioComposition.ReserveLeafFrame
 info: LidoSRv3/Audit/Source/TrioComposition/ReserveLeafFrame.lean:105:0: 'LidoSRv3.Audit.Source.TrioComposition.ReserveLeafFrame.corresponds' depends on axioms: [propext, Quot.sound]
-ℹ [1512/1606] Replayed LidoSRv3.Audit.Source.TrioComposition.ReserveLeafSpend
+ℹ [1512/1607] Replayed LidoSRv3.Audit.Source.TrioComposition.ReserveLeafSpend
 info: LidoSRv3/Audit/Source/TrioComposition/ReserveLeafSpend.lean:69:0: 'LidoSRv3.Audit.Source.TrioComposition.ReserveLeafSpend.corresponds' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
 info: LidoSRv3/Audit/Source/TrioComposition/ReserveLeafSpend.lean:70:0: 'LidoSRv3.Audit.Source.TrioComposition.ReserveLeafSpend.withdrawal_corresponds' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-ℹ [1513/1606] Replayed LidoSRv3.Audit.Source.TrioComposition.LifecycleHistory
+ℹ [1513/1607] Replayed LidoSRv3.Audit.Source.TrioComposition.LifecycleHistory
 info: LidoSRv3/Audit/Source/TrioComposition/LifecycleHistory.lean:117:0: 'LidoSRv3.Audit.Source.TrioComposition.LifecycleHistory.stored_parent_iff' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
@@ -3189,7 +3189,15 @@ info: LidoSRv3/Audit/Source/TrioComposition/LifecycleHistory.lean:122:0: 'LidoSR
 info: LidoSRv3/Audit/Source/TrioComposition/LifecycleHistory.lean:123:0: 'LidoSRv3.Audit.Source.TrioComposition.LifecycleHistory.parent_correspondence' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-⚠ [1587/1606] Replayed LidoSRv3.Audit.Source.TrioAlloc2.ParentArraySafety
+ℹ [1514/1607] Replayed LidoSRv3.Audit.Source.TrioComposition.CacheStores
+info: LidoSRv3/Audit/Source/TrioComposition/CacheStores.lean:111:0: 'LidoSRv3.Audit.Source.TrioComposition.CacheStores.fields' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/CacheStores.lean:112:0: 'LidoSRv3.Audit.Source.TrioComposition.CacheStores.preserves_arrays' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/CacheStores.lean:113:0: 'LidoSRv3.Audit.Source.TrioComposition.CacheStores.capacity_after_write' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+⚠ [1588/1607] Replayed LidoSRv3.Audit.Source.TrioAlloc2.ParentArraySafety
 warning: LidoSRv3/Audit/Source/TrioAlloc2/ParentArraySafety.lean:27:46: This simp argument is unused:
   Except.bind
 
@@ -3242,7 +3250,7 @@ Hint: Omit it from the simp argument list.
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
 info: LidoSRv3/Audit/Source/TrioAlloc2/ParentArraySafety.lean:61:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.positiveRows_array_safe' depends on axioms: [propext, Quot.sound]
 info: LidoSRv3/Audit/Source/TrioAlloc2/ParentArraySafety.lean:62:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.zeroRows_array_safe' depends on axioms: [propext, Quot.sound]
-ℹ [1588/1606] Replayed LidoSRv3.Audit.Source.TrioAlloc2.ParentValues
+ℹ [1589/1607] Replayed LidoSRv3.Audit.Source.TrioAlloc2.ParentValues
 info: LidoSRv3/Audit/Source/TrioAlloc2/ParentValues.lean:150:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.positive_values' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
@@ -3255,7 +3263,7 @@ info: LidoSRv3/Audit/Source/TrioAlloc2/ParentValues.lean:153:0: 'LidoSRv3.Audit.
 info: LidoSRv3/Audit/Source/TrioAlloc2/ParentValues.lean:155:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.zeroRows_values' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-⚠ [1589/1606] Replayed LidoSRv3.Audit.Source.TrioAlloc2.ParentSuccess
+⚠ [1590/1607] Replayed LidoSRv3.Audit.Source.TrioAlloc2.ParentSuccess
 warning: LidoSRv3/Audit/Source/TrioAlloc2/ParentSuccess.lean:54:31: This simp argument is unused:
   readNew
 
@@ -3315,7 +3323,7 @@ info: LidoSRv3/Audit/Source/TrioAlloc2/ParentSuccess.lean:210:0: 'LidoSRv3.Audit
 info: LidoSRv3/Audit/Source/TrioAlloc2/ParentSuccess.lean:211:0: 'LidoSRv3.Audit.Source.TrioAlloc2.ParentConversion.zeroRows_arithmetic_iff' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-⚠ [1594/1606] Replayed LidoSRv3.Audit.Verity.ConsolidationFee
+⚠ [1595/1607] Replayed LidoSRv3.Audit.Verity.ConsolidationFee
 warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:446:5: Variable name `hsize` is not explicitly referenced.
 
 The binding can be removed (if unused) or named `_` (if used implicitly).
@@ -3369,13 +3377,13 @@ Hint: Omit it from the simp argument list.
   ̲  ̲ ̲ ̲hvalid₀, hinvalid₁,̵ ̵h̵r̵e̵q̵u̵e̵s̵t̵]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1595/1606] Replayed LidoSRv3.Audit.Verity.DepositLedgerTx
+⚠ [1596/1607] Replayed LidoSRv3.Audit.Verity.DepositLedgerTx
 warning: LidoSRv3/Audit/Verity/DepositLedgerTx.lean:140:35: Variable name `n` is not explicitly referenced.
 
 The binding can be removed (if unused) or named `_` (if used implicitly).
 
 Note: This linter can be disabled with `set_option linter.unusedVariables false`
-⚠ [1597/1606] Replayed LidoSRv3.Audit.Verity.DepositTx
+⚠ [1598/1607] Replayed LidoSRv3.Audit.Verity.DepositTx
 warning: LidoSRv3/Audit/Verity/DepositTx.lean:153:35: This simp argument is unused:
   Pure.pure
 
@@ -3390,8 +3398,8 @@ Hint: Omit it from the simp argument list.
   ̲  ̲ ̲ ̲Nat.mod_eq_of_lt hAmountLt]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1605/1606] Replayed LidoSRv3.Legacy.SpecProofs
+⚠ [1606/1607] Replayed LidoSRv3.Legacy.SpecProofs
 warning: LidoSRv3/Legacy/SpecProofs.lean:1631:2: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
-Build completed successfully (1606 jobs).
+Build completed successfully (1607 jobs).
