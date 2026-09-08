@@ -9,6 +9,12 @@ private def args : ConstructorArgs := ⟨word 1, word 2, word 3⟩
 private def sources := [key 11, key 12]
 private def targets := [key 21, key 22]
 
+/-- A zero constructor immutable closes immediately, before either external
+call surface is consulted. -/
+example : executeSourceBounded 0 ⟨word 1, word 0, word 3⟩
+    (.success (word 3)) [] (word 6) sources targets 40 =
+    .reverted .invalidConstructor 40 := by decide
+
 example : executeSourceBounded 2 args (.success (word 3))
     [.success (), .success ()] (word 6) sources targets 40 =
     .committed (sources.zip targets) 40 := by decide
@@ -41,5 +47,16 @@ example : requireClosedExit 2 args (.success (word 3))
       .committed (sources.zip targets) 40 := by decide
   rw [hcommit]
   simp
+
+/-- Both pinned pre-loop failure arms inhabit the named closure obligation. -/
+example :
+    requireClosedExit 0 ⟨word 1, word 0, word 3⟩ (.success (word 3)) []
+        (word 6) sources targets 40 ∧
+      requireClosedExit 0 args .failure [] (word 6) sources targets 40 := by
+  constructor
+  · exact (preloop_failures_requireClosedExit 0
+      ⟨word 1, word 0, word 3⟩ [] (word 6) sources targets 40).1 (by decide)
+  · exact (preloop_failures_requireClosedExit 0 args [] (word 6) sources
+      targets 40).2 (by decide)
 
 end LidoSRv3.Tests.TrioConsolidation.SourceExecution

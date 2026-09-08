@@ -112,6 +112,29 @@ theorem staticcall_failure_closes (fuel : Nat) (args : ConstructorArgs)
       initialBalance = .reverted .staticcallFailed initialBalance := by
   simp [executeSourceBounded, h]
 
+/-- Constructor rejection and fee `STATICCALL` failure discharge the named
+closure obligation without consuming loop fuel or requiring any CALL results.
+This keeps the two pre-loop source failures visibly distinct from an open
+bounded exit. -/
+theorem preloop_failures_requireClosedExit (fuel : Nat)
+    (args : ConstructorArgs) (callResults : List (ExternalResult Unit))
+    (msgValue : Word) (sources targets : List Pubkey) (initialBalance : Nat) :
+    (constructorConditions args = false →
+      requireClosedExit fuel args (.success (word 0)) callResults msgValue
+        sources targets initialBalance) ∧
+    (constructorConditions args = true →
+      requireClosedExit fuel args .failure callResults msgValue sources targets
+        initialBalance) := by
+  constructor
+  · intro hconstructor
+    unfold requireClosedExit
+    rw [constructor_failure_closes (h := hconstructor)]
+    simp
+  · intro hconstructor
+    unfold requireClosedExit
+    rw [staticcall_failure_closes (h := hconstructor)]
+    simp
+
 /-- The named closed-exit obligation yields the source-level atomicity and
 `preservesEthBalance` correspondence: every closed failure restores the entry
 snapshot, while every commit satisfies the modifier's balance equality. -/
