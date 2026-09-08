@@ -13,4 +13,3 @@ trust, or `AllGuarantees` file is changed by this package.
 
 Production Lean lives beside this file.  Executable regressions live under
 `Tests/Verity` and are selected by the local Lake target.
-
