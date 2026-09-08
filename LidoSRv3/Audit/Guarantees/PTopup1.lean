@@ -742,6 +742,20 @@ abbrev EveryReturndataIsGuarded (cfg : SourceTopupConfig)
     (state : Verity.ContractState) : Prop :=
   ∀ call : Verity.TopupTx.TopupCall, VerityGuardedReturndataSimulation cfg call state
 
+/-- The concrete executable call is the byte-retaining presentation of the
+pinned abstract source input. The older source model retained `_pubkeys` only
+through their lengths, so this relation makes that projection explicit while
+binding every represented router/module input and the WC type-2 verdict. -/
+def SourceTopupCallCorresponds (cfg : SourceTopupConfig) (inp : SourceTopupInput)
+    (call : Verity.TopupTx.TopupCall) : Prop :=
+  call.roundedTarget = smDepositableEthAmountRounded cfg inp ∧
+  call.pubkeys.map List.length = inp.pubkeyLengths ∧
+  call.keyIndices.length = inp.keyIndicesLength ∧
+  call.operatorIds.length = inp.operatorIdsLength ∧
+  call.topUpLimits = inp.topUpLimits ∧
+  call.moduleReturndata = inp.allocations ∧
+  (call.withdrawalCredentialsType = 2 ↔ inp.wcTypeIsType2 = true)
+
 /-- **P-TOPUP-1, registered Verity parent.** Every possible untrusted module
 return is guarded. On its admitted branch the actual registered transaction is
 definitionally exposed by theorem (not hidden by an observable projection) as
@@ -750,12 +764,12 @@ signature, and source SSZ roots. The legacy allocation-only theorems above are
 retained as arithmetic/rollback lemmas but are not this registered executor. -/
 theorem verity_tx_simulates_source_with_nonzero_wrap_close
     (cfg : SourceTopupConfig) (inp : SourceTopupInput)
+    (call : Verity.TopupTx.TopupCall)
     (state : Verity.ContractState)
-    (hLen : inp.allocations.length ≤ uint256Modulus)
-    (hAmt : ∀ a ∈ inp.allocations, a < uint256Modulus)
-    (hCommit : (run cfg inp).reverts = false) :
-    EveryReturndataIsGuarded cfg state := by
-  intro call
+    (hCall : SourceTopupCallCorresponds cfg inp call) :
+    SourceTopupCallCorresponds cfg inp call ∧
+      VerityGuardedReturndataSimulation cfg call state := by
+  refine ⟨hCall, ?_⟩
   exact
       ⟨fun failure =>
           Verity.TopupTx.executeGuarded_binds_returndata cfg call failure _,
