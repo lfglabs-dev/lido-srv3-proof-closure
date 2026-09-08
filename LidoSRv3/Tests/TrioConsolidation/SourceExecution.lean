@@ -5,58 +5,59 @@ namespace LidoSRv3.Tests.TrioConsolidation.SourceExecution
 open audit.trio.consolidation
 
 private def key (id : Nat) : Pubkey := ⟨id, 48⟩
-private def args : ConstructorArgs := ⟨word 1, word 2, word 3⟩
+private def args : ConstructorArgs :=
+  ⟨word 1, word 2, word 3, word 4, word 5, word 6⟩
+private def deployment : DeployedVault := ⟨args, by decide⟩
+private def caller : Word := args.consolidationGateway
 private def sources := [key 11, key 12]
 private def targets := [key 21, key 22]
 
-/-- A zero constructor immutable closes immediately, before either external
-call surface is consulted. -/
-example : executeSourceBounded 0 ⟨word 1, word 0, word 3⟩
-    (.success (word 3)) [] (word 6) sources targets 40 =
-    .reverted .invalidConstructor 40 := by decide
+/-- Constructor rejection belongs to deployment, not runtime execution. -/
+example : constructorConditions
+    ⟨word 1, word 2, word 3, word 4, word 0, word 6⟩ = false := by decide
 
-example : executeSourceBounded 2 args (.success (word 3))
+example : executeSourceBounded 2 deployment caller (.success (word 3))
     [.success (), .success ()] (word 6) sources targets 40 =
     .committed (sources.zip targets) 40 := by decide
 
 /-- Regression for pinned `_getFeeFromContract`: failed STATICCALL reverts. -/
-example : executeSourceBounded 2 args .failure [] (word 6) sources targets 40 =
+example : executeSourceBounded 2 deployment caller .failure [] (word 6) sources targets 40 =
     .reverted .staticcallFailed 40 := by decide
 
 /-- Regression for pinned `_callAddConsolidationRequest`: a later failed CALL
 rolls back the earlier value transfer and restores the entry balance. -/
-example : executeSourceBounded 2 args (.success (word 3))
+example : executeSourceBounded 2 deployment caller (.success (word 3))
     [.success (), .failure] (word 6) sources targets 40 =
     .reverted (.callFailed 1) 40 := by decide
 
 /-- Too little fuel is explicitly open and therefore does not satisfy the
 named source-closure obligation. -/
-example : ¬ requireClosedExit 1 args (.success (word 3))
+example : ¬ requireClosedExit 1 deployment caller (.success (word 3))
     [.success (), .success ()] (word 6) sources targets 40 := by
   unfold requireClosedExit
-  have hopen : executeSourceBounded 1 args (.success (word 3))
+  have hopen : executeSourceBounded 1 deployment caller (.success (word 3))
       [.success (), .success ()] (word 6) sources targets 40 = .openExit := by
     decide
   exact fun h => h hopen
 
-example : requireClosedExit 2 args (.success (word 3))
+example : requireClosedExit 2 deployment caller (.success (word 3))
     [.success (), .success ()] (word 6) sources targets 40 := by
   unfold requireClosedExit
-  have hcommit : executeSourceBounded 2 args (.success (word 3))
+  have hcommit : executeSourceBounded 2 deployment caller (.success (word 3))
       [.success (), .success ()] (word 6) sources targets 40 =
       .committed (sources.zip targets) 40 := by decide
   rw [hcommit]
   simp
 
-/-- Both pinned pre-loop failure arms inhabit the named closure obligation. -/
+/-- Both pinned runtime pre-loop failure arms inhabit the named obligation. -/
 example :
-    requireClosedExit 0 ⟨word 1, word 0, word 3⟩ (.success (word 3)) []
+    requireClosedExit 0 deployment (word 99) (.success (word 3)) []
         (word 6) sources targets 40 ∧
-      requireClosedExit 0 args .failure [] (word 6) sources targets 40 := by
+      requireClosedExit 0 deployment caller .failure [] (word 6) sources targets 40 := by
   constructor
-  · exact (preloop_failures_requireClosedExit 0
-      ⟨word 1, word 0, word 3⟩ [] (word 6) sources targets 40).1 (by decide)
-  · exact (preloop_failures_requireClosedExit 0 args [] (word 6) sources
-      targets 40).2 (by decide)
+  · exact (preloop_failures_requireClosedExit 0 deployment (word 99) []
+      (word 6) sources targets 40).1 (by decide)
+  · exact (preloop_failures_requireClosedExit 0 deployment caller []
+      (word 6) sources targets 40).2 rfl
 
 end LidoSRv3.Tests.TrioConsolidation.SourceExecution
