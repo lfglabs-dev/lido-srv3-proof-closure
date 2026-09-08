@@ -1,0 +1,105 @@
+{
+  "validatedCommit": "c88f88733a54bdf1ce1a24089ca43e06f526df2e",
+  "commands": [
+    [
+      "lake",
+      "build",
+      "LidoSRv3",
+      "LidoSRv3Test",
+      "LidoSRv3Audit",
+      "TrioIntegrationChecks",
+      "AccountAddressChecks"
+    ],
+    [
+      "make",
+      "prove"
+    ],
+    [
+      "make",
+      "test"
+    ],
+    [
+      "lake",
+      "env",
+      "lean",
+      "--run",
+      "audit/trio/alloc1/RunVerityVectors.lean"
+    ],
+    [
+      "lake",
+      "env",
+      "lean",
+      "--run",
+      "audit/trio/integration/RunVerityParent.lean"
+    ]
+  ],
+  "results": [
+    {
+      "command": [
+        "lake",
+        "build",
+        "LidoSRv3",
+        "LidoSRv3Test",
+        "LidoSRv3Audit",
+        "TrioIntegrationChecks",
+        "AccountAddressChecks"
+      ],
+      "exitCode": 0,
+      "seconds": 1.47,
+      "log": "1.log"
+    },
+    {
+      "command": [
+        "make",
+        "prove"
+      ],
+      "exitCode": 0,
+      "seconds": 3.09,
+      "log": "2.log"
+    },
+    {
+      "command": [
+        "make",
+        "test"
+      ],
+      "exitCode": 0,
+      "seconds": 340.27,
+      "log": "3.log"
+    },
+    {
+      "command": [
+        "lake",
+        "env",
+        "lean",
+        "--run",
+        "audit/trio/alloc1/RunVerityVectors.lean"
+      ],
+      "exitCode": 0,
+      "seconds": 8.93,
+      "log": "4.log"
+    },
+    {
+      "command": [
+        "lake",
+        "env",
+        "lean",
+        "--run",
+        "audit/trio/integration/RunVerityParent.lean"
+      ],
+      "exitCode": 0,
+      "seconds": 9.56,
+      "log": "5.log"
+    }
+  ],
+  "status": "passed",
+  "exitCode": 0,
+  "integrationCommit": "58d888fe1bc91d4e14b64ba3da53502ce5d3d368",
+  "identicalTrackedTree": true,
+  "logHashes": {
+    "1.log": "e893f2150681282e8009ccde1403447fd95a166a46163babda54274cd8cc393b",
+    "2.log": "e9c5f65901aeb50544f3dd023045426db6c24fbd73195d42870cac9f60c7cc60",
+    "3.log": "bf7f85bc1099be7279c64e13c3c47992368e907a2c33b014915184ac51bcc0b4",
+    "4.log": "9d1e60f8deaef5e21c5dd4aedb7ccd2f6753c4119d3309cc23006d07e3bfbd8a",
+    "5.log": "7d4659218d9127ac916d0deb8f9a521bd11c4e2ceb8c22f006e14ad1b7a04102"
+  }
+}
