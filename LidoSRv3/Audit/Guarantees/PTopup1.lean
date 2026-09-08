@@ -677,11 +677,11 @@ def VerityGuardedReturndataSimulation (cfg : SourceTopupConfig)
   (∀ failure : Verity.TopupTx.FailurePoint,
       Verity.TopupTx.executeGuarded cfg call failure before =
         Verity.TopupTx.guardedStage cfg call.topUpLimits call.roundedTarget
-            (Verity.TopupTx.allocateEntry call.keyCount call.moduleReturndata).returndata
+            (Verity.TopupTx.allocateEntry call).returndata
             failure
           { before with
             calls := before.calls
-              ++ [Verity.TopupTx.allocateEntry call.keyCount call.moduleReturndata] }) ∧
+              ++ [Verity.TopupTx.allocateEntry call] }) ∧
     (∀ (o : SolidityTopup.Outcome) (failure : Verity.TopupTx.FailurePoint),
         allocationLoop cfg call.moduleReturndata call.topUpLimits = some o →
           (Verity.TopupTx.executeGuarded cfg call failure).run before =

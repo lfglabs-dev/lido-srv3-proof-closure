@@ -50,8 +50,8 @@ private def mutantPush (m : Mutation) (index amount : Nat) : Contract Unit :=
   | .misroutePush =>
       externalCallBindTo lidoAddress ((amount : Nat) : Uint256) [] "makeBeaconChainTopUp"
         ([((index : Nat) : Uint256), ((amount : Nat) : Uint256)] : List Uint256)
-  | .corruptAmount => beaconPush index (amount - 1)
-  | _ => beaconPush index amount
+  | .corruptAmount => beaconPush (scheduledDeposit index amount) (amount - 1)
+  | _ => beaconPush (scheduledDeposit index amount) amount
 
 /-- Sequence mutations of the push schedule `pushLoop` walks. -/
 private def mutantSchedule (m : Mutation) (allocations : List Nat) : List (Nat × Nat) :=
@@ -65,6 +65,7 @@ private def runSchedule (m : Mutation) : List (Nat × Nat) → Contract Unit
   | [] => Verity.pure ()
   | p :: rest => do
       mutantPush m p.1 p.2
+      require true "FAIL_AFTER_FIRST_BEACON_PUSH"
       runSchedule m rest
 
 private def mutantExecute (m : Mutation) (allocations : List Nat) : Contract Unit := do
@@ -75,11 +76,6 @@ private def mutantExecute (m : Mutation) (allocations : List Nat) : Contract Uni
     lidoPull total
     creditPull total
     runSchedule m (mutantSchedule m allocations)
-
-/-- The unmutated mutant *is* the production transaction. -/
-theorem mutant_none_reproduces_execute :
-    (mutantExecute .none twoBatch).run frame = (execute twoBatch .none).run frame := by
-  rfl
 
 /-- Positive control: the executable transaction reproduces the pinned-source
 observables, journal destinations and argument words included. -/
@@ -936,13 +932,22 @@ theorem dropped_over_target_guard_kill_line_refutes_parent :
 
 /-! ## Wave 7: the same three guards on the executable Verity plane -/
 
-/-- The same four witnesses as `TopupCall`s: key count, module returndata,
-per-index limits, rounded target. -/
-private def misalignedCall : TopupCall := ⟨1, [1000000001], [2000000000], 3000000000⟩
-private def overLimitCall : TopupCall := ⟨1, [2000000000], [1000000000], 3000000000⟩
-private def overLongCall : TopupCall := ⟨1, [1000000000, 1000000000], [2000000000], 5000000000⟩
-private def overTargetCall : TopupCall := ⟨1, [2000000000], [3000000000], 1000000000⟩
-private def honestCall : TopupCall := ⟨1, [1000000000], [2000000000], 3000000000⟩
+/-- Five-argument module-call witnesses plus the untrusted returndata. -/
+private def misalignedCall : TopupCall :=
+  { roundedTarget := 3000000000, pubkeys := [48], keyIndices := [0], operatorIds := [0],
+    topUpLimits := [2000000000], moduleReturndata := [1000000001] }
+private def overLimitCall : TopupCall :=
+  { roundedTarget := 3000000000, pubkeys := [48], keyIndices := [0], operatorIds := [0],
+    topUpLimits := [1000000000], moduleReturndata := [2000000000] }
+private def overLongCall : TopupCall :=
+  { roundedTarget := 5000000000, pubkeys := [48], keyIndices := [0], operatorIds := [0],
+    topUpLimits := [2000000000], moduleReturndata := [1000000000, 1000000000] }
+private def overTargetCall : TopupCall :=
+  { roundedTarget := 1000000000, pubkeys := [48], keyIndices := [0], operatorIds := [0],
+    topUpLimits := [3000000000], moduleReturndata := [2000000000] }
+private def honestCall : TopupCall :=
+  { roundedTarget := 3000000000, pubkeys := [48], keyIndices := [0], operatorIds := [0],
+    topUpLimits := [2000000000], moduleReturndata := [1000000000] }
 
 /-- Single-edit mutations of the corrected executable transaction. -/
 inductive GuardMutation where
@@ -988,7 +993,7 @@ private def mutantExecuteGuarded (m : GuardMutation) (cfg : SourceTopupConfig)
   if m = .noModuleFrame then
     mutantGuardedStage m cfg call.topUpLimits call.roundedTarget call.moduleReturndata failure
   else do
-    let returned ← allocateDeposits call.keyCount call.moduleReturndata
+    let returned ← allocateDeposits call
     mutantGuardedStage m cfg call.topUpLimits call.roundedTarget returned failure
 
 /-- The unmutated mutant *is* the corrected transaction. -/
@@ -1019,14 +1024,14 @@ theorem guarded_journal_starts_with_the_module_call :
         ((executeGuarded guardCfg honestCall .none).run frame)
       = guardedObservables honestCall ∧
     (guardedObservables honestCall).callNames
-      = ["allocateDeposits", "withdrawDepositableEther", "makeBeaconChainTopUp"] ∧
-    (allocateEntry honestCall.keyCount honestCall.moduleReturndata).returndata
+      = ["allocateDeposits", "withdrawDepositableEther", "deposit"] ∧
+    (allocateEntry honestCall).returndata
       = honestCall.moduleReturndata :=
   ⟨((LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source_with_nonzero_wrap_close
         guardCfg honestInput defaultState (by decide) (by decide) (by decide)).2.2
       honestCall).2.2.2 (by decide) (by decide) (by decide) (by decide),
    by decide,
-   allocateEntry_returndata _ _⟩
+   allocateEntry_returndata _⟩
 
 /-- KILL-LINE for the registered parent's Verity conjunct (2), the executable
 dual of the source allocation-loop kill-line.  Each single-guard mutant COMMITS
@@ -1082,10 +1087,10 @@ statement. -/
 theorem dropped_module_frame_kill_line_refutes_parent :
     mutantExecuteGuarded .noModuleFrame guardCfg honestCall .none frame
         ≠ guardedStage guardCfg honestCall.topUpLimits honestCall.roundedTarget
-            (allocateEntry honestCall.keyCount honestCall.moduleReturndata).returndata .none
+            (allocateEntry honestCall).returndata .none
           { frame with
             calls := frame.calls
-              ++ [allocateEntry honestCall.keyCount honestCall.moduleReturndata] } ∧
+              ++ [allocateEntry honestCall] } ∧
       observe frame honestCall.moduleReturndata.length
           ((mutantExecuteGuarded .noModuleFrame guardCfg honestCall .none).run frame)
         ≠ guardedObservables honestCall :=

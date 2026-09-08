@@ -38,8 +38,24 @@ def pulledTotalSlot : Nat := 7102
 the deployed Lido address. -/
 def lidoAddress : Address := (0xF00D : Address)
 /-- `DEPOSIT_CONTRACT` (`StakingRouter.sol:750`), the canonical beacon deposit
-contract address. -/
+contract address. This is a source pin only: constructor assignment / deployed
+provenance remains deliberately OPEN (A-TOPUP-BEACON-ADDRESS). -/
 def beaconAddress : Address := (0x00000000219ab540356cBB839Cbe05303d7705Fa : Address)
+
+/-- The four arguments of the Beacon-chain deposit precompile call at
+`BeaconChainDepositor.sol:106`.  They are deliberately a call-plane value,
+rather than an index/amount projection: the journal must retain the exact
+public key, withdrawal credentials, signature, and SSZ deposit-data root that
+the source hands to `IDepositContract.deposit`.
+
+The fields are word commitments in this Verity call plane; their byte-width,
+SSZ construction, and root correspondence are discharged by P-SSZ-1. -/
+structure BeaconDepositCall where
+  pubkey : Nat
+  withdrawalCredentials : Nat
+  signature : Nat
+  depositDataRoot : Nat
+  deriving Repr, DecidableEq
 
 inductive FailurePoint where
   | none
@@ -67,7 +83,7 @@ def sourcePushes : List Nat → Nat → List (Nat × Nat)
 /-- Calldata and call values are 256-bit EVM words, so the schedule states
 them reduced.  Only the loop index needs this: `A-TOPUP-NOWRAP` already
 bounds every wei amount. -/
-def evmWord (n : Nat) : Nat := n % uint256Modulus
+def evmWord (n : Nat) : Nat := n % Core.Uint256.modulus
 
 /-! ## Executable transaction -/
 
@@ -104,10 +120,18 @@ def creditPull (total : Nat) : Contract Unit := fun state =>
 
 /-- Real external-call frame: one value-bearing beacon push.  The frame fails
 closed when the router cannot pay, so a push is gated on funds actually held. -/
-def beaconPush (index amount : Nat) : Contract Unit :=
+def beaconPush (deposit : BeaconDepositCall) (amount : Nat) : Contract Unit :=
   -- BeaconChainDepositor.sol:106  _depositContract.deposit{value: amount}(pk, _withdrawalCredentials, dummySignature, depositDataRoot);
-  externalCallBindTo beaconAddress (amount : Uint256) [] "makeBeaconChainTopUp"
-    ([(index : Uint256), (amount : Uint256)] : List Uint256)
+  externalCallBindTo beaconAddress (amount : Uint256) [] "deposit"
+    ([(deposit.pubkey : Uint256), (deposit.withdrawalCredentials : Uint256),
+      (deposit.signature : Uint256), (deposit.depositDataRoot : Uint256)] : List Uint256)
+
+/-- Compatibility schedule used by the allocation-only executable slice.  It
+is not a source of provenance or SSZ data.  The faithful call constructor is
+`beaconPush`, whose journal takes all four pinned deposit fields directly. -/
+def scheduledDeposit (index amount : Nat) : BeaconDepositCall :=
+  { pubkey := index, withdrawalCredentials := 0, signature := 0,
+    depositDataRoot := amount }
 
 /-- The *value/journal* push loop of `BeaconChainDepositor.sol:79-107` (reached
 from `StakingRouter.sol:750`): one real `externalCallBindTo` frame per nonzero
@@ -130,7 +154,7 @@ def pushLoop (stopAfterFirst : Bool) : List Nat → Nat → Contract Unit
       if amount = 0 then pushLoop stopAfterFirst rest (index + 1)
       else do
         -- BeaconChainDepositor.sol:106  _depositContract.deposit{value: amount}(...)
-        beaconPush index amount
+        beaconPush (scheduledDeposit index amount) amount
         -- Added by the model: failure hook after the first real frame.
         require (!stopAfterFirst) "FAIL_AFTER_FIRST_BEACON_PUSH"
         pushLoop stopAfterFirst rest (index + 1)
@@ -219,7 +243,7 @@ def observe (before : ContractState) (allocationCount : Nat) :
       ⟨true, cellsOf after 0 allocationCount,
         (after.readSlot allocationTotalSlot).val,
         (after.readSlot pulledTotalSlot).val,
-        callValueOf "makeBeaconChainTopUp" fresh,
+        callValueOf "deposit" fresh,
         fresh.map (·.name), fresh.map (·.target),
         fresh.map (·.value), fresh.map (·.calldata)⟩
 
@@ -233,12 +257,12 @@ def sourceObservables (allocations : List Nat) : OutcomeObservables :=
   let pushes := sourcePushes allocations 0
   ⟨true, allocations, wrapped, wrapped, wrapped,
     if wrapped = 0 then [] else
-      "withdrawDepositableEther" :: pushes.map (fun _ => "makeBeaconChainTopUp"),
+      "withdrawDepositableEther" :: pushes.map (fun _ => "deposit"),
     if wrapped = 0 then [] else
       lidoAddress.toNat :: pushes.map (fun _ => beaconAddress.toNat),
     if wrapped = 0 then [] else 0 :: pushes.map (fun p => evmWord p.2),
     if wrapped = 0 then [] else
-      [evmWord wrapped] :: pushes.map (fun p => [evmWord p.1, evmWord p.2])⟩
+      [evmWord wrapped] :: pushes.map (fun p => [evmWord p.1, 0, 0, evmWord p.2])⟩
 
 /-! ## The journal execution has to produce
 
@@ -247,8 +271,10 @@ def sourceObservables (allocations : List Nat) : OutcomeObservables :=
 `externalCallBindTo` frames the transaction actually runs. -/
 
 def pushEntry (p : Nat × Nat) : ExternalCall :=
-  linkedCallEntryTo "makeBeaconChainTopUp" beaconAddress (p.2 : Uint256)
-    [(p.1 : Uint256), (p.2 : Uint256)]
+  let deposit := scheduledDeposit p.1 p.2
+  linkedCallEntryTo "deposit" beaconAddress (p.2 : Uint256)
+    [(deposit.pubkey : Uint256), (deposit.withdrawalCredentials : Uint256),
+      (deposit.signature : Uint256), (deposit.depositDataRoot : Uint256)]
 
 def beaconJournal (allocations : List Nat) (index : Nat) : List ExternalCall :=
   (sourcePushes allocations index).map pushEntry
@@ -407,19 +433,21 @@ theorem le_allocSum : ∀ {l : List Nat} {a : Nat}, a ∈ l → a ≤ allocSum l
         simp [allocSum]
         omega
 
-theorem beaconStub : externalCallStubSuccess "makeBeaconChainTopUp" = true := by decide
+theorem beaconStub : externalCallStubSuccess "deposit" = true := by decide
 
 theorem lidoStub : externalCallStubSuccess "withdrawDepositableEther" = true := by decide
 
 /-- One value-bearing frame: the balance check passes, `selfBalance` is debited
 by exactly the allocation, and the frame appends exactly `pushEntry`. -/
-theorem beaconPush_run (index amount : Nat) (state : ContractState)
+theorem beaconPush_run (deposit : BeaconDepositCall) (amount : Nat) (state : ContractState)
     (hle : ((amount : Uint256)) ≤ state.selfBalance) :
-    beaconPush index amount state =
+    beaconPush deposit amount state =
       ContractResult.success () { state with
         selfBalance := state.selfBalance - (amount : Uint256),
-        calls := state.calls ++ [pushEntry (index, amount)] } := by
-  simp [beaconPush, externalCallBindTo, hle, beaconStub, pushEntry, linkedCallEntryTo,
+        calls := state.calls ++ [linkedCallEntryTo "deposit" beaconAddress (amount : Uint256)
+          [(deposit.pubkey : Uint256), (deposit.withdrawalCredentials : Uint256),
+            (deposit.signature : Uint256), (deposit.depositDataRoot : Uint256)]] } := by
+  simp [beaconPush, externalCallBindTo, hle, beaconStub, linkedCallEntryTo,
     linkedCallEntry, ExternalArg.toWords]
 
 /-- The zero-value pull frame always passes the balance check and appends
@@ -467,7 +495,8 @@ theorem pushLoop_run (l : List Nat) :
         have hnext : (state.selfBalance - (a : Uint256)).val = state.selfBalance.val - a := by
           rw [Verity.Core.Uint256.sub_eq_of_le (by omega), hval]
         rw [pushLoop, if_neg ha]
-        simp only [Bind.bind, _root_.Verity.bind, beaconPush_run index a state hle]
+        simp only [Bind.bind, _root_.Verity.bind,
+          beaconPush_run (scheduledDeposit index a) a state hle]
         simp only [Bool.not_false, _root_.Verity.require, if_pos]
         rw [ih (index + 1) _ (by simp only [hnext]; omega)]
         have hbal2 : (state.selfBalance - (a : Uint256)).val - allocSum rest
@@ -476,7 +505,7 @@ theorem pushLoop_run (l : List Nat) :
         have hjournal : beaconJournal (a :: rest) index
             = pushEntry (index, a) :: beaconJournal rest (index + 1) := by
           simp [beaconJournal, sourcePushes, ha]
-        simp [hbal2, hjournal]
+        simp [hbal2, hjournal, pushEntry, scheduledDeposit]
 
 /-- If every allocation is a uint256 word but their exact sum exceeds the
 router's balance, the first unfundable nonzero allocation makes the real
@@ -526,7 +555,8 @@ theorem pushLoop_reverts_of_insufficient (l : List Nat) :
             ⟨reason, dirty, hrest⟩
           refine ⟨reason, dirty, ?_⟩
           rw [pushLoop, if_neg ha]
-          simp only [Bind.bind, _root_.Verity.bind, beaconPush_run index a state hle]
+          simp only [Bind.bind, _root_.Verity.bind,
+            beaconPush_run (scheduledDeposit index a) a state hle]
           simp only [Bool.not_false, _root_.Verity.require, if_pos]
           exact hrest
         · have hle : ¬ ((a : Uint256)) ≤ state.selfBalance := by
@@ -538,7 +568,7 @@ theorem pushLoop_reverts_of_insufficient (l : List Nat) :
           refine ⟨"insufficient balance", state, ?_⟩
           rw [pushLoop, if_neg ha]
           have hpush :
-              beaconPush index a state =
+              beaconPush (scheduledDeposit index a) a state =
                 ContractResult.revert "insufficient balance" state := by
             simp [beaconPush, Contracts.externalCallBindTo, hle]
           simp only [Bind.bind, _root_.Verity.bind, hpush]
@@ -652,11 +682,13 @@ The four projections below are what a caller sees of each recorded frame.
 Everything is `rfl` against `linkedCallEntryTo`, so a misrouted destination, a
 corrupted wei value, or a dropped argument word changes the observable. -/
 
-theorem pushEntry_name (p : Nat × Nat) : (pushEntry p).name = "makeBeaconChainTopUp" := rfl
+theorem pushEntry_name (p : Nat × Nat) : (pushEntry p).name = "deposit" := rfl
 theorem pushEntry_target (p : Nat × Nat) : (pushEntry p).target = beaconAddress.toNat := rfl
 theorem pushEntry_value (p : Nat × Nat) : (pushEntry p).value = evmWord p.2 := rfl
 theorem pushEntry_calldata (p : Nat × Nat) :
-    (pushEntry p).calldata = [evmWord p.1, evmWord p.2] := rfl
+    (pushEntry p).calldata = [evmWord p.1, 0, 0, evmWord p.2] := by
+  simp [pushEntry, scheduledDeposit, linkedCallEntryTo, linkedCallEntry,
+    evmWord, uint256Modulus]
 
 theorem pullEntry_name (total : Nat) :
     (pullEntry total).name = "withdrawDepositableEther" := rfl
@@ -666,7 +698,7 @@ theorem pullEntry_calldata (total : Nat) : (pullEntry total).calldata = [evmWord
 
 theorem callValueOf_beaconJournal :
     ∀ (l : List Nat) (index : Nat), (∀ a ∈ l, a < uint256Modulus) →
-      callValueOf "makeBeaconChainTopUp" (beaconJournal l index) = allocSum l
+      callValueOf "deposit" (beaconJournal l index) = allocSum l
   | [], _, _ => rfl
   | a :: rest, index, hmem => by
       have hrest := callValueOf_beaconJournal rest (index + 1)
@@ -676,13 +708,16 @@ theorem callValueOf_beaconJournal :
         rw [beaconJournal, sourcePushes, if_pos rfl, ← beaconJournal, hrest, allocSum,
           Nat.zero_add]
       · have haLt : a < uint256Modulus := hmem a List.mem_cons_self
+        have haCore : a < Core.Uint256.modulus := by
+          norm_num [Core.Uint256.modulus]
+          exact haLt
         rw [beaconJournal, sourcePushes, if_neg ha, List.map_cons, ← beaconJournal,
           callValueOf, hrest, pushEntry_name, pushEntry_value, allocSum]
-        simp [evmWord, Nat.mod_eq_of_lt haLt]
+        simp [evmWord, Nat.mod_eq_of_lt haCore]
 
 theorem beaconJournal_names (l : List Nat) (index : Nat) :
     (beaconJournal l index).map (·.name)
-      = (sourcePushes l index).map (fun _ => "makeBeaconChainTopUp") := by
+      = (sourcePushes l index).map (fun _ => "deposit") := by
   simp [beaconJournal, List.map_map, Function.comp_def, pushEntry_name]
 
 theorem beaconJournal_targets (l : List Nat) (index : Nat) :
@@ -697,7 +732,7 @@ theorem beaconJournal_values (l : List Nat) (index : Nat) :
 
 theorem beaconJournal_calldata (l : List Nat) (index : Nat) :
     (beaconJournal l index).map (·.calldata)
-      = (sourcePushes l index).map (fun p => [evmWord p.1, evmWord p.2]) := by
+      = (sourcePushes l index).map (fun p => [evmWord p.1, 0, 0, evmWord p.2]) := by
   simp [beaconJournal, List.map_map, Function.comp_def, pushEntry_calldata]
 
 /-! ## Composed correspondence -/
@@ -931,7 +966,10 @@ theorem revert_after_first_beacon_push (a : Nat) (rest : List Nat) (index : Nat)
           selfBalance := st.selfBalance - (a : Uint256)
           calls := st.calls ++ [pushEntry (index, a)] } := by
   rw [pushLoop, if_neg ha]
-  simp [Bind.bind, _root_.Verity.bind, beaconPush_run index a st hle, _root_.Verity.require]
+  simp only [Bind.bind, _root_.Verity.bind,
+    beaconPush_run (scheduledDeposit index a) a st hle]
+  simp [_root_.Verity.require,
+    pushEntry, scheduledDeposit]
 
 /-- Whatever was mutated, `Contract.run` hands back the entry snapshot. -/
 theorem revert_restores_snapshot (allocations : List Nat) (failure : FailurePoint)
@@ -979,43 +1017,68 @@ otherwise. -/
 equality with any deployed module address is claimed. -/
 def moduleAddress : Address := (0x5140 : Address)
 
-/-- The journalled `allocateDeposits` frame: a zero-value call to the module
-whose `returndata` words are the allocation array the router then guards and
-spends.
+/-- The exact five source arguments of
+`IStakingModuleV2.allocateDeposits` at `StakingRouter.sol:717-718`.
+`moduleReturndata` is intentionally separate: the module is untrusted and the
+router must guard whatever it returns. -/
+structure TopupCall where
+  /-- `smDepositableEthAmountRounded`. -/
+  roundedTarget : Nat
+  /-- `_pubkeys`. -/
+  pubkeys : List Nat
+  /-- `_keyIndices`. -/
+  keyIndices : List Nat
+  /-- `_operatorIds`. -/
+  operatorIds : List Nat
+  /-- `_topUpLimits`. -/
+  topUpLimits : List Nat
+  moduleReturndata : List Nat
+  deriving Repr, DecidableEq
 
-Calldata fidelity is *partial* and deliberately so.  The pinned call at source
-line 718 passes
-`(smDepositableEthAmountRounded, _pubkeys, _keyIndices, _operatorIds, _topUpLimits)`;
-this frame carries a single key-count word.  The correction being made here is
-about where the guarded array comes from and which guards run on it, so the
-argument words are modelled only far enough to make the frame observable and
-distinguishable.  No theorem below reads the calldata for anything except that
-observation, and none claims ABI-exact encoding of the module call. -/
-def allocateEntry (keyCount : Nat) (returndata : List Nat) : ExternalCall :=
-  linkedCallEntryTo "allocateDeposits" moduleAddress 0 [(keyCount : Uint256)]
-    .success returndata
+/-- The journal represents dynamic ABI arguments by their length-prefixed word
+payload.  Thus all five source parameters remain distinct in the Verity call
+frame instead of collapsing to a key-count projection. -/
+def abiDynamic (xs : List Nat) : List Uint256 :=
+  (xs.length : Uint256) :: xs.map (fun x => (x : Uint256))
 
-theorem allocateEntry_name (keyCount : Nat) (returndata : List Nat) :
-    (allocateEntry keyCount returndata).name = "allocateDeposits" := rfl
-theorem allocateEntry_target (keyCount : Nat) (returndata : List Nat) :
-    (allocateEntry keyCount returndata).target = moduleAddress.toNat := rfl
-theorem allocateEntry_value (keyCount : Nat) (returndata : List Nat) :
-    (allocateEntry keyCount returndata).value = 0 := rfl
-theorem allocateEntry_calldata (keyCount : Nat) (returndata : List Nat) :
-    (allocateEntry keyCount returndata).calldata = [evmWord keyCount] := rfl
+def allocateCalldata (call : TopupCall) : List Uint256 :=
+  [(call.roundedTarget : Uint256)] ++ abiDynamic call.pubkeys ++
+    abiDynamic call.keyIndices ++ abiDynamic call.operatorIds ++
+      abiDynamic call.topUpLimits
+
+theorem abiDynamic_calldata (xs : List Nat) :
+    (abiDynamic xs).map (·.val) =
+      (xs.length : Uint256).val :: xs.map (fun x => (x : Uint256).val) := by
+  simp [abiDynamic]
+
+ /-- The journalled five-argument `allocateDeposits` frame. -/
+def allocateEntry (call : TopupCall) : ExternalCall :=
+  linkedCallEntryTo "allocateDeposits" moduleAddress 0 (allocateCalldata call)
+    .success call.moduleReturndata
+
+theorem allocateEntry_name (call : TopupCall) :
+    (allocateEntry call).name = "allocateDeposits" := rfl
+theorem allocateEntry_target (call : TopupCall) :
+    (allocateEntry call).target = moduleAddress.toNat := rfl
+theorem allocateEntry_value (call : TopupCall) :
+    (allocateEntry call).value = 0 := rfl
+theorem allocateEntry_calldata (call : TopupCall) :
+    (allocateEntry call).calldata =
+      (linkedCallEntryTo "allocateDeposits" moduleAddress 0
+        (allocateCalldata call)).calldata := rfl
 
 /-- The fact the whole correction turns on: the words the guarded transaction
 consumes *are* the journalled frame's returndata. -/
-theorem allocateEntry_returndata (keyCount : Nat) (returndata : List Nat) :
-    (allocateEntry keyCount returndata).returndata = returndata := rfl
+theorem allocateEntry_returndata (call : TopupCall) :
+    (allocateEntry call).returndata = call.moduleReturndata := rfl
 
 /-- The module call as a transaction step: it journals the frame and binds the
 frame's returndata.  Callers of `executeGuarded` supply the module's return,
 never the guarded array directly. -/
-def allocateDeposits (keyCount : Nat) (returndata : List Nat) : Contract (List Nat) :=
+def allocateDeposits (call : TopupCall) : Contract (List Nat) :=
   fun state =>
-    .success (allocateEntry keyCount returndata).returndata
-      { state with calls := state.calls ++ [allocateEntry keyCount returndata] }
+    .success (allocateEntry call).returndata
+      { state with calls := state.calls ++ [allocateEntry call] }
 
 /-- The router's returndata guards, source lines 722--734, as a transaction
 step.  Guard order is source order: the alignment test at line 724 precedes the
@@ -1115,21 +1178,6 @@ theorem guardLoop_revert (cfg : SourceTopupConfig) :
                 hAlign, decide_true, if_true, hLimit]
               exact ih ls o state h
 
-/-- One top-up call's returndata-facing data: the key count the router passes
-to the module, the words the module returns, the per-index limits it is held
-to, and the rounded module target of source line 737. -/
-structure TopupCall where
-  /-- `n = _keyIndices.length`, the argument word at source lines 717--718. -/
-  keyCount : Nat
-  /-- The words `IStakingModuleV2.allocateDeposits` returns at source lines
-  717--718.  Unconstrained: the module is untrusted. -/
-  moduleReturndata : List Nat
-  /-- `_topUpLimits`, the per-index bounds read at source line 728. -/
-  topUpLimits : List Nat
-  /-- `smDepositableEthAmountRounded`, the target compared at source line 737. -/
-  roundedTarget : Nat
-  deriving Repr, DecidableEq
-
 /-- Everything the router does *to* the module's returndata: guard it, then
 spend it. -/
 def guardedStage (cfg : SourceTopupConfig) (limits : List Nat) (roundedTarget : Nat)
@@ -1146,7 +1194,7 @@ exactly what it returned. -/
 def executeGuarded (cfg : SourceTopupConfig) (call : TopupCall) (failure : FailurePoint) :
     Contract Unit := do
   -- StakingRouter.sol:717-718  uint256[] memory allocations = IStakingModuleV2(stateConfig.moduleAddress).allocateDeposits(...);
-  let returned ← allocateDeposits call.keyCount call.moduleReturndata
+  let returned ← allocateDeposits call
   guardedStage cfg call.topUpLimits call.roundedTarget returned failure
 
 /-- The binding statement.  `executeGuarded` journals the module frame and then
@@ -1156,9 +1204,9 @@ theorem executeGuarded_binds_returndata (cfg : SourceTopupConfig) (call : TopupC
     (failure : FailurePoint) (state : ContractState) :
     executeGuarded cfg call failure state =
       guardedStage cfg call.topUpLimits call.roundedTarget
-          (allocateEntry call.keyCount call.moduleReturndata).returndata failure
+          (allocateEntry call).returndata failure
         { state with
-          calls := state.calls ++ [allocateEntry call.keyCount call.moduleReturndata] } :=
+          calls := state.calls ++ [allocateEntry call] } :=
   rfl
 
 /-- Alignment, per-index limit, and out-of-bounds all fail closed with the
@@ -1171,7 +1219,7 @@ theorem executeGuarded_reverts_on_allocation_guard (cfg : SourceTopupConfig)
   have hStage : executeGuarded cfg call failure state
       = ContractResult.revert (guardReason o)
           { state with
-            calls := state.calls ++ [allocateEntry call.keyCount call.moduleReturndata] } := by
+            calls := state.calls ++ [allocateEntry call] } := by
     rw [executeGuarded_binds_returndata, allocateEntry_returndata]
     simp only [guardedStage, Bind.bind, _root_.Verity.bind]
     rw [guardLoop_revert cfg call.moduleReturndata call.topUpLimits o _ hLoop]
@@ -1188,7 +1236,7 @@ theorem executeGuarded_reverts_on_over_target (cfg : SourceTopupConfig)
   have hStage : executeGuarded cfg call failure state
       = ContractResult.revert "ModuleReturnExceedTarget"
           { state with
-            calls := state.calls ++ [allocateEntry call.keyCount call.moduleReturndata] } := by
+            calls := state.calls ++ [allocateEntry call] } := by
     rw [executeGuarded_binds_returndata, allocateEntry_returndata]
     simp only [guardedStage, Bind.bind, _root_.Verity.bind]
     rw [guardLoop_success cfg call.moduleReturndata call.topUpLimits _ hLoop]
@@ -1204,7 +1252,7 @@ theorem executeGuarded_apply_of_guards_pass (cfg : SourceTopupConfig) (call : To
     executeGuarded cfg call failure state =
       execute call.moduleReturndata failure
         { state with
-          calls := state.calls ++ [allocateEntry call.keyCount call.moduleReturndata] } := by
+          calls := state.calls ++ [allocateEntry call] } := by
   rw [executeGuarded_binds_returndata, allocateEntry_returndata]
   simp only [guardedStage, Bind.bind, _root_.Verity.bind]
   rw [guardLoop_success cfg call.moduleReturndata call.topUpLimits _ hLoop]
@@ -1228,7 +1276,7 @@ def guardedObservables (call : TopupCall) : OutcomeObservables :=
     callNames := "allocateDeposits" :: base.callNames
     callTargets := moduleAddress.toNat :: base.callTargets
     callValues := 0 :: base.callValues
-    callArgs := [evmWord call.keyCount] :: base.callArgs }
+    callArgs := (allocateEntry call).calldata :: base.callArgs }
 
 /-- The unguarded run always ends with the journal it started from extended by
 `expectedCalls`; both the zero and the nonzero branch. -/
@@ -1252,7 +1300,7 @@ the head of every journal projection; every other observable is read off the
 post-state and is untouched. -/
 theorem observe_after_leading_entry (before after : ContractState) (entry : ExternalCall)
     (tail : List ExternalCall) (count : Nat)
-    (hName : entry.name ≠ "makeBeaconChainTopUp")
+    (hName : entry.name ≠ "deposit")
     (hCalls : after.calls = (before.calls ++ [entry]) ++ tail) :
     observe before count (ContractResult.success () after) =
       (let base := observe { before with calls := before.calls ++ [entry] } count
@@ -1285,17 +1333,17 @@ theorem executeGuarded_observes_source (cfg : SourceTopupConfig) (call : TopupCa
   have hStagedBalance :
       ({ entryFrame state with
           calls := (entryFrame state).calls
-            ++ [allocateEntry call.keyCount call.moduleReturndata] } : ContractState).selfBalance
+            ++ [allocateEntry call] } : ContractState).selfBalance
         = 0 := rfl
   obtain ⟨after, hRun, hCalls⟩ :=
     execute_run_calls call.moduleReturndata
       { entryFrame state with
         calls := (entryFrame state).calls
-          ++ [allocateEntry call.keyCount call.moduleReturndata] } hStagedBalance hNoWrap
+          ++ [allocateEntry call] } hStagedBalance hNoWrap
   have hRaw : execute call.moduleReturndata .none
       { entryFrame state with
         calls := (entryFrame state).calls
-          ++ [allocateEntry call.keyCount call.moduleReturndata] }
+          ++ [allocateEntry call] }
       = ContractResult.success () after := by
     unfold Contract.run at hRun
     split at hRun <;> simp_all
@@ -1303,18 +1351,18 @@ theorem executeGuarded_observes_source (cfg : SourceTopupConfig) (call : TopupCa
       = ContractResult.success () after := by
     unfold Contract.run
     rw [executeGuarded_apply_of_guards_pass cfg call .none (entryFrame state) hLoop hTarget, hRaw]
-  have hName : (allocateEntry call.keyCount call.moduleReturndata).name
-      ≠ "makeBeaconChainTopUp" := by rw [allocateEntry_name]; decide
+  have hName : (allocateEntry call).name
+      ≠ "deposit" := by rw [allocateEntry_name]; decide
   have hInner : observe
       { entryFrame state with
         calls := (entryFrame state).calls
-          ++ [allocateEntry call.keyCount call.moduleReturndata] }
+          ++ [allocateEntry call] }
       call.moduleReturndata.length (ContractResult.success () after)
       = sourceObservables call.moduleReturndata := by
     rw [← hRun]
     exact execute_observes_source call.moduleReturndata _ hStagedBalance hNoWrap hLen
   rw [hGuardedRaw, observe_after_leading_entry (entryFrame state) after
-    (allocateEntry call.keyCount call.moduleReturndata)
+    (allocateEntry call)
     (expectedCalls call.moduleReturndata) call.moduleReturndata.length hName hCalls]
   simp only [hInner, guardedObservables, allocateEntry_name, allocateEntry_target,
     allocateEntry_value, allocateEntry_calldata]
