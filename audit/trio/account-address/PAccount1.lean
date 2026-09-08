@@ -92,15 +92,18 @@ def validateInterleaved : List Nat -> List Nat -> List Nat -> Except Error Unit
 def checkedAdd64 (a b : Nat) : Except Error Nat :=
   if a + b < two64 then .ok (a + b) else .error .arithmeticOverflow
 
-/-- Writes happen before the next checked addition, matching lines 883-888.
-The caller supplies exactly one physical module word per registered id. -/
+/-- A successful row contains the packed write followed by the checked
+addition, matching lines 883-888. On failure the enclosing transaction rolls
+the tentative write back. The caller supplies exactly one physical module
+word per registered id; that is this model's representation invariant. -/
 def writeRows : List ModuleAccounting -> List Nat -> Nat ->
     Except Error (List ModuleAccounting × Nat)
   | [], [], total => .ok ([], total)
   | m :: ms, amount :: bs, total => do
+      let written := writeModuleBalance m amount
       let next <- checkedAdd64 total amount
       let (tail, finalTotal) <- writeRows ms bs next
-      pure (writeModuleBalance m amount :: tail, finalTotal)
+      pure (written :: tail, finalTotal)
   | _, _, _ => .error .arraysLengthMismatch
 
 inductive Outcome where
@@ -108,13 +111,13 @@ inductive Outcome where
   | committed (post : State)
   deriving Repr, DecidableEq
 
-/-- Exact focused transaction: length guard, interleaved id/amount validation,
+/-- Focused transaction under the state-shape invariant: source length guard,
+interleaved id/amount validation,
 module writes with checked accumulation, then the router-total packed write.
 Every error rolls back to the supplied snapshot. -/
 def reportValidatorBalances (input : Input) (before : State) : Outcome :=
   if input.reportedModuleIds.length != input.registeredModuleIds.length ||
-      input.balancesGwei.length != input.registeredModuleIds.length ||
-      before.modules.length != input.registeredModuleIds.length then
+      input.balancesGwei.length != input.registeredModuleIds.length then
     .reverted .arraysLengthMismatch before
   else
     match validateInterleaved input.registeredModuleIds input.reportedModuleIds
@@ -144,8 +147,7 @@ theorem checkedAdd64_ok_iff (a b : Nat) :
 
 theorem length_guard_is_first (input : Input) (before : State)
     (h : input.reportedModuleIds.length != input.registeredModuleIds.length ||
-      input.balancesGwei.length != input.registeredModuleIds.length ||
-      before.modules.length != input.registeredModuleIds.length) :
+      input.balancesGwei.length != input.registeredModuleIds.length) :
     reportValidatorBalances input before =
       .reverted .arraysLengthMismatch before := by
   simp [reportValidatorBalances, h]
