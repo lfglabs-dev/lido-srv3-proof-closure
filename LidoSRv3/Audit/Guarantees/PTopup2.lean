@@ -243,6 +243,171 @@ above is the registered parent, and its kill-line mutant is stated against
 `transitionBudget`/`consumeBudget`, the functions the parent's proof actually
 uses. -/
 
+/-! ## Wei / Gwei conversion model
+
+The gateway operates in gwei; the router and EVM operate in wei.
+`valueWei / GWEI` is the gwei reading of `msg.value`, and
+`well_formed_pre` requires `valueWei % GWEI = 0` (the alignment guard at
+`TopUpGateway.sol`).  The theorems below connect the wei-domain batch
+value to the gwei-domain budget without assuming the alignment — the
+alignment hypothesis is an explicit premise.  This is the model-side
+anchor for the router's `amount % 1 gwei != 0` revert at source line 724.
+-/
+
+def weiToGwei (wei : Nat) : Nat := wei / GWEI
+def gweiToWei (gwei : Nat) : Nat := gwei * GWEI
+
+theorem gweiToWei_weiToGwei_of_aligned (w : Nat) (h : w % GWEI = 0) :
+    gweiToWei (weiToGwei w) = w := by
+  simp only [gweiToWei, weiToGwei]
+  exact Nat.div_mul_cancel (Nat.dvd_of_mod_eq_zero h)
+
+theorem weiToGwei_gweiToWei (g : Nat) : weiToGwei (gweiToWei g) = g := by
+  simp only [weiToGwei, gweiToWei, GWEI]
+  exact Nat.mul_div_cancel g (by decide)
+
+theorem weiToGwei_mono {a b : Nat} (h : a ≤ b) : weiToGwei a ≤ weiToGwei b :=
+  Nat.div_le_div_right h
+
+theorem transitionBudget_uses_gwei_value (b : TopupBatch) (cfg : TopupConfig) :
+    transitionBudget b cfg =
+      min (weiToGwei b.valueWei)
+        (min cfg.moduleAllocationLimitGwei cfg.maxTopUpPerBlockGwei) := rfl
+
+theorem transition_sum_le_valueGwei (b : TopupBatch) (cfg : TopupConfig) :
+    (transition b cfg).sum ≤ weiToGwei b.valueWei :=
+  Nat.le_trans (consumeBudget_sum_le _ _) (Nat.min_le_left _ _)
+
+theorem transition_sum_wei_le_valueWei (b : TopupBatch) (cfg : TopupConfig)
+    (hAlign : b.valueWei % GWEI = 0) :
+    gweiToWei (transition b cfg).sum ≤ b.valueWei := by
+  have hGwei := transition_sum_le_valueGwei b cfg
+  calc gweiToWei (transition b cfg).sum
+      = (transition b cfg).sum * GWEI := rfl
+    _ ≤ weiToGwei b.valueWei * GWEI := Nat.mul_le_mul_right _ hGwei
+    _ = b.valueWei := Nat.div_mul_cancel (Nat.dvd_of_mod_eq_zero hAlign)
+
+/-! ## Top-up freshness model
+
+The beacon root consumed by the verifier must be recent enough: the
+`TopUpGateway` rejects calls whose `beaconBlockRoot` timestamp is more
+than `maxRootAge` seconds behind `block.timestamp`.  `well_formed_pre`
+already carries this as
+`b.beaconRootTimestamp ≤ b.currentTimestamp` and
+`b.currentTimestamp - b.beaconRootTimestamp ≤ cfg.maxRootAge`.
+
+The theorems below are the model-level reading of that freshness guard:
+a stale root is rejected, and a fresh root's age is bounded.  These are
+independent of the transition budget or allocation walk.
+-/
+
+def rootIsFresh (b : TopupBatch) (cfg : TopupConfig) : Prop :=
+  b.beaconRootTimestamp ≤ b.currentTimestamp ∧
+    b.currentTimestamp - b.beaconRootTimestamp ≤ cfg.maxRootAge
+
+theorem well_formed_pre_implies_fresh (b : TopupBatch) (cfg : TopupConfig)
+    (h : well_formed_pre b cfg) : rootIsFresh b cfg :=
+  ⟨h.2.2.2.2.2.2.1, h.2.2.2.2.2.2.2.1⟩
+
+def staleBatch : TopupBatch :=
+  { validators := [], requestedGwei := [], allocations := []
+    valueWei := 0, beaconRootTimestamp := 0, currentTimestamp := 100 }
+
+def staleCfg : TopupConfig :=
+  { targetBalanceGwei := 32, minTopUpGwei := 1
+    maxTopUpPerBlockGwei := 1, maxValidatorsPerCall := 1
+    moduleAllocationLimitGwei := 10 ^ 18, maxRootAge := 50 }
+
+example : ¬ rootIsFresh staleBatch staleCfg := by
+  intro ⟨_, h⟩
+  simp [staleBatch, staleCfg] at h
+
+example : rootIsFresh { staleBatch with currentTimestamp := 30 } staleCfg := by
+  constructor <;> simp [staleBatch, staleCfg]
+
+/-! ## Inter-call policy model
+
+The top-up path makes two sequential external calls: first
+`allocateDeposits` (source line 718) to obtain the allocation array, then
+the beacon push loop (source line 750) to deposit.  The inter-call
+invariant is that the allocation array consumed by the push loop is
+exactly the array returned by the module call — no transformation,
+reordering, or injection between the two.
+
+At the model level this is captured by `well_formed_batch`: the batch's
+`allocations` field IS `transition b cfg`, which in turn consumes the
+budget from the `candidates` derived from `requestedGwei` (the module
+return) and the validator limits.  The inter-call policy says: the
+allocation array that the push loop deposits is the transition applied
+to the module's return, not an independently supplied list.
+-/
+
+def interCallConsistent (b : TopupBatch) (cfg : TopupConfig) : Prop :=
+  b.allocations = transition b cfg
+
+theorem well_formed_batch_implies_interCallConsistent
+    (b : TopupBatch) (cfg : TopupConfig)
+    (h : well_formed_batch b cfg) : interCallConsistent b cfg :=
+  h.2
+
+theorem interCall_allocations_bounded (b : TopupBatch) (cfg : TopupConfig)
+    (h : interCallConsistent b cfg) :
+    b.allocations.sum ≤ cfg.maxTopUpPerBlockGwei := by
+  rw [h]
+  exact aggregate_bounded_by_block_cap b cfg
+
+theorem interCall_allocations_per_key (b : TopupBatch) (cfg : TopupConfig)
+    (h : interCallConsistent b cfg) :
+    List.Forall₂ (fun allocated candidate => allocated ≤ candidate)
+      b.allocations (candidates b cfg) := by
+  rw [h]
+  exact per_key_bounded_by_candidate b cfg
+
+/-! ## Freshness + budget composition
+
+A well-formed batch simultaneously satisfies freshness, inter-call
+consistency, the per-block cap, and the value-budget constraint. -/
+
+theorem well_formed_batch_composition (b : TopupBatch) (cfg : TopupConfig)
+    (h : well_formed_batch b cfg) :
+    rootIsFresh b cfg ∧
+    interCallConsistent b cfg ∧
+    b.allocations.sum ≤ cfg.maxTopUpPerBlockGwei ∧
+    (transition b cfg).sum ≤ weiToGwei b.valueWei :=
+  ⟨well_formed_pre_implies_fresh b cfg h.1,
+   h.2,
+   aggregate_bounded_by_block_cap_of_well_formed b cfg h,
+   transition_sum_le_valueGwei b cfg⟩
+
+/-! ## Allocation length preservation
+
+The transition preserves the length relationship between validators and
+allocations, which is critical for the push loop's index correspondence. -/
+
+private theorem consumeBudget_length (budget : Nat) (amounts : List Nat) :
+    (consumeBudget budget amounts).length = amounts.length := by
+  induction amounts generalizing budget with
+  | nil => simp [consumeBudget]
+  | cons _ amounts ih => simp [consumeBudget, ih]
+
+private theorem candidates_length (b : TopupBatch) (cfg : TopupConfig) :
+    (candidates b cfg).length =
+      min b.requestedGwei.length b.validators.length := by
+  simp [candidates, List.length_zipWith]
+
+theorem transition_length (b : TopupBatch) (cfg : TopupConfig) :
+    (transition b cfg).length = (candidates b cfg).length := by
+  simp [transition, consumeBudget_length]
+
+theorem well_formed_batch_allocation_length (b : TopupBatch) (cfg : TopupConfig)
+    (h : well_formed_batch b cfg) :
+    b.allocations.length = b.validators.length := by
+  rw [h.2, transition_length, candidates_length]
+  have hreq := h.1.2.2.2.1
+  have hlen := h.1.2.2.2.2.1
+  rw [← hreq]
+  exact Nat.min_self _
+
 /-- P-TOPUP-2 is closed on the abstract Nat cap and on a composed faithful
 `Contract.run` transaction that computes allocation/share observables.
 The composed Verity theorem lives in this namespace via

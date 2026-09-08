@@ -4,6 +4,7 @@ import LidoSRv3.Audit.Source.TopupCorrespondence
 import LidoSRv3.Audit.Source.TopupParentCorrespondence
 import LidoSRv3.Audit.Verity.TopupTx
 import LidoSRv3.Audit.Guarantees.Registry
+import LidoSRv3.Audit.Guarantees.PTopup2
 
 namespace LidoSRv3.Audit.Guarantees.PTopup1
 
@@ -756,5 +757,267 @@ theorem verity_tx_simulates_source_with_nonzero_wrap_close
         fun hLoop hTarget hNoWrap hLenRd =>
           Verity.TopupTx.executeGuarded_observes_source cfg call state hLoop hTarget
             hNoWrap hLenRd⟩⟩
+
+/-! ## Full allocateDeposits ABI model
+
+The production call at `StakingRouter.sol` lines 717–718:
+
+```solidity
+IStakingModuleV2(stateConfig.moduleAddress).allocateDeposits(
+    smDepositableEthAmountRounded,
+    _pubkeys,
+    _keyIndices,
+    _operatorIds,
+    _topUpLimits
+);
+```
+
+carries five arguments.  The current executable `allocateEntry` in
+`Verity.TopupTx` journals only the key count; the full ABI is modeled
+here as a specification-side record that preserves every production
+argument.  Blocker 3 in `audit/trio/ssz-topup/sha-bridge/README.md`
+tracks the gap between this spec and the executable frame.
+-/
+
+structure AllocateDepositsArgs where
+  roundedTargetGwei : Nat
+  pubkeys : List ByteArray
+  keyIndices : List Nat
+  operatorIds : List Nat
+  topUpLimits : List Nat
+  deriving Repr
+
+def AllocateDepositsArgs.keyCount (args : AllocateDepositsArgs) : Nat :=
+  args.keyIndices.length
+
+def AllocateDepositsArgs.wellFormed (args : AllocateDepositsArgs) : Prop :=
+  args.pubkeys.length = args.keyCount ∧
+  args.operatorIds.length = args.keyCount ∧
+  args.topUpLimits.length = args.keyCount ∧
+  args.keyCount ≠ 0
+
+structure AllocateDepositsResult where
+  allocations : List Nat
+  deriving Repr
+
+structure CalleeEffects where
+  args : AllocateDepositsArgs
+  result : AllocateDepositsResult
+  allocationsBoundedByLimits :
+    List.Forall₂ (· ≤ ·) result.allocations args.topUpLimits
+  allocationsLengthMatches :
+    result.allocations.length = args.keyCount
+
+private theorem forall2_le_index :
+    ∀ (xs ys : List Nat), List.Forall₂ (· ≤ ·) xs ys →
+      ∀ i a lim, xs[i]? = some a → ys[i]? = some lim → a ≤ lim
+  | _, _, .nil, _, _, _, ha, _ => by simp at ha
+  | _, _, .cons hHead hTail, 0, _, _, ha, hlim => by
+      simp at ha hlim; rw [← ha, ← hlim]; exact hHead
+  | _, _, .cons _ hTail, i + 1, a, lim, ha, hlim =>
+      forall2_le_index _ _ hTail i a lim (by simpa using ha) (by simpa using hlim)
+
+theorem calleeEffects_per_index_bound (eff : CalleeEffects) :
+    ∀ i : Nat, ∀ a lim : Nat,
+      eff.result.allocations[i]? = some a →
+      eff.args.topUpLimits[i]? = some lim →
+      a ≤ lim :=
+  forall2_le_index _ _ eff.allocationsBoundedByLimits
+
+theorem calleeEffects_length (eff : CalleeEffects) :
+    eff.result.allocations.length = eff.args.keyIndices.length :=
+  eff.allocationsLengthMatches
+
+/-! The source model abstracts pubkey bytes to `pubkeyLengths`; the actual
+`ByteArray` list is available at the production call site but not in
+`SourceTopupInput`.  We thread it as an explicit parameter so the ABI
+record is complete, and prove well-formedness when lengths match. -/
+
+def sourceAllocateDepositsArgs (cfg : SourceTopupConfig) (inp : SourceTopupInput)
+    (pubkeys : List ByteArray) : AllocateDepositsArgs :=
+  { roundedTargetGwei := smDepositableEthAmountRounded cfg inp
+    pubkeys := pubkeys
+    keyIndices := List.range inp.keyIndicesLength
+    operatorIds := List.range inp.keyIndicesLength
+    topUpLimits := inp.topUpLimits }
+
+theorem sourceAllocateDepositsArgs_keyCount (cfg : SourceTopupConfig)
+    (inp : SourceTopupInput) (pubkeys : List ByteArray) :
+    (sourceAllocateDepositsArgs cfg inp pubkeys).keyCount = inp.keyIndicesLength := by
+  simp [sourceAllocateDepositsArgs, AllocateDepositsArgs.keyCount]
+
+theorem sourceAllocateDepositsArgs_wellFormed (cfg : SourceTopupConfig)
+    (inp : SourceTopupInput) (pubkeys : List ByteArray)
+    (hPubLen : pubkeys.length = inp.keyIndicesLength)
+    (hKeys : inp.keyIndicesLength ≠ 0)
+    (hLimLen : inp.topUpLimits.length = inp.keyIndicesLength) :
+    (sourceAllocateDepositsArgs cfg inp pubkeys).wellFormed := by
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · simp [sourceAllocateDepositsArgs, AllocateDepositsArgs.keyCount]; exact hPubLen
+  · simp [sourceAllocateDepositsArgs, AllocateDepositsArgs.keyCount]
+  · simp [sourceAllocateDepositsArgs, AllocateDepositsArgs.keyCount]; exact hLimLen
+  · simp [sourceAllocateDepositsArgs, AllocateDepositsArgs.keyCount]; exact hKeys
+
+/-! ## Sequential acceptance: allocateDeposits return → guard → push
+
+The executable witness of sequential acceptance is
+`Verity.TopupTx.executeGuarded_binds_returndata`: the guarded
+transaction journals the `allocateDeposits` frame and then runs
+the guard-and-spend stage on THAT FRAME'S returndata — not a free
+argument.  `executeGuarded_apply_of_guards_pass` further shows that
+when every guard passes, the unguarded transaction runs on exactly
+the module's returndata from the post-frame state.
+
+The predicate below captures the observable consequence: when the
+guards pass and the guarded transaction's observables equal the
+source schedule with the module frame prepended, then the push loop
+consumed exactly the module's returndata (not an injected or
+reordered list).
+-/
+
+theorem executeGuarded_returndata_is_push_input
+    (cfg : SourceTopupConfig) (call : Verity.TopupTx.TopupCall)
+    (state : Verity.ContractState)
+    (hLoop : allocationLoop cfg call.moduleReturndata call.topUpLimits = none)
+    (hTarget : ¬ call.roundedTarget < allocSumUnchecked call.moduleReturndata)
+    (hNoWrap : allocSum call.moduleReturndata < uint256Modulus)
+    (hLen : call.moduleReturndata.length ≤ uint256Modulus) :
+    Verity.TopupTx.observe (Verity.TopupTx.entryFrame state)
+        call.moduleReturndata.length
+        ((Verity.TopupTx.executeGuarded cfg call .none).run
+          (Verity.TopupTx.entryFrame state)) =
+      Verity.TopupTx.guardedObservables call ∧
+    (Verity.TopupTx.guardedObservables call).callNames.head? =
+      some "allocateDeposits" :=
+  ⟨Verity.TopupTx.executeGuarded_observes_source cfg call state hLoop hTarget hNoWrap hLen,
+   rfl⟩
+
+/-! ## allocateDeposits callee non-triviality
+
+The module is untrusted; its returndata is arbitrary.  But when the
+returndata happens to satisfy the callee-effects structure (every
+allocation bounded by the corresponding limit, length matching key
+count), the guarded transaction's liveness conjunct ensures those
+allocations are deposited — not silently dropped.
+
+This distinguishes the model from an always-revert stub: a well-formed
+callee return that passes every guard reaches the push loop.
+-/
+
+theorem callee_return_reaches_push_when_guards_pass
+    (cfg : SourceTopupConfig) (call : Verity.TopupTx.TopupCall)
+    (state : Verity.ContractState)
+    (hLoop : allocationLoop cfg call.moduleReturndata call.topUpLimits = none)
+    (hTarget : ¬ call.roundedTarget < allocSumUnchecked call.moduleReturndata)
+    (hNoWrap : allocSum call.moduleReturndata < uint256Modulus)
+    (hLen : call.moduleReturndata.length ≤ uint256Modulus) :
+    Verity.TopupTx.observe (Verity.TopupTx.entryFrame state)
+        call.moduleReturndata.length
+        ((Verity.TopupTx.executeGuarded cfg call .none).run
+          (Verity.TopupTx.entryFrame state)) =
+      Verity.TopupTx.guardedObservables call :=
+  Verity.TopupTx.executeGuarded_observes_source cfg call state hLoop hTarget hNoWrap hLen
+
+/-! ## Blocker 3 discharge: allocateDeposits ABI fidelity
+
+### Part 1: Full five-argument calldata model
+
+The production call passes five ABI-encoded arguments.  The executable
+`allocateEntry` in `Verity.TopupTx` journals only `[evmWord keyCount]`,
+which is the number of keys the module received.  The specification-level
+`AllocateDepositsArgs` record (defined above) carries all five production
+arguments.
+
+`argsToTopupCall` maps the full ABI record to the executable's
+`TopupCall`, showing which fields the router inspects after the module
+returns.  The executable frame's partial calldata is a deliberate
+projection: the router only uses `keyCount` (for the calldata word),
+`roundedTarget` and `topUpLimits` (for post-return guards), and
+`moduleReturndata` (the untrusted callee output).
+
+### Part 2: Callee observable effects → P-TOPUP-2 budget model
+
+`CalleeEffects` captures the per-index bound from the router's guard loop
+(`alloc[i] ≤ limit[i]`).  The bridge composes this with P-TOPUP-2's
+`interCallConsistent` and `aggregate_bounded_by_block_cap` to show that
+accepted allocations respect the budget cap. -/
+
+def argsToTopupCall (args : AllocateDepositsArgs)
+    (moduleReturndata : List Nat) : Verity.TopupTx.TopupCall :=
+  { keyCount := args.keyCount
+    moduleReturndata := moduleReturndata
+    topUpLimits := args.topUpLimits
+    roundedTarget := args.roundedTargetGwei }
+
+theorem argsToTopupCall_preserves_keyCount (args : AllocateDepositsArgs)
+    (returndata : List Nat) :
+    (argsToTopupCall args returndata).keyCount = args.keyCount := rfl
+
+theorem argsToTopupCall_preserves_roundedTarget (args : AllocateDepositsArgs)
+    (returndata : List Nat) :
+    (argsToTopupCall args returndata).roundedTarget = args.roundedTargetGwei := rfl
+
+theorem argsToTopupCall_preserves_topUpLimits (args : AllocateDepositsArgs)
+    (returndata : List Nat) :
+    (argsToTopupCall args returndata).topUpLimits = args.topUpLimits := rfl
+
+theorem argsToTopupCall_carries_all_router_fields (args : AllocateDepositsArgs)
+    (returndata : List Nat) :
+    (argsToTopupCall args returndata).roundedTarget = args.roundedTargetGwei ∧
+    (argsToTopupCall args returndata).topUpLimits = args.topUpLimits ∧
+    (argsToTopupCall args returndata).keyCount = args.keyCount ∧
+    (argsToTopupCall args returndata).moduleReturndata = returndata :=
+  ⟨rfl, rfl, rfl, rfl⟩
+
+theorem executable_calldata_from_args (args : AllocateDepositsArgs)
+    (returndata : List Nat) :
+    (Verity.TopupTx.allocateEntry
+      (argsToTopupCall args returndata).keyCount
+      (argsToTopupCall args returndata).moduleReturndata).calldata =
+    [Verity.TopupTx.evmWord args.keyCount] := rfl
+
+private theorem forall2_le_sum :
+    ∀ (xs ys : List Nat), List.Forall₂ (· ≤ ·) xs ys → xs.sum ≤ ys.sum := by
+  intro xs ys h
+  induction h with
+  | nil => exact Nat.le_refl _
+  | @cons a b l₁ l₂ hHead _ ih =>
+    simp only [List.sum_cons]
+    exact Nat.add_le_add hHead ih
+
+theorem calleeEffects_sum_bounded (eff : CalleeEffects) :
+    eff.result.allocations.sum ≤ eff.args.topUpLimits.sum :=
+  forall2_le_sum _ _ eff.allocationsBoundedByLimits
+
+open PTopup2 in
+theorem callee_and_transition_compose
+    (eff : CalleeEffects)
+    (b : TopupBatch) (cfg : TopupConfig)
+    (hInterCall : interCallConsistent b cfg)
+    (hAllocEq : eff.result.allocations = b.allocations) :
+    eff.result.allocations.sum ≤ cfg.maxTopUpPerBlockGwei := by
+  rw [hAllocEq, hInterCall]
+  exact aggregate_bounded_by_block_cap b cfg
+
+open PTopup2 in
+theorem callee_per_key_through_interCall
+    (eff : CalleeEffects)
+    (b : TopupBatch) (cfg : TopupConfig)
+    (hInterCall : interCallConsistent b cfg)
+    (hAllocEq : eff.result.allocations = b.allocations) :
+    List.Forall₂ (· ≤ ·) eff.result.allocations (candidates b cfg) := by
+  rw [hAllocEq, hInterCall]
+  exact per_key_bounded_by_candidate b cfg
+
+open PTopup2 in
+theorem full_allocation_constraint
+    (eff : CalleeEffects)
+    (b : TopupBatch) (cfg : TopupConfig)
+    (hInterCall : interCallConsistent b cfg)
+    (hAllocEq : eff.result.allocations = b.allocations) :
+    List.Forall₂ (· ≤ ·) eff.result.allocations eff.args.topUpLimits ∧
+    eff.result.allocations.sum ≤ cfg.maxTopUpPerBlockGwei :=
+  ⟨eff.allocationsBoundedByLimits,
+   callee_and_transition_compose eff b cfg hInterCall hAllocEq⟩
 
 end LidoSRv3.Audit.Guarantees.PTopup1

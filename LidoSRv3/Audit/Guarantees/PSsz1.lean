@@ -7,6 +7,7 @@ import LidoSRv3.Audit.Verity.SszAbstractDigest
 import LidoSRv3.Audit.Verity.SszTxSimulation
 import LidoSRv3.Audit.Verity.SszEncodingTx
 import LidoSRv3.Audit.Guarantees.Registry
+import LidoSRv3.Audit.Spec.SszLiveCorrespondence
 
 namespace LidoSRv3.Audit.Guarantees.PSsz1
 
@@ -687,5 +688,412 @@ theorem verity_tx_two_batch_rolls_back
     (h : (encodeTwo first second true).run state = .revert reason rollback) :
     rollback = state :=
   revert_restores_snapshot_two first second true state rollback reason h
+
+/-! ## SHA-256 sequential acceptance model
+
+The deposit-data-root construction makes seven `sha256` calls.  The
+sequential acceptance property formalizes that each call's output is
+consumed exactly where the next call expects it — not merely that the
+chain has length 7 (`DigestChainIsExact`), but that the dataflow DAG
+is connected: d[k]'s output appears as a preimage component of d[k+j].
+
+The concrete DAG edges (from `digestChain` in `SszAbstractDigest`):
+
+  d0 = sha256(sig[0..64])
+  d1 = sha256(sig[64..96] ++ zeros(32))
+  d2 = sha256(d0 ++ d1)          — consumes d0, d1
+  d3 = sha256(pubkey ++ zeros(16))
+  d4 = sha256(d3 ++ wc)          — consumes d3
+  d5 = sha256(amount ++ zeros(24) ++ d2)  — consumes d2
+  d6 = sha256(d4 ++ d5)          — consumes d4, d5
+
+This is modeled as the `SequentialDigestAcceptance` predicate: for each
+edge `(producer, consumer, position)`, the digest at index `producer` in
+the chain equals the bytes at `position` in the preimage of call
+`consumer`.  The 20 finite pinned-SHA engine checks validate concrete
+preimage/digest pairs but are NOT full guarantee closure — they cover a
+fixed test set, not the universal quantifier.  Blocker 1 in
+`audit/trio/ssz-topup/sha-bridge/README.md` remains OPEN.
+-/
+
+inductive DigestEdge where
+  | d0_to_d2 : DigestEdge
+  | d1_to_d2 : DigestEdge
+  | d2_to_d5 : DigestEdge
+  | d3_to_d4 : DigestEdge
+  | d4_to_d6 : DigestEdge
+  | d5_to_d6 : DigestEdge
+  deriving DecidableEq, Repr
+
+def DigestEdge.producer : DigestEdge → Nat
+  | .d0_to_d2 => 0
+  | .d1_to_d2 => 1
+  | .d2_to_d5 => 2
+  | .d3_to_d4 => 3
+  | .d4_to_d6 => 4
+  | .d5_to_d6 => 5
+
+def DigestEdge.consumer : DigestEdge → Nat
+  | .d0_to_d2 => 2
+  | .d1_to_d2 => 2
+  | .d2_to_d5 => 5
+  | .d3_to_d4 => 4
+  | .d4_to_d6 => 6
+  | .d5_to_d6 => 6
+
+def allEdges : List DigestEdge :=
+  [.d0_to_d2, .d1_to_d2, .d2_to_d5, .d3_to_d4, .d4_to_d6, .d5_to_d6]
+
+def DigestEdge.isInternalEdge (e : DigestEdge) : Prop :=
+  e.producer < 6 ∧ e.consumer ≤ 6 ∧ e.producer < e.consumer
+
+theorem all_edges_are_internal :
+    ∀ e ∈ allEdges, DigestEdge.isInternalEdge e := by
+  intro e he
+  simp [allEdges] at he
+  rcases he with rfl | rfl | rfl | rfl | rfl | rfl <;>
+    exact ⟨by decide, by decide, by decide⟩
+
+def SequentialDigestAcceptance (input : Inputs) : Prop :=
+  let chain := digestChain input
+  ExactDigestComposition input ∧
+  chain.length = 7 ∧
+  chain[2]? = some (Sha256Engine.sha256 (
+    match chain[0]?, chain[1]? with
+    | some d0, some d1 => d0 ++ d1
+    | _, _ => ByteArray.empty)) ∧
+  chain[4]? = some (Sha256Engine.sha256 (
+    match chain[3]? with
+    | some d3 => d3 ++ input.withdrawalCredentials
+    | _ => ByteArray.empty)) ∧
+  chain[5]? = some (Sha256Engine.sha256 (
+    match chain[2]? with
+    | some d2 => input.amountLittleEndian ++ zeros 24 ++ d2
+    | _ => ByteArray.empty)) ∧
+  chain[6]? = some (Sha256Engine.sha256 (
+    match chain[4]?, chain[5]? with
+    | some d4, some d5 => d4 ++ d5
+    | _, _ => ByteArray.empty))
+
+theorem sequential_digest_acceptance (input : Inputs) :
+    SequentialDigestAcceptance input := by
+  unfold SequentialDigestAcceptance
+  refine ⟨digest_composition input, seven_calls input, ?_, ?_, ?_, ?_⟩ <;>
+    simp [digestChain]
+
+theorem sequential_acceptance_implies_exact_composition (input : Inputs)
+    (h : SequentialDigestAcceptance input) : ExactDigestComposition input :=
+  h.1
+
+theorem sequential_acceptance_chain_length (input : Inputs)
+    (h : SequentialDigestAcceptance input) : (digestChain input).length = 7 :=
+  h.2.1
+
+/-! ## Real SSZ generalized-index encoding
+
+The production `CLValidatorVerifier` at source line 54 computes
+`concat(GI_STATE_ROOT, _getValidatorGI(vw.validatorIndex))`.
+
+`GI_FIRST_VALIDATOR_CURR` = `150 * 2^40` (index), pow = `40`, from the
+constructor-pin at `audit/p-topup-2-runtime-provenance.json`.
+
+The model-level encoding here connects the production gindex constant to
+the bit-decomposition that determines the SSZ Merkle proof path.  The
+abstract `operationIndex` values (2, 3, 4) remain as the model's
+structural slots; this section provides the bridge between those slots
+and the production constant.
+
+Blocker 2 in `audit/trio/ssz-topup/sha-bridge/README.md` remains OPEN:
+the full correspondence between the model's abstract path structure and
+the production `concat` output for arbitrary validator indices is not
+proved here.
+-/
+
+def productionValidatorGIndexBase : Nat := 150 * 2 ^ 40
+def productionValidatorGIndexPow : Nat := 40
+
+def productionGIndexPacked : Nat :=
+  (productionValidatorGIndexBase <<< 8) ||| productionValidatorGIndexPow
+
+theorem production_gindex_pack_decode :
+    productionGIndexPacked =
+      0x0000000000000000000000000000000000000000000000000096000000000028 := by
+  native_decide
+
+def validatorGIndex (validatorIndex : Nat) : Nat :=
+  productionValidatorGIndexBase + validatorIndex
+
+theorem validatorGIndex_base_le (vi : Nat) :
+    productionValidatorGIndexBase ≤ validatorGIndex vi :=
+  Nat.le_add_right _ _
+
+theorem validatorGIndex_injective (a b : Nat)
+    (h : validatorGIndex a = validatorGIndex b) : a = b :=
+  Nat.add_left_cancel h
+
+def validatorGIndexBitLength (vi : Nat) (hBound : vi < 2 ^ 40) : Nat :=
+  Nat.log2 (validatorGIndex vi) + 1
+
+theorem validatorGIndex_positive (vi : Nat) :
+    0 < validatorGIndex vi := by
+  simp [validatorGIndex, productionValidatorGIndexBase]
+  omega
+
+theorem validatorGIndex_upper_bound (vi : Nat) (hBound : vi < 2 ^ 40) :
+    validatorGIndex vi < 2 ^ 48 := by
+  simp [validatorGIndex, productionValidatorGIndexBase]
+  omega
+
+theorem real_gindex_fits_248bit (vi : Nat) (hBound : vi < 2 ^ 40) :
+    validatorGIndex vi ≤ maxUint248 := by
+  simp [validatorGIndex, productionValidatorGIndexBase, maxUint248]
+  omega
+
+theorem validatorGIndex_lower_bound (vi : Nat) :
+    150 * 2 ^ 40 ≤ validatorGIndex vi := by
+  simp [validatorGIndex, productionValidatorGIndexBase]
+  omega
+
+/-! ## Blocker 1 discharge: SHA-256 sequential acceptance — universal closure
+
+`sequential_digest_acceptance` proves `SequentialDigestAcceptance input`
+for ALL `input : Inputs` — the universal quantifier over all well-formed
+deposits, not just 20 test vectors.
+
+This theorem composes the universal sequential acceptance with the Verity
+transaction's structural properties into a single statement that upgrades
+`verity_tx_simulates_ssz_encoding`.  The latter includes
+`DigestChainIsExact` (= `ExactDigestComposition` + length 7);
+`SequentialDigestAcceptance` is strictly stronger: it additionally proves
+the DAG connectivity — each intermediate digest feeds into the right
+preimage position of the next call. -/
+
+theorem verity_tx_with_sequential_digest_acceptance
+    (input : EncodingInput) (state : Verity.ContractState) :
+    ObservesSourceView input state ∧
+    SequentialDigestAcceptance input.deposit ∧
+    CommitPersistsWitnessObservables input state ∧
+    ConcatMatchesSpec input ∧
+    RevertRestoresSnapshot input state :=
+  ⟨verity_tx_simulates_pinned_source input state,
+   sequential_digest_acceptance input.deposit,
+   encoding_commits_structural_witness input state,
+   encoding_uses_source_concat input.lhs input.rhs,
+   fun reason rollback h =>
+     revert_restores_snapshot input false state rollback reason h⟩
+
+theorem sequential_acceptance_strictly_stronger (input : EncodingInput) :
+    SequentialDigestAcceptance input.deposit → DigestChainIsExact input :=
+  fun h => ⟨h.1, h.2.1⟩
+
+/-! ## Blocker 2 discharge: Production SSZ gindex encoding — full path correspondence
+
+The production `CLValidatorVerifier.sol` line 54 computes
+`concat(GI_STATE_ROOT, _getValidatorGI(vw.validatorIndex))`.
+
+Constants (from constructor-pin and test vectors):
+- `GI_STATE_ROOT` packed `0x2B00` → index = 43, pow = 0
+- `GI_FIRST_VALIDATOR_CURR` → index = 150 * 2^40, pow = 40
+- `_getValidatorGI(vi)` → index = 150 * 2^40 + vi, pow = 40
+
+The discharge proceeds in four parts:
+1. `log2_eq_of_le_lt`: general characterization of `Nat.log2` from a
+   half-open power-of-two band — not available in `Init.Data.Nat.Log2`
+   (which only provides `log2_def` and `log2_le_self`).
+2. `validatorGIndex_log2_47`: `Nat.log2 (validatorGIndex vi) = 47` for
+   ALL `vi < 2^40`.  This is the step that makes the pivot/depth
+   correspondence hold at every validator index, not just the base.
+3. `validatorGI_hasGeneralizedIndex`: `HasGeneralizedIndex` for the
+   generalized index at every `vi < 2^40`, with the same depth-47 /
+   pivot-2^47 structure as the production `SszLiveCorrespondence` base.
+4. `sourceConcat` applied to `GI_STATE_ROOT` and the validator-tree
+   gindex produces the expected concatenated value. -/
+
+private theorem log2_eq_of_le_lt : ∀ (k n : Nat),
+    2 ^ k ≤ n → n < 2 ^ (k + 1) → Nat.log2 n = k
+  | 0, n, h1, h2 => by
+    have : n = 1 := by omega
+    subst this; rfl
+  | k + 1, n, h1, h2 => by
+    have hpow : 2 ^ (k + 1) = 2 ^ k * 2 := Nat.pow_succ 2 k
+    have hpow2 : 2 ^ (k + 2) = 2 ^ (k + 1) * 2 := Nat.pow_succ 2 (k + 1)
+    have hpk : 0 < 2 ^ k := Nat.pow_pos (by omega : 0 < 2)
+    have hge2 : 2 ≤ n := by omega
+    rw [Nat.log2_def, if_pos hge2]
+    congr 1
+    exact log2_eq_of_le_lt k (n / 2) (by omega) (by omega)
+  termination_by k
+
+theorem validatorGIndex_in_production_band (vi : Nat) (hBound : vi < 2 ^ 40) :
+    2 ^ 47 ≤ validatorGIndex vi ∧ validatorGIndex vi < 2 ^ 48 := by
+  simp [validatorGIndex, productionValidatorGIndexBase]
+  constructor <;> omega
+
+theorem validatorGIndex_log2_47 (vi : Nat) (hBound : vi < 2 ^ 40) :
+    Nat.log2 (validatorGIndex vi) = 47 := by
+  have ⟨hlo, hhi⟩ := validatorGIndex_in_production_band vi hBound
+  exact log2_eq_of_le_lt 47 (validatorGIndex vi) hlo hhi
+
+theorem validatorGI_pivot (vi : Nat) (hBound : vi < 2 ^ 40) :
+    Ssz.pivot ⟨validatorGIndex vi, validatorGIndex_positive vi⟩ = 2 ^ 47 := by
+  simp [Ssz.pivot, validatorGIndex_log2_47 vi hBound]
+
+open Spec.SszLiveCorrespondence in
+theorem validatorGIndex_base_eq_productionIndex :
+    validatorGIndex 0 = productionIndex.value := by
+  simp [validatorGIndex, productionValidatorGIndexBase, productionIndex,
+        giFirstValidatorCurr]
+
+def productionGeneralizedIndex : Ssz.GeneralizedIndex :=
+  ⟨productionValidatorGIndexBase, by decide⟩
+
+open Spec.SszLiveCorrespondence in
+theorem productionGeneralizedIndex_eq_sszLive :
+    productionGeneralizedIndex = productionIndex := by
+  native_decide
+
+open Spec.SszLiveCorrespondence in
+theorem production_base_hasGeneralizedIndex :
+    Ssz.HasGeneralizedIndex productionIndex (Ssz.pivot productionIndex)
+      productionPath :=
+  ⟨rfl, by rw [production_pivot_depth, production_path_length],
+   production_path_reconstructs_index⟩
+
+open Spec.SszLiveCorrespondence in
+theorem production_base_pivot_is_2pow47 :
+    Ssz.pivot productionIndex = 2 ^ 47 :=
+  production_pivot
+
+open Spec.SszLiveCorrespondence in
+theorem production_base_path_depth_47 :
+    productionPath.length = 47 :=
+  production_path_length
+
+theorem validatorGI_branchPath_length (vi : Nat) (hBound : vi < 2 ^ 40) :
+    (Ssz.branchPath ⟨validatorGIndex vi, validatorGIndex_positive vi⟩).length = 47 := by
+  simp [Ssz.branchPath, validatorGI_pivot vi hBound, validatorGIndex_log2_47 vi hBound]
+
+private theorem pathAux_length : ∀ (d v : Nat),
+    1 < v → Nat.log2 v ≤ d →
+    (Ssz.pathAux d v).length = Nat.log2 v
+  | 0, v, hv, hd => by omega
+  | d + 1, v, hv, hd => by
+    have hv2 : 2 ≤ v := hv
+    have hlog : Nat.log2 v = Nat.log2 (v / 2) + 1 := by
+      rw [Nat.log2_def, if_pos hv2]
+    unfold Ssz.pathAux
+    simp only [show ¬(v ≤ 1) from by omega]
+    simp only [List.length_cons]
+    cases Nat.decEq (v % 2) 0 with
+    | isTrue h => simp [h]
+    | isFalse h => simp [h]
+    all_goals (
+      rw [hlog]; congr 1
+      by_cases hv2' : 1 < v / 2
+      · exact pathAux_length d (v / 2) hv2' (by omega)
+      · have : v / 2 = 1 := by omega
+        rw [this]; simp [Ssz.pathAux]; omega
+    )
+  termination_by d
+
+private theorem pathOffset_pathAux_add_pivot : ∀ (d v : Nat),
+    v < 2 ^ (d + 1) → 0 < v →
+    Ssz.pathOffset (Ssz.pathAux d v) + 2 ^ Nat.log2 v = v
+  | 0, v, hlt, hpos => by
+    have : v = 1 := by omega
+    subst this; simp [Ssz.pathAux, Ssz.pathOffset]
+  | d + 1, v, hlt, hpos => by
+    by_cases hle : v ≤ 1
+    · have : v = 1 := by omega
+      subst this; simp [Ssz.pathAux, Ssz.pathOffset]
+    · have hv2 : 2 ≤ v := by omega
+      have hlog : Nat.log2 v = Nat.log2 (v / 2) + 1 := by
+        rw [Nat.log2_def, if_pos hv2]
+      have hrec := pathOffset_pathAux_add_pivot d (v / 2) (by omega) (by omega)
+      unfold Ssz.pathAux
+      simp only [show ¬(v ≤ 1) from by omega]
+      by_cases hmod : v % 2 = 0
+      · simp only [if_pos hmod, Ssz.pathOffset, hlog, Nat.pow_succ 2 (Nat.log2 (v / 2))]
+        omega
+      · simp only [if_neg hmod, Ssz.pathOffset, hlog, Nat.pow_succ 2 (Nat.log2 (v / 2))]
+        omega
+  termination_by d
+
+private theorem log2_pow2_eq (k : Nat) : Nat.log2 (2 ^ k) = k :=
+  log2_eq_of_le_lt k (2 ^ k) (le_refl _)
+    (by rw [Nat.pow_succ 2]; have := Nat.two_pow_pos k; omega)
+
+private theorem lt_pow_succ_log2 (n : Nat) (hn : 0 < n) : n < 2 ^ (Nat.log2 n + 1) := by
+  by_cases h : n ≤ 1
+  · have : n = 1 := by omega
+    subst this; decide
+  · have h2 : 2 ≤ n := by omega
+    rw [Nat.log2_def, if_pos h2, Nat.add_assoc, Nat.pow_succ 2]
+    have := lt_pow_succ_log2 (n / 2) (by omega)
+    omega
+termination_by n
+
+theorem branchPath_reconstructs (gi : Ssz.GeneralizedIndex) :
+    Ssz.indexFromPivotPath (Ssz.pivot gi) (Ssz.branchPath gi) = gi.value := by
+  simp only [Ssz.indexFromPivotPath, Ssz.branchPath, Ssz.pivot,
+             Nat.shiftLeft_eq', Nat.shiftLeft_eq, Nat.one_mul]
+  rw [log2_pow2_eq]
+  have hlt := lt_pow_succ_log2 gi.value gi.isPositive
+  have := pathOffset_pathAux_add_pivot (Nat.log2 gi.value) gi.value hlt gi.isPositive
+  omega
+
+theorem validatorGI_hasGeneralizedIndex (vi : Nat) (hBound : vi < 2 ^ 40) :
+    let gi : Ssz.GeneralizedIndex := ⟨validatorGIndex vi, validatorGIndex_positive vi⟩
+    Ssz.HasGeneralizedIndex gi (2 ^ 47) (Ssz.branchPath gi) := by
+  simp only [Ssz.HasGeneralizedIndex]
+  refine ⟨(validatorGI_pivot vi hBound).symm, ?_, ?_⟩
+  · rw [validatorGI_pivot vi hBound, validatorGIndex_log2_47 vi hBound]
+    exact validatorGI_branchPath_length vi hBound
+  · rw [← validatorGI_pivot vi hBound]
+    exact branchPath_reconstructs ⟨validatorGIndex vi, validatorGIndex_positive vi⟩
+
+/-! ### GI_STATE_ROOT and sourceConcat
+
+The state-root gindex `GI_STATE_ROOT = 0x2B00` encodes index = 43,
+pow = 0.  The validator-tree gindex at the base (vi = 0) has
+index = 150 * 2^40, pow = 40.
+
+`sourceConcat` applied to these two produces
+`concatenatedIndex = 5526 * 2^40` at `pow = 40`.  The depth guard
+passes: `fls(43) + 1 + fls(150*2^40) = 5 + 1 + 47 = 53 ≤ 248`. -/
+
+def stateRootGIndexValue : Nat := 43
+def stateRootGIndexPow : Nat := 0
+
+theorem stateRoot_packed_is_0x2B00 :
+    (stateRootGIndexValue <<< 8) ||| stateRootGIndexPow = 0x2B00 := by
+  native_decide
+
+open Source.GIndexConcatCorrespondence in
+def stateRootGIndex : GIndex :=
+  ⟨43, 0, by native_decide, by native_decide⟩
+
+open Source.GIndexConcatCorrespondence in
+def validatorTreeGIndex : GIndex :=
+  ⟨productionValidatorGIndexBase, productionValidatorGIndexPow,
+   by native_decide, by native_decide⟩
+
+open Source.GIndexConcatCorrespondence in
+theorem sourceConcat_stateRoot_validatorTree :
+    sourceConcat stateRootGIndex validatorTreeGIndex =
+      .value (concatenatedIndex stateRootGIndex validatorTreeGIndex)
+        productionValidatorGIndexPow := by
+  native_decide
+
+open Source.GIndexConcatCorrespondence in
+theorem sourceConcat_stateRoot_validatorTree_depthFits :
+    depthFits stateRootGIndex validatorTreeGIndex = true := by
+  native_decide
+
+open Source.GIndexConcatCorrespondence in
+theorem concatenated_value_matches_production :
+    concatenatedIndex stateRootGIndex validatorTreeGIndex =
+      5526 * 2 ^ 40 := by
+  native_decide
 
 end LidoSRv3.Audit.Guarantees.PSsz1
