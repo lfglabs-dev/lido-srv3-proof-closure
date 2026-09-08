@@ -124,20 +124,23 @@ def reportValidatorBalances (input : Input) (before : State) : Outcome :=
       match writeRows before.modules input.balancesGwei 0 with
       | .error e => .reverted e before
       | .ok (modules, total) =>
-        .committed { modules := modules,
-          router := writeRouterBalance before.router total }
+        .committed (State.mk modules (writeRouterBalance before.router total))
 
 theorem low64_writeLow64 (word value : Nat) (h : value < two64) :
     low64 (writeLow64 word value) = value := by
-  simp [low64, writeLow64, two64, Nat.add_mod, h]
+  change value < 18446744073709551616 at h
+  simp [low64, writeLow64, two64, Nat.mod_eq_of_lt h]
 
 theorem aboveLow64_writeLow64 (word value : Nat) (h : value < two64) :
     aboveLow64 (writeLow64 word value) = aboveLow64 word := by
-  simp [aboveLow64, writeLow64, two64, Nat.add_div, h]
+  change value < 18446744073709551616 at h
+  simp only [aboveLow64, writeLow64, two64]
+  omega
 
 theorem checkedAdd64_ok_iff (a b : Nat) :
     (exists n, checkedAdd64 a b = .ok n) <-> a + b < two64 := by
-  simp [checkedAdd64]
+  unfold checkedAdd64
+  split <;> simp_all
 
 theorem length_guard_is_first (input : Input) (before : State)
     (h : input.reportedModuleIds.length != input.registeredModuleIds.length ||
@@ -150,9 +153,11 @@ theorem length_guard_is_first (input : Input) (before : State)
 theorem every_revert_restores_snapshot (input : Input) (before rollback : State)
     (e : Error) (h : reportValidatorBalances input before = .reverted e rollback) :
     rollback = before := by
-  simp only [reportValidatorBalances] at h
-  split at h <;> simp_all
-  split at h <;> simp_all
-  split at h <;> simp_all
+  unfold reportValidatorBalances at h
+  split at h
+  · simp_all
+  · split at h
+    · simp_all
+    · split at h <;> simp_all
 
 end AccountAddress.PAccount1
