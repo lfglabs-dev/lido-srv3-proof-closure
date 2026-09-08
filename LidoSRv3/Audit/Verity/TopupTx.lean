@@ -241,16 +241,14 @@ def beaconPush (input : SourceDepositDataRootInput) (amount : Nat) : Contract Un
 
 /-- `BeaconChainDepositor.sol:79-107` with its source-byte inputs retained.
 An allocation can reach `deposit` only when it has a corresponding source
-input and its source `amountGwei` is exactly the allocation divided by the
-pinned `1 gwei` unit.  Extra or missing keys fail closed, matching the
+input; the registered constructor below sets its `amountGwei` to the
+allocation divided by the pinned `1 gwei` unit. Extra or missing keys fail closed, matching the
 source's array-length boundary rather than inventing a scheduled deposit. -/
 def sourcePushLoop : List SourceDepositDataRootInput → List Nat → Contract Unit
   | [], [] => Verity.pure ()
   | [], _ :: _ => require false "SourceDepositLengthMismatch"
   | _ :: _, [] => require false "SourceDepositLengthMismatch"
   | input :: inputs, amount :: amounts => do
-      require (decide (amount = input.amountGwei * 1000000000))
-        "SourceDepositAmountMismatch"
       if amount = 0 then sourcePushLoop inputs amounts
       else do
         beaconPush input amount

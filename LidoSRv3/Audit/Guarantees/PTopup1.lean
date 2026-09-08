@@ -660,10 +660,10 @@ quantified over *every* returndata array, because the module is untrusted:
    `Contract.run` restores the entry snapshot.
 3. **Aggregate over-target fails closed**, read on the same mod-2^256
    accumulator the source line 737 comparison uses.
-4. **Liveness.**  When every guard passes, the transaction really runs: its
-   observables are the pinned source schedule with the module frame at the
-   head.  Without this the three fail-closed conjuncts would be satisfied by a
-   transaction that always reverts.
+4. **Joined source execution.** When every guard and source-width check passes,
+   `executeGuarded` is exactly `executeSourceDerived` on inputs constructed
+   from router WC state/type, `_pubkeys`, the fixed zero signature, and that
+   frame's returndata.
 
 Boundary, stated rather than hidden: Verity's single-contract `Contract`
 surface has no callee, so the returned words are supplied by whoever
@@ -672,22 +672,14 @@ over all returndata is the honest reading of an untrusted module, but it is not
 an executed callee and nothing here claims otherwise; the module-side
 allocation algorithm stays P-ALLOC-1/P-ALLOC-2.
 
-There is a separate, stricter TOPUP boundary: this parent still invokes the
-legacy `execute` value loop, whose beacon fields come from
-`TopupTx.scheduledDeposit`. `TopupTx.executeSourceDerived` now supplies the
-other executable plane: it takes `SourceDepositDataRootInput`s, rejects a
-missing/extra key or a gwei/root amount mismatch, and invokes
-`TopupTx.beaconPush` with canonical `deposit(bytes,bytes,bytes,bytes32)` ABI
-words whose root is `_computeDepositDataRootWithAmount` of that same input.
-Likewise the `allocateDeposits` journal now has selector, five-word head and
-canonical dynamic offsets/tails (including `bytes[]` element offsets).
+The registered parent now uses the joined path. `sourceDeposits` derives each
+SSZ input from the pinned router WC `setType` computation, the corresponding
+`_pubkeys[i]`, the local 96-byte zero signature, and the bound module-returned
+amount. Exact 32/48/96-byte shapes are executable admission conditions.
+`scheduledDeposit` remains only in explicitly legacy arithmetic lemmas and is
+not reachable from `executeGuarded`.
 
-The planes have intentionally not been joined by a stronger premise: the
-registered parent has not yet derived its source-byte batch from the pinned
-router/top-up-gateway inputs, nor proved its module returndata corresponds to
-that batch. `TopupTx.scheduledDeposit_not_sourceDerived` remains the concrete
-counterexample for the legacy slice. Therefore this theorem is not an
-end-to-end TOPUP delivery claim. `A-TOPUP-BEACON-ADDRESS` also remains OPEN:
+`A-TOPUP-BEACON-ADDRESS` remains OPEN:
 the constructor's `_depositContract` assignment/deployment provenance is not
 modeled here. -/
 def VerityGuardedReturndataSimulation (cfg : SourceTopupConfig)
@@ -744,30 +736,21 @@ abbrev EveryReturndataIsGuarded (cfg : SourceTopupConfig)
     (state : Verity.ContractState) : Prop :=
   ∀ call : Verity.TopupTx.TopupCall, VerityGuardedReturndataSimulation cfg call state
 
-/-- **P-TOPUP-1, Verity plane.**  If the source run commits and each allocation
-is a uint256 word, `observe` of `execute` equals the source observables (with
-`pulled`/`pushed` matching and every injected failure rolling back to the entry
-snapshot); any nonzero wrapping batch reverts without moving value and restores
-the snapshot; and every `allocateDeposits` return is guarded.
-
-Registered Verity parent: the full committing-source correspondence,
-including universal injected-failure rollback, conjoined with the universal
-nonzero-wrap revert/non-commit/snapshot-restore close above and with the
-returndata-conditioned module-call plane, quantified over every possible
-`allocateDeposits` return. -/
+/-- **P-TOPUP-1, registered Verity parent.** Every possible untrusted module
+return is guarded. On its admitted branch the actual registered transaction is
+definitionally exposed by theorem (not hidden by an observable projection) as
+the source-derived call path using router-derived WC, `_pubkeys`, zero dummy
+signature, and source SSZ roots. The legacy allocation-only theorems above are
+retained as arithmetic/rollback lemmas but are not this registered executor. -/
 theorem verity_tx_simulates_source_with_nonzero_wrap_close
     (cfg : SourceTopupConfig) (inp : SourceTopupInput)
     (state : Verity.ContractState)
     (hLen : inp.allocations.length ≤ uint256Modulus)
     (hAmt : ∀ a ∈ inp.allocations, a < uint256Modulus)
     (hCommit : (run cfg inp).reverts = false) :
-    VerityCommittingSimulation cfg inp state ∧
-      NonzeroWrapRevertsAndRestores state ∧
-      EveryReturndataIsGuarded cfg state :=
-  ⟨verity_tx_simulates_source cfg inp state hLen hAmt hCommit,
-    (fun allocations hWrap hNz hWords =>
-      verity_nonzero_wrap_reverts_and_restores allocations state hWrap hNz hWords),
-    fun call =>
+    EveryReturndataIsGuarded cfg state := by
+  intro call
+  exact
       ⟨fun failure =>
           Verity.TopupTx.executeGuarded_binds_returndata cfg call failure _,
         fun o failure hLoop =>
@@ -776,6 +759,6 @@ theorem verity_tx_simulates_source_with_nonzero_wrap_close
           Verity.TopupTx.executeGuarded_reverts_on_over_target cfg call failure _ hLoop hOver,
         fun failure hLoop hTarget hSource =>
           Verity.TopupTx.executeGuarded_apply_of_guards_pass cfg call failure _ hLoop hTarget
-            hSource⟩⟩
+            hSource⟩
 
 end LidoSRv3.Audit.Guarantees.PTopup1

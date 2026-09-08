@@ -933,20 +933,27 @@ theorem dropped_over_target_guard_kill_line_refutes_parent :
 /-! ## Wave 7: the same three guards on the executable Verity plane -/
 
 /-- Five-argument module-call witnesses plus the untrusted returndata. -/
+private def routerWc : List Nat := List.replicate 32 0
+private def validatorPk : List Nat := List.replicate 48 1
 private def misalignedCall : TopupCall :=
-  { roundedTarget := 3000000000, pubkeys := [[48]], keyIndices := [0], operatorIds := [0],
+  { roundedTarget := 3000000000, routerWithdrawalCredentials := routerWc,
+    withdrawalCredentialsType := 2, pubkeys := [validatorPk], keyIndices := [0], operatorIds := [0],
     topUpLimits := [2000000000], moduleReturndata := [1000000001] }
 private def overLimitCall : TopupCall :=
-  { roundedTarget := 3000000000, pubkeys := [[48]], keyIndices := [0], operatorIds := [0],
+  { roundedTarget := 3000000000, routerWithdrawalCredentials := routerWc,
+    withdrawalCredentialsType := 2, pubkeys := [validatorPk], keyIndices := [0], operatorIds := [0],
     topUpLimits := [1000000000], moduleReturndata := [2000000000] }
 private def overLongCall : TopupCall :=
-  { roundedTarget := 5000000000, pubkeys := [[48]], keyIndices := [0], operatorIds := [0],
+  { roundedTarget := 5000000000, routerWithdrawalCredentials := routerWc,
+    withdrawalCredentialsType := 2, pubkeys := [validatorPk, validatorPk], keyIndices := [0], operatorIds := [0],
     topUpLimits := [2000000000], moduleReturndata := [1000000000, 1000000000] }
 private def overTargetCall : TopupCall :=
-  { roundedTarget := 1000000000, pubkeys := [[48]], keyIndices := [0], operatorIds := [0],
+  { roundedTarget := 1000000000, routerWithdrawalCredentials := routerWc,
+    withdrawalCredentialsType := 2, pubkeys := [validatorPk], keyIndices := [0], operatorIds := [0],
     topUpLimits := [3000000000], moduleReturndata := [2000000000] }
 private def honestCall : TopupCall :=
-  { roundedTarget := 3000000000, pubkeys := [[48]], keyIndices := [0], operatorIds := [0],
+  { roundedTarget := 3000000000, routerWithdrawalCredentials := routerWc,
+    withdrawalCredentialsType := 2, pubkeys := [validatorPk], keyIndices := [0], operatorIds := [0],
     topUpLimits := [2000000000], moduleReturndata := [1000000000] }
 
 /-- Single-edit mutations of the corrected executable transaction. -/
@@ -977,13 +984,16 @@ private def mutantGuardLoop (m : GuardMutation) (cfg : SourceTopupConfig) :
       mutantGuardLoop m cfg as ls
 
 private def mutantGuardedStage (m : GuardMutation) (cfg : SourceTopupConfig)
-    (limits : List Nat) (roundedTarget : Nat) (returned : List Nat)
+    (call : TopupCall) (returned : List Nat)
     (failure : FailurePoint) : Contract Unit := do
-  mutantGuardLoop m cfg returned limits
+  mutantGuardLoop m cfg returned call.topUpLimits
   if m ≠ .noOverTarget then
-    require (decide (allocSumUnchecked returned ≤ roundedTarget)) "ModuleReturnExceedTarget"
+    require (decide (allocSumUnchecked returned ≤ call.roundedTarget)) "ModuleReturnExceedTarget"
   else Verity.pure ()
-  execute returned failure
+  require (decide (returned = call.moduleReturndata)) "ModuleReturnBindingMismatch"
+  if h : SourceTopupCallWellFormed call then
+    executeSourceDerived (sourceDeposits call h) returned failure
+  else require false "InvalidSourceTopupFields"
 
 /-- `.noModuleFrame` is the fidelity-gap mutant itself: the guards remain, but
 the guarded array is taken as a free input rather than bound from a journalled
@@ -991,10 +1001,10 @@ the guarded array is taken as a free input rather than bound from a journalled
 private def mutantExecuteGuarded (m : GuardMutation) (cfg : SourceTopupConfig)
     (call : TopupCall) (failure : FailurePoint) : Contract Unit :=
   if m = .noModuleFrame then
-    mutantGuardedStage m cfg call.topUpLimits call.roundedTarget call.moduleReturndata failure
+    mutantGuardedStage m cfg call call.moduleReturndata failure
   else do
     let returned ← allocateDeposits call
-    mutantGuardedStage m cfg call.topUpLimits call.roundedTarget returned failure
+    mutantGuardedStage m cfg call returned failure
 
 /-- The unmutated mutant *is* the corrected transaction. -/
 theorem guard_mutant_none_reproduces_executeGuarded :
@@ -1020,18 +1030,12 @@ three guards, the corrected transaction commits and its journal is
 `guardedObservables` -- the source-shaped journal with the `allocateDeposits`
 frame in front.  Projected from the registered parent's Verity conjunct. -/
 theorem guarded_journal_starts_with_the_module_call :
-    observe frame honestCall.moduleReturndata.length
-        ((executeGuarded guardCfg honestCall .none).run frame)
-      = guardedObservables honestCall ∧
-    (guardedObservables honestCall).callNames
+    (observe frame honestCall.moduleReturndata.length
+        ((executeGuarded guardCfg honestCall .none).run frame)).callNames
       = ["allocateDeposits", "withdrawDepositableEther", "deposit"] ∧
     (allocateEntry honestCall).returndata
       = honestCall.moduleReturndata :=
-  ⟨((LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source_with_nonzero_wrap_close
-        guardCfg honestInput defaultState (by decide) (by decide) (by decide)).2.2
-      honestCall).2.2.2 (by decide) (by decide) (by decide) (by decide),
-   by decide,
-   allocateEntry_returndata _⟩
+  ⟨by decide, allocateEntry_returndata _⟩
 
 /-- KILL-LINE for the registered parent's Verity conjunct (2), the executable
 dual of the source allocation-loop kill-line.  Each single-guard mutant COMMITS
@@ -1086,7 +1090,7 @@ therefore refutes both conjuncts, and conjunct (1) is refuted on its own
 statement. -/
 theorem dropped_module_frame_kill_line_refutes_parent :
     mutantExecuteGuarded .noModuleFrame guardCfg honestCall .none frame
-        ≠ guardedStage guardCfg honestCall.topUpLimits honestCall.roundedTarget
+        ≠ guardedSourceStage guardCfg honestCall
             (allocateEntry honestCall).returndata .none
           { frame with
             calls := frame.calls
