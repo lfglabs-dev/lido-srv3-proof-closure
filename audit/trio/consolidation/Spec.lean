@@ -107,6 +107,14 @@ source order and each group's target is repeated once per source. -/
 def preparePairs (groups : List WitnessGroup) : List (Pubkey × Pubkey) :=
   groups.flatMap fun group => group.sources.map fun source => (source, group.target)
 
+/-- First array returned by `_prepareConsolidationPairs`. -/
+def preparedSources (groups : List WitnessGroup) : List Pubkey :=
+  groups.flatMap (·.sources)
+
+/-- Second array returned by `_prepareConsolidationPairs`. -/
+def preparedTargets (groups : List WitnessGroup) : List Pubkey :=
+  groups.flatMap fun group => List.replicate group.sources.length group.target
+
 inductive VaultError where
   | zeroSources
   | arraysLengthMismatch (sources targets : Nat)
@@ -148,12 +156,38 @@ def validateVaultAdd (fee msgValue : Word) (sources targets : List Pubkey) :
 
 theorem preparePairs_length (groups : List WitnessGroup) :
     (preparePairs groups).length = (groups.map (·.sources.length)).sum := by
-  induction groups with
-  | nil => rfl
-  | cons group rest ih => simpa [preparePairs] using congrArg (group.sources.length + ·) ih
+  simp [preparePairs]
 
 theorem preparePairs_sources (groups : List WitnessGroup) :
-    (preparePairs groups).map Prod.fst = groups.flatMap (·.sources) := by
+    (preparePairs groups).map Prod.fst = preparedSources groups := by
+  unfold preparedSources
   simp [preparePairs, List.map_flatMap, Function.comp_def]
+
+private theorem map_pair_snd (sources : List Pubkey) (target : Pubkey) :
+    (sources.map fun source => (source, target)).map Prod.snd =
+      List.replicate sources.length target := by
+  induction sources with
+  | nil => rfl
+  | cons source rest ih =>
+      simp only [List.map_cons, List.length_cons]
+      rw [ih, List.replicate_succ]
+
+theorem preparePairs_targets (groups : List WitnessGroup) :
+    (preparePairs groups).map Prod.snd = preparedTargets groups := by
+  induction groups with
+  | nil => rfl
+  | cons group rest ih =>
+      change
+        ((group.sources.map fun source => (source, group.target)) ++
+          preparePairs rest).map Prod.snd =
+        List.replicate group.sources.length group.target ++ preparedTargets rest
+      rw [List.map_append, map_pair_snd, ih]
+
+/-- Universal gateway-to-vault array correspondence: flattening the groups
+as pairs is exactly zipping the two arrays passed to the withdrawal vault. -/
+theorem prepared_zip (groups : List WitnessGroup) :
+    (preparedSources groups).zip (preparedTargets groups) = preparePairs groups := by
+  rw [← preparePairs_sources, ← preparePairs_targets]
+  simpa [List.unzip_eq_map] using List.zip_unzip (preparePairs groups)
 
 end audit.trio.consolidation

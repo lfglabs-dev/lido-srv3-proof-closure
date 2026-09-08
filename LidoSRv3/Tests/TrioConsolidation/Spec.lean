@@ -30,6 +30,13 @@ example : preparePairs witnesses =
     [(key 11, key 21), (key 12, key 21), (key 13, key 22)] := by
   rfl
 
+example : preparedSources witnesses = [key 11, key 12, key 13] := by rfl
+
+example : preparedTargets witnesses = [key 21, key 21, key 22] := by rfl
+
+example : (preparedSources witnesses).zip (preparedTargets witnesses) =
+    preparePairs witnesses := prepared_zip witnesses
+
 example : validateVaultAdd (word 3) (word 9)
     [key 11, key 12, key 13] [key 21, key 21, key 22] =
     .ok [(key 11, key 21), (key 12, key 21), (key 13, key 22)] := by
