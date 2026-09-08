@@ -1619,6 +1619,25 @@ theorem executeGuarded_reverts_on_over_target (cfg : SourceTopupConfig)
     simp [_root_.Verity.require, Nat.not_le.mpr hOver]
   simp [Contract.run, hStage]
 
+/-- The exact 32-byte router WC, 48-byte per-validator public keys, octet
+ranges, key/allocation cardinality and uint256 amount widths are executable
+admission checks. Any violation restores the transaction snapshot. -/
+theorem executeGuarded_reverts_on_invalid_source (cfg : SourceTopupConfig)
+    (call : TopupCall) (failure : FailurePoint) (state : ContractState)
+    (hLoop : allocationLoop cfg call.moduleReturndata call.topUpLimits = none)
+    (hTarget : ¬ call.roundedTarget < allocSumUnchecked call.moduleReturndata)
+    (hInvalid : ¬ SourceTopupCallWellFormed call) :
+    (executeGuarded cfg call failure).run state =
+      ContractResult.revert "InvalidSourceTopupFields" state := by
+  have hStage : executeGuarded cfg call failure state =
+      ContractResult.revert "InvalidSourceTopupFields"
+        { state with calls := state.calls ++ [allocateEntry call] } := by
+    rw [executeGuarded_binds_returndata, allocateEntry_returndata]
+    simp only [guardedSourceStage, Bind.bind, _root_.Verity.bind]
+    rw [guardLoop_success cfg call.moduleReturndata call.topUpLimits _ hLoop]
+    simp [_root_.Verity.require, Nat.not_lt.mp hTarget, hInvalid]
+  simp [Contract.run, hStage]
+
 /-- With every returndata guard passed, the guarded transaction is exactly the
 unguarded one run on the module's returndata from the post-frame state. -/
 theorem executeGuarded_apply_of_guards_pass (cfg : SourceTopupConfig) (call : TopupCall)

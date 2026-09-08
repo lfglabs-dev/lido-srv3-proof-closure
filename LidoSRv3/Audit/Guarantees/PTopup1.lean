@@ -701,6 +701,12 @@ def VerityGuardedReturndataSimulation (cfg : SourceTopupConfig)
           call.roundedTarget < allocSumUnchecked call.moduleReturndata →
           (Verity.TopupTx.executeGuarded cfg call failure).run before =
             Verity.ContractResult.revert "ModuleReturnExceedTarget" before) ∧
+    (∀ failure : Verity.TopupTx.FailurePoint,
+      allocationLoop cfg call.moduleReturndata call.topUpLimits = none →
+      ¬ call.roundedTarget < allocSumUnchecked call.moduleReturndata →
+      ¬ Verity.TopupTx.SourceTopupCallWellFormed call →
+      (Verity.TopupTx.executeGuarded cfg call failure).run before =
+        Verity.ContractResult.revert "InvalidSourceTopupFields" before) ∧
     (∀ (failure : Verity.TopupTx.FailurePoint),
       allocationLoop cfg call.moduleReturndata call.topUpLimits = none →
       ¬ call.roundedTarget < allocSumUnchecked call.moduleReturndata →
@@ -757,6 +763,9 @@ theorem verity_tx_simulates_source_with_nonzero_wrap_close
           Verity.TopupTx.executeGuarded_reverts_on_allocation_guard cfg call o failure _ hLoop,
         fun failure hLoop hOver =>
           Verity.TopupTx.executeGuarded_reverts_on_over_target cfg call failure _ hLoop hOver,
+        fun failure hLoop hTarget hInvalid =>
+          Verity.TopupTx.executeGuarded_reverts_on_invalid_source cfg call failure _ hLoop
+            hTarget hInvalid,
         fun failure hLoop hTarget hSource =>
           Verity.TopupTx.executeGuarded_apply_of_guards_pass cfg call failure _ hLoop hTarget
             hSource⟩

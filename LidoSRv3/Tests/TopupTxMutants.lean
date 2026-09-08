@@ -955,6 +955,10 @@ private def honestCall : TopupCall :=
   { roundedTarget := 3000000000, routerWithdrawalCredentials := routerWc,
     withdrawalCredentialsType := 2, pubkeys := [validatorPk], keyIndices := [0], operatorIds := [0],
     topUpLimits := [2000000000], moduleReturndata := [1000000000] }
+private def shortWcCall : TopupCall :=
+  { honestCall with routerWithdrawalCredentials := List.replicate 31 0 }
+private def shortPubkeyCall : TopupCall :=
+  { honestCall with pubkeys := [List.replicate 47 1] }
 
 /-- Single-edit mutations of the corrected executable transaction. -/
 inductive GuardMutation where
@@ -1024,6 +1028,15 @@ theorem guarded_transaction_reverts_at_each_guard :
       (executeGuarded guardCfg overTargetCall .none).run frame
         = .revert "ModuleReturnExceedTarget" frame :=
   ⟨rfl, rfl, rfl, rfl⟩
+
+/-- Exact source widths are live checks in the registered parent, rather than
+premises attached only to the SSZ theorem. -/
+theorem guarded_transaction_rejects_unpinned_source_widths :
+    (executeGuarded guardCfg shortWcCall .none).run frame =
+        .revert "InvalidSourceTopupFields" frame ∧
+      (executeGuarded guardCfg shortPubkeyCall .none).run frame =
+        .revert "InvalidSourceTopupFields" frame := by
+  exact ⟨rfl, rfl⟩
 
 /-- Positive control (NOT a kill-line): on a returndata array that passes all
 three guards, the corrected transaction commits and its journal is
