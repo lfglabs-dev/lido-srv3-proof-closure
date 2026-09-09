@@ -130,7 +130,7 @@ private def debitLiveRouter (liveCtx : Live.Context) (depositContract : Address)
     (amount : Nat) (w : Live.World) : Live.World :=
   Live.transfer w liveCtx.sender (Verity.Core.Address.ofNat depositContract.val) amount
 
-private def beaconLoop (external : External) (ctx : Context) (liveCtx : Live.Context)
+def beaconLoop (external : External) (ctx : Context) (liveCtx : Live.Context)
     (credentials : LidoSRv3.Audit.Source.TrioAlloc1.Bytes)
     (prepared : PreparedDeposit) (remaining index : Nat) (w : World)
     (attempts : List Live.Attempt) : Result :=
@@ -226,5 +226,36 @@ theorem every_failure_rolls_back (external : External) (ctx : Context)
       exact (Result.mk.inj h).2.1.symm
 
 #print axioms every_failure_rolls_back
+
+/-- Successful beacon-loop iterations move exactly `remaining * DEPOSIT_SIZE`
+wei from the router to the beacon. Failures of the loop are excluded by the
+`.ok` hypothesis, so this is the conservation content of the per-key suffix. -/
+theorem beaconLoop_ok_conservation
+    (external : External) (ctx : Context) (liveCtx : Live.Context)
+    (credentials : LidoSRv3.Audit.Source.TrioAlloc1.Bytes)
+    (prepared : PreparedDeposit) (remaining index : Nat)
+    (w after : World) (attempts outAttempts : List Live.Attempt)
+    (h : beaconLoop external ctx liveCtx credentials prepared remaining index w attempts =
+      ⟨.ok (), after, outAttempts⟩) :
+    after.router.beaconBalance = w.router.beaconBalance + remaining * DEPOSIT_SIZE ∧
+      after.router.routerBalance + remaining * DEPOSIT_SIZE = w.router.routerBalance := by
+  induction remaining generalizing index w after attempts outAttempts with
+  | zero =>
+    simp [beaconLoop] at h
+    rcases h with ⟨rfl, rfl⟩
+    simp
+  | succ n ih =>
+    simp [beaconLoop] at h
+    split_ifs at h with hBal hAcc
+    · cases h
+    · cases h
+    · obtain ⟨hBeacon, hRouter⟩ := ih (index + 1) _ after attempts outAttempts h
+      simp at hBeacon hRouter
+      constructor
+      · rw [hBeacon, Nat.add_assoc, Nat.add_comm DEPOSIT_SIZE, Nat.succ_mul]
+      · have hge : DEPOSIT_SIZE ≤ w.router.routerBalance := Nat.not_lt.mp hBal
+        rw [Nat.succ_mul, ← Nat.add_assoc, hRouter, Nat.sub_add_cancel hge]
+
+#print axioms beaconLoop_ok_conservation
 
 end audit.trio.deposit.RouterDeposit
