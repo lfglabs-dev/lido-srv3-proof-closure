@@ -1,0 +1,87 @@
+{
+  "schema": "lido-topup-beacon-effects-v1",
+  "created_utc": "2026-09-09T13:40:12.365872+00:00",
+  "checkout_head_at_validation": "c22ce0acbe53d9fae3adb2eef2d4695cba8f13fd",
+  "prior_funded_consumer_merge": "9f1bc6dce3a76e31c31a398d72ea67ebfecfd965",
+  "branch": "codex/local-lido-beacon-entry-20260909",
+  "source_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "verity_pin": "e977aaad6e1a9e92e0132d41b3d33a14135a4d46",
+  "lean": {
+    "command": "lake build LidoSRv3.Audit.Source.TopupBeaconCallee LidoSRv3.Audit.Source.TopupBeaconEffects LidoSRv3.Tests.TopupBeaconEffectsMutants",
+    "exit": 0,
+    "jobs": 1252,
+    "new_theorems": 24,
+    "regressions": 27,
+    "axiom_queries": 8,
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "new_file_warnings": 0,
+    "dependencies": "replayed pre-existing warnings; existing dependencies checked against prior funded merge in source-check.json",
+    "source_comment_only_reuse": {
+      "path": "LidoSRv3/Audit/Source/TopupBeaconCallee.lean",
+      "compiled_sha256": "cf997d7f212838e786ef8a5d23704de90979c87d1adc2ecfe854c9ed13a7472f",
+      "current_sha256": "c9ef3fa8e99966b336cb0dd3dd6092e4ca246f2e7eaa2b58b7a136c07c348568",
+      "change": "Corrected source span111\u2013172 to101\u2013159 in the introductory comment only; all definitions/statements/proofs byte-identical. Existing targeted build reused without rerun."
+    }
+  },
+  "solidity": {
+    "runner": "root agent, separately executed while author implemented Lean",
+    "compiler": "0.6.11",
+    "actual_source_unmodified": true,
+    "tests_passed": 4,
+    "fuzz_runs": 1024,
+    "fuzz_tests": 1,
+    "deterministic_edges": "all32 carry heights, min/maxuint64-gwei amount, final admissible count; ordered rejects and late rollback",
+    "reproduction_command": "forge test --root audit/topup-beacon-effects/solidity --fuzz-runs 1024 --fuzz-seed 0x20260909 -vv",
+    "storage_layout_file": "audit/topup-beacon-effects/solidity-storage-layout.json",
+    "executed_command": "forge test --root audit/topup-beacon-effects/solidity --fuzz-runs 1024 --fuzz-seed 0x20260909 -vv",
+    "storage_layout_command": "forge inspect --root audit/topup-beacon-effects/solidity DepositContract storageLayout --json",
+    "integrator_receipt_note": "Integrator recorded the exact previously executed seed and compiler layout command after author freeze; source, test and log hashes unchanged, no rerun needed."
+  },
+  "main_result": "source_push_success derives actual source journal bytes -> decode -> independent callee recomputation -> invoke debit/credit, count, semantic event and independent first-odd-quotient branch effect; no supplied success/frame/rootMatch",
+  "open": [
+    "new consumer not yet composed with PR267 funded withdrawal/sourcePushLoop or registered TopupTx",
+    "canonical-source ABI decoding only, not exhaustive solc malformed-input equivalence",
+    "opaque SHA and EVM/compiler/precompile/gas/runtime identity",
+    "LOG topics/data and Error(string) ABI not Lean-proved",
+    "no reachable initial deposit tree invariant",
+    "open A-TOPUP-BEACON-ADDRESS; no deployed immutable/code verification",
+    "Nat-ledger reachability and aggregate uint256 asset bounds not derived"
+  ],
+  "validated_inputs": {
+    "LidoSRv3/Audit/Source/TopupBeaconCallee.lean": "c9ef3fa8e99966b336cb0dd3dd6092e4ca246f2e7eaa2b58b7a136c07c348568",
+    "LidoSRv3/Audit/Source/TopupBeaconEffects.lean": "bb6bb4e2f557c7da67ec151559b660aa88ad6f5229e026e73bfbf2728d92c469",
+    "LidoSRv3/Tests/TopupBeaconEffectsMutants.lean": "84c8083566166beb942b75a21d61e35b72075ed2168e0b538f138f7093ab65ce",
+    "audit/topup-beacon-effects/solidity/foundry.toml": "4fa64e750514f9d67fb7b7a11431057066dc76b9284137d76453de4e476d366a",
+    "audit/topup-beacon-effects/solidity/TopupBeaconEffects.t.sol": "7469ff21c5ddffba28879e40bee15a3e6f0ddb56bcd94e90b6e70242074b2dbf",
+    "lido-core/contracts/0.6.11/deposit_contract.sol": "2a8db249155e8502e1132f14410b8d7b2a924512723ed07a08167477d8f8c073",
+    "lido-core/contracts/0.8.25/lib/BeaconChainDepositor.sol": "b4afeac2e4dab53d2b6d1cebcf41bfc670eb1ea069cb1d5bc0e07f1932bf9fe0",
+    "lido-core/contracts/common/interfaces/IDepositContract.sol": "d7b36c2de36cfc68a3fa0812add4e9c55879188a08317166a0ab0f63baaffc63",
+    "LidoSRv3/Audit/Verity/TopupTx.lean": "142c68fce97927bce27ce777f9d075fa04f4b4a2801fc765540f68fa00491d01",
+    "LidoSRv3/Audit/Source/DepositDataRootCorrespondence.lean": "d80aa66141ed44056fd8c46b21de06be559dd5c7d1e18e5d7c3b540157dcd486",
+    "LidoSRv3/Audit/Source/TrioReserve1/Live.lean": "f0479c959ca823fd95db8aab2a833ec8f7094abd0ada9a715f7e8c9052c468bb",
+    "LidoSRv3/Audit/Source/TrioReserve1/CallData.lean": "182787dda65d6cc315048e89212e1ef1bdb9d4c6a2084dad5413c303485d65eb",
+    "LidoSRv3/Audit/Source/TrioReserve1/ABI.lean": "07a7a120d8f50c630fbeb20c64b583ee41fe7f995d8b669ebf9d14fe220549c5",
+    "LidoSRv3/Audit/Source/TrioReserve1/CallFlow.lean": "02dbb2abe1326bcd2d29a75af4df615e54cc79c1425cfc899eb27ca2014280e0",
+    "LidoSRv3/Audit/Source/TrioReserve1/CallSpec.lean": "5fa67fcb9a60b075be89338e9ab3974a7b13a7275d3a900c7e311f0cc25e70a7",
+    ".lake/packages/verity/Verity/Core.lean": "29c84212c5cd19b5d1d7f03b26cf7cfda47b93acda0353be6af053e861531f74",
+    ".lake/packages/verity/Contracts/Common.lean": "837df97f38a2da768e46eeba017bf10661ce2796a6aa04aa7381adf09da00306",
+    "lean-toolchain": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee",
+    "lakefile.lean": "8ea3781110b3234bdfcf2b2c87c5c064fa7d2aee018da57bcab100f8baf1ab87",
+    "lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
+    "audit/artifacts.lock.json": "f9ef5bb656f858acd3813f21dbd8b50ff94bf2f5ca9146485080661e3199b81b"
+  },
+  "evidence_sha256": {
+    "audit/topup-beacon-effects/README.md": "de067e19b0272679ffd32d86651b79c739bab69918825ec4a6015b7078063210",
+    "audit/topup-beacon-effects/validation.log": "2887a37ba32e7965a554e7e78042ff36258dafe6d2e00ba7e24357a3458379fe",
+    "audit/topup-beacon-effects/axioms.log": "e77f11703bd60cfbb9c3f809e668906970dbd9faf00a25b4b4f002a2112315c0",
+    "audit/topup-beacon-effects/solidity-validation.log": "2705ac3d8af1bc01ef28d0fd22b8f5487613247bc296630f75cb2efa3cda8649",
+    "audit/topup-beacon-effects/solidity-storage-layout.json": "18ab4333c0a784782b9af96e7a06e03ed24bb1d4598dffe4fbf80c75130bc9e7",
+    "audit/topup-beacon-effects/source-check.json": "9a065f92089f426685329da977bff00dc825a2a6539f569764ac6f58b2a21ce5",
+    "audit/topup-beacon-effects/validated-inputs.sha256": "62b10536e68f3fbf26996407a320721758dc34c21df50b796dfd1c3d020511b5"
+  },
+  "review": "Independent reviewer must add REVIEW.md against exact committed candidate; author does not self-review."
+}

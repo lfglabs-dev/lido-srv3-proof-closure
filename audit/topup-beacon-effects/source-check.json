@@ -1,0 +1,82 @@
+{
+  "scope": "finite static source-token/order and compiler-layout checks; not formal Solidity equivalence",
+  "source_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "source_path": "lido-core/contracts/0.6.11/deposit_contract.sol",
+  "source_sha256": "2a8db249155e8502e1132f14410b8d7b2a924512723ed07a08167477d8f8c073",
+  "source_guard_and_effect_order": [
+    {
+      "token": "require(pubkey.length == 48",
+      "line": 108
+    },
+    {
+      "token": "require(withdrawal_credentials.length == 32",
+      "line": 109
+    },
+    {
+      "token": "require(signature.length == 96",
+      "line": 110
+    },
+    {
+      "token": "require(msg.value >= 1 ether",
+      "line": 113
+    },
+    {
+      "token": "require(msg.value % 1 gwei == 0",
+      "line": 114
+    },
+    {
+      "token": "require(deposit_amount <= type(uint64).max",
+      "line": 116
+    },
+    {
+      "token": "emit DepositEvent(",
+      "line": 120
+    },
+    {
+      "token": "require(node == deposit_data_root",
+      "line": 140
+    },
+    {
+      "token": "require(deposit_count < MAX_DEPOSIT_COUNT",
+      "line": 143
+    },
+    {
+      "token": "deposit_count += 1",
+      "line": 146
+    },
+    {
+      "token": "branch[height] = node",
+      "line": 150
+    }
+  ],
+  "compiler_storage_layout": [
+    [
+      "branch",
+      "0",
+      "t_array(t_bytes32)32_storage"
+    ],
+    [
+      "deposit_count",
+      "32",
+      "t_uint256"
+    ],
+    [
+      "zero_hashes",
+      "33",
+      "t_array(t_bytes32)32_storage"
+    ]
+  ],
+  "dependencies_and_267_unchanged_vs": "9f1bc6dce3a76e31c31a398d72ea67ebfecfd965",
+  "unchanged_paths": {
+    "LidoSRv3/Audit/Verity/TopupTx.lean": true,
+    "LidoSRv3/Audit/Source/DepositDataRootCorrespondence.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/Live.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/CallData.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/ABI.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/CallFlow.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/CallSpec.lean": true,
+    "LidoSRv3/Audit/Source/TopupFundedSource.lean": true,
+    "LidoSRv3/Audit/Verity/TopupFundedSourceTx.lean": true
+  },
+  "passed": true
+}
