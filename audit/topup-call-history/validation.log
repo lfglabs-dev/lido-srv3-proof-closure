@@ -1,0 +1,7 @@
+✔ [494/496] Built LidoSRv3.Audit.Source.TopupWeiBounds (3.0s)
+✔ [495/496] Built LidoSRv3.Audit.Source.TopupCallHistory (2.1s)
+ℹ [496/496] Built LidoSRv3.Tests.TopupCallHistoryMutants (2.2s)
+info: LidoSRv3/Tests/TopupCallHistoryMutants.lean:42:0: 'LidoSRv3.Audit.Source.TopupCallHistory.configured_positive' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/TopupCallHistoryMutants.lean:43:0: 'LidoSRv3.Audit.Source.TopupCallHistory.same_block_rejects_after_setter' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/TopupCallHistoryMutants.lean:44:0: 'LidoSRv3.Audit.Source.TopupCallHistory.zero_limits_zero_allocations' depends on axioms: [propext, Quot.sound]
+Build completed successfully (496 jobs).
