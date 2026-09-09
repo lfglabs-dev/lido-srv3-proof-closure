@@ -74,6 +74,26 @@ structure DepositValues where
   beaconTotalWei : Nat
   deriving DecidableEq, Repr
 
+/-- The exact arguments of `Lido.withdrawDepositableEther`.  In particular,
+`seedDepositsCount` is not an independently chosen word: on the nonempty
+branch it is the count derived from the module's returned public-key bytes. -/
+structure WithdrawalArguments where
+  amount : Word
+  seedDepositsCount : Word
+  deriving DecidableEq, Repr
+
+/-- The Lido call boundary used by this slice.  The interface deliberately
+returns a failure rather than assuming that the downstream withdrawal works. -/
+abbrev WithdrawDepositableEther := Word → Word → Except Failure Unit
+
+/-- A successful deposit entry either returned at StakingRouter.sol:978 without
+calling Lido, or made the source-shaped Lido call and records its exact ABI
+arguments. -/
+structure DepositExecution where
+  values : DepositValues
+  withdrawal : Option WithdrawalArguments
+  deriving DecidableEq, Repr
+
 def composeValues (selected : Word) (config : TrioAlloc1.Config)
     (actualKeys depositSize : Nat) : DepositValues :=
   { selectedAllocationWei := selected.val
@@ -106,7 +126,21 @@ inductive DepositFailure where
   | moduleCall (reason : Failure)
   | wrongPubkeyLength
   | moduleReturnExceedTarget
+  | lidoWithdrawal (reason : Failure)
   deriving DecidableEq, Repr
+
+/-- `StakingRouter.sol:978` is before the Lido call at line 983.  Therefore an
+empty result from `obtainDepositData` returns without a zero-value withdrawal;
+otherwise both withdrawal arguments are derived from `actualKeys`. -/
+def conditionalWithdrawal (values : DepositValues) (withdraw : WithdrawDepositableEther) :
+    Except DepositFailure (Option WithdrawalArguments) :=
+  if values.actualKeys = 0 then .ok none
+  else
+    let args : WithdrawalArguments :=
+      ⟨word values.lidoPullWei, word values.actualKeys⟩
+    match withdraw args.amount args.seedDepositsCount with
+    | .ok () => .ok (some args)
+    | .error reason => .error (.lidoWithdrawal reason)
 
 def maxDepositsCount (limits : DepositLimits) (selected : Word)
     (config : TrioAlloc1.Config) : Except DepositFailure Nat :=
@@ -122,7 +156,8 @@ def depositValuesABI
     (oracle : TrioAlloc1.StaticOracle) (config : TrioAlloc1.Config)
     (amount : Word) (before : TrioAlloc1.Transcript) (moduleId : Word)
     (limits : DepositLimits) (obtainDepositData : ObtainDepositData)
-    (depositSize : Nat) : Except DepositFailure DepositValues × TrioAlloc1.Transcript :=
+    (depositSize : Nat) (withdraw : WithdrawDepositableEther) :
+    Except DepositFailure DepositExecution × TrioAlloc1.Transcript :=
   match getDepositAllocationsABI layout storage oracle config amount false before with
   | (.error reason, after) => (.error (.allocation reason), after)
   | (.ok allocation, after) =>
@@ -144,7 +179,11 @@ def depositValuesABI
             else
               let actualKeys := moduleData.publicKeysBatchLength / pubkeyLength
               if actualKeys > target then (.error .moduleReturnExceedTarget, after)
-              else (.ok (composeValues selected config actualKeys depositSize), after)
+              else
+                let values := composeValues selected config actualKeys depositSize
+                match conditionalWithdrawal values withdraw with
+                | .error reason => (.error reason, after)
+                | .ok withdrawal => (.ok ⟨values, withdrawal⟩, after)
 
 /-- A successful execution derives the pull bound from the source cap and the
 post-call over-target guard. -/
@@ -154,11 +193,12 @@ theorem abi_success_composes_deposit_values
     (amount : Word) (before after : TrioAlloc1.Transcript)
     (moduleId : Word) (limits : DepositLimits)
     (obtainDepositData : ObtainDepositData) (depositSize : Nat)
-    (values : DepositValues)
+    (withdraw : WithdrawDepositableEther)
+    (execution : DepositExecution)
     (executed : depositValuesABI layout storage oracle config amount before moduleId
-      limits obtainDepositData depositSize = (.ok values, after)) :
-    values.lidoPullWei ≤ values.selectedAllocationWei ∧
-      values.beaconTotalWei = values.actualKeys * depositSize := by
+      limits obtainDepositData depositSize withdraw = (.ok execution, after)) :
+    execution.values.lidoPullWei ≤ execution.values.selectedAllocationWei ∧
+      execution.values.beaconTotalWei = execution.values.actualKeys * depositSize := by
   unfold depositValuesABI at executed
   split at executed <;> try simp_all
   next allocation allocAfter allocEq =>
@@ -177,20 +217,41 @@ theorem abi_success_composes_deposit_values
               next moduleData moduleEq =>
                 split at executed <;> try simp_all
                 next aligned =>
-                  rcases executed with ⟨rfl, rfl⟩
-                  constructor
-                  · dsimp [composeValues]
-                    have targetBound : target ≤ selected.val / config.maxEBType1.val := by
-                      by_cases unitZero : config.maxEBType1 = 0
-                      · simp [unitZero] at nonzero
-                      · simp [unitZero] at nonzero
-                        rw [← nonzero]
-                        exact Nat.min_le_right _ _
-                    apply Nat.le_trans
-                      (Nat.mul_le_mul_right config.maxEBType1.val
-                        (Nat.le_trans aligned targetBound))
-                    exact Nat.div_mul_le_self selected.val config.maxEBType1.val
-                  · simp [composeValues]
+                  unfold conditionalWithdrawal at executed
+                  split at executed <;> simp_all
+                  next emptyKeys =>
+                    rcases executed with ⟨rfl, rfl⟩
+                    constructor
+                    · dsimp [composeValues]
+                      have targetBound : target ≤ selected.val / config.maxEBType1.val := by
+                        by_cases unitZero : config.maxEBType1 = 0
+                        · simp [unitZero] at nonzero
+                        · simp [unitZero] at nonzero
+                          rw [← nonzero]
+                          exact Nat.min_le_right _ _
+                      apply Nat.le_trans
+                        (Nat.mul_le_mul_right config.maxEBType1.val
+                          (Nat.le_trans aligned targetBound))
+                      exact Nat.div_mul_le_self selected.val config.maxEBType1.val
+                    · simp [composeValues]
+                  next nonemptyKeys args withdrawalEq =>
+                    split at executed <;> simp_all
+                    next withdrawalFailure => cases executed
+                    next withdrawalSuccess =>
+                      rcases executed with ⟨rfl, rfl⟩
+                      constructor
+                      · dsimp [composeValues]
+                        have targetBound : target ≤ selected.val / config.maxEBType1.val := by
+                          by_cases unitZero : config.maxEBType1 = 0
+                          · simp [unitZero] at nonzero
+                          · simp [unitZero] at nonzero
+                            rw [← nonzero]
+                            exact Nat.min_le_right _ _
+                        apply Nat.le_trans
+                          (Nat.mul_le_mul_right config.maxEBType1.val
+                            (Nat.le_trans aligned targetBound))
+                        exact Nat.div_mul_le_self selected.val config.maxEBType1.val
+                      · simp [composeValues]
 
 #print axioms abi_success_composes_deposit_values
 end audit.trio.deposit
