@@ -1,4 +1,5 @@
 import audit.trio.deposit.Deposit
+import LidoSRv3.Audit.Source.TrioReserve1.Live
 
 /-! Executable source-order model for the remainder of `StakingRouter.deposit`.
 Pinned source: `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`,
@@ -13,6 +14,7 @@ inductive Fault where
   | notAuthorized | moduleNotActive | unsupportedWithdrawalCredentials
   | arithmeticOverflow | invalidPublicKeysBatchLength | invalidSignaturesBatchLength
   | beaconCallFailed | insufficientRouterBalance | balanceAssertion
+  | liveWithdrawalMissing | liveWorldMismatch
   deriving DecidableEq, Repr
 
 structure Context where
@@ -47,6 +49,28 @@ structure World where
 structure External where
   beaconAccepts : DepositCall → Bool
 
+/-- Evidence that the nonzero producer withdrawal ran in the RESERVE-1 live
+ETH world and that its successful router callback supplied the balance used by
+the deposit suffix. -/
+structure LiveWithdrawalExecution (execution : DepositExecution) where
+  external : LidoSRv3.Audit.Source.TrioReserve1.Live.External
+  context : LidoSRv3.Audit.Source.TrioReserve1.Live.Context
+  before : LidoSRv3.Audit.Source.TrioReserve1.Live.World
+  after : LidoSRv3.Audit.Source.TrioReserve1.Live.World
+  attempts : List LidoSRv3.Audit.Source.TrioReserve1.Live.Attempt
+  executed : LidoSRv3.Audit.Source.TrioReserve1.Live.run
+    (LidoSRv3.Audit.Source.TrioReserve1.Live.withdrawDepositableEther external context
+      (LidoSRv3.Audit.Source.TrioReserve1.Live.word execution.values.lidoPullWei)
+      (LidoSRv3.Audit.Source.TrioReserve1.Live.word execution.values.actualKeys)) before =
+      ⟨.ok (), after, attempts⟩
+  callbackCredit : after.balances context.sender =
+    before.balances context.sender + execution.values.lidoPullWei
+  callbackObserved : ∃ attempt ∈ attempts,
+    attempt.accepted = true ∧
+    attempt.request.target = context.sender ∧
+    attempt.request.value = LidoSRv3.Audit.Source.TrioReserve1.Live.word execution.values.lidoPullWei ∧
+    attempt.request.payload = LidoSRv3.Audit.Source.TrioReserve1.Live.encode 4 0x13ae8460
+
 structure Result where
   outcome : Except Fault Unit
   world : World
@@ -70,6 +94,8 @@ structure SuccessfulDepositExecution where
   execution : DepositExecution
   executed : depositValuesABI layout storage oracle config requested before moduleId
     limits obtainDepositData depositSize withdraw = (.ok execution, after)
+  liveWithdrawal : Option (LiveWithdrawalExecution execution)
+  liveWithdrawalIffNonzero : liveWithdrawal.isSome = (execution.values.actualKeys != 0)
 
 def checkedProduct (a b : Nat) : Except Fault Nat :=
   if a * b < 2 ^ 256 then .ok (a * b)
@@ -139,8 +165,9 @@ private def beaconLoop (external : External) (ctx : Context)
 actual count, immutable max balance, both returned batches, and successful Lido
 withdrawal are therefore not independently injectable at this boundary. -/
 private def executeExecutionRaw (external : External) (ctx : Context)
-    (execution : DepositExecution)
+    (linked : SuccessfulDepositExecution)
     (before : World) : Result :=
+  let execution := linked.execution
   if ctx.caller != ctx.depositSecurityModule then ⟨.error .notAuthorized, before⟩
   else if !ctx.moduleActive then ⟨.error .moduleNotActive, before⟩
   else match ctx.withdrawalCredentials with
@@ -150,8 +177,13 @@ private def executeExecutionRaw (external : External) (ctx : Context)
       let updated := updateModuleLastDepositState ctx execution before
       if execution.values.actualKeys = 0 then ⟨.ok (), updated⟩
       else
-        let pulled := { updated with routerBalance := updated.routerBalance +
-          execution.values.lidoPullWei }
+        match linked.liveWithdrawal with
+        | none => ⟨.error .liveWithdrawalMissing, updated⟩
+        | some live =>
+        if before.routerBalance != live.before.balances live.context.sender then
+          ⟨.error .liveWorldMismatch, updated⟩
+        else
+        let pulled := { updated with routerBalance := live.after.balances live.context.sender }
         match checkedProduct 48 execution.values.actualKeys with
         | .error fault => ⟨.error fault, pulled⟩
         | .ok expectedPublicKeys =>
@@ -173,7 +205,7 @@ private def executeExecutionRaw (external : External) (ctx : Context)
 is accompanied by a successful `depositValuesABI` premise. -/
 def executeRaw (external : External) (ctx : Context) (linked : SuccessfulDepositExecution)
     (before : World) : Result :=
-  executeExecutionRaw external ctx linked.execution before
+  executeExecutionRaw external ctx linked before
 
 def execute (external : External) (ctx : Context) (linked : SuccessfulDepositExecution)
     (before : World) : Result :=

@@ -23,10 +23,11 @@ The `WithdrawDepositableEther` suffix returns before the Lido call when the
 module returned zero keys.  On the nonzero path, one theorem composes successful
 deposit ABI execution with the complete RESERVE-1 `withdrawDepositableEther`
 relation, derives both the pull and seed-count arguments from the returned key
-count, and proves their word widths from the executed guards.  The separately executed live withdrawal suffix retains its pause, router-auth
-and zero-amount guards, reserve accounting, seed counter update and modeled
-value-bearing callback. This does not yet identify it with the producer's abstract
-withdrawal call or the router world.
+count, and proves their word widths from the executed guards. The linked live
+withdrawal retains its pause, router-auth and zero-amount guards, reserve
+accounting, seed counter update and value-bearing callback. Its successful live
+world and observed callback now supply the router balance consumed by the
+deposit suffix; the suffix no longer manufactures that credit.
 It accepts the documented trio limitations
 and does not claim compiler-memory, deployed-bytecode, or deployment identity.
 
@@ -38,8 +39,9 @@ address, source-computed deposit-data root, and 32-ether value transfer; root
 rollback on every modeled external failure; and the router-balance assert.
 Its public `executeRaw` boundary accepts a successful `depositValuesABI` package,
 so module ID, actual count, immutable max balance and batches are taken from
-that package. Its Lido success is relative to the supplied abstract withdrawal
-function; it is not yet tied to the independently executed live suffix. Solidity 0.8 checked multiplication is explicit
+that package. A nonzero execution additionally carries the successful live Lido
+withdrawal and callback-balance receipt for those same derived arguments.
+Solidity 0.8 checked multiplication is explicit
 for `actualDepositsCount * maxEBType1`, `48 * actualDepositsCount`, and
 `96 * actualDepositsCount`.
 The `maxEBType1 = DEPOSIT_SIZE` deployment identity remains deliberately
@@ -55,13 +57,13 @@ Production Lean lives beside this file.  Executable regressions live under
 
 ## Remaining composition obligations
 
-The producer transcript, storage, abstract withdrawal result and the router
-suffix's independently supplied Context/World are not yet bound to one shared
-Solidity execution. In particular the producer has already called its abstract
-withdrawal before the suffix checks authorization and updates module state; this
-packaging does not prove the source call order. The suffix models receipt of the
-pull by directly crediting its router balance. The callback and all before/after
-states still need a common execution relation.
+The producer transcript/storage and router suffix Context/World are not yet
+bound to one shared Solidity execution. In particular the producer's abstract
+withdrawal result and the now-linked live withdrawal are two executions of the
+same derived arguments; the packaging still does not prove their source call
+order in a single root transaction. The router and Lido balance boundary is
+linked, while the remaining storage and before/after states still need a common
+execution relation.
 
 The rollback theorem establishes the behavior of the model wrapper, which
 restores its input World on failure; it is not an EVM rollback correspondence

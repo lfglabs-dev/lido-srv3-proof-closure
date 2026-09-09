@@ -5,6 +5,7 @@ namespace audit.trio.deposit.Tests.Verity.RouterDeposit
 open audit.trio.deposit
 open audit.trio.deposit.RouterDeposit
 open LidoSRv3.Audit.Source.TrioAlloc1
+open LidoSRv3.Audit.Source.TrioReserve1
 
 def addr (n : Nat) : Address := ⟨n % 2^160, Nat.mod_lt _ (by omega)⟩
 def ctx : Context := ⟨addr 7, addr 7, true, some (word 99), addr 42, 123, 456⟩
@@ -16,8 +17,49 @@ def routerWithdrawal : WithdrawDepositableEther := fun amount seeds =>
   if amount = word (2 * DEPOSIT_SIZE) ∧ seeds = word 2 then .ok () else .error .exceptionalCall
 def execution : DepositExecution :=
   ⟨word 7, word DEPOSIT_SIZE, audit.trio.deposit.Tests.Verity.twoKeyData,
-    ⟨2 * DEPOSIT_SIZE, 2, 2 * DEPOSIT_SIZE, 32, 64⟩,
+    ⟨2 * DEPOSIT_SIZE, 2, 2 * DEPOSIT_SIZE, DEPOSIT_SIZE, 2 * DEPOSIT_SIZE⟩,
     some ⟨word (2 * DEPOSIT_SIZE), word 2⟩⟩
+
+def liveAddr (n : Nat) : Live.Address := Verity.Core.Address.ofNat n
+def liveLido := liveAddr 1
+def liveLocator := liveAddr 2
+def liveQueue := liveAddr 3
+def liveOracle := liveAddr 4
+def liveRouter := liveAddr 7
+def liveContext : Live.Context := ⟨liveLido, liveRouter⟩
+def liveCore : Verity.ContractState :=
+  let core := Verity.defaultState
+  let core := core.writeContractSlot liveLido.val Live.locatorSlot (Live.word liveLocator.val)
+  let core := core.writeContractSlot liveLido.val Live.activeSlot (Live.word 1)
+  let core := core.writeContractSlot liveLido.val Live.bufferSlot (Live.word (2 * DEPOSIT_SIZE))
+  { core with codeSize := fun _ => Live.word 1 }
+def liveBefore : Live.World :=
+  ⟨liveCore, fun a => if a = liveLido then 2 * DEPOSIT_SIZE else if a = liveRouter then 5 else 0, []⟩
+def liveExternal : Live.External := fun req w =>
+  if req.target = liveLocator then
+    if req.payload = Live.encode 4 0x37d5fe99 then .success (Live.encode 32 liveQueue.val) w
+    else if req.payload = Live.encode 4 0xef6c064c then .success (Live.encode 32 liveRouter.val) w
+    else if req.payload = Live.encode 4 0x5a2031f9 then .success (Live.encode 32 liveOracle.val) w
+    else .rejected []
+  else if req.target = liveQueue then
+    if req.payload = Live.encode 4 0x2b95b781 ∨ req.payload = Live.encode 4 0xd0fb84e8 then
+      .success (Live.encode 32 0) w
+    else .rejected []
+  else if req.target = liveOracle ∧ req.payload = Live.encode 4 0x72f79b13 then
+    .success (Live.encode 64 0) w
+  else if req.target = liveRouter ∧ req.payload = Live.encode 4 0x13ae8460 then .success [] w
+  else .rejected []
+def liveResult := Live.run (Live.withdrawDepositableEther liveExternal liveContext
+  (Live.word (2 * DEPOSIT_SIZE)) (Live.word 2)) liveBefore
+def liveReceipt : LiveWithdrawalExecution execution where
+  external := liveExternal
+  context := liveContext
+  before := liveBefore
+  after := liveResult.world
+  attempts := liveResult.attempts
+  executed := by rfl
+  callbackCredit := by native_decide
+  callbackObserved := by native_decide
 
 def linked : SuccessfulDepositExecution where
   layout := audit.trio.deposit.Tests.Verity.layout
@@ -30,10 +72,12 @@ def linked : SuccessfulDepositExecution where
   moduleId := word 7
   limits := audit.trio.deposit.Tests.Verity.limits
   obtainDepositData := audit.trio.deposit.Tests.Verity.exactTargetModule
-  depositSize := 32
+  depositSize := DEPOSIT_SIZE
   withdraw := routerWithdrawal
   execution := execution
   executed := by native_decide
+  liveWithdrawal := some liveReceipt
+  liveWithdrawalIffNonzero := by native_decide
 
 def expectSuccess (result : Result) : IO Unit :=
   match result.outcome with
