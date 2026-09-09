@@ -1,0 +1,32 @@
+[
+  {
+    "kind": "same candidate expression, rfl only",
+    "source": "/tmp/LidoSszDepthReviewProbe.lean",
+    "sha256": "4b7c405ff9fd637238eae45bf8085dca255b340cd3e9b62a3a6ff849c40cd7fa",
+    "command": [
+      "lake",
+      "env",
+      "lean",
+      "/tmp/LidoSszDepthReviewProbe.lean"
+    ],
+    "exit": 0,
+    "seconds": 1.710267666,
+    "stdout": "'SszDepthReviewProbe.actual_depth_rejected' depends on axioms: [propext, Classical.choice, Quot.sound]\n",
+    "stderr": ""
+  },
+  {
+    "kind": "wrong-error-label mutant",
+    "source": "/tmp/LidoSszDepthReviewMutant.lean",
+    "sha256": "34ec1453b82ba5c1d21d08319e6aa1eb9611c809074f9244eb1ffb1ffd4c06eb",
+    "command": [
+      "lake",
+      "env",
+      "lean",
+      "/tmp/LidoSszDepthReviewMutant.lean"
+    ],
+    "exit": 1,
+    "seconds": 1.67746325,
+    "stdout": "/tmp/LidoSszDepthReviewMutant.lean:12:2: error: Tactic `rfl` failed: The left-hand side\n  errorTag\n    (sourceStep 0\n      (let __src := cold;\n      { accountMap := __src.accountMap, \u03c3\u2080 := __src.\u03c3\u2080, totalGasUsedInBlock := __src.totalGasUsedInBlock,\n        transactionReceipts := __src.transactionReceipts, substate := __src.substate,\n        executionEnv :=\n          let __src := cold.executionEnv;\n          { codeOwner := __src.codeOwner, sender := __src.sender, source := __src.source, weiValue := __src.weiValue,\n            calldata := __src.calldata, code := __src.code, gasPrice := __src.gasPrice, header := __src.header,\n            depth := 1024, perm := __src.perm, blobVersionedHashes := __src.blobVersionedHashes },\n        blocks := __src.blocks, genesisBlockHeader := __src.genesisBlockHeader,\n        createdAccounts := __src.createdAccounts, toMachineState := __src.toMachineState, pc := __src.pc,\n        stack := __src.stack, execLength := __src.execLength })\n      (UInt256.ofNat 2) (UInt256.ofNat 0) (UInt256.ofNat 0) (UInt256.ofNat 32))\nis not definitionally equal to the right-hand side\n  some StepError.extraItem\n\n\u22a2 errorTag\n      (sourceStep 0\n        (let __src := cold;\n        { accountMap := __src.accountMap, \u03c3\u2080 := __src.\u03c3\u2080, totalGasUsedInBlock := __src.totalGasUsedInBlock,\n          transactionReceipts := __src.transactionReceipts, substate := __src.substate,\n          executionEnv :=\n            let __src := cold.executionEnv;\n            { codeOwner := __src.codeOwner, sender := __src.sender, source := __src.source, weiValue := __src.weiValue,\n              calldata := __src.calldata, code := __src.code, gasPrice := __src.gasPrice, header := __src.header,\n              depth := 1024, perm := __src.perm, blobVersionedHashes := __src.blobVersionedHashes },\n          blocks := __src.blocks, genesisBlockHeader := __src.genesisBlockHeader,\n          createdAccounts := __src.createdAccounts, toMachineState := __src.toMachineState, pc := __src.pc,\n          stack := __src.stack, execLength := __src.execLength })\n        (UInt256.ofNat 2) (UInt256.ofNat 0) (UInt256.ofNat 0) (UInt256.ofNat 32)) =\n    some StepError.extraItem\n'SszDepthReviewProbe.actual_depth_rejected' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]\n",
+    "stderr": ""
+  }
+]
