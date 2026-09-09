@@ -1,0 +1,40 @@
+{
+  "source_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "compiler": {
+    "version": "0.8.25+commit.b61c2a91"
+  },
+  "forge": "forge Version: 1.5.0-v1.5.0\nCommit SHA: 1c57854462289b2e71ee7654cd6666217ed86ffd\nBuild Timestamp: 2025-11-24T06:07:42.598695000Z (1763964462)\nBuild Profile: maxperf",
+  "command": "FOUNDRY_SRC=audit/topup-module-call/solidity FOUNDRY_TEST=audit/topup-module-call/solidity forge test --remappings contracts/=lido-core/contracts/ --remappings @openzeppelin/contracts-v5.2/=/tmp/lido-topup-wei-deps/package/ --match-contract TopupModuleCallTest --fuzz-runs 1024 --fuzz-seed 0x202609093 --out /tmp/lido-module-call-solidity-out --cache-path /tmp/lido-module-call-solidity-cache --threads 2 -vv",
+  "exit_code": 0,
+  "tests": 8,
+  "fuzz_properties": 1,
+  "runs_each": 1024,
+  "exact_lean_byte_vectors": 64,
+  "source_sha256": {
+    "audit/topup-module-call/vendor/EnumerableSet.sol.txt": "ed0804f9dcff9d2dceba8cc83f31669a84491dfcfe510050c9371aa7c48db09c",
+    "audit/topup-module-call/solidity/ModuleVectors.sol": "950dbd0c2c1247d04b78829441ca53c78afe375ba6566a30495fa22d3b2cd97c",
+    "audit/topup-module-call/solidity/TopupModuleCall.t.sol": "a9cb644d0d1cd1ab78a576f4bdaab8e63738dd042d6afd868f6c9edb9efbb904",
+    "lido-core/contracts/0.8.25/sr/SRStorage.sol": "62e922f76a1db7756684d73db3151a02f6d8f0de51fac27922f0a4095ceb9d95",
+    "lido-core/contracts/0.8.25/sr/SRTypes.sol": "22c28be7ceaf6ed841f18fc19296372ab246b1cfecc87902d49ee1670ed4aed6",
+    "lido-core/contracts/common/interfaces/IStakingModule.sol": "4a98e89e763d19b45cb1ea422cec1c554fbd43c9f39c6bcc7a18aad64d46e193",
+    "lido-core/contracts/common/interfaces/IStakingModuleV2.sol": "eacc19c668dd2ad94c7c0cffc5957181b8bf1ed2321c14c34c9845ea054a64ce"
+  },
+  "compiler_source_to_retained_path": {
+    "/tmp/lido-topup-wei-deps/package/utils/structs/EnumerableSet.sol": "audit/topup-module-call/vendor/EnumerableSet.sol.txt",
+    "audit/topup-module-call/solidity/ModuleVectors.sol": "audit/topup-module-call/solidity/ModuleVectors.sol",
+    "audit/topup-module-call/solidity/TopupModuleCall.t.sol": "audit/topup-module-call/solidity/TopupModuleCall.t.sol",
+    "lido-core/contracts/0.8.25/sr/SRStorage.sol": "lido-core/contracts/0.8.25/sr/SRStorage.sol",
+    "lido-core/contracts/0.8.25/sr/SRTypes.sol": "lido-core/contracts/0.8.25/sr/SRTypes.sol",
+    "lido-core/contracts/common/interfaces/IStakingModule.sol": "lido-core/contracts/common/interfaces/IStakingModule.sol",
+    "lido-core/contracts/common/interfaces/IStakingModuleV2.sol": "lido-core/contracts/common/interfaces/IStakingModuleV2.sol"
+  },
+  "all_compiler_source_keccak_compared": true,
+  "ir_compiler_sources_identical": true,
+  "scope": "Actual pinned getter/interface and compiler callsite with arbitrary raw callee; not full StakingRouter. 2^59 allocation-panic fixture explicitly differs from logical byte decoder. No-code result agrees but early-code-check traces differ.",
+  "artifacts": {
+    "README.md": "4c682cdb5b2f37cadbe9a255af655f0e86c598f192d26b1f1bf32bf7498cf3f0",
+    "validation.log": "2d76e11cd6a075cc6683c873b61fa5aa156fa54dbb3995d09de9f159e8e23fce",
+    "compiler-input-identities.json": "afef1be03976db6e9a55c9d7887b71bdb4d994a35459d3750de14d98c4225a20",
+    "ModuleCallHarness.ir.yul.txt": "d126958869b923eeca7639134a45e72c927b1a2b596b8bcea12ce21127f287d7"
+  }
+}

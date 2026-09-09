@@ -1,0 +1,7 @@
+LidoSRv3.Audit.Source.TopupModuleCall.address_packed: [propext, Quot.sound]
+LidoSRv3.Audit.Source.TopupModuleCall.call_success_origin: [propext]
+LidoSRv3.Audit.Source.TopupModuleCall.decodeReturn_encoded: [propext, Classical.choice, Quot.sound]
+LidoSRv3.Audit.Source.TopupModuleCall.program_success_origin: [propext, Classical.choice, Quot.sound]
+LidoSRv3.Audit.Source.TopupModuleCall.program_encoded: [propext, Classical.choice, Quot.sound]
+LidoSRv3.Audit.Source.TopupModuleCall.failure_restores: [propext, Classical.choice, Quot.sound]
+LidoSRv3.Tests.TopupModuleCallMutants.positive_execution: [propext, Classical.choice, Quot.sound]
