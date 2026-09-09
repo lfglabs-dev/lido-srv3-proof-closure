@@ -713,7 +713,7 @@ def VerityGuardedReturndataSimulation (cfg : SourceTopupConfig)
       ∀ hSource : Verity.TopupTx.SourceTopupCallWellFormed call,
         Verity.TopupTx.executeGuarded cfg call failure before =
           Verity.TopupTx.executeSourceDerived
-              (Verity.TopupTx.sourceDeposits call hSource)
+              cfg (Verity.TopupTx.sourceDeposits call hSource)
               call.moduleReturndata failure
             { before with
               calls := before.calls ++ [Verity.TopupTx.allocateEntry call] })

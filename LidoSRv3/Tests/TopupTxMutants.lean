@@ -968,6 +968,8 @@ inductive GuardMutation where
   | noBoundsPanic
   | noOverTarget
   | noModuleFrame
+  | noMinDeposit
+  | noUint64GweiMax
   deriving DecidableEq, Repr
 
 private def mutantGuardLoop (m : GuardMutation) (cfg : SourceTopupConfig) :
@@ -987,6 +989,39 @@ private def mutantGuardLoop (m : GuardMutation) (cfg : SourceTopupConfig) :
       else Verity.pure ()
       mutantGuardLoop m cfg as ls
 
+/-- Single-guard mutants of the pinned `makeBeaconChainTopUp` executor.  The
+zero skip, byte-derived calldata and real beacon frame are unchanged; only the
+named Solidity check is removed. -/
+private def mutantSourcePushLoop (m : GuardMutation) (cfg : SourceTopupConfig) :
+    List SourceDepositDataRootInput → List Nat → Contract Unit
+  | [], [] => Verity.pure ()
+  | [], _ :: _ => require false "SourceDepositLengthMismatch"
+  | _ :: _, [] => require false "SourceDepositLengthMismatch"
+  | input :: inputs, amount :: amounts => do
+      if amount = 0 then mutantSourcePushLoop m cfg inputs amounts
+      else do
+        if m ≠ .noMinDeposit then
+          require (decide (cfg.minDeposit ≤ amount)) "DepositAmountTooLow"
+        else Verity.pure ()
+        if m ≠ .noUint64GweiMax then
+          require (decide (amount / cfg.gwei ≤ cfg.uint64Max)) "AmountTooLarge"
+        else Verity.pure ()
+        beaconPush input amount
+        mutantSourcePushLoop m cfg inputs amounts
+
+private def mutantExecuteSourceDerived (m : GuardMutation) (cfg : SourceTopupConfig)
+    (deposits : List SourceDepositDataRootInput) (allocations : List Nat)
+    (failure : FailurePoint) : Contract Unit := do
+  allocationStage allocations
+  require (decide (failure ≠ .afterAllocationWrite)) "FAIL_AFTER_ALLOCATION_WRITE"
+  let total := allocSumUnchecked allocations
+  if total = 0 then Verity.pure ()
+  else do
+    lidoPull total
+    creditPull total
+    require (decide (failure ≠ .afterLidoPull)) "FAIL_AFTER_LIDO_PULL"
+    mutantSourcePushLoop m cfg deposits allocations
+
 private def mutantGuardedStage (m : GuardMutation) (cfg : SourceTopupConfig)
     (call : TopupCall) (returned : List Nat)
     (failure : FailurePoint) : Contract Unit := do
@@ -996,7 +1031,7 @@ private def mutantGuardedStage (m : GuardMutation) (cfg : SourceTopupConfig)
   else Verity.pure ()
   require (decide (returned = call.moduleReturndata)) "ModuleReturnBindingMismatch"
   if h : SourceTopupCallWellFormed call then
-    executeSourceDerived (sourceDeposits call h) returned failure
+    mutantExecuteSourceDerived m cfg (sourceDeposits call h) returned failure
   else require false "InvalidSourceTopupFields"
 
 /-- `.noModuleFrame` is the fidelity-gap mutant itself: the guards remain, but
@@ -1125,5 +1160,40 @@ theorem free_allocation_execute_commits_what_the_guards_reject :
       (executeGuarded guardCfg misalignedCall .none).run frame
         = .revert "AmountNotAlignedToGwei" frame := by
   exact ⟨by decide, rfl⟩
+
+/-! ## Pinned `makeBeaconChainTopUp` value guards -/
+
+/-- One gwei below the pinned 1 ether `MIN_DEPOSIT`; it is aligned and otherwise
+well-formed, so removing only the deposit-floor check reaches the real beacon
+deposit frame. -/
+private def belowMinDepositCall : TopupCall :=
+  { roundedTarget := 999999999000000000, routerWithdrawalCredentials := routerWc,
+    withdrawalCredentialsType := 2, pubkeys := [validatorPk], keyIndices := [0], operatorIds := [0],
+    topUpLimits := [999999999000000000], moduleReturndata := [999999999000000000] }
+
+/-- The first gwei amount which does not fit in `uint64`; it is above the
+floor and otherwise well-formed, isolating the narrowing check. -/
+private def aboveUint64GweiCall : TopupCall :=
+  { roundedTarget := 18446744073709551616000000000, routerWithdrawalCredentials := routerWc,
+    withdrawalCredentialsType := 2, pubkeys := [validatorPk], keyIndices := [0], operatorIds := [0],
+    topUpLimits := [18446744073709551616000000000],
+    moduleReturndata := [18446744073709551616000000000] }
+
+/-- KILL-LINES for `BeaconChainDepositor.makeBeaconChainTopUp` lines 92--99.
+The honest pinned executor reverts before a beacon frame. Each single-edit
+mutant instead commits and moves the exact witness value, so removing either
+guard makes this test fail. -/
+theorem verity_make_beacon_topup_value_guards_kill_lines :
+    (executeGuarded pinnedConfig belowMinDepositCall .none).run frame =
+        .revert "DepositAmountTooLow" frame ∧
+      (observe frame 1
+        ((mutantExecuteGuarded .noMinDeposit pinnedConfig belowMinDepositCall .none).run frame)).pushed
+          = 999999999000000000 ∧
+      (executeGuarded pinnedConfig aboveUint64GweiCall .none).run frame =
+        .revert "AmountTooLarge" frame ∧
+      (observe frame 1
+        ((mutantExecuteGuarded .noUint64GweiMax pinnedConfig aboveUint64GweiCall .none).run frame)).pushed
+          = 18446744073709551616000000000 := by
+  decide
 
 end LidoSRv3.Tests.TopupTxMutants

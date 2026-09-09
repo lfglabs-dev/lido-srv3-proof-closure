@@ -239,25 +239,35 @@ def beaconPush (input : SourceDepositDataRootInput) (amount : Nat) : Contract Un
   externalCallBindTo beaconAddress (amount : Uint256) [] "deposit"
     (sourceBeaconCalldata input)
 
+/-- `BeaconChainDepositor.makeBeaconChainTopUp`, lines 92--99.  This is after
+the zero-allocation `continue` and before the external deposit frame, in the
+same order as the pinned Solidity. `pinnedConfig` fixes these fields to
+`MIN_DEPOSIT = 1 ether`, `gwei = 10^9`, and `type(uint64).max`. -/
+def makeBeaconChainTopUpGuards (cfg : SourceTopupConfig) (amount : Nat) : Contract Unit := do
+  require (decide (cfg.minDeposit ≤ amount)) "DepositAmountTooLow"
+  require (decide (amount / cfg.gwei ≤ cfg.uint64Max))
+    "AmountTooLarge"
+
 /-- `BeaconChainDepositor.sol:79-107` with its source-byte inputs retained.
 An allocation can reach `deposit` only when it has a corresponding source
 input; the registered constructor below sets its `amountGwei` to the
 allocation divided by the pinned `1 gwei` unit. Extra or missing keys fail closed, matching the
 source's array-length boundary rather than inventing a scheduled deposit. -/
-def sourcePushLoop : List SourceDepositDataRootInput → List Nat → Contract Unit
+def sourcePushLoop (cfg : SourceTopupConfig) : List SourceDepositDataRootInput → List Nat → Contract Unit
   | [], [] => Verity.pure ()
   | [], _ :: _ => require false "SourceDepositLengthMismatch"
   | _ :: _, [] => require false "SourceDepositLengthMismatch"
   | input :: inputs, amount :: amounts => do
-      if amount = 0 then sourcePushLoop inputs amounts
+      if amount = 0 then sourcePushLoop cfg inputs amounts
       else do
+        makeBeaconChainTopUpGuards cfg amount
         beaconPush input amount
-        sourcePushLoop inputs amounts
+        sourcePushLoop cfg inputs amounts
 
 /-- Source-derived executable value tail. This is deliberately separate from
 the allocation-only legacy `execute`: its deposit frames consume the source
 bytes and source-computed root, never `scheduledDeposit`. -/
-def executeSourceDerived (deposits : List SourceDepositDataRootInput)
+def executeSourceDerived (cfg : SourceTopupConfig) (deposits : List SourceDepositDataRootInput)
     (allocations : List Nat) (failure : FailurePoint) : Contract Unit := do
   allocationStage allocations
   require (decide (failure ≠ .afterAllocationWrite)) "FAIL_AFTER_ALLOCATION_WRITE"
@@ -267,7 +277,7 @@ def executeSourceDerived (deposits : List SourceDepositDataRootInput)
     lidoPull total
     creditPull total
     require (decide (failure ≠ .afterLidoPull)) "FAIL_AFTER_LIDO_PULL"
-    sourcePushLoop deposits allocations
+    sourcePushLoop cfg deposits allocations
 
 private def nonzeroPubkeySourceInput : SourceDepositDataRootInput :=
   { withdrawalCredentials := List.replicate 32 0
@@ -1554,7 +1564,7 @@ def guardedSourceStage (cfg : SourceTopupConfig) (call : TopupCall)
     "ModuleReturnExceedTarget"
   require (decide (returned = call.moduleReturndata)) "ModuleReturnBindingMismatch"
   if h : SourceTopupCallWellFormed call then
-    executeSourceDerived (sourceDeposits call h) returned failure
+    executeSourceDerived cfg (sourceDeposits call h) returned failure
   else
     require false "InvalidSourceTopupFields"
 
@@ -1638,7 +1648,7 @@ theorem executeGuarded_apply_of_guards_pass (cfg : SourceTopupConfig) (call : To
     (hTarget : ¬ call.roundedTarget < allocSumUnchecked call.moduleReturndata)
     (hSource : SourceTopupCallWellFormed call) :
     executeGuarded cfg call failure state =
-      executeSourceDerived (sourceDeposits call hSource) call.moduleReturndata failure
+      executeSourceDerived cfg (sourceDeposits call hSource) call.moduleReturndata failure
         { state with
           calls := state.calls ++ [allocateEntry call] } := by
   rw [executeGuarded_binds_returndata, allocateEntry_returndata]
