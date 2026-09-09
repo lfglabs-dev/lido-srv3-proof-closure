@@ -4,8 +4,9 @@ import Std
 Independent P-ADDRESS-1 source model for the four pinned entrypoints. Errors
 are distinct and guards retain source order. Withdrawal request word 1 follows
 `WithdrawalQueueBase.WithdrawalRequest`: address owner in bits 0..159,
-timestamp in 160..199, claimed at bit 200, seven padding bits, and report
-timestamp in 208..247. No earlier address model is imported.
+timestamp in 160..199, claimed byte in bits 200..207, and report timestamp
+in 208..247. The claimed field is a full storage byte matching
+`AddressClaimBatchTx.requestClaimed`. No earlier address model is imported.
 -/
 
 namespace AccountAddress.PAddress1
@@ -24,9 +25,8 @@ abbrev Address := Fin two160
 abbrev StorageWord := Fin two256
 
 def addressPart (word : Nat) : Nat := word % two160
-def claimedPart (word : Nat) : Bool := (word / two200) % 2 = 1
+def claimedPart (word : Nat) : Bool := (word / two200) % 256 != 0
 def timestampPart (word : Nat) : Nat := (word / two160) % (2 ^ 40)
-def paddingPart (word : Nat) : Nat := (word / two201) % (2 ^ 7)
 def reportTimestampPart (word : Nat) : Nat := (word / two208) % (2 ^ 40)
 def unusedHighPart (word : Nat) : Nat := word / two248
 
@@ -45,8 +45,8 @@ def writeOwner (word : Nat) (owner : Address) : Nat :=
 def writeOwnerChecked (word owner : Nat) : Option Nat :=
   (addressOfNat? owner).map (writeOwner word)
 
-/-- Packed assignment `request.claimed = true`; all fields other than bit 200
-stay unchanged. -/
+/-- Packed assignment `request.claimed = true`; writes bit 200 only, setting
+the claimed byte to non-zero. All other fields stay unchanged. -/
 def setClaimed (word : Nat) : Nat :=
   (word / two201) * two201 + two200 + word % two200
 
@@ -335,7 +335,8 @@ theorem setClaimed_preserves_above201 (word : Nat) :
 
 /-- The two equalities preserve every bit below 200 and above 200,
 respectively; together with the middle equality they state that bit 200 is
-the only bit changed by the physical claimed-field assignment. -/
+the only bit changed by the physical claimed-byte assignment, making the
+full 200..207 byte non-zero as `AddressClaimBatchTx.requestClaimed` reads. -/
 theorem setClaimedStorage_sets_only_claimed (word : StorageWord) :
     (setClaimedStorage word).val % two200 = word.val % two200 ∧
     claimedPart (setClaimedStorage word).val = true ∧
@@ -345,7 +346,7 @@ theorem setClaimedStorage_sets_only_claimed (word : StorageWord) :
   · simp only [setClaimed, two200, two201]
     omega
   constructor
-  · simp [claimedPart, setClaimed, two200, two201]
+  · simp only [claimedPart, setClaimed, two200, two201, bne_iff_ne, ne_eq]
     omega
   · exact setClaimed_preserves_above201 word.val
 

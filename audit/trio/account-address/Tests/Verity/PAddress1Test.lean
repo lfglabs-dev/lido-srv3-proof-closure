@@ -33,10 +33,10 @@ example : (writeOwnerStorage physicalWord 5).val =
   decide
 
 def unclaimedPhysicalWord : StorageWord :=
-  ⟨13 * two248 + 19 * two208 + 85 * two201 + 23 * two160 + 3, by decide⟩
+  ⟨13 * two248 + 19 * two208 + 23 * two160 + 3, by decide⟩
 
 example : (setClaimedStorage unclaimedPhysicalWord).val =
-    13 * two248 + 19 * two208 + 85 * two201 + two200 + 23 * two160 + 3 := by
+    13 * two248 + 19 * two208 + two200 + 23 * two160 + 3 := by
   decide
 
 /-- Model-only boundaries for the checked enqueue increment. -/
@@ -70,7 +70,7 @@ example : requestWithdrawal { requestInput with resumed := false }
 
 
 def claimBefore : ClaimState :=
-  { lastFinalizedRequestId := 10, requestWord := 23 * two201 + 3
+  { lastFinalizedRequestId := 10, requestWord := 23 * two208 + 3
     lockedEther := 100, ownerSetRemoveSucceeds := true }
 
 def claimInput : ClaimInput :=
