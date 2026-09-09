@@ -34,7 +34,8 @@ example : (seedDepositsCount values).val = values.actualKeys := by native_decide
 example (external : External) (ctx : Context) (before : World) :
     let result := Live.run (suffix external ctx values) before
     DescribesSuffix external ctx values before result.world result.outcome result.attempts := by
-  exact deposit_execution_composes_suffix values external ctx before (by native_decide)
-    (by native_decide)
+  exact deposit_execution_composes_suffix layout storage oracle config (word 65) [] successfulAfter
+    (word 7) limits exactTargetModule 32 exactWithdrawal
+    successfulExecution successfulRun_eq external ctx before
 
 end audit.trio.deposit.Tests.Verity.WithdrawDepositableEther

@@ -8,7 +8,8 @@ Pinned Solidity source: `lidofinance/core@17005714f151e5502c559932319a3f2f74ac24
 This first slice consumes the accepted ABI parent and executes the deposit join
 through `_getModuleIndexById`, `allocated[moduleIdx]`, the named per-block/key
 limits, and the independently supplied `obtainDepositData` interface.  It derives
-the returned key count only after the pinned 48-byte alignment check, rejects a
+the returned key count from the returned public-key bytes only after the pinned
+48-byte alignment check, retains both returned byte batches, rejects a
 module result above `min(maxDepositsPerBlock, allocation/maxEBType1)`, and derives
 the Lido-pull bound from those executed guards rather than from a link premise.
 The execution then models the source order at `StakingRouter.sol:978`: a
@@ -31,8 +32,14 @@ and does not claim compiler-memory, deployed-bytecode, or deployment identity.
 `RouterDeposit.lean` closes the remaining source-body gaps at the pinned lines:
 router authorization, active-module and credential guards; the timestamp/block
 writer and event before the zero-key return; exact 48/96-byte helper validation;
-the per-key deposit call and value transfer fixed to `DEPOSIT_SIZE = 32 ether`;
-root rollback on every modeled external failure; and the router-balance assert.
+the per-key selected public key and signature, credentials, deposit-contract
+address, source-computed deposit-data root, and 32-ether value transfer; root
+rollback on every modeled external failure; and the router-balance assert.
+Its public `executeRaw` boundary accepts a successful `depositValuesABI` package,
+so module ID, actual count, immutable max balance, batches, and Lido success
+cannot be supplied a second time. Solidity 0.8 checked multiplication is explicit
+for `actualDepositsCount * maxEBType1`, `48 * actualDepositsCount`, and
+`96 * actualDepositsCount`.
 The `maxEBType1 = DEPOSIT_SIZE` deployment identity remains deliberately
 separate: a mismatch reaches and fails the modeled Solidity assertion.
 
