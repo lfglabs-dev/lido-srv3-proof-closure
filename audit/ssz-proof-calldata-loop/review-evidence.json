@@ -1,0 +1,36 @@
+{
+  "candidate": "a9f097c81db661dbd413dae298c7162ede248572",
+  "review_mission": "a5b20c8c-062e-4d1e-9324-196da0a86c8b",
+  "final_event_sequence": 4210,
+  "original_verdict": "BLOCKED",
+  "scoped_conclusion": "No within-domain implementation/proof/evidence defect requiring correction before bounded-lot integration",
+  "all_eight_guarantees": "OPEN",
+  "candidate_files_unchanged": {
+    "LidoSRv3/Audit/Source/SszProofCalldataLoop.lean": "ebc58764fcfc3b72f0c1bfd4a2ce3339b2d316344a47755e7819d9ad627f7d87",
+    "LidoSRv3/Audit/Source/SszProofLoopResources.lean": "064e7bca29c544035ec802ff920472a5ab29d6f96650b51af07f36da59821eb2",
+    "LidoSRv3/Tests/SszProofCalldataLoopMutants.lean": "67d9e112d11eb69b9f4dbbdfd8d37c7f74c486f7ba9161438a7638f6a3c3bd7b",
+    "audit/ssz-proof-calldata-loop/README.md": "e7edc9e72473a546b04cb7c0dc3b12f127a954c3a6c2e2aaf480d07a69a11bba",
+    "audit/ssz-proof-calldata-loop/axioms.log": "a564778eabc9e9e0039cb56b81b6be2513096c9b912af1912286e2d9891c8206",
+    "audit/ssz-proof-calldata-loop/check_receipt.py": "8ea32530c4af184823cca3c2f275c7aeb04152108fe3fac586438cfa77a3f5b4",
+    "audit/ssz-proof-calldata-loop/dependency-inputs.json": "5cc6f16563b14380a77abca6a497228231c5e7f411a9aeba249467742f92634c",
+    "audit/ssz-proof-calldata-loop/fresh-validation.json": "818d46494765d2e1b7bd1d7dfa3eb5c1a4c2d125d67fa517292c31bb7d8db550",
+    "audit/ssz-proof-calldata-loop/receipt.json": "e56cb8cd216786f75047b12a0e81fb0ffcbe52e86fe675745949d0d4e8f55204",
+    "audit/ssz-proof-calldata-loop/solidity/README.md": "60e333961fb2b686588014f7de265060bbb35fafa0a6445f2ef5b388434cfe1b",
+    "audit/ssz-proof-calldata-loop/solidity/SszProofCalldataLoop.t.sol": "fa850c734ff64c180b992dd9baedc61cfcba241a431e8650d48b55bb57d75f1a",
+    "audit/ssz-proof-calldata-loop/solidity/compiler-input-identities.json": "71c6654bf82994cdface1dc273d5c7b5858d2b9b2ff0fcbbb714ec99ce57e6d4",
+    "audit/ssz-proof-calldata-loop/solidity/receipt.json": "ec57ffd7e83ec71dc3bc93e7135a3b9606b0c73cbb517782c1427e8a562f687c",
+    "audit/ssz-proof-calldata-loop/solidity/validation.log": "0ade3d550d076915182bf3249d1eb7ac911ecfafa6bf0568b00847ae01424430",
+    "audit/ssz-proof-calldata-loop/source-check.json": "0466bba323a2cc52a3fe9c8e3011f94aa006cc809a9167797cc78c9d7e62df3d",
+    "audit/ssz-proof-calldata-loop/validated-inputs.sha256": "313b071042eae0db48b10d02109e2265a1af714d69a86389c96d7dc2b66e098a",
+    "audit/ssz-proof-calldata-loop/validation.log": "57008cbaffea090f23307515e4f7a20dc3c641f94e6cea5ff2af9f9ccbdab10f"
+  },
+  "artifacts": {
+    "280-282-independent-review.md": "c0084ff2577c77a886fe37f02b251091cc149dc8f9a3a116dd3af112337ec717",
+    "280-282-integration-supplement.md": "af485fdf0df355dd8037c5f8feb7c25854b0da6f48c9632727557a119ee37c35",
+    "independent-review-event.json": "315fd8361410598670ac5530d55b6ce80848f4edbd73a26ba53dcfe0638e1b91",
+    "review-input-check.json": "20bc39044d215c949da3ae5b89ce57520a625c82e03e92c814edef64db76fe9e",
+    "GasConstants.lean.txt": "906cda79711e73ca637184256f6b53f5f444918ced2952ead4296797c2503fa8",
+    "gasconstants-transport-supplement.json": "1680419ea2e78b785b9da7f298651f8a2425b33d5eaab16329f54dc1982cc180",
+    "review-response.md": "a12eb0ae8ede284fb059ee4f7352fae9e856d50d48911c03e7b625a9cad5d4e9"
+  }
+}

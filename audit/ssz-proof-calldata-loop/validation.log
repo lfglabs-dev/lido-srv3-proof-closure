@@ -1,0 +1,76 @@
+$ lake env lean LidoSRv3/Audit/Source/SszProofLoopResources.lean -o /tmp/lido-ssz-step-validated-wordbytes.olean
+Exit code: 0
+$ lake env lean LidoSRv3/Audit/Source/SszProofCalldataLoop.lean -o /tmp/lido-ssz-step-validated-calldata.olean
+Exit code: 0
+$ lake env lean LidoSRv3/Tests/SszProofCalldataLoopMutants.lean -o /tmp/lido-ssz-loop-validated-tests.olean
+'LidoSRv3.Audit.Source.SszProofLoopResources.call_admitted' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.SszProofLoopResources.call_observations' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.SszProofLoopResources.returned_gas' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.SszProofLoopResources.call_resource' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.SszProofLoopResources.step_resources' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.SszProofCalldataLoop.step_complete' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.SszProofCalldataLoop.loop_refines' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.SszProofCalldataLoop.verify_success_iff' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.SszProofCalldataLoop.decoded_branch_budget' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.SszProofCalldataLoop.verify_empty' depends on axioms: [propext, Classical.choice, Quot.sound]
+Exit code: 0
+$ lake build LidoSRv3.Tests.SszProofCalldataLoopMutants
+⚠ [1071/1130] Replayed Conform.Wheels
+warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: Conform/Wheels.lean:106:70: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1073/1130] Replayed EvmYul.Pretty
+warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: EvmYul/Pretty.lean:36:32: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1114/1130] Replayed EvmYul.Semantics
+warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1115/1130] Replayed EvmYul.EVM.Semantics
+warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+ℹ [1130/1130] Replayed LidoSRv3.Tests.SszProofCalldataLoopMutants
+info: LidoSRv3/Tests/SszProofCalldataLoopMutants.lean:66:0: 'LidoSRv3.Audit.Source.SszProofLoopResources.call_admitted' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszProofCalldataLoopMutants.lean:67:0: 'LidoSRv3.Audit.Source.SszProofLoopResources.call_observations' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/SszProofCalldataLoopMutants.lean:68:0: 'LidoSRv3.Audit.Source.SszProofLoopResources.returned_gas' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszProofCalldataLoopMutants.lean:69:0: 'LidoSRv3.Audit.Source.SszProofLoopResources.call_resource' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszProofCalldataLoopMutants.lean:70:0: 'LidoSRv3.Audit.Source.SszProofLoopResources.step_resources' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszProofCalldataLoopMutants.lean:71:0: 'LidoSRv3.Audit.Source.SszProofCalldataLoop.step_complete' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszProofCalldataLoopMutants.lean:72:0: 'LidoSRv3.Audit.Source.SszProofCalldataLoop.loop_refines' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszProofCalldataLoopMutants.lean:73:0: 'LidoSRv3.Audit.Source.SszProofCalldataLoop.verify_success_iff' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/SszProofCalldataLoopMutants.lean:74:0: 'LidoSRv3.Audit.Source.SszProofCalldataLoop.decoded_branch_budget' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/SszProofCalldataLoopMutants.lean:75:0: 'LidoSRv3.Audit.Source.SszProofCalldataLoop.verify_empty' depends on axioms: [propext, Classical.choice, Quot.sound]
+Build completed successfully (1130 jobs).
+Exit code: 0
