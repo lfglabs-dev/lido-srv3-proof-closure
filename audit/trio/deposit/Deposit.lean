@@ -234,24 +234,6 @@ theorem abi_success_composes_deposit_values
                           (Nat.le_trans aligned targetBound))
                       exact Nat.div_mul_le_self selected.val config.maxEBType1.val
                     · simp [composeValues]
-                  next nonemptyKeys args withdrawalEq =>
-                    split at executed <;> simp_all
-                    next withdrawalFailure => cases executed
-                    next withdrawalSuccess =>
-                      rcases executed with ⟨rfl, rfl⟩
-                      constructor
-                      · dsimp [composeValues]
-                        have targetBound : target ≤ selected.val / config.maxEBType1.val := by
-                          by_cases unitZero : config.maxEBType1 = 0
-                          · simp [unitZero] at nonzero
-                          · simp [unitZero] at nonzero
-                            rw [← nonzero]
-                            exact Nat.min_le_right _ _
-                        apply Nat.le_trans
-                          (Nat.mul_le_mul_right config.maxEBType1.val
-                            (Nat.le_trans aligned targetBound))
-                        exact Nat.div_mul_le_self selected.val config.maxEBType1.val
-                      · simp [composeValues]
 
 #print axioms abi_success_composes_deposit_values
 end audit.trio.deposit

@@ -11,6 +11,11 @@ limits, and the independently supplied `obtainDepositData` interface.  It derive
 the returned key count only after the pinned 48-byte alignment check, rejects a
 module result above `min(maxDepositsPerBlock, allocation/maxEBType1)`, and derives
 the Lido-pull bound from those executed guards rather than from a link premise.
+The execution then models the source order at `StakingRouter.sol:978`: a
+zero-key module result returns without calling Lido; a nonempty result calls the
+injected Lido boundary with `(actualKeys * maxEBType1, actualKeys)`, so the
+deprecated seed-count ABI argument is derived from the returned keys rather
+than supplied as an arbitrary word.
 The success theorem is stated over the composed executor, so it cannot be proved
 by restating an ALLOC equality without running the module call.
 It accepts the documented trio limitations
