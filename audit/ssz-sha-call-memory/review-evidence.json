@@ -1,0 +1,10 @@
+{
+  "scope": "Supplemental historical compilation logs and exact independent review only; original source/receipt unchanged. Final validation.log is targeted cache replay1126. Historical logs have no contemporaneous source hashes; absence of intervening edits is author-reported, final source identities/cache replay independently checked. No fresh reviewer build.",
+  "candidate": "23728167b21c2b0768c9d59cabd4c1dfb55eb6c1",
+  "artifacts": {
+    "independent-review.md": "d2557db40fe78f71d1be975f5bc00a407d41072c48f10dcfa3f90c61b5306d80",
+    "independent-evidence.json": "c0ffacb315a1a2b06821af1d10f9983240f23daf1adfb122cf15b20340e49484",
+    "historical-source-build.log": "4647bf33293d5493368338b49c105d6c04ed24711aa8e842e5b00a06cd9ed2b5",
+    "historical-tests-build.log": "b6883da91ac9401ed6f0ebcd1a0e6367e18cd04005caade455d4d546ebcc0e7a"
+  }
+}
