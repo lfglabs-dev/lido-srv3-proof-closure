@@ -1,0 +1,56 @@
+{
+  "scope": "SSZ toLittleEndian helper arithmetic, no end-to-end SSZ guarantee",
+  "worktree_head": "90111990e245c0d1d9bda14fad0dbd834b95de6d",
+  "files_sha256": {
+    "LidoSRv3/Audit/Source/SszLittleEndianCorrespondence.lean": "354768f3a855422699513646e7ec7b06809f7be545fba623ad9659c331e4fdb8",
+    "LidoSRv3/Tests/SszLittleEndianMutants.lean": "07f0747b127122bf33674fa6e8311d166da19a75898e3cfccca234d0af422cc3",
+    "lean-toolchain": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee",
+    "lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
+    "lido-core/contracts/common/lib/SSZ.sol": "91ef497b972bbee0fe89043034e6bd62fa0c1059f22874d4826bc6164a22009b",
+    "solidity/test/SszLittleEndian.t.sol": "70c14a73a76b3b23d39431ea4ed415c2ebfccc325a0dca4823e392b92b41a31f",
+    "foundry.toml": "adb4990ab31a2bb53f5eeb370e4f55d962f7bc1026bce01708497a56b262356c",
+    "lakefile.lean": "8ea3781110b3234bdfcf2b2c87c5c064fa7d2aee018da57bcab100f8baf1ab87",
+    "audit/ssz-little-endian/lean-tests.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "audit/ssz-little-endian/report.md": "ce025b0186da742f4921a8d1dd141f3e6c7ef3b899a5daff95fd9ca21a545f3c",
+    "audit/ssz-little-endian/differential.json": "46c3bafd08ee4842ab4643c1d164c050e06e9b4b190a29bcfc4a6215c7fd2f95",
+    "audit/ssz-little-endian/lean-source.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "audit/ssz-little-endian/solidity-validation.log": "81e832c1b0d9b7d94d368adcfb53644a1bc377f663abf3feda18aa81f1bbbbe4",
+    "audit/ssz-little-endian/axioms.log": "a4fa2bddee084775cf9e2ac86fe76804ac929011f19190c5f700df7485317c40",
+    "audit/ssz-little-endian/Axioms.lean": "b39af9a986dbbdb5167b3aea42569711a1d6a0f7a0f9eb658a3365a9fdf4b228",
+    "audit/ssz-little-endian/differential.py": "20efc64203330a4ff66640ddac1fe1c068cf41bd6bb9a5745f5e180fd0e145fb"
+  },
+  "commands": [
+    {
+      "command": "lake env lean -o /tmp/lido-ssz-endian-20260909/LidoSRv3/Audit/Source/SszLittleEndianCorrespondence.olean LidoSRv3/Audit/Source/SszLittleEndianCorrespondence.lean",
+      "exit": 0,
+      "log": "lean-source.log"
+    },
+    {
+      "command": "LEAN_PATH=/tmp/lido-ssz-endian-20260909:<repository lake env LEAN_PATH> lean LidoSRv3/Tests/SszLittleEndianMutants.lean",
+      "exit": 0,
+      "log": "lean-tests.log"
+    },
+    {
+      "command": "LEAN_PATH=/tmp/lido-ssz-endian-20260909:<repository lake env LEAN_PATH> lean /tmp/lido-ssz-endian-20260909/Axioms.lean",
+      "exit": 0,
+      "log": "axioms.log"
+    },
+    {
+      "command": "python3 /tmp/lido-ssz-endian-20260909/differential.py",
+      "exit": 0,
+      "log": "differential.json"
+    }
+  ],
+  "axioms": "propext, Classical.choice, Quot.sound only (bool: propext, Quot.sound)",
+  "independent_review": "initial source and receipt audit passed; exact committed candidate review required before merge",
+  "integration_base": "26bbe6ea969aa403002b75296b2175620bc4bf25",
+  "solidity_validation": {
+    "command": "forge test --match-path solidity/test/SszLittleEndian.t.sol --fuzz-runs 1024 --fuzz-seed 0x20260909 --out /tmp/lido-ssz-solidity-out --cache-path /tmp/lido-ssz-solidity-cache -vv",
+    "exit": 0,
+    "passed": 4,
+    "fuzz_runs_per_property": 1024,
+    "solc": "0.8.25",
+    "log": "solidity-validation.log",
+    "scope": "actual pinned library against independent byte serialization; no Lean-to-EVM refinement"
+  }
+}

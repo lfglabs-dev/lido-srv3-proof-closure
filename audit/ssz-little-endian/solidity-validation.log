@@ -1,0 +1,12 @@
+Compiling 5 files with Solc 0.8.25
+Solc 0.8.25 finished in 791.77ms
+Compiler run successful!
+
+Ran 4 tests for solidity/test/SszLittleEndian.t.sol:SszLittleEndianTest
+[PASS] testFuzz_integerMatchesOctets(uint256) (runs: 1024, μ: 5786, ~: 5786)
+[PASS] testFuzz_uint64ZeroPadding(uint64) (runs: 1024, μ: 5789, ~: 5789)
+[PASS] test_booleanBytePosition() (gas: 155)
+[PASS] test_everyInputBit() (gas: 1441741)
+Suite result: ok. 4 passed; 0 failed; 0 skipped; finished in 58.26ms (112.76ms CPU time)
+
+Ran 1 test suite in 459.09ms (58.26ms CPU time): 4 tests passed, 0 failed, 0 skipped (4 total tests)
