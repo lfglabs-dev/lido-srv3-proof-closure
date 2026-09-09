@@ -1,0 +1,13 @@
+✔ [787/788] Built LidoSRv3.Audit.Source.SszProofFold (1.3s)
+ℹ [788/788] Built LidoSRv3.Tests.SszProofFoldMutants (1.1s)
+info: LidoSRv3/Tests/SszProofFoldMutants.lean:69:0: 'LidoSRv3.Audit.Source.SszProofFold.verify_success_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszProofFoldMutants.lean:70:0: 'LidoSRv3.Audit.Source.SszProofFold.verify_depth' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszProofFoldMutants.lean:71:0: 'LidoSRv3.Audit.Source.SszProofFold.tree_branch_authenticates' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/SszProofFoldMutants.lean:72:0: 'LidoSRv3.Audit.Source.SszProofFold.tree_verifies' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszProofFoldMutants.lean:73:0: 'LidoSRv3.Audit.Source.SszProofFold.pinned_header_path_index' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszProofFoldMutants.lean:74:0: 'LidoSRv3.Audit.Source.SszProofFold.pinned_encoded_header_verifies' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+Build completed successfully (788 jobs).
