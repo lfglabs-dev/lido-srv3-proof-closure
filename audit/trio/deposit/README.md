@@ -18,10 +18,13 @@ deprecated seed-count ABI argument is derived from the returned keys rather
 than supplied as an arbitrary word.
 The success theorem is stated over the composed executor, so it cannot be proved
 by restating an ALLOC equality without running the module call.
-The `WithdrawDepositableEther` suffix then passes that executor-derived Lido
-pull to the complete RESERVE-1 `withdrawDepositableEther` relation.  It retains
-the live pause, router-auth and zero-amount guards, reserve accounting, seed
-counter update, value-bearing router callback, and whole-world failure rollback.
+The `WithdrawDepositableEther` suffix returns before the Lido call when the
+module returned zero keys.  On the nonzero path, one theorem composes successful
+deposit ABI execution with the complete RESERVE-1 `withdrawDepositableEther`
+relation, derives both the pull and seed-count arguments from the returned key
+count, and proves their word widths from the executed guards.  It retains the
+live pause, router-auth and zero-amount guards, reserve accounting, seed counter
+update, value-bearing router callback, and whole-world failure rollback.
 It accepts the documented trio limitations
 and does not claim compiler-memory, deployed-bytecode, or deployment identity.
 
