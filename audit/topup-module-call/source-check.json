@@ -1,0 +1,99 @@
+{
+  "scope": "Pinned byte identities and imported definition boundaries, not a compiled full-router correspondence.",
+  "source_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "files": [
+    {
+      "path": "lido-core/contracts/0.8.25/sr/StakingRouter.sol",
+      "sha256": "4d5b83fc73736db6755ebbb58811ed499c3e6de622cce11a3ad8548800a34155",
+      "byte_equal_to_pin": true
+    },
+    {
+      "path": "lido-core/contracts/0.8.25/sr/SRStorage.sol",
+      "sha256": "62e922f76a1db7756684d73db3151a02f6d8f0de51fac27922f0a4095ceb9d95",
+      "byte_equal_to_pin": true
+    },
+    {
+      "path": "lido-core/contracts/0.8.25/sr/SRTypes.sol",
+      "sha256": "22c28be7ceaf6ed841f18fc19296372ab246b1cfecc87902d49ee1670ed4aed6",
+      "byte_equal_to_pin": true
+    },
+    {
+      "path": "lido-core/contracts/common/interfaces/IStakingModule.sol",
+      "sha256": "4a98e89e763d19b45cb1ea422cec1c554fbd43c9f39c6bcc7a18aad64d46e193",
+      "byte_equal_to_pin": true
+    },
+    {
+      "path": "lido-core/contracts/common/interfaces/IStakingModuleV2.sol",
+      "sha256": "eacc19c668dd2ad94c7c0cffc5957181b8bf1ed2321c14c34c9845ea054a64ce",
+      "byte_equal_to_pin": true
+    }
+  ],
+  "local_dependency_comparison_to_base": {
+    "LidoSRv3/Audit/Arithmetic.lean": true,
+    "LidoSRv3/Audit/Source/DepositDataRootCorrespondence.lean": true,
+    "LidoSRv3/Audit/Source/TopupBeaconBatch.lean": true,
+    "LidoSRv3/Audit/Source/TopupBeaconCallee.lean": true,
+    "LidoSRv3/Audit/Source/TopupBeaconEffects.lean": true,
+    "LidoSRv3/Audit/Source/TopupCorrespondence.lean": true,
+    "LidoSRv3/Audit/Source/TopupFundedSource.lean": true,
+    "LidoSRv3/Audit/Source/TopupLiveWithdrawal.lean": true,
+    "LidoSRv3/Audit/Source/TopupRouterContinuation.lean": true,
+    "LidoSRv3/Audit/Source/TopupRouterCredentials.lean": true,
+    "LidoSRv3/Audit/Source/TopupWeiBounds.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/ABI.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/Admission.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/AdmissionSpec.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/Allocation.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/AllocationFlow.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/AllocationFlowSpec.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/AllocationSpec.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/BalanceSpec.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/CallData.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/CallFlow.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/CallResults.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/CallSpec.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/Consensus.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/ConsensusCalls.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/FrameRead.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/FrameReadSpec.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/FrameSpec.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/Live.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/Locator.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/Lookup.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/LookupSpec.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/Oracle.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/OracleCalls.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/OracleSpec.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/PartitionSpec.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/Pipeline.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/Queue.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/QueueCalls.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/QueueSpec.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/Router.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/RouterSpec.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/Spend.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/SpendSpec.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/Spending.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/SpendingSpec.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/StaticCall.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/Status.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/StatusSpec.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/Tail.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/TailSpec.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/WithdrawalComposition.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/WithdrawalParent.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/WithdrawalSpec.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/WithdrawalTail.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/WriterSpec.lean": true,
+    "LidoSRv3/Audit/Source/TrioReserve1/Writers.lean": true,
+    "LidoSRv3/Audit/Ssz.lean": true,
+    "LidoSRv3/Audit/Trace.lean": true,
+    "LidoSRv3/Audit/Verity/TopupBeaconFundedTx.lean": true,
+    "LidoSRv3/Audit/Verity/TopupTx.lean": true,
+    "LidoSRv3/Tests/TopupRouterContinuationMutants.lean": true
+  },
+  "compiler_boundaries": [
+    "typed call has no early extcodesize; Live.invoke does",
+    "compiler allocation precedes extent; count2^59 fixture differs"
+  ]
+}
