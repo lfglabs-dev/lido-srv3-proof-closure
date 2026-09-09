@@ -1,0 +1,14 @@
+Compiling 5 files with Solc 0.8.25
+Solc 0.8.25 finished in 930.97ms
+Compiler run successful!
+
+Ran 6 tests for solidity/test/SszProofFold.t.sol:SszProofFoldTest
+[PASS] testFuzz_missingAndExtra(uint8,uint248,bytes32) (runs: 1024, μ: 79772, ~: 27003)
+[PASS] testFuzz_pinnedHeaderPath(uint40,bytes32,bytes32) (runs: 1024, μ: 99031, ~: 99055)
+[PASS] testFuzz_validAndWrongRoot(uint8,uint248,bytes32,bytes32) (runs: 1024, μ: 105858, ~: 32240)
+[PASS] test_emptyAndRootIndices() (gas: 12446)
+[PASS] test_maximumDepthBothEdges() (gas: 630872)
+[PASS] test_orderAndParityMutants() (gas: 20106)
+Suite result: ok. 6 passed; 0 failed; 0 skipped; finished in 322.08ms (887.69ms CPU time)
+
+Ran 1 test suite in 326.67ms (322.08ms CPU time): 6 tests passed, 0 failed, 0 skipped (6 total tests)
