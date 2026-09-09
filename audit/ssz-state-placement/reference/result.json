@@ -1,0 +1,16 @@
+{
+  "specification": "ethereum/consensus-specs@f96d3e7acf35125295d234da4b0c67591fdef49c",
+  "library": {
+    "ssz": "1.2.1",
+    "persistentMerkleTree": "1.2.0"
+  },
+  "rootsChecked": 64,
+  "proofsChecked": 104,
+  "vectorCount": 6,
+  "scope": "Canonical container/validator-registry structure, opaque roots for other state fields; independent sparse SHA reference versus pinned ChainSafe SSZ",
+  "limits": [
+    "not recursive encoding of every BeaconState field",
+    "synthetic validators/header/root, not consensus authentication or deployment provenance",
+    "finite executable checks, not Lean/EVM refinement"
+  ]
+}

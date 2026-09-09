@@ -1,0 +1,14 @@
+Compiling 9 files with Solc 0.8.25
+Solc 0.8.25 finished in 1.70s
+Compiler run successful!
+
+Ran 6 tests for SszStatePlacement.t.sol:SszStatePlacementReferenceTest
+[PASS] test_electra_length1_index0() (gas: 118756)
+[PASS] test_electra_length7_index0() (gas: 118873)
+[PASS] test_electra_length7_index6() (gas: 119034)
+[PASS] test_fulu_length1_index0() (gas: 118734)
+[PASS] test_fulu_length7_index0() (gas: 118969)
+[PASS] test_fulu_length7_index6() (gas: 118949)
+Suite result: ok. 6 passed; 0 failed; 0 skipped; finished in 6.79ms (15.05ms CPU time)
+
+Ran 1 test suite in 145.51ms (6.79ms CPU time): 6 tests passed, 0 failed, 0 skipped (6 total tests)

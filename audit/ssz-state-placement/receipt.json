@@ -1,0 +1,159 @@
+{
+  "scope": "Canonical Electra/Fulu container/validator-registry spine from named schema, semantic list members and real length mix-in; final actual typed verifier-entry consumer without supplied index/path/placement premises. Other state roots opaque; not authenticated or deployed state/EVM refinement.",
+  "base_head": "8ef973fa37997e55061a95fce1a41bf3cfe968e7",
+  "source_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "external_schema_pin": "f96d3e7acf35125295d234da4b0c67591fdef49c",
+  "external_schema_provenance": "Additional explicitly selected official schema snapshot, not a Lido dependency or deployed-fork identity",
+  "files_sha256": {
+    "LidoSRv3/Audit/Source/SszPerfectTree.lean": "2d73d9064c4b4d3d01166c1454fb86dc8af1643fa9a989385023a09bd1b6707f",
+    "LidoSRv3/Audit/Source/SszStatePlacement.lean": "bab75a6eb383372497cd0a94880875e0e03af7992a6653f6ee8abc44299bd9a7",
+    "LidoSRv3/Tests/SszStatePlacementMutants.lean": "6859c309116541d31c78a0ae0e554387526b06f1571b73656391dc9fbbc7c1c8",
+    "LidoSRv3/Audit/Source/SszVerifierEntry.lean": "08780f8e0003f28c2ea5efc33125f127ff2e00facdacef30fa8180a4ff0c82c3",
+    "LidoSRv3/Audit/Source/SszValidatorLeaf.lean": "a2b5fa2b0f8b5955e0d4d27a5052e0d19bb08058b5e734dd48d55cc121d3170f",
+    "LidoSRv3/Audit/Source/SszProofFold.lean": "2e0c24c00c0fbae5cfe8dec50a459996b64988e839087bec1880034d65859b6d",
+    "LidoSRv3/Audit/Source/SszWrapperIndex.lean": "57833ae3afc8731c7b6a80862666194c1fa561db316952b3e5b4073013a6b045",
+    "LidoSRv3/Audit/Source/SszLittleEndianCorrespondence.lean": "354768f3a855422699513646e7ec7b06809f7be545fba623ad9659c331e4fdb8",
+    "lean-toolchain": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee",
+    "lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
+    "lakefile.lean": "8ea3781110b3234bdfcf2b2c87c5c064fa7d2aee018da57bcab100f8baf1ab87",
+    "foundry.toml": "adb4990ab31a2bb53f5eeb370e4f55d962f7bc1026bce01708497a56b262356c",
+    "lido-core/contracts/0.8.25/CLValidatorVerifier.sol": "d6e89f6975e4fa02f758bf461a98ac2d689296b5c92d03ffd4e43a22d0b3d7ed",
+    "lido-core/contracts/common/lib/GIndex.sol": "2653bd4ba89c349f3db36f21a8afc6a24e0e233816d9b608f46d048feb601d1f",
+    "lido-core/contracts/common/lib/SSZ.sol": "91ef497b972bbee0fe89043034e6bd62fa0c1059f22874d4826bc6164a22009b",
+    "lido-core/contracts/common/lib/BLS.sol": "0187cc6a6b1aaa833317695d88795db431fa237452213e8c3872a0f444dceb7c",
+    "lido-core/contracts/common/interfaces/ValidatorWitness.sol": "8fd24cfab7402233029756e52e59198b0d9cbf0a42e5c07d9fa2338ed731a5f7",
+    "lido-core/scripts/upgrade/upgrade-params-mainnet.toml": "57f3ea6d6247f14ed4e7c581b7ee9094fe4589ba769530598e457aae09007151",
+    "lido-core/yarn.lock": "d17f979eed36218b0bed85cf560bdc2e5d182e0c67aff6eabf2c68be8597c921",
+    "audit/ssz-state-placement/README.md": "9bc080a0bc3b44be32da1a345ad6bceaddbbee7c6161ffbfb6afee93d549b2e1",
+    "audit/ssz-state-placement/check_source.py": "c30cf0554e7700ece162f7a3e8312bb1b99bee9432d4be17b281781603344d2d",
+    "audit/ssz-state-placement/schema-sources.json": "d94068a5f3df82d2fb60935b67fd59bd42c44f86b32fd54104bc5d48b6e59293",
+    "audit/ssz-state-placement/source-check.json": "6fe90b4cd85119d867889146abdef569bab034663c8b6f173f58a0342bbd1bd2",
+    "audit/ssz-state-placement/validation.log": "ed76bdbd2b7c23375d6ab7b562e13cf7b26d274eb55d9b9b80c63aebfb8dd878",
+    "audit/ssz-state-placement/consensus-specs/specs/electra/beacon-chain.md": "a488a6084ad4e43d4957356ce7579e9ea246e445b5f237da757d142675529eb7",
+    "audit/ssz-state-placement/consensus-specs/specs/fulu/beacon-chain.md": "a4b1aae638842a21de4ea4e2edb0d86819c2337bfba0f9501fd7725f160f62ce",
+    "audit/ssz-state-placement/consensus-specs/specs/phase0/beacon-chain.md": "190e7fd81ddf4beda0a849a8d2ade1fa20b46b4405b6100352aab9633ee9cba8",
+    "audit/ssz-state-placement/consensus-specs/ssz/simple-serialize.md": "66f7119747f30e23be2a74dc77d19fa07251742955ce4de9daf764b2b4401a2e",
+    "audit/ssz-state-placement/consensus-specs/ssz/merkle-proofs.md": "ea67a158e28f5115cf985266efdb78f82277d1ab73efab4657313d63ffb03f7f",
+    "audit/ssz-state-placement/consensus-specs/LICENSE": "36ffd9dc085d529a7e60e1276d73ae5a030b020313e6c5408593a6ae2af39673",
+    "audit/ssz-state-placement/reference/README.md": "47ade9cf4f54bdfcedfc3fb684d5e4230dd00220fc30bbb04466f652c0144339",
+    "audit/ssz-state-placement/reference/SszStatePlacement.t.sol": "dd3323b365bbb343798ddc6f517800a1f389f613a8d76f9fabb30bd378ce8fab",
+    "audit/ssz-state-placement/reference/check.mjs": "bd32f5bfc4e871068b6523721f7fa52fd4244f10b12a7aaef4f3154fa1de9fdd",
+    "audit/ssz-state-placement/reference/foundry.toml": "696223c2740dd8384acf83daff43bfda5af29c58bd2711c9546e2731e118e950",
+    "audit/ssz-state-placement/reference/generate_solidity.py": "bc19003329207239526a086a1f8e7d22acb9810455f33e3af5a5f11d348a301e",
+    "audit/ssz-state-placement/reference/package-lock.json": "a93d0cf4e98e7f46f5f6fa8550185d6e39b1de1e66e97d2e58f6d0747aa16fce",
+    "audit/ssz-state-placement/reference/package.json": "6f1a83b4eb4abf2d2cbefbe6682fb38c6a5ad0ff0f5eefd757cce04a880e59c0",
+    "audit/ssz-state-placement/reference/result.json": "ee1e9fdeb6c3e4c9b20d631a21bf0dc4658d7f2214fba30ba7a49ce32d9e00c6",
+    "audit/ssz-state-placement/reference/schemas.json": "2efc41c9e7a9aa6ae8233cee5b127d1a06426ad1ba000188d995dda4417851c9",
+    "audit/ssz-state-placement/reference/solidity-validation.log": "c2165a7e18a88ba1e1826ccfc925b52f6db8d70e9d0402c39f6b854f37ec6c70",
+    "audit/ssz-state-placement/reference/validation.log": "ee1e9fdeb6c3e4c9b20d631a21bf0dc4658d7f2214fba30ba7a49ce32d9e00c6",
+    "audit/ssz-state-placement/reference/vectors.json": "e60ad4f8ab9fda80ef26cffd68c25bcd6550c25213234a0efc25f0bada813c02",
+    "audit/ssz-state-placement/reference/receipt.json": "52e0ed0a50f899690f53bebe13e3257200da120eb07f8e6a9b8be69b84bf4d6a"
+  },
+  "lean": {
+    "command": "lake build LidoSRv3.Audit.Source.SszPerfectTree LidoSRv3.Audit.Source.SszStatePlacement LidoSRv3.Tests.SszStatePlacementMutants",
+    "exit": 0,
+    "jobs": 792,
+    "log": "validation.log",
+    "scope": "Final targeted source/test compilation after comment-only wording cleanup, with unchanged accepted dependencies and generic source reused from cache; not full repository build",
+    "source_theorems": {
+      "SszPerfectTree": 9,
+      "SszStatePlacement": 17
+    },
+    "kernel_regressions": 39,
+    "axioms": {
+      "perfect_digest_ordered": [
+        "propext",
+        "Quot.sound"
+      ],
+      "chunks_padding": [
+        "propext",
+        "Quot.sound"
+      ],
+      "perfect_subtree": [
+        "propext",
+        "Quot.sound"
+      ],
+      "registry_chunks": [
+        "propext",
+        "Quot.sound"
+      ],
+      "length_encoding_no_wrap": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "state_root_ordered_fields": [
+        "propext",
+        "Quot.sound"
+      ],
+      "state_member_subtree": [
+        "propext",
+        "Quot.sound"
+      ],
+      "registry_length_sibling": [
+        "propext",
+        "Quot.sound"
+      ],
+      "canonical_validator_entry": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    "unchanged_dependency_inputs": [
+      "LidoSRv3/Audit/Source/SszVerifierEntry.lean",
+      "LidoSRv3/Audit/Source/SszValidatorLeaf.lean",
+      "LidoSRv3/Audit/Source/SszProofFold.lean",
+      "LidoSRv3/Audit/Source/SszWrapperIndex.lean",
+      "LidoSRv3/Audit/Source/SszLittleEndianCorrespondence.lean",
+      "lean-toolchain",
+      "lake-manifest.json",
+      "lakefile.lean",
+      "foundry.toml"
+    ]
+  },
+  "source_check": {
+    "command": "python3 audit/ssz-state-placement/check_source.py",
+    "exit": 0,
+    "log": "source-check.json",
+    "scope": "six bundled official schema/license file hashes, exact ordered field extraction and SSZ rule anchors, six Lido pinned source/config identities and packed-index arithmetic; no semantic/deployment proof"
+  },
+  "independent_reference": {
+    "receipt": "reference/receipt.json",
+    "author": "integrator",
+    "verified_artifact_hashes": 12,
+    "verified_pinned_source_hashes": 6,
+    "reference_schema_field_lists_match_bundled_commit": true,
+    "results": {
+      "specification": "ethereum/consensus-specs@f96d3e7acf35125295d234da4b0c67591fdef49c",
+      "library": {
+        "ssz": "1.2.1",
+        "persistentMerkleTree": "1.2.0"
+      },
+      "rootsChecked": 64,
+      "proofsChecked": 104,
+      "vectorCount": 6,
+      "scope": "Canonical container/validator-registry structure, opaque roots for other state fields; independent sparse SHA reference versus pinned ChainSafe SSZ",
+      "limits": [
+        "not recursive encoding of every BeaconState field",
+        "synthetic validators/header/root, not consensus authentication or deployment provenance",
+        "finite executable checks, not Lean/EVM refinement"
+      ]
+    },
+    "actual_solidity": {
+      "tests": 6,
+      "accepted_canonical": 6,
+      "rejected_length_mutants": 6,
+      "rejected_padding_mutants": 6,
+      "solc": "0.8.25"
+    },
+    "scope": "Existing exact successful Node/Forge logs and frozen artifacts verified; worker did not rerun reference or Forge"
+  },
+  "remaining_boundaries": [
+    "other named state-field roots opaque, nested field encodings and consensus consistency/reachability open",
+    "external schema selection and runtime fork/configuration provenance distinct",
+    "actual list membership stronger than Solidity capacity guard; no universal digest separation or hash injectivity",
+    "trusted oracle response, deterministic standard SHA/gas, raw calldata/memory/ABI/compiler/EVM and fls assembly boundaries unchanged"
+  ],
+  "independent_review": "pending exact committed-candidate review"
+}
