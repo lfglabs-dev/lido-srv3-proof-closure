@@ -1,0 +1,58 @@
+$ lake env lean LidoSRv3/Audit/Source/SszTypedFfiBridge.lean -o /tmp/lido-ssz-typed-validated-source.olean
+Exit code: 0
+$ lake env lean LidoSRv3/Tests/SszTypedFfiBridgeMutants.lean -o /tmp/lido-ssz-typed-validated-tests.olean
+'LidoSRv3.Audit.Source.SszTypedFfiBridge.digest_bytes' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.SszTypedFfiBridge.digest_actual_word' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.SszTypedFfiBridge.pair_transport' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.SszTypedFfiBridge.proof_bytes' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.SszTypedFfiBridge.branch_transport' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.SszTypedFfiBridge.primitive_typed_success' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+Exit code: 0
+$ lake build LidoSRv3.Tests.SszTypedFfiBridgeMutants
+⚠ [1071/1132] Replayed Conform.Wheels
+warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: Conform/Wheels.lean:106:70: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1073/1132] Replayed EvmYul.Pretty
+warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: EvmYul/Pretty.lean:36:32: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1114/1132] Replayed EvmYul.Semantics
+warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1115/1132] Replayed EvmYul.EVM.Semantics
+warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+ℹ [1132/1132] Replayed LidoSRv3.Tests.SszTypedFfiBridgeMutants
+info: LidoSRv3/Tests/SszTypedFfiBridgeMutants.lean:18:0: 'LidoSRv3.Audit.Source.SszTypedFfiBridge.digest_bytes' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/SszTypedFfiBridgeMutants.lean:19:0: 'LidoSRv3.Audit.Source.SszTypedFfiBridge.digest_actual_word' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszTypedFfiBridgeMutants.lean:20:0: 'LidoSRv3.Audit.Source.SszTypedFfiBridge.pair_transport' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/SszTypedFfiBridgeMutants.lean:21:0: 'LidoSRv3.Audit.Source.SszTypedFfiBridge.proof_bytes' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/SszTypedFfiBridgeMutants.lean:22:0: 'LidoSRv3.Audit.Source.SszTypedFfiBridge.branch_transport' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/SszTypedFfiBridgeMutants.lean:23:0: 'LidoSRv3.Audit.Source.SszTypedFfiBridge.primitive_typed_success' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+Build completed successfully (1132 jobs).
+Exit code: 0

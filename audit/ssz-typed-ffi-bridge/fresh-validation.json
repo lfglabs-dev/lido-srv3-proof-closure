@@ -1,0 +1,58 @@
+{
+  "created_utc": "2026-09-09T20:03:45.213188+00:00",
+  "scope": "Fresh direct checks of the source and test modules with imported caches and temporary outputs; targeted Lake graph replay separately reuses caches. Not a full dependency rebuild.",
+  "head": "a9f097c81db661dbd413dae298c7162ede248572",
+  "before": {
+    "LidoSRv3/Audit/Source/SszTypedFfiBridge.lean": "0b783ad4b3a15933d7096cff4e0450bf8b510689024bd7232011a8d326e29ad9",
+    "LidoSRv3/Tests/SszTypedFfiBridgeMutants.lean": "b352a4deb9b0c94f768144154027b9df7fd5142477ce99b07d318ef2ea259ca7",
+    "lakefile.lean": "8ea3781110b3234bdfcf2b2c87c5c064fa7d2aee018da57bcab100f8baf1ab87",
+    "lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
+    "lean-toolchain": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee",
+    "foundry.toml": "adb4990ab31a2bb53f5eeb370e4f55d962f7bc1026bce01708497a56b262356c"
+  },
+  "after": {
+    "LidoSRv3/Audit/Source/SszTypedFfiBridge.lean": "0b783ad4b3a15933d7096cff4e0450bf8b510689024bd7232011a8d326e29ad9",
+    "LidoSRv3/Tests/SszTypedFfiBridgeMutants.lean": "b352a4deb9b0c94f768144154027b9df7fd5142477ce99b07d318ef2ea259ca7",
+    "lakefile.lean": "8ea3781110b3234bdfcf2b2c87c5c064fa7d2aee018da57bcab100f8baf1ab87",
+    "lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
+    "lean-toolchain": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee",
+    "foundry.toml": "adb4990ab31a2bb53f5eeb370e4f55d962f7bc1026bce01708497a56b262356c"
+  },
+  "unchanged": true,
+  "runs": [
+    {
+      "command": [
+        "lake",
+        "env",
+        "lean",
+        "LidoSRv3/Audit/Source/SszTypedFfiBridge.lean",
+        "-o",
+        "/tmp/lido-ssz-typed-validated-source.olean"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.767
+    },
+    {
+      "command": [
+        "lake",
+        "env",
+        "lean",
+        "LidoSRv3/Tests/SszTypedFfiBridgeMutants.lean",
+        "-o",
+        "/tmp/lido-ssz-typed-validated-tests.olean"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.753
+    },
+    {
+      "command": [
+        "lake",
+        "build",
+        "LidoSRv3.Tests.SszTypedFfiBridgeMutants"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.001
+    }
+  ],
+  "passed": true
+}

@@ -1,0 +1,19 @@
+# Typed SSZ digest interface to actual FFI word loop
+
+The earlier typed verifier takes BitVec256 digests and serializes each word with `digestBytes`. The primitive calldata helper takes EvmYul UInt256 words encoded by the engine's actual big-endian codec. This module proves their byte-for-byte correspondence, then transports pair hashing and independent Merkle branches in both directions.
+
+`digest_bytes` relates every extracted byte of the typed encoder to the independently defined fixed-width base-256 digits. `digest_actual_word` connects this equality to the actual EvmYul encoder proved previously. `proof_bytes` lifts it to the complete proof payload. The two word conversions are inverse, with no truncation or domain assumption added. `ffiSha` instantiates the earlier abstract byte-level hash with the actual opaque SHA FFI and actual big-endian decoder; it does not assert an external binary implements the SHA standard. `pair_transport` proves the same bytes and decoder are used by both sides, rather than supplying pair agreement as a premise. `branch_transport` establishes a bidirectional correspondence of independently defined paths.
+
+`primitive_typed_success` concludes that the full primitive helper succeeds exactly when the existing typed `sourceVerify` succeeds, with `foldHash (standardSha ffiSha)`. The input layout is supplied using the typed digest serialization, not an assumed successful load or fold. The initial CALL-only budget derives individual call admission via the previous lot. The existing standardSha constructor is used on the typed side only after the previous actual-CALL theorem establishes success under its resource/FFI-length domain. This is a representation and verifier correspondence, not an independent cryptographic SHA correctness proof.
+
+## Remaining boundaries
+
+Raw ABI layout and decoded proof count remain supplied, and the primitive program does not execute the ABI decoder or compiled bytecode. Initial gas must satisfy the conservative CALL-only budget, depth must be below1024, active memory words below2^251, and raw calldata size below2^256. The opaque FFI must return32bytes for every pair64 input. Surrounding memory/control opcode charges are not modeled, so the budget is not total transaction gas. The transport covers the final proof verifier only: raw execution of the seven leaf pair calls, pubkey helper, slot check and EIP4788 lookup remains separate. Full World framing, revert ABI, rollback, consensus authenticity and deployed provenance remain open. SSZ-1 is not closed.
+
+## Validation and reuse
+
+Two fresh direct Lean checks cover the new source and test module, with before/after source/config identities. A separate1132-job targeted Lake replay reuses dependencies. Twelve public source theorems, eight kernel examples and six principal axiom queries use only propext, Classical.choice and Quot.sound. Examples check independent byte positions at low/high word boundaries, distinguish reversed significance, preserve the full256-bit word, and discard GIndex metadata. These are kernel evaluations after normalization by the proved encoder equality, not native runtime FFI executions.
+
+No Solidity source changed and no new Forge run is claimed. The previous complete-loop suite's source files, compiler metadata and receipts are retained by identity. That suite's five tests/1024 fuzz cases exercise the actual helper, but do not validate this Lean type conversion by themselves. Existing package sources and unchanged local dependencies are compared against Git HEAD; actual import source closure and selected Lean core sources are recorded. Compiled dependency binaries and complete toolchain closure are not certified.
+
+`python3 audit/ssz-typed-ffi-bridge/check_receipt.py` compares the recorded identities; it does not execute proofs or Solidity. This lot depends on PR280 and requires an exact-candidate independent review before integration.
