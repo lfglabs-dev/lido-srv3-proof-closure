@@ -1,0 +1,89 @@
+$ lake build LidoSRv3.Audit.Source.TopupFundedSource LidoSRv3.Audit.Verity.TopupFundedSourceTx LidoSRv3.Tests.TopupFundedSourceMutants
+⚠ [11/630] Replayed Verity.Core
+warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1041:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+⚠ [1128/1224] Replayed Conform.Wheels
+warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: Conform/Wheels.lean:106:70: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1129/1224] Replayed EvmYul.Pretty
+warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: EvmYul/Pretty.lean:36:32: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1176/1224] Replayed EvmYul.Semantics
+warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1177/1224] Replayed EvmYul.EVM.Semantics
+warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1215/1224] Replayed LidoSRv3.Audit.Verity.TopupTx
+warning: LidoSRv3/Audit/Verity/TopupTx.lean:293:8: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: LidoSRv3/Audit/Verity/TopupTx.lean:872:13: This simp argument is unused:
+  uint256Modulus
+
+Hint: Omit it from the simp argument list.
+  simp [pushEntry, scheduledDeposit, linkedCallEntryTo, linkedCallEntry, e̵v̵m̵W̵o̵r̵d̵,̵ ̵u̵i̵n̵t̵2̵5̵6̵M̵o̵d̵u̵l̵u̵s̵]̵e̲v̲m̲W̲o̲r̲d̲]̲
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/TopupTx.lean:965:19: This simp argument is unused:
+  Nat.mod_eq_of_lt hNoWrap
+
+Hint: Omit it from the simp argument list.
+  simp [evmWord,̵ ̵N̵a̵t̵.̵m̵o̵d̵_̵e̵q̵_̵o̵f̵_̵l̵t̵ ̵h̵N̵o̵W̵r̵a̵p̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/TopupTx.lean:1279:5: Variable name `hwcLen` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+ℹ [1263/1266] Replayed LidoSRv3.Tests.TopupLiveWithdrawalMutants
+info: LidoSRv3/Tests/TopupLiveWithdrawalMutants.lean:91:0: 'LidoSRv3.Audit.Source.TopupLiveWithdrawal.transfer_balances' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/TopupLiveWithdrawalMutants.lean:92:0: 'LidoSRv3.Audit.Source.TopupLiveWithdrawal.zero_noop' depends on axioms: [propext]
+info: LidoSRv3/Tests/TopupLiveWithdrawalMutants.lean:93:0: 'LidoSRv3.Audit.Source.TopupLiveWithdrawal.zero_seed_tail' depends on axioms: [propext]
+info: LidoSRv3/Tests/TopupLiveWithdrawalMutants.lean:94:0: 'LidoSRv3.Audit.Source.TopupLiveWithdrawal.positive_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+✔ [1264/1266] Built LidoSRv3.Audit.Source.TopupFundedSource (1.5s)
+✔ [1265/1266] Built LidoSRv3.Audit.Verity.TopupFundedSourceTx (1.5s)
+ℹ [1266/1266] Built LidoSRv3.Tests.TopupFundedSourceMutants (2.3s)
+info: LidoSRv3/Tests/TopupFundedSourceMutants.lean:84:0: 'LidoSRv3.Audit.Source.TopupFundedSource.loop_run' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/TopupFundedSourceMutants.lean:85:0: 'LidoSRv3.Audit.Source.TopupFundedSource.journal_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/TopupFundedSourceMutants.lean:86:0: 'LidoSRv3.Audit.Source.TopupFundedSource.gateway_sum_exact' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/TopupFundedSourceMutants.lean:87:0: 'LidoSRv3.Audit.Verity.TopupFundedSourceTx.ledger_roundtrip' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/TopupFundedSourceMutants.lean:88:0: 'LidoSRv3.Audit.Verity.TopupFundedSourceTx.gateway_projection_bound' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/TopupFundedSourceMutants.lean:89:0: 'LidoSRv3.Audit.Verity.TopupFundedSourceTx.positive_conservation' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TopupFundedSourceMutants.lean:90:0: 'LidoSRv3.Audit.Verity.TopupFundedSourceTx.wrapped_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/TopupFundedSourceMutants.lean:91:0: 'LidoSRv3.Audit.Verity.TopupFundedSourceTx.failure_restores' depends on axioms: [propext, Classical.choice, Quot.sound]
+Build completed successfully (1266 jobs).
+
+exit_code=0

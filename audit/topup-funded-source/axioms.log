@@ -1,0 +1,10 @@
+info: LidoSRv3/Tests/TopupFundedSourceMutants.lean:84:0: 'LidoSRv3.Audit.Source.TopupFundedSource.loop_run' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/TopupFundedSourceMutants.lean:85:0: 'LidoSRv3.Audit.Source.TopupFundedSource.journal_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/TopupFundedSourceMutants.lean:86:0: 'LidoSRv3.Audit.Source.TopupFundedSource.gateway_sum_exact' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/TopupFundedSourceMutants.lean:87:0: 'LidoSRv3.Audit.Verity.TopupFundedSourceTx.ledger_roundtrip' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/TopupFundedSourceMutants.lean:88:0: 'LidoSRv3.Audit.Verity.TopupFundedSourceTx.gateway_projection_bound' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/TopupFundedSourceMutants.lean:89:0: 'LidoSRv3.Audit.Verity.TopupFundedSourceTx.positive_conservation' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TopupFundedSourceMutants.lean:90:0: 'LidoSRv3.Audit.Verity.TopupFundedSourceTx.wrapped_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/TopupFundedSourceMutants.lean:91:0: 'LidoSRv3.Audit.Verity.TopupFundedSourceTx.failure_restores' depends on axioms: [propext, Classical.choice, Quot.sound]
