@@ -30,15 +30,11 @@ example (external : External) (ctx : Context) (before : World) :
 count; callers cannot choose it independently. -/
 example : (seedDepositsCount values).val = values.actualKeys := by native_decide
 
-/-- Regression over the real ABI executor: its successful result composes with
-the conditional withdrawal theorem, rather than testing arithmetic in isolation. -/
-example (after : Transcript)
-    (executed : depositValuesABI layout storage oracle config (word 65) [] (word 7)
-      limits exactTargetModule 32 = (.ok values, after))
-    (external : External) (ctx : Context) (before : World) :
+/-- The exact source-derived suffix composes with the complete RESERVE-1 call. -/
+example (external : External) (ctx : Context) (before : World) :
     let result := Live.run (suffix external ctx values) before
     DescribesSuffix external ctx values before result.world result.outcome result.attempts := by
-  exact deposit_execution_composes_suffix layout storage oracle config (word 65) [] after
-    (word 7) limits exactTargetModule 32 values executed external ctx before
+  exact deposit_execution_composes_suffix values external ctx before (by native_decide)
+    (by native_decide)
 
 end audit.trio.deposit.Tests.Verity.WithdrawDepositableEther

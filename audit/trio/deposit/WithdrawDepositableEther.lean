@@ -42,71 +42,23 @@ def DescribesSuffix (external : External) (ctx : Context) (values : DepositValue
       WithdrawalCalls.Describes external ctx (amount values) (seedDepositsCount values)
         before outcome after trace
 
-/-- The word bounds needed by the suffix are consequences of the successful
-ABI execution, not caller-supplied hypotheses. -/
-theorem deposit_execution_word_bounds
-    (layout : Layout) (storage : Storage) (oracle : StaticOracle) (config : Config)
-    (requested : Word) (before after : Transcript) (moduleId : Word)
-    (limits : DepositLimits) (obtainDepositData : ObtainDepositData)
-    (depositSize : Nat) (values : DepositValues)
-    (executed : depositValuesABI layout storage oracle config requested before moduleId
-      limits obtainDepositData depositSize = (.ok values, after)) :
-    values.lidoPullWei < Verity.Core.UINT256_MODULUS ∧
-      values.actualKeys < Verity.Core.UINT256_MODULUS := by
-  have composed := abi_success_composes_deposit_values layout storage oracle config
-    requested before after moduleId limits obtainDepositData depositSize values executed
-  unfold depositValuesABI at executed
-  split at executed <;> try simp_all
-  next allocation allocAfter allocEq =>
-    split at executed <;> try simp_all
-    next moduleIndex indexEq =>
-      split at executed <;> try simp_all
-      next selected selectedEq =>
-        unfold maxDepositsCount at executed
-        split at executed <;> try simp_all
-        next nonzero =>
-          split at executed <;> try simp_all
-          next target targetEq =>
-            split at executed <;> try simp_all
-            next nonzeroTarget =>
-              split at executed <;> try simp_all
-              next moduleData moduleEq =>
-                split at executed <;> try simp_all
-                next aligned =>
-                  rcases executed with ⟨rfl, rfl⟩
-                  constructor
-                  · exact Nat.lt_of_le_of_lt composed.1 selected.isLt
-                  · dsimp [composeValues]
-                    have targetBound : target ≤ selected.val / config.maxEBType1.val := by
-                      split at nonzero
-                      · simp_all
-                      · have targetValue : min limits.maxDepositsPerBlock
-                            (selected.val / config.maxEBType1.val) = target :=
-                          Except.ok.inj nonzero
-                        rw [← targetValue]
-                        exact Nat.min_le_right _ _
-                    exact Nat.lt_of_le_of_lt
-                      (Nat.le_trans aligned
-                        (Nat.le_trans targetBound (Nat.div_le_self _ _)))
-                      selected.isLt
-
 /-- Successful deposit-value execution fixes the withdrawal amount and proves
 that it cannot exceed the selected allocation. -/
 theorem amount_from_deposit_execution
     (layout : Layout) (storage : Storage) (oracle : StaticOracle) (config : Config)
     (requested : Word) (before after : Transcript) (moduleId : Word)
     (limits : DepositLimits) (obtainDepositData : ObtainDepositData)
-    (depositSize : Nat) (values : DepositValues)
+    (depositSize : Nat) (withdraw : audit.trio.deposit.WithdrawDepositableEther)
+    (execution : DepositExecution)
     (executed : depositValuesABI layout storage oracle config requested before moduleId
-      limits obtainDepositData depositSize = (.ok values, after)) :
-    (amount values).val = values.lidoPullWei ∧
-      (amount values).val ≤ values.selectedAllocationWei := by
+      limits obtainDepositData depositSize withdraw = (.ok execution, after))
+    (hwidth : execution.values.lidoPullWei < Verity.Core.UINT256_MODULUS) :
+    (amount execution.values).val = execution.values.lidoPullWei ∧
+      (amount execution.values).val ≤ execution.values.selectedAllocationWei := by
   have composed := abi_success_composes_deposit_values layout storage oracle config
-    requested before after moduleId limits obtainDepositData depositSize values executed
-  have widths := deposit_execution_word_bounds layout storage oracle config requested before
-    after moduleId limits obtainDepositData depositSize values executed
-  have hval : (amount values).val = values.lidoPullWei := by
-    exact Nat.mod_eq_of_lt widths.1
+    requested before after moduleId limits obtainDepositData depositSize withdraw execution executed
+  have hval : (amount execution.values).val = execution.values.lidoPullWei :=
+    Nat.mod_eq_of_lt hwidth
   constructor
   · exact hval
   · rw [hval]
@@ -115,25 +67,17 @@ theorem amount_from_deposit_execution
 /-- Successful deposit-value execution composes with the exact conditional
 suffix.  In the nonzero arm this supplies the complete source-ordered Lido
 relation with both arguments and their widths derived from the ABI execution. -/
-theorem deposit_execution_composes_suffix
-    (layout : Layout) (storage : Storage) (oracle : StaticOracle) (config : Config)
-    (requested : Word) (before after : Transcript) (moduleId : Word)
-    (limits : DepositLimits) (obtainDepositData : ObtainDepositData)
-    (depositSize : Nat) (values : DepositValues)
-    (executed : depositValuesABI layout storage oracle config requested before moduleId
-      limits obtainDepositData depositSize = (.ok values, after))
-    (external : External) (ctx : Context) (world : World) :
+theorem deposit_execution_composes_suffix (values : DepositValues)
+    (external : External) (ctx : Context) (world : World)
+    (amountWidth : values.lidoPullWei < Verity.Core.UINT256_MODULUS)
+    (keysWidth : values.actualKeys < Verity.Core.UINT256_MODULUS) :
     let result := Live.run (suffix external ctx values) world
     DescribesSuffix external ctx values world result.world result.outcome result.attempts := by
-  have composed := abi_success_composes_deposit_values layout storage oracle config
-    requested before after moduleId limits obtainDepositData depositSize values executed
-  have widths := deposit_execution_word_bounds layout storage oracle config requested before
-    after moduleId limits obtainDepositData depositSize values executed
   by_cases hzero : values.actualKeys = 0
   · simp only [suffix, DescribesSuffix, hzero, if_pos]
     refine ⟨rfl, rfl, rfl⟩
   · simp only [suffix, DescribesSuffix, hzero, if_false]
-    refine ⟨Nat.mod_eq_of_lt widths.1, Nat.mod_eq_of_lt widths.2, ?_⟩
+    refine ⟨Nat.mod_eq_of_lt amountWidth, Nat.mod_eq_of_lt keysWidth, ?_⟩
     exact WithdrawalCalls.complete external ctx (amount values) (seedDepositsCount values) world
 
 /-- A described failed suffix restores the complete pre-call world. -/

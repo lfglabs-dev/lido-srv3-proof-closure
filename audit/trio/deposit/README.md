@@ -28,6 +28,14 @@ update, value-bearing router callback, and whole-world failure rollback.
 It accepts the documented trio limitations
 and does not claim compiler-memory, deployed-bytecode, or deployment identity.
 
+`RouterDeposit.lean` closes the remaining source-body gaps at the pinned lines:
+router authorization, active-module and credential guards; the timestamp/block
+writer and event before the zero-key return; exact 48/96-byte helper validation;
+the per-key deposit call and value transfer fixed to `DEPOSIT_SIZE = 32 ether`;
+root rollback on every modeled external failure; and the router-balance assert.
+The `maxEBType1 = DEPOSIT_SIZE` deployment identity remains deliberately
+separate: a mismatch reaches and fails the modeled Solidity assertion.
+
 Pinned constructor source admits arbitrary nonzero caller-supplied values. The
 checked `0xDEAD` / `64 ether` counterexample therefore keeps
 `A-DEPOSIT-CONTRACT` and `A-DEPOSIT-32-ETHER` explicit. No ALLOC-1, ALLOC-2,

@@ -13,6 +13,8 @@ open TrioAlloc1 TrioComposition
 abbrev Word := TrioAlloc1.Word
 abbrev Address := TrioAlloc1.Address
 def thirtyTwoEtherWei : Nat := 32 * 10 ^ 18
+/-- `BeaconChainDepositor.DEPOSIT_SIZE` at the pinned source line 24. -/
+def DEPOSIT_SIZE : Nat := thirtyTwoEtherWei
 def canonicalDepositContract : Address :=
   ⟨0x00000000219ab540356cBB839Cbe05303d7705Fa, by native_decide⟩
 
