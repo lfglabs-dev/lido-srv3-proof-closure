@@ -1,0 +1,1 @@
+{"name":"lido-ssz-state-reference","version":"0.0.0","private":true,"type":"module","dependencies":{"@chainsafe/ssz":"1.2.1","@chainsafe/persistent-merkle-tree":"1.2.0"}}
