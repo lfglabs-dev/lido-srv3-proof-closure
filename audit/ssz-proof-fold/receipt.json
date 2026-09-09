@@ -1,0 +1,84 @@
+{
+  "scope": "typed digest-carrying SSZ proof loop, independent Merkle branch/tree refinement, pinned index+uint64 header consumer; not full SSZ-1",
+  "base_head": "42210924cd58ff751d2472f5ea998383fed4be7f",
+  "source_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "files_sha256": {
+    "LidoSRv3/Audit/Source/SszProofFold.lean": "2e0c24c00c0fbae5cfe8dec50a459996b64988e839087bec1880034d65859b6d",
+    "LidoSRv3/Tests/SszProofFoldMutants.lean": "d07aa8151d67c241e78d24ea49dc58b16e4f8ca574ea50f9b9d804211753c6f1",
+    "LidoSRv3/Audit/Source/SszWrapperIndex.lean": "57833ae3afc8731c7b6a80862666194c1fa561db316952b3e5b4073013a6b045",
+    "LidoSRv3/Audit/Source/SszLittleEndianCorrespondence.lean": "354768f3a855422699513646e7ec7b06809f7be545fba623ad9659c331e4fdb8",
+    "lean-toolchain": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee",
+    "lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
+    "lakefile.lean": "8ea3781110b3234bdfcf2b2c87c5c064fa7d2aee018da57bcab100f8baf1ab87",
+    "foundry.toml": "adb4990ab31a2bb53f5eeb370e4f55d962f7bc1026bce01708497a56b262356c",
+    "solidity/test/SszProofFold.t.sol": "ea6d1808fa85d6274194344dd617c45b048577387674ed10248fafe4b67625c1",
+    "lido-core/contracts/common/lib/SSZ.sol": "91ef497b972bbee0fe89043034e6bd62fa0c1059f22874d4826bc6164a22009b",
+    "lido-core/contracts/common/lib/GIndex.sol": "2653bd4ba89c349f3db36f21a8afc6a24e0e233816d9b608f46d048feb601d1f",
+    "lido-core/contracts/common/lib/BLS.sol": "0187cc6a6b1aaa833317695d88795db431fa237452213e8c3872a0f444dceb7c",
+    "lido-core/contracts/0.8.25/CLValidatorVerifier.sol": "d6e89f6975e4fa02f758bf461a98ac2d689296b5c92d03ffd4e43a22d0b3d7ed",
+    "lido-core/scripts/upgrade/upgrade-params-mainnet.toml": "57f3ea6d6247f14ed4e7c581b7ee9094fe4589ba769530598e457aae09007151",
+    "audit/ssz-proof-fold/README.md": "dcacd0f99544ac31b3b15e6143d729026c69e4b8c63d1873cc4161b2cd3ff589",
+    "audit/ssz-proof-fold/check_source.py": "3077423f1c42603bdd58b1064e013088a3b17df6e0f5bfb32c40e12e1f6da622",
+    "audit/ssz-proof-fold/source-check.json": "b166fa7b332217e576019f30ba21a626e053a92c22575584773d4d241f2b4df7",
+    "audit/ssz-proof-fold/validation.log": "1bd6e7e3d2eb9cdff42f574896fdbe8877e8427004673e75deb0042b60178678",
+    "audit/ssz-proof-fold/solidity-validation.log": "7d6623883b5bb6cdc859e8d9ab979da64a1286345e01f69d618237f29b7924fd"
+  },
+  "lean": {
+    "command": "lake build LidoSRv3.Audit.Source.SszProofFold LidoSRv3.Tests.SszProofFoldMutants",
+    "exit": 0,
+    "jobs": 788,
+    "log": "validation.log",
+    "scope": "targeted new source/tests; unchanged accepted wrapper and endian dependencies reused after byte comparison; not full repository build",
+    "source_theorems": 17,
+    "kernel_regressions": 26,
+    "axioms": {
+      "verify_success_iff": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "verify_depth": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "tree_branch_authenticates": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "tree_verifies": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "pinned_header_path_index": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "pinned_encoded_header_verifies": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    }
+  },
+  "source_check": {
+    "command": "python3 audit/ssz-proof-fold/check_source.py",
+    "exit": 0,
+    "log": "source-check.json",
+    "scope": "three exact source-file git comparisons and 21 textual anchors only"
+  },
+  "solidity": {
+    "command": "forge test --match-path solidity/test/SszProofFold.t.sol --remappings contracts/=lido-core/contracts/ --fuzz-runs 1024 --fuzz-seed 0x20260909 --out /tmp/lido-ssz-fold-solidity-out --cache-path /tmp/lido-ssz-fold-solidity-cache -vv",
+    "exit": 0,
+    "solc": "0.8.25",
+    "tests_passed": 6,
+    "fuzz_properties": 3,
+    "fuzz_runs_each": 1024,
+    "log": "solidity-validation.log",
+    "scope": "integrator harness imports actual SSZ.verifyProof; independent high-level SHA original-index reference, typed ABI calldata, no forced SHA failure/short returndata/raw pointer wrap"
+  },
+  "independent_review": "pending exact committed-candidate review"
+}
