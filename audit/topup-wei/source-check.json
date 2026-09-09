@@ -1,0 +1,26 @@
+{
+  "source_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "checks": [
+    {
+      "file": "contracts/0.8.25/TopUpGateway.sol",
+      "sha256": "a7ffb654fb4d8d83ba14a6d9452663f786e9a21434be3ce9b7205c546526b7b4",
+      "anchors": 12
+    },
+    {
+      "file": "contracts/common/interfaces/ValidatorWitness.sol",
+      "sha256": "8fd24cfab7402233029756e52e59198b0d9cbf0a42e5c07d9fa2338ed731a5f7",
+      "anchors": 3
+    },
+    {
+      "file": "contracts/0.8.25/sr/SRTypes.sol",
+      "sha256": "22c28be7ceaf6ed841f18fc19296372ab246b1cfecc87902d49ee1670ed4aed6",
+      "anchors": 1
+    },
+    {
+      "file": "contracts/0.8.25/sr/StakingRouter.sol",
+      "sha256": "4d5b83fc73736db6755ebbb58811ed499c3e6de622cce11a3ad8548800a34155",
+      "anchors": 8
+    }
+  ],
+  "scope": "exact file comparison and textual anchors only"
+}
