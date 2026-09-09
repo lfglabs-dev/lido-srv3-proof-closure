@@ -1,0 +1,41 @@
+{
+  "candidate": "b0d10887313075ee3c19e0d6fe0b07eee10598c8",
+  "parent": "23728167b21c2b0768c9d59cabd4c1dfb55eb6c1",
+  "independent_review": {
+    "mission": "4ed7c2ad-eb06-46f1-86fd-4f6daa7516ed",
+    "backend": "grok",
+    "model": "grok-4.6",
+    "event_sequence": 4101,
+    "verdict": "CLEAN for scoped witness-batch increment only",
+    "fresh_build": false,
+    "report_transport": "Complete assistant transcript event retained; Markdown extracts report section and replaces literal backslash-n with actual newlines. No substantive edits."
+  },
+  "root_consumption": {
+    "full_report_read": true,
+    "source_and_receipt_checker": "PASS 123 validated inputs, 6 evidence files, 11 queries, 3 source-order files, 7 Solidity tests; file/pin comparison, no fresh build",
+    "reviewer_identity_note": "a582 in the request identifies workspace a582a491-be96-4ede-8d14-1fb7897f7622, not an expected Grok executable git revision. Report caveat is preserved; observed Grok 0.1.211 (2f2cd6d5c) is consistent with the requested version.",
+    "limits": "All eight full guarantees remain OPEN. Typed witness loop and router arithmetic only. Generic success premises are discharged only by canonical theorem. No full gateway ordering, module/funding execution, aggregate history, root provenance or compiler/EVM refinement."
+  },
+  "changed_files": {
+    "LidoSRv3/Audit/Source/TopupGatewayConfigWords.lean": "bf7a38e8981d368c60f8edee6595c1a5d43b73c414416eb46983f1da6dd39301",
+    "LidoSRv3/Audit/Source/TopupGatewayWitnessBatch.lean": "f7eac7edd92983bd4e81dbb96c1ea8f6bb5822efe84a4d3634062ddab50f8a89",
+    "LidoSRv3/Tests/TopupGatewayWitnessBatchMutants.lean": "689771fb07269b99b7c92fda4801c689e99e5ea3a95bd76335aab5ef8a4663ae",
+    "audit/topup-gateway-witness-batch/README.md": "bd8c6dda89e13875d618d186ad584ff31d2dc9375578d845138b2b336d068bc7",
+    "audit/topup-gateway-witness-batch/axioms.log": "28693d734ee49f7da4364b1786225c42b16794c134e6bd11c43abf3f1965f592",
+    "audit/topup-gateway-witness-batch/check.py": "a4cffc1d33aabdb84950cc09838b8e77d873546dada289acebb4e9d184ab3448",
+    "audit/topup-gateway-witness-batch/receipt.json": "c28186b02c89d0f3831b08114e3d8824b0f95375bbbaf194e3c21918b3859eae",
+    "audit/topup-gateway-witness-batch/solidity/README.md": "8c74af6f31c76dae043d3d13e77e5fe2eded57781660386a0a4e949f959b0f19",
+    "audit/topup-gateway-witness-batch/solidity/TopupGatewayWitnessBatch.t.sol": "feddd9ebdd11e9dc1d0eb0fdf4f3da59e5e059ad7c41aa022b9875af0a20dee5",
+    "audit/topup-gateway-witness-batch/solidity/receipt.json": "574d6521222d86653acce547434f03fc590c45510adab6775fe02b2870ed65b7",
+    "audit/topup-gateway-witness-batch/solidity/storage-layout.json": "6c917bd2c4f0054e19aaff69453703681e7c3597fea2766f2cb193127410325e",
+    "audit/topup-gateway-witness-batch/solidity/validation.log": "e4bcbbddef7dbf39abbd737b990275d10178b3635d77542d5f769d336869bab4",
+    "audit/topup-gateway-witness-batch/source-check.json": "6a83ba986a8ed4c709ad2d7df82b33b36c8a3bfbc760579005a9122f2b9a40c9",
+    "audit/topup-gateway-witness-batch/validated-inputs.sha256": "c2d50597e5ae44c96053e38c7d4ae3e8b163efb87eca916fe7eb31e545d17f90",
+    "audit/topup-gateway-witness-batch/validation.log": "d7878814bb2f6b5098e42e62a0d60585902526243c819025e1c3b7718e57623d"
+  },
+  "artifacts": {
+    "independent-review.md": "9fbb73848c158ec12e8ff02f9a00ad91a5de36e9216c65102da79b50096479e9",
+    "independent-review-event.json": "2bb2796599b77217b6b822218392693fcba53038c8811a6939689ee9571a0c80",
+    "solidity-independent-review.md": "b5384fc3407c7ebc301236fdce990bc1a49928f4d8a18a9e65f3b185325cf473"
+  }
+}

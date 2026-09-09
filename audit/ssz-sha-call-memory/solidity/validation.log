@@ -1,0 +1,12 @@
+Compiling 5 files with Solc 0.8.25
+Solc 0.8.25 finished in 651.78ms
+Compiler run successful!
+
+Ran 4 tests for audit/ssz-sha-call-memory/solidity/SszShaCallMemory.t.sol:SszShaCallMemoryTest
+[PASS] testFuzz_actualBlsSizeGuardAndSszResidualBytes(bytes32,bytes32,bytes32,bytes32,uint8) (runs: 1024, μ: 25850, ~: 21508)
+[PASS] testFuzz_actualIdentityOutputCopy(bytes32,bytes32,bytes32,bytes32,uint8) (runs: 1024, μ: 15677, ~: 11337)
+[PASS] test_failureFlagsUseDifferentSourceReverts() (gas: 11291)
+[PASS] test_unmodifiedRealShaOverlap() (gas: 8331)
+Suite result: ok. 4 passed; 0 failed; 0 skipped; finished in 56.89ms (91.99ms CPU time)
+
+Ran 1 test suite in 157.67ms (56.89ms CPU time): 4 tests passed, 0 failed, 0 skipped (4 total tests)

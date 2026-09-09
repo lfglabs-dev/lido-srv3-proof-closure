@@ -1,0 +1,92 @@
+{
+  "storage": [
+    {
+      "astId": 779,
+      "contract": "audit/topup-gateway-witness-batch/solidity/TopupGatewayWitnessBatch.t.sol:GatewayWitnessHarness",
+      "label": "layoutOnly",
+      "offset": 0,
+      "slot": "0",
+      "type": "t_struct(Storage)3358_storage"
+    }
+  ],
+  "types": {
+    "t_struct(Storage)3358_storage": {
+      "encoding": "inplace",
+      "label": "struct TopUpGateway.Storage",
+      "numberOfBytes": "64",
+      "members": [
+        {
+          "astId": 3345,
+          "contract": "audit/topup-gateway-witness-batch/solidity/TopupGatewayWitnessBatch.t.sol:GatewayWitnessHarness",
+          "label": "maxValidatorsPerTopUp",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_uint64"
+        },
+        {
+          "astId": 3347,
+          "contract": "audit/topup-gateway-witness-batch/solidity/TopupGatewayWitnessBatch.t.sol:GatewayWitnessHarness",
+          "label": "lastTopUpTimestamp",
+          "offset": 8,
+          "slot": "0",
+          "type": "t_uint32"
+        },
+        {
+          "astId": 3349,
+          "contract": "audit/topup-gateway-witness-batch/solidity/TopupGatewayWitnessBatch.t.sol:GatewayWitnessHarness",
+          "label": "lastTopUpBlock",
+          "offset": 12,
+          "slot": "0",
+          "type": "t_uint32"
+        },
+        {
+          "astId": 3351,
+          "contract": "audit/topup-gateway-witness-batch/solidity/TopupGatewayWitnessBatch.t.sol:GatewayWitnessHarness",
+          "label": "minBlockDistance",
+          "offset": 16,
+          "slot": "0",
+          "type": "t_uint16"
+        },
+        {
+          "astId": 3353,
+          "contract": "audit/topup-gateway-witness-batch/solidity/TopupGatewayWitnessBatch.t.sol:GatewayWitnessHarness",
+          "label": "maxRootAge",
+          "offset": 18,
+          "slot": "0",
+          "type": "t_uint16"
+        },
+        {
+          "astId": 3355,
+          "contract": "audit/topup-gateway-witness-batch/solidity/TopupGatewayWitnessBatch.t.sol:GatewayWitnessHarness",
+          "label": "targetBalanceGwei",
+          "offset": 20,
+          "slot": "0",
+          "type": "t_uint64"
+        },
+        {
+          "astId": 3357,
+          "contract": "audit/topup-gateway-witness-batch/solidity/TopupGatewayWitnessBatch.t.sol:GatewayWitnessHarness",
+          "label": "minTopUpGwei",
+          "offset": 0,
+          "slot": "1",
+          "type": "t_uint64"
+        }
+      ]
+    },
+    "t_uint16": {
+      "encoding": "inplace",
+      "label": "uint16",
+      "numberOfBytes": "2"
+    },
+    "t_uint32": {
+      "encoding": "inplace",
+      "label": "uint32",
+      "numberOfBytes": "4"
+    },
+    "t_uint64": {
+      "encoding": "inplace",
+      "label": "uint64",
+      "numberOfBytes": "8"
+    }
+  }
+}

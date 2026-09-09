@@ -1,0 +1,27 @@
+{
+  "scope": "Actual BLS/SSZ source under explicit mock address2 return/failure; actual identity4 generic output-copy; real SHA pair/pubkey case. Not standard-SHA short output or FFI correctness proof.",
+  "source_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "command": "FOUNDRY_SRC=audit/ssz-sha-call-memory/solidity FOUNDRY_TEST=audit/ssz-sha-call-memory/solidity forge test --remappings contracts/=lido-core/contracts/ --match-contract SszShaCallMemoryTest --fuzz-runs 1024 --fuzz-seed 0x20260909 --out /tmp/lido-ssz-sha-call-solidity-out --cache-path /tmp/lido-ssz-sha-call-solidity-cache -vv",
+  "exit_code": 0,
+  "compiler": {
+    "version": "0.8.25+commit.b61c2a91"
+  },
+  "forge": "forge Version: 1.5.0-v1.5.0\nCommit SHA: 1c57854462289b2e71ee7654cd6666217ed86ffd\nBuild Timestamp: 2025-11-24T06:07:42.598695000Z (1763964462)\nBuild Profile: maxperf",
+  "tests": 4,
+  "fuzz_properties": 2,
+  "fuzz_runs_each": 1024,
+  "fuzz_seed": "0x20260909",
+  "source_sha256": {
+    "audit/ssz-sha-call-memory/solidity/SszShaCallMemory.t.sol": "31f45929c6deae55cb49997f3a236af3735f439d4428da66d20924e2129e2658",
+    "lido-core/contracts/common/lib/BLS.sol": "0187cc6a6b1aaa833317695d88795db431fa237452213e8c3872a0f444dceb7c",
+    "lido-core/contracts/common/lib/BeaconTypes.sol": "9591e9af1a4fd398db86267f3589e763f9eb2016bf29e26cfa50988cf73a10c3",
+    "lido-core/contracts/common/lib/GIndex.sol": "2653bd4ba89c349f3db36f21a8afc6a24e0e233816d9b608f46d048feb601d1f",
+    "lido-core/contracts/common/lib/SSZ.sol": "91ef497b972bbee0fe89043034e6bd62fa0c1059f22874d4826bc6164a22009b",
+    "foundry.toml": "adb4990ab31a2bb53f5eeb370e4f55d962f7bc1026bce01708497a56b262356c"
+  },
+  "artifacts": {
+    "SszShaCallMemory.t.sol": "31f45929c6deae55cb49997f3a236af3735f439d4428da66d20924e2129e2658",
+    "README.md": "777898e886dc4c54315063ca3ba560fb2322422f23ad722f89e71d23abab6222",
+    "validation.log": "e34f3cd75381c94d3af1c096ad588f1a5ecd5e2b44f0fc24e7efe36f33d2deba"
+  }
+}

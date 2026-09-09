@@ -1,0 +1,50 @@
+{
+  "scope": "Byte identity plus textual operation/guard order at the source pin; not a semantic compiler proof",
+  "source_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "files": [
+    {
+      "path": "lido-core/contracts/common/lib/BLS.sol",
+      "sha256": "0187cc6a6b1aaa833317695d88795db431fa237452213e8c3872a0f444dceb7c",
+      "byte_equal_to_pin": true
+    },
+    {
+      "path": "lido-core/contracts/common/lib/SSZ.sol",
+      "sha256": "91ef497b972bbee0fe89043034e6bd62fa0c1059f22874d4826bc6164a22009b",
+      "byte_equal_to_pin": true
+    },
+    {
+      "path": "lido-core/contracts/common/lib/MemUtils.sol",
+      "sha256": "dc4f389cfd1ae1b4dd5fe908432159103544ece1ca9f694093f64def5db7acca",
+      "byte_equal_to_pin": true
+    },
+    {
+      "path": "lido-core/contracts/0.8.25/CLValidatorVerifier.sol",
+      "sha256": "d6e89f6975e4fa02f758bf461a98ac2d689296b5c92d03ffd4e43a22d0b3d7ed",
+      "byte_equal_to_pin": true
+    }
+  ],
+  "ordered_source_tokens": [
+    "if (pubkey.length != 48) revert InvalidPubkeyLength();",
+    "mstore(0x20, 0)",
+    "calldatacopy(0x00, pubkey.offset, 48)",
+    "staticcall(gas(), SHA256, 0x00, 0x40, 0x00, 0x20)",
+    "returndatasize()",
+    "_pubkeyRoot := mload(0x00)"
+  ],
+  "positions_in_helper_excerpt": [
+    97,
+    333,
+    428,
+    561,
+    649,
+    867
+  ],
+  "local_dependency_comparison_to_base": {
+    "LidoSRv3/Audit/Source/SszLittleEndianCorrespondence.lean": true,
+    "LidoSRv3/Audit/Source/SszProofFold.lean": true,
+    "LidoSRv3/Audit/Source/SszScratchByteArray.lean": true,
+    "LidoSRv3/Audit/Source/SszScratchEvmMemory.lean": true,
+    "LidoSRv3/Audit/Source/SszValidatorLeaf.lean": true,
+    "LidoSRv3/Audit/Source/SszWrapperIndex.lean": true
+  }
+}
