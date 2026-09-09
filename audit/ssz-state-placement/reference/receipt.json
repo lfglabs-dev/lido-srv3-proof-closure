@@ -11,9 +11,13 @@
     "npm install --prefix /tmp/lido-ssz-state-reference --ignore-scripts --no-audit --no-fund",
     "node /tmp/lido-ssz-state-reference/check.mjs > /tmp/lido-ssz-state-reference-check.log 2>&1",
     "python3 /tmp/lido-generate-state-solidity.py",
-    "forge test --root audit/ssz-state-placement/reference --match-contract SszStatePlacementReferenceTest -vv > /tmp/lido-ssz-state-reference-solidity.log 2>&1"
+    "forge test --root audit/ssz-state-placement/reference --match-contract SszStatePlacementReferenceTest -vv > /tmp/lido-ssz-state-reference-solidity.log 2>&1",
+    "cd /tmp/lido-ssz-state-reference-portable && npm install --ignore-scripts --no-audit --no-fund",
+    "cd /tmp/lido-ssz-state-reference-portable && npm ci --ignore-scripts --no-audit --no-fund > /tmp/lido-ssz-state-reference-portable-ci.log 2>&1 && node check.mjs > /tmp/lido-ssz-state-reference-portable-check.log 2>&1"
   ],
   "exit_codes": [
+    0,
+    0,
     0,
     0,
     0,
@@ -43,12 +47,13 @@
     "solc": "0.8.25"
   },
   "files_sha256": {
-    "README.md": "47ade9cf4f54bdfcedfc3fb684d5e4230dd00220fc30bbb04466f652c0144339",
+    "README.md": "94497238a882add33af3e90e0ce6fb14bdd7fcd055dd4b6902707da5776193d2",
     "SszStatePlacement.t.sol": "dd3323b365bbb343798ddc6f517800a1f389f613a8d76f9fabb30bd378ce8fab",
     "check.mjs": "bd32f5bfc4e871068b6523721f7fa52fd4244f10b12a7aaef4f3154fa1de9fdd",
     "foundry.toml": "696223c2740dd8384acf83daff43bfda5af29c58bd2711c9546e2731e118e950",
     "generate_solidity.py": "bc19003329207239526a086a1f8e7d22acb9810455f33e3af5a5f11d348a301e",
-    "package-lock.json": "a93d0cf4e98e7f46f5f6fa8550185d6e39b1de1e66e97d2e58f6d0747aa16fce",
+    "npm-ci.log": "404a94e84225d4f1951081c77d06b2fad5945e1d29062000241cc521964ded54",
+    "package-lock.json": "e03fed99f0b7b2da3afc1dc3c451c0845cf0ff6b15386525e1b8e105e1cf6d0d",
     "package.json": "6f1a83b4eb4abf2d2cbefbe6682fb38c6a5ad0ff0f5eefd757cce04a880e59c0",
     "result.json": "ee1e9fdeb6c3e4c9b20d631a21bf0dc4658d7f2214fba30ba7a49ce32d9e00c6",
     "schemas.json": "2efc41c9e7a9aa6ae8233cee5b127d1a06426ad1ba000188d995dda4417851c9",
@@ -63,5 +68,14 @@
     "lido-core/contracts/common/lib/SSZ.sol": "91ef497b972bbee0fe89043034e6bd62fa0c1059f22874d4826bc6164a22009b",
     "lido-core/contracts/common/lib/BLS.sol": "0187cc6a6b1aaa833317695d88795db431fa237452213e8c3872a0f444dceb7c",
     "lido-core/contracts/common/interfaces/ValidatorWitness.sol": "8fd24cfab7402233029756e52e59198b0d9cbf0a42e5c07d9fa2338ed731a5f7"
+  },
+  "portability_fix": {
+    "rejected_candidate": "79868705d707985a921daadf0a772545726e8ef5",
+    "finding": "npm --prefix lock recorded temporary package paths; npm ci could not reproduce it",
+    "fixed": "normal install in fresh cwd followed by successful npm ci and Node replay",
+    "all_package_versions_and_integrities_unchanged": true,
+    "check_schema_vectors_and_results_byte_identical": true,
+    "no_lean_changes": true,
+    "unchanged_solidity_harness_and_fixtures_reuse_previous_run": true
   }
 }

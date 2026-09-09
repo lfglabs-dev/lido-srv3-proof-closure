@@ -151,10 +151,11 @@ validators are synthetic. This reference proves no deployed state, authenticated
 anchor, gas guarantee or forced SHA-failure behavior.
 
 `reference/receipt.json` records the actual commands, versions, logs, input hashes
-and reproduction instructions; its 12 artifact hashes and six source hashes were
+and reproduction instructions; its 13 artifact hashes and six source hashes were
 checked before integration. The outer receipt additionally hashes that receipt
-and all reference artifacts. These checks reuse the integrator's exact successful
-logs; no redundant Forge run or new reference execution is claimed by this worker.
+and all reference artifacts. The integrator repaired the npm lock after independent review and reran a clean
+npm ci and the unchanged reference; every version/integrity and output is retained.
+These checks use the exact successful logs; no redundant Forge run or new reference execution is claimed by this worker.
 `check_source.py` separately verifies bundled schema identities, field extraction,
 length/capacity rules, six complete Lido pinned source/config files and the packed
 configuration arithmetic. It is a source comparison aid, not semantic/EVM proof.

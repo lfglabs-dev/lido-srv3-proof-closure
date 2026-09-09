@@ -24,7 +24,7 @@
     "lido-core/contracts/common/interfaces/ValidatorWitness.sol": "8fd24cfab7402233029756e52e59198b0d9cbf0a42e5c07d9fa2338ed731a5f7",
     "lido-core/scripts/upgrade/upgrade-params-mainnet.toml": "57f3ea6d6247f14ed4e7c581b7ee9094fe4589ba769530598e457aae09007151",
     "lido-core/yarn.lock": "d17f979eed36218b0bed85cf560bdc2e5d182e0c67aff6eabf2c68be8597c921",
-    "audit/ssz-state-placement/README.md": "9bc080a0bc3b44be32da1a345ad6bceaddbbee7c6161ffbfb6afee93d549b2e1",
+    "audit/ssz-state-placement/README.md": "d1cb0aad5ab63a539511dadf6717a4b6e93f3483453ae1af2ece430acc052cc6",
     "audit/ssz-state-placement/check_source.py": "c30cf0554e7700ece162f7a3e8312bb1b99bee9432d4be17b281781603344d2d",
     "audit/ssz-state-placement/schema-sources.json": "d94068a5f3df82d2fb60935b67fd59bd42c44f86b32fd54104bc5d48b6e59293",
     "audit/ssz-state-placement/source-check.json": "6fe90b4cd85119d867889146abdef569bab034663c8b6f173f58a0342bbd1bd2",
@@ -35,19 +35,20 @@
     "audit/ssz-state-placement/consensus-specs/ssz/simple-serialize.md": "66f7119747f30e23be2a74dc77d19fa07251742955ce4de9daf764b2b4401a2e",
     "audit/ssz-state-placement/consensus-specs/ssz/merkle-proofs.md": "ea67a158e28f5115cf985266efdb78f82277d1ab73efab4657313d63ffb03f7f",
     "audit/ssz-state-placement/consensus-specs/LICENSE": "36ffd9dc085d529a7e60e1276d73ae5a030b020313e6c5408593a6ae2af39673",
-    "audit/ssz-state-placement/reference/README.md": "47ade9cf4f54bdfcedfc3fb684d5e4230dd00220fc30bbb04466f652c0144339",
+    "audit/ssz-state-placement/reference/README.md": "94497238a882add33af3e90e0ce6fb14bdd7fcd055dd4b6902707da5776193d2",
     "audit/ssz-state-placement/reference/SszStatePlacement.t.sol": "dd3323b365bbb343798ddc6f517800a1f389f613a8d76f9fabb30bd378ce8fab",
     "audit/ssz-state-placement/reference/check.mjs": "bd32f5bfc4e871068b6523721f7fa52fd4244f10b12a7aaef4f3154fa1de9fdd",
     "audit/ssz-state-placement/reference/foundry.toml": "696223c2740dd8384acf83daff43bfda5af29c58bd2711c9546e2731e118e950",
     "audit/ssz-state-placement/reference/generate_solidity.py": "bc19003329207239526a086a1f8e7d22acb9810455f33e3af5a5f11d348a301e",
-    "audit/ssz-state-placement/reference/package-lock.json": "a93d0cf4e98e7f46f5f6fa8550185d6e39b1de1e66e97d2e58f6d0747aa16fce",
+    "audit/ssz-state-placement/reference/package-lock.json": "e03fed99f0b7b2da3afc1dc3c451c0845cf0ff6b15386525e1b8e105e1cf6d0d",
     "audit/ssz-state-placement/reference/package.json": "6f1a83b4eb4abf2d2cbefbe6682fb38c6a5ad0ff0f5eefd757cce04a880e59c0",
     "audit/ssz-state-placement/reference/result.json": "ee1e9fdeb6c3e4c9b20d631a21bf0dc4658d7f2214fba30ba7a49ce32d9e00c6",
     "audit/ssz-state-placement/reference/schemas.json": "2efc41c9e7a9aa6ae8233cee5b127d1a06426ad1ba000188d995dda4417851c9",
     "audit/ssz-state-placement/reference/solidity-validation.log": "c2165a7e18a88ba1e1826ccfc925b52f6db8d70e9d0402c39f6b854f37ec6c70",
     "audit/ssz-state-placement/reference/validation.log": "ee1e9fdeb6c3e4c9b20d631a21bf0dc4658d7f2214fba30ba7a49ce32d9e00c6",
     "audit/ssz-state-placement/reference/vectors.json": "e60ad4f8ab9fda80ef26cffd68c25bcd6550c25213234a0efc25f0bada813c02",
-    "audit/ssz-state-placement/reference/receipt.json": "52e0ed0a50f899690f53bebe13e3257200da120eb07f8e6a9b8be69b84bf4d6a"
+    "audit/ssz-state-placement/reference/receipt.json": "b6cd2f5532b48b148501eb7811f0091dbd4bc8ebc4a6423ff7c295bd4a32704b",
+    "audit/ssz-state-placement/reference/npm-ci.log": "404a94e84225d4f1951081c77d06b2fad5945e1d29062000241cc521964ded54"
   },
   "lean": {
     "command": "lake build LidoSRv3.Audit.Source.SszPerfectTree LidoSRv3.Audit.Source.SszStatePlacement LidoSRv3.Tests.SszStatePlacementMutants",
@@ -121,7 +122,7 @@
   "independent_reference": {
     "receipt": "reference/receipt.json",
     "author": "integrator",
-    "verified_artifact_hashes": 12,
+    "verified_artifact_hashes": 13,
     "verified_pinned_source_hashes": 6,
     "reference_schema_field_lists_match_bundled_commit": true,
     "results": {
@@ -147,7 +148,8 @@
       "rejected_padding_mutants": 6,
       "solc": "0.8.25"
     },
-    "scope": "Existing exact successful Node/Forge logs and frozen artifacts verified; worker did not rerun reference or Forge"
+    "scope": "Existing exact successful Node/Forge logs and frozen artifacts verified; worker did not rerun reference or Forge",
+    "portability_fix": "Root repaired temporary package paths after independent review; fresh npm ci and unchanged Node checks passed with identical package versions/integrities and vectors/results. No Lean or Solidity source changed."
   },
   "remaining_boundaries": [
     "other named state-field roots opaque, nested field encodings and consensus consistency/reachability open",
