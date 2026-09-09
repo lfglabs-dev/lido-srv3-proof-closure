@@ -1,0 +1,14 @@
+Compiling 8 files with Solc 0.8.25
+Solc 0.8.25 finished in 1.36s
+Compiler run successful!
+
+Ran 6 tests for solidity/test/SszValidatorLeaf.t.sol:SszValidatorLeafTest
+[PASS] testFuzz_allWitnessFields(bytes32,bytes16,bytes32,uint64,uint64,uint64,uint64,uint64,bool) (runs: 1024, μ: 27606, ~: 27592)
+[PASS] testFuzz_badPubkeyLength(uint8) (runs: 1024, μ: 7770, ~: 7734)
+[PASS] testFuzz_pubkeyPadding(bytes32,bytes16) (runs: 1024, μ: 6691, ~: 6691)
+[PASS] test_allIntegerBoundariesAndBothBooleans() (gas: 93631)
+[PASS] test_fieldOrderAndCredentialMutants() (gas: 74037)
+[PASS] test_paddingAndProofIndependence() (gas: 20101)
+Suite result: ok. 6 passed; 0 failed; 0 skipped; finished in 64.07ms (95.74ms CPU time)
+
+Ran 1 test suite in 145.48ms (64.07ms CPU time): 6 tests passed, 0 failed, 0 skipped (6 total tests)

@@ -1,0 +1,10 @@
+ℹ [789/789] Replayed LidoSRv3.Tests.SszValidatorLeafMutants
+info: LidoSRv3/Tests/SszValidatorLeafMutants.lean:84:0: 'LidoSRv3.Audit.Source.SszValidatorLeaf.source_pubkey_padding' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/SszValidatorLeafMutants.lean:85:0: 'LidoSRv3.Audit.Source.SszValidatorLeaf.checked_sha_success_iff' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/SszValidatorLeafMutants.lean:86:0: 'LidoSRv3.Audit.Source.SszValidatorLeaf.leaf_success_length' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszValidatorLeafMutants.lean:87:0: 'LidoSRv3.Audit.Source.SszValidatorLeaf.source_slashed_chunk' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszValidatorLeafMutants.lean:88:0: 'LidoSRv3.Audit.Source.SszValidatorLeaf.source_leaf_eq_tree' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszValidatorLeafMutants.lean:89:0: 'LidoSRv3.Audit.Source.SszValidatorLeaf.validator_header_consumer' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+Build completed successfully (789 jobs).
