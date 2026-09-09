@@ -1,0 +1,9 @@
+# Real SSZ helper: complete loop differential checks
+
+`SszProofCalldataLoopTest` imports the unchanged prior calldata harness, which calls the pinned core SSZ/GIndex code. There are no SHA mocks, overrides, or copied replacements of the helper. The harness includes a preceding dynamic bytes argument and captures actual proof.offset, scratch words 0/32, and the free-memory pointer at word64.
+
+The independent reference constructs every node of a complete binary heap using real SHA and then extracts a selected path. Its root is not calculated by folding only that selected proof. One fuzz property covers depths 1 through 8, random leaves, positions, metadata and prefix lengths (1024 runs). A deterministic case visits all 256 positions of an eight-level tree with metadata paired to position; this is not a Cartesian product. Maximum-depth tests use recursively computed uniform subtree roots and 247 siblings at both extreme decoded indices, plus an extra 248th sibling. Uniform roots test extent/depth; the mixed heaps distinguish ordering.
+
+Late tests exercise missing siblings before root mismatch, extra siblings before root mismatch, wrong roots and mutated final siblings. Empty proof wins over an invalid decoded index. A Solidity staticcall with only 2000 gas fails, but this does not identify the exact failing instruction or validate the Lean CALL-only budget as a whole-transaction gas bound. Reported test gas includes reference-tree construction and is not a deployment gas estimate. Scratch and word64 observations are concrete test assertions, not a universal frame proof.
+
+Five tests passed using solc 0.8.25, the existing optimizer/viaIR/Cancun settings, and real SHA. The imported old harness's own test contract was compiled but was not selected for execution. `receipt.json` records the exact command, five compiler source identities plus foundry.toml, compiler metadata and log hashes.
