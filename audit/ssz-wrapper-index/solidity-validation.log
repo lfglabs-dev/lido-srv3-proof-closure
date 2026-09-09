@@ -1,0 +1,16 @@
+Compiling 8 files with Solc 0.8.25
+Solc 0.8.25 finished in 1.23s
+Compiler run successful!
+
+Ran 8 tests for solidity/test/SszWrapperIndex.t.sol:SszWrapperIndexTest
+[PASS] testFuzz_distinctForkBoundary(uint40) (runs: 1024, μ: 8964, ~: 8964)
+[PASS] testFuzz_genericPathAppend(uint248,uint248,uint8,uint8,uint8) (runs: 1024, μ: 7630, ~: 7645)
+[PASS] testFuzz_lastBitAgainstDivision(uint256) (runs: 1024, μ: 14672, ~: 10668)
+[PASS] testFuzz_pinnedHeaderIndex(uint40,uint64) (runs: 1024, μ: 12449, ~: 12452)
+[PASS] testFuzz_slotSiblingPosition(uint64,uint64) (runs: 1024, μ: 20859, ~: 20859)
+[PASS] test_lastBitBoundariesAndZeroIndices() (gas: 225863)
+[PASS] test_outOfRangeOffsets() (gas: 8801)
+[PASS] test_shortSlotProofPanics() (gas: 9989)
+Suite result: ok. 8 passed; 0 failed; 0 skipped; finished in 69.63ms (216.85ms CPU time)
+
+Ran 1 test suite in 171.50ms (69.63ms CPU time): 8 tests passed, 0 failed, 0 skipped (8 total tests)
