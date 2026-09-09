@@ -4,8 +4,9 @@ import Std
 Independent P-ADDRESS-1 source model for the four pinned entrypoints. Errors
 are distinct and guards retain source order. Withdrawal request word 1 follows
 `WithdrawalQueueBase.WithdrawalRequest`: address owner in bits 0..159,
-timestamp in 160..199, claimed at bit 200, seven padding bits, and report
-timestamp in 208..247. No earlier address model is imported.
+timestamp in 160..199, claimed byte in bits 200..207, and report timestamp
+in 208..247. The claimed field is a full storage byte matching
+`AddressClaimBatchTx.requestClaimed`. No earlier address model is imported.
 -/
 
 namespace AccountAddress.PAddress1
@@ -13,14 +14,21 @@ namespace AccountAddress.PAddress1
 def two160 : Nat := 2 ^ 160
 def two200 : Nat := 2 ^ 200
 def two201 : Nat := 2 ^ 201
+def two208 : Nat := 2 ^ 208
+def two248 : Nat := 2 ^ 248
+def two256 : Nat := 2 ^ 256
 
 instance : NeZero two160 := ⟨by simp [two160]⟩
 
 /-- Solidity `address`: exactly the values representable in 160 bits. -/
 abbrev Address := Fin two160
+abbrev StorageWord := Fin two256
 
 def addressPart (word : Nat) : Nat := word % two160
-def claimedPart (word : Nat) : Bool := (word / two200) % 2 = 1
+def claimedPart (word : Nat) : Bool := (word / two200) % 256 != 0
+def timestampPart (word : Nat) : Nat := (word / two160) % (2 ^ 40)
+def reportTimestampPart (word : Nat) : Nat := (word / two208) % (2 ^ 40)
+def unusedHighPart (word : Nat) : Nat := word / two248
 
 /-- ABI-facing conversion rejects integers which are not Solidity addresses. -/
 def addressOfNat? (value : Nat) : Option Address :=
@@ -37,10 +45,16 @@ def writeOwner (word : Nat) (owner : Address) : Nat :=
 def writeOwnerChecked (word owner : Nat) : Option Nat :=
   (addressOfNat? owner).map (writeOwner word)
 
-/-- Packed assignment `request.claimed = true`; all fields other than bit 200
-stay unchanged. -/
+/-- Packed assignment `request.claimed = true`; writes bit 200 only, setting
+the claimed byte to non-zero. All other fields stay unchanged. -/
 def setClaimed (word : Nat) : Nat :=
   (word / two201) * two201 + two200 + word % two200
+
+def writeOwnerStorage (word : StorageWord) (owner : Address) : StorageWord :=
+  ⟨writeOwner word.val owner % two256, Nat.mod_lt _ (by simp [two256])⟩
+
+def setClaimedStorage (word : StorageWord) : StorageWord :=
+  ⟨setClaimed word.val % two256, Nat.mod_lt _ (by simp [two256])⟩
 
 inductive Error where
   | transferToZeroAddress
@@ -111,8 +125,6 @@ def transferFrom (i : TransferInput) (before : TransferState) :
 def minWithdrawalAmount : Nat := 100
 def maxWithdrawalAmount : Nat := 1000 * 10 ^ 18
 def two128 : Nat := 2 ^ 128
-def two256 : Nat := 2 ^ 256
-
 structure RequestState where
   lastRequestId : Nat
   cumulativeStETH : Nat
@@ -277,6 +289,36 @@ theorem upper_writeOwner (word : Nat) (owner : Address) :
   simp only [writeOwner, two160]
   omega
 
+theorem writeOwner_lt_two256 (word : StorageWord) (owner : Address) :
+    writeOwner word.val owner < two256 := by
+  have hw := word.isLt
+  have ho := owner.isLt
+  change word.val < 115792089237316195423570985008687907853269984665640564039457584007913129639936 at hw
+  change owner.val < 1461501637330902918203684832716283019655932542976 at ho
+  simp only [writeOwner, two160, two256]
+  omega
+
+theorem setClaimed_lt_two256 (word : StorageWord) :
+    setClaimed word.val < two256 := by
+  have hw := word.isLt
+  change word.val < 115792089237316195423570985008687907853269984665640564039457584007913129639936 at hw
+  simp only [setClaimed, two200, two201, two256]
+  omega
+
+theorem writeOwnerStorage_exact (word : StorageWord) (owner : Address) :
+    (writeOwnerStorage word owner).val = writeOwner word.val owner := by
+  simp [writeOwnerStorage, Nat.mod_eq_of_lt (writeOwner_lt_two256 word owner)]
+
+theorem setClaimedStorage_exact (word : StorageWord) :
+    (setClaimedStorage word).val = setClaimed word.val := by
+  simp [setClaimedStorage, Nat.mod_eq_of_lt (setClaimed_lt_two256 word)]
+
+theorem writeOwnerStorage_preserves_packed_tail (word : StorageWord)
+    (owner : Address) :
+    (writeOwnerStorage word owner).val / two160 = word.val / two160 := by
+  rw [writeOwnerStorage_exact]
+  exact upper_writeOwner word.val owner
+
 theorem writeOwnerChecked_rejects_out_of_range (word owner : Nat)
     (h : two160 ≤ owner) : writeOwnerChecked word owner = none := by
   simp [writeOwnerChecked, addressOfNat?, Nat.not_lt.mpr h]
@@ -285,5 +327,27 @@ theorem setClaimed_preserves_owner (word : Nat) :
     addressPart (setClaimed word) = addressPart word := by
   unfold addressPart setClaimed two160 two200 two201
   omega
+
+theorem setClaimed_preserves_above201 (word : Nat) :
+    setClaimed word / two201 = word / two201 := by
+  simp only [setClaimed, two200, two201]
+  omega
+
+/-- The two equalities preserve every bit below 200 and above 200,
+respectively; together with the middle equality they state that bit 200 is
+the only bit changed by the physical claimed-byte assignment, making the
+full 200..207 byte non-zero as `AddressClaimBatchTx.requestClaimed` reads. -/
+theorem setClaimedStorage_sets_only_claimed (word : StorageWord) :
+    (setClaimedStorage word).val % two200 = word.val % two200 ∧
+    claimedPart (setClaimedStorage word).val = true ∧
+    (setClaimedStorage word).val / two201 = word.val / two201 := by
+  rw [setClaimedStorage_exact]
+  constructor
+  · simp only [setClaimed, two200, two201]
+    omega
+  constructor
+  · simp only [claimedPart, setClaimed, two200, two201, bne_iff_ne, ne_eq]
+    omega
+  · exact setClaimed_preserves_above201 word.val
 
 end AccountAddress.PAddress1

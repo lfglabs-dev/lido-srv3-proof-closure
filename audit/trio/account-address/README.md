@@ -27,9 +27,9 @@ These are supplementary slices, not replacements for the registered parents.
 ACCOUNT models balance writes, not the complete oracle report or subsequent
 fee calculation. Registered IDs and module-word correspondence are supplied;
 the list model needs distinct IDs to describe distinct physical records.
-Packed words are natural numbers; matching physical storage also needs the
-uint256 bounds and slot relation. Rollback is defined in this isolated model,
-not derived from executing EVM calls.
+ACCOUNT packed words remain natural numbers; matching its physical storage
+still needs uint256 bounds and a slot relation. Rollback is defined in this
+isolated model, not derived from executing EVM calls.
 
 ADDRESS supplies approval, set-operation, transfer and quote results. It does
 not compute them from deployed contracts or prove general account-renaming
@@ -41,4 +41,12 @@ strictly increasing ID from every successful execution, without an input-width
 premise. This is auxiliary-model evidence, not physical-storage or EVM
 correspondence. Exact ABI error bytes, arbitrary callbacks, events, enumerable
 sets and the full batch storage relation remain outside these slices. The
+ADDRESS now also has a physical `Fin (2^256)` storage-word layer for its packed
+withdrawal-request word. Owner and claimed assignments are proved not to wrap;
+the owner write preserves the complete upper 96-bit tail, while the claimed
+write preserves every bit below and above bit 200. The claimed field is a full
+storage byte (bits 200..207) matching `AddressClaimBatchTx.requestClaimed`.
+Concrete words exercise the timestamp, report-timestamp, and unused-high-bit
+regions. Slot-key
+derivation and execution-to-storage refinement remain outside the slice. These
 packing lemmas are useful independently of those execution boundaries.

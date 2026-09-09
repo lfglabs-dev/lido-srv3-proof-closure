@@ -25,6 +25,20 @@ example : writeOwnerChecked transferBefore.requestWord two160 = none := by
 example : writeOwnerChecked transferBefore.requestWord (two160 + 7) = none := by
   decide
 
+def physicalWord : StorageWord :=
+  ⟨13 * two248 + 19 * two208 + 85 * two201 + two200 + 23 * two160 + 3, by decide⟩
+
+example : (writeOwnerStorage physicalWord 5).val =
+    13 * two248 + 19 * two208 + 85 * two201 + two200 + 23 * two160 + 5 := by
+  decide
+
+def unclaimedPhysicalWord : StorageWord :=
+  ⟨13 * two248 + 19 * two208 + 23 * two160 + 3, by decide⟩
+
+example : (setClaimedStorage unclaimedPhysicalWord).val =
+    13 * two248 + 19 * two208 + two200 + 23 * two160 + 3 := by
+  decide
+
 /-- Model-only boundaries for the checked enqueue increment. -/
 def requestInput : RequestInput :=
   { caller := 3, owner := 0, amount := 100, shares := 100,
@@ -56,7 +70,7 @@ example : requestWithdrawal { requestInput with resumed := false }
 
 
 def claimBefore : ClaimState :=
-  { lastFinalizedRequestId := 10, requestWord := 23 * two201 + 3
+  { lastFinalizedRequestId := 10, requestWord := 23 * two208 + 3
     lockedEther := 100, ownerSetRemoveSucceeds := true }
 
 def claimInput : ClaimInput :=
