@@ -35,7 +35,10 @@ ADDRESS supplies approval, set-operation, transfer and quote results. It does
 not compute them from deployed contracts or prove general account-renaming
 symmetry. Requests and claims cover one item only. The unsupported empty or
 multi-item claim result is model-specific, not Solidity behavior. Assertion
-failures and some callee errors are grouped; exact ABI error bytes, uint256
-request-ID increment bounds, arbitrary callbacks, events, enumerable sets and
-the full batch storage relation remain outside these slices. The packing
-lemmas are useful independently of those execution boundaries.
+failures and some callee errors are grouped. The request model now checks the
+uint256 request-ID increment in source order and derives a representable,
+strictly increasing ID from every successful execution, without an input-width
+premise. This is auxiliary-model evidence, not physical-storage or EVM
+correspondence. Exact ABI error bytes, arbitrary callbacks, events, enumerable
+sets and the full batch storage relation remain outside these slices. The
+packing lemmas are useful independently of those execution boundaries.

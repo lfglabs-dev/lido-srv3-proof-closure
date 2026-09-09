@@ -25,6 +25,36 @@ example : writeOwnerChecked transferBefore.requestWord two160 = none := by
 example : writeOwnerChecked transferBefore.requestWord (two160 + 7) = none := by
   decide
 
+/-- Model-only boundaries for the checked enqueue increment. -/
+def requestInput : RequestInput :=
+  { caller := 3, owner := 0, amount := 100, shares := 100,
+    timestamp := 7, reportTimestamp := 6, resumed := true,
+    transferFromSucceeds := true, ownerSetAddSucceeds := true }
+
+def requestBefore : RequestState :=
+  { lastRequestId := two256 - 2, cumulativeStETH := 0, cumulativeShares := 0 }
+
+example : requestWithdrawal requestInput requestBefore =
+    .committed ⟨two256 - 1, 100, 100⟩ ⟨two256 - 1, 100, 100, 3, 7, 6⟩ := by decide
+
+example : requestWithdrawal requestInput { requestBefore with lastRequestId := two256 - 1 } =
+    .reverted .queueArithmeticOverflow { requestBefore with lastRequestId := two256 - 1 } := by decide
+
+/-- Invalid untyped model states also cannot commit an out-of-word ID. -/
+example : requestWithdrawal requestInput { requestBefore with lastRequestId := two256 } =
+    .reverted .queueArithmeticOverflow { requestBefore with lastRequestId := two256 } := by decide
+
+/-- Token-transfer failure is observed before enqueue arithmetic, as in the
+public request path; the new guard must not reorder it. -/
+example : requestWithdrawal { requestInput with transferFromSucceeds := false }
+    { requestBefore with lastRequestId := two256 - 1 } =
+    .reverted .tokenTransferFailed { requestBefore with lastRequestId := two256 - 1 } := by decide
+
+example : requestWithdrawal { requestInput with resumed := false }
+    { requestBefore with lastRequestId := two256 - 1 } =
+    .reverted .queuePaused { requestBefore with lastRequestId := two256 - 1 } := by decide
+
+
 def claimBefore : ClaimState :=
   { lastFinalizedRequestId := 10, requestWord := 23 * two201 + 3
     lockedEther := 100, ownerSetRemoveSucceeds := true }
