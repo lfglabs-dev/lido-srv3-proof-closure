@@ -1,0 +1,17 @@
+'LidoSRv3.Audit.Source.TopupGatewayWitnessBatch.checkLengths_iff' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TopupGatewayWitnessBatch.epoch_cast_exact' depends on axioms: [propext]
+'LidoSRv3.Audit.Source.TopupGatewayWitnessBatch.evaluate_headroom' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TopupGatewayWitnessBatch.loop_run' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Source.TopupGatewayWitnessBatch.canonical_row_entry' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TopupGatewayWitnessBatch.canonical_batch' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.TopupGatewayWitnessBatch.loop_spec' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TopupGatewayWitnessBatch.router_checked_from_loop' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TopupGatewayWitnessBatch.router_keys_exact' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TopupGatewayWitnessBatch.wei_word_values' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.TopupGatewayConfigWords.decode_packed' depends on axioms: [propext, Quot.sound]
