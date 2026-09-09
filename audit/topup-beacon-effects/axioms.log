@@ -1,0 +1,8 @@
+LidoSRv3.Audit.Source.TopupBeaconCallee.insert_selection : [propext, Quot.sound]
+LidoSRv3.Audit.Source.TopupBeaconCallee.dispatch_balances : [propext]
+LidoSRv3.Audit.Source.TopupBeaconCallee.reconstructed_source : [propext, Quot.sound]
+LidoSRv3.Audit.Source.TopupBeaconCallee.source_deposit_success : [propext, Classical.choice, Quot.sound]
+LidoSRv3.Audit.Source.TopupBeaconEffects.sourcePayload_eq : [propext, Classical.choice, Quot.sound]
+LidoSRv3.Audit.Source.TopupBeaconEffects.decode_sourcePayload : [propext, Classical.choice, Quot.sound]
+LidoSRv3.Audit.Source.TopupBeaconEffects.source_push_success : [propext, Classical.choice, Quot.sound]
+LidoSRv3.Audit.Source.TopupBeaconEffects.failure_restores : [propext]

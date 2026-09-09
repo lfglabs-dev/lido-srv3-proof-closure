@@ -1,0 +1,15 @@
+Reproduction command: forge test --root audit/topup-beacon-effects/solidity --fuzz-runs 1024 -vv
+Runner: root agent, actual unmodified pinned solc0.6.11 callee
+
+Compiling 1 files with Solc 0.6.11
+Solc 0.6.11 finished in 618.11ms
+Compiler run successful!
+
+Ran 4 tests for TopupBeaconEffects.t.sol:TopupBeaconEffectsTest
+[PASS] testFuzz_valueCountBranchAndEvent(uint32,uint64,bytes32,bytes32,uint128) (runs: 1024, μ: 277871, ~: 274058)
+[PASS] test_allCarryHeightsAndAmountEdges() (gas: 11265156)
+[PASS] test_guardOrderAndRejectionRestore() (gas: 112583)
+[PASS] test_lateFailureRevertsPriorCalleeEffects() (gas: 214387)
+Suite result: ok. 4 passed; 0 failed; 0 skipped; finished in 398.42ms (418.92ms CPU time)
+
+Ran 1 test suite in 402.35ms (398.42ms CPU time): 4 tests passed, 0 failed, 0 skipped (4 total tests)
