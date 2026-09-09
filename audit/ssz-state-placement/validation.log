@@ -1,0 +1,16 @@
+✔ [791/792] Built LidoSRv3.Audit.Source.SszStatePlacement (3.9s)
+ℹ [792/792] Built LidoSRv3.Tests.SszStatePlacementMutants (1.8s)
+info: LidoSRv3/Tests/SszStatePlacementMutants.lean:114:0: 'LidoSRv3.Audit.Source.SszPerfectTree.perfect_digest_ordered' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/SszStatePlacementMutants.lean:115:0: 'LidoSRv3.Audit.Source.SszPerfectTree.chunks_padding' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/SszStatePlacementMutants.lean:116:0: 'LidoSRv3.Audit.Source.SszPerfectTree.perfect_subtree' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/SszStatePlacementMutants.lean:117:0: 'LidoSRv3.Audit.Source.SszStatePlacement.registry_chunks' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/SszStatePlacementMutants.lean:118:0: 'LidoSRv3.Audit.Source.SszStatePlacement.length_encoding_no_wrap' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/SszStatePlacementMutants.lean:119:0: 'LidoSRv3.Audit.Source.SszStatePlacement.state_root_ordered_fields' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/SszStatePlacementMutants.lean:120:0: 'LidoSRv3.Audit.Source.SszStatePlacement.state_member_subtree' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/SszStatePlacementMutants.lean:121:0: 'LidoSRv3.Audit.Source.SszStatePlacement.registry_length_sibling' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/SszStatePlacementMutants.lean:122:0: 'LidoSRv3.Audit.Source.SszStatePlacement.canonical_validator_entry' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+Build completed successfully (792 jobs).

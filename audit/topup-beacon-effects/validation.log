@@ -1,0 +1,88 @@
+Command: lake build LidoSRv3.Audit.Source.TopupBeaconCallee LidoSRv3.Audit.Source.TopupBeaconEffects LidoSRv3.Tests.TopupBeaconEffectsMutants
+Exit: 0
+Scope: targeted modules and their dependencies, not full repository
+
+⚠ [11/313] Replayed Verity.Core
+warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1041:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+⚠ [1129/1252] Replayed Conform.Wheels
+warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: Conform/Wheels.lean:106:70: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1130/1252] Replayed EvmYul.Pretty
+warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: EvmYul/Pretty.lean:36:32: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1177/1252] Replayed EvmYul.Semantics
+warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1178/1252] Replayed EvmYul.EVM.Semantics
+warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1216/1252] Replayed LidoSRv3.Audit.Verity.TopupTx
+warning: LidoSRv3/Audit/Verity/TopupTx.lean:293:8: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: LidoSRv3/Audit/Verity/TopupTx.lean:872:13: This simp argument is unused:
+  uint256Modulus
+
+Hint: Omit it from the simp argument list.
+  simp [pushEntry, scheduledDeposit, linkedCallEntryTo, linkedCallEntry, e̵v̵m̵W̵o̵r̵d̵,̵ ̵u̵i̵n̵t̵2̵5̵6̵M̵o̵d̵u̵l̵u̵s̵]̵e̲v̲m̲W̲o̲r̲d̲]̲
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/TopupTx.lean:965:19: This simp argument is unused:
+  Nat.mod_eq_of_lt hNoWrap
+
+Hint: Omit it from the simp argument list.
+  simp [evmWord,̵ ̵N̵a̵t̵.̵m̵o̵d̵_̵e̵q̵_̵o̵f̵_̵l̵t̵ ̵h̵N̵o̵W̵r̵a̵p̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/TopupTx.lean:1279:5: Variable name `hwcLen` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+✔ [1251/1252] Built LidoSRv3.Audit.Source.TopupBeaconEffects (5.5s)
+ℹ [1252/1252] Built LidoSRv3.Tests.TopupBeaconEffectsMutants (4.2s)
+info: LidoSRv3/Tests/TopupBeaconEffectsMutants.lean:110:0: 'LidoSRv3.Audit.Source.TopupBeaconCallee.insert_selection' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/TopupBeaconEffectsMutants.lean:111:0: 'LidoSRv3.Audit.Source.TopupBeaconCallee.dispatch_balances' depends on axioms: [propext]
+info: LidoSRv3/Tests/TopupBeaconEffectsMutants.lean:112:0: 'LidoSRv3.Audit.Source.TopupBeaconCallee.reconstructed_source' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/TopupBeaconEffectsMutants.lean:113:0: 'LidoSRv3.Audit.Source.TopupBeaconCallee.source_deposit_success' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TopupBeaconEffectsMutants.lean:114:0: 'LidoSRv3.Audit.Source.TopupBeaconEffects.sourcePayload_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/TopupBeaconEffectsMutants.lean:115:0: 'LidoSRv3.Audit.Source.TopupBeaconEffects.decode_sourcePayload' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TopupBeaconEffectsMutants.lean:116:0: 'LidoSRv3.Audit.Source.TopupBeaconEffects.source_push_success' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TopupBeaconEffectsMutants.lean:117:0: 'LidoSRv3.Audit.Source.TopupBeaconEffects.failure_restores' depends on axioms: [propext]
+Build completed successfully (1252 jobs).
