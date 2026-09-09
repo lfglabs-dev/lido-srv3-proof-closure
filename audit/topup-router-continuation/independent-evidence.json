@@ -1,0 +1,73 @@
+{
+  "candidate": "1ef813405ac4d238fea7565c375a313022128858",
+  "parent": "38f1ceb327053a4ce54c88f8664967421a5be951",
+  "baseline": "4286b2de7c5359d7550a2d4b63674e9c8ea94735",
+  "changed_files": 15,
+  "candidate_matches_worktree": true,
+  "unchanged_prior_local_dependencies": 59,
+  "pinned_core_comparisons": 8,
+  "receipt_sha256": "66b5d70cc774b4645019eb0fa18cbbff4be13381b794996847eba38939305542",
+  "files": {
+    "LidoSRv3/Audit/Source/TopupRouterContinuation.lean": {
+      "sha256": "496ba9905f6b5b42c854a58f88f4dbe6ea5849a4de12aba6ebb776fc642104da",
+      "blob": "ac8f96bf016ba6bb8b81f35bfc9b63a9f2689f99"
+    },
+    "LidoSRv3/Audit/Source/TopupRouterCredentials.lean": {
+      "sha256": "1917509309754b11fbeba8b70a9b73334a5ad18b3e3805bfb135287a58a4d53f",
+      "blob": "5de4d8d9b6f36f6a32510d3032ce13238ca379de"
+    },
+    "LidoSRv3/Tests/TopupRouterContinuationMutants.lean": {
+      "sha256": "3566148eacf3a1deb2092a8b19c594d275ccbf087f7731139ba220a4a97eddd2",
+      "blob": "fe7a164b76690d5e4fa24b8c198332e63c1fdedd"
+    },
+    "audit/topup-router-continuation/README.md": {
+      "sha256": "f8d0ef6787236c7341f003c28618ea62060732271b434e2d057802fa548f0627",
+      "blob": "05cc9a0fdd1d654c15e8c7750a26cd5f4c85367b"
+    },
+    "audit/topup-router-continuation/axioms.log": {
+      "sha256": "1676e31ad7a164ea1429072366b97b634e8b58808e74f15797747c1d00854afa",
+      "blob": "f404a284e5d1d27500997df09c062a6225fbfc71"
+    },
+    "audit/topup-router-continuation/check.py": {
+      "sha256": "14f452448bc8fe122d2733fb49848fb2b0037d07a026a25fd5941d61279e3a6b",
+      "blob": "55e0a95b044555ee2f249363705c6a9138e50164"
+    },
+    "audit/topup-router-continuation/receipt.json": {
+      "sha256": "66b5d70cc774b4645019eb0fa18cbbff4be13381b794996847eba38939305542",
+      "blob": "0d6ebfd150fb6abec032229eb7906bad45d9fd82"
+    },
+    "audit/topup-router-continuation/solidity/README.md": {
+      "sha256": "6f29becdba0a95e0e46d1553cd7615323f209f7282e27b6b454be033ff60d829",
+      "blob": "5746ff360da658587435bcbf87d06aa6a3aedced"
+    },
+    "audit/topup-router-continuation/solidity/TopupRouterCredentials.t.sol": {
+      "sha256": "e6a776dfc9e1548f6686d63bafd5d5237eca8d8a3a7fd2a7718b615ee31c4669",
+      "blob": "f8002a7a657c26933f3d6775b9e481a9b23b6334"
+    },
+    "audit/topup-router-continuation/solidity/receipt.json": {
+      "sha256": "5f34708e9081d116f51351b94c657ce01b46ed3a8fff9fb4b6f7ccbcb7363f12",
+      "blob": "8c83ce0232c4004ed1c7927624020c3bcc68d539"
+    },
+    "audit/topup-router-continuation/solidity/storage-layout.json": {
+      "sha256": "26f2d3380d683b00196bebf668e358ddedd9fb5a99b8e5b449ba862ce0fcde5c",
+      "blob": "48297d8e4158d25601c6cdce1780e20a793fa419"
+    },
+    "audit/topup-router-continuation/solidity/validation.log": {
+      "sha256": "9afe26b858123e76637f82d126f622c0d4b998fde0eb8c6acdd5acd988f43a7f",
+      "blob": "3856ef2ce7a6fc898ff4dd706eb6ece6615a487d"
+    },
+    "audit/topup-router-continuation/source-check.json": {
+      "sha256": "22b8134b90841034f8f7a22de3008073e75f9e887875750273390abbe6ec7022",
+      "blob": "e4421f5424714499096b6d1ae9a40032bcf4749a"
+    },
+    "audit/topup-router-continuation/validated-inputs.sha256": {
+      "sha256": "bf5fc875b9d312e496dd75888440c61ae25fb47cea38367585d36da422c0a143",
+      "blob": "ad6245beb39fef7abc636cb7121c45832bf245da"
+    },
+    "audit/topup-router-continuation/validation.log": {
+      "sha256": "66015ab2fc1ad0b1e7a96b51c42d13e19ff16d9451fd012fa44878d4a0422886",
+      "blob": "299f0eb2b354f8ff10afa3c407805c790602c17f"
+    }
+  },
+  "new_lean_example_count": 37
+}

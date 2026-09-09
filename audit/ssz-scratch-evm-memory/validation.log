@@ -1,0 +1,37 @@
+⚠ [1071/1097] Replayed Conform.Wheels
+warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: Conform/Wheels.lean:106:70: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1073/1097] Replayed EvmYul.Pretty
+warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: EvmYul/Pretty.lean:36:32: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+✔ [1096/1097] Built LidoSRv3.Audit.Source.SszScratchEvmMemory (6.4s)
+ℹ [1097/1097] Built LidoSRv3.Tests.SszScratchEvmMemoryMutants (9.4s)
+info: LidoSRv3/Tests/SszScratchEvmMemoryMutants.lean:121:0: 'LidoSRv3.Audit.Source.SszScratchByteArray.write_fit' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszScratchEvmMemoryMutants.lean:122:0: 'LidoSRv3.Audit.Source.SszScratchByteArray.word_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszScratchEvmMemoryMutants.lean:123:0: 'LidoSRv3.Audit.Source.SszScratchByteArray.scratch_shape' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszScratchEvmMemoryMutants.lean:124:0: 'LidoSRv3.Audit.Source.SszScratchEvmMemory.memory_exact' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszScratchEvmMemoryMutants.lean:125:0: 'LidoSRv3.Audit.Source.SszScratchEvmMemory.read_exact' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszScratchEvmMemoryMutants.lean:126:0: 'LidoSRv3.Audit.Source.SszScratchEvmMemory.frame' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszScratchEvmMemoryMutants.lean:127:0: 'LidoSRv3.Audit.Source.SszScratchEvmMemory.memory_size' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszScratchEvmMemoryMutants.lean:128:0: 'LidoSRv3.Audit.Source.SszScratchEvmMemory.typed_pubkeyBlock' depends on axioms: [propext, Classical.choice, Quot.sound]
+Build completed successfully (1097 jobs).

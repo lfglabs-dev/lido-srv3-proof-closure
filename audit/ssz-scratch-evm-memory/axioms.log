@@ -1,0 +1,8 @@
+info: LidoSRv3/Tests/SszScratchEvmMemoryMutants.lean:121:0: 'LidoSRv3.Audit.Source.SszScratchByteArray.write_fit' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszScratchEvmMemoryMutants.lean:122:0: 'LidoSRv3.Audit.Source.SszScratchByteArray.word_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszScratchEvmMemoryMutants.lean:123:0: 'LidoSRv3.Audit.Source.SszScratchByteArray.scratch_shape' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszScratchEvmMemoryMutants.lean:124:0: 'LidoSRv3.Audit.Source.SszScratchEvmMemory.memory_exact' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszScratchEvmMemoryMutants.lean:125:0: 'LidoSRv3.Audit.Source.SszScratchEvmMemory.read_exact' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszScratchEvmMemoryMutants.lean:126:0: 'LidoSRv3.Audit.Source.SszScratchEvmMemory.frame' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszScratchEvmMemoryMutants.lean:127:0: 'LidoSRv3.Audit.Source.SszScratchEvmMemory.memory_size' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszScratchEvmMemoryMutants.lean:128:0: 'LidoSRv3.Audit.Source.SszScratchEvmMemory.typed_pubkeyBlock' depends on axioms: [propext, Classical.choice, Quot.sound]

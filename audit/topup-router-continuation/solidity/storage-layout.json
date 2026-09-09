@@ -1,0 +1,351 @@
+{
+  "storage": [
+    {
+      "astId": 642,
+      "contract": "audit/topup-router-continuation/solidity/TopupRouterCredentials.t.sol:TopupRouterCredentialsHarness",
+      "label": "compilerLayout",
+      "offset": 0,
+      "slot": "0",
+      "type": "t_struct(RouterState)1556_storage"
+    }
+  ],
+  "types": {
+    "t_address": {
+      "encoding": "inplace",
+      "label": "address",
+      "numberOfBytes": "20"
+    },
+    "t_array(t_bytes32)dyn_storage": {
+      "encoding": "dynamic_array",
+      "label": "bytes32[]",
+      "numberOfBytes": "32",
+      "base": "t_bytes32"
+    },
+    "t_bytes32": {
+      "encoding": "inplace",
+      "label": "bytes32",
+      "numberOfBytes": "32"
+    },
+    "t_enum(StakingModuleStatus)1402": {
+      "encoding": "inplace",
+      "label": "enum StakingModuleStatus",
+      "numberOfBytes": "1"
+    },
+    "t_mapping(t_bytes32,t_uint256)": {
+      "encoding": "mapping",
+      "key": "t_bytes32",
+      "label": "mapping(bytes32 => uint256)",
+      "numberOfBytes": "32",
+      "value": "t_uint256"
+    },
+    "t_mapping(t_uint256,t_struct(ModuleState)1538_storage)": {
+      "encoding": "mapping",
+      "key": "t_uint256",
+      "label": "mapping(uint256 => struct ModuleState)",
+      "numberOfBytes": "32",
+      "value": "t_struct(ModuleState)1538_storage"
+    },
+    "t_string_storage": {
+      "encoding": "bytes",
+      "label": "string",
+      "numberOfBytes": "32"
+    },
+    "t_struct(ModuleState)1538_storage": {
+      "encoding": "inplace",
+      "label": "struct ModuleState",
+      "numberOfBytes": "128",
+      "members": [
+        {
+          "astId": 1526,
+          "contract": "audit/topup-router-continuation/solidity/TopupRouterCredentials.t.sol:TopupRouterCredentialsHarness",
+          "label": "config",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_struct(ModuleStateConfig)1496_storage"
+        },
+        {
+          "astId": 1530,
+          "contract": "audit/topup-router-continuation/solidity/TopupRouterCredentials.t.sol:TopupRouterCredentialsHarness",
+          "label": "deposits",
+          "offset": 0,
+          "slot": "1",
+          "type": "t_struct(ModuleStateDeposits)1510_storage"
+        },
+        {
+          "astId": 1534,
+          "contract": "audit/topup-router-continuation/solidity/TopupRouterCredentials.t.sol:TopupRouterCredentialsHarness",
+          "label": "accounting",
+          "offset": 0,
+          "slot": "2",
+          "type": "t_struct(ModuleStateAccounting)1518_storage"
+        },
+        {
+          "astId": 1537,
+          "contract": "audit/topup-router-continuation/solidity/TopupRouterCredentials.t.sol:TopupRouterCredentialsHarness",
+          "label": "name",
+          "offset": 0,
+          "slot": "3",
+          "type": "t_string_storage"
+        }
+      ]
+    },
+    "t_struct(ModuleStateAccounting)1518_storage": {
+      "encoding": "inplace",
+      "label": "struct ModuleStateAccounting",
+      "numberOfBytes": "32",
+      "members": [
+        {
+          "astId": 1514,
+          "contract": "audit/topup-router-continuation/solidity/TopupRouterCredentials.t.sol:TopupRouterCredentialsHarness",
+          "label": "validatorsBalanceGwei",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_uint64"
+        },
+        {
+          "astId": 1517,
+          "contract": "audit/topup-router-continuation/solidity/TopupRouterCredentials.t.sol:TopupRouterCredentialsHarness",
+          "label": "exitedValidatorsCount",
+          "offset": 8,
+          "slot": "0",
+          "type": "t_uint64"
+        }
+      ]
+    },
+    "t_struct(ModuleStateConfig)1496_storage": {
+      "encoding": "inplace",
+      "label": "struct ModuleStateConfig",
+      "numberOfBytes": "32",
+      "members": [
+        {
+          "astId": 1476,
+          "contract": "audit/topup-router-continuation/solidity/TopupRouterCredentials.t.sol:TopupRouterCredentialsHarness",
+          "label": "moduleAddress",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_address"
+        },
+        {
+          "astId": 1479,
+          "contract": "audit/topup-router-continuation/solidity/TopupRouterCredentials.t.sol:TopupRouterCredentialsHarness",
+          "label": "moduleFee",
+          "offset": 20,
+          "slot": "0",
+          "type": "t_uint16"
+        },
+        {
+          "astId": 1482,
+          "contract": "audit/topup-router-continuation/solidity/TopupRouterCredentials.t.sol:TopupRouterCredentialsHarness",
+          "label": "treasuryFee",
+          "offset": 22,
+          "slot": "0",
+          "type": "t_uint16"
+        },
+        {
+          "astId": 1485,
+          "contract": "audit/topup-router-continuation/solidity/TopupRouterCredentials.t.sol:TopupRouterCredentialsHarness",
+          "label": "stakeShareLimit",
+          "offset": 24,
+          "slot": "0",
+          "type": "t_uint16"
+        },
+        {
+          "astId": 1488,
+          "contract": "audit/topup-router-continuation/solidity/TopupRouterCredentials.t.sol:TopupRouterCredentialsHarness",
+          "label": "priorityExitShareThreshold",
+          "offset": 26,
+          "slot": "0",
+          "type": "t_uint16"
+        },
+        {
+          "astId": 1492,
+          "contract": "audit/topup-router-continuation/solidity/TopupRouterCredentials.t.sol:TopupRouterCredentialsHarness",
+          "label": "status",
+          "offset": 28,
+          "slot": "0",
+          "type": "t_enum(StakingModuleStatus)1402"
+        },
+        {
+          "astId": 1495,
+          "contract": "audit/topup-router-continuation/solidity/TopupRouterCredentials.t.sol:TopupRouterCredentialsHarness",
+          "label": "withdrawalCredentialsType",
+          "offset": 29,
+          "slot": "0",
+          "type": "t_uint8"
+        }
+      ]
+    },
+    "t_struct(ModuleStateDeposits)1510_storage": {
+      "encoding": "inplace",
+      "label": "struct ModuleStateDeposits",
+      "numberOfBytes": "32",
+      "members": [
+        {
+          "astId": 1500,
+          "contract": "audit/topup-router-continuation/solidity/TopupRouterCredentials.t.sol:TopupRouterCredentialsHarness",
+          "label": "lastDepositAt",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_uint64"
+        },
+        {
+          "astId": 1503,
+          "contract": "audit/topup-router-continuation/solidity/TopupRouterCredentials.t.sol:TopupRouterCredentialsHarness",
+          "label": "lastDepositBlock",
+          "offset": 8,
+          "slot": "0",
+          "type": "t_uint64"
+        },
+        {
+          "astId": 1506,
+          "contract": "audit/topup-router-continuation/solidity/TopupRouterCredentials.t.sol:TopupRouterCredentialsHarness",
+          "label": "maxDepositsPerBlock",
+          "offset": 16,
+          "slot": "0",
+          "type": "t_uint64"
+        },
+        {
+          "astId": 1509,
+          "contract": "audit/topup-router-continuation/solidity/TopupRouterCredentials.t.sol:TopupRouterCredentialsHarness",
+          "label": "minDepositBlockDistance",
+          "offset": 24,
+          "slot": "0",
+          "type": "t_uint64"
+        }
+      ]
+    },
+    "t_struct(RouterState)1556_storage": {
+      "encoding": "inplace",
+      "label": "struct RouterState",
+      "numberOfBytes": "192",
+      "members": [
+        {
+          "astId": 1543,
+          "contract": "audit/topup-router-continuation/solidity/TopupRouterCredentials.t.sol:TopupRouterCredentialsHarness",
+          "label": "moduleStates",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_mapping(t_uint256,t_struct(ModuleState)1538_storage)"
+        },
+        {
+          "astId": 1546,
+          "contract": "audit/topup-router-continuation/solidity/TopupRouterCredentials.t.sol:TopupRouterCredentialsHarness",
+          "label": "moduleIds",
+          "offset": 0,
+          "slot": "1",
+          "type": "t_struct(UintSet)482_storage"
+        },
+        {
+          "astId": 1549,
+          "contract": "audit/topup-router-continuation/solidity/TopupRouterCredentials.t.sol:TopupRouterCredentialsHarness",
+          "label": "accounting",
+          "offset": 0,
+          "slot": "3",
+          "type": "t_struct(RouterStateAccounting)1522_storage"
+        },
+        {
+          "astId": 1551,
+          "contract": "audit/topup-router-continuation/solidity/TopupRouterCredentials.t.sol:TopupRouterCredentialsHarness",
+          "label": "withdrawalCredentials",
+          "offset": 0,
+          "slot": "4",
+          "type": "t_bytes32"
+        },
+        {
+          "astId": 1553,
+          "contract": "audit/topup-router-continuation/solidity/TopupRouterCredentials.t.sol:TopupRouterCredentialsHarness",
+          "label": "lastModuleId",
+          "offset": 0,
+          "slot": "5",
+          "type": "t_uint24"
+        },
+        {
+          "astId": 1555,
+          "contract": "audit/topup-router-continuation/solidity/TopupRouterCredentials.t.sol:TopupRouterCredentialsHarness",
+          "label": "maxTopUpPerBlockGwei",
+          "offset": 3,
+          "slot": "5",
+          "type": "t_uint64"
+        }
+      ]
+    },
+    "t_struct(RouterStateAccounting)1522_storage": {
+      "encoding": "inplace",
+      "label": "struct RouterStateAccounting",
+      "numberOfBytes": "32",
+      "members": [
+        {
+          "astId": 1521,
+          "contract": "audit/topup-router-continuation/solidity/TopupRouterCredentials.t.sol:TopupRouterCredentialsHarness",
+          "label": "validatorsBalanceGwei",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_uint64"
+        }
+      ]
+    },
+    "t_struct(Set)10_storage": {
+      "encoding": "inplace",
+      "label": "struct EnumerableSet.Set",
+      "numberOfBytes": "64",
+      "members": [
+        {
+          "astId": 5,
+          "contract": "audit/topup-router-continuation/solidity/TopupRouterCredentials.t.sol:TopupRouterCredentialsHarness",
+          "label": "_values",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_array(t_bytes32)dyn_storage"
+        },
+        {
+          "astId": 9,
+          "contract": "audit/topup-router-continuation/solidity/TopupRouterCredentials.t.sol:TopupRouterCredentialsHarness",
+          "label": "_positions",
+          "offset": 0,
+          "slot": "1",
+          "type": "t_mapping(t_bytes32,t_uint256)"
+        }
+      ]
+    },
+    "t_struct(UintSet)482_storage": {
+      "encoding": "inplace",
+      "label": "struct EnumerableSet.UintSet",
+      "numberOfBytes": "64",
+      "members": [
+        {
+          "astId": 481,
+          "contract": "audit/topup-router-continuation/solidity/TopupRouterCredentials.t.sol:TopupRouterCredentialsHarness",
+          "label": "_inner",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_struct(Set)10_storage"
+        }
+      ]
+    },
+    "t_uint16": {
+      "encoding": "inplace",
+      "label": "uint16",
+      "numberOfBytes": "2"
+    },
+    "t_uint24": {
+      "encoding": "inplace",
+      "label": "uint24",
+      "numberOfBytes": "3"
+    },
+    "t_uint256": {
+      "encoding": "inplace",
+      "label": "uint256",
+      "numberOfBytes": "32"
+    },
+    "t_uint64": {
+      "encoding": "inplace",
+      "label": "uint64",
+      "numberOfBytes": "8"
+    },
+    "t_uint8": {
+      "encoding": "inplace",
+      "label": "uint8",
+      "numberOfBytes": "1"
+    }
+  }
+}
