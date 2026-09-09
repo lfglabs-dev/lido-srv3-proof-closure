@@ -1,0 +1,4 @@
+ℹ [495/495] Built LidoSRv3.Tests.TopupWeiBoundsMutants (7.9s)
+info: LidoSRv3/Tests/TopupWeiBoundsMutants.lean:67:0: 'LidoSRv3.Audit.Source.TopupWeiBounds.gateway_wei_bounds' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/TopupWeiBoundsMutants.lean:68:0: 'LidoSRv3.Audit.Source.TopupWeiBounds.router_success' depends on axioms: [propext, Quot.sound]
+Build completed successfully (495 jobs).

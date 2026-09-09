@@ -1,0 +1,13 @@
+Compiling 22 files with Solc 0.8.25
+Solc 0.8.25 finished in 12.75s
+Compiler run successful!
+
+Ran 5 tests for audit/topup-wei/solidity/TopupWeiBounds.t.sol:TopupWeiBoundsTest
+[PASS] testFuzz_activeEvaluatorAndConversion(uint64,uint256,uint64,uint64) (runs: 1024, μ: 50211, ~: 52726)
+[PASS] testFuzz_pinnedEvaluatorAndConversion(uint64,uint256,uint64,bool,uint64,uint64) (runs: 1024, μ: 49889, ~: 52493)
+[PASS] testFuzz_successfulGap(uint64,uint64,uint64) (runs: 1024, μ: 52406, ~: 53531)
+[PASS] test_activeMaximumTarget() (gas: 52336)
+[PASS] test_checkedOverflowAndEarlyFilter() (gas: 99214)
+Suite result: ok. 5 passed; 0 failed; 0 skipped; finished in 54.60ms (139.65ms CPU time)
+
+Ran 1 test suite in 381.04ms (54.60ms CPU time): 5 tests passed, 0 failed, 0 skipped (5 total tests)
