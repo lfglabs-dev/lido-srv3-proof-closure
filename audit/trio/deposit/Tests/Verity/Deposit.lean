@@ -24,20 +24,36 @@ def config : Config := ⟨word 32, word 64⟩
 def oracle : StaticOracle := fun _ _ =>
   .returned (encodeWord (word 0) ++ encodeWord (word 1) ++ encodeWord (word 5))
 def limits : DepositLimits := ⟨8⟩
+def twoKeyData : ModuleDepositData :=
+  ⟨List.replicate 96 (byte 1), List.replicate 192 (byte 2)⟩
 
 /-- This module succeeds only if the executor really sends the source-derived
 cap `min(8, 64/32) = 2`. -/
 def exactTargetModule : ObtainDepositData := fun target =>
-  if target = 2 then .ok ⟨96⟩ else .error .exceptionalCall
+  if target = 2 then .ok twoKeyData else .error .exceptionalCall
 
-def checkSuccess (result : Except DepositFailure DepositValues) : IO Unit :=
+def exactWithdrawal : WithdrawDepositableEther := fun amount seeds =>
+  if amount = word 64 ∧ seeds = word 2 then .ok () else .error .exceptionalCall
+
+def checkSuccess (result : Except DepositFailure DepositExecution) : IO Unit :=
   match result with
-  | .ok values => unless values == ⟨64, 2, 64, 32, 64⟩ do
-      throw (IO.userError s!"wrong deposit values: {repr values}")
+  | .ok execution => unless execution ==
+      ⟨word 7, word 32, twoKeyData, ⟨64, 2, 64, 32, 64⟩,
+        some ⟨word 64, word 2⟩⟩ do
+      throw (IO.userError s!"wrong deposit execution: {repr execution}")
   | .error reason => throw (IO.userError s!"unexpected deposit failure: {repr reason}")
 
+def successfulExecution : DepositExecution :=
+  ⟨word 7, word 32, twoKeyData, ⟨64, 2, 64, 32, 64⟩,
+    some ⟨word 64, word 2⟩⟩
+def successfulRun := depositValuesABI layout storage oracle config (word 65) [] (word 7)
+  limits exactTargetModule 32 exactWithdrawal
+def successfulAfter : Transcript := successfulRun.2
+theorem successfulRun_eq : successfulRun = (.ok successfulExecution, successfulAfter) := by
+  native_decide
+
 #eval checkSuccess (depositValuesABI layout storage oracle config (word 65) [] (word 7)
-  limits exactTargetModule 32).1
+  limits exactTargetModule 32 exactWithdrawal).1
 
 /-- The selected cell is fixed by the one-based module-position lookup, not by
 an arbitrary caller-provided array index. -/
@@ -51,9 +67,10 @@ def selection : SelectedAllocation layout storage allocation (word 7) where
 example : allocation.allocated[selection.moduleIndex.val]? = some selection.selected :=
   selection.selected_eq
 
-def misalignedModule : ObtainDepositData := fun _ => .ok { publicKeysBatchLength := 97 }
+def misalignedModule : ObtainDepositData := fun _ =>
+  .ok ⟨List.replicate 97 (byte 1), []⟩
 def checkFailure (wanted : DepositFailure)
-    (result : Except DepositFailure DepositValues) : IO Unit :=
+    (result : Except DepositFailure DepositExecution) : IO Unit :=
   match result with
   | .error actual => unless actual == wanted do
       throw (IO.userError s!"wrong deposit failure: {repr actual}")
@@ -61,17 +78,45 @@ def checkFailure (wanted : DepositFailure)
 
 #eval checkFailure .wrongPubkeyLength
   (depositValuesABI layout storage oracle config (word 65) [] (word 7)
-    limits misalignedModule 32).1
+    limits misalignedModule 32 exactWithdrawal).1
 
-def tooManyKeysModule : ObtainDepositData := fun _ => .ok { publicKeysBatchLength := 144 }
+def tooManyKeysModule : ObtainDepositData := fun _ =>
+  .ok ⟨List.replicate 144 (byte 1), List.replicate 288 (byte 2)⟩
 #eval checkFailure .moduleReturnExceedTarget
   (depositValuesABI layout storage oracle config (word 65) [] (word 7)
-    limits tooManyKeysModule 32).1
+    limits tooManyKeysModule 32 exactWithdrawal).1
 
 -- A different registered ID cannot silently select cell zero.
 #eval checkFailure (.moduleIndex (.panic (word 0x11)))
   (depositValuesABI layout storage oracle config (word 65) [] (word 8)
-    limits exactTargetModule 32).1
+    limits exactTargetModule 32 exactWithdrawal).1
+
+/-- This module call reaches StakingRouter.sol:978 with a zero derived key
+count. The hostile withdrawal must not be observed: line 978 returns before
+the Lido call at line 983. -/
+def zeroKeysModule : ObtainDepositData := fun target =>
+  if target = 2 then .ok ⟨[], []⟩ else .error .exceptionalCall
+
+def hostileWithdrawal : WithdrawDepositableEther := fun _ _ => .error .exceptionalCall
+
+def checkZeroKeysReturn (result : Except DepositFailure DepositExecution) : IO Unit :=
+  match result with
+  | .ok execution => unless execution ==
+      ⟨word 7, word 32, ⟨[], []⟩, ⟨64, 0, 0, 32, 0⟩, none⟩ do
+      throw (IO.userError s!"zero-key path called Lido or returned wrong values: {repr execution}")
+  | .error reason => throw (IO.userError s!"zero-key path unexpectedly failed: {repr reason}")
+
+#eval checkZeroKeysReturn
+  (depositValuesABI layout storage oracle config (word 65) [] (word 7)
+    limits zeroKeysModule 32 hostileWithdrawal).1
+
+/-- This live callback accepts only the source ABI tuple
+`(actualKeys * maxEBType1, actualKeys)`. It rejects any arbitrary seed word. -/
+def rejectArbitrarySeeds : WithdrawDepositableEther := fun amount seeds =>
+  if amount = word 64 ∧ seeds = word 2 then .ok () else .error .exceptionalCall
+
+#eval checkSuccess (depositValuesABI layout storage oracle config (word 65) [] (word 7)
+  limits exactTargetModule 32 rejectArbitrarySeeds).1
 
 example : PinnedConstructorAdmitted openConstructorCounterexample :=
   pinned_constructor_does_not_discharge_artifact_identities.1
