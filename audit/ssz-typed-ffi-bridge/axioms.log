@@ -1,0 +1,6 @@
+LidoSRv3.Audit.Source.SszTypedFfiBridge.digest_bytes: [propext, Quot.sound]
+LidoSRv3.Audit.Source.SszTypedFfiBridge.digest_actual_word: [propext, Classical.choice, Quot.sound]
+LidoSRv3.Audit.Source.SszTypedFfiBridge.pair_transport: [propext, Quot.sound]
+LidoSRv3.Audit.Source.SszTypedFfiBridge.proof_bytes: [propext, Quot.sound]
+LidoSRv3.Audit.Source.SszTypedFfiBridge.branch_transport: [propext, Quot.sound]
+LidoSRv3.Audit.Source.SszTypedFfiBridge.primitive_typed_success: [propext, Classical.choice, Quot.sound]
