@@ -18,6 +18,22 @@ open Contracts
 open LidoSRv3.Audit.SolidityTopup
 open LidoSRv3.Audit.Verity.TopupTx
 
+/-! ## Address-provenance negative control
+
+This is deliberately different from a wrong-address execution mutant.  The
+pinned constructor source itself admits this address, so no execution theorem
+can kill it without the missing `A-RUNTIME-PROVENANCE` parent that identifies
+the deployed constructor argument/runtime immutable. -/
+
+/-- The exact `StakingRouter.sol:88-99` source guard admits `0xDEAD`, while
+`0xDEAD` is not the production beacon pin. -/
+theorem source_admits_wrong_beacon_constructor_input :
+    LidoSRv3.Audit.Guarantees.PTopup1.PinnedTopupConstructorAdmitted
+        LidoSRv3.Audit.Guarantees.PTopup1.wrongBeaconConstructorInput ∧
+      LidoSRv3.Audit.Guarantees.PTopup1.wrongBeaconConstructorInput.depositContract ≠
+        LidoSRv3.Audit.Guarantees.PTopup1.canonicalBeaconDepositAddress :=
+  LidoSRv3.Audit.Guarantees.PTopup1.pinned_constructor_span_does_not_determine_beacon_address
+
 private def twoBatch : List Nat := [11, 13]
 
 /-- The entry frame of the guarantee theorem, at a concrete state. -/

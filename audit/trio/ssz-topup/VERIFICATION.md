@@ -33,9 +33,18 @@ The registered executor now composes the corrections:
    longer the former length-prefixed flattening abstraction.
 
 The beacon literal remains a source pin only. `A-TOPUP-BEACON-ADDRESS` remains
-OPEN: the supplied `StakingRouter` constructor fixture (88--99) assigns
-`DEPOSIT_CONTRACT` from `_depositContract`, but this proof has no deployment
-input or constructor execution that derives the runtime address.
+OPEN. The exact address-determining Solidity span is `StakingRouter.sol:88-99`:
+line 89 accepts `_depositContract`, line 95 checks only that it is nonzero, and
+line 99 assigns it unchanged to `DEPOSIT_CONTRACT`. The executed path reads
+that immutable at `StakingRouter.sol:750` and passes it through
+`BeaconChainDepositor.makeBeaconChainTopUp` (`BeaconChainDepositor.sol:66-108`).
+
+`PTopup1.pinned_constructor_span_does_not_determine_beacon_address` proves the
+source-only obstruction with the admitted constructor value `0xDEAD`, and
+`PTopup1.no_source_only_beacon_address_derivation` refutes the corresponding
+universal source-only closure claim. The missing parent is explicitly
+`A-RUNTIME-PROVENANCE`: deployment evidence binding the constructor argument
+(or the deployed runtime immutable) to the canonical beacon deposit address.
 
 The only remaining item recorded here is constructor/deployment provenance for
 `DEPOSIT_CONTRACT` (`A-TOPUP-BEACON-ADDRESS`).

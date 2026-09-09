@@ -22,6 +22,56 @@ deployment-provenance obligation. -/
 def canonicalBeaconDepositAddress : Nat :=
   0x00000000219ab540356cBB839Cbe05303d7705Fa
 
+/-! ## Why the beacon-address obligation remains open
+
+The complete address-determining source span is pinned
+`StakingRouter.sol:88-99`: constructor line 89 receives the arbitrary
+`_depositContract`, line 95 checks only that it is nonzero, and line 99 copies
+it to the immutable `DEPOSIT_CONTRACT`.  The executed top-up path later reads
+that immutable at `StakingRouter.sol:750` and passes it to
+`BeaconChainDepositor.makeBeaconChainTopUp` (`BeaconChainDepositor.sol:66-108`).
+
+Consequently the pinned Solidity determines the executed target from a
+constructor input, but does not determine which nonzero input was deployed.
+Closing `A-TOPUP-BEACON-ADDRESS` requires the missing parent
+`A-RUNTIME-PROVENANCE`: deployment evidence binding the constructor argument
+(or equivalently the deployed runtime immutable) to
+`canonicalBeaconDepositAddress`. -/
+
+/-- The address-relevant projection of the pinned router constructor. -/
+structure TopupConstructorInput where
+  depositContract : Nat
+  deriving Repr, DecidableEq
+
+/-- Exactly the address guard in `StakingRouter.sol:95`; line 99 then assigns
+this value unchanged to `DEPOSIT_CONTRACT`. -/
+def PinnedTopupConstructorAdmitted (input : TopupConstructorInput) : Prop :=
+  input.depositContract ≠ 0
+
+/-- A concrete constructor argument admitted by the pinned source but unequal
+to the production beacon-deposit address. -/
+def wrongBeaconConstructorInput : TopupConstructorInput :=
+  { depositContract := 0xDEAD }
+
+/-- Source-only impossibility result for `A-TOPUP-BEACON-ADDRESS`: the exact
+constructor guard/assignment span does not imply the desired address.  A
+deployment/runtime-provenance parent is therefore necessary. -/
+theorem pinned_constructor_span_does_not_determine_beacon_address :
+    PinnedTopupConstructorAdmitted wrongBeaconConstructorInput ∧
+      wrongBeaconConstructorInput.depositContract ≠ canonicalBeaconDepositAddress := by
+  norm_num [PinnedTopupConstructorAdmitted, wrongBeaconConstructorInput,
+    canonicalBeaconDepositAddress]
+
+/-- The universal source-only closure claim is false, not merely unproved. -/
+theorem no_source_only_beacon_address_derivation :
+    ¬ (∀ input : TopupConstructorInput,
+        PinnedTopupConstructorAdmitted input →
+          input.depositContract = canonicalBeaconDepositAddress) := by
+  intro h
+  exact pinned_constructor_span_does_not_determine_beacon_address.2
+    (h wrongBeaconConstructorInput
+      pinned_constructor_span_does_not_determine_beacon_address.1)
+
 /-- Source-shaped allocation-model ordering fact; extraction is not established. -/
 theorem valid_result_preserves_router_order
     {snapshot : LidoSRv3.Audit.AllocationSnapshot}
