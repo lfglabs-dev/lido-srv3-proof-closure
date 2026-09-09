@@ -111,6 +111,7 @@ def transferFrom (i : TransferInput) (before : TransferState) :
 def minWithdrawalAmount : Nat := 100
 def maxWithdrawalAmount : Nat := 1000 * 10 ^ 18
 def two128 : Nat := 2 ^ 128
+def two256 : Nat := 2 ^ 256
 
 structure RequestState where
   lastRequestId : Nat
@@ -155,8 +156,11 @@ def requestWithdrawal (i : RequestInput) (before : RequestState) :
     let shares128 := i.shares % two128
     let cumulativeStETH := before.cumulativeStETH + amount128
     let cumulativeShares := before.cumulativeShares + shares128
-    if cumulativeStETH >= two128 || cumulativeShares >= two128 ||
-        !i.ownerSetAddSucceeds then .reverted .queueArithmeticOverflow before
+    if cumulativeShares >= two128 || cumulativeStETH >= two128 then
+      .reverted .queueArithmeticOverflow before
+    else if before.lastRequestId + 1 >= two256 then
+      .reverted .queueArithmeticOverflow before
+    else if !i.ownerSetAddSucceeds then .reverted .queueArithmeticOverflow before
     else
       let owner := if i.owner = 0 then i.caller else i.owner
       let post := RequestState.mk (before.lastRequestId + 1)
@@ -164,6 +168,26 @@ def requestWithdrawal (i : RequestInput) (before : RequestState) :
       .committed post (NewRequest.mk post.lastRequestId cumulativeStETH
         cumulativeShares owner (i.timestamp % (2 ^ 40))
         (i.reportTimestamp % (2 ^ 40)))
+
+/-- The checked uint256 increment at WithdrawalQueueBase.sol:374 derives a
+representable, strictly increasing request ID from every successful execution.
+No request-ID width premise is supplied by the caller. This concerns the
+supplementary source model, not physical storage or EVM refinement. -/
+theorem requestWithdrawal_success_id (i : RequestInput) (before after : RequestState)
+    (request : NewRequest) (h : requestWithdrawal i before = .committed after request) :
+    request.id = before.lastRequestId + 1 ∧ after.lastRequestId = request.id ∧
+      request.id < two256 ∧ before.lastRequestId < request.id := by
+  unfold requestWithdrawal at h
+  split at h <;> simp_all
+  split at h <;> simp_all
+  split at h <;> simp_all
+  split at h <;> simp_all
+  split at h <;> simp_all
+  split at h <;> simp_all
+  split at h <;> simp_all
+  all_goals rcases h with ⟨rfl, rfl⟩
+  all_goals simp_all
+
 
 structure ClaimState where
   lastFinalizedRequestId : Nat
