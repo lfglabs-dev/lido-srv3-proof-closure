@@ -1,0 +1,14 @@
+✔ [785/787] Built LidoSRv3.Audit.Source.SszLittleEndianCorrespondence (50s)
+✔ [786/787] Built LidoSRv3.Audit.Source.SszWrapperIndex (4.5s)
+ℹ [787/787] Built LidoSRv3.Tests.SszWrapperIndexMutants (1.3s)
+info: LidoSRv3/Tests/SszWrapperIndexMutants.lean:68:0: 'LidoSRv3.Audit.Source.SszWrapperIndex.concat_of_depth' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/SszWrapperIndexMutants.lean:69:0: 'LidoSRv3.Audit.Source.SszWrapperIndex.wrapper_success' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/SszWrapperIndexMutants.lean:70:0: 'LidoSRv3.Audit.Source.SszWrapperIndex.pinned_wrapper_accepts_iff' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/SszWrapperIndexMutants.lean:71:0: 'LidoSRv3.Audit.Source.SszWrapperIndex.pinned_header_steps' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/SszWrapperIndexMutants.lean:72:0: 'LidoSRv3.Audit.Source.SszWrapperIndex.slot_sibling_of_header_branch' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/SszWrapperIndexMutants.lean:74:0: 'LidoSRv3.Audit.Source.SszWrapperIndex.encoded_slot_accepts_header_branch' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+Build completed successfully (787 jobs).

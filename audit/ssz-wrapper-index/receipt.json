@@ -1,0 +1,78 @@
+{
+  "scope": "generic checked wrapper index, pinned-layout consumer, independent tree slot-sibling position and uint64 encoding consumer; not full SSZ-1",
+  "base_head": "ee5f7f63c958a80edcf6265072ef84613f4369e2",
+  "source_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "files_sha256": {
+    "LidoSRv3/Audit/Source/SszWrapperIndex.lean": "57833ae3afc8731c7b6a80862666194c1fa561db316952b3e5b4073013a6b045",
+    "LidoSRv3/Tests/SszWrapperIndexMutants.lean": "b8a550040bca086a45df53c4491dd7974f07e08f053f11f68161c554ba3592ef",
+    "LidoSRv3/Audit/Source/SszLittleEndianCorrespondence.lean": "354768f3a855422699513646e7ec7b06809f7be545fba623ad9659c331e4fdb8",
+    "lean-toolchain": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee",
+    "lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
+    "lakefile.lean": "8ea3781110b3234bdfcf2b2c87c5c064fa7d2aee018da57bcab100f8baf1ab87",
+    "foundry.toml": "adb4990ab31a2bb53f5eeb370e4f55d962f7bc1026bce01708497a56b262356c",
+    "solidity/test/SszWrapperIndex.t.sol": "46a9a1b27ba0069f8c9feb2f9bdece67b8de917f34eb2bef4cf83dd35d157f15",
+    "lido-core/contracts/0.8.25/CLValidatorVerifier.sol": "d6e89f6975e4fa02f758bf461a98ac2d689296b5c92d03ffd4e43a22d0b3d7ed",
+    "lido-core/contracts/common/lib/GIndex.sol": "2653bd4ba89c349f3db36f21a8afc6a24e0e233816d9b608f46d048feb601d1f",
+    "lido-core/contracts/common/lib/SSZ.sol": "91ef497b972bbee0fe89043034e6bd62fa0c1059f22874d4826bc6164a22009b",
+    "lido-core/contracts/common/lib/BLS.sol": "0187cc6a6b1aaa833317695d88795db431fa237452213e8c3872a0f444dceb7c",
+    "lido-core/contracts/common/lib/BeaconTypes.sol": "9591e9af1a4fd398db86267f3589e763f9eb2016bf29e26cfa50988cf73a10c3",
+    "lido-core/contracts/common/interfaces/ValidatorWitness.sol": "8fd24cfab7402233029756e52e59198b0d9cbf0a42e5c07d9fa2338ed731a5f7",
+    "lido-core/scripts/upgrade/upgrade-params-mainnet.toml": "57f3ea6d6247f14ed4e7c581b7ee9094fe4589ba769530598e457aae09007151",
+    "audit/ssz-wrapper-index/README.md": "a9ec29b6d46da8c9e11765d86476159a7ee3628cb3572f2346d002c9f5f16ca5",
+    "audit/ssz-wrapper-index/check_source.py": "4dd771a14c6ff18aad871780f210402756ff6e0a663b2b7c20b129eea1a7ab2b",
+    "audit/ssz-wrapper-index/source-check.json": "b59524950b81706029d38ae9d48e85a56c406739f808c793d4082d7edae5f64e",
+    "audit/ssz-wrapper-index/validation.log": "f1054ac59781e8e362bfd79493b63d64b38dcc09bda9e9dde413cb23bd0620e4",
+    "audit/ssz-wrapper-index/solidity-validation.log": "2e1ccf6ef3f1d3429d8093b047c73308b0d5f584a228bf7d7e92f49917e7e95e"
+  },
+  "lean": {
+    "command": "lake build LidoSRv3.Audit.Source.SszWrapperIndex LidoSRv3.Tests.SszWrapperIndexMutants",
+    "exit": 0,
+    "log": "validation.log",
+    "scope": "targeted new source/tests plus rebuilt unchanged endian dependency; not full repository build",
+    "axioms": {
+      "concat_of_depth": [
+        "propext",
+        "Quot.sound"
+      ],
+      "wrapper_success": [
+        "propext",
+        "Quot.sound"
+      ],
+      "pinned_wrapper_accepts_iff": [
+        "propext",
+        "Quot.sound"
+      ],
+      "pinned_header_steps": [
+        "propext",
+        "Quot.sound"
+      ],
+      "slot_sibling_of_header_branch": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "encoded_slot_accepts_header_branch": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    }
+  },
+  "source_check": {
+    "command": "python3 audit/ssz-wrapper-index/check_source.py",
+    "exit": 0,
+    "log": "source-check.json",
+    "scope": "immutable source-file comparison and 21 textual anchors only"
+  },
+  "solidity": {
+    "command": "forge test --match-path solidity/test/SszWrapperIndex.t.sol --remappings contracts/=lido-core/contracts/ --fuzz-runs 1024 --fuzz-seed 0x20260909 --out /tmp/lido-ssz-wrapper-solidity-out --cache-path /tmp/lido-ssz-wrapper-solidity-cache -vv",
+    "exit": 0,
+    "solc": "0.8.25",
+    "tests_passed": 8,
+    "fuzz_properties": 5,
+    "fuzz_runs_each": 1024,
+    "log": "solidity-validation.log",
+    "scope": "root-integrator actual inherited wrapper helper, concat/fls and byte-reference tests; not full _verifyValidator or Lean-to-EVM refinement"
+  },
+  "independent_review": "pending exact committed-candidate review"
+}
