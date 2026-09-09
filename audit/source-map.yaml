@@ -392,6 +392,16 @@
           "repository": "lidofinance/core",
           "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
           "path": "contracts/0.8.25/sr/StakingRouter.sol",
+          "function": "constructor",
+          "start_line": 88,
+          "end_line": 99,
+          "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/sr/StakingRouter.sol#L88-L99",
+          "provenance_status": "OPEN: _depositContract is only nonzero-checked then assigned unchanged to DEPOSIT_CONTRACT; deployed constructor argument/runtime immutable identity remains A-RUNTIME-PROVENANCE"
+        },
+        {
+          "repository": "lidofinance/core",
+          "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+          "path": "contracts/0.8.25/sr/StakingRouter.sol",
           "function": "topUp",
           "start_line": 679,
           "end_line": 759,
