@@ -1,6 +1,8 @@
 import audit.trio.consolidation.Bus
 import audit.trio.consolidation.Codec
 import audit.trio.consolidation.Gateway
+import audit.trio.consolidation.Producer
+import audit.trio.consolidation.SourceExecution
 import LidoSRv3.Audit.Verity.TrioConsolidation.Correspondence
 import LidoSRv3.Audit.Verity.TrioConsolidation.Memory
 
@@ -25,6 +27,13 @@ import LidoSRv3.Audit.Verity.TrioConsolidation.Memory
 #print axioms audit.trio.consolidation.leading_zero_mutant
 #print axioms audit.trio.consolidation.endian_mutant
 #print axioms audit.trio.consolidation.raw48_nat_injective
+#print axioms audit.trio.consolidation.decode_encode_bytes_element
+#print axioms audit.trio.consolidation.preparePairs_of_producer
+#print axioms audit.trio.consolidation.widthOk_source_is_raw48
+#print axioms audit.trio.consolidation.widthOk_target_is_raw48
+#print axioms audit.trio.consolidation.widthOk_payload_length
+#print axioms audit.trio.consolidation.vaultCallPayload_is_packed
+#print axioms audit.trio.consolidation.vaultCallPayload_is_packed_byteArray
 #print axioms audit.trio.consolidation.checkFee_additive
 #print axioms audit.trio.consolidation.committed_vault_payloads
 #print axioms audit.trio.consolidation.committed_payloads_are_packed
