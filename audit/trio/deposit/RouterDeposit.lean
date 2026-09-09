@@ -56,20 +56,36 @@ structure LiveWithdrawalExecution (execution : DepositExecution) where
   external : LidoSRv3.Audit.Source.TrioReserve1.Live.External
   context : LidoSRv3.Audit.Source.TrioReserve1.Live.Context
   before : LidoSRv3.Audit.Source.TrioReserve1.Live.World
-  after : LidoSRv3.Audit.Source.TrioReserve1.Live.World
-  attempts : List LidoSRv3.Audit.Source.TrioReserve1.Live.Attempt
-  executed : LidoSRv3.Audit.Source.TrioReserve1.Live.run
+  executed : (LidoSRv3.Audit.Source.TrioReserve1.Live.run
     (LidoSRv3.Audit.Source.TrioReserve1.Live.withdrawDepositableEther external context
       (LidoSRv3.Audit.Source.TrioReserve1.Live.word execution.values.lidoPullWei)
-      (LidoSRv3.Audit.Source.TrioReserve1.Live.word execution.values.actualKeys)) before =
-      ⟨.ok (), after, attempts⟩
-  callbackCredit : after.balances context.sender =
-    before.balances context.sender + execution.values.lidoPullWei
-  callbackObserved : ∃ attempt ∈ attempts,
-    attempt.accepted = true ∧
-    attempt.request.target = context.sender ∧
-    attempt.request.value = LidoSRv3.Audit.Source.TrioReserve1.Live.word execution.values.lidoPullWei ∧
-    attempt.request.payload = LidoSRv3.Audit.Source.TrioReserve1.Live.encode 4 0x13ae8460
+      (LidoSRv3.Audit.Source.TrioReserve1.Live.word execution.values.actualKeys)) before).outcome =
+      .ok ()
+
+/-- The live world returned by the source executor; it is not separately
+supplied by the composition witness. -/
+def LiveWithdrawalExecution.after (live : LiveWithdrawalExecution execution) :
+    LidoSRv3.Audit.Source.TrioReserve1.Live.World :=
+  (LidoSRv3.Audit.Source.TrioReserve1.Live.run
+    (LidoSRv3.Audit.Source.TrioReserve1.Live.withdrawDepositableEther live.external live.context
+      (LidoSRv3.Audit.Source.TrioReserve1.Live.word execution.values.lidoPullWei)
+      (LidoSRv3.Audit.Source.TrioReserve1.Live.word execution.values.actualKeys)) live.before).world
+
+/-- Router balance gained across the actual source execution. -/
+def LiveWithdrawalExecution.callbackCredit (live : LiveWithdrawalExecution execution) : Nat :=
+  live.after.balances live.context.sender - live.before.balances live.context.sender
+
+/-- Callback attempts observed from the actual source execution. -/
+def LiveWithdrawalExecution.callbackObserved (live : LiveWithdrawalExecution execution) :
+    List LidoSRv3.Audit.Source.TrioReserve1.Live.Attempt :=
+  (LidoSRv3.Audit.Source.TrioReserve1.Live.run
+    (LidoSRv3.Audit.Source.TrioReserve1.Live.withdrawDepositableEther live.external live.context
+      (LidoSRv3.Audit.Source.TrioReserve1.Live.word execution.values.lidoPullWei)
+      (LidoSRv3.Audit.Source.TrioReserve1.Live.word execution.values.actualKeys)) live.before).attempts.filter
+        fun attempt => attempt.accepted &&
+          attempt.request.target = live.context.sender &&
+          attempt.request.value = LidoSRv3.Audit.Source.TrioReserve1.Live.word execution.values.lidoPullWei &&
+          attempt.request.payload = LidoSRv3.Audit.Source.TrioReserve1.Live.encode 4 0x13ae8460
 
 structure Result where
   outcome : Except Fault Unit
@@ -90,12 +106,21 @@ structure SuccessfulDepositExecution where
   limits : DepositLimits
   obtainDepositData : ObtainDepositData
   depositSize : Nat
+  depositSize_eq : depositSize = DEPOSIT_SIZE
   withdraw : audit.trio.deposit.WithdrawDepositableEther
   execution : DepositExecution
   executed : depositValuesABI layout storage oracle config requested before moduleId
     limits obtainDepositData depositSize withdraw = (.ok execution, after)
   liveWithdrawal : Option (LiveWithdrawalExecution execution)
   liveWithdrawalIffNonzero : liveWithdrawal.isSome = (execution.values.actualKeys != 0)
+
+theorem SuccessfulDepositExecution.beaconTotal_eq (linked : SuccessfulDepositExecution) :
+    linked.execution.values.beaconTotalWei =
+      linked.execution.values.actualKeys * DEPOSIT_SIZE := by
+  have composed := abi_success_composes_deposit_values linked.layout linked.storage linked.oracle
+    linked.config linked.requested linked.before linked.after linked.moduleId linked.limits
+    linked.obtainDepositData linked.depositSize linked.withdraw linked.execution linked.executed
+  rw [composed.2.1, linked.depositSize_eq]
 
 def checkedProduct (a b : Nat) : Except Fault Nat :=
   if a * b < 2 ^ 256 then .ok (a * b)
@@ -145,15 +170,18 @@ private def makeCall (ctx : Context) (credentials : LidoSRv3.Audit.Source.TrioAl
     depositDataRoot := (LidoSRv3.Audit.Source.DepositDataRootCorrespondence.computeDepositDataRootWithAmount
       (rootInput credentials publicKey signature)).bytes }
 
+/-- Loop-local result retains the world reached after every accepted beacon
+call, including when a later call fails. `execute` applies root rollback only
+after this raw source-order result has been produced. -/
 private def beaconLoop (external : External) (ctx : Context)
     (credentials : LidoSRv3.Audit.Source.TrioAlloc1.Bytes)
-    (execution : DepositExecution) (remaining index : Nat) (w : World) : Except Fault World :=
+    (execution : DepositExecution) (remaining index : Nat) (w : World) : Result :=
   match remaining with
-  | 0 => .ok w
+  | 0 => ⟨.ok (), w⟩
   | n + 1 =>
       let call := makeCall ctx credentials execution index
-      if w.routerBalance < DEPOSIT_SIZE then .error .insufficientRouterBalance
-      else if !external.beaconAccepts call then .error .beaconCallFailed
+      if w.routerBalance < DEPOSIT_SIZE then ⟨.error .insufficientRouterBalance, w⟩
+      else if !external.beaconAccepts call then ⟨.error .beaconCallFailed, w⟩
       else
         beaconLoop external ctx credentials execution n (index + 1)
           { w with
@@ -194,12 +222,14 @@ private def executeExecutionRaw (external : External) (ctx : Context)
           | .ok expectedSignatures =>
             if execution.moduleData.signaturesBatch.length != expectedSignatures then
               ⟨.error .invalidSignaturesBatchLength, pulled⟩
-            else match beaconLoop external ctx credentials execution
-                execution.values.actualKeys 0 pulled with
-            | .error fault => ⟨.error fault, pulled⟩
-            | .ok after =>
-                if after.routerBalance = before.routerBalance then ⟨.ok (), after⟩
-                else ⟨.error .balanceAssertion, after⟩
+            else
+              let loop := beaconLoop external ctx credentials execution
+                execution.values.actualKeys 0 pulled
+              match loop.outcome with
+              | .error fault => ⟨.error fault, loop.world⟩
+              | .ok () =>
+                  if loop.world.routerBalance = before.routerBalance then ⟨.ok (), loop.world⟩
+                  else ⟨.error .balanceAssertion, loop.world⟩
 
 /-- `executeRaw` is the direct composition boundary: its only deposit payload
 is accompanied by a successful `depositValuesABI` premise. -/

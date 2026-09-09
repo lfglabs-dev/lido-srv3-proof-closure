@@ -39,7 +39,8 @@ address, source-computed deposit-data root, and 32-ether value transfer; root
 rollback on every modeled external failure; and the router-balance assert.
 Its public `executeRaw` boundary accepts a successful `depositValuesABI` package,
 so module ID, actual count, immutable max balance and batches are taken from
-that package. A nonzero execution additionally carries the successful live Lido
+that package, and its deposit-size input must equal the pinned
+`BeaconChainDepositor.DEPOSIT_SIZE` used by every beacon call. A nonzero execution additionally carries the successful live Lido
 withdrawal and callback-balance receipt for those same derived arguments.
 Solidity 0.8 checked multiplication is explicit
 for `actualDepositsCount * maxEBType1`, `48 * actualDepositsCount`, and
@@ -67,7 +68,8 @@ execution relation.
 
 The rollback theorem establishes the behavior of the model wrapper, which
 restores its input World on failure; it is not an EVM rollback correspondence
-proof. Deposit-data roots use the existing source computation model; its
+proof. Before that wrapper restores the snapshot, the raw result retains every
+successful beacon-call prefix when a later beacon call fails. Deposit-data roots use the existing source computation model; its
 cryptographic/SSZ correspondence and deployed target identity are separate
 obligations. This increment improves the model and its conditional producer
 link, without closing the full P-DEPOSIT-1 guarantee.

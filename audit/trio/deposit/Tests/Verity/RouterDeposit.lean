@@ -55,11 +55,7 @@ def liveReceipt : LiveWithdrawalExecution execution where
   external := liveExternal
   context := liveContext
   before := liveBefore
-  after := liveResult.world
-  attempts := liveResult.attempts
-  executed := by rfl
-  callbackCredit := by native_decide
-  callbackObserved := by native_decide
+  executed := by native_decide
 
 def linked : SuccessfulDepositExecution where
   layout := audit.trio.deposit.Tests.Verity.layout
@@ -73,11 +69,17 @@ def linked : SuccessfulDepositExecution where
   limits := audit.trio.deposit.Tests.Verity.limits
   obtainDepositData := audit.trio.deposit.Tests.Verity.exactTargetModule
   depositSize := DEPOSIT_SIZE
+  depositSize_eq := rfl
   withdraw := routerWithdrawal
   execution := execution
   executed := by native_decide
   liveWithdrawal := some liveReceipt
   liveWithdrawalIffNonzero := by native_decide
+
+example : liveReceipt.callbackCredit = 2 * DEPOSIT_SIZE := by native_decide
+example : liveReceipt.callbackObserved.length = 1 := by native_decide
+example : linked.execution.values.beaconTotalWei =
+    linked.execution.values.actualKeys * DEPOSIT_SIZE := linked.beaconTotal_eq
 
 def expectSuccess (result : Result) : IO Unit :=
   match result.outcome with
@@ -109,6 +111,20 @@ def expectRollback (wanted : Fault) (result : Result) : IO Unit :=
   (execute accepts {ctx with withdrawalCredentials := none} linked before)
 #eval expectRollback .beaconCallFailed
   (execute ⟨fun call => call.index = 0⟩ ctx linked before)
+
+def expectRawBeaconPrefix (result : Result) : IO Unit :=
+  match result.outcome with
+  | .ok () => throw (IO.userError "unexpected success")
+  | .error actual =>
+      unless actual == .beaconCallFailed &&
+          result.world.calls.length = 1 &&
+          result.world.calls.map (fun call => call.index) = [0] &&
+          result.world.routerBalance = before.routerBalance + DEPOSIT_SIZE &&
+          result.world.beaconBalance = before.beaconBalance + DEPOSIT_SIZE do
+        throw (IO.userError s!"raw failure lost successful beacon prefix: {repr result}")
+
+#eval expectRawBeaconPrefix
+  (executeRaw ⟨fun call => call.index = 0⟩ ctx linked before)
 
 /-- These are the three Solidity 0.8 multiplication sites. -/
 example : checkedMulNat (2^255) 32 = none := by native_decide
