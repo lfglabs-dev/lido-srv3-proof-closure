@@ -150,6 +150,61 @@ def beaconLoop (external : External) (ctx : Context) (liveCtx : Live.Context)
         beaconLoop external ctx liveCtx credentials prepared n (index + 1)
           { w with router := router, live := live } attempts
 
+/-- Line 996 assert: a successful loop must restore the pre-call router balance. -/
+def finishLoop (before : World) (loop : Result) : Result :=
+  match loop.outcome with
+  | .error _ => loop
+  | .ok () =>
+    if loop.world.router.routerBalance = before.router.routerBalance then loop
+    else ⟨.error .balanceAssertion, loop.world, loop.lidoAttempts⟩
+
+/-- Solidity 0.8 48/96-byte batch-length checks after the Lido pull. -/
+def batchLengthsOk (prepared : PreparedDeposit) : Except Fault Unit :=
+  match checkedProduct 48 prepared.values.actualKeys with
+  | .error fault => .error fault
+  | .ok expectedPublicKeys =>
+    if prepared.moduleData.publicKeysBatch.length != expectedPublicKeys then
+      .error .invalidPublicKeysBatchLength
+    else match checkedProduct 96 prepared.values.actualKeys with
+    | .error fault => .error fault
+    | .ok expectedSignatures =>
+      if prepared.moduleData.signaturesBatch.length != expectedSignatures then
+        .error .invalidSignaturesBatchLength
+      else .ok ()
+
+def runWithdrawal (external : External) (inputs : Inputs) (prepared : PreparedDeposit)
+    (live : Live.World) : Live.Result Unit :=
+  Live.run (Live.withdrawDepositableEther external.lido inputs.liveContext
+    (Live.word prepared.values.lidoPullWei) (Live.word prepared.values.actualKeys)) live
+
+/-- Source-ordered suffix after a successful allocation/module prefix. -/
+def executePrepared (external : External) (ctx : Context) (inputs : Inputs)
+    (before : World) (credentialsWord : Word) (prepared : PreparedDeposit)
+    (transcript : Transcript) : Result :=
+  let updatedRouter := updateModuleLastDepositState ctx prepared before.router
+  let updated : World :=
+    { before with allocationTranscript := transcript, router := updatedRouter }
+  if prepared.values.actualKeys = 0 then ⟨.ok (), updated, []⟩
+  else if before.router.routerBalance != before.live.balances inputs.liveContext.sender then
+    ⟨.error .liveWorldMismatch, updated, []⟩
+  else
+    let withdrawal := runWithdrawal external inputs prepared before.live
+    match withdrawal.outcome with
+    | .error reason =>
+      ⟨.error (.lidoWithdrawal reason), updated, withdrawal.attempts⟩
+    | .ok () =>
+      let pulled : World :=
+        { updated with
+          live := withdrawal.world
+          router := { updatedRouter with
+            routerBalance := withdrawal.world.balances inputs.liveContext.sender } }
+      match batchLengthsOk prepared with
+      | .error fault => ⟨.error fault, pulled, withdrawal.attempts⟩
+      | .ok () =>
+        finishLoop before
+          (beaconLoop external ctx inputs.liveContext (encodeWord credentialsWord)
+            prepared prepared.values.actualKeys 0 pulled withdrawal.attempts)
+
 /-- Execute authorization, allocation, returned keys, the Lido withdrawal, and
 all beacon calls as one transition over one root world. -/
 def executeRaw (external : External) (ctx : Context) (inputs : Inputs)
@@ -162,45 +217,12 @@ def executeRaw (external : External) (ctx : Context) (inputs : Inputs)
     let preparedResult := prepareDepositABI inputs.layout inputs.storage inputs.oracle inputs.config
       inputs.requested before.allocationTranscript inputs.moduleId inputs.limits
       inputs.obtainDepositData DEPOSIT_SIZE
-    let withTranscript := { before with allocationTranscript := preparedResult.2 }
     match preparedResult.1 with
-    | .error reason => ⟨.error (.depositPrefix reason), withTranscript, []⟩
+    | .error reason =>
+      ⟨.error (.depositPrefix reason),
+        { before with allocationTranscript := preparedResult.2 }, []⟩
     | .ok prepared =>
-      let updatedRouter := updateModuleLastDepositState ctx prepared before.router
-      let updated := { withTranscript with router := updatedRouter }
-      if prepared.values.actualKeys = 0 then ⟨.ok (), updated, []⟩
-      else if before.router.routerBalance != before.live.balances inputs.liveContext.sender then
-        ⟨.error .liveWorldMismatch, updated, []⟩
-      else
-        let withdrawal := Live.run
-          (Live.withdrawDepositableEther external.lido inputs.liveContext
-            (Live.word prepared.values.lidoPullWei)
-            (Live.word prepared.values.actualKeys)) before.live
-        match withdrawal.outcome with
-        | .error reason =>
-          ⟨.error (.lidoWithdrawal reason), updated, withdrawal.attempts⟩
-        | .ok () =>
-          let pulledRouter := { updatedRouter with
-            routerBalance := withdrawal.world.balances inputs.liveContext.sender }
-          let pulled := { updated with live := withdrawal.world, router := pulledRouter }
-          match checkedProduct 48 prepared.values.actualKeys with
-          | .error fault => ⟨.error fault, pulled, withdrawal.attempts⟩
-          | .ok expectedPublicKeys =>
-            if prepared.moduleData.publicKeysBatch.length != expectedPublicKeys then
-              ⟨.error .invalidPublicKeysBatchLength, pulled, withdrawal.attempts⟩
-            else match checkedProduct 96 prepared.values.actualKeys with
-            | .error fault => ⟨.error fault, pulled, withdrawal.attempts⟩
-            | .ok expectedSignatures =>
-              if prepared.moduleData.signaturesBatch.length != expectedSignatures then
-                ⟨.error .invalidSignaturesBatchLength, pulled, withdrawal.attempts⟩
-              else
-                let loop := beaconLoop external ctx inputs.liveContext (encodeWord credentialsWord)
-                  prepared prepared.values.actualKeys 0 pulled withdrawal.attempts
-                match loop.outcome with
-                | .error fault => loop
-                | .ok () =>
-                  if loop.world.router.routerBalance = before.router.routerBalance then loop
-                  else ⟨.error .balanceAssertion, loop.world, loop.lidoAttempts⟩
+      executePrepared external ctx inputs before credentialsWord prepared preparedResult.2
 
 /-- Root rollback restores the allocation transcript, Lido world, and router
 state together. Attempts remain observations of the failed transaction. -/
@@ -257,5 +279,190 @@ theorem beaconLoop_ok_conservation
         rw [Nat.succ_mul, ← Nat.add_assoc, hRouter, Nat.sub_add_cancel hge]
 
 #print axioms beaconLoop_ok_conservation
+
+/-- Caller hypothesis: prepared source values charge the beacon loop
+`actualKeys` keys at the pinned `DEPOSIT_SIZE` each. Data-only; no post-state.
+Not a consequence of ALLOC: ALLOC does not constrain `beaconPerKeyWei`. -/
+structure LinksSource (prepared : PreparedDeposit) : Prop where
+  perKey : prepared.values.beaconPerKeyWei = DEPOSIT_SIZE
+  total : prepared.values.beaconTotalWei = prepared.values.actualKeys * DEPOSIT_SIZE
+
+theorem updateModuleLastDepositState_preserves_balances
+    (ctx : Context) (prepared : PreparedDeposit) (w : RouterWorld) :
+    (updateModuleLastDepositState ctx prepared w).routerBalance = w.routerBalance ∧
+      (updateModuleLastDepositState ctx prepared w).beaconBalance = w.beaconBalance := by
+  simp [updateModuleLastDepositState]
+
+theorem finishLoop_ok
+    (before after : World) (attempts : List Live.Attempt) (loop : Result)
+    (h : finishLoop before loop = ⟨.ok (), after, attempts⟩) :
+    loop = ⟨.ok (), after, attempts⟩ ∧
+      after.router.routerBalance = before.router.routerBalance := by
+  cases loop with
+  | mk outcome world lidoAttempts =>
+    cases outcome with
+    | error _ =>
+      simp [finishLoop] at h
+    | ok _ =>
+      simp [finishLoop] at h
+      split_ifs at h with hBal
+      · exact ⟨h, by
+          have hw := (Result.mk.inj h).2.1
+          simpa [hw] using hBal⟩
+      · cases h
+
+/-- Successful `executePrepared` restores the pre-call router balance (line 996,
+or the zero-key early return) and credits the beacon with
+`actualKeys * DEPOSIT_SIZE`. Failures are excluded by the `.ok` hypothesis. -/
+theorem executePrepared_ok_conservation
+    (external : External) (ctx : Context) (inputs : Inputs)
+    (before after : World) (credentialsWord : Word) (prepared : PreparedDeposit)
+    (transcript : Transcript) (attempts : List Live.Attempt)
+    (h : executePrepared external ctx inputs before credentialsWord prepared transcript =
+      ⟨.ok (), after, attempts⟩) :
+    after.router.routerBalance = before.router.routerBalance ∧
+      after.router.beaconBalance =
+        before.router.beaconBalance + prepared.values.actualKeys * DEPOSIT_SIZE := by
+  simp only [executePrepared] at h
+  split_ifs at h with hZero hLive
+  · have hw := (Result.mk.inj h).2.1
+    subst after
+    exact ⟨(updateModuleLastDepositState_preserves_balances ctx prepared before.router).1,
+      by simp [updateModuleLastDepositState, hZero]⟩
+  · cases h
+  · split at h
+    · cases h
+    · split at h
+      · cases h
+      · obtain ⟨hLoopEq, hAssert⟩ := finishLoop_ok before after attempts _ h
+        obtain ⟨hBeacon, _⟩ :=
+          beaconLoop_ok_conservation external ctx inputs.liveContext
+            (encodeWord credentialsWord) prepared prepared.values.actualKeys 0
+            _ after _ attempts hLoopEq
+        have hBal :=
+          updateModuleLastDepositState_preserves_balances ctx prepared before.router
+        exact ⟨hAssert, by simpa [hBal.2, updateModuleLastDepositState] using hBeacon⟩
+
+private theorem execute_eq_raw_of_ok
+    {external : External} {ctx : Context} {inputs : Inputs}
+    {before after : World} {attempts : List Live.Attempt}
+    (h : execute external ctx inputs before = ⟨.ok (), after, attempts⟩) :
+    executeRaw external ctx inputs before = ⟨.ok (), after, attempts⟩ := by
+  simp only [execute] at h
+  cases hraw : executeRaw external ctx inputs before with
+  | mk outcome world lidoAttempts =>
+    cases outcome with
+    | error _ => simp [hraw] at h
+    | ok _ => simpa [hraw] using h
+
+/-- Successful `executeRaw` is a successful prepared suffix of the allocation
+prefix this transition actually ran. -/
+theorem executeRaw_ok_conservation
+    (external : External) (ctx : Context) (inputs : Inputs)
+    (before after : World) (attempts : List Live.Attempt)
+    (h : executeRaw external ctx inputs before = ⟨.ok (), after, attempts⟩) :
+    after.router.routerBalance = before.router.routerBalance ∧
+      ∃ credentialsWord prepared transcript,
+        ctx.withdrawalCredentials = some credentialsWord ∧
+        prepareDepositABI inputs.layout inputs.storage inputs.oracle inputs.config
+          inputs.requested before.allocationTranscript inputs.moduleId inputs.limits
+          inputs.obtainDepositData DEPOSIT_SIZE = (.ok prepared, transcript) ∧
+        executePrepared external ctx inputs before credentialsWord prepared transcript =
+          ⟨.ok (), after, attempts⟩ ∧
+        after.router.beaconBalance =
+          before.router.beaconBalance + prepared.values.actualKeys * DEPOSIT_SIZE := by
+  simp only [executeRaw] at h
+  split_ifs at h
+  · cases h
+  · cases h
+  · cases hCred : ctx.withdrawalCredentials with
+    | none =>
+      simp [hCred] at h
+    | some credentialsWord =>
+      simp [hCred] at h
+      generalize hPrep :
+        (prepareDepositABI inputs.layout inputs.storage inputs.oracle inputs.config
+          inputs.requested before.allocationTranscript inputs.moduleId inputs.limits
+          inputs.obtainDepositData DEPOSIT_SIZE) = preparedResult
+      simp [hPrep] at h
+      match preparedResult with
+      | (Except.error _, _) =>
+        simp at h
+      | (Except.ok prepared, transcript) =>
+        simp at h
+        have cons := executePrepared_ok_conservation external ctx inputs before after
+          credentialsWord prepared transcript attempts h
+        exact ⟨cons.1, credentialsWord, prepared, transcript, rfl, rfl, h, cons.2⟩
+
+#print axioms executeRaw_ok_conservation
+
+/-- Successful `execute` is the same conservation: the wrapper does not rewrite
+a committed world. -/
+theorem execute_ok_conservation
+    (external : External) (ctx : Context) (inputs : Inputs)
+    (before after : World) (attempts : List Live.Attempt)
+    (h : execute external ctx inputs before = ⟨.ok (), after, attempts⟩) :
+    after.router.routerBalance = before.router.routerBalance ∧
+      ∃ credentialsWord prepared transcript,
+        ctx.withdrawalCredentials = some credentialsWord ∧
+        prepareDepositABI inputs.layout inputs.storage inputs.oracle inputs.config
+          inputs.requested before.allocationTranscript inputs.moduleId inputs.limits
+          inputs.obtainDepositData DEPOSIT_SIZE = (.ok prepared, transcript) ∧
+        after.router.beaconBalance =
+          before.router.beaconBalance + prepared.values.actualKeys * DEPOSIT_SIZE := by
+  obtain ⟨hBal, credentialsWord, prepared, transcript, hCred, hPrep, _, hBeacon⟩ :=
+    executeRaw_ok_conservation external ctx inputs before after attempts (execute_eq_raw_of_ok h)
+  exact ⟨hBal, credentialsWord, prepared, transcript, hCred, hPrep, hBeacon⟩
+
+#print axioms execute_ok_conservation
+
+/-- Successful `execute` under the caller `LinksSource` hypothesis: the beacon
+credit is the prepared source `beaconTotalWei`. `LinksSource` is not derived
+from ALLOC; the caller supplies it for whichever prefix `execute` ran. -/
+theorem execute_ok_conservation_of_linkssource
+    (external : External) (ctx : Context) (inputs : Inputs)
+    (before after : World) (attempts : List Live.Attempt)
+    (hLink : ∀ prepared,
+      (prepareDepositABI inputs.layout inputs.storage inputs.oracle inputs.config
+          inputs.requested before.allocationTranscript inputs.moduleId inputs.limits
+          inputs.obtainDepositData DEPOSIT_SIZE).1 = .ok prepared →
+        LinksSource prepared)
+    (h : execute external ctx inputs before = ⟨.ok (), after, attempts⟩) :
+    after.router.routerBalance = before.router.routerBalance ∧
+      ∃ prepared,
+        (prepareDepositABI inputs.layout inputs.storage inputs.oracle inputs.config
+            inputs.requested before.allocationTranscript inputs.moduleId inputs.limits
+            inputs.obtainDepositData DEPOSIT_SIZE).1 = .ok prepared ∧
+          LinksSource prepared ∧
+            after.router.beaconBalance =
+              before.router.beaconBalance + prepared.values.beaconTotalWei := by
+  obtain ⟨hBal, _, prepared, _, _, hPrep, hBeacon⟩ :=
+    execute_ok_conservation external ctx inputs before after attempts h
+  have hOk : (prepareDepositABI inputs.layout inputs.storage inputs.oracle inputs.config
+      inputs.requested before.allocationTranscript inputs.moduleId inputs.limits
+      inputs.obtainDepositData DEPOSIT_SIZE).1 = .ok prepared :=
+    congrArg Prod.fst hPrep
+  exact ⟨hBal, prepared, hOk, hLink prepared hOk, (hLink prepared hOk).total ▸ hBeacon⟩
+
+#print axioms execute_ok_conservation_of_linkssource
+
+/-- Under the caller `LinksSource` hypothesis, the beacon credit is the
+prepared source `beaconTotalWei`. `LinksSource` is not derived from ALLOC. -/
+theorem executePrepared_ok_conservation_of_linkssource
+    (external : External) (ctx : Context) (inputs : Inputs)
+    (before after : World) (credentialsWord : Word) (prepared : PreparedDeposit)
+    (transcript : Transcript) (attempts : List Live.Attempt)
+    (hLink : LinksSource prepared)
+    (h : executePrepared external ctx inputs before credentialsWord prepared transcript =
+      ⟨.ok (), after, attempts⟩) :
+    after.router.routerBalance = before.router.routerBalance ∧
+      after.router.beaconBalance =
+        before.router.beaconBalance + prepared.values.beaconTotalWei := by
+  obtain ⟨hBal, hBeacon⟩ :=
+    executePrepared_ok_conservation external ctx inputs before after credentialsWord
+      prepared transcript attempts h
+  exact ⟨hBal, hLink.total ▸ hBeacon⟩
+
+#print axioms executePrepared_ok_conservation_of_linkssource
 
 end audit.trio.deposit.RouterDeposit
