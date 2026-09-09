@@ -44,8 +44,8 @@ sets and the full batch storage relation remain outside these slices. The
 ADDRESS now also has a physical `Fin (2^256)` storage-word layer for its packed
 withdrawal-request word. Owner and claimed assignments are proved not to wrap;
 the owner write preserves the complete upper 96-bit tail, while the claimed
-write preserves every bit below and above bit 200. The claimed field is a full
-storage byte (bits 200..207) matching `AddressClaimBatchTx.requestClaimed`.
+write preserves every bit below 200 and at/above 208. The claimed field is a
+full storage byte (bits 200..207) matching `AddressClaimBatchTx.requestClaimed`.
 Concrete words exercise the timestamp, report-timestamp, and unused-high-bit
 regions. Slot-key
 derivation and execution-to-storage refinement remain outside the slice. These
