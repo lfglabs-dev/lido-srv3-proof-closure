@@ -23,21 +23,23 @@ The `WithdrawDepositableEther` suffix returns before the Lido call when the
 module returned zero keys.  On the nonzero path, one theorem composes successful
 deposit ABI execution with the complete RESERVE-1 `withdrawDepositableEther`
 relation, derives both the pull and seed-count arguments from the returned key
-count, and proves their word widths from the executed guards.  It retains the
-live pause, router-auth and zero-amount guards, reserve accounting, seed counter
-update, value-bearing router callback, and whole-world failure rollback.
+count, and proves their word widths from the executed guards.  The separately executed live withdrawal suffix retains its pause, router-auth
+and zero-amount guards, reserve accounting, seed counter update and modeled
+value-bearing callback. This does not yet identify it with the producer's abstract
+withdrawal call or the router world.
 It accepts the documented trio limitations
 and does not claim compiler-memory, deployed-bytecode, or deployment identity.
 
-`RouterDeposit.lean` closes the remaining source-body gaps at the pinned lines:
+`RouterDeposit.lean` adds a conditional source-shaped suffix covering:
 router authorization, active-module and credential guards; the timestamp/block
 writer and event before the zero-key return; exact 48/96-byte helper validation;
 the per-key selected public key and signature, credentials, deposit-contract
 address, source-computed deposit-data root, and 32-ether value transfer; root
 rollback on every modeled external failure; and the router-balance assert.
 Its public `executeRaw` boundary accepts a successful `depositValuesABI` package,
-so module ID, actual count, immutable max balance, batches, and Lido success
-cannot be supplied a second time. Solidity 0.8 checked multiplication is explicit
+so module ID, actual count, immutable max balance and batches are taken from
+that package. Its Lido success is relative to the supplied abstract withdrawal
+function; it is not yet tied to the independently executed live suffix. Solidity 0.8 checked multiplication is explicit
 for `actualDepositsCount * maxEBType1`, `48 * actualDepositsCount`, and
 `96 * actualDepositsCount`.
 The `maxEBType1 = DEPOSIT_SIZE` deployment identity remains deliberately
@@ -50,3 +52,20 @@ RESERVE-1, registry, YAML, trust, or `AllGuarantees` file is changed.
 
 Production Lean lives beside this file.  Executable regressions live under
 `Tests/Verity` and are selected by the local Lake target.
+
+## Remaining composition obligations
+
+The producer transcript, storage, abstract withdrawal result and the router
+suffix's independently supplied Context/World are not yet bound to one shared
+Solidity execution. In particular the producer has already called its abstract
+withdrawal before the suffix checks authorization and updates module state; this
+packaging does not prove the source call order. The suffix models receipt of the
+pull by directly crediting its router balance. The callback and all before/after
+states still need a common execution relation.
+
+The rollback theorem establishes the behavior of the model wrapper, which
+restores its input World on failure; it is not an EVM rollback correspondence
+proof. Deposit-data roots use the existing source computation model; its
+cryptographic/SSZ correspondence and deployed target identity are separate
+obligations. This increment improves the model and its conditional producer
+link, without closing the full P-DEPOSIT-1 guarantee.
