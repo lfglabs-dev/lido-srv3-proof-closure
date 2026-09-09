@@ -1,0 +1,43 @@
+{
+  "candidate": "af331323faf4d8a1e74314506343bc91ae6499fe",
+  "review_mission": "d6c19c48-871b-4b64-bea9-53f02a6762eb",
+  "review_events": [
+    2928,
+    4952
+  ],
+  "verdict": "CLEAN for scoped transport; all eight useful guarantees OPEN",
+  "candidate_files_unchanged": {
+    "LidoSRv3/Audit/Source/TopupModuleCall.lean": "ebd2ab400e38891186aa298d84b860e20dd157e917219257c2888ccd9fd379d1",
+    "LidoSRv3/Tests/TopupModuleCallMutants.lean": "6f4e3d3e63bba837a6c553925227f223c73b76e7df4f932ec33ead4915581575",
+    "audit/topup-module-call/Export.lean": "557941b9e471e912b3e382f22e31b10232e25de922f5e249ad811bfe709b5529",
+    "audit/topup-module-call/README.md": "850d1abc05352147691bbeac3dd77ae7876dbfa93214e63e924b58d52cfbe8d5",
+    "audit/topup-module-call/axioms.log": "d3bf483dda6072f4025a00ad52f39f466230f95090ddfb79dd99e8792c1b66e5",
+    "audit/topup-module-call/build_vectors.py": "c8a6b045465a22e6d959397d1bd26290f29ee8feaaccfc4dffbfe55dd7e4cbdd",
+    "audit/topup-module-call/check_receipt.py": "8ea32530c4af184823cca3c2f275c7aeb04152108fe3fac586438cfa77a3f5b4",
+    "audit/topup-module-call/dependency-inputs.json": "a6213a49ea680682f3dd6471a210fd90a8b550f3d446b95296381d1bddf7c834",
+    "audit/topup-module-call/fresh-validation.json": "14b49f2db439d515e4e87960be10183fa9908b35c4736d2be5c96a31039fb234",
+    "audit/topup-module-call/receipt.json": "abbf056d150b0b70e41e1388e5f2bc3b69c8fa7a2c5b2469ee9c7b1fe80cdf47",
+    "audit/topup-module-call/solidity/ModuleCallHarness.ir.yul.txt": "d126958869b923eeca7639134a45e72c927b1a2b596b8bcea12ce21127f287d7",
+    "audit/topup-module-call/solidity/ModuleVectors.sol": "950dbd0c2c1247d04b78829441ca53c78afe375ba6566a30495fa22d3b2cd97c",
+    "audit/topup-module-call/solidity/README.md": "4c682cdb5b2f37cadbe9a255af655f0e86c598f192d26b1f1bf32bf7498cf3f0",
+    "audit/topup-module-call/solidity/TopupModuleCall.t.sol": "a9cb644d0d1cd1ab78a576f4bdaab8e63738dd042d6afd868f6c9edb9efbb904",
+    "audit/topup-module-call/solidity/compiler-input-identities.json": "afef1be03976db6e9a55c9d7887b71bdb4d994a35459d3750de14d98c4225a20",
+    "audit/topup-module-call/solidity/receipt.json": "ded6dfafcd5a5520d6eeb757c8f720024626e6f8ce0bdd4113edb50353e67d14",
+    "audit/topup-module-call/solidity/validation.log": "2d76e11cd6a075cc6683c873b61fa5aa156fa54dbb3995d09de9f159e8e23fce",
+    "audit/topup-module-call/source-check.json": "4b628faad28916ad7d67325766f22ea8d51791ea50db5b5952698e1dd8e01734",
+    "audit/topup-module-call/target-build.log": "d9144869bc7b288f22251bcf941bba7a731f9c1fa566c8664254d8ab0edfda91",
+    "audit/topup-module-call/validated-inputs.sha256": "a4fbded96dd8c8529d4850bc871d3da27010a0df4315fa35a46a63b53f39cee6",
+    "audit/topup-module-call/validation.log": "90ce07e354ec4f2aa6c7031521819139abe3b32be19ec99cfa85c7a17059013c",
+    "audit/topup-module-call/vectors-validation.log": "68472dab4fbbddeb2dd0dfc33d3f06064e7d8bfe680da1785ba5b7373dd40e1f",
+    "audit/topup-module-call/vectors.json": "f5d3252f49ebfdaba64ba512a669f5abfbd7f4737c659e506ff6739248b782f8",
+    "audit/topup-module-call/vendor/EnumerableSet.sol.txt": "ed0804f9dcff9d2dceba8cc83f31669a84491dfcfe510050c9371aa7c48db09c",
+    "audit/topup-module-call/vendor/package.json": "a0b136852c4d36c261ed32f0f29aa78e7feadeeec8ded5667cf8b2f1566a2f44"
+  },
+  "artifacts": {
+    "independent-review.md": "8b47085f6772cf21e892c92b2419ca5e029aeb6117028d46c0b2cd62abd625c5",
+    "independent-packet-supplement.md": "93e8741aa58ccbfca1206fa3b00611e38d63baa2bfdc854383a212c2688272cf",
+    "independent-review-events.json": "dc541a9ec28a15119de6451f43912db2050b86a9c57d22df57f1999cf4502517",
+    "review-input-check.json": "00556fdcf54231996bee5185e2dc422565f9543aab8ab01258206d3c32a37a3d",
+    "review-response.md": "19acc1ed4d3175ea4834e46bc565c8d6418396991001d58a9b60fb680cc66947"
+  }
+}
