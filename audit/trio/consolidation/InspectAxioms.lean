@@ -20,6 +20,11 @@ import LidoSRv3.Audit.Verity.TrioConsolidation.Memory
 #print axioms audit.trio.consolidation.distinct_raw_bytes_distinct_identities
 #print axioms audit.trio.consolidation.wrap_encode_eq
 #print axioms audit.trio.consolidation.encodePackedRequest_of_bytes
+#print axioms audit.trio.consolidation.encode_decode_raw48
+#print axioms audit.trio.consolidation.encode_decode_Raw48
+#print axioms audit.trio.consolidation.leading_zero_mutant
+#print axioms audit.trio.consolidation.endian_mutant
+#print axioms audit.trio.consolidation.raw48_nat_injective
 #print axioms audit.trio.consolidation.checkFee_additive
 #print axioms audit.trio.consolidation.committed_vault_payloads
 #print axioms audit.trio.consolidation.committed_payloads_are_packed

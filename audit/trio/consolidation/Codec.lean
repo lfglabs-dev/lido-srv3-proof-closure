@@ -126,4 +126,93 @@ theorem encodePackedRequest_of_bytes (source target : Bytes)
         simp [encodePackedRequest, hso, hto] at hsrc htgt ⊢
         rw [hsrc, htgt]
 
+/-! ## Raw 48-octet adapter
+
+Codec only. `Bytes = List UInt8`. Nat is derived from the octets by
+`Live.decode`; `TopupBeaconEffects.encode_decode_bytes` recovers the
+blob: `encode(decode(raw48)) = raw48`. No Live CALL, no vault hop.
+-/
+
+/-- Actual 48-octet calldata blob. Identity is derived from the bytes. -/
+structure Raw48 where
+  bytes : Bytes
+  length_eq : bytes.length = pubkeyLength
+
+/-- Nat derived from the raw 48 octets (`Live.decode`, MSB first). -/
+def raw48Nat (raw : Raw48) : Nat := decode raw.bytes
+
+def toRaw48 (bytes : Bytes) (h : bytes.length = pubkeyLength) : Raw48 :=
+  ⟨bytes, h⟩
+
+/-- Adapter: a 48-octet blob is a `RawPubkey` whose identity is `decode`. -/
+def raw48Pubkey (raw : Raw48) : Pubkey := pubkeyOfBytes raw.bytes
+
+theorem raw48Pubkey_raw (raw : Raw48) : RawPubkey (raw48Pubkey raw) :=
+  pubkeyOfBytes_raw raw.bytes raw.length_eq
+
+/-- Reuse of `TopupBeaconEffects.lean:86 encode_decode_bytes` at width 48. -/
+theorem encode_decode_raw48 (raw : Bytes) (h : raw.length = pubkeyLength) :
+    encode pubkeyLength (decode raw) = raw := by
+  have hround := encode_decode_bytes raw
+  rwa [h] at hround
+
+theorem encode_decode_Raw48 (raw : Raw48) :
+    encode pubkeyLength (raw48Nat raw) = raw.bytes :=
+  encode_decode_raw48 raw.bytes raw.length_eq
+
+/-- `Live.encode` of an integer strictly below `256^47` has a leading zero
+octet: the MSB of a 48-byte big-endian word is unused. -/
+theorem encode48_head_zero {n : Nat} (h : n < 256 ^ (pubkeyLength - 1)) :
+    (encode pubkeyLength n).head? = some 0 := by
+  have hsucc : pubkeyLength = (pubkeyLength - 1) + 1 := by simp [pubkeyLength]
+  have hdiv : n / 256 ^ (pubkeyLength - 1) = 0 := Nat.div_eq_of_lt h
+  unfold encode
+  rw [hsucc, List.range_succ_eq_map]
+  simp [hdiv]
+
+/-- Leading-zero mutant: width-48 padding is observable. Encoding the
+integer of a 47-octet tail cannot produce a 48-octet blob whose first
+byte is non-zero. -/
+theorem leading_zero_mutant (tail : Bytes) (h : tail.length = pubkeyLength - 1)
+    (b : UInt8) (hb : b ≠ 0) :
+    encode pubkeyLength (decode tail) ≠ b :: tail := by
+  intro heq
+  have hsmall : decode tail < 256 ^ (pubkeyLength - 1) := by
+    have := decode_lt tail
+    rwa [h] at this
+  have hzero := encode48_head_zero hsmall
+  have hhead : (b :: tail).head? = some b := rfl
+  have : some (0 : UInt8) = some b := by
+    rw [← hzero, heq, hhead]
+  exact hb (Option.some.inj this).symm
+
+private theorem getLast?_eq_reverse_head? {α : Type _} (l : List α) :
+    l.getLast? = l.reverse.head? := by
+  induction l using List.reverseRecOn with
+  | nil => rfl
+  | append_singleton xs x => simp
+
+/-- Endian mutant: reversing a 48-byte blob with distinct first/last
+octets yields a different Nat, so it is a different key.
+`encode_decode_bytes` recovers both orientations. -/
+theorem endian_mutant (raw : Bytes) (h : raw.length = pubkeyLength)
+    (hends : raw.head? ≠ raw.getLast?) :
+    decode raw ≠ decode raw.reverse := by
+  intro heq
+  have hr : raw.reverse.length = pubkeyLength := by simp [h]
+  have hraw := encode_decode_raw48 raw h
+  have hrev := encode_decode_raw48 raw.reverse hr
+  have hbytes : raw = raw.reverse :=
+    hraw.symm.trans ((congrArg (encode pubkeyLength) heq).trans hrev)
+  have : raw.head? = raw.getLast? :=
+    (congrArg List.head? hbytes).trans (getLast?_eq_reverse_head? raw).symm
+  exact hends this
+
+/-- Distinct raw 48-octet blobs remain distinct after Nat derivation.
+This is `encode_decode_bytes` instantiated at width 48. -/
+theorem raw48_nat_injective {a b : Bytes}
+    (ha : a.length = pubkeyLength) (hb : b.length = pubkeyLength)
+    (hne : a ≠ b) : decode a ≠ decode b :=
+  distinct_raw_bytes_distinct_identities ha hb hne
+
 end audit.trio.consolidation
