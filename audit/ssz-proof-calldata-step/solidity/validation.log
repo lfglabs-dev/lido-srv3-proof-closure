@@ -1,0 +1,12 @@
+Compiling 4 files with Solc 0.8.25
+Solc 0.8.25 finished in 646.32ms
+Compiler run successful!
+
+Ran 4 tests for audit/ssz-proof-calldata-step/solidity/SszProofCalldataStep.t.sol:SszProofCalldataStepTest
+[PASS] testFuzz_actualCalldataOrder(bytes32,bytes32,bytes32,uint8,uint8,uint8) (runs: 1024, μ: 14905, ~: 11722)
+[PASS] test_allMetadataAndWordBitPositions() (gas: 2756026)
+[PASS] test_sourceGuardPriority() (gas: 15042)
+[PASS] test_wrongOrderAndStrideRootsRejected() (gas: 18019)
+Suite result: ok. 4 passed; 0 failed; 0 skipped; finished in 30.92ms (36.67ms CPU time)
+
+Ran 1 test suite in 140.20ms (30.92ms CPU time): 4 tests passed, 0 failed, 0 skipped (4 total tests)

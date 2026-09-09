@@ -1,0 +1,20 @@
+{
+  "candidate": "d5f2acbdd811b49ac16aa33be8d50ba5366d660a",
+  "review_mission": "3d89bb0a-d445-4057-99dd-20b11a648b62",
+  "final_event_sequence": 2678,
+  "verdict": "CLEAN; LOW depth-test interpretation disputed with fresh named theorem and expected-failure evidence",
+  "source_unchanged": {
+    "LidoSRv3/Audit/Source/SszWordBytes.lean": "edf978676f3b42922ff121da12887e5552a9ddc2a9bb6d37c287c44132b01c23",
+    "LidoSRv3/Audit/Source/SszProofCalldataStep.lean": "8c8404c726594c7cdf9cdd9c96a6402dab9bcbcecd27afc7aa2a4d284b135411",
+    "LidoSRv3/Tests/SszProofCalldataStepMutants.lean": "aef474498d09febf8bd9ebd5b7e9849554ba86e506aaaaf7e3f05b983d17b42e"
+  },
+  "artifacts": {
+    "independent-review-event.json": "a89863c6f3ffed9806d7272a183b0a847e34738e85c39685cc2fdaf8de95133c",
+    "independent-review.md": "5346e976082a7831792fecdd4a8fbbec2f5454690488bd530c06da61aabbd161",
+    "depth-review-check.json": "a93990f4f51cbe71ea05471d900fb99be3720cb76212eef13c69d9347e1985f5",
+    "DepthReviewProbe.lean.txt": "4b7c405ff9fd637238eae45bf8085dca255b340cd3e9b62a3a6ff849c40cd7fa",
+    "DepthReviewMutant.lean.txt": "34ec1453b82ba5c1d21d08319e6aa1eb9611c809074f9244eb1ffb1ffd4c06eb",
+    "review-response.md": "188cce63ea8ef4261ab3f7bf56aa0ccfd58cb7afdd6920630a1d8a83555ade96"
+  },
+  "original_receipt_sha256": "901903ba70a6cd546b7ae72685f5da576aaaa59bf45b939b99f201f256828749"
+}

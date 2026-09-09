@@ -1,0 +1,14 @@
+import LidoSRv3.Audit.Source.SszProofCalldataStep
+open EvmYul EvmYul.EVM
+open LidoSRv3.Audit.Source.SszProofCalldataStep
+namespace SszDepthReviewProbe
+private def errorTag (out : Except StepError StepResult) : Option StepError :=
+  match out with | .error e => some e | .ok _ => none
+private def cold : EVM.State := { (default : EVM.State) with gasAvailable := UInt256.ofNat 2684 }
+-- Same statement as candidate d5f2acbd test130, with no `change` tactic.
+theorem actual_depth_rejected :
+    errorTag (sourceStep 0 { cold with executionEnv := {cold.executionEnv with depth := 1024} }
+      (UInt256.ofNat 2) (UInt256.ofNat 0) (UInt256.ofNat 0) (UInt256.ofNat 32)) = some .extraItem := by
+  rfl
+#print axioms actual_depth_rejected
+end SszDepthReviewProbe

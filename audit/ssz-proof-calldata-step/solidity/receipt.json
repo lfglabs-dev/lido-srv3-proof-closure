@@ -1,0 +1,27 @@
+{
+  "scope": "Unmodified pinned SSZ/GIndex, actual compiler calldata offsets, real SHA, explicit two-level reference, no mocks. One observed frame word64; not universal EVM/FFI, whole-loop proof, resource theorem or consensus provenance.",
+  "source_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "command": "FOUNDRY_SRC=audit/ssz-proof-calldata-step/solidity FOUNDRY_TEST=audit/ssz-proof-calldata-step/solidity forge test --remappings contracts/=lido-core/contracts/ --match-contract SszProofCalldataStepTest --fuzz-runs 1024 --fuzz-seed 0x20260909 --out /tmp/lido-ssz-calldatastep-solidity-out --cache-path /tmp/lido-ssz-calldatastep-solidity-cache -vv",
+  "exit_code": 0,
+  "compiler": {
+    "version": "0.8.25+commit.b61c2a91"
+  },
+  "forge": "forge Version: 1.5.0-v1.5.0\nCommit SHA: 1c57854462289b2e71ee7654cd6666217ed86ffd\nBuild Timestamp: 2025-11-24T06:07:42.598695000Z (1763964462)\nBuild Profile: maxperf",
+  "tests": 4,
+  "fuzz_properties": 1,
+  "fuzz_runs_each": 1024,
+  "coupled_bit_metadata_cases": 256,
+  "source_sha256": {
+    "audit/ssz-proof-calldata-step/solidity/SszProofCalldataStep.t.sol": "766b504b1de63d5009615cd6eafe449d700fe2c038b37cb8c933a8c66971ac18",
+    "foundry.toml": "adb4990ab31a2bb53f5eeb370e4f55d962f7bc1026bce01708497a56b262356c",
+    "lido-core/contracts/common/lib/BeaconTypes.sol": "9591e9af1a4fd398db86267f3589e763f9eb2016bf29e26cfa50988cf73a10c3",
+    "lido-core/contracts/common/lib/GIndex.sol": "2653bd4ba89c349f3db36f21a8afc6a24e0e233816d9b608f46d048feb601d1f",
+    "lido-core/contracts/common/lib/SSZ.sol": "91ef497b972bbee0fe89043034e6bd62fa0c1059f22874d4826bc6164a22009b"
+  },
+  "compiler_keccak_compared_to_current_files": true,
+  "artifact_sha256": {
+    "README.md": "9fe3408b4b17c165bd7669de555106a195f8e1279880dd868c9ec47dbac16e62",
+    "validation.log": "11caa2a7a34dc6277e8fca84a3a28483cd4b062ba642569cd94fe35421755482",
+    "compiler-input-identities.json": "e19b289defa292d725128839792e4358c25ac69e8baa152d8470d6a91f55652a"
+  }
+}
