@@ -1,0 +1,105 @@
+{
+  "scope": "Typed actual ordered CL validator verifier entry, byte-returning root call, computed index/leaf and independent Merkle branch; not root authentication or EVM refinement",
+  "base_head": "c22ce0acbe53d9fae3adb2eef2d4695cba8f13fd",
+  "source_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "files_sha256": {
+    "LidoSRv3/Audit/Source/SszVerifierEntry.lean": "08780f8e0003f28c2ea5efc33125f127ff2e00facdacef30fa8180a4ff0c82c3",
+    "LidoSRv3/Tests/SszVerifierEntryMutants.lean": "a7eda6884d288e0b43d4f0a32662c4e5e3307f9118601c8033b4cc6b3a282655",
+    "LidoSRv3/Audit/Source/SszValidatorLeaf.lean": "a2b5fa2b0f8b5955e0d4d27a5052e0d19bb08058b5e734dd48d55cc121d3170f",
+    "LidoSRv3/Audit/Source/SszProofFold.lean": "2e0c24c00c0fbae5cfe8dec50a459996b64988e839087bec1880034d65859b6d",
+    "LidoSRv3/Audit/Source/SszWrapperIndex.lean": "57833ae3afc8731c7b6a80862666194c1fa561db316952b3e5b4073013a6b045",
+    "LidoSRv3/Audit/Source/SszLittleEndianCorrespondence.lean": "354768f3a855422699513646e7ec7b06809f7be545fba623ad9659c331e4fdb8",
+    "lean-toolchain": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee",
+    "lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
+    "lakefile.lean": "8ea3781110b3234bdfcf2b2c87c5c064fa7d2aee018da57bcab100f8baf1ab87",
+    "foundry.toml": "adb4990ab31a2bb53f5eeb370e4f55d962f7bc1026bce01708497a56b262356c",
+    "solidity/test/SszVerifierEntry.t.sol": "588d3b6f0c06982ce48a5cab74f63674d09faadf1e84d326b7a363d1ee61bc11",
+    "lido-core/contracts/0.8.25/CLValidatorVerifier.sol": "d6e89f6975e4fa02f758bf461a98ac2d689296b5c92d03ffd4e43a22d0b3d7ed",
+    "lido-core/contracts/common/lib/BLS.sol": "0187cc6a6b1aaa833317695d88795db431fa237452213e8c3872a0f444dceb7c",
+    "lido-core/contracts/common/lib/SSZ.sol": "91ef497b972bbee0fe89043034e6bd62fa0c1059f22874d4826bc6164a22009b",
+    "lido-core/contracts/common/lib/GIndex.sol": "2653bd4ba89c349f3db36f21a8afc6a24e0e233816d9b608f46d048feb601d1f",
+    "lido-core/contracts/common/interfaces/ValidatorWitness.sol": "8fd24cfab7402233029756e52e59198b0d9cbf0a42e5c07d9fa2338ed731a5f7",
+    "lido-core/scripts/upgrade/upgrade-params-mainnet.toml": "57f3ea6d6247f14ed4e7c581b7ee9094fe4589ba769530598e457aae09007151",
+    "audit/ssz-verifier-entry/README.md": "fb4fc725ed85690ad0eab57bbaa176d4bb9b9cde8c53792753e00074ebff5e50",
+    "audit/ssz-verifier-entry/check_source.py": "d596676a60dd560d110b77c9af0907bb2cf88c56d016ee453dba8bc26a1f410a",
+    "audit/ssz-verifier-entry/source-check.json": "681fd110f26ee9831aa486f24409f23dcbc90bc98751a0035c52b78fd54a406c",
+    "audit/ssz-verifier-entry/validation.log": "b04935a9f204482a03c337571de2d3334cbc54f7b8c29b42562a63d27eaea218",
+    "audit/ssz-verifier-entry/solidity-validation.log": "e0723157f166e0b38161c5c0287f5122e5cc455e798a70c5358a055e1cf76f1a"
+  },
+  "lean": {
+    "command": "lake build LidoSRv3.Audit.Source.SszVerifierEntry LidoSRv3.Tests.SszVerifierEntryMutants",
+    "exit": 0,
+    "jobs": 790,
+    "log": "validation.log",
+    "scope": "Final targeted source and test compilation; accepted dependencies reused after byte comparison, not full repository build",
+    "source_theorems": 13,
+    "kernel_regressions": 35,
+    "axioms": {
+      "first_word_encoded": [
+        "propext",
+        "Quot.sound"
+      ],
+      "root_reply_success_iff": [
+        "propext",
+        "Quot.sound"
+      ],
+      "source_slot_standard": [
+        "propext",
+        "Quot.sound"
+      ],
+      "entry_success_iff": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "entry_success_returned_bytes": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "entry_success_domains": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "validator_entry_consumer": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    "unchanged_dependency_inputs": [
+      "LidoSRv3/Audit/Source/SszValidatorLeaf.lean",
+      "LidoSRv3/Audit/Source/SszProofFold.lean",
+      "LidoSRv3/Audit/Source/SszWrapperIndex.lean",
+      "LidoSRv3/Audit/Source/SszLittleEndianCorrespondence.lean",
+      "lean-toolchain",
+      "lake-manifest.json",
+      "lakefile.lean",
+      "foundry.toml"
+    ]
+  },
+  "source_check": {
+    "command": "python3 audit/ssz-verifier-entry/check_source.py",
+    "exit": 0,
+    "log": "source-check.json",
+    "scope": "six full pinned file identities, 35 ordered textual anchors and fold size-guard absence; not semantic equivalence"
+  },
+  "solidity": {
+    "command": "forge test --match-path solidity/test/SszVerifierEntry.t.sol --remappings contracts/=lido-core/contracts/ --fuzz-runs 1024 --fuzz-seed 0x20260909 --out /tmp/lido-ssz-entry-solidity-out --cache-path /tmp/lido-ssz-entry-solidity-cache -vv",
+    "exit": 0,
+    "solc": "0.8.25",
+    "tests_passed": 4,
+    "fuzz_properties": 2,
+    "fuzz_runs_each": 1024,
+    "log": "solidity-validation.log",
+    "scope": "Integrator inherited actual CLValidatorVerifier entry/root getter, independent leaf/fold, mocked exact timestamp/address synthetic root; not authenticated state; no forced SHA failure/short returndata"
+  },
+  "remaining_boundaries": [
+    "trusted root response, consensus anchoring, deployed runtime and root storage/timestamp provenance",
+    "typed calldata/memory/staticcall/ABI interpretation, raw EVM and revert encodings",
+    "abstract deterministic SHA and gas/history-dependent failure schedules",
+    "canonical state path/list/container placement and fork provenance; fls assembly refinement"
+  ],
+  "independent_review": "pending exact committed-candidate review"
+}

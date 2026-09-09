@@ -1,0 +1,16 @@
+✔ [789/790] Built LidoSRv3.Audit.Source.SszVerifierEntry (1.5s)
+ℹ [790/790] Built LidoSRv3.Tests.SszVerifierEntryMutants (1.8s)
+info: LidoSRv3/Tests/SszVerifierEntryMutants.lean:95:0: 'LidoSRv3.Audit.Source.SszVerifierEntry.first_word_encoded' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/SszVerifierEntryMutants.lean:96:0: 'LidoSRv3.Audit.Source.SszVerifierEntry.root_reply_success_iff' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/SszVerifierEntryMutants.lean:97:0: 'LidoSRv3.Audit.Source.SszVerifierEntry.source_slot_standard' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/SszVerifierEntryMutants.lean:98:0: 'LidoSRv3.Audit.Source.SszVerifierEntry.entry_success_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszVerifierEntryMutants.lean:99:0: 'LidoSRv3.Audit.Source.SszVerifierEntry.entry_success_returned_bytes' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/SszVerifierEntryMutants.lean:100:0: 'LidoSRv3.Audit.Source.SszVerifierEntry.entry_success_domains' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/SszVerifierEntryMutants.lean:101:0: 'LidoSRv3.Audit.Source.SszVerifierEntry.validator_entry_consumer' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+Build completed successfully (790 jobs).

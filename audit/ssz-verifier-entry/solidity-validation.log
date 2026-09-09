@@ -1,0 +1,12 @@
+Compiling 8 files with Solc 0.8.25
+Solc 0.8.25 finished in 1.63s
+Compiler run successful!
+
+Ran 4 tests for solidity/test/SszVerifierEntry.t.sol:SszVerifierEntryTest
+[PASS] testFuzz_fullEntryUsesTimestampRootAndWitness(uint64,uint64,uint64,uint40,bytes32,bytes32) (runs: 1024, μ: 150363, ~: 150328)
+[PASS] testFuzz_rootReturnWidths(uint64,bytes32,uint8) (runs: 1024, μ: 20955, ~: 13070)
+[PASS] test_rootReturnBoundaryWidths() (gas: 83713)
+[PASS] test_sourceFailureOrder() (gas: 122402)
+Suite result: ok. 4 passed; 0 failed; 0 skipped; finished in 344.88ms (380.13ms CPU time)
+
+Ran 1 test suite in 349.98ms (344.88ms CPU time): 4 tests passed, 0 failed, 0 skipped (4 total tests)
