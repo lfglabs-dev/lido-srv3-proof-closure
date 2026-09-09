@@ -993,7 +993,8 @@ private def mutantGuardLoop (m : GuardMutation) (cfg : SourceTopupConfig) :
 zero skip, byte-derived calldata and real beacon frame are unchanged; only the
 named Solidity check is removed. -/
 private def mutantSourcePushLoop (m : GuardMutation) (cfg : SourceTopupConfig) :
-    List SourceDepositDataRootInput → List Nat → Contract Unit
+    List LidoSRv3.Audit.Source.DepositDataRootCorrespondence.SourceDepositDataRootInput →
+      List Nat → Contract Unit
   | [], [] => Verity.pure ()
   | [], _ :: _ => require false "SourceDepositLengthMismatch"
   | _ :: _, [] => require false "SourceDepositLengthMismatch"
@@ -1010,7 +1011,9 @@ private def mutantSourcePushLoop (m : GuardMutation) (cfg : SourceTopupConfig) :
         mutantSourcePushLoop m cfg inputs amounts
 
 private def mutantExecuteSourceDerived (m : GuardMutation) (cfg : SourceTopupConfig)
-    (deposits : List SourceDepositDataRootInput) (allocations : List Nat)
+    (deposits : List
+      LidoSRv3.Audit.Source.DepositDataRootCorrespondence.SourceDepositDataRootInput)
+    (allocations : List Nat)
     (failure : FailurePoint) : Contract Unit := do
   allocationStage allocations
   require (decide (failure ≠ .afterAllocationWrite)) "FAIL_AFTER_ALLOCATION_WRITE"
@@ -1045,6 +1048,7 @@ private def mutantExecuteGuarded (m : GuardMutation) (cfg : SourceTopupConfig)
     let returned ← allocateDeposits call
     mutantGuardedStage m cfg call returned failure
 
+set_option maxRecDepth 100000 in
 /-- The unmutated mutant *is* the corrected transaction. -/
 theorem mutant_none_reproduces_execute :
     (mutantExecuteGuarded .none guardCfg honestCall .none).run frame
@@ -1121,6 +1125,7 @@ theorem verity_dropped_over_target_guard_kill_line_refutes_parent :
         ((executeGuarded guardCfg overTargetCall .none).run frame)).committed = false := by
   decide
 
+set_option maxRecDepth 100000 in
 /-- KILL-LINE for the registered parent's Verity conjunct (1), the binding
 conjunct.  `.noModuleFrame` keeps all three guards but takes the guarded array
 as a free input, so no `allocateDeposits` frame is journalled.
@@ -1194,6 +1199,8 @@ theorem verity_make_beacon_topup_value_guards_kill_lines :
       (observe frame 1
         ((mutantExecuteGuarded .noUint64GweiMax pinnedConfig aboveUint64GweiCall .none).run frame)).pushed
           = 18446744073709551616000000000 := by
-  decide
+  refine ⟨rfl, ?_, rfl, ?_⟩
+  · decide
+  · decide
 
 end LidoSRv3.Tests.TopupTxMutants
