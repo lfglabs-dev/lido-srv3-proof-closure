@@ -1,0 +1,49 @@
+{
+  "created_utc": "2026-09-09T23:09:07.165394+00:00",
+  "scope": "Fresh direct checks of the source and test modules with imported caches and temporary outputs; previous targeted build is retained separately, not rerun here. Not a full dependency rebuild.",
+  "head": "85ca4fb709ee52edbb2c2993ce42ccaf6705237b",
+  "before": {
+    "LidoSRv3/Audit/Source/SszBlsComposition.lean": "dae0997c41b32ed337300594b730e6b8b22c267c4d13c36ac60c9ba65230831f",
+    "LidoSRv3/Tests/SszBlsCompositionMutants.lean": "72c57b819798ca7ea051d3cb85a5c1433c10e46d3bfb8e13a76e946ef03f9e96",
+    "lakefile.lean": "8ea3781110b3234bdfcf2b2c87c5c064fa7d2aee018da57bcab100f8baf1ab87",
+    "lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
+    "lean-toolchain": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee",
+    "foundry.toml": "adb4990ab31a2bb53f5eeb370e4f55d962f7bc1026bce01708497a56b262356c"
+  },
+  "after": {
+    "LidoSRv3/Audit/Source/SszBlsComposition.lean": "dae0997c41b32ed337300594b730e6b8b22c267c4d13c36ac60c9ba65230831f",
+    "LidoSRv3/Tests/SszBlsCompositionMutants.lean": "72c57b819798ca7ea051d3cb85a5c1433c10e46d3bfb8e13a76e946ef03f9e96",
+    "lakefile.lean": "8ea3781110b3234bdfcf2b2c87c5c064fa7d2aee018da57bcab100f8baf1ab87",
+    "lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
+    "lean-toolchain": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee",
+    "foundry.toml": "adb4990ab31a2bb53f5eeb370e4f55d962f7bc1026bce01708497a56b262356c"
+  },
+  "unchanged": true,
+  "runs": [
+    {
+      "command": [
+        "lake",
+        "env",
+        "lean",
+        "LidoSRv3/Audit/Source/SszBlsComposition.lean",
+        "-o",
+        "/tmp/lido-ssz-bls-validated-source.olean"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.128
+    },
+    {
+      "command": [
+        "lake",
+        "env",
+        "lean",
+        "LidoSRv3/Tests/SszBlsCompositionMutants.lean",
+        "-o",
+        "/tmp/lido-ssz-bls-validated-tests.olean"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 3.577
+    }
+  ],
+  "passed": true
+}

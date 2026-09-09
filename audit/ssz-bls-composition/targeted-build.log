@@ -1,0 +1,45 @@
+⚠ [1071/1133] Replayed Conform.Wheels
+warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: Conform/Wheels.lean:106:70: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1073/1133] Replayed EvmYul.Pretty
+warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: EvmYul/Pretty.lean:36:32: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1114/1133] Replayed EvmYul.Semantics
+warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1115/1133] Replayed EvmYul.EVM.Semantics
+warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+ℹ [1133/1133] Built LidoSRv3.Tests.SszBlsCompositionMutants (5.9s)
+info: LidoSRv3/Tests/SszBlsCompositionMutants.lean:74:0: 'LidoSRv3.Audit.Source.SszBlsComposition.pair_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszBlsCompositionMutants.lean:75:0: 'LidoSRv3.Audit.Source.SszBlsComposition.pair_budget' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszBlsCompositionMutants.lean:76:0: 'LidoSRv3.Audit.Source.SszBlsComposition.merkle_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszBlsCompositionMutants.lean:77:0: 'LidoSRv3.Audit.Source.SszBlsComposition.merkle_digest_typed' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/SszBlsCompositionMutants.lean:78:0: 'LidoSRv3.Audit.Source.SszBlsComposition.pubkey_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszBlsCompositionMutants.lean:79:0: 'LidoSRv3.Audit.Source.SszBlsComposition.bytes_typed' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/SszBlsCompositionMutants.lean:80:0: 'LidoSRv3.Audit.Source.SszBlsComposition.pubkey_digest_typed' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszBlsCompositionMutants.lean:81:0: 'LidoSRv3.Audit.Source.SszBlsComposition.leaf_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszBlsCompositionMutants.lean:82:0: 'LidoSRv3.Audit.Source.SszBlsComposition.verify_leaf_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+Build completed successfully (1133 jobs).
