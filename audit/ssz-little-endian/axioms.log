@@ -1,0 +1,10 @@
+'LidoSRv3.Audit.Source.SszLittleEndianCorrespondence.source_uint256_eq_octets' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.SszLittleEndianCorrespondence.source_uint64_chunk' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Source.SszLittleEndianCorrespondence.source_bool_chunk' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Audit.Source.SszLittleEndianCorrespondence.source_uint256_injective' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
