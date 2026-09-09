@@ -1,0 +1,11 @@
+{
+  "path": "evmyul/EvmYul/EVM/GasConstants.lean",
+  "sha256": "906cda79711e73ca637184256f6b53f5f444918ced2952ead4296797c2503fa8",
+  "pin": "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9",
+  "already_in_280_package_closure": {
+    "module": "EvmYul.EVM.GasConstants",
+    "path": ".lake/packages/evmyul/EvmYul/EVM/GasConstants.lean",
+    "sha256": "906cda79711e73ca637184256f6b53f5f444918ced2952ead4296797c2503fa8"
+  },
+  "note": "Transport supplement only; original54filearchive immutable. Full47line body."
+}

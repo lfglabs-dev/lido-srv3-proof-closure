@@ -1,0 +1,13 @@
+{
+  "candidate": "c3cd5450af78a73daed221082b6d368fa9d18e90",
+  "command": [
+    "python3",
+    "audit/ssz-typed-ffi-bridge/check_receipt.py"
+  ],
+  "result": {
+    "scope": "Recorded file/package-pin comparison only; no fresh proof or EVM execution",
+    "checks": 1207,
+    "errors": []
+  },
+  "fresh_execution": "file and package-pin comparison only; no Lean or Forge rebuild"
+}

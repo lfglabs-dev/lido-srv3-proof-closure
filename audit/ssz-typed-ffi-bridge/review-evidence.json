@@ -1,0 +1,30 @@
+{
+  "candidate": "c3cd5450af78a73daed221082b6d368fa9d18e90",
+  "review_mission": "a5b20c8c-062e-4d1e-9324-196da0a86c8b",
+  "final_event_sequence": 4210,
+  "original_verdict": "BLOCKED",
+  "scoped_conclusion": "No within-domain implementation/proof/evidence defect requiring correction before bounded-lot integration",
+  "all_eight_guarantees": "OPEN",
+  "candidate_files_unchanged": {
+    "LidoSRv3/Audit/Source/SszTypedFfiBridge.lean": "0b783ad4b3a15933d7096cff4e0450bf8b510689024bd7232011a8d326e29ad9",
+    "LidoSRv3/Tests/SszTypedFfiBridgeMutants.lean": "b352a4deb9b0c94f768144154027b9df7fd5142477ce99b07d318ef2ea259ca7",
+    "audit/ssz-typed-ffi-bridge/README.md": "dc58ce785b14dd6f4de04e61ecf9b8ef209cdf3aef3bf57b85d03f5ef13bdb95",
+    "audit/ssz-typed-ffi-bridge/axioms.log": "0c07cbf406c2a88eeed74badd652b736c8b6736e1e52c1ef2243218f6bb95753",
+    "audit/ssz-typed-ffi-bridge/check_receipt.py": "8ea32530c4af184823cca3c2f275c7aeb04152108fe3fac586438cfa77a3f5b4",
+    "audit/ssz-typed-ffi-bridge/dependency-inputs.json": "c765237f005a406a00c34463e89e0a368f3ed162c3a1c0d3f1abf37d23d27166",
+    "audit/ssz-typed-ffi-bridge/fresh-validation.json": "2b13b9714c31d0596e8fb19e620daa8c4deb8fe136b73e6bf5b546f1012456d0",
+    "audit/ssz-typed-ffi-bridge/receipt.json": "7e3c377fc422dfcefe76c2c55732b4ae21946e9903a3fcef68c0a22d52ca07dc",
+    "audit/ssz-typed-ffi-bridge/source-check.json": "95dc701dd1eb921048aaf83df26178b08fae15e29503810bb86e073c3d34ee32",
+    "audit/ssz-typed-ffi-bridge/validated-inputs.sha256": "d294e73135825d8244941b6eea21d3ab986fc8a0cdbdecc2de934061acd0b065",
+    "audit/ssz-typed-ffi-bridge/validation.log": "02e8ca6559294010938cbe67f46ed2f778239e10240a64622a0ffbbcb95af1bf"
+  },
+  "artifacts": {
+    "280-282-independent-review.md": "c0084ff2577c77a886fe37f02b251091cc149dc8f9a3a116dd3af112337ec717",
+    "280-282-integration-supplement.md": "af485fdf0df355dd8037c5f8feb7c25854b0da6f48c9632727557a119ee37c35",
+    "independent-review-event.json": "315fd8361410598670ac5530d55b6ce80848f4edbd73a26ba53dcfe0638e1b91",
+    "review-input-check.json": "90b6ef3d51a9f4ea73f1466d497d4348cf05fad948b401828cee7c3b89e8459f",
+    "GasConstants.lean.txt": "906cda79711e73ca637184256f6b53f5f444918ced2952ead4296797c2503fa8",
+    "gasconstants-transport-supplement.json": "1680419ea2e78b785b9da7f298651f8a2425b33d5eaab16329f54dc1982cc180",
+    "review-response.md": "a12eb0ae8ede284fb059ee4f7352fae9e856d50d48911c03e7b625a9cad5d4e9"
+  }
+}
