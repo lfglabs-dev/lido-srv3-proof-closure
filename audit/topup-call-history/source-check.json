@@ -1,0 +1,7 @@
+{
+  "source_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "file": "lido-core/contracts/0.8.25/TopUpGateway.sol",
+  "sha256": "a7ffb654fb4d8d83ba14a6d9452663f786e9a21434be3ce9b7205c546526b7b4",
+  "result": "working source equals immutable git object",
+  "scope": "manual comparison of source lines 43-45,97,174-184,232-236,323-345,362-388; not machine checked semantic correspondence"
+}
