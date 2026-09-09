@@ -1,0 +1,17 @@
+{
+  "source_commit": "17005714f151e5502c559932319a3f2f74ac2436",
+  "source_sha256": "91ef497b972bbee0fe89043034e6bd62fa0c1059f22874d4826bc6164a22009b",
+  "lean_sha256": "354768f3a855422699513646e7ec7b06809f7be545fba623ad9659c331e4fdb8",
+  "scope": "parsed pinned Solidity expressions vs independent Python byte serialization; no compiler/EVM execution",
+  "masks_and_shifts_match_lean": true,
+  "uint256_vectors_passed": 2308,
+  "mutation_witnesses": {
+    "omit_swap_stage_0": "0x102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+    "omit_swap_stage_1": "0x102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+    "omit_swap_stage_2": "0x102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+    "omit_swap_stage_3": "0xffffffffffffffff",
+    "omit_swap_stage_4": "0xffffffffffffffff",
+    "truncate_to_uint64": "0x100000000000000000000000000000000000000000000000000000000000000",
+    "bool_wrong_end": true
+  }
+}

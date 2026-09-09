@@ -1,0 +1,5 @@
+import LidoSRv3.Audit.Source.SszLittleEndianCorrespondence
+#print axioms LidoSRv3.Audit.Source.SszLittleEndianCorrespondence.source_uint256_eq_octets
+#print axioms LidoSRv3.Audit.Source.SszLittleEndianCorrespondence.source_uint64_chunk
+#print axioms LidoSRv3.Audit.Source.SszLittleEndianCorrespondence.source_bool_chunk
+#print axioms LidoSRv3.Audit.Source.SszLittleEndianCorrespondence.source_uint256_injective
