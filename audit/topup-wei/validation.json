@@ -1,0 +1,41 @@
+{
+  "source_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "base_commit": "4a71f8ed12f484b2792fa082345ba05d1b3f10d4",
+  "toolchain": "leanprover/lean4:v4.31.0",
+  "lake_manifest_sha256": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
+  "lean": {
+    "command": "lake build LidoSRv3.Audit.Source.TopupWeiBounds LidoSRv3.Tests.TopupWeiBoundsMutants",
+    "exit_code": 0,
+    "tested_source_sha256": "9bbe96984f450105623082f1f28b3f4322c73904268c6b42f94896ecbc2b9d07",
+    "current_source_sha256": "254edfae1e8948850b65d682cc03d94fa0fdc05323b463767c6d79b9d2746372",
+    "reuse": "Only two source-reference comments corrected afterward. Reversing those exact string replacements reproduces the tested SHA256. No declaration or proof edits.",
+    "axioms": [
+      "propext",
+      "Quot.sound"
+    ]
+  },
+  "solidity": {
+    "compiler": "0.8.25",
+    "profile": "optimizer=true, runs=200, via_ir=true, evm=cancun",
+    "command": "FOUNDRY_SRC=audit/topup-wei/solidity FOUNDRY_TEST=audit/topup-wei/solidity forge test --remappings contracts/=lido-core/contracts/ --remappings @openzeppelin/contracts-v5.2/=/tmp/lido-topup-wei-deps/package/ --fuzz-runs 1024 --fuzz-seed 0x20260909 --out /tmp/lido-topup-wei-solidity-out --cache-path /tmp/lido-topup-wei-solidity-cache -vv",
+    "exit_code": 0,
+    "tests": 5,
+    "fuzz_runs_per_test": 1024,
+    "fuzz_tests": 3,
+    "openzeppelin": {
+      "version": "5.2.0",
+      "integrity": "sha512-bxjNie5z89W1Ea0NZLZluFh8PrFNn9DH8DQlujEok2yjsOlraUPKID5p1Wk3qdNbf6XkQ1Os2RvfiHrrXLHWKA==",
+      "tar_sha256": "7a7f3060fc71bf080f88cd2f574d9e4813a2409de4dff1badfadc7dec13e9441"
+    },
+    "scope": "Inherited pinned TopUpGateway evaluator values, return/revert including Panic(0x11), conversion, active/filtered inputs. Typed storage seeded; no auth/init/SSZ/router calls tested."
+  },
+  "files": {
+    "LidoSRv3/Audit/Source/TopupWeiBounds.lean": "254edfae1e8948850b65d682cc03d94fa0fdc05323b463767c6d79b9d2746372",
+    "LidoSRv3/Tests/TopupWeiBoundsMutants.lean": "f46b16ca39d6d21c3d029cb05a8ed8813047d6464e06ab5444bafd75ba53e459",
+    "audit/topup-wei/solidity/TopupWeiBounds.t.sol": "9039fc4f436228a0db250facfe310661a49c52741f615d3fb8d3d7d50076a091",
+    "audit/topup-wei/source-check.json": "ef449752a53a15af23b3c6c98c36ce8435f68d24270dde58e29209339161654d",
+    "audit/topup-wei/validation.log": "b2eac808c7a63905f81da612bd06bb61b347c947ba75db5e1dfc2cc32c96639d",
+    "audit/topup-wei/solidity-validation.log": "a6929b5ce5546fc9834a9c7a3a1053712cde6cbf50d1c758076ba1264a94f69e"
+  },
+  "acceptance": "Candidate only; independent exact-commit review required. Not full TOPUP2 acceptance."
+}
