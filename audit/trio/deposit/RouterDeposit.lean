@@ -1,7 +1,7 @@
 import audit.trio.deposit.Deposit
 import LidoSRv3.Audit.Source.TrioReserve1.Live
 
-/-! Executable source-order model for the remainder of `StakingRouter.deposit`.
+/-! One executable source-order model of `StakingRouter.deposit`.
 Pinned source: `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`,
 `StakingRouter.sol:943-996`, `SRLib.sol:896-900`, and
 `BeaconChainDepositor.sol:24,43-63`. -/
@@ -9,12 +9,15 @@ namespace audit.trio.deposit.RouterDeposit
 
 open audit.trio.deposit
 open LidoSRv3.Audit.Source.TrioAlloc1
+open LidoSRv3.Audit.Source.TrioReserve1
 
 inductive Fault where
   | notAuthorized | moduleNotActive | unsupportedWithdrawalCredentials
+  | depositPrefix (reason : DepositFailure)
+  | lidoWithdrawal (reason : Live.Fault)
   | arithmeticOverflow | invalidPublicKeysBatchLength | invalidSignaturesBatchLength
   | beaconCallFailed | insufficientRouterBalance | balanceAssertion
-  | liveWithdrawalMissing | liveWorldMismatch
+  | liveWorldMismatch
   deriving DecidableEq, Repr
 
 structure Context where
@@ -37,7 +40,7 @@ structure DepositCall where
   depositDataRoot : List Nat
   deriving DecidableEq, Repr
 
-structure World where
+structure RouterWorld where
   routerBalance : Nat
   beaconBalance : Nat
   lastDepositAt : Nat
@@ -46,93 +49,46 @@ structure World where
   calls : List DepositCall := []
   deriving DecidableEq, Repr
 
+/-- The allocation transcript, Lido storage/balances, and router suffix state
+are one root-transaction world. -/
+structure World where
+  allocationTranscript : Transcript
+  live : Live.World
+  router : RouterWorld
+
 structure External where
+  lido : Live.External
   beaconAccepts : DepositCall → Bool
 
-/-- Evidence that the nonzero producer withdrawal ran in the RESERVE-1 live
-ETH world and that its successful router callback supplied the balance used by
-the deposit suffix. -/
-structure LiveWithdrawalExecution (execution : DepositExecution) where
-  external : LidoSRv3.Audit.Source.TrioReserve1.Live.External
-  context : LidoSRv3.Audit.Source.TrioReserve1.Live.Context
-  before : LidoSRv3.Audit.Source.TrioReserve1.Live.World
-  executed : (LidoSRv3.Audit.Source.TrioReserve1.Live.run
-    (LidoSRv3.Audit.Source.TrioReserve1.Live.withdrawDepositableEther external context
-      (LidoSRv3.Audit.Source.TrioReserve1.Live.word execution.values.lidoPullWei)
-      (LidoSRv3.Audit.Source.TrioReserve1.Live.word execution.values.actualKeys)) before).outcome =
-      .ok ()
-
-/-- The live world returned by the source executor; it is not separately
-supplied by the composition witness. -/
-def LiveWithdrawalExecution.after (live : LiveWithdrawalExecution execution) :
-    LidoSRv3.Audit.Source.TrioReserve1.Live.World :=
-  (LidoSRv3.Audit.Source.TrioReserve1.Live.run
-    (LidoSRv3.Audit.Source.TrioReserve1.Live.withdrawDepositableEther live.external live.context
-      (LidoSRv3.Audit.Source.TrioReserve1.Live.word execution.values.lidoPullWei)
-      (LidoSRv3.Audit.Source.TrioReserve1.Live.word execution.values.actualKeys)) live.before).world
-
-/-- Router balance gained across the actual source execution. -/
-def LiveWithdrawalExecution.callbackCredit (live : LiveWithdrawalExecution execution) : Nat :=
-  live.after.balances live.context.sender - live.before.balances live.context.sender
-
-/-- Callback attempts observed from the actual source execution. -/
-def LiveWithdrawalExecution.callbackObserved (live : LiveWithdrawalExecution execution) :
-    List LidoSRv3.Audit.Source.TrioReserve1.Live.Attempt :=
-  (LidoSRv3.Audit.Source.TrioReserve1.Live.run
-    (LidoSRv3.Audit.Source.TrioReserve1.Live.withdrawDepositableEther live.external live.context
-      (LidoSRv3.Audit.Source.TrioReserve1.Live.word execution.values.lidoPullWei)
-      (LidoSRv3.Audit.Source.TrioReserve1.Live.word execution.values.actualKeys)) live.before).attempts.filter
-        fun attempt => attempt.accepted &&
-          attempt.request.target = live.context.sender &&
-          attempt.request.value = LidoSRv3.Audit.Source.TrioReserve1.Live.word execution.values.lidoPullWei &&
-          attempt.request.payload = LidoSRv3.Audit.Source.TrioReserve1.Live.encode 4 0x13ae8460
-
-structure Result where
-  outcome : Except Fault Unit
-  world : World
-  deriving Repr
-
-/-- A value can enter the router suffix only together with evidence that the
-ALLOC/module/Lido executor produced it successfully. -/
-structure SuccessfulDepositExecution where
+/-- All inputs needed to execute the source path. There is intentionally no
+successful execution premise and no independently supplied withdrawal receipt. -/
+structure Inputs where
   layout : Layout
   storage : Storage
   oracle : StaticOracle
   config : Config
   requested : Word
-  before : Transcript
-  after : Transcript
   moduleId : Word
   limits : DepositLimits
   obtainDepositData : ObtainDepositData
-  depositSize : Nat
-  depositSize_eq : depositSize = DEPOSIT_SIZE
-  withdraw : audit.trio.deposit.WithdrawDepositableEther
-  execution : DepositExecution
-  executed : depositValuesABI layout storage oracle config requested before moduleId
-    limits obtainDepositData depositSize withdraw = (.ok execution, after)
-  liveWithdrawal : Option (LiveWithdrawalExecution execution)
-  liveWithdrawalIffNonzero : liveWithdrawal.isSome = (execution.values.actualKeys != 0)
+  liveContext : Live.Context
 
-theorem SuccessfulDepositExecution.beaconTotal_eq (linked : SuccessfulDepositExecution) :
-    linked.execution.values.beaconTotalWei =
-      linked.execution.values.actualKeys * DEPOSIT_SIZE := by
-  have composed := abi_success_composes_deposit_values linked.layout linked.storage linked.oracle
-    linked.config linked.requested linked.before linked.after linked.moduleId linked.limits
-    linked.obtainDepositData linked.depositSize linked.withdraw linked.execution linked.executed
-  rw [composed.2.1, linked.depositSize_eq]
+structure Result where
+  outcome : Except Fault Unit
+  world : World
+  lidoAttempts : List Live.Attempt := []
 
 def checkedProduct (a b : Nat) : Except Fault Nat :=
   if a * b < 2 ^ 256 then .ok (a * b)
   else .error .arithmeticOverflow
 
-def updateModuleLastDepositState (ctx : Context) (execution : DepositExecution)
-    (w : World) : World :=
+def updateModuleLastDepositState (ctx : Context) (prepared : PreparedDeposit)
+    (w : RouterWorld) : RouterWorld :=
   { w with
     lastDepositAt := ctx.timestamp % 2^64
     lastDepositBlock := ctx.blockNumber % 2^64
     depositedEvents := w.depositedEvents ++
-      [(execution.moduleId, execution.values.lidoPullWei)] }
+      [(prepared.moduleId, prepared.values.lidoPullWei)] }
 
 private def rootInput (credentials publicKey signature : LidoSRv3.Audit.Source.TrioAlloc1.Bytes) :
     LidoSRv3.Audit.Source.DepositDataRootCorrespondence.SourceDepositDataRootInput where
@@ -158,9 +114,9 @@ private def rootInput (credentials publicKey signature : LidoSRv3.Audit.Source.T
   amountGweiBounded := by omega
 
 private def makeCall (ctx : Context) (credentials : LidoSRv3.Audit.Source.TrioAlloc1.Bytes)
-    (execution : DepositExecution) (index : Nat) : DepositCall :=
-  let publicKey := (execution.moduleData.publicKeysBatch.drop (index * 48)).take 48
-  let signature := (execution.moduleData.signaturesBatch.drop (index * 96)).take 96
+    (prepared : PreparedDeposit) (index : Nat) : DepositCall :=
+  let publicKey := (prepared.moduleData.publicKeysBatch.drop (index * 48)).take 48
+  let signature := (prepared.moduleData.signaturesBatch.drop (index * 96)).take 96
   { index := index
     value := DEPOSIT_SIZE
     publicKey := publicKey
@@ -170,92 +126,104 @@ private def makeCall (ctx : Context) (credentials : LidoSRv3.Audit.Source.TrioAl
     depositDataRoot := (LidoSRv3.Audit.Source.DepositDataRootCorrespondence.computeDepositDataRootWithAmount
       (rootInput credentials publicKey signature)).bytes }
 
-/-- Loop-local result retains the world reached after every accepted beacon
-call, including when a later call fails. `execute` applies root rollback only
-after this raw source-order result has been produced. -/
-private def beaconLoop (external : External) (ctx : Context)
+private def debitLiveRouter (liveCtx : Live.Context) (depositContract : Address)
+    (amount : Nat) (w : Live.World) : Live.World :=
+  Live.transfer w liveCtx.sender (Verity.Core.Address.ofNat depositContract.val) amount
+
+private def beaconLoop (external : External) (ctx : Context) (liveCtx : Live.Context)
     (credentials : LidoSRv3.Audit.Source.TrioAlloc1.Bytes)
-    (execution : DepositExecution) (remaining index : Nat) (w : World) : Result :=
+    (prepared : PreparedDeposit) (remaining index : Nat) (w : World)
+    (attempts : List Live.Attempt) : Result :=
   match remaining with
-  | 0 => ⟨.ok (), w⟩
+  | 0 => ⟨.ok (), w, attempts⟩
   | n + 1 =>
-      let call := makeCall ctx credentials execution index
-      if w.routerBalance < DEPOSIT_SIZE then ⟨.error .insufficientRouterBalance, w⟩
-      else if !external.beaconAccepts call then ⟨.error .beaconCallFailed, w⟩
+      let call := makeCall ctx credentials prepared index
+      if w.router.routerBalance < DEPOSIT_SIZE then
+        ⟨.error .insufficientRouterBalance, w, attempts⟩
+      else if !external.beaconAccepts call then ⟨.error .beaconCallFailed, w, attempts⟩
       else
-        beaconLoop external ctx credentials execution n (index + 1)
-          { w with
-            routerBalance := w.routerBalance - DEPOSIT_SIZE
-            beaconBalance := w.beaconBalance + DEPOSIT_SIZE
-            calls := w.calls ++ [call] }
+        let router := { w.router with
+          routerBalance := w.router.routerBalance - DEPOSIT_SIZE
+          beaconBalance := w.router.beaconBalance + DEPOSIT_SIZE
+          calls := w.router.calls ++ [call] }
+        let live := debitLiveRouter liveCtx ctx.depositContract DEPOSIT_SIZE w.live
+        beaconLoop external ctx liveCtx credentials prepared n (index + 1)
+          { w with router := router, live := live } attempts
 
-/-- The suffix consumes one successful `depositValuesABI` result. Module ID,
-actual count, immutable max balance, both returned batches, and successful Lido
-withdrawal are therefore not independently injectable at this boundary. -/
-private def executeExecutionRaw (external : External) (ctx : Context)
-    (linked : SuccessfulDepositExecution)
+/-- Execute authorization, allocation, returned keys, the Lido withdrawal, and
+all beacon calls as one transition over one root world. -/
+def executeRaw (external : External) (ctx : Context) (inputs : Inputs)
     (before : World) : Result :=
-  let execution := linked.execution
-  if ctx.caller != ctx.depositSecurityModule then ⟨.error .notAuthorized, before⟩
-  else if !ctx.moduleActive then ⟨.error .moduleNotActive, before⟩
+  if ctx.caller != ctx.depositSecurityModule then ⟨.error .notAuthorized, before, []⟩
+  else if !ctx.moduleActive then ⟨.error .moduleNotActive, before, []⟩
   else match ctx.withdrawalCredentials with
-  | none => ⟨.error .unsupportedWithdrawalCredentials, before⟩
+  | none => ⟨.error .unsupportedWithdrawalCredentials, before, []⟩
   | some credentialsWord =>
-      let credentials := encodeWord credentialsWord
-      let updated := updateModuleLastDepositState ctx execution before
-      if execution.values.actualKeys = 0 then ⟨.ok (), updated⟩
+    let preparedResult := prepareDepositABI inputs.layout inputs.storage inputs.oracle inputs.config
+      inputs.requested before.allocationTranscript inputs.moduleId inputs.limits
+      inputs.obtainDepositData DEPOSIT_SIZE
+    let withTranscript := { before with allocationTranscript := preparedResult.2 }
+    match preparedResult.1 with
+    | .error reason => ⟨.error (.depositPrefix reason), withTranscript, []⟩
+    | .ok prepared =>
+      let updatedRouter := updateModuleLastDepositState ctx prepared before.router
+      let updated := { withTranscript with router := updatedRouter }
+      if prepared.values.actualKeys = 0 then ⟨.ok (), updated, []⟩
+      else if before.router.routerBalance != before.live.balances inputs.liveContext.sender then
+        ⟨.error .liveWorldMismatch, updated, []⟩
       else
-        match linked.liveWithdrawal with
-        | none => ⟨.error .liveWithdrawalMissing, updated⟩
-        | some live =>
-        if before.routerBalance != live.before.balances live.context.sender then
-          ⟨.error .liveWorldMismatch, updated⟩
-        else
-        let pulled := { updated with routerBalance := live.after.balances live.context.sender }
-        match checkedProduct 48 execution.values.actualKeys with
-        | .error fault => ⟨.error fault, pulled⟩
-        | .ok expectedPublicKeys =>
-          if execution.moduleData.publicKeysBatch.length != expectedPublicKeys then
-            ⟨.error .invalidPublicKeysBatchLength, pulled⟩
-          else match checkedProduct 96 execution.values.actualKeys with
-          | .error fault => ⟨.error fault, pulled⟩
-          | .ok expectedSignatures =>
-            if execution.moduleData.signaturesBatch.length != expectedSignatures then
-              ⟨.error .invalidSignaturesBatchLength, pulled⟩
-            else
-              let loop := beaconLoop external ctx credentials execution
-                execution.values.actualKeys 0 pulled
-              match loop.outcome with
-              | .error fault => ⟨.error fault, loop.world⟩
-              | .ok () =>
-                  if loop.world.routerBalance = before.routerBalance then ⟨.ok (), loop.world⟩
-                  else ⟨.error .balanceAssertion, loop.world⟩
+        let withdrawal := Live.run
+          (Live.withdrawDepositableEther external.lido inputs.liveContext
+            (Live.word prepared.values.lidoPullWei)
+            (Live.word prepared.values.actualKeys)) before.live
+        match withdrawal.outcome with
+        | .error reason =>
+          ⟨.error (.lidoWithdrawal reason), updated, withdrawal.attempts⟩
+        | .ok () =>
+          let pulledRouter := { updatedRouter with
+            routerBalance := withdrawal.world.balances inputs.liveContext.sender }
+          let pulled := { updated with live := withdrawal.world, router := pulledRouter }
+          match checkedProduct 48 prepared.values.actualKeys with
+          | .error fault => ⟨.error fault, pulled, withdrawal.attempts⟩
+          | .ok expectedPublicKeys =>
+            if prepared.moduleData.publicKeysBatch.length != expectedPublicKeys then
+              ⟨.error .invalidPublicKeysBatchLength, pulled, withdrawal.attempts⟩
+            else match checkedProduct 96 prepared.values.actualKeys with
+            | .error fault => ⟨.error fault, pulled, withdrawal.attempts⟩
+            | .ok expectedSignatures =>
+              if prepared.moduleData.signaturesBatch.length != expectedSignatures then
+                ⟨.error .invalidSignaturesBatchLength, pulled, withdrawal.attempts⟩
+              else
+                let loop := beaconLoop external ctx inputs.liveContext (encodeWord credentialsWord)
+                  prepared prepared.values.actualKeys 0 pulled withdrawal.attempts
+                match loop.outcome with
+                | .error fault => loop
+                | .ok () =>
+                  if loop.world.router.routerBalance = before.router.routerBalance then loop
+                  else ⟨.error .balanceAssertion, loop.world, loop.lidoAttempts⟩
 
-/-- `executeRaw` is the direct composition boundary: its only deposit payload
-is accompanied by a successful `depositValuesABI` premise. -/
-def executeRaw (external : External) (ctx : Context) (linked : SuccessfulDepositExecution)
+/-- Root rollback restores the allocation transcript, Lido world, and router
+state together. Attempts remain observations of the failed transaction. -/
+def execute (external : External) (ctx : Context) (inputs : Inputs)
     (before : World) : Result :=
-  executeExecutionRaw external ctx linked before
-
-def execute (external : External) (ctx : Context) (linked : SuccessfulDepositExecution)
-    (before : World) : Result :=
-  let result := executeRaw external ctx linked before
+  let result := executeRaw external ctx inputs before
   match result.outcome with
   | .ok () => result
-  | .error fault => ⟨.error fault, before⟩
+  | .error fault => ⟨.error fault, before, result.lidoAttempts⟩
 
 theorem every_failure_rolls_back (external : External) (ctx : Context)
-    (linked : SuccessfulDepositExecution) (before after : World) (fault : Fault)
-    (h : execute external ctx linked before = ⟨.error fault, after⟩) : after = before := by
+    (inputs : Inputs) (before after : World) (fault : Fault) (attempts : List Live.Attempt)
+    (h : execute external ctx inputs before = ⟨.error fault, after, attempts⟩) :
+    after = before := by
   simp only [execute] at h
-  generalize rawEq : executeRaw external ctx linked before = raw at h
+  generalize rawEq : executeRaw external ctx inputs before = raw at h
   cases outcomeEq : raw.outcome with
   | ok value =>
       have impossible := congrArg Result.outcome h
       simp [outcomeEq] at impossible
   | error reason =>
       simp only [outcomeEq] at h
-      exact (Result.mk.inj h).2.symm
+      exact (Result.mk.inj h).2.1.symm
 
 #print axioms every_failure_rolls_back
 

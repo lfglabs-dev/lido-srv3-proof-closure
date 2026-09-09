@@ -101,6 +101,16 @@ structure DepositExecution where
   withdrawal : Option WithdrawalArguments
   deriving DecidableEq, Repr
 
+/-- The values produced by the allocation and staking-module prefix, before
+the source reaches the conditional Lido withdrawal.  This is an intermediate
+value of an executor, not evidence supplied to the router suffix. -/
+structure PreparedDeposit where
+  moduleId : Word
+  maxEBType1 : Word
+  moduleData : ModuleDepositData
+  values : DepositValues
+  deriving DecidableEq, Repr
+
 def composeValues (selected : Word) (config : TrioAlloc1.Config)
     (actualKeys depositSize : Nat) : DepositValues :=
   { selectedAllocationWei := selected.val
@@ -160,6 +170,43 @@ def maxDepositsCount (limits : DepositLimits) (selected : Word)
   if config.maxEBType1.val = 0 then .error .divisionByZero
   else .ok (min limits.maxDepositsPerBlock
     (selected.val / config.maxEBType1.val))
+
+/-- Execute the pinned allocation/module prefix through the checked
+`depositsValue` multiplication.  The caller must continue directly with the
+conditional Lido call; no withdrawal result is accepted at this boundary. -/
+def prepareDepositABI
+    (layout : TrioAlloc1.Layout) (storage : TrioAlloc1.Storage)
+    (oracle : TrioAlloc1.StaticOracle) (config : TrioAlloc1.Config)
+    (amount : Word) (before : TrioAlloc1.Transcript) (moduleId : Word)
+    (limits : DepositLimits) (obtainDepositData : ObtainDepositData)
+    (depositSize : Nat) :
+    Except DepositFailure PreparedDeposit × TrioAlloc1.Transcript :=
+  match getDepositAllocationsABI layout storage oracle config amount false before with
+  | (.error reason, after) => (.error (.allocation reason), after)
+  | (.ok allocation, after) =>
+    match getModuleIndexById layout storage moduleId with
+    | .error reason => (.error (.moduleIndex reason), after)
+    | .ok moduleIndex =>
+      match allocation.allocated[moduleIndex.val]? with
+      | none => (.error .allocationIndexOutOfBounds, after)
+      | some selected =>
+        match maxDepositsCount limits selected config with
+        | .error reason => (.error reason, after)
+        | .ok target =>
+          if target = 0 then (.error .zeroDeposits, after)
+          else match obtainDepositData target with
+          | .error reason => (.error (.moduleCall reason), after)
+          | .ok moduleData =>
+            if moduleData.publicKeysBatch.length % pubkeyLength ≠ 0 then
+              (.error .wrongPubkeyLength, after)
+            else
+              let actualKeys := moduleData.publicKeysBatch.length / pubkeyLength
+              if actualKeys > target then (.error .moduleReturnExceedTarget, after)
+              else if actualKeys * config.maxEBType1.val ≥ 2 ^ 256 then
+                (.error .arithmeticOverflow, after)
+              else
+                let values := composeValues selected config actualKeys depositSize
+                (.ok ⟨moduleId, config.maxEBType1, moduleData, values⟩, after)
 
 /-- Source-ordered execution through the module-return guard.  In particular,
 this function executes both the delivered ALLOC ABI and `obtainDepositData`;

@@ -20,14 +20,13 @@ than supplied as an arbitrary word.
 The success theorem is stated over the composed executor, so it cannot be proved
 by restating an ALLOC equality without running the module call.
 The `WithdrawDepositableEther` suffix returns before the Lido call when the
-module returned zero keys.  On the nonzero path, one theorem composes successful
-deposit ABI execution with the complete RESERVE-1 `withdrawDepositableEther`
-relation, derives both the pull and seed-count arguments from the returned key
-count, and proves their word widths from the executed guards. The linked live
-withdrawal retains its pause, router-auth and zero-amount guards, reserve
-accounting, seed counter update and value-bearing callback. Its successful live
-world and observed callback now supply the router balance consumed by the
-deposit suffix; the suffix no longer manufactures that credit.
+module returned zero keys. On the nonzero path, `RouterDeposit.executeRaw`
+continues directly from the executed allocation/module prefix into the
+RESERVE-1 live `withdrawDepositableEther` executor with both arguments derived
+from the returned key count. That execution retains its pause, router-auth and
+zero-amount guards, reserve accounting, seed counter update, callback, and call
+attempts. Its returned world supplies the router balance consumed by the beacon
+loop; there is no abstract withdrawal callback or separately supplied receipt.
 It accepts the documented trio limitations
 and does not claim compiler-memory, deployed-bytecode, or deployment identity.
 
@@ -37,11 +36,12 @@ writer and event before the zero-key return; exact 48/96-byte helper validation;
 the per-key selected public key and signature, credentials, deposit-contract
 address, source-computed deposit-data root, and 32-ether value transfer; root
 rollback on every modeled external failure; and the router-balance assert.
-Its public `executeRaw` boundary accepts a successful `depositValuesABI` package,
-so module ID, actual count, immutable max balance and batches are taken from
-that package, and its deposit-size input must equal the pinned
-`BeaconChainDepositor.DEPOSIT_SIZE` used by every beacon call. A nonzero execution additionally carries the successful live Lido
-withdrawal and callback-balance receipt for those same derived arguments.
+Its public `executeRaw` boundary accepts only source inputs and a root world.
+It executes the allocation, module selection and returned batches itself, then
+executes the conditional live Lido withdrawal and every beacon call in source
+order. The allocation transcript, live Lido storage/balances, and router/beacon
+state are fields of that one root world and roll back together. The deposit size
+is the pinned `BeaconChainDepositor.DEPOSIT_SIZE`, not an input.
 Solidity 0.8 checked multiplication is explicit
 for `actualDepositsCount * maxEBType1`, `48 * actualDepositsCount`, and
 `96 * actualDepositsCount`.
@@ -58,13 +58,11 @@ Production Lean lives beside this file.  Executable regressions live under
 
 ## Remaining composition obligations
 
-The producer transcript/storage and router suffix Context/World are not yet
-bound to one shared Solidity execution. In particular the producer's abstract
-withdrawal result and the now-linked live withdrawal are two executions of the
-same derived arguments; the packaging still does not prove their source call
-order in a single root transaction. The router and Lido balance boundary is
-linked, while the remaining storage and before/after states still need a common
-execution relation.
+The executable relation now binds allocation, returned keys, the live Lido
+withdrawal, and beacon calls in one source-ordered root transition. Remaining
+gaps are correspondence from this mixed source model to one compiled EVM
+transaction, physical router storage for the abstract allocation transcript and
+router metadata, and deployed contract/code identity.
 
 The rollback theorem establishes the behavior of the model wrapper, which
 restores its input World on failure; it is not an EVM rollback correspondence

@@ -9,16 +9,8 @@ open LidoSRv3.Audit.Source.TrioReserve1
 
 def addr (n : Nat) : Address := ⟨n % 2^160, Nat.mod_lt _ (by omega)⟩
 def ctx : Context := ⟨addr 7, addr 7, true, some (word 99), addr 42, 123, 456⟩
-def before : World := ⟨5, 9, 1, 2, [], []⟩
-def accepts : External := ⟨fun _ => true⟩
 
 def routerConfig : Config := ⟨word DEPOSIT_SIZE, word (2 * DEPOSIT_SIZE)⟩
-def routerWithdrawal : WithdrawDepositableEther := fun amount seeds =>
-  if amount = word (2 * DEPOSIT_SIZE) ∧ seeds = word 2 then .ok () else .error .exceptionalCall
-def execution : DepositExecution :=
-  ⟨word 7, word DEPOSIT_SIZE, audit.trio.deposit.Tests.Verity.twoKeyData,
-    ⟨2 * DEPOSIT_SIZE, 2, 2 * DEPOSIT_SIZE, DEPOSIT_SIZE, 2 * DEPOSIT_SIZE⟩,
-    some ⟨word (2 * DEPOSIT_SIZE), word 2⟩⟩
 
 def liveAddr (n : Nat) : Live.Address := Verity.Core.Address.ofNat n
 def liveLido := liveAddr 1
@@ -49,82 +41,80 @@ def liveExternal : Live.External := fun req w =>
     .success (Live.encode 64 0) w
   else if req.target = liveRouter ∧ req.payload = Live.encode 4 0x13ae8460 then .success [] w
   else .rejected []
-def liveResult := Live.run (Live.withdrawDepositableEther liveExternal liveContext
-  (Live.word (2 * DEPOSIT_SIZE)) (Live.word 2)) liveBefore
-def liveReceipt : LiveWithdrawalExecution execution where
-  external := liveExternal
-  context := liveContext
-  before := liveBefore
-  executed := by native_decide
 
-def linked : SuccessfulDepositExecution where
+def inputs : Inputs where
   layout := audit.trio.deposit.Tests.Verity.layout
   storage := audit.trio.deposit.Tests.Verity.storage
   oracle := audit.trio.deposit.Tests.Verity.oracle
   config := routerConfig
   requested := word (2 * DEPOSIT_SIZE + 1)
-  before := []
-  after := audit.trio.deposit.Tests.Verity.successfulAfter
   moduleId := word 7
   limits := audit.trio.deposit.Tests.Verity.limits
   obtainDepositData := audit.trio.deposit.Tests.Verity.exactTargetModule
-  depositSize := DEPOSIT_SIZE
-  depositSize_eq := rfl
-  withdraw := routerWithdrawal
-  execution := execution
-  executed := by native_decide
-  liveWithdrawal := some liveReceipt
-  liveWithdrawalIffNonzero := by native_decide
+  liveContext := liveContext
 
-example : liveReceipt.callbackCredit = 2 * DEPOSIT_SIZE := by native_decide
-example : liveReceipt.callbackObserved.length = 1 := by native_decide
-example : linked.execution.values.beaconTotalWei =
-    linked.execution.values.actualKeys * DEPOSIT_SIZE := linked.beaconTotal_eq
+def before : World :=
+  ⟨[], liveBefore, ⟨5, 9, 1, 2, [], []⟩⟩
+def accepts : External := ⟨liveExternal, fun _ => true⟩
+
+def successfulResult := execute accepts ctx inputs before
+
+example : successfulResult.world.allocationTranscript =
+    audit.trio.deposit.Tests.Verity.successfulAfter := by native_decide
+example : (successfulResult.lidoAttempts.filter (fun attempt =>
+    attempt.accepted && attempt.request.target = liveRouter &&
+      attempt.request.value = Live.word (2 * DEPOSIT_SIZE) &&
+      attempt.request.payload = Live.encode 4 0x13ae8460)).length = 1 := by native_decide
 
 def expectSuccess (result : Result) : IO Unit :=
   match result.outcome with
   | .error fault => throw (IO.userError s!"unexpected fault: {repr fault}")
   | .ok () =>
-      unless result.world.routerBalance = before.routerBalance &&
-          result.world.beaconBalance = before.beaconBalance + 2 * DEPOSIT_SIZE &&
-          result.world.lastDepositAt = 123 && result.world.lastDepositBlock = 456 &&
-          result.world.calls.map (fun call => call.value) = [DEPOSIT_SIZE, DEPOSIT_SIZE] &&
-          result.world.calls.map (fun call => call.publicKey.length) = [48, 48] &&
-          result.world.calls.map (fun call => call.signature.length) = [96, 96] &&
-          result.world.calls.map (fun call => call.depositContract) = [addr 42, addr 42] &&
-          result.world.calls.map (fun call => call.depositDataRoot.length) = [32, 32] do
-        throw (IO.userError s!"wrong committed world: {repr result.world}")
+      unless result.world.router.routerBalance = before.router.routerBalance &&
+          result.world.live.balances liveRouter = before.live.balances liveRouter &&
+          result.world.router.beaconBalance = before.router.beaconBalance + 2 * DEPOSIT_SIZE &&
+          result.world.router.lastDepositAt = 123 && result.world.router.lastDepositBlock = 456 &&
+          result.world.router.calls.map (fun call => call.value) = [DEPOSIT_SIZE, DEPOSIT_SIZE] &&
+          result.world.router.calls.map (fun call => call.publicKey.length) = [48, 48] &&
+          result.world.router.calls.map (fun call => call.signature.length) = [96, 96] &&
+          result.world.router.calls.map (fun call => call.depositContract) = [addr 42, addr 42] &&
+          result.world.router.calls.map (fun call => call.depositDataRoot.length) = [32, 32] do
+        throw (IO.userError "wrong committed world")
 
-#eval expectSuccess (execute accepts ctx linked before)
+#eval expectSuccess successfulResult
 
 def expectRollback (wanted : Fault) (result : Result) : IO Unit :=
   match result.outcome with
   | .ok () => throw (IO.userError "unexpected success")
-  | .error actual => unless actual == wanted && result.world == before do
-      throw (IO.userError s!"failure did not roll back: {repr result}")
+  | .error actual => unless actual == wanted &&
+        result.world.allocationTranscript == before.allocationTranscript &&
+        result.world.router == before.router &&
+        result.world.live.balances liveRouter = before.live.balances liveRouter &&
+        result.world.live.balances liveLido = before.live.balances liveLido do
+      throw (IO.userError "failure did not roll back")
 
 #eval expectRollback .notAuthorized
-  (execute accepts {ctx with caller := addr 8} linked before)
+  (execute accepts {ctx with caller := addr 8} inputs before)
 #eval expectRollback .moduleNotActive
-  (execute accepts {ctx with moduleActive := false} linked before)
+  (execute accepts {ctx with moduleActive := false} inputs before)
 #eval expectRollback .unsupportedWithdrawalCredentials
-  (execute accepts {ctx with withdrawalCredentials := none} linked before)
+  (execute accepts {ctx with withdrawalCredentials := none} inputs before)
 #eval expectRollback .beaconCallFailed
-  (execute ⟨fun call => call.index = 0⟩ ctx linked before)
+  (execute ⟨liveExternal, fun call => call.index = 0⟩ ctx inputs before)
 
 def expectRawBeaconPrefix (result : Result) : IO Unit :=
   match result.outcome with
   | .ok () => throw (IO.userError "unexpected success")
   | .error actual =>
       unless actual == .beaconCallFailed &&
-          result.world.calls.length = 1 &&
-          result.world.calls.map (fun call => call.index) = [0] &&
-          result.world.routerBalance = before.routerBalance + DEPOSIT_SIZE &&
-          result.world.beaconBalance = before.beaconBalance + DEPOSIT_SIZE do
-        throw (IO.userError s!"raw failure lost successful beacon prefix: {repr result}")
+          result.world.router.calls.length = 1 &&
+          result.world.router.calls.map (fun call => call.index) = [0] &&
+          result.world.router.routerBalance = before.router.routerBalance + DEPOSIT_SIZE &&
+          result.world.router.beaconBalance = before.router.beaconBalance + DEPOSIT_SIZE do
+        throw (IO.userError "raw failure lost successful beacon prefix")
 
 #eval expectRawBeaconPrefix
-  (executeRaw ⟨fun call => call.index = 0⟩ ctx linked before)
+  (executeRaw ⟨liveExternal, fun call => call.index = 0⟩ ctx inputs before)
 
 /-- These are the three Solidity 0.8 multiplication sites. -/
 example : checkedMulNat (2^255) 32 = none := by native_decide
