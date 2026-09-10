@@ -177,6 +177,28 @@ def runTransferFrom (ctx : Context) (fromAddr recipient : Address) (requestId : 
     (before : World) :=
   run (transferFrom ctx fromAddr recipient requestId) before
 
+def transferBridgeContext : Context := ⟨(99 : Address), (1 : Address)⟩
+
+def transferBridgeWorld : World :=
+  { core := (defaultState.writeMapUint (queuePosition + 1) 1
+      (packMetadata (1 : Address) 5 false 9)).writeMapUint
+        tokenApprovalsPosition 1 7
+    balances := fun _ => 0 }
+
+/-- Owner-operated `transferFrom` receipt: no approval flag is supplied. The
+caller is the request owner, so the physical token-approval word is deleted
+and only the owner field of the packed request metadata becomes address 2. -/
+theorem transfer_bridge_receipt :
+    let result := runTransferFrom transferBridgeContext (1 : Address) (2 : Address) 1
+      transferBridgeWorld
+    result.outcome = .ok () ∧
+      result.world.core.readMapUint tokenApprovalsPosition 1 = 0 ∧
+      requestOwner (requestMetadataWord result.world.core 1) = (2 : Address) ∧
+      result.world.core.readMapUint (queuePosition + 1) 1 =
+        withRequestOwner (requestMetadataWord transferBridgeWorld.core 1) (2 : Address) ∧
+      result.attempts = [] := by
+  decide +kernel
+
 /-- The direct ownership handoff is a top-level transaction too: every failed
 guard returns the entry world, including every unrelated account's state. -/
 theorem transfer_revert_restores_world
