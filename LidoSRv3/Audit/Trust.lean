@@ -1,3 +1,21 @@
+import LidoSRv3.Tests.WithdrawalMinimalLedgerRegression
+import LidoSRv3.Audit.Guarantees.PDeposit1PhysicalLedger
+import LidoSRv3.Audit.Guarantees.PTopup1MinimalLedger
+import LidoSRv3.Tests.ConsolidationSettlementRegression
+import LidoSRv3.Audit.Guarantees.PConsolidationEth1ActualSettlement
+import LidoSRv3.Tests.SszActualRootTreeRegression
+import LidoSRv3.Tests.SszRootCallRegression
+import LidoSRv3.Audit.Guarantees.PSsz1RootCall
+import LidoSRv3.Tests.SszCompiledMemoryRegression
+import LidoSRv3.Audit.Guarantees.PSsz1ActualMemory
+import LidoSRv3.Tests.DepositPhysicalMetadataRegression
+import LidoSRv3.Audit.Guarantees.PDeposit1PhysicalMetadata
+import LidoSRv3.Tests.ConsolidationGatewayCallRegression
+import LidoSRv3.Audit.Guarantees.PConsolidation1ActualGatewayVault
+import LidoSRv3.Audit.Guarantees.PTopup1ActualBatch
+import LidoSRv3.Audit.Guarantees.PTopup1ActualContinuation
+import LidoSRv3.Audit.Guarantees.PSsz1ActualDeposit
+import LidoSRv3.Audit.Guarantees.PDeposit1ActualPipeline
 import LidoSRv3.Audit.Source.TrioAlloc1.Determinism
 import LidoSRv3.Audit.Source.TrioAlloc1.CapacitySpec
 import LidoSRv3.Audit.Source.TrioAlloc2.LoopCorrespondence
@@ -42,6 +60,7 @@ import LidoSRv3.Audit.Verity.SszEncodingTx
 import LidoSRv3.Tests.SszEncodingTxMutants
 import LidoSRv3.Audit.Source.GIndexConcatCorrespondence
 import LidoSRv3.Audit.Guarantees.PTopup1
+import LidoSRv3.Audit.Guarantees.PTopup2ActualBatch
 import LidoSRv3.Tests.TopupTxMutants
 import LidoSRv3.Audit.Verity.TopupHybrid
 import LidoSRv3.Tests.TopupHybridMutants
@@ -526,6 +545,7 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.TopupTxMutants.unwrapped_accumulator_kill_line_refutes_parent
 #print axioms LidoSRv3.Audit.Source.Topup2.source_aggregate_bounded_by_block_cap
 #print axioms LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2.actual_module_batch_bound
 #print axioms LidoSRv3.Audit.Guarantees.PTopup2.per_key_bounded_by_candidate
 #print axioms LidoSRv3.Audit.Verity.Topup2Tx.tx_aggregate_bounded_by_block_cap
 #print axioms LidoSRv3.Audit.Verity.Topup2Tx.tx_all_success_value_exact
@@ -622,3 +642,28 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.TrioReserve1.PhysicalReserve.success_preserves
 #print axioms LidoSRv3.Audit.Source.TrioReserve1.PhysicalSequence.corresponds
 #print axioms LidoSRv3.Audit.Source.TrioReserve1.Transfers.credit_bound_from_aggregate
+
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.actual_live_pipeline_conservation
+
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.actual_continuation_conserves
+#print axioms LidoSRv3.Audit.Guarantees.PSsz1.actual_deposit_call_binds_root
+
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.actual_module_batch_effects
+
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1.actual_gateway_vault_requests
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1.actual_gateway_vault_failure_restores
+
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.actual_physical_metadata_before_calls
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.actual_physical_metadata_failure_restores
+
+#print axioms LidoSRv3.Audit.Guarantees.PSsz1.actual_memory_validator_branch
+
+#print axioms LidoSRv3.Audit.Guarantees.PSsz1.actual_root_staticcall_validator_branch
+#print axioms LidoSRv3.Audit.Guarantees.PSsz1.actual_root_staticcall_validator_tree
+#print axioms LidoSRv3.Audit.Source.SszRootCall.run_world
+
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1.actual_settlement_success
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1.actual_settlement_failure_restores
+
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.actual_physical_metadata_conserves
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.actual_continuation_locator_conserves

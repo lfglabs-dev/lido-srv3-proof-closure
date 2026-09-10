@@ -1,0 +1,20 @@
+{
+  "reviewed_source": "e7ea041c216365acab8114aaac8d6eca109aae84",
+  "integrated_main": "50f80b48f26f983f08cb0640d587bfe2d91f0e32",
+  "delta": "Merge accepted SSZ311 and add settlement facade/Trust imports; no reviewed executable/theorem/test changes",
+  "build": {
+    "jobs": 1641,
+    "exit": 0
+  },
+  "trust": {
+    "exact_axioms": 29,
+    "exit": 0
+  },
+  "sha256": {
+    "LidoSRv3/Audit/AllGuarantees.lean": "7f6a4113300d35e12e908a2099ae81e839691607b4ab83273bf725f6fc1b998c",
+    "LidoSRv3/Audit/Trust.lean": "41020c97a132506a20f0c6642954343088683f32d5202481a3a974ed72abea35",
+    "audit/consolidation-settlement/independent-review-e7ea.md": "f27ba817cb1e374a4ea4e7b5ceed40a6d3d3d30d0030f086b09caa48fdfe9880",
+    "audit/consolidation-settlement/integration-build.log": "875d57e656c74c18da25e4788a686245d7ea25da2d00240912cc6f6868100ac4",
+    "audit/consolidation-settlement/integration-trust.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439"
+  }
+}

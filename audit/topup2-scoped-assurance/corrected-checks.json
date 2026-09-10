@@ -1,0 +1,30 @@
+[
+  {
+    "command": [
+      "python3",
+      "scripts/test_main_guarantees.py"
+    ],
+    "exit_code": 0,
+    "stdout": "main guarantee declaration, assumption and condition mutations rejected\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "python3",
+      "scripts/generate_ux2.py",
+      "check"
+    ],
+    "exit_code": 0,
+    "stdout": "ux2 artifacts ok: 11 guarantee records match the registry and the Lean declarations\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "python3",
+      "scripts/check_public_claim_surfaces.py"
+    ],
+    "exit_code": 0,
+    "stdout": "public claim surfaces match canonical faithful-Verity claims\n",
+    "stderr": ""
+  }
+]

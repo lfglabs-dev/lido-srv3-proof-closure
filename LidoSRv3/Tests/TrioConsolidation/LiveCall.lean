@@ -1,10 +1,12 @@
 import audit.trio.consolidation.LiveCall
 
-/-! Executable vectors for the vault hop as an actual `Live.CallData` CALL
-under `Live.run`. The inbox callees below are acceptance-shape test doubles
-(96-byte payload, `value ≥ fee`, one count write, no logs, no return data);
-they are not the EIP-7251 predeploy. Test doubles have code, since
-`CallData.invoke` checks callee code (residual documented in `LiveCall.lean`). -/
+/-! Executable vectors for the vault hop as an actual low-level CALL
+(`lowLevelCall`, no target-code guard) under `Live.run`, with the fee read by
+an actual low-level `staticcall("")` (`lowLevelStaticCall`). The inbox callees
+below are acceptance-shape test doubles (96-byte payload, `value ≥ fee`, one
+count write, no logs, no return data); they are not the EIP-7251 predeploy
+(`Predeploy.lean` is the concrete body). The fee doubles answer the line-84
+`staticcall("")`. -/
 
 namespace LidoSRv3.Tests.TrioConsolidation.LiveCall
 
@@ -47,6 +49,17 @@ private def onceInbox : External := fun req w =>
 private def recipientCallee : External := fun req w =>
   if req.payload.length ≠ 0 then .rejected [] else .success [] w
 
+/-- Fee STATICCALL double: answers the 32-byte encoding of `fee` to
+`staticcall("")` (the `_getFeeFromContract` returndata of lines 83-95). -/
+private def feeStatic : StaticCall.External := fun req _ =>
+  if req.payload = [] then .success (encode 32 fee.val) else .rejected []
+
+/-- Failed STATICCALL (`FeeReadFailed`, lines 86-88). -/
+private def feeRejectedStatic : StaticCall.External := fun _ _ => .rejected []
+
+/-- 16-byte returndata (`FeeInvalidData`, lines 90-92). -/
+private def feeShortStatic : StaticCall.External := fun _ _ => .success (encode 16 fee.val)
+
 private def core : Verity.ContractState :=
   { Verity.defaultState with
     codeSize := fun a =>
@@ -60,7 +73,7 @@ private def sources : List Bytes := [blob 11, blob 12]
 private def targets : List Bytes := [blob 21, blob 22]
 
 private def committed : Result Unit :=
-  executeVault acceptingInbox ctx gateway inbox fee (Live.word 14) sources targets (before 14)
+  executeVault acceptingInbox feeStatic ctx gateway inbox (Live.word 14) sources targets (before 14)
 
 private def isOk (r : Result Unit) : Bool :=
   match r.outcome with
@@ -103,7 +116,7 @@ example : committed.world.balances vault = (before 14).balances vault - 14 := by
 /-! ### Rolled-back batches -/
 
 private def rejectedAll : Result Unit :=
-  executeVault rejectingInbox ctx gateway inbox fee (Live.word 14) sources targets (before 14)
+  executeVault rejectingInbox feeStatic ctx gateway inbox (Live.word 14) sources targets (before 14)
 
 example : rejectedAll.outcome = .error (.reason "RequestAdditionFailed") := by native_decide
 example : rejectedAll.world.balances vault = 14 := by native_decide
@@ -116,7 +129,7 @@ example : rejectedAll.attempts.map (fun a => (a.accepted, a.request.payload)) =
 /-- First hop accepted, second rejected: root rollback restores the first
 hop's inbox write, event and value transfer together. -/
 private def secondFails : Result Unit :=
-  executeVault onceInbox ctx gateway inbox fee (Live.word 14) sources targets (before 14)
+  executeVault onceInbox feeStatic ctx gateway inbox (Live.word 14) sources targets (before 14)
 
 example : secondFails.outcome = .error (.reason "RequestAdditionFailed") := by native_decide
 example : secondFails.attempts.map (·.accepted) = [true, false] := by native_decide
@@ -127,32 +140,65 @@ example : (secondFails.world.core.readContractSlot inbox.val countSlot).val = 0 
 example : secondFails.world.logs.length = 0 := by native_decide
 
 /-- Guards of lines 60-66 and `WithdrawalVault.sol:203-205`. -/
-example : (executeVault acceptingInbox ⟨vault, stranger⟩ gateway inbox fee (Live.word 14)
+example : (executeVault acceptingInbox feeStatic ⟨vault, stranger⟩ gateway inbox (Live.word 14)
     sources targets (before 14)).outcome = .error (.reason "NotConsolidationGateway") := by
   native_decide
 
-example : (executeVault acceptingInbox ctx gateway inbox fee (Live.word 14)
+example : (executeVault acceptingInbox feeStatic ctx gateway inbox (Live.word 14)
     [] [] (before 14)).outcome = .error (.reason "ZeroArgument") := by native_decide
 
-example : (executeVault acceptingInbox ctx gateway inbox fee (Live.word 14)
+example : (executeVault acceptingInbox feeStatic ctx gateway inbox (Live.word 14)
     sources [blob 21] (before 14)).outcome = .error (.reason "ArraysLengthMismatch") := by
   native_decide
 
 /-- `msg.value ≠ requestsCount * fee`: no hop is attempted. -/
-example : (executeVault acceptingInbox ctx gateway inbox fee (Live.word 13)
+example : (executeVault acceptingInbox feeStatic ctx gateway inbox (Live.word 13)
     sources targets (before 13)).outcome = .error (.reason "IncorrectFee") := by native_decide
-example : (executeVault acceptingInbox ctx gateway inbox fee (Live.word 13)
+example : (executeVault acceptingInbox feeStatic ctx gateway inbox (Live.word 13)
     sources targets (before 13)).attempts = [] := by native_decide
+
+/-! ### Fee STATICCALL ladder (lines 83-95) -/
+
+/-- A failed `staticcall("")` is `FeeReadFailed`; no hop is attempted. -/
+example : (executeVault acceptingInbox feeRejectedStatic ctx gateway inbox (Live.word 14)
+    sources targets (before 14)).outcome = .error (.reason "FeeReadFailed") := by native_decide
+
+/-- 16-byte returndata is `FeeInvalidData`; no hop is attempted. -/
+example : (executeVault acceptingInbox feeShortStatic ctx gateway inbox (Live.word 14)
+    sources targets (before 14)).outcome = .error (.reason "FeeInvalidData") := by native_decide
+
+/-- A code-less target of the fee STATICCALL answers empty success, which the
+caller-side 32-byte check rejects as `FeeInvalidData` (matching the source). -/
+private def codelessCore : Verity.ContractState :=
+  { Verity.defaultState with codeSize := fun _ => Live.word 0 }
+
+example : (executeVault acceptingInbox feeStatic ctx gateway inbox (Live.word 14)
+    sources targets ⟨codelessCore, fun a => if a = vault then 14 else 0, []⟩).outcome =
+      .error (.reason "FeeInvalidData") := by native_decide
 
 /-- A 47-octet target fails `_validatePublicKey` after the first hop; the
 first hop is rolled back. -/
 private def shortTarget : Result Unit :=
-  executeVault acceptingInbox ctx gateway inbox fee (Live.word 14)
+  executeVault acceptingInbox feeStatic ctx gateway inbox (Live.word 14)
     sources [blob 21, List.replicate 47 1] (before 14)
 
 example : shortTarget.outcome = .error (.reason "InvalidPublicKeyLength") := by native_decide
 example : shortTarget.attempts.length = 1 := by native_decide
 example : shortTarget.world.balances vault = 14 := by native_decide
+
+/-! ### Code-less (EOA) arms of the low-level CALL -/
+
+/-- Code-less hop target (`stranger` has no code in `core`): the low-level
+CALL accepts with empty return data after the value transfer; the rejecting
+callee double is never run. -/
+example : callAddConsolidationRequest rejectingInbox ctx stranger
+    { source := blob 11, target := blob 21 } fee (before 7) =
+    ⟨.ok (),
+      { transfer (before 7) vault stranger fee.val with
+          logs := (before 7).logs ++ [requestAddedEvent vault (blob 11 ++ blob 21)] },
+      [⟨⟨vault, stranger, fee, blob 11 ++ blob 21⟩, true, [], []⟩]⟩ :=
+  callAdd_no_code_accepted rejectingInbox ctx stranger { source := blob 11, target := blob 21 }
+    fee (before 7) (by native_decide) (by native_decide)
 
 /-! ### Refund hop (`ConsolidationGateway.sol:295-307`) -/
 
@@ -187,5 +233,14 @@ example : refundRejected.world.balances gateway = 5 := by native_decide
 example : (Live.word 14).val +
     (refundRequest gatewayCtx (audit.trio.consolidation.word (19 - 14)) recipient).value.val = 19 :=
   refund_value_split gatewayCtx recipient (Live.word 19) (Live.word 14) (by decide)
+
+/-- EOA refund recipient (`stranger` has no code): the low-level `.call`
+accepts with empty return data after the value transfer; the rejecting callee
+double is never run. -/
+example : refundFee rejectingInbox gatewayCtx (Live.word 5) stranger gatewayWorld =
+    ⟨.ok (), transfer gatewayWorld gateway stranger 5,
+      [⟨⟨gateway, stranger, Live.word 5, []⟩, true, [], []⟩]⟩ :=
+  refund_no_code_accepted rejectingInbox gatewayCtx stranger (Live.word 5) gatewayWorld
+    (by native_decide) (by native_decide) (by native_decide)
 
 end LidoSRv3.Tests.TrioConsolidation.LiveCall

@@ -1,0 +1,26 @@
+⚠ [800/807] Replayed Verity.Core
+warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1041:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+ℹ [804/807] Replayed LidoSRv3.Audit.Source.SszRootCall
+info: LidoSRv3/Audit/Source/SszRootCall.lean:206:0: 'LidoSRv3.Audit.Source.SszRootCall.run_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszRootCall.lean:207:0: 'LidoSRv3.Audit.Source.SszRootCall.slot_failure_no_call' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/SszRootCall.lean:208:0: 'LidoSRv3.Audit.Source.SszRootCall.run_world' depends on axioms: [propext, Quot.sound]
+ℹ [805/807] Replayed LidoSRv3.Audit.Guarantees.PSsz1RootCall
+info: LidoSRv3/Audit/Guarantees/PSsz1RootCall.lean:40:0: 'LidoSRv3.Audit.Guarantees.PSsz1.actual_root_staticcall_validator_branch' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [806/807] Built LidoSRv3.Audit.Source.SszActualLeafTree (1.6s)
+info: LidoSRv3/Audit/Source/SszActualLeafTree.lean:86:0: 'LidoSRv3.Audit.Source.SszActualLeafTree.leaf_success_tree' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszActualLeafTree.lean:87:0: 'LidoSRv3.Audit.Source.SszActualLeafTree.branch_output_tree' does not depend on any axioms
+ℹ [807/807] Built LidoSRv3.Audit.Guarantees.PSsz1ActualRootTree (1.5s)
+info: LidoSRv3/Audit/Guarantees/PSsz1ActualRootTree.lean:38:0: 'LidoSRv3.Audit.Guarantees.PSsz1.actual_root_staticcall_validator_tree' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+Build completed successfully (807 jobs).

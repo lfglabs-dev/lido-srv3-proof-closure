@@ -1,7 +1,9 @@
 import audit.trio.consolidation.Bus
 import audit.trio.consolidation.Codec
+import audit.trio.consolidation.Composition
 import audit.trio.consolidation.Gateway
 import audit.trio.consolidation.LiveCall
+import audit.trio.consolidation.Predeploy
 import audit.trio.consolidation.Producer
 import audit.trio.consolidation.SourceExecution
 import LidoSRv3.Audit.Verity.TrioConsolidation.Correspondence
@@ -41,6 +43,10 @@ import LidoSRv3.Audit.Verity.TrioConsolidation.Memory
 #print axioms audit.trio.consolidation.callAdd_error_restores
 #print axioms audit.trio.consolidation.callAdd_success
 #print axioms audit.trio.consolidation.callAdd_success_funded
+#print axioms audit.trio.consolidation.lowLevelCall_shape
+#print axioms audit.trio.consolidation.lowLevelCall_success_funded
+#print axioms audit.trio.consolidation.lowLevelStaticCall_shape
+#print axioms audit.trio.consolidation.callAdd_no_code_accepted
 #print axioms audit.trio.consolidation.callAdd_no_code
 #print axioms audit.trio.consolidation.callAdd_unfunded
 #print axioms audit.trio.consolidation.callAdd_rejected
@@ -53,12 +59,44 @@ import LidoSRv3.Audit.Verity.TrioConsolidation.Memory
 #print axioms audit.trio.consolidation.executeVault_success_body
 #print axioms audit.trio.consolidation.executeVault_success
 #print axioms audit.trio.consolidation.executeVault_success_frame
+#print axioms audit.trio.consolidation.feeRead_ok
+#print axioms audit.trio.consolidation.predeployBody_accepted
+#print axioms audit.trio.consolidation.predeployBody_underpaid
+#print axioms audit.trio.consolidation.predeployBody_malformed
+#print axioms audit.trio.consolidation.predeployBody_logFrame
+#print axioms audit.trio.consolidation.predeployBody_balanceFrame
+#print axioms audit.trio.consolidation.predeployBody_untraced
+#print axioms audit.trio.consolidation.predeploy_fee_read
+#print axioms audit.trio.consolidation.executeVault_success_frame_predeploy
+#print axioms audit.trio.consolidation.abiBytesElement_length
+#print axioms audit.trio.consolidation.elementOffsets_le
+#print axioms audit.trio.consolidation.offsetWords_length
+#print axioms audit.trio.consolidation.abiBytesArray_length
+#print axioms audit.trio.consolidation.abiBytesArray_length_48
+#print axioms audit.trio.consolidation.gatewayVaultArgs_length
+#print axioms audit.trio.consolidation.decodeBytesElement_append
+#print axioms audit.trio.consolidation.drop_encodeBytesElement_append
+#print axioms audit.trio.consolidation.decodeBytesElement_abi_append
+#print axioms audit.trio.consolidation.drop_abiBytesElement_append
+#print axioms audit.trio.consolidation.decodeOffsetSeq_encoded
+#print axioms audit.trio.consolidation.decodeBytesArray_abi
+#print axioms audit.trio.consolidation.decodeBytesArray_abi_nil
+#print axioms audit.trio.consolidation.decodeVaultArgs_gatewayVaultArgs
+#print axioms audit.trio.consolidation.pairsOf_hopArrays
+#print axioms audit.trio.consolidation.widthOk_hopArrays
+#print axioms audit.trio.consolidation.packedPayloads_eq_map
+#print axioms audit.trio.consolidation.hop_payloads
+#print axioms audit.trio.consolidation.gatewayVaultArgs_hop_length
+#print axioms audit.trio.consolidation.decodeVaultArgs_hop
+#print axioms audit.trio.consolidation.executeVaultCalldata_gateway
+#print axioms audit.trio.consolidation.executeVaultCalldata_success_payloads
 #print axioms audit.trio.consolidation.resolveAddress_val
 #print axioms audit.trio.consolidation.refund_zero
 #print axioms audit.trio.consolidation.refund_attempt_request
 #print axioms audit.trio.consolidation.refund_error_restores
 #print axioms audit.trio.consolidation.refund_rejected
 #print axioms audit.trio.consolidation.refund_accepted
+#print axioms audit.trio.consolidation.refund_no_code_accepted
 #print axioms audit.trio.consolidation.refund_value_split
 #print axioms audit.trio.consolidation.refund_request_is_hop
 #print axioms audit.trio.consolidation.checkFee_additive

@@ -1,3 +1,15 @@
+import LidoSRv3.Audit.Guarantees.PSsz1ActualRootTree
+import LidoSRv3.Audit.Guarantees.PDeposit1PhysicalLedger
+import LidoSRv3.Audit.Guarantees.PTopup1MinimalLedger
+import LidoSRv3.Audit.Guarantees.PConsolidationEth1ActualSettlement
+import LidoSRv3.Audit.Guarantees.PSsz1RootCall
+import LidoSRv3.Audit.Guarantees.PSsz1ActualMemory
+import LidoSRv3.Audit.Guarantees.PDeposit1PhysicalMetadata
+import LidoSRv3.Audit.Guarantees.PConsolidation1ActualGatewayVault
+import LidoSRv3.Audit.Guarantees.PTopup1ActualBatch
+import LidoSRv3.Audit.Guarantees.PTopup1ActualContinuation
+import LidoSRv3.Audit.Guarantees.PSsz1ActualDeposit
+import LidoSRv3.Audit.Guarantees.PDeposit1ActualPipeline
 import LidoSRv3.Audit.Guarantees.PAlloc1
 import LidoSRv3.Audit.Guarantees.PAlloc2
 import LidoSRv3.Audit.Guarantees.PDeposit1
@@ -9,6 +21,7 @@ import LidoSRv3.Audit.Guarantees.PReserve1
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1
 import LidoSRv3.Audit.Guarantees.PAddress1
 import LidoSRv3.Audit.Guarantees.PTopup2
+import LidoSRv3.Audit.Guarantees.PTopup2ActualBatch
 import LidoSRv3.Audit.Verity.Topup2Tx
 import LidoSRv3.Audit.Guarantees.PConsolidation1
 import LidoSRv3.Audit.Guarantees.PSsz1

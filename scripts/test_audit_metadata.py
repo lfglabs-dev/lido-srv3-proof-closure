@@ -8,19 +8,9 @@ import re
 import shutil
 import subprocess
 import tempfile
+from source_span_test_cases import check_invalid_annotations, write, invoke
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
-def write(path, value):
-    path.write_text(json.dumps(value, indent=2) + "\n", encoding="utf-8")
-def invoke(root, ok, needle=None, command="generate"):
-    result = subprocess.run(
-        ["python3", "scripts/audit_metadata.py", command], cwd=root,
-        text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-    )
-    if (result.returncode == 0) != ok:
-        raise AssertionError(f"unexpected rc={result.returncode}:\n{result.stdout}")
-    if needle and needle not in result.stdout:
-        raise AssertionError(f"missing {needle!r}:\n{result.stdout}")
 def reject_html_stage_a_families(reject, module):
     """A Stage A heading inside any CommonMark HTML block is invisible."""
     table_then_type_7 = "| heading |\n| --- |\n| body |\n{}\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n\n"
@@ -71,6 +61,7 @@ def main():
         shutil.copy2(ROOT / "scripts/gfm_table.py", fixture / "scripts/gfm_table.py")
         shutil.copy2(ROOT / "scripts/markdown_text.py", fixture / "scripts/markdown_text.py")
         shutil.copy2(ROOT / "scripts/trio_report.py", fixture / "scripts/trio_report.py")
+        shutil.copy2(ROOT / "scripts/source_spans.py", fixture / "scripts/source_spans.py")
         shutil.copy2(ROOT / "README.md", fixture / "README.md")
         shutil.copy2(ROOT / "audit/SOURCE-FIDELITY.md", fixture / "audit/SOURCE-FIDELITY.md")
         shutil.copy2(ROOT / "fixtures/solidity-reference/StakingRouter.constructor.L88-L106.sol",
@@ -307,6 +298,8 @@ def main():
         x = copy.deepcopy(source); x["ssz_claim"]["deployed_yul_binding"] = "FULL_RUNTIME"; write(spath, x); invoke(fixture, False, "source-map SSZ boundary differs"); write(spath, source)
         x = copy.deepcopy(source); x["targets"][0]["spans"][0]["permalink"] = "https://github.com/lidofinance/core/blob/main/x"; write(spath, x); invoke(fixture, False, "permalink is not immutable/exact"); write(spath, source)
         x = copy.deepcopy(source); x["targets"][0]["spans"][0]["source_sha"] = "0" * 40; write(spath, x); invoke(fixture, False, "source span pin differs"); write(spath, source)
+
+        check_invalid_annotations(source, spath, fixture, write, invoke)
 
         readme_path = fixture / "README.md"
         readme = readme_path.read_text(encoding="utf-8")

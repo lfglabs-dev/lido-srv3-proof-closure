@@ -1,0 +1,22 @@
+[
+  {
+    "path": "audit/trio/deposit/LiveBeacon.lean",
+    "sha256": "a8baf4087e56e43b5156b22d0c34581c1304ca3efc01af57dbbc6200bbbd4429",
+    "unchanged_from": "bc2416618a2d10d8dada15e4106422d8107761a8"
+  },
+  {
+    "path": "audit/trio/deposit/Deposit.lean",
+    "sha256": "9fb5b55477fef0cedd4733fd5c144446a31ad49ec7c749e5f2079b2efa83759d",
+    "unchanged_from": "bc2416618a2d10d8dada15e4106422d8107761a8"
+  },
+  {
+    "path": "audit/trio/deposit/RouterDeposit.lean",
+    "sha256": "fc1ee497cf7e2984e87df390256571903c54d0aed6e2f8f42f265fe81f1dfa28",
+    "unchanged_from": "bc2416618a2d10d8dada15e4106422d8107761a8"
+  },
+  {
+    "path": "audit/trio/deposit/Tests/Verity/LiveBeacon.lean",
+    "sha256": "71f6ba81327a25eab7b645aac2c2a3137cc9dcf42708e6bb453679670947157a",
+    "unchanged_from": "bc2416618a2d10d8dada15e4106422d8107761a8"
+  }
+]

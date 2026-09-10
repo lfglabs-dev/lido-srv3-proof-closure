@@ -1,0 +1,10 @@
+{
+  "command": [
+    "lake",
+    "build",
+    "+LidoSRv3.Audit.Guarantees.PConsolidationEth1ActualSettlement",
+    "+LidoSRv3.Tests.ConsolidationSettlementRegression"
+  ],
+  "exit_code": 0,
+  "log": "targeted-build-final.log"
+}

@@ -1,0 +1,84 @@
+{
+  "source_commit": "20c0185526e5ccbe2d1d30138124a41b84f1a2fc",
+  "base_main": "28585ee9766b0d5ce55da6d5f70e482b0caf2aff",
+  "reused_corrected295": "98f4136a609c5d86f53558f9c5f8faa6391362b7",
+  "candidate_status": "Sources frozen; exact complete-source independent review pending; all8fullOPEN",
+  "commands": [
+    {
+      "command": "lake build LidoSRv3.Audit.AllGuarantees LidoSRv3.Audit.Trust",
+      "exit_code": 0,
+      "jobs": 1613
+    },
+    {
+      "command": "python3 scripts/check_trust_axioms.py",
+      "exit_code": 0,
+      "exact_axioms": 29
+    },
+    {
+      "command": "lake build LidoSRv3.Tests.ConsolidationGatewayCallRegression",
+      "exit_code": 0,
+      "jobs": 1271,
+      "kernel_regressions": 4
+    },
+    {
+      "command": "lake build inherited295 Composition LiveCall Predeploy test modules",
+      "exit_code": 0,
+      "jobs": 1263
+    },
+    {
+      "command": "forge test -vv",
+      "cwd": "audit/consolidation-gateway-call/solidity",
+      "exit_code": 0,
+      "tests": 5
+    },
+    {
+      "command": "python3 scripts/test_ux2.py",
+      "exit_code": 0
+    }
+  ],
+  "source_input_count": 1609,
+  "lean_package_pins": 11,
+  "solidity_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "auxiliary_escape_scan": "Every audit/trio/consolidation Lean file: no proof escapes or native_decide outside comments/strings",
+  "new_public_axioms": {
+    "actual_gateway_vault_requests": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "actual_gateway_vault_failure_restores": [
+      "propext"
+    ]
+  },
+  "native_test_inventory": {
+    "old": 291,
+    "new": 376,
+    "added_or_moved": 120,
+    "removed_or_moved": 35,
+    "requires_independent_review": true
+  },
+  "files": {
+    "callsite.yul": "72e0f4c1ca810c3280dc51cef8bf9cb0a237f8a82c75cc7271b1b43f41db04ed",
+    "ux2-mutations.log": "dcff63c24c43ca580e855cf0be5661ec9e44160428d19d4d84c08713fb43ebc7",
+    "trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439",
+    "solidity-tests.log": "68db7dd957daf5c9af1f641dde37360f521536f82c39a1a916974515e87ea5d4",
+    "native-inventory.json": "83bb78fa4ceb0cb2af3d6562298767236f3718fb73387b4ccc00b6c26dddb85c",
+    "compiler-input.json": "89776a62292533bd8ba1b322ddad01ff72f54d519f4e9f93961296d713c3c073",
+    "README.md": "49eadf8c3cb16126bd809b74466c1553ed1c912e27d6dfa2f2a896585443bca9",
+    "public-build.log": "9fe1fad4d3b0c577576541cdebad3142421024b60104912c4b2cf322f4c254da",
+    "registry-checks.json": "ba483b32035c7507388ddbe61a339494a46ff1bf093bec59e029203890326fc7",
+    "inherited-tests.log": "2e6757fe3e0dca733adb1fe745e77997dfe362cbd3eb3f5a0e7ab7927ea31b65",
+    "kernel-tests.log": "dbe5ff2059c1362b1e8b1dbc4e8bf38ec7b033b293ab09b4278fca2263932f06",
+    "compiler-output.json": "80dca7c3f27415f4a04b923cf27f7a483ac1d29a06823aa9addce66d4e4b9e62",
+    "CallSite.sol": "aa044e687ebf68777346ddb78afccf78b008d50d82ea8867796cd472f4635986",
+    "trust-build-trace.json": "e1a989841dd5cf900a6444d94988f737843a42a6e813167909df963550610857",
+    "source-inputs.json": "d9facb8ab8285fe8a3af2cf0f9d3246b2a36b4ec938a8c28457fb9e43f3c62e3",
+    "solidity/foundry.toml": "49c7c904c53cb93685451ac01c631cba3606561f9f72c3b71d9eb637865c6ea6",
+    "solidity/.gitignore": "148e203aae4a9d321c31cf4b615c577f6d2ac4e66f3ee14098cb33e327f0d4e3",
+    "solidity/compiler-versions.json": "5e97d2ace4e434246d6184641b8d1a207ec23ba80355ff60709785704dd9b555",
+    "solidity/source-identities.json": "2ccfbfc36a38607f721ca895682699b4259e33642015f4ad2862033ed5e2a3fb",
+    "solidity/test/GatewayCall.t.sol": "b4a71f53970d8bda73f50da1e3447fa67f841a9681926ffcad2b853493522595",
+    "solidity/src/VaultHarness.sol": "258235adab078cbc94c2bd60611d5996065c6fd9d36112d90061a738231eff87",
+    "solidity/src/WithdrawalVaultEIP7685.sol": "e7dad85a284b7c07038bff8e936fb677a79b1fa9d2e8b9d628d3a107d9b79489"
+  }
+}

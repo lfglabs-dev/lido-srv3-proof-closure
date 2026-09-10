@@ -1,0 +1,7 @@
+✔ [2/8] Built PAccount1 (1.1s)
+✔ [3/8] Built Tests.Verity.PAccount1Test (443ms)
+✔ [4/8] Built ReportWriteFee (1.1s)
+✔ [5/8] Built Tests.Verity.ReportWriteFeeTest (476ms)
+✔ [6/8] Built PAddress1 (2.9s)
+✔ [7/8] Built Tests.Verity.PAddress1Test (406ms)
+Build completed successfully (8 jobs).
