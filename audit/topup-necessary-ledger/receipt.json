@@ -1,0 +1,38 @@
+{
+  "source_commit": "385cea890a4cbf58b90b9581a65b65332fa7cdba",
+  "base_commit": "a81fab25402f96aaf6cae3714ec491521d021f78",
+  "status": "Candidate validated; exact-source independent review pending; full TOPUP-1 OPEN",
+  "commands": [
+    {
+      "command": "lake build +LidoSRv3.Audit.Guarantees.PTopup1ActualContinuation +LidoSRv3.Audit.AllGuarantees",
+      "exit_code": 0,
+      "jobs": 1463
+    },
+    {
+      "command": "python3 scripts/check_trust_axioms.py",
+      "exit_code": 0,
+      "exact_axioms": 29
+    },
+    {
+      "command": "python3 scripts/test_ux2.py",
+      "exit_code": 0
+    }
+  ],
+  "source_identity_count": 1592,
+  "package_pin_count": 11,
+  "new_axioms": {
+    "LidoSRv3.Audit.Guarantees.PTopup1.actual_continuation_conserves": "propext,\n Classical.choice,\n Quot.sound",
+    "LidoSRv3.Audit.Source.TopupPipelineLedger.positive_effects_conservation": "propext,\n Classical.choice,\n Quot.sound",
+    "LidoSRv3.Audit.Source.TopupPipelineLedger.execute_success_conservation": "propext,\n Classical.choice,\n Quot.sound"
+  },
+  "files": {
+    "ux2-mutations.log": "dcff63c24c43ca580e855cf0be5661ec9e44160428d19d4d84c08713fb43ebc7",
+    "trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439",
+    "facade-build.log": "4ebfa2e750313002c06aeaf8673fff3fe502fa7d3270e9ecb6b7c47026bfa88b",
+    "README.md": "a8cc5c4167a2efedaebe773e305ffec66f4911ad7c3651252b6d1dbf142d7985",
+    "registry-checks.json": "cad7fb206f01c11243922b524b4f351374b23b8574c3f8f17d6eb1f1f9d176cb",
+    "unchanged-runtime-sources.json": "43e57f7b6a4074149bc3ab096106d6a490a4ac2cc2589e936b1b2baa051d58c8",
+    "trust-build-trace.json": "ff7eb47697fde891043b79d99bbddc2df749379222367b7014313a2974705509",
+    "source-inputs.json": "4965454ca17017207fec552cf7c638beb2e1600944043ab3566e67c9803a6edb"
+  }
+}
