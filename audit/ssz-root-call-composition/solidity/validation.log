@@ -1,0 +1,17 @@
+Compiling 7 files with Solc 0.8.25
+Solc 0.8.25 finished in 1.51s
+Compiler run successful!
+
+Ran 9 tests for audit/ssz-root-call-composition/solidity/SszRootCall.t.sol:SszRootCallTest
+[PASS] test_emptyReplyRootNotFound() (gas: 251609)
+[PASS] test_invalidSlotBeforeRejectedRoot() (gas: 250853)
+[PASS] test_noCodeSuccessEmptyRootNotFound() (gas: 83835)
+[PASS] test_onlyReturnedRootMutationFailsProof() (gas: 277509)
+[PASS] test_realRootCallFeedsFullVerifier() (gas: 277810)
+[PASS] test_rootRejectionBeforeIndexAndLeaf() (gas: 251999)
+[PASS] test_shortReplyAbiFailureBeforeIndex() (gas: 251659)
+[PASS] test_staticWriteRejected() (gas: 1040437421)
+[PASS] test_trailingRootBytesAccepted() (gas: 277107)
+Suite result: ok. 9 passed; 0 failed; 0 skipped; finished in 6.04ms (5.91ms CPU time)
+
+Ran 1 test suite in 136.39ms (6.04ms CPU time): 9 tests passed, 0 failed, 0 skipped (9 total tests)

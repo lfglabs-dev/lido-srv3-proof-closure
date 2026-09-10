@@ -1,0 +1,19 @@
+{
+  "reviewed_source": "e414df58f47c3126d8171ce9e6135c1fabdeb451",
+  "delta": "Imports source public theorem and kernel regressions into existing facade/Trust; records review; no source executable/statement changes",
+  "build": {
+    "jobs": 1638,
+    "exit": 0
+  },
+  "trust": {
+    "exact_axioms": 29,
+    "exit": 0
+  },
+  "sha256": {
+    "LidoSRv3/Audit/AllGuarantees.lean": "2778c1dfccd46f3d36b3532f66a769b7cbf9b3014706434bde06e41e846c8f86",
+    "LidoSRv3/Audit/Trust.lean": "200c6c912b4f6a562d5762452c1d356416ae01b94ab6403b28b1e40ac63c4ab4",
+    "audit/ssz-root-call-composition/independent-review-e414.md": "a67157f50114b6901b92e5329c794f9ffa3b2c2eebed831b2b2da4e068f53251",
+    "audit/ssz-root-call-composition/integration-build.log": "c0a7c3e42702729f7ee48f8d099c90567c4c05b2a35ddc4ed8643c97793ba06a",
+    "audit/ssz-root-call-composition/integration-trust.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439"
+  }
+}
