@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Source.AddressCorrespondence
+import LidoSRv3.Audit.Verity.AddressRecipientCallBridge
 import Verity.Core
 import Verity.Macro
 
