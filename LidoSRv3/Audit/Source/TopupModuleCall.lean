@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Source.TopupRouterContinuation
+import audit.trio.consolidation.LowLevel
 
 /-! StakingRouter.sol:717–758 at core@17005714. This adapter starts AFTER
 the preamble computed the rounded target. The module's physical address,
@@ -47,42 +48,55 @@ def payload (i : Input) : Bytes :=
 
 def call (hash : TopupRouterCredentials.Keccak) (callee : External)
     (ctx : Context) (i : Input) : Exec Bytes := fun w =>
-  CallData.invoke callee ctx (moduleAddress hash ctx.self i.moduleId w) (payload i) (word 0) w
+  audit.trio.consolidation.lowLevelCall callee ctx (moduleAddress hash ctx.self i.moduleId w) (payload i) (word 0) w
 
-/- CallData.invoke has an early code-size check. The inspected 0.8.25 typed
-CALL instead rejects a no-code target's empty return in its decoder. Failure
-agrees, but no-code attempt traces are NOT identified. Successful transports
-below derive the positive-code domain from the Live CALL. -/
+/- The pinned solc 0.8.25 typed allocateDeposits call has no code-size
+precheck: ordinary no-code targets return empty bytes and the caller decoder
+rejects them. Precompile dispatch is outside this inherited no-code model arm. -/
 
-/-- A successful call is traced back to the external interpreter on the actual
-request and provisionally transferred World. No successful-result field is
-supplied by Input. Both traced and untraced replies are retained. -/
+/-- Actual successful CALL origin, including ordinary no-code empty acceptance.
+A decoded successful module execution will derive the positive-code domain. -/
 theorem call_success_origin (hash : TopupRouterCredentials.Keccak) (callee : External)
     (ctx : Context) (i : Input) (before after : World) (raw : Bytes) (trace : List Attempt)
     (h : call hash callee ctx i before = ⟨.ok raw,after,trace⟩) :
     let target := moduleAddress hash ctx.self i.moduleId before
     let req : Request := ⟨ctx.self,target,word 0,payload i⟩
-    (before.core.codeSize target.val).val ≠ 0 ∧
-    ((callee req (transfer before ctx.self target 0) = .success raw after ∧
-       trace = [⟨req,true,raw,[]⟩]) ∨
-     ∃ nested, callee req (transfer before ctx.self target 0) = .successWithTrace raw after nested ∧
-       trace = [⟨req,true,raw,nested⟩]) := by
-  unfold call CallData.invoke at h
-  dsimp only at h ⊢
+    ((before.core.codeSize target.val).val = 0 ∧ raw = [] ∧
+      after = transfer before ctx.self target 0 ∧ trace = [⟨req,true,[],[]⟩]) ∨
+    ((before.core.codeSize target.val).val ≠ 0 ∧
+      ((callee req (transfer before ctx.self target 0) = .success raw after ∧
+        trace = [⟨req,true,raw,[]⟩]) ∨
+       ∃ nested, callee req (transfer before ctx.self target 0) = .successWithTrace raw after nested ∧
+         trace = [⟨req,true,raw,nested⟩])) := by
+  unfold call audit.trio.consolidation.lowLevelCall at h
+  simp only [word, Verity.Core.Uint256.val_ofNat, Nat.zero_mod, Nat.not_lt_zero, if_false] at h
+  dsimp only
   split at h
-  · simp at h
   · rename_i hc
+    cases h
+    exact Or.inl ⟨hc,rfl,rfl,rfl⟩
+  · rename_i hc
+    right
+    refine ⟨hc,?_⟩
     split at h
-    · simp at h
-    · split at h
-      · simp at h
-      · rename_i data w hr
-        cases h
-        exact ⟨hc,Or.inl ⟨hr,rfl⟩⟩
-      · rename_i data w nested hr
-        cases h
-        exact ⟨hc,Or.inr ⟨nested,hr,rfl⟩⟩
-      · simp at h
+    · cases h
+    · rename_i data w hr
+      cases h
+      exact Or.inl ⟨hr,rfl⟩
+    · rename_i data w nested hr
+      cases h
+      exact Or.inr ⟨nested,hr,rfl⟩
+    · cases h
+
+/-- The actual zero-value CALL to an ordinary no-code target succeeds empty
+and records the exact attempted request. No external interpreter is invoked. -/
+theorem call_no_code (hash : TopupRouterCredentials.Keccak) (callee : External)
+    (ctx : Context) (i : Input) (before : World)
+    (hc : (before.core.codeSize (moduleAddress hash ctx.self i.moduleId before).val).val = 0) :
+    call hash callee ctx i before =
+      ⟨.ok [], transfer before ctx.self (moduleAddress hash ctx.self i.moduleId before) 0,
+       [⟨⟨ctx.self,moduleAddress hash ctx.self i.moduleId before,word 0,payload i⟩,true,[],[]⟩]⟩ := by
+  simp [call,audit.trio.consolidation.lowLevelCall,hc,word]
 
 def encodeWords (xs : List Word) : Bytes := xs.flatMap (fun x => encode 32 x.val)
 def encodeReturn (xs : List Word) : Bytes :=
@@ -101,6 +115,18 @@ def decodeReturn (bytes : Bytes) : Except Fault (List Word) :=
   if count ≥ 2^64 then .error (.reason "Panic(0x41)") else
   if offset + 32 + 32*count > bytes.length then .error .empty else
   .ok (readWords count (bytes.drop (offset+32)))
+
+/-- Nonempty ABI success excludes the no-code empty reply by execution. -/
+theorem decoded_call_has_code (hash : TopupRouterCredentials.Keccak) (callee : External)
+    (ctx : Context) (i : Input) (before after : World) (raw : Bytes) (trace : List Attempt)
+    (allocations : List Word)
+    (h : call hash callee ctx i before = ⟨.ok raw,after,trace⟩)
+    (hd : decodeReturn raw = .ok allocations) :
+    (before.core.codeSize (moduleAddress hash ctx.self i.moduleId before).val).val ≠ 0 := by
+  rcases call_success_origin hash callee ctx i before after raw trace h with he | he
+  · rcases he with ⟨_,rfl,_,_⟩
+    simp [decodeReturn] at hd
+  · exact he.1
 
 theorem encodeWords_length (xs : List Word) : (encodeWords xs).length = 32*xs.length := by
   induction xs with
@@ -220,5 +246,34 @@ theorem failure_restores (hash : TopupRouterCredentials.Keccak) (m e : External)
   unfold execute Live.run at *
   dsimp only at *
   split <;> simp_all
+
+/-- Ordinary no-code acceptance is consumed by the ABI decoder, whose empty
+failure restores the complete entry world and retains the successful CALL. -/
+theorem execute_no_code (hash : TopupRouterCredentials.Keccak) (m x : External)
+    (ctx : Context) (beacon : Address) (i : Input) (before : World)
+    (hc : (before.core.codeSize (moduleAddress hash ctx.sender i.moduleId before).val).val = 0) :
+    execute hash m x ctx beacon i before =
+      ⟨.error .empty,before,
+       [⟨⟨ctx.sender,moduleAddress hash ctx.sender i.moduleId before,word 0,payload i⟩,true,[],[]⟩]⟩ := by
+  have hcall := call_no_code hash m
+    (LidoSRv3.Audit.Verity.TopupBeaconFundedTx.routerContext ctx) i before hc
+  have hp := program_of_call hash m x ctx beacon i before _ [] _ hcall
+  simp only [decodeReturn, List.length_nil, Nat.zero_lt_succ, if_true] at hp
+  simpa [execute,Live.run,hp,fail,LidoSRv3.Audit.Verity.TopupBeaconFundedTx.routerContext]
+
+/-- Full decoded success derives code presence; callers need no new premise. -/
+theorem execute_success_has_code (hash : TopupRouterCredentials.Keccak) (m x : External)
+    (ctx : Context) (beacon : Address) (i : Input) (before : World)
+    (h : (execute hash m x ctx beacon i before).outcome = .ok ()) :
+    (before.core.codeSize (moduleAddress hash ctx.sender i.moduleId before).val).val ≠ 0 := by
+  intro hc
+  rw [execute_no_code hash m x ctx beacon i before hc] at h
+  cases h
+
+#print axioms execute_success_has_code
+
+#print axioms call_success_origin
+#print axioms decoded_call_has_code
+#print axioms execute_no_code
 
 end LidoSRv3.Audit.Source.TopupModuleCall

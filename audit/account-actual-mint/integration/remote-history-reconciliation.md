@@ -1,0 +1,7 @@
+# Retained PR302 remote history
+
+PR302 still pointed to `a3f888bb285d8972cda967f2c36bd919b6ef680f`. Its five commits after `7095e20c20ef63b12135c1cd86c630b6719d2e42` had diverged from the recovered physical-mint branch. The initial normal push was rejected; no force push or replacement PR was used.
+
+The remote range changes only HandleOracleReportTx, public PAccount1, lakefile and the manifest. Its useful report-before-getter-before-checked-fee route is retained by the reviewed successor's actual ReportFeeMint execution and root-facing entry. The remote wrapper's invented Lido slots17/18 and notification tick are superseded by the physical packed total-share consumer and explicitly abstract account map; the new theorem does not claim the omitted callback. The remote removal of the obsolete observation-only checked-fee public theorem is also preserved. The redundant path-package requirement is replaced by the independently verified single existing AccountAddressChecks provider.
+
+A history merge retains all five remote commits as ancestors with a tree identical to reviewed `c042ccc2a971eab1a8c51c9decae13cd7b19a131`. This note is the only following file addition. No theorem, executable, dependency pin, source dossier or validation receipt changes. The valid source9658/integration86ee checks therefore remain applicable by exact object identity. Independent final review must also check the four-path remote range and exact final tree before integration. Historical source versions remain available through their retained Git commits.

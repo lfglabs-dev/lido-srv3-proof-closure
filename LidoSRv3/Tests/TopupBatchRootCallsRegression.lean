@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Guarantees.PTopup2RootCalls
+import LidoSRv3.Audit.Guarantees.PTopup2ModuleFailure
 import LidoSRv3.Tests.TopupBatchConsumerRegression
 
 namespace LidoSRv3.Tests.TopupBatchRootCallsRegression
@@ -115,6 +116,31 @@ theorem forbidden_root_skips_module :
     failedBatch.outcome = .error (.gateway (.verifier .rootNotFound)) ∧
     failedBatch.rootAttempts.map (·.accepted) = [false] ∧
     failedBatch.moduleAttempts = [] := by decide +kernel
+
+/-- BEACON_ROOTS remains coded; only the actual module address is an EOA. -/
+def noModuleWorld : World :=
+  {env.before with core := {env.before.core with codeSize := fun a =>
+    if a = 40 then (word 0) else (env.before.core.codeSize a)}}
+def noModuleBatch := TopupBatchRootCalls.run TopupBatchConsumerRegression.mapHash twoModule
+  TopupBatchConsumerRegression.reject {env with before := noModuleWorld}
+  TopupBatchConsumerRegression.ctx (TopupBatchConsumerRegression.address 8)
+  (word 7) [word 42] [word 3] [TopupBatchConsumerRegression.row] (word (2^256-1))
+
+theorem no_module_actual_call_then_decoder_failure :
+    noModuleBatch.outcome = .error (.module .empty) ∧
+    noModuleBatch.rootAttempts.map (·.accepted) = [true] ∧
+    noModuleBatch.moduleAttempts.map (fun a =>
+      (a.request.caller.val,a.request.target.val,a.request.value.val,a.accepted,a.returned)) =
+      [(2,40,0,true,[])] ∧
+    noModuleBatch.attempts.map (fun a => match a with | .inl _ => true | .inr _ => false) =
+      [true,false] := by decide +kernel
+
+theorem no_module_entire_entry_world_restored : noModuleBatch.world = noModuleWorld := by
+  exact TopupBatchRootCalls.failure_restores _ _ _ _ _ _ _ _ _ _ _ _
+    no_module_actual_call_then_decoder_failure.1
+
+#print axioms no_module_actual_call_then_decoder_failure
+#print axioms no_module_entire_entry_world_restored
 
 #print axioms two_rows_consume_ordered_limits
 #print axioms forbidden_root_skips_module

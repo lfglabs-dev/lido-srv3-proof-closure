@@ -70,7 +70,8 @@ example : over.attempts.length = 1 := by rfl
 
 def noCode : World := {before with core := {before.core with codeSize := fun _ => word 0}}
 example : TopupModuleCall.call mapHash (answer (encodeReturn [])) routerCtx input noCode =
-    ⟨.error .empty,noCode,[]⟩ := by rfl
+    ⟨.ok [],transfer noCode routerCtx.self (address 40) 0,
+      [⟨⟨routerCtx.self,address 40,word 0,payload input⟩,true,[],[]⟩]⟩ := by rfl
 
 -- The accepted positive withdrawal/beacon scenario is now driven by a raw
 -- module reply. The module's returned World is exactly that scenario's start.

@@ -1,0 +1,49 @@
+# Independent review — TOPUP ordinary no-code module CALL
+
+Verdict: **CLEAN within the explicitly retained typed covered-phase / ordinary non-precompile target scope.** No blocking source, theorem, consumer, compiler-correspondence or receipt defect found.
+
+Reviewed frozen candidate `4fd86cd2c53b6e1c06a05a3488d9a46bc65ad4ac` in `/tmp/lido-topup-nocode-call`, complete change against accepted base `64f73f101187992db5b9b446852c3063a5a6d5b7`. Author was stopped before review. Reviewer `/root/topup_root_call_batch` did not author this patch; reviewer authored the previously accepted #315 actual-root batch substrate. This is an independent review of the new no-code patch and its effect on that substrate, not a new independent certification of reviewer-authored #315.
+
+Review performed 2026-09-10. Candidate source and dossier were not edited by this reviewer. The only persistent review output is this external report. Root separately reported an accidental deterministic validation invocation; final candidate identity and clean status were checked independently after the checks below.
+
+## Executed source and public claims
+
+Read the complete modified `TopupModuleCall.lean`, both changed regression modules, new `PTopup2ModuleFailure.lean`, the existing low-level primitive and old `CallData.invoke`, plus the actual batch consumers and committed continuation relations. The consumed definition changes: `TopupModuleCall.call` invokes the existing `lowLevelCall` at value zero. This is on the execution path of `program`, `execute`, `TopupBatchConsumer` and the actual-root `TopupBatchRootCalls`; no disconnected adapter is being credited.
+
+The physical module target is read from the router module slot and reduced to its low 160 bits. Caller is the router context (`ctx.sender` at execute), value is zero, and the unchanged payload serializes the exact rounded target, pubkeys, key indices, operator IDs and limits. At value zero the primitive funding failure branch is impossible. In its ordinary no-code branch, transport succeeds with empty bytes, a single accepted exact request and no external interpreter invocation. Positive-code branches preserve all four previous external-result alternatives: success, success with nested attempts, rejection and rejection with nested attempts, including arbitrary successful returned Worlds. Generic Live/CallData/StaticCall primitives are unchanged.
+
+`call_success_origin` correctly generalizes its formerly unconditional code-presence conclusion to a no-code empty-success arm or a positive-code actual-interpreter arm. This necessary theorem-statement change is openly documented. `decoded_call_has_code` and `execute_success_has_code` derive code presence from actual decoded/execution success. No code-presence premise was added to existing successful public consumers; their allocation bound and joint authentication claims retain their success domain. Empty encoded allocation arrays still succeed when the real returned ABI bytes decode, unlike a zero-byte return.
+
+The real program decoder consumes the empty result and produces `.empty`; `Live.run` restores the complete entry World while retaining the accepted module attempt. `actual_module_no_code_failure` establishes the exact result from the physical no-code condition. `actual_root_batch_no_code_failure` does not assume successful length checks or a successful root prefix: its proof splits the actual length check and actual root loop. Early rejection has no module attempt; the successful-root branch retains the actual loop attempts and then records the exact empty successful module CALL using the loop-derived moduleInput. Both branches reject and restore `e.before`. `Result.attempts` places the retained root phase before module attempts.
+
+The new kernel regression executes this composition with BEACON_ROOTS still coded and only module code erased: accepted root, accepted zero-value empty module CALL, decoder failure, phase order, then full modeled World rollback. Existing positive module/withdrawal/beacon execution, successful batch/public success instantiation and prior rejection regressions remain checked.
+
+## Pinned Solidity and complete compiler artifact
+
+Verified core HEAD and relevant source bodies against `17005714f151e5502c559932319a3f2f74ac2436`. Read the pinned `StakingRouter.topUp` call path around lines 680–770, especially the actual `allocateDeposits` invocation at 717–719, together with the existing inherited Solidity fixture and the new test. The fixture inherits unmodified pinned `topUp`; its constructor setup is a harness boundary.
+
+Pinned Hardhat and Foundry configuration files were compared byte-for-byte with the pin. Both establish the applicable solc 0.8.25, optimizer enabled / 200 runs, viaIR, Cancun profile. The retained metadata states `0.8.25+commit.b61c2a91` and the same settings. Independently verified all 28 compiler source SHA256 values, all 28 metadata source keccak256 values, exact source-set equality, compiler input content equality and all core source bodies against the pin. Verified the retained standard-json input hash `5bec5c971d9c8f8396d8f0776da3b5a0c6680581f90eabedb03161b8e578e1c9`.
+
+Independently reran `/Users/thomas/.svm/0.8.25/solc-0.8.25 --standard-json` on those checked inputs, capturing output in memory. The entire 5,165-line retained optimized BatchRouter IR reproduced exactly (allowing only the artifact trailing newline); SHA256 `f0b1bbeecb5774f2b891b91524b1beddc72e133e99fa7f170f6543c5e122c7ef`.
+
+The selected emitted path reads and masks `stateConfig.moduleAddress`, encodes selector `0x783b8a65` and the actual five argument groups, and issues `call(gas(), cleaned_4, _2, ...)` with runtime `_2 = 0`. There is no target EXTCODESIZE precheck on this module CALL path. Unrelated EXTCODESIZE checks elsewhere in the full IR are not being erased or generalized away. The successful CALL branch copies actual returndata and invokes `abi_decode_array_uint256_dyn_fromMemory`; its first guard is `if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }`. Thus empty returndata selects the emitted empty decoder revert. This is exact compiler-artifact/source correspondence, not a formal whole-bytecode simulation.
+
+Independently replayed the named Foundry case with the retained source/remapping/profile and valid existing out/cache paths: PASS, 1 test, no files changed / compilation skipped. The test mocks only the two preceding module view getters, erases module code after registering mocks, checks code absence, and expects the exact allocateDeposits calldata. allocateDeposits itself is unmocked. The trace shows that CALL reaching the ordinary empty-code address and STOP, followed by parent rejection; router balance stays unchanged. This harness does not prove that a natural EOA can answer preceding view getters. Foundry injects a non-contract diagnostic into the caught parent revert data; the test and dossier correctly do not credit exact empty revert bytes. The exact empty emitted branch is supported separately by reproduced IR.
+
+## Independent checks and receipt reconciliation
+
+- Named Lake build of `LidoSRv3.Audit.Guarantees.PTopup2ModuleFailure`, `LidoSRv3.Tests.TopupBatchRootCallsRegression`, `LidoSRv3.Tests.TopupModuleCallMutants`: PASS, 1,302 jobs.
+- Independently reran normal `lake env lean` on all four changed/new Lean files, without disabling kernel checking or writing output artifacts: PASS. Only routine linter warnings; no admitted proof or diagnostic skip-kernel path.
+- Replayed the full dossier validator with its two deterministic JSON writes intercepted as byte-for-byte comparisons. PASS: 1,285 actual transitive source identities, 11 exact package pins, 26 independently recomputed theorem axiom sets. The recomputed source and axiom JSON matched the retained files exactly. All scoped sets contain only `propext`, `Classical.choice`, `Quot.sound` as applicable; no sorryAx/custom axioms.
+- Independently checked all 17 SHA256 entries in `receipt.json`: PASS. Compiler source identities and full IR reproduction additionally checked as described above.
+- Confirmed the one new actual-batch kernel regression, one general World-restoration regression, 11 retained batch kernel regressions and retained public success instantiation. Existing positive execution also passed normal kernel checks.
+- Targeted Foundry replay: PASS, 1/1. Exact revert-byte test is correctly recorded as false in the receipt.
+- `git diff --check 64f73f101187992db5b9b446852c3063a5a6d5b7..HEAD`: PASS. Final HEAD remains the frozen 4fd86cd2 commit and working tree is clean.
+
+## Retained boundaries and integration
+
+Ordinary no-code means the inherited LowLevel model's EOA/undeployed-address interpretation. Its Lean codeSize=0 guard itself does **not** exclude precompiles; the non-precompile restriction is a documented interpretation boundary, not a new proven address classifier. This review does not certify the theorem as a statement about arbitrary Ethereum codeSize=0 addresses, precompile behavior or chain upgrades. That limitation is stated in the new source/public docs and dossier and remains explicit in this verdict.
+
+The change does not close full gateway/router admission, preceding view-call execution, outer ABI, compiler memory-allocation failures, deployed bytecode simulation, gas, crypto/consensus or complete EVM trace equivalence. Root configuration and expected withdrawal credentials retain #315 typed-input boundaries. The new failure evidence improves the consumed ordinary module-CALL behavior within those bounds.
+
+No candidate source, AllGuarantees, Trust, Lake, manifest or publication edit is requested by this review. Root owns facade/global wiring, final combined-tree checks, integration and any publication. CLEAN applies to this exact candidate and scope; it is not an approval of later modified bytes or the eventual union.
