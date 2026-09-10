@@ -20,6 +20,7 @@ open AccountAddress.ReportWriteFee
 
 def two128 : Nat := 2 ^ 128
 def uint256Max : Nat := two256 - 1
+def uint128Max : Nat := two128 - 1
 
 /-- `keccak256("lido.StETH.totalAndExternalShares")`, StETH.sol:92-93. -/
 def totalSharesPosition : Nat :=
@@ -85,11 +86,18 @@ def setLowUint128 (word : StorageWord) (value : Nat) : StorageWord :=
 /-! `StETH.getPooledEthByShares` (329-334) calls virtual share-rate helpers.
 For Lido, the source override is `internalEther / (totalShares -
 externalShares)` (Lido.sol:1298-1309), not `totalPooledEther / totalShares`.
+The multiplication and subtraction use Solidity 0.4's raw `uint256`
+operators, not AragonSafeMath; they therefore wrap at 256 bits.
 -/
+def rawUint256Mul (a b : Nat) : Nat := (a * b) % two256
+def rawUint256Sub (a b : Nat) : Nat := (a + two256 - b) % two256
+
 def pooledEthByShares (s : State) (amount : Nat) : Except Error Nat :=
-  if amount ≥ two128 then .error .sharesTooLargeForEvent
-  else if totalShares s - externalShares s = 0 then .error .zeroShareRateDenominator
-  else .ok (amount * s.internalEther / (totalShares s - externalShares s))
+  if amount ≥ uint128Max then .error .sharesTooLargeForEvent
+  else
+    let denominator := rawUint256Sub (totalShares s) (externalShares s)
+    if denominator = 0 then .error .zeroShareRateDenominator
+    else .ok (rawUint256Mul amount s.internalEther / denominator)
 
 /-- StETH.sol:518-527.  The `newTotalShares & UINT128_HIGH_MASK == 0`
 check is represented by `newTotal < 2^128`; the high half of the existing
