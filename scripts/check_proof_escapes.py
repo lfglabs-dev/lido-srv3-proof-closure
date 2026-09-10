@@ -20,8 +20,12 @@ LIBRARY_ROOTS = ("LidoSRv3.lean",)
 # addition, deletion, or move of a project `native_decide` use must be reviewed
 # by deliberately updating this guard.  The existing uses are separately
 # disclosed by the Trust report's axiom output.
-NATIVE_DECIDE_COUNT = 218
-NATIVE_DECIDE_SHA256 = "3b69eb64b94ed88df117a907270846986630e5c971c02599349a018da5299a49"
+# Reconciled at main 02b53a15: 73 already-integrated TrioConsolidation TEST
+# sites, with the prior 218-site inventory unchanged. See
+# audit/metadata-reconcile/native-decide-inventory.json for the exact delta.
+# This records native-backed regressions; it does not grant kernel-proof credit.
+NATIVE_DECIDE_COUNT = 291
+NATIVE_DECIDE_SHA256 = "3310d7fb45c1d44c33d253422373e14e900f1b21b77b0a20e2131923065c8d68"
 ESCAPES = (
     ("sorry", re.compile(r"\bsorry\b")),
     ("admit", re.compile(r"\badmit\b")),

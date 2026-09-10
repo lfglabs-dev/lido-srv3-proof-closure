@@ -42,6 +42,7 @@ import LidoSRv3.Audit.Verity.SszEncodingTx
 import LidoSRv3.Tests.SszEncodingTxMutants
 import LidoSRv3.Audit.Source.GIndexConcatCorrespondence
 import LidoSRv3.Audit.Guarantees.PTopup1
+import LidoSRv3.Audit.Guarantees.PTopup2ActualBatch
 import LidoSRv3.Tests.TopupTxMutants
 import LidoSRv3.Audit.Verity.TopupHybrid
 import LidoSRv3.Tests.TopupHybridMutants
@@ -526,6 +527,7 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.TopupTxMutants.unwrapped_accumulator_kill_line_refutes_parent
 #print axioms LidoSRv3.Audit.Source.Topup2.source_aggregate_bounded_by_block_cap
 #print axioms LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2.actual_module_batch_bound
 #print axioms LidoSRv3.Audit.Guarantees.PTopup2.per_key_bounded_by_candidate
 #print axioms LidoSRv3.Audit.Verity.Topup2Tx.tx_aggregate_bounded_by_block_cap
 #print axioms LidoSRv3.Audit.Verity.Topup2Tx.tx_all_success_value_exact

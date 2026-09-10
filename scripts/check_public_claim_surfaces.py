@@ -184,6 +184,13 @@ CLAIMS = {
         "declarations": (
             ("def", "guarantee"),
             ("def", "canonicalBeaconDepositAddress"),
+            # Accepted constructor obstruction: source-only provenance is
+            # insufficient, and remains an explicit runtime assumption.
+            ("structure", "TopupConstructorInput"),
+            ("def", "PinnedTopupConstructorAdmitted"),
+            ("def", "wrongBeaconConstructorInput"),
+            ("theorem", "pinned_constructor_span_does_not_determine_beacon_address"),
+            ("theorem", "no_source_only_beacon_address_derivation"),
             ("theorem", "valid_result_preserves_router_order"),
             ("theorem", "revert_restores_state_value_and_logs"),
             ("theorem", "source_wrap_precludes_value_moving_commit"),
@@ -220,6 +227,7 @@ CLAIMS = {
             # Readable-statement vocabulary for the registered Verity parent.
             ("abbrev", "NonzeroWrapRevertsAndRestores"),
             ("abbrev", "EveryReturndataIsGuarded"),
+            ("def", "SourceTopupCallCorresponds"),
             ("theorem", "verity_tx_simulates_source_with_nonzero_wrap_close"),
         ),
     },

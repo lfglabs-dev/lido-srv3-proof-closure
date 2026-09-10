@@ -1,0 +1,1 @@
+python-quality ok: 401 executable scopes under cyclomatic 22 and 35 scripts under 500 lines, except pinned baseline debt (blob 6050d1fa26ac934f77091c10f55b618396b9c467) which did not grow

@@ -1,0 +1,30 @@
+{
+  "basis": "49ead320def330f4ca181dc6a0a1bd178f5e3946",
+  "scope": "Root pre-review finding: optional annotation must not make six mandatory consumer fields optional. Retained direct mandatory-key reads; six omission cases now checked. Writer explicitly reopened then refrozen before independent review.",
+  "changed_source_inputs": {
+    "scripts/source_spans.py": {
+      "previous_sha256": "6c253ae9a362cfd324504e2e0a385b60ac300b7d929f7e162853159d2d0b4bca",
+      "current_sha256": "6f74d1c52edc719ef4765b1f3117da39118326f8f2980845219fd5b08def212b"
+    },
+    "scripts/source_span_test_cases.py": {
+      "previous_sha256": "ea6ed69777b90fb33627f0bfd46c8070f6f422f6c960659c96aef6fa31490c7b",
+      "current_sha256": "5af0882459a7cbfafae70afdd42981a71016a784034ad7a043394d2b5814b4e1"
+    }
+  },
+  "other_original_inputs_identical": 575,
+  "new_runs": {
+    "metadata-tests": {
+      "exit": 0,
+      "sha256": "ddde747c52da72920f5e1c3edadbd8e84b306793e5d2c5b3f7f01e3e515775a8"
+    },
+    "ux2-tests": {
+      "exit": 0,
+      "sha256": "dcff63c24c43ca580e855cf0be5661ec9e44160428d19d4d84c08713fb43ebc7"
+    },
+    "quality": {
+      "exit": 0,
+      "sha256": "605ee9e6c244e25a0e8be87f70cd9e887d043bfc017fa63ecd1d74e61121bb7c"
+    }
+  },
+  "generated_outputs_unchanged": true
+}

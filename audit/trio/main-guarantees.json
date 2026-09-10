@@ -103,6 +103,37 @@
       "outside": [
         "Compiled and deployed bytecode, gas costs and full consensus-state truth."
       ]
+    },
+    "P-TOPUP-2": {
+      "description": "For a successful gateway witness and router module batch in the source model, the allocations decoded from the actual module reply sum to at most the router’s packed per-block cap, converted from gwei to wei. The same executed witness loop supplies the keys and per-key limits consumed by that call. Full gateway entry correspondence remains open.",
+      "model": "Source execution model using Verity physical contract storage and concrete raw module calls; the historical greedy Contract.run allocator is separate",
+      "theorems": [
+        "LidoSRv3.Audit.Guarantees.PTopup2.actual_module_batch_bound"
+      ],
+      "covered": [
+        "The actual gateway length guards and witness loop produce the keys and wei limits consumed by the actual module call and its decoder.",
+        "The router reads its uint64 cap from packed storage, computes the rounded minimum with the arbitrary preceding module allocation, and checks the module-selected allocations.",
+        "Successful execution derives the allocation-count and arithmetic bounds internally; zero and empty module returns are included. No greedy allocation policy or caller-supplied sum bound is assumed."
+      ],
+      "missing": [
+        "A successful full gateway entry has not yet been connected to this covered value path with the same physical state and ABI-decoded inputs; role, pause, timing and view-call admission still need that connection.",
+        "The old Contract.run allocate/sourceView theorem still executes a separate greedy model and is retained as historical evidence. It does not certify this actual module batch.",
+        "The inherited module call/decode models still have specific no-code-attempt and oversized-return allocation-error differences. Complete source error and observable rollback correspondence is not claimed."
+      ],
+      "conditions": [
+        "The covered value-path executor returns a result whose outcome is successful. Limits, target, cap, exact allocation sum and count bounds are derived from that execution.",
+        "The preceding module-allocation word and both external module/withdrawal interpreters are arbitrary. The claim bounds the decoded module allocations, not arbitrary callee ledger changes."
+      ],
+      "assumptions": [
+        "A-SOURCE-SHAPED",
+        "A-VERITY-SCAFFOLD",
+        "A-SOLC-TRUSTED",
+        "A-RUNTIME-PROVENANCE"
+      ],
+      "outside": [
+        "Cross-call accumulation and the last-top-up-state policy are outside this per-batch cap guarantee.",
+        "General compiler correctness, the declared Verity semantics, cryptographic primitives, general gas and consensus retain their accepted boundaries. No new or stronger assumption is admitted under these labels."
+      ]
     }
   }
 }
