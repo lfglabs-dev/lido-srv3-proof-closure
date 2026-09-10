@@ -527,6 +527,24 @@ private def mintCheckedShares (result : Result) (dirty : ContractState) (shares 
         some (⟨result.balances, result.total, storedSteps notified result.balances⟩, notified)
   else some (result, dirty)
 
+/-- The `AccountingOracle.sol:529-540` / `Accounting.sol:137-143` prefix for
+the composed path.  It deliberately stops before Accounting's router getter:
+the caller must run that getter against the committed `ReportWriteFee.Core`
+first.  This is an execution fragment, not a separately proved wrapper. -/
+private def prepareAccountingAfterRouterReport (i : ReportInput) (snapshot : ContractState) :
+    Except String (Result × ContractState) :=
+  if idsAndBalancesValid i then
+    match checkedTotal256 i.balancesGwei with
+    | none => .error "OVERFLOW"
+    | some total =>
+        let dirty := writeAll i.reportedModuleIds i.balancesGwei snapshot
+        let dirty := dirty.writeSlot totalBalanceSlot total
+        let dirty := dirty.writeSlot sequenceSlot 0
+        let dirty := stampStep balancesWrittenSlot dirty
+        let dirty := stampStep accountingCalledSlot dirty
+        .ok (⟨i.balancesGwei, total, []⟩, dirty)
+  else .error "INVALID_REPORT"
+
 /-! ## Physical report-write → getter → checked-fee → Lido-mint composition
 
 The previous wrapper is useful for the arithmetic unit, but its `feeInput`
@@ -593,9 +611,9 @@ def handleOracleReportFromCommittedFeeProducts (x : ReportWriteFeeMintInput)
       x.report.registeredModuleIds x.report.reportedModuleIds x.report.balancesGwei world.routerCore with
   | .reverted _ _ => .error "INVALID_REPORT"
   | .committed postCore =>
-      match (handleOracleReport x.report 0 (failAfterWrites := false)).run world.accounting with
-      | .revert reason _ => .error reason
-      | .success result dirty =>
+      match prepareAccountingAfterRouterReport x.report world.accounting with
+      | .error reason => .error reason
+      | .ok (result, accountingAfterReport) =>
           match AccountAddress.ReportWriteFee.getStakingRewardsDistribution x.layout
               x.report.registeredModuleIds postCore with
           | .error _ => .error "GETTER_ARITHMETIC"
@@ -606,7 +624,10 @@ def handleOracleReportFromCommittedFeeProducts (x : ReportWriteFeeMintInput)
                   match LidoSRv3.Audit.Source.ReportFeeProductsCorrespondence.sharesToMintAsFees products with
                   | none => .error "FEE_ARITHMETIC"
                   | some shares =>
-                      match mintCheckedShares result dirty shares with
+                      -- Accounting.sol:265-288 reads the post-report router
+                      -- distribution before its 403 `LIDO.mintShares` call.
+                      let accountingAfterGetter := stampStep rewardsReadSlot accountingAfterReport
+                      match mintCheckedShares result accountingAfterGetter shares with
                       | none => .error "MINT_ARITHMETIC"
                       | some (mintedResult, mintedAccounting) =>
                           .ok ⟨mintedResult, ⟨postCore, mintedAccounting⟩⟩
