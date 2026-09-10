@@ -1,0 +1,45 @@
+{
+  "schema": "lido-deposit-live-beacon-integration-v1",
+  "utc": "2026-09-10T08:17:48.717155+00:00",
+  "source_commit": "2741475f298bfda8d20a778dd9f407ded0517e25",
+  "integration_base": "06d52d72f370dbed09926af11a79cc16079b95b1",
+  "source_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "writer": "Original 19405 and predecessor writers stopped; root owns documentary integration only",
+  "source_files": {
+    "audit/trio/deposit/Deposit.lean": "9fb5b55477fef0cedd4733fd5c144446a31ad49ec7c749e5f2079b2efa83759d",
+    "audit/trio/deposit/LiveBeacon.lean": "a8baf4087e56e43b5156b22d0c34581c1304ca3efc01af57dbbc6200bbbd4429",
+    "audit/trio/deposit/README.md": "8eeae4bb0119b5a8c727d5f6fb28d734d660e6b52c8bad676779834e9bd3705f",
+    "audit/trio/deposit/RouterDeposit.lean": "fc1ee497cf7e2984e87df390256571903c54d0aed6e2f8f42f265fe81f1dfa28",
+    "audit/trio/deposit/Tests/Verity/LiveBeacon.lean": "71f6ba81327a25eab7b645aac2c2a3137cc9dcf42708e6bb453679670947157a",
+    "audit/trio/deposit/Tests/Verity/LiveBeaconKernelProbe.lean": "df1b1efdda4fe6338cbb6d66c55371997fdfd33fc24fceb2a15f41fe33f3f73d",
+    "audit/trio/deposit/hash-router-deposit.sh": "ee97754f688b33b721aa57098b1dcd91cfa8746c9e4c5c9cd562ed0232c551b7",
+    "audit/trio/deposit/lake-manifest.json": "d139b3d1d223cbc96c942375b7365549abdf5a7cc7c99351d848192caccba3c3",
+    "audit/trio/deposit/lakefile.lean": "0b5eed053c507c3fcffe621b586453fb2ab83e4e428f846f1f2db7077b60198f",
+    "audit/trio/deposit/lean-toolchain": "e0a7032ab1976a37a3e1e823816b4f490d462c1e864b21e1999c33cdac76e263"
+  },
+  "source_review": {
+    "mission": "19405e46-b5ed-448e-baa3-7abf498ecf6c",
+    "sha256": "db59eab1348054e18cd164d417e8fa1d1fb21312d7ca8cab239036cd9360b355",
+    "verdict": "ACCEPT conditional live-callee increment, not DEPOSIT delivery"
+  },
+  "validation": {
+    "command": "lake build TrioDeposit (isolated slice)",
+    "fresh_at_integration": false,
+    "jobs": 1318,
+    "source_log_sha256": "1054f0adbe7d15819fb3f45b694285ae67d1283d68d52c3213a4b83f6d962289",
+    "actual_import_source_comparisons": 1294,
+    "root_errors": [],
+    "unchanged_local_imports": 98,
+    "changed_local_imports": 3,
+    "native_fixtures_not_kernel": true
+  },
+  "goal": "Eight guarantees OPEN",
+  "files": {
+    "independent-review.md": "db59eab1348054e18cd164d417e8fa1d1fb21312d7ca8cab239036cd9360b355",
+    "axioms.json": "cc4a9b44d0946f392c05e1139c3f93de6e9165ffcfad90c1768f69cbddb304b3",
+    "dependency-inputs.json": "a2288fb5c2a29efd4286243801d0a8f266f6263a629c3ed879ac927e20013627",
+    "review-response.md": "098a4fb9de68cb627282c4c750a4e50f3084867e0be59ba618a69642fc935f5c",
+    "source-freeze.md": "d19e0d69189655a57a490c3080996faa36eeba6eb2e463d3879b8989441349c2",
+    "source-validation.log": "1054f0adbe7d15819fb3f45b694285ae67d1283d68d52c3213a4b83f6d962289"
+  }
+}
