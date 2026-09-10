@@ -52,7 +52,7 @@
     "audit/ssz-sha-committed/README.md": "2abc80afaad653c3dc9ae30ea929e11ff15377a547c7bf47ef1c07303bc83456",
     "audit/ssz-sha-committed/check_receipt.py": "f75ec0c6d6a1664fa264ceac5fbde170adaf1ffbe6758c98dbebbfe786ed5fe1",
     "lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
-    "lakefile.lean": "856f7b02b00ab14e9f934f60c635bd20714f45907dbc9acc7d3f0766312277dc",
+    "lakefile.lean": "8ea3781110b3234bdfcf2b2c87c5c064fa7d2aee018da57bcab100f8baf1ab87",
     "lean-toolchain": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee",
     "lido-core/contracts/0.8.25/CLValidatorVerifier.sol": "d6e89f6975e4fa02f758bf461a98ac2d689296b5c92d03ffd4e43a22d0b3d7ed",
     "lido-core/contracts/common/lib/BLS.sol": "0187cc6a6b1aaa833317695d88795db431fa237452213e8c3872a0f444dceb7c",
@@ -65,7 +65,7 @@
     "audit/ssz-sha-committed/failed-opaque-word-fixture.log": "c187d0238c3a073b86475cfad8c4cbbc96db85f7e813bd68f799992439381919",
     "audit/ssz-sha-committed/failed-consumer-namespace.log": "af4128cce22b2fbda0856933de167d98482d63817cbc82e652c4364f4dc58d31",
     "audit/ssz-sha-committed/dependency-inputs.json": "4cbd9621473b974de975f296cbf023d344b6f68caf415d43e1c6a0f4678df3f9",
-    "audit/ssz-sha-committed/inherited-validation.json": "9fcb195446dbcdafd3d29ba61409a2ed19266eac85f48c728534017fb81e164b",
+    "audit/ssz-sha-committed/inherited-validation.json": "1f0da20d3ca9eaf923a1f32cf043b0667d1651cf712771b8fd1c9cd0136a95a0",
     "audit/ssz-sha-committed/axioms.log": "578dff257e8d167c6412c029dd63e9de02f22a133bc7930206609eb2a6b46355"
   },
   "package_pins": {
@@ -81,12 +81,5 @@
     ".lake/packages/batteries": "fa08db58b30eb033edcdab331bba000827f9f785",
     ".lake/packages/Cli": "92564e5770e4d09f2d86dfbf8ada1e9c715b384c"
   },
-  "independent_review": "Pending frozen exact-source independent review",
-  "integration_metadata": {
-    "main": "e86f666862fb6621232b3c34d1656bb13119c64e",
-    "original_source_commit": "3e54bc475c83c0d5591d54a0aba88723d0efa00c",
-    "original_receipt": "audit/ssz-sha-committed/source-receipt.json",
-    "original_inherited_validation": "audit/ssz-sha-committed/source-inherited-validation.json",
-    "change": "Only current lakefile metadata updated for accepted PR294; inherited baseline lakefile now checked against exact retained snapshot. No proof/semantic source changed."
-  }
+  "independent_review": "Pending frozen exact-source independent review"
 }

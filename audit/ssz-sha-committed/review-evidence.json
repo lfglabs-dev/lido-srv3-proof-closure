@@ -1,0 +1,33 @@
+{
+  "source_commit": "3e54bc475c83c0d5591d54a0aba88723d0efa00c",
+  "integrated_main": "e86f666862fb6621232b3c34d1656bb13119c64e",
+  "source_writer": "STOPPED",
+  "source_review_mission": "f81c74fe-a1e8-42fb-8c55-f19b51e0bfad",
+  "source_review": "CLEAN exact full report",
+  "source_report_sha256": "b310f13d39f41464d83bd9ed57bb9abf854042615d23d09f1178431e9f289377",
+  "files": {
+    "audit/ssz-sha-committed/baseline-lakefile.lean": "8ea3781110b3234bdfcf2b2c87c5c064fa7d2aee018da57bcab100f8baf1ab87",
+    "audit/ssz-sha-committed/independent-review-events.json": "a26adea1095aaa4622f794d3f9a9eb92a91f503ccc589773f089868e6753ecd6",
+    "audit/ssz-sha-committed/validation.log": "e99fa47e44a1a517338541d90e4812acc0e29a4e2caaf109a8e51053aebcb0a4",
+    "audit/ssz-sha-committed/failed-consumer-namespace.log": "af4128cce22b2fbda0856933de167d98482d63817cbc82e652c4364f4dc58d31",
+    "audit/ssz-sha-committed/check_receipt.py": "f75ec0c6d6a1664fa264ceac5fbde170adaf1ffbe6758c98dbebbfe786ed5fe1",
+    "audit/ssz-sha-committed/independent-review.md": "b310f13d39f41464d83bd9ed57bb9abf854042615d23d09f1178431e9f289377",
+    "audit/ssz-sha-committed/failed-low-gas-rewrite.log": "46f06c3517356d7a49333f26af38957e6c15f96bf2270b21191ca4469cacfc51",
+    "audit/ssz-sha-committed/failed-opaque-word-fixture.log": "c187d0238c3a073b86475cfad8c4cbbc96db85f7e813bd68f799992439381919",
+    "audit/ssz-sha-committed/dependency-inputs.json": "4cbd9621473b974de975f296cbf023d344b6f68caf415d43e1c6a0f4678df3f9",
+    "audit/ssz-sha-committed/README.md": "2abc80afaad653c3dc9ae30ea929e11ff15377a547c7bf47ef1c07303bc83456",
+    "audit/ssz-sha-committed/integration-validation.log": "e16122f2ce537af0ac3de628eb3a5997aa5a02fa7d67969041d457c73c8d0b4a",
+    "audit/ssz-sha-committed/axioms.log": "578dff257e8d167c6412c029dd63e9de02f22a133bc7930206609eb2a6b46355",
+    "audit/ssz-sha-committed/source-inherited-validation.json": "1f0da20d3ca9eaf923a1f32cf043b0667d1651cf712771b8fd1c9cd0136a95a0",
+    "audit/ssz-sha-committed/review-response.md": "de1f65e6189274caaa3804efe1fcdb676c2d75ba0a74afd2ab19a991c87cbf5c",
+    "audit/ssz-sha-committed/inherited-validation.json": "9fcb195446dbcdafd3d29ba61409a2ed19266eac85f48c728534017fb81e164b",
+    "audit/ssz-sha-committed/source-receipt.json": "8654bddb769cc00c5f95faef51ebf4e00a1b51fa058d011003cc01a88d5fa239",
+    "audit/ssz-sha-committed/receipt.json": "defa129d6521a40452c07033f074ab09054ece5a2d4e26f6df8ebb04be938bfc",
+    "audit/ssz-sha-committed/source-validation.log": "889053aefbe6f34133bdf18120ec15f33b2aebc9ac6d0290fbacb2d99b22f835"
+  },
+  "new_lean_sources": {
+    "LidoSRv3/Audit/Source/SszShaCommitted.lean": "81674fbfd79a90d5358d13dadd9a39156d952c118a8e60353e95695d5ac01438",
+    "LidoSRv3/Tests/SszShaCommittedMutants.lean": "75a199c4a1cf834f9e99f68fd5e0a57fd5f8cbd5301559b7932cc695e98f3edd"
+  },
+  "all_eight": "OPEN"
+}

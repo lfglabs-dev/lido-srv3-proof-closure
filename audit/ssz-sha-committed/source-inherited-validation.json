@@ -4,7 +4,7 @@
     "909fd1670579092806121aed800767f707635337",
     "a455cc1ab0f75f7ebd6e11dddee18c7e87a1dd0f"
   ],
-  "scope": "Unchanged accepted BLS wrapper five tests including1024fuzz+24faults and four raw witness wrapper tests reused by identity; no fresh execution or full entry/compiler equivalence credit. Historical inherited lakefile is checked against its retained exact baseline snapshot; current root metadata includes independently accepted PR294 registrations.",
+  "scope": "Unchanged accepted BLS wrapper five tests including1024fuzz+24faults and four raw witness wrapper tests reused by identity; no fresh execution or full entry/compiler equivalence credit.",
   "identity_checks": {
     ".lake/packages/evmyul/EvmYul/EVM/Gas.lean": "9f06caccf5cc8f27f7822392cd1963c8353eb816052f4596321a12c2da707436",
     ".lake/packages/evmyul/EvmYul/EVM/PrecompiledContracts.lean": "cb69358e1f534c46e7054e4ef60eb8f78f7c78502b9d6e7e3ecf375c60206012",
@@ -59,6 +59,7 @@
     "audit/ssz-validator-leaf/receipt.json": "a90af348ca555767f050828f07e2bc292af306008f0f3cdf394e5887cd159782",
     "foundry.toml": "adb4990ab31a2bb53f5eeb370e4f55d962f7bc1026bce01708497a56b262356c",
     "lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
+    "lakefile.lean": "8ea3781110b3234bdfcf2b2c87c5c064fa7d2aee018da57bcab100f8baf1ab87",
     "lean-toolchain": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee",
     "lido-core/contracts/0.8.25/CLValidatorVerifier.sol": "d6e89f6975e4fa02f758bf461a98ac2d689296b5c92d03ffd4e43a22d0b3d7ed",
     "lido-core/contracts/common/interfaces/ValidatorWitness.sol": "8fd24cfab7402233029756e52e59198b0d9cbf0a42e5c07d9fa2338ed731a5f7",
@@ -91,7 +92,6 @@
     "audit/ssz-witness-abi/diagnostics/word-rewrite-failure.log": "db5684dd69b9eed93c3daeb1fdec9e34b94ef6985c192d6e3e684e746601126e",
     "audit/ssz-witness-abi/diagnostics/decoded-fields-transport-failure.log": "4cc9c697ecd80256a201a6b26dbf107455d17b6a4b955d3311eba64aa418ba6c",
     "audit/ssz-witness-abi/solidity/receipt.json": "1abc333d15d0f3e953519acc2b080cffadafc7aec162b8c4d4aae2393749aa17",
-    "audit/ssz-witness-abi/receipt.json": "247e6c54b8f2c6f16939c0ba8afb0aa71ed8d43f0b7d65d77e63c43e95fa6e15",
-    "audit/ssz-sha-committed/baseline-lakefile.lean": "8ea3781110b3234bdfcf2b2c87c5c064fa7d2aee018da57bcab100f8baf1ab87"
+    "audit/ssz-witness-abi/receipt.json": "247e6c54b8f2c6f16939c0ba8afb0aa71ed8d43f0b7d65d77e63c43e95fa6e15"
   }
 }
