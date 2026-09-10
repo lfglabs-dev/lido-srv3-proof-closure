@@ -1,0 +1,5 @@
+{
+  "scope": "Source and pin comparisons only; no proof or EVM execution",
+  "checks": 1536,
+  "errors": []
+}

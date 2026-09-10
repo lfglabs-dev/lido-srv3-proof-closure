@@ -92,6 +92,22 @@ lean_lib «LidoSRv3Test» where
     .one `LidoSRv3.Audit.Regression.AllocCapacityLegacy
   ]
 
+/-- Narrow DEPOSIT actual-callee necessary-success check; kept outside the
+default package while P-DEPOSIT-1 integration consumes the theorem. -/
+lean_lib «TrioDepositCommitted» where
+  roots := #[`audit.trio.deposit.LiveBeaconCommitted,
+    `audit.trio.deposit.Tests.Verity.LiveBeaconCommitted]
+  globs := #[.one `audit.trio.deposit.Deposit,
+    .one `audit.trio.deposit.RouterDeposit,
+    .one `audit.trio.deposit.WithdrawDepositableEther,
+    .one `audit.trio.deposit.LiveBeacon,
+    .one `audit.trio.deposit.WithdrawalLedger,
+    .one `audit.trio.deposit.WithdrawalLedgerMinimal,
+    .one `audit.trio.deposit.PhysicalMetadataLedger,
+    .one `audit.trio.deposit.PhysicalMetadata,
+    .one `audit.trio.deposit.LiveBeaconCommitted,
+    .one `audit.trio.deposit.Tests.Verity.LiveBeaconCommitted]
+
 /-- Trust inspection. Imports production and test modules; not part of the facade. -/
 lean_lib «LidoSRv3Audit» where
   roots := #[`LidoSRv3.Audit.Trust]

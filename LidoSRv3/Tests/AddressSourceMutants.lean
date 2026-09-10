@@ -1,6 +1,6 @@
 import LidoSRv3.Audit.Verity.AddressAdmission
 import LidoSRv3.Audit.Verity.AddressTx
-import LidoSRv3.Audit.Verity.AddressClaimBatchTx
+import LidoSRv3.Audit.Model.AddressClaimJournalLegacy
 
 namespace LidoSRv3.Tests.AddressSourceMutants
 
@@ -48,6 +48,11 @@ theorem owner_gated_admission_mutant_counterexample :
     (permissionlessAdmission (renameInput 1 2 inp) &&
       decide ((renameInput 1 2 inp).caller = owner)) = false := by
   decide
+
+/-! Historical claim-journal results below use the preserved
+`Model.AddressClaimJournalLegacy` executor. References to the live loop in
+retained comments denote that historical model, not the new physical CALL
+consumer. These results do not establish arbitrary recipient callbacks. -/
 
 /-! ## Kill-line for the registered parent
 
@@ -280,7 +285,7 @@ theorem verity_zero_amount_rejected :
 
 /-! ## Live claim-batch payout kill-line -/
 
-open LidoSRv3.Audit.Verity.AddressClaimBatchTx in
+open LidoSRv3.Audit.Model.AddressClaimJournalLegacy in
 def claimLoopFixedPayout : List Nat → List Nat → Address → Contract Unit
   | [], [], _ => Verity.pure ()
   | requestId :: requestIds, hint :: hints, recipient => do
@@ -288,14 +293,14 @@ def claimLoopFixedPayout : List Nat → List Nat → Address → Contract Unit
       claimLoopFixedPayout requestIds hints recipient
   | _, _, _ => fun state => .revert "ArraysLengthMismatch" state
 
-open LidoSRv3.Audit.Verity.AddressClaimBatchTx in
+open LidoSRv3.Audit.Model.AddressClaimJournalLegacy in
 def executeFixedPayoutRecipient (requestIds hints : List Nat) (recipient : Address) :
     Contract Unit := do
   require (recipient != zeroAddress) "ZeroRecipient"
   require (requestIds.length == hints.length) "ArraysLengthMismatch"
   claimLoopFixedPayout requestIds hints recipient
 
-open LidoSRv3.Audit.Verity.AddressClaimBatchTx
+open LidoSRv3.Audit.Model.AddressClaimJournalLegacy
 
 /-- Kill-line for the new live-batch observable: keeping all request reads,
 packed writes, values, and loop order but routing `_sendValue` to a fixed

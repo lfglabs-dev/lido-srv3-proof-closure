@@ -1,0 +1,8 @@
+{
+  "historical_commit": "14a96a3180ac9fb81f853db36af3b630c1d5891f",
+  "historical_path": "LidoSRv3/Audit/Verity/AddressClaimBatchTx.lean",
+  "new_path": "LidoSRv3/Audit/Model/AddressClaimJournalLegacy.lean",
+  "normalization": "Drop new leading archival comment, replace new namespace with old namespace",
+  "normalized_bytes_equal": true,
+  "sha256": "26524c6da3e7cfa998c8890364ab96aee474f742176ac0e6c84bbd7b79c6b7fd"
+}

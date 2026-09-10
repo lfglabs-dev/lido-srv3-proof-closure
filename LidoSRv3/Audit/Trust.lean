@@ -1,3 +1,22 @@
+import LidoSRv3.Tests.TopupBatchRootCallsRegression
+import LidoSRv3.Tests.WithdrawalMinimalLedgerRegression
+import LidoSRv3.Audit.Guarantees.PDeposit1PhysicalLedger
+import LidoSRv3.Audit.Guarantees.PTopup1MinimalLedger
+import LidoSRv3.Tests.ConsolidationSettlementRegression
+import LidoSRv3.Audit.Guarantees.PConsolidationEth1ActualSettlement
+import LidoSRv3.Tests.SszActualRootTreeRegression
+import LidoSRv3.Tests.SszRootCallRegression
+import LidoSRv3.Audit.Guarantees.PSsz1RootCall
+import LidoSRv3.Tests.SszCompiledMemoryRegression
+import LidoSRv3.Audit.Guarantees.PSsz1ActualMemory
+import LidoSRv3.Tests.DepositPhysicalMetadataRegression
+import LidoSRv3.Audit.Guarantees.PDeposit1PhysicalMetadata
+import LidoSRv3.Tests.ConsolidationGatewayCallRegression
+import LidoSRv3.Audit.Guarantees.PConsolidation1ActualGatewayVault
+import LidoSRv3.Audit.Guarantees.PTopup1ActualBatch
+import LidoSRv3.Audit.Guarantees.PTopup1ActualContinuation
+import LidoSRv3.Audit.Guarantees.PSsz1ActualDeposit
+import LidoSRv3.Audit.Guarantees.PDeposit1ActualPipeline
 import LidoSRv3.Audit.Source.TrioAlloc1.Determinism
 import LidoSRv3.Audit.Source.TrioAlloc1.CapacitySpec
 import LidoSRv3.Audit.Source.TrioAlloc2.LoopCorrespondence
@@ -42,6 +61,7 @@ import LidoSRv3.Audit.Verity.SszEncodingTx
 import LidoSRv3.Tests.SszEncodingTxMutants
 import LidoSRv3.Audit.Source.GIndexConcatCorrespondence
 import LidoSRv3.Audit.Guarantees.PTopup1
+import LidoSRv3.Audit.Guarantees.PTopup2ActualBatch
 import LidoSRv3.Tests.TopupTxMutants
 import LidoSRv3.Audit.Verity.TopupHybrid
 import LidoSRv3.Tests.TopupHybridMutants
@@ -193,9 +213,9 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Verity.SszAbstractDigest.abstract_digest_refinement
 #print axioms LidoSRv3.Tests.PackCSszMutants.skip_gindex_kill_line_refutes_structural_child
 #print axioms LidoSRv3.Tests.PackCSszMutants.engine_mutant_disagrees_with_sha256engine
-#print axioms LidoSRv3.Audit.Spec.AddressClaimCorrespondence.two_claim_payouts_match_reads
-#print axioms LidoSRv3.Tests.PackDAddressClaimMutants.swapped_payout_order_kill_line_refutes_batch
-#print axioms LidoSRv3.Tests.PackDAddressClaimMutants.wrong_recipient_kill_line_refutes_batch
+#print axioms LidoSRv3.Audit.Spec.AddressClaimCorrespondence.actual_claim_payout_matches_locked_write
+#print axioms LidoSRv3.Tests.PackDAddressClaimMutants.swapped_payout_order_changes_actual_attempts
+#print axioms LidoSRv3.Tests.PackDAddressClaimMutants.wrong_recipient_changes_actual_attempt
 #print axioms LidoSRv3.Audit.Spec.OracleFrameCorrespondence.oracle_frame_shares_are_the_argument
 #print axioms LidoSRv3.Audit.Spec.OracleFrameCorrespondence.account_parent_remains_order_only
 #print axioms LidoSRv3.Audit.Spec.OracleFrameCorrespondence.eugene_bound_cited
@@ -386,8 +406,8 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms
   LidoSRv3.Tests.ConsolidationTxMutants.journal_value_blind_kill_line_refutes_exact_forwarding
 #print axioms LidoSRv3.Audit.Guarantees.PAddress1.bounded_transfer_model_source_tx
-#print axioms LidoSRv3.Audit.Guarantees.PAddress1.bounded_live_claim_batch_storage_call_surface
-#print axioms LidoSRv3.Audit.Verity.AddressClaimBatchTx.two_claim_batch_observe
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_claim_withdrawals_to_chain
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_claim_recipient_effect
 #print axioms LidoSRv3.Audit.Verity.AddressClaimBatchTx.every_revert_restores_snapshot
 #print axioms LidoSRv3.Audit.Verity.AddressTransferTx.tx_refines_source_witness
 #print axioms LidoSRv3.Audit.Source.AddressTransferCorrespondence.fixed_caller_mutant_rejected
@@ -526,6 +546,7 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.TopupTxMutants.unwrapped_accumulator_kill_line_refutes_parent
 #print axioms LidoSRv3.Audit.Source.Topup2.source_aggregate_bounded_by_block_cap
 #print axioms LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2.actual_module_batch_bound
 #print axioms LidoSRv3.Audit.Guarantees.PTopup2.per_key_bounded_by_candidate
 #print axioms LidoSRv3.Audit.Verity.Topup2Tx.tx_aggregate_bounded_by_block_cap
 #print axioms LidoSRv3.Audit.Verity.Topup2Tx.tx_all_success_value_exact
@@ -622,3 +643,37 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.TrioReserve1.PhysicalReserve.success_preserves
 #print axioms LidoSRv3.Audit.Source.TrioReserve1.PhysicalSequence.corresponds
 #print axioms LidoSRv3.Audit.Source.TrioReserve1.Transfers.credit_bound_from_aggregate
+
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.actual_live_pipeline_conservation
+
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.actual_continuation_conserves
+#print axioms LidoSRv3.Audit.Guarantees.PSsz1.actual_deposit_call_binds_root
+
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.actual_module_batch_effects
+
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1.actual_gateway_vault_requests
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1.actual_gateway_vault_failure_restores
+
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.actual_physical_metadata_before_calls
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.actual_physical_metadata_failure_restores
+
+#print axioms LidoSRv3.Audit.Guarantees.PSsz1.actual_memory_validator_branch
+
+#print axioms LidoSRv3.Audit.Guarantees.PSsz1.actual_root_staticcall_validator_branch
+#print axioms LidoSRv3.Audit.Guarantees.PSsz1.actual_root_staticcall_validator_tree
+#print axioms LidoSRv3.Audit.Source.SszRootCall.run_world
+
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1.actual_settlement_success
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1.actual_settlement_failure_restores
+
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.actual_physical_metadata_conserves
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.actual_continuation_locator_conserves
+
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_claim_withdrawals_failure_restores
+#print axioms LidoSRv3.Tests.PackDAddressClaimMutants.zero_recipient_rejects_before_claim
+#print axioms LidoSRv3.Tests.PackDAddressClaimMutants.failed_batch_restores_world
+
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2.actual_root_module_batch_bound
+#print axioms LidoSRv3.Audit.Source.TopupBatchRootCalls.failure_restores
+#print axioms LidoSRv3.Tests.TopupBatchRootCallsRegression.actual_batch_has_joint_guarantee
+#print axioms LidoSRv3.Tests.TopupBatchRootCallsRegression.two_rows_consume_ordered_limits

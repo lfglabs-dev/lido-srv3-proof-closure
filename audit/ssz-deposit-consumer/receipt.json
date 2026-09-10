@@ -1,0 +1,64 @@
+{
+  "source_commit": "c42cb48429af4d00d137e51344d8de7665667326",
+  "base_commit": "50c63958182e44e83d548f536f9933ddebea1c12",
+  "created_utc": "2026-09-10T12:09:29.277865+00:00",
+  "status": "Candidate validated; independent exact-source review pending; full SSZ-1 OPEN",
+  "commands": [
+    {
+      "command": "lake build +LidoSRv3.Audit.Guarantees.PSsz1ActualDeposit +LidoSRv3.Audit.AllGuarantees",
+      "exit_code": 0,
+      "jobs": 1461,
+      "log": "facade-build.log"
+    },
+    {
+      "command": "python3 scripts/check_trust_axioms.py",
+      "exit_code": 0,
+      "log": "trust-check.log"
+    },
+    {
+      "command": "python3 scripts/test_ux2.py",
+      "exit_code": 0,
+      "log": "ux2-mutations.log"
+    }
+  ],
+  "source_identity_count": 1592,
+  "package_pin_count": 11,
+  "evidence": {
+    "ux2-mutations.log": {
+      "bytes": 371,
+      "sha256": "dcff63c24c43ca580e855cf0be5661ec9e44160428d19d4d84c08713fb43ebc7"
+    },
+    "trust-check.log": {
+      "bytes": 263,
+      "sha256": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439"
+    },
+    "facade-build.log": {
+      "bytes": 205311,
+      "sha256": "51199baeb050e3aa49a120f8d09864b870150ddc9f0d0c29f688e8a0e6a6ce10"
+    },
+    "README.md": {
+      "bytes": 4322,
+      "sha256": "be4a77a697dc324457360a0d2e6e49d34d80b0257e142050696009610db4b081"
+    },
+    "consumer-build.log": {
+      "bytes": 3985,
+      "sha256": "faceac2dcee4a3820d3f71b2385511b8dac2f93a440d951999808e8c9fdf24e3"
+    },
+    "registry-checks.json": {
+      "bytes": 1009,
+      "sha256": "ff186edfeedb3d603a5c28360a85a3c9e4abb5d975ac25e8fc7423c495b9caf4"
+    },
+    "unchanged-runtime-sources.json": {
+      "bytes": 1325,
+      "sha256": "2c18a5a6b63002b93ff32627ddf4c2e1a581103d5ce4abcf087adf84b14adabc"
+    },
+    "trust-build-trace.json": {
+      "bytes": 115128,
+      "sha256": "b797577172199f4e98d25176ca1579b1e4906b3714e624b1f2547f6be3481e84"
+    },
+    "source-inputs.json": {
+      "bytes": 206484,
+      "sha256": "2d9f267d9dea9ce832f9eaf82c727041c0a61eb67c47ea40016424d6eb2c222f"
+    }
+  }
+}

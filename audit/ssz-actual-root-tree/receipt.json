@@ -1,0 +1,47 @@
+{
+  "base": "14a96a3180ac9fb81f853db36af3b630c1d5891f",
+  "public_consumer": "LidoSRv3.Audit.Guarantees.PSsz1.actual_root_staticcall_validator_tree",
+  "source_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "build_jobs": 1650,
+  "target_build_jobs": 807,
+  "kernel_regressions": {
+    "executed_full_entry": 1,
+    "public_consumer_instantiation": 1
+  },
+  "source_identities": 792,
+  "package_pins": 11,
+  "independently_checked_axiom_sets": 5,
+  "new_axioms": 0,
+  "trust_inventory": 29,
+  "solidity_reuse": {
+    "from_integrated_pr": 311,
+    "fresh_run": false,
+    "tests": 9,
+    "compiler_source_identities_rechecked": [
+      "lido-core/contracts/0.8.25/CLValidatorVerifier.sol",
+      "lido-core/contracts/common/interfaces/ValidatorWitness.sol",
+      "lido-core/contracts/common/lib/BLS.sol",
+      "lido-core/contracts/common/lib/BeaconTypes.sol",
+      "lido-core/contracts/common/lib/GIndex.sol",
+      "lido-core/contracts/common/lib/SSZ.sol",
+      "audit/ssz-root-call-composition/solidity/SszRootCall.t.sol"
+    ],
+    "scope": "Unmodified pinned verifier fixture and all imported typed executables unchanged; no new compiled refinement."
+  },
+  "sha256": {
+    "LidoSRv3/Audit/Source/SszActualLeafTree.lean": "c80d42b745fa38511e433d47b1a7cf4c9d3e78ce3efe1b4d72b36d4ee4e1b6c2",
+    "LidoSRv3/Audit/Guarantees/PSsz1ActualRootTree.lean": "4824ab0c103fbaad9e707585da01274ffbb08aacf3107ea514f8c50257af7e91",
+    "LidoSRv3/Tests/SszActualRootTreeRegression.lean": "511296ec4ec85b7e7b1eb946249e138dc4dc99504f90c4dbd767e507a09fb010",
+    "LidoSRv3/Audit/AllGuarantees.lean": "44ae02784eae0ca27e7ab98f28c002b726023cf579932453ba8c4fe6cf5c6a95",
+    "LidoSRv3/Audit/Trust.lean": "54704b5c2bb00fd5baa3b9443521221bcbee631b85a8c5283dd682150f22a3ec",
+    "audit/ssz-actual-root-tree/axioms.json": "f69df9255c6c2fd1750546f726231174e4f16d6b3cbc2f65da902c2c3a852042",
+    "audit/ssz-actual-root-tree/all-trust-build.log": "4ff7a2ea4b4881312473a52311d767bb70299a05034aaffb4eb51317b5189bf2",
+    "audit/ssz-actual-root-tree/target-build.log": "9aac91f08325497ac5e10a33f8bd4e7427731c03bdc56b13242a253b928af3ba",
+    "audit/ssz-actual-root-tree/trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439",
+    "audit/ssz-actual-root-tree/README.md": "0c399a2ed0512a76d49131572f9026ea09920486bfdf9954f40c35dd8182e64e",
+    "audit/ssz-actual-root-tree/validate.py": "06bc4b286221bdc49a322ea6750fe9d4f9d8d82bed16f09b9bdd48761fca9b84",
+    "audit/ssz-actual-root-tree/kernel-regression.log": "eb5f36b06f837550cbd54ed5f7f7b37cd26c10db19dcebf1d76a509905949cdb",
+    "audit/ssz-actual-root-tree/source-inputs.json": "203185a824949a604992f6b44c00551e65de7c8825542126fadace18edf80729",
+    "audit/ssz-actual-root-tree/source-axiom-check.log": "a5904fdc30fd76e1b8ab3ba048a932f37dbebb12d9e50be92cd7e54bb636f1ab"
+  }
+}

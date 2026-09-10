@@ -1,16 +1,19 @@
 import LidoSRv3.Audit.Source.AddressCorrespondence
+import LidoSRv3.Audit.Verity.AddressRecipientCallBridge
 import Verity.Core
 import Verity.Macro
 
 /-!
-# P-ADDRESS-1 executable Verity transactions
+# Legacy P-ADDRESS-1 correspondence facade
 
-The four functions below are the address-bearing, single-item projections of the
-pinned entrypoints listed in `audit/source-map.yaml`.  Unlike the old receipt
-wrapper, admission is computed inside `Contract.run`: the sender, scalar gates,
-and address/uint keyed mappings are read by the program and successful address
-writes are performed with Verity storage primitives.  Boolean parameters stand
-only for non-address arithmetic and external-call results.
+This module is retained because public parent theorems import its original
+source-shaped correspondence. Its Boolean inputs, including external-call and
+allowance facts, are therefore **not** evidence for the live address-call
+claim. The execution-derived replacement is
+`AddressRecipientCallBridge`: it runs the four pinned entrypoint slices over a
+caller/callee world, uses physical slots and ABI frames, and obtains failures
+from the callee rather than from Boolean inputs. P-ADDRESS remains open until
+the public parent can be migrated off this compatibility facade.
 -/
 
 namespace LidoSRv3.Audit.Verity.AddressTx
@@ -224,7 +227,7 @@ def stateFor (inp : Input) : ContractState :=
     have hb : b.toNat < Verity.Core.Uint256.modulus := Nat.lt_trans b.isLt hmodulus
     change a.toNat % Verity.Core.Uint256.modulus =
       b.toNat % Verity.Core.Uint256.modulus at hv
-    simpa [Nat.mod_eq_of_lt ha, Nat.mod_eq_of_lt hb] using hv
+    simpa only [Nat.mod_eq_of_lt ha, Nat.mod_eq_of_lt hb] using hv
   · rintro rfl
     rfl
 
@@ -297,6 +300,7 @@ private theorem transfer_observable_correspondence (inp : Input)
   cases hApprovedToken : inp.callerIsTokenApproved <;> simp_all (config := { maxSteps := 1000000 })
 
 set_option maxHeartbeats 2000000 in
+set_option backward.isDefEq.respectTransparency false in
 private theorem request_observable_correspondence (inp : Input)
     (hEntry : inp.entryPoint = .requestWithdrawals)
     (hAmount : inp.amount < 2 ^ 256)
@@ -323,23 +327,24 @@ private theorem request_observable_correspondence (inp : Input)
     ContractState.readMapUint, ContractState.writeMapUint,
     ContractState.storage, ContractState.storageMap,
     ContractState.storageMap2, ContractState.storageMapUint,
-    Verity.Core.Uint256.ofNat, hmod]
-  cases hPaused : inp.paused <;> try simp_all (config := { maxSteps := 1000000 })
+    Verity.Core.Uint256.val_ofNat, hmod]
+  all_goals cases hPaused : inp.paused <;> try simp_all (config := { maxSteps := 1000000 })
     [hone, _root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind]
-  cases hRange : inp.amountInRange <;> try simp_all (config := { maxSteps := 1000000 })
+  all_goals cases hRange : inp.amountInRange <;> try simp_all (config := { maxSteps := 1000000 })
     [_root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind]
-  cases hBalanceFact : inp.callerBalanceSufficient <;> try simp_all (config := { maxSteps := 1000000 })
+  all_goals cases hBalanceFact : inp.callerBalanceSufficient <;> try simp_all (config := { maxSteps := 1000000 })
     [_root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind]
-  cases hAllowanceFact : inp.callerAllowanceSufficient <;> try simp_all (config := { maxSteps := 1000000 })
+  all_goals cases hAllowanceFact : inp.callerAllowanceSufficient <;> try simp_all (config := { maxSteps := 1000000 })
     [_root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind]
-  cases hExternal : inp.externalCallSucceeds <;> try simp_all (config := { maxSteps := 1000000 })
+  all_goals cases hExternal : inp.externalCallSucceeds <;> try simp_all (config := { maxSteps := 1000000 })
     [_root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind,
       _root_.Verity.setMapping, ContractState.writeMap]
-  by_cases hz : inp.recipient = 0 <;> simp_all (config := { maxSteps := 1000000 })
+  all_goals by_cases hz : inp.recipient = 0 <;> try simp_all (config := { maxSteps := 1000000 })
     [_root_.Verity.bind, Bind.bind, _root_.Verity.setMappingUint,
       _root_.Verity.Contract.run, observeAddress,
       ContractState.writeMapUint, ContractState.readMapUint,
-      ContractState.storageMapUint, ContractState.storage]
+      ContractState.storageMapUint, ContractState.storage,
+      Compiler.Constants.evmModulus, Nat.mod_eq_of_lt hAmount]
 
 set_option maxHeartbeats 2000000 in
 private theorem claim_observable_correspondence (inp : Input)
@@ -393,7 +398,7 @@ private theorem unwrap_observable_correspondence (inp : Input)
     constructor
     · intro h
       have hv := congrArg Verity.Core.Uint256.val h
-      simpa [Verity.Core.Uint256.val_ofNat, hmod] using hv
+      simpa only [Verity.Core.Uint256.val_ofNat, Verity.Core.Uint256.val_zero, hmod] using hv
     · intro h
       simpa [h]
   simp_all (config := { maxSteps := 1000000 })
@@ -411,13 +416,14 @@ private theorem unwrap_observable_correspondence (inp : Input)
     ContractState.readMapUint, ContractState.writeMapUint,
     ContractState.storage, ContractState.storageMap,
     ContractState.storageMap2, ContractState.storageMapUint,
-    Verity.Core.Uint256.ofNat, hzero]
-  by_cases hz : inp.amount = 0 <;> try simp_all (config := { maxSteps := 1000000 })
-  cases hBalanceFact : inp.callerBalanceSufficient <;> try simp_all (config := { maxSteps := 1000000 })
-  cases hExternal : inp.externalCallSucceeds <;> simp_all (config := { maxSteps := 1000000 })
+    Verity.Core.Uint256.ofNat, Verity.Core.Uint256.modulus,
+    Verity.Core.UINT256_MODULUS, Compiler.Constants.evmModulus, hzero, hmod]
+  all_goals by_cases hz : inp.amount = 0 <;> try simp_all (config := { maxSteps := 1000000 })
+  all_goals cases hBalanceFact : inp.callerBalanceSufficient <;> try simp_all (config := { maxSteps := 1000000 })
+  all_goals cases hExternal : inp.externalCallSucceeds <;> simp_all (config := { maxSteps := 1000000 })
     [_root_.Verity.bind, Bind.bind, _root_.Verity.setMappingUint,
       ContractState.writeMapUint, ContractState.readMapUint,
-      ContractState.storageMapUint]
+      ContractState.storageMapUint, Nat.mod_eq_of_lt hAmount]
 
 /-- Behavioral SOURCE → executable-Verity correspondence on only the address
 writes of the selected entrypoint.  `amount < 2^256` is the Solidity `uint256`

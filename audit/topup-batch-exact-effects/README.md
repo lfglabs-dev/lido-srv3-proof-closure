@@ -1,0 +1,15 @@
+# TOPUP-1: the actual batch sum selects the executed effects
+
+The public consumer `PTopup1.actual_module_batch_effects` supports the promise that a zero-total actual batch makes no withdrawal or beacon call, while a positive batch consumes the same decoded allocations through its actual continuation. It is registered with the existing necessary-ledger theorem under unchanged P-TOPUP-1. This result closes the separate zero/nonwrapping sum connection left explicit in305; it does not claim full TOPUP-1 delivery.
+
+The runtime `TopupBatchConsumer.run` is unchanged: physical gateway config and executed length guards, actual witness/wei-limit loop, then the existing module CALL/return decoder and same-world continuation. The earlier300 proof already derived a count bound and exact unchecked sum from these executed guards. `run_success_exact_effects` now carries that derived equality into `module_execute_success` on the very same module reply and returned World. It substitutes the mathematical allocation sum into the actual zero/positive effects, not into an auxiliary result field.
+
+Zero sum returns exactly the module-returned core and balances, appends the source StakingRouterETHTopUp event and adds no withdrawal/beacon attempts. Positive effects retain the actual successful withdrawal/helper calls and final router assertion, with the same nonzero mathematical sum. No new count, no-wrap, amount, helper length, or successful-stage premise is supplied. The old TOPUP-2 public bound is preserved and consumes this stronger result by projection. Its scope remains one batch, not cross-call history.
+
+Pin17005714: TopUpGateway length and witness/limit loop; StakingRouter.sol717–758 module CALL, unchecked accumulation, target guard, zero/positive continuation and event. No runtime change, new Solidity execution or finite fixture is claimed. The new universal connection and public theorem use only ordinary Lean axioms. The1464-job public build, full29-exact-axiom Trust check, registry/UX2 mutations, public surfaces and escape checks pass. Source identities explicitly reuse unchanged hashes from305, check changed Git bodies and preserve eleven Lean package pins separately from the Solidity pin.
+
+## Still open
+
+The ledger theorem in305 starts at the continuation with Pipeline.Bound. This increment derives the actual module-returned world but does not derive its configuration/code bindings through the preceding module call. Closing that invariant and full gateway/router entry, outer ABI/errors, observable effects and full-entry rollback remains necessary. The source consumer also retains its earlier free allocation-prefix result and typed witness/root adapters; no claim that the complete deployed entry is represented is added.
+
+Accepted compiler, declared Verity semantics, cryptographic primitives, general gas and consensus boundaries remain unchanged. Historical synthetic models are not refinement targets. ALLOC-1, ALLOC-2 and RESERVE-1 remain accepted and outside the improvement queue. All eight full guarantees remain OPEN. Independent complete-source review of the frozen candidate is pending.

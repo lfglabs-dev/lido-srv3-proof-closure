@@ -1,0 +1,56 @@
+{
+  "schema": "lido-topup-root-call-batch-v1",
+  "created_utc": "2026-09-10T20:36:42.378194+00:00",
+  "base": "ea5774a82facf0d474e68058c4645ebf4380d403",
+  "source_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "public_theorem": "LidoSRv3.Audit.Guarantees.PTopup2.actual_root_module_batch_bound",
+  "scope": "Additive typed actual root STATICCALL witness loop feeds unchanged actual module executor on one World; ordered authentication and packed cap derive jointly from success. Prior claims and compiled/ABI/crypto/full-entry boundaries preserved.",
+  "build": {
+    "command": "lake build LidoSRv3.Audit.Guarantees.PTopup2RootCalls LidoSRv3.Tests.TopupBatchRootCallsRegression",
+    "exit_code": 0,
+    "jobs": 1299,
+    "existing_pinned_dependency_cache_reused": true
+  },
+  "kernel_regressions": 11,
+  "public_consumer_instantiations": 1,
+  "source_identities": 1282,
+  "local_source_identities": 85,
+  "package_pins": {
+    "verity": "e977aaad6e1a9e92e0132d41b3d33a14135a4d46",
+    "evmyul": "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9",
+    "mathlib": "fabf563a7c95a166b8d7b6efca11c8b4dc9d911f",
+    "plausible": "63045536fe95024e6c18fc7b48e03f506701c5bc",
+    "LeanSearchClient": "c5d5b8fe6e5158def25cd28eb94e4141ad97c843",
+    "importGraph": "5c7542ed018c78194f1e2b903eaf6a792b74c03d",
+    "proofwidgets": "24b0d9dc081c5423f8eec7e866c441e5184f29d9",
+    "aesop": "e3cb2f741431ce31bf73549fb52316a57368b06f",
+    "Qq": "f46324995fca5f0483b742e4eb4daec7f4ee50d2",
+    "batteries": "fa08db58b30eb033edcdab331bba000827f9f785",
+    "Cli": "92564e5770e4d09f2d86dfbf8ada1e9c715b384c"
+  },
+  "independently_recomputed_scoped_axiom_sets": 18,
+  "new_axioms": 0,
+  "solidity": {
+    "fresh_run": false,
+    "unchanged_compiler_source_fixture_identities": 45,
+    "inherited_receipts": 3,
+    "new_compiled_composition_refinement": false
+  },
+  "sha256": {
+    "LidoSRv3/Audit/Guarantees/PTopup2RootCalls.lean": "d1c188f8c4fa1b18abf05e9ed3ccf9af975f753f32b741b7c97e4a21316ed5f3",
+    "LidoSRv3/Audit/Source/TopupBatchRootCalls.lean": "b2b67ee4544fe12b2ea4cf9762f308593ac5d3536068b9138617b38e600971e3",
+    "LidoSRv3/Audit/Source/TopupGatewayRootCalls.lean": "ec36630c478437641a0c44097bedf12702cbb5649f3483096f76a9443f4cd712",
+    "LidoSRv3/Tests/TopupBatchRootCallsRegression.lean": "4e1f16910339266272839f3057cf82518d05c74c1825812485bf34c2ad3219c8",
+    "audit/topup-root-call-batch/README.md": "e99aa6e5edcf79e65826a0546179bfe2a5147487c21b31b4168a6eb649d4a036",
+    "audit/topup-root-call-batch/axioms.json": "218c002dcd2867a08bb9af53b4e900a22a36f70bfb4f982083e1a9e18610cd5a",
+    "audit/topup-root-call-batch/check_inherited.py": "5eb4eb006ba05ede26ac7c611b6cda2fe69374b253d2c0a7255b5c17c1eea3ce",
+    "audit/topup-root-call-batch/inherited-check.log": "c8ea558aea9d294ae7d72ff6dd7b989c32a5eac7c272de866038131cb1bfd5ca",
+    "audit/topup-root-call-batch/inherited-validation.json": "9619a0bc11d763f3c4411a9e5dab2a1581fc8eca702021839b672c1c43b17c85",
+    "audit/topup-root-call-batch/source-axiom-check.log": "59560e6a5fede295d15583e7ac5a1a39208746e10fff858fb5efa836ffde76aa",
+    "audit/topup-root-call-batch/source-inputs.json": "659d6f4a0ede609fab027cd8206b3ede1f7fff696aea7f7234446129cc3f6422",
+    "audit/topup-root-call-batch/target-build.log": "06c7cc4eafc1b57b7493d545eeaef68870edc7a50bd07ec70c2856279d5cc82a",
+    "audit/topup-root-call-batch/validate.py": "6df3d61c161e8f67ac3a5f7f00f953740b0797d0f593f3569c201ea430ff5424",
+    "audit/topup-root-call-batch/write_receipt.py": "28fd808044b4ca832114e26a33c604f411508b3fcd2ff8c1562d1f07b62b94fb"
+  },
+  "status": "Candidate complete; independent full-source/pinned-Solidity review and root integration pending."
+}

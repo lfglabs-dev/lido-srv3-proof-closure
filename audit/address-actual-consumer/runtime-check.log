@@ -1,0 +1,5 @@
+PASS two physical claims and ordered CALL amounts
+PASS callback observes physical claim and returned storage commits before events
+PASS later callback rejection restores prior callback storage, balance and events
+PASS insufficient funding rolls physical claimed bit back
+PASS duplicate claim rejects and restores first transfer

@@ -1,0 +1,17 @@
+# TOPUP-1: necessary conservation in the live continuation
+
+The useful promise is that a completed top-up forwards all ETH pulled from Lido and restores the router balance. The current public consumer is `PTopup1.actual_continuation_conserves`, registered in main-guarantees, AllGuarantees, Trust and UX2 under the unchanged P-TOPUP-1 identifier.
+
+At pinned core17005714 StakingRouter.sol721–758, the executed allocation guards produce the amount, the positive path records the router balance, withdraws that amount with zero seed, executes the actual beacon helper, then asserts the router balance is restored. The new proof consumes this existing program's success. It reuses DEPOSIT303's necessary concrete withdrawal ledger, not a separate successful-withdrawal premise or arbitrary-callee balance-preservation premise. The actual helper debit and final assertion force the pulled word to equal its debit. Positive success consequently excludes empty keys and derives the exact mathematical allocation sum. Pointwise balance composition permits Lido/beacon aliasing, with the existing Lido/router and router/beacon inequalities. Zero total executes the original no-value path and final event.
+
+Two source lemmas and one public theorem use only propext, Classical.choice and Quot.sound. The combined candidate contains SSZ304 and DEPOSIT303 and preserves both registrations. The1463-job public build, full29-exact-axiom Trust check, public surfaces, proof escapes and UX2/registry mutations pass. The namespace escape inventory is not the isolated audit/trio fixture inventory. Actual import bodies and eleven Lean package pins are retained separately from the pinned Solidity identity. No new finite fixtures or Forge run are claimed. Initial local elaboration failed to supply the existing positive-case fact; the proof was corrected before successful validation.
+
+## Necessary internal obligations still open
+
+The theorem starts at the state after the module call. It does not prove the complete gateway/router entry or preserve the entry ledger across arbitrary module effects. Existing `Pipeline.Bound` supplies locator/consensus storage bindings, code presence and configuration separation at that point; their initialization and preservation through the preceding module call are not derived by this increment. This remains explicit work, not a new accepted general boundary.
+
+For arbitrary continuation inputs, an unchecked sum can wrap to zero and skip the helper. The positive result derives an exact sum from successful helper execution. The separate integrated TOPUP300 actual gateway-batch theorem derives no-wrap from executed count/wei-limit guards on all paths; the public composition of those bounds with this ledger is still required to claim exact mathematical allocation sums for the full batch. No cross-call history obligation is introduced for TOPUP-2.
+
+Outer Lido ABI/error bytes, source-specific observable effects and full-entry rollback remain open. The current result proves balances; earlier committed-execution results retain their explicit event and call-trace scope. Historical synthetic TOPUP results are separate evidence, not refinement targets. General compiler correctness, declared Verity semantics, cryptographic primitives, general gas and consensus keep the accepted boundaries. ALLOC-1, ALLOC-2 and RESERVE-1 are unchanged and outside the improvement queue. All eight full guarantees remain OPEN.
+
+Independent complete-source review of the frozen candidate is pending.

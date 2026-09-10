@@ -1,0 +1,22 @@
+{
+  "reviewed_source": "aa50b41a6f07d1321b752ba0108fcccacb1ca0c5",
+  "integrated_main": "9fdfd2a6d072490fc85ace542ac55791488f64ec",
+  "merge": "389a4d87",
+  "delta": "Additive union of reviewed public imports/Trust queries with accepted SSZ311 and CONSOL312; original proof/theorem/regression files unchanged, original receipt retained at aa50 scope",
+  "build": {
+    "jobs": 1647,
+    "exit": 0
+  },
+  "trust": {
+    "exact_axioms": 29,
+    "exit": 0
+  },
+  "sha256": {
+    "LidoSRv3/Audit/AllGuarantees.lean": "24d4102c228a29f92b116443bae088a3dc4245e9b9041bd96fccc4762de68866",
+    "LidoSRv3/Audit/Trust.lean": "1fee8a07810d830dba420eb4906f8d4869032a25834e15bfdeb77df40130913f",
+    "audit/withdrawal-minimal-ledger/independent-review-aa50.md": "427d5019bbbafe1d4c0612c233cf55759540349d35a646f55d0ae96ab5974860",
+    "audit/withdrawal-minimal-ledger/source-name-correction.md": "c64cf1a23fdc5be4d8a7b225f9dce97805f2cb394da10a2064c487b9aa4cf659",
+    "audit/withdrawal-minimal-ledger/combined-build.log": "901ae97914bbcc6a78eb57da2f4e24da61d12ba943c99936ad63fa57bcc7596c",
+    "audit/withdrawal-minimal-ledger/combined-trust.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439"
+  }
+}

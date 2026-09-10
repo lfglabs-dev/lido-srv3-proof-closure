@@ -1,0 +1,1489 @@
+⚠ [12/681] Replayed Verity.Core
+warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1041:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+⚠ [1097/1223] Replayed Conform.Wheels
+warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: Conform/Wheels.lean:106:70: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1098/1223] Replayed EvmYul.Pretty
+warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: EvmYul/Pretty.lean:36:32: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1145/1223] Replayed EvmYul.Semantics
+warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1146/1223] Replayed EvmYul.EVM.Semantics
+warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1263/1267] Replayed LidoSRv3.Audit.Verity.AddressRecipientCallBridge
+warning: LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean:671:56: This simp argument is unused:
+  pureExec
+
+Hint: Omit it from the simp argument list.
+  simp [claimTo, Bind.bind, bindExec, hs, hc, LidoSRv3.Audit.Source.TrioReserve1.Live.emit,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲p̵u̵r̵e̵E̵x̵e̵c̵,̵ ̵hsa]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean:674:94: This simp argument is unused:
+  pureExec
+
+Hint: Omit it from the simp argument list.
+  simp [claimTo, Bind.bind, bindExec, hs, hc, LidoSRv3.Audit.Source.TrioReserve1.Live.emit,
+  ̲ p̵u̵r̵e̵E̵x̵e̵c̵,̵  ̲ ̲claimEvents, List.append_assoc]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean:732:30: This simp argument is unused:
+  hn
+
+Hint: Omit it from the simp argument list.
+  simp [claimWithdrawalsTo, hn,̵ ̵h̵n̵0, hl, zeroAddress, Pure.pure,
+  ̲  ̲ ̲ ̲ ̲ ̲LidoSRv3.Audit.Source.TrioReserve1.Live.require, Bind.bind, bindExec, fail, pureExec] at hs
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean:735:30: This simp argument is unused:
+  hn
+
+Hint: Omit it from the simp argument list.
+  simp [claimWithdrawalsTo, hn,̵ ̵h̵n̵0, hl, zeroAddress, Pure.pure,
+  ̲  ̲ ̲ ̲ ̲ ̲LidoSRv3.Audit.Source.TrioReserve1.Live.require, Bind.bind, bindExec, pureExec]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+info: LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean:739:0: 'LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claimTo_success' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean:740:0: 'LidoSRv3.Audit.Verity.AddressRecipientCallBridge.runClaimWithdrawalsTo_success' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+⚠ [1264/1267] Replayed LidoSRv3.Audit.Verity.AddressTx
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:280:34: This simp argument is unused:
+  AddressTxContract.paused
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.transferFrom, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getMappingUint,
+  ̵  ̵ ̵ ̵_root_.Verity.setMappingUint, ̵A̵d̵d̵r̵e̵s̵s̵T̵x̵C̵o̵n̵t̵r̵a̵c̵t̵.̵p̵a̵u̵s̵e̵d̵,̵
+      AddressTxContract.balances, AddressTxContract.allowances,
+  ̵  ̵ ̵ ̵AddressTxContract.owners,
+  ̲  ̲ ̲ ̲AddressTxContract.claimed,
+  ̵  ̵ ̵ ̵AddressTxContract.recipients, ContractState.readSlot,
+      ContractState.writeSlot, ContractState.readMap, ContractState.writeMap,
+  ̵  ̵ ̵ ̵ContractState.readMap2,
+  ̲  ̲ ̲ ̲ContractState.writeMap2,
+  ̵  ̵ ̵ ̵ContractState.readMapUint, ContractState.writeMapUint,
+      ContractState.storage, ContractState.storageMap,
+  ̵  ̵ ̵ ̵ContractState.storageMap2,
+  ̲  ̲ ̲ ̲ContractState.storageMapUint]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:281:4: This simp argument is unused:
+  AddressTxContract.balances
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.transferFrom, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getMappingUint,
+  ̵  ̵ ̵ ̵_root_.Verity.setMappingUint,
+  ̲  ̲ ̲ ̲AddressTxContract.paused,
+  ̵  ̵ ̵ ̵AddressTxContract.b̵all̲o̲w̲ances, AddressTxContract.a̵l̵l̵owa̵nc̵er̲s,
+      AddressTxContract.o̵w̵n̵e̵r̵s̵,̵ ̵A̵d̵d̵r̵e̵s̵s̵T̵x̵C̵o̵n̵t̵r̵a̵ct̵.̵c̵laimed,
+  ̵  ̵ ̵ ̵AddressTxContract.recipients, ContractState.readSlot,
+      ContractState.writeSlot, ContractState.readMap, ContractState.writeMap,
+  ̵  ̵ ̵ ̵ContractState.readMap2,
+  ̲  ̲ ̲ ̲ContractState.writeMap2,
+  ̵  ̵ ̵ ̵ContractState.readMapUint, ContractState.writeMapUint,
+      ContractState.storage, ContractState.storageMap,
+  ̵  ̵ ̵ ̵ContractState.storageMap2,
+  ̲  ̲ ̲ ̲ContractState.storageMapUint]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:281:32: This simp argument is unused:
+  AddressTxContract.allowances
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.transferFrom, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getMappingUint,
+  ̵  ̵ ̵ ̵_root_.Verity.setMappingUint,
+  ̲  ̲ ̲ ̲AddressTxContract.paused,
+  ̵  ̵ ̵ ̵AddressTxContract.balances, AddressTxContract.a̵l̵l̵owa̵nc̵er̲s,
+      AddressTxContract.o̵w̵n̵e̵r̵s̵,̵ ̵A̵d̵d̵r̵e̵s̵s̵T̵x̵C̵o̵n̵t̵r̵a̵ct̵.̵c̵laimed,
+  ̵  ̵ ̵ ̵AddressTxContract.recipients, ContractState.readSlot,
+      ContractState.writeSlot, ContractState.readMap, ContractState.writeMap,
+  ̵  ̵ ̵ ̵ContractState.readMap2,
+  ̲  ̲ ̲ ̲ContractState.writeMap2,
+  ̵  ̵ ̵ ̵ContractState.readMapUint, ContractState.writeMapUint,
+      ContractState.storage, ContractState.storageMap,
+  ̵  ̵ ̵ ̵ContractState.storageMap2,
+  ̲  ̲ ̲ ̲ContractState.storageMapUint]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:283:34: This simp argument is unused:
+  ContractState.readSlot
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.transferFrom, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getMappingUint,
+  ̵  ̵ ̵ ̵_root_.Verity.setMappingUint,
+  ̲  ̲ ̲ ̲AddressTxContract.paused,
+  ̵  ̵ ̵ ̵AddressTxContract.balances, AddressTxContract.allowances,
+      AddressTxContract.owners, AddressTxContract.claimed,
+  ̵  ̵ ̵ ̵AddressTxContract.recipients, ̵C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵r̵e̵a̵d̵S̵l̵o̵t̵,̵
+      ContractState.writeSlot, ContractState.readMap, ContractState.writeMap,
+  ̵  ̵ ̵ ̵ContractState.readMap2,
+  ̲  ̲ ̲ ̲ContractState.writeMap2,
+  ̵  ̵ ̵ ̵ContractState.readMapUint, ContractState.writeMapUint,
+      ContractState.storage, ContractState.storageMap,
+  ̵  ̵ ̵ ̵ContractState.storageMap2,
+  ̲  ̲ ̲ ̲ContractState.storageMapUint]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:284:29: This simp argument is unused:
+  ContractState.readMap
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.transferFrom, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getMappingUint,
+  ̵  ̵ ̵ ̵_root_.Verity.setMappingUint,
+  ̲  ̲ ̲ ̲AddressTxContract.paused,
+  ̵  ̵ ̵ ̵AddressTxContract.balances, AddressTxContract.allowances,
+      AddressTxContract.owners, AddressTxContract.claimed,
+  ̵  ̵ ̵ ̵AddressTxContract.recipients,
+  ̲  ̲ ̲ ̲ContractState.readSlot,
+  ̵  ̵ ̵ ̵ContractState.writeSlot, ContractState.r̵e̵a̵d̵M̵a̵p̵,̵ ̵C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵writeMap,
+  ̵  ̵ ̵ ̵ContractState.readMap2,
+  ̲  ̲ ̲ ̲ContractState.writeMap2,
+  ̵  ̵ ̵ ̵ContractState.readMapUint, ContractState.writeMapUint,
+      ContractState.storage, ContractState.storageMap,
+  ̵  ̵ ̵ ̵ContractState.storageMap2,
+  ̲  ̲ ̲ ̲ContractState.storageMapUint]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:285:4: This simp argument is unused:
+  ContractState.readMap2
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.transferFrom, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getMappingUint,
+  ̵  ̵ ̵ ̵_root_.Verity.setMappingUint,
+  ̲  ̲ ̲ ̲AddressTxContract.paused,
+  ̵  ̵ ̵ ̵AddressTxContract.balances, AddressTxContract.allowances,
+      AddressTxContract.owners, AddressTxContract.claimed,
+  ̵  ̵ ̵ ̵AddressTxContract.recipients,
+  ̲  ̲ ̲ ̲ContractState.readSlot,
+  ̵  ̵ ̵ ̵ContractState.writeSlot, ContractState.readMap, ContractState.writeMap,
+      ContractState.r̵e̵a̵d̵M̵a̵p̵2̵,̵ ̵C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵writeMap2,
+  ̵  ̵ ̵ ̵ContractState.readMapUint, ContractState.writeMapUint,
+      ContractState.storage, ContractState.storageMap,
+  ̵  ̵ ̵ ̵ContractState.storageMap2,
+  ̲  ̲ ̲ ̲ContractState.storageMapUint]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:287:4: This simp argument is unused:
+  ContractState.storage
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.transferFrom, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getMappingUint,
+  ̵  ̵ ̵ ̵_root_.Verity.setMappingUint,
+  ̲  ̲ ̲ ̲AddressTxContract.paused,
+  ̵  ̵ ̵ ̵AddressTxContract.balances, AddressTxContract.allowances,
+      AddressTxContract.owners, AddressTxContract.claimed,
+  ̵  ̵ ̵ ̵AddressTxContract.recipients,
+  ̲  ̲ ̲ ̲ContractState.readSlot,
+  ̵  ̵ ̵ ̵ContractState.writeSlot, ContractState.readMap, ContractState.writeMap,
+      ContractState.readMap2, ContractState.writeMap2,
+  ̵  ̵ ̵ ̵ContractState.readMapUint,
+  ̲  ̲ ̲ ̲ContractState.writeMapUint,
+  ̵  ̵ ̵ ̵ContractState.storage,̵ ̵C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵s̵t̵o̵r̵a̵g̵e̵Map,
+  ̵  ̵ ̵ ̵ContractState.storageMap2,
+  ̲  ̲ ̲ ̲ContractState.storageMapUint]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:287:27: This simp argument is unused:
+  ContractState.storageMap
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.transferFrom, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getMappingUint,
+  ̵  ̵ ̵ ̵_root_.Verity.setMappingUint,
+  ̲  ̲ ̲ ̲AddressTxContract.paused,
+  ̵  ̵ ̵ ̵AddressTxContract.balances, AddressTxContract.allowances,
+      AddressTxContract.owners, AddressTxContract.claimed,
+  ̵  ̵ ̵ ̵AddressTxContract.recipients,
+  ̲  ̲ ̲ ̲ContractState.readSlot,
+  ̵  ̵ ̵ ̵ContractState.writeSlot, ContractState.readMap, ContractState.writeMap,
+      ContractState.readMap2, ContractState.writeMap2,
+  ̵  ̵ ̵ ̵ContractState.readMapUint,
+  ̲  ̲ ̲ ̲ContractState.writeMapUint,
+  ̵  ̵ ̵ ̵ContractState.storage, ContractState.storageMap,̵
+  ̵ ̵ ̵ ̵ ̵C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵s̵t̵o̵r̵a̵g̵e̵M̵a̵p̵2,
+  ̲  ̲ ̲ ̲ContractState.storageMapUint]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:288:4: This simp argument is unused:
+  ContractState.storageMap2
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.transferFrom, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getMappingUint,
+  ̵  ̵ ̵ ̵_root_.Verity.setMappingUint,
+  ̲  ̲ ̲ ̲AddressTxContract.paused,
+  ̵  ̵ ̵ ̵AddressTxContract.balances, AddressTxContract.allowances,
+      AddressTxContract.owners, AddressTxContract.claimed,
+  ̵  ̵ ̵ ̵AddressTxContract.recipients,
+  ̲  ̲ ̲ ̲ContractState.readSlot,
+  ̵  ̵ ̵ ̵ContractState.writeSlot, ContractState.readMap, ContractState.writeMap,
+      ContractState.readMap2, ContractState.writeMap2,
+  ̵  ̵ ̵ ̵ContractState.readMapUint,
+  ̲  ̲ ̲ ̲ContractState.writeMapUint,
+  ̵  ̵ ̵ ̵ContractState.storage, ContractState.storageMap,
+      ContractState.storageMap2̵,̵ ̵C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵s̵t̵o̵r̵a̵g̵e̵M̵a̵p̵Uint]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:293:5: This simp argument is unused:
+  hone
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[h̵o̵n̵e̵,̵ ̵_root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:293:11: This simp argument is unused:
+  _root_.Verity.Contract.run
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 }) [hone,
+  ̲  ̲ ̲ ̲_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵C̵o̵n̵t̵r̵a̵c̵t̵.̵r̵u̵n̵,̵ ̵_root_.Verity.bind, Bind.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:293:39: This simp argument is unused:
+  _root_.Verity.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 }) [hone,
+  ̲  ̲ ̲ ̲_root_.Verity.Contract.run, _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵b̵i̵n̵d̵,̵ ̵Bind.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:293:59: This simp argument is unused:
+  Bind.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[hone,
+  ̲  ̲ ̲ ̲_root_.Verity.Contract.run, _root_.Verity.bind,̵ ̵B̵i̵n̵d̵.̵b̵i̵n̵d̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:297:8: This simp argument is unused:
+  _root_.Verity.Contract.run
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲ ̲ ̲{
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲maxSteps :=
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲1000000 }) [show inp.requestOwner = inp.senderFrom ↔ inp.senderFrom = inp.requestOwner
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲from eq_comm,
+        _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵C̵o̵n̵t̵r̵a̵c̵t̵.̵r̵u̵n̵,̵ ̵_root_.Verity.bind, Bind.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:297:36: This simp argument is unused:
+  _root_.Verity.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲ ̲ ̲{
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲maxSteps :=
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲1000000 }) [show inp.requestOwner = inp.senderFrom ↔ inp.senderFrom = inp.requestOwner
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲from eq_comm,
+        _root_.Verity.Contract.run, _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵b̵i̵n̵d̵,̵ ̵Bind.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:297:56: This simp argument is unused:
+  Bind.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲ ̲ ̲{
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲maxSteps :=
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲1000000 }) [show inp.requestOwner = inp.senderFrom ↔ inp.senderFrom = inp.requestOwner
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲from eq_comm,
+        _root_.Verity.Contract.run, _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵b̵i̵n̵d̵,̵ ̵B̵i̵n̵d̵.̵b̵i̵n̵d̵]̵_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲b̲i̲n̲d̲]̲
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:321:4: This simp argument is unused:
+  _root_.Verity.setMappingUint
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.requestWithdrawal, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getStorage, _root_.Verity.getMapping,
+      _root_.Verity.getMapping2, _root_.Verity.setMapping,
+  ̵  ̵ ̵ ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵s̵e̵t̵M̵a̵p̵p̵i̵n̵g̵U̵i̵n̵t̵,̵ ̵AddressTxContract.paused,
+      AddressTxContract.balances, AddressTxContract.allowances,
+  ̵  ̵ ̵ ̵AddressTxContract.owners,
+  ̲  ̲ ̲ ̲AddressTxContract.claimed,
+  ̵  ̵ ̵ ̵AddressTxContract.recipients, ContractState.readSlot,
+  ̲  ̲ ̲ ̲ContractState.writeSlot,
+  ̵  ̵ ̵ ̵ContractState.readMap, ContractState.writeMap,
+  ̵  ̵ ̵ ̵ContractState.readMap2,
+  ̲  ̲ ̲ ̲ContractState.writeMap2,
+  ̵  ̵ ̵ ̵ContractState.readMapUint, ContractState.writeMapUint,
+      ContractState.storage, ContractState.storageMap,
+  ̵  ̵ ̵ ̵ContractState.storageMap2,
+  ̲  ̲ ̲ ̲ContractState.storageMapUint,
+  ̵  ̵ ̵ ̵Verity.Core.Uint256.val_ofNat, hmod]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:323:30: This simp argument is unused:
+  AddressTxContract.claimed
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.requestWithdrawal, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getStorage, _root_.Verity.getMapping,
+      _root_.Verity.getMapping2, _root_.Verity.setMapping,
+  ̵  ̵ ̵ ̵_root_.Verity.setMappingUint,
+  ̲  ̲ ̲ ̲AddressTxContract.paused,
+  ̵  ̵ ̵ ̵AddressTxContract.balances, AddressTxContract.allowances,
+      AddressTxContract.owners, AddressTxContract.c̵l̵a̵i̵m̵e̵d̵,̵
+  ̵ ̵ ̵ ̵ ̵A̵d̵d̵res̵s̵T̵x̵C̵o̵n̵t̵r̵a̵ct̵.̵r̵e̵c̵ipients, ContractState.readSlot,
+  ̲  ̲ ̲ ̲ContractState.writeSlot,
+  ̵  ̵ ̵ ̵ContractState.readMap, ContractState.writeMap,
+  ̵  ̵ ̵ ̵ContractState.readMap2,
+  ̲  ̲ ̲ ̲ContractState.writeMap2,
+  ̵  ̵ ̵ ̵ContractState.readMapUint, ContractState.writeMapUint,
+      ContractState.storage, ContractState.storageMap,
+  ̵  ̵ ̵ ̵ContractState.storageMap2,
+  ̲  ̲ ̲ ̲ContractState.storageMapUint,
+  ̵  ̵ ̵ ̵Verity.Core.Uint256.val_ofNat, hmod]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:330:35: This simp argument is unused:
+  hmod
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.requestWithdrawal, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getStorage, _root_.Verity.getMapping,
+      _root_.Verity.getMapping2, _root_.Verity.setMapping,
+  ̵  ̵ ̵ ̵_root_.Verity.setMappingUint,
+  ̲  ̲ ̲ ̲AddressTxContract.paused,
+  ̵  ̵ ̵ ̵AddressTxContract.balances, AddressTxContract.allowances,
+      AddressTxContract.owners, AddressTxContract.claimed,
+  ̵  ̵ ̵ ̵AddressTxContract.recipients,
+  ̲  ̲ ̲ ̲ContractState.readSlot, ContractState.writeSlot,
+  ̵  ̵ ̵ ̵ContractState.readMap, ContractState.writeMap,
+      ContractState.readMap2, ContractState.writeMap2,
+  ̵  ̵ ̵ ̵ContractState.readMapUint,
+  ̲  ̲ ̲ ̲ContractState.writeMapUint,
+  ̵  ̵ ̵ ̵ContractState.storage, ContractState.storageMap,
+      ContractState.storageMap2, ContractState.storageMapUint,
+  ̵  ̵ ̵ ̵Verity.Core.Uint256.val_ofNat,̵ ̵h̵m̵o̵d̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:332:5: This simp argument is unused:
+  hone
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[h̵o̵n̵e̵,̵ ̵_root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:332:11: This simp argument is unused:
+  _root_.Verity.Contract.run
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 }) [hone,
+  ̲  ̲ ̲ ̲_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵C̵o̵n̵t̵r̵a̵c̵t̵.̵r̵u̵n̵,̵ ̵_root_.Verity.bind, Bind.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:332:39: This simp argument is unused:
+  _root_.Verity.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 }) [hone,
+  ̲  ̲ ̲ ̲_root_.Verity.Contract.run, _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵b̵i̵n̵d̵,̵ ̵Bind.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:332:59: This simp argument is unused:
+  Bind.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[hone,
+  ̲  ̲ ̲ ̲_root_.Verity.Contract.run, _root_.Verity.bind,̵ ̵B̵i̵n̵d̵.̵b̵i̵n̵d̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:334:5: This simp argument is unused:
+  _root_.Verity.Contract.run
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵C̵o̵n̵t̵r̵a̵c̵t̵.̵r̵u̵n̵,̵ ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵b̵i̵n̵d̵,̵[̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲b̲i̲n̲d̲,̲ Bind.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:334:33: This simp argument is unused:
+  _root_.Verity.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [_root_.Verity.Contract.run, _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵b̵i̵n̵d̵,̵ ̵Bind.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:334:53: This simp argument is unused:
+  Bind.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[_root_.Verity.Contract.run, _root_.Verity.bind,̵ ̵B̵i̵n̵d̵.̵b̵i̵n̵d̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:336:5: This simp argument is unused:
+  _root_.Verity.Contract.run
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵C̵o̵n̵t̵r̵a̵c̵t̵.̵r̵u̵n̵,̵ ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵b̵i̵n̵d̵,̵[̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲b̲i̲n̲d̲,̲ Bind.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:336:33: This simp argument is unused:
+  _root_.Verity.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [_root_.Verity.Contract.run, _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵b̵i̵n̵d̵,̵ ̵Bind.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:336:53: This simp argument is unused:
+  Bind.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[_root_.Verity.Contract.run, _root_.Verity.bind,̵ ̵B̵i̵n̵d̵.̵b̵i̵n̵d̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:338:5: This simp argument is unused:
+  _root_.Verity.Contract.run
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵C̵o̵n̵t̵r̵a̵c̵t̵.̵r̵u̵n̵,̵ ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵b̵i̵n̵d̵,̵[̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲b̲i̲n̲d̲,̲ Bind.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:338:33: This simp argument is unused:
+  _root_.Verity.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [_root_.Verity.Contract.run, _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵b̵i̵n̵d̵,̵ ̵Bind.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:338:53: This simp argument is unused:
+  Bind.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[_root_.Verity.Contract.run, _root_.Verity.bind,̵ ̵B̵i̵n̵d̵.̵b̵i̵n̵d̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:340:5: This simp argument is unused:
+  _root_.Verity.Contract.run
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵C̵o̵n̵t̵r̵a̵c̵t̵.̵r̵u̵n̵,̵ ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵b̵i̵n̵d̵,̵[̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲b̲i̲n̲d̲,̲ Bind.bind, _root_.Verity.setMapping,
+  ̲  ̲ ̲ ̲ContractState.writeMap]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:340:33: This simp argument is unused:
+  _root_.Verity.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [_root_.Verity.Contract.run, _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵b̵i̵n̵d̵,̵ ̵Bind.bind, _root_.Verity.setMapping,
+  ̲  ̲ ̲ ̲ContractState.writeMap]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:340:53: This simp argument is unused:
+  Bind.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[_root_.Verity.Contract.run, _root_.Verity.bind, ̵B̵i̵n̵d̵.̵b̵i̵n̵d̵,̵
+       ̵ ̵_root_.Verity.setMapping, ContractState.writeMap]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:341:6: This simp argument is unused:
+  _root_.Verity.setMapping
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [_root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind,
+      _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵s̵e̵t̵M̵a̵p̵p̵i̵n̵g̵,̵ ̵ContractState.writeMap]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:341:32: This simp argument is unused:
+  ContractState.writeMap
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [_root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind,
+      _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵s̵e̵t̵M̵a̵p̵p̵i̵n̵g̵,̵ ̵C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵w̵r̵i̵t̵e̵M̵a̵p̵]̵_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲s̲e̲t̲M̲a̲p̲p̲i̲n̲g̲]̲
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:343:25: This simp argument is unused:
+  Bind.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [_root_.Verity.bind, B̵i̵n̵d̵.̵b̵i̵n̵d̵,̵ ̵_root_.Verity.setMappingUint,
+      _root_.Verity.Contract.run, observeAddress, ContractState.writeMapUint,
+  ̲  ̲ ̲ ̲ContractState.readMapUint, ContractState.storageMapUint, ContractState.storage,
+      Compiler.Constants.evmModulus, Nat.mod_eq_of_lt hAmount]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:344:6: This simp argument is unused:
+  _root_.Verity.Contract.run
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[_root_.Verity.bind, Bind.bind, _root_.Verity.setMappingUint,
+       ̵ ̵_̵r̵oo̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵C̵o̵n̵t̵r̵a̵c̵t̵.̵r̵u̵n̵,̵ ̵o̵bserveAddress,
+  ̵  ̵ ̵ ̵ ̵ ̵ContractState.writeMapUint, ContractState.readMapUint,
+       ̵ ̵ContractState.storageMapUint, ContractState.storage,
+  ̵  ̵ ̵ ̵ ̵ ̵Compiler.Constants.evmModulus,
+  ̲  ̲ ̲ ̲Nat.mod_eq_of_lt hAmount]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:344:34: This simp argument is unused:
+  observeAddress
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[_root_.Verity.bind, Bind.bind, _root_.Verity.setMappingUint,
+       ̵ ̵_root_.Verity.Contract.run, o̵b̵s̵e̵r̵v̵e̵A̵d̵d̵r̵e̵s̵s̵,̵
+  ̵ ̵ ̵ ̵ ̵ ̵ ̵ContractState.writeMapUint, ContractState.readMapUint,
+       ̵ ̵ContractState.storageMapUint, ContractState.storage,
+  ̵  ̵ ̵ ̵ ̵ ̵Compiler.Constants.evmModulus,
+  ̲  ̲ ̲ ̲Nat.mod_eq_of_lt hAmount]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:345:34: This simp argument is unused:
+  ContractState.readMapUint
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[_root_.Verity.bind, Bind.bind, _root_.Verity.setMappingUint,
+       ̵ ̵_root_.Verity.Contract.run, observeAddress,
+  ̵  ̵ ̵ ̵ ̵ ̵ContractState.writeMapUint, ̵C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵r̵e̵a̵d̵M̵a̵p̵U̵i̵n̵t̵,̵
+       ̵ ̵ContractState.storageMapUint, ContractState.storage,
+  ̵  ̵ ̵ ̵ ̵ ̵Compiler.Constants.evmModulus,
+  ̲  ̲ ̲ ̲Nat.mod_eq_of_lt hAmount]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:346:6: This simp argument is unused:
+  ContractState.storageMapUint
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [_root_.Verity.bind, Bind.bind, _root_.Verity.setMappingUint,
+      _root_.Verity.Contract.run, observeAddress, ContractState.writeMapUint,
+  ̲  ̲ ̲ ̲ContractState.readMapUint, C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵s̵t̵o̵r̵a̵g̵e̵M̵a̵p̵U̵i̵n̵t̵,̵ ̵ContractState.storage, Compiler.Constants.evmModulus,
+  ̲  ̲ ̲ ̲Nat.mod_eq_of_lt hAmount]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:346:36: This simp argument is unused:
+  ContractState.storage
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[_root_.Verity.bind, Bind.bind, _root_.Verity.setMappingUint,
+       ̵ ̵_root_.Verity.Contract.run, observeAddress,
+  ̵  ̵ ̵ ̵ ̵ ̵ContractState.writeMapUint,
+  ̲  ̲ ̲ ̲ContractState.readMapUint,
+  ̵  ̵ ̵ ̵ ̵ ̵ContractState.storageMapUint, Con̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵s̵t̵o̵r̵a̵g̵e̵,̵
+  ̵ ̵ ̵ ̵ ̵ ̵ ̵C̵o̵mpiler.Constants.evmModulus,
+  ̲  ̲ ̲ ̲Nat.mod_eq_of_lt hAmount]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:360:34: This simp argument is unused:
+  AddressTxContract.paused
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.claimWithdrawal, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getMappingUint,
+  ̵  ̵ ̵ ̵_root_.Verity.setMappingUint, ̵A̵d̵d̵r̵e̵s̵s̵T̵x̵C̵o̵n̵t̵r̵a̵c̵t̵.̵p̵a̵u̵s̵e̵d̵,̵
+      AddressTxContract.balances, AddressTxContract.allowances,
+  ̵  ̵ ̵ ̵AddressTxContract.owners,
+  ̲  ̲ ̲ ̲AddressTxContract.claimed,
+  ̵  ̵ ̵ ̵AddressTxContract.recipients, ContractState.readSlot,
+      ContractState.writeSlot, ContractState.readMap, ContractState.writeMap,
+  ̵  ̵ ̵ ̵ContractState.readMap2,
+  ̲  ̲ ̲ ̲ContractState.writeMap2,
+  ̵  ̵ ̵ ̵ContractState.readMapUint, ContractState.writeMapUint,
+      ContractState.storage, ContractState.storageMap,
+  ̵  ̵ ̵ ̵ContractState.storageMap2,
+  ̲  ̲ ̲ ̲ContractState.storageMapUint]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:361:4: This simp argument is unused:
+  AddressTxContract.balances
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.claimWithdrawal, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getMappingUint,
+  ̵  ̵ ̵ ̵_root_.Verity.setMappingUint,
+  ̲  ̲ ̲ ̲AddressTxContract.paused,
+  ̵  ̵ ̵ ̵AddressTxContract.b̵all̲o̲w̲ances, AddressTxContract.a̵l̵l̵owa̵nc̵er̲s,
+      AddressTxContract.o̵w̵n̵e̵r̵s̵,̵ ̵A̵d̵d̵r̵e̵s̵s̵T̵x̵C̵o̵n̵t̵r̵a̵ct̵.̵c̵laimed,
+  ̵  ̵ ̵ ̵AddressTxContract.recipients, ContractState.readSlot,
+      ContractState.writeSlot, ContractState.readMap, ContractState.writeMap,
+  ̵  ̵ ̵ ̵ContractState.readMap2,
+  ̲  ̲ ̲ ̲ContractState.writeMap2,
+  ̵  ̵ ̵ ̵ContractState.readMapUint, ContractState.writeMapUint,
+      ContractState.storage, ContractState.storageMap,
+  ̵  ̵ ̵ ̵ContractState.storageMap2,
+  ̲  ̲ ̲ ̲ContractState.storageMapUint]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:361:32: This simp argument is unused:
+  AddressTxContract.allowances
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.claimWithdrawal, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getMappingUint,
+  ̵  ̵ ̵ ̵_root_.Verity.setMappingUint,
+  ̲  ̲ ̲ ̲AddressTxContract.paused,
+  ̵  ̵ ̵ ̵AddressTxContract.balances, AddressTxContract.a̵l̵l̵owa̵nc̵er̲s,
+      AddressTxContract.o̵w̵n̵e̵r̵s̵,̵ ̵A̵d̵d̵r̵e̵s̵s̵T̵x̵C̵o̵n̵t̵r̵a̵ct̵.̵c̵laimed,
+  ̵  ̵ ̵ ̵AddressTxContract.recipients, ContractState.readSlot,
+      ContractState.writeSlot, ContractState.readMap, ContractState.writeMap,
+  ̵  ̵ ̵ ̵ContractState.readMap2,
+  ̲  ̲ ̲ ̲ContractState.writeMap2,
+  ̵  ̵ ̵ ̵ContractState.readMapUint, ContractState.writeMapUint,
+      ContractState.storage, ContractState.storageMap,
+  ̵  ̵ ̵ ̵ContractState.storageMap2,
+  ̲  ̲ ̲ ̲ContractState.storageMapUint]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:363:34: This simp argument is unused:
+  ContractState.readSlot
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.claimWithdrawal, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getMappingUint,
+  ̵  ̵ ̵ ̵_root_.Verity.setMappingUint,
+  ̲  ̲ ̲ ̲AddressTxContract.paused,
+  ̵  ̵ ̵ ̵AddressTxContract.balances, AddressTxContract.allowances,
+      AddressTxContract.owners, AddressTxContract.claimed,
+  ̵  ̵ ̵ ̵AddressTxContract.recipients, ̵C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵r̵e̵a̵d̵S̵l̵o̵t̵,̵
+      ContractState.writeSlot, ContractState.readMap, ContractState.writeMap,
+  ̵  ̵ ̵ ̵ContractState.readMap2,
+  ̲  ̲ ̲ ̲ContractState.writeMap2,
+  ̵  ̵ ̵ ̵ContractState.readMapUint, ContractState.writeMapUint,
+      ContractState.storage, ContractState.storageMap,
+  ̵  ̵ ̵ ̵ContractState.storageMap2,
+  ̲  ̲ ̲ ̲ContractState.storageMapUint]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:364:29: This simp argument is unused:
+  ContractState.readMap
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.claimWithdrawal, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getMappingUint,
+  ̵  ̵ ̵ ̵_root_.Verity.setMappingUint,
+  ̲  ̲ ̲ ̲AddressTxContract.paused,
+  ̵  ̵ ̵ ̵AddressTxContract.balances, AddressTxContract.allowances,
+      AddressTxContract.owners, AddressTxContract.claimed,
+  ̵  ̵ ̵ ̵AddressTxContract.recipients,
+  ̲  ̲ ̲ ̲ContractState.readSlot,
+  ̵  ̵ ̵ ̵ContractState.writeSlot, ContractState.r̵e̵a̵d̵M̵a̵p̵,̵ ̵C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵writeMap,
+  ̵  ̵ ̵ ̵ContractState.readMap2,
+  ̲  ̲ ̲ ̲ContractState.writeMap2,
+  ̵  ̵ ̵ ̵ContractState.readMapUint, ContractState.writeMapUint,
+      ContractState.storage, ContractState.storageMap,
+  ̵  ̵ ̵ ̵ContractState.storageMap2,
+  ̲  ̲ ̲ ̲ContractState.storageMapUint]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:365:4: This simp argument is unused:
+  ContractState.readMap2
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.claimWithdrawal, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getMappingUint,
+  ̵  ̵ ̵ ̵_root_.Verity.setMappingUint,
+  ̲  ̲ ̲ ̲AddressTxContract.paused,
+  ̵  ̵ ̵ ̵AddressTxContract.balances, AddressTxContract.allowances,
+      AddressTxContract.owners, AddressTxContract.claimed,
+  ̵  ̵ ̵ ̵AddressTxContract.recipients,
+  ̲  ̲ ̲ ̲ContractState.readSlot,
+  ̵  ̵ ̵ ̵ContractState.writeSlot, ContractState.readMap, ContractState.writeMap,
+      ContractState.r̵e̵a̵d̵M̵a̵p̵2̵,̵ ̵C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵writeMap2,
+  ̵  ̵ ̵ ̵ContractState.readMapUint, ContractState.writeMapUint,
+      ContractState.storage, ContractState.storageMap,
+  ̵  ̵ ̵ ̵ContractState.storageMap2,
+  ̲  ̲ ̲ ̲ContractState.storageMapUint]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:367:4: This simp argument is unused:
+  ContractState.storage
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.claimWithdrawal, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getMappingUint,
+  ̵  ̵ ̵ ̵_root_.Verity.setMappingUint,
+  ̲  ̲ ̲ ̲AddressTxContract.paused,
+  ̵  ̵ ̵ ̵AddressTxContract.balances, AddressTxContract.allowances,
+      AddressTxContract.owners, AddressTxContract.claimed,
+  ̵  ̵ ̵ ̵AddressTxContract.recipients,
+  ̲  ̲ ̲ ̲ContractState.readSlot,
+  ̵  ̵ ̵ ̵ContractState.writeSlot, ContractState.readMap, ContractState.writeMap,
+      ContractState.readMap2, ContractState.writeMap2,
+  ̵  ̵ ̵ ̵ContractState.readMapUint,
+  ̲  ̲ ̲ ̲ContractState.writeMapUint,
+  ̵  ̵ ̵ ̵ContractState.storage,̵ ̵C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵s̵t̵o̵r̵a̵g̵e̵Map,
+  ̵  ̵ ̵ ̵ContractState.storageMap2,
+  ̲  ̲ ̲ ̲ContractState.storageMapUint]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:367:27: This simp argument is unused:
+  ContractState.storageMap
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.claimWithdrawal, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getMappingUint,
+  ̵  ̵ ̵ ̵_root_.Verity.setMappingUint,
+  ̲  ̲ ̲ ̲AddressTxContract.paused,
+  ̵  ̵ ̵ ̵AddressTxContract.balances, AddressTxContract.allowances,
+      AddressTxContract.owners, AddressTxContract.claimed,
+  ̵  ̵ ̵ ̵AddressTxContract.recipients,
+  ̲  ̲ ̲ ̲ContractState.readSlot,
+  ̵  ̵ ̵ ̵ContractState.writeSlot, ContractState.readMap, ContractState.writeMap,
+      ContractState.readMap2, ContractState.writeMap2,
+  ̵  ̵ ̵ ̵ContractState.readMapUint,
+  ̲  ̲ ̲ ̲ContractState.writeMapUint,
+  ̵  ̵ ̵ ̵ContractState.storage, ContractState.storageMap,̵
+  ̵ ̵ ̵ ̵ ̵C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵s̵t̵o̵r̵a̵g̵e̵M̵a̵p̵2,
+  ̲  ̲ ̲ ̲ContractState.storageMapUint]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:368:4: This simp argument is unused:
+  ContractState.storageMap2
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.claimWithdrawal, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getMappingUint,
+  ̵  ̵ ̵ ̵_root_.Verity.setMappingUint,
+  ̲  ̲ ̲ ̲AddressTxContract.paused,
+  ̵  ̵ ̵ ̵AddressTxContract.balances, AddressTxContract.allowances,
+      AddressTxContract.owners, AddressTxContract.claimed,
+  ̵  ̵ ̵ ̵AddressTxContract.recipients,
+  ̲  ̲ ̲ ̲ContractState.readSlot,
+  ̵  ̵ ̵ ̵ContractState.writeSlot, ContractState.readMap, ContractState.writeMap,
+      ContractState.readMap2, ContractState.writeMap2,
+  ̵  ̵ ̵ ̵ContractState.readMapUint,
+  ̲  ̲ ̲ ̲ContractState.writeMapUint,
+  ̵  ̵ ̵ ̵ContractState.storage, ContractState.storageMap,
+      ContractState.storageMap2̵,̵ ̵C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵s̵t̵o̵r̵a̵g̵e̵M̵a̵p̵Uint]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:371:5: This simp argument is unused:
+  _root_.Verity.Contract.run
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵C̵o̵n̵t̵r̵a̵c̵t̵.̵r̵u̵n̵,̵ ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵b̵i̵n̵d̵,̵[̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲b̲i̲n̲d̲,̲ Bind.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:371:33: This simp argument is unused:
+  _root_.Verity.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [_root_.Verity.Contract.run, _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵b̵i̵n̵d̵,̵ ̵Bind.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:371:53: This simp argument is unused:
+  Bind.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[_root_.Verity.Contract.run, _root_.Verity.bind,̵ ̵B̵i̵n̵d̵.̵b̵i̵n̵d̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:373:5: This simp argument is unused:
+  hone
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[h̵o̵n̵e̵,̵ ̵_root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:373:11: This simp argument is unused:
+  _root_.Verity.Contract.run
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 }) [hone,
+  ̲  ̲ ̲ ̲_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵C̵o̵n̵t̵r̵a̵c̵t̵.̵r̵u̵n̵,̵ ̵_root_.Verity.bind, Bind.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:373:39: This simp argument is unused:
+  _root_.Verity.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 }) [hone,
+  ̲  ̲ ̲ ̲_root_.Verity.Contract.run, _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵b̵i̵n̵d̵,̵ ̵Bind.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:373:59: This simp argument is unused:
+  Bind.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[hone,
+  ̲  ̲ ̲ ̲_root_.Verity.Contract.run, _root_.Verity.bind,̵ ̵B̵i̵n̵d̵.̵b̵i̵n̵d̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:375:5: This simp argument is unused:
+  _root_.Verity.Contract.run
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵C̵o̵n̵t̵r̵a̵c̵t̵.̵r̵u̵n̵,̵ ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵b̵i̵n̵d̵,̵[̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲b̲i̲n̲d̲,̲ Bind.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:375:33: This simp argument is unused:
+  _root_.Verity.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [_root_.Verity.Contract.run, _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵b̵i̵n̵d̵,̵ ̵Bind.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:375:53: This simp argument is unused:
+  Bind.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[_root_.Verity.Contract.run, _root_.Verity.bind,̵ ̵B̵i̵n̵d̵.̵b̵i̵n̵d̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:377:5: This simp argument is unused:
+  _root_.Verity.Contract.run
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵C̵o̵n̵t̵r̵a̵c̵t̵.̵r̵u̵n̵,̵ ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵b̵i̵n̵d̵,̵[̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲b̲i̲n̲d̲,̲ Bind.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:377:33: This simp argument is unused:
+  _root_.Verity.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [_root_.Verity.Contract.run, _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵b̵i̵n̵d̵,̵ ̵Bind.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:377:53: This simp argument is unused:
+  Bind.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[_root_.Verity.Contract.run, _root_.Verity.bind,̵ ̵B̵i̵n̵d̵.̵b̵i̵n̵d̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:381:8: This simp argument is unused:
+  _root_.Verity.Contract.run
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲ ̲ ̲{
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲maxSteps :=
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲1000000 }) [show inp.requestOwner = inp.caller ↔ inp.caller = inp.requestOwner from
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲eq_comm,
+        _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵C̵o̵n̵t̵r̵a̵c̵t̵.̵r̵u̵n̵,̵ ̵_root_.Verity.bind, Bind.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:381:36: This simp argument is unused:
+  _root_.Verity.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲ ̲ ̲{
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲maxSteps :=
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲1000000 }) [show inp.requestOwner = inp.caller ↔ inp.caller = inp.requestOwner from
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲eq_comm,
+        _root_.Verity.Contract.run, _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵b̵i̵n̵d̵,̵ ̵Bind.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:381:56: This simp argument is unused:
+  Bind.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲ ̲ ̲{
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲maxSteps :=
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲1000000 }) [show inp.requestOwner = inp.caller ↔ inp.caller = inp.requestOwner from
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲eq_comm,
+        _root_.Verity.Contract.run, _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵b̵i̵n̵d̵,̵ ̵B̵i̵n̵d̵.̵b̵i̵n̵d̵]̵_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲b̲i̲n̲d̲]̲
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:383:5: This simp argument is unused:
+  _root_.Verity.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵b̵i̵n̵d̵,̵ ̵B̵i̵n̵d̵.̵b̵i̵n̵d̵,̵[̲B̲i̲n̲d̲.̲b̲i̲n̲d̲,̲ _root_.Verity.setMappingUint, ContractState.writeMapUint,
+  ̲  ̲ ̲ ̲ContractState.readMapUint, ContractState.storageMapUint]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:383:25: This simp argument is unused:
+  Bind.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[_root_.Verity.bind, B̵i̵n̵d̵.̵b̵i̵n̵d̵,̵ ̵_root_.Verity.setMappingUint,
+       ̵ ̵ContractState.writeMapUint, ContractState.readMapUint,
+  ̵  ̵ ̵ ̵ ̵ ̵ContractState.storageMapUint]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:383:36: This simp argument is unused:
+  _root_.Verity.setMappingUint
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [_root_.Verity.bind, Bind.bind, _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵s̵e̵t̵M̵a̵p̵p̵i̵n̵g̵U̵i̵n̵t̵,̵ContractState.writeMapUint,
+      ContractState.readMapUint, ContractState.storageMapUint]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:384:6: This simp argument is unused:
+  ContractState.writeMapUint
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [_root_.Verity.bind, Bind.bind, _root_.Verity.setMappingUint,
+      C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵w̵r̵i̵t̵e̵M̵a̵p̵U̵i̵n̵t̵,̵ ̵ContractState.readMapUint, ContractState.storageMapUint]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:384:34: This simp argument is unused:
+  ContractState.readMapUint
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [_root_.Verity.bind, Bind.bind, _root_.Verity.setMappingUint,
+      ContractState.writeMapUint, C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵r̵e̵a̵d̵M̵a̵p̵U̵i̵n̵t̵,̵ContractState.storageMapUint]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:385:6: This simp argument is unused:
+  ContractState.storageMapUint
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [_root_.Verity.bind, Bind.bind, _root_.Verity.setMappingUint,
+      ContractState.writeMapUint, C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵r̵e̵a̵d̵M̵a̵p̵U̵i̵n̵t̵,̵
+  ̵ ̵ ̵ ̵ ̵ ̵ ̵C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵s̵t̵o̵r̵a̵g̵e̵M̵a̵p̵U̵i̵n̵t̵]̵C̲o̲n̲t̲r̲a̲c̲t̲S̲t̲a̲t̲e̲.̲r̲e̲a̲d̲M̲a̲p̲U̲i̲n̲t̲]̲
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:403:6: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:410:4: This simp argument is unused:
+  AddressTxContract.paused
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.redeem, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getMapping,
+  ̵  ̵ ̵ ̵_root_.Verity.setMapping,
+  ̲  ̲ ̲ ̲_root_.Verity.setMappingUint,
+  ̵  ̵ ̵ ̵AddressTxContract.p̵a̵u̵s̵e̵d̵,̵ ̵A̵d̵d̵r̵e̵s̵s̵T̵x̵C̵o̵n̵t̵r̵a̵c̵t̵.̵balances,
+  ̵  ̵ ̵ ̵AddressTxContract.allowances,
+  ̲  ̲ ̲ ̲AddressTxContract.owners,
+  ̵  ̵ ̵ ̵AddressTxContract.claimed, AddressTxContract.recipients,
+      ContractState.readSlot, ContractState.writeSlot,
+  ̵  ̵ ̵ ̵ContractState.readMap, ContractState.writeMap,
+      ContractState.readMap2, ContractState.writeMap2,
+  ̵  ̵ ̵ ̵ContractState.readMapUint,
+  ̲  ̲ ̲ ̲ContractState.writeMapUint,
+  ̵  ̵ ̵ ̵ContractState.storage, ContractState.storageMap,
+      ContractState.storageMap2, ContractState.storageMapUint,
+  ̵  ̵ ̵ ̵Verity.Core.Uint256.ofNat,
+  ̲  ̲ ̲ ̲Verity.Core.Uint256.modulus,
+  ̵  ̵ ̵ ̵Verity.Core.UINT256_MODULUS, Compiler.Constants.evmModulus, hzero,
+  ̲  ̲ ̲ ̲hmod]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:411:4: This simp argument is unused:
+  AddressTxContract.allowances
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.redeem, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getMapping,
+  ̵  ̵ ̵ ̵_root_.Verity.setMapping,
+  ̲  ̲ ̲ ̲_root_.Verity.setMappingUint,
+  ̵  ̵ ̵ ̵AddressTxContract.paused, AddressTxContract.balances,
+      AddressTxContract.a̵l̵l̵owa̵nc̵es̵,̵ ̵A̵d̵d̵re̵ss̵T̵x̵C̵o̵n̵t̵r̵a̵c̵t̵.̵o̵w̵n̵e̵r̵s̵,
+  ̵  ̵ ̵ ̵AddressTxContract.claimed, AddressTxContract.recipients,
+      ContractState.readSlot, ContractState.writeSlot,
+  ̵  ̵ ̵ ̵ContractState.readMap, ContractState.writeMap,
+      ContractState.readMap2, ContractState.writeMap2,
+  ̵  ̵ ̵ ̵ContractState.readMapUint,
+  ̲  ̲ ̲ ̲ContractState.writeMapUint,
+  ̵  ̵ ̵ ̵ContractState.storage, ContractState.storageMap,
+      ContractState.storageMap2, ContractState.storageMapUint,
+  ̵  ̵ ̵ ̵Verity.Core.Uint256.ofNat,
+  ̲  ̲ ̲ ̲Verity.Core.Uint256.modulus,
+  ̵  ̵ ̵ ̵Verity.Core.UINT256_MODULUS, Compiler.Constants.evmModulus, hzero,
+  ̲  ̲ ̲ ̲hmod]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:411:34: This simp argument is unused:
+  AddressTxContract.owners
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.redeem, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getMapping,
+  ̵  ̵ ̵ ̵_root_.Verity.setMapping,
+  ̲  ̲ ̲ ̲_root_.Verity.setMappingUint,
+  ̵  ̵ ̵ ̵AddressTxContract.paused, AddressTxContract.balances,
+      AddressTxContract.allowances, AddressTxContract.o̵w̵n̵e̵r̵s̵,̵
+  ̵ ̵ ̵ ̵ ̵A̵d̵d̵r̵e̵s̵s̵T̵x̵C̵o̵n̵t̵r̵a̵ct̵.̵c̵laimed, AddressTxContract.recipients,
+      ContractState.readSlot, ContractState.writeSlot,
+  ̵  ̵ ̵ ̵ContractState.readMap, ContractState.writeMap,
+      ContractState.readMap2, ContractState.writeMap2,
+  ̵  ̵ ̵ ̵ContractState.readMapUint,
+  ̲  ̲ ̲ ̲ContractState.writeMapUint,
+  ̵  ̵ ̵ ̵ContractState.storage, ContractState.storageMap,
+      ContractState.storageMap2, ContractState.storageMapUint,
+  ̵  ̵ ̵ ̵Verity.Core.Uint256.ofNat,
+  ̲  ̲ ̲ ̲Verity.Core.Uint256.modulus,
+  ̵  ̵ ̵ ̵Verity.Core.UINT256_MODULUS, Compiler.Constants.evmModulus, hzero,
+  ̲  ̲ ̲ ̲hmod]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:412:4: This simp argument is unused:
+  AddressTxContract.claimed
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.redeem, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getMapping,
+  ̵  ̵ ̵ ̵_root_.Verity.setMapping,
+  ̲  ̲ ̲ ̲_root_.Verity.setMappingUint,
+  ̵  ̵ ̵ ̵AddressTxContract.paused, AddressTxContract.balances,
+      AddressTxContract.allowances, AddressTxContract.owners,
+  ̵  ̵ ̵ ̵AddressTxContract.c̵l̵a̵i̵m̵e̵d̵,̵ ̵A̵d̵d̵res̵s̵T̵x̵C̵o̵n̵t̵r̵a̵ct̵.̵r̵e̵c̵ipients,
+      ContractState.readSlot, ContractState.writeSlot,
+  ̵  ̵ ̵ ̵ContractState.readMap, ContractState.writeMap,
+      ContractState.readMap2, ContractState.writeMap2,
+  ̵  ̵ ̵ ̵ContractState.readMapUint,
+  ̲  ̲ ̲ ̲ContractState.writeMapUint,
+  ̵  ̵ ̵ ̵ContractState.storage, ContractState.storageMap,
+      ContractState.storageMap2, ContractState.storageMapUint,
+  ̵  ̵ ̵ ̵Verity.Core.Uint256.ofNat,
+  ̲  ̲ ̲ ̲Verity.Core.Uint256.modulus,
+  ̵  ̵ ̵ ̵Verity.Core.UINT256_MODULUS, Compiler.Constants.evmModulus, hzero,
+  ̲  ̲ ̲ ̲hmod]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:413:4: This simp argument is unused:
+  ContractState.readSlot
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.redeem, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getMapping,
+  ̵  ̵ ̵ ̵_root_.Verity.setMapping,
+  ̲  ̲ ̲ ̲_root_.Verity.setMappingUint,
+  ̵  ̵ ̵ ̵AddressTxContract.paused, AddressTxContract.balances,
+      AddressTxContract.allowances, AddressTxContract.owners,
+  ̵  ̵ ̵ ̵AddressTxContract.claimed,
+  ̲  ̲ ̲ ̲AddressTxContract.recipients,
+  ̵  ̵ ̵ ̵ContractState.r̵e̵a̵d̵S̵l̵o̵t̵,̵ ̵C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵writeSlot,
+  ̵  ̵ ̵ ̵ContractState.readMap,
+  ̲  ̲ ̲ ̲ContractState.writeMap,
+  ̵  ̵ ̵ ̵ContractState.readMap2, ContractState.writeMap2,
+      ContractState.readMapUint, ContractState.writeMapUint,
+  ̵  ̵ ̵ ̵ContractState.storage,
+  ̲  ̲ ̲ ̲ContractState.storageMap,
+  ̵  ̵ ̵ ̵ContractState.storageMap2, ContractState.storageMapUint,
+      Verity.Core.Uint256.ofNat, Verity.Core.Uint256.modulus,
+  ̵  ̵ ̵ ̵Verity.Core.UINT256_MODULUS,
+  ̲  ̲ ̲ ̲Compiler.Constants.evmModulus, hzero, hmod]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:415:4: This simp argument is unused:
+  ContractState.readMap2
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.redeem, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getMapping,
+  ̵  ̵ ̵ ̵_root_.Verity.setMapping,
+  ̲  ̲ ̲ ̲_root_.Verity.setMappingUint,
+  ̵  ̵ ̵ ̵AddressTxContract.paused, AddressTxContract.balances,
+      AddressTxContract.allowances, AddressTxContract.owners,
+  ̵  ̵ ̵ ̵AddressTxContract.claimed,
+  ̲  ̲ ̲ ̲AddressTxContract.recipients,
+  ̵  ̵ ̵ ̵ContractState.readSlot, ContractState.writeSlot,
+      ContractState.readMap, ContractState.writeMap,
+  ̵  ̵ ̵ ̵ContractState.r̵e̵a̵d̵M̵a̵p̵2̵,̵ ̵C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵writeMap2,
+      ContractState.readMapUint, ContractState.writeMapUint,
+  ̵  ̵ ̵ ̵ContractState.storage,
+  ̲  ̲ ̲ ̲ContractState.storageMap,
+  ̵  ̵ ̵ ̵ContractState.storageMap2, ContractState.storageMapUint,
+      Verity.Core.Uint256.ofNat, Verity.Core.Uint256.modulus,
+  ̵  ̵ ̵ ̵Verity.Core.UINT256_MODULUS,
+  ̲  ̲ ̲ ̲Compiler.Constants.evmModulus, hzero, hmod]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:417:4: This simp argument is unused:
+  ContractState.storage
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.redeem, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getMapping,
+  ̵  ̵ ̵ ̵_root_.Verity.setMapping,
+  ̲  ̲ ̲ ̲_root_.Verity.setMappingUint,
+  ̵  ̵ ̵ ̵AddressTxContract.paused, AddressTxContract.balances,
+      AddressTxContract.allowances, AddressTxContract.owners,
+  ̵  ̵ ̵ ̵AddressTxContract.claimed,
+  ̲  ̲ ̲ ̲AddressTxContract.recipients,
+  ̵  ̵ ̵ ̵ContractState.readSlot, ContractState.writeSlot,
+      ContractState.readMap, ContractState.writeMap,
+  ̵  ̵ ̵ ̵ContractState.readMap2, ContractState.writeMap2,
+      ContractState.readMapUint, ContractState.writeMapUint,
+  ̵  ̵ ̵ ̵ContractState.storage,̵ ̵C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵s̵t̵o̵r̵a̵g̵e̵Map,
+      ContractState.storageMap2, ContractState.storageMapUint,
+  ̵  ̵ ̵ ̵Verity.Core.Uint256.ofNat,
+  ̲  ̲ ̲ ̲Verity.Core.Uint256.modulus,
+  ̵  ̵ ̵ ̵Verity.Core.UINT256_MODULUS, Compiler.Constants.evmModulus, hzero,
+  ̲  ̲ ̲ ̲hmod]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:418:4: This simp argument is unused:
+  ContractState.storageMap2
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.redeem, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getMapping,
+  ̵  ̵ ̵ ̵_root_.Verity.setMapping,
+  ̲  ̲ ̲ ̲_root_.Verity.setMappingUint,
+  ̵  ̵ ̵ ̵AddressTxContract.paused, AddressTxContract.balances,
+      AddressTxContract.allowances, AddressTxContract.owners,
+  ̵  ̵ ̵ ̵AddressTxContract.claimed,
+  ̲  ̲ ̲ ̲AddressTxContract.recipients,
+  ̵  ̵ ̵ ̵ContractState.readSlot, ContractState.writeSlot,
+      ContractState.readMap, ContractState.writeMap,
+  ̵  ̵ ̵ ̵ContractState.readMap2, ContractState.writeMap2,
+      ContractState.readMapUint, ContractState.writeMapUint,
+  ̵  ̵ ̵ ̵ContractState.storage, ̵C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵s̵t̵o̵r̵a̵g̵e̵M̵a̵p̵,̵
+      ContractState.storageMap2̵, ContractState.storageMapUint,
+  ̵  ̵ ̵ ̵Verity.Core.Uint256.ofNat,
+  ̲  ̲ ̲ ̲Verity.Core.Uint256.modulus,
+  ̵  ̵ ̵ ̵Verity.Core.UINT256_MODULUS, Compiler.Constants.evmModulus, hzero,
+  ̲  ̲ ̲ ̲hmod]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:420:33: This simp argument is unused:
+  Compiler.Constants.evmModulus
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.redeem, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getMapping,
+  ̵  ̵ ̵ ̵_root_.Verity.setMapping,
+  ̲  ̲ ̲ ̲_root_.Verity.setMappingUint,
+  ̵  ̵ ̵ ̵AddressTxContract.paused, AddressTxContract.balances,
+      AddressTxContract.allowances, AddressTxContract.owners,
+  ̵  ̵ ̵ ̵AddressTxContract.claimed,
+  ̲  ̲ ̲ ̲AddressTxContract.recipients,
+  ̵  ̵ ̵ ̵ContractState.readSlot, ContractState.writeSlot,
+      ContractState.readMap, ContractState.writeMap,
+  ̵  ̵ ̵ ̵ContractState.readMap2, ContractState.writeMap2,
+      ContractState.readMapUint, ContractState.writeMapUint,
+  ̵  ̵ ̵ ̵ContractState.storage,
+  ̲  ̲ ̲ ̲ContractState.storageMap,
+  ̵  ̵ ̵ ̵ContractState.storageMap2, ContractState.storageMapUint,
+      Verity.Core.Uint256.ofNat, Verity.Core.Uint256.modulus,
+  ̵  ̵ ̵ ̵Verity.Core.UINT256_MODULUS, C̵o̵m̵p̵i̵l̵h̲z̲er.̵C̵on̵s̵t̵a̵n̵t̵s̵.̵e̵v̵m̵M̵o̵d̵u̵l̵u̵s̵,
+  ̲ h̵z̵e̵r̵o̵,̵  ̲ ̲hmod]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:420:64: This simp argument is unused:
+  hzero
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.redeem, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getMapping,
+  ̵  ̵ ̵ ̵_root_.Verity.setMapping,
+  ̲  ̲ ̲ ̲_root_.Verity.setMappingUint,
+  ̵  ̵ ̵ ̵AddressTxContract.paused, AddressTxContract.balances,
+      AddressTxContract.allowances, AddressTxContract.owners,
+  ̵  ̵ ̵ ̵AddressTxContract.claimed,
+  ̲  ̲ ̲ ̲AddressTxContract.recipients,
+  ̵  ̵ ̵ ̵ContractState.readSlot, ContractState.writeSlot,
+      ContractState.readMap, ContractState.writeMap,
+  ̵  ̵ ̵ ̵ContractState.readMap2, ContractState.writeMap2,
+      ContractState.readMapUint, ContractState.writeMapUint,
+  ̵  ̵ ̵ ̵ContractState.storage,
+  ̲  ̲ ̲ ̲ContractState.storageMap,
+  ̵  ̵ ̵ ̵ContractState.storageMap2, ContractState.storageMapUint,
+      Verity.Core.Uint256.ofNat, Verity.Core.Uint256.modulus,
+  ̵  ̵ ̵ ̵Verity.Core.UINT256_MODULUS,
+  ̲  ̲ ̲ ̲Compiler.Constants.evmModulus, hz̵e̵r̵o̵,̵ ̵h̵mod]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:420:71: This simp argument is unused:
+  hmod
+
+Hint: Omit it from the simp argument list.
+  simp_all (config := { maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[executePinnedSource, stateFor, observeAddress,
+  ̲  ̲ ̲ ̲sourceAddressView, run, admitted,
+  ̵  ̵ ̵ ̵successfulPost, AddressTxContract.redeem, ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵
+      _root_.Verity.r̲e̲q̲u̲i̲r̲e̲,̲ ̲_̲r̲o̲o̲t̲_̲.̲V̲e̲r̲i̲t̲y̲.̲Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.msgSender, _root_.Verity.getMapping,
+  ̵  ̵ ̵ ̵_root_.Verity.setMapping,
+  ̲  ̲ ̲ ̲_root_.Verity.setMappingUint,
+  ̵  ̵ ̵ ̵AddressTxContract.paused, AddressTxContract.balances,
+      AddressTxContract.allowances, AddressTxContract.owners,
+  ̵  ̵ ̵ ̵AddressTxContract.claimed,
+  ̲  ̲ ̲ ̲AddressTxContract.recipients,
+  ̵  ̵ ̵ ̵ContractState.readSlot, ContractState.writeSlot,
+      ContractState.readMap, ContractState.writeMap,
+  ̵  ̵ ̵ ̵ContractState.readMap2, ContractState.writeMap2,
+      ContractState.readMapUint, ContractState.writeMapUint,
+  ̵  ̵ ̵ ̵ContractState.storage,
+  ̲  ̲ ̲ ̲ContractState.storageMap,
+  ̵  ̵ ̵ ̵ContractState.storageMap2, ContractState.storageMapUint,
+      Verity.Core.Uint256.ofNat, Verity.Core.Uint256.modulus,
+  ̵  ̵ ̵ ̵Verity.Core.UINT256_MODULUS,
+  ̲  ̲ ̲ ̲Compiler.Constants.evmModulus, hzero,̵ ̵h̵m̵o̵d̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:424:5: This simp argument is unused:
+  _root_.Verity.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵b̵i̵n̵d̵,̵ ̵B̵i̵n̵d̵.̵b̵i̵n̵d̵,̵[̲B̲i̲n̲d̲.̲b̲i̲n̲d̲,̲ _root_.Verity.setMappingUint, ContractState.writeMapUint,
+  ̲  ̲ ̲ ̲ContractState.readMapUint, ContractState.storageMapUint, Nat.mod_eq_of_lt hAmount]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:424:25: This simp argument is unused:
+  Bind.bind
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 })
+  ̵  ̵ ̵ ̵[_root_.Verity.bind, B̵i̵n̵d̵.̵b̵i̵n̵d̵,̵ ̵_root_.Verity.setMappingUint,
+       ̵ ̵ContractState.writeMapUint, ContractState.readMapUint,
+  ̵  ̵ ̵ ̵ ̵ ̵ContractState.storageMapUint,
+  ̲  ̲ ̲ ̲Nat.mod_eq_of_lt hAmount]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:424:36: This simp argument is unused:
+  _root_.Verity.setMappingUint
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [_root_.Verity.bind, Bind.bind, _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵s̵e̵t̵M̵a̵p̵p̵i̵n̵g̵U̵i̵n̵t̵,̵ContractState.writeMapUint,
+      ContractState.readMapUint, ContractState.storageMapUint, Nat.mod_eq_of_lt hAmount]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:425:6: This simp argument is unused:
+  ContractState.writeMapUint
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [_root_.Verity.bind, Bind.bind, _root_.Verity.setMappingUint,
+      C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵w̵r̵i̵t̵e̵M̵a̵p̵U̵i̵n̵t̵,̵ ̵ContractState.readMapUint, ContractState.storageMapUint, Nat.mod_eq_of_lt hAmount]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:425:34: This simp argument is unused:
+  ContractState.readMapUint
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [_root_.Verity.bind, Bind.bind, _root_.Verity.setMappingUint,
+      ContractState.writeMapUint, C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵r̵e̵a̵d̵M̵a̵p̵U̵i̵n̵t̵,̵ContractState.storageMapUint, Nat.mod_eq_of_lt hAmount]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressTx.lean:426:6: This simp argument is unused:
+  ContractState.storageMapUint
+
+Hint: Omit it from the simp argument list.
+  simp_all (config :=
+  ̲  ̲ ̲ ̲{ maxSteps := 1000000 }) [_root_.Verity.bind, Bind.bind, _root_.Verity.setMappingUint,
+      ContractState.writeMapUint, ContractState.readMapUint, C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵s̵t̵o̵r̵a̵g̵e̵M̵a̵p̵U̵i̵n̵t̵,̵ ̵Nat.mod_eq_of_lt hAmount]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+ℹ [1267/1267] Built LidoSRv3.Audit.Guarantees.PAddress1 (1.7s)
+info: LidoSRv3/Audit/Guarantees/PAddress1.lean:353:0: 'LidoSRv3.Audit.Guarantees.PAddress1.actual_claim_recipient_effect' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Guarantees/PAddress1.lean:354:0: 'LidoSRv3.Audit.Guarantees.PAddress1.actual_claim_withdrawals_to_chain' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Guarantees/PAddress1.lean:355:0: 'LidoSRv3.Audit.Guarantees.PAddress1.actual_claim_withdrawals_failure_restores' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+Build completed successfully (1267 jobs).

@@ -23,9 +23,11 @@ LIBRARY_ROOTS = ("LidoSRv3.lean",)
 # Reconciled at main 02b53a15: 73 already-integrated TrioConsolidation TEST
 # sites, with the prior 218-site inventory unchanged. See
 # audit/metadata-reconcile/native-decide-inventory.json for the exact delta.
+# Corrected295 consolidation tests add85 sites and move existing test lines.
+# Exact delta: audit/consolidation-gateway-call/native-inventory.json.
 # This records native-backed regressions; it does not grant kernel-proof credit.
-NATIVE_DECIDE_COUNT = 291
-NATIVE_DECIDE_SHA256 = "3310d7fb45c1d44c33d253422373e14e900f1b21b77b0a20e2131923065c8d68"
+NATIVE_DECIDE_COUNT = 376
+NATIVE_DECIDE_SHA256 = "db5c6eb6b3bd6e17da32a3eeeb08bc460c427790963870ef3da1cfb86b6526eb"
 ESCAPES = (
     ("sorry", re.compile(r"\bsorry\b")),
     ("admit", re.compile(r"\badmit\b")),
