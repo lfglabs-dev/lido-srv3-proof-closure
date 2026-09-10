@@ -6,5 +6,5 @@ package accountAddress where
 
 @[default_target]
 lean_lib AccountAddress where
-  roots := #[`PAccount1, `PAddress1, `Tests.Verity.PAccount1Test,
-    `Tests.Verity.PAddress1Test]
+  roots := #[`PAccount1, `ReportWriteFee, `PAddress1, `Tests.Verity.PAccount1Test,
+    `Tests.Verity.ReportWriteFeeTest, `Tests.Verity.PAddress1Test]
