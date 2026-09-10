@@ -1,0 +1,34 @@
+Compiling 1 files with Solc 0.8.25
+Solc 0.8.25 finished in 182.38ms
+Compiler run successful with warnings:
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+ --> test/Settlement.t.sol:8:1:
+  |
+8 | contract SettlementInbox {
+  | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> test/Settlement.t.sol:15:2:
+   |
+15 |  fallback() external payable {
+   |  ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (5159): "selfdestruct" has been deprecated. Note that, starting from the Cancun hard fork, the underlying opcode no longer deletes the code and data associated with an account and only transfers its Ether to the beneficiary, unless executed in the same transaction in which the contract was created (see EIP-6780). Any use in newly deployed contracts is strongly discouraged even if the new behavior is taken into account. Future changes to the EVM might further reduce the functionality of the opcode.
+  --> test/Settlement.t.sol:37:47:
+   |
+37 |  constructor(address payable target) payable {selfdestruct(target);}
+   |                                               ^^^^^^^^^^^^
+
+
+Ran 9 tests for test/Settlement.t.sol:SettlementTest
+[PASS] testAcceptedRefundCallbackCannotEvadeGatewayBalanceAssertion() (gas: 1324463)
+[PASS] testCheckedProductOverflowBeforeVault() (gas: 1144972)
+[PASS] testCodeLessVaultFailsTypedReturnDecode() (gas: 1118114)
+[PASS] testEOARefundAndZeroRecipientFallback() (gas: 1313382)
+[PASS] testFeeRequotedOnVaultCreditedWorld() (gas: 1178837)
+[PASS] testRefundFailureRollsBackVaultStorageAndTransfers() (gas: 1411449)
+[PASS] testRefundSeesPriorVaultEffects() (gas: 1404259)
+[PASS] testShortFeeAndFeeReadFailure() (gas: 1197473)
+[PASS] testZeroRefundSkipsRejectingRecipient() (gas: 1374784)
+Suite result: ok. 9 passed; 0 failed; 0 skipped; finished in 1.05ms (4.44ms CPU time)
+
+Ran 1 test suite in 126.25ms (1.05ms CPU time): 9 tests passed, 0 failed, 0 skipped (9 total tests)

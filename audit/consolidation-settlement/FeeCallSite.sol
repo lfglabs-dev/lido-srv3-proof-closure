@@ -1,0 +1,1 @@
+pragma solidity 0.8.25; interface IVault { function getConsolidationRequestFee() external view returns(uint256); } contract FeeCallSite { function quote(IVault v) external view returns(uint256) { return v.getConsolidationRequestFee(); } }
