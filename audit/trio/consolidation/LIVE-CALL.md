@@ -1,5 +1,16 @@
 # Consolidation Live CALL validation packet
 
+> Historical packet of the `33b6053` increment (PR #281, merged as
+> `7db9187e`; independent review in `review-281/`). Four of its residuals
+> were internal obligations and are closed on this branch by
+> `LOW-LEVEL-CALL.md`: the CALL primitive is now `lowLevelCall` (no
+> target-code guard), the fee is read by an actual `staticcall("")`, the
+> callee frame is derived from the concrete predeploy body, and the
+> gateway→vault ABI hop is composed. Theorem names below that changed:
+> `callAdd_no_code` (revert on a code-less target) is replaced by
+> `callAdd_no_code_accepted`; `CallData.invoke` rows now read
+> `lowLevelCall`. Everything else in this packet is unchanged.
+
 Pin: `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`.
 PR: #281 (`p-consolidation-pubkey-octets`).
 Parent held: `d2983de830161b9317d43c12269f88591d392144`.
@@ -23,7 +34,7 @@ attempted calls). The root transaction runs under `Live.run`.
 | Source | Model |
 | --- | --- |
 | 114 `abi.encodePacked(sourcePubkey, targetPubkey)` | `(hopRequest ..).payload = source ++ target` (`hopRequest_payload`, `hopRequest_is_packed`) |
-| 115 `CONSOLIDATION_REQUEST.call{value: fee}(request)` | `CallData.invoke callee ctx inbox (vaultCallPayload pair) fee` |
+| 115 `CONSOLIDATION_REQUEST.call{value: fee}(request)` | `lowLevelCall callee ctx inbox (vaultCallPayload pair) fee` (was `CallData.invoke`; see `LOW-LEVEL-CALL.md`) |
 | 116-118 `revert RequestAdditionFailed(request)` | `Fault.reason "RequestAdditionFailed"`, world restored (`callAdd_fault`, `callAdd_error_restores`) |
 | 120 `emit ConsolidationRequestAdded(request)` | `requestAddedEvent` appended to the callee world (`callAdd_success`, `callAdd_accepted`) |
 
@@ -57,7 +68,7 @@ attempted calls). The root transaction runs under `Live.run`.
 | Failed hop is the vault's own error, world restored, no event | `callAdd_fault`, `callAdd_error_restores` |
 | Successful hop: one accepted attempt, event appended | `callAdd_success` |
 | Successful hop needs code and funds | `callAdd_success_funded` |
-| Concrete arms: no code / unfunded / rejected / accepted | `callAdd_no_code`, `callAdd_unfunded`, `callAdd_rejected`, `callAdd_accepted` |
+| Concrete arms: no code (accepted) / unfunded / rejected / accepted | `callAdd_no_code_accepted` (was `callAdd_no_code`), `callAdd_unfunded`, `callAdd_rejected`, `callAdd_accepted` |
 | Provisional `fee` transfer is the CALL ledger rule | `callAdd_credited_balances` |
 | Committed loop: all widths 48, one accepted request per pair in order | `loop_success` |
 | Any loop attempt is a request for a pair of the batch | `loop_attempt_request` |
@@ -73,19 +84,22 @@ where used. They are not asserted about the predeploy.
 
 ## Residuals (stated, not claimed)
 
-* Solidity low-level `.call` does not check callee code; `CallData.invoke`
-  fails with `Fault.empty` on a code-less target. The model reverts where
-  the source would succeed (vault hop and refund recipient alike). Success
-  theorems are stated on the funded, code-present paths.
+* ~~Solidity low-level `.call` does not check callee code; `CallData.invoke`
+  fails with `Fault.empty` on a code-less target.~~ Closed on this branch:
+  `lowLevelCall` has no target-code guard (`LOW-LEVEL-CALL.md`).
 * `RequestAdditionFailed(request)` / `InvalidPublicKeyLength(pubkey)` are
   `Fault.reason` names; the failed request octets remain in the attempt
   trace.
-* `_getFeeFromContract` (STATICCALL) is a supplied word. `FeeReadFailed`,
-  `FeeInvalidData` are not modeled.
+* ~~`_getFeeFromContract` (STATICCALL) is a supplied word. `FeeReadFailed`,
+  `FeeInvalidData` are not modeled.~~ Closed on this branch:
+  `getConsolidationRequestFee` is an actual `lowLevelStaticCall` with the
+  source ladder (`LOW-LEVEL-CALL.md`).
 * Checked-multiplication overflow and the modifier `assert` are
   `Fault.reason "Panic(0x11)"` / `"Panic(0x01)"`, not ABI panic data.
-* Gateway→vault ABI hop (`bytes[]` pairs, line 220) and the EIP-7251
-  callee body remain OPEN.
+* ~~Gateway→vault ABI hop (`bytes[]` pairs, line 220) and the EIP-7251
+  callee body remain OPEN.~~ Composed / given a concrete body on this branch
+  (`Composition.lean`, `Predeploy.lean`); the EIP-7251 fee-update rule and
+  the selector keccak remain OPEN (`LOW-LEVEL-CALL.md`).
 
 ## Tests
 
@@ -120,7 +134,7 @@ True compiler exit (no `tee`). Lean 4.31.0.
 | `callAdd_error_restores` | `propext`, `Quot.sound` |
 | `callAdd_success` | `propext`, `Quot.sound` |
 | `callAdd_success_funded` | `propext`, `Quot.sound` |
-| `callAdd_no_code` | `propext` |
+| `callAdd_no_code` (now `callAdd_no_code_accepted`) | `propext` |
 | `callAdd_unfunded` | `propext` |
 | `callAdd_rejected` | `propext` |
 | `callAdd_accepted` | `propext` |

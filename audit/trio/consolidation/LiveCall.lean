@@ -1,16 +1,16 @@
 import audit.trio.consolidation.Producer
 import audit.trio.consolidation.Gateway
-import LidoSRv3.Audit.Source.TrioReserve1.CallData
+import audit.trio.consolidation.LowLevel
 import LidoSRv3.Audit.Source.TrioReserve1.CallFlow
-import LidoSRv3.Audit.Source.TrioReserve1.CallDataFlow
 
 /-!
 # Live CALL of the vault hop (`WithdrawalVaultEIP7685.sol:113-121`)
 
 The producer increment stopped at the concatenation `source ++ target`.
-This file consumes that payload as the argument of an actual
-`Live.CallData.invoke` in the existing physical `Live.World` (Verity storage
-lenses, account balances, committed logs, attempted calls):
+This file consumes that payload as the argument of an actual low-level CALL
+(`lowLevelCall`, the EVM CALL opcode rule without a target-code precheck) in
+the existing physical `Live.World` (Verity storage lenses, account balances,
+committed logs, attempted calls):
 
 ```
 function _callAddConsolidationRequest(
@@ -25,38 +25,43 @@ function _callAddConsolidationRequest(
 
 * `hopRequest` is the CALL of line 115: callee `CONSOLIDATION_REQUEST`,
   value `fee`, payload `vaultCallPayload pair = source ++ target`.
-* `callAddConsolidationRequest` is that CALL through `CallData.invoke`,
+* `callAddConsolidationRequest` is that CALL through `lowLevelCall`,
   then the source's own revert (`RequestAdditionFailed`) on a failed CALL,
-  then `emit ConsolidationRequestAdded(request)` on success.
+  then `emit ConsolidationRequestAdded(request)` on success. Low-level
+  `.call` has no target-code guard: a code-less target accepts with empty
+  return data after the value transfer (`callAdd_no_code_accepted`).
 * `addConsolidationRequestsLoop` is the per-pair loop of lines 68-72
   (`_validatePublicKey` source, `_validatePublicKey` target, hop).
+* `getConsolidationRequestFee` is `_getConsolidationRequestFee` /
+  `_getFeeFromContract(CONSOLIDATION_REQUEST)` (lines 79-95): an actual
+  low-level `staticcall("")`, then the `FeeReadFailed` / `FeeInvalidData`
+  ladder, then the 32-byte decode. The fee is read, not supplied.
 * `addConsolidationRequestsVault` is `WithdrawalVault.addConsolidationRequests`
   (`WithdrawalVault.sol:199-208`) with the inherited guards of lines 60-66
   and the `preservesEthBalance` modifier (`WithdrawalVault.sol:81-85`).
 * `executeVault` is the root transaction under `Live.run`: any failure
   restores every slot, balance and committed event of the entry world.
 * `refundFee` is `ConsolidationGateway._refundFee`
-  (`ConsolidationGateway.sol:295-307`) as the same CALL primitive with an
-  empty payload and value `refund`.
+  (`ConsolidationGateway.sol:295-307`) as the same low-level CALL primitive
+  with an empty payload and value `refund`. The refund recipient may be an
+  EOA: `refund_no_code_accepted`.
 
-The callee is an arbitrary `External`. Frame conditions on accepted replies
-(`LogFrame`, `BalanceFrame`) are explicit premises where a theorem needs
-them; they are not asserted about the EIP-7251 predeploy.
+The vault-hop callee is an arbitrary `External`. Frame conditions on accepted
+replies (`LogFrame`, `BalanceFrame`) are explicit premises where a generic
+theorem needs them; `Predeploy.lean` derives them from the concrete EIP-7251
+body instead of assuming them.
 
 ## Residuals (stated, not claimed)
 
-* Solidity's low-level `.call` does not check callee code. `CallData.invoke`
-  fails with `Fault.empty` on a code-less target. On such a target the model
-  reverts where the source would succeed; every success theorem below is
-  therefore stated on the funded, code-present paths.
 * `RequestAdditionFailed(request)` and `InvalidPublicKeyLength(pubkey)`
   carry their argument in the source. Here the fault is `Fault.reason`
   with the error name; the request octets of the failed hop remain
   observable in the attempt trace (`callAdd_attempt_request`).
-* `_getFeeFromContract` (STATICCALL, lines 83-95) is a supplied word, as in
-  `SourceExecution.lean`. `FeeReadFailed` / `FeeInvalidData` are not modeled.
-* The gateway→vault ABI hop (`bytes[]` pairs, `ConsolidationGateway.sol:220`)
-  and the EIP-7251 callee body remain OPEN.
+* Checked-multiplication overflow and the modifier `assert` are
+  `Fault.reason "Panic(0x11)"` / `"Panic(0x01)"`, not ABI panic data.
+* The EIP-7251 fake-exponential fee update rule is abstracted into the
+  predeploy fee slot (`Predeploy.lean`); per-block excess updates remain
+  OPEN. The gateway→vault ABI hop is composed in `Composition.lean`.
 
 Pin `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`.
 Codec lemmas are reused, not reopened. P-CONSOLIDATION remains OPEN.
@@ -81,41 +86,21 @@ def hopRequest (ctx : Context) (inbox : Live.Address) (pair : ProducedPair)
     (fee : Live.Word) : Request :=
   ⟨ctx.self, inbox, fee, vaultCallPayload pair⟩
 
-/-- Lines 113-121 in the physical world. The CALL primitive is
-`CallData.invoke` on the producer payload and the per-request fee. A failed
-CALL is the vault's own `RequestAdditionFailed` revert; success appends the
-`ConsolidationRequestAdded` event to the callee-returned world. -/
+/-- Lines 113-121 in the physical world. The CALL primitive is the low-level
+opcode rule `lowLevelCall` (no target-code guard) on the producer payload and
+the per-request fee. A failed CALL is the vault's own `RequestAdditionFailed`
+revert; success appends the `ConsolidationRequestAdded` event to the
+callee-returned world (or, for a code-less target, to the transferred
+world). -/
 def callAddConsolidationRequest (callee : External) (ctx : Context)
     (inbox : Live.Address) (pair : ProducedPair) (fee : Live.Word) : Exec Unit := fun w =>
   let request := vaultCallPayload pair
-  let r := CallData.invoke callee ctx inbox request fee w
+  let r := lowLevelCall callee ctx inbox request fee w
   match r.outcome with
   | .ok _ =>
       ⟨.ok (), { r.world with logs := r.world.logs ++ [requestAddedEvent ctx.self request] },
         r.attempts⟩
   | .error _ => ⟨.error (.reason "RequestAdditionFailed"), r.world, r.attempts⟩
-
-/-- Exhaustive shape of the CALL primitive on any world. -/
-private theorem invoke_shape (callee : External) (ctx : Context) (target : Live.Address)
-    (payload : Bytes) (value : Live.Word) (w : World) :
-    CallData.invoke callee ctx target payload value w = ⟨.error .empty, w, []⟩ ∨
-    CallData.invoke callee ctx target payload value w =
-      ⟨.error (.bubbled []), w, [⟨⟨ctx.self, target, value, payload⟩, false, [], []⟩]⟩ ∨
-    (∃ data nested, CallData.invoke callee ctx target payload value w =
-      ⟨.error (.bubbled data), w, [⟨⟨ctx.self, target, value, payload⟩, false, data, nested⟩]⟩) ∨
-    (∃ data after nested, CallData.invoke callee ctx target payload value w =
-      ⟨.ok data, after, [⟨⟨ctx.self, target, value, payload⟩, true, data, nested⟩]⟩) := by
-  unfold CallData.invoke
-  dsimp only
-  split
-  · exact Or.inl rfl
-  · split
-    · exact Or.inr (Or.inl rfl)
-    · split
-      · exact Or.inr (Or.inr (Or.inl ⟨_, [], rfl⟩))
-      · exact Or.inr (Or.inr (Or.inr ⟨_, _, [], rfl⟩))
-      · exact Or.inr (Or.inr (Or.inr ⟨_, _, _, rfl⟩))
-      · exact Or.inr (Or.inr (Or.inl ⟨_, _, rfl⟩))
 
 /-- The CALL payload is the producer concatenation and the value is `fee`. -/
 theorem hopRequest_payload (ctx : Context) (inbox : Live.Address) (pair : ProducedPair)
@@ -148,18 +133,31 @@ theorem callAdd_attempt_request (callee : External) (ctx : Context) (inbox : Liv
     (pair : ProducedPair) (fee : Live.Word) (w : World) (a : Attempt)
     (ha : a ∈ (callAddConsolidationRequest callee ctx inbox pair fee w).attempts) :
     a.request = hopRequest ctx inbox pair fee := by
-  rcases invoke_shape callee ctx inbox (vaultCallPayload pair) fee w with
-    h | h | ⟨data, nested, h⟩ | ⟨data, after, nested, h⟩ <;>
-    simp [callAddConsolidationRequest, h] at ha <;> simp [ha, hopRequest]
+  rcases lowLevelCall_shape callee ctx inbox (vaultCallPayload pair) fee w with
+    ⟨-, h⟩ | ⟨-, -, h⟩ | ⟨-, -, h⟩
+  · simp [callAddConsolidationRequest, h] at ha
+    simp [ha, hopRequest]
+  · simp [callAddConsolidationRequest, h] at ha
+    simp [ha, hopRequest]
+  · rcases h with ⟨data, -, h⟩ | ⟨data, nested, -, h⟩ | ⟨data, after, -, h⟩ |
+        ⟨data, after, nested, -, h⟩ <;>
+      simp [callAddConsolidationRequest, h] at ha <;> simp [ha, hopRequest]
 
 /-- Failed hop: the fault is the vault's own error, not bubbled callee data. -/
 theorem callAdd_fault (callee : External) (ctx : Context) (inbox : Live.Address)
     (pair : ProducedPair) (fee : Live.Word) (w : World) (fault : Fault)
     (h : (callAddConsolidationRequest callee ctx inbox pair fee w).outcome = .error fault) :
     fault = .reason "RequestAdditionFailed" := by
-  rcases invoke_shape callee ctx inbox (vaultCallPayload pair) fee w with
-    hs | hs | ⟨data, nested, hs⟩ | ⟨data, after, nested, hs⟩ <;>
-    simp [callAddConsolidationRequest, hs] at h <;> exact h.symm
+  rcases lowLevelCall_shape callee ctx inbox (vaultCallPayload pair) fee w with
+    ⟨-, hs⟩ | ⟨-, -, hs⟩ | ⟨-, -, hs⟩
+  · simp [callAddConsolidationRequest, hs] at h
+    exact h.symm
+  · simp [callAddConsolidationRequest, hs] at h
+  · rcases hs with ⟨data, -, hs⟩ | ⟨data, nested, -, hs⟩ | ⟨data, after, -, hs⟩ |
+        ⟨data, after, nested, -, hs⟩ <;>
+      simp [callAddConsolidationRequest, hs] at h
+    · exact h.symm
+    · exact h.symm
 
 /-- Failed hop restores the incoming world: the provisional value transfer
 and every callee effect are rolled back, and no event is committed. -/
@@ -167,63 +165,78 @@ theorem callAdd_error_restores (callee : External) (ctx : Context) (inbox : Live
     (pair : ProducedPair) (fee : Live.Word) (w : World) (fault : Fault)
     (h : (callAddConsolidationRequest callee ctx inbox pair fee w).outcome = .error fault) :
     (callAddConsolidationRequest callee ctx inbox pair fee w).world = w := by
-  rcases invoke_shape callee ctx inbox (vaultCallPayload pair) fee w with
-    hs | hs | ⟨data, nested, hs⟩ | ⟨data, after, nested, hs⟩ <;>
-    simp [callAddConsolidationRequest, hs] at h ⊢
+  rcases lowLevelCall_shape callee ctx inbox (vaultCallPayload pair) fee w with
+    ⟨-, hs⟩ | ⟨-, -, hs⟩ | ⟨-, -, hs⟩
+  · simp [callAddConsolidationRequest, hs] at h ⊢
+  · simp [callAddConsolidationRequest, hs] at h
+  · rcases hs with ⟨data, -, hs⟩ | ⟨data, nested, -, hs⟩ | ⟨data, after, -, hs⟩ |
+        ⟨data, after, nested, -, hs⟩ <;>
+      simp [callAddConsolidationRequest, hs] at h ⊢
 
 /-- Successful hop: exactly one accepted attempt with the line-115 request,
 and the committed world is the callee-returned world plus the
-`ConsolidationRequestAdded(request)` event. -/
+`ConsolidationRequestAdded(request)` event. The code-less (EOA) arm is the
+`data = []`, `after = transfer w ctx.self inbox fee.val`, `nested = []`
+instance. -/
 theorem callAdd_success (callee : External) (ctx : Context) (inbox : Live.Address)
     (pair : ProducedPair) (fee : Live.Word) (w : World)
     (h : (callAddConsolidationRequest callee ctx inbox pair fee w).outcome = .ok ()) :
     ∃ data after nested,
-      CallData.invoke callee ctx inbox (vaultCallPayload pair) fee w =
+      lowLevelCall callee ctx inbox (vaultCallPayload pair) fee w =
         ⟨.ok data, after, [⟨hopRequest ctx inbox pair fee, true, data, nested⟩]⟩ ∧
       (callAddConsolidationRequest callee ctx inbox pair fee w).world =
         { after with logs := after.logs ++ [requestAddedEvent ctx.self (vaultCallPayload pair)] } ∧
       (callAddConsolidationRequest callee ctx inbox pair fee w).attempts =
         [⟨hopRequest ctx inbox pair fee, true, data, nested⟩] := by
-  rcases invoke_shape callee ctx inbox (vaultCallPayload pair) fee w with
-    hs | hs | ⟨data, nested, hs⟩ | ⟨data, after, nested, hs⟩
+  rcases lowLevelCall_shape callee ctx inbox (vaultCallPayload pair) fee w with
+    ⟨-, hs⟩ | ⟨-, -, hs⟩ | ⟨-, -, hs⟩
   · simp [callAddConsolidationRequest, hs] at h
-  · simp [callAddConsolidationRequest, hs] at h
-  · simp [callAddConsolidationRequest, hs] at h
-  · exact ⟨data, after, nested, hs, by simp [callAddConsolidationRequest, hs],
+  · exact ⟨[], _, [], hs, by simp [callAddConsolidationRequest, hs],
       by simp [callAddConsolidationRequest, hs, hopRequest]⟩
+  · rcases hs with ⟨data, -, hs⟩ | ⟨data, nested, -, hs⟩ | ⟨data, after, -, hs⟩ |
+        ⟨data, after, nested, -, hs⟩
+    · simp [callAddConsolidationRequest, hs] at h
+    · simp [callAddConsolidationRequest, hs] at h
+    · exact ⟨data, after, [], hs, by simp [callAddConsolidationRequest, hs],
+        by simp [callAddConsolidationRequest, hs, hopRequest]⟩
+    · exact ⟨data, after, nested, hs, by simp [callAddConsolidationRequest, hs],
+        by simp [callAddConsolidationRequest, hs, hopRequest]⟩
 
-/-- Successful hop requires callee code and a funded caller. -/
+/-- Successful hop requires a funded caller. The target needs no code: the
+low-level CALL accepts code-less recipients (EOA). -/
 theorem callAdd_success_funded (callee : External) (ctx : Context) (inbox : Live.Address)
     (pair : ProducedPair) (fee : Live.Word) (w : World)
     (h : (callAddConsolidationRequest callee ctx inbox pair fee w).outcome = .ok ()) :
-    (w.core.codeSize inbox.val).val ≠ 0 ∧ fee.val ≤ w.balances ctx.self := by
+    fee.val ≤ w.balances ctx.self := by
   obtain ⟨data, after, nested, hinv, -, -⟩ := callAdd_success callee ctx inbox pair fee w h
-  have hd := CallDataFlow.to_spec callee ctx inbox (vaultCallPayload pair) fee w after
-    (.ok data) [⟨hopRequest ctx inbox pair fee, true, data, nested⟩] hinv
-  unfold CallDataFlow.Describes at hd
-  exact CallSpec.success_funded hd
+  exact lowLevelCall_success_funded callee ctx inbox (vaultCallPayload pair) fee w data after
+    [⟨hopRequest ctx inbox pair fee, true, data, nested⟩] hinv
 
 /-! ### Concrete reply arms -/
 
-/-- Callee code absent: `CallData.invoke` fails before any attempt. Residual:
-Solidity's low-level `.call` would succeed here (see module docstring). -/
-theorem callAdd_no_code (callee : External) (ctx : Context) (inbox : Live.Address)
+/-- Code-less target (EOA, or an undeployed address): the low-level CALL
+accepts with empty return data after the value transfer, so the vault emits
+`ConsolidationRequestAdded` and continues. This is the EVM rule the
+code-guarded primitive misstated. -/
+theorem callAdd_no_code_accepted (callee : External) (ctx : Context) (inbox : Live.Address)
     (pair : ProducedPair) (fee : Live.Word) (w : World)
-    (hc : (w.core.codeSize inbox.val).val = 0) :
+    (hc : (w.core.codeSize inbox.val).val = 0) (hb : fee.val ≤ w.balances ctx.self) :
     callAddConsolidationRequest callee ctx inbox pair fee w =
-      ⟨.error (.reason "RequestAdditionFailed"), w, []⟩ := by
-  unfold callAddConsolidationRequest CallData.invoke
-  simp [hc]
+      ⟨.ok (), { transfer w ctx.self inbox fee.val with
+          logs := w.logs ++ [requestAddedEvent ctx.self (vaultCallPayload pair)] },
+        [⟨hopRequest ctx inbox pair fee, true, [], []⟩]⟩ := by
+  unfold callAddConsolidationRequest lowLevelCall
+  simp [hc, Nat.not_lt.mpr hb, hopRequest, transfer]
 
 /-- Insufficient vault balance for `fee`: failed attempt, no callee run. -/
 theorem callAdd_unfunded (callee : External) (ctx : Context) (inbox : Live.Address)
     (pair : ProducedPair) (fee : Live.Word) (w : World)
-    (hc : (w.core.codeSize inbox.val).val ≠ 0) (hb : w.balances ctx.self < fee.val) :
+    (hb : w.balances ctx.self < fee.val) :
     callAddConsolidationRequest callee ctx inbox pair fee w =
       ⟨.error (.reason "RequestAdditionFailed"), w,
         [⟨hopRequest ctx inbox pair fee, false, [], []⟩]⟩ := by
-  unfold callAddConsolidationRequest CallData.invoke
-  simp [hc, hb, hopRequest]
+  unfold callAddConsolidationRequest lowLevelCall
+  simp [hb, hopRequest]
 
 /-- Callee rejects: the value transfer is rolled back, the vault reverts
 with `RequestAdditionFailed`, and no event is committed. -/
@@ -236,7 +249,7 @@ theorem callAdd_rejected (callee : External) (ctx : Context) (inbox : Live.Addre
       ⟨.error (.reason "RequestAdditionFailed"), w,
         [⟨hopRequest ctx inbox pair fee, false, data, []⟩]⟩ := by
   unfold hopRequest at hr ⊢
-  unfold callAddConsolidationRequest CallData.invoke
+  unfold callAddConsolidationRequest lowLevelCall
   simp [hc, Nat.not_lt.mpr hb, hr]
 
 /-- Callee accepts: the committed world is the callee's world after the
@@ -250,7 +263,7 @@ theorem callAdd_accepted (callee : External) (ctx : Context) (inbox : Live.Addre
       ⟨.ok (), { after with logs := after.logs ++ [requestAddedEvent ctx.self (vaultCallPayload pair)] },
         [⟨hopRequest ctx inbox pair fee, true, data, []⟩]⟩ := by
   unfold hopRequest at hr ⊢
-  unfold callAddConsolidationRequest CallData.invoke
+  unfold callAddConsolidationRequest lowLevelCall
   simp [hc, Nat.not_lt.mpr hb, hr]
 
 /-- The provisional transfer of the accepted hop is the CALL ledger rule:
@@ -433,28 +446,32 @@ private theorem callAdd_success_frame (callee : External) (ctx : Context) (inbox
       CallSpec.Balances w.balances
         (callAddConsolidationRequest callee ctx inbox pair fee w).world.balances
         ctx.self inbox fee.val := by
-  obtain ⟨hc, hb⟩ := callAdd_success_funded callee ctx inbox pair fee w h
-  have hshape := invoke_shape callee ctx inbox (vaultCallPayload pair) fee w
-  unfold CallData.invoke at hshape
-  simp only [hc, Nat.not_lt.mpr hb, if_false] at hshape
-  cases hr : callee ⟨ctx.self, inbox, fee, vaultCallPayload pair⟩ (transfer w ctx.self inbox fee.val) with
-  | rejected data =>
-      have := callAdd_rejected callee ctx inbox pair fee w data hc hb hr
-      rw [this] at h
-      simp at h
-  | rejectedWithTrace data nested =>
-      unfold callAddConsolidationRequest CallData.invoke at h
-      simp [hc, Nat.not_lt.mpr hb, hr] at h
-  | successWithTrace data after nested => exact absurd hr (hun _ _ _ _ _)
-  | success data after =>
-      rw [callAdd_accepted callee ctx inbox pair fee w after data hc hb hr]
-      have hl := hlog _ _ _ _ hr
-      have hbl := hbal _ _ _ _ hr
-      refine ⟨?_, ?_⟩
-      · simp only [hl]
-        rfl
-      · simp only [hbl]
-        exact CallFlow.transfer_balances w ctx.self inbox fee.val hb
+  have hb := callAdd_success_funded callee ctx inbox pair fee w h
+  by_cases hc : (w.core.codeSize inbox.val).val = 0
+  · -- EOA arm: no callee run; the transfer itself is the frame.
+    rw [callAdd_no_code_accepted callee ctx inbox pair fee w hc hb]
+    refine ⟨?_, ?_⟩
+    · rfl
+    · exact CallFlow.transfer_balances w ctx.self inbox fee.val hb
+  · cases hr : callee ⟨ctx.self, inbox, fee, vaultCallPayload pair⟩
+        (transfer w ctx.self inbox fee.val) with
+    | rejected data =>
+        have := callAdd_rejected callee ctx inbox pair fee w data hc hb hr
+        rw [this] at h
+        simp at h
+    | rejectedWithTrace data nested =>
+        unfold callAddConsolidationRequest lowLevelCall at h
+        simp [hc, Nat.not_lt.mpr hb, hr] at h
+    | successWithTrace data after nested => exact absurd hr (hun _ _ _ _ _)
+    | success data after =>
+        rw [callAdd_accepted callee ctx inbox pair fee w after data hc hb hr]
+        have hl := hlog _ _ _ _ hr
+        have hbl := hbal _ _ _ _ hr
+        refine ⟨?_, ?_⟩
+        · simp only [hl]
+          rfl
+        · simp only [hbl]
+          exact CallFlow.transfer_balances w ctx.self inbox fee.val hb
 
 /-- Aggregate ledger of `n` hops of `fee` each. -/
 private theorem balances_trans {before mid after : Live.Address → Nat}
@@ -531,14 +548,31 @@ def selfBalance (ctx : Context) : Exec Nat := fun w => ⟨.ok (w.balances ctx.se
 def pairsOf (sources targets : List Bytes) : List ProducedPair :=
   (sources.zip targets).map fun st => { source := st.1, target := st.2 }
 
+/-- `_getConsolidationRequestFee()` / `_getFeeFromContract(CONSOLIDATION_REQUEST)`
+(`WithdrawalVaultEIP7685.sol:79-95`): an actual low-level `staticcall("")` to
+the predeploy, then the source's own ladder — `FeeReadFailed` on a failed
+STATICCALL, `FeeInvalidData` on returndata other than 32 bytes, otherwise the
+big-endian word decode (`abi.decode(feeData, (uint256))`). A code-less target
+answers empty success, so it fails here as `FeeInvalidData`, matching the
+source. The fee is read, not supplied. -/
+def getConsolidationRequestFee (sexternal : StaticCall.External) (ctx : Context)
+    (inbox : Live.Address) : Exec Live.Word := fun w =>
+  let r := lowLevelStaticCall sexternal ctx.self inbox [] w
+  match r.outcome with
+  | .error _ => ⟨.error (.reason "FeeReadFailed"), w, []⟩
+  | .ok data =>
+      if data.length = 32 then ⟨.ok (Live.word (decode data)), w, []⟩
+      else ⟨.error (.reason "FeeInvalidData"), w, []⟩
+
 /-- `WithdrawalVault.addConsolidationRequests` (`WithdrawalVault.sol:199-208`)
 with the inherited guards (`WithdrawalVaultEIP7685.sol:60-66`) and the
 `preservesEthBalance` modifier (`WithdrawalVault.sol:81-85`). The entry world
-is the callee world after the payable credit of `msgValue`, as
-`CallData.invoke` hands it to a callee. `fee` is the supplied
-`_getConsolidationRequestFee()` word (STATICCALL open). -/
-def addConsolidationRequestsVault (callee : External) (ctx : Context)
-    (gateway inbox : Live.Address) (fee msgValue : Live.Word)
+is the callee world after the payable credit of `msgValue`, as the CALL rule
+hands it to a callee. `fee` is actually read by `getConsolidationRequestFee`
+(lines 65 / 79-95), after the `ZeroArgument` / `ArraysLengthMismatch` guards
+and before the checked exact-fee requirement, as in the source. -/
+def addConsolidationRequestsVault (callee : External) (sexternal : StaticCall.External)
+    (ctx : Context) (gateway inbox : Live.Address) (msgValue : Live.Word)
     (sources targets : List Bytes) : Exec Unit := do
   -- WithdrawalVault.sol:82  balanceBeforeCall = address(this).balance - msg.value
   let entry ← selfBalance ctx
@@ -548,6 +582,8 @@ def addConsolidationRequestsVault (callee : External) (ctx : Context)
   Live.require (decide (sources.length ≠ 0)) (.reason "ZeroArgument")
   -- WithdrawalVaultEIP7685.sol:62-63
   Live.require (decide (sources.length = targets.length)) (.reason "ArraysLengthMismatch")
+  -- WithdrawalVaultEIP7685.sol:65 / 79-95: the fee STATICCALL
+  let fee ← getConsolidationRequestFee sexternal ctx inbox
   -- WithdrawalVaultEIP7685.sol:66 / 123-126: checked `requestsCount * fee`, exact fee
   Live.require (decide (sources.length * fee.val < Verity.Core.UINT256_MODULUS))
     (.reason "Panic(0x11)")
@@ -559,33 +595,34 @@ def addConsolidationRequestsVault (callee : External) (ctx : Context)
   Live.require (decide (exit = entry - msgValue.val)) (.reason "Panic(0x01)")
 
 /-- Root transaction of the vault entrypoint under `Live.run`. -/
-def executeVault (callee : External) (ctx : Context) (gateway inbox : Live.Address)
-    (fee msgValue : Live.Word) (sources targets : List Bytes) (before : World) : Result Unit :=
-  Live.run (addConsolidationRequestsVault callee ctx gateway inbox fee msgValue sources targets)
-    before
+def executeVault (callee : External) (sexternal : StaticCall.External) (ctx : Context)
+    (gateway inbox : Live.Address) (msgValue : Live.Word)
+    (sources targets : List Bytes) (before : World) : Result Unit :=
+  Live.run (addConsolidationRequestsVault callee sexternal ctx gateway inbox msgValue
+    sources targets) before
 
 /-- Root revert restores the entire entry world: every account slot, balance
 and committed event, including those of earlier accepted hops. Attempted
 calls remain observable to the audit. -/
-theorem executeVault_failure_restores (callee : External) (ctx : Context)
-    (gateway inbox : Live.Address) (fee msgValue : Live.Word) (sources targets : List Bytes)
-    (before : World) (fault : Fault)
-    (h : (executeVault callee ctx gateway inbox fee msgValue sources targets before).outcome =
+theorem executeVault_failure_restores (callee : External) (sexternal : StaticCall.External)
+    (ctx : Context) (gateway inbox : Live.Address) (msgValue : Live.Word)
+    (sources targets : List Bytes) (before : World) (fault : Fault)
+    (h : (executeVault callee sexternal ctx gateway inbox msgValue sources targets before).outcome =
       .error fault) :
-    (executeVault callee ctx gateway inbox fee msgValue sources targets before).world =
+    (executeVault callee sexternal ctx gateway inbox msgValue sources targets before).world =
       before := by
   unfold executeVault Live.run at *
   dsimp only at *
   split <;> simp_all
 
 /-- Root success is the unrolled-back body result. -/
-theorem executeVault_success_body (callee : External) (ctx : Context)
-    (gateway inbox : Live.Address) (fee msgValue : Live.Word) (sources targets : List Bytes)
-    (before : World)
-    (h : (executeVault callee ctx gateway inbox fee msgValue sources targets before).outcome =
+theorem executeVault_success_body (callee : External) (sexternal : StaticCall.External)
+    (ctx : Context) (gateway inbox : Live.Address) (msgValue : Live.Word)
+    (sources targets : List Bytes) (before : World)
+    (h : (executeVault callee sexternal ctx gateway inbox msgValue sources targets before).outcome =
       .ok ()) :
-    executeVault callee ctx gateway inbox fee msgValue sources targets before =
-      addConsolidationRequestsVault callee ctx gateway inbox fee msgValue sources targets
+    executeVault callee sexternal ctx gateway inbox msgValue sources targets before =
+      addConsolidationRequestsVault callee sexternal ctx gateway inbox msgValue sources targets
         before := by
   unfold executeVault Live.run at *
   dsimp only at *
@@ -599,24 +636,58 @@ private theorem require_fail (c : Bool) (fault : Fault) (w : World) (h : c = fal
     Live.require c fault w = ⟨.error fault, w, []⟩ := by
   simp [Live.require, h, fail]
 
+/-- A successful 32-byte STATICCALL reply yields the decoded fee word. -/
+theorem feeRead_ok (sexternal : StaticCall.External) (ctx : Context)
+    (inbox : Live.Address) (w : World) (feeData : Bytes) (sattempts : List NestedAttempt)
+    (h : lowLevelStaticCall sexternal ctx.self inbox [] w = ⟨.ok feeData, sattempts⟩)
+    (hlen : feeData.length = 32) :
+    getConsolidationRequestFee sexternal ctx inbox w =
+      ⟨.ok (Live.word (decode feeData)), w, []⟩ := by
+  simp [getConsolidationRequestFee, h, hlen]
+
+/-- A failed STATICCALL is `FeeReadFailed` (lines 86-88). -/
+private theorem feeRead_failed (sexternal : StaticCall.External) (ctx : Context)
+    (inbox : Live.Address) (w : World) (sdata : Bytes) (sattempts : List NestedAttempt)
+    (h : lowLevelStaticCall sexternal ctx.self inbox [] w = ⟨.error sdata, sattempts⟩) :
+    getConsolidationRequestFee sexternal ctx inbox w =
+      ⟨.error (.reason "FeeReadFailed"), w, []⟩ := by
+  simp [getConsolidationRequestFee, h]
+
+/-- Malformed returndata (length ≠ 32) is `FeeInvalidData` (lines 90-92). A
+code-less target lands here: its low-level STATICCALL succeeds with empty
+return data. -/
+private theorem feeRead_invalid (sexternal : StaticCall.External) (ctx : Context)
+    (inbox : Live.Address) (w : World) (feeData : Bytes) (sattempts : List NestedAttempt)
+    (h : lowLevelStaticCall sexternal ctx.self inbox [] w = ⟨.ok feeData, sattempts⟩)
+    (hlen : feeData.length ≠ 32) :
+    getConsolidationRequestFee sexternal ctx inbox w =
+      ⟨.error (.reason "FeeInvalidData"), w, []⟩ := by
+  simp [getConsolidationRequestFee, h, hlen]
+
 /-- Committed vault entrypoint: the guards of lines 60-66 held (gateway
-caller, nonempty equal-length arrays, checked exact fee), the loop committed
-one accepted line-115 attempt per zipped pair, and the modifier assertion
-held on the committed world: the vault balance is the entry balance minus
-`msg.value`. -/
-theorem executeVault_success (callee : External) (ctx : Context)
-    (gateway inbox : Live.Address) (fee msgValue : Live.Word) (sources targets : List Bytes)
-    (before : World)
-    (h : (executeVault callee ctx gateway inbox fee msgValue sources targets before).outcome =
+caller, nonempty equal-length arrays), the fee was actually read by the
+line-84 `staticcall("")` (32-byte success reply), the checked exact-fee held
+for that read word, the loop committed one accepted line-115 attempt per
+zipped pair, and the modifier assertion held on the committed world: the
+vault balance is the entry balance minus `msg.value`. -/
+theorem executeVault_success (callee : External) (sexternal : StaticCall.External)
+    (ctx : Context) (gateway inbox : Live.Address) (msgValue : Live.Word)
+    (sources targets : List Bytes) (before : World)
+    (h : (executeVault callee sexternal ctx gateway inbox msgValue sources targets before).outcome =
       .ok ()) :
     ctx.sender = gateway ∧ sources ≠ [] ∧ sources.length = targets.length ∧
-      sources.length * fee.val = msgValue.val ∧
-      (∀ pair ∈ pairsOf sources targets, widthOk pair) ∧
-      (executeVault callee ctx gateway inbox fee msgValue sources targets before).attempts.map
-          (·.request) = hopRequests ctx inbox fee (pairsOf sources targets) ∧
-      (executeVault callee ctx gateway inbox fee msgValue sources targets before).world.balances
-          ctx.self = before.balances ctx.self - msgValue.val := by
-  have hbody := executeVault_success_body callee ctx gateway inbox fee msgValue sources targets before h
+      ∃ feeData sattempts,
+        lowLevelStaticCall sexternal ctx.self inbox [] before = ⟨.ok feeData, sattempts⟩ ∧
+        feeData.length = 32 ∧
+        sources.length * (Live.word (decode feeData)).val = msgValue.val ∧
+        (∀ pair ∈ pairsOf sources targets, widthOk pair) ∧
+        (executeVault callee sexternal ctx gateway inbox msgValue sources targets before).attempts.map
+            (·.request) =
+          hopRequests ctx inbox (Live.word (decode feeData)) (pairsOf sources targets) ∧
+        (executeVault callee sexternal ctx gateway inbox msgValue sources targets before).world.balances
+            ctx.self = before.balances ctx.self - msgValue.val := by
+  have hbody := executeVault_success_body callee sexternal ctx gateway inbox msgValue sources
+    targets before h
   rw [hbody] at h ⊢
   unfold addConsolidationRequestsVault at h ⊢
   rw [bind_ok (selfBalance ctx) _ before _ before [] rfl] at h ⊢
@@ -626,35 +697,55 @@ theorem executeVault_success (callee : External) (ctx : Context)
     · rw [bind_ok _ _ before () before [] (require_ok _ _ before (by simp [hnonempty]))] at h ⊢
       by_cases hlen : sources.length = targets.length
       · rw [bind_ok _ _ before () before [] (require_ok _ _ before (by simp [hlen]))] at h ⊢
-        by_cases hfit : sources.length * fee.val < Verity.Core.UINT256_MODULUS
-        · rw [bind_ok _ _ before () before [] (require_ok _ _ before (by simp [hfit]))] at h ⊢
-          by_cases hexact : sources.length * fee.val = msgValue.val
-          · rw [bind_ok _ _ before () before [] (require_ok _ _ before (by simp [hexact]))] at h ⊢
-            rcases hloop : (addConsolidationRequestsLoop callee ctx inbox fee
-                (pairsOf sources targets) before).outcome with fault | u
-            ·
-                rw [bind_error _ _ before fault _ _ (by rw [← hloop])] at h
-                simp at h
-            · 
-                cases u
-                rw [bind_ok _ _ before () _ _ (by rw [← hloop])] at h ⊢
-                obtain ⟨hvalid, hreq, -⟩ :=
-                  loop_success callee ctx inbox fee (pairsOf sources targets) before hloop
-                set after := (addConsolidationRequestsLoop callee ctx inbox fee
-                  (pairsOf sources targets) before).world with hafter
-                rw [bind_ok (selfBalance ctx) _ after _ after [] rfl] at h ⊢
-                by_cases hassert : after.balances ctx.self = before.balances ctx.self - msgValue.val
-                · rw [require_ok _ _ after (by simp [hassert])] at h ⊢
-                  refine ⟨hsender, ?_, hlen, hexact, hvalid, ?_, hassert⟩
-                  · intro hnil
-                    exact hnonempty (by simp [hnil])
-                  · simp only [List.nil_append, List.append_nil, hreq]
-                · rw [require_fail _ _ after (by simp [hassert])] at h
-                  simp at h
-          · rw [bind_error _ _ before _ before [] (require_fail _ _ before (by simp [hexact]))] at h
+        rcases hs : lowLevelStaticCall sexternal ctx.self inbox [] before with ⟨sout, satt⟩
+        match sout with
+        | .error sdata =>
+            rw [bind_error _ _ before _ before []
+              (feeRead_failed sexternal ctx inbox before sdata satt hs)] at h
             simp at h
-        · rw [bind_error _ _ before _ before [] (require_fail _ _ before (by simp [hfit]))] at h
-          simp at h
+        | .ok feeData =>
+            by_cases hflen : feeData.length = 32
+            · rw [bind_ok _ _ before _ before []
+                (feeRead_ok sexternal ctx inbox before feeData satt hs hflen)] at h ⊢
+              by_cases hfit : sources.length * (Live.word (decode feeData)).val <
+                  Verity.Core.UINT256_MODULUS
+              · rw [bind_ok _ _ before () before [] (require_ok _ _ before (by simp [hfit]))] at h ⊢
+                by_cases hexact : sources.length * (Live.word (decode feeData)).val = msgValue.val
+                · rw [bind_ok _ _ before () before [] (require_ok _ _ before (by simp [hexact]))]
+                    at h ⊢
+                  rcases hloop : (addConsolidationRequestsLoop callee ctx inbox
+                      (Live.word (decode feeData))
+                      (pairsOf sources targets) before).outcome with fault | u
+                  · rw [bind_error _ _ before fault _ _ (by rw [← hloop])] at h
+                    simp at h
+                  · cases u
+                    rw [bind_ok _ _ before () _ _ (by rw [← hloop])] at h ⊢
+                    obtain ⟨hvalid, hreq, -⟩ :=
+                      loop_success callee ctx inbox (Live.word (decode feeData))
+                        (pairsOf sources targets) before hloop
+                    set after := (addConsolidationRequestsLoop callee ctx inbox
+                      (Live.word (decode feeData)) (pairsOf sources targets) before).world
+                      with hafter
+                    rw [bind_ok (selfBalance ctx) _ after _ after [] rfl] at h ⊢
+                    by_cases hassert :
+                        after.balances ctx.self = before.balances ctx.self - msgValue.val
+                    · rw [require_ok _ _ after (by simp [hassert])] at h ⊢
+                      refine ⟨hsender, ?_, hlen, feeData, satt, rfl, hflen, hexact, hvalid, ?_,
+                        hassert⟩
+                      · intro hnil
+                        exact hnonempty (by simp [hnil])
+                      · simp only [List.nil_append, List.append_nil, hreq]
+                    · rw [require_fail _ _ after (by simp [hassert])] at h
+                      simp at h
+                · rw [bind_error _ _ before _ before [] (require_fail _ _ before
+                    (by simp [hexact]))] at h
+                  simp at h
+              · rw [bind_error _ _ before _ before [] (require_fail _ _ before (by simp [hfit]))]
+                  at h
+                simp at h
+            · rw [bind_error _ _ before _ before []
+                (feeRead_invalid sexternal ctx inbox before feeData satt hs hflen)] at h
+              simp at h
       · rw [bind_error _ _ before _ before [] (require_fail _ _ before (by simp [hlen]))] at h
         simp at h
     · rw [bind_error _ _ before _ before [] (require_fail _ _ before (by simp [hnonempty]))] at h
@@ -665,36 +756,38 @@ theorem executeVault_success (callee : External) (ctx : Context)
 /-- Under the callee frame, a committed vault entrypoint emitted exactly the
 per-pair `ConsolidationRequestAdded(source ++ target)` events in order, and
 the ledger moved exactly `msg.value` from the vault to `CONSOLIDATION_REQUEST`. -/
-theorem executeVault_success_frame (callee : External) (ctx : Context)
-    (gateway inbox : Live.Address) (fee msgValue : Live.Word) (sources targets : List Bytes)
-    (before : World)
+theorem executeVault_success_frame (callee : External) (sexternal : StaticCall.External)
+    (ctx : Context) (gateway inbox : Live.Address) (msgValue : Live.Word)
+    (sources targets : List Bytes) (before : World)
     (hlog : LogFrame callee) (hbal : BalanceFrame callee) (hun : Untraced callee)
-    (h : (executeVault callee ctx gateway inbox fee msgValue sources targets before).outcome =
+    (h : (executeVault callee sexternal ctx gateway inbox msgValue sources targets before).outcome =
       .ok ()) :
-    (executeVault callee ctx gateway inbox fee msgValue sources targets before).world.logs =
+    (executeVault callee sexternal ctx gateway inbox msgValue sources targets before).world.logs =
         before.logs ++ (pairsOf sources targets).map
           (fun pair => requestAddedEvent ctx.self (vaultCallPayload pair)) ∧
       CallSpec.Balances before.balances
-        (executeVault callee ctx gateway inbox fee msgValue sources targets before).world.balances
+        (executeVault callee sexternal ctx gateway inbox msgValue sources targets before).world.balances
         ctx.self inbox msgValue.val := by
-  obtain ⟨hsender, hnonempty, hlen, hexact, -, -, -⟩ :=
-    executeVault_success callee ctx gateway inbox fee msgValue sources targets before h
-  have hbody := executeVault_success_body callee ctx gateway inbox fee msgValue sources targets before h
+  obtain ⟨hsender, hnonempty, hlen, feeData, satt, hs, hflen, hexact, -, -, -⟩ :=
+    executeVault_success callee sexternal ctx gateway inbox msgValue sources targets before h
+  have hbody := executeVault_success_body callee sexternal ctx gateway inbox msgValue sources
+    targets before h
   rw [hbody] at h ⊢
   unfold addConsolidationRequestsVault at h ⊢
   rw [bind_ok (selfBalance ctx) _ before _ before [] rfl] at h ⊢
   have hne : sources.length ≠ 0 := by
     intro hz
     exact hnonempty (List.eq_nil_of_length_eq_zero hz)
-  have hfit : sources.length * fee.val < Verity.Core.UINT256_MODULUS := by
+  have hfit : sources.length * (Live.word (decode feeData)).val < Verity.Core.UINT256_MODULUS := by
     rw [hexact]
     exact msgValue.isLt
   rw [bind_ok _ _ before () before [] (require_ok _ _ before (by simp [hsender])),
     bind_ok _ _ before () before [] (require_ok _ _ before (by simp [hne])),
     bind_ok _ _ before () before [] (require_ok _ _ before (by simp [hlen])),
+    bind_ok _ _ before _ before [] (feeRead_ok sexternal ctx inbox before feeData satt hs hflen),
     bind_ok _ _ before () before [] (require_ok _ _ before (by simp [hfit])),
     bind_ok _ _ before () before [] (require_ok _ _ before (by simp [hexact]))] at h ⊢
-  rcases hloop : (addConsolidationRequestsLoop callee ctx inbox fee
+  rcases hloop : (addConsolidationRequestsLoop callee ctx inbox (Live.word (decode feeData))
       (pairsOf sources targets) before).outcome with fault | u
   ·
       rw [bind_error _ _ before fault _ _ (by rw [← hloop])] at h
@@ -702,9 +795,10 @@ theorem executeVault_success_frame (callee : External) (ctx : Context)
   ·
       cases u
       obtain ⟨hlogs, hbalances⟩ :=
-        loop_success_frame callee ctx inbox fee (pairsOf sources targets) before hlog hbal hun hloop
+        loop_success_frame callee ctx inbox (Live.word (decode feeData))
+          (pairsOf sources targets) before hlog hbal hun hloop
       rw [bind_ok _ _ before () _ _ (by rw [← hloop])] at h ⊢
-      set after := (addConsolidationRequestsLoop callee ctx inbox fee
+      set after := (addConsolidationRequestsLoop callee ctx inbox (Live.word (decode feeData))
         (pairsOf sources targets) before).world with hafter
       rw [bind_ok (selfBalance ctx) _ after _ after [] rfl] at h ⊢
       by_cases hassert : after.balances ctx.self = before.balances ctx.self - msgValue.val
@@ -750,12 +844,14 @@ theorem resolveAddress_val (recipient sender : Live.Address) :
 def refundRequest (ctx : Context) (refund : Live.Word) (recipient : Live.Address) : Request :=
   ⟨ctx.self, resolveAddress recipient ctx.sender, refund, []⟩
 
-/-- `_refundFee` in the physical world through the same CALL primitive. -/
+/-- `_refundFee` in the physical world through the same low-level CALL
+primitive. The recipient may be an EOA: low-level `.call` accepts a code-less
+target after the value transfer (`refund_no_code_accepted`). -/
 def refundFee (callee : External) (ctx : Context) (refund : Live.Word)
     (recipient : Live.Address) : Exec Unit := fun w =>
   if refund.val = 0 then ⟨.ok (), w, []⟩
   else
-    let r := CallData.invoke callee ctx (resolveAddress recipient ctx.sender) [] refund w
+    let r := lowLevelCall callee ctx (resolveAddress recipient ctx.sender) [] refund w
     match r.outcome with
     | .ok _ => ⟨.ok (), r.world, r.attempts⟩
     | .error _ => ⟨.error (.reason "FeeRefundFailed"), r.world, r.attempts⟩
@@ -774,9 +870,15 @@ theorem refund_attempt_request (callee : External) (ctx : Context) (recipient : 
     a.request = refundRequest ctx refund recipient := by
   by_cases hz : refund.val = 0
   · simp [refundFee, hz] at ha
-  · rcases invoke_shape callee ctx (resolveAddress recipient ctx.sender) [] refund w with
-      h | h | ⟨data, nested, h⟩ | ⟨data, after, nested, h⟩ <;>
-      simp [refundFee, hz, h] at ha <;> simp [ha, refundRequest]
+  · rcases lowLevelCall_shape callee ctx (resolveAddress recipient ctx.sender) [] refund w with
+      ⟨-, h⟩ | ⟨-, -, h⟩ | ⟨-, -, h⟩
+    · simp [refundFee, hz, h] at ha
+      simp [ha, refundRequest]
+    · simp [refundFee, hz, h] at ha
+      simp [ha, refundRequest]
+    · rcases h with ⟨data, -, h⟩ | ⟨data, nested, -, h⟩ | ⟨data, after, -, h⟩ |
+          ⟨data, after, nested, -, h⟩ <;>
+        simp [refundFee, hz, h] at ha <;> simp [ha, refundRequest]
 
 /-- Failed refund: `FeeRefundFailed`, and the world is restored. -/
 theorem refund_error_restores (callee : External) (ctx : Context) (recipient : Live.Address)
@@ -785,9 +887,14 @@ theorem refund_error_restores (callee : External) (ctx : Context) (recipient : L
     fault = .reason "FeeRefundFailed" ∧ (refundFee callee ctx refund recipient w).world = w := by
   by_cases hz : refund.val = 0
   · simp [refundFee, hz] at h
-  · rcases invoke_shape callee ctx (resolveAddress recipient ctx.sender) [] refund w with
-      hs | hs | ⟨data, nested, hs⟩ | ⟨data, after, nested, hs⟩ <;>
-      simp [refundFee, hz, hs] at h ⊢ <;> exact h.symm
+  · rcases lowLevelCall_shape callee ctx (resolveAddress recipient ctx.sender) [] refund w with
+      ⟨-, hs⟩ | ⟨-, -, hs⟩ | ⟨-, -, hs⟩
+    · simp [refundFee, hz, hs] at h ⊢
+      exact h.symm
+    · simp [refundFee, hz, hs] at h
+    · rcases hs with ⟨data, -, hs⟩ | ⟨data, nested, -, hs⟩ | ⟨data, after, -, hs⟩ |
+          ⟨data, after, nested, -, hs⟩ <;>
+        simp [refundFee, hz, hs] at h ⊢ <;> simp [h]
 
 /-- Recipient rejects the plain value transfer (line 302-305). -/
 theorem refund_rejected (callee : External) (ctx : Context) (recipient : Live.Address)
@@ -800,7 +907,7 @@ theorem refund_rejected (callee : External) (ctx : Context) (recipient : Live.Ad
       ⟨.error (.reason "FeeRefundFailed"), w,
         [⟨refundRequest ctx refund recipient, false, data, []⟩]⟩ := by
   unfold refundRequest at hr ⊢
-  unfold refundFee CallData.invoke
+  unfold refundFee lowLevelCall
   simp [hz, hc, Nat.not_lt.mpr hb, hr]
 
 /-- Recipient accepts: the remainder left the gateway. -/
@@ -813,8 +920,21 @@ theorem refund_accepted (callee : External) (ctx : Context) (recipient : Live.Ad
     refundFee callee ctx refund recipient w =
       ⟨.ok (), after, [⟨refundRequest ctx refund recipient, true, data, []⟩]⟩ := by
   unfold refundRequest at hr ⊢
-  unfold refundFee CallData.invoke
+  unfold refundFee lowLevelCall
   simp [hz, hc, Nat.not_lt.mpr hb, hr]
+
+/-- EOA refund recipient: code-less, funded — the low-level `.call` accepts
+with empty return data after the value transfer, so `_refundFee` succeeds.
+This is the valid refund path the code-guarded primitive rejected. -/
+theorem refund_no_code_accepted (callee : External) (ctx : Context) (recipient : Live.Address)
+    (refund : Live.Word) (w : World) (hz : refund.val ≠ 0)
+    (hc : (w.core.codeSize (resolveAddress recipient ctx.sender).val).val = 0)
+    (hb : refund.val ≤ w.balances ctx.self) :
+    refundFee callee ctx refund recipient w =
+      ⟨.ok (), transfer w ctx.self (resolveAddress recipient ctx.sender) refund.val,
+        [⟨refundRequest ctx refund recipient, true, [], []⟩]⟩ := by
+  unfold refundFee lowLevelCall refundRequest
+  simp [hz, hc, Nat.not_lt.mpr hb]
 
 /-- Gateway value split (`ConsolidationGateway.sol:212-213, 220, 302`): the
 vault hop value `totalFee` and the refund CALL value reconstruct
