@@ -28,6 +28,7 @@
     "audit/ssz-pubkey-bytes/README.md": "27622d1fefa4316081973b19f09c91a15ee1867ec8636ffdfd385e7d98dee743",
     "audit/ssz-pubkey-bytes/check_receipt.py": "f75ec0c6d6a1664fa264ceac5fbde170adaf1ffbe6758c98dbebbfe786ed5fe1",
     "lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
+    "lakefile.lean": "856f7b02b00ab14e9f934f60c635bd20714f45907dbc9acc7d3f0766312277dc",
     "lean-toolchain": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee",
     "lido-core/contracts/0.8.25/CLValidatorVerifier.sol": "d6e89f6975e4fa02f758bf461a98ac2d689296b5c92d03ffd4e43a22d0b3d7ed",
     "lido-core/contracts/common/lib/BLS.sol": "0187cc6a6b1aaa833317695d88795db431fa237452213e8c3872a0f444dceb7c",
@@ -119,8 +120,6 @@
     "audit/ssz-witness-abi/diagnostics/decoded-fields-transport-failure.log": "4cc9c697ecd80256a201a6b26dbf107455d17b6a4b955d3311eba64aa418ba6c",
     "audit/ssz-witness-abi/solidity/receipt.json": "1abc333d15d0f3e953519acc2b080cffadafc7aec162b8c4d4aae2393749aa17",
     "audit/ssz-witness-abi/receipt.json": "247e6c54b8f2c6f16939c0ba8afb0aa71ed8d43f0b7d65d77e63c43e95fa6e15",
-    "audit/ssz-sha-committed/baseline-lakefile.lean": "8ea3781110b3234bdfcf2b2c87c5c064fa7d2aee018da57bcab100f8baf1ab87",
-    "audit/ssz-proof-committed/baseline-lakefile.lean": "856f7b02b00ab14e9f934f60c635bd20714f45907dbc9acc7d3f0766312277dc"
-  },
-  "integration_note": "Original map retained in source-inherited-validation.json; changed root library file checked at retained baseline. All actual SSZ proof bodies/dependencies are unchanged."
+    "audit/ssz-sha-committed/baseline-lakefile.lean": "8ea3781110b3234bdfcf2b2c87c5c064fa7d2aee018da57bcab100f8baf1ab87"
+  }
 }

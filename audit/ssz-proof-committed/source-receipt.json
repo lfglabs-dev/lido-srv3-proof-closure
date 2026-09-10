@@ -1,7 +1,7 @@
 {
   "schema": "lido-ssz-proof-committed-v1",
   "created_utc": "2026-09-10T05:42:06.063636+00:00",
-  "integration_base": "6cf4817382ca4f798978f427750d31058dc10034",
+  "integration_base": "8125d79f90029fd759eaea3a153d6e97aa328657",
   "source_pin": "17005714f151e5502c559932319a3f2f74ac2436",
   "goal": "all eight complete guarantees OPEN",
   "scope": "Actual raw consumer success implies independent Merkle branch from existing typed leaf to original root over actual calldata words; depth/gas/loop environment and extent derived. Reused external SHA32 and initial memory invariant remain explicit. Declared-list extent and complete entry/compiler/World correspondence remain internal OPEN.",
@@ -55,17 +55,13 @@
     "audit/artifacts.lock.json": "f9ef5bb656f858acd3813f21dbd8b50ff94bf2f5ca9146485080661e3199b81b",
     "audit/ssz-proof-committed/README.md": "1c9cce4907a58a6926c5d8f7cc7de2908254b4ca7269fdfb63dafbe42f7967c2",
     "audit/ssz-proof-committed/check_receipt.py": "f75ec0c6d6a1664fa264ceac5fbde170adaf1ffbe6758c98dbebbfe786ed5fe1",
-    "audit/ux2/index.json": "a54d621ac0853135dc9135a4717ac1cf76254658a0f197ace1863b123f656fef",
+    "audit/ux2/index.json": "3ba4a790c078dd19d54a9ced60bf4f1c5b0ffd4151b721cc610d1518412f54b7",
     "lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
-    "lakefile.lean": "64caaebf19570fafc9391fd87352a36085165c863492c9c0c697c9919d424ccf",
+    "lakefile.lean": "856f7b02b00ab14e9f934f60c635bd20714f45907dbc9acc7d3f0766312277dc",
     "lean-toolchain": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee",
     "lido-core/contracts/0.8.25/CLValidatorVerifier.sol": "d6e89f6975e4fa02f758bf461a98ac2d689296b5c92d03ffd4e43a22d0b3d7ed",
     "lido-core/contracts/common/lib/BLS.sol": "0187cc6a6b1aaa833317695d88795db431fa237452213e8c3872a0f444dceb7c",
-    "lido-core/contracts/common/lib/SSZ.sol": "91ef497b972bbee0fe89043034e6bd62fa0c1059f22874d4826bc6164a22009b",
-    "audit/ssz-proof-committed/source-receipt.json": "03b77f2822790d490eca533c67477ab6f5131b633fc1afcf3641a0fb923fd0be",
-    "audit/ssz-proof-committed/source-inherited-validation.json": "1a1da5904d55007cb496df76d6eae2827aa979d81dfd1d861c46692f40dd4123",
-    "audit/ssz-proof-committed/baseline-lakefile.lean": "856f7b02b00ab14e9f934f60c635bd20714f45907dbc9acc7d3f0766312277dc",
-    "audit/ssz-proof-committed/baseline-ux2-index.json": "3ba4a790c078dd19d54a9ced60bf4f1c5b0ffd4151b721cc610d1518412f54b7"
+    "lido-core/contracts/common/lib/SSZ.sol": "91ef497b972bbee0fe89043034e6bd62fa0c1059f22874d4826bc6164a22009b"
   },
   "evidence_hashes": {
     "audit/ssz-proof-committed/validation.log": "c2f9521656415e08a5401f3e82cf1139760196490e2f5bb6420f57c6b2f8e4fc",
@@ -75,17 +71,10 @@
     "audit/ssz-proof-committed/failed-verifier-nonempty.log": "0c9566e6ada2d2335789cb3f9207ca8669f431e8554095a00176bbc1ed74a6b1",
     "audit/ssz-proof-committed/failed-step-elimination.log": "dc7178019adbb6f073970b5e9726044b8b1207c7ff8c41afa9199c853f3085ac",
     "audit/ssz-proof-committed/dependency-inputs.json": "2eb0fa29ec878b88f4feaaa197f70ab0514c760c46e45e0b25927a781cb00e4b",
-    "audit/ssz-proof-committed/inherited-validation.json": "927ec62707379a0b83c78dc462121832e287e980dbd1246adac187685653d052",
+    "audit/ssz-proof-committed/inherited-validation.json": "1a1da5904d55007cb496df76d6eae2827aa979d81dfd1d861c46692f40dd4123",
     "audit/ssz-proof-committed/ux2-check.log": "4d0a00eaee6f0e519d89d7de728d9cc72f9fba9d2ac7975c8c910d812e900e20",
     "audit/ssz-proof-committed/proof-escape-check.log": "7b5df6421c94db77ac06d6083eb615258c2323c32dea1f39160c0723b6fc4217",
-    "audit/ssz-proof-committed/axioms.log": "80ec1e53f93526f1cf8ce3cda136d029ca8cd3eac12e08ba708139c2dde08c2a",
-    "audit/ssz-proof-committed/independent-review.md": "5199c1ed6616ce8243143d348f7641923c24c30717222fa522fff665fed1b95c",
-    "audit/ssz-proof-committed/independent-review-events.json": "9a754d446e4f6d4e69c278ab1a2db1c40cb25824a4562f09c925ef8e66d5bc4a",
-    "audit/ssz-proof-committed/review-response.md": "96ac94fde1ad91ad8d1096bd7c11247b04ffe2cea0d2e25950752ea40a7fa0d3",
-    "audit/ssz-proof-committed/current-ux2-check.log": "4d0a00eaee6f0e519d89d7de728d9cc72f9fba9d2ac7975c8c910d812e900e20",
-    "audit/ssz-proof-committed/current-proof-escapes.log": "7b5df6421c94db77ac06d6083eb615258c2323c32dea1f39160c0723b6fc4217",
-    "audit/ssz-proof-committed/independent-build-job.json": "d065d18b8413853d5b1ab51e7ec83634d77cfd1ebc1d20f32539bc5a1b92d31a",
-    "audit/ssz-proof-committed/review-evidence.json": "a6a7b32d42057aa78560a51ab8f8bdb2ceb7f01c053d39d188dfed4f80d5a631"
+    "audit/ssz-proof-committed/axioms.log": "80ec1e53f93526f1cf8ce3cda136d029ca8cd3eac12e08ba708139c2dde08c2a"
   },
   "package_pins": {
     ".lake/packages/verity": "e977aaad6e1a9e92e0132d41b3d33a14135a4d46",
@@ -100,14 +89,5 @@
     ".lake/packages/batteries": "fa08db58b30eb033edcdab331bba000827f9f785",
     ".lake/packages/Cli": "92564e5770e4d09f2d86dfbf8ada1e9c715b384c"
   },
-  "independent_review": "CLEAN exact d23f318a; full original report plus root scope/exit-code clarification retained. Exact documentary successor review pending.",
-  "source_head": "d23f318af5720a74c9324699935cca1faab1cd76",
-  "source_receipt": "audit/ssz-proof-committed/source-receipt.json",
-  "documentary_integration": {
-    "proof_source_unchanged": true,
-    "original_inherited_relocations": {
-      "lakefile.lean": "audit/ssz-proof-committed/baseline-lakefile.lean"
-    },
-    "current_lakefile_and_ux2_are_metadata_checks_not_a_new_proof_run": true
-  }
+  "independent_review": "Pending frozen exact-source independent review"
 }
