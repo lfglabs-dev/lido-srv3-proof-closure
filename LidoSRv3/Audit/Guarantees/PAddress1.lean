@@ -13,8 +13,9 @@ open LidoSRv3.Audit.SolidityAddress
 
 abbrev Address := Nat
 
-/-- P-ADDRESS-1 is closed by the universal source-shaped address transition and
-its executable Verity transaction composition. -/
+/-- P-ADDRESS-1 remains OPEN: the source-shaped transition and its executable
+Verity composition are checked, while the named live-receipt renaming
+obligation below has not been discharged. -/
 def guarantee : Guarantee := ⟨.pAddress1, [.model, .source, .verityTx]⟩
 
 /-!
@@ -250,6 +251,9 @@ below needs only `a₁, a₂ ≠ 0`), and `singletonActorEntryPoint` is provably
 content while reading as a real exclusion. Carrying either as an unused
 binder would hide that they are premise-free rather than making the claim
 more honest. -/
+/-- Source-level universal writer equivariance.  This theorem does not consume
+the live `claimWithdrawalsTo` receipt; the exact missing consumption is named
+by `live_claim_receipt_renaming_obligation` below, so P-ADDRESS-1 stays OPEN. -/
 theorem universal_address_writer_equivariance
     (a₁ a₂ : Verity.Address) (h₁ : a₁ ≠ 0) (h₂ : a₂ ≠ 0)
     (inp : LidoSRv3.Audit.SolidityAddress.Input) :
@@ -291,21 +295,27 @@ theorem abstract_source_verity_tx_address_equivariance :
     LidoSRv3.Audit.Verity.AddressTx.composed_verity_tx_address_equivariance.2.2.2.2.1,
     LidoSRv3.Audit.Verity.AddressTx.composed_verity_tx_address_equivariance.2.2.2.2.2.2.2⟩
 
-/-- Bounded live `claimWithdrawalsTo` evidence consumed by the public parent.
-This is the recipient-CALL bridge, not the storage-only batch abstraction: it
+/-- Bounded live `claimWithdrawalsTo` evidence. This is the recipient-CALL
+bridge, not the storage-only batch abstraction: it
 commits both packed claims, both ordered empty-calldata value CALLs, their two
 events per claim, and the returned callee world. This remains a bounded model
-slice; compiler extraction and keccak correspondence are OPEN. -/
+slice; it is deliberately not claimed to establish universal renaming. -/
 theorem bounded_live_claim_recipient_call_surface :
     (let result := LidoSRv3.Audit.Verity.AddressRecipientCallBridge.runClaimWithdrawalsTo
       LidoSRv3.Audit.Verity.AddressRecipientCallBridge.acceptingCallee
       LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claimBridgeContext [1, 2] [1, 1]
       (2 : Verity.Address) LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claimBridgeWorld
     result.outcome = .ok () ∧
-      LidoSRv3.Audit.Verity.AddressClaimBatchTx.requestClaimed
-        (LidoSRv3.Audit.Verity.AddressClaimBatchTx.requestMetadataWord result.world.core 1) = true ∧
-      LidoSRv3.Audit.Verity.AddressClaimBatchTx.requestClaimed
-        (LidoSRv3.Audit.Verity.AddressClaimBatchTx.requestMetadataWord result.world.core 2) = true ∧
+      result.world.core.readSlot
+        (LidoSRv3.Audit.Verity.AddressClaimBatchTx.queueMetadataPhysicalSlot 1) =
+          LidoSRv3.Audit.Verity.AddressClaimBatchTx.markClaimed
+            (LidoSRv3.Audit.Verity.AddressClaimBatchTx.requestMetadataWord
+              LidoSRv3.Audit.Verity.AddressClaimBatchTx.twoClaimState 1) ∧
+      result.world.core.readSlot
+        (LidoSRv3.Audit.Verity.AddressClaimBatchTx.queueMetadataPhysicalSlot 2) =
+          LidoSRv3.Audit.Verity.AddressClaimBatchTx.markClaimed
+            (LidoSRv3.Audit.Verity.AddressClaimBatchTx.requestMetadataWord
+              LidoSRv3.Audit.Verity.AddressClaimBatchTx.twoClaimState 2) ∧
       result.world.core.readSlot LidoSRv3.Audit.Verity.AddressClaimBatchTx.lockedEtherAmountPosition = 0 ∧
       result.world.balances LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claimBridgeContext.self = 0 ∧
       result.world.balances (2 : Verity.Address) = 70 ∧
@@ -328,6 +338,40 @@ theorem bounded_live_claim_recipient_call_surface :
         callee ctx requestIds hints recipient before).world = before) := by
   exact ⟨LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claim_withdrawals_to_bridge_receipt,
     LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claim_withdrawals_to_revert_restores_caller_and_callee_world⟩
+
+/-- Remaining OPEN obligation for P-ADDRESS-1.  A caller/recipient renaming
+must consume the *live* receipt, not merely the source post-state: it has to
+relate the two physical claimed words, caller and recipient balances, and the
+ordered CALL/event/attempt journals.  No theorem proves this definition yet. -/
+def live_claim_receipt_renaming_obligation : Prop :=
+  ∀ (ρ : Verity.Address → Verity.Address), ρ 0 = 0 → ρ 1 = 1 → ρ 99 = 99 →
+    ρ 2 ≠ 0 →
+    let result := LidoSRv3.Audit.Verity.AddressRecipientCallBridge.runClaimWithdrawalsTo
+      LidoSRv3.Audit.Verity.AddressRecipientCallBridge.acceptingCallee
+      LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claimBridgeContext [1, 2] [1, 1]
+      (ρ 2) LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claimBridgeWorld
+    result.outcome = .ok () ∧
+      result.world.core.readSlot
+        (LidoSRv3.Audit.Verity.AddressClaimBatchTx.queueMetadataPhysicalSlot 1) =
+          LidoSRv3.Audit.Verity.AddressClaimBatchTx.markClaimed
+            (LidoSRv3.Audit.Verity.AddressClaimBatchTx.requestMetadataWord
+              LidoSRv3.Audit.Verity.AddressClaimBatchTx.twoClaimState 1) ∧
+      result.world.core.readSlot
+        (LidoSRv3.Audit.Verity.AddressClaimBatchTx.queueMetadataPhysicalSlot 2) =
+          LidoSRv3.Audit.Verity.AddressClaimBatchTx.markClaimed
+            (LidoSRv3.Audit.Verity.AddressClaimBatchTx.requestMetadataWord
+              LidoSRv3.Audit.Verity.AddressClaimBatchTx.twoClaimState 2) ∧
+      result.world.core.readSlot LidoSRv3.Audit.Verity.AddressClaimBatchTx.lockedEtherAmountPosition = 0 ∧
+      result.world.balances LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claimBridgeContext.self = 0 ∧
+      result.world.balances (ρ 2) = 70 ∧
+      result.world.logs =
+        [⟨LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claimBridgeContext.self, "WithdrawalClaimed", [1, 1, .ofNat (ρ 2).toNat, 30]⟩,
+         ⟨LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claimBridgeContext.self, "Transfer", [1, 0, 1]⟩,
+         ⟨LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claimBridgeContext.self, "WithdrawalClaimed", [2, 1, .ofNat (ρ 2).toNat, 40]⟩,
+         ⟨LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claimBridgeContext.self, "Transfer", [1, 0, 2]⟩] ∧
+      result.attempts =
+        [⟨⟨LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claimBridgeContext.self, ρ 2, 30, []⟩, true, [], []⟩,
+         ⟨⟨LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claimBridgeContext.self, ρ 2, 40, []⟩, true, [], []⟩]
 
 /-- Bounded horizontal slice only: MODEL→SOURCE→official-Denote composition
 for the owner-operated WithdrawalQueue ERC-721 ownership handoff. This retained
