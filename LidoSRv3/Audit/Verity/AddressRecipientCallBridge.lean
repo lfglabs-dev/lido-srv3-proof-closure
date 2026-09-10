@@ -104,6 +104,34 @@ def runClaimTo (callee : External) (ctx : Context) (requestId hint : Nat)
     (recipient : Address) (before : World) :=
   run (claimTo callee ctx requestId hint recipient) before
 
+/-- The public `claimWithdrawalsTo` loop, lifted over the same callee-world
+boundary as `claimTo`.  This deliberately reuses `claimOne`: each iteration
+therefore keeps its physical request/checkpoint reads, packed claimed write,
+locked-ETH decrement, and `externalCallBindTo` receipt.  The immediately
+following `payoutCall` executes that exact recipient/value/empty-calldata
+frame and adopts the callee-returned world. -/
+def claimWithdrawalsLoop (callee : External) (ctx : Context) :
+    List Nat → List Nat → Address → Exec Unit
+  | [], [], _ => pure ()
+  | requestId :: requestIds, hint :: hints, recipient => do
+      claimTo callee ctx requestId hint recipient
+      claimWithdrawalsLoop callee ctx requestIds hints recipient
+  | _, _, _ => fun world => ⟨.error (.reason "ArraysLengthMismatch"), world, []⟩
+
+/-- `WithdrawalQueue.claimWithdrawalsTo`: the recipient and matching arrays
+are checked at the external boundary, then every item uses the same real CALL
+bridge.  A failure in a later iteration is still top-level failure, so `run`
+restores the complete entry caller/callee world. -/
+def claimWithdrawalsTo (callee : External) (ctx : Context) (requestIds hints : List Nat)
+    (recipient : Address) : Exec Unit := do
+  require (decide (recipient != zeroAddress)) (.reason "ZeroRecipient")
+  require (decide (requestIds.length = hints.length)) (.reason "ArraysLengthMismatch")
+  claimWithdrawalsLoop callee ctx requestIds hints recipient
+
+def runClaimWithdrawalsTo (callee : External) (ctx : Context) (requestIds hints : List Nat)
+    (recipient : Address) (before : World) :=
+  run (claimWithdrawalsTo callee ctx requestIds hints recipient) before
+
 /-- A callee that accepts a value frame without changing the post-transfer
 world.  It is a concrete executable callee, not a Boolean success input. -/
 def acceptingCallee : External := fun _ world => .success [] world
@@ -132,6 +160,34 @@ theorem claim_bridge_receipt :
       result.attempts = [⟨⟨claimBridgeContext.self, (2 : Address), 30, []⟩,
         true, [], []⟩] := by
   decide +kernel
+
+/-- The public two-item entrypoint retains both physical claimed writes and
+executes two recipient CALLs in source loop order.  The callee's returned
+world is the committed result, rather than a Boolean call-success premise. -/
+theorem claim_withdrawals_to_bridge_receipt :
+    let result := runClaimWithdrawalsTo acceptingCallee claimBridgeContext [1, 2] [1, 1]
+      (2 : Address) claimBridgeWorld
+    result.outcome = .ok () ∧
+      requestClaimed (requestMetadataWord result.world.core 1) = true ∧
+      requestClaimed (requestMetadataWord result.world.core 2) = true ∧
+      result.world.core.readSlot lockedEtherAmountPosition = 0 ∧
+      result.world.balances claimBridgeContext.self = 0 ∧
+      result.world.balances (2 : Address) = 70 ∧
+      result.attempts =
+        [⟨⟨claimBridgeContext.self, (2 : Address), 30, []⟩, true, [], []⟩,
+         ⟨⟨claimBridgeContext.self, (2 : Address), 40, []⟩, true, [], []⟩] := by
+  decide +kernel
+
+theorem claim_withdrawals_to_revert_restores_caller_and_callee_world
+    (callee : External) (ctx : Context) (requestIds hints : List Nat)
+    (recipient : Address) (before : World) (fault : Fault)
+    (h : (runClaimWithdrawalsTo callee ctx requestIds hints recipient before).outcome =
+      .error fault) :
+    (runClaimWithdrawalsTo callee ctx requestIds hints recipient before).world = before := by
+  unfold runClaimWithdrawalsTo LidoSRv3.Audit.Source.TrioReserve1.Live.run at h ⊢
+  generalize hresult : claimWithdrawalsTo callee ctx requestIds hints recipient before = result at h ⊢
+  cases result with
+  | mk outcome after attempts => cases outcome <;> simp_all
 
 /-! ## `transferFrom` owner-operated physical branch
 
