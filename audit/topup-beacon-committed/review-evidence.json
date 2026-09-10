@@ -1,0 +1,31 @@
+{
+  "source_head": "9c5b239b2d93cea0b8917de220550f01dded4f24",
+  "reviewer": "db703d0a-dd18-47e5-a45f-1dbd54264f22",
+  "workspace": "891b1439-da15-4230-8785-26fa4a2a88e2",
+  "model": "kimi/k3",
+  "event_id": "21e59511-f03d-4b59-82e6-0114ba148090",
+  "event_sequence": 140,
+  "review_sha256": "defcabf3239767edbe5806f09f11c49968c2324b42771356d64dca493c2ea080",
+  "original_candidate_files": {
+    "LidoSRv3/Audit/Source/TopupBeaconCommitted.lean": "8cfa6ab58d9fb1f6ef558c3f0b8a6b8dd4897d3740e5c09d445c7e14ad02f54a",
+    "LidoSRv3/Tests/TopupBeaconCommittedMutants.lean": "9343d54f6daf98ba8fdec57c4972f669c9b6cdf305225554215443484537b770",
+    "audit/topup-beacon-committed/README.md": "e9df01a3906939885bc841f89ae3b22316d0e32c8e6eeabc374f2449aa5a0088",
+    "audit/topup-beacon-committed/check_receipt.py": "f75ec0c6d6a1664fa264ceac5fbde170adaf1ffbe6758c98dbebbfe786ed5fe1",
+    "audit/topup-beacon-committed/dependency-inputs.json": "9b04ee3a7480ac698ef3c6043af6d9b3d52122a07adf9eb1a8d696f9bdec3a7c",
+    "audit/topup-beacon-committed/inherited-validation.json": "4782bdce41435b73d4b466e80b2b90a84dcaec452ae43af07238348d8bfce693",
+    "audit/topup-beacon-committed/receipt.json": "d7a1e26f42b73f2ac5f3c88523b1ea76db9a14d411a15fbdcf7a4ff7053e3a50",
+    "audit/topup-beacon-committed/source-build-with-failed-fixture.log": "912c4392a8f54d3efe76d00575370f2650010b89ef6beb0390c85372e3afd694",
+    "audit/topup-beacon-committed/validation.log": "e4d09879a02b18be20feceee03fabe8bf50d6a9ad573d823e70cb5eeeb1d71fd",
+    "audit/topup-beacon-committed/wrong-initial-count-diagnostic.log": "480ab06a28a147a9339a383135b652319acf7e7ca74bfcaf402f75f39359d66b"
+  },
+  "scope": "Full exact-source correspondence and evidence review CLEAN; documentary gate pending. All8OPEN.",
+  "independent_build": {
+    "job": "9d6fa386-75d9-478f-b470-efbc6ad0f745",
+    "exit_code": 0,
+    "jobs": 1646
+  },
+  "independent_receipt_checker": {
+    "checks": 1382,
+    "errors": []
+  }
+}
