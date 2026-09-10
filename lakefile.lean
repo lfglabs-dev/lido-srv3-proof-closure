@@ -69,6 +69,8 @@ lean_lib «LidoSRv3» where
     .one `LidoSRv3.Audit.Verity.SubmitReportEntryTx,
     .one `LidoSRv3.Audit.Verity.Topup2DistributionTx,
     .one `LidoSRv3.Audit.Verity.Topup2Tx,
+    .one `LidoSRv3.Audit.Verity.TopupBeaconFundedTx,
+    .one `LidoSRv3.Audit.Verity.TopupFundedSourceTx,
     .one `LidoSRv3.Audit.Verity.TopupHybrid,
     .one `LidoSRv3.Audit.Verity.TopupPackedStorage,
     .one `LidoSRv3.Audit.Verity.TopupParent,
