@@ -1,0 +1,23 @@
+{
+  "remappings": [
+    "@openzeppelin/contracts-v5.2/=/tmp/lido-topup-wei-deps/package/",
+    "contracts/=/tmp/lido-ssz-proof-committed/lido-core/contracts/"
+  ],
+  "optimizer": {
+    "enabled": true,
+    "runs": 200
+  },
+  "metadata": {
+    "bytecodeHash": "ipfs"
+  },
+  "evmVersion": "cancun",
+  "libraries": {},
+  "viaIR": true,
+  "outputSelection": {
+    "*": {
+      "*": [
+        "irOptimized"
+      ]
+    }
+  }
+}
