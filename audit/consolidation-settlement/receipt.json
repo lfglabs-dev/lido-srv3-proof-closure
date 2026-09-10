@@ -1,0 +1,69 @@
+{
+  "base_commit": "b45cf453834a628439c9899feba760a77d3b984d",
+  "candidate_status": "Implementation frozen for independent exact-source review; no self-review or publication acceptance claimed.",
+  "solidity_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "commands": [
+    {
+      "command": [
+        "lake",
+        "build",
+        "+LidoSRv3.Audit.Guarantees.PConsolidationEth1ActualSettlement",
+        "+LidoSRv3.Tests.ConsolidationSettlementRegression"
+      ],
+      "exit_code": 0,
+      "log": "targeted-build-final.log"
+    },
+    {
+      "command": [
+        "forge",
+        "test",
+        "--root",
+        "audit/consolidation-settlement/solidity",
+        "-vv"
+      ],
+      "exit_code": 0,
+      "log": "solidity-validation-final.log"
+    }
+  ],
+  "targeted_build_jobs": 1263,
+  "kernel_regressions": 11,
+  "solidity_fragment_tests": 9,
+  "source_input_count": 1249,
+  "lean_package_pin_count": 11,
+  "new_public_axioms": {
+    "LidoSRv3.Audit.Guarantees.PConsolidationEth1.actual_settlement_success": [
+      "propext",
+      "Quot.sound"
+    ],
+    "LidoSRv3.Audit.Guarantees.PConsolidationEth1.actual_settlement_failure_restores": [
+      "propext"
+    ]
+  },
+  "kernel_regression_axioms": [
+    "propext"
+  ],
+  "new_source_escape_scan": "PASS: new three Lean sources have no sorry/admit/axiom/native_decide/unsafe/implemented_by/extern outside comments/strings.",
+  "unchanged_existing_files": true,
+  "global_checks": "No AllGuarantees/Trust/registry modifications or new global checks; root integration follows independent review.",
+  "artifacts": {
+    "README.md": "b7ec095ae21dcc08fbe22c03929ea94e00a6ed838f797f2e270d4e720748dd45",
+    "check.py": "79029983e71a3a04f93a37245237dc07298c576b29c4a8246c867487b52c403d",
+    ".gitignore": "2b21ef7559c9eb7cb47c631ec2ea5647c27824000bf54e47ce89a08a95f17064",
+    "FeeCallSite.sol": "acdbe21bc74909616011ccfa31b1d7d3889087314701332ad7ab3ec13b0f5eb8",
+    "fee-compiler-input.json": "e41bb79291cc0af0a49dcf4ec2d36637d8d0afdef5c00572a6ec410546af8a1c",
+    "fee-compiler-output.json": "b416223c4945148380189a9f146d85bd9471da3e69ed081554450f0c84e4b8f3",
+    "fee-callsite.yul": "7d064ae898319a52c927b35d09dda6716fee0148ace3b4a118d3cf37cf407135",
+    "lean-status.json": "3758d27a8fe1e290a0f6550d3c294fc1f28cbda6df75915cb016b868bcc1f6a5",
+    "solidity-status.json": "154c4961fb8319dabd18e0d21439171c7f3d87e6dc4cab7bc5edac6d41b2c358",
+    "source-inputs.json": "ebfadc15167a647a642e7cb3b56c8828b276f11144766e66664fac615072aac4",
+    "toolchain-versions.json": "83c3ec887ea53601791c62320771123efa2ca0f99c40dc334cd7e355c555912c",
+    "targeted-build-final.log": "61c836b557ec918edbcc33835cdb5f9e627e76a87b09f4c091e51b2e66f4da2e",
+    "solidity-validation-final.log": "9bcdad8bd3eede9ee789d8d2c637825b42db2aec25354643ec0d716744db306b",
+    "solidity/foundry.toml": "49c7c904c53cb93685451ac01c631cba3606561f9f72c3b71d9eb637865c6ea6",
+    "solidity/source-identities.json": "2112b24166ddbe6c18f844ab9b5f787e21dc24f2c07f6cc8c7de9a63bc95366a",
+    "solidity/src/WithdrawalVaultEIP7685.sol": "e7dad85a284b7c07038bff8e936fb677a79b1fa9d2e8b9d628d3a107d9b79489",
+    "solidity/src/SettlementVaultHarness.sol": "f21f97037917b2fe8997c5684ac4ef70b46a05fab37f7a1fbba5e4dd8bb5421e",
+    "solidity/src/SettlementHarness.sol": "77dba591fcf7871239d756f011069f05094ea71fdd2c521adcc4a0de84436565",
+    "solidity/test/Settlement.t.sol": "f3381bef796be4c2fed68ac143d15c00b1fbe557310ebabaefe77ae3823c752c"
+  }
+}

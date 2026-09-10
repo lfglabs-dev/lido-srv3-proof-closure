@@ -1,0 +1,24 @@
+{
+  "solidity_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "full_copied_source": "contracts/0.8.9/WithdrawalVaultEIP7685.sol",
+  "full_source_sha256": "e7dad85a284b7c07038bff8e936fb677a79b1fa9d2e8b9d628d3a107d9b79489",
+  "gateway_fragments": [
+    "preservesEthBalance",
+    "count guards/loop",
+    "211\u2013222 fee/vault/refund suffix",
+    "_checkFee",
+    "_refundFee",
+    "_prepareConsolidationPairs"
+  ],
+  "vault_fragments": [
+    "preservesEthBalance",
+    "addConsolidationRequests",
+    "getConsolidationRequestFee"
+  ],
+  "omitted": "Role/pause/DSM/locator/witness/quota prefix; full witness struct; actual deployment/proxy.",
+  "full_pinned_sources": {
+    "contracts/0.8.25/consolidation/ConsolidationGateway.sol": "86eee98160b1b24c84a7ebf37cc053aa09cea7a4b78f43d5c12651e4ca923426",
+    "contracts/0.8.9/WithdrawalVault.sol": "0d13d6a75d690541a7cc2eb399a96dd87bfd908ae0411c80d93bd056d985d298",
+    "contracts/0.8.9/WithdrawalVaultEIP7685.sol": "e7dad85a284b7c07038bff8e936fb677a79b1fa9d2e8b9d628d3a107d9b79489"
+  }
+}
