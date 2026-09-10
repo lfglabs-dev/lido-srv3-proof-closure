@@ -1,0 +1,67 @@
+{
+  "source_commit": "6d175de64e385fad0d484f64c62416f490777b53",
+  "base_commit": "d56a7c40b7d120ac81f26c979195357a2f3262c6",
+  "time_utc": "2026-09-10T11:50:43.610141+00:00",
+  "status": "validated candidate; independent exact-commit source review pending; full DEPOSIT-1 OPEN",
+  "commands": [
+    {
+      "command": "lake build +LidoSRv3.Audit.Guarantees.PDeposit1ActualPipeline +LidoSRv3.Audit.AllGuarantees TrioDepositCommitted",
+      "exit_code": 0,
+      "log": "facade-build.log",
+      "jobs": 1462
+    },
+    {
+      "command": "python3 scripts/check_trust_axioms.py",
+      "exit_code": 0,
+      "log": "trust-check.log",
+      "scope": "29 existing exact axioms; no new production exception"
+    },
+    {
+      "command": "python3 scripts/test_ux2.py",
+      "exit_code": 0,
+      "log": "ux2-mutations.log"
+    }
+  ],
+  "registry_checks": "registry-checks.json",
+  "reuse": "reused-program-identities.json",
+  "axiom_scope": "New production theorem queries use propext, Classical.choice, Quot.sound only. Full Trust retains 23 native fixture axioms and 3 existing production exceptions. The proof-escape namespace inventory excludes audit/trio; do not treat it as whole-repository native inventory.",
+  "source_identity_count": 1589,
+  "artifacts": {
+    "README.md": {
+      "bytes": 5422,
+      "sha256": "85bae1c70cfee129953d829141118eb5fe554f9e7f6a7ca38fc38e7d769b2caf"
+    },
+    "composition-build.log": {
+      "bytes": 51994,
+      "sha256": "fcec641b90e67afd9c00d3c9eecf6b8eabe58d8700b3abbb0edf09719d75726b"
+    },
+    "facade-build.log": {
+      "bytes": 205756,
+      "sha256": "f2d112a2a3a1741a2ae9f4b8d84063fcf4b0348ecd109b592ba7cd6e7ed3ebe7"
+    },
+    "registry-checks.json": {
+      "bytes": 1009,
+      "sha256": "0df8a6ee3ad23c13d45e0c7c9c3163e15a626a0c32c6f679859d425985ed92d5"
+    },
+    "reused-program-identities.json": {
+      "bytes": 840,
+      "sha256": "a27c5965fa44baebbe16f2e0ff989e4ec448f82d9b86929fa7fd8843da92d83c"
+    },
+    "source-inputs.json": {
+      "bytes": 205988,
+      "sha256": "a106ba65a1a646d3055b8ba7baf22eb34d09721e3aec5bc63c49695e655dc278"
+    },
+    "trust-build-trace.json": {
+      "bytes": 135890,
+      "sha256": "e52aaa05bc5180f6bd75d391bd6d849782f86c1971719f7ab75cf607cb69c3d7"
+    },
+    "trust-check.log": {
+      "bytes": 263,
+      "sha256": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439"
+    },
+    "ux2-mutations.log": {
+      "bytes": 371,
+      "sha256": "dcff63c24c43ca580e855cf0be5661ec9e44160428d19d4d84c08713fb43ebc7"
+    }
+  }
+}
