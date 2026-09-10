@@ -1,0 +1,143 @@
+⚠ [11/269] Replayed Verity.Core
+warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1041:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+⚠ [65/269] Replayed LidoSRv3.Audit.Verity.ConsolidationTx
+warning: LidoSRv3/Audit/Verity/ConsolidationTx.lean:726:36: This simp argument is unused:
+  requestCall
+
+Hint: Omit it from the simp argument list.
+  simp [commitObservables,̵ ̵r̵e̵q̵u̵e̵s̵t̵C̵a̵l̵l̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/ConsolidationTx.lean:770:53: This simp argument is unused:
+  payload
+
+Hint: Omit it from the simp argument list.
+  simp [commitObservables, p̵a̵y̵l̵o̵a̵d̵,̵ ̵hLen]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/ConsolidationTx.lean:930:23: This simp argument is unused:
+  ih
+
+Hint: Omit it from the simp argument list.
+  simp ̵[̵i̵h̵]̵
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [67/269] Replayed LidoSRv3.Audit.Guarantees.PConsolidation1
+warning: LidoSRv3/Audit/Guarantees/PConsolidation1.lean:240:41: This simp argument is unused:
+  List.mem_nil_iff
+
+Hint: Omit it from the simp argument list.
+  simp [List.mem_cons,̵ ̵L̵i̵s̵t̵.̵m̵e̵m̵_̵n̵i̵l̵_̵i̵f̵f̵] at hx
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [1138/1182] Replayed Conform.Wheels
+warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: Conform/Wheels.lean:106:70: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1139/1182] Replayed EvmYul.Pretty
+warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: EvmYul/Pretty.lean:36:32: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1187/1271] Replayed EvmYul.Semantics
+warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1188/1271] Replayed EvmYul.EVM.Semantics
+warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1226/1271] Replayed LidoSRv3.Audit.Verity.TopupTx
+warning: LidoSRv3/Audit/Verity/TopupTx.lean:293:8: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: LidoSRv3/Audit/Verity/TopupTx.lean:872:13: This simp argument is unused:
+  uint256Modulus
+
+Hint: Omit it from the simp argument list.
+  simp [pushEntry, scheduledDeposit, linkedCallEntryTo, linkedCallEntry, e̵v̵m̵W̵o̵r̵d̵,̵ ̵u̵i̵n̵t̵2̵5̵6̵M̵o̵d̵u̵l̵u̵s̵]̵e̲v̲m̲W̲o̲r̲d̲]̲
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/TopupTx.lean:965:19: This simp argument is unused:
+  Nat.mod_eq_of_lt hNoWrap
+
+Hint: Omit it from the simp argument list.
+  simp [evmWord,̵ ̵N̵a̵t̵.̵m̵o̵d̵_̵e̵q̵_̵o̵f̵_̵l̵t̵ ̵h̵N̵o̵W̵r̵a̵p̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/TopupTx.lean:1279:5: Variable name `hwcLen` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+⚠ [1269/1271] Replayed audit.trio.consolidation.GatewayCall
+warning: audit/trio/consolidation/GatewayCall.lean:187:79: This simp argument is unused:
+  pureExec
+
+Hint: Omit it from the simp argument list.
+  simp only [addConsolidationRequestsLoop, validatePublicKey, pubkeyLength, ̲h̲s̲'̲,̲
+                      hs̵'̵,̵ ̵h̵t', decide_true, Live.require, bind, bindExec, pure, ̵p̵u̵r̵e̵E̵x̵e̵c̵,̵
+                      callAddConsolidationRequest, hc, List.nil_append]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: audit/trio/consolidation/GatewayCall.lean:188:49: This simp argument is unused:
+  hc
+
+Hint: Omit it from the simp argument list.
+  simp only [addConsolidationRequestsLoop, validatePublicKey, pubkeyLength,
+  ̵  ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵hs',
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ht', decide_true, Live.require, bind, bindExec, pure, pureExec,
+                      callAddConsolidationRequest, h̵c̵,̵ ̵List.nil_append]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: audit/trio/consolidation/GatewayCall.lean:188:53: This simp argument is unused:
+  List.nil_append
+
+Hint: Omit it from the simp argument list.
+  simp only [addConsolidationRequestsLoop, validatePublicKey, pubkeyLength, hs',
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ht', decide_true, Live.require, bind, bindExec, pure, pureExec,
+                      callAddConsolidationRequest, h̵c̵,̵ ̵L̵i̵s̵t̵.̵n̵i̵l̵_̵a̵p̵p̵e̵n̵d̵]̵h̲c̲]̲
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: audit/trio/consolidation/GatewayCall.lean:259:54: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+info: audit/trio/consolidation/GatewayCall.lean:366:0: 'audit.trio.consolidation.GatewayCall.execute_success_requests' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: audit/trio/consolidation/GatewayCall.lean:367:0: 'audit.trio.consolidation.GatewayCall.invoke_failure_restores' depends on axioms: [propext]
+ℹ [1270/1271] Replayed LidoSRv3.Audit.Guarantees.PConsolidation1ActualGatewayVault
+info: LidoSRv3/Audit/Guarantees/PConsolidation1ActualGatewayVault.lean:34:0: 'LidoSRv3.Audit.Guarantees.PConsolidation1.actual_gateway_vault_requests' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [1271/1271] Built LidoSRv3.Tests.ConsolidationGatewayCallRegression (9.1s)
+info: LidoSRv3/Tests/ConsolidationGatewayCallRegression.lean:51:0: 'LidoSRv3.Tests.ConsolidationGatewayCallRegression.consumes_two_real_payloads' depends on axioms: [propext]
+info: LidoSRv3/Tests/ConsolidationGatewayCallRegression.lean:52:0: 'LidoSRv3.Tests.ConsolidationGatewayCallRegression.preserves_static_flag_and_call_order' depends on axioms: [propext]
+info: LidoSRv3/Tests/ConsolidationGatewayCallRegression.lean:53:0: 'LidoSRv3.Tests.ConsolidationGatewayCallRegression.unauthorized_gateway_rejected' depends on axioms: [propext]
+info: LidoSRv3/Tests/ConsolidationGatewayCallRegression.lean:54:0: 'LidoSRv3.Tests.ConsolidationGatewayCallRegression.incorrect_fee_after_staticcall' depends on axioms: [propext]
+Build completed successfully (1271 jobs).
