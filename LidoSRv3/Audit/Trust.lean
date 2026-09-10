@@ -1,3 +1,4 @@
+import LidoSRv3.Audit.Guarantees.PDeposit1ActualPipeline
 import LidoSRv3.Audit.Source.TrioAlloc1.Determinism
 import LidoSRv3.Audit.Source.TrioAlloc1.CapacitySpec
 import LidoSRv3.Audit.Source.TrioAlloc2.LoopCorrespondence
@@ -624,3 +625,5 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.TrioReserve1.PhysicalReserve.success_preserves
 #print axioms LidoSRv3.Audit.Source.TrioReserve1.PhysicalSequence.corresponds
 #print axioms LidoSRv3.Audit.Source.TrioReserve1.Transfers.credit_bound_from_aggregate
+
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.actual_live_pipeline_conservation
