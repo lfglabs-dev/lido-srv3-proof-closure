@@ -1,0 +1,32 @@
+{
+  "source": "2063fb762cda58e6824f64cb8a395ebace58f24c",
+  "main_base": "eee5d6700e5d99cc35eab7bf3e1e2b51a2465857",
+  "union": "ad0ffffc13d12b40db5592b12967900c7bd938cb",
+  "AllTrust": {
+    "command": "lake build LidoSRv3.Audit.AllGuarantees LidoSRv3.Audit.Trust",
+    "exit": 0,
+    "jobs": 1712
+  },
+  "trust": {
+    "command": "python3 scripts/check_trust_axioms.py",
+    "exit": 0,
+    "exact_axioms": 29,
+    "dependencies_recomputed": true,
+    "native_claims_reevaluated": true
+  },
+  "scoped_sets": 21,
+  "source_bodies": 4,
+  "imported_source_identities": 1340,
+  "package_pins": 11,
+  "candidate_artifacts": 15,
+  "inherited_artifacts": 17,
+  "compiler_input_bodies": 28,
+  "fresh_solidity_tests": 0,
+  "sha256": {
+    "audit/topup-module-memory/integration/README.md": "94d27b731daa76cd13563c604f838eef8f6a72e4024be6ff9d0b2612d3ea1ab7",
+    "audit/topup-module-memory/integration/all-trust-build.log": "ae1d02300630593198d9ab51b19674592f2acd52333a86ec3830f03e62a86e10",
+    "audit/topup-module-memory/integration/independent-source-review-2063.md": "65f4c20dbb9a310293674cc64814ff99710ed33bf2c60a9187a7e89ee5c9ba3a",
+    "audit/topup-module-memory/integration/scoped-axioms.json": "21def6d3d8f8d96862b18e76ea985bed9fb6d74b7692e0b00cb716c61d145ff0",
+    "audit/topup-module-memory/integration/trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439"
+  }
+}

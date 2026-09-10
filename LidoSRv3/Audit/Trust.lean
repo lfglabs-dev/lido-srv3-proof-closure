@@ -160,6 +160,7 @@ import LidoSRv3.Tests.AllocationTxMutants
 import LidoSRv3.Tests.AddressSourceMutants
 import LidoSRv3.Audit.Verity.Tests.SszTxSimulation
 import LidoSRv3.Audit.Source.SanityEnvelope
+import LidoSRv3.Tests.TopupModuleMemoryRegression
 
 /-!
 Machine-readable-in-build trust report for the first audit slice.
@@ -728,3 +729,8 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1.actual_report_fee_distribution_failure_restores
 #print axioms AccountAddress.ReportFeeDistribution.minted_budget
 #print axioms AccountAddress.FeeDistribution.PaymentChain.ledger
+
+#print axioms LidoSRv3.Audit.Guarantees.PTopupMemoryCalls.actual_root_module_memory_effects
+#print axioms LidoSRv3.Audit.Guarantees.PTopupMemoryCalls.actual_root_module_memory_failure_restores
+#print axioms LidoSRv3.Audit.Source.TopupModuleMemory.raw_bounds
+#print axioms LidoSRv3.Audit.Source.TopupModuleMemory.decode_success
