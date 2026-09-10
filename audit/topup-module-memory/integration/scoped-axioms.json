@@ -1,0 +1,102 @@
+{
+  "sets": {
+    "LidoSRv3.Audit.Guarantees.PTopupMemoryCalls.actual_root_module_memory_effects": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "LidoSRv3.Audit.Guarantees.PTopupMemoryCalls.actual_root_module_memory_failure_restores": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "LidoSRv3.Audit.Source.TopupBatchMemory.failure_restores": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "LidoSRv3.Audit.Source.TopupBatchMemory.run_success": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "LidoSRv3.Audit.Source.TopupModuleMemory.decode_success": [
+      "Quot.sound",
+      "propext"
+    ],
+    "LidoSRv3.Audit.Source.TopupModuleMemory.execute_success": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "LidoSRv3.Audit.Source.TopupModuleMemory.program_success": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "LidoSRv3.Audit.Source.TopupModuleMemory.raw_bounds": [
+      "Quot.sound",
+      "propext"
+    ],
+    "LidoSRv3.Tests.TopupModuleMemoryRegression.array_allocation_before_extent": [
+      "propext"
+    ],
+    "LidoSRv3.Tests.TopupModuleMemoryRegression.canonical_array": [
+      "propext"
+    ],
+    "LidoSRv3.Tests.TopupModuleMemoryRegression.count_panics": [
+      "propext"
+    ],
+    "LidoSRv3.Tests.TopupModuleMemoryRegression.empty_head": [
+      "propext"
+    ],
+    "LidoSRv3.Tests.TopupModuleMemoryRegression.full_batch_memory_failure": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "LidoSRv3.Tests.TopupModuleMemoryRegression.full_batch_same_world_attempts": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "LidoSRv3.Tests.TopupModuleMemoryRegression.full_batch_success": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "LidoSRv3.Tests.TopupModuleMemoryRegression.positive_preserves_physical_execution": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "LidoSRv3.Tests.TopupModuleMemoryRegression.positive_success": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "LidoSRv3.Tests.TopupModuleMemoryRegression.public_consumer": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "LidoSRv3.Tests.TopupModuleMemoryRegression.raw_allocation_first": [
+      "propext"
+    ],
+    "LidoSRv3.Tests.TopupModuleMemoryRegression.short_payload": [
+      "propext"
+    ],
+    "LidoSRv3.Tests.TopupModuleMemoryRegression.unaligned_empty": [
+      "propext"
+    ]
+  },
+  "sources": 1340,
+  "pins": 11,
+  "source_artifacts": 15,
+  "normal_olean_sha256": {
+    "LidoSRv3.Audit.Source.TopupModuleMemory": "7ab54b37719a1b5e36f5c5a3ed23592ffc1d6e1b1cc53a0e612a577dfc7f6287",
+    "LidoSRv3.Audit.Source.TopupBatchMemory": "6ec741d12e6d4b72426045166dfa8dd7d77a98e35b9c4728be3d79ee6c002bde",
+    "LidoSRv3.Audit.Guarantees.PTopupMemoryCalls": "0666bd93a3c1b9ae2d9d6caba22eb0a6ac478a4a34eb5d99b653c62817eb4d0b",
+    "LidoSRv3.Tests.TopupModuleMemoryRegression": "e81d24d0c08b1570df1616a31d9716af0fbbd1ac152d2a0e9996594aebfc1111"
+  }
+}
