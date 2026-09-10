@@ -1,0 +1,52 @@
+{
+  "schema": "lido-consol281-independent-review-v1",
+  "reviewed_source": "33b6053794ac96251a9f0713dbee7ec8b5c9612e",
+  "actual_merge": "7db9187e5d701977209735b8b6ae4441774b5e3d",
+  "documentary_base": "51cf7e70748d95cf41c7de9b11648cf442f04b08",
+  "scope": "Historical exact-source live CALL increment review and actual targeted kernel/axiom receipt; fullguarantees OPEN. No source changes/rebuild.",
+  "reviewer": "a11c0430-8bca-4a4a-84b4-93f564e05030",
+  "model": "kimi/k3",
+  "full_review_sha256": "8ad61d525af488d4cd729a4a3482f783cd092696fc7945d5b30bc99e104fcd83",
+  "original_increment_files": {
+    "LidoSRv3/Tests/TrioConsolidation/LiveCall.lean": "fe7b2773e572fdbb4aaef1629a200c7f9d706b2b6c8270cc7312c570f1eee40e",
+    "audit/trio/consolidation/InspectAxioms.lean": "51b75f5e21f826818d274d0feb7f1a9fb578f022eb37a399033adca33fe7ce6c",
+    "audit/trio/consolidation/LIVE-CALL.md": "4110697d2ff6db974ae11f9321ec9966ac76a37581208b6bbf08e0713e597b20",
+    "audit/trio/consolidation/LiveCall.lean": "d0c466b44ab48ae8161f4e21bc2c5bde707e63482086ece257e0fbab85c112cf"
+  },
+  "source_to_merge_and_current_base_identical": true,
+  "build": {
+    "created_at": "2026-09-09T23:52:19.764109973Z",
+    "deadline_at": "2026-09-10T01:52:19.764109973Z",
+    "exit_code": 0,
+    "heartbeat_at": "2026-09-10T00:15:49.931135356Z",
+    "id": "d944b0e8-00f0-4e8f-9057-37a066da2ad8",
+    "mission_id": "a11c0430-8bca-4a4a-84b4-93f564e05030",
+    "pid": 2944098,
+    "resource_class": null,
+    "scope_unit": "sandboxed-durable-sandboxed-assistant-49731151-d944b0e800f04e8f905737a066da2ad8",
+    "signal": null,
+    "status": "completed",
+    "updated_at": "2026-09-10T00:16:01Z",
+    "workspace_id": "ee5140d0-ef8c-45d0-8f6e-be508ca3f629"
+  },
+  "new_increment_axioms": [
+    "propext",
+    "Quot.sound"
+  ],
+  "tests": "Historical test examples use native_decide; this is explicitly outside the theorem axiom query. Not kernel-only examples or Solidity differential tests.",
+  "limitations": [
+    "Live codeSize rejects EOA unlike actual low-level CALL",
+    "STATICCALL fee supplied, not read through actual fee callee",
+    "Arbitrary callee frame laws and payable-credit entry assumed",
+    "Named fault/event words not exact ABI",
+    "Gateway-to-vault hop and EIP7251 body unresolved",
+    "Live.run model rollback not compiled EVM equivalence"
+  ],
+  "documents_sha256": {
+    "validation.log": "c5eca222aebdcedccc417179c173bbc22cc1cc92d6a1e9f07f2f8901e61da959",
+    "build-native-receipt.json": "acce578fd0b20a1972aca319e62a537423d903093ddc1827b286fc4a101fd1ea",
+    "independent-review.md": "8ad61d525af488d4cd729a4a3482f783cd092696fc7945d5b30bc99e104fcd83",
+    "independent-review-native.json": "e2bc017cf6518089f0c23b4eb38580306a9fd870e662fe22a43b9cc43d7eb40e",
+    "independent-review-event.json": "9464653d72227075025adadbf7cebea8698216490bc6827c1d81e876c6b78851"
+  }
+}
