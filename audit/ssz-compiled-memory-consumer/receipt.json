@@ -1,0 +1,49 @@
+{
+  "base": "d28dca58388a6d216f4144095f75988b64b0d708",
+  "source_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "public_theorem": "LidoSRv3.Audit.Guarantees.PSsz1.actual_memory_validator_branch",
+  "fresh_build_jobs": 1635,
+  "kernel_regressions": 2,
+  "new_axioms": 0,
+  "full_trust_exact_axioms": 29,
+  "source_identity_count": 1618,
+  "package_pins": {
+    ".lake/packages/verity": "e977aaad6e1a9e92e0132d41b3d33a14135a4d46",
+    ".lake/packages/evmyul": "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9",
+    ".lake/packages/mathlib": "fabf563a7c95a166b8d7b6efca11c8b4dc9d911f",
+    ".lake/packages/plausible": "63045536fe95024e6c18fc7b48e03f506701c5bc",
+    ".lake/packages/LeanSearchClient": "c5d5b8fe6e5158def25cd28eb94e4141ad97c843",
+    ".lake/packages/importGraph": "5c7542ed018c78194f1e2b903eaf6a792b74c03d",
+    ".lake/packages/proofwidgets": "24b0d9dc081c5423f8eec7e866c441e5184f29d9",
+    ".lake/packages/aesop": "e3cb2f741431ce31bf73549fb52316a57368b06f",
+    ".lake/packages/Qq": "f46324995fca5f0483b742e4eb4daec7f4ee50d2",
+    ".lake/packages/batteries": "fa08db58b30eb033edcdab331bba000827f9f785",
+    ".lake/packages/Cli": "92564e5770e4d09f2d86dfbf8ada1e9c715b384c"
+  },
+  "inputs": {
+    "LidoSRv3/Audit/Source/SszCompiledMemory.lean": "e762696100a72c659d504a790ff68a9b8157ffb09d8444354dc72a7eba00e4ed",
+    "LidoSRv3/Audit/Source/SszCompiledConsumer.lean": "7395497b4d2777e7960f144e8729d82cf0b9f0cf6931eae57cd6204fd6b3db5e",
+    "LidoSRv3/Audit/Source/SszCompiledMerkle.lean": "fe53672ff82bae89d3456e89a3624c538a71e192be3f8e711c89b7e65dc0ad84",
+    "LidoSRv3/Audit/Guarantees/PSsz1ActualMemory.lean": "e4f4fac6c8a51ad7ba0f90026a8246205c1773c60413bcab26679c1b48333633",
+    "LidoSRv3/Tests/SszCompiledMemoryRegression.lean": "30cb9b44a5cf1cf0164b68e7c90b4b9f73836decc95e4b3d7ceea0b37440aff6",
+    "LidoSRv3/Audit/AllGuarantees.lean": "4dc8a7a57157d687ef8e5fd0021217911e178ec061d986660df9537cef91bd57",
+    "LidoSRv3/Audit/Trust.lean": "bdae78b3456d997c0fd64a94abc7434f0cb4b591cddd470916ade44330e3e4e4",
+    "audit/trio/main-guarantees.json": "8e43dfb9ffbb188e3a483e65b4ca8e22c7448d3b846760e3824de1d7aeff12fa",
+    "audit/ux2/P-SSZ-1.json": "a92420331af4f86159ee80fd8aaa663a22633e0d1e2710281c16b8d6b902bfce"
+  },
+  "evidence": {
+    "audit/ssz-compiled-memory-consumer/reused-solidity.json": "a9c6caa0ed525c72004a8e69d3565bc23b171a3b617044f4079579432e3bf496",
+    "audit/ssz-compiled-memory-consumer/axioms.json": "7e9073ebb91c2fdd28def3cc49e30e75a135f6ac20bb53647c12a4ed51ef00a3",
+    "audit/ssz-compiled-memory-consumer/trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439",
+    "audit/ssz-compiled-memory-consumer/facade-build.log": "43a7a49bab220a473ef1d7de1ea453c611b3d8652810db2eee87adf5a852688a",
+    "audit/ssz-compiled-memory-consumer/proof-escape-check.log": "09f8d42016f03fe3eb48ff00d5fe0cbc473eac6e73b5fde92e9e214065cb42b0",
+    "audit/ssz-compiled-memory-consumer/README.md": "027c0a05b279cb09dffa36a089d2b268ba58059ee0936e1a660aa39cb22ec472",
+    "audit/ssz-compiled-memory-consumer/public-build.log": "ced48af778b0ad6412f3811ddd4a15fcb284a9e3a06d73f6c96c4140ca4c97b3",
+    "audit/ssz-compiled-memory-consumer/registry-checks.json": "cf7128b02fc319049f881ed8263f0f29c61a226d5980edfd8881cf7511a6825e",
+    "audit/ssz-compiled-memory-consumer/diagnostic-missing-trust-import.log": "7bfe1fb00cc8471e59dc477303a260bbcd2aa3ced5f1dee1461eab85cf968a61",
+    "audit/ssz-compiled-memory-consumer/source-inputs.json": "8dafd0cd29831c00772c1af9738a581add13099d6e4ea4f7b49473bd28906b39",
+    "audit/ssz-compiled-memory-consumer/kernel-regressions.log": "3731bcecc3737d0ba5fb005b7e43b46ee6eec42ef234560545815a7ce0710409",
+    "audit/ssz-compiled-memory-consumer/ux2-validation-reuse.json": "ef43cc45ac16b9bdf8d522b34394cd7945082dc471c888cb9ae9494422c0ea6a"
+  },
+  "status": "SSZ-1 OPEN: full CL entry and full ABI-declared list remain required; exact independent review pending"
+}

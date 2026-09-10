@@ -205,23 +205,26 @@
       ]
     },
     "P-SSZ-1": {
-      "description": "A successful deposit CALL in the source interpreter binds the submitted root to the ordered SHA preimages of its actually decoded public key, credentials, signature and msg.value in gwei. The guards derive exact field widths, uint64 amount range and gwei divisibility. The separate CL verifier ABI-frame composition remains open.",
+      "description": "A successful deposit CALL in the source interpreter binds the submitted root to the ordered SHA preimages of its actually decoded public key, credentials, signature and msg.value in gwei. The guards derive exact field widths, uint64 amount range and gwei divisibility. The separate CL verifier ABI-frame composition remains open. A separate initialized compiled-harness consumer carries the actual memory allocations, field stores and SHA loads into the proof loop, deriving its typed validator leaf and bounded memory extent from initialization.",
       "model": "Source deposit CALL/ABI interpreter with forward opaque SHA evaluation; historical synthetic encoding and Nat.pair results are separate",
       "theorems": [
-        "LidoSRv3.Audit.Guarantees.PSsz1.actual_deposit_call_binds_root"
+        "LidoSRv3.Audit.Guarantees.PSsz1.actual_deposit_call_binds_root",
+        "LidoSRv3.Audit.Guarantees.PSsz1.actual_memory_validator_branch"
       ],
       "covered": [
         "The actual CALL dispatcher decodes the same payload and consumes the same transferred value; no independent helper input is supplied.",
         "The source guard sequence derives 48/32/96-byte widths and an exactly divisible uint64 gwei amount.",
-        "The independently transcribed callee hash chain agrees forward with the depositor helper on those consumed fields, including signature splits, zero padding and little-endian amount."
+        "The independently transcribed callee hash chain agrees forward with the depositor helper on those consumed fields, including signature splits, zero padding and little-endian amount.",
+        "The initialized harness consumer derives memory extent at most 20 words, the key length and field values, and connects all seven Merkle SHA calls and their physical loads/stores to the actual consumed proof branch. No initial-memory bound or successful intermediate-stage premise is supplied."
       ],
       "missing": [
-        "The CLValidatorVerifier internal calldata-frame bridge to its existing typed leaf, wrapper and ordered proof branch remains open.",
+        "The complete CLValidatorVerifier entry (root/slot/proposer/generalized-index prefix) must consume the initialized compiled-harness result, and the actual consumed proof words must be related to the full ABI-declared list. The new memory consumer does not establish these connections.",
         "General malformed deposit-ABI acceptance and exact revert/event byte encodings are not established by the existing source callee interpreter."
       ],
       "conditions": [
         "The existing concrete CALL/ABI source interpreter and physical-world semantics apply; general compiler and declared Verity semantics remain accepted boundaries.",
-        "SHA is the existing opaque function returning exactly 32 bounded bytes. Only forward evaluation is used; no cryptographic injectivity or relation to a separate validator-proof transaction is assumed."
+        "SHA is the existing opaque function returning exactly 32 bounded bytes. Only forward evaluation is used; no cryptographic injectivity or relation to a separate validator-proof transaction is assumed.",
+        "The compiled-harness consumer uses the inherited SHA output-width condition and its actual successful execution; the initialized memory bound is derived. General opcode dispatch/gas remains within the accepted semantics scope; no new calldata-size or allocation premise is added."
       ],
       "assumptions": [
         "A-SOURCE-SHAPED",
