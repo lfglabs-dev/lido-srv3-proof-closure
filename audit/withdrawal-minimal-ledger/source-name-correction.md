@@ -1,0 +1,1 @@
+The source function cited in README is `SRLib._updateModuleLastDepositState` at pinned SRLib.sol:896–901, not `setLastDepositTimeAndBlock`. The described assignments and their order are unchanged. The original reviewed README and its receipt are retained byte-for-byte.

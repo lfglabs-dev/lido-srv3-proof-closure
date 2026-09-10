@@ -1,0 +1,45 @@
+{
+  "LidoSRv3.Audit.Guarantees.PDeposit1.actual_physical_metadata_conserves": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Guarantees.PTopup1.actual_continuation_locator_conserves": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.TopupPipelineMinimalLedger.execute_success_conservation": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.TopupPipelineMinimalLedger.positive_effects_conservation": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.WithdrawalMinimalLedgerRegression.actual_aliased_getters_and_unbound_consensus_succeed": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.WithdrawalMinimalLedgerRegression.locator_missing_code_rejects_without_calls": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.WithdrawalMinimalLedgerRegression.physical_metadata_callback_then_root_rollback": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.WithdrawalMinimalLedgerRegression.removed_conditions_are_false": [
+    "propext"
+  ],
+  "audit.trio.deposit.PhysicalMetadataLedger.execute_success_conservation": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "audit.trio.deposit.WithdrawalLedgerMinimal.pipeline_withdrawal_success_ledger": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ]
+}
