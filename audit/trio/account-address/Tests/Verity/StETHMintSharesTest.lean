@@ -36,6 +36,6 @@ example : mintShares 7 0 1 { before with stopped := true } =
     .reverted .stopped { before with stopped := true } := by decide
 
 /-- `_getTotalShares().add` reverts before the high-half mask check. -/
-example : mintShares 7 7 two256 before = .reverted .safeMathAddOverflow before := by decide
+example : mintShares 7 7 uint256Max before = .reverted .safeMathAddOverflow before := by decide
 
 end AccountAddress.Tests.Verity.StETHMintSharesTest
