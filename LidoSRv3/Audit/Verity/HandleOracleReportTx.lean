@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Source.AccountingCorrespondence
+import LidoSRv3.Audit.Source.ReportFeeProductsCorrespondence
 import Verity.Core
 
 /-!
@@ -488,6 +489,34 @@ theorem mintAfterReadDiscipline_holds : mintAfterReadDiscipline := by
             sequenceSlot] <;>
           decide
   · simp [hValid]
+
+/-- Execute the checked `Accounting.sol:317,323,325,331` fee products and
+feed their actual share result to the report transaction.  A checked-arithmetic
+failure is a transaction revert, so a failed fee calculation cannot be
+silently converted into a zero-share report. -/
+def handleOracleReportFromFeeProducts (i : ReportInput)
+    (feeInput : LidoSRv3.Audit.Source.ReportFeeProductsCorrespondence.Input) :
+    Contract Result :=
+  match LidoSRv3.Audit.Source.ReportFeeProductsCorrespondence.sharesToMintAsFees feeInput with
+  | none => fun snapshot => .revert "FEE_ARITHMETIC" snapshot
+  | some shares => handleOracleReport i shares.val
+
+/-- The actual checked-fee consumer retains the report's mint-after-read
+discipline.  If fee arithmetic reverts there is no committed transaction;
+otherwise this is exactly `handleOracleReport` supplied with the checked L331
+quotient rather than an unconstrained mint argument. -/
+theorem mintAfterReadDiscipline_fromFeeProducts (i : ReportInput)
+    (feeInput : LidoSRv3.Audit.Source.ReportFeeProductsCorrespondence.Input)
+    (state : ContractState) :
+    match (handleOracleReportFromFeeProducts i feeInput).run state with
+    | .success _ dirty =>
+        mintAfterRead (dirty.readSlot rewardsReadSlot) (dirty.readSlot rewardsMintedSlot)
+    | .revert _ _ => True := by
+  unfold handleOracleReportFromFeeProducts
+  cases hFee : LidoSRv3.Audit.Source.ReportFeeProductsCorrespondence.sharesToMintAsFees feeInput with
+  | none => simp
+  | some shares =>
+      exact mintAfterReadDiscipline_holds i shares.val state
 
 /-- Reordering mutant: the mint step runs before the read step, the same fault
 as a patch that calls `reportRewardsMinted` before re-reading the freshly

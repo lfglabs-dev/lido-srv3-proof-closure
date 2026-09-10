@@ -35,6 +35,7 @@ import LidoSRv3.Audit.Guarantees.PVaultEth1
 import LidoSRv3.Audit.Guarantees.PToken1
 import LidoSRv3.Audit.Spec.OracleMintCorrespondence
 import LidoSRv3.Audit.Source.SubmitReportFeeCorrespondence
+import LidoSRv3.Audit.Source.ReportFeeProductsCorrespondence
 import LidoSRv3.Audit.Verity.SubmitReportEntryTx
 import LidoSRv3.Audit.Guarantees.POracleSupply1
 import LidoSRv3.Audit.Spec.AddressClaimFuelCorrespondence

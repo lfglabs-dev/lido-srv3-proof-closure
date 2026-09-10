@@ -105,6 +105,19 @@ contains. -/
 theorem mint_after_read_discipline : mintAfterReadDiscipline :=
   mintAfterReadDiscipline_holds
 
+/-- Checked fee-product consumer: the value minted by the report transaction
+is the successful `Accounting.sol:331` uint256 quotient, not a free argument.
+An overflow, underflow, or zero divisor reverts before the report commits. -/
+theorem checked_fee_products_mint_after_read
+    (i : ReportInput)
+    (feeInput : LidoSRv3.Audit.Source.ReportFeeProductsCorrespondence.Input)
+    (state : Verity.ContractState) :
+    match (handleOracleReportFromFeeProducts i feeInput).run state with
+    | .success _ dirty =>
+        mintAfterRead (dirty.readSlot rewardsReadSlot) (dirty.readSlot rewardsMintedSlot)
+    | .revert _ _ => True :=
+  mintAfterReadDiscipline_fromFeeProducts i feeInput state
+
 /-- Kill-line for the registered parent `mint_after_read_discipline`.
 `handleOracleReportMintBeforeRead` is a pure call-site reordering of the real
 transaction: the `stampStep rewardsMintedSlot` call moves above the
