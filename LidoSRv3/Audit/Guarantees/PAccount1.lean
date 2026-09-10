@@ -123,6 +123,23 @@ theorem committed_fee_mint_consumes_checked_result
   AccountAddress.ReportFeeMint.committed_nonzero_mint_uses_fee_result
     x before post fee events h hfee
 
+/-- The same consumer through the restored root transaction name. -/
+theorem root_committed_fee_mint_consumes_checked_result
+    (x : LidoSRv3.Audit.Verity.HandleOracleReportTx.ReportWriteFeeMintInput)
+    (before post : AccountAddress.ReportFeeMint.World)
+    (fee : AccountAddress.ReportWriteFee.FeeResult)
+    (events : List AccountAddress.StETHMintShares.Event)
+    (h : LidoSRv3.Audit.Verity.HandleOracleReportTx.handleOracleReportFromCommittedFeeProducts
+      x before = .committed post fee events)
+    (hfee : 0 < fee.sharesToMintAsFees) :
+    ∃ pooled, events = [.transfer 0 before.steth.locatorAccounting pooled,
+      .transferShares 0 before.steth.locatorAccounting fee.sharesToMintAsFees] := by
+  simpa [LidoSRv3.Audit.Verity.HandleOracleReportTx.handleOracleReportFromCommittedFeeProducts]
+    using AccountAddress.ReportFeeMint.committed_nonzero_mint_uses_fee_result
+      { layout := x.layout, registeredModuleIds := x.registeredModuleIds,
+        reportedModuleIds := x.reportedModuleIds, balancesGwei := x.balancesGwei,
+        report := x.accountingReport } before post fee events h hfee
+
 /-- Kill-line for the registered parent `mint_after_read_discipline`.
 `handleOracleReportMintBeforeRead` is a pure call-site reordering of the real
 transaction: the `stampStep rewardsMintedSlot` call moves above the
