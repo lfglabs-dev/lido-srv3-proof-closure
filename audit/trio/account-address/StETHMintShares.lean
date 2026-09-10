@@ -45,8 +45,8 @@ inductive Error where
   | stopped
   | mintToZeroAddr
   | mintToStethContract
+  | safeMathAddOverflow
   | sharesOverflow
-  | recipientSharesOverflow
   | sharesTooLargeForEvent
   | zeroShareRateDenominator
   deriving Repr, DecidableEq
@@ -99,18 +99,23 @@ def mintShares (caller recipient amount : Nat) (before : State) : Outcome :=
   else if before.stopped then .reverted .stopped before
   else if recipient = 0 then .reverted .mintToZeroAddr before
   else if recipient = before.steth then .reverted .mintToStethContract before
+  -- `_getTotalShares().add(_sharesAmount)`, before the high-half check.
+  else if totalShares before + amount > uint256Max then .reverted .safeMathAddOverflow before
   else if totalShares before + amount ≥ two128 then .reverted .sharesOverflow before
+  -- `shares[_recipient].add(_sharesAmount)`, after the packed low-half write.
   else if before.shares recipient + amount > uint256Max then
-    .reverted .recipientSharesOverflow before
+    .reverted .safeMathAddOverflow before
   else
-    match pooledEthByShares before amount with
+    let post := { before with
+      totalAndExternalShares := setLowUint128 before.totalAndExternalShares
+        (totalShares before + amount)
+      shares := fun account => if account = recipient then before.shares account + amount
+        else before.shares account }
+    -- Lido.sol:899 invokes this only after `_mintShares` (898), so the
+    -- conversion observes the updated packed total and recipient mapping.
+    match pooledEthByShares post amount with
     | .error e => .reverted e before
     | .ok pooled =>
-      let post := { before with
-        totalAndExternalShares := setLowUint128 before.totalAndExternalShares
-          (totalShares before + amount)
-        shares := fun account => if account = recipient then before.shares account + amount
-          else before.shares account }
       .committed post [.transfer 0 recipient pooled, .transferShares 0 recipient amount]
 
 /-- The `Accounting.sol:403-407` bridge: only a successful getter/fee product
