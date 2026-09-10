@@ -3,6 +3,7 @@
 import copy
 import json
 import subprocess
+from source_spans import display_span
 
 
 def check_invalid_annotations(source, path, fixture, write, invoke):
@@ -38,6 +39,15 @@ def check_annotation_projection(fixture, expect):
     value = json.loads(original)
     annotated = next(span for span in value["source_spans"] if "provenance_status" in span)
     assert annotated["provenance_status"] == annotation
+    for required in ("path", "function", "start_line", "end_line", "source_sha", "permalink"):
+        missing = dict(annotated)
+        del missing[required]
+        try:
+            display_span(missing)
+        except KeyError:
+            pass
+        else:
+            raise AssertionError(f"projection silently omitted required field {required}")
     del annotated["provenance_status"]
     record.write_text(json.dumps(value, indent=2) + "\n")
     expect(fixture, "check", False, "differs from the registry and Lean sources")
@@ -75,5 +85,4 @@ def check_artifact_drift(fixture, expect, rewrite) -> None:
     expect(fixture, "check", False, "P-ALLOC-1.json is missing")
     expect(fixture, "generate", True, "generated 12 files")
     expect(fixture, "check", True, "11 guarantee records match")
-
 
