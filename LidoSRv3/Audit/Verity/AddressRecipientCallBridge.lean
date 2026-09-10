@@ -235,6 +235,62 @@ theorem request_revert_restores_caller_and_callee_world
   cases hrun : requestWithdrawals external ctx stETH amount suppliedOwner before <;>
     simp [hrun] at h ⊢
 
+/-! ## `WstETH.unwrap` physical path -/
+
+/-- OpenZeppelin ERC20's inherited physical layout in the pinned WstETH
+contract: `_balances` is mapping slot 0 and `_totalSupply` is scalar slot 2.
+`unwrap` changes both via `_burn(msg.sender, amount)`. -/
+def wstETHBalancesSlot : Nat := 0
+def wstETHTotalSupplySlot : Nat := 2
+
+def getPooledEthBySharesSelector : Nat := 0x7a28fb88
+def erc20TransferSelector : Nat := 0xa9059cbb
+
+def pooledEthBySharesCalldata (shares : Nat) : Bytes :=
+  encode 4 getPooledEthBySharesSelector ++ abiWord shares
+
+def erc20TransferCalldata (recipient : Address) (amount : Nat) : Bytes :=
+  encode 4 erc20TransferSelector ++ abiAddress recipient ++ abiWord amount
+
+/-- Source-ordered ERC20 `_burn`: both inherited physical slots change before
+the subsequent stETH transfer.  No balance fact is supplied by the caller. -/
+def burnWstETH (ctx : Context) (amount : Nat) : Exec Unit := fun world =>
+  let state := world.core
+  let balance := state.readMap wstETHBalancesSlot ctx.sender
+  let supply := state.readSlot wstETHTotalSupplySlot
+  if amount > balance.val then ⟨.error (.reason "ERC20: burn amount exceeds balance"), world, []⟩
+  else if amount > supply.val then ⟨.error (.reason "ERC20: burn exceeds total supply"), world, []⟩
+  else
+    ⟨.ok (), { world with core :=
+      (state.writeMap wstETHBalancesSlot ctx.sender (.ofNat (balance.val - amount))).writeSlot
+        wstETHTotalSupplySlot (.ofNat (supply.val - amount)) }, []⟩
+
+/-- `WstETH.unwrap` (0.6.12, lines 69--75).  The stETH amount is decoded from
+the configured stETH callee's `getPooledEthByShares` reply; then the bridge
+burns the caller's actual wstETH slots and calls the same stETH target's
+`transfer(msg.sender, amount)`.  Thus the recipient is the execution-derived
+`ctx.sender`, and any callee rejection rolls back caller and callee worlds. -/
+def unwrap (external : External) (ctx : Context) (stETH : Address) (amount : Nat) :
+    Exec Nat := do
+  require (decide (amount ≠ 0)) (.reason "wstETH: zero amount unwrap not allowed")
+  let amountBytes ← callWithCalldata external ctx stETH (pooledEthBySharesCalldata amount)
+  let stETHAmount ← decodeWord amountBytes
+  burnWstETH ctx amount
+  let _ ← callWithCalldata external ctx stETH (erc20TransferCalldata ctx.sender stETHAmount.val)
+  pure stETHAmount.val
+
+def runUnwrap (external : External) (ctx : Context) (stETH : Address) (amount : Nat)
+    (before : World) :=
+  run (unwrap external ctx stETH amount) before
+
+theorem unwrap_revert_restores_caller_and_callee_world
+    (external : External) (ctx : Context) (stETH : Address) (amount : Nat)
+    (before : World) (fault : Fault)
+    (h : (runUnwrap external ctx stETH amount before).outcome = .error fault) :
+    (runUnwrap external ctx stETH amount before).world = before := by
+  unfold runUnwrap LidoSRv3.Audit.Source.TrioReserve1.Live.run
+  cases hrun : unwrap external ctx stETH amount before <;> simp [hrun] at h ⊢
+
 /-- Top-level failure restores the exact caller/callee world.  Failed calls
 remain in `attempts`, but no queue slot, balance, or callee effect commits. -/
 theorem revert_restores_caller_and_callee_world
