@@ -1,0 +1,43 @@
+Compiling 2 files with Solc 0.8.9
+Compiling 31 files with Solc 0.4.24
+Solc 0.8.9 finished in 158.88ms
+Solc 0.4.24 finished in 165.68ms
+Compiler run successful with warnings:
+Warning: Functions in interfaces should be declared external.
+../../account-fee-distribution/solidity/vendor/@aragon/os/contracts/acl/IACL.sol:13:5: Warning: Functions in interfaces should be declared external.
+    function hasPermission(address who, address where, bytes32 what, bytes how) public view returns (bool);
+    ^-----------------------------------------------------------------------------------------------------^
+Warning: Functions in interfaces should be declared external.
+../../account-fee-distribution/solidity/vendor/@aragon/os/contracts/evmscript/IEVMScriptRegistry.sol:24:5: Warning: Functions in interfaces should be declared external.
+    function getScriptExecutor(bytes script) public view returns (IEVMScriptExecutor);
+    ^--------------------------------------------------------------------------------^
+Warning: Functions in interfaces should be declared external.
+/private/tmp/lido-account-treasury-call/audit/account-fee-distribution/solidity/vendor/@aragon/os/contracts/acl/IACL.sol:13:5: Warning: Functions in interfaces should be declared external.
+    function hasPermission(address who, address where, bytes32 what, bytes how) public view returns (bool);
+    ^-----------------------------------------------------------------------------------------------------^
+Warning: Functions in interfaces should be declared external.
+/private/tmp/lido-account-treasury-call/audit/account-fee-distribution/solidity/vendor/@aragon/os/contracts/evmscript/IEVMScriptRegistry.sol:24:5: Warning: Functions in interfaces should be declared external.
+    function getScriptExecutor(bytes script) public view returns (IEVMScriptExecutor);
+    ^--------------------------------------------------------------------------------^
+Warning: Unused function parameter. Remove or comment out the variable name to silence this warning.
+../../account-fee-distribution/solidity/vendor/@aragon/os/contracts/common/VaultRecoverable.sol:49:34: Warning: Unused function parameter. Remove or comment out the variable name to silence this warning.
+    function allowRecoverability(address token) public view returns (bool) {
+                                 ^-----------^
+Warning: Unused function parameter. Remove or comment out the variable name to silence this warning.
+/private/tmp/lido-account-treasury-call/audit/account-fee-distribution/solidity/vendor/@aragon/os/contracts/common/VaultRecoverable.sol:49:34: Warning: Unused function parameter. Remove or comment out the variable name to silence this warning.
+    function allowRecoverability(address token) public view returns (bool) {
+                                 ^-----------^
+
+Ran 9 tests for test/TreasuryCall.t.sol:TreasuryCallTest
+[PASS] testActualRequestAfterModulesAndTrailingBytesPaid() (gas: 167784)
+[PASS] testNoCodeRejectedAndEarlierTransfersRollback() (gas: 556133)
+[PASS] testNoncanonicalAddressRejected() (gas: 157860)
+[PASS] testRevertBytesBubbled() (gas: 157778)
+[PASS] testShortReplyRejected() (gas: 157689)
+[PASS] testStateWriteRejectedByActualStaticcall() (gas: 1040447953)
+[PASS] testZeroDecodedThenTransferRejects() (gas: 161143)
+[PASS] testZeroMintSkipsLocator() (gas: 56175)
+[PASS] testZeroTreasurySkipsRejectingLocator() (gas: 132074)
+Suite result: ok. 9 passed; 0 failed; 0 skipped; finished in 6.06ms (9.54ms CPU time)
+
+Ran 1 test suite in 140.93ms (6.06ms CPU time): 9 tests passed, 0 failed, 0 skipped (9 total tests)
