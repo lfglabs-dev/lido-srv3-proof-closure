@@ -7,9 +7,9 @@
 > target-code guard), the fee is read by an actual `staticcall("")`, the
 > callee frame is derived from the concrete predeploy body, and the
 > gateway→vault ABI hop is composed. Theorem names below that changed:
-> `callAdd_no_code` (revert on a code-less target) is replaced by
-> `callAdd_no_code_accepted`; `CallData.invoke` rows now read
-> `lowLevelCall`. Everything else in this packet is unchanged.
+> `callAdd_no_code` (revert on a code-less target) now states acceptance
+> (`callAdd_no_code_accepted`, same name kept as an alias); `CallData.invoke`
+> rows now read `lowLevelCall`. Everything else in this packet is unchanged.
 
 Pin: `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`.
 PR: #281 (`p-consolidation-pubkey-octets`).
@@ -68,7 +68,7 @@ attempted calls). The root transaction runs under `Live.run`.
 | Failed hop is the vault's own error, world restored, no event | `callAdd_fault`, `callAdd_error_restores` |
 | Successful hop: one accepted attempt, event appended | `callAdd_success` |
 | Successful hop needs code and funds | `callAdd_success_funded` |
-| Concrete arms: no code (accepted) / unfunded / rejected / accepted | `callAdd_no_code_accepted` (was `callAdd_no_code`), `callAdd_unfunded`, `callAdd_rejected`, `callAdd_accepted` |
+| Concrete arms: no code (accepted) / unfunded / rejected / accepted | `callAdd_no_code_accepted` (= `callAdd_no_code`), `callAdd_unfunded`, `callAdd_rejected`, `callAdd_accepted` |
 | Provisional `fee` transfer is the CALL ledger rule | `callAdd_credited_balances` |
 | Committed loop: all widths 48, one accepted request per pair in order | `loop_success` |
 | Any loop attempt is a request for a pair of the batch | `loop_attempt_request` |
@@ -134,7 +134,7 @@ True compiler exit (no `tee`). Lean 4.31.0.
 | `callAdd_error_restores` | `propext`, `Quot.sound` |
 | `callAdd_success` | `propext`, `Quot.sound` |
 | `callAdd_success_funded` | `propext`, `Quot.sound` |
-| `callAdd_no_code` (now `callAdd_no_code_accepted`) | `propext` |
+| `callAdd_no_code` (now the acceptance arm, = `callAdd_no_code_accepted`) | `propext` |
 | `callAdd_unfunded` | `propext` |
 | `callAdd_rejected` | `propext` |
 | `callAdd_accepted` | `propext` |

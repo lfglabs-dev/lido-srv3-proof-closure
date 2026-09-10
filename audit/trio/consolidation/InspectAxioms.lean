@@ -47,6 +47,7 @@ import LidoSRv3.Audit.Verity.TrioConsolidation.Memory
 #print axioms audit.trio.consolidation.lowLevelCall_success_funded
 #print axioms audit.trio.consolidation.lowLevelStaticCall_shape
 #print axioms audit.trio.consolidation.callAdd_no_code_accepted
+#print axioms audit.trio.consolidation.callAdd_no_code
 #print axioms audit.trio.consolidation.callAdd_unfunded
 #print axioms audit.trio.consolidation.callAdd_rejected
 #print axioms audit.trio.consolidation.callAdd_accepted

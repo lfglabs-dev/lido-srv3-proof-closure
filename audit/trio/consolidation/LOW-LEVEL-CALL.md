@@ -50,7 +50,8 @@ Consumers:
 | `WithdrawalVaultEIP7685.sol:115` `CONSOLIDATION_REQUEST.call{value: fee}(request)` | `callAddConsolidationRequest` = `lowLevelCall callee ctx inbox (vaultCallPayload pair) fee` |
 | `ConsolidationGateway.sol:302` `recipient.call{value: refund}("")` | `refundFee` = `lowLevelCall callee ctx (resolveAddress recipient sender) [] refund` |
 
-`callAdd_no_code_accepted`: a code-less, funded hop target accepts, the
+`callAdd_no_code_accepted` (also under the stable name `callAdd_no_code`
+that #281 inspected): a code-less, funded hop target accepts, the
 value moves, `ConsolidationRequestAdded` is emitted, the callee double never
 runs. `refund_no_code_accepted`: an EOA refund recipient is the valid path
 the code-guarded primitive rejected. Every #281 theorem
@@ -197,6 +198,7 @@ head is in the PR body.
 | `callAdd_success` | `propext` |
 | `callAdd_success_funded` | `propext` |
 | `callAdd_no_code_accepted` | `propext`, `Quot.sound` |
+| `callAdd_no_code` (stable name, = the acceptance arm) | `propext`, `Quot.sound` |
 | `callAdd_unfunded` | `propext` |
 | `callAdd_rejected` | `propext` |
 | `callAdd_accepted` | `propext` |

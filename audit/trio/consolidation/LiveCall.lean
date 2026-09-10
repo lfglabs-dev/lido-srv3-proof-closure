@@ -228,6 +228,18 @@ theorem callAdd_no_code_accepted (callee : External) (ctx : Context) (inbox : Li
   unfold callAddConsolidationRequest lowLevelCall
   simp [hc, Nat.not_lt.mpr hb, hopRequest, transfer]
 
+/-- Stable name of the no-code arm inspected since #281. Under `lowLevelCall`
+it is the acceptance arm (`callAdd_no_code_accepted`), not the revert the
+code-guarded primitive produced. -/
+theorem callAdd_no_code (callee : External) (ctx : Context) (inbox : Live.Address)
+    (pair : ProducedPair) (fee : Live.Word) (w : World)
+    (hc : (w.core.codeSize inbox.val).val = 0) (hb : fee.val ≤ w.balances ctx.self) :
+    callAddConsolidationRequest callee ctx inbox pair fee w =
+      ⟨.ok (), { transfer w ctx.self inbox fee.val with
+          logs := w.logs ++ [requestAddedEvent ctx.self (vaultCallPayload pair)] },
+        [⟨hopRequest ctx inbox pair fee, true, [], []⟩]⟩ :=
+  callAdd_no_code_accepted callee ctx inbox pair fee w hc hb
+
 /-- Insufficient vault balance for `fee`: failed attempt, no callee run. -/
 theorem callAdd_unfunded (callee : External) (ctx : Context) (inbox : Live.Address)
     (pair : ProducedPair) (fee : Live.Word) (w : World)
