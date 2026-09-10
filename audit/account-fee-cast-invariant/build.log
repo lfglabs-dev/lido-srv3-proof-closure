@@ -1,0 +1,8 @@
+'AccountAddress.ReportFeeCastInvariant.rows_allocation_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'AccountAddress.ReportFeeCastInvariant.report_allocation_le_total' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'AccountAddress.ReportFeeCastInvariant.report_exact_casts' depends on axioms: [propext, Classical.choice, Quot.sound]
+'AccountAddress.ReportFeeCastInvariant.composition_exact_casts' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]

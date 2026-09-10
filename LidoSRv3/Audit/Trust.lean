@@ -1,3 +1,5 @@
+import Tests.Verity.ReportFeeCastInvariantTest
+import LidoSRv3.Audit.Guarantees.PTopup2ModuleFailure
 import Tests.Verity.ReportFeeMintTest
 import LidoSRv3.Tests.TopupBatchRootCallsRegression
 import LidoSRv3.Tests.WithdrawalMinimalLedgerRegression
@@ -684,3 +686,12 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms AccountActualMintRegression.same_world_mint_and_rate
 #print axioms AccountActualMintRegression.mismatched_accounting_rejects
 #print axioms AccountActualMintRegression.mapping_overflow_restores_packed_word
+
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2.actual_module_no_code_failure
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2.actual_root_batch_no_code_failure
+
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1.actual_report_fee_mint_casts
+#print axioms AccountAddress.ReportFeeCastInvariant.report_allocation_le_total
+#print axioms AccountAddress.Tests.Verity.ReportFeeCastInvariantTest.module_slot_collision
+#print axioms AccountAddress.Tests.Verity.ReportFeeCastInvariantTest.router_slot_collision
+#print axioms AccountAddress.Tests.Verity.ReportFeeCastInvariantTest.actual_positive_mint_casts

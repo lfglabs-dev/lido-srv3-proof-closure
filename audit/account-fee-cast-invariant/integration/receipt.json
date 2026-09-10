@@ -1,0 +1,39 @@
+{
+  "source": "408e6a4378711dece329d6c0ae0d045b8d54b81f",
+  "main_base": "a8988b0140abe62450827b20300332e8f1961cdf",
+  "union": "450356fc3ee3eaef20c13716791f5842514044a1",
+  "source_review": "CLEAN full source/Solidity408e; retained verbatim",
+  "source_files_unchanged": [
+    "audit/trio/account-address/ReportFeeCastInvariant.lean",
+    "LidoSRv3/Audit/Guarantees/PAccount1ActualFeeCasts.lean",
+    "audit/trio/account-address/Tests/Verity/ReportFeeCastInvariantTest.lean"
+  ],
+  "source_receipt": {
+    "artifacts": 13,
+    "scoped_source_ids": 24,
+    "pins": 11,
+    "Solidity_files": 4,
+    "axiom_sets": 13,
+    "kernel_regressions": 6,
+    "public_instance": 1
+  },
+  "AllTrust": {
+    "command": "lake build LidoSRv3.Audit.AllGuarantees LidoSRv3.Audit.Trust",
+    "exit": 0,
+    "jobs": 1689
+  },
+  "trust": {
+    "command": "python3 scripts/check_trust_axioms.py",
+    "exit": 0,
+    "exact_axioms": 29,
+    "environment_dependencies_recomputed": true,
+    "native_claims_reevaluated": true
+  },
+  "integration_review": "Separate frozen exact-commit gate, not self-approved",
+  "sha256": {
+    "audit/account-fee-cast-invariant/integration/all-trust-build.log": "bb4ceaa16a349e22ce93de670e89fa6763c7e74715d2243d7407061bdeb1a3e6",
+    "audit/account-fee-cast-invariant/integration/independent-source-review-408e.md": "fa17136a42cbaa4a0c2e695fe47310c1ef25b665ca0b9abe96878d25c8dfc7b3",
+    "audit/account-fee-cast-invariant/integration/trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439",
+    "audit/account-fee-cast-invariant/integration/README.md": "7d0b45d746e1d906f3cab72e070afbd0678e7e39f8bc28aa556aa85ab83c1613"
+  }
+}
