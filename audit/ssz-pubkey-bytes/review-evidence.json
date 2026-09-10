@@ -1,0 +1,21 @@
+{
+  "source_head": "d31291a735baafb2be400e3f7dc1e7522f8eb1cf",
+  "base": "02b53a157e5e6e2049faced7f26009cbc55eb932",
+  "reviewer": "131e81a7-a7e4-4517-8e69-2f74ae1a79db",
+  "verdict": "CLEAN for this increment only",
+  "writer": "STOPPED",
+  "report_bytes": 21667,
+  "report_sha256": "400ea177d9c6621cce8aad1b04bd9c399a4b1feabcdd316927c3e1b93e467121",
+  "report_events": [
+    107,
+    108
+  ],
+  "packet_files": 1226,
+  "reviewer_git_comparisons": 112,
+  "receipt_checks": 1276,
+  "jobs": 1136,
+  "active_source_seconds": 6.9,
+  "active_tests_seconds": 9.3,
+  "fresh_forge": false,
+  "complete_guarantees": "all eight OPEN"
+}
