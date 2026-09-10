@@ -1,0 +1,26 @@
+{
+  "base": "222f1870e0cb0522a51d97534895b57bb62aeabc",
+  "scope": "Two missing production library registrations; proof and checker bodies unchanged. Not new theorem, new fidelity or full guarantee credit.",
+  "before_failure": "production modules missing from lakefile globs: LidoSRv3.Audit.Verity.TopupBeaconFundedTx, LidoSRv3.Audit.Verity.TopupFundedSourceTx",
+  "after_import_dag": "PASS; no production-to-tests/legacy/Trust imports and no layer debt increase",
+  "lean": {
+    "command": "lake build +LidoSRv3.Audit.Verity.TopupBeaconFundedTx +LidoSRv3.Audit.Verity.TopupFundedSourceTx",
+    "exit": 0,
+    "jobs": 1270,
+    "scope": "Existing proof targets replayed from matching source cache; no new proof or Forge execution."
+  },
+  "files": {
+    "lakefile.lean": "856f7b02b00ab14e9f934f60c635bd20714f45907dbc9acc7d3f0766312277dc",
+    "LidoSRv3/Audit/Verity/TopupBeaconFundedTx.lean": "536f5c81865f4c5b00fb7bb1b2440308a8a99a3190cb22e9ccd56c0a340c56e0",
+    "LidoSRv3/Audit/Verity/TopupFundedSourceTx.lean": "019f6255dd60caa74af208f664a6dae2255292f6b3b7c020b2501084274bafcb",
+    "scripts/check_import_dag.py": "4840f12fc06e42d4e096bf7e4fbc1ea43c1a4dc91b63c13ecff298fd9825097e",
+    "audit/import-layer-allowlist.txt": "77d1fe5464a801121a0db6fbb7873c1b92963034777a8b7a563131f4397cab03",
+    "audit/import-layer-baseline.txt": "77d1fe5464a801121a0db6fbb7873c1b92963034777a8b7a563131f4397cab03",
+    "audit/import-layer-retired.txt": "20f81c221626f19c541de4f1434ffc6642b88310b430bd9367eeb36e315d57db"
+  },
+  "evidence": {
+    "audit/topup-build-roots/validation.log": "ae39d76aaed76da0641a7038e310cff8c64406bff3f3257c1316feadeac33ba4",
+    "audit/topup-build-roots/import-dag.log": "45c3eaadcb1b9c3c68618893e3f1c2bd725c9ce8e7515e59d638783a5f561a63"
+  },
+  "all_eight": "OPEN"
+}

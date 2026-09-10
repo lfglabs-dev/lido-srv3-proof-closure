@@ -1,0 +1,32 @@
+{
+  "previous_basis": "ffd6ae4d5be0a5e1e7d1be335700e58ca90771f5",
+  "current_integrated_basis": "02b53a157e5e6e2049faced7f26009cbc55eb932",
+  "scope": "Documentary input binding only; source review is not inherited or broadened",
+  "inputs": {
+    "audit/guarantees.yaml": {
+      "prior_sha256": "30cae9ec654561f7320a3bd2031989868e6e530d00a36a63b5bc470ec3212189",
+      "current_sha256": "30cae9ec654561f7320a3bd2031989868e6e530d00a36a63b5bc470ec3212189",
+      "unchanged": true
+    },
+    "audit/source-map.yaml": {
+      "prior_sha256": "b390faebf0eb8ccea9e149c92f421e8f0bb1dca16c0dffa843489c31b52c5f32",
+      "current_sha256": "33040d89e1b1b93dd5cd5b7e855d45eee0883caec1629ee64fe6199a143619fb",
+      "unchanged": false,
+      "only_added_span": {
+        "repository": "lidofinance/core",
+        "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+        "path": "contracts/0.8.25/sr/StakingRouter.sol",
+        "function": "constructor",
+        "start_line": 88,
+        "end_line": 99,
+        "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/sr/StakingRouter.sol#L88-L99",
+        "provenance_status": "OPEN: _depositContract is only nonzero-checked then assigned unchanged to DEPOSIT_CONTRACT; deployed constructor argument/runtime immutable identity remains A-RUNTIME-PROVENANCE"
+      }
+    },
+    "audit/trust-native-decide-allowlist.txt": {
+      "prior_sha256": "4874951cd0717f16756f3f644c424f06bdbbfcca1561173b32fd134b1fb6730c",
+      "current_sha256": "4874951cd0717f16756f3f644c424f06bdbbfcca1561173b32fd134b1fb6730c",
+      "unchanged": true
+    }
+  }
+}

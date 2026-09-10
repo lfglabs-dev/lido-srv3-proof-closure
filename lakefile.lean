@@ -69,6 +69,8 @@ lean_lib «LidoSRv3» where
     .one `LidoSRv3.Audit.Verity.SubmitReportEntryTx,
     .one `LidoSRv3.Audit.Verity.Topup2DistributionTx,
     .one `LidoSRv3.Audit.Verity.Topup2Tx,
+    .one `LidoSRv3.Audit.Verity.TopupBeaconFundedTx,
+    .one `LidoSRv3.Audit.Verity.TopupFundedSourceTx,
     .one `LidoSRv3.Audit.Verity.TopupHybrid,
     .one `LidoSRv3.Audit.Verity.TopupPackedStorage,
     .one `LidoSRv3.Audit.Verity.TopupParent,
@@ -92,9 +94,9 @@ lean_lib «LidoSRv3Audit» where
 /-- Isolated accounting/address slices, with kernel-checked regression proofs. -/
 lean_lib «AccountAddressChecks» where
   srcDir := "audit/trio/account-address"
-  roots := #[`PAccount1, `PAddress1, `PAddress1Physical,
-    `Tests.Verity.PAccount1Test, `Tests.Verity.PAddress1Test,
-    `Tests.Verity.PAddress1PhysicalTest]
+  roots := #[`PAccount1, `ReportWriteFee, `PAddress1, `PAddress1Physical,
+    `Tests.Verity.PAccount1Test, `Tests.Verity.ReportWriteFeeTest,
+    `Tests.Verity.PAddress1Test, `Tests.Verity.PAddress1PhysicalTest]
 
 /-- Cross-check the staged indexed parent against the integrated source/ABI parent. -/
 lean_lib «TrioIntegrationChecks» where

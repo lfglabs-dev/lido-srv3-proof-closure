@@ -1,0 +1,402 @@
+{
+  "integrated_basis": "02b53a157e5e6e2049faced7f26009cbc55eb932",
+  "previous_count": 218,
+  "previous_digest": "3b69eb64b94ed88df117a907270846986630e5c971c02599349a018da5299a49",
+  "current_count": 291,
+  "current_digest": "3310d7fb45c1d44c33d253422373e14e900f1b21b77b0a20e2131923065c8d68",
+  "scope": "73 already-integrated native-backed test sites; existing 218 records unchanged; no new Lean source or kernel-proof claim",
+  "added_test_files": {
+    "LidoSRv3/Tests/TrioConsolidation/Codec.lean": {
+      "sha256": "1402b2abb21aae3cf80e8d40ac637a4da32ab9d5bbf73f60e4fb6e4a5bfe47b8",
+      "sites": 5,
+      "last_source_commit": "605b88290d5353eb9760686b5dce3a02a67a7b8b"
+    },
+    "LidoSRv3/Tests/TrioConsolidation/Gateway.lean": {
+      "sha256": "8f7919e219f906dabbd72f7cc371e8844aab19967b704d0db505f35308c27b54",
+      "sites": 22,
+      "last_source_commit": "d2983de830161b9317d43c12269f88591d392144"
+    },
+    "LidoSRv3/Tests/TrioConsolidation/LiveCall.lean": {
+      "sha256": "fe7b2773e572fdbb4aaef1629a200c7f9d706b2b6c8270cc7312c570f1eee40e",
+      "sites": 36,
+      "last_source_commit": "33b6053794ac96251a9f0713dbee7ec8b5c9612e"
+    },
+    "LidoSRv3/Tests/TrioConsolidation/Producer.lean": {
+      "sha256": "42f9c79ca1c0f49304c45b7774cace3c2fffa810cb3fe5169b82602bf85e7b77",
+      "sites": 3,
+      "last_source_commit": "2bbddb6659e460f05e7617aedd114a77d2832a2b"
+    },
+    "LidoSRv3/Tests/TrioConsolidation/Spec.lean": {
+      "sha256": "c861242ab04018a0411c16cfcd249615f8b5862175738839dcd21d6434de5d89",
+      "sites": 7,
+      "last_source_commit": "d2983de830161b9317d43c12269f88591d392144"
+    }
+  },
+  "added_records": [
+    [
+      "LidoSRv3/Tests/TrioConsolidation/Codec.lean",
+      17,
+      "example : blob 1 \u2260 blob 2 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/Codec.lean",
+      35,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/Codec.lean",
+      65,
+      "leading_zero_mutant (List.replicate 47 1) (by native_decide) 1 (by decide)"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/Codec.lean",
+      71,
+      "endian_mutant (encode pubkeyLength 1) (ABI.encode_length _ _) (by native_decide)"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/Codec.lean",
+      75,
+      "raw48_nat_injective (ABI.encode_length _ _) (ABI.encode_length _ _) (by native_decide)"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/Gateway.lean",
+      23,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/Gateway.lean",
+      29,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/Gateway.lean",
+      33,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/Gateway.lean",
+      38,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/Gateway.lean",
+      43,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/Gateway.lean",
+      48,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/Gateway.lean",
+      52,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/Gateway.lean",
+      55,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/Gateway.lean",
+      59,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/Gateway.lean",
+      63,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/Gateway.lean",
+      67,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/Gateway.lean",
+      74,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/Gateway.lean",
+      78,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/Gateway.lean",
+      82,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/Gateway.lean",
+      86,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/Gateway.lean",
+      91,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/Gateway.lean",
+      100,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/Gateway.lean",
+      109,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/Gateway.lean",
+      118,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/Gateway.lean",
+      123,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/Gateway.lean",
+      128,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/Gateway.lean",
+      137,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/LiveCall.lean",
+      72,
+      "example : isOk committed = true := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/LiveCall.lean",
+      78,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/LiveCall.lean",
+      80,
+      "example : committed.attempts.map (\u00b7.accepted) = [true, true] := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/LiveCall.lean",
+      83,
+      "example : committed.world.balances vault = 0 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/LiveCall.lean",
+      84,
+      "example : committed.world.balances inbox = 14 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/LiveCall.lean",
+      88,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/LiveCall.lean",
+      93,
+      "[\"ConsolidationRequestAdded\", \"ConsolidationRequestAdded\"] := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/LiveCall.lean",
+      94,
+      "example : committed.world.logs.map (\u00b7.emitter) = [vault, vault] := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/LiveCall.lean",
+      97,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/LiveCall.lean",
+      101,
+      "example : committed.world.balances vault = (before 14).balances vault - 14 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/LiveCall.lean",
+      108,
+      "example : rejectedAll.outcome = .error (.reason \"RequestAdditionFailed\") := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/LiveCall.lean",
+      109,
+      "example : rejectedAll.world.balances vault = 14 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/LiveCall.lean",
+      110,
+      "example : rejectedAll.world.balances inbox = 0 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/LiveCall.lean",
+      111,
+      "example : rejectedAll.world.logs.length = 0 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/LiveCall.lean",
+      114,
+      "[(false, blob 11 ++ blob 21)] := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/LiveCall.lean",
+      121,
+      "example : secondFails.outcome = .error (.reason \"RequestAdditionFailed\") := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/LiveCall.lean",
+      122,
+      "example : secondFails.attempts.map (\u00b7.accepted) = [true, false] := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/LiveCall.lean",
+      123,
+      "example : secondFails.world.balances vault = 14 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/LiveCall.lean",
+      124,
+      "example : secondFails.world.balances inbox = 0 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/LiveCall.lean",
+      126,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/LiveCall.lean",
+      127,
+      "example : secondFails.world.logs.length = 0 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/LiveCall.lean",
+      132,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/LiveCall.lean",
+      135,
+      "[] [] (before 14)).outcome = .error (.reason \"ZeroArgument\") := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/LiveCall.lean",
+      139,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/LiveCall.lean",
+      143,
+      "sources targets (before 13)).outcome = .error (.reason \"IncorrectFee\") := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/LiveCall.lean",
+      145,
+      "sources targets (before 13)).attempts = [] := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/LiveCall.lean",
+      153,
+      "example : shortTarget.outcome = .error (.reason \"InvalidPublicKeyLength\") := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/LiveCall.lean",
+      154,
+      "example : shortTarget.attempts.length = 1 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/LiveCall.lean",
+      155,
+      "example : shortTarget.world.balances vault = 14 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/LiveCall.lean",
+      169,
+      "example : isOk refunded = true := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/LiveCall.lean",
+      171,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/LiveCall.lean",
+      172,
+      "example : refunded.world.balances gateway = 0 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/LiveCall.lean",
+      173,
+      "example : refunded.world.balances recipient = 5 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/LiveCall.lean",
+      176,
+      "example : (refundRequest gatewayCtx (Live.word 5) 0).target = stranger := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/LiveCall.lean",
+      183,
+      "example : refundRejected.outcome = .error (.reason \"FeeRefundFailed\") := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/LiveCall.lean",
+      184,
+      "example : refundRejected.world.balances gateway = 5 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/Producer.lean",
+      27,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/Producer.lean",
+      49,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/Producer.lean",
+      66,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/Spec.lean",
+      71,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/Spec.lean",
+      74,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/Spec.lean",
+      77,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/Spec.lean",
+      80,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/Spec.lean",
+      84,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/Spec.lean",
+      87,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TrioConsolidation/Spec.lean",
+      91,
+      "native_decide"
+    ]
+  ]
+}

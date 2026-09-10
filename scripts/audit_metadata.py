@@ -21,11 +21,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import gfm_table  # noqa: E402  (sibling module, located above)
 import markdown_text  # noqa: E402  (sibling module, located above)
 import trio_report  # noqa: E402  (sibling module, located above)
+from source_spans import span_identity
 
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
 SOURCE_FIDELITY = AUDIT / "SOURCE-FIDELITY.md"
-R1_REVIEW_BASE = "ffd6ae4d5be0a5e1e7d1be335700e58ca90771f5"
+R1_REVIEW_BASE = "02b53a157e5e6e2049faced7f26009cbc55eb932"
 # Bind the report inputs to the recorded Git object and exact bytes.
 # Changed inputs must never inherit an earlier source review.
 # This exact family is every structured input used to render the R1 review
@@ -33,7 +34,7 @@ R1_REVIEW_BASE = "ffd6ae4d5be0a5e1e7d1be335700e58ca90771f5"
 # stale certified basis.
 R1_REPORT_INPUT_SHA256 = {
     "audit/guarantees.yaml": "30cae9ec654561f7320a3bd2031989868e6e530d00a36a63b5bc470ec3212189",
-    "audit/source-map.yaml": "b390faebf0eb8ccea9e149c92f421e8f0bb1dca16c0dffa843489c31b52c5f32",
+    "audit/source-map.yaml": "33040d89e1b1b93dd5cd5b7e855d45eee0883caec1629ee64fe6199a143619fb",
     "audit/trust-native-decide-allowlist.txt": "4874951cd0717f16756f3f644c424f06bdbbfcca1561173b32fd134b1fb6730c",
 }
 CANONICAL_IDS = [
@@ -266,12 +267,11 @@ def validate_pins(lock, manifest, source_map):
             require(spans, f"{target.get('id')}: mapped target has no spans")
         seen = set()
         for span in spans:
-            require(set(span) == {"repository", "source_sha", "path", "function", "start_line", "end_line", "permalink"}, f"{target.get('id')}: malformed source span")
+            key = span_identity(span, target.get("id"), require)
             require(span["repository"] == "lidofinance/core" and span["source_sha"] == sha, f"{target.get('id')}: source span pin differs")
             require(isinstance(span["start_line"], int) and span["start_line"] > 0 and span["end_line"] >= span["start_line"], f"{target.get('id')}: invalid source lines")
             expected = f"https://github.com/lidofinance/core/blob/{sha}/{span['path']}#L{span['start_line']}-L{span['end_line']}"
             require(span["permalink"] == expected, f"{target.get('id')}: source permalink is not immutable/exact")
-            key = tuple(sorted(span.items()))
             require(key not in seen, f"{target.get('id')}: duplicate source span")
             seen.add(key)
     deposit_target = next(target for target in targets if target.get("id") == "P-DEPOSIT-1")
@@ -747,7 +747,7 @@ def rendered(rows, source_map):
         gap_note = "No row is gap-free."
     report = [header + "# R1 final auditor report\n\n",
         "## Decision\n\n",
-        f"Review basis: structured inputs after the PR250 vault-premise editorial correction (theorem registrations and statuses unchanged; this revision is not a new independent certification; prior input history remains in Git; trio composition scoped separately) `{R1_REVIEW_BASE}`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.\n\n",
+        f"Review basis: structured inputs including the accepted TOPUP constructor provenance disclosure (theorem registrations and statuses unchanged; prior PR250 basis `ffd6ae4d5be0a5e1e7d1be335700e58ca90771f5` and exact input delta retained in `audit/metadata-reconcile/report-basis.json`; this revision is not a new independent certification; trio composition scoped separately) `{R1_REVIEW_BASE}`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.\n\n",
         "## Architecture and evidence boundary\n\n",
         "The evidence stack is: pinned Lido source spans → source-shaped/abstract Lean specifications → Verity Lean program and `Contract.run` transaction observables → named theorem and negative-mutant receipts. Revert theorems concern the modeled snapshot and journal. External calls, storage observations, and source correspondences have only the scope stated per row. Lean theorem names are authoritative; metadata records classification and fidelity, never proof progress.\n\n",
         "Pinned upstream source is `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`; Verity is pinned in `audit/artifacts.lock.json`; Lean is `leanprover/lean4:v4.31.0`. Canonical source anchors are immutable permalinks in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance. Supplemental rows deliberately have no independent source-map target unless their parent mapping says otherwise.\n\n",
