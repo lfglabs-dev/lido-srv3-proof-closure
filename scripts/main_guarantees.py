@@ -9,7 +9,7 @@ def main_record(identifier: str, context: dict, theorem_record, fail) -> dict:
     if set(main) != required:
         fail(f"{identifier}: incomplete main result")
     for key in ("theorems", "covered", "missing", "conditions", "assumptions", "outside"):
-        if not isinstance(main[key], list) or not main[key] or not all(isinstance(x, str) and x.strip() for x in main[key]):
+        if not isinstance(main[key], list) or (key != "missing" and not main[key]) or not all(isinstance(x, str) and x.strip() for x in main[key]):
             fail(f"{identifier}: invalid main result {key}")
     if not set(main["assumptions"]) <= set(context["assumptions"]):
         fail(f"{identifier}: unknown main assumption")

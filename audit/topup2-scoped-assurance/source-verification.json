@@ -1,0 +1,12 @@
+{
+  "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "sources": {
+    "contracts/0.8.25/TopUpGateway.sol": "a7ffb654fb4d8d83ba14a6d9452663f786e9a21434be3ce9b7205c546526b7b4",
+    "contracts/0.8.25/CLValidatorVerifier.sol": "d6e89f6975e4fa02f758bf461a98ac2d689296b5c92d03ffd4e43a22d0b3d7ed",
+    "contracts/0.8.25/sr/StakingRouter.sol": "4d5b83fc73736db6755ebbb58811ed499c3e6de622cce11a3ad8548800a34155",
+    "contracts/0.8.25/sr/SRTypes.sol": "22c28be7ceaf6ed841f18fc19296372ab246b1cfecc87902d49ee1670ed4aed6",
+    "contracts/0.8.25/sr/SRStorage.sol": "62e922f76a1db7756684d73db3151a02f6d8f0de51fac27922f0a4095ceb9d95",
+    "contracts/common/interfaces/IStakingModuleV2.sol": "eacc19c668dd2ad94c7c0cffc5957181b8bf1ed2321c14c34c9845ea054a64ce"
+  },
+  "verification": "Root read selected full functions, field layouts, caller/consumer value flow; source-scoped correspondence review, not a full bytecode simulation."
+}

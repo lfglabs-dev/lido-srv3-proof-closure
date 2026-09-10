@@ -29,6 +29,11 @@ def main():
                 raise
         else:
             raise SystemExit(f'{key}: main registry mutation was accepted')
+    closed = copy.deepcopy(context)
+    closed['main_results']['P-TOPUP-2']['missing'] = []
+    resolved = main_record('P-TOPUP-2', closed, generate_ux2.theorem_record, generate_ux2.fail)
+    assert resolved['main_result']['missing'] == []
+    assert resolved['main_result']['theorems']
     print('main guarantee declaration, assumption and condition mutations rejected')
 
 
