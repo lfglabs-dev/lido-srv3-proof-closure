@@ -128,12 +128,17 @@ def mintShares (caller recipient amount : Nat) (before : State) : Outcome :=
 
 /-- The `Accounting.sol:403-407` bridge: only a successful getter/fee product
 can furnish the amount that is passed to `LIDO.mintShares(address(this), ...)`.
-No post-state or independently proposed mint amount is accepted. -/
+No post-state or independently proposed mint amount is accepted.  The
+strict-positive guard is source code, too: a committed zero fee does not call
+`mintShares` and emits no mint events. -/
 def mintCommittedFee (L : Layout) (registeredIds : List Nat) (core : Core)
     (report : ReportWei) (before : State) : Option Outcome :=
   match calculateProtocolFees L registeredIds core report with
   | .error _ => none
-  | .ok fee => some (mintShares before.accounting before.accounting fee.sharesToMintAsFees before)
+  | .ok fee =>
+      if 0 < fee.sharesToMintAsFees then
+        some (mintShares before.accounting before.accounting fee.sharesToMintAsFees before)
+      else some (.committed before [])
 
 theorem totalShares_setLowUint128 (word : StorageWord) (value : Nat) (h : value < two128) :
     (setLowUint128 word value).val % two128 = value := by
