@@ -31,9 +31,10 @@ abbrev Exec := LidoSRv3.Audit.Source.TrioReserve1.Live.Exec
 abbrev Address := _root_.Verity.Address
 abbrev Bytes := LidoSRv3.Audit.Source.TrioReserve1.Live.Bytes
 
-/-- Executable lenses for the source's `requestsByOwner` EnumerableSet. -/
+/-- `keccak256("lido.WithdrawalQueue.requestsByOwner")`: the source's
+owner-indexed `EnumerableSet.UintSet` root. -/
 def ownerRequestIndexPosition : Nat :=
-  0x7f973f1f0bd3b6a1d72f7b49927429710d68c91b5cf61dd64e2f5f40545ef4b6
+  0x4b9bfe0774f05ab288bd50bd23f74ae80a797f1d0c82d419d43ebda4fdc2fe1f
 def ownerRequestKey (owner : Address) (requestId : Nat) : Uint256 :=
   .ofNat (owner.toNat * 2 ^ 128 + requestId)
 
@@ -244,7 +245,7 @@ def lastReportTimestampPosition : Nat :=
 /-- `isApprovedForAll[owner][operator]` is a nested mapping.  The key below
 is its ABI-pair projection in this executable storage lens. -/
 def operatorApprovalsPosition : Nat :=
-  0x2e6c8bafb6f9028b48d2d99e6559efba8c57eecbdb9b8b40b2ee6163e6c9e8da
+  0xe6a0e71d546599dab4b90490502c456cf7c806a5710690dde406c1a77d7f25e7
 def approvalPairKey (owner operator : Address) : Uint256 :=
   .ofNat (owner.toNat * 2 ^ 160 + operator.toNat)
 
