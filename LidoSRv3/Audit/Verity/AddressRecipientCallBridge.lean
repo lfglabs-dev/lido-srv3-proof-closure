@@ -474,7 +474,8 @@ def burnWstETH (ctx : Context) (amount : Nat) : Exec Unit := fun world =>
   else
     ⟨.ok (), { world with core :=
       ((state.writeMap wstETHBalancesSlot ctx.sender (.ofNat (balance.val - amount))).writeSlot
-        wstETHTotalSupplySlot (.ofNat (supply.val - amount))) }, []⟩
+        wstETHTotalSupplySlot (.ofNat (supply.val - amount))),
+      logs := world.logs ++ [⟨ctx.self, "Transfer", [(.ofNat ctx.sender.toNat), 0, (.ofNat amount)]⟩] }, []⟩
 
 /-- `staticcall` form of the `getPooledEthByShares` view.  It shares CALL's
 ABI framing but names the source-level static boundary explicitly; no value is
@@ -527,6 +528,8 @@ theorem unwrap_bridge_receipt :
     result.outcome = .ok 15 ∧
       result.world.core.readMap wstETHBalancesSlot unwrapBridgeContext.sender = 0 ∧
       result.world.core.readSlot wstETHTotalSupplySlot = 0 ∧
+      result.world.logs =
+        [⟨unwrapBridgeContext.self, "Transfer", [1, 0, 10]⟩] ∧
       result.attempts =
         [⟨⟨unwrapBridgeContext.self, (2 : Address), 0, pooledEthBySharesCalldata 10⟩,
             true, abiWord 15, []⟩,
