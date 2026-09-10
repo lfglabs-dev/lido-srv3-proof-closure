@@ -1,4 +1,5 @@
 import audit.trio.deposit.LiveBeacon
+import audit.trio.deposit.WithdrawalLedger
 import LidoSRv3.Audit.Source.TopupBeaconCommitted
 
 /-! Necessary consequences of a successful `LiveBeacon` suffix.
@@ -261,34 +262,80 @@ theorem execute_ok_derives_actual_effects (callee : Live.External)
   · exact Or.inr ⟨hz, suffix_ok_actual_beacon_effects callee ctx inputs.liveContext credentialsWord
       prepared before.live live trace hz hsuffix⟩
 
+/-- The executed root now consumes the necessary Lido ledger theorem and the
+actual beacon CALL ledger in one world. Neither funding nor `maxEBType1 = 32
+ether` is a premise: a nonempty successful execution and its final router
+assertion derive that equality. The existing pipeline configuration binding
+and distinct Lido/router/beacon roles remain explicit. -/
+theorem execute_pipeline_success_conservation (k : Queue.Keccak) (config : Pipeline.Config)
+    (staticOther : StaticCall.External) (other : Live.External)
+    (ctx : RouterDeposit.Context) (inputs : RouterDeposit.Inputs)
+    (before after : World) (attempts : List Live.Attempt)
+    (bound : Pipeline.Bound config inputs.liveContext before.live)
+    (lido_ne_router : inputs.liveContext.self ≠ inputs.liveContext.sender)
+    (router_ne_beacon : inputs.liveContext.sender ≠ beaconAddress ctx)
+    (h : execute (Pipeline.external k config staticOther other) ctx inputs before =
+      ⟨.ok (), after, attempts⟩) :
+    ∃ prepared transcript,
+      prepareDepositABI inputs.layout inputs.storage inputs.oracle inputs.config
+        inputs.requested before.allocationTranscript inputs.moduleId inputs.limits
+        inputs.obtainDepositData DEPOSIT_SIZE = (.ok prepared, transcript) ∧
+      CallSpec.Balances before.live.balances after.live.balances
+        inputs.liveContext.self (beaconAddress ctx) (prepared.values.actualKeys * DEPOSIT_SIZE) ∧
+      (prepared.values.actualKeys = 0 ∨ inputs.config.maxEBType1.val = DEPOSIT_SIZE) := by
+  obtain ⟨credentials, prepared, transcript, live, trace, hprep, hafter, htrace, cases⟩ :=
+    execute_ok_derives_actual_effects (Pipeline.external k config staticOther other)
+      ctx inputs before after attempts h
+  subst after
+  refine ⟨prepared, transcript, hprep, ?_⟩
+  rcases cases with ⟨hz, hw, ht⟩ | ⟨hn, committed, hbeacon, hcount, hcapacity⟩
+  · subst live
+    exact ⟨by simp [CallSpec.Balances, hz], Or.inl hz⟩
+  · have values := prepareDepositABI_composes_beacon_values inputs.layout inputs.storage inputs.oracle
+      inputs.config inputs.requested before.allocationTranscript transcript inputs.moduleId inputs.limits
+      inputs.obtainDepositData DEPOSIT_SIZE prepared hprep
+    have hword : (Live.word prepared.values.lidoPullWei).val = prepared.values.lidoPullWei :=
+      Nat.mod_eq_of_lt values.2.2.2.2.1
+    have hw := WithdrawalLedger.pipeline_withdrawal_success_ledger k config staticOther other
+      inputs.liveContext (Live.word prepared.values.lidoPullWei) (Live.word prepared.values.actualKeys)
+      before.live committed.withdrawn committed.withdrawalTrace bound committed.withdrawal_ok
+    rw [hword] at hw
+    obtain ⟨hfunds, hledger⟩ := hw
+    have hwithdraw := CallFlow.transfer_balances before.live inputs.liveContext.self
+      inputs.liveContext.sender prepared.values.lidoPullWei hfunds
+    rw [← hledger] at hwithdraw
+    have hwr := hwithdraw inputs.liveContext.sender
+    have hbr := hbeacon inputs.liveContext.sender
+    simp only [routerContext] at hbr
+    simp only [Ne.symm lido_ne_router, if_false, ite_true, Nat.add_zero] at hwr
+    simp only [router_ne_beacon, if_false, ite_true, Nat.add_zero] at hbr
+    have restored := committed.router_restored
+    have hamount : prepared.values.lidoPullWei = prepared.values.actualKeys * DEPOSIT_SIZE := by omega
+    have hmax : inputs.config.maxEBType1.val = DEPOSIT_SIZE := by
+      have hp := values.2.2.2.1.symm.trans hamount
+      exact Nat.eq_of_mul_eq_mul_left (Nat.pos_of_ne_zero hn) hp
+    refine ⟨?_, Or.inr hmax⟩
+    intro account
+    have hw := hwithdraw account
+    have hb := hbeacon account
+    simp only [routerContext] at hb
+    rw [hamount] at hw
+    dsimp only
+    by_cases hl : account = inputs.liveContext.self <;>
+      by_cases hr : account = inputs.liveContext.sender <;>
+      by_cases hbcn : account = beaconAddress ctx <;>
+      simp only [hl, hr, hbcn, if_pos, if_neg] at hw hb ⊢ <;> omega
+
+#print axioms execute_pipeline_success_conservation
+
 #print axioms execute_ok_derives_preparation
 #print axioms execute_ok_derives_actual_effects
 
 /-
-`SuffixCommitment.withdrawal_ok` is deliberately not converted here into a
-`TopupLiveWithdrawal.Balances` fact.  That conversion is the remaining
-load-bearing missing step for deriving `maxEBType1 = DEPOSIT_SIZE` from a
-successful `execute`: the prepared prefix gives
-`lidoPullWei = actualKeys * maxEBType1`; this file gives the actual callee's
-`actualKeys * DEPOSIT_SIZE` debit and the final router assertion; cancellation
-would then prove the equality for nonzero keys.
-
-The current RESERVE-1 API has sufficient `Pipeline.success`/`positive_success`
-theorems, but no necessary-success ledger inversion for
-`withdrawDepositableEther`.  Its `Live.External` reply type permits a
-successful delegated reply to return a changed world, and success alone does
-not recover the `Pipeline.Bound` routing facts that rule that path out.  Thus
-adding a caller-supplied withdrawal balance receipt (or a fresh `hEB`) here
-would merely rename the gap.  The required next theorem is a source-connected
-inversion of the concrete pipeline routing/call result, then this suffix
-consumer can cancel the two actual ledger deltas.
+The new pipeline consumer closes the necessary withdrawal/beacon ledger
+connection and derives the 32-ether configured amount on nonempty success.
+It does not connect the supplied allocation/module transcript to physical
+router storage or repair the metadata/event ordering of LiveBeacon.execute.
+Those source obligations and the registered public facade remain open.
 -/
-
-#print axioms suffix_ok_commitment
-#print axioms suffix_ok_actual_beacon_effects
-#print axioms execute_ok_exposes_actual_suffix
-#print axioms execute_ok_actual_beacon_effects
-#print axioms zero_keys_suffix_no_actual_calls
-#print axioms execute_failure_restores_root
-
 end audit.trio.deposit.LiveBeaconCommitted
