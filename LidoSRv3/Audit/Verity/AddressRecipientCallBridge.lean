@@ -84,6 +84,54 @@ def runClaimTo (external : External) (ctx : Context) (requestId hint : Nat)
     (recipient : Address) (before : World) :=
   run (claimTo external ctx requestId hint recipient) before
 
+/-! ## `transferFrom` owner-operated physical branch
+
+The live Solidity function also admits the two approval branches.  This bridge
+contains the owner-operated branch, which is the branch shared with the
+existing `AddressTransferTx` source slice: authorization is read from
+`ctx.sender`, never injected as an approval Boolean.  It updates precisely the
+low 160-bit `owner` field of the same `QUEUE_POSITION` metadata word used by
+`claimOne`; timestamp, claimed byte, and report timestamp are retained. -/
+
+/-- Replace only `WithdrawalRequest.owner`, packed into bits 0--159 of the
+second request word. -/
+def withRequestOwner (word : Uint256) (owner : Address) : Uint256 :=
+  .ofNat ((word.val / 2 ^ 160) * 2 ^ 160 + owner.toNat)
+
+/-- `WithdrawalQueueERC721.transferFrom` through `_transfer`, restricted to
+the literal `msg.sender == _from` branch.  Every guard is evaluated from the
+caller and physical request word; the successful write is
+`keccak256(abi.encode(requestId, QUEUE_POSITION)) + 1`. -/
+def transferFrom (ctx : Context) (from recipient : Address) (requestId : Nat) :
+    Exec Unit := fun world =>
+  let before := { world.core with sender := ctx.sender }
+  let metadata := requestMetadataWord before requestId
+  if recipient = zeroAddress then ⟨.error (.reason "TransferToZeroAddress"), world, []⟩
+  else if recipient = from then ⟨.error (.reason "TransferToThemselves"), world, []⟩
+  else if requestId = 0 then ⟨.error (.reason "InvalidRequestId"), world, []⟩
+  else if requestClaimed metadata then ⟨.error (.reason "RequestAlreadyClaimed"), world, []⟩
+  else if requestOwner metadata != from then
+    ⟨.error (.reason "TransferFromIncorrectOwner"), world, []⟩
+  else if ctx.sender != from then ⟨.error (.reason "NotOwnerOrApproved"), world, []⟩
+  else
+    ⟨.ok (), { world with core :=
+      before.writeMapUint (queuePosition + 1) (.ofNat requestId)
+        (withRequestOwner metadata recipient) }, []⟩
+
+def runTransferFrom (ctx : Context) (from recipient : Address) (requestId : Nat)
+    (before : World) :=
+  run (transferFrom ctx from recipient requestId) before
+
+/-- The direct ownership handoff is a top-level transaction too: every failed
+guard returns the entry world, including every unrelated account's state. -/
+theorem transfer_revert_restores_world
+    (ctx : Context) (from recipient : Address) (requestId : Nat) (before : World)
+    (fault : Fault)
+    (h : (runTransferFrom ctx from recipient requestId before).outcome = .error fault) :
+    (runTransferFrom ctx from recipient requestId before).world = before := by
+  unfold runTransferFrom LidoSRv3.Audit.Source.TrioReserve1.Live.run
+  cases hrun : transferFrom ctx from recipient requestId before <;> simp [hrun] at h ⊢
+
 /-- Top-level failure restores the exact caller/callee world.  Failed calls
 remain in `attempts`, but no queue slot, balance, or callee effect commits. -/
 theorem revert_restores_caller_and_callee_world
