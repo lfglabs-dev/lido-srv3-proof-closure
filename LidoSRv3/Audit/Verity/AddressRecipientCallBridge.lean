@@ -14,6 +14,10 @@ callee is not an input flag; `Live.run` restores the complete entry world.
 The bridge intentionally starts with the smallest address-bearing call edge.
 The other entrypoint work must use this boundary rather than add another
 boolean success parameter or an observation-only recipient slot.
+
+The recipient CALL remains an empty-calldata EVM CALL, including the EOA
+success path; its receipt is intentionally left for the named OPEN renaming
+obligation rather than being silently discharged by an abstract source swap.
 -/
 
 namespace LidoSRv3.Audit.Verity.AddressRecipientCallBridge

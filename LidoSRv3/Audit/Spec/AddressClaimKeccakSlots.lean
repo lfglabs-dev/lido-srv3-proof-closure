@@ -43,6 +43,16 @@ theorem physical_checkpoint_slots_are_keccak_derivation (hint : Nat) :
   ⟨mappingSlotLocation_zero checkpointsPosition hint, rfl,
     solidityMappingSlot_ne (Or.inl (Nat.succ_ne_self checkpointsPosition))⟩
 
+/-- The `EnumerableSet.UintSet._indexes` mapping is the struct member after
+`_values`: its base is the owner's outer-map value plus one *before* the
+request-id keccak.  This is deliberately a slot-identity statement, not a
+keccak injectivity assumption. -/
+theorem owner_request_index_slot_is_keccak_derivation (owner : Address) (requestId : Nat) :
+    ownerRequestIndexSlot owner requestId =
+      solidityMappingSlot (solidityMappingSlot requestsByOwnerPosition owner.toNat + 1)
+        requestId := by
+  simp [ownerRequestIndexSlot, ownerRequestSetBase]
+
 /-- The executable storage lenses themselves are the physical keccak slots.
 This is an invariant of every state, rather than a correspondence hypothesis
 that a caller must supply. -/

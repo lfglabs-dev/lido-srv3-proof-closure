@@ -57,7 +57,11 @@ def ownerRequestValueSlot (owner : Address) (index : Nat) : Nat :=
   EvmYul.fromByteArrayBigEndian
     (Compiler.Proofs.Storage.storageArrayElementPointer (ownerRequestSetBase owner) index)
 def ownerRequestIndexSlot (owner : Address) (requestId : Nat) : Nat :=
-  Compiler.Proofs.nestedMappingSlotLocation requestsByOwnerPosition owner.toNat requestId 1
+  -- `_indexes` is the second `EnumerableSet.Set` member.  Its mapping base
+  -- is `keccak256(abi.encode(owner, requestsByOwnerPosition)) + 1`, before
+  -- hashing `requestId`; adding one after a nested-map hash addresses a
+  -- different word entirely.
+  Compiler.Proofs.mappingSlotLocation (ownerRequestSetBase owner + 1) requestId 0
 
 /-- Executable lenses for the actual `EnumerableSet.UintSet` layout.  The
 outer owner mapping, its dynamic values array, and its `_indexes` mapping are
@@ -81,10 +85,17 @@ def removeOwnerRequest (state : ContractState) (owner : Address) (requestId : Na
     let lastIndex := ownerRequestValuesLength state owner - 1
     let toDeleteIndex := indexPlusOne - 1
     let lastValue := ownerRequestValue state owner lastIndex
-    let after := ((state.writeSlot (ownerRequestValueSlot owner toDeleteIndex)
-      (.ofNat lastValue)).writeSlot (ownerRequestIndexSlot owner lastValue)
-        (.ofNat (toDeleteIndex + 1))).writeSlot (ownerRequestValuesLengthSlot owner)
-          (.ofNat lastIndex)
+    -- OZ 4.4.1 `EnumerableSet.remove`: move the tail only when the removed
+    -- element is not itself the tail, then `pop` clears that final array
+    -- cell.  An unconditional swap would rewrite the removed index before
+    -- deleting it and would not model the conditional Solidity branch.
+    let swapped := if toDeleteIndex != lastIndex then
+      (state.writeSlot (ownerRequestValueSlot owner toDeleteIndex)
+        (.ofNat lastValue)).writeSlot (ownerRequestIndexSlot owner lastValue)
+          (.ofNat (toDeleteIndex + 1))
+      else state
+    let after := (swapped.writeSlot (ownerRequestValueSlot owner lastIndex) 0).writeSlot
+      (ownerRequestValuesLengthSlot owner) (.ofNat lastIndex)
     some (after.writeSlot (ownerRequestIndexSlot owner requestId) 0)
 
 def insertOwnerRequest (state : ContractState) (owner : Address) (requestId : Nat) :

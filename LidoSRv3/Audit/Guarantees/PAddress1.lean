@@ -15,7 +15,8 @@ abbrev Address := Nat
 
 /-- P-ADDRESS-1 remains OPEN: the source-shaped transition and its executable
 Verity composition are checked, while the named live-receipt renaming
-obligation below has not been discharged. -/
+obligation below has not been discharged.  In particular, no source-level
+renaming theorem is presented as consuming the live CALL/world receipt. -/
 def guarantee : Guarantee := ⟨.pAddress1, [.model, .source, .verityTx]⟩
 
 /-!
