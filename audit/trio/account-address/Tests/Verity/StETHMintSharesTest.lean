@@ -8,9 +8,13 @@ open AccountAddress.StETHMintShares
 /-- A concrete packed word with total shares `10` and an independent external
 share payload `4` in the high half. -/
 private def before : State := {
-  storage := Core.write ⟨[]⟩ totalSharesPosition ⟨4 * two128 + 10, by
-    have : 4 * two128 + 10 < two256 := by decide
-    exact this⟩
+  storage := Core.write
+    (Core.write
+      (Core.write ⟨[]⟩ 17 ⟨111, by decide⟩)
+      18 ⟨222, by decide⟩)
+    totalSharesPosition ⟨4 * two128 + 10, by
+      have : 4 * two128 + 10 < two256 := by decide
+      exact this⟩
   shares := fun account => if account = 7 then 5 else 0
   internalEther := 100
   accounting := 7
@@ -25,6 +29,7 @@ example : match mintShares 7 7 2 before with
   | .committed post events =>
       totalShares post = 12 ∧ externalShares post = 4 ∧
       post.shares 7 = 7 ∧ post.shares 9 = 0 ∧
+      (post.storage.read 17).val = 111 ∧ (post.storage.read 18).val = 222 ∧
       events = [.transfer 0 7 25, .transferShares 0 7 2]
   | .reverted _ _ => False := by decide
 
