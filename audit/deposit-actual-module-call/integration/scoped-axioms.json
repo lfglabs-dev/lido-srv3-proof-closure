@@ -1,0 +1,122 @@
+{
+  "command": "lake env lean /tmp/LidoDepositIntegratedScope.lean",
+  "axiom_sets": {
+    "audit.trio.deposit.ModuleCall.call_success_origin": [
+      "propext"
+    ],
+    "audit.trio.deposit.ModuleCall.call_no_code": [
+      "propext"
+    ],
+    "audit.trio.deposit.ModuleCall.finalizeAllocation_ok": [
+      "propext",
+      "Quot.sound"
+    ],
+    "audit.trio.deposit.ModuleCall.return_size_bounds": [
+      "propext",
+      "Quot.sound"
+    ],
+    "audit.trio.deposit.ModuleCall.end_sub_base": [
+      "propext",
+      "Quot.sound"
+    ],
+    "audit.trio.deposit.ModuleCall.decode_empty": [
+      "propext",
+      "Quot.sound"
+    ],
+    "audit.trio.deposit.ModuleCall.decodeReturn_size_bounds": [
+      "propext",
+      "Quot.sound"
+    ],
+    "audit.trio.deposit.ModuleCall.decoded_call_origin": [
+      "propext",
+      "Quot.sound"
+    ],
+    "audit.trio.deposit.ModuleCall.prepare_values": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "audit.trio.deposit.ModulePhysicalMetadata.program_of_call": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "audit.trio.deposit.ModulePhysicalMetadata.failure_restores": [
+      "propext",
+      "Quot.sound"
+    ],
+    "audit.trio.deposit.ModulePhysicalMetadata.success_commitment": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "audit.trio.deposit.ModulePhysicalMetadata.success_effects": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "LidoSRv3.Audit.Guarantees.PDeposit1.actual_module_call_metadata_suffix": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "LidoSRv3.Audit.Guarantees.PDeposit1.actual_module_call_failure_restores": [
+      "propext",
+      "Quot.sound"
+    ],
+    "audit.trio.deposit.Tests.Verity.ModulePhysicalMetadataTest.zero_retains_module_changes": [
+      "propext",
+      "Quot.sound"
+    ],
+    "audit.trio.deposit.Tests.Verity.ModulePhysicalMetadataTest.zero_uses_entry_address_cap_and_payload": [
+      "propext",
+      "Quot.sound"
+    ],
+    "audit.trio.deposit.Tests.Verity.ModulePhysicalMetadataTest.zero_event_value": [
+      "propext",
+      "Quot.sound"
+    ],
+    "audit.trio.deposit.Tests.Verity.ModulePhysicalMetadataTest.malformed_outcome": [
+      "propext",
+      "Quot.sound"
+    ],
+    "audit.trio.deposit.Tests.Verity.ModulePhysicalMetadataTest.malformed_rollback": [
+      "propext",
+      "Quot.sound"
+    ],
+    "audit.trio.deposit.Tests.Verity.ModulePhysicalMetadataTest.malformed_keeps_nested_attempt": [
+      "propext",
+      "Quot.sound"
+    ],
+    "audit.trio.deposit.Tests.Verity.ModulePhysicalMetadataTest.over_target_rejects": [
+      "propext",
+      "Quot.sound"
+    ],
+    "audit.trio.deposit.Tests.Verity.ModulePhysicalMetadataTest.wrong_alignment_rejects": [
+      "propext",
+      "Quot.sound"
+    ],
+    "audit.trio.deposit.Tests.Verity.ModulePhysicalMetadataTest.below_target_actual_withdrawal_sees_module_and_metadata": [
+      "propext",
+      "Quot.sound"
+    ],
+    "audit.trio.deposit.Tests.Verity.ModulePhysicalMetadataTest.positive_execution": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "audit.trio.deposit.Tests.Verity.ModulePhysicalMetadataTest.positive_has_commitment": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "current_olean_sha256": {
+    "audit/trio/deposit/ModuleCall.lean": "d52cd5a93e298ee242b13a206d760e56355b26813e7b8d7c475e6c156c60d6ab",
+    "audit/trio/deposit/ModulePhysicalMetadata.lean": "c072a7300f1277293ed32f29644964e337c8c22c6cd7211cb651940c1a52bd3c",
+    "LidoSRv3/Audit/Guarantees/PDeposit1ModuleCalls.lean": "289c4e0b26707c175d7dd0a46848483ce28d24eb4cffb1283a87b6a10af5c753",
+    "audit/trio/deposit/Tests/Verity/ModulePhysicalMetadataTest.lean": "07806167b3ea3de2405d9f3be868a483f633c5174a516aa461d888e86c667566"
+  },
+  "sources_unchanged": true,
+  "manual_candidate_olean_byte_identity_claimed": false
+}

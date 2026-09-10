@@ -1,0 +1,577 @@
+{
+  "LidoSRv3/Audit/Arithmetic.lean": {
+    "is_new": false,
+    "olean_sha256": "fffbc8e01ad40b491056689b4f484f8b15a05f6d75eed6085750c2b41fcff920",
+    "source_sha256": "f1016418727da225ef9158f14c32a9ea173975686291f479b18e887d02632978"
+  },
+  "LidoSRv3/Audit/Guarantees/PDeposit1ModuleCalls.lean": {
+    "is_new": true,
+    "olean_sha256": "b422b1b8bad51a8cb6241515737cfaed61ba0f369c12d03e939902a3654797fa",
+    "source_sha256": "86e47fefdb28a1c708d801afec59cdcff7cd7abe5f889ae62559cd54e05ff2ee"
+  },
+  "LidoSRv3/Audit/Source/DepositDataRootCorrespondence.lean": {
+    "is_new": false,
+    "olean_sha256": "fc72470278a9ce91340819342c77e0770d839c6391c67b31aa00fa9102bd0cd0",
+    "source_sha256": "d80aa66141ed44056fd8c46b21de06be559dd5c7d1e18e5d7c3b540157dcd486"
+  },
+  "LidoSRv3/Audit/Source/TopupBeaconBatch.lean": {
+    "is_new": false,
+    "olean_sha256": "3590c3ab27b0a7ac19d6748e06c5fa8be9fe57310345f7162596493b914a0de9",
+    "source_sha256": "55d8e5060e24c18caaacca152f0c69560392ca4809b11af54826013f4507126a"
+  },
+  "LidoSRv3/Audit/Source/TopupBeaconCallee.lean": {
+    "is_new": false,
+    "olean_sha256": "24af747d5ce2ea3c511e1968a354df35fcce8a5999e33ff352a3d1ed18b283b7",
+    "source_sha256": "c9ef3fa8e99966b336cb0dd3dd6092e4ca246f2e7eaa2b58b7a136c07c348568"
+  },
+  "LidoSRv3/Audit/Source/TopupBeaconCommitted.lean": {
+    "is_new": false,
+    "olean_sha256": "5b6269b0e1edbba700cd1cfd86435b1437dfddb639c621a9dda25112837dd67a",
+    "source_sha256": "8cfa6ab58d9fb1f6ef558c3f0b8a6b8dd4897d3740e5c09d445c7e14ad02f54a"
+  },
+  "LidoSRv3/Audit/Source/TopupBeaconEffects.lean": {
+    "is_new": false,
+    "olean_sha256": "3b9a633400b78a040a4e93c441ce82edba267a757765c93de53c231d6a0f59d8",
+    "source_sha256": "bb6bb4e2f557c7da67ec151559b660aa88ad6f5229e026e73bfbf2728d92c469"
+  },
+  "LidoSRv3/Audit/Source/TopupCorrespondence.lean": {
+    "is_new": false,
+    "olean_sha256": "442ca0351d1bfc5890ec1f5d1213e009e7c2798edbd059d7031ae53fcee0545b",
+    "source_sha256": "b5a81d5f2171bca2655420cf6ee2ba841f63725ce02b5f3d25184c1d81adbc3d"
+  },
+  "LidoSRv3/Audit/Source/TopupFundedSource.lean": {
+    "is_new": false,
+    "olean_sha256": "b39e6b512b36da4f66f3a5c312d813a3893187fe87eec40187e368e3c809e505",
+    "source_sha256": "821059b47c41a0cc3cedc2713a6fde256fff455a1f6c4871e3f3aa71ea7cc3c6"
+  },
+  "LidoSRv3/Audit/Source/TopupLiveWithdrawal.lean": {
+    "is_new": false,
+    "olean_sha256": "7e9792e7aaaf5b987e7006e9a3259efec20900ca35360784e17796999abe64c7",
+    "source_sha256": "c8f154fe5ce744e87812090a7fdfb889c9ad28660491d8b1c686bb0a51f27d79"
+  },
+  "LidoSRv3/Audit/Source/TopupModuleCall.lean": {
+    "is_new": false,
+    "olean_sha256": "6235c5068b5beb74bafeb221766721918150b5bc79ba97964233c3034c3eba4a",
+    "source_sha256": "4748a14cccf561ab340d3698244ac7897cb2db75506c9146e76555b021c6347e"
+  },
+  "LidoSRv3/Audit/Source/TopupRouterContinuation.lean": {
+    "is_new": false,
+    "olean_sha256": "4458f77ec180946a99661ebc969d6e46741c920e11a69658cb7c08201d12fe02",
+    "source_sha256": "496ba9905f6b5b42c854a58f88f4dbe6ea5849a4de12aba6ebb776fc642104da"
+  },
+  "LidoSRv3/Audit/Source/TopupRouterCredentials.lean": {
+    "is_new": false,
+    "olean_sha256": "dc7e112f0b91b1c5ebadeb12b52d65c62ce7fd84023c896e2bb41d4d901c2927",
+    "source_sha256": "1917509309754b11fbeba8b70a9b73334a5ad18b3e3805bfb135287a58a4d53f"
+  },
+  "LidoSRv3/Audit/Source/TopupWeiBounds.lean": {
+    "is_new": false,
+    "olean_sha256": "ee0dc99b47db1a59e81a6a14e2ced31ae10a6e749cb345a05e042879eac2f298",
+    "source_sha256": "254edfae1e8948850b65d682cc03d94fa0fdc05323b463767c6d79b9d2746372"
+  },
+  "LidoSRv3/Audit/Source/TrioAlloc1/Bytes.lean": {
+    "is_new": false,
+    "olean_sha256": "08728220ecce5c0f5de9d0b3fd7c421416340abec9c72b2ffc2673af3c1a28f0",
+    "source_sha256": "80807f4a9a7894bf9bef06339eb7a50e59e715e2d77d508f07e19c847b70e5fb"
+  },
+  "LidoSRv3/Audit/Source/TrioAlloc1/CapacitySpec.lean": {
+    "is_new": false,
+    "olean_sha256": "df7d6d621c331308b2fce8f15033c9646c465dfed9a77e56786edddeee4e4e3b",
+    "source_sha256": "7005ebf63953d0bbc4c708885cc3572645e89c5ec0ee333b91a69ed7bea11131"
+  },
+  "LidoSRv3/Audit/Source/TrioAlloc1/Determinism.lean": {
+    "is_new": false,
+    "olean_sha256": "220781de7bc134b15f63332720304762ec3b04adb6fbf899e98169a4ba2cee75",
+    "source_sha256": "704f5b83e6474a7146e459ec58476d160484f8f0a85e1ec4153c5d94b9ec8b34"
+  },
+  "LidoSRv3/Audit/Source/TrioAlloc1/Execution.lean": {
+    "is_new": false,
+    "olean_sha256": "39a270765be4a4ea575a414bdb2f9bb482d3ecbe5ff3214485011ef72af8e6a7",
+    "source_sha256": "83ba3e3ad07068ef841ee743e2a975bc7bdb57e3f1855f535ada7c4426f64b11"
+  },
+  "LidoSRv3/Audit/Source/TrioAlloc1/FirstPass.lean": {
+    "is_new": false,
+    "olean_sha256": "0fd10ebf5666e6d243f77800a6c164adfbb59bcbedf1124dd59188ebfbdff347",
+    "source_sha256": "b32afeb9ebf468345ee7d61ff3030069b57e58eba621cd0b4976a567d359f11d"
+  },
+  "LidoSRv3/Audit/Source/TrioAlloc1/Interface.lean": {
+    "is_new": false,
+    "olean_sha256": "ee3a29e52f9c171307f6d3d9905b62bc03ac53db2d7b719da6a5edaf87f7255e",
+    "source_sha256": "17e1a11514fbe170f9b6402f2bc2edc24c853389e9b34add24c51305e3b4f674"
+  },
+  "LidoSRv3/Audit/Source/TrioAlloc1/Memory.lean": {
+    "is_new": false,
+    "olean_sha256": "daac2463f0114cc62d7a884476d367b330d76a458c7683b44d46aa4585f21af3",
+    "source_sha256": "955ddb2b118d7b47c12fd4ec0e6c54a197125d92f613316667ed1865fa0be52a"
+  },
+  "LidoSRv3/Audit/Source/TrioAlloc1/Properties.lean": {
+    "is_new": false,
+    "olean_sha256": "71b4aabd13166815d5c03b47e24e0eca2cf25f1a1a9f2dbb76bbd7237f9d941c",
+    "source_sha256": "53729f579147896741da3ef532c67682a96a77c68b0b3127d95721751b54e64a"
+  },
+  "LidoSRv3/Audit/Source/TrioAlloc1/Relational.lean": {
+    "is_new": false,
+    "olean_sha256": "13f9eb2fd197197a585892a68ad7639bbd844d294b315e1d7ec7352c706a2054",
+    "source_sha256": "aa86140523302f6ab219150899f274d040993626e8d2b594329b1fbe3ff74d8a"
+  },
+  "LidoSRv3/Audit/Source/TrioAlloc1/ShareWriter.lean": {
+    "is_new": false,
+    "olean_sha256": "d3be8201b9910f1ed831032888ab93027f25c1cc5f5de4ca33e80f39d51041f5",
+    "source_sha256": "5e41fd84413510e8db5f4fe21880c3f1de6558020076f34f2d44f4f2fbb3be69"
+  },
+  "LidoSRv3/Audit/Source/TrioAlloc1/Storage.lean": {
+    "is_new": false,
+    "olean_sha256": "6c4f397959f5d3c4286ceda425a4a3d578edca441a3b80b7157fd0347f54daf4",
+    "source_sha256": "f964606f020150deaeed389ce2605ee23d89a64ebc31967baf300e9149ba4496"
+  },
+  "LidoSRv3/Audit/Source/TrioAlloc2/ABIComposition.lean": {
+    "is_new": false,
+    "olean_sha256": "a8ef9a21b04c775799d4b4969323d500a42fa62cc3e4666d1605c2eb8e645e8e",
+    "source_sha256": "4046811e5a8fd40fc6af5d2bbf162c17c1e0947ef0b884d84652d9f75b66ef3e"
+  },
+  "LidoSRv3/Audit/Source/TrioAlloc2/Arithmetic.lean": {
+    "is_new": false,
+    "olean_sha256": "87632cc103a9a0f05d0d7b8e5ed980a85d24d967bab089b5b3304969dcd44bb6",
+    "source_sha256": "188c43817b202b3b618c398634304f42d20b4733f4311d3d3e698fbf53003e7c"
+  },
+  "LidoSRv3/Audit/Source/TrioAlloc2/ChoiceCorrespondence.lean": {
+    "is_new": false,
+    "olean_sha256": "e9a2f2f21af406a2102c97dbc923e0769c3d059310078c5a20ed6f7aba77b772",
+    "source_sha256": "bda52309f3a1618f5738b9ed7edf1331a6e122040d39687f293500c9f6e7d265"
+  },
+  "LidoSRv3/Audit/Source/TrioAlloc2/Composition.lean": {
+    "is_new": false,
+    "olean_sha256": "cfe4af94f267812699531e3ecc577c195ad9b935250e1a7cb4717662b0303b14",
+    "source_sha256": "dfad29f3e859430242012bb1a3472b0157a62ff73cdcb90934a131d96d2deead"
+  },
+  "LidoSRv3/Audit/Source/TrioAlloc2/Conservation.lean": {
+    "is_new": false,
+    "olean_sha256": "774a4d717c61ab7126d7ad97ad46065b3905740493a92212871b514b33fa597f",
+    "source_sha256": "5abfd99974099814330fccc405d90d5575557bbb389ed222ec26491f94b9ad65"
+  },
+  "LidoSRv3/Audit/Source/TrioAlloc2/Errors.lean": {
+    "is_new": false,
+    "olean_sha256": "380410a2a20383b4e6257f4dfd4d26dc1b5e8284c40112831dd77ad7fe043090",
+    "source_sha256": "42130536c8d55720a2f5249e06f187c9e01c0fa35e17120babb895503c57efec"
+  },
+  "LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean": {
+    "is_new": false,
+    "olean_sha256": "4982a7f2c3fcf480f6a22a387e5eb42918c89ebb8e3684b81bcf58222fe24eb5",
+    "source_sha256": "b2f7d6085d8fa79f57acb3d0d710bf0b9037bcebc04ea9acb4f92418072abd57"
+  },
+  "LidoSRv3/Audit/Source/TrioAlloc2/Loop.lean": {
+    "is_new": false,
+    "olean_sha256": "0a6bd27037a68d4182d7853f6225413ff7de9d9712ce3a88d34fb52118083300",
+    "source_sha256": "a717883f464a3e0acef64722a0f7fe222151ad98ba5b6b67049aab74f4ee0ea4"
+  },
+  "LidoSRv3/Audit/Source/TrioAlloc2/LoopBounds.lean": {
+    "is_new": false,
+    "olean_sha256": "da432e976dee530bb1ae701759d732e2fbd80eb7049cc800408c3aa4bf769d87",
+    "source_sha256": "f4862b07e0c08d4302ad291b9e16dd0dc6796fc45c5a37531b17c3e39420ff17"
+  },
+  "LidoSRv3/Audit/Source/TrioAlloc2/LoopCorrespondence.lean": {
+    "is_new": false,
+    "olean_sha256": "dd551e8db997bac54a0f23a0ddb19a2f51d1ab4e6e6f0286f54be1f86fccc19d",
+    "source_sha256": "82402ccea48e59c12090c408c578511d4c42d1c979c61b3f39a061b67ad06485"
+  },
+  "LidoSRv3/Audit/Source/TrioAlloc2/LoopTotality.lean": {
+    "is_new": false,
+    "olean_sha256": "4a84ecdcca223776e08b56891bea6785876974702cb5bb2c8a0b103d53e653d2",
+    "source_sha256": "5006feb6b0bac67a23c87ee5223d2094a8403a66300164073919541ff1caa521"
+  },
+  "LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean": {
+    "is_new": false,
+    "olean_sha256": "6f603d74f5618a040d1c2e47221f36774b5a55da8648a9f885781fd2d68e47cc",
+    "source_sha256": "6bd90551f9cb4a39c3384b98b2a6ff40c27b7eba6b491308c2bfa02ca1c5b025"
+  },
+  "LidoSRv3/Audit/Source/TrioAlloc2/ScanBounds.lean": {
+    "is_new": false,
+    "olean_sha256": "cfbb8e3d93fa0809f660992b61e153891af3029c10cb95501b14d4104842ff09",
+    "source_sha256": "2e998cf69f26826b8974d72eabf8f15638be9c02e8a2473f92148491af07b2e1"
+  },
+  "LidoSRv3/Audit/Source/TrioAlloc2/ScanCorrespondence.lean": {
+    "is_new": false,
+    "olean_sha256": "87e05ee22cfd9b07268b489be4d6e8983635af01a6b96f3f0ec3ce53c3ec19cf",
+    "source_sha256": "9fe0d714a57657508dc07351cd342f2e6aa4dd65b29801f4efc94b0b2ec28b4c"
+  },
+  "LidoSRv3/Audit/Source/TrioAlloc2/Selection.lean": {
+    "is_new": false,
+    "olean_sha256": "b126473b69e3e8e8a86c1c6e9ce9a348261c04b1954c8294bee98e0378e60d84",
+    "source_sha256": "38cdf79f1564aa022b1084d65b64e5fe627cb04ecc0a89cd496d74cfd7accc60"
+  },
+  "LidoSRv3/Audit/Source/TrioAlloc2/Spec.lean": {
+    "is_new": false,
+    "olean_sha256": "f1e060013050869907f15ef86983706328b5c2af9bebbc8826097bf2e6489b78",
+    "source_sha256": "fe3bbee5cc73badac5ac54ad818480ee6f5cea32228d1c6e34e7c07d3ff2dc37"
+  },
+  "LidoSRv3/Audit/Source/TrioAlloc2/SpecProgress.lean": {
+    "is_new": false,
+    "olean_sha256": "e0d860432ca3584968136a5670b88d7d417674db922fcf587ec4cb18c6454089",
+    "source_sha256": "a4ec617e036124438832d5822d4a68e80c461ea63b93cd677b40c56c86f10f76"
+  },
+  "LidoSRv3/Audit/Source/TrioAlloc2/Step.lean": {
+    "is_new": false,
+    "olean_sha256": "35b9c042e065deb7da4dadfa636f222e8d6b3091ced25ddfb9c4d1a3e7722b1b",
+    "source_sha256": "5ff153803de99ee07f99683c6b657a51c4d85b62b958e3fc726c1b93a4a4ecaf"
+  },
+  "LidoSRv3/Audit/Source/TrioAlloc2/StepBounds.lean": {
+    "is_new": false,
+    "olean_sha256": "0150cf2e7cdf6f00a62cd93feaf83e18b64cfae7561220aac861fcf6cc0985f3",
+    "source_sha256": "20d655b2720753ce76c4d650bd42b89655e2925eb588493d0a628c83bbae147b"
+  },
+  "LidoSRv3/Audit/Source/TrioAlloc2/StepCorrespondence.lean": {
+    "is_new": false,
+    "olean_sha256": "9909c218d9cec5376195f11c1288ecc2e86f6bff19dba5de2bdeebe7eb0b1c42",
+    "source_sha256": "f4a3f68e194a3282fcac20d89e847f6687c9389a0360a270794a555dae701755"
+  },
+  "LidoSRv3/Audit/Source/TrioAlloc2/Totality.lean": {
+    "is_new": false,
+    "olean_sha256": "7869be46ce0b37c5f7c11506ceaf8340a426a90417f2b5431a95fe97bf914a5c",
+    "source_sha256": "335759eb0d05c1177705ed588d6341ad143bac8f6070271b18fb780c84cbd653"
+  },
+  "LidoSRv3/Audit/Source/TrioAlloc2/Word.lean": {
+    "is_new": false,
+    "olean_sha256": "098181d09ad035cce90f87ed14f20cd258d0eb55dd846a0adde923f880b24997",
+    "source_sha256": "0d13d4c1e245bf01efdaad3a0a5c40a75a00f2b06c3ac22d6994c25e0ad8b786"
+  },
+  "LidoSRv3/Audit/Source/TrioComposition/Parent.lean": {
+    "is_new": false,
+    "olean_sha256": "0e94d0927f6aee3c0fe97bb9adb7f41e34a7d27fc40a38bc65829a59d38b8b26",
+    "source_sha256": "d3e6251154fa9f9b9c4f8ff23c3fe4906c2c7dd1168f835b964be9436354c8a9"
+  },
+  "LidoSRv3/Audit/Source/TrioComposition/ParentABI.lean": {
+    "is_new": false,
+    "olean_sha256": "eb68d573a74b1aa10f1eec15b6b758681232d0041ec9784469025d0d424836f2",
+    "source_sha256": "dd224c5e279ec37b8983e64b77706c0c4d6d6fd431db9530eae6b89e12858afe"
+  },
+  "LidoSRv3/Audit/Source/TrioComposition/ParentComposition.lean": {
+    "is_new": false,
+    "olean_sha256": "c1471cfbbdf1aabe5edd5566f24ba47cb5e46b698ffb5797e08731f67b78750b",
+    "source_sha256": "6975dcef3387cc907a49c182ad6794220265e5b82c8e3eb3f3267c308b21d6ae"
+  },
+  "LidoSRv3/Audit/Source/TrioComposition/ParentDeterminism.lean": {
+    "is_new": false,
+    "olean_sha256": "36d3528d7d2760e20919adcd7c288a09793a68c58d4dc20fd90bc29a94d92f84",
+    "source_sha256": "a67a430529b05f47b3bda8e159d57f2ec497a2eb87cf5b33578c6ef80e7eb6ea"
+  },
+  "LidoSRv3/Audit/Source/TrioComposition/ParentRelational.lean": {
+    "is_new": false,
+    "olean_sha256": "1bd492e264937a181f438e94d30e57f21df6d14f373f9d86aa144e3dd0465c67",
+    "source_sha256": "7c938bc42168bd63cfa011b406e7db38f0b92bf404246182558a88ae650407b3"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/ABI.lean": {
+    "is_new": false,
+    "olean_sha256": "455e63b6ae6be137a3f1a5602bf52d2e36c032ab585ce3b24a89180bc3766199",
+    "source_sha256": "07a7a120d8f50c630fbeb20c64b583ee41fe7f995d8b669ebf9d14fe220549c5"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/Admission.lean": {
+    "is_new": false,
+    "olean_sha256": "7beb0b216bb1c523b91ffa31fd26d189d1aeda6e6e7637599259e7812fb7ce9b",
+    "source_sha256": "6e7fae6f37e732b07041e458e07ded6a924ef004fad4eca219f3278cb5e132d8"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/AdmissionSpec.lean": {
+    "is_new": false,
+    "olean_sha256": "81417480c6ff67a98e992dcee23590e49ae05245a9406e3bb61b53c16d0fd4d5",
+    "source_sha256": "5700f877cb029fd1a648976002289fc1c9d720552b9728eb37228c3f2911cae1"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/Allocation.lean": {
+    "is_new": false,
+    "olean_sha256": "2986a31a005c750195acfae767ec3dd4950eff775f2a16f7792901e40c0b7e60",
+    "source_sha256": "4ca5c228218f30415badae67fb0373a98cff00851e4b09d1e0477fdcedf0f400"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/AllocationFlow.lean": {
+    "is_new": false,
+    "olean_sha256": "39be744a19d5c12c244fac148511c05f6b0fa374c6f43bf1daeb1f4d03ed5365",
+    "source_sha256": "cb5d67055e515e193d2cd64207967df0e2a937cd95b05a901af2e7119f56682b"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/AllocationFlowSpec.lean": {
+    "is_new": false,
+    "olean_sha256": "29226bb7638efd132cccb28ab181a831cababa3f7907abd1a19eb8c98c4e80e0",
+    "source_sha256": "2ab14bbcc8bc114eb00a1c63c55adfbb42ff749af781481eaf072077c5109e72"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/AllocationSpec.lean": {
+    "is_new": false,
+    "olean_sha256": "1ee613185d9c326742881bc5c52186d8287675a67c997d4dbbb107f290106945",
+    "source_sha256": "0ac96b84013977f21dcb8bc3577650a720bc09ce0f36ce99a0da16d07f7e5ccf"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/Balance.lean": {
+    "is_new": false,
+    "olean_sha256": "73e0cd0b30b11f6344d0d7105f53e33eccf2f5edc2dcd464614d3132eb006d1f",
+    "source_sha256": "3938834fef06bd5bfbcfeacf624e2a839aecac6f5ec5f3739151dec7616eb352"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/BalanceSpec.lean": {
+    "is_new": false,
+    "olean_sha256": "1653a3de29479083a22234fb324e20c34fa3ef39c1a696cd93bbe87e57ef834a",
+    "source_sha256": "08323391ebd2af2fcc9530c2fa3d793a9dc270bd79583886a3cb3c4a9f1b5c4e"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/CallData.lean": {
+    "is_new": false,
+    "olean_sha256": "5a6f5eb8521d3819775a24fa30018dc3f8e2b85c780803149016e5314c93cccc",
+    "source_sha256": "182787dda65d6cc315048e89212e1ef1bdb9d4c6a2084dad5413c303485d65eb"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/CallFlow.lean": {
+    "is_new": false,
+    "olean_sha256": "30fd6639ecea95de4e844157a60c91a3081baeec9b2d8755353847c95d162aa9",
+    "source_sha256": "02dbb2abe1326bcd2d29a75af4df615e54cc79c1425cfc899eb27ca2014280e0"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/CallResults.lean": {
+    "is_new": false,
+    "olean_sha256": "84300bab1bb31c94583b495f2ea31f3cef5849f77edf7c3f9caaa54171a2c42a",
+    "source_sha256": "068aff6f28ceeb8906190c8ca96db25fc95f8ff80373a75b84ba629d01785849"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/CallSpec.lean": {
+    "is_new": false,
+    "olean_sha256": "5e4b8b54d1f4fcba60272e46585b39ab9a3ebdf01f5a22237efa96a8d2238494",
+    "source_sha256": "5fa67fcb9a60b075be89338e9ab3974a7b13a7275d3a900c7e311f0cc25e70a7"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/CalleeBalance.lean": {
+    "is_new": false,
+    "olean_sha256": "456d2dd1818b42ab86a228307f8f0686167a4902b3ef934fe1371b0b95c71db3",
+    "source_sha256": "738ea9a345723e7ec46d010d6188e0781f7e8176ed9b9fdfd1cfa0600d341ed3"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/Consensus.lean": {
+    "is_new": false,
+    "olean_sha256": "a649efdd1280eaba485708c12e56000232f23c34962d98b68fa3ded38c02aa74",
+    "source_sha256": "65b5ac3a8e80a9d2451a6969d4af5b42b6df084d2445a5794553ec684d079426"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/ConsensusCalls.lean": {
+    "is_new": false,
+    "olean_sha256": "20688c53e37bc791654eddbd66d1b60755a7a84b2d2b6504efb835956c8a7320",
+    "source_sha256": "e8c91768ad643fe01b97d578bb33ae768130ca6dda5af58f66b9ca6553309c61"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/FrameRead.lean": {
+    "is_new": false,
+    "olean_sha256": "2b30b060bb251ba596018d652eb4e3efe83e7122ce74d48614fbdaecc6f6c18e",
+    "source_sha256": "c5ee90958ab5045ae2f5204913331a50610f1c8f9941787f08e980cae8e6d0e5"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/FrameReadSpec.lean": {
+    "is_new": false,
+    "olean_sha256": "d6ca13cd69d4162422b20a216d3c779ac95f52aba62316a778a69ab366938d24",
+    "source_sha256": "66a122d0c0ad3b804820141720d58d4f332ed21b380a551334520276743902f3"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/FrameSpec.lean": {
+    "is_new": false,
+    "olean_sha256": "99b54c03eb56427637f7ddaa3248633fb00faf631666fcdf030fe960d88a4417",
+    "source_sha256": "62d02f2ca38091687691a30124db9b9ca25260f4254daea1c1fcc445cc392102"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/Live.lean": {
+    "is_new": false,
+    "olean_sha256": "aced884f94a86389f6352f3eec73dfd87df373ee508da99cdd77d09331302c93",
+    "source_sha256": "f0479c959ca823fd95db8aab2a833ec8f7094abd0ada9a715f7e8c9052c468bb"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/Locator.lean": {
+    "is_new": false,
+    "olean_sha256": "ecf4bce8c58c2acd79b6b706265df5d33cdb030e797cbe90a0ed167cd6c489c4",
+    "source_sha256": "5e3a90aba1013cb65aa3306eacfe3122a84840e0138bc0d2496f34257bfb459f"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/Lookup.lean": {
+    "is_new": false,
+    "olean_sha256": "69915115e4e5f3e080645c953a92333f7cd092e040c560a3f7510b747d19a59b",
+    "source_sha256": "6f3a1e7ef063838f10ca5b0a951ff46c04376475c029b78a9318fab926a61aec"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/LookupSpec.lean": {
+    "is_new": false,
+    "olean_sha256": "936ce24142f3a5dccb00b9c34a4b45352d2d2d3052b943cd34350983bc9b98bc",
+    "source_sha256": "25bdc3ff977ee35b10756490fe075fd4db714fc3da595606920da7965691c976"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/Oracle.lean": {
+    "is_new": false,
+    "olean_sha256": "53ea5feab99754479bd47c4b444c76f2b9ce3a94f1389671a038119ecfe02339",
+    "source_sha256": "bcd662f8f412864768a9f058464a217976b63dbdde2a35f474038e62b2e8fc6b"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/OracleCalls.lean": {
+    "is_new": false,
+    "olean_sha256": "114de0d8b0b448d3d4b56765bcce04eddde7ffc849c0157f8c6a88768a6424ef",
+    "source_sha256": "fed5da04b0ec434f658bc6751bcc4e1de9a7306bbaad08426ec1930cbe09adfc"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/OracleSpec.lean": {
+    "is_new": false,
+    "olean_sha256": "5f5443430ad058b5dcc46bac307680e511f0735c13649253d194a92855d79852",
+    "source_sha256": "eacfde78139d66a7d2de260e5f70e46cd94991a534db30255ccd947690de8c10"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/PartitionSpec.lean": {
+    "is_new": false,
+    "olean_sha256": "a7b3fd9ab5b95788abc035d85924474b276ae43ec6308fd7b4157cc54fc84d58",
+    "source_sha256": "36f1afa4bf2c60832bc7edc34c8c9623e492c3f8ab92a75d4bbd713442d8987b"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/Pipeline.lean": {
+    "is_new": false,
+    "olean_sha256": "91acea364e41ee8631963d40f1edb1a9ea5154b6dd645218239a893590411f17",
+    "source_sha256": "1ede76ec371c8f87606aa29378fd10e2a93797e2cc7489d2157598f35d71b9c0"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/Queue.lean": {
+    "is_new": false,
+    "olean_sha256": "b4b259230f344469091890d3d6063b3796a7746bde539d23bd21a44b23ca2fdd",
+    "source_sha256": "be75949b3843e55ce9cbe56ad20f54dcf95b8d0ed6dbe380778366863aac6890"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/QueueCalls.lean": {
+    "is_new": false,
+    "olean_sha256": "ab22cd268410ae10c805812b0cfae0ec171d21f9191047b0dbf929eb87a0adda",
+    "source_sha256": "a8cb6c2e9de88683731d9914d8a639d081b0054d374f4179c613bcff35f4cf39"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/QueueSpec.lean": {
+    "is_new": false,
+    "olean_sha256": "6e4ced6bae11eac19c8dae3c492377e69d53734aa8b759326401cdace9c48685",
+    "source_sha256": "b9fe21bb34946a83565a61b298ab178ccff6adab6cc711ab3eb1e3672c7729e4"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/Router.lean": {
+    "is_new": false,
+    "olean_sha256": "bbd55cd262e96e1a4cdb2e358d9ed6f0a3633891391152e9b0ce9e04a641d676",
+    "source_sha256": "b272e74a80bda456d4adaaf8006593f46822551162be97282918488f901e8470"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/RouterSpec.lean": {
+    "is_new": false,
+    "olean_sha256": "38bc10c6217b6b9e8fe2577a439093e1ba3a74d8cd32b5d9948353176af2c38c",
+    "source_sha256": "3893ba4c92ef3e0e3fcf347e05fef79cff230164e89be8b40210e1a945001181"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/Spend.lean": {
+    "is_new": false,
+    "olean_sha256": "1a007286de282129fd6da7ba65334e71705836108f18d0dc50de0a8a1da10a6e",
+    "source_sha256": "62979abd6b6ccc21582e8070214870115c1af9c6f238e98ad30a44a4f58ea371"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/SpendSpec.lean": {
+    "is_new": false,
+    "olean_sha256": "b8077727c0004f452cab4993fae4c4e537f08384c9976d8a6790d6b992c0e1a3",
+    "source_sha256": "c79eb4ed05147550a6264afa4117d89429d33b5276d3466afb81888dd9c7113c"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/Spending.lean": {
+    "is_new": false,
+    "olean_sha256": "ea3eea23f73abde599e79836ce83e545b9d7f0587507cd5e3e26e32d0a98d0cf",
+    "source_sha256": "03a308a26089fa1c41cc69fc88ca6d6e10f6956969b9344b91ea12d7ccddf677"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/SpendingSpec.lean": {
+    "is_new": false,
+    "olean_sha256": "d26c36b8e61d0129acfe72e403c6049bc054b5cd69a3a254815876d00a61ddf4",
+    "source_sha256": "a1512835b40d6632089ac50f09be55f67a8c6d2a791d34c8abce09f8ccfa8c2d"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/StaticCall.lean": {
+    "is_new": false,
+    "olean_sha256": "e611a634265b05cfa902fdd65a03cf25dabcc4bfb181fabcfeeedab9ef10ffc8",
+    "source_sha256": "e2e989cb1b07e14ca4d5d548f6e0dcaeac1eb903badb9b05871fd71ee41e6f52"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/Status.lean": {
+    "is_new": false,
+    "olean_sha256": "746cef25c3fd7f8715d9665ef69cd8038c12022bd633ca421b3dc6ad08b7248b",
+    "source_sha256": "35524487b5657340163f8327523e98682437f9ba4f1d56045218be76d102ab38"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/StatusSpec.lean": {
+    "is_new": false,
+    "olean_sha256": "cda12c9802d4a1c2d5e3e734568f4181c0dbd878a44e4044abbcbd7787650a5c",
+    "source_sha256": "2181496589bbb4da51d37d2c4f02005442a57fca162667dde685374f0ed28cc2"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/Tail.lean": {
+    "is_new": false,
+    "olean_sha256": "d2d8a9e2c98abdd1f3d9e4d38eda8d7b6609bb8597dbff33dce57a4826690564",
+    "source_sha256": "ea697ace85a0fa77ecad3a5306b0dfc0cd97ccad808d4baee582e14bf9b447b6"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/TailSpec.lean": {
+    "is_new": false,
+    "olean_sha256": "014ebf7423746f9b28468d01ec57c0ab3d6d769bf9761a0bb70919beafc7e095",
+    "source_sha256": "55967f1fd74830cf72ba679bb175adea005277a4e3d1f613ccd99086ff804780"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/WithdrawalCalls.lean": {
+    "is_new": false,
+    "olean_sha256": "7d34920a643e0eea0d6f31fd1a475ee0778611b016cd939f12c7cd7b2148d410",
+    "source_sha256": "9b915c0b978941a81add086b8134e92b16b0efe941aed2746a89bf71cdc3c634"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/WithdrawalComposition.lean": {
+    "is_new": false,
+    "olean_sha256": "61a51f15325eb29b4aa7c8e143f30d8288a59635902263f2332a9776590caed5",
+    "source_sha256": "f87f0ceed14dde280292ac086b9fba11d89c2f4846c3bbea6e034db291f831a1"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/WithdrawalParent.lean": {
+    "is_new": false,
+    "olean_sha256": "648640ee6fc2ea812a1c177746c14b327fd79ae9fd65614b7f37538555a55a27",
+    "source_sha256": "1844fc5c2b349056ec6d12637579eee70ae70315dff1ffd9cde7945e2c9f54a5"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/WithdrawalSpec.lean": {
+    "is_new": false,
+    "olean_sha256": "c9083a8f20bc505f76eae970d4fafeea70eb3804756cc27f3a2739ccaa721665",
+    "source_sha256": "fe57761ff56e793dde3e8d68d8421ac1c4f04e52db75a29b7769cdf9c1db50ee"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/WithdrawalTail.lean": {
+    "is_new": false,
+    "olean_sha256": "9b8b8caabbf9089f2908405a1af11143369c44df4ed63f97cf584f197d56484a",
+    "source_sha256": "fbc9b2345740d1c9eb4a5578421302f77a969c87d642093fc5aeccf8703ac135"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/WriterSpec.lean": {
+    "is_new": false,
+    "olean_sha256": "17a2f22f329c0c266ba488416a701410fc8c954288920c2d77303dc0d6f84634",
+    "source_sha256": "4d060c61f360d339e52c72eba03b8f1c6e06856f7f7c643d7945a05f2f51371e"
+  },
+  "LidoSRv3/Audit/Source/TrioReserve1/Writers.lean": {
+    "is_new": false,
+    "olean_sha256": "ae35a2f8296726e005967b5542e11107663db04f6fafc5ef7634b9e771cd6f47",
+    "source_sha256": "463d563881d6433272f930ebf9d465a9c275a822b8b2e1ced66632246d89a7ba"
+  },
+  "LidoSRv3/Audit/Ssz.lean": {
+    "is_new": false,
+    "olean_sha256": "ced9468f69d4a68a81534fb776722144a1a1189c8c37e5d0841ae792c657a70f",
+    "source_sha256": "c4f1d60439d9fb141d8d9bff884d5fd21332b0b94eea552ea95f43ecd3457dab"
+  },
+  "LidoSRv3/Audit/Trace.lean": {
+    "is_new": false,
+    "olean_sha256": "1946dd80c57da9b31833342d26844f570c6df84d2ec145ac7e244e7ac404e226",
+    "source_sha256": "3f3b4d469905e75a21343ab87ecebac81accbfa08bc11e0becebb1e2e64fd29a"
+  },
+  "LidoSRv3/Audit/Verity/TopupBeaconFundedTx.lean": {
+    "is_new": false,
+    "olean_sha256": "9f0f757c6b35eddad8b8d53d2a28023c0de30ce6b6dbc748c800e52e1ceef0b5",
+    "source_sha256": "536f5c81865f4c5b00fb7bb1b2440308a8a99a3190cb22e9ccd56c0a340c56e0"
+  },
+  "LidoSRv3/Audit/Verity/TopupTx.lean": {
+    "is_new": false,
+    "olean_sha256": "733b468fbc2cf8aa6879ef5cba9e0ffe63aa927ed3c88c02b18b7dd0f0bb5e08",
+    "source_sha256": "142c68fce97927bce27ce777f9d075fa04f4b4a2801fc765540f68fa00491d01"
+  },
+  "audit/trio/consolidation/LowLevel.lean": {
+    "is_new": false,
+    "olean_sha256": "7c7609a8cfa09b77523ac4730b93592f101d85bf6c5df4f39899d4487f305ee8",
+    "source_sha256": "b50bd0951bdad2e9dd49f7cfdb1be06a6374cae702af94d31f8b8c251a405ce8"
+  },
+  "audit/trio/deposit/Deposit.lean": {
+    "is_new": false,
+    "olean_sha256": "13bce010046b6b64669ceec3ebe0dc9a7042b4f1bbba6e58b3f606d48d8f2587",
+    "source_sha256": "9fb5b55477fef0cedd4733fd5c144446a31ad49ec7c749e5f2079b2efa83759d"
+  },
+  "audit/trio/deposit/LiveBeacon.lean": {
+    "is_new": false,
+    "olean_sha256": "4847997fd79aef61f2e9f7ca92c615ff39b4346864e515214032f3361a609c0f",
+    "source_sha256": "a8baf4087e56e43b5156b22d0c34581c1304ca3efc01af57dbbc6200bbbd4429"
+  },
+  "audit/trio/deposit/LiveBeaconCommitted.lean": {
+    "is_new": false,
+    "olean_sha256": "df0086bb0a7ffda82c00f429b77b61d7f3e1f02567a129a40565a613faaca5d3",
+    "source_sha256": "f27e70b093c51a9ab28cfc2671fb4a0a1f95bbe87daca0fe4d156a06f8f9d83c"
+  },
+  "audit/trio/deposit/ModuleCall.lean": {
+    "is_new": true,
+    "olean_sha256": "9102cd5ee4db47da83bf4492cec520b5a3418c1296621a33333a7eb7c3eb5ef8",
+    "source_sha256": "adad48fda7ca5482c47bf9ff5bf6b82835ccee6996efe45b16cc410aef7343bc"
+  },
+  "audit/trio/deposit/ModulePhysicalMetadata.lean": {
+    "is_new": true,
+    "olean_sha256": "e1f69eaeb7116a0a8039af7785ec37ab20c7b6126a8327f623f885c8cea45a3b",
+    "source_sha256": "db78f50aa47f66ead81f35f65df6fd20daf046b716a05cfcd42785d37487c903"
+  },
+  "audit/trio/deposit/PhysicalMetadata.lean": {
+    "is_new": false,
+    "olean_sha256": "1cd9320ac2a64360acf6d8590892e8fa6e996e38a8b7eb2854287de76e8310f3",
+    "source_sha256": "b03b994a294272b4cd51cf7bc69f0ad1201d7d8860167d51cf9939e517eadcbd"
+  },
+  "audit/trio/deposit/RouterDeposit.lean": {
+    "is_new": false,
+    "olean_sha256": "5b70cc32d5b3816f0a11303298a805cd3d5b4fe6cbba0feea7077e5ffcd23b88",
+    "source_sha256": "fc1ee497cf7e2984e87df390256571903c54d0aed6e2f8f42f265fe81f1dfa28"
+  },
+  "audit/trio/deposit/Tests/Verity/ModulePhysicalMetadataTest.lean": {
+    "is_new": true,
+    "olean_sha256": "cb447ab242ccc4b4581f72494aa18423d6ec22d8f8950263ff8d724241053089",
+    "source_sha256": "3ef15679efc35eb965d3fd5a2ceac0690126270e6be0dce470c5fc5e9f02b54f"
+  },
+  "audit/trio/deposit/WithdrawalLedger.lean": {
+    "is_new": false,
+    "olean_sha256": "79364dd2bad5940893140756b36ea55f3dbbba7cd1e7e58c40d8b5c27c4787a2",
+    "source_sha256": "75b5761fe467331948dec506ca7d753be4cfa71e9f36b78d27a72dafc2dc1bf5"
+  }
+}

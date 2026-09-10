@@ -1,0 +1,40 @@
+'audit.trio.deposit.ModuleCall.call_success_origin' depends on axioms: [propext]
+'audit.trio.deposit.ModuleCall.call_no_code' depends on axioms: [propext]
+'audit.trio.deposit.ModuleCall.finalizeAllocation_ok' depends on axioms: [propext, Quot.sound]
+'audit.trio.deposit.ModuleCall.return_size_bounds' depends on axioms: [propext, Quot.sound]
+'audit.trio.deposit.ModuleCall.end_sub_base' depends on axioms: [propext, Quot.sound]
+'audit.trio.deposit.ModuleCall.decode_empty' depends on axioms: [propext, Quot.sound]
+'audit.trio.deposit.ModuleCall.decodeReturn_size_bounds' depends on axioms: [propext, Quot.sound]
+'audit.trio.deposit.ModuleCall.decoded_call_origin' depends on axioms: [propext, Quot.sound]
+'audit.trio.deposit.ModuleCall.prepare_values' depends on axioms: [propext, Classical.choice, Quot.sound]
+'audit.trio.deposit.ModulePhysicalMetadata.program_of_call' depends on axioms: [propext, Classical.choice, Quot.sound]
+'audit.trio.deposit.ModulePhysicalMetadata.failure_restores' depends on axioms: [propext, Quot.sound]
+'audit.trio.deposit.ModulePhysicalMetadata.success_commitment' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'audit.trio.deposit.ModulePhysicalMetadata.success_effects' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Guarantees.PDeposit1.actual_module_call_metadata_suffix' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Guarantees.PDeposit1.actual_module_call_failure_restores' depends on axioms: [propext, Quot.sound]
+'audit.trio.deposit.Tests.Verity.ModulePhysicalMetadataTest.zero_retains_module_changes' depends on axioms: [propext,
+ Quot.sound]
+'audit.trio.deposit.Tests.Verity.ModulePhysicalMetadataTest.zero_uses_entry_address_cap_and_payload' depends on axioms: [propext,
+ Quot.sound]
+'audit.trio.deposit.Tests.Verity.ModulePhysicalMetadataTest.zero_event_value' depends on axioms: [propext, Quot.sound]
+'audit.trio.deposit.Tests.Verity.ModulePhysicalMetadataTest.malformed_outcome' depends on axioms: [propext, Quot.sound]
+'audit.trio.deposit.Tests.Verity.ModulePhysicalMetadataTest.malformed_rollback' depends on axioms: [propext, Quot.sound]
+'audit.trio.deposit.Tests.Verity.ModulePhysicalMetadataTest.malformed_keeps_nested_attempt' depends on axioms: [propext,
+ Quot.sound]
+'audit.trio.deposit.Tests.Verity.ModulePhysicalMetadataTest.over_target_rejects' depends on axioms: [propext,
+ Quot.sound]
+'audit.trio.deposit.Tests.Verity.ModulePhysicalMetadataTest.wrong_alignment_rejects' depends on axioms: [propext,
+ Quot.sound]
+'audit.trio.deposit.Tests.Verity.ModulePhysicalMetadataTest.below_target_actual_withdrawal_sees_module_and_metadata' depends on axioms: [propext,
+ Quot.sound]
+'audit.trio.deposit.Tests.Verity.ModulePhysicalMetadataTest.positive_execution' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'audit.trio.deposit.Tests.Verity.ModulePhysicalMetadataTest.positive_has_commitment' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]

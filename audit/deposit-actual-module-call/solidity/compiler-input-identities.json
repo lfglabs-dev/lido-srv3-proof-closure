@@ -1,0 +1,30 @@
+{
+  "/private/tmp/lido-ssz-proof-committed/lido-core/contracts/0.8.25/sr/SRStorage.sol": {
+    "sha256": "62e922f76a1db7756684d73db3151a02f6d8f0de51fac27922f0a4095ceb9d95",
+    "keccak256": "0x39238b6ec00dbbba1be6d12e43e48bd1d7016a8775a714afe5485afb1ab7bf03"
+  },
+  "/private/tmp/lido-ssz-proof-committed/lido-core/contracts/0.8.25/sr/SRTypes.sol": {
+    "sha256": "22c28be7ceaf6ed841f18fc19296372ab246b1cfecc87902d49ee1670ed4aed6",
+    "keccak256": "0xfb467a0c8bb5d72186f62e66bc9c5b448ac677c3a835a10753e2fce868f3acea"
+  },
+  "/private/tmp/lido-ssz-proof-committed/lido-core/contracts/common/interfaces/IStakingModule.sol": {
+    "sha256": "4a98e89e763d19b45cb1ea422cec1c554fbd43c9f39c6bcc7a18aad64d46e193",
+    "keccak256": "0xe3e35ede05e6e7109275e77609d26cd5377c83505237155af19a5b49b7f1041f"
+  },
+  "/private/tmp/lido-ssz-proof-committed/lido-core/contracts/common/interfaces/IStakingModuleV2.sol": {
+    "sha256": "eacc19c668dd2ad94c7c0cffc5957181b8bf1ed2321c14c34c9845ea054a64ce",
+    "keccak256": "0x57b261d2d140860c4aeec309e359a20e4edb4adce1787a260830224f0f82bcb6"
+  },
+  "/private/tmp/lido-topup-wei-deps/package/utils/structs/EnumerableSet.sol": {
+    "sha256": "ed0804f9dcff9d2dceba8cc83f31669a84491dfcfe510050c9371aa7c48db09c",
+    "keccak256": "0x9b161e97b8967d4bc0c08d25741889a30692cdda4b71910bf1b0e315f1962212"
+  },
+  "audit/deposit-actual-module-call/solidity/DepositModuleCall.t.sol": {
+    "sha256": "ede95f0f759f22c58058f678803e24a5fb711f7a344d672a5e6df5091558f394",
+    "keccak256": "0x3f685cd345bdffea71f130e7aab54ed770c22e2e860ae058c244c063e5ebcf95"
+  },
+  "audit/deposit-actual-module-call/solidity/DepositModuleVectors.sol": {
+    "sha256": "ced44f0d6ea7417cfc6788ac835562f4a0a7368165719e9adc2b0379d131f902",
+    "keccak256": "0x89a26b3d54d1d04ce20dd46212ecec674214dbd70763bb7c2c21b9d091e62fdc"
+  }
+}
