@@ -110,10 +110,10 @@ lean_lib «LidoSRv3Audit» where
 /-- Isolated accounting/address slices, with kernel-checked regression proofs. -/
 lean_lib «AccountAddressChecks» where
   srcDir := "audit/trio/account-address"
-  roots := #[`PAccount1, `ReportWriteFee, `StETHMintShares, `ReportFeeMint, `ReportFeeCastInvariant, `PAddress1, `PAddress1Physical,
+  roots := #[`PAccount1, `ReportWriteFee, `StETHMintShares, `ReportFeeMint, `ReportFeeCastInvariant, `ReportFeeCheckedSplit, `PAddress1, `PAddress1Physical,
     `Tests.Verity.PAccount1Test, `Tests.Verity.ReportWriteFeeTest,
     `Tests.Verity.StETHMintSharesTest, `Tests.Verity.ReportFeeMintTest,
-    `Tests.Verity.ReportFeeCastInvariantTest,
+    `Tests.Verity.ReportFeeCastInvariantTest, `Tests.Verity.ReportFeeCheckedSplitTest,
     `Tests.Verity.PAddress1Test, `Tests.Verity.PAddress1PhysicalTest]
 
 /-- Cross-check the staged indexed parent against the integrated source/ABI parent. -/
