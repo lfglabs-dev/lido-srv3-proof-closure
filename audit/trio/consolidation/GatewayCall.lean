@@ -35,9 +35,12 @@ gateway's low-level CALL.  The low-level rule preserves this returndata as a
 `Fault.bubbled`; this bounded component uses empty revert data because the
 vault model's faults are names, not ABI-encoded revert bytes. -/
 def vaultCalldataExternal (callee : External) (sexternal : StaticCall.External)
-    (vaultCtx : Context) (gateway inbox : Address) (fee : Word) (selector calldata : Bytes) :
-    External := fun _ credited =>
-  let r := executeVaultCalldata callee sexternal vaultCtx gateway inbox fee selector calldata credited
+    (vaultCtx : Context) (inbox : Address) (selector : Bytes) : External := fun request credited =>
+  /- `request` is the low-level CALL request just constructed by the gateway.
+  Reading its caller, value and payload here is intentional: it prevents this
+  adapter from smuggling a separately precomputed hop into the vault body. -/
+  let r := executeVaultCalldata callee sexternal vaultCtx request.caller inbox request.value
+    selector request.payload credited
   match r.outcome with
   | .ok _ => .success [] r.world
   | .error _ => .rejected []
@@ -57,8 +60,7 @@ def gatewayProgram (callee : External) (sexternal : StaticCall.External)
   | .reverted _ => ⟨.error (.reason "GatewayRejected"), before, []⟩
   | .committed hop refund =>
       let calldata := gatewayVaultCalldata selector (hopSources hop.pairs) (hopTargets hop.pairs)
-      let vaultExternal := vaultCalldataExternal callee sexternal vaultCtx gatewayCtx.self inbox
-        hop.value selector calldata
+      let vaultExternal := vaultCalldataExternal callee sexternal vaultCtx inbox selector
       let callResult := lowLevelCall vaultExternal gatewayCtx vault calldata hop.value before
       match callResult.outcome with
       | .error fault => ⟨.error fault, callResult.world, callResult.attempts⟩
