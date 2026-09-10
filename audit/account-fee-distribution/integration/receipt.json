@@ -1,0 +1,35 @@
+{
+  "source": "6c1f367a7c9c22af7bad2dae073b8dbf277ea02b",
+  "main_base": "2c2c72a91cd68a43de0777912772d12cc48a285d",
+  "union": "b34fa406f5a9feaf475975fd963463111c058a79",
+  "source_review": "CLEAN with explicit raw assembly stdout EOF whitespace exception; full source/Solidity correspondence retained verbatim",
+  "AllTrust": {
+    "command": "lake build LidoSRv3.Audit.AllGuarantees LidoSRv3.Audit.Trust",
+    "exit": 0,
+    "jobs": 1708
+  },
+  "trust": {
+    "command": "python3 scripts/check_trust_axioms.py",
+    "exit": 0,
+    "exact_axioms": 29,
+    "dependencies_recomputed": true,
+    "native_claims_reevaluated": true
+  },
+  "registered_scoped_sets": 27,
+  "source_printed_sets": 21,
+  "source_bodies": 4,
+  "source_artifacts": 58,
+  "imported_source_identities": 31,
+  "package_pins": 11,
+  "pinned_solidity_bodies": 5,
+  "compiler_inputs": 32,
+  "vendored_dependencies": 29,
+  "fresh_solidity_execution_in_integration": false,
+  "sha256": {
+    "audit/account-fee-distribution/integration/README.md": "fb51eafcb6f0bcb6046621059f2bb8126c2e26f3de911c943b98887c79e6da55",
+    "audit/account-fee-distribution/integration/all-trust-build.log": "7bd4d11fb780f39d446536033a4ed6875003f548c930e24471ab1ca46700e398",
+    "audit/account-fee-distribution/integration/independent-source-review-6c1f.md": "3c7e992d5d4c267ee03354aebacab31ef5743fd466f0f3582a2d7dd15b140398",
+    "audit/account-fee-distribution/integration/scoped-axioms.json": "0ab64524eac4e108b785ddb8bdb530d08db022b93ab4ef0793fec44e7133a124",
+    "audit/account-fee-distribution/integration/trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439"
+  }
+}

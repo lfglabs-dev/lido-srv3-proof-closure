@@ -1,3 +1,4 @@
+import Tests.Verity.ReportFeeDistributionTest
 import audit.trio.deposit.Tests.Verity.ModulePhysicalMetadataTest
 import LidoSRv3.Tests.ConsolidationSettlementRequestsRegression
 import Tests.Verity.ReportFeeCheckedSplitTest
@@ -722,3 +723,8 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.actual_module_call_failure_restores
 #print axioms audit.trio.deposit.ModuleCall.decodeReturn_size_bounds
 #print axioms audit.trio.deposit.ModulePhysicalMetadata.success_effects
+
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1.actual_report_fee_mint_distribution
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1.actual_report_fee_distribution_failure_restores
+#print axioms AccountAddress.ReportFeeDistribution.minted_budget
+#print axioms AccountAddress.FeeDistribution.PaymentChain.ledger
