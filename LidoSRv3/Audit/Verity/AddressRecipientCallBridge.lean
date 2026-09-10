@@ -261,12 +261,11 @@ def lastRequestIdPosition : Nat :=
 def lastReportTimestampPosition : Nat :=
   0x6825d6bead788134d1ac062bbb7f1f0e4a9e13182688453e79955a721d58c45d
 
-/-- `isApprovedForAll[owner][operator]` is a nested mapping.  The key below
-is its ABI-pair projection in this executable storage lens. -/
+/-- `isApprovedForAll[owner][operator]` is a Solidity nested mapping. -/
 def operatorApprovalsPosition : Nat :=
   0xe6a0e71d546599dab4b90490502c456cf7c806a5710690dde406c1a77d7f25e7
-def approvalPairKey (owner operator : Address) : Uint256 :=
-  .ofNat (owner.toNat * 2 ^ 160 + operator.toNat)
+def operatorApprovalSlot (owner operator : Address) : Nat :=
+  Compiler.Proofs.nestedMappingSlotLocation operatorApprovalsPosition owner.toNat operator.toNat 0
 
 
 /-- `WithdrawalQueueERC721.transferFrom` through `_transfer`, restricted to
@@ -287,8 +286,7 @@ def transferFrom (ctx : Context) (fromAddr recipient : Address) (requestId : Nat
     ⟨.error (.reason "TransferFromIncorrectOwner"), world, []⟩
   else if ctx.sender != fromAddr &&
       (before.readMapUint tokenApprovalsPosition (.ofNat requestId)).val != ctx.sender.toNat &&
-      (before.readMapUint operatorApprovalsPosition
-        (approvalPairKey fromAddr ctx.sender)).val = 0 then
+      (before.readSlot (operatorApprovalSlot fromAddr ctx.sender)).val = 0 then
     ⟨.error (.reason "NotOwnerOrApproved"), world, []⟩
   else
     -- `_transfer` is owner-operated on this registered path. Approval and

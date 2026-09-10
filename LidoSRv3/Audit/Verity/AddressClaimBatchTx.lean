@@ -1,5 +1,6 @@
 import LidoSRv3.Audit.Source.AddressCorrespondence
 import Compiler.Proofs.MappingSlot
+import Compiler.Proofs.Storage.StructArrayStorage
 import Contracts.Common
 
 /-!
@@ -56,24 +57,22 @@ def ownerRequestSetBase (owner : Address) : Nat :=
   Compiler.Proofs.mappingSlotLocation requestsByOwnerPosition owner.toNat 0
 def ownerRequestValuesLengthSlot (owner : Address) : Nat := ownerRequestSetBase owner
 def ownerRequestValueSlot (owner : Address) (index : Nat) : Nat :=
-  Compiler.Proofs.mappingSlotLocation (ownerRequestSetBase owner) index 0
+  EvmYul.fromByteArrayBigEndian
+    (Compiler.Proofs.storageArrayElementPointer (ownerRequestSetBase owner) index)
 def ownerRequestIndexSlot (owner : Address) (requestId : Nat) : Nat :=
-  Compiler.Proofs.mappingSlotLocation (ownerRequestSetBase owner + 1) requestId 0
+  Compiler.Proofs.nestedMappingSlotLocation requestsByOwnerPosition owner.toNat requestId 1
 
-/-- Executable lenses for the set's three disjoint components. The key is a
-pair encoding only within an array/index component; unlike the old model it
-cannot turn `remove` into a single membership-map zeroing operation. -/
-def ownerRequestValuesPosition : Nat := requestsByOwnerPosition + 1
-def ownerRequestIndexesPosition : Nat := requestsByOwnerPosition + 2
-def ownerRequestCellKey (owner : Address) (index : Nat) : Uint256 :=
-  .ofNat (owner.toNat * 2 ^ 128 + index)
+/-- Executable lenses for the actual `EnumerableSet.UintSet` layout.  The
+outer owner mapping, its dynamic values array, and its `_indexes` mapping are
+addressed by their Solidity keccak slots, so no concatenated `Uint256` key can
+alias distinct owners or array indices. -/
 
 def ownerRequestValuesLength (state : ContractState) (owner : Address) : Nat :=
-  (state.readMapUint requestsByOwnerPosition (.ofNat owner.toNat)).val
+  (state.readSlot (ownerRequestValuesLengthSlot owner)).val
 def ownerRequestValue (state : ContractState) (owner : Address) (index : Nat) : Nat :=
-  (state.readMapUint ownerRequestValuesPosition (ownerRequestCellKey owner index)).val
+  (state.readSlot (ownerRequestValueSlot owner index)).val
 def ownerRequestIndex (state : ContractState) (owner : Address) (requestId : Nat) : Nat :=
-  (state.readMapUint ownerRequestIndexesPosition (ownerRequestCellKey owner requestId)).val
+  (state.readSlot (ownerRequestIndexSlot owner requestId)).val
 
 /-- OpenZeppelin `EnumerableSet.remove`, including its swap-and-pop writes.
 `none` is the source `assert(remove(...))` failure, not a synthetic
@@ -86,22 +85,20 @@ def removeOwnerRequest (state : ContractState) (owner : Address) (requestId : Na
     let lastIndex := ownerRequestValuesLength state owner - 1
     let toDeleteIndex := indexPlusOne - 1
     let lastValue := ownerRequestValue state owner lastIndex
-    let after := ((state.writeMapUint ownerRequestValuesPosition
-      (ownerRequestCellKey owner toDeleteIndex) (.ofNat lastValue)).writeMapUint
-        ownerRequestIndexesPosition (ownerRequestCellKey owner lastValue)
-          (.ofNat (toDeleteIndex + 1))).writeMapUint requestsByOwnerPosition
-            (.ofNat owner.toNat) (.ofNat lastIndex)
-    some (after.writeMapUint ownerRequestIndexesPosition (ownerRequestCellKey owner requestId) 0)
+    let after := ((state.writeSlot (ownerRequestValueSlot owner toDeleteIndex)
+      (.ofNat lastValue)).writeSlot (ownerRequestIndexSlot owner lastValue)
+        (.ofNat (toDeleteIndex + 1))).writeSlot (ownerRequestValuesLengthSlot owner)
+          (.ofNat lastIndex)
+    some (after.writeSlot (ownerRequestIndexSlot owner requestId) 0)
 
 def insertOwnerRequest (state : ContractState) (owner : Address) (requestId : Nat) :
     Option ContractState :=
   if ownerRequestIndex state owner requestId != 0 then none
   else
     let index := ownerRequestValuesLength state owner
-    let after := (state.writeMapUint ownerRequestValuesPosition
-      (ownerRequestCellKey owner index) (.ofNat requestId)).writeMapUint
-        ownerRequestIndexesPosition (ownerRequestCellKey owner requestId) (.ofNat (index + 1))
-    some (after.writeMapUint requestsByOwnerPosition (.ofNat owner.toNat) (.ofNat (index + 1)))
+    let after := (state.writeSlot (ownerRequestValueSlot owner index) (.ofNat requestId)).writeSlot
+      (ownerRequestIndexSlot owner requestId) (.ofNat (index + 1))
+    some (after.writeSlot (ownerRequestValuesLengthSlot owner) (.ofNat (index + 1)))
 
 /-- Physical keccak slot of `queue[requestId]` word 0:
 `keccak256(abi.encode(requestId, queuePosition))`. -/
