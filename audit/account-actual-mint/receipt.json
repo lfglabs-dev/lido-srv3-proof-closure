@@ -1,0 +1,95 @@
+{
+  "schema": 1,
+  "source_base": "f75775708b62b078adbd69018ad268815755c9d9",
+  "created_utc": "2026-09-10T20:52:35.697162+00:00",
+  "scope": "Scoped ACCOUNT candidate; no full root All/Trust or Solidity runtime result claimed",
+  "solidity_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "artifacts": {
+    "LidoSRv3/Audit/Guarantees/PAccount1.lean": "67c88010fdc868ee990f41e0775da5d829f01d34b72946886e60f22629195d0c",
+    "LidoSRv3/Audit/Source/ReportFeeProductsCorrespondence.lean": "471edd6b2b855844679dd5ef23409523caea2b221482991a51bc028a06135936",
+    "LidoSRv3/Audit/Verity/HandleOracleReportTx.lean": "d41736060fc56b9d89f2c2fec1859dda053357c3895cb3fd109972033d5aae4d",
+    "audit/account-actual-mint/Axioms.lean": "14e6f0f517b9a035ba2da527db3851a49db33424e78d564cdeee04f9438aab15",
+    "audit/account-actual-mint/FeeOrder.sol": "c462a57ccd73d1db107dbad5871f0f0eff9e7397dbbb895f88b8dd8fc5590102",
+    "audit/account-actual-mint/README.md": "0f08b7297581598579fda481dc224ebc2fe969cea60b4cdea7424d9ff87134e2",
+    "audit/account-actual-mint/axioms.log": "1f03f3c6441823e744de02c2d7f48fcde4efa11b424c7a18d1fda0943943190a",
+    "audit/account-actual-mint/check_receipt.py": "24144dd6620d589047d9342f115140cc73903df4276e8ac745373bea4ec445a8",
+    "audit/account-actual-mint/compiler-version.log": "42b3b944e56b8dec08f839a426951c22f960b4599c531e72dc3820c6e85f15cc",
+    "audit/account-actual-mint/fee-helper-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "audit/account-actual-mint/fee-order-compiler.log": "2daa9676289ad53918c8bd60f0dd1b3d7b75b92fd1975bfa5d94f2e9fd27e985",
+    "audit/account-actual-mint/fee-order.asm": "fab99678aabbb388f772711ec342560407fca6ea0cf448328d0667a37ac6bbcb",
+    "audit/account-actual-mint/fee-order.ir": "8caf5763f5c78f956aef7263ca6688617340dfcef79f2193d56e852343086b2b",
+    "audit/account-actual-mint/mint-build.log": "548be60b2d6c7f12a2c337e38c0044854ad8733ff8c20f4e5068df8095d3ef1c",
+    "audit/account-actual-mint/package-build.log": "6d7c2c9d6e569cdbe38535418e1b81fbb9396c970f1f1b6a83d430a733b5e718",
+    "audit/account-actual-mint/proof-escapes.log": "848c2e442334420e69d57b6ead6d3425fe46e21d3bece6c14172057fc18ae6db",
+    "audit/account-actual-mint/public-build.log": "8fa24f2f107bf647d3174ada5679cbfa140c76ae9d13e3b60d8f40eefbf757d8",
+    "audit/account-actual-mint/regression.log": "1a823d95e3d22ca3a38dacaae5e99a7e80ba5e8306a8374b29ce7113c2e6d94c",
+    "audit/account-actual-mint/slot-identity.log": "607c27712bedd48226c02c4239bd180a541b5f319bceb79d5fae2bc1b679f800",
+    "audit/account-actual-mint/source-annotations.log": "73a0dc268a5c3a9603816de41b1c9e1ef2cffc344e6c6bdc1b940a3a521a8aaf",
+    "audit/account-actual-mint/wrapper-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "audit/trio/account-address/PAccount1.lean": "71609c24079ff13983323c98f8be5728c951d4b2b6d57ea7dee12b7e2964938d",
+    "audit/trio/account-address/ReportFeeMint.lean": "0876f53edde2fbb6742fa4ac1e49b01071d14ccf54896165299264be9fca05c0",
+    "audit/trio/account-address/ReportWriteFee.lean": "162476cddc0e4a960286684f9000a813ef513adb9d3d6eb7713723d90464e750",
+    "audit/trio/account-address/StETHMintShares.lean": "f4fc5b04455acb9c5993779e4171ccc5a288fe5adf701ee68b0a16d47b031f1b",
+    "audit/trio/account-address/Tests/Verity/ReportFeeMintTest.lean": "980481aa1936fc32f2a1d315cb97114ba1b68257f660b1e14a32b5162ff5a995",
+    "audit/trio/account-address/Tests/Verity/StETHMintSharesTest.lean": "6371f34d781ed3ddf6c63413c952f3fb3b5715ff23a400cf3d3b6e33f43f830c"
+  },
+  "solidity_sources": {
+    "contracts/0.8.9/Accounting.sol": "dc0609ab76e462be8b28806cc768f22bdd61f24f23d45baef5ec3b1457bf659f",
+    "contracts/0.4.24/Lido.sol": "3bf84b96fb155af2290e6b26bc0138de356442a9abe3ea0f5274497f9fbffc10",
+    "contracts/0.4.24/StETH.sol": "63ebed0e205b602fe2e427bb09c111479f98253bd02f96ac052b38202d3713bd",
+    "contracts/0.4.24/utils/UnstructuredStorageExt.sol": "11dbb51c4885d38eee1fdd632a45f79223647785ee80c0877a1d7123d7a3aea6",
+    "contracts/0.4.24/utils/Pausable.sol": "ae1be0a85b0171321429ad1079908c2bf89eb9551ee56bbded51f8b2cc0d1c36",
+    "contracts/0.8.25/sr/StakingRouter.sol": "4d5b83fc73736db6755ebbb58811ed499c3e6de622cce11a3ad8548800a34155",
+    "contracts/0.8.25/sr/SRLib.sol": "2a53ec2d183f3c3d8b6257f18dc7143e8afbc8d3d2f8a48bd0e5e0580b5b47ab",
+    "hardhat.config.ts": "29b3e91ff197c0ea1df5b6401cc12982d3f684e7bf3e68b380096fe33e43b223"
+  },
+  "checks": [
+    {
+      "command": "cd audit/trio/account-address && lake build +ReportFeeMint +Tests.Verity.StETHMintSharesTest +Tests.Verity.ReportWriteFeeTest",
+      "exit_code": 0,
+      "jobs": 7
+    },
+    {
+      "command": "cd audit/trio/account-address && lake env lean Tests/Verity/ReportFeeMintTest.lean",
+      "exit_code": 0,
+      "kernel_regressions": 8
+    },
+    {
+      "command": "lake env lean LidoSRv3/Audit/Source/ReportFeeProductsCorrespondence.lean -o .lake/build/lib/lean/LidoSRv3/Audit/Source/ReportFeeProductsCorrespondence.olean",
+      "exit_code": 0
+    },
+    {
+      "command": "lake env lean LidoSRv3/Audit/Verity/HandleOracleReportTx.lean -o .lake/build/lib/lean/LidoSRv3/Audit/Verity/HandleOracleReportTx.olean",
+      "exit_code": 0
+    },
+    {
+      "command": "lake env lean LidoSRv3/Audit/Guarantees/PAccount1.lean -o .lake/build/lib/lean/LidoSRv3/Audit/Guarantees/PAccount1.olean",
+      "exit_code": 0
+    },
+    {
+      "command": "lake env lean audit/account-actual-mint/Axioms.lean",
+      "exit_code": 0,
+      "axiom_sets": 10
+    },
+    {
+      "command": "scripts/check_source_annotations.py module with CORE pinned external checkout and LEAN_DIRS root Audit + audit/trio/account-address; --strict",
+      "exit_code": 0,
+      "citations": 863
+    },
+    {
+      "command": "python3 scripts/check_proof_escapes.py",
+      "exit_code": 0,
+      "project_files": 539
+    },
+    {
+      "command": "solc0.8.9 --optimize --optimize-runs 200 --evm-version istanbul --asm audit/account-actual-mint/FeeOrder.sol",
+      "exit_code": 0,
+      "scope": "expression fixture compiler assembly only"
+    },
+    {
+      "command": "cast keccak for three pinned slot strings; integer comparison to Lean literals",
+      "exit_code": 0,
+      "matches": 3
+    }
+  ]
+}

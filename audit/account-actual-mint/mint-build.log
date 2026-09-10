@@ -1,0 +1,13 @@
+✔ [4/7] Built PAccount1 (496ms)
+✖ [5/7] Running ReportWriteFee
+error: audit/trio/account-address/ReportWriteFee.lean: could not disambiguate the module `PAccount1`; multiple packages provide distinct definitions:
+  lido-srv3-proof-closure@0.1.0 (hash: 3f1385081b94bf69)
+  accountAddress (hash: c3edbbeaadb4a048)
+✖ [6/7] Running ReportWriteFee
+error: ReportWriteFee.lean: could not disambiguate the module `PAccount1`; multiple packages provide distinct definitions:
+  lido-srv3-proof-closure@0.1.0 (hash: 3f1385081b94bf69)
+  accountAddress (hash: c3edbbeaadb4a048)
+Some required targets logged failures:
+- ReportWriteFee
+- ReportWriteFee
+error: build failed

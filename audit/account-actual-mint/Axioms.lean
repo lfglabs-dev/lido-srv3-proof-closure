@@ -1,0 +1,12 @@
+import LidoSRv3.Audit.Guarantees.PAccount1
+import LidoSRv3.Audit.Source.ReportFeeProductsCorrespondence
+#print axioms AccountAddress.StETHMintShares.committed_mint_effect
+#print axioms AccountAddress.StETHMintShares.every_revert_restores_snapshot
+#print axioms AccountAddress.ReportFeeMint.committed_success
+#print axioms AccountAddress.ReportFeeMint.failure_restores
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1.actual_report_fee_mint
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1.actual_report_fee_mint_failure_restores
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1.root_committed_fee_mint_consumes_checked_result
+#print axioms LidoSRv3.Audit.Source.ReportFeeProductsCorrespondence.nonprofitable_returns_zero
+#print axioms LidoSRv3.Audit.Source.ReportFeeProductsCorrespondence.successful_result_is_l331_quotient
+#print axioms LidoSRv3.Audit.Source.ReportFeeProductsCorrespondence.zero_precision_reverts_on_profitable_path

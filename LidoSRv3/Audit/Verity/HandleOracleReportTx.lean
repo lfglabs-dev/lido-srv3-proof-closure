@@ -1,4 +1,6 @@
 import LidoSRv3.Audit.Source.AccountingCorrespondence
+import LidoSRv3.Audit.Source.ReportFeeProductsCorrespondence
+import ReportFeeMint
 import Verity.Core
 
 /-!
@@ -488,6 +490,53 @@ theorem mintAfterReadDiscipline_holds : mintAfterReadDiscipline := by
             sequenceSlot] <;>
           decide
   · simp [hValid]
+
+/-! ## Physical committed fee-products consumer
+
+This preserves the useful a3 post-report route while making its consumer the
+physical StETH mint model.  There are no model-local Lido total/balance slots:
+the packed total/external word and the abstract account-share map reside together
+in `AccountAddress.StETHMintShares.State`.
+-/
+
+structure ReportWriteFeeMintInput where
+  accountingAddress : Nat
+  layout : AccountAddress.ReportWriteFee.Layout
+  registeredModuleIds : List Nat
+  reportedModuleIds : List Nat
+  balancesGwei : List Nat
+  accountingReport : AccountAddress.ReportWriteFee.ReportWei
+
+/-- The a3 conversion is deliberately after the physical router getter. -/
+def feeProductsFromCommittedGetter (r : AccountAddress.ReportWriteFee.ReportWei)
+    (d : AccountAddress.ReportWriteFee.Distribution) :
+    Option LidoSRv3.Audit.Source.ReportFeeProductsCorrespondence.Input := do
+  let word := fun n => if n ≤ Verity.Core.MAX_UINT256 then
+    some (Verity.Core.Uint256.ofNat n) else none
+  pure {
+    clValidatorsBalance := ← word r.clValidatorsBalance
+    clPendingBalance := ← word r.clPendingBalance
+    withdrawalsVaultTransfer := ← word r.withdrawalsVaultTransfer
+    principalClBalance := ← word r.principalClBalance
+    elRewardsVaultTransfer := ← word r.elRewardsVaultTransfer
+    totalFee := ← word d.totalFee
+    feePrecisionPoints := ← word d.precisionPoints
+    postInternalEther := ← word r.postInternalEther
+    internalSharesBeforeFees := ← word r.internalSharesBeforeFees }
+
+/-- Root-facing name for the one-world report write → getter → checked fee →
+physical mint transaction.  Its implementation calls the physical consumer;
+the source-level conversion above documents the exact checked-word bridge and
+remains available to root proofs without introducing fake slots 17/18. -/
+def handleOracleReportFromCommittedFeeProducts (x : ReportWriteFeeMintInput)
+    (before : AccountAddress.ReportFeeMint.World) : AccountAddress.ReportFeeMint.Outcome :=
+  AccountAddress.ReportFeeMint.handleOracleReportFromCommittedFeeProducts {
+    accountingAddress := x.accountingAddress
+    layout := x.layout
+    registeredModuleIds := x.registeredModuleIds
+    reportedModuleIds := x.reportedModuleIds
+    balancesGwei := x.balancesGwei
+    report := x.accountingReport } before
 
 /-- Reordering mutant: the mint step runs before the read step, the same fault
 as a patch that calls `reportRewardsMinted` before re-reading the freshly
