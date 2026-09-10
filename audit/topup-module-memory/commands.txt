@@ -1,0 +1,4 @@
+lake build LidoSRv3.Tests.TopupModuleMemoryRegression
+python3 audit/topup-module-memory/validate.py
+python3 audit/topup-module-memory/source-ir-check.py
+python3 audit/topup-module-memory/write-receipt.py
