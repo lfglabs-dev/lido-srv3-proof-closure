@@ -512,6 +512,14 @@ def mintLidoShares (shares : Word) (state : ContractState) : Option ContractStat
   let balance <- safeAdd (state.readSlot accountingSharesSlot) shares
   pure ((state.writeSlot lidoTotalSharesSlot total).writeSlot accountingSharesSlot balance)
 
+/-- The post-mint callback suffix: `Accounting.sol:409-413` calls
+`StakingRouter.reportRewardsMinted`, which delegates to
+`SRLib.sol:620-641 onRewardsMinted`.  The slot is only a reachability/order
+observation of that callback.  It is deliberately separate from the Lido
+state mutation above: a notification tick cannot stand in for a mint. -/
+private def notifyRewardsMintedAfterPhysicalMint (state : ContractState) : ContractState :=
+  stampStep rewardsMintedSlot state
+
 /-- Complete the `Accounting.sol:403-413` suffix after the report snapshot,
 post-write getter, and checked products have already run.  The Lido state
 update is deliberately before the `reportRewardsMinted` observation, matching
@@ -523,7 +531,7 @@ private def mintCheckedShares (result : Result) (dirty : ContractState) (shares 
     match mintLidoShares shares dirty with
     | none => none
     | some minted =>
-        let notified := stampStep rewardsMintedSlot minted
+        let notified := notifyRewardsMintedAfterPhysicalMint minted
         some (⟨result.balances, result.total, storedSteps notified result.balances⟩, notified)
   else some (result, dirty)
 
