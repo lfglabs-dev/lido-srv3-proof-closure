@@ -1,0 +1,60 @@
+{
+  "schema": "lido-consolidation-settlement-requests-v1",
+  "created_utc": "2026-09-10T21:58:29.583613+00:00",
+  "base": "f8ea5f9d3cffc165f5d84dd96444836c806827eb",
+  "source_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "public_theorem": "LidoSRv3.Audit.Guarantees.PConsolidationEth1.actual_settlement_requests",
+  "scope": "Same existing shared-callee settlement success jointly supplies full prior Success and actual decoded inbox requests, exact distinct outer/inner fee reads, loop world consumed by refund, final world/balance/trace; no new stage premise or executor.",
+  "executable_changes": 0,
+  "new_public_premises": 0,
+  "build": {
+    "command": "lake build LidoSRv3.Tests.ConsolidationSettlementRequestsRegression",
+    "exit_code": 0,
+    "jobs": 1266,
+    "unchanged_dependency_cache_reused": true
+  },
+  "kernel_regressions": 7,
+  "public_actual_consumer_instantiations": 2,
+  "source_identities": 1249,
+  "package_pins": {
+    "verity": "e977aaad6e1a9e92e0132d41b3d33a14135a4d46",
+    "evmyul": "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9",
+    "mathlib": "fabf563a7c95a166b8d7b6efca11c8b4dc9d911f",
+    "plausible": "63045536fe95024e6c18fc7b48e03f506701c5bc",
+    "LeanSearchClient": "c5d5b8fe6e5158def25cd28eb94e4141ad97c843",
+    "importGraph": "5c7542ed018c78194f1e2b903eaf6a792b74c03d",
+    "proofwidgets": "24b0d9dc081c5423f8eec7e866c441e5184f29d9",
+    "aesop": "e3cb2f741431ce31bf73549fb52316a57368b06f",
+    "Qq": "f46324995fca5f0483b742e4eb4daec7f4ee50d2",
+    "batteries": "fa08db58b30eb033edcdab331bba000827f9f785",
+    "Cli": "92564e5770e4d09f2d86dfbf8ada1e9c715b384c"
+  },
+  "scoped_axiom_sets": 9,
+  "new_axioms": 0,
+  "solidity": {
+    "fresh_run": false,
+    "pinned_complete_bodies": 3,
+    "retained_artifact_fixture_hashes": 41,
+    "historical_tests": [
+      9,
+      5
+    ],
+    "new_compiled_composition_refinement": false
+  },
+  "sha256": {
+    "audit/trio/consolidation/SettlementRequests.lean": "0bb0f084b3c4eed037d75e79ffc90d4576c026ef6a357d5310ed56f9e5ab9c20",
+    "LidoSRv3/Audit/Guarantees/PConsolidationEth1Requests.lean": "ea65883b22970ac691a1b4f29b2ef5ee15f0da5ca6bee950e922ccec6268756f",
+    "LidoSRv3/Tests/ConsolidationSettlementRequestsRegression.lean": "04990bd06f6ec06096bce7992abebbda0cae4bf0b9e9a77d6ce16db95b066005",
+    "audit/consolidation-settlement-requests/README.md": "f7057075916d0d35f175e1a5565ed7103a8332b1913456c2e13a704302d91466",
+    "audit/consolidation-settlement-requests/axioms.json": "af4f60ffc0150abb9454ad65533f28053f8974d20725880a1f0d2412f61c72d8",
+    "audit/consolidation-settlement-requests/check_inherited.py": "30fadce1fefee0e8434e65e04b76d98ab0ca23fdaaad14361eceb00d0558dda3",
+    "audit/consolidation-settlement-requests/inherited-check.log": "7b0a3fba84af3b9dd92c44802ce2562c7f355521302226644831293fef1a18de",
+    "audit/consolidation-settlement-requests/inherited-validation.json": "cb485b7872fa84fbd12fe9141e3949c9e7c8d79d93d408eb25dd30ea67a80efb",
+    "audit/consolidation-settlement-requests/source-axiom-check.log": "7cb1934d98d932c43b83880947cfff2ca979a2de47d9582b528a5c0bb5c8ea13",
+    "audit/consolidation-settlement-requests/source-inputs.json": "e669d6d70fe8a86afd19cbd9c6e9722cd5b4cf7b4603c1a219c9155fdceb5600",
+    "audit/consolidation-settlement-requests/target-build.log": "f5c6fae963ee0180d469851f8b4a4138c37cd5908e4b4de97e65420f40138038",
+    "audit/consolidation-settlement-requests/validate.py": "8b6289789cdbf1b49e45ed8d3d837f7e49b4b680711e2183faa683de053ad506",
+    "audit/consolidation-settlement-requests/write_receipt.py": "d45d41a94fd09ae8425662b42c1a5547f3ed2e5f59a4c6227abe1074597892c5"
+  },
+  "status": "Frozen local candidate for independent exact source/Solidity review; root facade/Trust integration pending."
+}
