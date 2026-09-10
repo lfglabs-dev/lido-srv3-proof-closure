@@ -1,5 +1,10 @@
 import LidoSRv3.Audit.Spec.AddressClaimFuelCorrespondence
 
+/-! Historical claim-journal results below use the preserved
+`Model.AddressClaimJournalLegacy` executor. References to the live loop in
+retained comments denote that historical model, not the new physical CALL
+consumer. These results do not establish arbitrary recipient callbacks. -/
+
 /-!
 # Unbounded live claim-batch correspondence
 
@@ -10,7 +15,7 @@ covers every well-formed request/hint list.
 
 namespace LidoSRv3.Audit.Spec.AddressClaimUnboundedCorrespondence
 
-open LidoSRv3.Audit.Verity.AddressClaimBatchTx
+open LidoSRv3.Audit.Model.AddressClaimJournalLegacy
 open LidoSRv3.Audit.Spec.AddressClaimFuelCorrespondence
 open _root_.Verity
 open _root_.Verity.EVM.Uint256

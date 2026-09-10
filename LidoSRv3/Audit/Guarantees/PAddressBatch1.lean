@@ -3,6 +3,11 @@ import LidoSRv3.Audit.Spec.AddressClaimUnboundedCorrespondence
 import LidoSRv3.Audit.Spec.AddressClaimKeccakSlots
 import LidoSRv3.Audit.Guarantees.Registry
 
+/-! Historical claim-journal results below use the preserved
+`Model.AddressClaimJournalLegacy` executor. References to the live loop in
+retained comments denote that historical model, not the new physical CALL
+consumer. These results do not establish arbitrary recipient callbacks. -/
+
 /-!
 # P-ADDRESS-BATCH-1: unbounded live claim rename and physical keccak slots
 
@@ -19,7 +24,7 @@ namespace LidoSRv3.Audit.Guarantees.PAddressBatch1
 
 open _root_.Verity
 open _root_.Verity.EVM.Uint256
-open LidoSRv3.Audit.Verity.AddressClaimBatchTx
+open LidoSRv3.Audit.Model.AddressClaimJournalLegacy
 open LidoSRv3.Audit.Spec.AddressClaimFuelCorrespondence
 open LidoSRv3.Audit.Spec.AddressClaimUnboundedCorrespondence
 open LidoSRv3.Audit.Spec.AddressClaimKeccakSlots
@@ -103,13 +108,13 @@ and the next word. -/
 theorem p_address_batch_1_physical_keccak_slots
     (state : ContractState) (requestId hint : Nat) (recipient : Address)
     (h : PhysicalClaimSlots state) :
-    requestAmountsWord state requestId =
+    LidoSRv3.Audit.Verity.AddressClaimBatchTx.requestAmountsWord state requestId =
         state.readSlot (queueAmountsPhysicalSlot requestId) ∧
-      requestMetadataWord state requestId =
+      LidoSRv3.Audit.Verity.AddressClaimBatchTx.requestMetadataWord state requestId =
         state.readSlot (queueMetadataPhysicalSlot requestId) ∧
-      checkpointFromWord state hint =
+      LidoSRv3.Audit.Verity.AddressClaimBatchTx.checkpointFromWord state hint =
         state.readSlot (checkpointFromPhysicalSlot hint) ∧
-      checkpointRateWord state hint =
+      LidoSRv3.Audit.Verity.AddressClaimBatchTx.checkpointRateWord state hint =
         state.readSlot (checkpointRatePhysicalSlot hint) :=
   live_claim_channels_are_physical_keccak_slots state requestId hint
     recipient h

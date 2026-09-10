@@ -212,9 +212,9 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Verity.SszAbstractDigest.abstract_digest_refinement
 #print axioms LidoSRv3.Tests.PackCSszMutants.skip_gindex_kill_line_refutes_structural_child
 #print axioms LidoSRv3.Tests.PackCSszMutants.engine_mutant_disagrees_with_sha256engine
-#print axioms LidoSRv3.Audit.Spec.AddressClaimCorrespondence.two_claim_payouts_match_reads
-#print axioms LidoSRv3.Tests.PackDAddressClaimMutants.swapped_payout_order_kill_line_refutes_batch
-#print axioms LidoSRv3.Tests.PackDAddressClaimMutants.wrong_recipient_kill_line_refutes_batch
+#print axioms LidoSRv3.Audit.Spec.AddressClaimCorrespondence.actual_claim_payout_matches_locked_write
+#print axioms LidoSRv3.Tests.PackDAddressClaimMutants.swapped_payout_order_changes_actual_attempts
+#print axioms LidoSRv3.Tests.PackDAddressClaimMutants.wrong_recipient_changes_actual_attempt
 #print axioms LidoSRv3.Audit.Spec.OracleFrameCorrespondence.oracle_frame_shares_are_the_argument
 #print axioms LidoSRv3.Audit.Spec.OracleFrameCorrespondence.account_parent_remains_order_only
 #print axioms LidoSRv3.Audit.Spec.OracleFrameCorrespondence.eugene_bound_cited
@@ -405,8 +405,8 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms
   LidoSRv3.Tests.ConsolidationTxMutants.journal_value_blind_kill_line_refutes_exact_forwarding
 #print axioms LidoSRv3.Audit.Guarantees.PAddress1.bounded_transfer_model_source_tx
-#print axioms LidoSRv3.Audit.Guarantees.PAddress1.bounded_live_claim_batch_storage_call_surface
-#print axioms LidoSRv3.Audit.Verity.AddressClaimBatchTx.two_claim_batch_observe
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_claim_withdrawals_to_chain
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_claim_recipient_effect
 #print axioms LidoSRv3.Audit.Verity.AddressClaimBatchTx.every_revert_restores_snapshot
 #print axioms LidoSRv3.Audit.Verity.AddressTransferTx.tx_refines_source_witness
 #print axioms LidoSRv3.Audit.Source.AddressTransferCorrespondence.fixed_caller_mutant_rejected
@@ -667,3 +667,7 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.actual_physical_metadata_conserves
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.actual_continuation_locator_conserves
+
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_claim_withdrawals_failure_restores
+#print axioms LidoSRv3.Tests.PackDAddressClaimMutants.zero_recipient_rejects_before_claim
+#print axioms LidoSRv3.Tests.PackDAddressClaimMutants.failed_batch_restores_world
