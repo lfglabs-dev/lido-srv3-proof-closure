@@ -1,0 +1,72 @@
+{
+  "fresh_solidity_execution": false,
+  "source_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "receipts": [
+    {
+      "receipt": "audit/ssz-root-call-composition/solidity/compiler-input-identities.json",
+      "sha256": "9898f5e914fb7225d0238b1606db525ae4d5ed971a48b3210919e0b9451376f7",
+      "source_checks": 7,
+      "historical_test_count": 9
+    },
+    {
+      "receipt": "audit/topup-gateway-witness-batch/solidity/receipt.json",
+      "sha256": "574d6521222d86653acce547434f03fc590c45510adab6775fe02b2870ed65b7",
+      "source_checks": 22,
+      "historical_test_count": 7
+    },
+    {
+      "receipt": "audit/topup-batch-consumer/solidity/receipt.json",
+      "sha256": "e38fa90f46f10d7a4f098636949b73067fed03b455f7d0a146cca153372bf996",
+      "source_checks": 28,
+      "historical_test_count": 5
+    }
+  ],
+  "scope": "Identity-only reuse of existing SSZ root, gateway loop, and module-batch Solidity checks. New typed composition is kernel-tested; no compiled composition refinement claimed.",
+  "source_sha256": {
+    "lido-core/contracts/0.8.25/CLValidatorVerifier.sol": "d6e89f6975e4fa02f758bf461a98ac2d689296b5c92d03ffd4e43a22d0b3d7ed",
+    "lido-core/contracts/common/interfaces/ValidatorWitness.sol": "8fd24cfab7402233029756e52e59198b0d9cbf0a42e5c07d9fa2338ed731a5f7",
+    "lido-core/contracts/common/lib/BLS.sol": "0187cc6a6b1aaa833317695d88795db431fa237452213e8c3872a0f444dceb7c",
+    "lido-core/contracts/common/lib/BeaconTypes.sol": "9591e9af1a4fd398db86267f3589e763f9eb2016bf29e26cfa50988cf73a10c3",
+    "lido-core/contracts/common/lib/GIndex.sol": "2653bd4ba89c349f3db36f21a8afc6a24e0e233816d9b608f46d048feb601d1f",
+    "lido-core/contracts/common/lib/SSZ.sol": "91ef497b972bbee0fe89043034e6bd62fa0c1059f22874d4826bc6164a22009b",
+    "audit/ssz-root-call-composition/solidity/SszRootCall.t.sol": "ed5b04da50dd98519ef85425a30477e63372eb7781cbca43ea446cd3c9761c90",
+    "/tmp/lido-topup-wei-deps/package/access/IAccessControl.sol": "c112f5c86fdc4e862f88d4f5694530342320923ebd5b5e7d9d8493550d337c2d",
+    "/tmp/lido-topup-wei-deps/package/access/extensions/IAccessControlEnumerable.sol": "f91dc4b5750c1bac7a6a11a6057f14f01121847e6a6284e1200d8a87a4c4ff1e",
+    "/tmp/lido-topup-wei-deps/package/utils/introspection/IERC165.sol": "7c5c3f98ab876991e7dd34b84d41137e836306eb9f36f6386a631f5be3f5d6d4",
+    "/tmp/lido-topup-wei-deps/package/utils/structs/EnumerableSet.sol": "ed0804f9dcff9d2dceba8cc83f31669a84491dfcfe510050c9371aa7c48db09c",
+    "audit/topup-gateway-witness-batch/solidity/TopupGatewayWitnessBatch.t.sol": "feddd9ebdd11e9dc1d0eb0fdf4f3da59e5e059ad7c41aa022b9875af0a20dee5",
+    "lido-core/contracts/0.8.25/TopUpGateway.sol": "a7ffb654fb4d8d83ba14a6d9452663f786e9a21434be3ce9b7205c546526b7b4",
+    "lido-core/contracts/common/interfaces/IPausableUntil.sol": "0377e3ac9ff2d6be41f4b8f40eee7cfd452ce6de760f9b9145fdb38b94902de3",
+    "lido-core/contracts/common/interfaces/TopUpWitness.sol": "34135d561e4d8c3f1585cdbc15d20f568e36bb37db6c8d4444a8d0cd48cef44d",
+    "lido-core/contracts/common/lib/UnstructuredStorage.sol": "ca4ad93eedff40de12fdd50a88ef608650139a5543fd160dab61cad4d3c03160",
+    "lido-core/contracts/common/lib/WithdrawalCredentials.sol": "cf5e77be0c5d522d853d19a4c5284e53fa0fb149a9902f77648a8f6d5584636c",
+    "lido-core/contracts/common/utils/PausableUntil.sol": "f27405a7f52a15f7e1b10a73ae57ed69fe6514aaba821415e5584458546cf255",
+    "lido-core/contracts/openzeppelin/5.2/upgradeable/access/AccessControlUpgradeable.sol": "d32578f73ad0a24f65d8208033226cc5567a9df2a57fabadf644f6e4e7f172a4",
+    "lido-core/contracts/openzeppelin/5.2/upgradeable/access/extensions/AccessControlEnumerableUpgradeable.sol": "b6b854fdb69cfe58d7494f6cfc1920a68b504c32e97f6028b6d62a844bc17426",
+    "lido-core/contracts/openzeppelin/5.2/upgradeable/proxy/utils/Initializable.sol": "a8b7eafa0fdc7cb5a644c8c61a8e4c51e031d5e1e6f268f72dbe18b768ead56e",
+    "lido-core/contracts/openzeppelin/5.2/upgradeable/utils/ContextUpgradeable.sol": "a08e16324da33a9d666dc07a22ae58031c242a3869f6808e55b4b82fc70cb209",
+    "lido-core/contracts/openzeppelin/5.2/upgradeable/utils/introspection/ERC165Upgradeable.sol": "76f4b4b6f5d8de71b0b29d90f2b277b88b2c45898340b20b278b9e9ed5074f77",
+    "audit/topup-batch-consumer/vendor/access/IAccessControl.sol.txt": "c112f5c86fdc4e862f88d4f5694530342320923ebd5b5e7d9d8493550d337c2d",
+    "audit/topup-batch-consumer/vendor/access/extensions/IAccessControlEnumerable.sol.txt": "f91dc4b5750c1bac7a6a11a6057f14f01121847e6a6284e1200d8a87a4c4ff1e",
+    "audit/topup-batch-consumer/vendor/utils/Panic.sol.txt": "270fc8401c1a13fae6a7a4a2dd6e381b95d658896701e51f0d3e2688acab3dec",
+    "audit/topup-batch-consumer/vendor/utils/StorageSlot.sol.txt": "75704538dcb223239280c6726d9a31cf769a7816718517c997fc7d63bdb70778",
+    "audit/topup-batch-consumer/vendor/utils/introspection/IERC165.sol.txt": "7c5c3f98ab876991e7dd34b84d41137e836306eb9f36f6386a631f5be3f5d6d4",
+    "audit/topup-batch-consumer/vendor/utils/math/Math.sol.txt": "68cf79a637995d5ed243c4a5856b42a5e134ee8786a05034e24d75927fc40ebc",
+    "audit/topup-batch-consumer/vendor/utils/math/SafeCast.sol.txt": "9769274bf53f26a7c7896c526ea1980dc9bea5bf5c2a5fd04870008c4afc1de9",
+    "audit/topup-batch-consumer/vendor/utils/structs/EnumerableSet.sol.txt": "ed0804f9dcff9d2dceba8cc83f31669a84491dfcfe510050c9371aa7c48db09c",
+    "audit/topup-batch-consumer/solidity/TopupBatchConsumer.t.sol": "0c3f42e784be4363182206ac098f5d12a57e74e2e2fea8e7c45b91936c6133f4",
+    "lido-core/contracts/0.8.25/lib/BeaconChainDepositor.sol": "b4afeac2e4dab53d2b6d1cebcf41bfc670eb1ea069cb1d5bc0e07f1932bf9fe0",
+    "lido-core/contracts/0.8.25/sr/ISRBase.sol": "63466ac2f70f94c6b1045c628a7b677975aad56b95d7b8634758e97bdbebeb64",
+    "lido-core/contracts/0.8.25/sr/SRLib.sol": "2a53ec2d183f3c3d8b6257f18dc7143e8afbc8d3d2f8a48bd0e5e0580b5b47ab",
+    "lido-core/contracts/0.8.25/sr/SRStorage.sol": "62e922f76a1db7756684d73db3151a02f6d8f0de51fac27922f0a4095ceb9d95",
+    "lido-core/contracts/0.8.25/sr/SRTypes.sol": "22c28be7ceaf6ed841f18fc19296372ab246b1cfecc87902d49ee1670ed4aed6",
+    "lido-core/contracts/0.8.25/sr/SRUtils.sol": "1f59e455e510e5eb9c19bdf64dd7357c3e4a8c445c5baaa2f3691ecb7115d295",
+    "lido-core/contracts/0.8.25/sr/StakingRouter.sol": "4d5b83fc73736db6755ebbb58811ed499c3e6de622cce11a3ad8548800a34155",
+    "lido-core/contracts/common/interfaces/ILidoLocator.sol": "cc65faee8789012cbb58c0073c770bddb37c9a7fc2594ff2e200fc7894a2dc7a",
+    "lido-core/contracts/common/interfaces/IStakingModule.sol": "4a98e89e763d19b45cb1ea422cec1c554fbd43c9f39c6bcc7a18aad64d46e193",
+    "lido-core/contracts/common/interfaces/IStakingModuleV2.sol": "eacc19c668dd2ad94c7c0cffc5957181b8bf1ed2321c14c34c9845ea054a64ce",
+    "lido-core/contracts/common/lib/Math256.sol": "028e9b0c87fea3ec6fd5aac9e7a5724a18b4a175d5ab70159f24428dd28ea6b6",
+    "lido-core/contracts/common/lib/MemUtils.sol": "dc4f389cfd1ae1b4dd5fe908432159103544ece1ca9f694093f64def5db7acca",
+    "lido-core/contracts/common/lib/MinFirstAllocationStrategy.sol": "90aae2101a74b1aec03470da771f673dc4310ae415e31391d81c589403166b9c"
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "LidoSRv3.Audit.Guarantees.PTopup2.actual_root_module_batch_bound": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.TopupBatchRootCalls.failure_restores": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.TopupBatchRootCalls.run_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.TopupGatewayRootCalls.authenticated": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.TopupGatewayRootCalls.loop_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.TopupGatewayRootCalls.row_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupBatchRootCallsRegression.above_cap_rolls_back_keeps_both_attempts": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupBatchRootCallsRegression.activation_precedes_root": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupBatchRootCallsRegression.actual_batch_has_joint_guarantee": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupBatchRootCallsRegression.actual_batch_succeeds": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupBatchRootCallsRegression.actual_requests_and_effects": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupBatchRootCallsRegression.duplicate_retains_first_root": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupBatchRootCallsRegression.forbidden_root_skips_module": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupBatchRootCallsRegression.pending_overflow_retains_verified_root": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupBatchRootCallsRegression.rejected_root_retains_attempt": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupBatchRootCallsRegression.short_slot_proof_makes_no_root_attempt": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupBatchRootCallsRegression.two_rows_consume_ordered_limits": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupBatchRootCallsRegression.wrong_caller_rejected": [
+    "Quot.sound",
+    "propext"
+  ]
+}
