@@ -1,0 +1,69 @@
+{
+  "LidoSRv3.Audit.Guarantees.PTopup1.actual_root_module_batch_effects": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.TopupRootCallEffects.run_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRootCallEffectsRegression.actual_input_is_expected": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRootCallEffectsRegression.actual_reply_above_cap_rejected": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRootCallEffectsRegression.actual_reply_above_cap_restores": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRootCallEffectsRegression.module_program_matches_physical_fixture": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRootCallEffectsRegression.positive_batch_joint_consumer": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRootCallEffectsRegression.positive_batch_succeeds": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRootCallEffectsRegression.positive_physical_balances_and_count": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRootCallEffectsRegression.positive_program_projection": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRootCallEffectsRegression.positive_world_matches_physical_fixture": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRootCallEffectsRegression.prefix_computes_expected": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRootCallEffectsRegression.zero_batch_effects": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRootCallEffectsRegression.zero_keeps_actual_module_effects": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ]
+}
