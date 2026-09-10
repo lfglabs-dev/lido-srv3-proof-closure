@@ -258,6 +258,39 @@ def runRequestWithdrawals (callee : External) (ctx : Context) (stETH : Address)
     (amount : Nat) (suppliedOwner : Address) (before : World) :=
   run (requestWithdrawals callee ctx stETH amount suppliedOwner) before
 
+def requestBridgeContext : Context := ⟨(99 : Address), (1 : Address)⟩
+
+/-- The share conversion call returns ten shares; the preceding ERC20
+`transferFrom` succeeds without returndata, as its source call ignores the
+return value. -/
+def requestCallee : External := fun request world =>
+  if request.payload = stETHSharesCalldata 100 then .success (abiWord 10) world
+  else .success [] world
+
+def requestBridgeWorld : World :=
+  { core := ({ defaultState with
+      codeSize := fun address => if address = (2 : Address).toNat then 1 else 0,
+      blockTimestamp := 5 }).writeSlot lastReportTimestampPosition 9
+    balances := fun _ => 0 }
+
+/-- One-item `requestWithdrawals` receipt. The owner fallback is caller 1,
+and the successful post-call enqueue writes request id 1 with cumulative
+amount/shares `(100, 10)` and the packed owner/timestamp/report word. -/
+theorem request_bridge_receipt :
+    let result := runRequestWithdrawals requestCallee requestBridgeContext (2 : Address)
+      100 zeroAddress requestBridgeWorld
+    result.outcome = .ok 1 ∧
+      result.world.core.readSlot lastRequestIdPosition = 1 ∧
+      requestAmountsWord result.world.core 1 = packEnqueuedAmounts 100 10 ∧
+      requestMetadataWord result.world.core 1 = packEnqueuedMetadata (1 : Address) 5 9 ∧
+      result.attempts =
+        [⟨⟨requestBridgeContext.self, (2 : Address), 0,
+            stETHTransferFromCalldata requestBridgeContext.sender requestBridgeContext.self 100⟩,
+            true, [], []⟩,
+         ⟨⟨requestBridgeContext.self, (2 : Address), 0, stETHSharesCalldata 100⟩,
+            true, abiWord 10, []⟩] := by
+  decide +kernel
+
 theorem request_revert_restores_caller_and_callee_world
     (callee : External) (ctx : Context) (stETH : Address) (amount : Nat)
     (suppliedOwner : Address) (before : World) (fault : Fault)
