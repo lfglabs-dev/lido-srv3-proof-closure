@@ -10,8 +10,10 @@ This is deliberately an ACCOUNT-only continuation of `ReportWriteFee`: a
 mint quantity is obtained only from an already committed
 `calculateProtocolFees` result.  The model does not manufacture a second fee
 arithmetic error or assume anything about the subsequent router callback.
-`shares` is a conventional Solidity mapping (slot 17/18 are not asserted to
-be Lido storage); the total-share word is the pinned unstructured slot.
+`shares` is an abstract Nat-keyed account map, not a proved physical keccak
+mapping (slot 17/18 are not asserted to be Lido storage). The total-share word
+is the pinned unstructured slot. Locator resolution, active flag and contract
+identity are supplied call context; no external locator CALL is executed here.
 -/
 
 namespace AccountAddress.StETHMintShares
@@ -43,7 +45,7 @@ abbrev Shares := Nat → Nat
 
 structure State where
   /-- StETH's own physical storage. The total/external packed word is read
-  only at `totalSharesPosition`; `shares` remains a Solidity mapping below. -/
+  only at `totalSharesPosition`; `shares` remains an abstract account map below. -/
   storage : Core
   shares : Shares
   /-- Result of `Lido._getLidoLocator().accounting()` at Lido.sol:1422-1427.
@@ -57,6 +59,7 @@ not a fabricated storage slot. -/
   activeFlag : Bool
 
 inductive Error where
+  | invalidAddress
   | notAccounting
   | stopped
   | mintToZeroAddr
@@ -140,9 +143,13 @@ def pooledEthByShares (s : State) (amount : Nat) : Except Error Nat :=
 
 /-- StETH.sol:518-527.  The `newTotalShares & UINT128_HIGH_MASK == 0`
 check is represented by `newTotal < 2^128`; the high half of the existing
-unstructured word is retained by `setLowUint128`. -/
+unstructured word is retained by `setLowUint128`.
+The first guard admits Nat-encoded addresses into the Solidity address
+domain; it is model admission, not an extra Solidity source branch. -/
 def mintShares (caller recipient amount : Nat) (before : State) : Outcome :=
-  if caller != before.locatorAccounting then .reverted .notAccounting before
+  if caller ≥ 2^160 ∨ recipient ≥ 2^160 ∨ before.locatorAccounting ≥ 2^160 ∨ before.selfAddress ≥ 2^160 then
+    .reverted .invalidAddress before
+  else if caller != before.locatorAccounting then .reverted .notAccounting before
   else if !before.activeFlag then .reverted .stopped before
   else if recipient = 0 then .reverted .mintToZeroAddr before
   else if recipient = before.selfAddress then .reverted .mintToStethContract before
@@ -172,13 +179,13 @@ can furnish the amount that is passed to `LIDO.mintShares(address(this), ...)`.
 No post-state or independently proposed mint amount is accepted.  The
 strict-positive guard is source code, too: a committed zero fee does not call
 `mintShares` and emits no mint events. -/
-def mintCommittedFee (L : Layout) (registeredIds : List Nat) (core : Core)
+def mintCommittedFee (accountingAddress : Nat) (L : Layout) (registeredIds : List Nat) (core : Core)
     (report : ReportWei) (before : State) : Option Outcome :=
   match calculateProtocolFees L registeredIds core report with
   | .error _ => none
   | .ok fee =>
       if 0 < fee.sharesToMintAsFees then
-        some (mintShares before.locatorAccounting before.locatorAccounting fee.sharesToMintAsFees before)
+        some (mintShares accountingAddress accountingAddress fee.sharesToMintAsFees before)
       else some (.committed before [])
 
 theorem totalShares_setLowUint128 (word : StorageWord) (value : Nat) (h : value < two128) :
@@ -199,6 +206,9 @@ theorem every_revert_restores_snapshot (caller recipient amount : Nat) (before r
     (e : Error) (h : mintShares caller recipient amount before = .reverted e rollback) :
     rollback = before := by
   unfold mintShares at h
+  split at h
+  · cases h
+    rfl
   split at h
   · cases h
     rfl
@@ -252,6 +262,8 @@ theorem committed_mint_has_paired_events (caller recipient amount : Nat) (before
   · cases h
   split at h
   · cases h
+  split at h
+  · cases h
   · cases hPooled : pooledEthByShares
       { before with
         storage := before.storage.write totalSharesPosition
@@ -264,5 +276,57 @@ theorem committed_mint_has_paired_events (caller recipient amount : Nat) (before
     | ok pooled =>
       simp only [hPooled, Outcome.committed.injEq] at h
       exact ⟨pooled, h.2.symm⟩
+
+/-- Exact effects of the executed mint. `shares` is an abstract account map,
+not a proved physical keccak mapping. Conversion consumes the updated state. -/
+def MintEffect (caller recipient amount : Nat) (before post : State) (events : List Event) : Prop :=
+  caller = before.locatorAccounting ∧ recipient ≠ 0 ∧ recipient ≠ before.selfAddress ∧
+  totalShares post = totalShares before + amount ∧ totalShares post < two128 ∧
+  externalShares post = externalShares before ∧
+  post.storage = before.storage.write totalSharesPosition
+    (setLowUint128 (totalAndExternalShares before) (totalShares before + amount)) ∧
+  (∀ account, post.shares account = before.shares account + (if account = recipient then amount else 0)) ∧
+  ∃ pooled, pooledEthByShares post amount = .ok pooled ∧
+    events = [.transfer 0 recipient pooled, .transferShares 0 recipient amount]
+
+theorem committed_mint_effect (caller recipient amount : Nat) (before post : State)
+    (events : List Event) (h : mintShares caller recipient amount before = .committed post events) :
+    MintEffect caller recipient amount before post events := by
+  unfold mintShares at h
+  split at h
+  · cases h
+  split at h
+  · cases h
+  rename_i hauth
+  split at h
+  · cases h
+  split at h
+  · cases h
+  rename_i hnz
+  split at h
+  · cases h
+  rename_i hself
+  split at h
+  · cases h
+  split at h
+  · cases h
+  rename_i htotal
+  split at h
+  · cases h
+  dsimp only at h
+  split at h
+  · cases h
+  rename_i pooled hpooled
+  cases h
+  refine ⟨by simpa using hauth, hnz, hself, ?_, ?_, ?_, rfl, ?_, pooled, hpooled, rfl⟩
+  · simp only [totalShares, totalAndExternalShares, Core.read_write_same]
+    exact totalShares_setLowUint128 _ _ (Nat.lt_of_not_ge htotal)
+  · exact Nat.mod_lt _ (by decide)
+  · simp only [externalShares, totalAndExternalShares, Core.read_write_same]
+    exact externalShares_setLowUint128 _ _
+  · intro account
+    split <;> simp_all
+
+#print axioms committed_mint_effect
 
 end AccountAddress.StETHMintShares

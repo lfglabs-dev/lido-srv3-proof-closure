@@ -495,11 +495,12 @@ theorem mintAfterReadDiscipline_holds : mintAfterReadDiscipline := by
 
 This preserves the useful a3 post-report route while making its consumer the
 physical StETH mint model.  There are no model-local Lido total/balance slots:
-the packed total/external word and the Solidity shares mapping reside together
+the packed total/external word and the abstract account-share map reside together
 in `AccountAddress.StETHMintShares.State`.
 -/
 
 structure ReportWriteFeeMintInput where
+  accountingAddress : Nat
   layout : AccountAddress.ReportWriteFee.Layout
   registeredModuleIds : List Nat
   reportedModuleIds : List Nat
@@ -530,6 +531,7 @@ remains available to root proofs without introducing fake slots 17/18. -/
 def handleOracleReportFromCommittedFeeProducts (x : ReportWriteFeeMintInput)
     (before : AccountAddress.ReportFeeMint.World) : AccountAddress.ReportFeeMint.Outcome :=
   AccountAddress.ReportFeeMint.handleOracleReportFromCommittedFeeProducts {
+    accountingAddress := x.accountingAddress
     layout := x.layout
     registeredModuleIds := x.registeredModuleIds
     reportedModuleIds := x.reportedModuleIds

@@ -108,7 +108,7 @@ theorem mint_after_read_discipline : mintAfterReadDiscipline :=
 
 /-- The registered ACCOUNT consumer for the physical report/write/getter/mint
 path.  Its mint event is produced by the same `StETHMintShares.State` that
-holds both the Solidity `shares` mapping and the packed total/external-shares
+holds both the abstract account-share map and the packed total/external-shares
 word; the share amount is not an input independent of the committed getter.
 This supplements the registered parent rather than creating a P-MINT node. -/
 theorem committed_fee_mint_consumes_checked_result
@@ -136,7 +136,7 @@ theorem root_committed_fee_mint_consumes_checked_result
       .transferShares 0 before.steth.locatorAccounting fee.sharesToMintAsFees] := by
   simpa [LidoSRv3.Audit.Verity.HandleOracleReportTx.handleOracleReportFromCommittedFeeProducts]
     using AccountAddress.ReportFeeMint.committed_nonzero_mint_uses_fee_result
-      { layout := x.layout, registeredModuleIds := x.registeredModuleIds,
+      { accountingAddress := x.accountingAddress, layout := x.layout, registeredModuleIds := x.registeredModuleIds,
         reportedModuleIds := x.reportedModuleIds, balancesGwei := x.balancesGwei,
         report := x.accountingReport } before post fee events h hfee
 
@@ -156,5 +156,28 @@ reverts them to per-call-site constants, this theorem's witness fails and the
 regression is caught here, not only by informal review. -/
 theorem mint_order_kill_line : mintOrderKillLine :=
   mintOrderKillLine_holds
+
+/-- Necessary result of the bounded report/getter/checked-fee/mint executor.
+The positive branch includes authorization derived from actual success, exact
+packed total/external halves, pointwise abstract account-share increase and
+conversion/events on the updated mint state. No later fee transfers or router
+reward callback are included in this bounded composition. -/
+theorem actual_report_fee_mint
+    (x : AccountAddress.ReportFeeMint.Input) (before post : AccountAddress.ReportFeeMint.World)
+    (fee : AccountAddress.ReportWriteFee.FeeResult) (events : List AccountAddress.StETHMintShares.Event)
+    (h : AccountAddress.ReportFeeMint.handleOracleReportFromCommittedFeeProducts x before =
+      .committed post fee events) :
+    AccountAddress.ReportFeeMint.Success x before post fee events :=
+  AccountAddress.ReportFeeMint.committed_success x before post fee events h
+
+theorem actual_report_fee_mint_failure_restores
+    (x : AccountAddress.ReportFeeMint.Input) (before rollback : AccountAddress.ReportFeeMint.World)
+    (error : AccountAddress.ReportFeeMint.Error)
+    (h : AccountAddress.ReportFeeMint.handleOracleReportFromCommittedFeeProducts x before =
+      .reverted error rollback) : rollback = before :=
+  AccountAddress.ReportFeeMint.failure_restores x before rollback error h
+
+#print axioms actual_report_fee_mint
+#print axioms actual_report_fee_mint_failure_restores
 
 end LidoSRv3.Audit.Guarantees.PAccount1

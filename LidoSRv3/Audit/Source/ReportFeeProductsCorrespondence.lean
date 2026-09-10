@@ -10,7 +10,8 @@ This is a deliberately narrow transcription of
 It does not model report admission, storage, fee distribution, or minting.
 Its only purpose is to make the Solidity 0.8 checked arithmetic of the fee
 products explicit: an overflow, an underflow, or a zero divisor produces no
-result, in the same left-to-right order as the source expressions.
+result, with the denominator-before-product order emitted by pinned solc0.8.9
+legacy code generation for the final quotient. Option erases panic subcodes.
 -/
 
 namespace LidoSRv3.Audit.Source.ReportFeeProductsCorrespondence
@@ -58,10 +59,9 @@ def execute (i : Input) : Option (Option Products) := do
     -- Accounting.sol:325: checked product before checked division.
     let feeProduct <- safeMul totalRewards i.totalFee
     let feeEther <- safeDiv feeProduct i.feePrecisionPoints
-    -- Accounting.sol:331: checked product, then checked denominator subtraction,
-    -- then checked division.  Do not commute these operations.
-    let shareProduct <- safeMul feeEther i.internalSharesBeforeFees
+    -- Accounting.sol:331, solc0.8.9 legacy codegen evaluates denominator first.
     let feeShareDenominator <- safeSub i.postInternalEther feeEther
+    let shareProduct <- safeMul feeEther i.internalSharesBeforeFees
     let sharesToMintAsFees <- safeDiv shareProduct feeShareDenominator
     some (some ⟨unifiedClBalance, totalRewards, feeEther,
       feeShareDenominator, sharesToMintAsFees⟩)

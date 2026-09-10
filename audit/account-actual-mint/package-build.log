@@ -1,0 +1,7 @@
+ℹ [5/7] Built StETHMintShares (2.1s)
+info: StETHMintShares.lean:330:0: 'AccountAddress.StETHMintShares.committed_mint_effect' depends on axioms: [propext, Classical.choice, Quot.sound]
+✔ [6/7] Built Tests.Verity.StETHMintSharesTest (339ms)
+ℹ [7/7] Built ReportFeeMint (456ms)
+info: ReportFeeMint.lean:307:0: 'AccountAddress.ReportFeeMint.committed_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ReportFeeMint.lean:308:0: 'AccountAddress.ReportFeeMint.failure_restores' depends on axioms: [propext, Classical.choice, Quot.sound]
+Build completed successfully (7 jobs).
