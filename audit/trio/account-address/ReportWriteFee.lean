@@ -750,11 +750,19 @@ def feeResultOf (d : Distribution) (shares : Nat) : FeeResult :=
 distribution. The 279-280 length asserts and the 340 positivity assert are
 theorems (`getter_ok_spec`, `totalFee_pos_of_shares_pos`), so no assertion
 branch is modeled. -/
+def feeProductsFromCommittedGetter (r : ReportWei) (d : Distribution) :
+    Except FeeError FeeResult :=
+  totalProtocolFeeShares r d.totalFee d.precisionPoints >>= fun shares =>
+  pure (feeResultOf d shares)
+
+/-- Accounting 265-301: the getter result, the minted fee shares, then the
+distribution.  Keeping the post-getter continuation named lets the composed
+transaction consume the exact `Distribution` it just read, instead of
+performing a second getter call or accepting a caller-provided fee record. -/
 def calculateProtocolFees (L : Layout) (registeredIds : List Nat) (core : Core) (r : ReportWei) :
     Except FeeError FeeResult :=
   (getStakingRewardsDistribution L registeredIds core).mapError FeeError.getter >>= fun d =>
-  totalProtocolFeeShares r d.totalFee d.precisionPoints >>= fun shares =>
-  pure (feeResultOf d shares)
+  feeProductsFromCommittedGetter r d
 
 theorem except_bind_eq_ok {ε α β : Type} (x : Except ε α) (f : α → Except ε β) (b : β) :
     (x >>= f) = .ok b ↔ ∃ a, x = .ok a ∧ f a = .ok b := by
@@ -794,6 +802,7 @@ theorem calculateProtocolFees_spec (L : Layout) (reg : List Nat) (core : Core) (
   rw [except_bind_eq_ok] at h
   obtain ⟨d, hd, h⟩ := h
   rw [except_mapError_eq_ok] at hd
+  unfold feeProductsFromCommittedGetter at h
   rw [except_bind_eq_ok] at h
   obtain ⟨shares, hs, h⟩ := h
   exact ⟨d, shares, hd, hs, (Except.ok.inj h).symm⟩

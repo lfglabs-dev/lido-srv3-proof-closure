@@ -1,3 +1,4 @@
+import Tests.Verity.ReportFeeMintTest
 import LidoSRv3.Tests.TopupBatchRootCallsRegression
 import LidoSRv3.Tests.WithdrawalMinimalLedgerRegression
 import LidoSRv3.Audit.Guarantees.PDeposit1PhysicalLedger
@@ -677,3 +678,9 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.TopupBatchRootCalls.failure_restores
 #print axioms LidoSRv3.Tests.TopupBatchRootCallsRegression.actual_batch_has_joint_guarantee
 #print axioms LidoSRv3.Tests.TopupBatchRootCallsRegression.two_rows_consume_ordered_limits
+
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1.actual_report_fee_mint
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1.actual_report_fee_mint_failure_restores
+#print axioms AccountActualMintRegression.same_world_mint_and_rate
+#print axioms AccountActualMintRegression.mismatched_accounting_rejects
+#print axioms AccountActualMintRegression.mapping_overflow_restores_packed_word
