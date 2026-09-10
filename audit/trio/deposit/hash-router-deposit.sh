@@ -28,7 +28,7 @@ if [[ "${tee_status}" -ne 0 ]]; then
   exit "${tee_status}"
 fi
 
-mapfile -t oleans < <(find "$root/.lake" "$repo/.lake" -name 'RouterDeposit.olean' 2>/dev/null | sort)
+mapfile -t oleans < <(find "$root/.lake" "$repo/.lake" \( -name 'RouterDeposit.olean' -o -name 'LiveBeacon.olean' \) 2>/dev/null | sort)
 if [[ "${#oleans[@]}" -eq 0 ]]; then
   echo "RouterDeposit.olean not found after a successful lake build" >&2
   exit 1
@@ -42,6 +42,8 @@ fi
   echo "lakefile_sha256=$(sha256sum "$root/lakefile.lean" | awk '{print $1}')"
   echo "deposit_sha256=$(sha256sum "$root/Deposit.lean" | awk '{print $1}')"
   echo "withdraw_sha256=$(sha256sum "$root/WithdrawDepositableEther.lean" | awk '{print $1}')"
+  echo "livebeacon_sha256=$(sha256sum "$root/LiveBeacon.lean" | awk '{print $1}')"
+  echo "livebeacon_tests_sha256=$(sha256sum "$root/Tests/Verity/LiveBeacon.lean" | awk '{print $1}')"
   for olean in "${oleans[@]}"; do
     echo "olean_path=${olean}"
     echo "olean_sha256=$(sha256sum "$olean" | awk '{print $1}')"

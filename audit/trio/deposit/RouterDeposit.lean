@@ -90,7 +90,7 @@ def updateModuleLastDepositState (ctx : Context) (prepared : PreparedDeposit)
     depositedEvents := w.depositedEvents ++
       [(prepared.moduleId, prepared.values.lidoPullWei)] }
 
-private def rootInput (credentials publicKey signature : LidoSRv3.Audit.Source.TrioAlloc1.Bytes) :
+def rootInput (credentials publicKey signature : LidoSRv3.Audit.Source.TrioAlloc1.Bytes) :
     LidoSRv3.Audit.Source.DepositDataRootCorrespondence.SourceDepositDataRootInput where
   withdrawalCredentials := credentials.map Fin.val
   publicKey := publicKey.map Fin.val
@@ -113,7 +113,7 @@ private def rootInput (credentials publicKey signature : LidoSRv3.Audit.Source.T
     exact b.isLt
   amountGweiBounded := by omega
 
-private def makeCall (ctx : Context) (credentials : LidoSRv3.Audit.Source.TrioAlloc1.Bytes)
+def makeCall (ctx : Context) (credentials : LidoSRv3.Audit.Source.TrioAlloc1.Bytes)
     (prepared : PreparedDeposit) (index : Nat) : DepositCall :=
   let publicKey := (prepared.moduleData.publicKeysBatch.drop (index * 48)).take 48
   let signature := (prepared.moduleData.signaturesBatch.drop (index * 96)).take 96
@@ -464,5 +464,48 @@ theorem executePrepared_ok_conservation_of_linkssource
   exact ⟨hBal, hLink.total ▸ hBeacon⟩
 
 #print axioms executePrepared_ok_conservation_of_linkssource
+
+/-- `LinksSource` is derived from the executed callee: a successful
+`prepareDepositABI` prefix at the pinned `DEPOSIT_SIZE` composes its beacon
+values from that literal, so the caller hypothesis of PR #277 is discharged
+by the prefix `executeRaw` actually ran. Still not derived from ALLOC alone:
+the equation comes from `composeValues` after the module call and the
+alignment/over-target/product guards. -/
+theorem linksSource_of_prepareDepositABI
+    (layout : Layout) (storage : Storage) (oracle : StaticOracle) (config : Config)
+    (amount : Word) (before after : Transcript) (moduleId : Word) (limits : DepositLimits)
+    (obtainDepositData : ObtainDepositData) (prepared : PreparedDeposit)
+    (executed : prepareDepositABI layout storage oracle config amount before moduleId
+      limits obtainDepositData DEPOSIT_SIZE = (.ok prepared, after)) :
+    LinksSource prepared :=
+  let facts := prepareDepositABI_composes_beacon_values layout storage oracle config amount
+    before after moduleId limits obtainDepositData DEPOSIT_SIZE prepared executed
+  ⟨facts.1, facts.2.1⟩
+
+#print axioms linksSource_of_prepareDepositABI
+
+/-- Successful `execute` without any caller hypothesis: the beacon credit is
+the prepared source `beaconTotalWei`, with `LinksSource` derived from the
+executed prefix rather than supplied. -/
+theorem execute_ok_conservation_derived
+    (external : External) (ctx : Context) (inputs : Inputs)
+    (before after : World) (attempts : List Live.Attempt)
+    (h : execute external ctx inputs before = ⟨.ok (), after, attempts⟩) :
+    after.router.routerBalance = before.router.routerBalance ∧
+      ∃ prepared transcript,
+        prepareDepositABI inputs.layout inputs.storage inputs.oracle inputs.config
+          inputs.requested before.allocationTranscript inputs.moduleId inputs.limits
+          inputs.obtainDepositData DEPOSIT_SIZE = (.ok prepared, transcript) ∧
+        LinksSource prepared ∧
+        after.router.beaconBalance =
+          before.router.beaconBalance + prepared.values.beaconTotalWei := by
+  obtain ⟨hBal, _, prepared, transcript, _, hPrep, hBeacon⟩ :=
+    execute_ok_conservation external ctx inputs before after attempts h
+  have hLink := linksSource_of_prepareDepositABI inputs.layout inputs.storage inputs.oracle
+    inputs.config inputs.requested before.allocationTranscript transcript inputs.moduleId
+    inputs.limits inputs.obtainDepositData prepared hPrep
+  exact ⟨hBal, prepared, transcript, hPrep, hLink, hLink.total ▸ hBeacon⟩
+
+#print axioms execute_ok_conservation_derived
 
 end audit.trio.deposit.RouterDeposit
