@@ -61,7 +61,13 @@ body instead of assuming them.
   `Fault.reason "Panic(0x11)"` / `"Panic(0x01)"`, not ABI panic data.
 * The EIP-7251 fake-exponential fee update rule is abstracted into the
   predeploy fee slot (`Predeploy.lean`); per-block excess updates remain
-  OPEN. The gateway→vault ABI hop is composed in `Composition.lean`.
+  OPEN. The gateway→vault ABI hop is composed in `Composition.lean`
+  (Solidity ABI framing of `(bytes[], bytes[])`; `executeVaultCalldata`).
+* The fee STATICCALL attempt is not recorded in the trace
+  (`getConsolidationRequestFee`, `attempts := []`); the code-less acceptance
+  arm of `lowLevelCall` does not exclude precompiles (`LowLevel.lean`);
+  `predeployBody` is a simplified stand-in (`Predeploy.lean`). Recorded, not
+  closed (`LOW-LEVEL-CALL.md`).
 
 Pin `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`.
 Codec lemmas are reused, not reopened. P-CONSOLIDATION remains OPEN.
@@ -566,7 +572,14 @@ the predeploy, then the source's own ladder — `FeeReadFailed` on a failed
 STATICCALL, `FeeInvalidData` on returndata other than 32 bytes, otherwise the
 big-endian word decode (`abi.decode(feeData, (uint256))`). A code-less target
 answers empty success, so it fails here as `FeeInvalidData`, matching the
-source. The fee is read, not supplied. -/
+source. The fee is read, not supplied.
+
+Residual (named by the #295 review 3bb8da69, recorded, not closed): the
+STATICCALL attempt record is dropped, `attempts := []` on every branch.
+`Result.attempts : List Attempt` carries CALL attempts while
+`lowLevelStaticCall` reports `List NestedAttempt`, so the fee read is
+invisible in the `executeVault` trace; `executeVault_success` exhibits the
+reply by re-running `lowLevelStaticCall` on the entry world instead. -/
 def getConsolidationRequestFee (sexternal : StaticCall.External) (ctx : Context)
     (inbox : Live.Address) : Exec Live.Word := fun w =>
   let r := lowLevelStaticCall sexternal ctx.self inbox [] w

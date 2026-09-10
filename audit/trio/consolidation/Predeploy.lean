@@ -30,6 +30,16 @@ Residuals (stated, not claimed):
 * Excess/fee-on-excess accounting, the queue head/tail ring positions, and
   the source's exact revert data are not modeled; rejection is empty
   returndata.
+* `predeployBody` is a simplified stand-in of EIP-7251 shape, not the
+  deployed predeploy (residual named by the #295 review 3bb8da69, recorded,
+  not closed): the real contract records the source address (`msg.sender`)
+  with each request and stores four words per queue entry (source address,
+  then the 96 request octets spread over three words), whereas this body
+  stores three words of the request and no address; a CALL with empty
+  calldata returns the fee on chain but is rejected (`≠ 96`) here, which the
+  vault never exercises; the system-call dequeue path is not modeled. The
+  frame theorems close the assumption on an *arbitrary* callee; the
+  correspondence of this body to the EIP-7251 bytecode remains OPEN.
 
 Pin `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`.
 P-CONSOLIDATION remains OPEN.
@@ -68,8 +78,10 @@ def predeployAcceptCore (target : Nat) (payload : Bytes)
   c3.writeContractSlot target (predeployQueueSlot + 3 * count + 2)
     (requestWord payload 2)
 
-/-- The concrete EIP-7251 callee body as a low-level-CALL `External`. The
-incoming world is the CALL-credited world (the fee already moved). -/
+/-- The concrete callee body of EIP-7251 shape as a low-level-CALL
+`External` (simplified stand-in: no source-address field, three queue words
+per request; see the module docstring). The incoming world is the
+CALL-credited world (the fee already moved). -/
 def predeployBody : External := fun req w =>
   if req.payload.length ≠ 96 then .rejected []
   else if req.value.val < (w.core.readContractSlot req.target.val predeployFeeSlot).val then

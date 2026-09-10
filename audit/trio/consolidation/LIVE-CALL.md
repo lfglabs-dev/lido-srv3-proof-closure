@@ -98,8 +98,16 @@ where used. They are not asserted about the predeploy.
   `Fault.reason "Panic(0x11)"` / `"Panic(0x01)"`, not ABI panic data.
 * ~~Gateway→vault ABI hop (`bytes[]` pairs, line 220) and the EIP-7251
   callee body remain OPEN.~~ Composed / given a concrete body on this branch
-  (`Composition.lean`, `Predeploy.lean`); the EIP-7251 fee-update rule and
-  the selector keccak remain OPEN (`LOW-LEVEL-CALL.md`).
+  (`Composition.lean`, `Predeploy.lean`): the hop is the Solidity ABI
+  framing of `(bytes[], bytes[])` (offset tables and 32-octet padding; the
+  first revision of this branch, head `94ef159c`, lacked both and was found
+  NOT CLEAN by review 3bb8da69; repaired), and the vault entrypoint on the
+  raw calldata is `executeVault` on the committed arrays
+  (`executeVaultCalldata_gateway`). The EIP-7251 fee-update rule, the
+  selector keccak, the correspondence of the simplified `predeployBody` to
+  the deployed predeploy, the untraced fee STATICCALL attempt and the
+  precompile exclusion of the code-less CALL arm remain OPEN / recorded
+  (`LOW-LEVEL-CALL.md`).
 
 ## Tests
 

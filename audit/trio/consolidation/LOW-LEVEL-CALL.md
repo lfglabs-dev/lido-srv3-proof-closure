@@ -7,6 +7,20 @@ Historical packets: `CODEC-VALIDATION.md`, `PRODUCER-PAYLOAD.md`,
 `LIVE-CALL.md`. Independent review of #281: `review-281/`.
 P-CONSOLIDATION remains OPEN. No guarantee is credited. No merge.
 
+> Revision after the independent review of head `94ef159c` (review
+> 3bb8da69, verdict NOT CLEAN). That review confirmed one defect: the
+> `Composition.lean` encoder omitted the per-element offset table and the
+> 32-octet padding the Solidity ABI requires for `bytes[]`, so its 448-octet
+> two-pair block was not the 640-octet block the gateway's line-220 call
+> puts on the wire and its decoder would have refused real calldata. This
+> revision repairs the framing (§4) and records, without closing them, the
+> three fidelity residuals that review named: the fee STATICCALL attempt is
+> not in the trace (§2), the predeploy body is a simplified stand-in (§3),
+> and the code-less CALL acceptance arm does not exclude precompiles (§1).
+> Obligations 1-3 remain closed relative to the model with those residuals
+> stated; obligation 4 is now closed for the ABI framing and the payload
+> identity, with the residuals of §4.
+
 The #281 review (`review-281/independent-review.md`, "Honestly stated
 residuals") named four internal obligations of the Live CALL increment.
 This branch closes exactly those four inside the consolidation lane and
@@ -17,7 +31,7 @@ nothing else:
 | 1 | Low-level `.call` has no target-code guard; the model reverted on a code-less target where the source succeeds | `LowLevel.lean` (`lowLevelCall`), `LiveCall.lean` (`callAdd_no_code_accepted`, `refund_no_code_accepted`) |
 | 2 | `_getFeeFromContract` was a supplied word; `FeeReadFailed` / `FeeInvalidData` were not modeled | `LowLevel.lean` (`lowLevelStaticCall`), `LiveCall.lean` (`getConsolidationRequestFee`, `feeRead_ok`) |
 | 3 | `LogFrame` / `BalanceFrame` / `Untraced` were premises on an arbitrary callee | `Predeploy.lean` (`predeployBody`, `predeployBody_logFrame`, `predeployBody_balanceFrame`, `predeployBody_untraced`, `executeVault_success_frame_predeploy`) |
-| 4 | The gateway→vault ABI hop (`bytes[]` pairs, line 220) was OPEN | `Composition.lean` (`gatewayVaultArgs`, `decodeVaultArgs`, `decodeVaultArgs_gatewayVaultArgs`, `hop_payloads`) |
+| 4 | The gateway→vault ABI hop (`bytes[]` pairs, line 220) was OPEN | `Composition.lean` (`abiBytesArray`, `gatewayVaultArgs`, `decodeVaultArgs`, `decodeVaultArgs_gatewayVaultArgs`, `executeVaultCalldata`, `executeVaultCalldata_gateway`, `executeVaultCalldata_success_payloads`, `hop_payloads`) |
 
 Files of this increment: `audit/trio/consolidation/{LowLevel,Predeploy,Composition}.lean`
 (new), `audit/trio/consolidation/{LiveCall,InspectAxioms}.lean` (changed),
@@ -49,6 +63,17 @@ Consumers:
 | --- | --- |
 | `WithdrawalVaultEIP7685.sol:115` `CONSOLIDATION_REQUEST.call{value: fee}(request)` | `callAddConsolidationRequest` = `lowLevelCall callee ctx inbox (vaultCallPayload pair) fee` |
 | `ConsolidationGateway.sol:302` `recipient.call{value: refund}("")` | `refundFee` = `lowLevelCall callee ctx (resolveAddress recipient sender) [] refund` |
+
+Residual of the code-less arm (review 3bb8da69, not closed here): the EVM
+treats precompile addresses (`0x01`-`0x0a` and later additions) as code-less
+yet executing accounts; `lowLevelCall` / `lowLevelStaticCall` answer
+"accepted, empty return data" for every code-less target, which is exact
+for EOAs and undeployed addresses but not for precompiles (an empty payload
+to `0x09` blake2f or `0x0a` KZG point evaluation fails on chain). The
+theorems below are therefore stated for targets that are not precompiles;
+the practical exposure is nil (the refund recipient is chosen by the role
+holder; `CONSOLIDATION_REQUEST` has code), but the premise is now written
+into the docstrings rather than implied.
 
 `callAdd_no_code_accepted` (also under the stable name `callAdd_no_code`
 that #281 inspected): a code-less, funded hop target accepts, the
@@ -84,6 +109,16 @@ word. The fee is read, not supplied. (`Gateway.lean`'s gateway-side
 that call is the gateway's typed interface call to the vault and is outside
 this packet.)
 
+Residual of the fee read (review 3bb8da69, not closed here): the STATICCALL
+attempt record is dropped. `getConsolidationRequestFee` returns
+`attempts := []` on every branch because `Result.attempts : List Attempt`
+carries CALL attempts, while `lowLevelStaticCall` reports a
+`List NestedAttempt`; the fee read is therefore invisible in the
+`executeVault` trace. `executeVault_success` exhibits the STATICCALL reply
+by re-running `lowLevelStaticCall` on the entry world, not by reading the
+trace. Lifting static attempts into the trace (as `Oracle.frame` does with
+`*WithTrace`) is left OPEN.
+
 ## 3. Predeploy body, frame derived (`Predeploy.lean`)
 
 `predeployBody : External` is a concrete callee for the EIP-7251
@@ -100,29 +135,78 @@ balances. `predeployStaticBody : StaticCall.External` answers
 | `LogFrame predeployBody` — derived, not assumed | `predeployBody_logFrame` |
 | `BalanceFrame predeployBody` — derived, not assumed | `predeployBody_balanceFrame` |
 | `Untraced predeployBody` — derived, not assumed | `predeployBody_untraced` |
-| Line-87 `staticcall("")` against the body returns the fee slot | `predeploy_fee_read` |
+| Line-84 `staticcall("")` against the body returns the fee slot | `predeploy_fee_read` |
 | Committed entrypoint against the body: events per pair in order, ledger moved `msg.value`, **no frame premise** | `executeVault_success_frame_predeploy` |
 
 `executeVault_success_frame` (generic callee, explicit frame premises) is
 kept; the predeploy theorem instantiates it with the derived frames.
+
+Residual of the body (review 3bb8da69, not closed here): `predeployBody` is
+a simplified stand-in of EIP-7251 shape, not the deployed predeploy. Beyond
+the fee-update and excess accounting already listed, the real contract
+records the *source address* (`msg.sender`) with each request and stores
+four words per queue entry (source address, source pubkey, target pubkey
+split over the words), whereas the model stores three words of the 96
+request octets and no address; a CALL with empty calldata returns the fee
+on chain but is rejected (`≠ 96`) by the model (unobservable from the vault,
+which never CALLs with empty calldata); the system-call dequeue path is not
+modeled. What the frame theorems close is the assumption on an *arbitrary*
+callee; what remains OPEN is the correspondence of `predeployBody` to the
+EIP-7251 bytecode. "Concrete EIP-7251 body" in this packet means "concrete
+model body of EIP-7251 shape".
 
 ## 4. Gateway→vault ABI hop (`Composition.lean`)
 
 `ConsolidationGateway.sol:220`
 `withdrawalVault.addConsolidationRequests{value: totalFee}(sourcePubkeys, targetPubkeys)`.
 
+The framing is the Solidity ABI encoding of `(bytes[], bytes[])`: two head
+offset words; each tail is a count word, one offset word per element
+(relative to the octet after the count word), then each element as a length
+word, its payload, and zero padding to a multiple of 32 octets. For two
+48-octet keys per array: element `96` octets, tail `288` octets, second
+head offset `0x160`, argument block `640` octets. The encoder output for
+that vector was compared octet for octet with ethers v6
+`AbiCoder.defaultAbiCoder().encode(["bytes[]","bytes[]"], ...)` (640 octets,
+identical; SHA-256 of the block
+`0e67339e7c83a75539118ec18735760d407d33677891e9f29d4def4be1449f65`). That
+comparison is an external check recorded here, not a Lean theorem.
+
+The decoder follows offsets the way Solidity's calldata accessors for
+`bytes[] calldata` do: head offset word, count word, per-element offset word,
+length word, payload; missing words, offsets past the calldata, an offset
+table that does not fit, and a length past the calldata are refused. Padding
+octets and offset canonicity are not inspected (neither does Solidity).
+
 | Claim | Theorem |
 | --- | --- |
-| `bytes[]` tail = count word ++ framed elements (`encodeBytesElement`) | `framedBytesArray`, `framedBytesArray_length` |
-| Argument block = head offsets `64`, `64 + |sources tail|`, then the two tails | `gatewayVaultArgs`; `gatewayVaultCalldata` prefixes a selector parameter |
-| Framed element decodes with any suffix; dropping it leaves the suffix | `decodeBytesElement_append`, `drop_encodeBytesElement_append` |
-| Framed sequence / tail decode back to the blobs, consuming exactly the framing | `decodeFramedSeq_flatten`, `decodeBytesArray_framed` |
+| ABI element = length word ++ payload ++ zero padding to 32; 48-octet key → 96 octets | `abiBytesElement`, `abiBytesElement_length`, `abiBytesElement_length_48` |
+| Element offset table: one word per element, every offset inside the element area | `elementOffsets`, `offsetWords_length`, `elementOffsets_le` |
+| `bytes[]` tail = count word ++ offset table ++ padded elements; `32 + 128·n` octets for `n` keys | `abiBytesArray`, `abiBytesArray_length`, `abiBytesArray_length_48` |
+| Argument block = head offsets `64`, `64 + |sources tail|`, then the two tails; `640` octets for two pairs | `gatewayVaultArgs`, `gatewayVaultArgs_length`, `gatewayVaultArgs_hop_length`; `gatewayVaultCalldata` prefixes a selector parameter |
+| Padded element decodes with any suffix; dropping it leaves the suffix | `decodeBytesElement_abi_append`, `drop_abiBytesElement_append` |
+| Following the encoder's offset table over its element area returns the blobs | `decodeOffsetSeq_encoded` |
+| Tail decodes back to the blobs, with any suffix | `decodeBytesArray_abi`, `decodeBytesArray_abi_nil` |
 | Decoding the encoded hop returns exactly `(sources, targets)` | `decodeVaultArgs_gatewayVaultArgs` |
 | Hop arrays from the committed gateway pairs are 48-octet blobs | `hopSources_length`, `hopTargets_length` |
 | Zipping the hop arrays is the vault's `pairsOf` input | `pairsOf_hopArrays` |
 | Every zipped pair passes `_validatePublicKey` width | `widthOk_hopArrays` |
 | Gateway packed payloads = per-pair `integerBE` concatenations | `packedPayloads_eq_map` |
 | Vault's re-packed line-114 payloads = gateway's packed payloads (same 96 octets) | `hop_payloads` |
+| The committed hop, ABI-encoded, decodes back to its own arrays | `decodeVaultArgs_hop` |
+| The vault entrypoint **on the raw calldata** (selector check, ABI decode, then `executeVault`) applied to the gateway's line-220 calldata *is* `executeVault` on the committed hop arrays | `executeVaultCalldata`, `executeVaultCalldata_gateway` |
+| Committed success on that calldata: guards held, fee read by the line-84 STATICCALL, exact fee, and the attempted line-115 requests carry the gateway's packed payloads pair by pair | `executeVaultCalldata_success_payloads` |
+
+Residuals of the hop (stated, not claimed): the selector is a parameter
+(keccak256 outside the model; ethers gives `0xa75ac640` for the signature,
+recorded here, not proved); Solidity validates each `bytes[] calldata`
+element lazily at its access in the line-68 loop, after the fee read and
+exact-fee check, while the model decodes everything before the body runs —
+both revert the whole call so the committed state is identical, but the
+fault name and the pre-revert attempt trace on malformed calldata differ;
+the decoder accepts some non-canonical layouts Solidity also accepts
+(swapped or reordered offsets, non-zero padding) and no claim is made about
+them beyond "decodes to some arrays".
 
 ## Residuals (stated, not claimed)
 
@@ -130,10 +214,20 @@ kept; the predeploy theorem instantiates it with the derived frames.
   head/tail ring positions and the source's exact revert data are not
   modeled; the fee is a slot and rejection is empty returndata.
 * The 4-octet selector of the line-220 hop is a parameter (keccak256 is
-  outside this model). Solidity's ABI decoder additionally bounds-checks
-  head/tail lengths against calldata size; `decodeVaultArgs` refuses short
-  heads and unframed elements and the round trip is stated for the
-  encoder's output.
+  outside this model). `decodeVaultArgs` refuses what Solidity's calldata
+  decoder refuses (missing words, offsets or lengths past the calldata) and
+  accepts every canonical encoding; element validation is eager here and
+  lazy (per access in the loop) in Solidity; non-canonical layouts are not
+  characterised (§4).
+* The fee STATICCALL attempt is not recorded in the `executeVault` trace
+  (`getConsolidationRequestFee` returns `attempts := []`); the read is
+  exhibited by re-running `lowLevelStaticCall` on the entry world (§2).
+* `predeployBody` is a simplified stand-in: no source-address field, three
+  queue words per request instead of EIP-7251's four-word entries, no
+  empty-calldata fee read via CALL, no dequeue path (§3).
+* The code-less acceptance arm of `lowLevelCall` / `lowLevelStaticCall` is
+  exact for EOAs and undeployed addresses, not for precompiles; the no-code
+  theorems are read with "target is not a precompile" as a premise (§1).
 * `RequestAdditionFailed(request)` / `InvalidPublicKeyLength(pubkey)` /
   panics remain `Fault.reason` names; request octets remain in the attempt
   trace.
@@ -159,11 +253,21 @@ at the read fee, balances `0 / 14`, count `2`, six queue words retaining all
 `IncorrectFee` against the read fee; code-less predeploy address →
 `FeeInvalidData`; body arms (48-octet request, underpayment, slot `8`).
 
-`LidoSRv3/Tests/TrioConsolidation/Composition.lean` (new): head offsets,
-count words, first framed element, round trip, truncated / mis-headed blocks
-refused, unequal arrays decode (the vault guard is downstream), hop arrays
-equal the producer blobs, zip = `pairsOf`, re-packed payloads = gateway
-packed payloads.
+`LidoSRv3/Tests/TrioConsolidation/Composition.lean`: the 640-octet
+two-pair argument block spelled out word by word against the ABI
+specification (heads `0x40` / `0x160`, counts, per-element offsets `0x40` /
+`0xa0`, length words, 48 key octets, 16 zero padding octets); head, count,
+offset, length and payload positions; round trip on two pairs, one pair, no
+pairs, and 33- / 32-octet elements; refusals (truncated heads, truncated
+payload, truncated first tail, head offset / element offset / element length
+past the calldata, oversized count); Solidity-matching leniency (missing
+padding octets, swapped heads decode swapped, reordered element offsets
+decode reordered); unequal arrays decode (the vault guard is downstream);
+hop arrays equal the producer blobs, zip = `pairsOf`, re-packed payloads =
+gateway packed payloads; and the vault entrypoint on the raw calldata
+against the predeploy bodies: same attempts, logs and balances as the array
+entry, packed payloads on the wire, `UnknownSelector` / `AbiDecodingFailed`
+reverts with no attempt, and `executeVaultCalldata_gateway` instantiated.
 
 All vectors are `native_decide` on projections of `Live.run` results and
 of the decoders. This adds `native_decide` sites under `LidoSRv3/Tests/`;
@@ -181,9 +285,12 @@ lake build +audit.trio.consolidation.LowLevel +audit.trio.consolidation.LiveCall
 ```
 
 True compiler exit (`set -o pipefail`, no `tee` shim). Lean 4.31.0
-(commit 68218e87), Lake 5.0.0. Base `222f1870` (`origin/main`). Result:
-`Build completed successfully`, exit 0. The receipt for the exact pushed
-head is in the PR body.
+(commit 68218e87), Lake 5.0.0. Base `222f1870` (`origin/main`); submodule
+`lido-core` initialised and verified at the pin in the build checkout.
+Result on the revision-2 tree: `Build completed successfully (1275 jobs)`,
+exit 0, no warnings on any `consolidation` / `TrioConsolidation` module;
+97 `#print axioms` lines, none with `sorryAx` or `Lean.ofReduceBool`. The
+receipt for the exact pushed head is in the PR body.
 
 `#print axioms` of `InspectAxioms.lean` (compiler output, this increment):
 
@@ -219,15 +326,28 @@ head is in the PR body.
 | `predeployBody_untraced` | `propext` |
 | `predeploy_fee_read` | `propext`, `Classical.choice`, `Quot.sound` |
 | `executeVault_success_frame_predeploy` | `propext`, `Quot.sound` |
+| `abiBytesElement_length` | `propext` |
+| `elementOffsets_le` | `propext`, `Quot.sound` |
+| `offsetWords_length` | `propext`, `Quot.sound` |
+| `abiBytesArray_length` | `propext`, `Quot.sound` |
+| `abiBytesArray_length_48` | `propext`, `Quot.sound` |
+| `gatewayVaultArgs_length` | `propext` |
 | `decodeBytesElement_append` | `propext`, `Classical.choice`, `Quot.sound` |
 | `drop_encodeBytesElement_append` | `propext` |
-| `decodeFramedSeq_flatten` | `propext`, `Classical.choice`, `Quot.sound` |
-| `decodeBytesArray_framed` | `propext`, `Classical.choice`, `Quot.sound` |
+| `decodeBytesElement_abi_append` | `propext`, `Classical.choice`, `Quot.sound` |
+| `drop_abiBytesElement_append` | (none) |
+| `decodeOffsetSeq_encoded` | `propext`, `Classical.choice`, `Quot.sound` |
+| `decodeBytesArray_abi` | `propext`, `Classical.choice`, `Quot.sound` |
+| `decodeBytesArray_abi_nil` | `propext`, `Classical.choice`, `Quot.sound` |
 | `decodeVaultArgs_gatewayVaultArgs` | `propext`, `Classical.choice`, `Quot.sound` |
 | `pairsOf_hopArrays` | `propext` |
 | `widthOk_hopArrays` | `propext`, `Quot.sound` |
 | `packedPayloads_eq_map` | `propext` |
 | `hop_payloads` | `propext`, `Quot.sound` |
+| `gatewayVaultArgs_hop_length` | `propext`, `Quot.sound` |
+| `decodeVaultArgs_hop` | `propext`, `Classical.choice`, `Quot.sound` |
+| `executeVaultCalldata_gateway` | `propext`, `Classical.choice`, `Quot.sound` |
+| `executeVaultCalldata_success_payloads` | `propext`, `Classical.choice`, `Quot.sound` |
 | `refund_zero` | `propext` |
 | `refund_attempt_request` | `propext` |
 | `refund_error_restores` | `propext` |
@@ -237,10 +357,15 @@ head is in the PR body.
 | `refund_value_split` | `propext` |
 | `refund_request_is_hop` | `propext` |
 
-`Classical.choice` appears on exactly the five theorems that reuse the
-existing `ABI.decode_encode` / `ABI.decode_encode_bounded` round trip
-(`#print axioms` of those two: `propext`, `Classical.choice`, `Quot.sound`),
-as the existing `decode_encode_bytes_element` already did. No `sorryAx`, no
+`Classical.choice` appears exactly on the theorems that reuse the existing
+`ABI.decode_encode` / `ABI.decode_encode_bounded` round trip (`#print
+axioms` of those two: `propext`, `Classical.choice`, `Quot.sound`), as the
+existing `decode_encode_bytes_element` already did: `predeploy_fee_read`
+and the decode chain `decodeBytesElement_append` →
+`decodeBytesElement_abi_append` → `decodeOffsetSeq_encoded` →
+`decodeBytesArray_abi(_nil)` → `decodeVaultArgs_gatewayVaultArgs` →
+`decodeVaultArgs_hop` → `executeVaultCalldata_gateway` →
+`executeVaultCalldata_success_payloads`. No `sorryAx`, no
 `Lean.ofReduceBool` on any theorem of the lane. The `InspectAxioms` module is
 lane-local and not wired into global Trust.
 

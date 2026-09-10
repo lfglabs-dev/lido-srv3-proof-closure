@@ -10,6 +10,18 @@ precheck: a code-less target (EOA or not-yet-deployed address) *accepts* with
 empty return data, after the value transfer for CALL. Only an unfunded caller
 fails before the callee runs.
 
+Premise of the code-less arm (residual named by the #295 review 3bb8da69,
+recorded, not closed): precompile addresses (`0x01`-`0x0a` and later
+additions) have no code yet execute, and some of them fail on an empty
+payload (`0x09` blake2f, `0x0a` KZG point evaluation). The rule below treats
+every code-less target as accepting, which is exact for EOAs and undeployed
+addresses only. Every theorem stated on the code-less arm
+(`callAdd_no_code_accepted`, `refund_no_code_accepted`, the fee read on a
+code-less target) is to be read with "the target is not a precompile" as a
+premise. Exposure at the pinned call sites is nil (`CONSOLIDATION_REQUEST`
+has code; the refund recipient is chosen by the role holder), but the model
+does not enforce the premise.
+
 Pinned usages at `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`:
 
 * `WithdrawalVaultEIP7685.sol:115`
@@ -31,7 +43,8 @@ open LidoSRv3.Audit.Source.TrioReserve1
 open LidoSRv3.Audit.Source.TrioReserve1.Live
 
 /-- Low-level `target.call{value: value}(payload)`. No target-code guard: a
-code-less target accepts with empty return data after the value transfer. An
+code-less target (EOA or undeployed address; **not a precompile**, see the
+module docstring) accepts with empty return data after the value transfer. An
 unfunded caller records a failed attempt without running any callee. A coded
 target runs the supplied external interpreter on the credited world; rejection
 rolls the transfer and all callee effects back. -/
@@ -50,8 +63,9 @@ def lowLevelCall (external : External) (ctx : Context) (target : Address)
     | .rejectedWithTrace data nested => ⟨.error (.bubbled data), w, [⟨req, false, data, nested⟩]⟩
 
 /-- Low-level `target.staticcall(payload)` (e.g. `_getFeeFromContract`'s
-`staticcall("")`). No target-code guard: a code-less target answers success
-with empty return data, and the caller-side returndata checks decide.
+`staticcall("")`). No target-code guard: a code-less target (EOA or
+undeployed address; **not a precompile**, see the module docstring) answers
+success with empty return data, and the caller-side returndata checks decide.
 STATICCALL never moves value or state; the incoming world is observed, not
 modified. -/
 def lowLevelStaticCall (external : StaticCall.External) (caller target : Address)
