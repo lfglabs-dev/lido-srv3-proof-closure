@@ -1,0 +1,40 @@
+{
+  "source": "c0e2fe625f423c3f9b804b64e65d635c5af6d896",
+  "main_base": "70301660264f2f710e7160e190aaa3af330e84fa",
+  "union": "a34d355da0b78b7add2ee62dbb05aef59b5c4188",
+  "source_files_unchanged": [
+    "LidoSRv3/Audit/Source/TopupRootCallEffects.lean",
+    "LidoSRv3/Audit/Guarantees/PTopup1RootCalls.lean",
+    "LidoSRv3/Tests/TopupRootCallEffectsRegression.lean"
+  ],
+  "source_review": "CLEAN complete c0e2 source/Solidity; retained verbatim",
+  "AllTrust": {
+    "command": "lake build LidoSRv3.Audit.AllGuarantees LidoSRv3.Audit.Trust",
+    "exit": 0,
+    "jobs": 1694
+  },
+  "trust": {
+    "command": "python3 scripts/check_trust_axioms.py",
+    "exit": 0,
+    "exact_axioms": 29,
+    "environment_dependencies_recomputed": true,
+    "native_claims_reevaluated": true
+  },
+  "source_receipt": {
+    "identities": 1288,
+    "pins": 11,
+    "scoped_axiom_sets": 14,
+    "kernel_regressions": 12,
+    "public_instances": 2,
+    "artifact_hashes": 13,
+    "inherited_Solidity_identities": 45,
+    "fresh_Solidity_run": false
+  },
+  "integration_review": "Independent frozen exact-commit gate, not self-approved",
+  "sha256": {
+    "audit/topup-root-physical-effects/integration/README.md": "e10408c70e87ab94781e3dd46f17a9c1b2e45d510e471115a5e3fa11b76e2842",
+    "audit/topup-root-physical-effects/integration/all-trust-build.log": "cf42c6526c0a8761b5260fe46f2b4dc6f565fbcc1341f4dbdc7016873a159ca5",
+    "audit/topup-root-physical-effects/integration/independent-source-review-c0e2.md": "40026241646ebae3c32a59225bff46bb622140584c4f7283349c4c8892d89c7a",
+    "audit/topup-root-physical-effects/integration/trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439"
+  }
+}
