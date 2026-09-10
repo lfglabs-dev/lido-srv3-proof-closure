@@ -1,0 +1,2412 @@
+{
+  "scope": "Actual Lake import source closure compared to base Git or pinned package checkout. Four selected toolchain source identities; no complete toolchain rebuild or binary certification.",
+  "setup_module": "LidoSRv3.Audit.Source.TopupHistoryDomain",
+  "package_source_closure": [
+    {
+      "module": "Aesop",
+      "path": ".lake/packages/aesop/Aesop.lean",
+      "sha256": "6806b32ad8ef01dd86cbf70d72a64ab731858956522a336409804ac303b14260"
+    },
+    {
+      "module": "Aesop.BaseM",
+      "path": ".lake/packages/aesop/Aesop/BaseM.lean",
+      "sha256": "1363357eb12f4245c05cb3bb1c0e4bd0ea11df60a9ac2018fc280c0498e93f89"
+    },
+    {
+      "module": "Aesop.Builder.Apply",
+      "path": ".lake/packages/aesop/Aesop/Builder/Apply.lean",
+      "sha256": "1d75e204b0b0a7e29978e20cb0c1ab833a8fa701a91e3bef8f947c488ed6b10b"
+    },
+    {
+      "module": "Aesop.Builder.Basic",
+      "path": ".lake/packages/aesop/Aesop/Builder/Basic.lean",
+      "sha256": "2aa56bbaa5bbf72b10a8d9c18d34a27acca3bebd9bd4c661e5b783715f5642f0"
+    },
+    {
+      "module": "Aesop.Builder.Cases",
+      "path": ".lake/packages/aesop/Aesop/Builder/Cases.lean",
+      "sha256": "fb150abdf155e3746bb623efca5f53c4947fcce7c9b0542a252abf402fbc71ed"
+    },
+    {
+      "module": "Aesop.Builder.Constructors",
+      "path": ".lake/packages/aesop/Aesop/Builder/Constructors.lean",
+      "sha256": "b2851bc173f7f3696edc89592b8b59b4e4b78a271a0c78eb2b46d2ff7fa701fb"
+    },
+    {
+      "module": "Aesop.Builder.Default",
+      "path": ".lake/packages/aesop/Aesop/Builder/Default.lean",
+      "sha256": "cc901da10482780df7ff8b9e4eb7d529d16116ff2031298819d52595a5019a98"
+    },
+    {
+      "module": "Aesop.Builder.Forward",
+      "path": ".lake/packages/aesop/Aesop/Builder/Forward.lean",
+      "sha256": "554d5bd71d753c389cca51e6e92ca0f109a76b4c267f660343e63b291ef041d6"
+    },
+    {
+      "module": "Aesop.Builder.NormSimp",
+      "path": ".lake/packages/aesop/Aesop/Builder/NormSimp.lean",
+      "sha256": "d10cbc2104999437682e32d075dc10229b277cc7cdf5f157ad5fc77cae4b1f94"
+    },
+    {
+      "module": "Aesop.Builder.Tactic",
+      "path": ".lake/packages/aesop/Aesop/Builder/Tactic.lean",
+      "sha256": "d0d8284c962a60113041a110d268a9d0ab17089cc051240aa407167c5a8558f6"
+    },
+    {
+      "module": "Aesop.Builder.Unfold",
+      "path": ".lake/packages/aesop/Aesop/Builder/Unfold.lean",
+      "sha256": "8464fbf97cc3adce5373b7a4462320080d4865493c0dd1acd6f7a502dd9a325d"
+    },
+    {
+      "module": "Aesop.BuiltinRules",
+      "path": ".lake/packages/aesop/Aesop/BuiltinRules.lean",
+      "sha256": "60a2029cb540854afebccd00b0a3ad7fc4ce1274cbad36f00a87795d0d96a376"
+    },
+    {
+      "module": "Aesop.BuiltinRules.ApplyHyps",
+      "path": ".lake/packages/aesop/Aesop/BuiltinRules/ApplyHyps.lean",
+      "sha256": "2386ba354d3e2b2e2284aa208033554a1c398a588b87cd4c1f65d6f0518696e2"
+    },
+    {
+      "module": "Aesop.BuiltinRules.Assumption",
+      "path": ".lake/packages/aesop/Aesop/BuiltinRules/Assumption.lean",
+      "sha256": "a40b74f7cd0c796a2e3759863be052f20f71ea25b723a9061283fd601ac6bde6"
+    },
+    {
+      "module": "Aesop.BuiltinRules.DestructProducts",
+      "path": ".lake/packages/aesop/Aesop/BuiltinRules/DestructProducts.lean",
+      "sha256": "6626554bb0f7b24d95f0b91ab6afcaaa3acf9c17662d4b2d7b367933f0efd15b"
+    },
+    {
+      "module": "Aesop.BuiltinRules.Ext",
+      "path": ".lake/packages/aesop/Aesop/BuiltinRules/Ext.lean",
+      "sha256": "602292051351aa87744fcfc90cca86c718428576fad89d3f1df7aa317afb3641"
+    },
+    {
+      "module": "Aesop.BuiltinRules.Intros",
+      "path": ".lake/packages/aesop/Aesop/BuiltinRules/Intros.lean",
+      "sha256": "f17fbbb2dfb37688a73b8dd8bfdf67c1923e5784cc3e7a4e2f061b3fd5e1fe6c"
+    },
+    {
+      "module": "Aesop.BuiltinRules.Rfl",
+      "path": ".lake/packages/aesop/Aesop/BuiltinRules/Rfl.lean",
+      "sha256": "f72f8008d4080b2f9984e74b1b989e464f39ff48b5ab2cc481b2d1041dfe8d60"
+    },
+    {
+      "module": "Aesop.BuiltinRules.Split",
+      "path": ".lake/packages/aesop/Aesop/BuiltinRules/Split.lean",
+      "sha256": "312b9167d64314540b13da100ff2f18907a3b53fc0dd9e69b82f31f8a7c90fc2"
+    },
+    {
+      "module": "Aesop.BuiltinRules.Subst",
+      "path": ".lake/packages/aesop/Aesop/BuiltinRules/Subst.lean",
+      "sha256": "eac974cebafc3a49e9a5e7293ddc1033a41050891c8fd1ef0426f52ef99dc6c9"
+    },
+    {
+      "module": "Aesop.Check",
+      "path": ".lake/packages/aesop/Aesop/Check.lean",
+      "sha256": "d40831751f0423be5e3a78031c240d6fe0bd01f674e1cc4c569dd825f068ab8e"
+    },
+    {
+      "module": "Aesop.Constants",
+      "path": ".lake/packages/aesop/Aesop/Constants.lean",
+      "sha256": "1406d23ca68a786564a5fffa414067690960f560ea57624e5c0a40147f5749b3"
+    },
+    {
+      "module": "Aesop.EMap",
+      "path": ".lake/packages/aesop/Aesop/EMap.lean",
+      "sha256": "af1215fc741523fc33bb41553523b3ada944ea4bf70843509de7523f7f3f3eae"
+    },
+    {
+      "module": "Aesop.ElabM",
+      "path": ".lake/packages/aesop/Aesop/ElabM.lean",
+      "sha256": "1664355fd7a398234a5fc8e79b20657b57c08e311c68a37c75c0b72af76f52c5"
+    },
+    {
+      "module": "Aesop.Exception",
+      "path": ".lake/packages/aesop/Aesop/Exception.lean",
+      "sha256": "1eae03b3c64d6d73ca03fafd81eecfcd1e6d6fb4540b9238313817e43fd705ca"
+    },
+    {
+      "module": "Aesop.Forward.LevelIndex",
+      "path": ".lake/packages/aesop/Aesop/Forward/LevelIndex.lean",
+      "sha256": "98acaf47ffcb6a64458fc9254e43d2a8d506e3ff35e120e7d6b79f2602df98b0"
+    },
+    {
+      "module": "Aesop.Forward.Match",
+      "path": ".lake/packages/aesop/Aesop/Forward/Match.lean",
+      "sha256": "68647e8d05c0c3dee85d0f3d2bda42d723f7e9c542921cddb6e36e24e9e6688d"
+    },
+    {
+      "module": "Aesop.Forward.Match.Types",
+      "path": ".lake/packages/aesop/Aesop/Forward/Match/Types.lean",
+      "sha256": "5751e55a72d0f1c7b0d67d14a3bedcdfa4d867bcd702ece06b47bc357af5a9be"
+    },
+    {
+      "module": "Aesop.Forward.PremiseIndex",
+      "path": ".lake/packages/aesop/Aesop/Forward/PremiseIndex.lean",
+      "sha256": "8251a4b130ea392b184b08ba056f345523846e88a7d7b3f5996a72c8c832bd6a"
+    },
+    {
+      "module": "Aesop.Forward.RuleInfo",
+      "path": ".lake/packages/aesop/Aesop/Forward/RuleInfo.lean",
+      "sha256": "7e612777abcbaf7672774f10abff8bc1f87ae52ffdeeaca0a528e1567699a66a"
+    },
+    {
+      "module": "Aesop.Forward.SlotIndex",
+      "path": ".lake/packages/aesop/Aesop/Forward/SlotIndex.lean",
+      "sha256": "bbd54944a07082f8d14babbc0a79ebc4831201ba6c8e154036e349c8b972d88d"
+    },
+    {
+      "module": "Aesop.Forward.State",
+      "path": ".lake/packages/aesop/Aesop/Forward/State.lean",
+      "sha256": "3249143deab03d0d0806fc418669ad3547a7388c5c88a95763d5cec413ef7d64"
+    },
+    {
+      "module": "Aesop.Forward.State.ApplyGoalDiff",
+      "path": ".lake/packages/aesop/Aesop/Forward/State/ApplyGoalDiff.lean",
+      "sha256": "782f71bd8ae05284633dc8b1d26157197f82e7bc71b0e99a4721f2c5a7e227a4"
+    },
+    {
+      "module": "Aesop.Forward.State.Initial",
+      "path": ".lake/packages/aesop/Aesop/Forward/State/Initial.lean",
+      "sha256": "71663c4de8e0b6376373e4646d7351ef74b040d617c02020f3c66f39ff7354a2"
+    },
+    {
+      "module": "Aesop.Forward.State.UpdateGoal",
+      "path": ".lake/packages/aesop/Aesop/Forward/State/UpdateGoal.lean",
+      "sha256": "89f0c6ace2500e78c56c316937a6a8e0a5556e362ffb467ab716cebae79b090c"
+    },
+    {
+      "module": "Aesop.Forward.Substitution",
+      "path": ".lake/packages/aesop/Aesop/Forward/Substitution.lean",
+      "sha256": "39099f7cef9ff6e577ac4d0a63238bcfdb0eae14d562deb26ab017b475e22677"
+    },
+    {
+      "module": "Aesop.Frontend",
+      "path": ".lake/packages/aesop/Aesop/Frontend.lean",
+      "sha256": "755cf427c42bfcc1c97760c82827c105fc168a875a809be74ac886f74e195423"
+    },
+    {
+      "module": "Aesop.Frontend.Attribute",
+      "path": ".lake/packages/aesop/Aesop/Frontend/Attribute.lean",
+      "sha256": "2d2fd56166a5472b74ab182fa6999bc098247326396c913b434738d3b1455a3d"
+    },
+    {
+      "module": "Aesop.Frontend.Basic",
+      "path": ".lake/packages/aesop/Aesop/Frontend/Basic.lean",
+      "sha256": "56709adee6bb856633a5af6475589200c104e0cc8b0727023b3b72aae7d05818"
+    },
+    {
+      "module": "Aesop.Frontend.Command",
+      "path": ".lake/packages/aesop/Aesop/Frontend/Command.lean",
+      "sha256": "cf72530869644310f1c730811f12926d433e5ebb53047e3f8286105b1b7668b7"
+    },
+    {
+      "module": "Aesop.Frontend.Extension",
+      "path": ".lake/packages/aesop/Aesop/Frontend/Extension.lean",
+      "sha256": "cef9a9dd119cd6cc9f10671a8f26f01efce38bfd190152ffeb36d4ad4e1b3161"
+    },
+    {
+      "module": "Aesop.Frontend.Extension.Init",
+      "path": ".lake/packages/aesop/Aesop/Frontend/Extension/Init.lean",
+      "sha256": "eebb1c6f6ed50edda3817e580e456b158d943acc8aa39754d1073fc16c98352c"
+    },
+    {
+      "module": "Aesop.Frontend.RuleExpr",
+      "path": ".lake/packages/aesop/Aesop/Frontend/RuleExpr.lean",
+      "sha256": "1db0f649e81d140301a21c559298308b77ffd8e51a3221f4f7ed13d0da1ad281"
+    },
+    {
+      "module": "Aesop.Frontend.Saturate",
+      "path": ".lake/packages/aesop/Aesop/Frontend/Saturate.lean",
+      "sha256": "1977fcff92fbf3a7927ac3d0618c0d60fe85dcff9a87911fcd74cef864e23d68"
+    },
+    {
+      "module": "Aesop.Frontend.Tactic",
+      "path": ".lake/packages/aesop/Aesop/Frontend/Tactic.lean",
+      "sha256": "4de8bd498bd6655cbfaa1f75b640c4ee3d9db42d9cada4dcff9a05912bbced0f"
+    },
+    {
+      "module": "Aesop.Index",
+      "path": ".lake/packages/aesop/Aesop/Index.lean",
+      "sha256": "a6abdfb91d6eeeb2e14b850a8f094f49f508403d4057ac51cd1323cb7692b8b1"
+    },
+    {
+      "module": "Aesop.Index.Basic",
+      "path": ".lake/packages/aesop/Aesop/Index/Basic.lean",
+      "sha256": "56ca5de2dd76dd716fbc18558dbc3e93502df64e8c22aacbd830cd1a23e20662"
+    },
+    {
+      "module": "Aesop.Index.DiscrTreeConfig",
+      "path": ".lake/packages/aesop/Aesop/Index/DiscrTreeConfig.lean",
+      "sha256": "d816388c2f73d1e51b6c84e41a79521fff82f606140ec4004a2ccf52f5bd91b7"
+    },
+    {
+      "module": "Aesop.Index.Forward",
+      "path": ".lake/packages/aesop/Aesop/Index/Forward.lean",
+      "sha256": "44cfc9d28fb915d76d810feeca2c7c727d271e9fe40f15c90e05ff838caa392c"
+    },
+    {
+      "module": "Aesop.Index.RulePattern",
+      "path": ".lake/packages/aesop/Aesop/Index/RulePattern.lean",
+      "sha256": "01f61a1c3e7d673dfb32251a0675142bd35341cd025d2055edc59393213765fe"
+    },
+    {
+      "module": "Aesop.Main",
+      "path": ".lake/packages/aesop/Aesop/Main.lean",
+      "sha256": "1dcc1fcfff276a1d00cdc32cf2767d93ee6cd088247c6ab8c69c31c653160a33"
+    },
+    {
+      "module": "Aesop.Nanos",
+      "path": ".lake/packages/aesop/Aesop/Nanos.lean",
+      "sha256": "3dbae06eb9ecab0376f6202c2586a81327ef38871773a7c6a35d54b3998c2616"
+    },
+    {
+      "module": "Aesop.Options.Internal",
+      "path": ".lake/packages/aesop/Aesop/Options/Internal.lean",
+      "sha256": "876ba63e306f608719c5dece7d92266cef9dda97e604b5b6860a9a2ba99f8e18"
+    },
+    {
+      "module": "Aesop.Options.Public",
+      "path": ".lake/packages/aesop/Aesop/Options/Public.lean",
+      "sha256": "9aa5555935aa919f0fbdf069de4b0a8ab81ddae629a4db13180dc6f3d7123aec"
+    },
+    {
+      "module": "Aesop.Percent",
+      "path": ".lake/packages/aesop/Aesop/Percent.lean",
+      "sha256": "018c491c4aba730acc649714091ff3b1605aa7fb40d302bf312b7d4477d8a76e"
+    },
+    {
+      "module": "Aesop.Rule",
+      "path": ".lake/packages/aesop/Aesop/Rule.lean",
+      "sha256": "1f19949060bcb5757dd9637101643b36d4f8f4c567d181f47e0766bfa0290f23"
+    },
+    {
+      "module": "Aesop.Rule.Basic",
+      "path": ".lake/packages/aesop/Aesop/Rule/Basic.lean",
+      "sha256": "a01206a7097efc52821b86341c382beb4250349a095d1f78b831ed4f77586f5d"
+    },
+    {
+      "module": "Aesop.Rule.Forward",
+      "path": ".lake/packages/aesop/Aesop/Rule/Forward.lean",
+      "sha256": "eb5613bd7d585643c601847f985613f4e54fc6719dbf010f858f4bee8f80c29d"
+    },
+    {
+      "module": "Aesop.Rule.Name",
+      "path": ".lake/packages/aesop/Aesop/Rule/Name.lean",
+      "sha256": "6dc5bc557fd31bc927c3a0c86379fa37935148db857bc03181cc73e83d3f29b4"
+    },
+    {
+      "module": "Aesop.RulePattern",
+      "path": ".lake/packages/aesop/Aesop/RulePattern.lean",
+      "sha256": "597dec6514b1ac817578c101ed9ee1321e9e1d69430345b0b8c7c6e4fc96ee02"
+    },
+    {
+      "module": "Aesop.RulePattern.Cache",
+      "path": ".lake/packages/aesop/Aesop/RulePattern/Cache.lean",
+      "sha256": "72de9f4d8b65463f066839ddade22d845cabee125f31dfbd167251459e1551fe"
+    },
+    {
+      "module": "Aesop.RuleSet",
+      "path": ".lake/packages/aesop/Aesop/RuleSet.lean",
+      "sha256": "7d08d9588a327688bb48a5c548f6ab7e2c2f9a3d1139f30f7287a1aa5f32ff68"
+    },
+    {
+      "module": "Aesop.RuleSet.Filter",
+      "path": ".lake/packages/aesop/Aesop/RuleSet/Filter.lean",
+      "sha256": "38436d296949f99c983f9a2653095282d0e261f4757e4173f2a27b6e242da146"
+    },
+    {
+      "module": "Aesop.RuleSet.Member",
+      "path": ".lake/packages/aesop/Aesop/RuleSet/Member.lean",
+      "sha256": "0b11f44c4ce0dabb0da8023a17c819806c1969039dd8c2bf7309205dda49b323"
+    },
+    {
+      "module": "Aesop.RuleSet.Name",
+      "path": ".lake/packages/aesop/Aesop/RuleSet/Name.lean",
+      "sha256": "935b8305a29faed6d0c6da368935c1f146674441650369d9e035621a4e27eb8a"
+    },
+    {
+      "module": "Aesop.RuleTac",
+      "path": ".lake/packages/aesop/Aesop/RuleTac.lean",
+      "sha256": "b0c4dc2069b3c874e533a11402c42d8edca375fde1c962e115e5e843a310d7e6"
+    },
+    {
+      "module": "Aesop.RuleTac.Apply",
+      "path": ".lake/packages/aesop/Aesop/RuleTac/Apply.lean",
+      "sha256": "5d9ac94541b87d943ddaa8ba9c29867d8a72e7fdaa0a60e44ce2ff510e3ae3fb"
+    },
+    {
+      "module": "Aesop.RuleTac.Basic",
+      "path": ".lake/packages/aesop/Aesop/RuleTac/Basic.lean",
+      "sha256": "39788520fa03626c8d86caa3d4ad79d001185f3fc7336aa55d391262b0e51fe1"
+    },
+    {
+      "module": "Aesop.RuleTac.Cases",
+      "path": ".lake/packages/aesop/Aesop/RuleTac/Cases.lean",
+      "sha256": "41894e7d01212ce9a6c8915fa0c654a2a8b15a59d2dba8782e0e430dc25ae57d"
+    },
+    {
+      "module": "Aesop.RuleTac.Descr",
+      "path": ".lake/packages/aesop/Aesop/RuleTac/Descr.lean",
+      "sha256": "0a04a56a1d99239ad7a5690e3a9e759808017251a061cd17306ef5e19433e7c0"
+    },
+    {
+      "module": "Aesop.RuleTac.ElabRuleTerm",
+      "path": ".lake/packages/aesop/Aesop/RuleTac/ElabRuleTerm.lean",
+      "sha256": "df3203dad823ab596246030972846252135d230edc9b7dd0768c2f92fe4e49c4"
+    },
+    {
+      "module": "Aesop.RuleTac.Forward",
+      "path": ".lake/packages/aesop/Aesop/RuleTac/Forward.lean",
+      "sha256": "9dc9c8abf26334209bdd3b55dd48d54d7284a865d2110a4c0e94f95328d9826e"
+    },
+    {
+      "module": "Aesop.RuleTac.Forward.Basic",
+      "path": ".lake/packages/aesop/Aesop/RuleTac/Forward/Basic.lean",
+      "sha256": "c4dc85c3d1508922296f86b32f78461955e2efcefe2852e4b87368dffb990dc0"
+    },
+    {
+      "module": "Aesop.RuleTac.GoalDiff",
+      "path": ".lake/packages/aesop/Aesop/RuleTac/GoalDiff.lean",
+      "sha256": "975755be019f959083d5064737e3758e62caefcd1bb119dc6c8bca2bb0ca4aac"
+    },
+    {
+      "module": "Aesop.RuleTac.Preprocess",
+      "path": ".lake/packages/aesop/Aesop/RuleTac/Preprocess.lean",
+      "sha256": "dc3c0227bea44873acdb1bee024043a5fd699812232e355a08f67654f4f7905c"
+    },
+    {
+      "module": "Aesop.RuleTac.RuleTerm",
+      "path": ".lake/packages/aesop/Aesop/RuleTac/RuleTerm.lean",
+      "sha256": "173fa280bee8b161326be2f951d61c3aa232ac06d0c16ac140e0bd16fa61e961"
+    },
+    {
+      "module": "Aesop.RuleTac.Tactic",
+      "path": ".lake/packages/aesop/Aesop/RuleTac/Tactic.lean",
+      "sha256": "ae02990abe5a0b14c03d8b2fe15e6a86fbc94e266f07e8bbd7816af93bdac584"
+    },
+    {
+      "module": "Aesop.Saturate",
+      "path": ".lake/packages/aesop/Aesop/Saturate.lean",
+      "sha256": "313a2d68709ed69c64130d24772e1fb4185aed98ca11509f7aeb7270edf97a88"
+    },
+    {
+      "module": "Aesop.Script.Check",
+      "path": ".lake/packages/aesop/Aesop/Script/Check.lean",
+      "sha256": "411252b0d77ea0088b0c49ea73720ce2abe70d3987ca46341577ff610c66e90b"
+    },
+    {
+      "module": "Aesop.Script.CtorNames",
+      "path": ".lake/packages/aesop/Aesop/Script/CtorNames.lean",
+      "sha256": "6d43226e76cdb8a76da204c9abea9959c83dfb506a7679542369b484c98d35ae"
+    },
+    {
+      "module": "Aesop.Script.GoalWithMVars",
+      "path": ".lake/packages/aesop/Aesop/Script/GoalWithMVars.lean",
+      "sha256": "cfea836cd3919948dac6e203f9f917ef3c366f8fae0dcf460148655aadb1cec4"
+    },
+    {
+      "module": "Aesop.Script.Main",
+      "path": ".lake/packages/aesop/Aesop/Script/Main.lean",
+      "sha256": "c2db929766d316e142a87fb21dee362ac55c8470e346a8532bb7a6cc1ba9c926"
+    },
+    {
+      "module": "Aesop.Script.OptimizeSyntax",
+      "path": ".lake/packages/aesop/Aesop/Script/OptimizeSyntax.lean",
+      "sha256": "1b12de57536bf443ef3ba4779da6111ed893476f8339f15baae76c050227a68c"
+    },
+    {
+      "module": "Aesop.Script.SScript",
+      "path": ".lake/packages/aesop/Aesop/Script/SScript.lean",
+      "sha256": "f4eb49215a0906021f649581312abeb4e61b6a400ef363114ddd896d17091eae"
+    },
+    {
+      "module": "Aesop.Script.ScriptM",
+      "path": ".lake/packages/aesop/Aesop/Script/ScriptM.lean",
+      "sha256": "19e55f1952c9b08ab7f070a90eb86e4e2081be8aae4b10977966f1fb4c7b7429"
+    },
+    {
+      "module": "Aesop.Script.SpecificTactics",
+      "path": ".lake/packages/aesop/Aesop/Script/SpecificTactics.lean",
+      "sha256": "26118ff575de646a61e88195c1b59c0e1fde2fab68052a25b9a68f79e5e5133e"
+    },
+    {
+      "module": "Aesop.Script.Step",
+      "path": ".lake/packages/aesop/Aesop/Script/Step.lean",
+      "sha256": "b200c193512da81f639bf68cd33cf2f1a564698102734c8920a0cbbe9b75e9e9"
+    },
+    {
+      "module": "Aesop.Script.StructureDynamic",
+      "path": ".lake/packages/aesop/Aesop/Script/StructureDynamic.lean",
+      "sha256": "35d1aaab87fbdf44bd61096644fe2c3b69f963a488bfce22f83ba66e664c7a28"
+    },
+    {
+      "module": "Aesop.Script.StructureStatic",
+      "path": ".lake/packages/aesop/Aesop/Script/StructureStatic.lean",
+      "sha256": "f06132cd7573e7ef4426ed53fd3c6b3d2135916a065a110848c148dfdd5a8182"
+    },
+    {
+      "module": "Aesop.Script.Tactic",
+      "path": ".lake/packages/aesop/Aesop/Script/Tactic.lean",
+      "sha256": "48c1dc81b64c4dabf93ab71c03d1501ac2eb5f44eb1f7ef879d04c306285b01e"
+    },
+    {
+      "module": "Aesop.Script.TacticState",
+      "path": ".lake/packages/aesop/Aesop/Script/TacticState.lean",
+      "sha256": "aca2291287516db2491c648170b3d169139488d029800de3e0bfe2e02e24e851"
+    },
+    {
+      "module": "Aesop.Script.UScript",
+      "path": ".lake/packages/aesop/Aesop/Script/UScript.lean",
+      "sha256": "fc59c178a83442d842c44923ecaa7c358385b7ee92ece83971ee4153ff492610"
+    },
+    {
+      "module": "Aesop.Script.UScriptToSScript",
+      "path": ".lake/packages/aesop/Aesop/Script/UScriptToSScript.lean",
+      "sha256": "044092129a8e108b73bf627e4ea77a15f79b36c0b355932628e36c0f48186828"
+    },
+    {
+      "module": "Aesop.Script.Util",
+      "path": ".lake/packages/aesop/Aesop/Script/Util.lean",
+      "sha256": "e4cd604a4f74b8bd2a5da676736ae0080d709f8892e78785000a24231b2d0122"
+    },
+    {
+      "module": "Aesop.Search.ExpandSafePrefix",
+      "path": ".lake/packages/aesop/Aesop/Search/ExpandSafePrefix.lean",
+      "sha256": "63c84297e8e22340506d96700667325c8d197afcbaebeedd4db787e57c3ce07d"
+    },
+    {
+      "module": "Aesop.Search.Expansion",
+      "path": ".lake/packages/aesop/Aesop/Search/Expansion.lean",
+      "sha256": "7eeee4656e838e398ce12fbab36a9fc5920d6d95b8d4207db731ad65d552ee1b"
+    },
+    {
+      "module": "Aesop.Search.Expansion.Basic",
+      "path": ".lake/packages/aesop/Aesop/Search/Expansion/Basic.lean",
+      "sha256": "2476339216f379c2cde0fde4b885e9e3b4e5ecbdb41bc07e7fc8e62c470a2e46"
+    },
+    {
+      "module": "Aesop.Search.Expansion.Norm",
+      "path": ".lake/packages/aesop/Aesop/Search/Expansion/Norm.lean",
+      "sha256": "c366e6d89d41f83eec01ebe6a704ddb1e6227cd756e35a40525da3251a13fc56"
+    },
+    {
+      "module": "Aesop.Search.Expansion.Simp",
+      "path": ".lake/packages/aesop/Aesop/Search/Expansion/Simp.lean",
+      "sha256": "2b43d8d550d9e702f644a88205e6f0fd1fb7e28480064e5642c753e218e9ba85"
+    },
+    {
+      "module": "Aesop.Search.Main",
+      "path": ".lake/packages/aesop/Aesop/Search/Main.lean",
+      "sha256": "09c06459da7f087466f7be93037bc757d8c23c3ecda944a6aba2ed1a944851fb"
+    },
+    {
+      "module": "Aesop.Search.Queue",
+      "path": ".lake/packages/aesop/Aesop/Search/Queue.lean",
+      "sha256": "3ef26820f9353eb26342c06a2388b743422d0bc5f40fa99dc8af9304311ac952"
+    },
+    {
+      "module": "Aesop.Search.Queue.Class",
+      "path": ".lake/packages/aesop/Aesop/Search/Queue/Class.lean",
+      "sha256": "c2b64776f16a3efb5bec2d2e0b53e42754a03df46572b2cb3cd6ab221f24d7bd"
+    },
+    {
+      "module": "Aesop.Search.RuleSelection",
+      "path": ".lake/packages/aesop/Aesop/Search/RuleSelection.lean",
+      "sha256": "f2fa0fe863e2a1872232f4303573e5ea014adc6833a13f389fdb7930bdf74242"
+    },
+    {
+      "module": "Aesop.Search.SearchM",
+      "path": ".lake/packages/aesop/Aesop/Search/SearchM.lean",
+      "sha256": "2fa61f1477d9df307637caa0fbe29de553b6dc7a83d2ad9dad4845078ef6fbee"
+    },
+    {
+      "module": "Aesop.Stats.Basic",
+      "path": ".lake/packages/aesop/Aesop/Stats/Basic.lean",
+      "sha256": "dfd6a895c344ebe6a1dddc573c0886403bec5ea839b5b4b5c66e6aa523233319"
+    },
+    {
+      "module": "Aesop.Stats.Extension",
+      "path": ".lake/packages/aesop/Aesop/Stats/Extension.lean",
+      "sha256": "a135bd78e2f504f1774db72c9c3b4f1bc6a25bafcecee4af5ef7a0286c45575f"
+    },
+    {
+      "module": "Aesop.Stats.File",
+      "path": ".lake/packages/aesop/Aesop/Stats/File.lean",
+      "sha256": "86a5ae9d2ae2953177c0158a9f27f4b9df4b6e61be0bb53bfabee44ec7d3aeac"
+    },
+    {
+      "module": "Aesop.Stats.Report",
+      "path": ".lake/packages/aesop/Aesop/Stats/Report.lean",
+      "sha256": "b4c897105bce396b9f63a8d0362b77cf95ee9f624cda23d5bdfab19bc12bcea4"
+    },
+    {
+      "module": "Aesop.Tracing",
+      "path": ".lake/packages/aesop/Aesop/Tracing.lean",
+      "sha256": "9dcb9960323578ca32cf4c60e575169e3fc37fcb303dcb64b33a167e3abc5fd2"
+    },
+    {
+      "module": "Aesop.Tree.AddRapp",
+      "path": ".lake/packages/aesop/Aesop/Tree/AddRapp.lean",
+      "sha256": "a3d5fc58f60c4a14992682988937c8c2a0855bce9cf7da20e41f8e8e0831922e"
+    },
+    {
+      "module": "Aesop.Tree.Check",
+      "path": ".lake/packages/aesop/Aesop/Tree/Check.lean",
+      "sha256": "26358e41dbaf1c391bd0d55035975da5f641333e56088b52e7edf66f778723bb"
+    },
+    {
+      "module": "Aesop.Tree.Data",
+      "path": ".lake/packages/aesop/Aesop/Tree/Data.lean",
+      "sha256": "abe682ec1aa9891b0005da83f46e3be6271e2e5e451bcd34431b6faa95f40b51"
+    },
+    {
+      "module": "Aesop.Tree.Data.ForwardRuleMatches",
+      "path": ".lake/packages/aesop/Aesop/Tree/Data/ForwardRuleMatches.lean",
+      "sha256": "a23be6e151064f3a3886642ade55bb7a4c43793b749f98ae8889f687cc242b4d"
+    },
+    {
+      "module": "Aesop.Tree.ExtractProof",
+      "path": ".lake/packages/aesop/Aesop/Tree/ExtractProof.lean",
+      "sha256": "f1c5310f3fa55583b3389c2f1514da1628d3c3574e229cc383894005c2968b83"
+    },
+    {
+      "module": "Aesop.Tree.ExtractScript",
+      "path": ".lake/packages/aesop/Aesop/Tree/ExtractScript.lean",
+      "sha256": "5474c713ef7f0d9a386248362e0e4170a9a2f31d6d85ad2f6f19bfd8520a8ba0"
+    },
+    {
+      "module": "Aesop.Tree.Free",
+      "path": ".lake/packages/aesop/Aesop/Tree/Free.lean",
+      "sha256": "46a55621040a2c41891df504fb8b9d81e9958cd17afb8ecf4472f33c34f4db76"
+    },
+    {
+      "module": "Aesop.Tree.RunMetaM",
+      "path": ".lake/packages/aesop/Aesop/Tree/RunMetaM.lean",
+      "sha256": "d89a9840aa5f12e9306b25139a51846c2717d344b57018c9f476566d713a4433"
+    },
+    {
+      "module": "Aesop.Tree.State",
+      "path": ".lake/packages/aesop/Aesop/Tree/State.lean",
+      "sha256": "4306bdabd6512e343c659fb15d86d399d1dc85a8afe5bab8a417fc3a906aa501"
+    },
+    {
+      "module": "Aesop.Tree.Stats",
+      "path": ".lake/packages/aesop/Aesop/Tree/Stats.lean",
+      "sha256": "bc6c2be59c61021bc55dfe67867be975a1dc24caa4d6ed8dfcfd6db38eeefffc"
+    },
+    {
+      "module": "Aesop.Tree.Tracing",
+      "path": ".lake/packages/aesop/Aesop/Tree/Tracing.lean",
+      "sha256": "e17bab4a5c0e98853c231b9221d02491402793a50ab8706f14949f63d4ff93f6"
+    },
+    {
+      "module": "Aesop.Tree.Traversal",
+      "path": ".lake/packages/aesop/Aesop/Tree/Traversal.lean",
+      "sha256": "6b9401204d8b69e878edd762c1212705e326fb1deb8f89b71922377dff666feb"
+    },
+    {
+      "module": "Aesop.Tree.TreeM",
+      "path": ".lake/packages/aesop/Aesop/Tree/TreeM.lean",
+      "sha256": "c412d8a3512fa4a8eec257efbfc36149ac046360d41fe079ff5b1f3d8bccc392"
+    },
+    {
+      "module": "Aesop.Tree.UnsafeQueue",
+      "path": ".lake/packages/aesop/Aesop/Tree/UnsafeQueue.lean",
+      "sha256": "8e5b976a26d9817f19d45986b8ecf017c08d06f9516eba3193ada2bdfb2adacd"
+    },
+    {
+      "module": "Aesop.Util.Basic",
+      "path": ".lake/packages/aesop/Aesop/Util/Basic.lean",
+      "sha256": "889b0abf7a8f588048ef076869745808a2f1dcc71c6e0130ce7159b65b8fffd0"
+    },
+    {
+      "module": "Aesop.Util.EqualUpToIds",
+      "path": ".lake/packages/aesop/Aesop/Util/EqualUpToIds.lean",
+      "sha256": "5cb2b601c59ef55202ff1d747edb6587cf37deda5e3f66b1d3b41f643f21e744"
+    },
+    {
+      "module": "Aesop.Util.OrderedHashSet",
+      "path": ".lake/packages/aesop/Aesop/Util/OrderedHashSet.lean",
+      "sha256": "8bd05912708184e2f18180441ce4feab19e62263daa3e43cebc8f1216e09015d"
+    },
+    {
+      "module": "Aesop.Util.Tactic",
+      "path": ".lake/packages/aesop/Aesop/Util/Tactic.lean",
+      "sha256": "fec2b66aab7c69d825a191b7f136bc3ee3388b4dba7c816dd1c20277e651ca7b"
+    },
+    {
+      "module": "Aesop.Util.Tactic.Ext",
+      "path": ".lake/packages/aesop/Aesop/Util/Tactic/Ext.lean",
+      "sha256": "7cb49b37e100e31dc4b1c0b5b8921344e23a3bdb306afc33adc667d06c0661f1"
+    },
+    {
+      "module": "Aesop.Util.Tactic.Unfold",
+      "path": ".lake/packages/aesop/Aesop/Util/Tactic/Unfold.lean",
+      "sha256": "4c048632f7f7fee02d63ce3bfd1685cda8c0428004edbea09552d26c81debce7"
+    },
+    {
+      "module": "Aesop.Util.Unfold",
+      "path": ".lake/packages/aesop/Aesop/Util/Unfold.lean",
+      "sha256": "38fa112bb2fe7ade0feed23a4f5375cdfb4273eb7d8f0290c298c14b4f77c78a"
+    },
+    {
+      "module": "Aesop.Util.UnionFind",
+      "path": ".lake/packages/aesop/Aesop/Util/UnionFind.lean",
+      "sha256": "6da0d9be7470f222aa4b42922e5ed556e4e36bfb30a0971ae6257a8851ca3d8f"
+    },
+    {
+      "module": "Aesop.Util.UnorderedArraySet",
+      "path": ".lake/packages/aesop/Aesop/Util/UnorderedArraySet.lean",
+      "sha256": "8e829303d7583ebb284ee574c0b5779f03478b4998eeaadd732958f475a7a4d8"
+    },
+    {
+      "module": "Batteries.Classes.Order",
+      "path": ".lake/packages/batteries/Batteries/Classes/Order.lean",
+      "sha256": "8e593bc38701f9f64c036a6e12ec5e913e7af65c06d3ce9e402c429b1fd79283"
+    },
+    {
+      "module": "Batteries.CodeAction",
+      "path": ".lake/packages/batteries/Batteries/CodeAction.lean",
+      "sha256": "44318f37bb3bb2bedd69b1baedb248fb58007508e2a575000343489e2c7fa32d"
+    },
+    {
+      "module": "Batteries.CodeAction.Attr",
+      "path": ".lake/packages/batteries/Batteries/CodeAction/Attr.lean",
+      "sha256": "aa178b9fd3fd65bb716bf10781a070239b9f2ff7dc2d58037a92a2f7afd93fbc"
+    },
+    {
+      "module": "Batteries.CodeAction.Basic",
+      "path": ".lake/packages/batteries/Batteries/CodeAction/Basic.lean",
+      "sha256": "a49b213c098ceaff81162549a30a4b3bb40c9d00d887c0c414c58abeb7aa3d63"
+    },
+    {
+      "module": "Batteries.CodeAction.Deprecated",
+      "path": ".lake/packages/batteries/Batteries/CodeAction/Deprecated.lean",
+      "sha256": "eb8e4c2b5e86626e3fc291c77d31b29f036e788808d838df6c3b6d4f0d8a5b84"
+    },
+    {
+      "module": "Batteries.CodeAction.Match",
+      "path": ".lake/packages/batteries/Batteries/CodeAction/Match.lean",
+      "sha256": "d574190af4c74720e5346faf44dab04c6c84e0e7d2a1b2434539420ccd7b0994"
+    },
+    {
+      "module": "Batteries.CodeAction.Misc",
+      "path": ".lake/packages/batteries/Batteries/CodeAction/Misc.lean",
+      "sha256": "c664e7ad2ca802baf342724a4b3d0c7896cc42faacc073cd2341e093b25d3d9c"
+    },
+    {
+      "module": "Batteries.Control.AlternativeMonad",
+      "path": ".lake/packages/batteries/Batteries/Control/AlternativeMonad.lean",
+      "sha256": "c0461d5318582cac24437b3123aaad304a0806eff0ccf491901320c62fa36b96"
+    },
+    {
+      "module": "Batteries.Control.ForInStep.Basic",
+      "path": ".lake/packages/batteries/Batteries/Control/ForInStep/Basic.lean",
+      "sha256": "8ec4237f9363d4d6a0a390cf62808c1676b7ba496b533ec2c5228b8bb152d89e"
+    },
+    {
+      "module": "Batteries.Control.ForInStep.Lemmas",
+      "path": ".lake/packages/batteries/Batteries/Control/ForInStep/Lemmas.lean",
+      "sha256": "bb64f141ecf9d378130442270fe52d09be17f64908fc9dcf84b857b2a87bd010"
+    },
+    {
+      "module": "Batteries.Control.LawfulMonadState",
+      "path": ".lake/packages/batteries/Batteries/Control/LawfulMonadState.lean",
+      "sha256": "e68ff1086c7ec4832b5937c97ba76b8409721779bfc0664918b072fc463d6ef0"
+    },
+    {
+      "module": "Batteries.Control.Lemmas",
+      "path": ".lake/packages/batteries/Batteries/Control/Lemmas.lean",
+      "sha256": "28db32250844c2ec1640ea43066ddb1b426f7692c0c71a58e74135add290e106"
+    },
+    {
+      "module": "Batteries.Control.Nondet.Basic",
+      "path": ".lake/packages/batteries/Batteries/Control/Nondet/Basic.lean",
+      "sha256": "bb202a049c224630b4cf34faf69151fed107eabd6af052dfe69b54b6b48d0d87"
+    },
+    {
+      "module": "Batteries.Control.OptionT",
+      "path": ".lake/packages/batteries/Batteries/Control/OptionT.lean",
+      "sha256": "019b4d7dc7cdfaa79e5b9ba3864c689fa073a28c7bbbbb0da9811909a463b181"
+    },
+    {
+      "module": "Batteries.Data.Array.Basic",
+      "path": ".lake/packages/batteries/Batteries/Data/Array/Basic.lean",
+      "sha256": "6934a8d943785cd7482c44d13a14f01732724fc2bff4cfb4aaf7fe204c0c58de"
+    },
+    {
+      "module": "Batteries.Data.Array.Merge",
+      "path": ".lake/packages/batteries/Batteries/Data/Array/Merge.lean",
+      "sha256": "552140f63d6a304c68ee4e7e5c1054df5629bb2ca6e2de8bd732663a3adf9fca"
+    },
+    {
+      "module": "Batteries.Data.BinomialHeap.Basic",
+      "path": ".lake/packages/batteries/Batteries/Data/BinomialHeap/Basic.lean",
+      "sha256": "8e027aa85eaedcdad0ab30ca3c5d3c00ffc853dfde87ceee35e14bb8d88de1c3"
+    },
+    {
+      "module": "Batteries.Data.List.Basic",
+      "path": ".lake/packages/batteries/Batteries/Data/List/Basic.lean",
+      "sha256": "a807f0893bbafe1270cae12ea51752c314eff70a67392f0d6a4ad97cf4024333"
+    },
+    {
+      "module": "Batteries.Data.List.Count",
+      "path": ".lake/packages/batteries/Batteries/Data/List/Count.lean",
+      "sha256": "19b1e761b58caffecd418e3902d662980f8df3bff240f071ff155c264abaca0d"
+    },
+    {
+      "module": "Batteries.Data.List.Lemmas",
+      "path": ".lake/packages/batteries/Batteries/Data/List/Lemmas.lean",
+      "sha256": "ea27ad22a89c0b839552b8d244962800e9a3347a7f2ae17af65ea305796fc790"
+    },
+    {
+      "module": "Batteries.Data.List.Perm",
+      "path": ".lake/packages/batteries/Batteries/Data/List/Perm.lean",
+      "sha256": "bb91f10b25676a6e30e15bc4bbfe8c4f1e4a6870fb7e3a55140fb628a3a90ca6"
+    },
+    {
+      "module": "Batteries.Data.MLList.Basic",
+      "path": ".lake/packages/batteries/Batteries/Data/MLList/Basic.lean",
+      "sha256": "da94447391d6c9fa2815f52e0ecfc2cc6cac5723327e94ae7b355020c6c71cf4"
+    },
+    {
+      "module": "Batteries.Data.UInt",
+      "path": ".lake/packages/batteries/Batteries/Data/UInt.lean",
+      "sha256": "031fbbb32a1a564d349eb6767ae3b572f43d87dbbe3a124157ff3f08a76196d2"
+    },
+    {
+      "module": "Batteries.Lean.AttributeExtra",
+      "path": ".lake/packages/batteries/Batteries/Lean/AttributeExtra.lean",
+      "sha256": "7590eabd938d4abb5d8e98982592a110b9b94e9eeffde60c5e166d8e8357b54c"
+    },
+    {
+      "module": "Batteries.Lean.Except",
+      "path": ".lake/packages/batteries/Batteries/Lean/Except.lean",
+      "sha256": "7c5731b86a795219f00cd59a4424434beb8fee82e822473a7e1473ce0968e2eb"
+    },
+    {
+      "module": "Batteries.Lean.Expr",
+      "path": ".lake/packages/batteries/Batteries/Lean/Expr.lean",
+      "sha256": "e36a0e6f2c0ff7f6e2055cc5a517f3332812abe17b7f2635c5a2bd435079efec"
+    },
+    {
+      "module": "Batteries.Lean.HashSet",
+      "path": ".lake/packages/batteries/Batteries/Lean/HashSet.lean",
+      "sha256": "d78be8b7f563b38ad827a55676d27ef5b05636ad18b20a9015e531c2e58d423e"
+    },
+    {
+      "module": "Batteries.Lean.Meta.Basic",
+      "path": ".lake/packages/batteries/Batteries/Lean/Meta/Basic.lean",
+      "sha256": "e919fbcdf57c4dd683408c3d7056eaadd37cc8949d381191848c1b0991f1d586"
+    },
+    {
+      "module": "Batteries.Lean.Meta.DiscrTree",
+      "path": ".lake/packages/batteries/Batteries/Lean/Meta/DiscrTree.lean",
+      "sha256": "7e15e05976732f6508368a0c465073cf0a2a1c5f44c92405800bca93252c40e1"
+    },
+    {
+      "module": "Batteries.Lean.Meta.Expr",
+      "path": ".lake/packages/batteries/Batteries/Lean/Meta/Expr.lean",
+      "sha256": "53557c521c3e19d3c61e0bfc82ffdbaf801dc897a1ec87dc823936c2f7235dc3"
+    },
+    {
+      "module": "Batteries.Lean.Meta.Inaccessible",
+      "path": ".lake/packages/batteries/Batteries/Lean/Meta/Inaccessible.lean",
+      "sha256": "1a637e3b23d7e28cf0d66cd7bcb694ff32971a5a597c134c2dddbb0f2939b537"
+    },
+    {
+      "module": "Batteries.Lean.Meta.InstantiateMVars",
+      "path": ".lake/packages/batteries/Batteries/Lean/Meta/InstantiateMVars.lean",
+      "sha256": "414ec0eab586b66f311c5d59f01a1fde7d2c5c9ab0ab3d9df18aa511bcefe650"
+    },
+    {
+      "module": "Batteries.Lean.Meta.SavedState",
+      "path": ".lake/packages/batteries/Batteries/Lean/Meta/SavedState.lean",
+      "sha256": "3d9845d3356ed537871cfcdff20419c83323fd8b559a031dca483eaf72890d43"
+    },
+    {
+      "module": "Batteries.Lean.Meta.UnusedNames",
+      "path": ".lake/packages/batteries/Batteries/Lean/Meta/UnusedNames.lean",
+      "sha256": "b0c0b9c8aeb1bc1c31d30bc99a58b3d678ec89bdc89905c50f8001e945145c2b"
+    },
+    {
+      "module": "Batteries.Lean.MonadBacktrack",
+      "path": ".lake/packages/batteries/Batteries/Lean/MonadBacktrack.lean",
+      "sha256": "0cd6f3af1933f15cb54a2bf70d27f86225e1711f5fea9c9e12d892bdb18851f0"
+    },
+    {
+      "module": "Batteries.Lean.NameMapAttribute",
+      "path": ".lake/packages/batteries/Batteries/Lean/NameMapAttribute.lean",
+      "sha256": "579dc6c8a5e9b0d55fd07e7407e80899ea9e89fa89a5c69000ab30d518635785"
+    },
+    {
+      "module": "Batteries.Lean.PersistentHashMap",
+      "path": ".lake/packages/batteries/Batteries/Lean/PersistentHashMap.lean",
+      "sha256": "ecd3809e9edee709f5fba56a16fce438dee0124dd4d0411710e7e51cfaf6da10"
+    },
+    {
+      "module": "Batteries.Lean.PersistentHashSet",
+      "path": ".lake/packages/batteries/Batteries/Lean/PersistentHashSet.lean",
+      "sha256": "8e8befa4956c99cf968804d4e6230b84b9cb235194d4922f0d065c03b37a4e2b"
+    },
+    {
+      "module": "Batteries.Lean.Position",
+      "path": ".lake/packages/batteries/Batteries/Lean/Position.lean",
+      "sha256": "9697484ab399cbc1d1c9ef7c97bf8919e57c616921b38d7f09155083029dfca3"
+    },
+    {
+      "module": "Batteries.Lean.Syntax",
+      "path": ".lake/packages/batteries/Batteries/Lean/Syntax.lean",
+      "sha256": "996f042a39a2ead850d3f2466b52002c7d194b2432d75605f345f460cd92cf44"
+    },
+    {
+      "module": "Batteries.Lean.TagAttribute",
+      "path": ".lake/packages/batteries/Batteries/Lean/TagAttribute.lean",
+      "sha256": "0bdb26e3e60f36b6cec4839c1f53d18cbc6e154a1bbb324e638d8a5c21380852"
+    },
+    {
+      "module": "Batteries.Linter",
+      "path": ".lake/packages/batteries/Batteries/Linter.lean",
+      "sha256": "968013f74f47ca13860b36ebc7d51f9d9e4d496474fa93368b93537eaf34bd65"
+    },
+    {
+      "module": "Batteries.Linter.UnnecessarySeqFocus",
+      "path": ".lake/packages/batteries/Batteries/Linter/UnnecessarySeqFocus.lean",
+      "sha256": "8b29be115163e2a837ad2ead2ccb7b48c674ca7248c3318d323efc19cc176034"
+    },
+    {
+      "module": "Batteries.Linter.UnreachableTactic",
+      "path": ".lake/packages/batteries/Batteries/Linter/UnreachableTactic.lean",
+      "sha256": "985ba647192c78910e67b9d04b3e7f621aa1a3adbbbbdae84f7edd7488413417"
+    },
+    {
+      "module": "Batteries.Logic",
+      "path": ".lake/packages/batteries/Batteries/Logic.lean",
+      "sha256": "d1f6e92e7902dea0f9760af29def39e4958a122f7d0e272eba84effd86b14de7"
+    },
+    {
+      "module": "Batteries.Tactic.Alias",
+      "path": ".lake/packages/batteries/Batteries/Tactic/Alias.lean",
+      "sha256": "d811d7f5ac763e5c2a5dab9ae76575d072980eac476fcd502caf7b6add4f7f10"
+    },
+    {
+      "module": "Batteries.Tactic.Basic",
+      "path": ".lake/packages/batteries/Batteries/Tactic/Basic.lean",
+      "sha256": "8a29b7854fe340ac13ff13838d924b87c7a7c6c2f52cd0678117de8ffec8295e"
+    },
+    {
+      "module": "Batteries.Tactic.Case",
+      "path": ".lake/packages/batteries/Batteries/Tactic/Case.lean",
+      "sha256": "39d0a9defe11a56155187c63842e39158dcd3f791019c3f04cd562f85b8f2fcb"
+    },
+    {
+      "module": "Batteries.Tactic.Exact",
+      "path": ".lake/packages/batteries/Batteries/Tactic/Exact.lean",
+      "sha256": "5ddfd54d0668e7c3cb03706d4db55d5cc14ce1e0901dc9215941728526f5a169"
+    },
+    {
+      "module": "Batteries.Tactic.GeneralizeProofs",
+      "path": ".lake/packages/batteries/Batteries/Tactic/GeneralizeProofs.lean",
+      "sha256": "368c5f6ccb72fe04bfa5fe6a9cf9baa21f921b65b653943218bd2f89f2ae8a0d"
+    },
+    {
+      "module": "Batteries.Tactic.HelpCmd",
+      "path": ".lake/packages/batteries/Batteries/Tactic/HelpCmd.lean",
+      "sha256": "6fd20ec50e5d0e842abccc2d591545f40cbd042287b3ef46a83c51cd9dd71443"
+    },
+    {
+      "module": "Batteries.Tactic.Init",
+      "path": ".lake/packages/batteries/Batteries/Tactic/Init.lean",
+      "sha256": "dd2c327b7eec6c59e4385a43475d0ecb373b7b7f8dbd496fbdd7871096b81389"
+    },
+    {
+      "module": "Batteries.Tactic.Lint",
+      "path": ".lake/packages/batteries/Batteries/Tactic/Lint.lean",
+      "sha256": "70cdcc284aaa3b637fecbbdc91316ad0d0c59c4766637f3e8c38d3f686bd30e8"
+    },
+    {
+      "module": "Batteries.Tactic.Lint.Basic",
+      "path": ".lake/packages/batteries/Batteries/Tactic/Lint/Basic.lean",
+      "sha256": "fd93b8f7d0f635f09eed3b8058b8608290474244dc76a388013ef171a219d57b"
+    },
+    {
+      "module": "Batteries.Tactic.Lint.Frontend",
+      "path": ".lake/packages/batteries/Batteries/Tactic/Lint/Frontend.lean",
+      "sha256": "c220e1431d89e12fbe9ba483e0f1eceebb7f5fe811ffaea9049104266f1a105a"
+    },
+    {
+      "module": "Batteries.Tactic.Lint.Misc",
+      "path": ".lake/packages/batteries/Batteries/Tactic/Lint/Misc.lean",
+      "sha256": "99409e34d35176eaa391471b30d26ca7e31c2b897e448044f0fc2f9f9bebb16c"
+    },
+    {
+      "module": "Batteries.Tactic.Lint.Simp",
+      "path": ".lake/packages/batteries/Batteries/Tactic/Lint/Simp.lean",
+      "sha256": "d2623903c65c01704402dfca762dfde1a41b5afd2015a48bbf978b8e7c22832d"
+    },
+    {
+      "module": "Batteries.Tactic.Lint.TypeClass",
+      "path": ".lake/packages/batteries/Batteries/Tactic/Lint/TypeClass.lean",
+      "sha256": "005e92fb6fd3a7677a52afe29e9b445851bde976e3beaecab6884faf80b0fabf"
+    },
+    {
+      "module": "Batteries.Tactic.OpenPrivate",
+      "path": ".lake/packages/batteries/Batteries/Tactic/OpenPrivate.lean",
+      "sha256": "a7258d60e4d27e4599bb1247dd742b01de5fd933e328a19d118e68af7e5ff4dc"
+    },
+    {
+      "module": "Batteries.Tactic.PermuteGoals",
+      "path": ".lake/packages/batteries/Batteries/Tactic/PermuteGoals.lean",
+      "sha256": "2163efc92beb0094986d0993bd4637c0bcae14818afdd7a0eaa554fc3c8a6c03"
+    },
+    {
+      "module": "Batteries.Tactic.SeqFocus",
+      "path": ".lake/packages/batteries/Batteries/Tactic/SeqFocus.lean",
+      "sha256": "dff63f8b324fb45d873cd2209c849384cd43860f87932af68a42e66b06bc80b2"
+    },
+    {
+      "module": "Batteries.Tactic.Trans",
+      "path": ".lake/packages/batteries/Batteries/Tactic/Trans.lean",
+      "sha256": "1cd950b137b037a8cce3390d766dea3ab3318807a2eb94dc9cc1906a5b34b6de"
+    },
+    {
+      "module": "Batteries.Tactic.Unreachable",
+      "path": ".lake/packages/batteries/Batteries/Tactic/Unreachable.lean",
+      "sha256": "b0a97e9b68e71bf9d2f006a241ba7d52b1165f8af921da8d31d05de108b115ff"
+    },
+    {
+      "module": "Batteries.Util.Cache",
+      "path": ".lake/packages/batteries/Batteries/Util/Cache.lean",
+      "sha256": "20635bef53ee8efb079a722fb2adff4a5646339a78a5faca28a42e586592a62a"
+    },
+    {
+      "module": "Batteries.Util.ExtendedBinder",
+      "path": ".lake/packages/batteries/Batteries/Util/ExtendedBinder.lean",
+      "sha256": "6e75b660ea9fc2add9fe44ee10367a9f1ff9930cdd9af69e2d4aa1a04a4e1280"
+    },
+    {
+      "module": "Batteries.Util.LibraryNote",
+      "path": ".lake/packages/batteries/Batteries/Util/LibraryNote.lean",
+      "sha256": "588ec13960ff57195a56aac66a3f0d8881cf64bce14a3a30ebf732c8bb72d620"
+    },
+    {
+      "module": "Batteries.Util.ProofWanted",
+      "path": ".lake/packages/batteries/Batteries/Util/ProofWanted.lean",
+      "sha256": "598491ac0e3c6a3b9fa6cd0e1de20d42d846bbab62b59e0f611b6a78ec9ef6c4"
+    },
+    {
+      "module": "ImportGraph.Graph.TransitiveClosure",
+      "path": ".lake/packages/importGraph/ImportGraph/Graph/TransitiveClosure.lean",
+      "sha256": "c6f046a83125a4680bc1343c3dd69cfcf48085cd398cef1e2117ad977e182be3"
+    },
+    {
+      "module": "ImportGraph.Imports.ImportGraph",
+      "path": ".lake/packages/importGraph/ImportGraph/Imports/ImportGraph.lean",
+      "sha256": "bdf53f84c3ee34acbf6245467141247c7cf266131f8e02ed42f4949fa5e6e387"
+    },
+    {
+      "module": "ImportGraph.Imports.Redundant",
+      "path": ".lake/packages/importGraph/ImportGraph/Imports/Redundant.lean",
+      "sha256": "31b67ac1f7ad0de0380e659efdb0b1d3c018e572ed628386dd349b42eed74a7d"
+    },
+    {
+      "module": "ImportGraph.Imports.RequiredModules",
+      "path": ".lake/packages/importGraph/ImportGraph/Imports/RequiredModules.lean",
+      "sha256": "376952cd46c9bc674ab92ce443e0a3fb51a10a58c426b0cdf76fdbdb5ce8d00f"
+    },
+    {
+      "module": "ImportGraph.Lean.Environment",
+      "path": ".lake/packages/importGraph/ImportGraph/Lean/Environment.lean",
+      "sha256": "487d996a12f9e3ee0aa04ef9cce7858c9beef9450bf8acd912c586402f6e74b2"
+    },
+    {
+      "module": "ImportGraph.Tools",
+      "path": ".lake/packages/importGraph/ImportGraph/Tools.lean",
+      "sha256": "3ddcf61fa8bfd50bb9dd0f9ec9ae8b86b0eb39a92dc7ea3fd020986dc3f00ccd"
+    },
+    {
+      "module": "ImportGraph.Tools.FindHome",
+      "path": ".lake/packages/importGraph/ImportGraph/Tools/FindHome.lean",
+      "sha256": "134f8e8c77b5618486edf4527684560970f6410c6613641394611778ddd6b3a4"
+    },
+    {
+      "module": "ImportGraph.Tools.ImportDiff",
+      "path": ".lake/packages/importGraph/ImportGraph/Tools/ImportDiff.lean",
+      "sha256": "cbf3aa04b93623ad1cc24893919ede1db2eab0ea7a098394bc37a6cb4d473bc2"
+    },
+    {
+      "module": "ImportGraph.Tools.MinImports",
+      "path": ".lake/packages/importGraph/ImportGraph/Tools/MinImports.lean",
+      "sha256": "a7bb006c2b46530be71b094281569121d57dceba39c89b48f62f1d35e436544d"
+    },
+    {
+      "module": "ImportGraph.Tools.RedundantImports",
+      "path": ".lake/packages/importGraph/ImportGraph/Tools/RedundantImports.lean",
+      "sha256": "800d3a7811bfff89b4fa45cbd79a0c5ac3503589d81b71265e882bce2a84b1a3"
+    },
+    {
+      "module": "LeanSearchClient",
+      "path": ".lake/packages/LeanSearchClient/LeanSearchClient.lean",
+      "sha256": "6d81a1665e16266ab466bb65b43d60b01de05e866ee7429f6fa0ae6b0dbc85e2"
+    },
+    {
+      "module": "LeanSearchClient.Basic",
+      "path": ".lake/packages/LeanSearchClient/LeanSearchClient/Basic.lean",
+      "sha256": "e642f11fa930e53d902d4b349719ecaa65b82664dd018ca91df9b91c4361d941"
+    },
+    {
+      "module": "LeanSearchClient.LoogleSyntax",
+      "path": ".lake/packages/LeanSearchClient/LeanSearchClient/LoogleSyntax.lean",
+      "sha256": "2478d3a3b16ae49bc7aa0d5ba1fb1f0cf20af63c27dd09c3ea354f003e98d656"
+    },
+    {
+      "module": "LeanSearchClient.Syntax",
+      "path": ".lake/packages/LeanSearchClient/LeanSearchClient/Syntax.lean",
+      "sha256": "46f538b08d849f772f160369b803c85fbb81671867f211b1df4682a81dbc0ef3"
+    },
+    {
+      "module": "LidoSRv3.Audit.Source.TopupCallHistory",
+      "path": "LidoSRv3/Audit/Source/TopupCallHistory.lean",
+      "sha256": "5e3ce8abcafb33e56e3ebb01fe71bd16a41d9c845d38968401ac64907b8b798d"
+    },
+    {
+      "module": "LidoSRv3.Audit.Source.TopupWeiBounds",
+      "path": "LidoSRv3/Audit/Source/TopupWeiBounds.lean",
+      "sha256": "254edfae1e8948850b65d682cc03d94fa0fdc05323b463767c6d79b9d2746372"
+    },
+    {
+      "module": "Mathlib.Algebra.BigOperators.Group.List.Basic",
+      "path": ".lake/packages/mathlib/Mathlib/Algebra/BigOperators/Group/List/Basic.lean",
+      "sha256": "34162a68927fa520f05575c33e903319373e6b7bddc22e0032e839ef70fc655f"
+    },
+    {
+      "module": "Mathlib.Algebra.BigOperators.Group.List.Defs",
+      "path": ".lake/packages/mathlib/Mathlib/Algebra/BigOperators/Group/List/Defs.lean",
+      "sha256": "c750fb48df8b820f8b82b25b0a6a6e3ce4d9d97da1c912c0496788344ab84855"
+    },
+    {
+      "module": "Mathlib.Algebra.Divisibility.Basic",
+      "path": ".lake/packages/mathlib/Mathlib/Algebra/Divisibility/Basic.lean",
+      "sha256": "4449401fdf20870ca4f9ac299173a0357ae475a7bad6ab7ca2a374a91c09001b"
+    },
+    {
+      "module": "Mathlib.Algebra.Group.Basic",
+      "path": ".lake/packages/mathlib/Mathlib/Algebra/Group/Basic.lean",
+      "sha256": "5409a4470cf5643dc8eb815c8db1851447dbbbbf70d6930a3365741647146dfd"
+    },
+    {
+      "module": "Mathlib.Algebra.Group.Commute.Defs",
+      "path": ".lake/packages/mathlib/Mathlib/Algebra/Group/Commute/Defs.lean",
+      "sha256": "74d17c29291d3f76c53668262093186eddefa54e41a87720f3d442c4b9479d76"
+    },
+    {
+      "module": "Mathlib.Algebra.Group.Defs",
+      "path": ".lake/packages/mathlib/Mathlib/Algebra/Group/Defs.lean",
+      "sha256": "5e73b83b97228605f3a2eea3ba2b7253d94d041a5731c8c0787bb688cb1d1134"
+    },
+    {
+      "module": "Mathlib.Algebra.Group.Hom.Defs",
+      "path": ".lake/packages/mathlib/Mathlib/Algebra/Group/Hom/Defs.lean",
+      "sha256": "04932451d66be79620893e30c94e0f5b29820266d41e13e7fbef709b873902a7"
+    },
+    {
+      "module": "Mathlib.Algebra.Group.Int.Defs",
+      "path": ".lake/packages/mathlib/Mathlib/Algebra/Group/Int/Defs.lean",
+      "sha256": "1cae23321b875a01e60228b9eb9f4f17be906da7abeefe7fbc5431482bd77f7a"
+    },
+    {
+      "module": "Mathlib.Algebra.Group.Nat.Defs",
+      "path": ".lake/packages/mathlib/Mathlib/Algebra/Group/Nat/Defs.lean",
+      "sha256": "17bee4169c02f700e10b9f0201c8bd2fc893dfb4e039f6c722f8bcef6d3254aa"
+    },
+    {
+      "module": "Mathlib.Algebra.Group.Semiconj.Defs",
+      "path": ".lake/packages/mathlib/Mathlib/Algebra/Group/Semiconj/Defs.lean",
+      "sha256": "0fa59d1e74cf767aa2f49e5fb56f4209bf8aa85625bd3a37b67e46409ab77d3f"
+    },
+    {
+      "module": "Mathlib.Algebra.Notation.Defs",
+      "path": ".lake/packages/mathlib/Mathlib/Algebra/Notation/Defs.lean",
+      "sha256": "92c66dc133555beb2a862e4b2a2dca83d1d49ae0ca39c8448881a371c4539e3f"
+    },
+    {
+      "module": "Mathlib.Algebra.Notation.Pi.Defs",
+      "path": ".lake/packages/mathlib/Mathlib/Algebra/Notation/Pi/Defs.lean",
+      "sha256": "79c1a26611ae1d19d22b47b0b109eb02ff5502545b55e7ad96b2a9164622a89c"
+    },
+    {
+      "module": "Mathlib.Algebra.Regular.Defs",
+      "path": ".lake/packages/mathlib/Mathlib/Algebra/Regular/Defs.lean",
+      "sha256": "d3cb718b53951b3165153f6438e97d495942cc112c4c5f65951ca2e05283ad94"
+    },
+    {
+      "module": "Mathlib.Control.Functor",
+      "path": ".lake/packages/mathlib/Mathlib/Control/Functor.lean",
+      "sha256": "5a4f54fd29cfe069fea867c69828d269ba47c91304db43399f104e9b431d8d5c"
+    },
+    {
+      "module": "Mathlib.Data.FunLike.Basic",
+      "path": ".lake/packages/mathlib/Mathlib/Data/FunLike/Basic.lean",
+      "sha256": "7f367dac477d9e0d2f1894913aeb621d2748d6793fab3cdf3e7cb277d6a2dfb8"
+    },
+    {
+      "module": "Mathlib.Data.Int.Init",
+      "path": ".lake/packages/mathlib/Mathlib/Data/Int/Init.lean",
+      "sha256": "6cb0bd197ee00b411779ecfa29cb3a2ea78d76e7040edc67eb6b43b519532ea7"
+    },
+    {
+      "module": "Mathlib.Data.Int.Notation",
+      "path": ".lake/packages/mathlib/Mathlib/Data/Int/Notation.lean",
+      "sha256": "89268cf136a8c3328c8942bbdb3f60beed0ea098c378c247834cd132dadbacb7"
+    },
+    {
+      "module": "Mathlib.Data.List.Basic",
+      "path": ".lake/packages/mathlib/Mathlib/Data/List/Basic.lean",
+      "sha256": "973abf26ae1fad70f88ad0a14f5345a8b33d0fe0e8363943d2451ea324b8c920"
+    },
+    {
+      "module": "Mathlib.Data.List.Defs",
+      "path": ".lake/packages/mathlib/Mathlib/Data/List/Defs.lean",
+      "sha256": "5ee74e568657c2628623127168cb7c52e33da8ec8af0a846443c983261f459cb"
+    },
+    {
+      "module": "Mathlib.Data.List.Forall2",
+      "path": ".lake/packages/mathlib/Mathlib/Data/List/Forall2.lean",
+      "sha256": "d00bb3b6ff171f9283aa73b8ebaf6abd2010d501300aa200ac9462dfa1f54e66"
+    },
+    {
+      "module": "Mathlib.Data.List.InsertIdx",
+      "path": ".lake/packages/mathlib/Mathlib/Data/List/InsertIdx.lean",
+      "sha256": "695ff3b327095e789583bc3b6b4ee84309cb167e8911c07223c05c82213048c2"
+    },
+    {
+      "module": "Mathlib.Data.List.Monad",
+      "path": ".lake/packages/mathlib/Mathlib/Data/List/Monad.lean",
+      "sha256": "584b0d2d47e199ee4e2e34ae636e76fe3937d9ee49a391f5b7023e6c3ebbf990"
+    },
+    {
+      "module": "Mathlib.Data.List.Perm.Basic",
+      "path": ".lake/packages/mathlib/Mathlib/Data/List/Perm/Basic.lean",
+      "sha256": "e081d192a72fc9d2000ec04982d9408ca3549bfd9e4cc50ef4c04911d16384fe"
+    },
+    {
+      "module": "Mathlib.Data.List.TakeDrop",
+      "path": ".lake/packages/mathlib/Mathlib/Data/List/TakeDrop.lean",
+      "sha256": "53f2af436e83214711222bef6cff70a36cca1ccb14581bc7978ecc487afbdc3a"
+    },
+    {
+      "module": "Mathlib.Data.Nat.BinaryRec",
+      "path": ".lake/packages/mathlib/Mathlib/Data/Nat/BinaryRec.lean",
+      "sha256": "961da33a284e5cacc9b06dc03a8aa95bbdc7627969975403b4cbb82930d3fc13"
+    },
+    {
+      "module": "Mathlib.Data.Nat.Notation",
+      "path": ".lake/packages/mathlib/Mathlib/Data/Nat/Notation.lean",
+      "sha256": "48df403836cf3740eb6520688120d1c26783a751f31b000f1074d50184e6bf3d"
+    },
+    {
+      "module": "Mathlib.Data.Ordering.Basic",
+      "path": ".lake/packages/mathlib/Mathlib/Data/Ordering/Basic.lean",
+      "sha256": "bbdbc7d0305073a122c1dbd814dcde5e2ba2ebebf27d3548554b1ce01cf33c6b"
+    },
+    {
+      "module": "Mathlib.Data.SProd",
+      "path": ".lake/packages/mathlib/Mathlib/Data/SProd.lean",
+      "sha256": "f29a693f693c597f48870bb0ffe3892224c10f657c1e8ef7b8ba72ba4df2bb3e"
+    },
+    {
+      "module": "Mathlib.Data.Set.Defs",
+      "path": ".lake/packages/mathlib/Mathlib/Data/Set/Defs.lean",
+      "sha256": "23dcc8b8b5bf533949d0be221d90a727bb32b654ccd335515a28c7b3e9d19b3f"
+    },
+    {
+      "module": "Mathlib.Data.String.Defs",
+      "path": ".lake/packages/mathlib/Mathlib/Data/String/Defs.lean",
+      "sha256": "87e7d0497aa18efeb0408c753792d23db882df6e0d337780934751d5940faed6"
+    },
+    {
+      "module": "Mathlib.Data.Subtype",
+      "path": ".lake/packages/mathlib/Mathlib/Data/Subtype.lean",
+      "sha256": "e6830adfa88d7ee19de9b47bb7b6ec133125d777f15bac19bea160536a6d6d19"
+    },
+    {
+      "module": "Mathlib.Init",
+      "path": ".lake/packages/mathlib/Mathlib/Init.lean",
+      "sha256": "398aee670b82b0969ecaa06e3245535126b476f4ef1ab7d6bd36299d7331fee7"
+    },
+    {
+      "module": "Mathlib.Lean.ContextInfo",
+      "path": ".lake/packages/mathlib/Mathlib/Lean/ContextInfo.lean",
+      "sha256": "dd0f09e7b2362b43b8ae13cda26ccb8ea4fcfea1b12738016b1136547627099e"
+    },
+    {
+      "module": "Mathlib.Lean.Elab.InfoTree",
+      "path": ".lake/packages/mathlib/Mathlib/Lean/Elab/InfoTree.lean",
+      "sha256": "cdf992235f2afe1115608bd94c09a99c186993dc1705b85929599854508472ea"
+    },
+    {
+      "module": "Mathlib.Lean.Elab.Tactic.Meta",
+      "path": ".lake/packages/mathlib/Mathlib/Lean/Elab/Tactic/Meta.lean",
+      "sha256": "a0a38764609aa2ff0a6d19ad0bac4739056fbacb22941bd4726474856a587177"
+    },
+    {
+      "module": "Mathlib.Lean.Environment",
+      "path": ".lake/packages/mathlib/Mathlib/Lean/Environment.lean",
+      "sha256": "6f43088f23cbcdb40d186ea296e61d448a006e4435d34408f6a278f00c272e06"
+    },
+    {
+      "module": "Mathlib.Lean.Expr.Basic",
+      "path": ".lake/packages/mathlib/Mathlib/Lean/Expr/Basic.lean",
+      "sha256": "50673f669e499333b6ae4c6f1e9032c8a805777d60c35f095d86a2dd53c9f5a8"
+    },
+    {
+      "module": "Mathlib.Lean.GoalsLocation",
+      "path": ".lake/packages/mathlib/Mathlib/Lean/GoalsLocation.lean",
+      "sha256": "2686ef22ea53fe7861430345fcd21d5ddfaece4a273bb0092ef0dea2ab71b08e"
+    },
+    {
+      "module": "Mathlib.Lean.Linter",
+      "path": ".lake/packages/mathlib/Mathlib/Lean/Linter.lean",
+      "sha256": "ba6d34f9133b02e50ee05becd15facdef9cc7123c9e3c0502aa1fc5c2ba99bc9"
+    },
+    {
+      "module": "Mathlib.Lean.MessageData.Trace",
+      "path": ".lake/packages/mathlib/Mathlib/Lean/MessageData/Trace.lean",
+      "sha256": "07c854deabae0b88de4d74ed4a0915dc97032c91c4f4923d81e62bd411d1d4cd"
+    },
+    {
+      "module": "Mathlib.Lean.Meta",
+      "path": ".lake/packages/mathlib/Mathlib/Lean/Meta.lean",
+      "sha256": "82f5f53e7870542bcf17d7a938bf11e0b9f1444ed46cf164a6a3ed3a02f695fe"
+    },
+    {
+      "module": "Mathlib.Lean.Meta.Basic",
+      "path": ".lake/packages/mathlib/Mathlib/Lean/Meta/Basic.lean",
+      "sha256": "70c7a9e88e2e40258f2a918856b2d3da5bc1b6e3519dfd6818dcb5bf03edcdda"
+    },
+    {
+      "module": "Mathlib.Lean.Meta.CongrTheorems",
+      "path": ".lake/packages/mathlib/Mathlib/Lean/Meta/CongrTheorems.lean",
+      "sha256": "3c79b9d29b22c5ce289e8c6df1fcd95387edc65b6523871495eea67bb3ad4f65"
+    },
+    {
+      "module": "Mathlib.Lean.Meta.KAbstractPositions",
+      "path": ".lake/packages/mathlib/Mathlib/Lean/Meta/KAbstractPositions.lean",
+      "sha256": "4fa4973529bba8049bca0eb2264846ec025676dcf61cf8fd1a3ad9ba38461865"
+    },
+    {
+      "module": "Mathlib.Lean.Meta.RefinedDiscrTree",
+      "path": ".lake/packages/mathlib/Mathlib/Lean/Meta/RefinedDiscrTree.lean",
+      "sha256": "adf8ab898f25b40654e7c1473612d9c335be3a03c341f035e3a4b91bcd6cba15"
+    },
+    {
+      "module": "Mathlib.Lean.Meta.RefinedDiscrTree.Basic",
+      "path": ".lake/packages/mathlib/Mathlib/Lean/Meta/RefinedDiscrTree/Basic.lean",
+      "sha256": "2d07d755e0a6577b5e7cfcdc9bd5f413cd13c7a645a7bb81d58d363f80dd400e"
+    },
+    {
+      "module": "Mathlib.Lean.Meta.RefinedDiscrTree.Encode",
+      "path": ".lake/packages/mathlib/Mathlib/Lean/Meta/RefinedDiscrTree/Encode.lean",
+      "sha256": "5d3d7234d877c9742fab09e2c4a3160494b8e9789711f5df33968aeb3d91cb57"
+    },
+    {
+      "module": "Mathlib.Lean.Meta.RefinedDiscrTree.Initialize",
+      "path": ".lake/packages/mathlib/Mathlib/Lean/Meta/RefinedDiscrTree/Initialize.lean",
+      "sha256": "d5f5d575214c08727ff29f7192592a4b538ecafd0d18888250a592833b5902a8"
+    },
+    {
+      "module": "Mathlib.Lean.Meta.RefinedDiscrTree.Lookup",
+      "path": ".lake/packages/mathlib/Mathlib/Lean/Meta/RefinedDiscrTree/Lookup.lean",
+      "sha256": "61f263938588d46df635a52f473a9e053f78a066d141bae7cd14068d05577078"
+    },
+    {
+      "module": "Mathlib.Lean.Meta.Simp",
+      "path": ".lake/packages/mathlib/Mathlib/Lean/Meta/Simp.lean",
+      "sha256": "4681eb412b4fb0139ef632c3236d05e650b43c7c69e500906ec0b8ae26d5529e"
+    },
+    {
+      "module": "Mathlib.Lean.Name",
+      "path": ".lake/packages/mathlib/Mathlib/Lean/Name.lean",
+      "sha256": "beefa08ffacffb505e8fe55501595e110a1ace2ef501682a2a7015f22828fb08"
+    },
+    {
+      "module": "Mathlib.Lean.PrettyPrinter.Delaborator",
+      "path": ".lake/packages/mathlib/Mathlib/Lean/PrettyPrinter/Delaborator.lean",
+      "sha256": "8beeb127df7dbbe47f2738f7b0f640956fe3eaadfd15caef955ff15a09cc52ca"
+    },
+    {
+      "module": "Mathlib.Logic.Basic",
+      "path": ".lake/packages/mathlib/Mathlib/Logic/Basic.lean",
+      "sha256": "10ade0fb226e950ab804b3e17fbd907edbc8ed7bee368b31fa5ac49b171f69d5"
+    },
+    {
+      "module": "Mathlib.Logic.ExistsUnique",
+      "path": ".lake/packages/mathlib/Mathlib/Logic/ExistsUnique.lean",
+      "sha256": "b4d81b4a50a7a4675d2b0a619ab10b57720499ffb13e2f7694834dd6a32a5f23"
+    },
+    {
+      "module": "Mathlib.Logic.Function.Basic",
+      "path": ".lake/packages/mathlib/Mathlib/Logic/Function/Basic.lean",
+      "sha256": "f60b796f741de3fdcaf219dff8e93eb01e8a6faa3455072677b21a1cd83d21f8"
+    },
+    {
+      "module": "Mathlib.Logic.Function.Conjugate",
+      "path": ".lake/packages/mathlib/Mathlib/Logic/Function/Conjugate.lean",
+      "sha256": "44a68afcb363966ef7f2b63502857136c3bd4c99a1c97f05a7a56f4033d6671b"
+    },
+    {
+      "module": "Mathlib.Logic.Function.Defs",
+      "path": ".lake/packages/mathlib/Mathlib/Logic/Function/Defs.lean",
+      "sha256": "90ce4b2771d2b95050e27cba36d46cabd76ca3269271bf2dbb72b3449e3c38e0"
+    },
+    {
+      "module": "Mathlib.Logic.Function.Iterate",
+      "path": ".lake/packages/mathlib/Mathlib/Logic/Function/Iterate.lean",
+      "sha256": "bf42e948bbf3fae276cd05b8e53d1d143feec96f95d81675bee103010e210339"
+    },
+    {
+      "module": "Mathlib.Logic.IsEmpty.Defs",
+      "path": ".lake/packages/mathlib/Mathlib/Logic/IsEmpty/Defs.lean",
+      "sha256": "db98e57f8b62d31b74d25017c21137820bc60fa63dda8604b01dccf5d4c892cc"
+    },
+    {
+      "module": "Mathlib.Logic.Nonempty",
+      "path": ".lake/packages/mathlib/Mathlib/Logic/Nonempty.lean",
+      "sha256": "a9e40f416b5612a106a36fb6c0a78d07067f20b8841a83b12daff491e546c502"
+    },
+    {
+      "module": "Mathlib.Logic.Nontrivial.Defs",
+      "path": ".lake/packages/mathlib/Mathlib/Logic/Nontrivial/Defs.lean",
+      "sha256": "e6ed626f52730f45ca36129d8b77b24071a2cee6973cf9b0b2dfb896ff9281e8"
+    },
+    {
+      "module": "Mathlib.Logic.OpClass",
+      "path": ".lake/packages/mathlib/Mathlib/Logic/OpClass.lean",
+      "sha256": "24f411d7026d0286a4487b83ab2b152b8ad766b1731a947ef89aa7cef46dc4a4"
+    },
+    {
+      "module": "Mathlib.Logic.Relation",
+      "path": ".lake/packages/mathlib/Mathlib/Logic/Relation.lean",
+      "sha256": "0747f9f7b69c986ecb393711d51b0af9980875a85ca8fbc2bbaf6c7d9767ba65"
+    },
+    {
+      "module": "Mathlib.Logic.Relator",
+      "path": ".lake/packages/mathlib/Mathlib/Logic/Relator.lean",
+      "sha256": "a0ad95b7ebb29decac456937ae17148df8c5ca381521aef822125ea772f1bf82"
+    },
+    {
+      "module": "Mathlib.Logic.Unique",
+      "path": ".lake/packages/mathlib/Mathlib/Logic/Unique.lean",
+      "sha256": "f41f939259e3579be913105ada04be43ea6e9c64db469e70b4ffdb0dbce4fa16"
+    },
+    {
+      "module": "Mathlib.Order.Basic",
+      "path": ".lake/packages/mathlib/Mathlib/Order/Basic.lean",
+      "sha256": "8f1987df671de8a5cd93aad3d4ad753e54e4167065b9f9572f95751c7b271400"
+    },
+    {
+      "module": "Mathlib.Order.Defs.LinearOrder",
+      "path": ".lake/packages/mathlib/Mathlib/Order/Defs/LinearOrder.lean",
+      "sha256": "837dba1e44eb02eb7837e8e7b72b59c277e85899454f45d3be66de44ecd98632"
+    },
+    {
+      "module": "Mathlib.Order.Defs.PartialOrder",
+      "path": ".lake/packages/mathlib/Mathlib/Order/Defs/PartialOrder.lean",
+      "sha256": "6515bdb4a68678b27490ec2b3332f6d7b1e529489ff9d844898ec1eda5637ec5"
+    },
+    {
+      "module": "Mathlib.Order.Defs.Unbundled",
+      "path": ".lake/packages/mathlib/Mathlib/Order/Defs/Unbundled.lean",
+      "sha256": "ed157e7c7c68ed949a9371c56964d3190bad4ed52886e84659d79a0b11cb1e16"
+    },
+    {
+      "module": "Mathlib.Order.Notation",
+      "path": ".lake/packages/mathlib/Mathlib/Order/Notation.lean",
+      "sha256": "0a0ff33caa4bf0b75600dbbd20ad4a374e46faa34ef16fba598f265144a69aa9"
+    },
+    {
+      "module": "Mathlib.Tactic.AdaptationNote",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/AdaptationNote.lean",
+      "sha256": "3db5242efe5d1bcc7bcd41e27e893ab8503c91e69c29a38b9bc1dce6ccf1b1e9"
+    },
+    {
+      "module": "Mathlib.Tactic.ApplyAt",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/ApplyAt.lean",
+      "sha256": "c24cc40d86ba39fec1b8dd56376c5bbea9dc779526f312c24ba46006824c7852"
+    },
+    {
+      "module": "Mathlib.Tactic.ApplyCongr",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/ApplyCongr.lean",
+      "sha256": "7c6d3ca3ea873ffbc867aff301372e602442b6b06de82a46a78e7efad2ad0d85"
+    },
+    {
+      "module": "Mathlib.Tactic.ApplyWith",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/ApplyWith.lean",
+      "sha256": "da284ff51dcf698c96001fdf5e1a7818e5c60ab7053a0b65a8887b54d4aae7fc"
+    },
+    {
+      "module": "Mathlib.Tactic.Attr.Core",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Attr/Core.lean",
+      "sha256": "de1161e429230f11c158ba7b3adec09fbaac088717d1c3e3ef06cdde261ef529"
+    },
+    {
+      "module": "Mathlib.Tactic.Attr.Register",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Attr/Register.lean",
+      "sha256": "4f8b1f026d7c286b2b5f54232c5d7e541f86aa82d623991dc9b0262890075d2b"
+    },
+    {
+      "module": "Mathlib.Tactic.Basic",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Basic.lean",
+      "sha256": "7343d7aa32046a52d90f561e83b1880c79be4b05e0f9cd1df52370382249159d"
+    },
+    {
+      "module": "Mathlib.Tactic.ByCases",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/ByCases.lean",
+      "sha256": "f2a78aea421c16e8ea8c01f36e63b5e16d67ed6dade61ae211417e0817dcaa46"
+    },
+    {
+      "module": "Mathlib.Tactic.ByContra",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/ByContra.lean",
+      "sha256": "e1d82e56e8fbeabdaa1ec3479c6b7da1d6d5b0d49c0fa883ddb2f4bcd59232ab"
+    },
+    {
+      "module": "Mathlib.Tactic.CasesM",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/CasesM.lean",
+      "sha256": "95f05253fa0a61c5d4acc053930d0ddeef7c0a525dba35f5173255f38204472a"
+    },
+    {
+      "module": "Mathlib.Tactic.Check",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Check.lean",
+      "sha256": "f598f42dc501cdcc872f2ced5c7f23a018d3c16989f4d0c48720032e03ae880a"
+    },
+    {
+      "module": "Mathlib.Tactic.Choose",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Choose.lean",
+      "sha256": "7960d067d56947cd6d88018b11d6f687456ef1b417faefda4c3cc699a82d3a5e"
+    },
+    {
+      "module": "Mathlib.Tactic.ClearExcept",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/ClearExcept.lean",
+      "sha256": "7bc16bbe18bde4d507226c82b271d94ed2bc80328922707db69908406a64ce2d"
+    },
+    {
+      "module": "Mathlib.Tactic.ClearExclamation",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/ClearExclamation.lean",
+      "sha256": "bb0be5a3d3c4772da5cc717ed83fe17357498b283348e4483e730f9072b15d57"
+    },
+    {
+      "module": "Mathlib.Tactic.Clear_",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Clear_.lean",
+      "sha256": "46c7f5a80007cb0d8a5111a7f5aa41ce918fd274b2ed694e0a30722a0c615a2a"
+    },
+    {
+      "module": "Mathlib.Tactic.Coe",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Coe.lean",
+      "sha256": "92408523773a557efb865e9a5353dc15c6ebc6d6663101bcb398273c70ec4050"
+    },
+    {
+      "module": "Mathlib.Tactic.Common",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Common.lean",
+      "sha256": "9f6049272272f567c86ebb36a65cffc1110a28fa3812147420276074e916b1c7"
+    },
+    {
+      "module": "Mathlib.Tactic.CongrExclamation",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/CongrExclamation.lean",
+      "sha256": "f96cf7e595849d51cf1ad05a39071765d23b4ad135bc2cc6b34724b8783b730d"
+    },
+    {
+      "module": "Mathlib.Tactic.CongrM",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/CongrM.lean",
+      "sha256": "460a66c0a60d7feecb5dd284149f1fb0d7da67bf1077813c2a8feed6055371ff"
+    },
+    {
+      "module": "Mathlib.Tactic.Constructor",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Constructor.lean",
+      "sha256": "2d853833c3c3e9b845154e3afa4bec5d01ebfe4b122aa65b77d2778284126ada"
+    },
+    {
+      "module": "Mathlib.Tactic.Contrapose",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Contrapose.lean",
+      "sha256": "8f83e7fac69f481cc3512a43235f7bd4d888b0ed481abf8ad31c28ba66a7de45"
+    },
+    {
+      "module": "Mathlib.Tactic.Conv",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Conv.lean",
+      "sha256": "4fe66eec0e33112b32f0dc98e71e728f0a28aa15d82a0f3a393370e37aed2740"
+    },
+    {
+      "module": "Mathlib.Tactic.Convert",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Convert.lean",
+      "sha256": "2aa737460dd870fc1bbc6d49662de490650d4fe22d6ab5ae0f2ce01e2c21c90b"
+    },
+    {
+      "module": "Mathlib.Tactic.Core",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Core.lean",
+      "sha256": "aeeb0287c20968f92eaece1843b3cb08ff32a0d8fa53641bab553393734c469f"
+    },
+    {
+      "module": "Mathlib.Tactic.CrossRefAttribute",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/CrossRefAttribute.lean",
+      "sha256": "e64de6b95f319f9283b5caae0afc1588277367831756b5782d5a0bba5428628a"
+    },
+    {
+      "module": "Mathlib.Tactic.DSimpPercent",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/DSimpPercent.lean",
+      "sha256": "b0ed3ef3f03631f028a44869fc3c154edd232c12e3f7c1edbcef73902491e6ed"
+    },
+    {
+      "module": "Mathlib.Tactic.DeclarationNames",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/DeclarationNames.lean",
+      "sha256": "c54d289634d78e4582973b596166d52470dd016a2dbca9239dce7671d121eebd"
+    },
+    {
+      "module": "Mathlib.Tactic.DefEqAbuse",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/DefEqAbuse.lean",
+      "sha256": "9c90069a8a60fb5a903e1ca050bf711137fd57bdb80bb2b90e35ce414bc8def5"
+    },
+    {
+      "module": "Mathlib.Tactic.DefEqTransformations",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/DefEqTransformations.lean",
+      "sha256": "a4c07cb60c4b5020caa60f6c40053a38c737a6cb188a1b57c609fa48af828b56"
+    },
+    {
+      "module": "Mathlib.Tactic.DepRewrite",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/DepRewrite.lean",
+      "sha256": "4219a281d3f202d70be2c36ec0ebb51b72119989b184c85eea8dc690e4381001"
+    },
+    {
+      "module": "Mathlib.Tactic.DeprecateTo",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/DeprecateTo.lean",
+      "sha256": "3f9c4df9e4994ce10ee7dd37a540559864babc8425faf8059071b4948d836d4f"
+    },
+    {
+      "module": "Mathlib.Tactic.Eqns",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Eqns.lean",
+      "sha256": "3c3638f2fcd06d61ebd03d87b822ab870169603e41e1e9add8b5b8ef88dea687"
+    },
+    {
+      "module": "Mathlib.Tactic.ErwQuestion",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/ErwQuestion.lean",
+      "sha256": "8aa46fa933c74c15e3fb218a8f66de3a77ac8cd2b2b7c3622006ae166e7b269f"
+    },
+    {
+      "module": "Mathlib.Tactic.ExistsI",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/ExistsI.lean",
+      "sha256": "5a217680fc636ab417137d496c57e3d15c298da5194f8ad2bd38b1608f704100"
+    },
+    {
+      "module": "Mathlib.Tactic.ExtendDoc",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/ExtendDoc.lean",
+      "sha256": "92537cacc555eff2f61ea126024e81bd7c95ad58cf4c3e1f3e5bba2cf21515cf"
+    },
+    {
+      "module": "Mathlib.Tactic.ExtractGoal",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/ExtractGoal.lean",
+      "sha256": "197be65d44bd4b219adb55958e7e76ef128eccc17ee65b25709c4bf4d17f8f39"
+    },
+    {
+      "module": "Mathlib.Tactic.FBinop",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/FBinop.lean",
+      "sha256": "f82438b7bcd2fbaf4d44ff1a2b98a16172a3cf82387cf98a4b04656d10fd621b"
+    },
+    {
+      "module": "Mathlib.Tactic.FailIfNoProgress",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/FailIfNoProgress.lean",
+      "sha256": "561fa2bec9919123c391457dc450b0cb171ce20e8525f9368e74f656ad71f874"
+    },
+    {
+      "module": "Mathlib.Tactic.FastInstance",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/FastInstance.lean",
+      "sha256": "508689b65014d87e23e9a181efc75ef850518143188cea38008d30b348f4a742"
+    },
+    {
+      "module": "Mathlib.Tactic.Find",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Find.lean",
+      "sha256": "9dc670c5b8ef62e330bd1572a0ab752e7216ee97c89815ec32ebb3d79b0ff02d"
+    },
+    {
+      "module": "Mathlib.Tactic.FunProp",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/FunProp.lean",
+      "sha256": "8913738bcf16901e2de78c0e393fcb7dd55089dbde70faf866be4b34d337d30a"
+    },
+    {
+      "module": "Mathlib.Tactic.FunProp.Attr",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/FunProp/Attr.lean",
+      "sha256": "f511aa248315e4adb0dc8ad5629b47ed242c9da663481d83051d44ef71082e4e"
+    },
+    {
+      "module": "Mathlib.Tactic.FunProp.Core",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/FunProp/Core.lean",
+      "sha256": "4713fffa4ec6430c09b727cfda62a6a7a52d53f3a79ea5f6656837743887a4fe"
+    },
+    {
+      "module": "Mathlib.Tactic.FunProp.Decl",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/FunProp/Decl.lean",
+      "sha256": "1919670b26f17e02ed6dfdca22941c8476d7fed7fc49b5aa599c64c100c8ea4d"
+    },
+    {
+      "module": "Mathlib.Tactic.FunProp.Elab",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/FunProp/Elab.lean",
+      "sha256": "f3e17ad1bd2cb27c56bfd6da8d232359e40809e882ddba43af60cbdc5746abb3"
+    },
+    {
+      "module": "Mathlib.Tactic.FunProp.FunctionData",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/FunProp/FunctionData.lean",
+      "sha256": "22fb55f82bf88c576afab94869f73c8f6b49b162d90ab6aada6ca968f7e72e53"
+    },
+    {
+      "module": "Mathlib.Tactic.FunProp.Mor",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/FunProp/Mor.lean",
+      "sha256": "43409d70c2f7613ff127c0ba95fa044304dfd2d5d157958e56c0ea3002fc0793"
+    },
+    {
+      "module": "Mathlib.Tactic.FunProp.Theorems",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/FunProp/Theorems.lean",
+      "sha256": "97c7851039a751b93e451546eb6f9464d033fbc587489d431e16c9cd2d738d19"
+    },
+    {
+      "module": "Mathlib.Tactic.FunProp.ToBatteries",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/FunProp/ToBatteries.lean",
+      "sha256": "bd9cdd953af4e16caa20b0f1b81ac9ff01a30f428267583097e04f6f839c12bb"
+    },
+    {
+      "module": "Mathlib.Tactic.FunProp.Types",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/FunProp/Types.lean",
+      "sha256": "60a9d51eef4886c80b316290cdc78c55834eb640aa3320a0316f14e73ac49551"
+    },
+    {
+      "module": "Mathlib.Tactic.GCongr",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/GCongr.lean",
+      "sha256": "2bf8a1f3821398421422698977bb0bf22ace83a3e2b572adcb80d02fedd280a5"
+    },
+    {
+      "module": "Mathlib.Tactic.GCongr.Core",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/GCongr/Core.lean",
+      "sha256": "f73e1933fad67710373d782257d966f7701cc597a197cd65a02faa2fb8b639b6"
+    },
+    {
+      "module": "Mathlib.Tactic.GCongr.CoreAttrs",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/GCongr/CoreAttrs.lean",
+      "sha256": "588c6ee82f641eeb3d962522a1d85766217cb2f97b0a5378bf6f779958a3981a"
+    },
+    {
+      "module": "Mathlib.Tactic.GCongr.ForwardAttr",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/GCongr/ForwardAttr.lean",
+      "sha256": "8fd7458f499a4960fafec9fbc2032fdc50f5ffd18d18d7af709a3c493c004e1c"
+    },
+    {
+      "module": "Mathlib.Tactic.GRewrite",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/GRewrite.lean",
+      "sha256": "5ed4cd4c916853efef1823bd96fb0b044826013f7eb8b961166cf994e9a27092"
+    },
+    {
+      "module": "Mathlib.Tactic.GRewrite.Core",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/GRewrite/Core.lean",
+      "sha256": "2a743e05b270967fb3c6c43dedfc78a4b4b467712327921acf097a3be42ef5a3"
+    },
+    {
+      "module": "Mathlib.Tactic.GRewrite.Elab",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/GRewrite/Elab.lean",
+      "sha256": "857dbb2c80d1f7c2e3182b7ad0b17abfc8893548162c3394c34fd1b5c70800bf"
+    },
+    {
+      "module": "Mathlib.Tactic.GuardGoalNums",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/GuardGoalNums.lean",
+      "sha256": "00ef9a87b8fc332650da726f3d9fff7371acd22397f72228fd11164b9952c347"
+    },
+    {
+      "module": "Mathlib.Tactic.GuardHypNums",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/GuardHypNums.lean",
+      "sha256": "0b46b13243082377243a719f7f3d8d9bb47bc8b1ad7eb5590480f944d42bc17d"
+    },
+    {
+      "module": "Mathlib.Tactic.HigherOrder",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/HigherOrder.lean",
+      "sha256": "ae24f3000163be657dc6dd6434e3589a288ee3c99ee12062f9efba84082ca2c7"
+    },
+    {
+      "module": "Mathlib.Tactic.Hint",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Hint.lean",
+      "sha256": "94dd640b31a73543f8ee2136fea00be49d544f5fe2c95c2f5396f91d5d7886dc"
+    },
+    {
+      "module": "Mathlib.Tactic.InferParam",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/InferParam.lean",
+      "sha256": "51151e91f89b38709da86ea7dfd2370630a3bbdf4f01ef1c833df23f8e2aa25b"
+    },
+    {
+      "module": "Mathlib.Tactic.Inhabit",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Inhabit.lean",
+      "sha256": "0eaccb057b722bf95ccc6ebba5e7ef8b61bc8c1301ca74314d0d7ecb5b84cb34"
+    },
+    {
+      "module": "Mathlib.Tactic.IrreducibleDef",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/IrreducibleDef.lean",
+      "sha256": "52ce191de4b39a53291f843b19285d2cb496729734ce05cb1145e7ab36fd0dd6"
+    },
+    {
+      "module": "Mathlib.Tactic.Lemma",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Lemma.lean",
+      "sha256": "cba1dc9166fb3e84c25faa0725604306faa4117722e87cd5b3932014a6531456"
+    },
+    {
+      "module": "Mathlib.Tactic.Lift",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Lift.lean",
+      "sha256": "a0e8117b3064286e00da19c0e338c3c3a425c701720992134cd4a87e68c84e2f"
+    },
+    {
+      "module": "Mathlib.Tactic.Linter",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Linter.lean",
+      "sha256": "409d8c0647f6c4fc92c18c6368ada0b210edd83b81c8ae6d03832798feea45e5"
+    },
+    {
+      "module": "Mathlib.Tactic.Linter.AuxLemma",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Linter/AuxLemma.lean",
+      "sha256": "a39bc08be5e7dccb1cc843c022ce256b47dbe977a3dcf88be4e4665bee6ce364"
+    },
+    {
+      "module": "Mathlib.Tactic.Linter.DeprecatedSyntaxLinter",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Linter/DeprecatedSyntaxLinter.lean",
+      "sha256": "c06f1f319baca635625680f33c9b1692286ea24ca868b903a52c5eab8c4f534b"
+    },
+    {
+      "module": "Mathlib.Tactic.Linter.DirectoryDependency",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Linter/DirectoryDependency.lean",
+      "sha256": "0e159a7cbe7ce9147856c3dcff442edf2559b7de04530c78f70c35449843908d"
+    },
+    {
+      "module": "Mathlib.Tactic.Linter.DocPrime",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Linter/DocPrime.lean",
+      "sha256": "358b8ec9712ea59503eeabc2f0fd705ff97140597817c70367f1163ccda69519"
+    },
+    {
+      "module": "Mathlib.Tactic.Linter.DocString",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Linter/DocString.lean",
+      "sha256": "83abb3ba8ef63cd13e17a950764c67221c8f601f154830b280dc142331a9f5c7"
+    },
+    {
+      "module": "Mathlib.Tactic.Linter.EmptyLine",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Linter/EmptyLine.lean",
+      "sha256": "14fbd618bd36661b8d8c9a9f2351a8f4a76b3438c732a086cf31953b98b16d9c"
+    },
+    {
+      "module": "Mathlib.Tactic.Linter.FlexibleLinter",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Linter/FlexibleLinter.lean",
+      "sha256": "498d544fb18cb3ffb1e23c6d39be36c5a5aef67594e34754f26652719a6b3847"
+    },
+    {
+      "module": "Mathlib.Tactic.Linter.GlobalAttributeIn",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Linter/GlobalAttributeIn.lean",
+      "sha256": "b61076cb6c7d7307adb2b1d7312f1c2281bca87e020e91228cb230d3054bb9d7"
+    },
+    {
+      "module": "Mathlib.Tactic.Linter.HashCommandLinter",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Linter/HashCommandLinter.lean",
+      "sha256": "3d916d6e03fcd067f09c0959512ab2d79edc32f261f6faca1a722ef114db21da"
+    },
+    {
+      "module": "Mathlib.Tactic.Linter.HaveLetLinter",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Linter/HaveLetLinter.lean",
+      "sha256": "e356f5d5372e039ed6b5cd8a5bdcb6c3a2e9f0accf3f3ae25fab6bb008d2f151"
+    },
+    {
+      "module": "Mathlib.Tactic.Linter.Header",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Linter/Header.lean",
+      "sha256": "9e28b6e8266ec0efe5ef8272a0971dccf026ef652deaa40af791cf53fa68ca7b"
+    },
+    {
+      "module": "Mathlib.Tactic.Linter.Lint",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Linter/Lint.lean",
+      "sha256": "40356e9f711475a4600fbde732c06d243f81c1f2b04d8f9794a3463b905f196b"
+    },
+    {
+      "module": "Mathlib.Tactic.Linter.MinImports",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Linter/MinImports.lean",
+      "sha256": "9ef11c631da19a81e1a0ef2d1275a5d4ade251d658c68627561343ddfae6579d"
+    },
+    {
+      "module": "Mathlib.Tactic.Linter.Multigoal",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Linter/Multigoal.lean",
+      "sha256": "e66a75451b1766b4804eb5d614eb3e57878315e1de7d9d38a75377a01a3a0432"
+    },
+    {
+      "module": "Mathlib.Tactic.Linter.OldObtain",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Linter/OldObtain.lean",
+      "sha256": "c96c5749330da1ac7156322cb5286b8f0bf1a7540ba6eb87295c560d1a8c41cc"
+    },
+    {
+      "module": "Mathlib.Tactic.Linter.OverlappingInstances",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Linter/OverlappingInstances.lean",
+      "sha256": "89974017e0d63573c2168776184ec88738f1bb4e546d604eab5185d9c6c1f066"
+    },
+    {
+      "module": "Mathlib.Tactic.Linter.PPRoundtrip",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Linter/PPRoundtrip.lean",
+      "sha256": "388401779d0609768ec37ca3a109e9c2db2e92338abd960d7102ea42fdcad024"
+    },
+    {
+      "module": "Mathlib.Tactic.Linter.PrivateModule",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Linter/PrivateModule.lean",
+      "sha256": "8ae4286d34bea5a0b26cc2b6c81a177d908c7097d8c9e07dd0c8654a222586bb"
+    },
+    {
+      "module": "Mathlib.Tactic.Linter.Style",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Linter/Style.lean",
+      "sha256": "d8ccf9e5d57b1f7b827fb952652707095f575afbcf585a8d040729ef1a00f034"
+    },
+    {
+      "module": "Mathlib.Tactic.Linter.TacticDocumentation",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Linter/TacticDocumentation.lean",
+      "sha256": "1b8f5c38c19a73387baf032b2c786646f5ab0a7d27fb95b83bfcd7bbad4744a9"
+    },
+    {
+      "module": "Mathlib.Tactic.Linter.UnusedInstancesInType",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Linter/UnusedInstancesInType.lean",
+      "sha256": "1748a176f9b48a3987be1b56e5e30be908d9baa5a6242270355784d68dc90864"
+    },
+    {
+      "module": "Mathlib.Tactic.Linter.UnusedTactic",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Linter/UnusedTactic.lean",
+      "sha256": "5717754be042f979a8b9747ce86cd612c7e60f940e06ba79466a20b4e36f9623"
+    },
+    {
+      "module": "Mathlib.Tactic.Linter.UnusedTacticExtension",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Linter/UnusedTacticExtension.lean",
+      "sha256": "c8c18fae0d8095e4f951f0938952e75348d2df9a4a1aca5e5c158a2ecb064591"
+    },
+    {
+      "module": "Mathlib.Tactic.Linter.UpstreamableDecl",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Linter/UpstreamableDecl.lean",
+      "sha256": "8de350687c8b6f97d90c007946399e338efbc5eb5bad4ccb06aeb2fe11ec2d19"
+    },
+    {
+      "module": "Mathlib.Tactic.Linter.Whitespace",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Linter/Whitespace.lean",
+      "sha256": "4847be39a1958ed04abb93f2edb18a9bfb577dcccf8a0d1a269e34ab9a75795e"
+    },
+    {
+      "module": "Mathlib.Tactic.MinImports",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/MinImports.lean",
+      "sha256": "93b4dabe0a6dae84d0eb2d4dde119492aaa1cdbeada0a9dc597b6d49ce90f427"
+    },
+    {
+      "module": "Mathlib.Tactic.MkIffOfInductiveProp",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/MkIffOfInductiveProp.lean",
+      "sha256": "52862f2975313a8ee87fa74f8ac536043cda9e14e3c346c78a2bc4b972f3201a"
+    },
+    {
+      "module": "Mathlib.Tactic.NthRewrite",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/NthRewrite.lean",
+      "sha256": "babff44c4090666f51fd28ce13732b445c623eae540643b907ffd7acf2055da5"
+    },
+    {
+      "module": "Mathlib.Tactic.Observe",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Observe.lean",
+      "sha256": "61e8b6d61f6f227216c2a58fdefa7283951262062f881eaf6e1c0465b45c0700"
+    },
+    {
+      "module": "Mathlib.Tactic.OfNat",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/OfNat.lean",
+      "sha256": "f09ae01daefa914f2d28f8370d016d22d244ae4d6c417b809ba45a1002450c74"
+    },
+    {
+      "module": "Mathlib.Tactic.PPWithUniv",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/PPWithUniv.lean",
+      "sha256": "f8cce63ec316b7fbcfc67f176c1ebcd6b117b6bdef143d3735c8845a124c56c1"
+    },
+    {
+      "module": "Mathlib.Tactic.Push",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Push.lean",
+      "sha256": "d7acc3a004c15accebd6d45309fe45d664ef797e4323544be409a4df62649511"
+    },
+    {
+      "module": "Mathlib.Tactic.Push.Attr",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Push/Attr.lean",
+      "sha256": "c91866cabd3fc3f7277324b3256fff67ca63ef217652431589be4d786f501d07"
+    },
+    {
+      "module": "Mathlib.Tactic.RSuffices",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/RSuffices.lean",
+      "sha256": "dd2f60c634d747569ab2866eadb9a6b821556d11e2eac89cbabbb39aea4d0830"
+    },
+    {
+      "module": "Mathlib.Tactic.Recover",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Recover.lean",
+      "sha256": "5f0a51bb93f63be43ac97bbe8c3515dc2c92438ec55d0f5573a395cfcf5f6a31"
+    },
+    {
+      "module": "Mathlib.Tactic.Relation.Rfl",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Relation/Rfl.lean",
+      "sha256": "210df05c455e2251e75ed49e9242431bb67638052e99bf947690f72877c66da9"
+    },
+    {
+      "module": "Mathlib.Tactic.Rename",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Rename.lean",
+      "sha256": "0366b1fde13bb01309a331e79a61a45b696c68e8d0e5767c62a793dad81a3d51"
+    },
+    {
+      "module": "Mathlib.Tactic.RenameBVar",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/RenameBVar.lean",
+      "sha256": "9e308b56471cf144cb7b7bc57f8e5610566b0be500a19c673f304552fd2bd76d"
+    },
+    {
+      "module": "Mathlib.Tactic.Says",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Says.lean",
+      "sha256": "655ab2d7e77ab42fc9374cc2ae229455ebac2c0181035c2ced2d24f644206b1a"
+    },
+    {
+      "module": "Mathlib.Tactic.ScopedNS",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/ScopedNS.lean",
+      "sha256": "391dc136ef931fd7d838b89be74a53812cbadd4a4208d476db745648b5d79804"
+    },
+    {
+      "module": "Mathlib.Tactic.Set",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Set.lean",
+      "sha256": "a75cf60655061f14e4bbd9fe8b431cbed3cc7eb378a7c2cc84fc5ef305210e86"
+    },
+    {
+      "module": "Mathlib.Tactic.SimpIntro",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/SimpIntro.lean",
+      "sha256": "acb5dca34a1d3202070a8841019f1600cfeb82a11b90fa6b7b3ebe8cf48382bc"
+    },
+    {
+      "module": "Mathlib.Tactic.SimpRw",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/SimpRw.lean",
+      "sha256": "7f5aa276e2ccc63a96542572b66a1bff1c4c7b785d83af6ce4fafb264e2582d5"
+    },
+    {
+      "module": "Mathlib.Tactic.Simproc.ExistsAndEq",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Simproc/ExistsAndEq.lean",
+      "sha256": "c5c2495bae1b9a5e8b125c76706e8f9d53d21852057d6b122272972ea825f994"
+    },
+    {
+      "module": "Mathlib.Tactic.Simps.Basic",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Simps/Basic.lean",
+      "sha256": "8e1477de194eca390e48d686aef656d46eb1cd716f20f4cb456a3db64e7fed9f"
+    },
+    {
+      "module": "Mathlib.Tactic.Simps.NotationClass",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Simps/NotationClass.lean",
+      "sha256": "110bfbd7eeb32ca139e0daf3cceb8e96d0864677ee22aceda932a70acb3f726f"
+    },
+    {
+      "module": "Mathlib.Tactic.SplitIfs",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/SplitIfs.lean",
+      "sha256": "dc78688f1b1b5378b20d056706251bb4d14d72404adc4318a75e1817db8d8372"
+    },
+    {
+      "module": "Mathlib.Tactic.Spread",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Spread.lean",
+      "sha256": "d70b1002cfb6a999ed2c94570c96cff6d70b4e818f6782967b1d3ecb33885dce"
+    },
+    {
+      "module": "Mathlib.Tactic.Subsingleton",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Subsingleton.lean",
+      "sha256": "bd274053089402f5f585ab7e1d2b498ea91e4688042297d73d4c84807af69694"
+    },
+    {
+      "module": "Mathlib.Tactic.Substs",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Substs.lean",
+      "sha256": "2cb4eb2c4f86c4adb3e48a5f1d4c2affd1da8cb941fe820a017bfd31e696456f"
+    },
+    {
+      "module": "Mathlib.Tactic.SuccessIfFailWithMsg",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/SuccessIfFailWithMsg.lean",
+      "sha256": "01778740cc1367a5f0966db9e0dcb43c2bffcebbe52adad6a5609cbb0d43fd1b"
+    },
+    {
+      "module": "Mathlib.Tactic.SudoSetOption",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/SudoSetOption.lean",
+      "sha256": "a508fd9b7013deee9654cb641c93383d8d247c986965b696cb6aa4b2346ea3a0"
+    },
+    {
+      "module": "Mathlib.Tactic.SwapVar",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/SwapVar.lean",
+      "sha256": "da801d7e089a958ec8ef92a458395de718a076dca55a5ee20a22e158bd97a085"
+    },
+    {
+      "module": "Mathlib.Tactic.TacticAnalysis",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/TacticAnalysis.lean",
+      "sha256": "c435edac5d3693f8ca8e479bc5eef553cd7d9fa36e1f8468f4981ca393e7ba10"
+    },
+    {
+      "module": "Mathlib.Tactic.TacticAnalysis.Declarations",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/TacticAnalysis/Declarations.lean",
+      "sha256": "2d75bdb9a5e179a954297ceee853293d1371a2665a0dcebf5bf4d47409adb714"
+    },
+    {
+      "module": "Mathlib.Tactic.Tauto",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Tauto.lean",
+      "sha256": "7251597429f1817631b0f5ce8823e57cc377a1db408bdf2033fc1f1291e179ef"
+    },
+    {
+      "module": "Mathlib.Tactic.TermCongr",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/TermCongr.lean",
+      "sha256": "0e0c654d1fc2303975095b3c0d0ddf2738edd849ebea77de50a4a5ad9eea7ea5"
+    },
+    {
+      "module": "Mathlib.Tactic.ToAdditive",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/ToAdditive.lean",
+      "sha256": "ed06ad68d5a4f97074173c127bb950d1c6794d7ca3540c70c6fc6656458e453b"
+    },
+    {
+      "module": "Mathlib.Tactic.ToDual",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/ToDual.lean",
+      "sha256": "dcf58e19306131d8af50180bbf1d551a6b68b273eea699ee774fcf889a1db175"
+    },
+    {
+      "module": "Mathlib.Tactic.ToExpr",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/ToExpr.lean",
+      "sha256": "b00cbcc869cf5272df689438fb7e4a16dd9ffca91f179f9feb513896cfa13c77"
+    },
+    {
+      "module": "Mathlib.Tactic.ToFun",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/ToFun.lean",
+      "sha256": "f48ae3ad95e86b8778054cc3fea7dc582ec2b495d16c529ad1d46a882cc879f2"
+    },
+    {
+      "module": "Mathlib.Tactic.ToLevel",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/ToLevel.lean",
+      "sha256": "5cd0090c3efa8349a1b66651f0f990a6e23263e2b86aa364f9450224ff7f7aa4"
+    },
+    {
+      "module": "Mathlib.Tactic.Trace",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Trace.lean",
+      "sha256": "ce67c0f2f023b43c80897844cbe8373198f4492fc385a902180ac51812a24929"
+    },
+    {
+      "module": "Mathlib.Tactic.Translate.Attributes",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Translate/Attributes.lean",
+      "sha256": "df599abbe8bfdfc999ba6b630b7a28459fab4341affe88ff70b6b7437a649348"
+    },
+    {
+      "module": "Mathlib.Tactic.Translate.Core",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Translate/Core.lean",
+      "sha256": "640f44c5d03bbb00682fa76fb9a38392560f647f4eeb78afc669a9f7cf6f972a"
+    },
+    {
+      "module": "Mathlib.Tactic.Translate.GuessName",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Translate/GuessName.lean",
+      "sha256": "0b29ea2d30e29fbc669cc910ff77345ead8bf17c44f93cd4c353a30af55662e8"
+    },
+    {
+      "module": "Mathlib.Tactic.Translate.Reorder",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Translate/Reorder.lean",
+      "sha256": "7a2a1285b13bc192579db96072e34f687f0fe8a7de39b58a6ec898c96f425a7f"
+    },
+    {
+      "module": "Mathlib.Tactic.Translate.TagUnfoldBoundary",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Translate/TagUnfoldBoundary.lean",
+      "sha256": "0cfe8224c7f78ccf19c0c7fe802e042e9985ee34e6fa9e0ba4f360cc2b12a95c"
+    },
+    {
+      "module": "Mathlib.Tactic.Translate.ToAdditive",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Translate/ToAdditive.lean",
+      "sha256": "a7f92a2ae05af9d31d7dcb84dc004f6139c3909305e49be218c807778d5721b4"
+    },
+    {
+      "module": "Mathlib.Tactic.Translate.ToDual",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Translate/ToDual.lean",
+      "sha256": "235840f1e26ab7aef17a5f8f65bf75c2a56a7b4aee46c6f0296bd93ec8aac59c"
+    },
+    {
+      "module": "Mathlib.Tactic.Translate.UnfoldBoundary",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Translate/UnfoldBoundary.lean",
+      "sha256": "07fc817c4a0ecf8f433e4afd312b8ed5602456b8d29c5c20f57a5d84eb6e5571"
+    },
+    {
+      "module": "Mathlib.Tactic.TypeStar",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/TypeStar.lean",
+      "sha256": "e73939e8146a2d64c0324599c7870d5d1bfcd144e9e67c577591808d04b3dd65"
+    },
+    {
+      "module": "Mathlib.Tactic.UnsetOption",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/UnsetOption.lean",
+      "sha256": "07ec745ad004d854c9a58dca7befcc75955afc094075b1767961047bc57f2d40"
+    },
+    {
+      "module": "Mathlib.Tactic.Use",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Use.lean",
+      "sha256": "826514251c74607e3fe46a09d5ca598797c4b03a0b6c399079f979bae2f953d1"
+    },
+    {
+      "module": "Mathlib.Tactic.Variable",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Variable.lean",
+      "sha256": "5c764b73fe7db70d8a304a4c72843e6ba0f8c44762bd11ead965137d29e374b1"
+    },
+    {
+      "module": "Mathlib.Tactic.WLOG",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/WLOG.lean",
+      "sha256": "37671c56d8f9471c820c71bebb70591e55451c948e3210cccf0118a109c5960b"
+    },
+    {
+      "module": "Mathlib.Tactic.Widget.Calc",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Widget/Calc.lean",
+      "sha256": "6952a908f6a276eb7d66e2effa10535a76b0d5b60dd1bb25a2afbbc6a3ea942b"
+    },
+    {
+      "module": "Mathlib.Tactic.Widget.CongrM",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Widget/CongrM.lean",
+      "sha256": "64c689e592093a167e5478ecce6ade5b6722cd1391176ba5c0014b76ff558361"
+    },
+    {
+      "module": "Mathlib.Tactic.Widget.Conv",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Widget/Conv.lean",
+      "sha256": "8444727eab9276db8e9c78282cac667c77d91d15a9083627458c19a3dd80ddf0"
+    },
+    {
+      "module": "Mathlib.Tactic.Widget.LibraryRewrite",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Widget/LibraryRewrite.lean",
+      "sha256": "8f932c26941de8614de2f0cece0518abcc43bf959b9b1b028956851bc378ca9e"
+    },
+    {
+      "module": "Mathlib.Tactic.Widget.SelectInsertParamsClass",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Widget/SelectInsertParamsClass.lean",
+      "sha256": "09462e432fffc061330bac24a74d6719c1ad245711ec0849277f375e23ba97c9"
+    },
+    {
+      "module": "Mathlib.Tactic.Widget.SelectPanelUtils",
+      "path": ".lake/packages/mathlib/Mathlib/Tactic/Widget/SelectPanelUtils.lean",
+      "sha256": "3606cbd77c3c6dda5c596b0a618967cda0040ed8bb53349bb7b868e4063edd29"
+    },
+    {
+      "module": "Mathlib.Util.AddRelatedDecl",
+      "path": ".lake/packages/mathlib/Mathlib/Util/AddRelatedDecl.lean",
+      "sha256": "8a430d84a3561e305eef54b3aa3f66629a5c8a5ffd307c05a5f4dcbc7a258eb5"
+    },
+    {
+      "module": "Mathlib.Util.AtLocation",
+      "path": ".lake/packages/mathlib/Mathlib/Util/AtLocation.lean",
+      "sha256": "b30bf67a6b52bf3475a0f28f959aa24f6fc4430be785111b3120c35d1c32341c"
+    },
+    {
+      "module": "Mathlib.Util.CompileInductive",
+      "path": ".lake/packages/mathlib/Mathlib/Util/CompileInductive.lean",
+      "sha256": "659ebbe1c1328b2c244a8169f637a2881ccf4785c8626ab7b883b1c6d38c865a"
+    },
+    {
+      "module": "Mathlib.Util.CountHeartbeats",
+      "path": ".lake/packages/mathlib/Mathlib/Util/CountHeartbeats.lean",
+      "sha256": "77c39d1a783a8f9ae4c5c4ff19727596840df27c9df556032aa11d290e655eed"
+    },
+    {
+      "module": "Mathlib.Util.ParseCommand",
+      "path": ".lake/packages/mathlib/Mathlib/Util/ParseCommand.lean",
+      "sha256": "5ea0f4bb8fd240b7ad213597e2ee70a372198e7cb48eb4abc7db70677d0e1466"
+    },
+    {
+      "module": "Mathlib.Util.PrintSorries",
+      "path": ".lake/packages/mathlib/Mathlib/Util/PrintSorries.lean",
+      "sha256": "03670b0b0007740e5390dadd49c3d10a02b7d0919092d2b3214ef8a6a8cf798f"
+    },
+    {
+      "module": "Mathlib.Util.Tactic",
+      "path": ".lake/packages/mathlib/Mathlib/Util/Tactic.lean",
+      "sha256": "2c051dffed127c503c032cdc774c904e473ea4d30ecb20cef5e3ea15cd353443"
+    },
+    {
+      "module": "Mathlib.Util.TermReduce",
+      "path": ".lake/packages/mathlib/Mathlib/Util/TermReduce.lean",
+      "sha256": "bfbccc3c37bc50aabc457e7a3e3e90ab010dcc61a3798b7308fee25436878229"
+    },
+    {
+      "module": "Mathlib.Util.TransImports",
+      "path": ".lake/packages/mathlib/Mathlib/Util/TransImports.lean",
+      "sha256": "9303035ef2be3801f88795b681e1c275f4f03fb3e3bbf48b2c2f1a131b79c7da"
+    },
+    {
+      "module": "Mathlib.Util.WhatsNew",
+      "path": ".lake/packages/mathlib/Mathlib/Util/WhatsNew.lean",
+      "sha256": "607b6e92f9c1b63984b3733c56f09dd35820faba491f227d90bbb1e8ade77451"
+    },
+    {
+      "module": "Mathlib.Util.WithWeakNamespace",
+      "path": ".lake/packages/mathlib/Mathlib/Util/WithWeakNamespace.lean",
+      "sha256": "bc61eee5078867c84f1d3570d6ff8fe5e6b1651496a6838cb22a5ab9fe8557d4"
+    },
+    {
+      "module": "Plausible",
+      "path": ".lake/packages/plausible/Plausible.lean",
+      "sha256": "b216e00a8bb4ea5445b2e3a62b8dfe94db2c558f92b07be40aac61b39330df1e"
+    },
+    {
+      "module": "Plausible.Arbitrary",
+      "path": ".lake/packages/plausible/Plausible/Arbitrary.lean",
+      "sha256": "dd5b62aa354f6c2b2e3d0c375b3bb0274d2ba8e5dc8698142bba59cb241fce24"
+    },
+    {
+      "module": "Plausible.ArbitraryFueled",
+      "path": ".lake/packages/plausible/Plausible/ArbitraryFueled.lean",
+      "sha256": "d6b665f16fa368a6bee659fc9acebd74f5409121158509a90d07bcea25f8aa39"
+    },
+    {
+      "module": "Plausible.Attr",
+      "path": ".lake/packages/plausible/Plausible/Attr.lean",
+      "sha256": "6ee1de864a02e91a4132166bd395382bf527107cbab064ed2c6bb6ef2b82e6fc"
+    },
+    {
+      "module": "Plausible.DeriveArbitrary",
+      "path": ".lake/packages/plausible/Plausible/DeriveArbitrary.lean",
+      "sha256": "046968886e11a82d5e21bee2ad1d9d7964fc2b1bed666ae6524f4fabc9700e8f"
+    },
+    {
+      "module": "Plausible.DeriveShrinkable",
+      "path": ".lake/packages/plausible/Plausible/DeriveShrinkable.lean",
+      "sha256": "efcf29f8893aa63ee38889fedb87634e072a08fc0ca7144a3405306093d6d400"
+    },
+    {
+      "module": "Plausible.Functions",
+      "path": ".lake/packages/plausible/Plausible/Functions.lean",
+      "sha256": "02425fb475cd524e934175136d32acb9c538bb01b38af2da97058fd2790ef45c"
+    },
+    {
+      "module": "Plausible.Gen",
+      "path": ".lake/packages/plausible/Plausible/Gen.lean",
+      "sha256": "518bca3354f39385c5c69c5c454a9596a1545f93a753b29a65bf9fbbe5108669"
+    },
+    {
+      "module": "Plausible.Random",
+      "path": ".lake/packages/plausible/Plausible/Random.lean",
+      "sha256": "226866d0a23139379a19e5f73c27226d6b1dcd2525a083ab358a83ff7a1e2227"
+    },
+    {
+      "module": "Plausible.Sampleable",
+      "path": ".lake/packages/plausible/Plausible/Sampleable.lean",
+      "sha256": "923faf6049534f2f461ef06a58f0db3cc4169a8c81c6a49bd4bee7b17b7b8295"
+    },
+    {
+      "module": "Plausible.Shrinkable",
+      "path": ".lake/packages/plausible/Plausible/Shrinkable.lean",
+      "sha256": "bfd4540d72555a6caa69ade214136c21e7b6b63e7e15e294c8c2978504c2f79b"
+    },
+    {
+      "module": "Plausible.Tactic",
+      "path": ".lake/packages/plausible/Plausible/Tactic.lean",
+      "sha256": "51148f1df67f14740a7a63abe0743d35a18e4d2a40cee0ecd9223e1f70045e14"
+    },
+    {
+      "module": "Plausible.Testable",
+      "path": ".lake/packages/plausible/Plausible/Testable.lean",
+      "sha256": "822d968caa61372e8d3f6876c78c03fc6fb56d64c0f48a8cff3f6b87783a78f3"
+    },
+    {
+      "module": "ProofWidgets.Cancellable",
+      "path": ".lake/packages/proofwidgets/ProofWidgets/Cancellable.lean",
+      "sha256": "c5403e8b2bc1fe9803d9046dedd5271ce305e1bbf14bea521aeea77eb08d4b07"
+    },
+    {
+      "module": "ProofWidgets.Compat",
+      "path": ".lake/packages/proofwidgets/ProofWidgets/Compat.lean",
+      "sha256": "e22bc6f385ea9fcdf5ab60297b5b3d634f7998491e7e313be8ce9ee1154abdb7"
+    },
+    {
+      "module": "ProofWidgets.Component.Basic",
+      "path": ".lake/packages/proofwidgets/ProofWidgets/Component/Basic.lean",
+      "sha256": "61a0d474e5c2aaf591fae52e60875612ebf11e61b78c35ef653de9bcd4af8b05"
+    },
+    {
+      "module": "ProofWidgets.Component.FilterDetails",
+      "path": ".lake/packages/proofwidgets/ProofWidgets/Component/FilterDetails.lean",
+      "sha256": "5fc78b97580ac732d68416bcb7c11709d0eb30ca26bf6493b5fb1d43c9e7474f"
+    },
+    {
+      "module": "ProofWidgets.Component.MakeEditLink",
+      "path": ".lake/packages/proofwidgets/ProofWidgets/Component/MakeEditLink.lean",
+      "sha256": "d985e70287c006101334e1ca70b60108fa2e9f42c929266ee2fb81a4bd32c743"
+    },
+    {
+      "module": "ProofWidgets.Component.OfRpcMethod",
+      "path": ".lake/packages/proofwidgets/ProofWidgets/Component/OfRpcMethod.lean",
+      "sha256": "c50bd8731e2fd0237cdb0dacc5b72c7e03a42f2bc889acc3a95fd660ef04e61d"
+    },
+    {
+      "module": "ProofWidgets.Data.Html",
+      "path": ".lake/packages/proofwidgets/ProofWidgets/Data/Html.lean",
+      "sha256": "d571bdb223a3fc981b86b7b74e294f3c990256c9a058f5076156f01dbb7349a3"
+    },
+    {
+      "module": "ProofWidgets.Util",
+      "path": ".lake/packages/proofwidgets/ProofWidgets/Util.lean",
+      "sha256": "31258c878ff47f73b0f20bef3b7c264e3297020b1bf5e155fb879a2d9ba37323"
+    },
+    {
+      "module": "Qq",
+      "path": ".lake/packages/Qq/Qq.lean",
+      "sha256": "dd373354d6fdf8d400b811ea10cb4148b2b86aef7267d217fdd8c846b579b15f"
+    },
+    {
+      "module": "Qq.AssertInstancesCommute",
+      "path": ".lake/packages/Qq/Qq/AssertInstancesCommute.lean",
+      "sha256": "d6b968b6e99baa890dedddecbed1b632490df1eb1e3bfc792812cce69d9f9988"
+    },
+    {
+      "module": "Qq.Commands",
+      "path": ".lake/packages/Qq/Qq/Commands.lean",
+      "sha256": "50fda99ce73ec5cce8b9b7f3d914d8c11012788d071f75123a306f4fa906ca07"
+    },
+    {
+      "module": "Qq.Delab",
+      "path": ".lake/packages/Qq/Qq/Delab.lean",
+      "sha256": "34304c78065c9408181b67ef908449c2912021e744d8e5da2549534ec8d265a3"
+    },
+    {
+      "module": "Qq.ForLean.Do",
+      "path": ".lake/packages/Qq/Qq/ForLean/Do.lean",
+      "sha256": "136f260bcd0bce1793f24a5afb86e076a86340aebce0c406bbd760b5d807f556"
+    },
+    {
+      "module": "Qq.ForLean.ReduceEval",
+      "path": ".lake/packages/Qq/Qq/ForLean/ReduceEval.lean",
+      "sha256": "6f007676dc7ddab5a6569e7b42861aba90c0e2b4454e74b4f07a473049a7986f"
+    },
+    {
+      "module": "Qq.ForLean.ToExpr",
+      "path": ".lake/packages/Qq/Qq/ForLean/ToExpr.lean",
+      "sha256": "38d45a05204b5d71898c765f2ee62b8d2e9a616c3dfbecff10065912bbd4ddb9"
+    },
+    {
+      "module": "Qq.Macro",
+      "path": ".lake/packages/Qq/Qq/Macro.lean",
+      "sha256": "83af2d75f825b9901b6e825fa36ccc69f4c22e19b99d8a2d01de028dec3327c7"
+    },
+    {
+      "module": "Qq.Match",
+      "path": ".lake/packages/Qq/Qq/Match.lean",
+      "sha256": "81305799ad2a5136e8517c0b86bca116a492bf54fd1f2fa75d9ad109a8bfd631"
+    },
+    {
+      "module": "Qq.MatchImpl",
+      "path": ".lake/packages/Qq/Qq/MatchImpl.lean",
+      "sha256": "a981b70671a79a0d2272286b7c0e8c758e5f2e3ce6dcdab5f7312b6190296742"
+    },
+    {
+      "module": "Qq.MetaM",
+      "path": ".lake/packages/Qq/Qq/MetaM.lean",
+      "sha256": "fbe080a57926c6545b5532e53ad071bc9f83958d53b7a394034ea4a0219cacb2"
+    },
+    {
+      "module": "Qq.Simp",
+      "path": ".lake/packages/Qq/Qq/Simp.lean",
+      "sha256": "22b544ad69576ae068f4e7fc22b4c1f8132f577ed6efee714701985fac8e787f"
+    },
+    {
+      "module": "Qq.SortLocalDecls",
+      "path": ".lake/packages/Qq/Qq/SortLocalDecls.lean",
+      "sha256": "b73aed8d4b313d65be8cf44921a21040b54f95d8ceb04f03d76a7677d724c268"
+    },
+    {
+      "module": "Qq.Typ",
+      "path": ".lake/packages/Qq/Qq/Typ.lean",
+      "sha256": "de4e7433eff717b300298c68b4ab4440b7b4ed6b3680b32e2b86c625dc43f64f"
+    }
+  ],
+  "selected_core_sources": {
+    "Init/Data/Nat/Div/Basic.lean": "67f894497257111dff81a5b3bab0f849cc53f31a3c62656333366ad62ab63a58",
+    "Init/Data/Nat/Div/Lemmas.lean": "3046e785238fe8afe1f0b40f02902ee1cef13589ba8fcb045bc48f16ad4412c0",
+    "Lean/Elab/Tactic/Omega.lean": "7a81cef2ff724f9f690993d01aef906b200ca11c36f72fb57f9e6e5eaf4ec45e",
+    "Init/Data/Fin/Basic.lean": "fcf6cfb3553deaf9eb88e62c51e7ab6c54c1d873953f65f2216b154034b7fc31"
+  }
+}

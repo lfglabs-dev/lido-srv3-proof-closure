@@ -1,0 +1,6 @@
+ℹ [496/496] Built LidoSRv3.Audit.Source.TopupHistoryDomain (2.4s)
+info: LidoSRv3/Audit/Source/TopupHistoryDomain.lean:52:0: 'LidoSRv3.Audit.Source.TopupHistoryDomain.truncated_blocks_reopen' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TopupHistoryDomain.lean:53:0: 'LidoSRv3.Audit.Source.TopupHistoryDomain.truncated_timestamp_is_older' depends on axioms: [propext]
+info: LidoSRv3/Audit/Source/TopupHistoryDomain.lean:54:0: 'LidoSRv3.Audit.Source.TopupHistoryDomain.configured_does_not_give_unrestricted_exclusion' depends on axioms: [propext,
+ Quot.sound]
+Build completed successfully (496 jobs).
