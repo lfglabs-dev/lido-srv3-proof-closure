@@ -3,7 +3,7 @@
   "authority": "Main website claims registered against existing composed source-model theorems. The historical abstract/verity pairs remain available; they do not establish these new claims. No proof status or deployment claim is promoted by this registry.",
   "guarantees": {
     "P-ALLOC-1": {
-      "description": "The modeled router calculates each active module\u2019s capacity from its target share and available headroom. Inactive modules receive no additional capacity. For successful execution under the stated storage, memory and arithmetic conditions, the resulting allocation and capacity lists match the independent mathematical specification.",
+      "description": "The modeled router calculates each active module’s capacity from its target share and available headroom. Inactive modules receive no additional capacity. For successful execution under the stated storage, memory and arithmetic conditions, the resulting allocation and capacity lists match the independent mathematical specification.",
       "model": "Source execution model with a Verity external-call interpretation",
       "theorems": [
         "LidoSRv3.Audit.Source.TrioAlloc1.Relational.producer_iff",
@@ -14,7 +14,7 @@
       "covered": [
         "Storage-backed module reads, response-dependent calls and checked calculations follow the modeled source order.",
         "Successful capacity calculations match the independent capacity specification and produce the corresponding memory arrays.",
-        "The Verity call interpreter matches the producer\u2019s return or error and module-call observations; static calls preserve its world."
+        "The Verity call interpreter matches the producer’s return or error and module-call observations; static calls preserve its world."
       ],
       "missing": [
         "The compiler interpretation of memory operations and the effects of omitted internal writes remain assumptions.",
@@ -105,7 +105,7 @@
       ]
     },
     "P-TOPUP-2": {
-      "description": "For a successful gateway witness and router module batch in the source model, the allocations decoded from the actual module reply sum to at most the router\u2019s packed per-block cap, converted from gwei to wei. The same executed witness loop supplies the keys and per-key limits consumed by that call. Full gateway entry correspondence remains open.",
+      "description": "For a successful gateway witness and router module batch in the source model, the allocations decoded from the actual module reply sum to at most the router’s packed per-block cap, converted from gwei to wei. The same executed witness loop supplies the keys and per-key limits consumed by that call. Full gateway entry correspondence remains open.",
       "model": "Source execution model using Verity physical contract storage and concrete raw module calls; the historical greedy Contract.run allocator is separate",
       "theorems": [
         "LidoSRv3.Audit.Guarantees.PTopup2.actual_module_batch_bound"
@@ -165,6 +165,38 @@
       "outside": [
         "General compiler correctness, the declared Verity semantics, cryptographic primitives, general gas and consensus retain their accepted boundaries. No stronger source/ABI/storage/call premise is hidden in them.",
         "The historical abstract/Verity theorem pair remains separate model evidence and is not required to equal this source executor."
+      ]
+    },
+    "P-TOPUP-1": {
+      "description": "Successful execution of the source router continuation after its module call transfers the guarded total from Lido to beacon in the same live ledger and restores the router balance. Positive success derives the exact allocation sum and nonempty keys. The full gateway/router entry connection remains open.",
+      "model": "Source post-module router continuation with concrete Lido withdrawal and beacon calls in Verity physical storage and a live balance ledger",
+      "theorems": [
+        "LidoSRv3.Audit.Guarantees.PTopup1.actual_continuation_conserves"
+      ],
+      "covered": [
+        "The executed router guards bound the pulled word; the concrete withdrawal derives funding and its exact transfer without an arbitrary-callee frame premise.",
+        "Actual beacon helper debits and the final router assertion force the withdrawn total to equal the actual sent value, including rejection of the empty-key positive path.",
+        "Positive success derives the exact mathematical allocation sum, nonempty keys and pointwise Lido-to-beacon conservation. Zero total keeps its source early path and final router event."
+      ],
+      "missing": [
+        "Full gateway/router entry, actual module-prefix effects and its connection to the continuation remain open; the theorem begins at the post-module state.",
+        "Zero-total equality with the mathematical allocation sum requires the preceding actual gateway batch bounds; this continuation alone also admits an unchecked wrapped sum of zero.",
+        "Exact outer Lido ABI/error bytes and full-entry observable rollback are not established by this result."
+      ],
+      "conditions": [
+        "Existing Pipeline.Bound supplies physical locator/consensus bindings, code presence and configuration separation at the continuation entry. Initialization and preservation through the preceding module call are not derived here.",
+        "Distinct Lido/router and router/beacon roles. No funding, initial beacon capacity, matching helper lengths, amount admission, successful sub-stage or callee balance-preservation premise.",
+        "Existing source CALL/ABI and declared Verity semantics apply; SHA, general compiler, gas and consensus boundaries are unchanged."
+      ],
+      "assumptions": [
+        "A-SOURCE-SHAPED",
+        "A-VERITY-SCAFFOLD",
+        "A-SOLC-TRUSTED",
+        "A-RUNTIME-PROVENANCE"
+      ],
+      "outside": [
+        "General compiler correctness, declared Verity semantics, cryptographic primitives, gas and consensus.",
+        "The historical synthetic TOPUP programs remain separate evidence; equality with their independently supplied inputs is not a source refinement target."
       ]
     }
   }
