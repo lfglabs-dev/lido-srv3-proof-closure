@@ -230,6 +230,40 @@
         "General SHA/precompile correctness, compiler correctness, gas and consensus.",
         "The full TOPUP or DEPOSIT entry state machine belongs to the respective guarantee; this result binds one successful deposit call."
       ]
+    },
+    "P-CONSOLIDATION-1": {
+      "description": "Successful execution of the gateway-to-vault CALL consumes the grouped byte producer through the actual bytes[] ABI and vault body. The result derives configured-gateway authorization, exact fee and one width-valid source/target request per decoded pair, with the same consumer world and static/value-call trace. Failed vault calls restore the caller world before value transfer. Full gateway-entry and producer-memory correspondence remain open.",
+      "model": "Source gateway-to-vault call frame using corrected Solidity bytes[] ABI, actual fee STATICCALL and request CALLs in the existing live world",
+      "theorems": [
+        "LidoSRv3.Audit.Guarantees.PConsolidation1.actual_gateway_vault_requests",
+        "LidoSRv3.Audit.Guarantees.PConsolidation1.actual_gateway_vault_failure_restores"
+      ],
+      "covered": [
+        "The high-level call checks code presence and uses the concrete a75ac640 selector and corrected offset-table/padded bytes[] encoder. The vault interpreter consumes that calldata and the actually credited world.",
+        "Configured gateway authorization is independent of request.caller. Fee is read by STATICCALL; checked fee multiplication, exact value and per-pair source/target width guards precede the request CALLs.",
+        "Successful execution connects the decoded requests, actual consumer world and complete static/CALL trace. Source custom-error payloads and panic bytes are encoded in the runtime; outer failure rolls back the whole vault call frame.",
+        "The byte producer is preparePairBytes on grouped source/target bytes, not an independently supplied Nat identity. No separate vault success, funding, positive fee, callee frame or array-width premise is supplied."
+      ],
+      "missing": [
+        "Full gateway entry: role/pause and deposit preconditions, locator/withdrawal credentials, witness validation, quota, count and fee lookup, actual producer allocation and refund composition.",
+        "Initialization must bind immutable configuration and producer memory extents; the existing ABI round trip requires these bounds. The current public result identifies the actually decoded arrays, without silently equating arbitrary unbounded producer arrays with their encoded/decoded representation.",
+        "Malformed ABI elements are decoded eagerly here, while Solidity accesses them lazily after the fee read. Exact failure precedence/traces on malformed calldata and deployed LOG topics/data remain open.",
+        "The inherited low-level primitive treats code-less targets as EOAs and does not dispatch precompiles. The real EIP7251 body and its physical queue are not supplied by this public consumer; no simplified predeploy or arbitrary-callee balance frame is promoted to deployed correspondence."
+      ],
+      "conditions": [
+        "Successful actual invocation is the sole execution premise; all guards and successful internal stages in the result are derived.",
+        "Gateway and inbox configuration are parameters awaiting constructor/deployment binding; the arbitrary callee operates under the declared live-world CALL/STATICCALL semantics.",
+        "The historical vault model and its gateway-admitted-nonzero premise remain separate conditional evidence. The new consumer neither assumes a positive fee nor targets equality with that historical model."
+      ],
+      "assumptions": [
+        "A-SOURCE-SHAPED",
+        "A-VERITY-SCAFFOLD",
+        "A-SOLC-TRUSTED",
+        "A-RUNTIME-PROVENANCE"
+      ],
+      "outside": [
+        "General compiler correctness, declared Verity semantics, cryptographic primitives, general gas and consensus remain at their accepted boundaries. No stronger premise is accepted under those labels."
+      ]
     }
   }
 }

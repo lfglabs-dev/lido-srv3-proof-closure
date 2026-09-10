@@ -1,3 +1,4 @@
+import LidoSRv3.Audit.Guarantees.PConsolidation1ActualGatewayVault
 import LidoSRv3.Audit.Guarantees.PTopup1ActualBatch
 import LidoSRv3.Audit.Guarantees.PTopup1ActualContinuation
 import LidoSRv3.Audit.Guarantees.PSsz1ActualDeposit

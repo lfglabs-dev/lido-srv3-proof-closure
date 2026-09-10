@@ -1,5 +1,61 @@
 {
   "schema": "lido-srv3-ux2-guarantee-v1",
+  "main_result": {
+    "description": "Successful execution of the gateway-to-vault CALL consumes the grouped byte producer through the actual bytes[] ABI and vault body. The result derives configured-gateway authorization, exact fee and one width-valid source/target request per decoded pair, with the same consumer world and static/value-call trace. Failed vault calls restore the caller world before value transfer. Full gateway-entry and producer-memory correspondence remain open.",
+    "model": "Source gateway-to-vault call frame using corrected Solidity bytes[] ABI, actual fee STATICCALL and request CALLs in the existing live world",
+    "theorems": [
+      {
+        "plane": "source",
+        "role": "registered main source-model result (audit/trio/main-guarantees.json)",
+        "status": "CHECKED",
+        "name": "LidoSRv3.Audit.Guarantees.PConsolidation1.actual_gateway_vault_requests",
+        "module": "LidoSRv3.Audit.Guarantees.PConsolidation1ActualGatewayVault",
+        "file": "LidoSRv3/Audit/Guarantees/PConsolidation1ActualGatewayVault.lean",
+        "start_line": 11,
+        "end_line": 31,
+        "doc": "/-- Actual gateway-to-vault CALL success derives authorization, exact fee,\nwidth-valid decoded requests and the consumer world/trace. Full gateway\nprefix and array-allocation provenance remain internal composition work. -/",
+        "statement": "theorem actual_gateway_vault_requests (callee : External) (sexternal : StaticCall.External)\n    (ctx : Context) (vault gateway inbox : Address) (value : Live.Word)\n    (groups : List WitnessGroupBytes) (before : World) (returned : Bytes)\n    (h : (GatewayCall.execute callee sexternal ctx vault gateway inbox value groups before).outcome = .ok returned) :\n    ctx.self = gateway ∧\n    ∃ sources targets data sats attempts,\n      decodeVaultArgs (gatewayVaultArgs (GatewayCall.sourceArray groups) (GatewayCall.targetArray groups)) = some (sources, targets) ∧\n      sources.length ≠ 0 ∧ sources.length = targets.length ∧\n      lowLevelStaticCall sexternal vault inbox [] (transfer before ctx.self vault value.val) =\n        ⟨.ok data, sats⟩ ∧\n      data.length = 32 ∧ sources.length * (Live.word (decode data)).val = value.val ∧\n      (∀ p ∈ pairsOf sources targets, widthOk p) ∧\n      attempts.map (·.request) = hopRequests ⟨vault, ctx.self⟩ inbox\n        (Live.word (decode data)) (pairsOf sources targets) ∧\n      (GatewayCall.execute callee sexternal ctx vault gateway inbox value groups before).world =\n        (addConsolidationRequestsLoop callee ⟨vault, ctx.self⟩ inbox (Live.word (decode data))\n          (pairsOf sources targets) (transfer before ctx.self vault value.val)).world ∧\n      (GatewayCall.execute callee sexternal ctx vault gateway inbox value groups before).attempts =\n        [⟨⟨ctx.self, vault, value,\n          gatewayVaultCalldata GatewayCall.selector (GatewayCall.sourceArray groups) (GatewayCall.targetArray groups)⟩,\n          true, [], sats ++ GatewayCall.callTrace attempts⟩]"
+      },
+      {
+        "plane": "source",
+        "role": "registered main source-model result (audit/trio/main-guarantees.json)",
+        "status": "CHECKED",
+        "name": "LidoSRv3.Audit.Guarantees.PConsolidation1.actual_gateway_vault_failure_restores",
+        "module": "LidoSRv3.Audit.Guarantees.PConsolidation1ActualGatewayVault",
+        "file": "LidoSRv3/Audit/Guarantees/PConsolidation1ActualGatewayVault.lean",
+        "start_line": 36,
+        "end_line": 41,
+        "doc": "/-- Failure of this actual vault CALL restores the caller world before its\nvalue transfer. This is the call-frame rollback, not the full gateway entry. -/",
+        "statement": "theorem actual_gateway_vault_failure_restores (callee : External) (sexternal : StaticCall.External)\n    (ctx : Context) (vault gateway inbox : Address) (value : Live.Word)\n    (groups : List WitnessGroupBytes) (before : World) (fault : Fault)\n    (h : (GatewayCall.execute callee sexternal ctx vault gateway inbox value groups before).outcome =\n      .error fault) :\n    (GatewayCall.execute callee sexternal ctx vault gateway inbox value groups before).world = before"
+      }
+    ],
+    "covered": [
+      "The high-level call checks code presence and uses the concrete a75ac640 selector and corrected offset-table/padded bytes[] encoder. The vault interpreter consumes that calldata and the actually credited world.",
+      "Configured gateway authorization is independent of request.caller. Fee is read by STATICCALL; checked fee multiplication, exact value and per-pair source/target width guards precede the request CALLs.",
+      "Successful execution connects the decoded requests, actual consumer world and complete static/CALL trace. Source custom-error payloads and panic bytes are encoded in the runtime; outer failure rolls back the whole vault call frame.",
+      "The byte producer is preparePairBytes on grouped source/target bytes, not an independently supplied Nat identity. No separate vault success, funding, positive fee, callee frame or array-width premise is supplied."
+    ],
+    "missing": [
+      "Full gateway entry: role/pause and deposit preconditions, locator/withdrawal credentials, witness validation, quota, count and fee lookup, actual producer allocation and refund composition.",
+      "Initialization must bind immutable configuration and producer memory extents; the existing ABI round trip requires these bounds. The current public result identifies the actually decoded arrays, without silently equating arbitrary unbounded producer arrays with their encoded/decoded representation.",
+      "Malformed ABI elements are decoded eagerly here, while Solidity accesses them lazily after the fee read. Exact failure precedence/traces on malformed calldata and deployed LOG topics/data remain open.",
+      "The inherited low-level primitive treats code-less targets as EOAs and does not dispatch precompiles. The real EIP7251 body and its physical queue are not supplied by this public consumer; no simplified predeploy or arbitrary-callee balance frame is promoted to deployed correspondence."
+    ],
+    "conditions": [
+      "Successful actual invocation is the sole execution premise; all guards and successful internal stages in the result are derived.",
+      "Gateway and inbox configuration are parameters awaiting constructor/deployment binding; the arbitrary callee operates under the declared live-world CALL/STATICCALL semantics.",
+      "The historical vault model and its gateway-admitted-nonzero premise remain separate conditional evidence. The new consumer neither assumes a positive fee nor targets equality with that historical model."
+    ],
+    "assumptions": [
+      "A-SOURCE-SHAPED",
+      "A-VERITY-SCAFFOLD",
+      "A-SOLC-TRUSTED",
+      "A-RUNTIME-PROVENANCE"
+    ],
+    "outside": [
+      "General compiler correctness, declared Verity semantics, cryptographic primitives, general gas and consensus remain at their accepted boundaries. No stronger premise is accepted under those labels."
+    ]
+  },
   "id": "P-CONSOLIDATION-1",
   "position": 10,
   "summary": "source_consolidation_preserves_eligibility_value_atomicity: sourceRun commits iff caller=gateway, nonempty aligned 48-byte keys, product fits, msg.value = count*fee (_requireExactFee). The caller-supplied gateway-admitted-nonzero-value premise (caller=gateway -> msg.value != 0) is threaded into the proof and used: on any run satisfying it, the committed branch's own msg.value = count*fee equality forces fee != 0, so the theorem derives that conjunct instead of leaving the premise unused. Parent-refuting kill-line: fee_blind_commit_kill_line_refutes_parent evaluates the parent's hypothesis-conditioned committed-arm conjunction on the model mutant sourceRunFeeBlind (sourceRun with the exact-fee guard dropped) and falsifies it on a concrete committed batch that SATISFIES the premise (caller=gateway, msg.value=1, fee=0, one valid 48-byte pair): every fee-independent conjunct holds of that commit while fee != 0 fails. Premise-necessity evidence, separately: gateway_admitted_nonzero_kill_line shows that with the premise dropped a free batch (fee=0, msg.value=0) still commits sourceRun; that witness violates the premise, so it refutes only the hypothesis-free projection, not the hypothesis-conditioned parent. Packing-order kill-line: swapped source||target concat fails observe. Verity: if the four memory arrays decode, observe (state.calls/events) equals sourceView of the same sourceRun. Value-bearing CALL lift: the executed transaction credits msg.value at frame entry (credited), debits each journaled CALL (forwardCalls), and proves committed_preserves_eth_balance (post-run vault selfBalance equals the pre-call balance, the pinned preservesEthBalance modifier's assert, vault side) and committed_journal_forwards_msg_value (journal suffix frames are .success CALLs to the request target each carrying the per-request fee, summing to msg.value). Not beacon eligibility and not the Bus. Do not compose with P-CONSOLIDATION-ETH-1. The frame-entry credit is admissibility-guarded: a selfBalance + msg.value that would wrap Uint256 is rejected at entry (ENTRY_CREDIT_OVERFLOW via entry_credit_overflow_reverts) before decode, so committed runs certify a non-wrapping entry credit and fundable per-CALL debits.",

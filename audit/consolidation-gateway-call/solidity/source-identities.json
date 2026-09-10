@@ -1,0 +1,8 @@
+{
+  "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "base_full_sha256": "e7dad85a284b7c07038bff8e936fb677a79b1fa9d2e8b9d628d3a107d9b79489",
+  "vault_source_sha256": "0d13d6a75d690541a7cc2eb399a96dd87bfd908ae0411c80d93bd056d985d298",
+  "copied_modifier_sha256": "81e37903a4a47b31a9b8d327016d193de17a7c6dd59f5c99b37573437b765904",
+  "copied_entry_sha256": "b6591f582e71ee89daa0d7d14730cb8cdf29cd9c4f58cc5dc90c4358d6791481",
+  "scope": "Full unmodified pinned EIP7685 base; exact vault modifier and addConsolidationRequests body copied into minimal constructor harness. Other WithdrawalVault entrypoints, gateway prefix and proxy initialization not executed."
+}
