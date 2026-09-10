@@ -1,0 +1,1 @@
+python-quality mutants ok: pinned baseline, new dense function, new long script, growth past baseline, stale row, retired-but-listed row, malformed row, missing baseline, baseline rewrite, nested directories, an un-pinned improvement, scope-qualified and nested definitions, module-level lambdas, body-only traversal, and the branch metric
