@@ -1,0 +1,34 @@
+{
+  "source": "80f391eedea92824327edefffe3f75635e1d271e",
+  "main_base": "3b818d143fc7ef730d8b249f333d11c4251ef898",
+  "union": "476abdbe1fb7b9b14c0162b484e91cd50ea534af",
+  "source_review": "CLEAN full source/Solidity/IR retained verbatim",
+  "AllTrust": {
+    "command": "lake build LidoSRv3.Audit.AllGuarantees LidoSRv3.Audit.Trust",
+    "exit": 0,
+    "jobs": 1704
+  },
+  "trust": {
+    "command": "python3 scripts/check_trust_axioms.py",
+    "exit": 0,
+    "exact_axioms": 29,
+    "dependencies_recomputed": true,
+    "native_claims_reevaluated": true
+  },
+  "registered_scoped_sets": 26,
+  "source_bodies": 4,
+  "source_artifacts": 23,
+  "local_imported_sources": 115,
+  "package_pins": 11,
+  "pinned_solidity_bodies": 6,
+  "compiler_inputs": 7,
+  "fresh_solidity_execution_in_integration": false,
+  "sha256": {
+    "audit/deposit-actual-module-call/integration/README.md": "8670342773ac705367d4d7e4c030e122f2e7b908e84ca965ced3e9700491558f",
+    "audit/deposit-actual-module-call/integration/all-trust-build.log": "dc263ba46671f1cc2ae86a3cfc79a1db049865bb503515860c63187659d6f07d",
+    "audit/deposit-actual-module-call/integration/independent-source-review-80f3.md": "bbbae7d7fe72d662f2c6b2a53ee3f343e8b17ce42199440c509dce11efea8181",
+    "audit/deposit-actual-module-call/integration/scoped-axiom-check.log": "1035f10cdad426abf543aaea7890d6891158657f9361d02fdd69c8c7ed97f378",
+    "audit/deposit-actual-module-call/integration/scoped-axioms.json": "a1b822cf0827124d60212250b067723ec88ca41f7c78fb8de7021869574e29ed",
+    "audit/deposit-actual-module-call/integration/trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439"
+  }
+}

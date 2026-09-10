@@ -92,7 +92,10 @@ default package while P-DEPOSIT-1 integration consumes the theorem. -/
 lean_lib «TrioDepositCommitted» where
   roots := #[`audit.trio.deposit.LiveBeaconCommitted,
     `audit.trio.deposit.Tests.Verity.LiveBeaconCommitted]
-  globs := #[.one `audit.trio.deposit.Deposit,
+  globs := #[.one `audit.trio.deposit.ModuleCall,
+    .one `audit.trio.deposit.ModulePhysicalMetadata,
+    .one `audit.trio.deposit.Tests.Verity.ModulePhysicalMetadataTest,
+    .one `audit.trio.deposit.Deposit,
     .one `audit.trio.deposit.RouterDeposit,
     .one `audit.trio.deposit.WithdrawDepositableEther,
     .one `audit.trio.deposit.LiveBeacon,
