@@ -1,3 +1,4 @@
+import LidoSRv3.Tests.TopupRootCallEffectsRegression
 import Tests.Verity.ReportFeeCastInvariantTest
 import LidoSRv3.Audit.Guarantees.PTopup2ModuleFailure
 import Tests.Verity.ReportFeeMintTest
@@ -695,3 +696,10 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms AccountAddress.Tests.Verity.ReportFeeCastInvariantTest.module_slot_collision
 #print axioms AccountAddress.Tests.Verity.ReportFeeCastInvariantTest.router_slot_collision
 #print axioms AccountAddress.Tests.Verity.ReportFeeCastInvariantTest.actual_positive_mint_casts
+
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.actual_root_module_batch_effects
+#print axioms LidoSRv3.Audit.Source.TopupRootCallEffects.run_success
+#print axioms LidoSRv3.Tests.TopupRootCallEffectsRegression.zero_keeps_actual_module_effects
+#print axioms LidoSRv3.Tests.TopupRootCallEffectsRegression.positive_batch_joint_consumer
+#print axioms LidoSRv3.Tests.TopupRootCallEffectsRegression.positive_physical_balances_and_count
+#print axioms LidoSRv3.Tests.TopupRootCallEffectsRegression.actual_reply_above_cap_restores

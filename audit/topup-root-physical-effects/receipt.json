@@ -1,0 +1,54 @@
+{
+  "schema": "lido-topup-root-physical-effects-v1",
+  "created_utc": "2026-09-10T21:31:31.238307+00:00",
+  "base": "09a09ad875f8e1519586a04932efd4dbacdf713f",
+  "source_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "public_theorem": "LidoSRv3.Audit.Guarantees.PTopup1.actual_root_module_batch_effects",
+  "scope": "Success of existing actual root/module batch composes same authenticated rows and actual reply with exact mathematical sum and zero/positive physical continuation. No new executor or public premise.",
+  "build": {
+    "command": "lake build LidoSRv3.Tests.TopupRootCallEffectsRegression",
+    "exit_code": 0,
+    "jobs": 1305,
+    "unchanged_dependency_cache_reused": true
+  },
+  "kernel_regressions": 12,
+  "public_consumer_instantiations": 2,
+  "source_identities": 1288,
+  "package_pins": {
+    "verity": "e977aaad6e1a9e92e0132d41b3d33a14135a4d46",
+    "evmyul": "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9",
+    "mathlib": "fabf563a7c95a166b8d7b6efca11c8b4dc9d911f",
+    "plausible": "63045536fe95024e6c18fc7b48e03f506701c5bc",
+    "LeanSearchClient": "c5d5b8fe6e5158def25cd28eb94e4141ad97c843",
+    "importGraph": "5c7542ed018c78194f1e2b903eaf6a792b74c03d",
+    "proofwidgets": "24b0d9dc081c5423f8eec7e866c441e5184f29d9",
+    "aesop": "e3cb2f741431ce31bf73549fb52316a57368b06f",
+    "Qq": "f46324995fca5f0483b742e4eb4daec7f4ee50d2",
+    "batteries": "fa08db58b30eb033edcdab331bba000827f9f785",
+    "Cli": "92564e5770e4d09f2d86dfbf8ada1e9c715b384c"
+  },
+  "scoped_axiom_sets": 14,
+  "new_axioms": 0,
+  "solidity": {
+    "fresh_run": false,
+    "reused_compiler_source_fixture_identities": 45,
+    "inherited_receipts": 3,
+    "new_compiled_composition_refinement": false
+  },
+  "sha256": {
+    "LidoSRv3/Audit/Source/TopupRootCallEffects.lean": "2b84a3ca29f4dd69508d5b08315355b93693f81bafedc63a94c0ec97135d4c5a",
+    "LidoSRv3/Audit/Guarantees/PTopup1RootCalls.lean": "419ee3dcbf5fa4aa33f6c3bdd53c21c6ebfb995cb11cb86ef6827d19a951d956",
+    "LidoSRv3/Tests/TopupRootCallEffectsRegression.lean": "179a55c67ceb7bc4196f869d058c4007cafe2fd049350ea58612918db5fc1ee2",
+    "audit/topup-root-physical-effects/README.md": "e3b0d86cea5bcaeffb800cba7f36c06332cb97dde091bf7e69c7415cf51bb1ba",
+    "audit/topup-root-physical-effects/axioms.json": "5991c8023e23794996547aa319ef8b51a67382543b595c933f244c14f74b28b4",
+    "audit/topup-root-physical-effects/check_inherited.py": "5eb4eb006ba05ede26ac7c611b6cda2fe69374b253d2c0a7255b5c17c1eea3ce",
+    "audit/topup-root-physical-effects/inherited-check.log": "c8ea558aea9d294ae7d72ff6dd7b989c32a5eac7c272de866038131cb1bfd5ca",
+    "audit/topup-root-physical-effects/inherited-validation.json": "9619a0bc11d763f3c4411a9e5dab2a1581fc8eca702021839b672c1c43b17c85",
+    "audit/topup-root-physical-effects/source-axiom-check.log": "4da4a3de9449d8796395ee5e38d1c78128d9dbabc750ad0345083206fa7c925f",
+    "audit/topup-root-physical-effects/source-inputs.json": "dd7533775c47326928e0d864c0df0a8af6e87ca451863f69366740c6633b8e80",
+    "audit/topup-root-physical-effects/target-build.log": "ed07c479db3c5fc77a66d7e8bf797d9ee2119a46d106d8f08a29f7ab09ada876",
+    "audit/topup-root-physical-effects/validate.py": "aba0f67497a946a645ca5805303fcece3531fe930934491e01eadf2a34afdd9c",
+    "audit/topup-root-physical-effects/write_receipt.py": "9ddaac7cf392d27c01f93b0044079149e4c2d0b9153cbdeec769640ba207d665"
+  },
+  "status": "Local candidate; independent exact full-source/Solidity review and root facade/Trust integration pending."
+}
