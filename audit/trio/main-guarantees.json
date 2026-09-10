@@ -134,6 +134,36 @@
         "Cross-call accumulation and the last-top-up-state policy are outside this per-batch cap guarantee.",
         "General compiler correctness, the declared Verity semantics, cryptographic primitives, general gas and consensus retain their accepted boundaries. No new or stronger assumption is admitted under these labels."
       ]
+    },
+    "P-SSZ-1": {
+      "description": "A successful deposit CALL in the source interpreter binds the submitted root to the ordered SHA preimages of its actually decoded public key, credentials, signature and msg.value in gwei. The guards derive exact field widths, uint64 amount range and gwei divisibility. The separate CL verifier ABI-frame composition remains open.",
+      "model": "Source deposit CALL/ABI interpreter with forward opaque SHA evaluation; historical synthetic encoding and Nat.pair results are separate",
+      "theorems": [
+        "LidoSRv3.Audit.Guarantees.PSsz1.actual_deposit_call_binds_root"
+      ],
+      "covered": [
+        "The actual CALL dispatcher decodes the same payload and consumes the same transferred value; no independent helper input is supplied.",
+        "The source guard sequence derives 48/32/96-byte widths and an exactly divisible uint64 gwei amount.",
+        "The independently transcribed callee hash chain agrees forward with the depositor helper on those consumed fields, including signature splits, zero padding and little-endian amount."
+      ],
+      "missing": [
+        "The CLValidatorVerifier internal calldata-frame bridge to its existing typed leaf, wrapper and ordered proof branch remains open.",
+        "General malformed deposit-ABI acceptance and exact revert/event byte encodings are not established by the existing source callee interpreter."
+      ],
+      "conditions": [
+        "The existing concrete CALL/ABI source interpreter and physical-world semantics apply; general compiler and declared Verity semantics remain accepted boundaries.",
+        "SHA is the existing opaque function returning exactly 32 bounded bytes. Only forward evaluation is used; no cryptographic injectivity or relation to a separate validator-proof transaction is assumed."
+      ],
+      "assumptions": [
+        "A-SOURCE-SHAPED",
+        "A-VERITY-SCAFFOLD",
+        "A-SOLC-TRUSTED",
+        "A-SHA256-FFI"
+      ],
+      "outside": [
+        "General SHA/precompile correctness, compiler correctness, gas and consensus.",
+        "The full TOPUP or DEPOSIT entry state machine belongs to the respective guarantee; this result binds one successful deposit call."
+      ]
     }
   }
 }
