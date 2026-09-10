@@ -4,14 +4,16 @@ import Verity.Core
 import Verity.Macro
 
 /-!
-# P-ADDRESS-1 executable Verity transactions
+# Legacy P-ADDRESS-1 correspondence facade
 
-The four functions below are the address-bearing, single-item projections of the
-pinned entrypoints listed in `audit/source-map.yaml`.  Unlike the old receipt
-wrapper, admission is computed inside `Contract.run`: the sender, scalar gates,
-and address/uint keyed mappings are read by the program and successful address
-writes are performed with Verity storage primitives.  Boolean parameters stand
-only for non-address arithmetic and external-call results.
+This module is retained because public parent theorems import its original
+source-shaped correspondence. Its Boolean inputs, including external-call and
+allowance facts, are therefore **not** evidence for the live address-call
+claim. The execution-derived replacement is
+`AddressRecipientCallBridge`: it runs the four pinned entrypoint slices over a
+caller/callee world, uses physical slots and ABI frames, and obtains failures
+from the callee rather than from Boolean inputs. P-ADDRESS remains open until
+the public parent can be migrated off this compatibility facade.
 -/
 
 namespace LidoSRv3.Audit.Verity.AddressTx
