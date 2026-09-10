@@ -31,12 +31,10 @@ abbrev Exec := LidoSRv3.Audit.Source.TrioReserve1.Live.Exec
 abbrev Address := _root_.Verity.Address
 abbrev Bytes := LidoSRv3.Audit.Source.TrioReserve1.Live.Bytes
 
-/-- `keccak256("lido.WithdrawalQueue.requestsByOwner")`: the source's
-owner-indexed `EnumerableSet.UintSet` root. -/
-def ownerRequestIndexPosition : Nat :=
-  0x4b9bfe0774f05ab288bd50bd23f74ae80a797f1d0c82d419d43ebda4fdc2fe1f
+/-- Aliases for the base module's physical owner-set root and key. -/
+def ownerRequestIndexPosition : Nat := requestsByOwnerPosition
 def ownerRequestKey (owner : Address) (requestId : Nat) : Uint256 :=
-  .ofNat (owner.toNat * 2 ^ 128 + requestId)
+  requestByOwnerKey owner requestId
 
 /-- Execute a first-class CALL with the supplied ABI bytes.  The live helper
 only accepts a selector, while the token entrypoints below have real argument
@@ -67,14 +65,7 @@ def claimStorage (ctx : Context) (requestId hint : Nat) (recipient : Address) :
   -- do not calculate a prospective payout before it has checked finalization,
   -- ownership, and hints.
   match claimOne requestId hint recipient before with
-  | .success payout after =>
-      let owner := requestOwner (requestMetadataWord before requestId)
-      if (before.readMapUint ownerRequestIndexPosition
-        (ownerRequestKey owner requestId)).val = 0 then
-        ⟨.error (.reason "OwnerRequestSetInvariant"), world, []⟩
-      else
-        ⟨.ok payout, { world with core := after.writeMapUint ownerRequestIndexPosition
-          (ownerRequestKey owner requestId) 0 }, []⟩
+  | .success payout after => ⟨.ok payout, { world with core := after }, []⟩
   | .revert reason _ => ⟨.error (.reason reason), world, []⟩
 
 /-- Exact `WithdrawalQueueBase._sendValue` call frame (lines 475--480): it is
@@ -160,9 +151,7 @@ def claimBridgeContext : Context := ⟨(99 : Address), (1 : Address)⟩
 separate account-balance world for the actual CALL. -/
 def claimBridgeWorld : World :=
   { core := { twoClaimState with
-      codeSize := fun address => if address = (2 : Address).toNat then 1 else 0 } |>.writeMapUint
-        ownerRequestIndexPosition (ownerRequestKey (1 : Address) 1) 1 |>.writeMapUint
-          ownerRequestIndexPosition (ownerRequestKey (1 : Address) 2) 1
+      codeSize := fun address => if address = (2 : Address).toNat then 1 else 0 }
     balances := fun address => if address = claimBridgeContext.self then 70 else 0 }
 
 /-- End-to-end receipt for the smallest recipient bridge.  The storage claim,

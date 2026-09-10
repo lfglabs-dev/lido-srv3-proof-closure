@@ -44,6 +44,13 @@ def lastCheckpointIndexPosition : Nat :=
   0x9d8be19d6a54e40bd767aa61b0f462241f5562ef6967d7045485bccac825b240
 def lockedEtherAmountPosition : Nat :=
   0x0e27eaa2e71c8572ab988fef0b54cd45bbd1740de1e22343fb6cda7536edc12f
+def requestsByOwnerPosition : Nat :=
+  0x4b9bfe0774f05ab288bd50bd23f74ae80a797f1d0c82d419d43ebda4fdc2fe1f
+
+/-- Lens key for an owner-indexed request-set member.  The source assertion
+at WithdrawalQueueBase.sol:470 is represented by its nonzero index. -/
+def requestByOwnerKey (owner : Address) (requestId : Nat) : Uint256 :=
+  .ofNat (owner.toNat * 2 ^ 128 + requestId)
 
 /-- Physical keccak slot of `queue[requestId]` word 0:
 `keccak256(abi.encode(requestId, queuePosition))`. -/
@@ -144,6 +151,9 @@ def claimOne (requestId hint : Nat) (_recipient : Address) : Contract Nat := fun
   else if requestId > lastFinalized then .revert "RequestNotFoundOrNotFinalized" state
   else if request.claimed then .revert "RequestAlreadyClaimed" state
   else if request.owner != sender then .revert "NotOwner" state
+  else if (state.readMapUint requestsByOwnerPosition
+    (requestByOwnerKey request.owner requestId)).val = 0 then
+    .revert "OwnerRequestSetInvariant" state
   else if hint = 0 || hint > lastCheckpoint then .revert "InvalidHint" state
   else if requestId < request.checkpointFrom then .revert "InvalidHint" state
   else if hint < lastCheckpoint && nextCheckpointFrom ≤ requestId then
@@ -158,9 +168,10 @@ def claimOne (requestId hint : Nat) (_recipient : Address) : Contract Nat := fun
         if payout > locked then .revert "LockedEtherUnderflow" state
         else
           let dirty :=
-            (state.writeMapUint (queuePosition + 1) (.ofNat requestId)
-              (markClaimed (requestMetadataWord state requestId))).writeSlot
-                lockedEtherAmountPosition (.ofNat (locked - payout))
+            ((state.writeMapUint (queuePosition + 1) (.ofNat requestId)
+              (markClaimed (requestMetadataWord state requestId))).writeMapUint
+                requestsByOwnerPosition (requestByOwnerKey request.owner requestId) 0).writeSlot
+                  lockedEtherAmountPosition (.ofNat (locked - payout))
           .success payout dirty
 
 def claimLoop : List Nat → List Nat → Address → Contract Unit
@@ -208,6 +219,8 @@ def twoClaimState : ContractState :=
     (packMetadata (1 : Address) 100 false 90)
   let state := state.writeMapUint (queuePosition + 1) 2
     (packMetadata (1 : Address) 101 false 90)
+  let state := state.writeMapUint requestsByOwnerPosition (requestByOwnerKey (1 : Address) 1) 1
+  let state := state.writeMapUint requestsByOwnerPosition (requestByOwnerKey (1 : Address) 2) 1
   let state := state.writeMapUint checkpointsPosition 1 1
   state.writeMapUint (checkpointsPosition + 1) 1 (.ofNat E27)
 
