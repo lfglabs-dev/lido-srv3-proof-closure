@@ -97,6 +97,7 @@ lean_lib «TrioDepositCommitted» where
     .one `audit.trio.deposit.WithdrawDepositableEther,
     .one `audit.trio.deposit.LiveBeacon,
     .one `audit.trio.deposit.WithdrawalLedger,
+    .one `audit.trio.deposit.PhysicalMetadata,
     .one `audit.trio.deposit.LiveBeaconCommitted,
     .one `audit.trio.deposit.Tests.Verity.LiveBeaconCommitted]
 
