@@ -85,3 +85,15 @@ proof. The universal successful bound is the Lean theorem just identified.
 Registry generation and its mutation checks are rerun for this candidate.
 Other guarantees and their limitations are preserved. This dossier is
 evidence for the structured roadmap, not a second delivery queue.
+
+## Exact-candidate review correction
+
+The first exact review accepted the unchanged proof and necessary source
+connection but rejected candidate `131ae229` because the exported summary,
+classification and next gate still described the historical allocator. The
+corrected exporter derives those display fields from a main result with no
+missing internal obligation. It preserves the original three fields under
+`legacy_display` and explicitly labels the retained theorem pair, fidelity
+and boundary fields as historical model evidence. Other records are unchanged.
+The full rejection is retained in `first-candidate-review.md`; this correction
+requires a new exact-candidate review before integration.
