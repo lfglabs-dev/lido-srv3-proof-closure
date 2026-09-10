@@ -1,0 +1,37 @@
+{
+  "LidoSRv3.Audit.Guarantees.PConsolidationEth1.actual_settlement_requests": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.ConsolidationSettlementRequestsRegression.actual_bytes_decode": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.ConsolidationSettlementRequestsRegression.actual_two_requests_joint_consumer": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.ConsolidationSettlementRequestsRegression.changed_inner_fee_rejects_and_restores": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.ConsolidationSettlementRequestsRegression.decoded_loop_and_refund_effects": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.ConsolidationSettlementRequestsRegression.distinct_fee_read_worlds": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.ConsolidationSettlementRequestsRegression.rejected_refund_restores_inbox_effects": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.ConsolidationSettlementRequestsRegression.zero_refund_joint_consumer": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "audit.trio.consolidation.SettlementRequests.execute_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ]
+}

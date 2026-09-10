@@ -1,0 +1,8 @@
+{
+  "base": "70301660264f2f710e7160e190aaa3af330e84fa",
+  "path": "audit/trio/account-address/ReportFeeMint.lean",
+  "base_sha256": "0876f53edde2fbb6742fa4ac1e49b01071d14ccf54896165299264be9fca05c0",
+  "current_sha256": "93be9d8f39fd3907796f8bb66b9fc67c5fc681c1f88dec1c70fc6a9b573455e6",
+  "removed_new_theorem_block_bytes": 5126,
+  "all_previous_bytes_identical": true
+}
