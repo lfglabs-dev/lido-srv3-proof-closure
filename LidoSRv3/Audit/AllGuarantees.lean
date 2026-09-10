@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Guarantees.PTopup1ActualContinuation
+import LidoSRv3.Audit.Guarantees.PSsz1ActualDeposit
 import LidoSRv3.Audit.Guarantees.PDeposit1ActualPipeline
 import LidoSRv3.Audit.Guarantees.PAlloc1
 import LidoSRv3.Audit.Guarantees.PAlloc2

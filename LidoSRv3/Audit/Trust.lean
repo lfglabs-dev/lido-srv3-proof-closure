@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Guarantees.PTopup1ActualContinuation
+import LidoSRv3.Audit.Guarantees.PSsz1ActualDeposit
 import LidoSRv3.Audit.Guarantees.PDeposit1ActualPipeline
 import LidoSRv3.Audit.Source.TrioAlloc1.Determinism
 import LidoSRv3.Audit.Source.TrioAlloc1.CapacitySpec
@@ -630,3 +631,4 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.actual_live_pipeline_conservation
 
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.actual_continuation_conserves
+#print axioms LidoSRv3.Audit.Guarantees.PSsz1.actual_deposit_call_binds_root
