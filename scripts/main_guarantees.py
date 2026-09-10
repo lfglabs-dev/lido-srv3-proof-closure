@@ -20,6 +20,6 @@ def main_record(identifier: str, context: dict, theorem_record, fail) -> dict:
 def load_main(root):
     import json
     main = json.loads((root / "audit/trio/main-guarantees.json").read_text())
-    if main.get("schema") != 1 or set(main.get("guarantees", {})) != {"P-ALLOC-1", "P-ALLOC-2", "P-RESERVE-1"}:
-        raise ValueError("main source-model registry must contain exactly the trio")
+    if main.get("schema") != 1 or set(main.get("guarantees", {})) != {"P-ALLOC-1", "P-ALLOC-2", "P-RESERVE-1", "P-TOPUP-2"}:
+        raise ValueError("main source-model registry must contain the accepted trio and the registered actual TOPUP-2 value path")
     return main["guarantees"]

@@ -16,7 +16,7 @@ At core `17005714f151e5502c559932319a3f2f74ac2436`:
 | Gateway limits reach the module | `TopUpGateway.sol` 163–236; the accepted `TopupGatewayWitnessBatch.loop` produces the keys and limits consumed by `TopupBatchConsumer.moduleInput`, then `TopupModuleCall.execute`. |
 | Cap and conversion are the stored values | `SRTypes.RouterState`, slot 5, uint64 at bit 24; `StakingRouter.sol` 696–709. `blockCap` reads that word, `target` applies the minimum and Gwei rounding, and `target_bound` derives the width and cap bound. |
 | The actual reply is bounded | `StakingRouter.sol` 717–743. `run_success_bound` obtains the real raw CALL result and decode from `module_execute_success`, derives the exact mathematical sum using the gateway count/limit invariants, and applies the executed target guard. |
-| Public consumer | `LidoSRv3.Audit.Guarantees.PTopup2.actual_module_batch_bound` directly consumes the preceding source theorem. The historical abstract allocator theorem and identifiers remain available. |
+| Public consumer | `LidoSRv3.Audit.Guarantees.PTopup2.actual_module_batch_bound` directly consumes the preceding source theorem. It is imported by `AllGuarantees`, queried by `Trust`, and registered as the current source result for P-TOPUP-2 in `audit/trio/main-guarantees.json`; UX2 resolves its complete declaration. The historical abstract/Verity theorem pair and all eleven IDs remain available. |
 
 The preceding module-allocation result is an arbitrary uint256: the minimum
 proves the cap for **every** result of that preceding computation. This avoids
@@ -26,9 +26,12 @@ This is the value path, not a complete public-entry simulation. The caller
 supplies typed witness rows, credential/root configuration and the starting
 world. Role/pause/timing/root-age and router admission, the source view-call
 prefix, public ABI admission and final gateway history writes have not yet
-been connected to this executor. The public Verity simulation still uses the
-historical abstract allocator; connecting the actual consumer to that registered
-simulation remains necessary. `TopupModuleCall`'s documented no-code attempt
+been connected to this executor. The older Verity simulation still uses the
+historical abstract allocator and is labeled separately from the current source
+result. No equality between that greedy policy and arbitrary module-selected
+allocations is asserted: it is not a property of the pinned Solidity. The
+required remaining connection is from the actual full entry execution to this
+same-world value path. `TopupModuleCall`'s documented no-code attempt
 and decoder allocation-error differences remain unresolved wherever exact
 observable failure behavior is claimed. These omissions are not discharged by
 this successful-batch bound. The existing independent module and withdrawal
