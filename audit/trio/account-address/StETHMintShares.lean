@@ -46,9 +46,15 @@ structure State where
   only at `totalSharesPosition`; `shares` remains a Solidity mapping below. -/
   storage : Core
   shares : Shares
-  accounting : Nat
-  steth : Nat
-  stopped : Bool
+  /-- Result of `Lido._getLidoLocator().accounting()` at Lido.sol:1422-1427.
+The locator call is external; its resolved address is part of the call-world,
+not a fabricated storage slot. -/
+  locatorAccounting : Nat
+  /-- `address(this)` in StETH.sol:520. -/
+  selfAddress : Nat
+  /-- `Pausable.ACTIVE_FLAG_POSITION.getStorageBool()` at Pausable.sol:18-19.
+`true` is the source active flag, so minting requires it directly. -/
+  activeFlag : Bool
 
 inductive Error where
   | notAccounting
@@ -136,10 +142,10 @@ def pooledEthByShares (s : State) (amount : Nat) : Except Error Nat :=
 check is represented by `newTotal < 2^128`; the high half of the existing
 unstructured word is retained by `setLowUint128`. -/
 def mintShares (caller recipient amount : Nat) (before : State) : Outcome :=
-  if caller != before.accounting then .reverted .notAccounting before
-  else if before.stopped then .reverted .stopped before
+  if caller != before.locatorAccounting then .reverted .notAccounting before
+  else if !before.activeFlag then .reverted .stopped before
   else if recipient = 0 then .reverted .mintToZeroAddr before
-  else if recipient = before.steth then .reverted .mintToStethContract before
+  else if recipient = before.selfAddress then .reverted .mintToStethContract before
   -- `_getTotalShares().add(_sharesAmount)`, before the high-half check.
   else if totalShares before + amount > uint256Max then .reverted .safeMathAddOverflow before
   else if totalShares before + amount ≥ two128 then .reverted .sharesOverflow before
@@ -172,7 +178,7 @@ def mintCommittedFee (L : Layout) (registeredIds : List Nat) (core : Core)
   | .error _ => none
   | .ok fee =>
       if 0 < fee.sharesToMintAsFees then
-        some (mintShares before.accounting before.accounting fee.sharesToMintAsFees before)
+        some (mintShares before.locatorAccounting before.locatorAccounting fee.sharesToMintAsFees before)
       else some (.committed before [])
 
 theorem totalShares_setLowUint128 (word : StorageWord) (value : Nat) (h : value < two128) :

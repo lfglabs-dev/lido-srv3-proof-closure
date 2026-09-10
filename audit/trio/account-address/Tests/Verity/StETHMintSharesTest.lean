@@ -20,9 +20,9 @@ private def before : State := {
       have : 4 * two128 + 10 < two256 := by decide
       exact this⟩
   shares := fun account => if account = 7 then 5 else 0
-  accounting := 7
-  steth := 8
-  stopped := false
+  locatorAccounting := 7
+  selfAddress := 8
+  activeFlag := true
 }
 
 /-- Lido's emission reads the post-mint rate: `(2 * 100) / (12 - 4) = 25`.
@@ -40,8 +40,8 @@ example : match mintShares 7 7 2 before with
 example : mintShares 6 0 1 before = .reverted .notAccounting before := by decide
 
 /-- `_whenNotStopped` runs before `_mintShares`' recipient checks. -/
-example : mintShares 7 0 1 { before with stopped := true } =
-    .reverted .stopped { before with stopped := true } := by decide
+example : mintShares 7 0 1 { before with activeFlag := false } =
+    .reverted .stopped { before with activeFlag := false } := by decide
 
 /-- `_getTotalShares().add` reverts before the high-half mask check. -/
 example : mintShares 7 7 uint256Max before = .reverted .safeMathAddOverflow before := by decide

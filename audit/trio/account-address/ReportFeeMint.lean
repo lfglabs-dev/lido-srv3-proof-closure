@@ -102,7 +102,7 @@ private def checkedFeeProductsFromCommittedGetter (r : ReportWei) (d : Distribut
 revert the enclosing report transaction is rolled back to its entry world. -/
 private def mintCommittedFee (before : World) (fee : FeeResult) : Outcome :=
   if 0 < fee.sharesToMintAsFees then
-    match mintShares before.steth.accounting before.steth.accounting
+    match mintShares before.steth.locatorAccounting before.steth.locatorAccounting
         fee.sharesToMintAsFees before.steth with
     | .reverted e _ => .reverted (.mint e) before
     | .committed steth events => .committed { before with steth } fee events
@@ -134,8 +134,8 @@ theorem committed_nonzero_mint_uses_fee_result (x : Input) (before post : World)
     (fee : FeeResult) (events : List Event)
     (h : handleOracleReportFromCommittedFeeProducts x before = .committed post fee events)
     (hfee : 0 < fee.sharesToMintAsFees) :
-    ∃ pooled, events = [.transfer 0 before.steth.accounting pooled,
-      .transferShares 0 before.steth.accounting fee.sharesToMintAsFees] := by
+    ∃ pooled, events = [.transfer 0 before.steth.locatorAccounting pooled,
+      .transferShares 0 before.steth.locatorAccounting fee.sharesToMintAsFees] := by
   unfold handleOracleReportFromCommittedFeeProducts at h
   split at h
   · cases h

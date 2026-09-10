@@ -118,8 +118,8 @@ theorem committed_fee_mint_consumes_checked_result
     (h : AccountAddress.ReportFeeMint.handleOracleReportFromCommittedFeeProducts x before =
       .committed post fee events)
     (hfee : 0 < fee.sharesToMintAsFees) :
-    ∃ pooled, events = [.transfer 0 before.steth.accounting pooled,
-      .transferShares 0 before.steth.accounting fee.sharesToMintAsFees] :=
+    ∃ pooled, events = [.transfer 0 before.steth.locatorAccounting pooled,
+      .transferShares 0 before.steth.locatorAccounting fee.sharesToMintAsFees] :=
   AccountAddress.ReportFeeMint.committed_nonzero_mint_uses_fee_result
     x before post fee events h hfee
 
