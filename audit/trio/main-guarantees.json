@@ -3,7 +3,7 @@
   "authority": "Main website claims registered against existing composed source-model theorems. The historical abstract/verity pairs remain available; they do not establish these new claims. No proof status or deployment claim is promoted by this registry.",
   "guarantees": {
     "P-ALLOC-1": {
-      "description": "The modeled router calculates each active module’s capacity from its target share and available headroom. Inactive modules receive no additional capacity. For successful execution under the stated storage, memory and arithmetic conditions, the resulting allocation and capacity lists match the independent mathematical specification.",
+      "description": "The modeled router calculates each active module\u2019s capacity from its target share and available headroom. Inactive modules receive no additional capacity. For successful execution under the stated storage, memory and arithmetic conditions, the resulting allocation and capacity lists match the independent mathematical specification.",
       "model": "Source execution model with a Verity external-call interpretation",
       "theorems": [
         "LidoSRv3.Audit.Source.TrioAlloc1.Relational.producer_iff",
@@ -14,7 +14,7 @@
       "covered": [
         "Storage-backed module reads, response-dependent calls and checked calculations follow the modeled source order.",
         "Successful capacity calculations match the independent capacity specification and produce the corresponding memory arrays.",
-        "The Verity call interpreter matches the producer’s return or error and module-call observations; static calls preserve its world."
+        "The Verity call interpreter matches the producer\u2019s return or error and module-call observations; static calls preserve its world."
       ],
       "missing": [
         "The compiler interpretation of memory operations and the effects of omitted internal writes remain assumptions.",
@@ -102,6 +102,133 @@
       ],
       "outside": [
         "Compiled and deployed bytecode, gas costs and full consensus-state truth."
+      ]
+    },
+    "P-TOPUP-2": {
+      "description": "For a successful gateway witness and router module batch in the source model, the allocations decoded from the actual module reply sum to at most the router\u2019s packed per-block cap, converted from gwei to wei. The same executed witness loop supplies the keys and per-key limits consumed by that call. Full gateway entry correspondence remains open.",
+      "model": "Source execution model using Verity physical contract storage and concrete raw module calls; the historical greedy Contract.run allocator is separate",
+      "theorems": [
+        "LidoSRv3.Audit.Guarantees.PTopup2.actual_module_batch_bound"
+      ],
+      "covered": [
+        "The actual gateway length guards and witness loop produce the keys and wei limits consumed by the actual module call and its decoder.",
+        "The router reads its uint64 cap from packed storage, computes the rounded minimum with the arbitrary preceding module allocation, and checks the module-selected allocations.",
+        "Successful execution derives the allocation-count and arithmetic bounds internally; zero and empty module returns are included. No greedy allocation policy or caller-supplied sum bound is assumed."
+      ],
+      "missing": [
+        "A successful full gateway entry has not yet been connected to this covered value path with the same physical state and ABI-decoded inputs; role, pause, timing and view-call admission still need that connection.",
+        "The old Contract.run allocate/sourceView theorem still executes a separate greedy model and is retained as historical evidence. It does not certify this actual module batch.",
+        "The inherited module call/decode models still have specific no-code-attempt and oversized-return allocation-error differences. Complete source error and observable rollback correspondence is not claimed."
+      ],
+      "conditions": [
+        "The covered value-path executor returns a result whose outcome is successful. Limits, target, cap, exact allocation sum and count bounds are derived from that execution.",
+        "The preceding module-allocation word and both external module/withdrawal interpreters are arbitrary. The claim bounds the decoded module allocations, not arbitrary callee ledger changes."
+      ],
+      "assumptions": [
+        "A-SOURCE-SHAPED",
+        "A-VERITY-SCAFFOLD",
+        "A-SOLC-TRUSTED",
+        "A-RUNTIME-PROVENANCE"
+      ],
+      "outside": [
+        "Cross-call accumulation and the last-top-up-state policy are outside this per-batch cap guarantee.",
+        "General compiler correctness, the declared Verity semantics, cryptographic primitives, general gas and consensus retain their accepted boundaries. No new or stronger assumption is admitted under these labels."
+      ]
+    },
+    "P-DEPOSIT-1": {
+      "description": "For successful execution of the deposit source model with its configured Lido withdrawal pipeline, the actual Lido and beacon calls preserve pointwise ETH accounting from Lido to beacon and restore the router balance. A nonempty successful run derives the configured 32-ether per-key amount from these effects. Full physical prefix and metadata correspondence remains open.",
+      "model": "Source transaction interpreter with source-interpreted Lido withdrawal, raw beacon calls and Verity physical contract storage; allocation/module prefix and metadata remain partial",
+      "theorems": [
+        "LidoSRv3.Audit.Guarantees.PDeposit1.actual_live_pipeline_conservation"
+      ],
+      "covered": [
+        "The root success derives authorization, executed preparation, the actual withdrawal and the beacon-loop effects in the same live world.",
+        "The withdrawal derives available funding and precise debit/credit from success of the called source pipeline. Arbitrary fallback behavior is retained and proved unreachable on the covered getter/receiver routes.",
+        "The final router assertion equates the actual Lido withdrawal with the beacon-loop debit, yielding pointwise conservation and maxEBType1 = 32 ether for nonempty success. No funding, prepared-result, per-key amount or callee-preservation premise is supplied. Zero-key success is included."
+      ],
+      "missing": [
+        "The allocation/module prefix still reads supplied storage/oracle/transcript inputs and an obtainDepositData outcome, rather than the physical live-world module call. Its source guards, ABI, values and consumed state need complete correspondence.",
+        "Physical module metadata writes and event ordering remain open: the source writes before withdrawal, while LiveBeacon.execute assembles separate metadata after the suffix.",
+        "The public facade covers the declared source executor. Actual outer ABI/error bytes and complete observable failure/rollback correspondence remain to be connected. Its supplementary model rollback is not claimed as full Solidity rollback."
+      ],
+      "conditions": [
+        "A successful execution of LiveBeacon.execute with the concrete Pipeline.external source dispatchers. The existing Pipeline.Bound links locator and consensus reads, separates queue/oracle/locator roles, and requires their code to be present in the entry world.",
+        "The Lido and router roles are distinct, and router and beacon roles are distinct. These remain explicit runtime/configuration facts, not invariants established by this increment.",
+        "Source functions and model inputs retain their declared interpretation. The static external interpreter and arbitrary fallback are universally quantified; no new preservation condition on the fallback is imposed."
+      ],
+      "assumptions": [
+        "A-SOURCE-SHAPED",
+        "A-VERITY-SCAFFOLD",
+        "A-SOLC-TRUSTED",
+        "A-RUNTIME-PROVENANCE"
+      ],
+      "outside": [
+        "General compiler correctness, the declared Verity semantics, cryptographic primitives, general gas and consensus retain their accepted boundaries. No stronger source/ABI/storage/call premise is hidden in them.",
+        "The historical abstract/Verity theorem pair remains separate model evidence and is not required to equal this source executor."
+      ]
+    },
+    "P-TOPUP-1": {
+      "description": "Successful execution of the source router continuation after its module call transfers the guarded total from Lido to beacon in the same live ledger and restores the router balance. Positive success derives the exact allocation sum and nonempty keys. The full gateway/router entry connection remains open. The actual batch consumer also derives the zero/positive continuation at the exact mathematical sum of its decoded allocations, with no new bound or sub-stage premise.",
+      "model": "Source post-module router continuation with concrete Lido withdrawal and beacon calls in Verity physical storage and a live balance ledger",
+      "theorems": [
+        "LidoSRv3.Audit.Guarantees.PTopup1.actual_continuation_conserves",
+        "LidoSRv3.Audit.Guarantees.PTopup1.actual_module_batch_effects"
+      ],
+      "covered": [
+        "The executed router guards bound the pulled word; the concrete withdrawal derives funding and its exact transfer without an arbitrary-callee frame premise.",
+        "Actual beacon helper debits and the final router assertion force the withdrawn total to equal the actual sent value, including rejection of the empty-key positive path.",
+        "Positive success derives the exact mathematical allocation sum, nonempty keys and pointwise Lido-to-beacon conservation. Zero total keeps its source early path and final router event.",
+        "The actual gateway witness/count and wei-limit bounds connect the exact mathematical sum of decoded module allocations to the executed zero/positive continuation. Zero total preserves the module-returned storage and balances, emits the source router event and adds no withdrawal/beacon attempts."
+      ],
+      "missing": [
+        "Full gateway/router entry, actual module-prefix effects and its connection to the continuation remain open; the theorem begins at the post-module state.",
+        "Exact outer Lido ABI/error bytes and full-entry observable rollback are not established by this result.",
+        "Connecting the same module-returned world to the necessary live ledger still requires deriving its Pipeline.Bound bindings through the preceding module call; the registered batch effects do not establish that invariant."
+      ],
+      "conditions": [
+        "Existing Pipeline.Bound supplies physical locator/consensus bindings, code presence and configuration separation at the continuation entry. Initialization and preservation through the preceding module call are not derived here.",
+        "Distinct Lido/router and router/beacon roles. No funding, initial beacon capacity, matching helper lengths, amount admission, successful sub-stage or callee balance-preservation premise.",
+        "Existing source CALL/ABI and declared Verity semantics apply; SHA, general compiler, gas and consensus boundaries are unchanged."
+      ],
+      "assumptions": [
+        "A-SOURCE-SHAPED",
+        "A-VERITY-SCAFFOLD",
+        "A-SOLC-TRUSTED",
+        "A-RUNTIME-PROVENANCE"
+      ],
+      "outside": [
+        "General compiler correctness, declared Verity semantics, cryptographic primitives, gas and consensus.",
+        "The historical synthetic TOPUP programs remain separate evidence; equality with their independently supplied inputs is not a source refinement target."
+      ]
+    },
+    "P-SSZ-1": {
+      "description": "A successful deposit CALL in the source interpreter binds the submitted root to the ordered SHA preimages of its actually decoded public key, credentials, signature and msg.value in gwei. The guards derive exact field widths, uint64 amount range and gwei divisibility. The separate CL verifier ABI-frame composition remains open.",
+      "model": "Source deposit CALL/ABI interpreter with forward opaque SHA evaluation; historical synthetic encoding and Nat.pair results are separate",
+      "theorems": [
+        "LidoSRv3.Audit.Guarantees.PSsz1.actual_deposit_call_binds_root"
+      ],
+      "covered": [
+        "The actual CALL dispatcher decodes the same payload and consumes the same transferred value; no independent helper input is supplied.",
+        "The source guard sequence derives 48/32/96-byte widths and an exactly divisible uint64 gwei amount.",
+        "The independently transcribed callee hash chain agrees forward with the depositor helper on those consumed fields, including signature splits, zero padding and little-endian amount."
+      ],
+      "missing": [
+        "The CLValidatorVerifier internal calldata-frame bridge to its existing typed leaf, wrapper and ordered proof branch remains open.",
+        "General malformed deposit-ABI acceptance and exact revert/event byte encodings are not established by the existing source callee interpreter."
+      ],
+      "conditions": [
+        "The existing concrete CALL/ABI source interpreter and physical-world semantics apply; general compiler and declared Verity semantics remain accepted boundaries.",
+        "SHA is the existing opaque function returning exactly 32 bounded bytes. Only forward evaluation is used; no cryptographic injectivity or relation to a separate validator-proof transaction is assumed."
+      ],
+      "assumptions": [
+        "A-SOURCE-SHAPED",
+        "A-VERITY-SCAFFOLD",
+        "A-SOLC-TRUSTED",
+        "A-SHA256-FFI"
+      ],
+      "outside": [
+        "General SHA/precompile correctness, compiler correctness, gas and consensus.",
+        "The full TOPUP or DEPOSIT entry state machine belongs to the respective guarantee; this result binds one successful deposit call."
       ]
     }
   }

@@ -1,0 +1,22 @@
+{
+  "job": {
+    "created_at": "2026-09-10T06:19:06.805110400Z",
+    "deadline_at": "2026-09-10T08:19:06.805110400Z",
+    "exit_code": 0,
+    "heartbeat_at": "2026-09-10T06:27:21.989400251Z",
+    "id": "d44076e0-fbd7-4bbd-a57d-1cbed0fa91fa",
+    "mission_id": "cbe84201-0e95-4dac-b223-4e0332b2118d",
+    "pid": 3711622,
+    "resource_class": null,
+    "scope_unit": "sandboxed-durable-sandboxed-verity-0be37510-d44076e0fbd74bbda57d1cbed0fa91fa",
+    "signal": null,
+    "status": "completed",
+    "updated_at": "2026-09-10T06:27:22Z",
+    "workspace_id": "ac93f6d5-ad3d-422c-924e-edaddefce6b3"
+  },
+  "logs": {
+    "job_id": "d44076e0-fbd7-4bbd-a57d-1cbed0fa91fa",
+    "stderr": "",
+    "stdout": "Current branch: HEAD\nUsing cache (Azure) from origin: (some leanprover-community/mathlib4)\nNo files to download\nDecompressed 8538 already-cached file(s)\nCompleted successfully in 59553 ms!\ninfo: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:238:0: 'LidoSRv3.Audit.Source.SszPubkeyBytes.run_success_computed_leaf' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\ninfo: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:239:0: 'LidoSRv3.Audit.Source.SszPubkeyBytes.pubkey_success_digest' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:240:0: 'LidoSRv3.Audit.Source.SszPubkeyBytes.memory_exact' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:241:0: 'LidoSRv3.Audit.Source.SszPubkeyBytes.read_exact' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:242:0: 'LidoSRv3.Audit.Source.SszPubkeyBytes.copy_padded' depends on axioms: [propext, Classical.choice, Quot.sound]\n\u2139 [1136/1137] Built LidoSRv3.Audit.Source.SszProofCommitted (4.9s)\ninfo: LidoSRv3/Audit/Source/SszProofCommitted.lean:300:0: 'LidoSRv3.Audit.Source.SszProofCommitted.proofWords_length_le' depends on axioms: [propext]\ninfo: LidoSRv3/Audit/Source/SszProofCommitted.lean:301:0: 'LidoSRv3.Audit.Source.SszProofCommitted.verify_success_depth' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\ninfo: LidoSRv3/Audit/Source/SszProofCommitted.lean:302:0: 'LidoSRv3.Audit.Source.SszProofCommitted.run_success_branch' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: LidoSRv3/Audit/Source/SszProofCommitted.lean:303:0: 'LidoSRv3.Audit.Source.SszProofCommitted.verify_success_branch' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\ninfo: LidoSRv3/Audit/Source/SszProofCommitted.lean:304:0: 'LidoSRv3.Audit.Source.SszProofCommitted.loop_success_fold' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: LidoSRv3/Audit/Source/SszProofCommitted.lean:305:0: 'LidoSRv3.Audit.Source.SszProofCommitted.step_success_effects' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\ninfo: LidoSRv3/Audit/Source/SszProofCommitted.lean:306:0: 'LidoSRv3.Audit.Source.SszProofCommitted.step_call_digest' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: LidoSRv3/Audit/Source/SszProofCommitted.lean:307:0: 'LidoSRv3.Audit.Source.SszProofCommitted.step_success_shape' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: LidoSRv3/Audit/Source/SszProofCommitted.lean:308:0: 'LidoSRv3.Audit.Source.SszProofCommitted.prepared_memory' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: LidoSRv3/Audit/Source/SszProofCommitted.lean:309:0: 'LidoSRv3.Audit.Source.SszProofCommitted.prepared_read' depends on axioms: [propext, Classical.choice, Quot.sound]\n\u2139 [1137/1137] Built LidoSRv3.Tests.SszProofCommittedRegression (2.8s)\ninfo: LidoSRv3/Tests/SszProofCommittedRegression.lean:49:0: 'LidoSRv3.Tests.SszProofCommittedRegression.contiguous_two_words' depends on axioms: [propext]\ninfo: LidoSRv3/Tests/SszProofCommittedRegression.lean:50:0: 'LidoSRv3.Tests.SszProofCommittedRegression.wrapped_early_stop' depends on axioms: [propext]\ninfo: LidoSRv3/Tests/SszProofCommittedRegression.lean:51:0: 'LidoSRv3.Tests.SszProofCommittedRegression.wrapped_two_words' depends on axioms: [propext]\ninfo: LidoSRv3/Tests/SszProofCommittedRegression.lean:52:0: 'LidoSRv3.Audit.Source.SszProofCommitted.run_success_branch' depends on axioms: [propext, Classical.choice, Quot.sound]\nBuild completed successfully (1137 jobs).\n"
+  }
+}

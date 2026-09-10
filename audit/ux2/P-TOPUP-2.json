@@ -1,5 +1,47 @@
 {
   "schema": "lido-srv3-ux2-guarantee-v1",
+  "main_result": {
+    "description": "For a successful gateway witness and router module batch in the source model, the allocations decoded from the actual module reply sum to at most the router’s packed per-block cap, converted from gwei to wei. The same executed witness loop supplies the keys and per-key limits consumed by that call. Full gateway entry correspondence remains open.",
+    "model": "Source execution model using Verity physical contract storage and concrete raw module calls; the historical greedy Contract.run allocator is separate",
+    "theorems": [
+      {
+        "plane": "source",
+        "role": "registered main source-model result (audit/trio/main-guarantees.json)",
+        "status": "CHECKED",
+        "name": "LidoSRv3.Audit.Guarantees.PTopup2.actual_module_batch_bound",
+        "module": "LidoSRv3.Audit.Guarantees.PTopup2ActualBatch",
+        "file": "LidoSRv3/Audit/Guarantees/PTopup2ActualBatch.lean",
+        "start_line": 17,
+        "end_line": 36,
+        "doc": "/-- The completed covered batch's actual returned allocations total no more\nthan the packed router cap, converted to wei. The gateway derives the limits,\nand the module CALL/decode consumes the same keys, amounts and World.\nZero/empty returns are included. No gas, consensus or cryptographic proof is\nadded to the accepted boundary by this safety statement. -/",
+        "statement": "theorem actual_module_batch_bound (hash : TopupRouterCredentials.Keccak)\n    (moduleExternal withdrawalExternal : External) (precompile : Precompile)\n    (oracle : RootOracle) (scratch : Fin 32 → Byte) (gi : Configuration)\n    (beacon : BeaconData) (divisor : Index) (credentials : Digest)\n    (gateway : Address) (ctx : Context) (depositContract : Address) (moduleId : Word)\n    (keyIndices operatorIds : List Word) (rows : List Row) (moduleAllocation : Word)\n    (before : World) (result : Result Unit)\n    (h : TopupBatchConsumer.run hash moduleExternal withdrawalExternal precompile oracle scratch gi beacon divisor\n      credentials gateway ctx depositContract moduleId keyIndices operatorIds rows moduleAllocation before = .ok result)\n    (hs : result.outcome = .ok ()) :\n    ∃ out raw afterModule trace allocations,\n      loop precompile oracle scratch gi (TopupGatewayConfigWords.readConfig gateway before)\n        beacon divisor credentials none 0 rows = .ok out ∧\n      TopupModuleCall.call hash moduleExternal\n        (LidoSRv3.Audit.Verity.TopupBeaconFundedTx.routerContext ctx)\n        (TopupBatchConsumer.moduleInput out moduleId keyIndices operatorIds ctx.sender moduleAllocation before) before =\n          ⟨.ok raw,afterModule,trace⟩ ∧\n      TopupModuleCall.decodeReturn raw = .ok allocations ∧\n      (TopupRouterContinuation.values allocations).sum ≤\n        (TopupBatchConsumer.blockCap ctx.sender before).val * GWEI"
+      }
+    ],
+    "covered": [
+      "The actual gateway length guards and witness loop produce the keys and wei limits consumed by the actual module call and its decoder.",
+      "The router reads its uint64 cap from packed storage, computes the rounded minimum with the arbitrary preceding module allocation, and checks the module-selected allocations.",
+      "Successful execution derives the allocation-count and arithmetic bounds internally; zero and empty module returns are included. No greedy allocation policy or caller-supplied sum bound is assumed."
+    ],
+    "missing": [
+      "A successful full gateway entry has not yet been connected to this covered value path with the same physical state and ABI-decoded inputs; role, pause, timing and view-call admission still need that connection.",
+      "The old Contract.run allocate/sourceView theorem still executes a separate greedy model and is retained as historical evidence. It does not certify this actual module batch.",
+      "The inherited module call/decode models still have specific no-code-attempt and oversized-return allocation-error differences. Complete source error and observable rollback correspondence is not claimed."
+    ],
+    "conditions": [
+      "The covered value-path executor returns a result whose outcome is successful. Limits, target, cap, exact allocation sum and count bounds are derived from that execution.",
+      "The preceding module-allocation word and both external module/withdrawal interpreters are arbitrary. The claim bounds the decoded module allocations, not arbitrary callee ledger changes."
+    ],
+    "assumptions": [
+      "A-SOURCE-SHAPED",
+      "A-VERITY-SCAFFOLD",
+      "A-SOLC-TRUSTED",
+      "A-RUNTIME-PROVENANCE"
+    ],
+    "outside": [
+      "Cross-call accumulation and the last-top-up-state policy are outside this per-batch cap guarantee.",
+      "General compiler correctness, the declared Verity semantics, cryptographic primitives, general gas and consensus retain their accepted boundaries. No new or stronger assumption is admitted under these labels."
+    ]
+  },
   "id": "P-TOPUP-2",
   "position": 9,
   "summary": "aggregate_bounded_by_block_cap proves the leftover-budget walk cannot exceed maxTopUpPerBlockGwei. per_key_bounded_by_candidate additionally proves a pointwise Forall2 bound between every produced allocation and its requested/evaluated candidate. block_cap_kill_line_refutes_parent drops the cap term. Verity correspondence now decodes an explicit gwei-normalized topUpLimits array, checks it equals the independently evaluated per-key limits, and uses it to cap requests; it remains conditional on count <= 32. The count>32 no-check mutant is guard-necessity evidence outside that parent's premises, not a parent refutation. A-TOPUP-NOWRAP is removed from this row because its recorded line-732 risk belongs to P-TOPUP-1. Live wei conversion, module allocateDeposits policy, and SSZ remain open. This is a single-call bound: same-block accumulation across calls is excluded; no sequential-call or last-top-up-state policy is proved by this parent.",

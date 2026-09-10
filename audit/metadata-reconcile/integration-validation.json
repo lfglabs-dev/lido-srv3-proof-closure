@@ -1,0 +1,24 @@
+{
+  "integrated_base": "58c1cea8d5cb64afd51204e95f86cb687ac29b21",
+  "prior_validated_base": "02b53a157e5e6e2049faced7f26009cbc55eb932",
+  "prior_inputs_identical": 577,
+  "additional_unchanged_main_sources": {
+    "LidoSRv3/Audit/Source/SszPubkeyBytes.lean": "e31266121766aac35acb693fcafbfbdc4ae2a95d658b1fa96a4503582afde1a7",
+    "LidoSRv3/Tests/SszPubkeyBytesMutants.lean": "c317ef4fb18568d4014155a885fedf81d3f0878d8732e8a48dede13db9c72b5a"
+  },
+  "checks": {
+    "ux2": {
+      "exit": 0,
+      "log_sha256": "4d0a00eaee6f0e519d89d7de728d9cc72f9fba9d2ac7975c8c910d812e900e20"
+    },
+    "escapes": {
+      "exit": 0,
+      "log_sha256": "c586188e09891513dfd477a7e055092514680f6dd91790ef1bd65e2ccc8830c0"
+    },
+    "quality": {
+      "exit": 0,
+      "log_sha256": "9214cfdbb93494a9b5b7955d138d232d460bffaacd62bd34f07aafed3a473a84"
+    }
+  },
+  "scope": "Original nine mutation/check runs reused on identical scripts and existing inputs; new main sources contain no native_decide. Regenerated UX2 tree index and repeated current UX2/escape/quality guards. No new proof execution."
+}

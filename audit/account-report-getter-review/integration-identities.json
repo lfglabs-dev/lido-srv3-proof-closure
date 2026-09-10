@@ -1,0 +1,25 @@
+{
+  "head": "dbe17499619b4f96e3f488cd2beaeb0c8ac4bdfd",
+  "merge": "564d729f30dc588ccd4c1d38d4b4827d28eed44d",
+  "direct_files": [
+    {
+      "path": "audit/trio/account-address/README.md",
+      "sha256": "97cdd6a3dbcffb5ea4b4c754bfb63912a99090938b1c1cc4cc927f98c003a262"
+    },
+    {
+      "path": "audit/trio/account-address/ReportWriteFee.lean",
+      "sha256": "98ab33f1038600ee1c20be389934f78d7b16d90098bc2ea61467b68b22f32932"
+    },
+    {
+      "path": "audit/trio/account-address/Tests/Verity/ReportWriteFeeTest.lean",
+      "sha256": "6a08b51aded80db01736f06bb9d0b2c9762baff863926a8ded1d6e4a2ca1b301"
+    },
+    {
+      "path": "audit/trio/account-address/lakefile.lean",
+      "sha256": "c0f9b33ece0385b3fb3d1283ff8197f92666eb246b92c26c1ed7cfa20d34a1ca"
+    }
+  ],
+  "root_lakefile": "merge preserves main TOPUP roots and adds same two ACCOUNT roots; source delta manually inspected",
+  "review": "account-297-review/pr297-review.md",
+  "all8": "OPEN"
+}
