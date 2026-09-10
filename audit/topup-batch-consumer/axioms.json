@@ -1,0 +1,10 @@
+{
+  "LidoSRv3.Audit.Source.TopupBatchConsumer.blockCap_packed": "propext, Quot.sound",
+  "LidoSRv3.Audit.Source.TopupBatchConsumer.target_bound": "propext, Quot.sound",
+  "LidoSRv3.Audit.Source.TopupBatchConsumer.continuation_input": "propext",
+  "LidoSRv3.Audit.Source.TopupBatchConsumer.run_success_bound": "propext, Classical.choice, Quot.sound",
+  "LidoSRv3.Audit.Guarantees.PTopup2.actual_module_batch_bound": "propext, Classical.choice, Quot.sound",
+  "LidoSRv3.Tests.TopupBatchConsumerRegression.packed_cap": "propext",
+  "LidoSRv3.Tests.TopupBatchConsumerRegression.zero_batch_consumes_actual_module": "propext,\n Classical.choice,\n Quot.sound",
+  "LidoSRv3.Tests.TopupBatchConsumerRegression.above_cap_restores_module_effects": "propext,\n Classical.choice,\n Quot.sound"
+}
