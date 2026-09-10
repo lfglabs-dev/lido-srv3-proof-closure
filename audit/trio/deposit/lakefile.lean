@@ -15,7 +15,9 @@ lean_lib TrioDeposit where
     .one `audit.trio.deposit.Deposit,
     .one `audit.trio.deposit.RouterDeposit,
     .one `audit.trio.deposit.WithdrawDepositableEther,
+    .one `audit.trio.deposit.LiveBeacon,
     .one `audit.trio.deposit.Tests.Verity.Deposit,
     .one `audit.trio.deposit.Tests.Verity.RouterDeposit,
-    .one `audit.trio.deposit.Tests.Verity.WithdrawDepositableEther
+    .one `audit.trio.deposit.Tests.Verity.WithdrawDepositableEther,
+    .one `audit.trio.deposit.Tests.Verity.LiveBeacon
   ]

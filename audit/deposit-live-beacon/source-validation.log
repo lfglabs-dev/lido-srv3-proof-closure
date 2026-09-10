@@ -1,0 +1,198 @@
+⚠ [13/42] Replayed LidoSRv3.Audit.Source.TrioAlloc2.Selection
+warning: LidoSRv3/Audit/Source/TrioAlloc2/Selection.lean:53:10: This simp argument is unused:
+  levelsEq
+
+Hint: Omit it from the simp argument list.
+  simp [l̵e̵v̵e̵l̵s̵E̵q̵,̵ ̵Spec.minimum, countEq]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioAlloc2/Selection.lean:70:10: This simp argument is unused:
+  levelsEq
+
+Hint: Omit it from the simp argument list.
+  simp [l̵e̵v̵e̵l̵s̵E̵q̵,̵ ̵Spec.minimum, nonzero, minimumEq]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [22/42] Replayed LidoSRv3.Audit.Source.TrioAlloc2.StepCorrespondence
+warning: LidoSRv3/Audit/Source/TrioAlloc2/StepCorrespondence.lean:16:71: This simp argument is unused:
+  eq
+
+Hint: Omit it from the simp argument list.
+  simp [decodedRows, List.getElem?_zipWith, List.getElem?_set_ne eq,̵ ̵e̵q̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+ℹ [25/42] Replayed LidoSRv3.Audit.Source.TrioAlloc2.Composition
+info: LidoSRv3/Audit/Source/TrioAlloc2/Composition.lean:53:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_success_establishes_consumer_premises' depends on axioms: [propext,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/Composition.lean:54:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_then_consumer_succeeds' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/Composition.lean:71:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_then_consumer_distributes' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [26/42] Replayed LidoSRv3.Audit.Source.TrioComposition.Parent
+info: LidoSRv3/Audit/Source/TrioComposition/Parent.lean:252:0: 'LidoSRv3.Audit.Source.TrioComposition.getDepositAllocations_total_bound' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/Parent.lean:253:0: 'LidoSRv3.Audit.Source.TrioComposition.convertPositive_refines' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/Parent.lean:254:0: 'LidoSRv3.Audit.Source.TrioComposition.convertZero_refines' depends on axioms: [propext, Classical.choice, Quot.sound]
+⚠ [27/42] Replayed LidoSRv3.Audit.Source.TrioAlloc2.RowBounds
+warning: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:171:20: This simp argument is unused:
+  ↓reduceDIte
+
+Hint: Omit it from the simp argument list.
+  simp only [bound,̵ ̵↓̵r̵e̵d̵u̵c̵e̵D̵I̵t̵e̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+info: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:174:0: 'LidoSRv3.Audit.Source.TrioAlloc2.step_row_bounds' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:175:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocateLoop_row_bounds' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:176:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocate_row_bounds' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:177:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocate_delta_success' depends on axioms: [propext, Quot.sound]
+ℹ [35/48] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentComposition
+info: LidoSRv3/Audit/Source/TrioComposition/ParentComposition.lean:65:0: 'LidoSRv3.Audit.Source.TrioComposition.producer_consumer_conversion_refines' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ParentComposition.lean:66:0: 'LidoSRv3.Audit.Source.TrioComposition.producer_zero_conversion_refines' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ParentComposition.lean:67:0: 'LidoSRv3.Audit.Source.TrioComposition.producer_consumer_parent_subtraction' depends on axioms: [propext, Quot.sound]
+ℹ [36/48] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentRelational
+info: LidoSRv3/Audit/Source/TrioComposition/ParentRelational.lean:185:0: 'LidoSRv3.Audit.Source.TrioComposition.ParentSpec.public_all_outcomes' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [37/48] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentDeterminism
+info: LidoSRv3/Audit/Source/TrioComposition/ParentDeterminism.lean:155:0: 'LidoSRv3.Audit.Source.TrioComposition.ParentSpec.public_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [38/48] Replayed LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI
+info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:169:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.decodeArray_encoded' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:170:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.decodeArguments_encoded' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:171:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.decodeReturn_encoded' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:172:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.run_encoded' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:173:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.run_short' depends on axioms: [propext, Quot.sound]
+ℹ [39/48] Replayed LidoSRv3.Audit.Source.TrioAlloc2.ABIComposition
+info: LidoSRv3/Audit/Source/TrioAlloc2/ABIComposition.lean:46:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_then_abi_distributes' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [40/48] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentABI
+info: LidoSRv3/Audit/Source/TrioComposition/ParentABI.lean:110:0: 'LidoSRv3.Audit.Source.TrioComposition.public_abi_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+⚠ [485/526] Replayed Verity.Core
+warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1041:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+⚠ [1202/1294] Replayed Conform.Wheels
+warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: Conform/Wheels.lean:106:70: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1203/1294] Replayed EvmYul.Pretty
+warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: EvmYul/Pretty.lean:36:32: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1248/1294] Replayed EvmYul.Semantics
+warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1249/1294] Replayed EvmYul.EVM.Semantics
+warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1288/1318] Replayed LidoSRv3.Audit.Verity.TopupTx
+warning: LidoSRv3/Audit/Verity/TopupTx.lean:293:8: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: LidoSRv3/Audit/Verity/TopupTx.lean:872:13: This simp argument is unused:
+  uint256Modulus
+
+Hint: Omit it from the simp argument list.
+  simp [pushEntry, scheduledDeposit, linkedCallEntryTo, linkedCallEntry, e̵v̵m̵W̵o̵r̵d̵,̵ ̵u̵i̵n̵t̵2̵5̵6̵M̵o̵d̵u̵l̵u̵s̵]̵e̲v̲m̲W̲o̲r̲d̲]̲
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/TopupTx.lean:965:19: This simp argument is unused:
+  Nat.mod_eq_of_lt hNoWrap
+
+Hint: Omit it from the simp argument list.
+  simp [evmWord,̵ ̵N̵a̵t̵.̵m̵o̵d̵_̵e̵q̵_̵o̵f̵_̵l̵t̵ ̵h̵N̵o̵W̵r̵a̵p̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/TopupTx.lean:1279:5: Variable name `hwcLen` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+ℹ [1310/1318] Built audit.trio.deposit.Deposit (10s)
+info: ../../../audit/trio/deposit/Deposit.lean:313:0: 'audit.trio.deposit.abi_success_composes_deposit_values' depends on axioms: [propext, Quot.sound]
+info: ../../../audit/trio/deposit/Deposit.lean:367:0: 'audit.trio.deposit.prepareDepositABI_composes_beacon_values' depends on axioms: [propext, Quot.sound]
+✔ [1311/1318] Built audit.trio.deposit.Tests.Verity.Deposit (3.3s)
+ℹ [1312/1318] Built audit.trio.deposit.WithdrawDepositableEther (5.0s)
+info: ../../../audit/trio/deposit/WithdrawDepositableEther.lean:106:0: 'audit.trio.deposit.WithdrawDepositableEther.amount_from_deposit_execution' depends on axioms: [propext, Quot.sound]
+info: ../../../audit/trio/deposit/WithdrawDepositableEther.lean:107:0: 'audit.trio.deposit.WithdrawDepositableEther.deposit_execution_composes_suffix' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ../../../audit/trio/deposit/WithdrawDepositableEther.lean:108:0: 'audit.trio.deposit.WithdrawDepositableEther.failure_rolls_back' depends on axioms: [propext]
+ℹ [1313/1318] Built audit.trio.deposit.RouterDeposit (8.3s)
+info: ../../../audit/trio/deposit/RouterDeposit.lean:250:0: 'audit.trio.deposit.RouterDeposit.every_failure_rolls_back' depends on axioms: [propext, Quot.sound]
+info: ../../../audit/trio/deposit/RouterDeposit.lean:281:0: 'audit.trio.deposit.RouterDeposit.beaconLoop_ok_conservation' depends on axioms: [propext, Quot.sound]
+info: ../../../audit/trio/deposit/RouterDeposit.lean:397:0: 'audit.trio.deposit.RouterDeposit.executeRaw_ok_conservation' depends on axioms: [propext, Quot.sound]
+info: ../../../audit/trio/deposit/RouterDeposit.lean:417:0: 'audit.trio.deposit.RouterDeposit.execute_ok_conservation' depends on axioms: [propext, Quot.sound]
+info: ../../../audit/trio/deposit/RouterDeposit.lean:447:0: 'audit.trio.deposit.RouterDeposit.execute_ok_conservation_of_linkssource' depends on axioms: [propext, Quot.sound]
+info: ../../../audit/trio/deposit/RouterDeposit.lean:466:0: 'audit.trio.deposit.RouterDeposit.executePrepared_ok_conservation_of_linkssource' depends on axioms: [propext,
+ Quot.sound]
+info: ../../../audit/trio/deposit/RouterDeposit.lean:485:0: 'audit.trio.deposit.RouterDeposit.linksSource_of_prepareDepositABI' depends on axioms: [propext, Quot.sound]
+info: ../../../audit/trio/deposit/RouterDeposit.lean:509:0: 'audit.trio.deposit.RouterDeposit.execute_ok_conservation_derived' depends on axioms: [propext, Quot.sound]
+✔ [1314/1318] Built audit.trio.deposit.Tests.Verity.WithdrawDepositableEther (3.7s)
+✔ [1315/1318] Built audit.trio.deposit.Tests.Verity.RouterDeposit (4.2s)
+ℹ [1316/1318] Built audit.trio.deposit.LiveBeacon (7.1s)
+info: ../../../audit/trio/deposit/LiveBeacon.lean:176:0: 'audit.trio.deposit.LiveBeacon.failure_restores' depends on axioms: [propext, Quot.sound]
+info: ../../../audit/trio/deposit/LiveBeacon.lean:613:0: 'audit.trio.deposit.LiveBeacon.positive_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ../../../audit/trio/deposit/LiveBeacon.lean:614:0: 'audit.trio.deposit.LiveBeacon.keyInputs_admissible' depends on axioms: [propext, Quot.sound]
+ℹ [1317/1318] Built audit.trio.deposit.Tests.Verity.LiveBeacon (10s)
+info: ../../../audit/trio/deposit/Tests/Verity/LiveBeacon.lean:180:0: 'audit.trio.deposit.Tests.Verity.LiveBeacon.prepared_eq' depends on axioms: [propext,
+ Quot.sound,
+ prepared_eq._native.native_decide.ax_1_1]
+info: ../../../audit/trio/deposit/Tests/Verity/LiveBeacon.lean:181:0: 'audit.trio.deposit.Tests.Verity.LiveBeacon.fixture_ok' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ prepared_eq._native.native_decide.ax_1_1]
+info: ../../../audit/trio/deposit/Tests/Verity/LiveBeacon.lean:182:0: 'audit.trio.deposit.Tests.Verity.LiveBeacon.fixture_router' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ prepared_eq._native.native_decide.ax_1_1]
+info: ../../../audit/trio/deposit/Tests/Verity/LiveBeacon.lean:183:0: 'audit.trio.deposit.Tests.Verity.LiveBeacon.fixture_beacon' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ prepared_eq._native.native_decide.ax_1_1]
+info: ../../../audit/trio/deposit/Tests/Verity/LiveBeacon.lean:184:0: 'audit.trio.deposit.Tests.Verity.LiveBeacon.fixture_count' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ prepared_eq._native.native_decide.ax_1_1]
+info: ../../../audit/trio/deposit/Tests/Verity/LiveBeacon.lean:185:0: 'audit.trio.deposit.Tests.Verity.LiveBeacon.fixture_other' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ prepared_eq._native.native_decide.ax_1_1]
+Build completed successfully (1318 jobs).

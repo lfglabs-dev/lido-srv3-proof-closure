@@ -1,0 +1,29 @@
+{
+  "production": {
+    "audit.trio.deposit.abi_success_composes_deposit_values": "propext, Quot.sound",
+    "audit.trio.deposit.prepareDepositABI_composes_beacon_values": "propext, Quot.sound",
+    "audit.trio.deposit.WithdrawDepositableEther.amount_from_deposit_execution": "propext, Quot.sound",
+    "audit.trio.deposit.WithdrawDepositableEther.deposit_execution_composes_suffix": "propext,\n Classical.choice,\n Quot.sound",
+    "audit.trio.deposit.WithdrawDepositableEther.failure_rolls_back": "propext",
+    "audit.trio.deposit.RouterDeposit.every_failure_rolls_back": "propext, Quot.sound",
+    "audit.trio.deposit.RouterDeposit.beaconLoop_ok_conservation": "propext, Quot.sound",
+    "audit.trio.deposit.RouterDeposit.executeRaw_ok_conservation": "propext, Quot.sound",
+    "audit.trio.deposit.RouterDeposit.execute_ok_conservation": "propext, Quot.sound",
+    "audit.trio.deposit.RouterDeposit.execute_ok_conservation_of_linkssource": "propext, Quot.sound",
+    "audit.trio.deposit.RouterDeposit.executePrepared_ok_conservation_of_linkssource": "propext,\n Quot.sound",
+    "audit.trio.deposit.RouterDeposit.linksSource_of_prepareDepositABI": "propext, Quot.sound",
+    "audit.trio.deposit.RouterDeposit.execute_ok_conservation_derived": "propext, Quot.sound",
+    "audit.trio.deposit.LiveBeacon.failure_restores": "propext, Quot.sound",
+    "audit.trio.deposit.LiveBeacon.positive_success": "propext, Classical.choice, Quot.sound",
+    "audit.trio.deposit.LiveBeacon.keyInputs_admissible": "propext, Quot.sound"
+  },
+  "native_fixture_queries": {
+    "audit.trio.deposit.Tests.Verity.LiveBeacon.prepared_eq": "propext,\n Quot.sound,\n prepared_eq._native.native_decide.ax_1_1",
+    "audit.trio.deposit.Tests.Verity.LiveBeacon.fixture_ok": "propext,\n Classical.choice,\n Quot.sound,\n prepared_eq._native.native_decide.ax_1_1",
+    "audit.trio.deposit.Tests.Verity.LiveBeacon.fixture_router": "propext,\n Classical.choice,\n Quot.sound,\n prepared_eq._native.native_decide.ax_1_1",
+    "audit.trio.deposit.Tests.Verity.LiveBeacon.fixture_beacon": "propext,\n Classical.choice,\n Quot.sound,\n prepared_eq._native.native_decide.ax_1_1",
+    "audit.trio.deposit.Tests.Verity.LiveBeacon.fixture_count": "propext,\n Classical.choice,\n Quot.sound,\n prepared_eq._native.native_decide.ax_1_1",
+    "audit.trio.deposit.Tests.Verity.LiveBeacon.fixture_other": "propext,\n Classical.choice,\n Quot.sound,\n prepared_eq._native.native_decide.ax_1_1"
+  },
+  "scope": "Actual original build output. Native fixture axioms are preserved, not presented as kernel proofs; no full unqueried declaration audit claimed."
+}
