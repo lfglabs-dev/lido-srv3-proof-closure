@@ -1,0 +1,29 @@
+{
+  "source_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "scope": "Complete pinned CLValidatorVerifier/BLS/SSZ and imported compiler sources checked by byte identity. Primitive call/memory composition and actual Solidity suffix assessed; no compiled opcode/ABI/domain/World closure.",
+  "files": {
+    "contracts/0.8.25/CLValidatorVerifier.sol": "d6e89f6975e4fa02f758bf461a98ac2d689296b5c92d03ffd4e43a22d0b3d7ed",
+    "contracts/common/interfaces/ValidatorWitness.sol": "8fd24cfab7402233029756e52e59198b0d9cbf0a42e5c07d9fa2338ed731a5f7",
+    "contracts/common/lib/BLS.sol": "0187cc6a6b1aaa833317695d88795db431fa237452213e8c3872a0f444dceb7c",
+    "contracts/common/lib/BeaconTypes.sol": "9591e9af1a4fd398db86267f3589e763f9eb2016bf29e26cfa50988cf73a10c3",
+    "contracts/common/lib/GIndex.sol": "2653bd4ba89c349f3db36f21a8afc6a24e0e233816d9b608f46d048feb601d1f",
+    "contracts/common/lib/SSZ.sol": "91ef497b972bbee0fe89043034e6bd62fa0c1059f22874d4826bc6164a22009b"
+  },
+  "local_dependency_comparison_to_base": {
+    "LidoSRv3/Audit/Source/SszLittleEndianCorrespondence.lean": true,
+    "LidoSRv3/Audit/Source/SszProofCalldataLoop.lean": true,
+    "LidoSRv3/Audit/Source/SszProofCalldataStep.lean": true,
+    "LidoSRv3/Audit/Source/SszProofFold.lean": true,
+    "LidoSRv3/Audit/Source/SszProofLoopResources.lean": true,
+    "LidoSRv3/Audit/Source/SszScratchByteArray.lean": true,
+    "LidoSRv3/Audit/Source/SszScratchEvmMemory.lean": true,
+    "LidoSRv3/Audit/Source/SszShaCallBytes.lean": true,
+    "LidoSRv3/Audit/Source/SszShaCallMemory.lean": true,
+    "LidoSRv3/Audit/Source/SszTypedFfiBridge.lean": true,
+    "LidoSRv3/Audit/Source/SszValidatorLeaf.lean": true,
+    "LidoSRv3/Audit/Source/SszVerifierEntry.lean": true,
+    "LidoSRv3/Audit/Source/SszWordBytes.lean": true,
+    "LidoSRv3/Audit/Source/SszWrapperIndex.lean": true
+  },
+  "compiler_input_identity_manifest": "solidity/compiler-input-identities.json"
+}

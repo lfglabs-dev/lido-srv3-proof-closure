@@ -1,0 +1,80 @@
+[
+  {
+    "content": "I'll review PR #284 at the exact claimed HEAD in read-only mode: confirm git identity, then inspect BLS/SSZ composition against the claimed theorems and remaining OPEN items.HEAD and parent match the claimed SHAs. Next I\u2019ll read the composition sources and machine-check theorems, axioms, and manifests.The 16 theorems and 31 kernel examples match the claim on paper. Next I\u2019ll check the actual BLS/SSZ call wiring and machine-verify hashes, pins, and manifests.lido-core is empty in this clone, so I\u2019ll fetch the pin and the prior BLS/SSZ definitions next.Resuming the exact-head review: I\u2019ll finish BLS/SSZ wiring, pin/manifest checks, and theorem/sorry/axiom counts, then issue the verdict.The prior file reads are cached; I\u2019ll pull the composition module, BLS/SSZ callees, and remaining identity checks in parallel.Identity matches. Next I\u2019ll finish the composition module, Solidity BLS/SSZ bodies, and axiom/hash checks.Composition wiring looks real so far. I\u2019ll now count theorems/examples, read axioms, and hash-check Git files against the receipt.I\u2019ll finish callee definitions, axioms, remaining OPEN fields, and the 31-kernel vs 9-ordinary count.I have enough to close the composition check. Confirming a few remaining identities, then I\u2019ll issue the verdict.Independent exact-head review of [lfglabs-dev/lido-srv3-proof-closure#284](https://github.com/lfglabs-dev/lido-srv3-proof-closure/pull/284). Git is authoritative. PR283 was not reopened. P-SSZ-1 is not closed.\n\n## Identity\n\n| Item | Value |\n|---|---|\n| HEAD | `191a807d07607fa08c2eb80b32db995014d89095` |\n| Parent | `85ca4fb709ee52edbb2c2993ce42ccaf6705237b` (accepted #282 merge) |\n| Pin | `17005714f151e5502c559932319a3f2f74ac2436` (`lido-core` gitlink) |\n| Files | **18** (matches claim) |\n| Subject | `Compose actual BLS validator leaf with raw SSZ proof verification` |\n| Packet `4e1a5ecf` | **absent** (not a blocker) |\n\nLake pins in `lake-manifest.json` match receipt `package_pins` (11/11). Parent SSZ modules, `lakefile.lean`, `lake-manifest.json`, `lean-toolchain`, `foundry.toml` are unchanged vs `HEAD^` and match receipt hashes. Guarantee / ALLOC / RESERVE files are untouched.\n\nPinned Solidity SHA-256 at `17005714` matches `source-check.json` / compiler-input identities:\n\n- `CLValidatorVerifier.sol` `d6e89f69\u2026`\n- `BLS.sol` `0187cc6a\u2026`\n- `SSZ.sol` `91ef497b\u2026`\n- plus `ValidatorWitness.sol`, `BeaconTypes.sol`, `GIndex.sol`\n\n## Composition (real, not rename / opaque Nat)\n\nThis increment **does** compose real BLS leaf calls with the same-state SSZ verifier.\n\nControl flow in [`LidoSRv3/Audit/Source/SszBlsComposition.lean`](/tmp/pr284-review/repo/LidoSRv3/Audit/Source/SszBlsComposition.lean):\n\n1. **Pubkey** \u2014 `pubkeyRun` \u2192 parent `blsCall` (`SszShaCallMemory.lean:188`): `mstore(0x20,0)` + `calldatacopy` of 48 calldata bytes + SHA-256 precompile 2 + success\u2227`returndatasize==32` + `mload(0)`.\n2. **Seven pairs** \u2014 `merkleRun` threads **one** `EVM.State` through seven `pairRun`s: `(a,b),(c,d),(e,f),(g,h)` then `(l10,l11),(l12,l13)` then `(l20,l21)`. Matches `CLValidatorVerifier.sol:60\u201385` / `BLS.sol:516\u2013534`.\n3. **Leaf** \u2014 `leafRun` = pubkey + seven pairs with `expectedCredentials` as a separate argument and `chunk` = `sourceUint256` little-endian (not a bare `Nat`).\n4. **Verifier** \u2014 `verifyLeaf` feeds `leaf.digest` **and** `leaf.state` into parent `SszProofCalldataLoop.verify` (`SSZ.sol:179\u2013254`).\n\n`verify_leaf_success` is an iff against independent `validatorTree` / `sourceVerify`, not a supplied leaf digest. `pairDigest` / `merkleDigest` / `pubkeyDigest` are computed FFI outputs.\n\nHarness [`audit/ssz-bls-composition/solidity/SszBlsComposition.t.sol`](/tmp/pr284-review/repo/audit/ssz-bls-composition/solidity/SszBlsComposition.t.sol) inherits unmodified `_validatorHashTreeRoot` and calls unmodified `SSZ.verifyProof`. Slot / EIP-4788 root / GIndex construction stay out of the harness, as claimed.\n\n## Theorems / tests / axioms vs claim\n\n| Claim | Observed |\n|---|---|\n| 16 theorems | **16**, all with bodies |\n| 31 kernel examples | **31** `example`s (`decide +kernel` / `rfl` / lemma `rw`) |\n| 9 ordinary | **9** `#print axioms` queries |\n| 18 files | **18** |\n\nNo `sorry`, `admit`, added `axiom`, `native_decide`, or `bv_decide` in the two new Lean files.\n\nAxiom log (theorems only): `propext`, `Classical.choice`, `Quot.sound`.\n\nReceipt Lean hashes match Git HEAD:\n\n- `SszBlsComposition.lean` `dae0997c41b32ed337300594b730e6b8b22c267c4d13c36ac60c9ba65230831f`\n- `SszBlsCompositionMutants.lean` `72c57b819798ca7ea051d3cb85a5c1433c10e46d3bfb8e13a76e946ef03f9e96`\n\nRecorded `lake env lean` exits are 0 on imported caches (not a full rebuild; not re-run here). `checkout_head_at_validation` is the parent `85ca4fb7`; file bytes at `191a807` match the validated hashes.\n\nManifest machine-check: `validated-inputs.sha256` 40 present hashes OK; 21 missing are `.lake/packages/evmyul` (15) and unpacked `lido-core` (6). Pin gitlink + separately fetched core pin hashes cover the Solidity identities. `dependency-inputs.json`: 1116 package-source entries, 15 local imports, 16 selected core sources.\n\n## Remaining OPEN (do not close P-SSZ-1)\n\nReceipt `all_eight_guarantees`: **OPEN**. [`PSsz1.lean`](/tmp/pr284-review/repo/LidoSRv3/Audit/Guarantees/PSsz1.lean) not in the diff.\n\nStill outside this increment:\n\n- ABI / field extraction / key offset-extent / proof layout\n- init / depth / memory `< 2^251` / surrounding opcode gas\n- slot / proposer / EIP-4788 root / GIndex prefix into this suffix\n- compiled ABI / World / account / revert-rollback\n- SHA cryptography (`shaOutput` opaque FFI, size-32 hypothesis)\n\nALLOC-1 / ALLOC-2 / RESERVE-1 untouched.\n\nVERDICT: CLEAN",
+    "event_id": "5cb4ccc7-d0b7-489d-bba8-ea6ca6560e09",
+    "event_type": "assistant_message",
+    "id": 3703876,
+    "metadata": {
+      "completion_evidence": {
+        "classification_source": "structured",
+        "completion_confidence": "high",
+        "completion_signal": "process_exit",
+        "failure_class": null,
+        "native_terminal_seen": false,
+        "pending_tools": null,
+        "provider_error_source": null,
+        "terminal_reason": "TurnComplete",
+        "transport_failure_stage": null
+      },
+      "cost": {
+        "amount_cents": 19,
+        "currency": "USD",
+        "source": "estimated"
+      },
+      "cost_cents": 19,
+      "model": "grok-4.6",
+      "model_normalized": "grok-4.6",
+      "success": true,
+      "usage": {
+        "cache_creation_input_tokens": "[redacted]",
+        "cache_read_input_tokens": "[redacted]",
+        "input_tokens": "[redacted]",
+        "output_tokens": "[redacted]"
+      }
+    },
+    "mission_id": "a1a9f3d2-a89e-429c-a715-c68cc81a8daa",
+    "sequence": 1953,
+    "timestamp": "2026-09-09T23:45:54.513431966+00:00",
+    "tool_call_id": null,
+    "tool_name": null
+  },
+  {
+    "content": "I'll treat this as a source-completeness supplement only: verify the 57-file packet against Git/receipt identities, then read the previously missing EvmYul callees.Packet is present. Next I\u2019ll verify its 57 hashes against Git/receipt identities and read the previously missing EvmYul callees.Resuming the source-completeness supplement: verify the 57-file packet against Git/receipt, then read the missing EvmYul callees.Packet and HEAD identity confirmed. Next I\u2019ll hash-check all 57 files and reconcile selected-core vs EvmYul inventories.Packet hashes match Git/pin. Next I\u2019ll reconcile EvmYul vs receipt identities and read the selected-core callees.GasConstants is in the packet but not the 61 validated inputs \u2014 I\u2019ll confirm that against the 16 selected-core list, then read the EvmYul callees.Inventories are distinct: 16 selected-core are Lean `Init` files; packet EvmYul is 15 validated + GasConstants. Reading those callee bodies next.The 16 receipt `selected_core` files are Lean `Init`, not EvmYul. Packet EvmYul is 16 files (15 in the 61-set plus GasConstants). Reading the remaining callees.Reading the remaining EvmYul callees that the composition actually calls: \u0398, SHA-256 precompile, mload/mstore, and gas.I have hash identity and callee coverage. Distinguishing the three inventories, then issuing the supplement verdict.Source-completeness supplement to CLEAN event 1953. Original PR284 report is unchanged. HEAD is still `191a807d07607fa08c2eb80b32db995014d89095`. P-SSZ-1 and all eight stay OPEN.\n\n## Identity (unchanged)\n\n| Item | Value |\n|---|---|\n| HEAD | `191a807d07607fa08c2eb80b32db995014d89095` |\n| Parent | `85ca4fb709ee52edbb2c2993ce42ccaf6705237b` |\n| Pin | `17005714f151e5502c559932319a3f2f74ac2436` |\n| EvmYul pin | `f7e4ee0dc8f8d5265ce822a937ab5be771f182e9` |\n| Archive | decoded SHA-256 `4e1a5ecf24bab7348f11fcdd8684cc1f6d254941e13b50393515580c8869a477` |\n\nGit remains authoritative. Packet is access help.\n\n## Packet vs Git / receipt\n\n| Check | Result |\n|---|---|\n| Archive decoded vs claimed `4e1a5ecf\u2026` | **match** |\n| 57/57 packet bytes vs `source-manifest.json` | **match** |\n| 35 proof files vs `git cat-file HEAD` SHA-256 | **35/35** |\n| 6 Solidity vs pin `git show HEAD` SHA-256 | **6/6** (`d6e89f69\u2026`, `8fd24cfa\u2026`, `0187cc6a\u2026`, `9591e9af\u2026`, `2653bd4b\u2026`, `91ef497b\u2026`) |\n| 15 EvmYul in the 61-set vs receipt `validated_inputs` | **15/15** |\n| `GasConstants.lean` vs 1116 closure | **match** `906cda79711e73ca\u2026` |\n| `GasConstants.lean` in the 61-set | **absent** (not a hash mismatch) |\n\n## Three inventories (do not collapse)\n\n| Name | Count | What it is |\n|---|---|---|\n| Closure | **1116** | `package_source_closure`. Includes **15 local imports** (the 15 `LidoSRv3/Audit/Source/Ssz*.lean` modules). Test file is **not** in this 1116. Split: mathlib 681, batteries 186, aesop 132, evmyul 53, local 15, Qq 14, plausible 13, importGraph 10, proofwidgets 8, LeanSearchClient 4. |\n| Validated inputs | **61** | Direct SHA list. **Includes** `LidoSRv3/Tests/SszBlsCompositionMutants.lean`. Split: 15 EvmYul + 15 local Lean + 1 test + 6 core + 4 pins + 20 audit. Original local gap was 15 EvmYul + 6 core = 21; those 21 are now in the packet and hash-match. |\n| Selected core (receipt) | **16** | `dependency-inputs.json` `selected_core_sources`: Lean **Init** (`ByteArray`/`Array`/`UInt`/`Fin`/`BitVec`/`List`/`Platform`). **Not** EvmYul. **Not** in the packet. Hashes recorded only. |\n\nPacket EvmYul is a **fourth** list of **16** files (`evmyul@f7e4ee0d`): the 15 from the 61-set **plus** `EVM/GasConstants.lean`. That is the previously missing callee set, including GasConstants.\n\nReceipt `validated_local_count` **16** = 15 local imports + 1 direct test. Distinct from both \u201c16\u201ds above.\n\n## EvmYul callees now read (16)\n\nBodies in the packet, used by pubkey \u2192 7 pair SHA \u2192 same-state verifier:\n\n| File | Role for this increment |\n|---|---|\n| [`EVM/GasConstants.lean`](/tmp/lido-ssz-review284-191a807d/ssz284-review-packet/sources/evmyul/EvmYul/EVM/GasConstants.lean) | Fee schedule (`Gmemory=3`, `Gcopy=3`, `Gverylow=3`, `Gcallstipend=2300`, \u2026). Imported by `Gas.lean` / `StateOps.lean` / `Semantics.lean`. |\n| [`EVM/State.lean`](/tmp/lido-ssz-review284-191a807d/ssz284-review-packet/sources/evmyul/EvmYul/EVM/State.lean) | `EVM.State` extends `SharedState .EVM` (`pc`, `stack`, `execLength`). |\n| [`State.lean`](/tmp/lido-ssz-review284-191a807d/ssz284-review-packet/sources/evmyul/EvmYul/State.lean) | Yellow-paper `\u03c3` / `A` / `I`. |\n| [`SharedState.lean`](/tmp/lido-ssz-review284-191a807d/ssz284-review-packet/sources/evmyul/EvmYul/SharedState.lean) | `State` + `MachineState`. |\n| [`MachineState.lean`](/tmp/lido-ssz-review284-191a807d/ssz284-review-packet/sources/evmyul/EvmYul/MachineState.lean) | `gasAvailable`, `memory`, `activeWords`, `returnData`. |\n| [`MachineStateOps.lean`](/tmp/lido-ssz-review284-191a807d/ssz284-review-packet/sources/evmyul/EvmYul/MachineStateOps.lean) | Real `M` / `mload` / `mstore` (32-byte extent, big-endian lookup). |\n| [`SharedStateOps.lean`](/tmp/lido-ssz-review284-191a807d/ssz284-review-packet/sources/evmyul/EvmYul/SharedStateOps.lean) | Real `calldatacopy` into `executionEnv.calldata` + `M` on `activeWords`. |\n| [`EVM/Semantics.lean`](/tmp/lido-ssz-review284-191a807d/ssz284-review-packet/sources/evmyul/EvmYul/EVM/Semantics.lean) | `call` \u2192 `\u0398`; `\u0398` address **2** \u2192 `\u039e_SHA256`. |\n| [`EVM/PrecompiledContracts.lean`](/tmp/lido-ssz-review284-191a807d/ssz284-review-packet/sources/evmyul/EvmYul/EVM/PrecompiledContracts.lean) | `\u039e_SHA256`: gas `60+12*ceil(len/32)`, then `ffi.SHA256 I.calldata`. |\n| [`FFI/ffi.lean`](/tmp/lido-ssz-review284-191a807d/ssz284-review-packet/sources/evmyul/EvmYul/FFI/ffi.lean) | `@[extern \"sha256\"] opaque sha256`. Crypto stays external. |\n| [`EVM/Gas.lean`](/tmp/lido-ssz-review284-191a807d/ssz284-review-packet/sources/evmyul/EvmYul/EVM/Gas.lean) | `C'`, `Ccallgas`, `memoryExpansionCost` (`MLOAD`/`MSTORE`/`CALL`/`CALLDATACOPY`). |\n| [`Maps/AccountMap.lean`](/tmp/lido-ssz-review284-191a807d/ssz284-review-packet/sources/evmyul/EvmYul/Maps/AccountMap.lean) | `toExecute`: `t \u2208 \u03c0` \u2192 `Precompiled`. |\n| [`State/ExecutionEnv.lean`](/tmp/lido-ssz-review284-191a807d/ssz284-review-packet/sources/evmyul/EvmYul/State/ExecutionEnv.lean) | `I` including `calldata`. |\n| [`StateOps.lean`](/tmp/lido-ssz-review284-191a807d/ssz284-review-packet/sources/evmyul/EvmYul/StateOps.lean) | `lookupAccount`, `addAccessedAccount`, `calldataload`. |\n| [`UInt256.lean`](/tmp/lido-ssz-review284-191a807d/ssz284-review-packet/sources/evmyul/EvmYul/UInt256.lean) | `ofNat`, `fromByteArrayBigEndian`. |\n| [`Wheels.lean`](/tmp/lido-ssz-review284-191a807d/ssz284-review-packet/sources/evmyul/EvmYul/Wheels.lean) | `BE`, `toByteArray`, `readBytes`/`readWithPadding`, `ByteArray.write`. |\n\nThese are real memory / \u0398 / precompile-2 / opaque SHA callees, not renamed payload fields. Composition wiring from event 1953 is unchanged.\n\nInit `selected_core_sources` (16) remain identity-only; not required to re-open composition.\n\n## Still OPEN (unchanged)\n\n- P-SSZ-1 / `all_eight_guarantees`\n- ABI / field extraction / key offset-extent / proof layout\n- init / depth / memory `< 2^251` / surrounding opcode gas\n- slot / proposer / EIP-4788 root / GIndex prefix\n- compiled ABI / World / account / revert-rollback\n- SHA cryptography (`ffi.sha256` opaque; size-32 hypothesis)\n\nALLOC-1 / ALLOC-2 / RESERVE-1 untouched. PR283 not reopened.\n\nNo new composition defect. Completeness gap from event 1953 (15 EvmYul + 6 core locally missing) is closed by packet bytes that match Git/pin/receipt. GasConstants is the extra EvmYul body: in 1116, not in 61, now read.\n\nVERDICT: CLEAN",
+    "event_id": "b4ddcbcd-2fe3-42b1-a38b-3082af9272e1",
+    "event_type": "assistant_message",
+    "id": 3704123,
+    "metadata": {
+      "completion_evidence": {
+        "classification_source": "structured",
+        "completion_confidence": "high",
+        "completion_signal": "process_exit",
+        "failure_class": null,
+        "native_terminal_seen": false,
+        "pending_tools": null,
+        "provider_error_source": null,
+        "terminal_reason": "TurnComplete",
+        "transport_failure_stage": null
+      },
+      "cost": {
+        "amount_cents": 19,
+        "currency": "USD",
+        "source": "estimated"
+      },
+      "cost_cents": 19,
+      "model": "grok-4.6",
+      "model_normalized": "grok-4.6",
+      "success": true,
+      "usage": {
+        "cache_creation_input_tokens": "[redacted]",
+        "cache_read_input_tokens": "[redacted]",
+        "input_tokens": "[redacted]",
+        "output_tokens": "[redacted]"
+      }
+    },
+    "mission_id": "a1a9f3d2-a89e-429c-a715-c68cc81a8daa",
+    "sequence": 4678,
+    "timestamp": "2026-09-10T00:02:56.772255717+00:00",
+    "tool_call_id": null,
+    "tool_name": null
+  }
+]

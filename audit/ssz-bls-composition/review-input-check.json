@@ -1,0 +1,13 @@
+{
+  "candidate": "191a807d07607fa08c2eb80b32db995014d89095",
+  "command": [
+    "python3",
+    "audit/ssz-bls-composition/check_receipt.py"
+  ],
+  "result": {
+    "scope": "Recorded file/package-pin comparison only; no fresh proof or EVM execution",
+    "checks": 1217,
+    "errors": []
+  },
+  "scope": "Root replayed this checker during integration preparation. Sources and dependencies remain byte-identical; no further Lean or Forge rerun."
+}

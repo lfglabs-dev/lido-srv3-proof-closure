@@ -1,0 +1,24 @@
+{
+  "source_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "command": "FOUNDRY_SRC=audit/ssz-bls-composition/solidity FOUNDRY_TEST=audit/ssz-bls-composition/solidity FOUNDRY_OUT=/tmp/lido-ssz-bls-forge-out FOUNDRY_CACHE_PATH=/tmp/lido-ssz-bls-forge-cache forge test --remappings contracts/=lido-core/contracts/ --threads 2 --fuzz-runs 1024 -vv",
+  "exit_code": 0,
+  "tests_passed": 5,
+  "fuzz_runs": 1024,
+  "fault_injections": 24,
+  "scope": "Unmodified pinned leaf and calldata verifier suffix, real SHA differential; separate finite synthetic BLS and verifier fault-order tests. Not full wrapper, universal compiler equivalence, cryptography or World rollback.",
+  "source_sha256": {
+    "audit/ssz-bls-composition/solidity/SszBlsComposition.t.sol": "610017ad3b52a3ffda650301516240eded3f7b031b37b027920417317ae24ce3",
+    "lido-core/contracts/0.8.25/CLValidatorVerifier.sol": "d6e89f6975e4fa02f758bf461a98ac2d689296b5c92d03ffd4e43a22d0b3d7ed",
+    "lido-core/contracts/common/interfaces/ValidatorWitness.sol": "8fd24cfab7402233029756e52e59198b0d9cbf0a42e5c07d9fa2338ed731a5f7",
+    "lido-core/contracts/common/lib/BLS.sol": "0187cc6a6b1aaa833317695d88795db431fa237452213e8c3872a0f444dceb7c",
+    "lido-core/contracts/common/lib/BeaconTypes.sol": "9591e9af1a4fd398db86267f3589e763f9eb2016bf29e26cfa50988cf73a10c3",
+    "lido-core/contracts/common/lib/GIndex.sol": "2653bd4ba89c349f3db36f21a8afc6a24e0e233816d9b608f46d048feb601d1f",
+    "lido-core/contracts/common/lib/SSZ.sol": "91ef497b972bbee0fe89043034e6bd62fa0c1059f22874d4826bc6164a22009b"
+  },
+  "evidence_hashes": {
+    "audit/ssz-bls-composition/solidity/validation.log": "8b1f83b3846f88bc57833c57ea24152eab675fff527116de75840b75a4f02d83",
+    "audit/ssz-bls-composition/solidity/compiler-input-identities.json": "85930e3027c3b258e5f6b0957554b89f80e2c06daea22a85fa9908e606244050",
+    "audit/ssz-bls-composition/solidity/diagnostic-first-run.log": "de390eda80e984fbabe4ca419531ad88065b9530d028de1d2b90ba948efbc09a",
+    "audit/ssz-bls-composition/solidity/diagnostic-fault-trace.log": "c08e13f74cc4435a153e755777fd791c614abd2e931232e674855196e39160c2"
+  }
+}
