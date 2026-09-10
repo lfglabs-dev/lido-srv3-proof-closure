@@ -1,0 +1,7 @@
+# TOPUP ordinary no-code integration
+
+The writer froze4fd86cd2 and stopped before the retained independent complete-source/Solidity review. Root merged reviewed source4fd86cd2 with accepted main808db8a0 in union09a09ad8. All four Lean source bodies, all1285 transitive source identities, all11 package pins and all17 source-packet hashes remain identical. The independent review additionally reproduced the complete optimized IR from all28 pinned compiler sources and replayed the targeted Foundry case; its limits remain explicit.
+
+Root adds the new PTopup2ModuleFailure public module to AllGuarantees and Trust, and queries both actual module and whole-root-batch failure consumers. Existing test imports already consume both changed regression modules. No dependency, generic CALL primitive or prior public success premise changes in this integration. The ordinary non-precompile interpretation and the distinction between Foundry diagnostic revert data and the compiler's empty decoder revert are retained.
+
+The integration receipt records the full AllGuarantees/Trust build and fresh trust gate. Source validation is reused by exact source/dependency identity. Independent review of the exact frozen integration commit is the separate merge gate; the writer's historical Pending field is not rewritten or credited as a verdict.

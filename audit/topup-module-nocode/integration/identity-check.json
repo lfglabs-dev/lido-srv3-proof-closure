@@ -1,0 +1,15 @@
+{
+  "source": "4fd86cd2c53b6e1c06a05a3488d9a46bc65ad4ac",
+  "main": "808db8a02694c1b0268f0480513466b03761491f",
+  "union": "09a09ad875f8e1519586a04932efd4dbacdf713f",
+  "four_Lean_sources_unchanged": [
+    "LidoSRv3/Audit/Source/TopupModuleCall.lean",
+    "LidoSRv3/Audit/Guarantees/PTopup2ModuleFailure.lean",
+    "LidoSRv3/Tests/TopupModuleCallMutants.lean",
+    "LidoSRv3/Tests/TopupBatchRootCallsRegression.lean"
+  ],
+  "packet_hashes": 17,
+  "source_hashes": 1285,
+  "package_pins": 11,
+  "scope": "Exact identities retain independent source/kernel/compiler/Foundry checks; no extra Solidity rerun credited."
+}
