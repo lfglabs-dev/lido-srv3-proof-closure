@@ -1,0 +1,12 @@
+{
+  "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "source_sha256": {
+    "contracts/0.8.9/Accounting.sol": "dc0609ab76e462be8b28806cc768f22bdd61f24f23d45baef5ec3b1457bf659f",
+    "contracts/0.8.25/sr/StakingRouter.sol": "4d5b83fc73736db6755ebbb58811ed499c3e6de622cce11a3ad8548800a34155",
+    "contracts/0.8.25/sr/SRLib.sol": "2a53ec2d183f3c3d8b6257f18dc7143e8afbc8d3d2f8a48bd0e5e0580b5b47ab",
+    "contracts/0.4.24/Lido.sol": "3bf84b96fb155af2290e6b26bc0138de356442a9abe3ea0f5274497f9fbffc10",
+    "contracts/0.4.24/StETH.sol": "63ebed0e205b602fe2e427bb09c111479f98253bd02f96ac052b38202d3713bd"
+  },
+  "fresh_execution": false,
+  "scope": "Pinned complete source identity for proof-only checked fee split; inherited executable definitions unchanged."
+}

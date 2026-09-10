@@ -1,0 +1,71 @@
+{
+  "module": "Tests.Verity.ReportFeeCheckedSplitTest",
+  "source_candidate": "a3fe6041ecddbc3b7a4af56495da17ae15e9f001",
+  "sets": {
+    "AccountAddress.ReportFeeCheckedSplit.checked_products_split": [
+      "Quot.sound",
+      "propext"
+    ],
+    "AccountAddress.ReportFeeCheckedSplit.committed_checked_split": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "AccountAddress.ReportFeeMint.checkedFeeProducts_split_origin": [
+      "Quot.sound",
+      "propext"
+    ],
+    "AccountAddress.ReportFeeMint.checkedFeeResultOf_split": [
+      "Quot.sound",
+      "propext"
+    ],
+    "AccountAddress.ReportFeeMint.committed_success": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "AccountAddress.ReportFeeMint.failure_restores": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "AccountCheckedSplitRegression.actual_arithmetic_reject_restores": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "AccountCheckedSplitRegression.actual_multirow_joint_consumer": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "AccountCheckedSplitRegression.actual_multirow_mint_split": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "AccountCheckedSplitRegression.actual_zero_skip_retained": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "AccountCheckedSplitRegression.checked_product_rejects": [],
+    "AccountCheckedSplitRegression.checked_sum_rejects": [],
+    "AccountCheckedSplitRegression.checked_treasury_subtraction_rejects": [],
+    "AccountCheckedSplitRegression.nontrivial_rounding": [],
+    "AccountCheckedSplitRegression.zero_mint_skips_distribution": [],
+    "AccountCheckedSplitRegression.zero_row_retains_position": [],
+    "LidoSRv3.Audit.Guarantees.PAccount1.actual_report_fee_mint_checked_split": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  "reason": "Normal Lake registration changes two module identities from the prior manual build; recompute all 17 sets on the actual registered environment.",
+  "built_oleans": {
+    "ReportFeeMint": "470fd24a198f4016aa7b2e5e0d527e883caacd722e57e7cc9cf0da5358ee53db",
+    "ReportFeeCheckedSplit": "42b944c7019bfa061a926535ceec22525c962f10bb5941b262986129b2f9484f",
+    "LidoSRv3.Audit.Guarantees.PAccount1CheckedFeeSplit": "471ac75962a6b2220d6b231eacc3471b3b9e7cbec89624d51a1c2a7a1cc95e47",
+    "Tests.Verity.ReportFeeCheckedSplitTest": "017bb6dc0b61427a39b22d7e81ba389affd4950b53117c8c32a205a579baf9fb"
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "schema": "lido-account-checked-fee-split-v1",
+  "created_utc": "2026-09-10T21:50:06.494433+00:00",
+  "base": "70301660264f2f710e7160e190aaa3af330e84fa",
+  "source_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "public_theorem": "LidoSRv3.Audit.Guarantees.PAccount1.actual_report_fee_mint_checked_split",
+  "scope": "Actual report/getter/checked fee calculation/mint success jointly implies previous Success, ExactCasts, equal distribution lengths and exact checked module-floor plus treasury partition of the same actually minted fee; no later payout claimed.",
+  "executable_changes": 0,
+  "public_new_premises": 0,
+  "build": {
+    "command": "python3 audit/account-checked-fee-split/build.py",
+    "exit_code": 0,
+    "lake_prerequisite_jobs": 26,
+    "new_sequential_lean_modules": 3
+  },
+  "kernel_regressions": 10,
+  "public_actual_consumer_instantiations": 1,
+  "source_identities": 27,
+  "package_pins": {
+    "verity": "e977aaad6e1a9e92e0132d41b3d33a14135a4d46",
+    "evmyul": "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9",
+    "mathlib": "fabf563a7c95a166b8d7b6efca11c8b4dc9d911f",
+    "plausible": "63045536fe95024e6c18fc7b48e03f506701c5bc",
+    "LeanSearchClient": "c5d5b8fe6e5158def25cd28eb94e4141ad97c843",
+    "importGraph": "5c7542ed018c78194f1e2b903eaf6a792b74c03d",
+    "proofwidgets": "24b0d9dc081c5423f8eec7e866c441e5184f29d9",
+    "aesop": "e3cb2f741431ce31bf73549fb52316a57368b06f",
+    "Qq": "f46324995fca5f0483b742e4eb4daec7f4ee50d2",
+    "batteries": "fa08db58b30eb033edcdab331bba000827f9f785",
+    "Cli": "92564e5770e4d09f2d86dfbf8ada1e9c715b384c"
+  },
+  "pinned_solidity_bodies": 5,
+  "scoped_axiom_sets": 17,
+  "new_axioms": 0,
+  "fresh_solidity_execution": false,
+  "built_olean_sha256": {
+    "ReportFeeMint": "470fd24a198f4016aa7b2e5e0d527e883caacd722e57e7cc9cf0da5358ee53db",
+    "ReportFeeCheckedSplit": "b6efdf0d40e26b234b7324d71f098dcf1a8c408bcf15054a327a5a2a40b30c40",
+    "LidoSRv3.Audit.Guarantees.PAccount1CheckedFeeSplit": "792c787659f85e5f8e1853b96e630850d31eb5f6a86b188165791cf46c43c702",
+    "Tests.Verity.ReportFeeCheckedSplitTest": "114a8900bd346e40a907e0af1a9693decadf2da26cb538e3ea432c62fd1b3ba9"
+  },
+  "sha256": {
+    "audit/trio/account-address/ReportFeeMint.lean": "93be9d8f39fd3907796f8bb66b9fc67c5fc681c1f88dec1c70fc6a9b573455e6",
+    "audit/trio/account-address/ReportFeeCheckedSplit.lean": "879c03d3a1fee37d3fb80e6e3b2698eee1c3e642e4fffa6da703b8d8715d56aa",
+    "audit/trio/account-address/Tests/Verity/ReportFeeCheckedSplitTest.lean": "4cb2d5a19115c295ec1e950dcbc00dce060a7408b51789d64d151fac86cfa877",
+    "LidoSRv3/Audit/Guarantees/PAccount1CheckedFeeSplit.lean": "9b2abcd1a2a99df90916f0da3ad7c1b0fcd667eed85893b239fc0e59cf8818a7",
+    "audit/account-checked-fee-split/README.md": "0bf2c60a73cfd2ed82d1d8c43f8ab7d036135661e31b1d97d29462b04d30aa39",
+    "audit/account-checked-fee-split/axioms.json": "ad6a7a38f87948f69e00397adcd49d4760d361d91641cb7eda19452b6abea0e9",
+    "audit/account-checked-fee-split/build.py": "11c18b69196c135f56e5e6844fc693b3bc0aebe7bc40c4d658debb292a2028a2",
+    "audit/account-checked-fee-split/preservation.json": "f22ff6f5ab52b03112e0e2f3d3a8e47ba566eded0a479ced5c10cd169ed47c95",
+    "audit/account-checked-fee-split/solidity-identities.json": "cfc40d83ba04cd20b7be86054548cc2e404550f8a3a3bd9e887043877b8476a5",
+    "audit/account-checked-fee-split/source-axiom-check.log": "3aa7471b2aaf81d2d8405f04c291ad285988abd3d5d4ef254a6ea1a9f7578f9f",
+    "audit/account-checked-fee-split/source-inputs.json": "85ada3c6aa37c424577e03ad746d5011a7355506fbf76f3624c962e640d855f2",
+    "audit/account-checked-fee-split/target-build.log": "db29c0792ddb412feca3ffed362d8df5fe005192fbbf92eed357ace09ac313e0",
+    "audit/account-checked-fee-split/validate.py": "81cebc35a6ef90edf1f4a809db43f15168c5ca9a3869aee323af05d4aa55208e",
+    "audit/account-checked-fee-split/write_receipt.py": "008637d9f53a84ace1a50f8db28173985941b688fce4e90cd2a4941b0b507d94"
+  },
+  "status": "Candidate frozen for independent exact full-source/Solidity review; global registration and All/Trust integration pending."
+}
