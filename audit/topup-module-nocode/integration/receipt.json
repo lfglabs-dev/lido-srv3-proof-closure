@@ -1,0 +1,33 @@
+{
+  "source": "4fd86cd2c53b6e1c06a05a3488d9a46bc65ad4ac",
+  "main_base": "808db8a02694c1b0268f0480513466b03761491f",
+  "union": "09a09ad875f8e1519586a04932efd4dbacdf713f",
+  "source_review": "CLEAN; independent fullsource, normal kernel, full pinned IR reproduction and targeted Foundry",
+  "AllTrust": {
+    "command": "lake build LidoSRv3.Audit.AllGuarantees LidoSRv3.Audit.Trust",
+    "exit": 0,
+    "jobs": 1686
+  },
+  "trust": {
+    "command": "python3 scripts/check_trust_axioms.py",
+    "exit": 0,
+    "exact_axioms": 29,
+    "dependencies_recomputed": true,
+    "native_claims_reevaluated": true
+  },
+  "reused": {
+    "source_identities": 1285,
+    "packet_hashes": 17,
+    "pins": 11,
+    "axiom_sets": 26,
+    "scope": "same exact bodies; no new Solidity rerun credited by integration"
+  },
+  "integration_review": "Separate frozen exact-commit review required before merge",
+  "sha256": {
+    "audit/topup-module-nocode/integration/identity-check.json": "88c2a8d51e9d2a51429a600727b83a8a185765d2508ab0cc36bc3e023aecc933",
+    "audit/topup-module-nocode/integration/all-trust-build.log": "0adb38b6fdbe99e823cdf99eda5c1b2725887a1e2944351d2b021b36ae9d91e6",
+    "audit/topup-module-nocode/integration/trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439",
+    "audit/topup-module-nocode/integration/README.md": "c3601188f67585b161dfc5a4493d593ac2f89d50bac3d7cba8978ff3e513467f",
+    "audit/topup-module-nocode/integration/independent-source-review-4fd8.md": "8bac61bdddaa2062be433f861631a2b17c94b5e953a09c976abd7c519e27b619"
+  }
+}
