@@ -1,0 +1,24 @@
+{
+  "candidate": "2db21492d2d39f3199ce25f0deea9225190d6485",
+  "review_mission": "35839bb3-1536-46c6-a7e8-734ee0f39488",
+  "source_event": 2405,
+  "event_id": "94077cce-b55d-4fd4-a126-fdfd9163ff9e",
+  "verdict": "CLEAN scoped; all eight OPEN",
+  "original_files_unchanged": {
+    "LidoSRv3/Audit/Source/TopupHistoryDomain.lean": "3116637d8dfac8f1cfc79caec243a0bbf4a7bd7d46349496bd536558fa7fe774",
+    "audit/topup-history-domain/README.md": "1c3e66abcfc7f344e51d6275fcadb80c59cc56982663c914fac1d00d09a32301",
+    "audit/topup-history-domain/check_receipt.py": "c63e61ef299303d4124a8d6d0b381131adf1e2c6b428a388c8c730269603ccc8",
+    "audit/topup-history-domain/dependency-inputs.json": "b09c75f5b75b95137b2a1266a49ac3f7f2fc7f36ab6e5ee00bac74a5c924ff7e",
+    "audit/topup-history-domain/receipt.json": "94805ad3d57698096413c9844fbec1dd4f4432ce1821524dbd75794702b13c7d",
+    "audit/topup-history-domain/solidity/TopupHistoryDomain.t.sol": "5c9f1e315a17f6287e089e787637190debf0a179df36fed9a070ffc65e287b09",
+    "audit/topup-history-domain/solidity/compiler-input-identities.json": "993e809e497937c302ef0318e2c182ab8f7f06c72ed0ba1ebbaf4995d8475aab",
+    "audit/topup-history-domain/solidity/validation.log": "4e926e95ae642caeb142a92c0d0bd1c5406e1d75c8cb3e98d818672a70671895",
+    "audit/topup-history-domain/source-check.json": "2b4cc47e1984ef139fa8742d67da3e4601a16666f6132bdb48fd7a7be15151ce",
+    "audit/topup-history-domain/validation.log": "b6bd9369e92ffdf15ef4df76382b3773a8382b5f3fdda07fa7b3861ca7bbcbe2"
+  },
+  "artifacts": {
+    "independent-review.md": "c16e50cc2d36a458c2423444ec8f2e97ca9b07c6f096be8d8f8df9909be2c752",
+    "independent-review-events.json": "cc48487f8cde3dec4c59bb32cfd1f61da470f30cdc9dde4a5500198d51260296",
+    "review-response.md": "43c413243693af6c8e52d3f712dec12b25c25a8d02e866c49bf1e1755d65048f"
+  }
+}
