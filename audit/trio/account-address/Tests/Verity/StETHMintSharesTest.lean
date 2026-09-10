@@ -10,13 +10,16 @@ share payload `4` in the high half. -/
 private def before : State := {
   storage := Core.write
     (Core.write
-      (Core.write ⟨[]⟩ 17 ⟨111, by decide⟩)
-      18 ⟨222, by decide⟩)
+      (Core.write
+        (Core.write
+          (Core.write ⟨[]⟩ 17 ⟨111, by decide⟩)
+          18 ⟨222, by decide⟩)
+        bufferedEtherAndDepositedPostReportPosition ⟨100, by decide⟩)
+      clValidatorsAndPendingPosition ⟨0, by decide⟩)
     totalSharesPosition ⟨4 * two128 + 10, by
       have : 4 * two128 + 10 < two256 := by decide
       exact this⟩
   shares := fun account => if account = 7 then 5 else 0
-  internalEther := 100
   accounting := 7
   steth := 8
   stopped := false

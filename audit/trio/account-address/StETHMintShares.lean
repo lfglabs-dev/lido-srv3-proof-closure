@@ -26,6 +26,16 @@ def uint128Max : Nat := two128 - 1
 def totalSharesPosition : Nat :=
   0x6038150aecaa250d524370a0fdcdec13f2690e0723eaf277f41d7cae26b359e6
 
+/-- Lido.sol:130-132, whose low/high uint128 fields are buffered ether and
+deposited post-report ether respectively. -/
+def bufferedEtherAndDepositedPostReportPosition : Nat :=
+  0x81a11fa1111afa59b50051f60ccf604a39d96acb484dc467ad8eadb4a63f0a5f
+
+/-- Lido.sol:143-145, whose low/high uint128 fields are CL validator and
+pending balances respectively. -/
+def clValidatorsAndPendingPosition : Nat :=
+  0x096e465397f38e659238ccd5d5a2c434ced54a63fd8d694045bfb058ab9d8112
+
 /-- The conventional `mapping(address => uint256) shares` at StETH.sol:68.
 The key derivation is intentionally not claimed here; it is a mapping, not a
 pair of invented sequential storage slots. -/
@@ -36,9 +46,6 @@ structure State where
   only at `totalSharesPosition`; `shares` remains a Solidity mapping below. -/
   storage : Core
   shares : Shares
-  /-- Lido.sol:1298-1305 overrides StETH's share-rate numerator with
-  `_getInternalEther()`, rather than total pooled ether. -/
-  internalEther : Nat
   accounting : Nat
   steth : Nat
   stopped : Bool
@@ -72,6 +79,24 @@ def totalShares (s : State) : Nat := (totalAndExternalShares s).val % two128
 /-- The external-share payload in the high half is not token total shares. -/
 def externalShares (s : State) : Nat := (totalAndExternalShares s).val / two128
 
+private def low128 (word : StorageWord) : Nat := word.val % two128
+private def high128 (word : StorageWord) : Nat := word.val / two128
+
+/-- Lido.sol:1271-1277.  Unlike the raw arithmetic in the event conversion,
+these four additions are Solidity 0.4 AragonSafeMath additions over values
+read from their two packed storage words. -/
+def getInternalEther (s : State) : Except Error Nat :=
+  let bufferedDeposited := s.storage.read bufferedEtherAndDepositedPostReportPosition
+  let clBalances := s.storage.read clValidatorsAndPendingPosition
+  let buffered := low128 bufferedDeposited
+  let deposited := high128 bufferedDeposited
+  let validators := low128 clBalances
+  let pending := high128 clBalances
+  if uint256Max < buffered + validators then .error .safeMathAddOverflow
+  else if uint256Max < buffered + validators + pending then .error .safeMathAddOverflow
+  else if uint256Max < buffered + validators + pending + deposited then .error .safeMathAddOverflow
+  else .ok (buffered + validators + pending + deposited)
+
 /-- `UnstructuredStorageExt.setLowUint128`: replace only the low half. -/
 def setLowUint128 (word : StorageWord) (value : Nat) : StorageWord :=
   ⟨(word.val / two128) * two128 + value % two128, by
@@ -102,7 +127,10 @@ def pooledEthByShares (s : State) (amount : Nat) : Except Error Nat :=
   else
     let denominator := rawUint256Sub (totalShares s) (externalShares s)
     if denominator = 0 then .error .zeroShareRateDenominator
-    else .ok (rawUint256Mul amount s.internalEther / denominator)
+    else
+      match getInternalEther s with
+      | .error e => .error e
+      | .ok internalEther => .ok (rawUint256Mul amount internalEther / denominator)
 
 /-- StETH.sol:518-527.  The `newTotalShares & UINT128_HIGH_MASK == 0`
 check is represented by `newTotal < 2^128`; the high half of the existing
