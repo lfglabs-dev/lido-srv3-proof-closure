@@ -23,10 +23,9 @@ report timestamp use the pinned Solidity packing exactly.
 
 The transaction checks the parallel-array lengths, iterates every request,
 reads the current and previous cumulative request words and checkpoint words,
-sets the packed claimed byte, decrements locked ETH, and executes a real
-value-bearing empty-calldata `externalCallBindTo` frame to the recipient.
-Consequently the payout destination, value, order, and rollback boundary are
-execution-derived. EnumerableSet removal and events remain outside this slice.
+and sets the packed claimed byte and locked-ETH scalar.  The recipient CALL is
+executed exactly once by `AddressRecipientCallBridge`, against its callee
+world; it is deliberately not duplicated here by a stub-side CALL journal.
 -/
 
 namespace LidoSRv3.Audit.Verity.AddressClaimBatchTx
@@ -133,10 +132,9 @@ def claimableEther (request : RequestRead) : Option Nat :=
     some (if batchShareRate > request.checkpointMaxShareRate
       then shares * request.checkpointMaxShareRate / E27 else eth)
 
-/-- One pinned `_claim` iteration. The packed claimed write and locked-ETH
-decrement occur before the real payout frame, so `Contract.run` must roll both
-back if the frame cannot pay. -/
-def claimOne (requestId hint : Nat) (recipient : Address) : Contract Unit := fun state =>
+/-- One pinned `_claim` storage iteration.  It returns the exact payout for the
+following live recipient CALL; it does not issue a second synthetic CALL. -/
+def claimOne (requestId hint : Nat) (_recipient : Address) : Contract Nat := fun state =>
   let sender := state.sender
   let request := readRequest state requestId hint
   let lastFinalized := (state.readSlot lastFinalizedRequestIdPosition).val
@@ -163,13 +161,12 @@ def claimOne (requestId hint : Nat) (recipient : Address) : Contract Unit := fun
             (state.writeMapUint (queuePosition + 1) (.ofNat requestId)
               (markClaimed (requestMetadataWord state requestId))).writeSlot
                 lockedEtherAmountPosition (.ofNat (locked - payout))
-          externalCallBindTo recipient (.ofNat payout) []
-            "WithdrawalQueue._sendValue" ([] : List Uint256) dirty
+          .success payout dirty
 
 def claimLoop : List Nat → List Nat → Address → Contract Unit
   | [], [], _ => Verity.pure ()
   | requestId :: requestIds, hint :: hints, recipient => do
-      claimOne requestId hint recipient
+      let _ ← claimOne requestId hint recipient
       claimLoop requestIds hints recipient
   | _, _, _ => fun state => .revert "ArraysLengthMismatch" state
 
@@ -214,14 +211,12 @@ def twoClaimState : ContractState :=
   let state := state.writeMapUint checkpointsPosition 1 1
   state.writeMapUint (checkpointsPosition + 1) 1 (.ofNat E27)
 
-/-- Concrete executable correspondence/observe receipt for a two-item live
-batch. Both packed request words are read and marked, the locked scalar reaches
-zero, and two payout CALLs are journaled in loop order. -/
+/-- Concrete storage receipt for a two-item live batch.  The actual recipient
+CALLs are represented by the live-world bridge, not a duplicate stub journal. -/
 theorem two_claim_batch_observe :
     observe [1, 2]
         ((executeClaimWithdrawalsTo [1, 2] [1, 1] (2 : Address)).run twoClaimState) =
-      ⟨.committed, [true, true], 0,
-        [payoutEntry (2 : Address) 30, payoutEntry (2 : Address) 40]⟩ := by
+      ⟨.committed, [true, true], 0, []⟩ := by
   decide +kernel
 
 /-- The transaction boundary restores the entry snapshot after any failed
