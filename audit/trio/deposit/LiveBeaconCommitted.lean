@@ -15,6 +15,7 @@ set_option autoImplicit false
 
 open audit.trio.deposit
 open audit.trio.deposit.LiveBeacon
+open audit.trio.deposit.RouterDeposit (batchLengthsOk)
 open LidoSRv3.Audit.Source
 open LidoSRv3.Audit.Source.TrioAlloc1
 open LidoSRv3.Audit.Source.TrioReserve1
@@ -25,7 +26,7 @@ open LidoSRv3.Audit.SolidityTopup (allocSum)
 
 structure SuffixCommitment (callee : Live.External) (ctx : RouterDeposit.Context)
     (liveCtx : Live.Context) (credentialsWord : Word) (prepared : PreparedDeposit)
-    (before after : Live.World) (trace : List Live.Attempt) : Prop where
+    (before after : Live.World) (trace : List Live.Attempt) where
   withdrawn : Live.World
   withdrawalTrace : List Live.Attempt
   loopTrace : List Live.Attempt
@@ -75,13 +76,13 @@ theorem execute_ok_exposes_actual_suffix (callee : Live.External) (ctx : RouterD
   cases hsuffix : suffix callee ctx inputs.liveContext credentialsWord prepared before.live with
   | mk suffixOutcome live trace =>
     cases suffixOutcome with
-    | error fault => simp [execute, executeRaw, hAuth, hActive, hCred, hPrep, hsuffix] at h
+    | «error» fault => simp [execute, executeRaw, hAuth, hActive, hCred, hPrep, hsuffix, liftOutcome] at h
     | ok unit =>
       cases unit
       simp only [execute, executeRaw, hAuth, bne_self_eq_false, Bool.false_eq_true, if_false,
-        hActive, Bool.not_true, hCred, hPrep, hsuffix, liftOutcome] at h
+        hActive, Bool.not_true, hCred, hPrep, hsuffix, liftOutcome, Result.mk.injEq, true_and] at h
       rcases h with ⟨hafter, hattempts⟩
-      exact ⟨live, trace, hsuffix, hafter.symm, hattempts.symm⟩
+      exact ⟨live, trace, rfl, hafter.symm, hattempts.symm⟩
 
 /-- Invert a nonempty successful suffix.  In particular, the Lido result and
 the callee-loop result below are computed subexecutions, not supplied receipts.
@@ -91,17 +92,17 @@ theorem suffix_ok_commitment (callee : Live.External) (ctx : RouterDeposit.Conte
     (before after : Live.World) (trace : List Live.Attempt)
     (hkeys : prepared.values.actualKeys ≠ 0)
     (h : suffix callee ctx liveCtx credentialsWord prepared before = ⟨.ok (), after, trace⟩) :
-    SuffixCommitment callee ctx liveCtx credentialsWord prepared before after trace := by
+    Nonempty (SuffixCommitment callee ctx liveCtx credentialsWord prepared before after trace) := by
   unfold suffix at h
   rw [if_neg hkeys] at h
   cases hwithdrawal : withdrawal callee liveCtx prepared before with
   | mk withdrawalOutcome withdrawn withdrawalTrace =>
     cases withdrawalOutcome with
-    | error fault => simp [Live.bindExec, hwithdrawal] at h
+    | «error» fault => simp [Live.bindExec, hwithdrawal] at h
     | ok unit =>
       cases unit
       cases hlengths : batchLengthsOk prepared with
-      | error fault => simp [Live.bindExec, lengthGuard, hwithdrawal, hlengths] at h
+      | «error» fault => cases fault <;> simp [Live.bindExec, lengthGuard, hwithdrawal, hlengths, Live.fail] at h
       | ok unit =>
         cases unit
         cases hloop : TopupBeaconBatch.loop (routerContext liveCtx ctx) (beaconAddress ctx)
@@ -109,21 +110,21 @@ theorem suffix_ok_commitment (callee : Live.External) (ctx : RouterDeposit.Conte
             (amounts prepared.values.actualKeys) withdrawn with
         | mk loopOutcome loopWorld loopTrace =>
           cases loopOutcome with
-          | error fault => simp [Live.bindExec, lengthGuard, beaconLoop, hwithdrawal,
-              hlengths, hloop] at h
+          | «error» fault => simp [Live.bindExec, lengthGuard, beaconLoop, hwithdrawal,
+              hlengths, hloop, Live.pureExec] at h
           | ok unit =>
             cases unit
             unfold finish at h
             simp only [Live.bindExec, lengthGuard, Live.pureExec, beaconLoop,
               hwithdrawal, hlengths, hloop, List.append_nil] at h
             split at h
-            · contradiction
+            · simp [Live.fail] at h
             · rename_i hrestored
-              simp only [Live.pureExec, Result.mk.injEq] at h
+              simp only [Live.pureExec, Live.Result.mk.injEq, true_and, List.nil_append, List.append_nil] at h
               rcases h with ⟨hworld, hjournal⟩
               subst loopWorld
-              exact ⟨withdrawn, withdrawalTrace, loopTrace, hwithdrawal, hlengths,
-                hloop, by simpa using hrestored, hjournal.symm⟩
+              exact ⟨⟨withdrawn, withdrawalTrace, loopTrace, hwithdrawal, hlengths,
+                hloop, by simpa using hrestored, hjournal.symm⟩⟩
 
 /-- A nonempty successful suffix necessarily performed the accepted beacon
 callee loop and therefore has its exact live-ledger and physical-count effects.
@@ -143,7 +144,7 @@ theorem suffix_ok_actual_beacon_effects (callee : Live.External) (ctx : RouterDe
         (committed.withdrawn.core.readContractSlot (beaconAddress ctx).val countSlot).val +
           prepared.values.actualKeys ∧
       (after.core.readContractSlot (beaconAddress ctx).val countSlot).val ≤ maxCount := by
-  let committed := suffix_ok_commitment callee ctx liveCtx credentialsWord prepared before after trace hkeys h
+  obtain ⟨committed⟩ := suffix_ok_commitment callee ctx liveCtx credentialsWord prepared before after trace hkeys h
   refine ⟨committed, ?_, ?_, ?_⟩
   · rw [← allocSum_amounts]
     exact loop_success_balances (routerContext liveCtx ctx) (beaconAddress ctx)
@@ -194,6 +195,74 @@ theorem execute_ok_actual_beacon_effects (callee : Live.External) (ctx : RouterD
     suffix_ok_actual_beacon_effects callee ctx inputs.liveContext credentialsWord prepared before.live
       live trace hkeys hsuffix
   exact ⟨live, trace, hafter, hattempts, committed, hbalances, hcount, hcap⟩
+
+/-- Every successful root run supplies its own authorized, active preparation.
+No guard or prepared transcript is supplied by the caller of this theorem. -/
+theorem execute_ok_derives_preparation (callee : Live.External)
+    (ctx : RouterDeposit.Context) (inputs : RouterDeposit.Inputs)
+    (before after : World) (attempts : List Live.Attempt)
+    (h : execute callee ctx inputs before = ⟨.ok (), after, attempts⟩) :
+    ∃ credentialsWord prepared transcript,
+      ctx.caller = ctx.depositSecurityModule ∧ ctx.moduleActive = true ∧
+      ctx.withdrawalCredentials = some credentialsWord ∧
+      prepareDepositABI inputs.layout inputs.storage inputs.oracle inputs.config
+        inputs.requested before.allocationTranscript inputs.moduleId inputs.limits
+        inputs.obtainDepositData DEPOSIT_SIZE = (.ok prepared, transcript) := by
+  by_cases hAuth : ctx.caller = ctx.depositSecurityModule
+  · by_cases hActive : ctx.moduleActive = true
+    · cases hCred : ctx.withdrawalCredentials with
+      | none => simp [execute, executeRaw, hAuth, hActive, hCred] at h
+      | some credentialsWord =>
+        generalize hPrep : prepareDepositABI inputs.layout inputs.storage inputs.oracle inputs.config
+          inputs.requested before.allocationTranscript inputs.moduleId inputs.limits
+          inputs.obtainDepositData DEPOSIT_SIZE = preparedResult at h
+        rcases preparedResult with ⟨outcome, transcript⟩
+        cases outcome with
+        | «error» reason => simp [execute, executeRaw, hAuth, hActive, hCred, hPrep] at h
+        | ok prepared => exact ⟨credentialsWord, prepared, transcript, hAuth, hActive, rfl, rfl⟩
+    · simp [execute, executeRaw, hAuth, hActive] at h
+  · simp [execute, executeRaw, hAuth] at h
+
+/-- Necessary successful-root facts, including the zero-key branch, consumed
+from the same execution. The nonzero branch derives actual beacon ledger and
+physical count effects without caller funding/capacity/signature premises. -/
+theorem execute_ok_derives_actual_effects (callee : Live.External)
+    (ctx : RouterDeposit.Context) (inputs : RouterDeposit.Inputs)
+    (before after : World) (attempts : List Live.Attempt)
+    (h : execute callee ctx inputs before = ⟨.ok (), after, attempts⟩) :
+    ∃ credentialsWord prepared transcript live trace,
+      prepareDepositABI inputs.layout inputs.storage inputs.oracle inputs.config
+        inputs.requested before.allocationTranscript inputs.moduleId inputs.limits
+        inputs.obtainDepositData DEPOSIT_SIZE = (.ok prepared, transcript) ∧
+      after = ⟨transcript, live, recordDeposit ctx prepared before.metadata⟩ ∧
+      attempts = trace ∧
+      ((prepared.values.actualKeys = 0 ∧ live = before.live ∧ trace = []) ∨
+        (prepared.values.actualKeys ≠ 0 ∧
+          ∃ committed : SuffixCommitment callee ctx inputs.liveContext credentialsWord prepared
+              before.live live trace,
+            CallSpec.Balances committed.withdrawn.balances live.balances
+              (routerContext inputs.liveContext ctx).self (beaconAddress ctx)
+              (prepared.values.actualKeys * DEPOSIT_SIZE) ∧
+            (live.core.readContractSlot (beaconAddress ctx).val countSlot).val =
+              (committed.withdrawn.core.readContractSlot (beaconAddress ctx).val countSlot).val +
+                prepared.values.actualKeys ∧
+            (live.core.readContractSlot (beaconAddress ctx).val countSlot).val ≤ maxCount)) := by
+  obtain ⟨credentialsWord, prepared, transcript, hAuth, hActive, hCred, hPrep⟩ :=
+    execute_ok_derives_preparation callee ctx inputs before after attempts h
+  obtain ⟨live, trace, hsuffix, hafter, htrace⟩ :=
+    execute_ok_exposes_actual_suffix callee ctx inputs before after attempts credentialsWord prepared
+      transcript hAuth hActive hCred hPrep h
+  refine ⟨credentialsWord, prepared, transcript, live, trace, hPrep, hafter, htrace, ?_⟩
+  by_cases hz : prepared.values.actualKeys = 0
+  · left
+    have he := zero_keys_suffix_no_actual_calls callee ctx inputs.liveContext credentialsWord prepared before.live hz
+    have hi := Live.Result.mk.inj (hsuffix.symm.trans he)
+    exact ⟨hz, hi.2.1, hi.2.2⟩
+  · exact Or.inr ⟨hz, suffix_ok_actual_beacon_effects callee ctx inputs.liveContext credentialsWord
+      prepared before.live live trace hz hsuffix⟩
+
+#print axioms execute_ok_derives_preparation
+#print axioms execute_ok_derives_actual_effects
 
 /-
 `SuffixCommitment.withdrawal_ok` is deliberately not converted here into a
