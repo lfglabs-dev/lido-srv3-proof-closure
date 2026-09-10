@@ -1,0 +1,36 @@
+{
+  "candidate": "191a807d07607fa08c2eb80b32db995014d89095",
+  "review_mission": "a1a9f3d2-a89e-429c-a715-c68cc81a8daa",
+  "source_events": [
+    1953,
+    4678
+  ],
+  "verdict": "CLEAN scoped; all eight OPEN",
+  "original_files_unchanged": {
+    "LidoSRv3/Audit/Source/SszBlsComposition.lean": "dae0997c41b32ed337300594b730e6b8b22c267c4d13c36ac60c9ba65230831f",
+    "LidoSRv3/Tests/SszBlsCompositionMutants.lean": "72c57b819798ca7ea051d3cb85a5c1433c10e46d3bfb8e13a76e946ef03f9e96",
+    "audit/ssz-bls-composition/README.md": "6e2591574a6576d4c9f23a622a8447fcf0f3ac0df29cd248e999df4fd065afad",
+    "audit/ssz-bls-composition/axioms.log": "5a30a30019c094601ec1357d90a68199fee8e6ce8b857291eba7feb81ad52365",
+    "audit/ssz-bls-composition/check_receipt.py": "8ea32530c4af184823cca3c2f275c7aeb04152108fe3fac586438cfa77a3f5b4",
+    "audit/ssz-bls-composition/dependency-inputs.json": "c7289cdafff95558a2c734e8637ae382afe0693ee5cc414abddb5e183b42d486",
+    "audit/ssz-bls-composition/fresh-validation.json": "ef45684f6ae06a70d8f4e8215bb2971e7917b7ccb65c47705d87a82cca2450db",
+    "audit/ssz-bls-composition/receipt.json": "ac1efb2e448f0923ee06dbb36e503902a84626a5a3511f707f4eaf2f46eb11cf",
+    "audit/ssz-bls-composition/solidity/SszBlsComposition.t.sol": "610017ad3b52a3ffda650301516240eded3f7b031b37b027920417317ae24ce3",
+    "audit/ssz-bls-composition/solidity/compiler-input-identities.json": "85930e3027c3b258e5f6b0957554b89f80e2c06daea22a85fa9908e606244050",
+    "audit/ssz-bls-composition/solidity/diagnostic-fault-trace.log": "c08e13f74cc4435a153e755777fd791c614abd2e931232e674855196e39160c2",
+    "audit/ssz-bls-composition/solidity/diagnostic-first-run.log": "de390eda80e984fbabe4ca419531ad88065b9530d028de1d2b90ba948efbc09a",
+    "audit/ssz-bls-composition/solidity/receipt.json": "1a911c847f632092bb587d8247b639914d02861b0f3c30fa4d9aac72e92d0573",
+    "audit/ssz-bls-composition/solidity/validation.log": "8b1f83b3846f88bc57833c57ea24152eab675fff527116de75840b75a4f02d83",
+    "audit/ssz-bls-composition/source-check.json": "54304c20abcddbd25f391267596c0be6b06db1e18c4fae43e1f7f7d4066fc655",
+    "audit/ssz-bls-composition/targeted-build.log": "a262bafcb4c28eb6d7bdcf433568c4a2eae8b403de36ba10d5aedca2c47b9ff7",
+    "audit/ssz-bls-composition/validated-inputs.sha256": "1df86c369bca1582939a81ddf03e4fd69532534179272c9c7482e9ee579c7338",
+    "audit/ssz-bls-composition/validation.log": "c2c9b006ad59edba8d5aed08fc2765e98c933b4e3671a7397670c57e25101a3a"
+  },
+  "artifacts": {
+    "independent-review.md": "e87991014ed883b583289103650682848dc058e289e8e7b9d9dc046457689266",
+    "independent-packet-supplement.md": "c94daf5f1d76d7a3c2fe989942caf4f92d9310c8968c83271269e61f3d324b21",
+    "independent-review-events.json": "3f89770456c5b8e2f67f853f278abb0643c7264d4c2b67b6aadeeb47f783ddb3",
+    "review-input-check.json": "e3533ab8686759c9b8edb298fe459db2409ed20b3a4eaf513976e1eb4176cebe",
+    "review-response.md": "c21bd04050d0da273c7db6c4dbefca11501a0fe6b9ec7558e21399ed8358feff"
+  }
+}
