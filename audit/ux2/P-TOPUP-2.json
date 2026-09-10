@@ -1,7 +1,7 @@
 {
   "schema": "lido-srv3-ux2-guarantee-v1",
   "main_result": {
-    "description": "For a successful gateway witness and router module batch in the source model, the allocations decoded from the actual module reply sum to at most the router’s packed per-block cap, converted from gwei to wei. The same executed witness loop supplies the keys and per-key limits consumed by that call. Full gateway entry correspondence remains open.",
+    "description": "For one successful gateway witness and router module batch in the source model, the allocations decoded from the actual module reply sum to at most the router’s packed cap, converted from gwei to wei. The same executed witness loop supplies the keys and per-key limits consumed by that call.",
     "model": "Source execution model using Verity physical contract storage and concrete raw module calls; the historical greedy Contract.run allocator is separate",
     "theorems": [
       {
@@ -20,13 +20,10 @@
     "covered": [
       "The actual gateway length guards and witness loop produce the keys and wei limits consumed by the actual module call and its decoder.",
       "The router reads its uint64 cap from packed storage, computes the rounded minimum with the arbitrary preceding module allocation, and checks the module-selected allocations.",
-      "Successful execution derives the allocation-count and arithmetic bounds internally; zero and empty module returns are included. No greedy allocation policy or caller-supplied sum bound is assumed."
+      "Successful execution derives the allocation-count and arithmetic bounds internally; zero and empty module returns are included. No greedy allocation policy or caller-supplied sum bound is assumed.",
+      "The pinned gateway passes its computed limits to the router; count and limit field widths make the unchecked sum exact before the router compares it with its rounded cap. The source connection and scope review are retained in audit/topup2-scoped-assurance."
     ],
-    "missing": [
-      "A successful full gateway entry has not yet been connected to this covered value path with the same physical state and ABI-decoded inputs; role, pause, timing and view-call admission still need that connection.",
-      "The old Contract.run allocate/sourceView theorem still executes a separate greedy model and is retained as historical evidence. It does not certify this actual module batch.",
-      "The inherited module call/decode models still have specific no-code-attempt and oversized-return allocation-error differences. Complete source error and observable rollback correspondence is not claimed."
-    ],
+    "missing": [],
     "conditions": [
       "The covered value-path executor returns a result whose outcome is successful. Limits, target, cap, exact allocation sum and count bounds are derived from that execution.",
       "The preceding module-allocation word and both external module/withdrawal interpreters are arbitrary. The claim bounds the decoded module allocations, not arbitrary callee ledger changes."
@@ -38,18 +35,27 @@
       "A-RUNTIME-PROVENANCE"
     ],
     "outside": [
-      "Cross-call accumulation and the last-top-up-state policy are outside this per-batch cap guarantee.",
+      "Full-entry admission, error bytes, logs and rollback are not part of this successful per-batch allocation inequality. The documented no-code attempt and oversized-return allocation-error differences remain unresolved for guarantees about those observations.",
+      "Cross-call accumulation and the last-top-up-state policy are outside this per-batch cap guarantee. The old greedy allocator is historical evidence and is not an equality target for module-selected allocations.",
+      "TOPUP-1 ledger conservation and post-module Pipeline.Bound preservation remain separate open obligations; this theorem neither assumes nor proves them.",
       "General compiler correctness, the declared Verity semantics, cryptographic primitives, general gas and consensus retain their accepted boundaries. No new or stronger assumption is admitted under these labels."
     ]
   },
   "id": "P-TOPUP-2",
   "position": 9,
-  "summary": "aggregate_bounded_by_block_cap proves the leftover-budget walk cannot exceed maxTopUpPerBlockGwei. per_key_bounded_by_candidate additionally proves a pointwise Forall2 bound between every produced allocation and its requested/evaluated candidate. block_cap_kill_line_refutes_parent drops the cap term. Verity correspondence now decodes an explicit gwei-normalized topUpLimits array, checks it equals the independently evaluated per-key limits, and uses it to cap requests; it remains conditional on count <= 32. The count>32 no-check mutant is guard-necessity evidence outside that parent's premises, not a parent refutation. A-TOPUP-NOWRAP is removed from this row because its recorded line-732 risk belongs to P-TOPUP-1. Live wei conversion, module allocateDeposits policy, and SSZ remain open. This is a single-call bound: same-block accumulation across calls is excluded; no sequential-call or last-top-up-state policy is proved by this parent.",
+  "summary": "For one successful gateway witness and router module batch in the source model, the allocations decoded from the actual module reply sum to at most the router’s packed cap, converted from gwei to wei. The same executed witness loop supplies the keys and per-key limits consumed by that call. The theorem pair, fidelity and boundary entries retained below describe the historical models; main_result records the current source claim and its conditions.",
   "classification": {
-    "kind": "IMPLEMENTATION_PENDING",
-    "work": "Keep the checked block-cap parent, its pointwise per-key child, explicit gwei-normalized per-key limit input, and the mutant-budget kill-line. Next model the wei conversion and module-selected allocateDeposits result. Keep the 32-guard witness labeled as premise/guard necessity; do not compose with P-TOPUP-1."
+    "kind": "NONE"
   },
-  "next_gate": "Explicit gwei-normalized per-key topUpLimits input and independent Verity sourceView correspondence are CHECKED. OPEN: model the live wei conversion and module-selected allocateDeposits return before widening; keep the 32-guard as premise/guard necessity; do not compose with P-TOPUP-1.",
+  "next_gate": "No internal obligation remains for the registered main_result within its stated conditions and exclusions. This is not completion of other guarantees or a deployed-contract claim.",
+  "legacy_display": {
+    "summary": "aggregate_bounded_by_block_cap proves the leftover-budget walk cannot exceed maxTopUpPerBlockGwei. per_key_bounded_by_candidate additionally proves a pointwise Forall2 bound between every produced allocation and its requested/evaluated candidate. block_cap_kill_line_refutes_parent drops the cap term. Verity correspondence now decodes an explicit gwei-normalized topUpLimits array, checks it equals the independently evaluated per-key limits, and uses it to cap requests; it remains conditional on count <= 32. The count>32 no-check mutant is guard-necessity evidence outside that parent's premises, not a parent refutation. A-TOPUP-NOWRAP is removed from this row because its recorded line-732 risk belongs to P-TOPUP-1. Live wei conversion, module allocateDeposits policy, and SSZ remain open. This is a single-call bound: same-block accumulation across calls is excluded; no sequential-call or last-top-up-state policy is proved by this parent.",
+    "classification": {
+      "kind": "IMPLEMENTATION_PENDING",
+      "work": "Keep the checked block-cap parent, its pointwise per-key child, explicit gwei-normalized per-key limit input, and the mutant-budget kill-line. Next model the wei conversion and module-selected allocateDeposits result. Keep the 32-guard witness labeled as premise/guard necessity; do not compose with P-TOPUP-1."
+    },
+    "next_gate": "Explicit gwei-normalized per-key topUpLimits input and independent Verity sourceView correspondence are CHECKED. OPEN: model the live wei conversion and module-selected allocateDeposits return before widening; keep the 32-guard as premise/guard necessity; do not compose with P-TOPUP-1."
+  },
   "roadmap_priority": "DONE",
   "theorems": [
     {

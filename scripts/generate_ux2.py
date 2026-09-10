@@ -24,7 +24,7 @@ from typing import NoReturn
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from main_guarantees import main_record, load_main
+from main_guarantees import main_record, main_display, load_main
 import audit_metadata  # noqa: E402  (sibling module, located above)
 from source_spans import span_rows
 import check_proof_escapes  # noqa: E402  (sibling module, located above)
@@ -890,6 +890,7 @@ def build_record(row: dict, position: int, context: dict) -> dict:
         "summary": row["summary"],
         "classification": row["classification"],
         "next_gate": row["next_gate"],
+        **main_display(row, context["main_results"].get(row["id"], {})),
         "roadmap_priority": row["roadmap_priority"],
         "theorems": [theorem_record(context["declarations"], plane, row[plane])
                      for plane in ("abstract", "verity")],

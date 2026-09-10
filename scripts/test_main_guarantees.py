@@ -3,7 +3,7 @@ import copy
 import json
 from pathlib import Path
 import generate_ux2
-from main_guarantees import load_main, main_record
+from main_guarantees import load_main, main_record, main_display
 
 
 def main():
@@ -29,6 +29,20 @@ def main():
                 raise
         else:
             raise SystemExit(f'{key}: main registry mutation was accepted')
+    closed = copy.deepcopy(context)
+    closed['main_results']['P-TOPUP-2']['missing'] = []
+    resolved = main_record('P-TOPUP-2', closed, generate_ux2.theorem_record, generate_ux2.fail)
+    assert resolved['main_result']['missing'] == []
+    assert resolved['main_result']['theorems']
+    legacy = {'summary': 'Historical allocator', 'classification': {'kind': 'IMPLEMENTATION_PENDING'}, 'next_gate': 'Historical missing implementation'}
+    display = main_display(legacy, closed['main_results']['P-TOPUP-2'])
+    assert display['classification'] == {'kind': 'NONE'}
+    assert display['summary'].startswith(closed['main_results']['P-TOPUP-2']['description'])
+    assert display['legacy_display'] == legacy
+    assert main_display(legacy, {}) == {}
+    still_open = copy.deepcopy(closed['main_results']['P-TOPUP-2'])
+    still_open['missing'] = ['A required source obligation']
+    assert main_display(legacy, still_open) == {}
     print('main guarantee declaration, assumption and condition mutations rejected')
 
 

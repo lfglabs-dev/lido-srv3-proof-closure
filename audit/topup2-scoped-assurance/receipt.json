@@ -1,0 +1,12 @@
+{
+  "base": "14f601e7b34d62663a38d06ccee1d1ba113ae953",
+  "source_identities": 1274,
+  "package_pins": 11,
+  "solidity_sources": 6,
+  "proof_changes": 0,
+  "new_axioms": 0,
+  "validation": "Prior proof/trust/runtime validations reused by exact identity; registry and UX2 mutation checks pass for this candidate.",
+  "scope": "Necessary source connection for existing TOPUP2 successful per-batch allocation bound; exact candidate review pending, no whole-campaign delivery.",
+  "other_guarantees_unchanged": true,
+  "diagnostic": "Initial UX2 run reached its Lean syntax check without the shared cache; stopped that process and its attempted dependency fetch. Cached rerun passed. No failed/aborted run credited."
+}
