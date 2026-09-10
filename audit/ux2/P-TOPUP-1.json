@@ -1,7 +1,7 @@
 {
   "schema": "lido-srv3-ux2-guarantee-v1",
   "main_result": {
-    "description": "Successful execution of the source router continuation after its module call transfers the guarded total from Lido to beacon in the same live ledger and restores the router balance. Positive success derives the exact allocation sum and nonempty keys. The full gateway/router entry connection remains open.",
+    "description": "Successful execution of the source router continuation after its module call transfers the guarded total from Lido to beacon in the same live ledger and restores the router balance. Positive success derives the exact allocation sum and nonempty keys. The full gateway/router entry connection remains open. The actual batch consumer also derives the zero/positive continuation at the exact mathematical sum of its decoded allocations, with no new bound or sub-stage premise.",
     "model": "Source post-module router continuation with concrete Lido withdrawal and beacon calls in Verity physical storage and a live balance ledger",
     "theorems": [
       {
@@ -15,17 +15,30 @@
         "end_line": 27,
         "doc": "/-- The source continuation's success derives the value transfer and router\nrestoration. Positive success also derives the exact mathematical allocation\nsum and nonempty keys; no successful withdrawal or beacon-stage premises are inputs. -/",
         "statement": "theorem actual_continuation_conserves (hash : TopupRouterCredentials.Keccak)\n    (k : Queue.Keccak) (config : Pipeline.Config)\n    (staticOther : StaticCall.External) (other : External)\n    (ctx : Context) (beacon : Address) (i : Input) (before : World)\n    (bound : Pipeline.Bound config ctx before)\n    (lido_ne_router : ctx.self ≠ ctx.sender) (router_ne_beacon : ctx.sender ≠ beacon)\n    (h : (execute hash (Pipeline.external k config staticOther other) ctx beacon i before).outcome = .ok ()) :\n    ∃ total, guardSum (values i.allocations) (values i.limits) 0 = .ok total ∧\n      total ≤ i.roundedTarget.val ∧\n      CallSpec.Balances before.balances\n        (execute hash (Pipeline.external k config staticOther other) ctx beacon i before).world.balances\n        ctx.self beacon total ∧\n      (execute hash (Pipeline.external k config staticOther other) ctx beacon i before).world.balances ctx.sender =\n        before.balances ctx.sender ∧\n      (total = 0 ∨ (i.pubkeys ≠ [] ∧ total = allocSum (values i.allocations)))"
+      },
+      {
+        "plane": "source",
+        "role": "registered main source-model result (audit/trio/main-guarantees.json)",
+        "status": "CHECKED",
+        "name": "LidoSRv3.Audit.Guarantees.PTopup1.actual_module_batch_effects",
+        "module": "LidoSRv3.Audit.Guarantees.PTopup1ActualBatch",
+        "file": "LidoSRv3/Audit/Guarantees/PTopup1ActualBatch.lean",
+        "start_line": 16,
+        "end_line": 43,
+        "doc": "/-- Actual batch success exposes its module-returned world and continuation\neffects at the exact mathematical allocation sum. The zero branch makes no\nwithdrawal or beacon call and preserves the module's returned storage/balances;\nthe positive branch contains the actual successful subexecutions. No separate\nsum, no-wrap, count, helper-length or sub-stage-success premise is supplied. -/",
+        "statement": "theorem actual_module_batch_effects (hash : TopupRouterCredentials.Keccak)\n    (moduleExternal withdrawalExternal : External) (precompile : Precompile)\n    (oracle : RootOracle) (scratch : Fin 32 → Byte) (gi : Configuration)\n    (beacon : BeaconData) (divisor : Index) (credentials : Digest)\n    (gateway : Address) (ctx : Context) (depositContract : Address) (moduleId : Word)\n    (keyIndices operatorIds : List Word) (rows : List Row) (moduleAllocation : Word)\n    (before : World) (result : Result Unit)\n    (h : TopupBatchConsumer.run hash moduleExternal withdrawalExternal precompile oracle scratch gi beacon divisor\n      credentials gateway ctx depositContract moduleId keyIndices operatorIds rows moduleAllocation before = .ok result)\n    (hs : result.outcome = .ok ()) :\n    ∃ out raw afterModule trace allocations,\n      loop precompile oracle scratch gi (TopupGatewayConfigWords.readConfig gateway before)\n        beacon divisor credentials none 0 rows = .ok out ∧\n      TopupModuleCall.call hash moduleExternal\n        (LidoSRv3.Audit.Verity.TopupBeaconFundedTx.routerContext ctx)\n        (moduleInput out moduleId keyIndices operatorIds ctx.sender moduleAllocation before) before =\n          ⟨.ok raw,afterModule,trace⟩ ∧\n      TopupModuleCall.decodeReturn raw = .ok allocations ∧\n      (TopupRouterContinuation.values allocations).sum ≤ (blockCap ctx.sender before).val * 10^9 ∧\n      let ci := TopupModuleCall.continuationInput\n        (moduleInput out moduleId keyIndices operatorIds ctx.sender moduleAllocation before) allocations\n      let suffix := TopupRouterContinuation.program hash withdrawalExternal ctx depositContract ci afterModule\n      result.world = suffix.world ∧ result.attempts = trace ++ suffix.attempts ∧\n      (((TopupRouterContinuation.values allocations).sum = 0 ∧\n        suffix = ⟨.ok (), {afterModule with logs := afterModule.logs ++\n          [TopupRouterContinuation.topUpEvent ctx.sender ci 0]}, []⟩) ∨\n       TopupRouterCommitted.PositiveEffects hash withdrawalExternal ctx depositContract ci afterModule suffix\n         (TopupRouterContinuation.values allocations).sum)"
       }
     ],
     "covered": [
       "The executed router guards bound the pulled word; the concrete withdrawal derives funding and its exact transfer without an arbitrary-callee frame premise.",
       "Actual beacon helper debits and the final router assertion force the withdrawn total to equal the actual sent value, including rejection of the empty-key positive path.",
-      "Positive success derives the exact mathematical allocation sum, nonempty keys and pointwise Lido-to-beacon conservation. Zero total keeps its source early path and final router event."
+      "Positive success derives the exact mathematical allocation sum, nonempty keys and pointwise Lido-to-beacon conservation. Zero total keeps its source early path and final router event.",
+      "The actual gateway witness/count and wei-limit bounds connect the exact mathematical sum of decoded module allocations to the executed zero/positive continuation. Zero total preserves the module-returned storage and balances, emits the source router event and adds no withdrawal/beacon attempts."
     ],
     "missing": [
       "Full gateway/router entry, actual module-prefix effects and its connection to the continuation remain open; the theorem begins at the post-module state.",
-      "Zero-total equality with the mathematical allocation sum requires the preceding actual gateway batch bounds; this continuation alone also admits an unchecked wrapped sum of zero.",
-      "Exact outer Lido ABI/error bytes and full-entry observable rollback are not established by this result."
+      "Exact outer Lido ABI/error bytes and full-entry observable rollback are not established by this result.",
+      "Connecting the same module-returned world to the necessary live ledger still requires deriving its Pipeline.Bound bindings through the preceding module call; the registered batch effects do not establish that invariant."
     ],
     "conditions": [
       "Existing Pipeline.Bound supplies physical locator/consensus bindings, code presence and configuration separation at the continuation entry. Initialization and preservation through the preceding module call are not derived here.",
