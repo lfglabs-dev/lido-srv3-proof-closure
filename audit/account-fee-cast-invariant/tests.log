@@ -1,0 +1,11 @@
+'AccountAddress.Tests.Verity.ReportFeeCastInvariantTest.module_slot_collision' depends on axioms: [propext]
+'AccountAddress.Tests.Verity.ReportFeeCastInvariantTest.router_slot_collision' depends on axioms: [propext]
+'AccountAddress.Tests.Verity.ReportFeeCastInvariantTest.duplicate_registered_ids' depends on axioms: [propext]
+'AccountAddress.Tests.Verity.ReportFeeCastInvariantTest.max_admitted_row_and_fee_fields' depends on axioms: [propext]
+'AccountAddress.Tests.Verity.ReportFeeCastInvariantTest.zero_report_and_skipped_getter' depends on axioms: [propext]
+'AccountAddress.Tests.Verity.ReportFeeCastInvariantTest.actual_positive_mint_casts' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'AccountAddress.Tests.Verity.ReportFeeCastInvariantTest.public_consumer' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]

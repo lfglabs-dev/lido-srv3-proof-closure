@@ -1,0 +1,36 @@
+{
+  "base": "86ee843a2c755bc044b6eed47fe332a4138d4d6e",
+  "created_utc": "2026-09-10T21:15:07.374445+00:00",
+  "core_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "artifacts": {
+    "LidoSRv3/Audit/Guarantees/PAccount1ActualFeeCasts.lean": "eb98721c3b5d8949aa6ba679b9e734687af28860b28ed52979c58405c78c4e22",
+    "audit/account-fee-cast-invariant/README.md": "9799172d9dbf3600eb67c8282f85f10ceac049300c62b27ab51e567f9e1de8f0",
+    "audit/account-fee-cast-invariant/axioms.json": "8db2b373434c39c67c80ab01bae7f0d048ce632aaa60732f1c7b21806ea73b09",
+    "audit/account-fee-cast-invariant/build.log": "3b4cace80eecdffb25d35e575bac3946fbfb7a3274c9d1bfd69992cd3136eba7",
+    "audit/account-fee-cast-invariant/check_receipt.py": "39ef0a99e62f14cc4b48daaded63d12f85e832a19042bc74831abe42cb81abbf",
+    "audit/account-fee-cast-invariant/public-build.log": "3ae36b5d79f0796d50a88a58c6652996d7bef4e4f95dd538d50e0e8b86d92b97",
+    "audit/account-fee-cast-invariant/source-inputs.json": "40b05d715312120b0cc562ca8c54a0cae573d98a360ad5e3efb278dda1fe8fb8",
+    "audit/account-fee-cast-invariant/tests.log": "af4ba6526c57aef261ed92683473080aeff5fb016b562fb896900f9f4802222c",
+    "audit/account-fee-cast-invariant/validate.py": "2dcaf21047355d0c44a7d0b363803ac4ef62424d7422d6c9feb4169e673b73c4",
+    "audit/account-fee-cast-invariant/validation.log": "b0e008ead0e58397690af30be49b396b69e4c649f764c35b8d6e87b537ce6bba",
+    "audit/trio/account-address/ReportFeeCastInvariant.lean": "b6ae4125a8889f55c3c939cc2c14fdef1a57f2508b4a10cae06d4dfc92b6480c",
+    "audit/trio/account-address/Tests/Verity/ReportFeeCastInvariantTest.lean": "0509e5cd2c8ad2410aeca6f2e1ada30a132a648d074fddbad42740fd73a480c1",
+    "lean-toolchain": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee"
+  },
+  "solidity_sources": {
+    "contracts/0.8.25/sr/SRLib.sol": "2a53ec2d183f3c3d8b6257f18dc7143e8afbc8d3d2f8a48bd0e5e0580b5b47ab",
+    "contracts/0.8.25/sr/SRTypes.sol": "22c28be7ceaf6ed841f18fc19296372ab246b1cfecc87902d49ee1670ed4aed6",
+    "contracts/0.8.25/sr/SRUtils.sol": "1f59e455e510e5eb9c19bdf64dd7357c3e4a8c445c5baaa2f3691ecb7115d295",
+    "contracts/0.8.25/sr/StakingRouter.sol": "4d5b83fc73736db6755ebbb58811ed499c3e6de622cce11a3ad8548800a34155"
+  },
+  "checks": {
+    "direct_lean_modules": 3,
+    "kernel_regressions": 6,
+    "public_instantiations": 1,
+    "source_identities": 24,
+    "dependency_pins": 11,
+    "independent_axiom_sets": 13,
+    "new_All_Trust_run": false,
+    "new_Solidity_runtime_test": false
+  }
+}
