@@ -32,7 +32,9 @@ pair of invented sequential storage slots. -/
 abbrev Shares := Nat → Nat
 
 structure State where
-  totalAndExternalShares : StorageWord
+  /-- StETH's own physical storage. The total/external packed word is read
+  only at `totalSharesPosition`; `shares` remains a Solidity mapping below. -/
+  storage : Core
   shares : Shares
   /-- Lido.sol:1298-1305 overrides StETH's share-rate numerator with
   `_getInternalEther()`, rather than total pooled ether. -/
@@ -62,10 +64,13 @@ inductive Outcome where
   | committed (post : State) (events : List Event)
 
 /-- StETH's `_getTotalShares`: low 128 bits only (StETH.sol:473-475). -/
-def totalShares (s : State) : Nat := s.totalAndExternalShares.val % two128
+def totalAndExternalShares (s : State) : StorageWord :=
+  s.storage.read totalSharesPosition
+
+def totalShares (s : State) : Nat := (totalAndExternalShares s).val % two128
 
 /-- The external-share payload in the high half is not token total shares. -/
-def externalShares (s : State) : Nat := s.totalAndExternalShares.val / two128
+def externalShares (s : State) : Nat := (totalAndExternalShares s).val / two128
 
 /-- `UnstructuredStorageExt.setLowUint128`: replace only the low half. -/
 def setLowUint128 (word : StorageWord) (value : Nat) : StorageWord :=
@@ -115,8 +120,10 @@ def mintShares (caller recipient amount : Nat) (before : State) : Outcome :=
     .reverted .safeMathAddOverflow before
   else
     let post := { before with
-      totalAndExternalShares := setLowUint128 before.totalAndExternalShares
+      storage := before.storage.write totalSharesPosition
+        (setLowUint128 (totalAndExternalShares before)
         (totalShares before + amount)
+        )
       shares := fun account => if account = recipient then before.shares account + amount
         else before.shares account }
     -- Lido.sol:899 invokes this only after `_mintShares` (898), so the

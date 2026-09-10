@@ -8,7 +8,7 @@ open AccountAddress.StETHMintShares
 /-- A concrete packed word with total shares `10` and an independent external
 share payload `4` in the high half. -/
 private def before : State := {
-  totalAndExternalShares := ⟨4 * two128 + 10, by
+  storage := Core.write ⟨[]⟩ totalSharesPosition ⟨4 * two128 + 10, by
     have : 4 * two128 + 10 < two256 := by decide
     exact this⟩
   shares := fun account => if account = 7 then 5 else 0
