@@ -9,6 +9,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from source_span_test_cases import check_artifact_drift
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -68,25 +69,6 @@ def rewrite(path: Path, old: str, new: str) -> str:
         raise SystemExit(f"fixture {path.name} lost {old!r}")
     path.write_text(original.replace(old, new, 1), encoding="utf-8")
     return original
-
-
-def check_artifact_drift(fixture: Path) -> None:
-    record = fixture / "audit/ux2/P-ALLOC-1.json"
-    original = rewrite(record, '"position": 1', '"position": 11')
-    expect(fixture, "check", False, "differs from the registry and Lean sources")
-    record.write_text(original, encoding="utf-8")
-
-    bogus = fixture / "audit/ux2/P-BOGUS.json"
-    bogus.write_text("{}\n", encoding="utf-8")
-    expect(fixture, "check", False, "artifacts no registry row derives")
-    expect(fixture, "generate", True, "generated 12 files")
-    if bogus.exists():
-        raise SystemExit("generation left a stale UX2 JSON artifact behind")
-
-    record.unlink()
-    expect(fixture, "check", False, "P-ALLOC-1.json is missing")
-    expect(fixture, "generate", True, "generated 12 files")
-    expect(fixture, "check", True, "11 guarantee records match")
 
 
 def check_registry_binding(fixture: Path) -> None:
@@ -1379,7 +1361,7 @@ with tempfile.TemporaryDirectory() as tmp:
     fixture = Path(tmp)
     copy_tree(fixture)
     expect(fixture, "check", True, "11 guarantee records match")
-    check_artifact_drift(fixture)
+    check_artifact_drift(fixture, expect, rewrite)
     check_registry_binding(fixture)
     check_lean_scanner(fixture)
     check_escaped_identifier_lexing(fixture)
