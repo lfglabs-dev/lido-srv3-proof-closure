@@ -1,3 +1,4 @@
+import audit.trio.deposit.Tests.Verity.ModulePhysicalMetadataTest
 import LidoSRv3.Tests.ConsolidationSettlementRequestsRegression
 import Tests.Verity.ReportFeeCheckedSplitTest
 import LidoSRv3.Tests.TopupRootCallEffectsRegression
@@ -716,3 +717,8 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.ConsolidationSettlementRequestsRegression.actual_two_requests_joint_consumer
 #print axioms LidoSRv3.Tests.ConsolidationSettlementRequestsRegression.zero_refund_joint_consumer
 #print axioms LidoSRv3.Tests.ConsolidationSettlementRequestsRegression.decoded_loop_and_refund_effects
+
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.actual_module_call_metadata_suffix
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.actual_module_call_failure_restores
+#print axioms audit.trio.deposit.ModuleCall.decodeReturn_size_bounds
+#print axioms audit.trio.deposit.ModulePhysicalMetadata.success_effects

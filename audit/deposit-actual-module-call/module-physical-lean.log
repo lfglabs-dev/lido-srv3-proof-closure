@@ -1,0 +1,5 @@
+'audit.trio.deposit.ModulePhysicalMetadata.failure_restores' depends on axioms: [propext, Quot.sound]
+'audit.trio.deposit.ModulePhysicalMetadata.success_commitment' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'audit.trio.deposit.ModulePhysicalMetadata.success_effects' depends on axioms: [propext, Classical.choice, Quot.sound]

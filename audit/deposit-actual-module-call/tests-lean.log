@@ -1,0 +1,13 @@
+'audit.trio.deposit.Tests.Verity.ModulePhysicalMetadataTest.positive_execution' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'audit.trio.deposit.Tests.Verity.ModulePhysicalMetadataTest.positive_has_commitment' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'audit.trio.deposit.Tests.Verity.ModulePhysicalMetadataTest.zero_retains_module_changes' depends on axioms: [propext,
+ Quot.sound]
+'audit.trio.deposit.Tests.Verity.ModulePhysicalMetadataTest.zero_uses_entry_address_cap_and_payload' depends on axioms: [propext,
+ Quot.sound]
+'audit.trio.deposit.Tests.Verity.ModulePhysicalMetadataTest.malformed_rollback' depends on axioms: [propext, Quot.sound]
+'audit.trio.deposit.Tests.Verity.ModulePhysicalMetadataTest.below_target_actual_withdrawal_sees_module_and_metadata' depends on axioms: [propext,
+ Quot.sound]

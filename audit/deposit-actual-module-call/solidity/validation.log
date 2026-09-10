@@ -1,0 +1,14 @@
+No files changed, compilation skipped
+
+Ran 8 tests for audit/deposit-actual-module-call/solidity/DepositModuleCall.t.sol:DepositModuleCallTest
+[PASS] testFuzz_payloadAndReturn(uint256,bytes,bytes,bytes) (runs: 256, μ: 432129, ~: 429751)
+[PASS] test_64ActualLeanByteVectors() (gas: 7368720)
+[PASS] test_decoderFaultOrderAndRollback() (gas: 1207037)
+[PASS] test_noCodeEmptyDecodeAndExactBubble() (gas: 178457)
+[PASS] test_noncanonicalDualBytes() (gas: 322107)
+[PASS] test_scalarMemoryProjectionWrapAndSignedGuards() (gas: 6279)
+[PASS] test_selectorLiteral() (gas: 168)
+[PASS] test_targetCapShorterZeroAndGuards() (gas: 356414)
+Suite result: ok. 8 passed; 0 failed; 0 skipped; finished in 12.56ms (21.83ms CPU time)
+
+Ran 1 test suite in 131.45ms (12.56ms CPU time): 8 tests passed, 0 failed, 0 skipped (8 total tests)
