@@ -1,0 +1,33 @@
+⚠ [800/806] Replayed Verity.Core
+warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1041:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+ℹ [804/806] Replayed LidoSRv3.Audit.Source.SszRootCall
+info: LidoSRv3/Audit/Source/SszRootCall.lean:206:0: 'LidoSRv3.Audit.Source.SszRootCall.run_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszRootCall.lean:207:0: 'LidoSRv3.Audit.Source.SszRootCall.slot_failure_no_call' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/SszRootCall.lean:208:0: 'LidoSRv3.Audit.Source.SszRootCall.run_world' depends on axioms: [propext, Quot.sound]
+ℹ [805/806] Replayed LidoSRv3.Audit.Guarantees.PSsz1RootCall
+info: LidoSRv3/Audit/Guarantees/PSsz1RootCall.lean:40:0: 'LidoSRv3.Audit.Guarantees.PSsz1.actual_root_staticcall_validator_branch' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [806/806] Built LidoSRv3.Tests.SszRootCallRegression (3.1s)
+info: LidoSRv3/Tests/SszRootCallRegression.lean:95:0: 'LidoSRv3.Tests.SszRootCallRegression.root_guards_before_index' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/SszRootCallRegression.lean:96:0: 'LidoSRv3.Tests.SszRootCallRegression.timestamp_octets' does not depend on any axioms
+info: LidoSRv3/Tests/SszRootCallRegression.lean:97:0: 'LidoSRv3.Tests.SszRootCallRegression.success_consumes_one_reply' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/SszRootCallRegression.lean:98:0: 'LidoSRv3.Tests.SszRootCallRegression.changed_returned_root_fails' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/SszRootCallRegression.lean:99:0: 'LidoSRv3.Tests.SszRootCallRegression.trailing_data_accepted' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/SszRootCallRegression.lean:100:0: 'LidoSRv3.Tests.SszRootCallRegression.slot_failure_before_root' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/SszRootCallRegression.lean:101:0: 'LidoSRv3.Tests.SszRootCallRegression.slot_hash_before_short_proof' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/SszRootCallRegression.lean:102:0: 'LidoSRv3.Tests.SszRootCallRegression.rejected_call_retained' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/SszRootCallRegression.lean:103:0: 'LidoSRv3.Tests.SszRootCallRegression.forbidden_write_retained' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/SszRootCallRegression.lean:104:0: 'LidoSRv3.Tests.SszRootCallRegression.empty_reply_before_decode' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/SszRootCallRegression.lean:105:0: 'LidoSRv3.Tests.SszRootCallRegression.short_reply_before_invalid_leaf' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/SszRootCallRegression.lean:106:0: 'LidoSRv3.Tests.SszRootCallRegression.no_code_success_empty_then_root_failure' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/SszRootCallRegression.lean:107:0: 'LidoSRv3.Tests.SszRootCallRegression.index_before_leaf' depends on axioms: [propext, Quot.sound]
+Build completed successfully (806 jobs).
