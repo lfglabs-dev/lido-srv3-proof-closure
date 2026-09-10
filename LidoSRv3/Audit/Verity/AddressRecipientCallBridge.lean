@@ -45,13 +45,31 @@ def claimStorage (ctx : Context) (requestId hint : Nat) (recipient : Address) :
       | .success _ after => ⟨.ok payout, { world with core := after }, []⟩
       | .revert reason _ => ⟨.error (.reason reason), world, []⟩
 
-/-- The recipient is the CALL target, not a post-hoc observation.  `Live.call`
-passes the value-debited world to the external callee and returns its resulting
-world on success. -/
+/-- Exact `WithdrawalQueueBase._sendValue` call frame (lines 475--480): it is
+an EVM `CALL` to the recipient with value and **empty** calldata.  The generic
+`Live.call` helper encodes a four-byte selector, so using it here would silently
+change the real call target's input.  Rejection restores the value transfer;
+success returns the callee's entire resulting world. -/
+def emptyValueCall (external : External) (ctx : Context) (recipient : Address)
+    (payout : Nat) : Exec Unit := fun world =>
+  let value : Uint256 := .ofNat payout
+  let request : Request := ⟨ctx.self, recipient, value, []⟩
+  if (world.core.codeSize recipient.val).val = 0 then
+    ⟨.error .empty, world, []⟩
+  else if world.balances ctx.self < value.val then
+    ⟨.error (.bubbled []), world, [⟨request, false, [], []⟩]⟩
+  else
+    match external request (transfer world ctx.self recipient value.val) with
+    | .rejected data => ⟨.error (.bubbled data), world, [⟨request, false, data, []⟩]⟩
+    | .success data after => ⟨.ok (), after, [⟨request, true, data, []⟩]⟩
+    | .successWithTrace data after nested => ⟨.ok (), after, [⟨request, true, data, nested⟩]⟩
+    | .rejectedWithTrace data nested =>
+        ⟨.error (.bubbled data), world, [⟨request, false, data, nested⟩]⟩
+
+/-- The recipient is the CALL target, not a post-hoc observation. -/
 def payoutCall (external : External) (ctx : Context) (recipient : Address)
-    (payout : Nat) : Exec Unit := do
-  let _ ← call external ctx recipient 0 (.ofNat payout)
-  pure ()
+    (payout : Nat) : Exec Unit :=
+  emptyValueCall external ctx recipient payout
 
 /-- One physical `_claim` followed by its value-bearing recipient CALL.  The
 two layers have distinct jobs: `claimOne` fixes Solidity storage and its
