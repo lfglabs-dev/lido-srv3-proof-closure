@@ -1,0 +1,13 @@
+{
+  "base": "7fb1c675d2f18e98b99627646e44996d4081b5eb",
+  "unchanged_batch_runtime_prefix_sha256": "209c78df1745b373d3b80012d48964373e3b8e570fa0f89a5fe054041819b8f7",
+  "unchanged_programs": [
+    "TopupBatchConsumer.run",
+    "TopupBatchConsumer.moduleInput",
+    "TopupBatchConsumer.target",
+    "TopupModuleCall.execute",
+    "TopupRouterContinuation.program"
+  ],
+  "scope": "Only proof results, public registration and UX2 changed; runtime definitions before bind_success byte-identical. Prior gateway/module/beacon/withdrawal and Solidity validations reused at integrated305; no new finite fixtures or Forge claimed.",
+  "solidity_pin": "17005714f151e5502c559932319a3f2f74ac2436"
+}
