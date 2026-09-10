@@ -8,11 +8,6 @@ package «lido-srv3-proof-closure» where
 require verity from git
   "https://github.com/lfglabs-dev/verity.git"@"e977aaad6e1a9e92e0132d41b3d33a14135a4d46"
 
-/-- The physical ACCOUNT report/getter/mint continuation is a local package.
-It is imported only by the registered P-ACCOUNT-1 consumer; it does not add a
-second guarantee registry entry. -/
-require accountAddress from "audit/trio/account-address"
-
 /-- Stable definitions and public guarantees. Does not compile Tests, Legacy, or Trust. -/
 @[default_target]
 lean_lib «LidoSRv3» where
@@ -115,8 +110,9 @@ lean_lib «LidoSRv3Audit» where
 /-- Isolated accounting/address slices, with kernel-checked regression proofs. -/
 lean_lib «AccountAddressChecks» where
   srcDir := "audit/trio/account-address"
-  roots := #[`PAccount1, `ReportWriteFee, `PAddress1, `PAddress1Physical,
+  roots := #[`PAccount1, `ReportWriteFee, `StETHMintShares, `ReportFeeMint, `PAddress1, `PAddress1Physical,
     `Tests.Verity.PAccount1Test, `Tests.Verity.ReportWriteFeeTest,
+    `Tests.Verity.StETHMintSharesTest, `Tests.Verity.ReportFeeMintTest,
     `Tests.Verity.PAddress1Test, `Tests.Verity.PAddress1PhysicalTest]
 
 /-- Cross-check the staged indexed parent against the integrated source/ABI parent. -/

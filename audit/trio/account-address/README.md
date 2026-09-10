@@ -56,15 +56,20 @@ the total, adds with the checked uint96 total, enforces the post-loop
 `ReportFeeMint.lean` continues that physical report write through one
 post-write `getStakingRewardsDistribution` result, checked uint256
 Accounting 317/323/325/331 products, and the source-ordered
-`Accounting.sol:403-413` Lido mint. Its mint invokes
-`StETHMintShares.mintShares` on a single StETH state: the conventional
-`shares` mapping and the `lido.StETH.totalAndExternalShares` packed word are
+`Accounting.sol:403-406` Lido mint. Its mint invokes
+`StETHMintShares.mintShares` on a single StETH state: the abstract account
+`shares` map and the `lido.StETH.totalAndExternalShares` packed word are
 therefore read and written by the same execution. The Lido caller/recipient
 identity is the Accounting address, the stopped guard precedes `_mintShares`,
 and the two transfer events use the post-mint internal-ether share-rate
 numerator. Fee arithmetic and mint failures roll the entire composed world
 back; a zero fee reaches neither mint nor mint events. This is supplementary
 evidence for the registered `P-ACCOUNT-1`, not a new guarantee ID.
+The public `actual_report_fee_mint` theorem consumes this execution. Locator
+resolution and call context remain supplied; intervening report operations,
+`_distributeFee` and `reportRewardsMinted` are outside this continuation.
+See [the exact mint dossier](../../account-actual-mint/README.md) for its
+physical-word, abstract-map, arithmetic and transactional rollback scope.
 
 Proved: a committed report sets exactly the low uint64 of each registered
 accounting word and of the router word, preserves every other bit (including
@@ -84,7 +89,9 @@ Still OPEN (P-ACCOUNT is not closed): the keccak slot-key derivation is not
 computed; the registered-id order is an input standing for the `EnumerableSet`
 values array, whose own slots are not modeled; deposits and name words and the
 router's other words are outside the slice; the config word is only read here;
-uint256 overflow of the Accounting 325 and 331 products is unmodeled; the
+uint256 overflow of the Accounting 325 and 331 products is unmodeled in the
+older `ReportWriteFee.calculateProtocolFees` helper (the new public
+`ReportFeeMint` consumer executes checked products); the
 uint96 casts are shown load-bearing on report-inconsistent storage only, and
 their exactness on report-consistent storage is not proved (HOLD); a status
 byte above 2 is modeled as the storage-load panic; the getter is modeled over

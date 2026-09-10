@@ -1,0 +1,43 @@
+{
+  "source": "965835661f8db5caba9263b0d62e94106b1f07cf",
+  "main_base": "64f73f101187992db5b9b446852c3063a5a6d5b7",
+  "merge_union": "32853f90f6dac15f1854bb43a1a61579314e41eb",
+  "source_review": "CLEAN retained independent-source-review-9658.md; complete unaccepted ancestry/source/Solidity",
+  "root_changes": [
+    "single existing AccountAddressChecks provider; remove redundant path dependency",
+    "main external manifest identical",
+    "Trust imports kernel regression and queries new public consumers",
+    "clarify shared historical README source extent/abstract mapping/old-helper overflow"
+  ],
+  "checks": {
+    "AllGuarantees_Trust": {
+      "command": "lake build LidoSRv3.Audit.AllGuarantees LidoSRv3.Audit.Trust",
+      "exit": 0,
+      "jobs": 1685
+    },
+    "trust": {
+      "command": "python3 scripts/check_trust_axioms.py",
+      "exit": 0,
+      "exact_axioms": 29,
+      "dependencies_recomputed": true,
+      "native_claims_reevaluated": true
+    },
+    "source_receipt": {
+      "command": "python3 audit/account-actual-mint/check_receipt.py --core /tmp/lido-ssz-proof-committed/lido-core",
+      "exit": 0,
+      "artifacts": 27,
+      "pinned_sources": 8,
+      "scoped_axiom_sets": 10,
+      "new_kernel_regressions": 8,
+      "slot_identities": 3
+    }
+  },
+  "integration_review": "Separate exact frozen-commit gate; not self-approved",
+  "sha256": {
+    "audit/account-actual-mint/integration/README.md": "394ec733f4f71af7ed3059223cd14a4b6be681696be931b99a488e5332fd3d1a",
+    "audit/account-actual-mint/integration/independent-source-review-9658.md": "76f4943082684de51840e3b81a77c63b43f035c5e6400c33364922abfa47ab24",
+    "audit/account-actual-mint/integration/source-identities.json": "8300398a10d7eff6f2318c9fbb3d8506b3d8dad95b257327df7067a63b8fc11c",
+    "audit/account-actual-mint/integration/all-trust-build.log": "5202235e907b0b87578c3641591da2d2d2b3b9414988e52a2545bf3b52a89655",
+    "audit/account-actual-mint/integration/trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439"
+  }
+}
