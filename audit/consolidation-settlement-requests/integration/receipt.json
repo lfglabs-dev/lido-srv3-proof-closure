@@ -1,0 +1,35 @@
+{
+  "source": "27f2394bd9afb416ffc6ed753d57f04d0f082228",
+  "main_base": "241c2ce1e78860b8451a843949b71f60b8c2df25",
+  "union": "814a7a8349b278a413fa60af78c80a3a7eb33951",
+  "source_review": "CLEAN full source/Solidity, verbatim retained",
+  "AllTrust": {
+    "command": "lake build LidoSRv3.Audit.AllGuarantees LidoSRv3.Audit.Trust",
+    "exit": 0,
+    "jobs": 1700
+  },
+  "trust": {
+    "command": "python3 scripts/check_trust_axioms.py",
+    "exit": 0,
+    "exact_axioms": 29,
+    "dependencies_recomputed": true,
+    "native_claims_reevaluated": true
+  },
+  "source_receipt": {
+    "bodies": 3,
+    "scoped_axiom_sets": 9,
+    "source_identities": 1249,
+    "pins": 11,
+    "kernel_regressions": 7,
+    "public_instances": 2,
+    "inherited_solidity_artifacts": 41,
+    "pinned_solidity_bodies": 3,
+    "fresh_solidity_execution": false
+  },
+  "sha256": {
+    "audit/consolidation-settlement-requests/integration/README.md": "46fbc10b17f1d9e22bef34e9881da6bfa4ee6f87df0336e19ac3e15b37c65773",
+    "audit/consolidation-settlement-requests/integration/all-trust-build.log": "3907f0008079f9e41206d21ef9908dd2fb75e19486f04da899ed06406b4848eb",
+    "audit/consolidation-settlement-requests/integration/independent-source-review-27f2.md": "01383bdfe38f4ec2fdd76633dfa007c5a6a12967a28711ab20e7b3b3260c76b3",
+    "audit/consolidation-settlement-requests/integration/trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439"
+  }
+}
