@@ -30,6 +30,24 @@ abbrev Context := LidoSRv3.Audit.Source.TrioReserve1.Live.Context
 abbrev External := LidoSRv3.Audit.Source.TrioReserve1.Live.External
 abbrev Exec := LidoSRv3.Audit.Source.TrioReserve1.Live.Exec
 
+/-- Execute a first-class CALL with the supplied ABI bytes.  The live helper
+only accepts a selector, while the token entrypoints below have real argument
+words.  As with `Live.call`, the callee sees the value-transferred world and a
+rejection restores that transfer before the top-level rollback is applied. -/
+def callWithCalldata (external : External) (ctx : Context) (target : Address)
+    (payload : Bytes) (value : Uint256 := 0) : Exec Bytes := fun world =>
+  let request : Request := ⟨ctx.self, target, value, payload⟩
+  if (world.core.codeSize target.val).val = 0 then ⟨.error .empty, world, []⟩
+  else if world.balances ctx.self < value.val then
+    ⟨.error (.bubbled []), world, [⟨request, false, [], []⟩]⟩
+  else
+    match external request (transfer world ctx.self target value.val) with
+    | .rejected data => ⟨.error (.bubbled data), world, [⟨request, false, data, []⟩]⟩
+    | .success data after => ⟨.ok data, after, [⟨request, true, data, []⟩]⟩
+    | .successWithTrace data after nested => ⟨.ok data, after, [⟨request, true, data, nested⟩]⟩
+    | .rejectedWithTrace data nested =>
+        ⟨.error (.bubbled data), world, [⟨request, false, data, nested⟩]⟩
+
 /-- Lift the pinned storage transition into the whole-world interpreter.  The
 state supplied to `claimOne` receives the live transaction sender; every
 queue/checkpoint read and the claimed/locked write therefore remains on the
@@ -137,6 +155,85 @@ theorem transfer_revert_restores_world
     (runTransferFrom ctx from recipient requestId before).world = before := by
   unfold runTransferFrom LidoSRv3.Audit.Source.TrioReserve1.Live.run
   cases hrun : transferFrom ctx from recipient requestId before <;> simp [hrun] at h ⊢
+
+/-! ## `requestWithdrawals` one-item physical path -/
+
+/-- `keccak256("lido.WithdrawalQueue.lastRequestId")`. -/
+def lastRequestIdPosition : Nat :=
+  0x8ee26abbbdf5335e3953ccf2204a79e845eecb5ab51f8398526746e4ea068041
+
+/-- `keccak256("lido.WithdrawalQueue.lastReportTimestamp")`. -/
+def lastReportTimestampPosition : Nat :=
+  0x6825d6bead788134d1ac062bbb7f1f0e4a9e13182688453e79955a721d58c45d
+
+def transferFromSelector : Nat := 0x23b872dd
+def getSharesByPooledEthSelector : Nat := 0x19208451
+
+def abiWord (n : Nat) : Bytes := encode 32 n
+def abiAddress (a : Address) : Bytes := abiWord a.toNat
+
+def stETHTransferFromCalldata (from queue : Address) (amount : Nat) : Bytes :=
+  encode 4 transferFromSelector ++ abiAddress from ++ abiAddress queue ++ abiWord amount
+
+def stETHSharesCalldata (amount : Nat) : Bytes :=
+  encode 4 getSharesByPooledEthSelector ++ abiWord amount
+
+/-- Solidity's packed `WithdrawalRequest` constructor, including the uint128
+and uint40 narrowing performed by the source types. -/
+def packEnqueuedAmounts (stETH shares : Nat) : Uint256 :=
+  packAmounts (stETH % 2 ^ 128) (shares % 2 ^ 128)
+
+def packEnqueuedMetadata (owner : Address) (timestamp reportTimestamp : Nat) : Uint256 :=
+  .ofNat (owner.toNat + (timestamp % 2 ^ 40) * 2 ^ 160 +
+    (reportTimestamp % 2 ^ 40) * 2 ^ 208)
+
+/-- Physical `_enqueue` suffix.  Its request id, cumulative pair, report
+timestamp, and owner all come from the current post-call storage world. -/
+def enqueueRequest (ctx : Context) (owner : Address) (amount shares : Nat) : Exec Nat := fun world =>
+  let state := world.core
+  let lastId := (state.readSlot lastRequestIdPosition).val
+  if lastId + 1 ≥ 2 ^ 256 then ⟨.error (.reason "RequestIdOverflow"), world, []⟩
+  else
+    let requestId := lastId + 1
+    let previous := requestAmountsWord state lastId
+    let cumulativeStETH := cumulativeStETH previous + amount
+    let cumulativeShares := cumulativeShares previous + shares
+    let reportTimestamp := (state.readSlot lastReportTimestampPosition).val
+    let after :=
+      ((state.writeSlot lastRequestIdPosition (.ofNat requestId)).writeMapUint
+        queuePosition (.ofNat requestId) (packEnqueuedAmounts cumulativeStETH cumulativeShares)).writeMapUint
+          (queuePosition + 1) (.ofNat requestId)
+            (packEnqueuedMetadata owner state.blockTimestamp.val reportTimestamp)
+    ⟨.ok requestId, { world with core := after }, []⟩
+
+/-- One item of `WithdrawalQueue.requestWithdrawals`.  The queue calls the
+configured stETH target twice: first `transferFrom(msg.sender, address(this),
+amount)`, then `getSharesByPooledEth(amount)`.  Both replies are execution
+results from `external`; there is no supplied success, balance, or allowance
+bit.  Only after both calls return does the physical queue record commit. -/
+def requestWithdrawals (external : External) (ctx : Context) (stETH : Address)
+    (amount : Nat) (suppliedOwner : Address) : Exec Nat := do
+  require (decide (100 ≤ amount) && decide (amount ≤ 1000 * 10 ^ 18))
+    (.reason "RequestAmountOutOfRange")
+  let owner := if suppliedOwner = zeroAddress then ctx.sender else suppliedOwner
+  let _ ← callWithCalldata external ctx stETH (stETHTransferFromCalldata ctx.sender ctx.self amount)
+  let sharesBytes ← callWithCalldata external ctx stETH (stETHSharesCalldata amount)
+  let shares ← decodeWord sharesBytes
+  enqueueRequest ctx owner amount shares.val
+
+def runRequestWithdrawals (external : External) (ctx : Context) (stETH : Address)
+    (amount : Nat) (suppliedOwner : Address) (before : World) :=
+  run (requestWithdrawals external ctx stETH amount suppliedOwner) before
+
+theorem request_revert_restores_caller_and_callee_world
+    (external : External) (ctx : Context) (stETH : Address) (amount : Nat)
+    (suppliedOwner : Address) (before : World) (fault : Fault)
+    (h : (runRequestWithdrawals external ctx stETH amount suppliedOwner before).outcome =
+      .error fault) :
+    (runRequestWithdrawals external ctx stETH amount suppliedOwner before).world = before := by
+  unfold runRequestWithdrawals LidoSRv3.Audit.Source.TrioReserve1.Live.run
+  cases hrun : requestWithdrawals external ctx stETH amount suppliedOwner before <;>
+    simp [hrun] at h ⊢
 
 /-- Top-level failure restores the exact caller/callee world.  Failed calls
 remain in `attempts`, but no queue slot, balance, or callee effect commits. -/
