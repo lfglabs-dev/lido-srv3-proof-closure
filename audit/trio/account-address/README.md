@@ -92,8 +92,10 @@ router's other words are outside the slice; the config word is only read here;
 uint256 overflow of the Accounting 325 and 331 products is unmodeled in the
 older `ReportWriteFee.calculateProtocolFees` helper (the new public
 `ReportFeeMint` consumer executes checked products); the
-uint96 casts are shown load-bearing on report-inconsistent storage only, and
-their exactness on report-consistent storage is not proved (HOLD); a status
+uint96 casts remain load-bearing on report-inconsistent arbitrary storage.
+Their exactness on the actual report output is now derived by
+`ReportFeeCastInvariant` and consumed by `PAccount1.actual_report_fee_mint_casts`,
+without separated-layout or distinct-ID premises; a status
 byte above 2 is modeled as the storage-load panic; the getter is modeled over
 arbitrary storage, so words written by other paths are read as-is; and there
 is no compiler, EVM, bytecode, or deployment correspondence.

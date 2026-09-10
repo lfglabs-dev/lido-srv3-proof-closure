@@ -1,0 +1,9 @@
+# ACCOUNT derived fee-cast integration
+
+Source408e6a43 was frozen with its writer stopped before the retained independent complete-source/Solidity review. Root combined it with maina8988b01 in union450356fc. The three new Lean sources remain byte-identical, and the source receipt checker verifies13 artifacts,24 scoped identities,11 pins and four pinned Solidity bodies. The scoped24 identities are not presented as a new whole-repository closure.
+
+Root adds the invariant and its regression module to the existing AccountAddressChecks provider; AllGuarantees imports the public PAccount1ActualFeeCasts, and Trust imports the new regression and queries the consuming theorem, derived report allocation bound, two alias regressions and the positive mint fixture. The provider is not duplicated and the external manifest is unchanged. The existing README now marks only the specific post-report uint96 exactness concern as resolved by this public consumer; historical exact per-row correspondence keeps its original separation/distinctness conditions.
+
+The actual successful report derives allocation<=total even with modeled slot aliases or repeated IDs. Decoded uint16 fees then make both uint96 casts exact on the actual post-report router consumed by the mint composition. No executable or existing theorem changes, no layout/distinctness/allocation-bound premise is added. The source skips zero-total/zero-allocation rows; total Nat helper facts for skipped rows do not assert executed Solidity division by zero.
+
+Root combined AllGuarantees/Trust passes1689jobs; the fresh trust gate confirms29exact axioms, recomputing environment dependencies and reevaluating native claims. Source checks are reused by exact identity. No new Solidity runtime execution is credited. Independent exact integration review remains the separate merge gate.
