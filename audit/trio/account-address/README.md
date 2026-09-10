@@ -53,6 +53,19 @@ the total, adds with the checked uint96 total, enforces the post-loop
 `calculateProtocolFees` consumes that result with the LIP-12 guard, the checked
 `postInternalEther - feeEther` subtraction, and the per-module floor shares.
 
+`ReportFeeMint.lean` continues that physical report write through one
+post-write `getStakingRewardsDistribution` result, checked uint256
+Accounting 317/323/325/331 products, and the source-ordered
+`Accounting.sol:403-413` Lido mint. Its mint invokes
+`StETHMintShares.mintShares` on a single StETH state: the conventional
+`shares` mapping and the `lido.StETH.totalAndExternalShares` packed word are
+therefore read and written by the same execution. The Lido caller/recipient
+identity is the Accounting address, the stopped guard precedes `_mintShares`,
+and the two transfer events use the post-mint internal-ether share-rate
+numerator. Fee arithmetic and mint failures roll the entire composed world
+back; a zero fee reaches neither mint nor mint events. This is supplementary
+evidence for the registered `P-ACCOUNT-1`, not a new guarantee ID.
+
 Proved: a committed report sets exactly the low uint64 of each registered
 accounting word and of the router word, preserves every other bit (including
 `exitedValidatorsCount`) and every other slot (including the config words),
