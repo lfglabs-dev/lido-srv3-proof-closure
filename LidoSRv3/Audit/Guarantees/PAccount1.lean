@@ -1,6 +1,7 @@
 import LidoSRv3.Audit.Source.AccountingCorrespondence
 import LidoSRv3.Audit.Verity.HandleOracleReportTx
 import LidoSRv3.Audit.Guarantees.Registry
+import ReportFeeMint
 
 namespace LidoSRv3.Audit.Guarantees.PAccount1
 
@@ -104,6 +105,23 @@ claim rather than a fact about which numeral a line of program text
 contains. -/
 theorem mint_after_read_discipline : mintAfterReadDiscipline :=
   mintAfterReadDiscipline_holds
+
+/-- The registered ACCOUNT consumer for the physical report/write/getter/mint
+path.  Its mint event is produced by the same `StETHMintShares.State` that
+holds both the Solidity `shares` mapping and the packed total/external-shares
+word; the share amount is not an input independent of the committed getter.
+This supplements the registered parent rather than creating a P-MINT node. -/
+theorem committed_fee_mint_consumes_checked_result
+    (x : AccountAddress.ReportFeeMint.Input) (before post : AccountAddress.ReportFeeMint.World)
+    (fee : AccountAddress.ReportWriteFee.FeeResult)
+    (events : List AccountAddress.StETHMintShares.Event)
+    (h : AccountAddress.ReportFeeMint.handleOracleReportFromCommittedFeeProducts x before =
+      .committed post fee events)
+    (hfee : 0 < fee.sharesToMintAsFees) :
+    ∃ pooled, events = [.transfer 0 before.steth.accounting pooled,
+      .transferShares 0 before.steth.accounting fee.sharesToMintAsFees] :=
+  AccountAddress.ReportFeeMint.committed_nonzero_mint_uses_fee_result
+    x before post fee events h hfee
 
 /-- Kill-line for the registered parent `mint_after_read_discipline`.
 `handleOracleReportMintBeforeRead` is a pure call-site reordering of the real
