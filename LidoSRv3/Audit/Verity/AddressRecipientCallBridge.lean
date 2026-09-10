@@ -317,6 +317,37 @@ def runUnwrap (callee : External) (ctx : Context) (stETH : Address) (amount : Na
     (before : World) :=
   run (unwrap callee ctx stETH amount) before
 
+def unwrapBridgeContext : Context := ⟨(99 : Address), (1 : Address)⟩
+
+/-- A concrete stETH callee for the unwrap receipt: its conversion reply is
+the ABI word 15, and its later ERC20 transfer reply succeeds. -/
+def unwrapCallee : External := fun request world =>
+  if request.payload = pooledEthBySharesCalldata 10 then
+    .success (abiWord 15) world
+  else
+    .success [] world
+
+def unwrapBridgeWorld : World :=
+  { core := ({ defaultState with
+      codeSize := fun address => if address = (2 : Address).toNat then 1 else 0 }).writeMap
+        wstETHBalancesSlot unwrapBridgeContext.sender 10 |>.writeSlot wstETHTotalSupplySlot 10
+    balances := fun _ => 0 }
+
+/-- Executable `unwrap` receipt: conversion result 15 drives the transfer
+calldata, while the caller's inherited balance and total-supply slots are both
+burned by 10. -/
+theorem unwrap_bridge_receipt :
+    let result := runUnwrap unwrapCallee unwrapBridgeContext (2 : Address) 10 unwrapBridgeWorld
+    result.outcome = .ok 15 ∧
+      result.world.core.readMap wstETHBalancesSlot unwrapBridgeContext.sender = 0 ∧
+      result.world.core.readSlot wstETHTotalSupplySlot = 0 ∧
+      result.attempts =
+        [⟨⟨unwrapBridgeContext.self, (2 : Address), 0, pooledEthBySharesCalldata 10⟩,
+            true, abiWord 15, []⟩,
+         ⟨⟨unwrapBridgeContext.self, (2 : Address), 0,
+            erc20TransferCalldata unwrapBridgeContext.sender 15⟩, true, [], []⟩] := by
+  decide +kernel
+
 theorem unwrap_revert_restores_caller_and_callee_world
     (callee : External) (ctx : Context) (stETH : Address) (amount : Nat)
     (before : World) (fault : Fault)
