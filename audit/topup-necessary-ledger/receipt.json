@@ -18,7 +18,7 @@
       "exit_code": 0
     }
   ],
-  "source_identity_count": 1592,
+  "source_identity_count": 1594,
   "package_pin_count": 11,
   "new_axioms": {
     "LidoSRv3.Audit.Guarantees.PTopup1.actual_continuation_conserves": "propext,\n Classical.choice,\n Quot.sound",
@@ -33,6 +33,6 @@
     "registry-checks.json": "cad7fb206f01c11243922b524b4f351374b23b8574c3f8f17d6eb1f1f9d176cb",
     "unchanged-runtime-sources.json": "43e57f7b6a4074149bc3ab096106d6a490a4ac2cc2589e936b1b2baa051d58c8",
     "trust-build-trace.json": "ff7eb47697fde891043b79d99bbddc2df749379222367b7014313a2974705509",
-    "source-inputs.json": "4965454ca17017207fec552cf7c638beb2e1600944043ab3566e67c9803a6edb"
+    "source-inputs.json": "e57705ae2796e6d020e79672e68100b00ecb8554d1ee02c240b345bae89453de"
   }
 }

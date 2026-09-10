@@ -1592,7 +1592,9 @@
     "audit/trio/main-guarantees.json": "2d3de358ca9894dac3308170496ef9ed6671e8ec0b7686e75d1b7a9fbc1c90e6",
     "lakefile.lean": "2cdcec78f9aafea563acb4ac7dca7cd52d94517c1a65517cf408025f8b7288d1",
     "lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
-    "lean-toolchain": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee"
+    "lean-toolchain": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee",
+    "scripts/check_public_claim_surfaces.py": "c8a9dfe158079897e08a1e644b85598e8dedeb45fd6868590b81f2614852ecd0",
+    "scripts/generate_ux2.py": "9b0dbf05192c6826b1985266de965f130da683a5c3d41dc432c3bf1104daef81"
   },
   "package_pins": {
     ".lake/packages/verity": "e977aaad6e1a9e92e0132d41b3d33a14135a4d46",
