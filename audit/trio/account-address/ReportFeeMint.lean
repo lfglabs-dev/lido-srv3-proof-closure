@@ -27,8 +27,7 @@ are distinct contracts, while the packed StETH total-share word and the
 by the same `mintShares` execution. -/
 structure World where
   router : Core
-  steth : State
-  deriving Repr
+  steth : AccountAddress.StETHMintShares.State
 
 structure Input where
   layout : Layout
@@ -36,10 +35,9 @@ structure Input where
   reportedModuleIds : List Nat
   balancesGwei : List Nat
   report : ReportWei
-  deriving Repr
 
 inductive Error where
-  | invalidReport (e : AccountAddress.ReportWriteFee.Error)
+  | invalidReport (e : AccountAddress.PAccount1.Error)
   | getter (e : GetterError)
   /-- A Solidity 0.8 uint256 operation in Accounting 317/323/325/331 panics. -/
   | feeArithmetic
@@ -50,7 +48,6 @@ inductive Error where
 inductive Outcome where
   | reverted (error : Error) (rollback : World)
   | committed (post : World) (fee : FeeResult) (events : List Event)
-  deriving Repr
 
 private def uint256Max : Nat := two256 - 1
 
@@ -84,8 +81,8 @@ private def checkedFeeProductsFromCommittedGetter (r : ReportWei) (d : Distribut
   let internalShares ← checkedWord r.internalSharesBeforeFees
   let totalFee ← checkedWord d.totalFee
   let precision ← checkedWord d.precisionPoints
-  let prefix ← checkedAdd validators pending
-  let unified ← checkedAdd prefix withdrawals
+  let validatorPending ← checkedAdd validators pending
+  let unified ← checkedAdd validatorPending withdrawals
   if principal < unified then
     let rewardBeforeEl ← checkedSub unified principal
     let rewards ← checkedAdd rewardBeforeEl elRewards
@@ -108,25 +105,83 @@ private def mintCommittedFee (before : World) (fee : FeeResult) : Outcome :=
     | .committed steth events => .committed { before with steth } fee events
   else .committed before fee []
 
+private def continueFromCommittedReport (x : Input) (before : World) (postRouter : Core) : Outcome :=
+  match getStakingRewardsDistribution x.layout x.registeredModuleIds postRouter with
+  | .error e => .reverted (.getter e) before
+  | .ok distribution =>
+      match checkedFeeProductsFromCommittedGetter x.report distribution with
+      | none => .reverted .feeArithmetic before
+      | some fee =>
+          match mintCommittedFee { before with router := postRouter } fee with
+          | .reverted e _ => .reverted e before
+          | .committed post fee events => .committed post fee events
+
 /-- One complete physical ACCOUNT suffix.  `getStakingRewardsDistribution`
-is intentionally exposed as its own match between the report write and the
-fee continuation: this makes the post-write getter dependency executable,
-rather than an informal assertion hidden inside a fee wrapper. -/
+is intentionally exposed as its own continuation after the report write: this
+makes the post-write getter dependency executable, rather than an informal
+assertion hidden inside a fee wrapper. -/
 def handleOracleReportFromCommittedFeeProducts (x : Input) (before : World) : Outcome :=
   match reportValidatorBalances x.layout x.registeredModuleIds x.reportedModuleIds
       x.balancesGwei before.router with
   | .reverted e _ => .reverted (.invalidReport e) before
-  | .committed postRouter =>
-      match getStakingRewardsDistribution x.layout x.registeredModuleIds postRouter with
-      | .error e => .reverted (.getter e) before
-      | .ok distribution =>
-          match checkedFeeProductsFromCommittedGetter x.report distribution with
-          | none => .reverted .feeArithmetic before
-          | some fee =>
-              match mintCommittedFee { before with router := postRouter } fee with
-              | .reverted e _ => .reverted e before
-              | .committed post fee events => .committed post fee events
+  | .committed postRouter => continueFromCommittedReport x before postRouter
 
+set_option maxRecDepth 1000000 in
+private theorem mintCommittedFee_nonzero_mint_uses_fee_result
+    (before post : World) (inputFee outputFee : FeeResult) (events : List Event)
+    (h : mintCommittedFee before inputFee = .committed post outputFee events)
+    (hfee : 0 < outputFee.sharesToMintAsFees) :
+    ∃ pooled, events = [.transfer 0 before.steth.locatorAccounting pooled,
+      .transferShares 0 before.steth.locatorAccounting outputFee.sharesToMintAsFees] := by
+  unfold mintCommittedFee at h
+  by_cases hpositive : 0 < inputFee.sharesToMintAsFees
+  · simp only [if_pos hpositive] at h
+    generalize hmint : mintShares before.steth.locatorAccounting
+      before.steth.locatorAccounting inputFee.sharesToMintAsFees before.steth = minted at h
+    cases minted with
+    | reverted e rollback => nomatch h
+    | committed mintedState mintedEvents =>
+      simp only [Outcome.committed.injEq] at h
+      obtain ⟨_, hfees, hevents⟩ := h
+      obtain ⟨pooled, hmintedEvents⟩ :=
+        committed_mint_has_paired_events _ _ _ _ _ _ hmint
+      refine ⟨pooled, ?_⟩
+      rw [← hevents, hmintedEvents, hfees]
+  · simp only [if_neg hpositive] at h
+    simp only [Outcome.committed.injEq] at h
+    obtain ⟨_, hfees, _⟩ := h
+    exact False.elim (hpositive (hfees ▸ hfee))
+
+set_option maxRecDepth 1000000 in
+private theorem committed_distribution_nonzero_mint_uses_fee_result
+    (x : Input) (before post : World) (postRouter : Core) (distribution : Distribution)
+    (fee : FeeResult) (events : List Event)
+    (h : (match checkedFeeProductsFromCommittedGetter x.report distribution with
+      | none => .reverted .feeArithmetic before
+      | some products =>
+          match mintCommittedFee { before with router := postRouter } products with
+          | .reverted e _ => .reverted e before
+          | .committed post fee events => .committed post fee events) =
+      .committed post fee events)
+    (hfee : 0 < fee.sharesToMintAsFees) :
+    ∃ pooled, events = [.transfer 0 before.steth.locatorAccounting pooled,
+      .transferShares 0 before.steth.locatorAccounting fee.sharesToMintAsFees] := by
+  split at h
+  · exact False.elim (Outcome.noConfusion h)
+  rename_i products hproducts
+  generalize hmint : mintCommittedFee { before with router := postRouter } products = outcome at h
+  cases outcome with
+  | reverted e rollback => exact False.elim (Outcome.noConfusion h)
+  | committed committedPost committedFee committedEvents =>
+    simp only [Outcome.committed.injEq] at h
+    obtain ⟨_, hfeeResult, hevents⟩ := h
+    obtain ⟨pooled, hmintedEvents⟩ := mintCommittedFee_nonzero_mint_uses_fee_result
+      { before with router := postRouter } committedPost products committedFee committedEvents hmint
+        (hfeeResult ▸ hfee)
+    refine ⟨pooled, ?_⟩
+    rw [← hevents, hmintedEvents, hfeeResult]
+
+set_option maxRecDepth 1000000 in
 /-- On a successful nonzero fee, the emitted transfer-share amount is the
 very `FeeResult` produced from the committed getter, and the packed word and
 recipient mapping are both observations of that one post-mint `State`. -/
@@ -140,19 +195,11 @@ theorem committed_nonzero_mint_uses_fee_result (x : Input) (before post : World)
   split at h
   · cases h
   rename_i postRouter hreport
+  unfold continueFromCommittedReport at h
   split at h
   · cases h
   rename_i distribution hgetter
-  split at h
-  · cases h
-  rename_i products hproducts
-  unfold mintCommittedFee at h
-  simp only [hfee, ↓reduceIte] at h
-  split at h
-  · cases h
-  · rename_i steth mintedEvents hmint
-    simp only [Outcome.committed.injEq, World.mk.injEq] at h
-    obtain ⟨_, _, rfl⟩ := h
-    exact committed_mint_has_paired_events _ _ _ _ _ _ hmint
+  exact committed_distribution_nonzero_mint_uses_fee_result
+    x before post postRouter distribution fee events h hfee
 
 end AccountAddress.ReportFeeMint

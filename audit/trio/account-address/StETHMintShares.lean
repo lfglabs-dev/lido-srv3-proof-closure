@@ -189,8 +189,11 @@ theorem externalShares_setLowUint128 (word : StorageWord) (value : Nat) :
     (setLowUint128 word value).val / two128 = word.val / two128 := by
   rw [show (setLowUint128 word value).val =
     (word.val / two128) * two128 + value % two128 by rfl]
-  rw [Nat.add_div]
-  simp [Nat.mod_lt _ (by decide)]
+  have htwo128 : 0 < two128 := by
+    simp [two128]
+  have hmod : value % two128 < two128 := Nat.mod_lt _ htwo128
+  rw [Nat.add_comm, Nat.add_mul_div_right _ _ htwo128, Nat.div_eq_of_lt hmod]
+  simp
 
 theorem every_revert_restores_snapshot (caller recipient amount : Nat) (before rollback : State)
     (e : Error) (h : mintShares caller recipient amount before = .reverted e rollback) :
@@ -227,20 +230,39 @@ theorem every_revert_restores_snapshot (caller recipient amount : Nat) (before r
       simp only [post, hPooled, Outcome.reverted.injEq] at h
       exact h.2.symm
     | ok pooled =>
-      simp only [post, hPooled, Outcome.committed.injEq] at h
+      simp only [post, hPooled] at h
+      cases h
 
 theorem committed_mint_has_paired_events (caller recipient amount : Nat) (before post : State)
     (events : List Event)
     (h : mintShares caller recipient amount before = .committed post events) :
     ∃ pooled, events = [.transfer 0 recipient pooled, .transferShares 0 recipient amount] := by
   unfold mintShares at h
-  split at h <;> try simp_all
-  split at h <;> try simp_all
-  split at h <;> try simp_all
-  split at h <;> try simp_all
-  split at h <;> try simp_all
-  split at h <;> try simp_all
-  split at h <;> try simp_all
-  next pooled hpooled => exact ⟨pooled, by simpa using h.2⟩
+  split at h
+  · cases h
+  split at h
+  · cases h
+  split at h
+  · cases h
+  split at h
+  · cases h
+  split at h
+  · cases h
+  split at h
+  · cases h
+  split at h
+  · cases h
+  · cases hPooled : pooledEthByShares
+      { before with
+        storage := before.storage.write totalSharesPosition
+          (setLowUint128 (totalAndExternalShares before) (totalShares before + amount))
+        shares := fun account => if account = recipient then before.shares account + amount
+          else before.shares account } amount with
+    | error e =>
+      simp only [hPooled] at h
+      cases h
+    | ok pooled =>
+      simp only [hPooled, Outcome.committed.injEq] at h
+      exact ⟨pooled, h.2.symm⟩
 
 end AccountAddress.StETHMintShares
