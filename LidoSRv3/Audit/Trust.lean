@@ -1,3 +1,4 @@
+import Tests.Verity.ReportFeeCheckedSplitTest
 import LidoSRv3.Tests.TopupRootCallEffectsRegression
 import Tests.Verity.ReportFeeCastInvariantTest
 import LidoSRv3.Audit.Guarantees.PTopup2ModuleFailure
@@ -703,3 +704,8 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.TopupRootCallEffectsRegression.positive_batch_joint_consumer
 #print axioms LidoSRv3.Tests.TopupRootCallEffectsRegression.positive_physical_balances_and_count
 #print axioms LidoSRv3.Tests.TopupRootCallEffectsRegression.actual_reply_above_cap_restores
+
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1.actual_report_fee_mint_checked_split
+#print axioms AccountAddress.ReportFeeMint.checkedFeeResultOf_split
+#print axioms AccountAddress.ReportFeeMint.checkedFeeProducts_split_origin
+#print axioms AccountAddress.ReportFeeCheckedSplit.committed_checked_split

@@ -304,6 +304,118 @@ theorem failure_restores (x : Input) (before rollback : World) (error : Error)
       (checkedFeeProductsFromCommittedGetter x.report)
       (mintCommittedFee x.accountingAddress {before with router := r}) before w e hc) h
 
+/-- Checked loop success determines every exact floor and its mathematical
+running total; no bounded-sum premise is supplied. -/
+private theorem checkedModuleShares_split (shares totalFee : Nat) (fees : List Nat) :
+    ∀ running parts final,
+      checkedModuleShares shares totalFee fees running = some (parts, final) →
+      parts = fees.map (fun f => shares * f / totalFee) ∧ final = running + parts.sum := by
+  induction fees with
+  | nil =>
+    intro running parts final h
+    simp only [checkedModuleShares, Option.some.injEq, Prod.mk.injEq] at h
+    rcases h with ⟨rfl,rfl⟩
+    simp
+  | cons f fs ih =>
+    intro running parts final h
+    have step (part next : Nat) (rest : List Nat) (finish : Nat)
+        (hn : checkedAdd running part = some next)
+        (hr : checkedModuleShares shares totalFee fs next = some (rest,finish))
+        (he : some (part :: rest,finish) = some (parts,final))
+        (hp : part = shares * f / totalFee) :
+        parts = (f :: fs).map (fun f => shares * f / totalFee) ∧ final = running + parts.sum := by
+      cases Option.some.inj he
+      have hnext : next = running + part := by
+        unfold checkedAdd at hn
+        split at hn
+        · exact (Option.some.inj hn).symm
+        · cases hn
+      obtain ⟨hparts,hfinal⟩ := ih next rest _ hr
+      constructor
+      · simp only [List.map_cons,hp,hparts]
+      · simp only [List.sum_cons]
+        omega
+    simp only [checkedModuleShares] at h
+    by_cases hf : 0 < f
+    · simp only [if_pos hf,bind,Option.bind_eq_some_iff] at h
+      obtain ⟨product,hm,part,hd,next,hn,⟨rest,finish⟩,hr,he⟩ := h
+      apply step part next rest finish hn hr he
+      unfold checkedMul at hm
+      split at hm
+      · cases Option.some.inj hm
+        unfold checkedDiv at hd
+        split at hd
+        · cases hd
+        · exact (Option.some.inj hd).symm
+      · cases hm
+    · simp only [if_neg hf,bind,Option.bind_some,Option.bind_eq_some_iff] at h
+      obtain ⟨next,hn,⟨rest,finish⟩,hr,he⟩ := h
+      apply step 0 next rest finish hn hr he
+      simp [Nat.eq_zero_of_not_pos hf]
+
+/-- Exact checked distribution, including the source's zero-mint skip. -/
+theorem checkedFeeResultOf_split (d : Distribution) (shares : Nat) (fee : FeeResult)
+    (h : checkedFeeResultOf d shares = some fee) :
+    fee.sharesToMintAsFees = shares ∧
+    fee.moduleSharesToMint.sum + fee.treasurySharesToMint = shares ∧
+    ((shares = 0 ∧ fee.moduleSharesToMint = [] ∧ fee.moduleFeeRecipients = [] ∧ fee.moduleIds = []) ∨
+     (0 < shares ∧ 0 < d.totalFee ∧
+      fee.moduleSharesToMint = d.stakingModuleFees.map (fun f => shares * f / d.totalFee) ∧
+      fee.moduleFeeRecipients = d.recipients ∧ fee.moduleIds = d.stakingModuleIds)) := by
+  unfold checkedFeeResultOf at h
+  split at h
+  · rename_i hs
+    split at h
+    · cases h
+    · rename_i ht
+      simp only [bind, Option.bind_eq_some_iff] at h
+      obtain ⟨⟨parts,total⟩,hm,treasury,htreasury,heq⟩ := h
+      cases Option.some.inj heq
+      obtain ⟨hp,hsum⟩ := checkedModuleShares_split shares d.totalFee d.stakingModuleFees 0 parts total hm
+      unfold checkedSub at htreasury
+      split at htreasury
+      · rename_i hle
+        cases Option.some.inj htreasury
+        refine ⟨rfl,?_,Or.inr ⟨hs,Nat.pos_of_ne_zero ht,hp,rfl,rfl⟩⟩
+        simp only [Nat.zero_add] at hsum
+        dsimp only
+        omega
+      · cases htreasury
+  · rename_i hs
+    cases Option.some.inj h
+    have hz := Nat.eq_zero_of_not_pos hs
+    exact ⟨hz.symm,by simp [hz],Or.inl ⟨hz,rfl,rfl,rfl⟩⟩
+
+/-- Any actual checked fee-products success reaches that same checked split;
+the share quantity is obtained from execution rather than a caller equality. -/
+theorem checkedFeeProducts_split_origin (r : ReportWei) (d : Distribution) (fee : FeeResult)
+    (h : checkedFeeProductsFromCommittedGetter r d = some fee) :
+    ∃ shares, checkedFeeResultOf d shares = some fee := by
+  unfold checkedFeeProductsFromCommittedGetter at h
+  obtain ⟨_,_,h⟩ := Option.bind_eq_some_iff.mp h
+  obtain ⟨_,_,h⟩ := Option.bind_eq_some_iff.mp h
+  obtain ⟨_,_,h⟩ := Option.bind_eq_some_iff.mp h
+  obtain ⟨_,_,h⟩ := Option.bind_eq_some_iff.mp h
+  obtain ⟨_,_,h⟩ := Option.bind_eq_some_iff.mp h
+  obtain ⟨_,_,h⟩ := Option.bind_eq_some_iff.mp h
+  obtain ⟨_,_,h⟩ := Option.bind_eq_some_iff.mp h
+  obtain ⟨_,_,h⟩ := Option.bind_eq_some_iff.mp h
+  obtain ⟨_,_,h⟩ := Option.bind_eq_some_iff.mp h
+  obtain ⟨_,_,h⟩ := Option.bind_eq_some_iff.mp h
+  obtain ⟨_,_,h⟩ := Option.bind_eq_some_iff.mp h
+  split at h
+  · obtain ⟨_,_,h⟩ := Option.bind_eq_some_iff.mp h
+    obtain ⟨_,_,h⟩ := Option.bind_eq_some_iff.mp h
+    obtain ⟨_,_,h⟩ := Option.bind_eq_some_iff.mp h
+    obtain ⟨_,_,h⟩ := Option.bind_eq_some_iff.mp h
+    obtain ⟨_,_,h⟩ := Option.bind_eq_some_iff.mp h
+    obtain ⟨_,_,h⟩ := Option.bind_eq_some_iff.mp h
+    obtain ⟨_,_,h⟩ := Option.bind_eq_some_iff.mp h
+    exact ⟨_,h⟩
+  · exact ⟨0,h⟩
+
+#print axioms checkedFeeResultOf_split
+#print axioms checkedFeeProducts_split_origin
 #print axioms committed_success
 #print axioms failure_restores
 end AccountAddress.ReportFeeMint

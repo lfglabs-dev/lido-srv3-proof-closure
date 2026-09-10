@@ -1,0 +1,43 @@
+{
+  "source": "a3fe6041ecddbc3b7a4af56495da17ae15e9f001",
+  "main_base": "f8ea5f9d3cffc165f5d84dd96444836c806827eb",
+  "union": "ac3893e784f7af7a60a973638aef57821070c288",
+  "source_review": "CLEAN exact a3fe complete source/Solidity; verbatim retained",
+  "source_receipt": {
+    "source_bodies": 4,
+    "scoped_identities": 27,
+    "pins": 11,
+    "pinned_Solidity_bodies": 5,
+    "scoped_axiom_sets": 17,
+    "kernel_regressions": 10,
+    "artifact_hashes": 14,
+    "old_executable_bytes_preserved": true
+  },
+  "AllTrust": {
+    "command": "lake build LidoSRv3.Audit.AllGuarantees LidoSRv3.Audit.Trust",
+    "exit": 0,
+    "jobs": 1697
+  },
+  "trust": {
+    "command": "python3 scripts/check_trust_axioms.py",
+    "exit": 0,
+    "exact_axioms": 29,
+    "dependencies_recomputed": true,
+    "native_claims_reevaluated": true
+  },
+  "registered_scope": {
+    "axiom_sets": 17,
+    "same_as_source_packet": true,
+    "fresh_recomputation": true,
+    "reason": "Actual normal-Lake module identities differ from manual candidate compilation"
+  },
+  "integration_review": "Independent exact frozen-commit gate, not self-approved",
+  "sha256": {
+    "audit/account-checked-fee-split/integration/README.md": "1d955934cad806212ba3627189f787a134ba2662ee28aed4a5f0c65a586d4766",
+    "audit/account-checked-fee-split/integration/all-trust-build.log": "51810aaa5d38eed083512310e5764b3ac63c0fa16fad67a71e5ffa3db68636b8",
+    "audit/account-checked-fee-split/integration/independent-source-review-a3fe.md": "9f29ed24a5a11961bbfd9f1d589005e24d05941db75443d17e0d47b239a40c95",
+    "audit/account-checked-fee-split/integration/scoped-axiom-check.log": "fe357ac5a3a90ae731be5fafffdc1f9b9b526b633771aba3acfa96c3a2ca3ce6",
+    "audit/account-checked-fee-split/integration/scoped-axioms.json": "ef45c600566fd0e181e8de94a446e3584e88cfa7c2e826611813c81ac5afb79d",
+    "audit/account-checked-fee-split/integration/trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439"
+  }
+}
