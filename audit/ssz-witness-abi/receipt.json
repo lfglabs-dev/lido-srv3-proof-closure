@@ -1,0 +1,100 @@
+{
+  "schema": "lido-ssz-witness-abi-v1",
+  "created_utc": "2026-09-10T02:44:29.098291+00:00",
+  "integration_base": "912bdeca1464797597731e45c4c3eb027d169c09",
+  "source_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "goal": "All eight complete guarantees OPEN",
+  "main_result": "Actual raw consumer derives key/field/proof-length facts and original-calldata binding through actual SHA call environment invariants; no decoded-witness or intermediate-frame premise.",
+  "lean": {
+    "exit_code": 0,
+    "target": "LidoSRv3.Tests.SszWitnessAbiMutants",
+    "jobs": 1134,
+    "source_theorems": 10,
+    "private_proof_helpers": 3,
+    "named_test_theorems": 2,
+    "kernel_examples": 9,
+    "axiom_query_occurrences": 13,
+    "distinct_queried_declarations": 12,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "scope": "Targeted build: final source and test actively compiled, unchanged imports replayed. No full rebuild."
+  },
+  "solidity": {
+    "fresh_tests": 4,
+    "receipt": "audit/ssz-witness-abi/solidity/receipt.json"
+  },
+  "validated_inputs": {
+    "LidoSRv3/Audit/Source/SszBlsComposition.lean": "dae0997c41b32ed337300594b730e6b8b22c267c4d13c36ac60c9ba65230831f",
+    "LidoSRv3/Audit/Source/SszLittleEndianCorrespondence.lean": "354768f3a855422699513646e7ec7b06809f7be545fba623ad9659c331e4fdb8",
+    "LidoSRv3/Audit/Source/SszProofCalldataLoop.lean": "ebc58764fcfc3b72f0c1bfd4a2ce3339b2d316344a47755e7819d9ad627f7d87",
+    "LidoSRv3/Audit/Source/SszProofCalldataStep.lean": "8c8404c726594c7cdf9cdd9c96a6402dab9bcbcecd27afc7aa2a4d284b135411",
+    "LidoSRv3/Audit/Source/SszProofFold.lean": "2e0c24c00c0fbae5cfe8dec50a459996b64988e839087bec1880034d65859b6d",
+    "LidoSRv3/Audit/Source/SszProofLoopResources.lean": "064e7bca29c544035ec802ff920472a5ab29d6f96650b51af07f36da59821eb2",
+    "LidoSRv3/Audit/Source/SszScratchByteArray.lean": "ed6249a91046db3165beb3d38f5c3f1ee5b9db0c4a6ff559a3b0877d5757218b",
+    "LidoSRv3/Audit/Source/SszScratchEvmMemory.lean": "44489c5cd5688a6747b5d1eea1672015c709db91695faedd66b27e44e9053edd",
+    "LidoSRv3/Audit/Source/SszShaCallBytes.lean": "f91d8f08c5e0dbc7eb97dce0a405fd0b072b73f1b6738f1eafc752989e30db9f",
+    "LidoSRv3/Audit/Source/SszShaCallMemory.lean": "acd7b15153918e28c3881e073f6f0f5f165c01cf959863b272e2f9ffa7305020",
+    "LidoSRv3/Audit/Source/SszTypedFfiBridge.lean": "0b783ad4b3a15933d7096cff4e0450bf8b510689024bd7232011a8d326e29ad9",
+    "LidoSRv3/Audit/Source/SszValidatorLeaf.lean": "a2b5fa2b0f8b5955e0d4d27a5052e0d19bb08058b5e734dd48d55cc121d3170f",
+    "LidoSRv3/Audit/Source/SszVerifierEntry.lean": "08780f8e0003f28c2ea5efc33125f127ff2e00facdacef30fa8180a4ff0c82c3",
+    "LidoSRv3/Audit/Source/SszWitnessAbi.lean": "073f890c3ee130bccd2680f95dcb6bc7657708e4382accd2cd02b26e03906f04",
+    "LidoSRv3/Audit/Source/SszWordBytes.lean": "edf978676f3b42922ff121da12887e5552a9ddc2a9bb6d37c287c44132b01c23",
+    "LidoSRv3/Audit/Source/SszWrapperIndex.lean": "57833ae3afc8731c7b6a80862666194c1fa561db316952b3e5b4073013a6b045",
+    "LidoSRv3/Tests/SszWitnessAbiMutants.lean": "0f685a02633c5681b7e34810fbd9aac9e005ad98f680691e5bcaeb9711de4320",
+    "audit/ssz-bls-composition/solidity/SszBlsComposition.t.sol": "610017ad3b52a3ffda650301516240eded3f7b031b37b027920417317ae24ce3",
+    "audit/ssz-witness-abi/README.md": "3d1b6156332345d142d32ee5b286cd45278cc5f6bc9d623ad16b4461185a48d8",
+    "audit/ssz-witness-abi/check_receipt.py": "f75ec0c6d6a1664fa264ceac5fbde170adaf1ffbe6758c98dbebbfe786ed5fe1",
+    "audit/ssz-witness-abi/solidity/SszWitnessAbi.t.sol": "da5edc79343242f15a0ebe9d85f694920fe518190628d3ad1d9e751f6a8a44d0",
+    "foundry.toml": "adb4990ab31a2bb53f5eeb370e4f55d962f7bc1026bce01708497a56b262356c",
+    "lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
+    "lakefile.lean": "8ea3781110b3234bdfcf2b2c87c5c064fa7d2aee018da57bcab100f8baf1ab87",
+    "lean-toolchain": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee",
+    "lido-core/contracts/0.8.25/CLValidatorVerifier.sol": "d6e89f6975e4fa02f758bf461a98ac2d689296b5c92d03ffd4e43a22d0b3d7ed",
+    "lido-core/contracts/common/interfaces/ValidatorWitness.sol": "8fd24cfab7402233029756e52e59198b0d9cbf0a42e5c07d9fa2338ed731a5f7",
+    "lido-core/contracts/common/lib/BLS.sol": "0187cc6a6b1aaa833317695d88795db431fa237452213e8c3872a0f444dceb7c",
+    "lido-core/contracts/common/lib/BeaconTypes.sol": "9591e9af1a4fd398db86267f3589e763f9eb2016bf29e26cfa50988cf73a10c3",
+    "lido-core/contracts/common/lib/GIndex.sol": "2653bd4ba89c349f3db36f21a8afc6a24e0e233816d9b608f46d048feb601d1f",
+    "lido-core/contracts/common/lib/SSZ.sol": "91ef497b972bbee0fe89043034e6bd62fa0c1059f22874d4826bc6164a22009b"
+  },
+  "evidence_hashes": {
+    "audit/ssz-witness-abi/validation.log": "710cd7d423be73ecfa580d6ab625814a9b0274deeddaaedc85c9001f8a11d7e4",
+    "audit/ssz-witness-abi/dependency-inputs.json": "06a7c1c69f4d144a66977a334253f803bd3c77194cbba89834cdc2274aa6752a",
+    "audit/ssz-witness-abi/axioms.log": "ec447f57fca4b57ada63cc4f337e529f9fd8a9fe188757bbce4d363bbd2e9533",
+    "audit/ssz-witness-abi/inherited-validation.json": "fff53b9d7251e7d648285f7fa7da2a4356e1c21a1ea8721eb469ff20d8eadda1",
+    "audit/ssz-witness-abi/solidity/validation.log": "b0ea9f8f79ae60f91fb798d7bd58329d0cc8179cb93ef55b69b2ce971104f6a6",
+    "audit/ssz-witness-abi/solidity/compiler-input-identities.json": "8a6826c12636bfb8bd0c2d456b2f77b02a9f549feac326bf0b55388ee8c31b66",
+    "audit/ssz-witness-abi/solidity/inspected-harness-ir.yul": "1d2924b9c4a6ab33fa848d72e93fdd5ce6d1a7055a591eaa694328514a6ebf25",
+    "audit/ssz-witness-abi/diagnostics/call-frame-inversion-failure.log": "abbf11a4a873966f8b42d1062ca55eedda84876da7caa6d431b169f114d4085d",
+    "audit/ssz-witness-abi/diagnostics/opaque-padding-kernel.log": "bf78f3e1924246564ddc85503c361b8e31fc18a31c0dbbb60cfed6aeaa182569",
+    "audit/ssz-witness-abi/diagnostics/word-rewrite-failure.log": "db5684dd69b9eed93c3daeb1fdec9e34b94ef6985c192d6e3e684e746601126e",
+    "audit/ssz-witness-abi/diagnostics/decoded-fields-transport-failure.log": "4cc9c697ecd80256a201a6b26dbf107455d17b6a4b955d3311eba64aa418ba6c",
+    "audit/ssz-witness-abi/solidity/receipt.json": "1abc333d15d0f3e953519acc2b080cffadafc7aec162b8c4d4aae2393749aa17"
+  },
+  "package_pins": {
+    ".lake/packages/verity": "e977aaad6e1a9e92e0132d41b3d33a14135a4d46",
+    ".lake/packages/evmyul": "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9",
+    ".lake/packages/mathlib": "fabf563a7c95a166b8d7b6efca11c8b4dc9d911f",
+    ".lake/packages/plausible": "63045536fe95024e6c18fc7b48e03f506701c5bc",
+    ".lake/packages/LeanSearchClient": "c5d5b8fe6e5158def25cd28eb94e4141ad97c843",
+    ".lake/packages/importGraph": "5c7542ed018c78194f1e2b903eaf6a792b74c03d",
+    ".lake/packages/proofwidgets": "24b0d9dc081c5423f8eec7e866c441e5184f29d9",
+    ".lake/packages/aesop": "e3cb2f741431ce31bf73549fb52316a57368b06f",
+    ".lake/packages/Qq": "f46324995fca5f0483b742e4eb4daec7f4ee50d2",
+    ".lake/packages/batteries": "fa08db58b30eb033edcdab331bba000827f9f785",
+    ".lake/packages/Cli": "92564e5770e4d09f2d86dfbf8ada1e9c715b384c"
+  },
+  "remaining_internal": [
+    "Raw-byte/typed-tree complete equivalence, derived extents and initial reachable size/memory/depth/gas",
+    "Compiled memory allocations, free pointer/spills and surrounding opcode gas",
+    "Full verifier slot/root/GIndex prefix consuming this path",
+    "Exact revert/log ABI, full World and compiled rollback"
+  ],
+  "external_trust": [
+    "Opaque SHA implementation/cryptographic correctness",
+    "Authentic consensus and deployed configuration; no new deployment verification"
+  ],
+  "independent_review": "Pending exact frozen source and full packet review"
+}

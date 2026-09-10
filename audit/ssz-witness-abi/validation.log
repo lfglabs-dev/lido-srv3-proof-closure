@@ -1,0 +1,141 @@
+⚠ [1071/1134] Replayed Conform.Wheels
+warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: Conform/Wheels.lean:106:70: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1073/1134] Replayed EvmYul.Pretty
+warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: EvmYul/Pretty.lean:36:32: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1114/1134] Replayed EvmYul.Semantics
+warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1115/1134] Replayed EvmYul.EVM.Semantics
+warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+ℹ [1133/1134] Built LidoSRv3.Audit.Source.SszWitnessAbi (1.8s)
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:326:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.run_success_input_binding' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:327:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.pubkey_environment' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:328:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.pair_environment' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:329:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.merkle_environment' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:330:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.call_environment' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:331:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.fields_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:332:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.run_success_origin' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:334:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.read64_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:335:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.readBool_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:336:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.tail_success_length' depends on axioms: [propext, Classical.choice, Quot.sound]
+⚠ [1134/1134] Built LidoSRv3.Tests.SszWitnessAbiMutants (22s)
+warning: LidoSRv3/Tests/SszWitnessAbiMutants.lean:59:45: This simp argument is unused:
+  read64
+
+Hint: Omit it from the simp argument list.
+  simp (disch := decide +kernel) only [tail, read6̵4̵,̵ ̵r̵e̵a̵d̵Bool, EvmYul.State.calldataload, calldata_read_fit]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Tests/SszWitnessAbiMutants.lean:59:53: This simp argument is unused:
+  readBool
+
+Hint: Omit it from the simp argument list.
+  simp (disch := decide +kernel) only [tail, read64, r̵e̵a̵d̵B̵o̵o̵l̵,̵ ̵EvmYul.State.calldataload, calldata_read_fit]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Tests/SszWitnessAbiMutants.lean:64:45: This simp argument is unused:
+  read64
+
+Hint: Omit it from the simp argument list.
+  simp (disch := decide +kernel) only [tail, read6̵4̵,̵ ̵r̵e̵a̵d̵Bool, EvmYul.State.calldataload, calldata_read_fit]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Tests/SszWitnessAbiMutants.lean:64:53: This simp argument is unused:
+  readBool
+
+Hint: Omit it from the simp argument list.
+  simp (disch := decide +kernel) only [tail, read64, r̵e̵a̵d̵B̵o̵o̵l̵,̵ ̵EvmYul.State.calldataload, calldata_read_fit]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Tests/SszWitnessAbiMutants.lean:69:45: This simp argument is unused:
+  read64
+
+Hint: Omit it from the simp argument list.
+  simp (disch := decide +kernel) only [tail, read6̵4̵,̵ ̵r̵e̵a̵d̵Bool, EvmYul.State.calldataload, calldata_read_fit]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Tests/SszWitnessAbiMutants.lean:69:53: This simp argument is unused:
+  readBool
+
+Hint: Omit it from the simp argument list.
+  simp (disch := decide +kernel) only [tail, read64, r̵e̵a̵d̵B̵o̵o̵l̵,̵ ̵EvmYul.State.calldataload, calldata_read_fit]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Tests/SszWitnessAbiMutants.lean:75:39: This simp argument is unused:
+  tail
+
+Hint: Omit it from the simp argument list.
+  simp (disch := decide +kernel) only [t̵a̵i̵l̵,̵ ̵read64, readBool, EvmYul.State.calldataload,
+  ̲  ̲ ̲ ̲calldata_read_fit]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Tests/SszWitnessAbiMutants.lean:75:53: This simp argument is unused:
+  readBool
+
+Hint: Omit it from the simp argument list.
+  simp (disch := decide +kernel) only [tail, read64, r̵e̵a̵d̵B̵o̵o̵l̵,̵ ̵EvmYul.State.calldataload, calldata_read_fit]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Tests/SszWitnessAbiMutants.lean:79:39: This simp argument is unused:
+  tail
+
+Hint: Omit it from the simp argument list.
+  simp (disch := decide +kernel) only [t̵a̵i̵l̵,̵ ̵read64, readBool, EvmYul.State.calldataload,
+  ̲  ̲ ̲ ̲calldata_read_fit]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Tests/SszWitnessAbiMutants.lean:79:53: This simp argument is unused:
+  readBool
+
+Hint: Omit it from the simp argument list.
+  simp (disch := decide +kernel) only [tail, read64, r̵e̵a̵d̵B̵o̵o̵l̵,̵ ̵EvmYul.State.calldataload, calldata_read_fit]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Tests/SszWitnessAbiMutants.lean:83:39: This simp argument is unused:
+  tail
+
+Hint: Omit it from the simp argument list.
+  simp (disch := decide +kernel) only [t̵a̵i̵l̵,̵ ̵read64, readBool, EvmYul.State.calldataload,
+  ̲  ̲ ̲ ̲calldata_read_fit]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Tests/SszWitnessAbiMutants.lean:83:45: This simp argument is unused:
+  read64
+
+Hint: Omit it from the simp argument list.
+  simp (disch := decide +kernel) only [tail, read6̵4̵,̵ ̵r̵e̵a̵d̵Bool, EvmYul.State.calldataload, calldata_read_fit]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+info: LidoSRv3/Tests/SszWitnessAbiMutants.lean:152:0: 'LidoSRv3.Tests.SszWitnessAbiMutants.negative_key_slice' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszWitnessAbiMutants.lean:153:0: 'LidoSRv3.Tests.SszWitnessAbiMutants.key_failure_before_dirty_fields' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/SszWitnessAbiMutants.lean:154:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.run_success_origin' depends on axioms: [propext, Classical.choice, Quot.sound]
+Build completed successfully (1134 jobs).

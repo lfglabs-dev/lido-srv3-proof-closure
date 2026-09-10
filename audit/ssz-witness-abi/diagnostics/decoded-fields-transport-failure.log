@@ -1,0 +1,145 @@
+⚠ [1071/1134] Replayed Conform.Wheels
+warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: Conform/Wheels.lean:106:70: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1073/1134] Replayed EvmYul.Pretty
+warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: EvmYul/Pretty.lean:36:32: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1114/1134] Replayed EvmYul.Semantics
+warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1115/1134] Replayed EvmYul.EVM.Semantics
+warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+✖ [1133/1134] Building LidoSRv3.Audit.Source.SszWitnessAbi (1.7s)
+trace: .> LEAN_PATH=/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Cli/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/batteries/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Qq/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/aesop/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/proofwidgets/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/importGraph/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/plausible/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/mathlib/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/evmyul/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/verity/.lake/build/lib/lean:/private/tmp/lido-ssz-witness-abi/.lake/build/lib/lean /Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean /private/tmp/lido-ssz-witness-abi/LidoSRv3/Audit/Source/SszWitnessAbi.lean -o /private/tmp/lido-ssz-witness-abi/.lake/build/lib/lean/LidoSRv3/Audit/Source/SszWitnessAbi.olean -i /private/tmp/lido-ssz-witness-abi/.lake/build/lib/lean/LidoSRv3/Audit/Source/SszWitnessAbi.ilean -c /private/tmp/lido-ssz-witness-abi/.lake/build/ir/LidoSRv3/Audit/Source/SszWitnessAbi.c --setup /private/tmp/lido-ssz-witness-abi/.lake/build/ir/LidoSRv3/Audit/Source/SszWitnessAbi.setup.json --json
+error: LidoSRv3/Audit/Source/SszWitnessAbi.lean:312:4: Type mismatch: After simplification, term
+  hf
+ has type
+  @Eq (Except Error Fields)
+    (do
+      let effectiveBalance ←
+        if (uInt256OfByteArray (st.executionEnv.calldata.readBytes (offset + abiWord 68).toNat 32)).toNat < 2 ^ 64 then
+            Except.ok
+              (BitVec.ofNat 64
+                (uInt256OfByteArray (st.executionEnv.calldata.readBytes (offset + abiWord 68).toNat 32)).toNat)
+          else Except.error Error.abi
+      let slashed ←
+        if (uInt256OfByteArray (st.executionEnv.calldata.readBytes (offset + abiWord 228).toNat 32)).toNat = 0 then
+            Except.ok false
+          else
+            if (uInt256OfByteArray (st.executionEnv.calldata.readBytes (offset + abiWord 228).toNat 32)).toNat = 1 then
+              Except.ok true
+            else Except.error Error.abi
+      let activationEligibilityEpoch ←
+        if (uInt256OfByteArray (st.executionEnv.calldata.readBytes (offset + abiWord 100).toNat 32)).toNat < 2 ^ 64 then
+            Except.ok
+              (BitVec.ofNat 64
+                (uInt256OfByteArray (st.executionEnv.calldata.readBytes (offset + abiWord 100).toNat 32)).toNat)
+          else Except.error Error.abi
+      let activationEpoch ←
+        if (uInt256OfByteArray (st.executionEnv.calldata.readBytes (offset + abiWord 132).toNat 32)).toNat < 2 ^ 64 then
+            Except.ok
+              (BitVec.ofNat 64
+                (uInt256OfByteArray (st.executionEnv.calldata.readBytes (offset + abiWord 132).toNat 32)).toNat)
+          else Except.error Error.abi
+      let exitEpoch ←
+        if (uInt256OfByteArray (st.executionEnv.calldata.readBytes (offset + abiWord 164).toNat 32)).toNat < 2 ^ 64 then
+            Except.ok
+              (BitVec.ofNat 64
+                (uInt256OfByteArray (st.executionEnv.calldata.readBytes (offset + abiWord 164).toNat 32)).toNat)
+          else Except.error Error.abi
+      let withdrawableEpoch ←
+        if (uInt256OfByteArray (st.executionEnv.calldata.readBytes (offset + abiWord 196).toNat 32)).toNat < 2 ^ 64 then
+            Except.ok
+              (BitVec.ofNat 64
+                (uInt256OfByteArray (st.executionEnv.calldata.readBytes (offset + abiWord 196).toNat 32)).toNat)
+          else Except.error Error.abi
+      pure
+          { effectiveBalance := effectiveBalance, slashed := slashed,
+            activationEligibilityEpoch := activationEligibilityEpoch, activationEpoch := activationEpoch,
+            exitEpoch := exitEpoch, withdrawableEpoch := withdrawableEpoch })
+    (Except.ok f)
+but is expected to have type
+  @Eq (Except Error Fields)
+    (do
+      let effectiveBalance ←
+        if (uInt256OfByteArray (st.executionEnv.calldata.readBytes (offset + abiWord 68).toNat 32)).toNat < 2 ^ 64 then
+            Except.ok
+              (BitVec.ofNat 64
+                (uInt256OfByteArray (st.executionEnv.calldata.readBytes (offset + abiWord 68).toNat 32)).toNat)
+          else Except.error Error.abi
+      let slashed ←
+        if (uInt256OfByteArray (st.executionEnv.calldata.readBytes (offset + abiWord 228).toNat 32)).toNat = 0 then
+            Except.ok false
+          else
+            if (uInt256OfByteArray (st.executionEnv.calldata.readBytes (offset + abiWord 228).toNat 32)).toNat = 1 then
+              Except.ok true
+            else Except.error Error.abi
+      let activationEligibilityEpoch ←
+        if (uInt256OfByteArray (st.executionEnv.calldata.readBytes (offset + abiWord 100).toNat 32)).toNat < 2 ^ 64 then
+            Except.ok
+              (BitVec.ofNat 64
+                (uInt256OfByteArray (st.executionEnv.calldata.readBytes (offset + abiWord 100).toNat 32)).toNat)
+          else Except.error Error.abi
+      let activationEpoch ←
+        if (uInt256OfByteArray (st.executionEnv.calldata.readBytes (offset + abiWord 132).toNat 32)).toNat < 2 ^ 64 then
+            Except.ok
+              (BitVec.ofNat 64
+                (uInt256OfByteArray (st.executionEnv.calldata.readBytes (offset + abiWord 132).toNat 32)).toNat)
+          else Except.error Error.abi
+      let exitEpoch ←
+        if (uInt256OfByteArray (st.executionEnv.calldata.readBytes (offset + abiWord 164).toNat 32)).toNat < 2 ^ 64 then
+            Except.ok
+              (BitVec.ofNat 64
+                (uInt256OfByteArray (st.executionEnv.calldata.readBytes (offset + abiWord 164).toNat 32)).toNat)
+          else Except.error Error.abi
+      let withdrawableEpoch ←
+        if (uInt256OfByteArray (st.executionEnv.calldata.readBytes (offset + abiWord 196).toNat 32)).toNat < 2 ^ 64 then
+            Except.ok
+              (BitVec.ofNat 64
+                (uInt256OfByteArray (st.executionEnv.calldata.readBytes (offset + abiWord 196).toNat 32)).toNat)
+          else Except.error Error.abi
+      pure
+          { effectiveBalance := effectiveBalance, slashed := slashed,
+            activationEligibilityEpoch := activationEligibilityEpoch, activationEpoch := activationEpoch,
+            exitEpoch := exitEpoch, withdrawableEpoch := withdrawableEpoch })
+    (Except.ok f)
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:319:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.run_success_input_binding' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:320:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.pubkey_environment' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:321:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.pair_environment' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:322:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.merkle_environment' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:323:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.call_environment' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:324:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.fields_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:325:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.run_success_origin' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:327:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.read64_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:328:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.readBool_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:329:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.tail_success_length' depends on axioms: [propext, Classical.choice, Quot.sound]
+error: Lean exited with code 1
+Some required targets logged failures:
+- LidoSRv3.Audit.Source.SszWitnessAbi
+error: build failed
