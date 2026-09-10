@@ -136,25 +136,29 @@
       ]
     },
     "P-DEPOSIT-1": {
-      "description": "For successful execution of the deposit source model with its configured Lido withdrawal pipeline, the actual Lido and beacon calls preserve pointwise ETH accounting from Lido to beacon and restore the router balance. A nonempty successful run derives the configured 32-ether per-key amount from these effects. Full physical prefix and metadata correspondence remains open.",
-      "model": "Source transaction interpreter with source-interpreted Lido withdrawal, raw beacon calls and Verity physical contract storage; allocation/module prefix and metadata remain partial",
+      "description": "For successful execution of the deposit source model with its configured Lido withdrawal pipeline, the actual Lido and beacon calls preserve pointwise ETH accounting from Lido to beacon and restore the router balance. A nonempty successful run derives the configured 32-ether per-key amount from these effects. Full physical prefix and metadata correspondence remains open. The physical-metadata executor also derives the packed uint64 timestamp/block writes and preserved upper fields before its actual withdrawal/beacon continuation, including the zero-key event and failing-root rollback.",
+      "model": "Source transaction interpreter with source-interpreted Lido withdrawal, raw beacon calls and Verity physical contract storage; allocation/module prefix and metadata remain partial; additional physical metadata executor consumes those writes before the same live suffix",
       "theorems": [
-        "LidoSRv3.Audit.Guarantees.PDeposit1.actual_live_pipeline_conservation"
+        "LidoSRv3.Audit.Guarantees.PDeposit1.actual_live_pipeline_conservation",
+        "LidoSRv3.Audit.Guarantees.PDeposit1.actual_physical_metadata_before_calls",
+        "LidoSRv3.Audit.Guarantees.PDeposit1.actual_physical_metadata_failure_restores"
       ],
       "covered": [
         "The root success derives authorization, executed preparation, the actual withdrawal and the beacon-loop effects in the same live world.",
         "The withdrawal derives available funding and precise debit/credit from success of the called source pipeline. Arbitrary fallback behavior is retained and proved unreachable on the covered getter/receiver routes.",
-        "The final router assertion equates the actual Lido withdrawal with the beacon-loop debit, yielding pointwise conservation and maxEBType1 = 32 ether for nonempty success. No funding, prepared-result, per-key amount or callee-preservation premise is supplied. Zero-key success is included."
+        "The final router assertion equates the actual Lido withdrawal with the beacon-loop debit, yielding pointwise conservation and maxEBType1 = 32 ether for nonempty success. No funding, prepared-result, per-key amount or callee-preservation premise is supplied. Zero-key success is included.",
+        "PhysicalMetadata.execute consumes the computed preparation, writes both uint64 fields at the actual mapping slot plus one (with uint256 wrap), preserves both upper configuration fields, and emits the semantic router event before zero return or the actual withdrawal/beacon continuation. A failed root restores these physical effects. No successful sub-stage, count restriction or caller metadata premise is supplied."
       ],
       "missing": [
         "The allocation/module prefix still reads supplied storage/oracle/transcript inputs and an obtainDepositData outcome, rather than the physical live-world module call. Its source guards, ABI, values and consumed state need complete correspondence.",
-        "Physical module metadata writes and event ordering remain open: the source writes before withdrawal, while LiveBeacon.execute assembles separate metadata after the suffix.",
+        "The physical metadata-before-call executor is now registered, but its full composition with the earlier pipeline-conservation result still requires deriving the configuration binding at the updated same live world. The earlier LiveBeacon.execute retains its historical auxiliary metadata. The actual module-call prefix and deployed LOG topics/data are not established by the new executor.",
         "The public facade covers the declared source executor. Actual outer ABI/error bytes and complete observable failure/rollback correspondence remain to be connected. Its supplementary model rollback is not claimed as full Solidity rollback."
       ],
       "conditions": [
         "A successful execution of LiveBeacon.execute with the concrete Pipeline.external source dispatchers. The existing Pipeline.Bound links locator and consensus reads, separates queue/oracle/locator roles, and requires their code to be present in the entry world.",
         "The Lido and router roles are distinct, and router and beacon roles are distinct. These remain explicit runtime/configuration facts, not invariants established by this increment.",
-        "Source functions and model inputs retain their declared interpretation. The static external interpreter and arbitrary fallback are universally quantified; no new preservation condition on the fallback is imposed."
+        "Source functions and model inputs retain their declared interpretation. The static external interpreter and arbitrary fallback are universally quantified; no new preservation condition on the fallback is imposed.",
+        "The physical-metadata result quantifies over its own computed root execution and arbitrary live callees with no additional success, packing or configuration premise. The inherited prepared allocation/module prefix and source Context remain explicit model inputs; their physical source connection is not claimed. Keccak is the existing opaque primitive applied to the two actual mapping ABI words."
       ],
       "assumptions": [
         "A-SOURCE-SHAPED",

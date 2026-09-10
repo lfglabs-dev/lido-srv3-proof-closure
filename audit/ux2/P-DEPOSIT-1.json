@@ -1,8 +1,8 @@
 {
   "schema": "lido-srv3-ux2-guarantee-v1",
   "main_result": {
-    "description": "For successful execution of the deposit source model with its configured Lido withdrawal pipeline, the actual Lido and beacon calls preserve pointwise ETH accounting from Lido to beacon and restore the router balance. A nonempty successful run derives the configured 32-ether per-key amount from these effects. Full physical prefix and metadata correspondence remains open.",
-    "model": "Source transaction interpreter with source-interpreted Lido withdrawal, raw beacon calls and Verity physical contract storage; allocation/module prefix and metadata remain partial",
+    "description": "For successful execution of the deposit source model with its configured Lido withdrawal pipeline, the actual Lido and beacon calls preserve pointwise ETH accounting from Lido to beacon and restore the router balance. A nonempty successful run derives the configured 32-ether per-key amount from these effects. Full physical prefix and metadata correspondence remains open. The physical-metadata executor also derives the packed uint64 timestamp/block writes and preserved upper fields before its actual withdrawal/beacon continuation, including the zero-key event and failing-root rollback.",
+    "model": "Source transaction interpreter with source-interpreted Lido withdrawal, raw beacon calls and Verity physical contract storage; allocation/module prefix and metadata remain partial; additional physical metadata executor consumes those writes before the same live suffix",
     "theorems": [
       {
         "plane": "source",
@@ -15,22 +15,48 @@
         "end_line": 31,
         "doc": "/-- Successful modeled deposit execution preserves pointwise ETH accounting\nfrom Lido to beacon. A nonempty success derives the configured 32-ether amount\nfrom the actual withdrawal/beacon calls and the final router balance assertion.\nIt assumes only the existing source pipeline binding and distinct roles shown\nbelow; no funding, prepared transcript, capacity or per-key amount premise. -/",
         "statement": "theorem actual_live_pipeline_conservation (k : Queue.Keccak) (config : Pipeline.Config)\n    (staticOther : StaticCall.External) (other : Live.External)\n    (ctx : RouterDeposit.Context) (inputs : RouterDeposit.Inputs)\n    (before after : World) (attempts : List Live.Attempt)\n    (bound : Pipeline.Bound config inputs.liveContext before.live)\n    (lido_ne_router : inputs.liveContext.self ≠ inputs.liveContext.sender)\n    (router_ne_beacon : inputs.liveContext.sender ≠ beaconAddress ctx)\n    (h : execute (Pipeline.external k config staticOther other) ctx inputs before =\n      ⟨.ok (), after, attempts⟩) :\n    ∃ prepared transcript,\n      prepareDepositABI inputs.layout inputs.storage inputs.oracle inputs.config\n        inputs.requested before.allocationTranscript inputs.moduleId inputs.limits\n        inputs.obtainDepositData DEPOSIT_SIZE = (.ok prepared, transcript) ∧\n      CallSpec.Balances before.live.balances after.live.balances\n        inputs.liveContext.self (beaconAddress ctx) (prepared.values.actualKeys * DEPOSIT_SIZE) ∧\n      (prepared.values.actualKeys = 0 ∨ inputs.config.maxEBType1.val = DEPOSIT_SIZE)"
+      },
+      {
+        "plane": "source",
+        "role": "registered main source-model result (audit/trio/main-guarantees.json)",
+        "status": "CHECKED",
+        "name": "LidoSRv3.Audit.Guarantees.PDeposit1.actual_physical_metadata_before_calls",
+        "module": "LidoSRv3.Audit.Guarantees.PDeposit1PhysicalMetadata",
+        "file": "LidoSRv3/Audit/Guarantees/PDeposit1PhysicalMetadata.lean",
+        "start_line": 12,
+        "end_line": 31,
+        "doc": "/-- The computed preparation updates the physical module word and source event\nbefore the actual withdrawal/beacon continuation. The prefix world is consumed\nby that continuation, including the zero-key case. This does not replace the\nopen allocation/module CALL or deployment/configuration composition. -/",
+        "statement": "theorem actual_physical_metadata_before_calls (hash : Keccak) (callee : Live.External) (ctx : RouterDeposit.Context)\n    (inputs : RouterDeposit.Inputs) (before after : World) (attempts : List Live.Attempt)\n    (h : execute hash callee ctx inputs before = ⟨.ok (),after,attempts⟩) :\n    ∃ credentials prepared transcript,\n      prepareDepositABI inputs.layout inputs.storage inputs.oracle inputs.config\n        inputs.requested before.allocationTranscript inputs.moduleId inputs.limits\n        inputs.obtainDepositData DEPOSIT_SIZE = (.ok prepared,transcript) ∧\n      after.allocationTranscript = transcript ∧\n      let updated := update hash ctx inputs.liveContext.sender prepared before.live\n      let key := moduleDepositSlot hash prepared.moduleId\n      let packed := (updated.core.readContractSlot inputs.liveContext.sender.val key).val\n      (packed % 2^64 = before.live.core.blockTimestamp.val % 2^64 ∧\n       packed / 2^64 % 2^64 = before.live.core.blockNumber.val % 2^64 ∧\n       packed / 2^128 = (before.live.core.readContractSlot inputs.liveContext.sender.val key).val / 2^128) ∧\n      updated.balances = before.live.balances ∧\n      updated.logs = before.live.logs ++ [routerEvent inputs.liveContext.sender prepared] ∧\n      ((prepared.values.actualKeys = 0 ∧ after.live = updated ∧ attempts = []) ∨\n       (prepared.values.actualKeys ≠ 0 ∧ Nonempty\n         (LiveBeaconCommitted.SuffixCommitment callee ctx inputs.liveContext credentials prepared\n           updated after.live attempts)))"
+      },
+      {
+        "plane": "source",
+        "role": "registered main source-model result (audit/trio/main-guarantees.json)",
+        "status": "CHECKED",
+        "name": "LidoSRv3.Audit.Guarantees.PDeposit1.actual_physical_metadata_failure_restores",
+        "module": "LidoSRv3.Audit.Guarantees.PDeposit1PhysicalMetadata",
+        "file": "LidoSRv3/Audit/Guarantees/PDeposit1PhysicalMetadata.lean",
+        "start_line": 36,
+        "end_line": 40,
+        "doc": "/-- A failing execution restores this physical metadata together with the\nwhole live world, using the existing declared root rollback semantics. -/",
+        "statement": "theorem actual_physical_metadata_failure_restores (hash : Keccak) (callee : Live.External) (ctx : RouterDeposit.Context)\n    (inputs : RouterDeposit.Inputs) (before after : World) (fault : LiveBeacon.Fault)\n    (attempts : List Live.Attempt)\n    (h : execute hash callee ctx inputs before = ⟨.error fault,after,attempts⟩) :\n    after = before"
       }
     ],
     "covered": [
       "The root success derives authorization, executed preparation, the actual withdrawal and the beacon-loop effects in the same live world.",
       "The withdrawal derives available funding and precise debit/credit from success of the called source pipeline. Arbitrary fallback behavior is retained and proved unreachable on the covered getter/receiver routes.",
-      "The final router assertion equates the actual Lido withdrawal with the beacon-loop debit, yielding pointwise conservation and maxEBType1 = 32 ether for nonempty success. No funding, prepared-result, per-key amount or callee-preservation premise is supplied. Zero-key success is included."
+      "The final router assertion equates the actual Lido withdrawal with the beacon-loop debit, yielding pointwise conservation and maxEBType1 = 32 ether for nonempty success. No funding, prepared-result, per-key amount or callee-preservation premise is supplied. Zero-key success is included.",
+      "PhysicalMetadata.execute consumes the computed preparation, writes both uint64 fields at the actual mapping slot plus one (with uint256 wrap), preserves both upper configuration fields, and emits the semantic router event before zero return or the actual withdrawal/beacon continuation. A failed root restores these physical effects. No successful sub-stage, count restriction or caller metadata premise is supplied."
     ],
     "missing": [
       "The allocation/module prefix still reads supplied storage/oracle/transcript inputs and an obtainDepositData outcome, rather than the physical live-world module call. Its source guards, ABI, values and consumed state need complete correspondence.",
-      "Physical module metadata writes and event ordering remain open: the source writes before withdrawal, while LiveBeacon.execute assembles separate metadata after the suffix.",
+      "The physical metadata-before-call executor is now registered, but its full composition with the earlier pipeline-conservation result still requires deriving the configuration binding at the updated same live world. The earlier LiveBeacon.execute retains its historical auxiliary metadata. The actual module-call prefix and deployed LOG topics/data are not established by the new executor.",
       "The public facade covers the declared source executor. Actual outer ABI/error bytes and complete observable failure/rollback correspondence remain to be connected. Its supplementary model rollback is not claimed as full Solidity rollback."
     ],
     "conditions": [
       "A successful execution of LiveBeacon.execute with the concrete Pipeline.external source dispatchers. The existing Pipeline.Bound links locator and consensus reads, separates queue/oracle/locator roles, and requires their code to be present in the entry world.",
       "The Lido and router roles are distinct, and router and beacon roles are distinct. These remain explicit runtime/configuration facts, not invariants established by this increment.",
-      "Source functions and model inputs retain their declared interpretation. The static external interpreter and arbitrary fallback are universally quantified; no new preservation condition on the fallback is imposed."
+      "Source functions and model inputs retain their declared interpretation. The static external interpreter and arbitrary fallback are universally quantified; no new preservation condition on the fallback is imposed.",
+      "The physical-metadata result quantifies over its own computed root execution and arbitrary live callees with no additional success, packing or configuration premise. The inherited prepared allocation/module prefix and source Context remain explicit model inputs; their physical source connection is not claimed. Keccak is the existing opaque primitive applied to the two actual mapping ABI words."
     ],
     "assumptions": [
       "A-SOURCE-SHAPED",

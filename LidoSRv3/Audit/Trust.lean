@@ -1,3 +1,5 @@
+import LidoSRv3.Tests.DepositPhysicalMetadataRegression
+import LidoSRv3.Audit.Guarantees.PDeposit1PhysicalMetadata
 import LidoSRv3.Tests.ConsolidationGatewayCallRegression
 import LidoSRv3.Audit.Guarantees.PConsolidation1ActualGatewayVault
 import LidoSRv3.Audit.Guarantees.PTopup1ActualBatch
@@ -640,3 +642,6 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidation1.actual_gateway_vault_requests
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidation1.actual_gateway_vault_failure_restores
+
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.actual_physical_metadata_before_calls
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.actual_physical_metadata_failure_restores

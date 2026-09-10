@@ -1,0 +1,11 @@
+Compiling 2 files with Solc 0.8.25
+Solc 0.8.25 finished in 157.84ms
+Compiler run successful!
+
+Ran 3 tests for test/Metadata.t.sol:MetadataTest
+[PASS] testCallbackFailureRestoresPhysicalWord() (gas: 463393)
+[PASS] testCallbackSeesPackedWritesAndActualArguments() (gas: 436466)
+[PASS] testZeroKeysStillWriteAndEmit() (gas: 372835)
+Suite result: ok. 3 passed; 0 failed; 0 skipped; finished in 5.20ms (7.72ms CPU time)
+
+Ran 1 test suite in 145.27ms (5.20ms CPU time): 3 tests passed, 0 failed, 0 skipped (3 total tests)
