@@ -29,19 +29,21 @@ abbrev World := LidoSRv3.Audit.Source.TrioReserve1.Live.World
 abbrev Context := LidoSRv3.Audit.Source.TrioReserve1.Live.Context
 abbrev External := LidoSRv3.Audit.Source.TrioReserve1.Live.External
 abbrev Exec := LidoSRv3.Audit.Source.TrioReserve1.Live.Exec
+abbrev Address := _root_.Verity.Address
+abbrev Bytes := LidoSRv3.Audit.Source.TrioReserve1.Live.Bytes
 
 /-- Execute a first-class CALL with the supplied ABI bytes.  The live helper
 only accepts a selector, while the token entrypoints below have real argument
 words.  As with `Live.call`, the callee sees the value-transferred world and a
 rejection restores that transfer before the top-level rollback is applied. -/
-def callWithCalldata (external : External) (ctx : Context) (target : Address)
+def callWithCalldata (callee : External) (ctx : Context) (target : Address)
     (payload : Bytes) (value : Uint256 := 0) : Exec Bytes := fun world =>
   let request : Request := ⟨ctx.self, target, value, payload⟩
   if (world.core.codeSize target.val).val = 0 then ⟨.error .empty, world, []⟩
   else if world.balances ctx.self < value.val then
     ⟨.error (.bubbled []), world, [⟨request, false, [], []⟩]⟩
   else
-    match external request (transfer world ctx.self target value.val) with
+    match callee request (transfer world ctx.self target value.val) with
     | .rejected data => ⟨.error (.bubbled data), world, [⟨request, false, data, []⟩]⟩
     | .success data after => ⟨.ok data, after, [⟨request, true, data, []⟩]⟩
     | .successWithTrace data after nested => ⟨.ok data, after, [⟨request, true, data, nested⟩]⟩
@@ -68,7 +70,7 @@ an EVM `CALL` to the recipient with value and **empty** calldata.  The generic
 `Live.call` helper encodes a four-byte selector, so using it here would silently
 change the real call target's input.  Rejection restores the value transfer;
 success returns the callee's entire resulting world. -/
-def emptyValueCall (external : External) (ctx : Context) (recipient : Address)
+def emptyValueCall (callee : External) (ctx : Context) (recipient : Address)
     (payout : Nat) : Exec Unit := fun world =>
   let value : Uint256 := .ofNat payout
   let request : Request := ⟨ctx.self, recipient, value, []⟩
@@ -77,7 +79,7 @@ def emptyValueCall (external : External) (ctx : Context) (recipient : Address)
   else if world.balances ctx.self < value.val then
     ⟨.error (.bubbled []), world, [⟨request, false, [], []⟩]⟩
   else
-    match external request (transfer world ctx.self recipient value.val) with
+    match callee request (transfer world ctx.self recipient value.val) with
     | .rejected data => ⟨.error (.bubbled data), world, [⟨request, false, data, []⟩]⟩
     | .success data after => ⟨.ok (), after, [⟨request, true, data, []⟩]⟩
     | .successWithTrace data after nested => ⟨.ok (), after, [⟨request, true, data, nested⟩]⟩
@@ -85,22 +87,22 @@ def emptyValueCall (external : External) (ctx : Context) (recipient : Address)
         ⟨.error (.bubbled data), world, [⟨request, false, data, nested⟩]⟩
 
 /-- The recipient is the CALL target, not a post-hoc observation. -/
-def payoutCall (external : External) (ctx : Context) (recipient : Address)
+def payoutCall (callee : External) (ctx : Context) (recipient : Address)
     (payout : Nat) : Exec Unit :=
-  emptyValueCall external ctx recipient payout
+  emptyValueCall callee ctx recipient payout
 
 /-- One physical `_claim` followed by its value-bearing recipient CALL.  The
 two layers have distinct jobs: `claimOne` fixes Solidity storage and its
 `externalCallBindTo` receipt; `payoutCall` executes that same frame against a
 callee that may accept, reject, or change its own world. -/
-def claimTo (external : External) (ctx : Context) (requestId hint : Nat)
+def claimTo (callee : External) (ctx : Context) (requestId hint : Nat)
     (recipient : Address) : Exec Unit := do
   let payout ← claimStorage ctx requestId hint recipient
-  payoutCall external ctx recipient payout
+  payoutCall callee ctx recipient payout
 
-def runClaimTo (external : External) (ctx : Context) (requestId hint : Nat)
+def runClaimTo (callee : External) (ctx : Context) (requestId hint : Nat)
     (recipient : Address) (before : World) :=
-  run (claimTo external ctx requestId hint recipient) before
+  run (claimTo callee ctx requestId hint recipient) before
 
 /-! ## `transferFrom` owner-operated physical branch
 
@@ -126,35 +128,37 @@ the literal `msg.sender == _from` branch.  Every guard is evaluated from the
 caller and physical request word; the successful writes are the approval
 deletion at `TOKEN_APPROVALS_POSITION` and the owner word at
 `keccak256(abi.encode(requestId, QUEUE_POSITION)) + 1`. -/
-def transferFrom (ctx : Context) (from recipient : Address) (requestId : Nat) :
+def transferFrom (ctx : Context) (fromAddr recipient : Address) (requestId : Nat) :
     Exec Unit := fun world =>
   let before := { world.core with sender := ctx.sender }
   let metadata := requestMetadataWord before requestId
   if recipient = zeroAddress then ⟨.error (.reason "TransferToZeroAddress"), world, []⟩
-  else if recipient = from then ⟨.error (.reason "TransferToThemselves"), world, []⟩
+  else if recipient = fromAddr then ⟨.error (.reason "TransferToThemselves"), world, []⟩
   else if requestId = 0 then ⟨.error (.reason "InvalidRequestId"), world, []⟩
   else if requestClaimed metadata then ⟨.error (.reason "RequestAlreadyClaimed"), world, []⟩
-  else if requestOwner metadata != from then
+  else if requestOwner metadata != fromAddr then
     ⟨.error (.reason "TransferFromIncorrectOwner"), world, []⟩
-  else if ctx.sender != from then ⟨.error (.reason "NotOwnerOrApproved"), world, []⟩
+  else if ctx.sender != fromAddr then ⟨.error (.reason "NotOwnerOrApproved"), world, []⟩
   else
     ⟨.ok (), { world with core :=
-      (before.writeMapUint tokenApprovalsPosition (.ofNat requestId) 0).writeMapUint
-        (queuePosition + 1) (.ofNat requestId) (withRequestOwner metadata recipient) }, []⟩
+      ((before.writeMapUint tokenApprovalsPosition (.ofNat requestId) 0).writeMapUint
+        (queuePosition + 1) (.ofNat requestId) (withRequestOwner metadata recipient)) }, []⟩
 
-def runTransferFrom (ctx : Context) (from recipient : Address) (requestId : Nat)
+def runTransferFrom (ctx : Context) (fromAddr recipient : Address) (requestId : Nat)
     (before : World) :=
-  run (transferFrom ctx from recipient requestId) before
+  run (transferFrom ctx fromAddr recipient requestId) before
 
 /-- The direct ownership handoff is a top-level transaction too: every failed
 guard returns the entry world, including every unrelated account's state. -/
 theorem transfer_revert_restores_world
-    (ctx : Context) (from recipient : Address) (requestId : Nat) (before : World)
+    (ctx : Context) (fromAddr recipient : Address) (requestId : Nat) (before : World)
     (fault : Fault)
-    (h : (runTransferFrom ctx from recipient requestId before).outcome = .error fault) :
-    (runTransferFrom ctx from recipient requestId before).world = before := by
-  unfold runTransferFrom LidoSRv3.Audit.Source.TrioReserve1.Live.run
-  cases hrun : transferFrom ctx from recipient requestId before <;> simp [hrun] at h ⊢
+    (h : (runTransferFrom ctx fromAddr recipient requestId before).outcome = .error fault) :
+    (runTransferFrom ctx fromAddr recipient requestId before).world = before := by
+  unfold runTransferFrom LidoSRv3.Audit.Source.TrioReserve1.Live.run at h ⊢
+  generalize hresult : transferFrom ctx fromAddr recipient requestId before = result at h ⊢
+  cases result with
+  | mk outcome after attempts => cases outcome <;> simp_all
 
 /-! ## `requestWithdrawals` one-item physical path -/
 
@@ -172,8 +176,8 @@ def getSharesByPooledEthSelector : Nat := 0x19208451
 def abiWord (n : Nat) : Bytes := encode 32 n
 def abiAddress (a : Address) : Bytes := abiWord a.toNat
 
-def stETHTransferFromCalldata (from queue : Address) (amount : Nat) : Bytes :=
-  encode 4 transferFromSelector ++ abiAddress from ++ abiAddress queue ++ abiWord amount
+def stETHTransferFromCalldata (fromAddr queue : Address) (amount : Nat) : Bytes :=
+  encode 4 transferFromSelector ++ abiAddress fromAddr ++ abiAddress queue ++ abiWord amount
 
 def stETHSharesCalldata (amount : Nat) : Bytes :=
   encode 4 getSharesByPooledEthSelector ++ abiWord amount
@@ -189,7 +193,7 @@ def packEnqueuedMetadata (owner : Address) (timestamp reportTimestamp : Nat) : U
 
 /-- Physical `_enqueue` suffix.  Its request id, cumulative pair, report
 timestamp, and owner all come from the current post-call storage world. -/
-def enqueueRequest (ctx : Context) (owner : Address) (amount shares : Nat) : Exec Nat := fun world =>
+def enqueueRequest (_ctx : Context) (owner : Address) (amount shares : Nat) : Exec Nat := fun world =>
   let state := world.core
   let lastId := (state.readSlot lastRequestIdPosition).val
   if lastId + 1 ≥ 2 ^ 256 then ⟨.error (.reason "RequestIdOverflow"), world, []⟩
@@ -211,29 +215,30 @@ configured stETH target twice: first `transferFrom(msg.sender, address(this),
 amount)`, then `getSharesByPooledEth(amount)`.  Both replies are execution
 results from `external`; there is no supplied success, balance, or allowance
 bit.  Only after both calls return does the physical queue record commit. -/
-def requestWithdrawals (external : External) (ctx : Context) (stETH : Address)
+def requestWithdrawals (callee : External) (ctx : Context) (stETH : Address)
     (amount : Nat) (suppliedOwner : Address) : Exec Nat := do
   require (decide (100 ≤ amount) && decide (amount ≤ 1000 * 10 ^ 18))
     (.reason "RequestAmountOutOfRange")
   let owner := if suppliedOwner = zeroAddress then ctx.sender else suppliedOwner
-  let _ ← callWithCalldata external ctx stETH (stETHTransferFromCalldata ctx.sender ctx.self amount)
-  let sharesBytes ← callWithCalldata external ctx stETH (stETHSharesCalldata amount)
+  let _ ← callWithCalldata callee ctx stETH (stETHTransferFromCalldata ctx.sender ctx.self amount)
+  let sharesBytes ← callWithCalldata callee ctx stETH (stETHSharesCalldata amount)
   let shares ← decodeWord sharesBytes
   enqueueRequest ctx owner amount shares.val
 
-def runRequestWithdrawals (external : External) (ctx : Context) (stETH : Address)
+def runRequestWithdrawals (callee : External) (ctx : Context) (stETH : Address)
     (amount : Nat) (suppliedOwner : Address) (before : World) :=
-  run (requestWithdrawals external ctx stETH amount suppliedOwner) before
+  run (requestWithdrawals callee ctx stETH amount suppliedOwner) before
 
 theorem request_revert_restores_caller_and_callee_world
-    (external : External) (ctx : Context) (stETH : Address) (amount : Nat)
+    (callee : External) (ctx : Context) (stETH : Address) (amount : Nat)
     (suppliedOwner : Address) (before : World) (fault : Fault)
-    (h : (runRequestWithdrawals external ctx stETH amount suppliedOwner before).outcome =
+    (h : (runRequestWithdrawals callee ctx stETH amount suppliedOwner before).outcome =
       .error fault) :
-    (runRequestWithdrawals external ctx stETH amount suppliedOwner before).world = before := by
-  unfold runRequestWithdrawals LidoSRv3.Audit.Source.TrioReserve1.Live.run
-  cases hrun : requestWithdrawals external ctx stETH amount suppliedOwner before <;>
-    simp [hrun] at h ⊢
+    (runRequestWithdrawals callee ctx stETH amount suppliedOwner before).world = before := by
+  unfold runRequestWithdrawals LidoSRv3.Audit.Source.TrioReserve1.Live.run at h ⊢
+  generalize hresult : requestWithdrawals callee ctx stETH amount suppliedOwner before = result at h ⊢
+  cases result with
+  | mk outcome after attempts => cases outcome <;> simp_all
 
 /-! ## `WstETH.unwrap` physical path -/
 
@@ -262,44 +267,47 @@ def burnWstETH (ctx : Context) (amount : Nat) : Exec Unit := fun world =>
   else if amount > supply.val then ⟨.error (.reason "ERC20: burn exceeds total supply"), world, []⟩
   else
     ⟨.ok (), { world with core :=
-      (state.writeMap wstETHBalancesSlot ctx.sender (.ofNat (balance.val - amount))).writeSlot
-        wstETHTotalSupplySlot (.ofNat (supply.val - amount)) }, []⟩
+      ((state.writeMap wstETHBalancesSlot ctx.sender (.ofNat (balance.val - amount))).writeSlot
+        wstETHTotalSupplySlot (.ofNat (supply.val - amount))) }, []⟩
 
 /-- `WstETH.unwrap` (0.6.12, lines 69--75).  The stETH amount is decoded from
 the configured stETH callee's `getPooledEthByShares` reply; then the bridge
 burns the caller's actual wstETH slots and calls the same stETH target's
 `transfer(msg.sender, amount)`.  Thus the recipient is the execution-derived
 `ctx.sender`, and any callee rejection rolls back caller and callee worlds. -/
-def unwrap (external : External) (ctx : Context) (stETH : Address) (amount : Nat) :
+def unwrap (callee : External) (ctx : Context) (stETH : Address) (amount : Nat) :
     Exec Nat := do
   require (decide (amount ≠ 0)) (.reason "wstETH: zero amount unwrap not allowed")
-  let amountBytes ← callWithCalldata external ctx stETH (pooledEthBySharesCalldata amount)
+  let amountBytes ← callWithCalldata callee ctx stETH (pooledEthBySharesCalldata amount)
   let stETHAmount ← decodeWord amountBytes
   burnWstETH ctx amount
-  let _ ← callWithCalldata external ctx stETH (erc20TransferCalldata ctx.sender stETHAmount.val)
+  let _ ← callWithCalldata callee ctx stETH (erc20TransferCalldata ctx.sender stETHAmount.val)
   pure stETHAmount.val
 
-def runUnwrap (external : External) (ctx : Context) (stETH : Address) (amount : Nat)
+def runUnwrap (callee : External) (ctx : Context) (stETH : Address) (amount : Nat)
     (before : World) :=
-  run (unwrap external ctx stETH amount) before
+  run (unwrap callee ctx stETH amount) before
 
 theorem unwrap_revert_restores_caller_and_callee_world
-    (external : External) (ctx : Context) (stETH : Address) (amount : Nat)
+    (callee : External) (ctx : Context) (stETH : Address) (amount : Nat)
     (before : World) (fault : Fault)
-    (h : (runUnwrap external ctx stETH amount before).outcome = .error fault) :
-    (runUnwrap external ctx stETH amount before).world = before := by
-  unfold runUnwrap LidoSRv3.Audit.Source.TrioReserve1.Live.run
-  cases hrun : unwrap external ctx stETH amount before <;> simp [hrun] at h ⊢
+    (h : (runUnwrap callee ctx stETH amount before).outcome = .error fault) :
+    (runUnwrap callee ctx stETH amount before).world = before := by
+  unfold runUnwrap LidoSRv3.Audit.Source.TrioReserve1.Live.run at h ⊢
+  generalize hresult : unwrap callee ctx stETH amount before = result at h ⊢
+  cases result with
+  | mk outcome after attempts => cases outcome <;> simp_all
 
 /-- Top-level failure restores the exact caller/callee world.  Failed calls
 remain in `attempts`, but no queue slot, balance, or callee effect commits. -/
 theorem revert_restores_caller_and_callee_world
-    (external : External) (ctx : Context) (requestId hint : Nat)
+    (callee : External) (ctx : Context) (requestId hint : Nat)
     (recipient : Address) (before : World) (fault : Fault)
-  (h : (runClaimTo external ctx requestId hint recipient before).outcome = .error fault) :
-    (runClaimTo external ctx requestId hint recipient before).world = before := by
-  unfold runClaimTo LidoSRv3.Audit.Source.TrioReserve1.Live.run
-  cases hrun : claimTo external ctx requestId hint recipient before <;>
-    simp [hrun] at h ⊢
+  (h : (runClaimTo callee ctx requestId hint recipient before).outcome = .error fault) :
+    (runClaimTo callee ctx requestId hint recipient before).world = before := by
+  unfold runClaimTo LidoSRv3.Audit.Source.TrioReserve1.Live.run at h ⊢
+  generalize hresult : claimTo callee ctx requestId hint recipient before = result at h ⊢
+  cases result with
+  | mk outcome after attempts => cases outcome <;> simp_all
 
 end LidoSRv3.Audit.Verity.AddressRecipientCallBridge
