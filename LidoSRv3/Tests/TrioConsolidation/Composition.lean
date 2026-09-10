@@ -20,6 +20,13 @@ private def sources : List Bytes := [blob 11, blob 12]
 private def targets : List Bytes := [blob 21, blob 22]
 private def args : Bytes := gatewayVaultArgs sources targets
 
+/-- The concrete solc-0.8.25 interface selector, not a caller parameter. -/
+example : gatewayVaultSelector = 0xa75ac640 := rfl
+example : gatewayVaultSelectorBytes = [0xa7, 0x5a, 0xc6, 0x40] := by native_decide
+example : (gatewayVaultCalldata sources targets).take 4 = gatewayVaultSelectorBytes := by
+  native_decide
+example : (gatewayVaultCalldata sources targets).drop 4 = args := by native_decide
+
 /-! ### Framing of the argument block -/
 
 /-- Head offsets: the first tail at `64`, the second after `32 + 2 * 80`. -/

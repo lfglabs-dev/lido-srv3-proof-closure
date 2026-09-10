@@ -99,7 +99,7 @@ where used. They are not asserted about the predeploy.
 * ~~Gateway→vault ABI hop (`bytes[]` pairs, line 220) and the EIP-7251
   callee body remain OPEN.~~ Composed / given a concrete body on this branch
   (`Composition.lean`, `Predeploy.lean`); the EIP-7251 fee-update rule and
-  the selector keccak remain OPEN (`LOW-LEVEL-CALL.md`).
+  deriving the selector from keccak remains OPEN (`LOW-LEVEL-CALL.md`).
 
 ## Tests
 

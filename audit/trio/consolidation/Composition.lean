@@ -19,8 +19,9 @@ hop returns exactly the producer blobs `_prepareConsolidationPairs` flattened
 
 Residuals (stated, not claimed):
 
-* The 4-octet function selector is a parameter; keccak256 of the signature
-  is outside this model.
+* The selector below is the solc-0.8.25 ABI selector for the pinned
+  signature. This model records the resulting four octets; it does not prove
+  Keccak256.
 * Solidity's ABI decoder also bounds-checks head/tail lengths against the
   calldata size; the decoder here refuses short heads and unframed elements,
   and the round trip is stated for the encoder's own output.
@@ -52,10 +53,16 @@ def gatewayVaultArgs (sources targets : List Bytes) : Bytes :=
   encode 32 64 ++ encode 32 (64 + (framedBytesArray sources).length) ++
     framedBytesArray sources ++ framedBytesArray targets
 
-/-- Calldata of the line-220 hop. The selector is a parameter (keccak is
-outside this model). -/
-def gatewayVaultCalldata (selector : Bytes) (sources targets : List Bytes) : Bytes :=
-  selector ++ gatewayVaultArgs sources targets
+/-- The concrete 4-octet selector used by line 220. -/
+def gatewayVaultSelector : Nat := 0xa75ac640
+
+/-- `keccak256("addConsolidationRequests(bytes[],bytes[])")[0:4]`, as emitted
+by solc 0.8.25 for the pinned `IWithdrawalVault` interface. -/
+def gatewayVaultSelectorBytes : Bytes := encode 4 gatewayVaultSelector
+
+/-- Complete line-220 calldata, including the concrete interface selector. -/
+def gatewayVaultCalldata (sources targets : List Bytes) : Bytes :=
+  gatewayVaultSelectorBytes ++ gatewayVaultArgs sources targets
 
 /-- Framed-element decode with a trailing suffix (the encoder's own output
 shape). -/
@@ -321,5 +328,105 @@ theorem hop_payloads (pairs : List (Pubkey × Pubkey)) (payloads : List (List Na
       payloads.map (List.map UInt8.ofNat) := by
   rw [pairsOf_hopArrays, packedPayloads_eq_map pairs payloads h]
   simp [List.map_map, vaultCallPayload, List.map_append, Function.comp_def]
+
+/-! ## Executed high-level gateway → vault bridge -/
+
+/-- Context at the body of a high-level `IWithdrawalVault` call.  In
+particular, `address(this)` is the request target (the vault) and
+`msg.sender` is the request caller (the gateway); neither is a free choice of
+the bridge. -/
+def vaultContext (request : Request) : Context :=
+  ⟨request.target, request.caller⟩
+
+/-- Solc's high-level interface call has an `extcodesize` check before the
+CALL.  This is deliberately distinct from `lowLevelCall`, used by the vault
+for its EIP-7251 and refund low-level calls. -/
+def highLevelVaultCall (external : External) (ctx : Context) (vault : Address)
+    (value : Word) (sources targets : List Bytes) : Exec Bytes := fun w =>
+  let request : Request := ⟨ctx.self, vault, value, gatewayVaultCalldata sources targets⟩
+  if (w.core.codeSize vault.val).val = 0 then ⟨.error .empty, w, []⟩
+  else if w.balances ctx.self < value.val then
+    ⟨.error (.bubbled []), w, [⟨request, false, [], []⟩]⟩
+  else match external request (transfer w ctx.self vault value.val) with
+    | .rejected data => ⟨.error (.bubbled data), w, [⟨request, false, data, []⟩]⟩
+    | .success data after => ⟨.ok data, after, [⟨request, true, data, []⟩]⟩
+    | .successWithTrace data after nested =>
+        ⟨.ok data, after, [⟨request, true, data, nested⟩]⟩
+    | .rejectedWithTrace data nested =>
+        ⟨.error (.bubbled data), w, [⟨request, false, data, nested⟩]⟩
+
+/-- Preserve the root vault execution as a nested trace instead of replacing
+it with an uninformative `success []` / `rejected []` oracle answer. -/
+def vaultTrace (result : Result Unit) : List NestedAttempt :=
+  result.attempts.map fun attempt =>
+    ⟨attempt.request, false, attempt.accepted, attempt.returned, 2⟩
+
+/-- A compact observable encoding of a vault root fault.  The bridge keeps
+the detailed internal attempts in `vaultTrace`; panic and named source faults
+are not silently relabelled as an empty rejection. -/
+def vaultFaultData : Fault → Bytes
+  | .empty => [0]
+  | .reason text => text.toList.map fun c => UInt8.ofNat c.toNat
+  | .bubbled data => data
+
+/-- The public vault body reached by the compiled high-level interface CALL.
+It decodes the actual selector-plus-arguments, derives the vault context from
+the request, and delegates the callee transaction to the already reviewed
+`LiveCall.executeVault_*` root semantics.  The gateway quota/pause/role and
+witness prefix occur before this call in `ConsolidationGateway.sol` and remain
+explicitly OPEN; this bridge does not replace them with booleans. -/
+def executeVaultExternal (callee : External) (sexternal : StaticCall.External)
+    (vault inbox : Address) : External := fun request credited =>
+  if request.target ≠ vault then .rejected [1]
+  else if request.payload.take 4 ≠ gatewayVaultSelectorBytes then .rejected [2]
+  else match decodeVaultArgs (request.payload.drop 4) with
+    | none => .rejected [3]
+    | some (sources, targets) =>
+        let result := executeVault callee sexternal (vaultContext request) request.caller inbox
+          request.value sources targets credited
+        match result.outcome with
+        | .ok _ => .successWithTrace [] result.world (vaultTrace result)
+        | .error fault => .rejectedWithTrace (vaultFaultData fault) (vaultTrace result)
+
+/-- Successful outer interface call is an actual successful vault root, with
+the public context `self = request.target`, `sender = request.caller`. -/
+theorem executeVaultExternal_success_root (callee : External) (sexternal : StaticCall.External)
+    (vault inbox : Address) (request : Request) (credited after : World) (nested : List NestedAttempt)
+    (h : executeVaultExternal callee sexternal vault inbox request credited =
+      .successWithTrace [] after nested) :
+    request.target = vault ∧ request.payload.take 4 = gatewayVaultSelectorBytes ∧
+      ∃ sources targets result,
+        decodeVaultArgs (request.payload.drop 4) = some (sources, targets) ∧
+        result = executeVault callee sexternal (vaultContext request) request.caller inbox
+          request.value sources targets credited ∧
+        result.outcome = .ok () ∧ after = result.world ∧ nested = vaultTrace result := by
+  unfold executeVaultExternal at h
+  split at h
+  · contradiction
+  rename_i htarget
+  split at h
+  · contradiction
+  rename_i hselector
+  split at h <;> try contradiction
+  rename_i sources targets hargs
+  generalize hresult : executeVault callee sexternal (vaultContext request) request.caller inbox
+    request.value sources targets credited = result at h
+  cases hout : result.outcome with
+  | error fault => simp [hout] at h
+  | ok unit =>
+      cases unit
+      simp [hout] at h
+      subst after
+      subst nested
+      exact ⟨by simpa using htarget, by simpa using hselector,
+        sources, targets, result, hargs, hresult.symm, hout, rfl, rfl⟩
+
+/-- The compiled line-220 call's code check is load-bearing: an address with
+no code creates no attempt and cannot enter `executeVault`. -/
+theorem highLevelVaultCall_no_code (external : External) (ctx : Context) (vault : Address)
+    (value : Word) (sources targets : List Bytes) (w : World)
+    (hcode : (w.core.codeSize vault.val).val = 0) :
+    highLevelVaultCall external ctx vault value sources targets w = ⟨.error .empty, w, []⟩ := by
+  simp [highLevelVaultCall, hcode]
 
 end audit.trio.consolidation

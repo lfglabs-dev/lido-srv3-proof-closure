@@ -114,7 +114,7 @@ kept; the predeploy theorem instantiates it with the derived frames.
 | Claim | Theorem |
 | --- | --- |
 | `bytes[]` tail = count word ++ framed elements (`encodeBytesElement`) | `framedBytesArray`, `framedBytesArray_length` |
-| Argument block = head offsets `64`, `64 + |sources tail|`, then the two tails | `gatewayVaultArgs`; `gatewayVaultCalldata` prefixes a selector parameter |
+| Argument block = head offsets `64`, `64 + |sources tail|`, then the two tails | `gatewayVaultArgs`; `gatewayVaultCalldata` prefixes the solc-0.8.25 selector `0xa75ac640` |
 | Framed element decodes with any suffix; dropping it leaves the suffix | `decodeBytesElement_append`, `drop_encodeBytesElement_append` |
 | Framed sequence / tail decode back to the blobs, consuming exactly the framing | `decodeFramedSeq_flatten`, `decodeBytesArray_framed` |
 | Decoding the encoded hop returns exactly `(sources, targets)` | `decodeVaultArgs_gatewayVaultArgs` |
@@ -129,8 +129,9 @@ kept; the predeploy theorem instantiates it with the derived frames.
 * EIP-7251 fake-exponential per-block fee update, excess accounting, queue
   head/tail ring positions and the source's exact revert data are not
   modeled; the fee is a slot and rejection is empty returndata.
-* The 4-octet selector of the line-220 hop is a parameter (keccak256 is
-  outside this model). Solidity's ABI decoder additionally bounds-checks
+* The line-220 selector is the concrete solc-0.8.25 ABI value `0xa75ac640`;
+  deriving that value from keccak256 remains outside this model. Solidity's
+  ABI decoder additionally bounds-checks
   head/tail lengths against calldata size; `decodeVaultArgs` refuses short
   heads and unframed elements and the round trip is stated for the
   encoder's output.
