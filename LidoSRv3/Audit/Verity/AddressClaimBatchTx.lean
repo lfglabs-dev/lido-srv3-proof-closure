@@ -47,10 +47,61 @@ def lockedEtherAmountPosition : Nat :=
 def requestsByOwnerPosition : Nat :=
   0x4b9bfe0774f05ab288bd50bd23f74ae80a797f1d0c82d419d43ebda4fdc2fe1f
 
-/-- Lens key for an owner-indexed request-set member.  The source assertion
-at WithdrawalQueueBase.sol:470 is represented by its nonzero index. -/
-def requestByOwnerKey (owner : Address) (requestId : Nat) : Uint256 :=
-  .ofNat (owner.toNat * 2 ^ 128 + requestId)
+/-- The `EnumerableSet.UintSet` stored at `_requestsByOwner[owner]` has its
+array length at the outer mapping value, its array cells at `keccak(length
+slot) + i`, and its `_indexes` mapping at the next struct word.  Keeping
+these three locations separate is important: `remove` swaps a real array cell
+and fixes the moved member's index before deleting the removed index. -/
+def ownerRequestSetBase (owner : Address) : Nat :=
+  Compiler.Proofs.mappingSlotLocation requestsByOwnerPosition owner.toNat 0
+def ownerRequestValuesLengthSlot (owner : Address) : Nat := ownerRequestSetBase owner
+def ownerRequestValueSlot (owner : Address) (index : Nat) : Nat :=
+  Compiler.Proofs.mappingSlotLocation (ownerRequestSetBase owner) index 0
+def ownerRequestIndexSlot (owner : Address) (requestId : Nat) : Nat :=
+  Compiler.Proofs.mappingSlotLocation (ownerRequestSetBase owner + 1) requestId 0
+
+/-- Executable lenses for the set's three disjoint components. The key is a
+pair encoding only within an array/index component; unlike the old model it
+cannot turn `remove` into a single membership-map zeroing operation. -/
+def ownerRequestValuesPosition : Nat := requestsByOwnerPosition + 1
+def ownerRequestIndexesPosition : Nat := requestsByOwnerPosition + 2
+def ownerRequestCellKey (owner : Address) (index : Nat) : Uint256 :=
+  .ofNat (owner.toNat * 2 ^ 128 + index)
+
+def ownerRequestValuesLength (state : ContractState) (owner : Address) : Nat :=
+  (state.readMapUint requestsByOwnerPosition (.ofNat owner.toNat)).val
+def ownerRequestValue (state : ContractState) (owner : Address) (index : Nat) : Nat :=
+  (state.readMapUint ownerRequestValuesPosition (ownerRequestCellKey owner index)).val
+def ownerRequestIndex (state : ContractState) (owner : Address) (requestId : Nat) : Nat :=
+  (state.readMapUint ownerRequestIndexesPosition (ownerRequestCellKey owner requestId)).val
+
+/-- OpenZeppelin `EnumerableSet.remove`, including its swap-and-pop writes.
+`none` is the source `assert(remove(...))` failure, not a synthetic
+membership guard. -/
+def removeOwnerRequest (state : ContractState) (owner : Address) (requestId : Nat) :
+    Option ContractState :=
+  let indexPlusOne := ownerRequestIndex state owner requestId
+  if indexPlusOne = 0 then none
+  else
+    let lastIndex := ownerRequestValuesLength state owner - 1
+    let toDeleteIndex := indexPlusOne - 1
+    let lastValue := ownerRequestValue state owner lastIndex
+    let after := ((state.writeMapUint ownerRequestValuesPosition
+      (ownerRequestCellKey owner toDeleteIndex) (.ofNat lastValue)).writeMapUint
+        ownerRequestIndexesPosition (ownerRequestCellKey owner lastValue)
+          (.ofNat (toDeleteIndex + 1))).writeMapUint requestsByOwnerPosition
+            (.ofNat owner.toNat) (.ofNat lastIndex)
+    some (after.writeMapUint ownerRequestIndexesPosition (ownerRequestCellKey owner requestId) 0)
+
+def insertOwnerRequest (state : ContractState) (owner : Address) (requestId : Nat) :
+    Option ContractState :=
+  if ownerRequestIndex state owner requestId != 0 then none
+  else
+    let index := ownerRequestValuesLength state owner
+    let after := (state.writeMapUint ownerRequestValuesPosition
+      (ownerRequestCellKey owner index) (.ofNat requestId)).writeMapUint
+        ownerRequestIndexesPosition (ownerRequestCellKey owner requestId) (.ofNat (index + 1))
+    some (after.writeMapUint requestsByOwnerPosition (.ofNat owner.toNat) (.ofNat (index + 1)))
 
 /-- Physical keccak slot of `queue[requestId]` word 0:
 `keccak256(abi.encode(requestId, queuePosition))`. -/
@@ -151,27 +202,29 @@ def claimOne (requestId hint : Nat) (_recipient : Address) : Contract Nat := fun
   else if requestId > lastFinalized then .revert "RequestNotFoundOrNotFinalized" state
   else if request.claimed then .revert "RequestAlreadyClaimed" state
   else if request.owner != sender then .revert "NotOwner" state
-  else if (state.readMapUint requestsByOwnerPosition
-    (requestByOwnerKey request.owner requestId)).val = 0 then
-    .revert "OwnerRequestSetInvariant" state
-  else if hint = 0 || hint > lastCheckpoint then .revert "InvalidHint" state
-  else if requestId < request.checkpointFrom then .revert "InvalidHint" state
-  else if hint < lastCheckpoint && nextCheckpointFrom ≤ requestId then
-    .revert "InvalidHint" state
-  else if request.previousCumulativeStETH > request.cumulativeStETH ||
-      request.previousCumulativeShares > request.cumulativeShares then
-    .revert "NonMonotonicRequest" state
-  else match claimableEther request with
+  else
+    -- Solidity marks the packed byte and then executes
+    -- `assert(_requestsByOwner[owner].remove(requestId))`; hint calculation
+    -- follows that mutation. A later failure is rolled back by the entry frame.
+    let marked := state.writeMapUint (queuePosition + 1) (.ofNat requestId)
+      (markClaimed (requestMetadataWord state requestId))
+    match removeOwnerRequest marked request.owner requestId with
+    | none => .revert "Panic(0x01)" state
+    | some removed =>
+      if hint = 0 || hint > lastCheckpoint then .revert "InvalidHint" state
+      else if requestId < request.checkpointFrom then .revert "InvalidHint" state
+      else if hint < lastCheckpoint && nextCheckpointFrom ≤ requestId then
+        .revert "InvalidHint" state
+      else if request.previousCumulativeStETH > request.cumulativeStETH ||
+          request.previousCumulativeShares > request.cumulativeShares then
+        .revert "NonMonotonicRequest" state
+      else match claimableEther request with
     | none => .revert "ZeroShares" state
     | some payout =>
         let locked := (state.readSlot lockedEtherAmountPosition).val
         if payout > locked then .revert "LockedEtherUnderflow" state
         else
-          let dirty :=
-            ((state.writeMapUint (queuePosition + 1) (.ofNat requestId)
-              (markClaimed (requestMetadataWord state requestId))).writeMapUint
-                requestsByOwnerPosition (requestByOwnerKey request.owner requestId) 0).writeSlot
-                  lockedEtherAmountPosition (.ofNat (locked - payout))
+          let dirty := removed.writeSlot lockedEtherAmountPosition (.ofNat (locked - payout))
           .success payout dirty
 
 def claimLoop : List Nat → List Nat → Address → Contract Unit
@@ -219,8 +272,10 @@ def twoClaimState : ContractState :=
     (packMetadata (1 : Address) 100 false 90)
   let state := state.writeMapUint (queuePosition + 1) 2
     (packMetadata (1 : Address) 101 false 90)
-  let state := state.writeMapUint requestsByOwnerPosition (requestByOwnerKey (1 : Address) 1) 1
-  let state := state.writeMapUint requestsByOwnerPosition (requestByOwnerKey (1 : Address) 2) 1
+  let state := match insertOwnerRequest state (1 : Address) 1 with
+    | some after => after | none => state
+  let state := match insertOwnerRequest state (1 : Address) 2 with
+    | some after => after | none => state
   let state := state.writeMapUint checkpointsPosition 1 1
   state.writeMapUint (checkpointsPosition + 1) 1 (.ofNat E27)
 

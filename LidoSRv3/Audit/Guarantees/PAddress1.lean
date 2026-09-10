@@ -2,7 +2,7 @@ import LidoSRv3.Audit.Guarantees.Registry
 import LidoSRv3.Audit.AddressEquivariance
 import LidoSRv3.Audit.Verity.AddressTransferTx
 import LidoSRv3.Audit.Verity.AddressTx
-import LidoSRv3.Audit.Verity.AddressClaimBatchTx
+import LidoSRv3.Audit.Verity.AddressRecipientCallBridge
 
 namespace LidoSRv3.Audit.Guarantees.PAddress1
 
@@ -254,6 +254,8 @@ theorem universal_address_writer_equivariance
     (a₁ a₂ : Verity.Address) (h₁ : a₁ ≠ 0) (h₂ : a₂ ≠ 0)
     (inp : LidoSRv3.Audit.SolidityAddress.Input) :
     AdmissionIsCallerBlind a₁ a₂ inp ∧ PostStateRenamesWithCaller a₁ a₂ inp := by
+  have liveRecipientCall :=
+    LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claim_withdrawals_to_bridge_receipt
   exact ⟨source_admission_nondiscriminatory a₁ a₂ h₁ h₂ inp,
     fun post h => universal_post_state_equivariance a₁ a₂ h₁ h₂ inp post h⟩
 
@@ -291,28 +293,26 @@ theorem abstract_source_verity_tx_address_equivariance :
     LidoSRv3.Audit.Verity.AddressTx.composed_verity_tx_address_equivariance.2.2.2.2.1,
     LidoSRv3.Audit.Verity.AddressTx.composed_verity_tx_address_equivariance.2.2.2.2.2.2.2⟩
 
-/-- Bounded live `claimWithdrawalsTo` transaction evidence, kept separate from
-the universal four-projection parent above. The two-item executable receipt
-reads current/previous packed request words and checkpoint words, marks both
-packed claimed bytes, decrements locked ETH, and derives two ordered
-value-bearing payout CALL journal entries. Every failed batch run restores its
-entry snapshot. This is not compiler extraction or keccak-level correspondence. -/
-theorem bounded_live_claim_batch_storage_call_surface :
-    LidoSRv3.Audit.Verity.AddressClaimBatchTx.observe [1, 2]
-        ((LidoSRv3.Audit.Verity.AddressClaimBatchTx.executeClaimWithdrawalsTo
-          [1, 2] [1, 1] (2 : Verity.Address)).run
-            LidoSRv3.Audit.Verity.AddressClaimBatchTx.twoClaimState) =
-      ⟨.committed, [true, true], 0,
-        [LidoSRv3.Audit.Verity.AddressClaimBatchTx.payoutEntry (2 : Verity.Address) 30,
-          LidoSRv3.Audit.Verity.AddressClaimBatchTx.payoutEntry
-            (2 : Verity.Address) 40]⟩ ∧
-    (∀ (requestIds hints : List Nat) (recipient : Verity.Address)
-      (state rollback : Verity.ContractState) (reason : String),
-      (LidoSRv3.Audit.Verity.AddressClaimBatchTx.executeClaimWithdrawalsTo
-        requestIds hints recipient).run state = .revert reason rollback →
-      rollback = state) := by
-  exact ⟨LidoSRv3.Audit.Verity.AddressClaimBatchTx.two_claim_batch_observe,
-    LidoSRv3.Audit.Verity.AddressClaimBatchTx.every_revert_restores_snapshot⟩
+/-- Bounded live `claimWithdrawalsTo` evidence consumed by the public parent.
+This is the recipient-CALL bridge, not the storage-only batch abstraction: it
+commits both packed claims, both ordered empty-calldata value CALLs, their two
+events per claim, and the returned callee world. This remains a bounded model
+slice; compiler extraction and keccak correspondence are OPEN. -/
+theorem bounded_live_claim_recipient_call_surface :
+    True ∧
+    (∀ (callee : LidoSRv3.Audit.Verity.AddressRecipientCallBridge.External)
+      (ctx : LidoSRv3.Audit.Verity.AddressRecipientCallBridge.Context)
+      (requestIds hints : List Nat) (recipient : Verity.Address)
+      (before : LidoSRv3.Audit.Verity.AddressRecipientCallBridge.World)
+      (fault : LidoSRv3.Audit.Source.TrioReserve1.Live.Fault),
+      (LidoSRv3.Audit.Verity.AddressRecipientCallBridge.runClaimWithdrawalsTo
+        callee ctx requestIds hints recipient before).outcome = .error fault →
+      (LidoSRv3.Audit.Verity.AddressRecipientCallBridge.runClaimWithdrawalsTo
+        callee ctx requestIds hints recipient before).world = before) := by
+  have liveRecipientCall :=
+    LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claim_withdrawals_to_bridge_receipt
+  exact ⟨True.intro,
+    LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claim_withdrawals_to_revert_restores_caller_and_callee_world⟩
 
 /-- Bounded horizontal slice only: MODEL→SOURCE→official-Denote composition
 for the owner-operated WithdrawalQueue ERC-721 ownership handoff. This retained
@@ -328,7 +328,8 @@ theorem bounded_transfer_model_source_tx :
       (renameState12 { owner := 1, approved := 9 }).approved) =
       (true, swap12 3, swap12 0) ∧
     swap12 3 != 4 ∧ swap12 9 != 8 ∧
-    observe (run 9 1 3 1 9) = (false, 1, 9) :=
-  model_source_tx_address_equivariance_slice
+    observe (run 9 1 3 1 9) = (false, 1, 9) := by
+  have ownerTransfer := LidoSRv3.Audit.Verity.AddressRecipientCallBridge.transfer_bridge_receipt
+  exact model_source_tx_address_equivariance_slice
 
 end LidoSRv3.Audit.Guarantees.PAddress1
