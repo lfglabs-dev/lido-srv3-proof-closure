@@ -107,7 +107,8 @@
     "audit/topup-beacon-committed/validation.log": "e4d09879a02b18be20feceee03fabe8bf50d6a9ad573d823e70cb5eeeb1d71fd",
     "audit/topup-beacon-committed/source-build-with-failed-fixture.log": "912c4392a8f54d3efe76d00575370f2650010b89ef6beb0390c85372e3afd694",
     "audit/topup-beacon-committed/dependency-inputs.json": "9b04ee3a7480ac698ef3c6043af6d9b3d52122a07adf9eb1a8d696f9bdec3a7c",
-    "audit/topup-beacon-committed/inherited-validation.json": "4782bdce41435b73d4b466e80b2b90a84dcaec452ae43af07238348d8bfce693"
+    "audit/topup-beacon-committed/inherited-validation.json": "4782bdce41435b73d4b466e80b2b90a84dcaec452ae43af07238348d8bfce693",
+    "audit/topup-beacon-committed/wrong-initial-count-diagnostic.log": "480ab06a28a147a9339a383135b652319acf7e7ca74bfcaf402f75f39359d66b"
   },
   "package_pins": {
     ".lake/packages/verity": "e977aaad6e1a9e92e0132d41b3d33a14135a4d46",
