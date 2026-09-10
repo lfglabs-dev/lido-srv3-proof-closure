@@ -3,6 +3,7 @@ import LidoSRv3.Audit.Guarantees.PDeposit1PhysicalLedger
 import LidoSRv3.Audit.Guarantees.PTopup1MinimalLedger
 import LidoSRv3.Tests.ConsolidationSettlementRegression
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1ActualSettlement
+import LidoSRv3.Tests.SszActualRootTreeRegression
 import LidoSRv3.Tests.SszRootCallRegression
 import LidoSRv3.Audit.Guarantees.PSsz1RootCall
 import LidoSRv3.Tests.SszCompiledMemoryRegression
@@ -658,6 +659,7 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PSsz1.actual_memory_validator_branch
 
 #print axioms LidoSRv3.Audit.Guarantees.PSsz1.actual_root_staticcall_validator_branch
+#print axioms LidoSRv3.Audit.Guarantees.PSsz1.actual_root_staticcall_validator_tree
 #print axioms LidoSRv3.Audit.Source.SszRootCall.run_world
 
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1.actual_settlement_success
