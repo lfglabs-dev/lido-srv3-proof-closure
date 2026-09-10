@@ -3,7 +3,7 @@
   "authority": "Main website claims registered against existing composed source-model theorems. The historical abstract/verity pairs remain available; they do not establish these new claims. No proof status or deployment claim is promoted by this registry.",
   "guarantees": {
     "P-ALLOC-1": {
-      "description": "The modeled router calculates each active module\u2019s capacity from its target share and available headroom. Inactive modules receive no additional capacity. For successful execution under the stated storage, memory and arithmetic conditions, the resulting allocation and capacity lists match the independent mathematical specification.",
+      "description": "The modeled router calculates each active module’s capacity from its target share and available headroom. Inactive modules receive no additional capacity. For successful execution under the stated storage, memory and arithmetic conditions, the resulting allocation and capacity lists match the independent mathematical specification.",
       "model": "Source execution model with a Verity external-call interpretation",
       "theorems": [
         "LidoSRv3.Audit.Source.TrioAlloc1.Relational.producer_iff",
@@ -14,7 +14,7 @@
       "covered": [
         "Storage-backed module reads, response-dependent calls and checked calculations follow the modeled source order.",
         "Successful capacity calculations match the independent capacity specification and produce the corresponding memory arrays.",
-        "The Verity call interpreter matches the producer\u2019s return or error and module-call observations; static calls preserve its world."
+        "The Verity call interpreter matches the producer’s return or error and module-call observations; static calls preserve its world."
       ],
       "missing": [
         "The compiler interpretation of memory operations and the effects of omitted internal writes remain assumptions.",
@@ -105,7 +105,7 @@
       ]
     },
     "P-TOPUP-2": {
-      "description": "For a successful gateway witness and router module batch in the source model, the allocations decoded from the actual module reply sum to at most the router\u2019s packed per-block cap, converted from gwei to wei. The same executed witness loop supplies the keys and per-key limits consumed by that call. Full gateway entry correspondence remains open.",
+      "description": "For a successful gateway witness and router module batch in the source model, the allocations decoded from the actual module reply sum to at most the router’s packed per-block cap, converted from gwei to wei. The same executed witness loop supplies the keys and per-key limits consumed by that call. Full gateway entry correspondence remains open.",
       "model": "Source execution model using Verity physical contract storage and concrete raw module calls; the historical greedy Contract.run allocator is separate",
       "theorems": [
         "LidoSRv3.Audit.Guarantees.PTopup2.actual_module_batch_bound"
@@ -165,6 +165,36 @@
       "outside": [
         "General compiler correctness, the declared Verity semantics, cryptographic primitives, general gas and consensus retain their accepted boundaries. No stronger source/ABI/storage/call premise is hidden in them.",
         "The historical abstract/Verity theorem pair remains separate model evidence and is not required to equal this source executor."
+      ]
+    },
+    "P-SSZ-1": {
+      "description": "A successful deposit CALL in the source interpreter binds the submitted root to the ordered SHA preimages of its actually decoded public key, credentials, signature and msg.value in gwei. The guards derive exact field widths, uint64 amount range and gwei divisibility. The separate CL verifier ABI-frame composition remains open.",
+      "model": "Source deposit CALL/ABI interpreter with forward opaque SHA evaluation; historical synthetic encoding and Nat.pair results are separate",
+      "theorems": [
+        "LidoSRv3.Audit.Guarantees.PSsz1.actual_deposit_call_binds_root"
+      ],
+      "covered": [
+        "The actual CALL dispatcher decodes the same payload and consumes the same transferred value; no independent helper input is supplied.",
+        "The source guard sequence derives 48/32/96-byte widths and an exactly divisible uint64 gwei amount.",
+        "The independently transcribed callee hash chain agrees forward with the depositor helper on those consumed fields, including signature splits, zero padding and little-endian amount."
+      ],
+      "missing": [
+        "The CLValidatorVerifier internal calldata-frame bridge to its existing typed leaf, wrapper and ordered proof branch remains open.",
+        "General malformed deposit-ABI acceptance and exact revert/event byte encodings are not established by the existing source callee interpreter."
+      ],
+      "conditions": [
+        "The existing concrete CALL/ABI source interpreter and physical-world semantics apply; general compiler and declared Verity semantics remain accepted boundaries.",
+        "SHA is the existing opaque function returning exactly 32 bounded bytes. Only forward evaluation is used; no cryptographic injectivity or relation to a separate validator-proof transaction is assumed."
+      ],
+      "assumptions": [
+        "A-SOURCE-SHAPED",
+        "A-VERITY-SCAFFOLD",
+        "A-SOLC-TRUSTED",
+        "A-SHA256-FFI"
+      ],
+      "outside": [
+        "General SHA/precompile correctness, compiler correctness, gas and consensus.",
+        "The full TOPUP or DEPOSIT entry state machine belongs to the respective guarantee; this result binds one successful deposit call."
       ]
     }
   }
