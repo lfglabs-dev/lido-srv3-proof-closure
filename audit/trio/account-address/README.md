@@ -50,3 +50,25 @@ Concrete words exercise the timestamp, report-timestamp, and unused-high-bit
 regions. Slot-key
 derivation and execution-to-storage refinement remain outside the slice. These
 packing lemmas are useful independently of those execution boundaries.
+
+`PAddress1Physical.lean` adds physical-storage equivariance for the two
+pinned address-bearing packed words: the SRStorage `ModuleStateConfig` slot
+(`SRTypes.sol:118-135`, module address in bits 0..159, reached through
+`RouterState.moduleStates` at `SRTypes.sol:187`) and the first
+`NodeOperatorsRegistry.NodeOperator` slot (`NodeOperatorsRegistry.sol:171-175`,
+`active` byte then reward address in bits 8..167). An address renaming acts on
+a word by rewriting exactly the address field; decoding the renamed word is
+the renamed decoding, every non-address bit is preserved, encode and decode
+are mutually inverse, no write wraps past `2^256`, renaming is functorial
+(identity, composition, swap involution, injectivity), and the pinned source
+comparisons (`SRLib.sol:203` duplicate scan, `NodeOperatorsRegistry.sol:373`
+unchanged-address guard) are transported by an injective renaming. A
+storage-level renaming over `Word -> Word` rewrites only the enumerated module
+config slots and is stated with `keccak` and `ROUTER_STORAGE_POSITION` as
+explicit parameters; no hash injectivity is assumed. Five mutant renamings
+(wrong bit offset, 19-byte mask, fixed unrenamed module address, reserved-bit
+clearing, `active`-byte clobber) are refuted by `decide`. This is
+layout-level evidence only: it does not execute `_addModule`,
+`setNodeOperatorRewardAddress`, or any EVM code, does not model the
+EnumerableSet enumeration physically, and does not identify the parameterized
+hash with keccak256.
