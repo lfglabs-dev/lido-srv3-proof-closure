@@ -1,0 +1,35 @@
+{
+  "reviewed_source": "89acb917ccaa452303610f0c5c3654d5556a771a",
+  "source_parent": "a3245527ed2ef8a96e8b1e7877124ab1d5e7ef07",
+  "reviewer": "a8310864-7c6b-4f89-a7e5-cfe723e49f26",
+  "source_verdict": "CLEAN",
+  "event": "0ba69c6e-77b5-4e16-a2f4-6ba68cd6a21e",
+  "sequence": 3263,
+  "source_writer": "STOPPED",
+  "independent_reviewer": "terminal; execution null verified",
+  "checker": {
+    "checks": 1508,
+    "errors": [],
+    "scope": "root source/pin/evidence identity only; no new Lean or Solidity execution"
+  },
+  "source_files": {
+    "LidoSRv3/Audit/Source/TopupBeaconSumBound.lean": "e68900945d8b66ae248d6381c8e0dc8631fb907ecede496cba13d4b225c87fac",
+    "LidoSRv3/Tests/TopupBeaconSumBoundMutants.lean": "e06cbe501e979b51f0fc9a7dd0d7a29df5fc020acc26fc9efd1d294abe7a24a6",
+    "audit/topup-beacon-sum/README.md": "5a3c6d18e0e82c8c889668963c6df89901b2e1994d48940e9644646c68bbe0b3",
+    "audit/topup-beacon-sum/check_receipt.py": "f75ec0c6d6a1664fa264ceac5fbde170adaf1ffbe6758c98dbebbfe786ed5fe1",
+    "audit/topup-beacon-sum/dependency-inputs.json": "de952620d0a5ae0a3fa5225158f21b9948c415eee3f4af6a854f4ee6fc471023",
+    "audit/topup-beacon-sum/failed-modulus-diagnostic.log": "a4a8f532185b49afb679c793de5a4e86ece3b35ec71312b0d5fce59a1b6f3d81",
+    "audit/topup-beacon-sum/failed-source-namespace-diagnostic.log": "d8e1194028269752559283096629913b5bfdbd662dbb41e0c561c42668173411",
+    "audit/topup-beacon-sum/failed-test-name-diagnostic.log": "f5a7e1f8313d19c0b7ab9ef4b145d26e159e8eb5486e10a9f4974309bc6e7184",
+    "audit/topup-beacon-sum/inherited-validation.json": "bf9f2f672194a9f86473fbdcca9ac479c665ab9cd7e603b35757e000c1326dd7",
+    "audit/topup-beacon-sum/receipt.json": "cdc73f956a360bffc8d4c0d507a8b97b1d5897ddfc16bb715ea4c062d6e5f538",
+    "audit/topup-beacon-sum/source-validation.log": "5b2d48e3021cfb2240c94e03deed90f918f02e28b0017645f741c40a23fa6ce9",
+    "audit/topup-beacon-sum/validation.log": "617fe2a43cb20e25aaf7d4e4c430d82cf0718664b2d612d5da2fcc1c51e7a2e2"
+  },
+  "review_files": {
+    "independent-review.md": "098992e22ad6e181cb7090ce28140e14e5602ee9265d736f9566241d30698532",
+    "independent-review-events.json": "7d3998bfb634f090be9cd2ffd61cd0ea17aa400e01083ac3e18e68738fb8a0b1",
+    "review-response.md": "25caf02475b42de9c22598ba0361bb1890bb71311fd07657cc826a375688abbb"
+  },
+  "all_eight": "OPEN"
+}
