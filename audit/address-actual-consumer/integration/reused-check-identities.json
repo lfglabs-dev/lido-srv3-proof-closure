@@ -1,0 +1,7 @@
+{
+  "source_identities": 1250,
+  "package_pins": 11,
+  "retained_receipt_hashes": 30,
+  "all_match_99c9": true,
+  "reuse": "Existing source/Solidity/kernel/runtime validations retain their original stated scopes; independent integrated AllTrust and trust checks additionally required."
+}

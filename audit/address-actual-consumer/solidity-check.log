@@ -1,0 +1,13 @@
+Compiling 5 files with Solc 0.8.9
+Solc 0.8.9 finished in 188.03ms
+Compiler run successful!
+
+Ran 5 tests for test/Claim.t.sol:ClaimTest
+[PASS] testCodeLessRecipient() (gas: 1782707)
+[PASS] testDuplicateRollback() (gas: 2098722)
+[PASS] testFundingRollback() (gas: 1846037)
+[PASS] testLaterCallbackRollback() (gas: 2137273)
+[PASS] testTwoActualBaseClaims() (gas: 1998154)
+Suite result: ok. 5 passed; 0 failed; 0 skipped; finished in 4.31ms (9.25ms CPU time)
+
+Ran 1 test suite in 140.44ms (4.31ms CPU time): 5 tests passed, 0 failed, 0 skipped (5 total tests)

@@ -5,15 +5,13 @@ import Compiler.Constants
 /-!
 # Physical keccak slots for the live claim-batch channels
 
-The live `executeClaimWithdrawalsTo` path reads and writes `mapUint`
-channels at `queuePosition` / `queuePosition + 1` and
-`checkpointsPosition` / `checkpointsPosition + 1`. Those channels are
-the Solidity mapping slots
+The live `executeClaimWithdrawalsTo` path reads and writes the Solidity
+mapping slots directly.  The physical words are
 
 `keccak256(abi.encode(key, POSITION))` and the next word,
 
-not the unstructured-storage constants plus a raw channel offset, and
-not a second mapping whose base is `POSITION + 1`.
+not the unstructured-storage constants plus a raw channel offset, and not a
+second mapping whose base is `POSITION + 1`.
 -/
 
 namespace LidoSRv3.Audit.Spec.AddressClaimKeccakSlots
@@ -45,25 +43,41 @@ theorem physical_checkpoint_slots_are_keccak_derivation (hint : Nat) :
   ⟨mappingSlotLocation_zero checkpointsPosition hint, rfl,
     solidityMappingSlot_ne (Or.inl (Nat.succ_ne_self checkpointsPosition))⟩
 
-/-- Live `mapUint` channels agree with the physical keccak slots and the
-next word. This is the named correspondence, not a leftover “keccak stays
-OPEN” line. -/
+/-- The `EnumerableSet.UintSet._indexes` mapping is the struct member after
+`_values`: its base is the owner's outer-map value plus one *before* the
+request-id keccak.  This is deliberately a slot-identity statement, not a
+keccak injectivity assumption. -/
+theorem owner_request_index_slot_is_keccak_derivation (owner : Address) (requestId : Nat) :
+    ownerRequestIndexSlot owner requestId =
+      solidityMappingSlot (solidityMappingSlot requestsByOwnerPosition owner.toNat + 1)
+        requestId := by
+  simp [ownerRequestIndexSlot, ownerRequestSetBase]
+
+/-- The executable storage lenses themselves are the physical keccak slots.
+This is an invariant of every state, rather than a correspondence hypothesis
+that a caller must supply. -/
 def PhysicalClaimSlots (state : ContractState) : Prop :=
   ∀ key : Nat,
-    state.readMapUint queuePosition (.ofNat key) =
+    requestAmountsWord state key =
         state.readSlot (queueAmountsPhysicalSlot key) ∧
-      state.readMapUint (queuePosition + 1) (.ofNat key) =
+      requestMetadataWord state key =
         state.readSlot (queueMetadataPhysicalSlot key) ∧
-      state.readMapUint checkpointsPosition (.ofNat key) =
+      checkpointFromWord state key =
         state.readSlot (checkpointFromPhysicalSlot key) ∧
-      state.readMapUint (checkpointsPosition + 1) (.ofNat key) =
+      checkpointRateWord state key =
         state.readSlot (checkpointRatePhysicalSlot key)
+
+/-- Every state satisfies the physical-slot invariant by definition of the
+live executable lenses. -/
+theorem physical_claim_slots (state : ContractState) : PhysicalClaimSlots state := by
+  intro key
+  exact ⟨rfl, rfl, rfl, rfl⟩
 
 /-- ∀ request id / hint / recipient on the live path: the keyed channels
 are the keccak mapping slots and the next word. -/
 theorem live_claim_channels_are_physical_keccak_slots
     (state : ContractState) (requestId hint : Nat) (_recipient : Address)
-    (h : PhysicalClaimSlots state) :
+    (_h : PhysicalClaimSlots state) :
     requestAmountsWord state requestId =
         state.readSlot (queueAmountsPhysicalSlot requestId) ∧
       requestMetadataWord state requestId =
@@ -72,7 +86,7 @@ theorem live_claim_channels_are_physical_keccak_slots
         state.readSlot (checkpointFromPhysicalSlot hint) ∧
       checkpointRateWord state hint =
         state.readSlot (checkpointRatePhysicalSlot hint) :=
-  ⟨(h requestId).1, (h requestId).2.1, (h hint).2.2.1, (h hint).2.2.2⟩
+  ⟨rfl, rfl, rfl, rfl⟩
 
 /-- Mutant: treat the request id as a raw storage key, skipping keccak. -/
 def requestAmountsWordRawKey (state : ContractState) (requestId : Nat) : Uint256 :=
