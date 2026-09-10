@@ -1,0 +1,173 @@
+{
+  "entries": [
+    {
+      "module": "FeeDistribution",
+      "path": "audit/trio/account-address/FeeDistribution.lean",
+      "sha256": "e8775b4c94c8e2f5bef1131779be0e8709a377aaa47906e650c1d07ef39f84f4"
+    },
+    {
+      "module": "LidoSRv3.Audit.Arithmetic",
+      "path": "LidoSRv3/Audit/Arithmetic.lean",
+      "sha256": "f1016418727da225ef9158f14c32a9ea173975686291f479b18e887d02632978"
+    },
+    {
+      "module": "LidoSRv3.Audit.Guarantees.PAccount1",
+      "path": "LidoSRv3/Audit/Guarantees/PAccount1.lean",
+      "sha256": "67c88010fdc868ee990f41e0775da5d829f01d34b72946886e60f22629195d0c"
+    },
+    {
+      "module": "LidoSRv3.Audit.Guarantees.PAccount1ActualFeeCasts",
+      "path": "LidoSRv3/Audit/Guarantees/PAccount1ActualFeeCasts.lean",
+      "sha256": "eb98721c3b5d8949aa6ba679b9e734687af28860b28ed52979c58405c78c4e22"
+    },
+    {
+      "module": "LidoSRv3.Audit.Guarantees.PAccount1CheckedFeeSplit",
+      "path": "LidoSRv3/Audit/Guarantees/PAccount1CheckedFeeSplit.lean",
+      "sha256": "9b2abcd1a2a99df90916f0da3ad7c1b0fcd667eed85893b239fc0e59cf8818a7"
+    },
+    {
+      "module": "LidoSRv3.Audit.Guarantees.PAccount1FeeDistribution",
+      "path": "LidoSRv3/Audit/Guarantees/PAccount1FeeDistribution.lean",
+      "sha256": "55c102d3bf67b96892834025c7ce1166b76fd69fb97c127958f6cdff62bee1f7"
+    },
+    {
+      "module": "LidoSRv3.Audit.Guarantees.Registry",
+      "path": "LidoSRv3/Audit/Guarantees/Registry.lean",
+      "sha256": "90eaa0eb6cbed01d88318a8aa8fac135486b8fc76fac7b5b9d9b2bbf2f85ebf2"
+    },
+    {
+      "module": "LidoSRv3.Audit.Source.AccountingCorrespondence",
+      "path": "LidoSRv3/Audit/Source/AccountingCorrespondence.lean",
+      "sha256": "633b7c9e8ea1076f605acdae1ec60c79071301d47bb959ef5e8a5d946b7cdc39"
+    },
+    {
+      "module": "LidoSRv3.Audit.Source.ReportFeeProductsCorrespondence",
+      "path": "LidoSRv3/Audit/Source/ReportFeeProductsCorrespondence.lean",
+      "sha256": "471edd6b2b855844679dd5ef23409523caea2b221482991a51bc028a06135936"
+    },
+    {
+      "module": "LidoSRv3.Audit.Verity.HandleOracleReportTx",
+      "path": "LidoSRv3/Audit/Verity/HandleOracleReportTx.lean",
+      "sha256": "d41736060fc56b9d89f2c2fec1859dda053357c3895cb3fd109972033d5aae4d"
+    },
+    {
+      "module": "PAccount1",
+      "path": "audit/trio/account-address/PAccount1.lean",
+      "sha256": "71609c24079ff13983323c98f8be5728c951d4b2b6d57ea7dee12b7e2964938d"
+    },
+    {
+      "module": "ReportFeeCastInvariant",
+      "path": "audit/trio/account-address/ReportFeeCastInvariant.lean",
+      "sha256": "b6ae4125a8889f55c3c939cc2c14fdef1a57f2508b4a10cae06d4dfc92b6480c"
+    },
+    {
+      "module": "ReportFeeCheckedSplit",
+      "path": "audit/trio/account-address/ReportFeeCheckedSplit.lean",
+      "sha256": "879c03d3a1fee37d3fb80e6e3b2698eee1c3e642e4fffa6da703b8d8715d56aa"
+    },
+    {
+      "module": "ReportFeeDistribution",
+      "path": "audit/trio/account-address/ReportFeeDistribution.lean",
+      "sha256": "4c4a6e53a4505ac7005a25a3fdc1e972d4e14eb292bdbb62d4fd1027388bb6f3"
+    },
+    {
+      "module": "ReportFeeMint",
+      "path": "audit/trio/account-address/ReportFeeMint.lean",
+      "sha256": "93be9d8f39fd3907796f8bb66b9fc67c5fc681c1f88dec1c70fc6a9b573455e6"
+    },
+    {
+      "module": "ReportWriteFee",
+      "path": "audit/trio/account-address/ReportWriteFee.lean",
+      "sha256": "162476cddc0e4a960286684f9000a813ef513adb9d3d6eb7713723d90464e750"
+    },
+    {
+      "module": "StETHMintShares",
+      "path": "audit/trio/account-address/StETHMintShares.lean",
+      "sha256": "f4fc5b04455acb9c5993779e4171ccc5a288fe5adf701ee68b0a16d47b031f1b"
+    },
+    {
+      "module": "Tests.Verity.ReportFeeCheckedSplitTest",
+      "path": "audit/trio/account-address/Tests/Verity/ReportFeeCheckedSplitTest.lean",
+      "sha256": "4cb2d5a19115c295ec1e950dcbc00dce060a7408b51789d64d151fac86cfa877"
+    },
+    {
+      "module": "Tests.Verity.ReportFeeDistributionTest",
+      "path": "audit/trio/account-address/Tests/Verity/ReportFeeDistributionTest.lean",
+      "sha256": "bd296f19ab91a6dde5cb53937de5c2477da084d8732b8c9e2348c83700fc8694"
+    },
+    {
+      "module": "Tests.Verity.ReportFeeMintTest",
+      "path": "audit/trio/account-address/Tests/Verity/ReportFeeMintTest.lean",
+      "sha256": "980481aa1936fc32f2a1d315cb97114ba1b68257f660b1e14a32b5162ff5a995"
+    },
+    {
+      "module": "Verity.Core",
+      "path": ".lake/packages/verity/Verity/Core.lean",
+      "sha256": "29c84212c5cd19b5d1d7f03b26cf7cfda47b93acda0353be6af053e861531f74"
+    },
+    {
+      "module": "Verity.Core.Address",
+      "path": ".lake/packages/verity/Verity/Core/Address.lean",
+      "sha256": "a68d80ad5721d8fdc07771dbc400d2925560982b13da921ad229cd3922d7d005"
+    },
+    {
+      "module": "Verity.Core.FiniteSet",
+      "path": ".lake/packages/verity/Verity/Core/FiniteSet.lean",
+      "sha256": "50b8e07fa6270cd3555b97c6e16011f6a202d654c01a3909a9dacd8ffce8d62e"
+    },
+    {
+      "module": "Verity.Core.Int256",
+      "path": ".lake/packages/verity/Verity/Core/Int256.lean",
+      "sha256": "278db115d5545fa3be130799b0d6c5a26e77f79ca6eba434e831e8a4aec94efe"
+    },
+    {
+      "module": "Verity.Core.Intrinsics",
+      "path": ".lake/packages/verity/Verity/Core/Intrinsics.lean",
+      "sha256": "37813e33dd2591295a3600e603877722b798b96590636d9a659659c780b36048"
+    },
+    {
+      "module": "Verity.Core.Model.Yul.Ast",
+      "path": ".lake/packages/verity/Verity/Core/Model/Yul/Ast.lean",
+      "sha256": "2e2ac0077612d77bb48a23aa152b60e980bd04eb74ad94d6d1a398da2e15bb54"
+    },
+    {
+      "module": "Verity.Core.NarrowTypes",
+      "path": ".lake/packages/verity/Verity/Core/NarrowTypes.lean",
+      "sha256": "c3079d2d70a672129d971f7c8f4be20c14e5a8adb18ea1e683146330decdb7b0"
+    },
+    {
+      "module": "Verity.Core.StorageAttr",
+      "path": ".lake/packages/verity/Verity/Core/StorageAttr.lean",
+      "sha256": "c044fb0eace47e32ecaf46e911cc2aa3e119370d974c8c98649dce58830906c4"
+    },
+    {
+      "module": "Verity.Core.Uint16",
+      "path": ".lake/packages/verity/Verity/Core/Uint16.lean",
+      "sha256": "660b305f31b0a8b319f44ec89f21e589ce69c730db555e6493a5bd9af0c1ad00"
+    },
+    {
+      "module": "Verity.Core.Uint256",
+      "path": ".lake/packages/verity/Verity/Core/Uint256.lean",
+      "sha256": "49641098562b484876d503577e3c3c6a6cb850f2b264b3b92c25ef4a2e902247"
+    },
+    {
+      "module": "Verity.Stdlib.Math",
+      "path": ".lake/packages/verity/Verity/Stdlib/Math.lean",
+      "sha256": "4c44d0d2d5a2bf1ac2f0e0381cc351b3fa1a183a3f93eb501109c570e8c31800"
+    }
+  ],
+  "package_pins": {
+    "verity": "e977aaad6e1a9e92e0132d41b3d33a14135a4d46",
+    "evmyul": "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9",
+    "mathlib": "fabf563a7c95a166b8d7b6efca11c8b4dc9d911f",
+    "plausible": "63045536fe95024e6c18fc7b48e03f506701c5bc",
+    "LeanSearchClient": "c5d5b8fe6e5158def25cd28eb94e4141ad97c843",
+    "importGraph": "5c7542ed018c78194f1e2b903eaf6a792b74c03d",
+    "proofwidgets": "24b0d9dc081c5423f8eec7e866c441e5184f29d9",
+    "aesop": "e3cb2f741431ce31bf73549fb52316a57368b06f",
+    "Qq": "f46324995fca5f0483b742e4eb4daec7f4ee50d2",
+    "batteries": "fa08db58b30eb033edcdab331bba000827f9f785",
+    "Cli": "92564e5770e4d09f2d86dfbf8ada1e9c715b384c"
+  },
+  "scope": "Actual two prerequisite setup import closures plus four sequentially compiled new modules; every old local source body unchanged at base; cached setup absolute paths checked byte-identical against current source and actual local olean."
+}
