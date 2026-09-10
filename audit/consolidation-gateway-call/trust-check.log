@@ -1,0 +1,1 @@
+trust-axiom check ok: 29 exact axioms (23 test/mutant-only native-decision axioms + 3 production exceptions (Phase-3 capacity, consolidation flow, SSZ digest) + foundations); dependencies recomputed from the built environment; native-decision claims re-evaluated

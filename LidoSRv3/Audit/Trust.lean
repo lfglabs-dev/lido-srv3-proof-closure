@@ -1,3 +1,5 @@
+import LidoSRv3.Tests.ConsolidationGatewayCallRegression
+import LidoSRv3.Audit.Guarantees.PConsolidation1ActualGatewayVault
 import LidoSRv3.Audit.Guarantees.PTopup1ActualBatch
 import LidoSRv3.Audit.Guarantees.PTopup1ActualContinuation
 import LidoSRv3.Audit.Guarantees.PSsz1ActualDeposit
@@ -635,3 +637,6 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PSsz1.actual_deposit_call_binds_root
 
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.actual_module_batch_effects
+
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1.actual_gateway_vault_requests
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1.actual_gateway_vault_failure_restores
