@@ -81,6 +81,7 @@ inductive SourceExecutionError where
   | notConsolidationGateway
   | staticcallFailed
   | vaultGuard (error : VaultError)
+  | invalidPubkey
   | callFailed (index : Nat)
   deriving DecidableEq, Repr
 
@@ -89,8 +90,11 @@ inductive SourceExecutionOutcome where
   | openExit
   /-- All source failures roll the payable credit and prior calls back. -/
   | reverted (error : SourceExecutionError) (vaultBalance : Nat)
-  /-- The modifier accepted the final balance. -/
-  | committed (pairs : List (Pubkey × Pubkey)) (vaultBalance : Nat)
+  /-- The modifier accepted the final balance. Each committed pair is the
+  caller-side `(source, target)` and the matching 96-byte callee payload
+  `abi.encodePacked(sourcePubkey, targetPubkey)`. -/
+  | committed (pairs : List (Pubkey × Pubkey)) (payloads : List (List Nat))
+      (vaultBalance : Nat)
   deriving DecidableEq, Repr
 
 private def firstCallFailure : Nat → List (ExternalResult Unit) → Option Nat
@@ -117,19 +121,25 @@ def executeSourceBounded (fuel : Nat) (deployment : DeployedVault)
         match validateVaultAdd fee msgValue sources targets with
         | .error error => .reverted (.vaultGuard error) initialBalance
         | .ok pairs =>
-            if pairs.length > fuel || callResults.length < pairs.length then
-              .openExit
-            else
-              match firstCallFailure 0 (callResults.take pairs.length) with
-              | some index => .reverted (.callFailed index) initialBalance
-              | none =>
-                  let finalBalance := initialBalance + msgValue.val -
-                    pairs.length * fee.val
-                  if finalBalance = initialBalance then
-                    .committed pairs finalBalance
-                  else .reverted (.vaultGuard
-                    (.incorrectFee (word (pairs.length * fee.val)) msgValue))
-                    initialBalance
+            -- Callee input of `_callAddConsolidationRequest` is the packed
+            -- 96-byte blob, not the word identity. Wrapping identities are
+            -- not 48-byte keys and cannot form a payload.
+            match packedPayloads pairs with
+            | none => .reverted .invalidPubkey initialBalance
+            | some payloads =>
+                if pairs.length > fuel || callResults.length < pairs.length then
+                  .openExit
+                else
+                  match firstCallFailure 0 (callResults.take pairs.length) with
+                  | some index => .reverted (.callFailed index) initialBalance
+                  | none =>
+                      let finalBalance := initialBalance + msgValue.val -
+                        pairs.length * fee.val
+                      if finalBalance = initialBalance then
+                        .committed pairs payloads finalBalance
+                      else .reverted (.vaultGuard
+                        (.incorrectFee (word (pairs.length * fee.val)) msgValue))
+                        initialBalance
 
 /-- Named environmental obligation for the bounded model: execution reaches a
 closed committed or reverted source exit, rather than exhausting fuel or an
@@ -140,6 +150,52 @@ def requireClosedExit (fuel : Nat) (deployment : DeployedVault) (caller : Word)
     (initialBalance : Nat) : Prop :=
   executeSourceBounded fuel deployment caller feeRead callResults msgValue sources targets
     initialBalance ≠ .openExit
+
+/-- Caller/callee boundary: a committed hop's payloads are exactly the
+96-byte packed blobs of the accepted pairs. Wrapping identities never
+reach this constructor. -/
+theorem committed_payloads_are_packed
+    (fuel : Nat) (deployment : DeployedVault) (caller : Word)
+    (feeRead : ExternalResult Word) (callResults : List (ExternalResult Unit))
+    (msgValue : Word) (sources targets : List Pubkey) (initialBalance : Nat)
+    (pairs : List (Pubkey × Pubkey)) (payloads : List (List Nat))
+    (balance : Nat)
+    (h : executeSourceBounded fuel deployment caller feeRead callResults
+        msgValue sources targets initialBalance =
+          .committed pairs payloads balance) :
+    packedPayloads pairs = some payloads ∧
+      payloads.length = pairs.length ∧
+      ∀ payload ∈ payloads, payload.length = 96 := by
+  unfold executeSourceBounded at h
+  split at h
+  · contradiction
+  next hconstructor =>
+    cases feeRead with
+    | failure => simp at h
+    | success fee =>
+        cases hguard : validateVaultAdd fee msgValue sources targets with
+        | error _ => simp [hguard] at h
+        | ok accepted =>
+            simp [hguard] at h
+            cases hpayloads : packedPayloads accepted with
+            | none => simp [hpayloads] at h
+            | some acceptedPayloads =>
+                simp [hpayloads] at h
+                split at h
+                · contradiction
+                next hbound =>
+                  cases hfailure : firstCallFailure 0
+                      (callResults.take accepted.length) with
+                  | some _ => simp [hfailure] at h
+                  | none =>
+                      simp [hfailure] at h
+                      split at h
+                      · next =>
+                          injection h with hpairs hpayloadsEq _
+                          have heach := packedPayloads_each_96 accepted acceptedPayloads hpayloads
+                          rw [← hpairs, ← hpayloadsEq]
+                          exact ⟨hpayloads, heach.1, heach.2⟩
+                      · contradiction
 
 theorem unauthorized_caller_closes (fuel : Nat) (deployment : DeployedVault)
     (caller : Word) (feeRead : ExternalResult Word)
@@ -197,8 +253,9 @@ theorem closed_exit_bounded_model_balance_invariant
       targets initialBalance) :
     (∃ error, executeSourceBounded fuel deployment caller feeRead callResults msgValue sources
         targets initialBalance = .reverted error initialBalance) ∨
-      (∃ pairs, executeSourceBounded fuel deployment caller feeRead callResults msgValue
-          sources targets initialBalance = .committed pairs initialBalance) := by
+      (∃ pairs payloads, executeSourceBounded fuel deployment caller feeRead callResults
+          msgValue sources targets initialBalance =
+            .committed pairs payloads initialBalance) := by
   unfold requireClosedExit at hclosed
   cases hrun : executeSourceBounded fuel deployment caller feeRead callResults msgValue sources
       targets initialBalance with
@@ -215,15 +272,17 @@ theorem closed_exit_bounded_model_balance_invariant
             cases hguard : validateVaultAdd fee msgValue sources targets <;>
               simp_all
             next pairs =>
-              split at hrun <;> simp_all
-              next hbound =>
-                cases hfailure : firstCallFailure 0
-                    (callResults.take pairs.length) <;> simp_all
-                next => split at hrun <;> simp_all
+              cases hpayloads : packedPayloads pairs <;> simp_all
+              next payloads =>
+                split at hrun <;> simp_all
+                next hbound =>
+                  cases hfailure : firstCallFailure 0
+                      (callResults.take pairs.length) <;> simp_all
+                  next => split at hrun <;> simp_all
       simp [hbalance] at hrun ⊢
-  | committed pairs balance =>
+  | committed pairs payloads balance =>
       right
-      refine ⟨pairs, ?_⟩
+      refine ⟨pairs, payloads, ?_⟩
       have hbalance : balance = initialBalance := by
         unfold executeSourceBounded at hrun
         split at hrun <;> simp_all
@@ -233,11 +292,13 @@ theorem closed_exit_bounded_model_balance_invariant
             cases hguard : validateVaultAdd fee msgValue sources targets <;>
               simp_all
             next accepted =>
-              split at hrun <;> simp_all
-              next hbound =>
-                cases hfailure : firstCallFailure 0
-                    (callResults.take accepted.length) <;> simp_all
-                next => split at hrun <;> simp_all
+              cases hpayloads : packedPayloads accepted <;> simp_all
+              next acceptedPayloads =>
+                split at hrun <;> simp_all
+                next hbound =>
+                  cases hfailure : firstCallFailure 0
+                      (callResults.take accepted.length) <;> simp_all
+                  next => split at hrun <;> simp_all
       simp [hbalance] at hrun ⊢
 
 end audit.trio.consolidation

@@ -26,52 +26,15 @@ lookup, and `preservesEthBalance` remain outside this component. The fee
 
 namespace audit.trio.consolidation
 
-/-! ## 96-byte packed consolidation payload -/
+/-! ## Gateway payable fee/call computation
 
-/-- Big-endian `PUBLIC_KEY_LENGTH` octets of a pubkey's identity. This is the
-byte blob `abi.encodePacked` sees for a 48-byte BLS key whose integer value
-is `key.identity`. -/
-def pubkeyOctets (key : Pubkey) : List Nat :=
-  (List.range pubkeyLength).map fun i =>
-    (key.identity / 256 ^ (pubkeyLength - 1 - i)) % 256
-
-theorem pubkeyOctets_length (key : Pubkey) :
-    (pubkeyOctets key).length = pubkeyLength := by
-  simp [pubkeyOctets, pubkeyLength]
-
-/-- Vault `_callAddConsolidationRequest` payload:
-`abi.encodePacked(sourcePubkey, targetPubkey)` (`WithdrawalVaultEIP7685.sol:114`). -/
-def encodePackedRequest (source target : Pubkey) : List Nat :=
-  pubkeyOctets source ++ pubkeyOctets target
-
-theorem encodePackedRequest_length (source target : Pubkey) :
-    (encodePackedRequest source target).length = 96 := by
-  simp [encodePackedRequest, pubkeyOctets_length, pubkeyLength]
-
-theorem encodePackedRequest_source_prefix (source target : Pubkey) :
-    (encodePackedRequest source target).take pubkeyLength = pubkeyOctets source := by
-  simp [encodePackedRequest, pubkeyOctets_length]
-
-theorem encodePackedRequest_target_suffix (source target : Pubkey) :
-    (encodePackedRequest source target).drop pubkeyLength = pubkeyOctets target := by
-  simp [encodePackedRequest, pubkeyOctets_length]
-
-/-- One packed payload per flattened gateway pair, in `_prepareConsolidationPairs`
-order. -/
-def packedPayloads (pairs : List (Pubkey × Pubkey)) : List (List Nat) :=
-  pairs.map fun pair => encodePackedRequest pair.1 pair.2
-
-theorem packedPayloads_length (pairs : List (Pubkey × Pubkey)) :
-    (packedPayloads pairs).length = pairs.length := by
-  simp [packedPayloads]
-
-theorem packedPayloads_each_96 (pairs : List (Pubkey × Pubkey))
-    (payload : List Nat) (hmem : payload ∈ packedPayloads pairs) :
-    payload.length = 96 := by
-  obtain ⟨pair, _, rfl⟩ := List.mem_map.mp hmem
-  exact encodePackedRequest_length pair.1 pair.2
-
-/-! ## Gateway payable fee/call computation -/
+Packed 96-byte payloads live in `Spec.lean` as `pubkeyOctets` /
+`encodePackedRequest` / `packedPayloads`. Those functions refuse keys that
+are not actual 48-byte representations (`length ≠ 48` or
+`identity ≥ 2^384`), so the reviewed wrapping collision
+`integerBE 48 1 = integerBE 48 (1 + 2^384)` cannot appear as a callee
+payload.
+-/
 
 inductive GatewayError where
   | zeroMsgValue
@@ -80,6 +43,7 @@ inductive GatewayError where
   | countOverflow
   | feeOverflow
   | insufficientFee (required provided : Word)
+  | invalidPubkey
   | vaultReverted
   | refundFailed
   deriving DecidableEq, Repr
@@ -158,22 +122,85 @@ def gatewayAddConsolidationRequests (msgValue : Word) (groups : List WitnessGrou
               | .error error => .reverted error
               | .ok refundVal =>
                   let pairs := preparePairs groups
-                  let vault : VaultHop :=
-                    { pairs := pairs
-                      value := totalFee
-                      payloads := packedPayloads pairs }
-                  -- ConsolidationGateway.sol:220  {value: totalFee}
-                  if !vaultAccepts then .reverted .vaultReverted
-                  else if refundVal.val = 0 then
-                    -- ConsolidationGateway.sol:296  if (refund > 0) { ... }
-                    .committed vault none
-                  else if !refundAccepts then .reverted .refundFailed
-                  else
-                    -- ConsolidationGateway.sol:302  recipient.call{value: refund}("");
-                    .committed vault
-                      (some
-                        { recipient := resolveRecipient refundRecipient sender
-                          value := refundVal })
+                  -- Callee payloads are actual 48+48 octets, or the hop is
+                  -- refused: wrapping identities are not 48-byte keys.
+                  match packedPayloads pairs with
+                  | none => .reverted .invalidPubkey
+                  | some payloads =>
+                      let vault : VaultHop :=
+                        { pairs := pairs
+                          value := totalFee
+                          payloads := payloads }
+                      -- ConsolidationGateway.sol:220  {value: totalFee}
+                      if !vaultAccepts then .reverted .vaultReverted
+                      else if refundVal.val = 0 then
+                        -- ConsolidationGateway.sol:296  if (refund > 0) { ... }
+                        .committed vault none
+                      else if !refundAccepts then .reverted .refundFailed
+                      else
+                        -- ConsolidationGateway.sol:302  recipient.call{value: refund}("");
+                        .committed vault
+                          (some
+                            { recipient := resolveRecipient refundRecipient sender
+                              value := refundVal })
+
+/-- Caller/callee boundary on the committed vault hop: payloads are the
+actual 96-byte packed blobs of `_prepareConsolidationPairs`, not wrapping
+integer encodings. -/
+theorem committed_vault_payloads
+    (msgValue : Word) (groups : List WitnessGroup) (fee : Word)
+    (refundRecipient sender : Nat) (vaultAccepts refundAccepts : Bool)
+    (vault : VaultHop) (refund : Option RefundHop)
+    (h : gatewayAddConsolidationRequests msgValue groups fee refundRecipient sender
+        vaultAccepts refundAccepts = .committed vault refund) :
+    packedPayloads vault.pairs = some vault.payloads ∧
+      vault.payloads.length = vault.pairs.length ∧
+      ∀ payload ∈ vault.payloads, payload.length = 96 := by
+  unfold gatewayAddConsolidationRequests at h
+  split at h
+  · contradiction
+  next hvalue =>
+    split at h
+    · contradiction
+    next hgroups =>
+      cases hcount : countGatewayRequests groups with
+      | error _ => simp [hcount] at h
+      | ok requestsCount =>
+          simp [hcount] at h
+          cases hmul : checkedMulWord requestsCount fee with
+          | none => simp [hmul] at h
+          | some totalFee =>
+              simp [hmul] at h
+              cases hfee : checkFee msgValue totalFee with
+              | error _ => simp [hfee] at h
+              | ok refundVal =>
+                  simp [hfee] at h
+                  cases hpayloads : packedPayloads (preparePairs groups) with
+                  | none => simp [hpayloads] at h
+                  | some payloads =>
+                      simp [hpayloads] at h
+                      split at h
+                      · contradiction
+                      next hvault =>
+                        split at h
+                        · next =>
+                            injection h with hvaultEq _
+                            subst vault
+                            exact ⟨hpayloads,
+                              (packedPayloads_each_96 (preparePairs groups) payloads
+                                hpayloads).1,
+                              (packedPayloads_each_96 (preparePairs groups) payloads
+                                hpayloads).2⟩
+                        · split at h
+                          · contradiction
+                          next =>
+                            injection h with hvaultEq _
+                            subst vault
+                            exact ⟨hpayloads,
+                              (packedPayloads_each_96 (preparePairs groups) payloads
+                                hpayloads).1,
+                              (packedPayloads_each_96 (preparePairs groups) payloads
+                                hpayloads).2⟩
 
 theorem add_zero_msgValue (groups : List WitnessGroup) (fee : Word)
     (refundRecipient sender : Nat) (vaultAccepts refundAccepts : Bool) :
