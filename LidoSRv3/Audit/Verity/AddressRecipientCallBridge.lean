@@ -104,6 +104,35 @@ def runClaimTo (callee : External) (ctx : Context) (requestId hint : Nat)
     (recipient : Address) (before : World) :=
   run (claimTo callee ctx requestId hint recipient) before
 
+/-- A callee that accepts a value frame without changing the post-transfer
+world.  It is a concrete executable callee, not a Boolean success input. -/
+def acceptingCallee : External := fun _ world => .success [] world
+
+def claimBridgeContext : Context := ⟨(99 : Address), (1 : Address)⟩
+
+/-- The `twoClaimState` storage witness with a code-bearing recipient and a
+separate account-balance world for the actual CALL. -/
+def claimBridgeWorld : World :=
+  { core := { twoClaimState with
+      codeSize := fun address => if address = (2 : Address).toNat then 1 else 0 }
+    balances := fun address => if address = claimBridgeContext.self then 70 else 0 }
+
+/-- End-to-end receipt for the smallest recipient bridge.  The storage claim,
+the exact empty-calldata CALL, and the callee-returned world agree on both the
+30 wei value and address 2. -/
+theorem claim_bridge_receipt :
+    let result := runClaimTo acceptingCallee claimBridgeContext 1 1 (2 : Address)
+      claimBridgeWorld
+    result.outcome = .ok () ∧
+      result.world.core.readMapUint (queuePosition + 1) 1 =
+        markClaimed (requestMetadataWord twoClaimState 1) ∧
+      result.world.core.selfBalance = 40 ∧
+      result.world.balances claimBridgeContext.self = 40 ∧
+      result.world.balances (2 : Address) = 30 ∧
+      result.attempts = [⟨⟨claimBridgeContext.self, (2 : Address), 30, []⟩,
+        true, [], []⟩] := by
+  decide +kernel
+
 /-! ## `transferFrom` owner-operated physical branch
 
 The live Solidity function also admits the two approval branches.  This bridge
