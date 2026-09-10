@@ -1,4 +1,9 @@
-import LidoSRv3.Audit.Verity.AddressClaimBatchTx
+import LidoSRv3.Audit.Model.AddressClaimJournalLegacy
+
+/-! Historical claim-journal results below use the preserved
+`Model.AddressClaimJournalLegacy` executor. References to the live loop in
+retained comments denote that historical model, not the new physical CALL
+consumer. These results do not establish arbitrary recipient callbacks. -/
 
 /-!
 # Wave 2 W2-ADDR: three-item live claim-batch correspondence
@@ -15,7 +20,7 @@ are permissionless.
 
 namespace LidoSRv3.Audit.Spec.AddressClaimBatchCorrespondence
 
-open LidoSRv3.Audit.Verity.AddressClaimBatchTx
+open LidoSRv3.Audit.Model.AddressClaimJournalLegacy
 open _root_.Verity
 
 /-- Three-item witness packed like `twoClaimState`. Request 3 pays 10;
@@ -72,7 +77,7 @@ theorem every_revert_restores_snapshot (requestIds hints : List Nat)
     (recipient : Address) (state rollback : ContractState) (reason : String)
     (h : (executeClaimWithdrawalsTo requestIds hints recipient).run state =
       .revert reason rollback) : rollback = state :=
-  LidoSRv3.Audit.Verity.AddressClaimBatchTx.every_revert_restores_snapshot
+  LidoSRv3.Audit.Model.AddressClaimJournalLegacy.every_revert_restores_snapshot
     requestIds hints recipient state rollback reason h
 
 end LidoSRv3.Audit.Spec.AddressClaimBatchCorrespondence

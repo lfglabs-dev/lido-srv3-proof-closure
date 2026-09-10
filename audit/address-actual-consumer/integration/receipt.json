@@ -1,0 +1,28 @@
+{
+  "source_candidate": "99c9dab6aafc753698c9ece26e415dfe01843992",
+  "integration_source": "20e23769e1391fcdcfa495b7e8936ea07cf3bb19",
+  "main_base": "ea5774a82facf0d474e68058c4645ebf4380d403",
+  "all_trust_build": {
+    "exit": 0,
+    "jobs": 1674
+  },
+  "exact_trust_check": {
+    "exit": 0,
+    "axioms": 29,
+    "native_claims_reevaluated": true,
+    "dependencies_recomputed": true
+  },
+  "reused_source_identities": 1250,
+  "package_pins": 11,
+  "retained_receipt_hashes": 30,
+  "source_verdict": "CLEAN 99c9 complete source/Solidity review retained",
+  "integration_review": "Pending independent exact migration/final commit review; not self-approved",
+  "sha256": {
+    "audit/address-actual-consumer/integration/README.md": "cccc45934803307c49474b36183f5ed22e9850fd2dc2190a15aaabb6bf7e90f6",
+    "audit/address-actual-consumer/integration/all-trust-build.log": "15f76099539d33163038c86e2eabe06dde27a25f00bf996228c036099b53ea6c",
+    "audit/address-actual-consumer/integration/independent-source-review-99c9.md": "ec2b214658cd4fdaf72ae2b9b937922b7102b241ad4c354d9caf8a508eeb0749",
+    "audit/address-actual-consumer/integration/legacy-identity.json": "719730f4506a0f0c3a83bd20df375c302f756962eba092dce02475207728e421",
+    "audit/address-actual-consumer/integration/reused-check-identities.json": "c167d90ef11908fc2517de9cb930dff8f26a003e9c8ebf2e4918a98a1bb1b426",
+    "audit/address-actual-consumer/integration/trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439"
+  }
+}
