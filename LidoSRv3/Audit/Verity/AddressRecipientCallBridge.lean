@@ -98,9 +98,15 @@ second request word. -/
 def withRequestOwner (word : Uint256) (owner : Address) : Uint256 :=
   .ofNat ((word.val / 2 ^ 160) * 2 ^ 160 + owner.toNat)
 
+/-- `keccak256("lido.WithdrawalQueueERC721.tokenApprovals")`, the actual
+unstructured mapping base deleted by `_transfer` at source line 247. -/
+def tokenApprovalsPosition : Nat :=
+  0x528f2b9d452f4b604589d1a9e64c321ee1035a867d38a1359d022af391cf7df5
+
 /-- `WithdrawalQueueERC721.transferFrom` through `_transfer`, restricted to
 the literal `msg.sender == _from` branch.  Every guard is evaluated from the
-caller and physical request word; the successful write is
+caller and physical request word; the successful writes are the approval
+deletion at `TOKEN_APPROVALS_POSITION` and the owner word at
 `keccak256(abi.encode(requestId, QUEUE_POSITION)) + 1`. -/
 def transferFrom (ctx : Context) (from recipient : Address) (requestId : Nat) :
     Exec Unit := fun world =>
@@ -115,8 +121,8 @@ def transferFrom (ctx : Context) (from recipient : Address) (requestId : Nat) :
   else if ctx.sender != from then ⟨.error (.reason "NotOwnerOrApproved"), world, []⟩
   else
     ⟨.ok (), { world with core :=
-      before.writeMapUint (queuePosition + 1) (.ofNat requestId)
-        (withRequestOwner metadata recipient) }, []⟩
+      (before.writeMapUint tokenApprovalsPosition (.ofNat requestId) 0).writeMapUint
+        (queuePosition + 1) (.ofNat requestId) (withRequestOwner metadata recipient) }, []⟩
 
 def runTransferFrom (ctx : Context) (from recipient : Address) (requestId : Nat)
     (before : World) :=
