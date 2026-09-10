@@ -122,7 +122,7 @@ def handleOracleReportFromCommittedFeeProducts (x : Input) (before : World) : Ou
       | .ok distribution =>
           match checkedFeeProductsFromCommittedGetter x.report distribution with
           | none => .reverted .feeArithmetic before
-          | .ok fee =>
+          | some fee =>
               match mintCommittedFee { before with router := postRouter } fee with
               | .reverted e _ => .reverted e before
               | .committed post fee events => .committed post fee events

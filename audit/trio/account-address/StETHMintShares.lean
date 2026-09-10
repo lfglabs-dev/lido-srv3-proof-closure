@@ -196,13 +196,38 @@ theorem every_revert_restores_snapshot (caller recipient amount : Nat) (before r
     (e : Error) (h : mintShares caller recipient amount before = .reverted e rollback) :
     rollback = before := by
   unfold mintShares at h
-  split at h <;> simp_all
-  split at h <;> simp_all
-  split at h <;> simp_all
-  split at h <;> simp_all
-  split at h <;> simp_all
-  split at h <;> simp_all
-  cases hPooled : pooledEthByShares before amount <;> simp [hPooled] at h
+  split at h
+  · cases h
+    rfl
+  split at h
+  · cases h
+    rfl
+  split at h
+  · cases h
+    rfl
+  split at h
+  · cases h
+    rfl
+  split at h
+  · cases h
+    rfl
+  split at h
+  · cases h
+    rfl
+  split at h
+  · cases h
+    rfl
+  · let post := { before with
+      storage := before.storage.write totalSharesPosition
+        (setLowUint128 (totalAndExternalShares before) (totalShares before + amount))
+      shares := fun account => if account = recipient then before.shares account + amount
+        else before.shares account }
+    cases hPooled : pooledEthByShares post amount with
+    | error e' =>
+      simp only [post, hPooled, Outcome.reverted.injEq] at h
+      exact h.2.symm
+    | ok pooled =>
+      simp only [post, hPooled, Outcome.committed.injEq] at h
 
 theorem committed_mint_has_paired_events (caller recipient amount : Nat) (before post : State)
     (events : List Event)
