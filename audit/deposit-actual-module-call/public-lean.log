@@ -1,0 +1,4 @@
+'LidoSRv3.Audit.Guarantees.PDeposit1.actual_module_call_metadata_suffix' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Guarantees.PDeposit1.actual_module_call_failure_restores' depends on axioms: [propext, Quot.sound]

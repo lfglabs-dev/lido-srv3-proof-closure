@@ -1,0 +1,5 @@
+'audit.trio.deposit.ModuleCall.call_success_origin' depends on axioms: [propext]
+'audit.trio.deposit.ModuleCall.decoded_call_origin' depends on axioms: [propext, Quot.sound]
+'audit.trio.deposit.ModuleCall.prepare_values' depends on axioms: [propext, Classical.choice, Quot.sound]
+'audit.trio.deposit.ModuleCall.return_size_bounds' depends on axioms: [propext, Quot.sound]
+'audit.trio.deposit.ModuleCall.decodeReturn_size_bounds' depends on axioms: [propext, Quot.sound]

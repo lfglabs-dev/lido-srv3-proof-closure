@@ -1,0 +1,208 @@
+{
+  "artifacts_sha256": {
+    "LidoSRv3/Audit/Guarantees/PDeposit1ModuleCalls.lean": "86e47fefdb28a1c708d801afec59cdcff7cd7abe5f889ae62559cd54e05ff2ee",
+    "audit/deposit-actual-module-call/Export.lean": "af3186a386f5d26755bdd7944fa9ef5a1fffa3873c159d68e8fcedd74dc124a6",
+    "audit/deposit-actual-module-call/README.md": "f996077341d0cd0deb97b4185d3bb75007658c54713a71991b460cae0c6d918e",
+    "audit/deposit-actual-module-call/build_vectors.py": "e6adca9dfa7a1c49257012e958443aceae8ce645021c43d46342759d393be0a2",
+    "audit/deposit-actual-module-call/check_receipt.py": "81308c39a006f9d64fd3cff7b300b9395faef20f7f757f63e192f4cb496dbcb1",
+    "audit/deposit-actual-module-call/dependency-inputs.json": "9387031bd7384fbefda5f0bbb9a7659ca9a48fdd128a3fb1f868c34d217f7c3b",
+    "audit/deposit-actual-module-call/module-call-lean.log": "7e670e6c20b6ab38812b73f75871beeac2fdf9ddd1bec647d60042290e1eb9b5",
+    "audit/deposit-actual-module-call/module-physical-lean.log": "f1b7141a26c245ff8f1df911a95e915b237482c13d23b8565e2b56c11d512602",
+    "audit/deposit-actual-module-call/public-lean.log": "7cb16c0a6b9ff06f300e4a483ee9486bdc1ba01626dbed80fa18bb2bba23c5eb",
+    "audit/deposit-actual-module-call/solidity/DepositModuleCall.t.sol": "ede95f0f759f22c58058f678803e24a5fb711f7a344d672a5e6df5091558f394",
+    "audit/deposit-actual-module-call/solidity/DepositModuleCallHarness.ir.yul.txt": "acf4d98c47f026039ef7bb95eda1df45db012b77719c40f74bfd2bf9ecd99494",
+    "audit/deposit-actual-module-call/solidity/DepositModuleVectors.sol": "ced44f0d6ea7417cfc6788ac835562f4a0a7368165719e9adc2b0379d131f902",
+    "audit/deposit-actual-module-call/solidity/compiler-input-identities.json": "4eacf329de1c7d9915ebf513bc9f895e6a2fe65d68d20299b08a18af89985e77",
+    "audit/deposit-actual-module-call/solidity/metadata.json": "53ae47952a437f92c93dd9518eec3c6367ae2a4dddeab1fec9eafa0fcff2a20b",
+    "audit/deposit-actual-module-call/solidity/validation.log": "4071f36412161090b4c4a4104fe6f5647a4898de19cfc060daa715bf2ae00af7",
+    "audit/deposit-actual-module-call/source-check.json": "e72db0cbe303a274f715f3b2bc549737593f5f8336b5d544bd2c3f6097d7e276",
+    "audit/deposit-actual-module-call/tests-lean.log": "6ac55e002c1e39a1dad1aa8037b7702c24294d8a492f197f7cabbf24165794e5",
+    "audit/deposit-actual-module-call/validate.py": "1481a88d784c7b7ba6f174b560ca931879ef69b1a11639a4cee0b33fdead05fa",
+    "audit/deposit-actual-module-call/vectors-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "audit/deposit-actual-module-call/vectors.json": "c209a890ac506412a5046aca7f7c5393dec5078ef00d40de7307aa977e107733",
+    "audit/trio/deposit/ModuleCall.lean": "adad48fda7ca5482c47bf9ff5bf6b82835ccee6996efe45b16cc410aef7343bc",
+    "audit/trio/deposit/ModulePhysicalMetadata.lean": "db78f50aa47f66ead81f35f65df6fd20daf046b716a05cfcd42785d37487c903",
+    "audit/trio/deposit/Tests/Verity/ModulePhysicalMetadataTest.lean": "3ef15679efc35eb965d3fd5a2ceac0690126270e6be0dce470c5fc5e9f02b54f"
+  },
+  "base": "f8ea5f9d3cffc165f5d84dd96444836c806827eb",
+  "checks": [
+    {
+      "argv": [
+        "lake",
+        "env",
+        "lean",
+        "-o",
+        "/private/tmp/lido-deposit-actual-module-call/.lake/build/lib/lean/audit/trio/deposit/ModuleCall.olean",
+        "audit/trio/deposit/ModuleCall.lean"
+      ],
+      "exit_code": 0,
+      "log": "module-call-lean.log",
+      "seconds": 2.463
+    },
+    {
+      "argv": [
+        "lake",
+        "env",
+        "lean",
+        "-o",
+        "/private/tmp/lido-deposit-actual-module-call/.lake/build/lib/lean/audit/trio/deposit/ModulePhysicalMetadata.olean",
+        "audit/trio/deposit/ModulePhysicalMetadata.lean"
+      ],
+      "exit_code": 0,
+      "log": "module-physical-lean.log",
+      "seconds": 2.265
+    },
+    {
+      "argv": [
+        "lake",
+        "env",
+        "lean",
+        "-o",
+        "/private/tmp/lido-deposit-actual-module-call/.lake/build/lib/lean/LidoSRv3/Audit/Guarantees/PDeposit1ModuleCalls.olean",
+        "LidoSRv3/Audit/Guarantees/PDeposit1ModuleCalls.lean"
+      ],
+      "exit_code": 0,
+      "log": "public-lean.log",
+      "seconds": 2.112
+    },
+    {
+      "argv": [
+        "lake",
+        "env",
+        "lean",
+        "-o",
+        "/private/tmp/lido-deposit-actual-module-call/.lake/build/lib/lean/audit/trio/deposit/Tests/Verity/ModulePhysicalMetadataTest.olean",
+        "audit/trio/deposit/Tests/Verity/ModulePhysicalMetadataTest.lean"
+      ],
+      "exit_code": 0,
+      "log": "tests-lean.log",
+      "seconds": 3.345
+    },
+    {
+      "argv": [
+        "lake",
+        "env",
+        "lean",
+        "--run",
+        "/private/tmp/lido-deposit-actual-module-call/audit/deposit-actual-module-call/Export.lean"
+      ],
+      "exit_code": 0,
+      "log": "vectors.json",
+      "seconds": 2.141
+    },
+    {
+      "argv": [
+        "python3",
+        "/private/tmp/lido-deposit-actual-module-call/audit/deposit-actual-module-call/build_vectors.py"
+      ],
+      "exit_code": 0,
+      "log": "vectors-build.log",
+      "seconds": 0.048
+    },
+    {
+      "argv": [
+        "forge",
+        "test",
+        "--remappings",
+        "contracts/=/private/tmp/lido-ssz-proof-committed/lido-core/contracts/",
+        "--remappings",
+        "@openzeppelin/contracts-v5.2/=/private/tmp/lido-topup-wei-deps/package/",
+        "--out",
+        "/tmp/lido-deposit-actual-module-solidity-out",
+        "--cache-path",
+        "/tmp/lido-deposit-actual-module-solidity-cache",
+        "--match-contract",
+        "DepositModuleCallTest",
+        "--fuzz-runs",
+        "256",
+        "--fuzz-seed",
+        "0x20260910",
+        "--threads",
+        "2",
+        "-vv"
+      ],
+      "exit_code": 0,
+      "log": "solidity/validation.log",
+      "seconds": 0.258
+    },
+    {
+      "argv": [
+        "forge",
+        "inspect",
+        "--remappings",
+        "contracts/=/private/tmp/lido-ssz-proof-committed/lido-core/contracts/",
+        "--remappings",
+        "@openzeppelin/contracts-v5.2/=/private/tmp/lido-topup-wei-deps/package/",
+        "--out",
+        "/tmp/lido-deposit-actual-module-solidity-out",
+        "--cache-path",
+        "/tmp/lido-deposit-actual-module-solidity-cache",
+        "DepositModuleCallHarness",
+        "ir"
+      ],
+      "exit_code": 0,
+      "log": "solidity/DepositModuleCallHarness.ir.yul.txt",
+      "seconds": 0.024
+    },
+    {
+      "argv": [
+        "forge",
+        "inspect",
+        "--remappings",
+        "contracts/=/private/tmp/lido-ssz-proof-committed/lido-core/contracts/",
+        "--remappings",
+        "@openzeppelin/contracts-v5.2/=/private/tmp/lido-topup-wei-deps/package/",
+        "--out",
+        "/tmp/lido-deposit-actual-module-solidity-out",
+        "--cache-path",
+        "/tmp/lido-deposit-actual-module-solidity-cache",
+        "DepositModuleCallHarness",
+        "metadata"
+      ],
+      "exit_code": 0,
+      "log": "solidity/metadata.json",
+      "seconds": 0.023
+    }
+  ],
+  "compiler": {
+    "version": "0.8.25+commit.b61c2a91"
+  },
+  "core_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "forge": "forge Version: 1.5.0-v1.5.0\nCommit SHA: 1c57854462289b2e71ee7654cd6666217ed86ffd\nBuild Timestamp: 2025-11-24T06:07:42.598695000Z (1763964462)\nBuild Profile: maxperf",
+  "head_at_validation": "f8ea5f9d3cffc165f5d84dd96444836c806827eb",
+  "lean": "Lean (version 4.31.0, arm64-apple-darwin24.6.0, commit 68218e876d2a38b1985b8590fff244a83c321783, Release)",
+  "local_imported_sources": 115,
+  "packages": {
+    "Cli": "92564e5770e4d09f2d86dfbf8ada1e9c715b384c",
+    "LeanSearchClient": "c5d5b8fe6e5158def25cd28eb94e4141ad97c843",
+    "Qq": "f46324995fca5f0483b742e4eb4daec7f4ee50d2",
+    "aesop": "e3cb2f741431ce31bf73549fb52316a57368b06f",
+    "batteries": "fa08db58b30eb033edcdab331bba000827f9f785",
+    "evmyul": "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9",
+    "importGraph": "5c7542ed018c78194f1e2b903eaf6a792b74c03d",
+    "mathlib": "fabf563a7c95a166b8d7b6efca11c8b4dc9d911f",
+    "plausible": "63045536fe95024e6c18fc7b48e03f506701c5bc",
+    "proofwidgets": "24b0d9dc081c5423f8eec7e866c441e5184f29d9",
+    "verity": "e977aaad6e1a9e92e0132d41b3d33a14135a4d46"
+  },
+  "scope": "Focused fresh Lean/Forge checks using identified existing caches; no full dependency or deployed-bytecode rebuild.",
+  "settings": {
+    "compilationTarget": {
+      "audit/deposit-actual-module-call/solidity/DepositModuleCall.t.sol": "DepositModuleCallHarness"
+    },
+    "evmVersion": "cancun",
+    "libraries": {},
+    "metadata": {
+      "bytecodeHash": "ipfs"
+    },
+    "optimizer": {
+      "enabled": true,
+      "runs": 200
+    },
+    "remappings": [
+      "@openzeppelin/contracts-v5.2/=/private/tmp/lido-topup-wei-deps/package/",
+      "contracts/=/private/tmp/lido-ssz-proof-committed/lido-core/contracts/"
+    ],
+    "viaIR": true
+  }
+}
