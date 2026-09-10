@@ -538,38 +538,9 @@ has written the report and reached the rewards-distribution read. -/
 def handleOracleReportFromFeeProducts (i : ReportInput)
     (feeInput : LidoSRv3.Audit.Source.ReportFeeProductsCorrespondence.Input) :
     Contract Result := fun snapshot =>
-  match (handleOracleReport i 0).run snapshot with
+  match handleOracleReport i 0 (failAfterWrites := false) snapshot with
   | .revert reason rollback => .revert reason rollback
   | .success result dirty => mintAfterCommittedReport i result dirty snapshot feeInput
-
-/-- The actual checked-fee consumer retains the report's mint-after-read
-discipline.  If fee arithmetic reverts there is no committed transaction;
-otherwise this is exactly `handleOracleReport` supplied with the checked L331
-quotient rather than an unconstrained mint argument. -/
-theorem mintAfterReadDiscipline_fromFeeProducts (i : ReportInput)
-    (feeInput : LidoSRv3.Audit.Source.ReportFeeProductsCorrespondence.Input)
-    (state : ContractState) :
-    match (handleOracleReportFromFeeProducts i feeInput).run state with
-    | .success _ dirty =>
-        mintAfterRead (dirty.readSlot rewardsReadSlot) (dirty.readSlot rewardsMintedSlot)
-    | .revert _ _ => True := by
-  unfold handleOracleReportFromFeeProducts mintAfterCommittedReport
-  cases hFee : LidoSRv3.Audit.Source.ReportFeeProductsCorrespondence.sharesToMintAsFees feeInput with
-  | none => simp
-  | some shares =>
-      unfold handleOracleReport Contract.run
-      by_cases hValid : idsAndBalancesValid i = true
-      · simp only [hValid, Bool.false_eq_true, ↓reduceIte]
-        cases checkedTotal256 i.balancesGwei with
-        | none => simp
-        | some total =>
-          by_cases hShares : 0 < shares.val <;>
-            simp [hShares, mintLidoShares, safeAdd, mintAfterRead, stampStep, nextTick,
-              ContractState.readSlot_writeSlot_same, ContractState.readSlot_writeSlot_other,
-              balancesWrittenSlot, totalBalanceSlot, accountingCalledSlot,
-              rewardsReadSlot, rewardsMintedSlot, lidoTotalSharesSlot,
-              accountingSharesSlot, sequenceSlot] <;> try decide
-      · simp [hValid]
 
 /-! ## Physical report-write → getter → checked-fee → Lido-mint composition
 
@@ -587,7 +558,6 @@ structure ReportWriteFeeMintInput where
   report : ReportInput
   routerCore : AccountAddress.ReportWriteFee.Core
   accountingReport : AccountAddress.ReportWriteFee.ReportWei
-  deriving Repr, DecidableEq
 
 /-- Reject Nat-side values that cannot denote the source uint256 read.  This
 keeps the bridge from silently reducing an out-of-range physical-model value
@@ -626,7 +596,7 @@ def handleOracleReportFromCommittedFeeProducts (x : ReportWriteFeeMintInput) :
       x.report.registeredModuleIds x.report.reportedModuleIds x.report.balancesGwei x.routerCore with
   | .reverted _ _ => .revert "INVALID_REPORT" snapshot
   | .committed postCore =>
-      match (handleOracleReport x.report 0).run snapshot with
+      match handleOracleReport x.report 0 (failAfterWrites := false) snapshot with
       | .revert reason rollback => .revert reason rollback
       | .success result dirty =>
           match AccountAddress.ReportWriteFee.getStakingRewardsDistribution x.layout

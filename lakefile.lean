@@ -8,6 +8,11 @@ package «lido-srv3-proof-closure» where
 require verity from git
   "https://github.com/lfglabs-dev/verity.git"@"e977aaad6e1a9e92e0132d41b3d33a14135a4d46"
 
+/-! The ACCOUNT report/write/getter slice is an isolated local Lake package.
+`HandleOracleReportTx` imports its checked physical composition, so retain it
+as a local dependency instead of copying its storage model into LidoSRv3. -/
+require accountAddress from "audit/trio/account-address"
+
 /-- Stable definitions and public guarantees. Does not compile Tests, Legacy, or Trust. -/
 @[default_target]
 lean_lib «LidoSRv3» where
