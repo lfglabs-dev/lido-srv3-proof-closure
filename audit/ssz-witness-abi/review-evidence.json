@@ -1,0 +1,36 @@
+{
+  "reviewed_source": "3521761bba0ad6e1651f620ae0d2359bfc1343b0",
+  "source_parent": "912bdeca1464797597731e45c4c3eb027d169c09",
+  "reviewer": "8857d050-fb71-4c9d-9b19-585a90be0c02",
+  "source_verdict": "CLEAN",
+  "source_writer": "STOPPED",
+  "independent_reviewer": "ACK; execution null verified",
+  "event": "69631aac-c7f5-4446-88cc-decf47eaeb26",
+  "sequence": 128,
+  "source_files": {
+    "LidoSRv3/Audit/Source/SszWitnessAbi.lean": "073f890c3ee130bccd2680f95dcb6bc7657708e4382accd2cd02b26e03906f04",
+    "LidoSRv3/Tests/SszWitnessAbiMutants.lean": "0f685a02633c5681b7e34810fbd9aac9e005ad98f680691e5bcaeb9711de4320",
+    "audit/ssz-witness-abi/README.md": "3d1b6156332345d142d32ee5b286cd45278cc5f6bc9d623ad16b4461185a48d8",
+    "audit/ssz-witness-abi/axioms.log": "ec447f57fca4b57ada63cc4f337e529f9fd8a9fe188757bbce4d363bbd2e9533",
+    "audit/ssz-witness-abi/check_receipt.py": "f75ec0c6d6a1664fa264ceac5fbde170adaf1ffbe6758c98dbebbfe786ed5fe1",
+    "audit/ssz-witness-abi/dependency-inputs.json": "06a7c1c69f4d144a66977a334253f803bd3c77194cbba89834cdc2274aa6752a",
+    "audit/ssz-witness-abi/diagnostics/call-frame-inversion-failure.log": "abbf11a4a873966f8b42d1062ca55eedda84876da7caa6d431b169f114d4085d",
+    "audit/ssz-witness-abi/diagnostics/decoded-fields-transport-failure.log": "4cc9c697ecd80256a201a6b26dbf107455d17b6a4b955d3311eba64aa418ba6c",
+    "audit/ssz-witness-abi/diagnostics/opaque-padding-kernel.log": "bf78f3e1924246564ddc85503c361b8e31fc18a31c0dbbb60cfed6aeaa182569",
+    "audit/ssz-witness-abi/diagnostics/word-rewrite-failure.log": "db5684dd69b9eed93c3daeb1fdec9e34b94ef6985c192d6e3e684e746601126e",
+    "audit/ssz-witness-abi/inherited-validation.json": "fff53b9d7251e7d648285f7fa7da2a4356e1c21a1ea8721eb469ff20d8eadda1",
+    "audit/ssz-witness-abi/receipt.json": "247e6c54b8f2c6f16939c0ba8afb0aa71ed8d43f0b7d65d77e63c43e95fa6e15",
+    "audit/ssz-witness-abi/solidity/SszWitnessAbi.t.sol": "da5edc79343242f15a0ebe9d85f694920fe518190628d3ad1d9e751f6a8a44d0",
+    "audit/ssz-witness-abi/solidity/compiler-input-identities.json": "8a6826c12636bfb8bd0c2d456b2f77b02a9f549feac326bf0b55388ee8c31b66",
+    "audit/ssz-witness-abi/solidity/inspected-harness-ir.yul": "1d2924b9c4a6ab33fa848d72e93fdd5ce6d1a7055a591eaa694328514a6ebf25",
+    "audit/ssz-witness-abi/solidity/receipt.json": "1abc333d15d0f3e953519acc2b080cffadafc7aec162b8c4d4aae2393749aa17",
+    "audit/ssz-witness-abi/solidity/validation.log": "b0ea9f8f79ae60f91fb798d7bd58329d0cc8179cb93ef55b69b2ce971104f6a6",
+    "audit/ssz-witness-abi/validation.log": "710cd7d423be73ecfa580d6ab625814a9b0274deeddaaedc85c9001f8a11d7e4"
+  },
+  "review_files": {
+    "independent-review.md": "380df47f7fcc388d2699882aaa335b4643bfdc620b2eab4736faf883fd52971e",
+    "independent-review-events.json": "5bf55e3d1e1174261ad2d9cfd95058020b24408073b5f67206fe3ad230c15d29",
+    "review-response.md": "a5696715497b89cf31542a0a695d26c59782c4329331a21323cd23a708a35879"
+  },
+  "all_eight": "OPEN"
+}

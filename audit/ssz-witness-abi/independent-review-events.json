@@ -1,0 +1,422 @@
+[
+  {
+    "content": "\"[\\n {\\n  \\\"scope\\\": \\\"fresh_abi_tests\\\",\\n  \\\"artifact_sha256\\\": \\\"ff91dde0b57e5766276e2ada3b7426cce7df732786d5cf82b3e6790bc2ed91e2\\\",\\n  \\\"compiler\\\": {\\n   \\\"version\\\": \\\"0.8.25+commit.b61c2a91\\\"\\n  },\\n  \\\"settings\\\": {\\n   \\\"remappings\\\": [\\n    \\\"contracts/=lido-core/contracts/\\\"\\n   ],\\n   \\\"optimizer\\\": {\\n    \\\"enabled\\\": true,\\n    \\\"runs\\\": 200\\n   },\\n   \\\"metadata\\\": {\\n    \\\"bytecodeHash\\\": \\\"ipfs\\\"\\n   },\\n   \\\"compilationTarget\\\": {\\n    \\\"audit/ssz-witness-abi/solidity/SszWitnessAbi.t.sol\\\": \\\"SszWitnessAbiTest\\\"\\n   },\\n   \\\"evmVersion\\\": \\\"cancun\\\",\\n   \\\"libraries\\\": {},\\n   \\\"viaIR\\\": true\\n  },\\n  \\\"inputs\\\": {\\n   \\\"audit/ssz-bls-composition/solidity/SszBlsComposition.t.sol\\\": {\\n    \\\"sha256\\\": \\\"610017ad3b52a3ffda650301516240eded3f7b031b37b027920417317ae24ce3\\\",\\n    \\\"keccak256\\\": \\\"0x2d41e9f19fd36630d7d713a6f1e270af5702695f303982a31e6b8094a9e28d36\\\"\\n   },\\n   \\\"audit/ssz-witness-abi/solidity/SszWitnessAbi.t.sol\\\": {\\n    \\\"sha256\\\": \\\"da5edc79343242f15a0ebe9d85f694920fe518190628d3ad1d9e751f6a8a44d0\\\",\\n    \\\"keccak256\\\": \\\"0x8558ff096effa321d13e7422818ab93fa4c55c844651fec45848a9a7f27320f9\\\"\\n   },\\n   \\\"lido-core/contracts/0.8.25/CLValidatorVerifier.sol\\\": {\\n    \\\"sha256\\\": \\\"d6e89f6975e4fa02f758bf461a98ac2d689296b5c92d03ffd4e43a22d0b3d7ed\\\",\\n    \\\"keccak256\\\": \\\"0xeb6c14b6c9c715d9585d73cea0a63dc218c3b9fd28eec6047a883f622ab09e9f\\\"\\n   },\\n   \\\"lido-core/contracts/common/interfaces/ValidatorWitness.sol\\\": {\\n    \\\"sha256\\\": \\\"8fd24cfab7402233029756e52e59198b0d9cbf0a42e5c07d9fa2338ed731a5f7\\\",\\n    \\\"keccak256\\\": \\\"0x8a8c7644d91bef60068027b444c104eb1dcd86ac6dc8ff3c5a928e64d\\n\"",
+    "event_id": null,
+    "event_type": "tool_result",
+    "id": 3706787,
+    "metadata": {},
+    "mission_id": "8857d050-fb71-4c9d-9b19-585a90be0c02",
+    "sequence": 105,
+    "timestamp": "2026-09-10T02:58:21.611830512+00:00",
+    "tool_call_id": "tool_BTMomPGLQf1isdOyVsZmwzhc",
+    "tool_name": "bash"
+  },
+  {
+    "content": "{\"command\":\"cd /workspaces/lido-reclone.hNhWCS && grep -rn \\\"sorry\\\\|admit\\\\|native_decide\\\\|axiom \\\" LidoSRv3/Audit/Source/SszWitnessAbi.lean LidoSRv3/Tests/SszWitnessAbiMutants.lean; echo \\\"---new files clean check done---\\\"; grep -rn \\\"^opaque\\\\|^axiom\\\\|@\\\\[extern\\\\|implemented_by\\\" LidoSRv3/Audit/Source/SszTypedFfiBridge.lean LidoSRv3/Audit/Source/SszScratchByteArray.lean | head -20\"}",
+    "event_id": null,
+    "event_type": "tool_call",
+    "id": 3706790,
+    "metadata": {},
+    "mission_id": "8857d050-fb71-4c9d-9b19-585a90be0c02",
+    "sequence": 106,
+    "timestamp": "2026-09-10T02:58:41.577303176+00:00",
+    "tool_call_id": "tool_0QXuLNUcuhqyUCEg83RM5F4a",
+    "tool_name": "bash"
+  },
+  {
+    "content": "\"---new files clean check done---\\n\"",
+    "event_id": null,
+    "event_type": "tool_result",
+    "id": 3706791,
+    "metadata": {},
+    "mission_id": "8857d050-fb71-4c9d-9b19-585a90be0c02",
+    "sequence": 107,
+    "timestamp": "2026-09-10T02:58:41.590601390+00:00",
+    "tool_call_id": "tool_0QXuLNUcuhqyUCEg83RM5F4a",
+    "tool_name": "bash"
+  },
+  {
+    "content": "{\"command\":\"cd /workspaces/lido-reclone.hNhWCS && grep -rn \\\"sorry\\\\|admit\\\\|native_decide\\\" LidoSRv3/Audit/Source/SszBlsComposition.lean LidoSRv3/Audit/Source/SszShaCallMemory.lean LidoSRv3/Audit/Source/SszProofCalldataLoop.lean LidoSRv3/Audit/Source/SszScratchEvmMemory.lean LidoSRv3/Audit/Source/SszProofCalldataStep.lean LidoSRv3/Audit/Source/SszProofLoopResources.lean LidoSRv3/Audit/Source/SszShaCallBytes.lean LidoSRv3/Audit/Source/SszValidatorLeaf.lean LidoSRv3/Audit/Source/SszLittleEndianCorrespondence.lean LidoSRv3/Audit/Source/SszWordBytes.lean LidoSRv3/Audit/Source/SszTypedFfiBridge.lean LidoSRv3/Audit/Source/SszScratchByteArray.lean LidoSRv3/Audit/Source/SszVerifierEntry.lean LidoSRv3/Audit/Source/SszWrapperIndex.lean; echo EXIT=$?\"}",
+    "event_id": null,
+    "event_type": "tool_call",
+    "id": 3706792,
+    "metadata": {},
+    "mission_id": "8857d050-fb71-4c9d-9b19-585a90be0c02",
+    "sequence": 108,
+    "timestamp": "2026-09-10T02:58:45.861521473+00:00",
+    "tool_call_id": "tool_fqFb3AZ1Eat3dJXvwOk39jOO",
+    "tool_name": "bash"
+  },
+  {
+    "content": "\"LidoSRv3/Audit/Source/SszBlsComposition.lean:110:  obtain \u27e8hcgas, _\u27e9 := call_admitted prep hgas\\nLidoSRv3/Audit/Source/SszBlsComposition.lean:242:  obtain \u27e8hcgas, _\u27e9 := call_admitted prep hgas\\nLidoSRv3/Audit/Source/SszBlsComposition.lean:288:consumes. Typed ABI fields and the admitted offset/extent remain explicit. -/\\nLidoSRv3/Audit/Source/SszProofCalldataLoop.lean:58:  obtain \u27e8hgas,hpaid\u27e9 := call_admitted (preparedStep st index leaf (proofOffset prebytes before)) hgp\\nLidoSRv3/Audit/Source/SszProofLoopResources.lean:20:/-- A conservative bound admitting both cold and warm zero-value SHA calls. -/\\nLidoSRv3/Audit/Source/SszProofLoopResources.lean:21:theorem call_admitted (st : EVM.State) (hg : 2685 \u2264 st.gasAvailable.toNat) :\\nLidoSRv3/Audit/Source/SszProofLoopResources.lean:96:are proved not to wrap from the admitted fee and callee cost. -/\\nLidoSRv3/Audit/Source/SszProofLoopResources.lean:117:  obtain \u27e8hgas,hpaid\u27e9 := call_admitted st hg\\nLidoSRv3/Audit/Source/SszProofLoopResources.lean:145:  obtain \u27e8hcgas, hpaid\u27e9 := call_admitted st hg\\nLidoSRv3/Audit/Source/SszProofLoopResources.lean:178:  obtain \u27e8hcgas,hpaid\u27e9 := call_admitted prep hgas\\nLidoSRv3/Audit/Source/SszValidatorLeaf.lean:176:/-- Exact admitted and rejected outcomes on standard successful SHA. The leaf\\nEXIT=0\\n\"",
+    "event_id": null,
+    "event_type": "tool_result",
+    "id": 3706793,
+    "metadata": {},
+    "mission_id": "8857d050-fb71-4c9d-9b19-585a90be0c02",
+    "sequence": 109,
+    "timestamp": "2026-09-10T02:58:45.873325564+00:00",
+    "tool_call_id": "tool_fqFb3AZ1Eat3dJXvwOk39jOO",
+    "tool_name": "bash"
+  },
+  {
+    "content": "{\"command\":\"cd /workspaces/lido-reclone.hNhWCS && grep -rn \\\"opaque\\\\|extern\\\\|unsafe\\\" LidoSRv3/Audit/Source/SszTypedFfiBridge.lean LidoSRv3/Audit/Source/SszScratchByteArray.lean LidoSRv3/Audit/Source/SszValidatorLeaf.lean LidoSRv3/Audit/Source/SszShaCallBytes.lean | head; grep -n \\\"def ffi\\\\|structure.*Ffi\\\\|ffiSha\\\" LidoSRv3/Audit/Source/SszTypedFfiBridge.lean | head\"}",
+    "event_id": null,
+    "event_type": "tool_call",
+    "id": 3706798,
+    "metadata": {},
+    "mission_id": "8857d050-fb71-4c9d-9b19-585a90be0c02",
+    "sequence": 110,
+    "timestamp": "2026-09-10T02:58:59.600644501+00:00",
+    "tool_call_id": "tool_HRo3OQUkpONlCoHZ3OqBxnb4",
+    "tool_name": "bash"
+  },
+  {
+    "content": "\"LidoSRv3/Audit/Source/SszTypedFfiBridge.lean:4:real EvmYul word codec and opaque SHA FFI, at core17005714. This module proves\\nLidoSRv3/Audit/Source/SszTypedFfiBridge.lean:54:/-- Instantiate the earlier abstract byte-level hash with the actual opaque\\nLidoSRv3/Audit/Source/SszTypedFfiBridge.lean:56:implementation or a proof that the external binary computes standard SHA. -/\\nLidoSRv3/Audit/Source/SszValidatorLeaf.lean:87:parameter keeps byte serialization opaque while proving this finite control flow. -/\\n57:def ffiSha : Sha := fun xs => toDigest (UInt256.ofNat (fromByteArrayBigEndian (shaOutput (bytes xs))))\\n60:    ffiPair (toWord left) (toWord right) = some (toWord (pair ffiSha left right)) := by\\n61:  simp only [ffiPair,pair,ffiSha,bytes_append,digest_bytes]\\n80:    (some (pair ffiSha (toDigest left) (toDigest right)) : Option Digest) =\\n87:      SszProofFold.Branch (fun a b => some (pair ffiSha a b)) index leaf proof root := by\\n90:    have hm := branch_map (hb := fun a b => some (pair ffiSha a b)) toDigest pair_transport_back h\\n129:    SszProofFold.sourceVerify (SszVerifierEntry.foldHash (standardSha ffiSha))\\n\"",
+    "event_id": null,
+    "event_type": "tool_result",
+    "id": 3706799,
+    "metadata": {},
+    "mission_id": "8857d050-fb71-4c9d-9b19-585a90be0c02",
+    "sequence": 111,
+    "timestamp": "2026-09-10T02:58:59.610005651+00:00",
+    "tool_call_id": "tool_HRo3OQUkpONlCoHZ3OqBxnb4",
+    "tool_name": "bash"
+  },
+  {
+    "content": "{\"command\":\"cd /workspaces/lido-reclone.hNhWCS && head -50 audit/ssz-witness-abi/diagnostics/call-frame-inversion-failure.log; echo ===; head -30 audit/ssz-witness-abi/diagnostics/decoded-fields-transport-failure.log\"}",
+    "event_id": null,
+    "event_type": "tool_call",
+    "id": 3706800,
+    "metadata": {},
+    "mission_id": "8857d050-fb71-4c9d-9b19-585a90be0c02",
+    "sequence": 112,
+    "timestamp": "2026-09-10T02:59:00.641088508+00:00",
+    "tool_call_id": "tool_kcl8yuVzyJ7LwiAuVcH4aIhL",
+    "tool_name": "bash"
+  },
+  {
+    "content": "\"\u26a0 [1071/1133] Replayed Conform.Wheels\\nwarning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead\\n\\nNote: The updated constant has a different type:\\n  {\u03b1 : Sort u} \u2192 (\u03b1 \u2192 \u03b1 \u2192 Prop) \u2192 Prop\\ninstead of\\n  (\u03b1 : Sort u_1) \u2192 (\u03b1 \u2192 \u03b1 \u2192 Prop) \u2192 Prop\\nwarning: Conform/Wheels.lean:106:70: `IsTotal` has been deprecated: Use `Std.Total` instead\\n\\nNote: The updated constant has a different type:\\n  {\u03b1 : Sort u} \u2192 (\u03b1 \u2192 \u03b1 \u2192 Prop) \u2192 Prop\\ninstead of\\n  (\u03b1 : Sort u_1) \u2192 (\u03b1 \u2192 \u03b1 \u2192 Prop) \u2192 Prop\\n\u26a0 [1073/1133] Replayed EvmYul.Pretty\\nwarning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead\\n\\nNote: The updated constant has a different type:\\n  {\u03b1 : Sort u} \u2192 (\u03b1 \u2192 \u03b1 \u2192 Prop) \u2192 Prop\\ninstead of\\n  (\u03b1 : Sort u_1) \u2192 (\u03b1 \u2192 \u03b1 \u2192 Prop) \u2192 Prop\\nwarning: EvmYul/Pretty.lean:36:32: `IsTotal` has been deprecated: Use `Std.Total` instead\\n\\nNote: The updated constant has a different type:\\n  {\u03b1 : Sort u} \u2192 (\u03b1 \u2192 \u03b1 \u2192 Prop) \u2192 Prop\\ninstead of\\n  (\u03b1 : Sort u_1) \u2192 (\u03b1 \u2192 \u03b1 \u2192 Prop) \u2192 Prop\\n\u26a0 [1114/1133] Replayed EvmYul.Semantics\\nwarning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by\\n\\nimport Mathlib.Init\\n\u26a0 [1115/1133] Replayed EvmYul.EVM.Semantics\\nwarning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by\\n\\nimport Mathlib.Init\\n\u2716 [1133/1133] Building LidoSRv3.Audit.Source.SszWitnessAbi (9.8s)\\ntrace: .> LEAN_PATH=/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Cli/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/batteries/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Qq/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/aesop/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/proofwidgets/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/importGraph/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/plausible/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/mathlib/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/evmyul/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/verity/.lake/build/lib/lean:/private/tmp/lido-ssz-witness-abi/.lake/build/lib/lean /Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean /private/tmp/lido-ssz-witness-abi/LidoSRv3/Audit/Source/SszWitnessAbi.lean -o /private/tmp/lido-ssz-witness-abi/.lake/build/lib/lean/LidoSRv3/Audit/Source/SszWitnessAbi.olean -i /private/tmp/lido-ssz-witness-abi/.lake/build/lib/lean/LidoSRv3/Audit/Source/SszWitnessAbi.ilean -c /private/tmp/lido-ssz-witness-abi/.lake/build/ir/LidoSRv3/Audit/Source/SszWitnessAbi.c --setup /private/tmp/lido-ssz-witness-abi/.lake/build/ir/LidoSRv3/Audit/Source/SszWitnessAbi.setup.json --json\\nerror: LidoSRv3/Audit/Source/SszWitnessAbi.lean:172:6: Dependent elimination failed: Failed to solve equation\\n  Except.ok result =\\n    Decidable.rec\\n      (fun h =>\\n        (fun x =>\\n            match st\u271d.mload (UInt256.ofNat 0) with\\n            | (digest, machine) =>\\n              Except.ok\\n                {\\n                  state :=\\n                    have __SharedState :=\\n                      have __src := st\u271d.toSharedState;\\n                      { toState := __src.toState, toMachineState := machine };\\n                    { toSharedState := __SharedState, pc := st\u271d.pc, stack := st\u271d.stack, execLength := st\u271d.execLength },\\n===\\n\u26a0 [1071/1134] Replayed Conform.Wheels\\nwarning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead\\n\\nNote: The updated constant has a different type:\\n  {\u03b1 : Sort u} \u2192 (\u03b1 \u2192 \u03b1 \u2192 Prop) \u2192 Prop\\ninstead of\\n  (\u03b1 : Sort u_1) \u2192 (\u03b1 \u2192 \u03b1 \u2192 Prop) \u2192 Prop\\nwarning: Conform/Wheels.lean:106:70: `IsTotal` has been deprecated: Use `Std.Total` instead\\n\\nNote: The updated constant has a different type:\\n  {\u03b1 : Sort u} \u2192 (\u03b1 \u2192 \u03b1 \u2192 Prop) \u2192 Prop\\ninstead of\\n  (\u03b1 : Sort u_1) \u2192 (\u03b1 \u2192 \u03b1 \u2192 Prop) \u2192 Prop\\n\u26a0 [1073/1134] Replayed EvmYul.Pretty\\nwarning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead\\n\\nNote: The updated constant has a different type:\\n  {\u03b1 : Sort u} \u2192 (\u03b1 \u2192 \u03b1 \u2192 Prop) \u2192 Prop\\ninstead of\\n  (\u03b1 : Sort u_1) \u2192 (\u03b1 \u2192 \u03b1 \u2192 Prop) \u2192 Prop\\nwarning: EvmYul/Pretty.lean:36:32: `IsTotal` has been deprecated: Use `Std.Total` instead\\n\\nNote: The updated constant has a different type:\\n  {\u03b1 : Sort u} \u2192 (\u03b1 \u2192 \u03b1 \u2192 Prop) \u2192 Prop\\ninstead of\\n  (\u03b1 : Sort u_1) \u2192 (\u03b1 \u2192 \u03b1 \u2192 Prop) \u2192 Prop\\n\u26a0 [1114/1134] Replayed EvmYul.Semantics\\nwarning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by\\n\\nimport Mathlib.Init\\n\"",
+    "event_id": null,
+    "event_type": "tool_result",
+    "id": 3706801,
+    "metadata": {},
+    "mission_id": "8857d050-fb71-4c9d-9b19-585a90be0c02",
+    "sequence": 113,
+    "timestamp": "2026-09-10T02:59:00.653866655+00:00",
+    "tool_call_id": "tool_kcl8yuVzyJ7LwiAuVcH4aIhL",
+    "tool_name": "bash"
+  },
+  {
+    "content": "{\"command\":\"cd /workspaces/lido-reclone.hNhWCS && python3 -c \\\"\\nimport json\\nd=json.load(open('audit/ssz-witness-abi/dependency-inputs.json'))\\nprint('scope:',d['scope']); print('setup_module:',d['setup_module']); print('local_import_count:',d['local_import_count'])\\nprint('core sources:',list(d['selected_core_sources'].keys()))\\nimport collections\\npkgs=collections.Counter(p['path'].split('/')[2] for p in d['package_source_closure'])\\nprint('closure by package:',dict(pkgs))\\n\\\"\"}",
+    "event_id": null,
+    "event_type": "tool_call",
+    "id": 3706804,
+    "metadata": {},
+    "mission_id": "8857d050-fb71-4c9d-9b19-585a90be0c02",
+    "sequence": 114,
+    "timestamp": "2026-09-10T02:59:22.540552592+00:00",
+    "tool_call_id": "tool_y3vHNllj4HoxegKNLHaMJf6H",
+    "tool_name": "bash"
+  },
+  {
+    "content": "\"scope: Actual targeted import source closure. Unchanged local inputs matched frozen base912bdeca; packages matched pinned Git bodies. Selected core files only, not full dependency/toolchain certification.\\nsetup_module: LidoSRv3.Tests.SszWitnessAbiMutants\\nlocal_import_count: 16\\ncore sources: ['Init/Data/Nat/Div/Basic.lean', 'Init/Data/BitVec/Basic.lean', 'Init/Data/List/Basic.lean', 'Init/Data/Array/Basic.lean', 'Init/Control/Except.lean', 'Lean/Elab/Tactic/Omega.lean']\\nclosure by package: {'aesop': 132, 'batteries': 186, 'evmyul': 53, 'importGraph': 10, 'LeanSearchClient': 4, 'Source': 16, 'mathlib': 681, 'plausible': 13, 'proofwidgets': 8, 'Qq': 14}\\n\"",
+    "event_id": null,
+    "event_type": "tool_result",
+    "id": 3706805,
+    "metadata": {},
+    "mission_id": "8857d050-fb71-4c9d-9b19-585a90be0c02",
+    "sequence": 115,
+    "timestamp": "2026-09-10T02:59:22.547987650+00:00",
+    "tool_call_id": "tool_y3vHNllj4HoxegKNLHaMJf6H",
+    "tool_name": "bash"
+  },
+  {
+    "content": "{\"command\":\"cd /workspaces/lido-reclone.hNhWCS && git status --short | head; git log --format='%H %s' -1\"}",
+    "event_id": null,
+    "event_type": "tool_call",
+    "id": 3706806,
+    "metadata": {},
+    "mission_id": "8857d050-fb71-4c9d-9b19-585a90be0c02",
+    "sequence": 116,
+    "timestamp": "2026-09-10T02:59:23.053388362+00:00",
+    "tool_call_id": "tool_d7uVCYSeH86FSbqENR2n0q0w",
+    "tool_name": "bash"
+  },
+  {
+    "content": "\"3521761bba0ad6e1651f620ae0d2359bfc1343b0 feat(ssz): bind decoded witness inputs through actual SHA call states\\n\"",
+    "event_id": null,
+    "event_type": "tool_result",
+    "id": 3706807,
+    "metadata": {},
+    "mission_id": "8857d050-fb71-4c9d-9b19-585a90be0c02",
+    "sequence": 117,
+    "timestamp": "2026-09-10T02:59:23.068591559+00:00",
+    "tool_call_id": "tool_d7uVCYSeH86FSbqENR2n0q0w",
+    "tool_name": "bash"
+  },
+  {
+    "content": "{\"command\":\"cd /workspaces/lido-reclone.hNhWCS && grep -n \\\"decodeIndex\\\" LidoSRv3/Audit/Source/*.lean | head -5; grep -rn \\\"def decodeIndex\\\" -A3 LidoSRv3/Audit/Source/SszProofCalldataStep.lean\"}",
+    "event_id": null,
+    "event_type": "tool_call",
+    "id": 3706808,
+    "metadata": {},
+    "mission_id": "8857d050-fb71-4c9d-9b19-585a90be0c02",
+    "sequence": 118,
+    "timestamp": "2026-09-10T02:59:39.225819551+00:00",
+    "tool_call_id": "tool_1df3cJY500pwmxWiXUycKSKE",
+    "tool_name": "bash"
+  },
+  {
+    "content": "\"LidoSRv3/Audit/Source/SszProofCalldataLoop.lean:192:  let index := decodeIndex rawIndex\\nLidoSRv3/Audit/Source/SszProofCalldataLoop.lean:237:      proof \u2260 [] \u2227 SszProofFold.Branch ffiPair (decodeIndex rawIndex).toNat leaf proof root := by\\nLidoSRv3/Audit/Source/SszProofCalldataLoop.lean:241:    have hr := loop_refines rest fuel st (decodeIndex rawIndex) leaf sibling prebytes suffix []\\nLidoSRv3/Audit/Source/SszProofCalldataLoop.lean:247:        (\u2203 r, loop (rest.length+1) fuel st (decodeIndex rawIndex) leaf (UInt256.ofNat prebytes.size)\\nLidoSRv3/Audit/Source/SszProofCalldataLoop.lean:249:        SszProofFold.Branch ffiPair (decodeIndex rawIndex).toNat leaf (sibling::rest) root := by\\n467:def decodeIndex (raw : UInt256) : UInt256 := raw >>> UInt256.ofNat 8\\n468-\\n469-theorem decode_nat (raw : UInt256) : (decodeIndex raw).toNat = raw.toNat / 256 := by\\n470-  change (raw.toNat >>> 8) % UInt256.size = raw.toNat / 256\\n\"",
+    "event_id": null,
+    "event_type": "tool_result",
+    "id": 3706809,
+    "metadata": {},
+    "mission_id": "8857d050-fb71-4c9d-9b19-585a90be0c02",
+    "sequence": 119,
+    "timestamp": "2026-09-10T02:59:39.235368406+00:00",
+    "tool_call_id": "tool_1df3cJY500pwmxWiXUycKSKE",
+    "tool_name": "bash"
+  },
+  {
+    "content": "{\"command\":\"ls -la /output 2>&1; ls -la /workspaces/mission-8857d050/output 2>&1; ls -la /mission-out 2>&1 | head\"}",
+    "event_id": null,
+    "event_type": "tool_call",
+    "id": 3706812,
+    "metadata": {},
+    "mission_id": "8857d050-fb71-4c9d-9b19-585a90be0c02",
+    "sequence": 120,
+    "timestamp": "2026-09-10T02:59:50.863840119+00:00",
+    "tool_call_id": "tool_LSf2WQOOXTSgr4tvz5Mmdt5G",
+    "tool_name": "bash"
+  },
+  {
+    "content": "\"ls: cannot access '/output': No such file or directory\\ntotal 8\\ndrwxr-xr-x  2 root root 4096 Sep 10 04:48 .\\ndrwxr-xr-x 13 root root 4096 Sep 10 04:56 ..\\ntotal 124\\ndrwxr-xr-x  2 root root  4096 Jul 28 05:25 .\\ndrwxr-xr-x 25 root root  4096 Sep 10 04:48 ..\\n-rw-r--r--  1 root root  1897 Jul 28 05:25 MISSION_COMPLETE_MARKER.json\\n-rw-r--r--  1 root root  7527 Jul 26 18:58 VERIFIED_FINDINGS_PR2207.md\\n-rw-r--r--  1 root root  2581 Jul 28 05:25 VERIFIED_FINDINGS_PR2209.md\\n-rw-r--r--  1 root root 16827 Jul 26 17:45 pr2207-adversarial-review-2c996e934be944.md\\n-rw-r--r--  1 root root 15090 Jul 26 18:58 pr2207-adversarial-review-5627b60a9a55.md\\n-rw-r--r--  1 root root  1880 Jul 26 17:45 pr2207-adversarial-review-summary-2c996e934be944.md\\n-rw-r--r--  1 root root  2468 Jul 26 18:58 pr2207-adversarial-review-summary-5627b60a9a55.md\\n\"",
+    "event_id": null,
+    "event_type": "tool_result",
+    "id": 3706813,
+    "metadata": {},
+    "mission_id": "8857d050-fb71-4c9d-9b19-585a90be0c02",
+    "sequence": 121,
+    "timestamp": "2026-09-10T02:59:50.877882644+00:00",
+    "tool_call_id": "tool_LSf2WQOOXTSgr4tvz5Mmdt5G",
+    "tool_name": "bash"
+  },
+  {
+    "content": "{\"content\":\"# Independent Exact-Source Review \u2014 lfglabs-dev/lido-srv3-proof-closure PR #289 (DRAFT)\\n\\n- **Head (frozen):** `3521761bba0ad6e1651f620ae0d2359bfc1343b0` (`feat(ssz): bind decoded witness inputs through actual SHA call states`)\\n- **Base:** `912bdeca1464797597731e45c4c3eb027d169c09`\\n- **Solidity pin:** `17005714f151e5502c559932319a3f2f74ac2436` (lidofinance/core, submodule `lido-core`)\\n- **Mode:** read-only; writer=false; no merge/push/comments/source edits/site/deploy\\n- **Date:** 2026-09-10\\n\\n## 1. Source access and identity\\n\\n| Check | Result |\\n|---|---|\\n| `git fetch origin pull/289/head` + checkout exact SHA | OK; `HEAD = 3521761b\u2026`, single commit, 18 files, +15572 |\\n| Base commit present | OK (`912bdeca\u2026` resolvable) |\\n| `lido-core` submodule | initialized at exactly `17005714f151e5502c559932319a3f2f74ac2436` \u2014 matches `receipt.json source_pin` |\\n| Review packet `/tmp/lido-ssz289-review-3521761b/ssz-witness-abi-review-packet/` | 78 files, all `manifest.json` SHA-256 match; recursive diff vs the git checkout shows **zero content differences** (packet is an exact subset of the frozen tree) |\\n| Package pins (11) | verified by the provided checker against `.lake/packages/*/HEAD` (verity `e977aaad\u2026`, evmyul `f7e4ee0d\u2026`, mathlib `fabf563a\u2026`, \u2026) |\\n\\n## 2. Executed verification (this container)\\n\\n1. **`python3 audit/ssz-witness-abi/check_receipt.py` \u2192 exit 0, `{\\\"checks\\\": 1246, \\\"errors\\\": []}`.**\\n   Composition: 31 validated inputs + 12 evidence hashes + 69 inherited identity checks + 1117 package-source-closure entries (16 of them the local `Source` imports; `local_import_count = 16`) + 11 package pins + 6 selected Lean core sources = **1246 comparisons, all byte-exact**.\\n2. **Independent targeted build reproduced:** `lake build LidoSRv3.Tests.SszWitnessAbiMutants` \u2192 exit 0, **`Build completed successfully (1134 jobs)`**, reusing existing package caches *after* the identity checks above (no full rebuild). Axiom output identical to the packet `validation.log`/`axioms.log`.\\n3. **Count cross-checks:** 10 public source theorems; 3 private helpers (`bind_success`, `mapped_success`, `finish_origin`); 2 named regression theorems (`negative_key_slice`, `key_failure_before_dirty_fields`); 9 kernel `example`s \u2192 11 kernel cases; 13 axiom-query occurrences / 12 distinct declarations (`run_success_origin` queried twice); all report exactly `[propext, Classical.choice, Quot.sound]` \u2014 no `sorryAx`, no new axioms.\\n4. **Hidden-premise scan:** no `sorry`/`admit`/`native_decide`/`axiom` declarations in the two new files or anywhere in the 14-file transitive dependency closure (grep clean; only the pre-existing theorem *name* `call_admitted`). No free `variable` premises in `SszWitnessAbi.lean`; every theorem quantifies only over fuel/states and a `.ok` hypothesis.\\n5. **Forge tests:** `forge`/`solc` are not installed in this container, so the 4 tests were **not re-executed**; the four test bodies in `SszWitnessAbi.t.sol` were inspected and match the names/results in the hash-bound `solidity/validation.log` (4 PASS), and `compiler-input-identities.json` binds all 8 actual source inputs by SHA-256 + Keccak-256 (SHA-256 side byte-verified via the checker; via-IR, optimizer 200, cancun, solc 0.8.25 confirmed).\\n\\n## 3. Scoped source fidelity \u2014 model vs inspected optimized IR\\n\\nCompared `LidoSRv3/Audit/Source/SszWitnessAbi.lean` line-by-line against `audit/ssz-witness-abi/solidity/inspected-harness-ir.yul` (solc 0.8.25, via-IR, runs 200, Cancun, selector `0x3bd227c1` case) and against the pinned `BLS.sol`/`CLValidatorVerifier.sol`/`SSZ.sol` sources at `17005714`.\\n\\n**Exact matches confirmed:**\\n\\n- `header`: value \u2260 0 reject; `slt(size\u22124, 128)` (IR `slt(add(calldatasize(), not(3)), 128)`); `offset = calldataload(4)`; `offset > 2^64\u22121` reject; `slt(size\u2212offset\u22124, 256)`. UInt256 wrapping subtraction \u2261 IR `add(\u2026, not(3))`.\\n- `tail`: `relative = calldataload(h+f)`; guard `\u00ac slt(relative, size\u2212h\u221235)` (IR `_9 = add(_6, not(34))`, the same reused `_9` for both tails); `base = h+relative` (wrapping); `length = calldataload(base+4) \u2264 2^64\u22121`; data at `base+36`; `sgt(addr, size \u2212 scale\u00b7length)` exact for scale 1 (IR `sub(calldatasize(), length)`) and scale 32 (IR `sub(calldatasize(), shl(5, length_1))`; `shl` wrap \u2261 `UInt256.ofNat (32*length)`).\\n- **Signed negative offsets retained, no canonical/aligned/positive admission:** relative `2^256\u2212128` is slt-negative, passes the guard and wraps `base` to `h\u2212128`. Kernel theorem `negative_key_slice` executes `h=256 \u2192 slice (164, 48)`; the Forge test `test_wrappedNegativePubkeyOffsetStillExecutes` uses identical arithmetic (word 4 := 256, word 292 := `2^256\u2212128`, length at 132, key at 164) and executes with real SHA. Both artifacts agree.\\n- **Order:** key-tail guards \u2192 `length == 48` (`.bls .invalidPubkeyLength`) \u2192 `mstore(32,0)` then `calldatacopy(0, addr, 48)` (`scratch`, source order preserved, inSize 64 = 48 key + 16 zero bytes) \u2192 `staticcall(gas, 0x02, 0, 64, 0, 32)` \u2192 `flag=0 \u2228 returndatasize\u226032 \u2192 .bls .sha256PrecompileFailed` (`finish`) \u2192 WC = `calldataload(36)` \u2192 field decode in the IR's exact order: effectiveBalance `h+68`, slashed `h+228` (0/1-only guard), eligibility `h+100`, activation `h+132`, exit `h+164`, withdrawable `h+196`, each with dirty-upper-bit uint64 rejection (`read_from_calldatat_uint64`) \u2192 **seven** `sha256Pair` calls in the exact (0,1)(2,3)(4,5)(6,7)\u2192(l\u2081\u2080,l\u2081\u2081)(l\u2081\u2082,l\u2081\u2083)\u2192(l\u2082\u2080,l\u2082\u2081) tree order \u2192 proof-tail decode (`h+4`, scale 32, same guards) \u2192 GIndex `shr(8, calldataload(100))` (`decodeIndex = >>> 8`) \u2192 proof loop \u2192 final `eq(leaf, calldataload(68))`. `verify` argument order (rawIndex, leaf, root, offset, count) checked against the IR \u2014 no swap.\\n- **Actual consumption:** no decoded field, key/proof length or leaf digest is a caller argument; `pubkeyRun`/`merkleRun`/`SszProofCalldataLoop.verify` receive decoder outputs and the threaded actual post-call states. `run_success_input_binding` binds fields/WC/root/GIndex/proof slice to the **original** `st` calldata while `verify` runs on `leaf.state` (the actual state returned by the real 8 SHA calls) with `leaf.digest` (the actual mload) \u2014 calls are not replaced by an unused payload.\\n- **Caller-environment invariant unconditional on resources:** `EVM.call` (`.lake/packages/evmyul/EvmYul/EVM/Semantics.lean:141-219`) returns `.ok (x, {evmState with accountMap, substate, createdAccounts, toMachineState})` \u2014 `executionEnv` is carried identically on *every* `.ok` path, including `x=0` (codeExecutionFailed / notEnoughFunds / depth-limit) and arbitrary \u0398 account/substate/createdAccounts results. `call_environment` is therefore a pure consequence of the `.ok` hypothesis with no gas/depth/memory/SHA-output premise. `prepared`/`preparePair`/`finish` touch only `toSharedState`, so the `pubkey/pair/merkle_environment` chains are sound. Read the bodies; confirmed.\\n- **Failure fixtures genuine:** `key_failure_before_dirty_fields` sets `depth = 1024` so `EVM.call` itself yields `z=false \u2192 x=0 \u2192 sha256PrecompileFailed` \u2014 real engine rejection, no fake SHA reply, as claimed. The Forge fault-order tests mock selected SHA replies via `vm.mockCall` (disclosed as synthetic); the accepted negative-offset test uses the real precompile.\\n\\n**Disclosed omissions (verified absent from the model, and listed OPEN in README/receipt \u2014 correctly not closed):**\\n\\n- Compiler dynamic-array allocation, free-memory-pointer/`0x41` panic blocks, memory spill layout, surrounding opcode gas (IR lines 71\u201379, 154\u2013162, 181\u2013189 have no model counterpart).\\n- Full raw-byte/typed-tree equivalence; derived calldata extents and initial reachable size/memory/depth/gas.\\n- Exact revert bytes, full World frame, compiled rollback; the complete slot/root/GIndex prefix and the actual `CLValidatorVerifier` entrypoint (the harness wrapper is explicitly *not* the full entrypoint).\\n- External trust: opaque FFI SHA (`ffi.sha256`; kernel cannot inspect the external binary) and authentic consensus/deployed configuration.\\n- **P-SSZ OPEN; all eight guarantees remain OPEN.** Nothing in this increment closes them.\\n\\n## 4. Non-blocking observations\\n\\n1. `header` evaluates the value check before the size/selector checks; the compiled dispatcher does selector first. Unobservable: every branch raises the same `Error.abi`, and success requires the same conjunction.\\n2. Cosmetic `linter.unusedSimpArgs` warnings in the test file (also present in the author's log).\\n3. `inherited-validation.json`: `fresh_inherited_execution = false` \u2014 the five earlier Forge tests/fuzz runs were reused by identity, not rerun; disclosed in the receipt.\\n4. Huge-calldata execution (calldata size \u2265 2^256) is explicitly not claimed; kernel examples use bounded layouts.\\n\\n## 5. Defects\\n\\nNone found within the scoped claims. Guards, signed-offset arithmetic, evaluation/failure order, absolute static offsets (WC 36 / root 68 / GIndex 100), the 7-pair tree order, actual consumption through threaded states, and the unconditional environment invariant all check out against the pinned IR, the pinned Solidity at `17005714`, and the evmyul `EVM.call` body at the pinned package commit. Omitted IR allocations/spills/gas/full prefix remain OPEN as stated.\\n\\nVERDICT: CLEAN\\n\",\"filePath\":\"/workspaces/mission-8857d050/output/PR289-exact-source-review-3521761b.md\"}",
+    "event_id": null,
+    "event_type": "tool_call",
+    "id": 3706820,
+    "metadata": {},
+    "mission_id": "8857d050-fb71-4c9d-9b19-585a90be0c02",
+    "sequence": 123,
+    "timestamp": "2026-09-10T03:02:14.312808674+00:00",
+    "tool_call_id": "tool_7CsIEkD2hGTjxAHZ0ClGs60c",
+    "tool_name": "write"
+  },
+  {
+    "content": "\"Wrote file successfully.\"",
+    "event_id": null,
+    "event_type": "tool_result",
+    "id": 3706821,
+    "metadata": {},
+    "mission_id": "8857d050-fb71-4c9d-9b19-585a90be0c02",
+    "sequence": 124,
+    "timestamp": "2026-09-10T03:02:14.327944632+00:00",
+    "tool_call_id": "tool_7CsIEkD2hGTjxAHZ0ClGs60c",
+    "tool_name": "write"
+  },
+  {
+    "content": "{\"command\":\"mkdir -p /output && cp /workspaces/mission-8857d050/output/PR289-exact-source-review-3521761b.md /output/ && ls -la /output/\"}",
+    "event_id": null,
+    "event_type": "tool_call",
+    "id": 3706822,
+    "metadata": {},
+    "mission_id": "8857d050-fb71-4c9d-9b19-585a90be0c02",
+    "sequence": 125,
+    "timestamp": "2026-09-10T03:02:24.361371193+00:00",
+    "tool_call_id": "tool_ajBETCKyVs8XXbJXwoyvcc25",
+    "tool_name": "bash"
+  },
+  {
+    "content": "\"total 20\\ndrwxr-xr-x  2 root root 4096 Sep 10 05:02 .\\ndrwxr-xr-x 26 root root 4096 Sep 10 05:02 ..\\n-rw-r--r--  1 root root 9335 Sep 10 05:02 PR289-exact-source-review-3521761b.md\\n\"",
+    "event_id": null,
+    "event_type": "tool_result",
+    "id": 3706823,
+    "metadata": {},
+    "mission_id": "8857d050-fb71-4c9d-9b19-585a90be0c02",
+    "sequence": 126,
+    "timestamp": "2026-09-10T03:02:24.374846752+00:00",
+    "tool_call_id": "tool_ajBETCKyVs8XXbJXwoyvcc25",
+    "tool_name": "bash"
+  },
+  {
+    "content": "Review complete. Report written to `/output/PR289-exact-source-review-3521761b.md` (and workspace `output/`).\n\n**What was verified independently at exact `3521761b`:**\n- Git fetch of `pull/289/head` \u2192 exact frozen SHA; base resolvable; `lido-core` submodule pinned exactly `17005714`; packet (78 files) hash-verified and an exact subset of the git tree.\n- Provided checker run: **1246 comparisons, 0 errors** (31 inputs + 12 evidence + 69 inherited + 1117 package closure incl. 16 local imports + 11 pins + 6 core).\n- Targeted build reproduced: **1134 jobs, exit 0**, caches reused after identity checks, no full rebuild; axioms only `propext/Classical.choice/Quot.sound` across all 13 queries.\n- Line-by-line model-vs-IR fidelity: guards (`slt/sgt` on wrapping subtractions, `not(3)`/`not(34)` equivalents), signed **\u2212128 relative-offset wrap** (confirmed by both the kernel theorem and the Forge test arithmetic), exact field order (68/228/100/132/164/196), key-SHA-before-dirty-fields and proof-tail-after-7-pairs ordering, absolute WC 36 / root 68 / GIndex 100, `decodeIndex = >>>8`, `verify` argument order.\n- Caller-environment invariant read through the actual `EVM.call` body: `executionEnv` carried on every `.ok` path including `x=0` and arbitrary \u0398 results \u2014 no resource premise. No hidden premises, `sorry`, or new axioms anywhere in the closure.\n- No defects. Omitted IR allocations/spills/gas/full prefix, P-SSZ, and all eight guarantees remain **OPEN** as declared.\n\nVERDICT: CLEAN",
+    "event_id": "69631aac-c7f5-4446-88cc-decf47eaeb26",
+    "event_type": "assistant_message",
+    "id": 3706824,
+    "metadata": {
+      "completion_evidence": {
+        "classification_source": "structured",
+        "completion_confidence": "high",
+        "completion_signal": "native_terminal",
+        "failure_class": null,
+        "native_terminal_seen": true,
+        "pending_tools": null,
+        "provider_error_source": null,
+        "terminal_reason": "TurnComplete",
+        "transport_failure_stage": null
+      },
+      "cost": {
+        "amount_cents": 0,
+        "currency": "USD",
+        "source": "unknown"
+      },
+      "cost_cents": 0,
+      "model": "kimi/k3",
+      "model_normalized": "kimi/k3",
+      "success": true
+    },
+    "mission_id": "8857d050-fb71-4c9d-9b19-585a90be0c02",
+    "sequence": 128,
+    "timestamp": "2026-09-10T03:02:42.614731098+00:00",
+    "tool_call_id": null,
+    "tool_name": null
+  },
+  {
+    "content": "",
+    "event_id": null,
+    "event_type": "mission_status_changed",
+    "id": 3706825,
+    "metadata": {
+      "status": "waiting_background"
+    },
+    "mission_id": "8857d050-fb71-4c9d-9b19-585a90be0c02",
+    "sequence": 129,
+    "timestamp": "2026-09-10T03:02:43.156100649+00:00",
+    "tool_call_id": null,
+    "tool_name": null
+  },
+  {
+    "content": "Review PR289 SSZ witness ABI exact-head 3521761b",
+    "event_id": null,
+    "event_type": "mission_metadata_updated",
+    "id": 3706826,
+    "metadata": {
+      "metadata_model": "kimi/k3",
+      "metadata_source": "user",
+      "metadata_updated_at": "2026-09-10T03:02:43.583126564+00:00",
+      "metadata_version": "v1",
+      "short_description": "VERDICT: CLEAN \u2014 exact-head review reported no blocking finding.",
+      "title": "Review PR289 SSZ witness ABI exact-head 3521761b",
+      "updated_at": "2026-09-10T03:02:43.583126564+00:00"
+    },
+    "mission_id": "8857d050-fb71-4c9d-9b19-585a90be0c02",
+    "sequence": 130,
+    "timestamp": "2026-09-10T03:02:43.607952665+00:00",
+    "tool_call_id": null,
+    "tool_name": null
+  },
+  {
+    "content": "",
+    "event_id": null,
+    "event_type": "mission_status_changed",
+    "id": 3706827,
+    "metadata": {
+      "status": "active"
+    },
+    "mission_id": "8857d050-fb71-4c9d-9b19-585a90be0c02",
+    "sequence": 131,
+    "timestamp": "2026-09-10T03:03:13.008645748+00:00",
+    "tool_call_id": null,
+    "tool_name": null
+  },
+  {
+    "content": "Background task `durable:9a7b0e0e-3204-4fc0-bd45-af60e16b2b39` (`lake build LidoSRv3.Tests.SszWitnessAbiMutants 2>&1 | tail -60`) finished. Output:\n\n```\n\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`\nwarning: LidoSRv3/Tests/SszWitnessAbiMutants.lean:69:53: This simp argument is unused:\n  readBool\n\nHint: Omit it from the simp argument list.\n  simp (disch := decide +kernel) only [tail, read64, r\u0335e\u0335a\u0335d\u0335B\u0335o\u0335o\u0335l\u0335,\u0335 \u0335EvmYul.State.calldataload, calldata_read_fit]\n\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`\nwarning: LidoSRv3/Tests/SszWitnessAbiMutants.lean:75:39: This simp argument is unused:\n  tail\n\nHint: Omit it from the simp argument list.\n  simp (disch := decide +kernel) only [t\u0335a\u0335i\u0335l\u0335,\u0335 \u0335read64, readBool, EvmYul.State.calldataload,\n  \u0332  \u0332 \u0332 \u0332calldata_read_fit]\n\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`\nwarning: LidoSRv3/Tests/SszWitnessAbiMutants.lean:75:53: This simp argument is unused:\n  readBool\n\nHint: Omit it from the simp argument list.\n  simp (disch := decide +kernel) only [tail, read64, r\u0335e\u0335a\u0335d\u0335B\u0335o\u0335o\u0335l\u0335,\u0335 \u0335EvmYul.State.calldataload, calldata_read_fit]\n\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`\nwarning: LidoSRv3/Tests/SszWitnessAbiMutants.lean:79:39: This simp argument is unused:\n  tail\n\nHint: Omit it from the simp argument list.\n  simp (disch := decide +kernel) only [t\u0335a\u0335i\u0335l\u0335,\u0335 \u0335read64, readBool, EvmYul.State.calldataload,\n  \u0332  \u0332 \u0332 \u0332calldata_read_fit]\n\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`\nwarning: LidoSRv3/Tests/SszWitnessAbiMutants.lean:79:53: This simp argument is unused:\n  readBool\n\nHint: Omit it from the simp argument list.\n  simp (disch := decide +kernel) only [tail, read64, r\u0335e\u0335a\u0335d\u0335B\u0335o\u0335o\u0335l\u0335,\u0335 \u0335EvmYul.State.calldataload, calldata_read_fit]\n\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`\nwarning: LidoSRv3/Tests/SszWitnessAbiMutants.lean:83:39: This simp argument is unused:\n  tail\n\nHint: Omit it from the simp argument list.\n  simp (disch := decide +kernel) only [t\u0335a\u0335i\u0335l\u0335,\u0335 \u0335read64, readBool, EvmYul.State.calldataload,\n  \u0332  \u0332 \u0332 \u0332calldata_read_fit]\n\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`\nwarning: LidoSRv3/Tests/SszWitnessAbiMutants.lean:83:45: This simp argument is unused:\n  read64\n\nHint: Omit it from the simp argument list.\n  simp (disch := decide +kernel) only [tail, read6\u03354\u0335,\u0335 \u0335r\u0335e\u0335a\u0335d\u0335Bool, EvmYul.State.calldataload, calldata_read_fit]\n\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`\ninfo: LidoSRv3/Tests/SszWitnessAbiMutants.lean:152:0: 'LidoSRv3.Tests.SszWitnessAbiMutants.negative_key_slice' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: LidoSRv3/Tests/SszWitnessAbiMutants.lean:153:0: 'LidoSRv3.Tests.SszWitnessAbiMutants.key_failure_before_dirty_fields' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\ninfo: LidoSRv3/Tests/SszWitnessAbiMutants.lean:154:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.run_success_origin' depends on axioms: [propext, Classical.choice, Quot.sound]\nBuild completed successfully (1134 jobs).\n```\n\nContinue from here.",
+    "event_id": "1fc5fc43-2156-4e8d-889e-a28e1f6d08d3",
+    "event_type": "user_message",
+    "id": 3706828,
+    "metadata": {
+      "queued": false
+    },
+    "mission_id": "8857d050-fb71-4c9d-9b19-585a90be0c02",
+    "sequence": 132,
+    "timestamp": "2026-09-10T03:03:13.071595964+00:00",
+    "tool_call_id": null,
+    "tool_name": null
+  },
+  {
+    "content": "That durable job was already consumed \u2014 its output (1134 jobs, exit 0, axioms `[propext, Classical.choice, Quot.sound]`) is incorporated into the delivered report at `/output/PR289-exact-source-review-3521761b.md`.\n\nAll deliverables exist; no further work remains.\n\nVERDICT: CLEAN",
+    "event_id": "text_delta_latest",
+    "event_type": "text_delta",
+    "id": 3706601,
+    "metadata": {},
+    "mission_id": "8857d050-fb71-4c9d-9b19-585a90be0c02",
+    "sequence": 133,
+    "timestamp": "2026-09-10T03:03:33.164954285+00:00",
+    "tool_call_id": null,
+    "tool_name": null
+  },
+  {
+    "content": "That durable job was already consumed \u2014 its output (1134 jobs, exit 0, axioms `[propext, Classical.choice, Quot.sound]`) is incorporated into the delivered report at `/output/PR289-exact-source-review-3521761b.md`.\n\nAll deliverables exist; no further work remains.\n\nVERDICT: CLEAN",
+    "event_id": "882ff139-e527-4d60-b329-ddf5b178ce51",
+    "event_type": "assistant_message",
+    "id": 3706829,
+    "metadata": {
+      "completion_evidence": {
+        "classification_source": "structured",
+        "completion_confidence": "high",
+        "completion_signal": "native_terminal",
+        "failure_class": null,
+        "native_terminal_seen": true,
+        "pending_tools": null,
+        "provider_error_source": null,
+        "terminal_reason": "TurnComplete",
+        "transport_failure_stage": null
+      },
+      "cost": {
+        "amount_cents": 0,
+        "currency": "USD",
+        "source": "unknown"
+      },
+      "cost_cents": 0,
+      "model": "kimi/k3",
+      "model_normalized": "kimi/k3",
+      "success": true
+    },
+    "mission_id": "8857d050-fb71-4c9d-9b19-585a90be0c02",
+    "sequence": 134,
+    "timestamp": "2026-09-10T03:03:33.588577184+00:00",
+    "tool_call_id": null,
+    "tool_name": null
+  },
+  {
+    "content": "",
+    "event_id": null,
+    "event_type": "mission_status_changed",
+    "id": 3706830,
+    "metadata": {
+      "status": "awaiting_user"
+    },
+    "mission_id": "8857d050-fb71-4c9d-9b19-585a90be0c02",
+    "sequence": 135,
+    "timestamp": "2026-09-10T03:03:34.135844999+00:00",
+    "tool_call_id": null,
+    "tool_name": null
+  },
+  {
+    "content": "",
+    "event_id": null,
+    "event_type": "mission_status_changed",
+    "id": 3706831,
+    "metadata": {
+      "status": "acknowledged"
+    },
+    "mission_id": "8857d050-fb71-4c9d-9b19-585a90be0c02",
+    "sequence": 136,
+    "timestamp": "2026-09-10T03:05:18.636627729+00:00",
+    "tool_call_id": null,
+    "tool_name": null
+  }
+]
