@@ -33,7 +33,9 @@ abbrev Shares := Nat → Nat
 structure State where
   totalAndExternalShares : StorageWord
   shares : Shares
-  totalPooledEther : Nat
+  /-- Lido.sol:1298-1305 overrides StETH's share-rate numerator with
+  `_getInternalEther()`, rather than total pooled ether. -/
+  internalEther : Nat
   accounting : Nat
   steth : Nat
   stopped : Bool
@@ -80,10 +82,14 @@ def setLowUint128 (word : StorageWord) (value : Nat) : StorageWord :=
         _ ≤ two128 * two128 := Nat.mul_le_mul_right _ (Nat.succ_le_iff.mpr hhigh)
     simpa [hpow] using this⟩
 
+/-! `StETH.getPooledEthByShares` (329-334) calls virtual share-rate helpers.
+For Lido, the source override is `internalEther / (totalShares -
+externalShares)` (Lido.sol:1298-1309), not `totalPooledEther / totalShares`.
+-/
 def pooledEthByShares (s : State) (amount : Nat) : Except Error Nat :=
   if amount ≥ two128 then .error .sharesTooLargeForEvent
   else if totalShares s - externalShares s = 0 then .error .zeroShareRateDenominator
-  else .ok (amount * s.totalPooledEther / (totalShares s - externalShares s))
+  else .ok (amount * s.internalEther / (totalShares s - externalShares s))
 
 /-- StETH.sol:518-527.  The `newTotalShares & UINT128_HIGH_MASK == 0`
 check is represented by `newTotal < 2^128`; the high half of the existing
@@ -111,10 +117,10 @@ def mintShares (caller recipient amount : Nat) (before : State) : Outcome :=
 can furnish the amount that is passed to `LIDO.mintShares(address(this), ...)`.
 No post-state or independently proposed mint amount is accepted. -/
 def mintCommittedFee (L : Layout) (registeredIds : List Nat) (core : Core)
-    (report : ReportWei) (accountingAddress : Nat) (before : State) : Option Outcome :=
+    (report : ReportWei) (before : State) : Option Outcome :=
   match calculateProtocolFees L registeredIds core report with
   | .error _ => none
-  | .ok fee => some (mintShares accountingAddress accountingAddress fee.sharesToMintAsFees before)
+  | .ok fee => some (mintShares before.accounting before.accounting fee.sharesToMintAsFees before)
 
 theorem totalShares_setLowUint128 (word : StorageWord) (value : Nat) (h : value < two128) :
     (setLowUint128 word value).val % two128 = value := by
