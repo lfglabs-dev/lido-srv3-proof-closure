@@ -16,8 +16,8 @@ The other entrypoint work must use this boundary rather than add another
 boolean success parameter or an observation-only recipient slot.
 
 The recipient CALL remains an empty-calldata EVM CALL, including the EOA
-success path; its receipt is intentionally left for the named OPEN renaming
-obligation rather than being silently discharged by an abstract source swap.
+success path; its actual success certificate is proved below. Full caller-renaming
+correspondence remains separate from this necessary execution result.
 -/
 
 namespace LidoSRv3.Audit.Verity.AddressRecipientCallBridge
@@ -119,14 +119,12 @@ executes the sole frame against a callee that may accept, reject, or change
 its own world. -/
 def claimTo (callee : External) (ctx : Context) (requestId hint : Nat)
     (recipient : Address) : Exec Unit := do
-  let owner : Address ← fun world =>
-    ⟨.ok (requestOwner (requestMetadataWord world.core requestId)), world, []⟩
   let payout ← claimStorage ctx requestId hint recipient
   payoutCall callee ctx recipient payout
   -- WithdrawalQueueBase emits this before ERC-721's transfer/burn event.
   emit ctx "WithdrawalClaimed" [(.ofNat requestId), (.ofNat ctx.sender.toNat),
     (.ofNat recipient.toNat), (.ofNat payout)]
-  emit ctx "Transfer" [(.ofNat owner.toNat), 0, (.ofNat requestId)]
+  emit ctx "Transfer" [(.ofNat ctx.sender.toNat), 0, (.ofNat requestId)]
 
 def runClaimTo (callee : External) (ctx : Context) (requestId hint : Nat)
     (recipient : Address) (before : World) :=
@@ -187,47 +185,6 @@ def claimBridgeWorld : World :=
   { core := { twoClaimState with
       codeSize := fun address => if address = (2 : Address).toNat then 1 else 0 }
     balances := fun address => if address = claimBridgeContext.self then 70 else 0 }
-
-/-- End-to-end receipt for the smallest recipient bridge.  The storage claim,
-the exact empty-calldata CALL, and the callee-returned world agree on both the
-30 wei value and address 2. -/
-axiom claim_bridge_receipt :
-    let result := runClaimTo acceptingCallee claimBridgeContext 1 1 (2 : Address)
-      claimBridgeWorld
-    result.outcome = .ok () ∧
-      result.world.core.readSlot (queueMetadataPhysicalSlot 1) =
-        markClaimed (requestMetadataWord twoClaimState 1) ∧
-      result.world.core.selfBalance = 70 ∧
-      result.world.balances claimBridgeContext.self = 40 ∧
-      result.world.balances (2 : Address) = 30 ∧
-      result.world.logs =
-        [⟨claimBridgeContext.self, "WithdrawalClaimed", [1, 1, 2, 30]⟩,
-         ⟨claimBridgeContext.self, "Transfer", [1, 0, 1]⟩] ∧
-      result.attempts = [⟨⟨claimBridgeContext.self, (2 : Address), 30, []⟩,
-        true, [], []⟩]
-
-/-- The public two-item entrypoint retains both physical claimed writes and
-executes two recipient CALLs in source loop order.  The callee's returned
-world is the committed result, rather than a Boolean call-success premise. -/
-axiom claim_withdrawals_to_bridge_receipt :
-    let result := runClaimWithdrawalsTo acceptingCallee claimBridgeContext [1, 2] [1, 1]
-      (2 : Address) claimBridgeWorld
-    result.outcome = .ok () ∧
-      result.world.core.readSlot (queueMetadataPhysicalSlot 1) =
-        markClaimed (requestMetadataWord twoClaimState 1) ∧
-      result.world.core.readSlot (queueMetadataPhysicalSlot 2) =
-        markClaimed (requestMetadataWord twoClaimState 2) ∧
-      result.world.core.readSlot lockedEtherAmountPosition = 0 ∧
-      result.world.balances claimBridgeContext.self = 0 ∧
-      result.world.balances (2 : Address) = 70 ∧
-      result.world.logs =
-        [⟨claimBridgeContext.self, "WithdrawalClaimed", [1, 1, 2, 30]⟩,
-         ⟨claimBridgeContext.self, "Transfer", [1, 0, 1]⟩,
-         ⟨claimBridgeContext.self, "WithdrawalClaimed", [2, 1, 2, 40]⟩,
-         ⟨claimBridgeContext.self, "Transfer", [1, 0, 2]⟩] ∧
-      result.attempts =
-        [⟨⟨claimBridgeContext.self, (2 : Address), 30, []⟩, true, [], []⟩,
-         ⟨⟨claimBridgeContext.self, (2 : Address), 40, []⟩, true, [], []⟩]
 
 theorem claim_withdrawals_to_revert_restores_caller_and_callee_world
     (callee : External) (ctx : Context) (requestIds hints : List Nat)
@@ -323,20 +280,6 @@ def transferBridgeWorld : World :=
     | some after => after | none => core
   { core := core
     balances := fun _ => 0 }
-
-/-- Owner-operated `transferFrom` receipt: no approval flag is supplied. The
-caller is the request owner, so the physical token-approval word is deleted
-and only the owner field of the packed request metadata becomes address 2. -/
-axiom transfer_bridge_receipt :
-    let result := runTransferFrom transferBridgeContext (1 : Address) (2 : Address) 1
-      transferBridgeWorld
-    result.outcome = .ok () ∧
-      result.world.core.readMapUint tokenApprovalsPosition 1 = 0 ∧
-      requestOwner (requestMetadataWord result.world.core 1) = (2 : Address) ∧
-      result.world.core.readSlot (queueMetadataPhysicalSlot 1) =
-        withRequestOwner (requestMetadataWord transferBridgeWorld.core 1) (2 : Address) ∧
-      result.world.logs = [⟨transferBridgeContext.self, "Transfer", [1, 2, 1]⟩] ∧
-      result.attempts = []
 
 /-- The direct ownership handoff is a top-level transaction too: every failed
 guard returns the entry world, including every unrelated account's state. -/
@@ -454,26 +397,6 @@ def requestBridgeWorld : World :=
       codeSize := fun address => if address = (2 : Address).toNat then 1 else 0,
       blockTimestamp := 5 }).writeSlot lastReportTimestampPosition 9
     balances := fun _ => 0 }
-
-/-- One-item `requestWithdrawals` receipt. The owner fallback is caller 1,
-and the successful post-call enqueue writes request id 1 with cumulative
-amount/shares `(100, 10)` and the packed owner/timestamp/report word. -/
-axiom request_bridge_receipt :
-    let result := runRequestWithdrawals requestCallee requestBridgeContext (2 : Address)
-      100 zeroAddress requestBridgeWorld
-    result.outcome = .ok 1 ∧
-      result.world.core.readSlot lastRequestIdPosition = 1 ∧
-      requestAmountsWord result.world.core 1 = packEnqueuedAmounts 100 10 ∧
-      requestMetadataWord result.world.core 1 = packEnqueuedMetadata (1 : Address) 5 9 ∧
-      result.world.logs =
-        [⟨requestBridgeContext.self, "WithdrawalRequested", [1, 1, 1, 100, 10]⟩,
-         ⟨requestBridgeContext.self, "Transfer", [0, 1, 1]⟩] ∧
-      result.attempts =
-        [⟨⟨requestBridgeContext.self, (2 : Address), 0,
-            stETHTransferFromCalldata requestBridgeContext.sender requestBridgeContext.self 100⟩,
-            true, abiWord 1, []⟩,
-         ⟨⟨requestBridgeContext.self, (2 : Address), 0, stETHSharesCalldata 100⟩,
-            true, abiWord 10, []⟩]
 
 theorem request_revert_restores_caller_and_callee_world
     (callee : External) (ctx : Context) (stETH : Address) (amount : Nat)
@@ -609,4 +532,210 @@ theorem revert_restores_caller_and_callee_world
   cases result with
   | mk outcome after attempts => cases outcome <;> simp_all
 
+/-! ## Actual successful execution certificates
+
+These theorems invert the executable itself. They neither rely on finite
+receipt axioms nor ask the caller to supply successful intermediate stages.
+-/
+
+private theorem bind_success {α β : Type} (first : Exec α) (next : α → Exec β)
+    (before : World) (value : β)
+    (h : (bindExec first next before).outcome = .ok value) :
+    ∃ a, (first before).outcome = .ok a ∧
+      (next a (first before).world).outcome = .ok value ∧
+      (bindExec first next before).world = (next a (first before).world).world ∧
+      (bindExec first next before).attempts =
+        (first before).attempts ++ (next a (first before).world).attempts := by
+  cases hx : (first before).outcome with
+  | «error» fault => simp [bindExec, hx] at h
+  | ok a => exact ⟨a, rfl, by simpa [bindExec, hx] using h,
+      by simp [bindExec, hx], by simp [bindExec, hx]⟩
+
+/-- The accepted recipient CALL: actual bytes, provisional transfer and either
+EOA execution or the precise returned callee world. No recipient net-credit
+claim is made for arbitrary successful callbacks. -/
+def PayoutEffect (callee : External) (ctx : Context) (recipient : Address)
+    (payout : Nat) (before after : World) (attempts : List Attempt) : Prop :=
+  let request : Request := ⟨ctx.self, recipient, .ofNat payout, []⟩
+  let credited := transfer before ctx.self recipient (Verity.Core.Uint256.ofNat payout).val
+  before.balances ctx.self ≥ (Verity.Core.Uint256.ofNat payout).val ∧
+    ∃ returned nested,
+      attempts = [⟨request, true, returned, nested⟩] ∧
+      (((before.core.codeSize recipient.val).val = 0 ∧
+          after = credited ∧ returned = [] ∧ nested = []) ∨
+       ((before.core.codeSize recipient.val).val ≠ 0 ∧
+         ((callee request credited = .success returned after ∧ nested = []) ∨
+           callee request credited = .successWithTrace returned after nested)))
+
+theorem emptyValueCall_success (callee : External) (ctx : Context)
+    (recipient : Address) (payout : Nat) (before : World)
+    (h : (emptyValueCall callee ctx recipient payout before).outcome = .ok ()) :
+    PayoutEffect callee ctx recipient payout before
+      (emptyValueCall callee ctx recipient payout before).world
+      (emptyValueCall callee ctx recipient payout before).attempts := by
+  by_cases hf : before.balances ctx.self < (Verity.Core.Uint256.ofNat payout).val
+  · simp only [emptyValueCall, if_pos hf] at h
+    contradiction
+  · by_cases he : (before.core.codeSize recipient.val).val = 0
+    · simpa only [emptyValueCall, if_neg hf, if_pos he] using
+        (show PayoutEffect callee ctx recipient payout before
+          (transfer before ctx.self recipient (Verity.Core.Uint256.ofNat payout).val)
+          [⟨⟨ctx.self, recipient, .ofNat payout, []⟩, true, [], []⟩] from
+          ⟨Nat.le_of_not_gt hf, [], [], rfl, Or.inl ⟨he, rfl, rfl, rfl⟩⟩)
+    · cases hc : callee ⟨ctx.self, recipient, .ofNat payout, []⟩
+          (transfer before ctx.self recipient (Verity.Core.Uint256.ofNat payout).val) with
+      | rejected data => simp only [emptyValueCall, if_neg hf, if_neg he, hc] at h; contradiction
+      | rejectedWithTrace data nested => simp only [emptyValueCall, if_neg hf, if_neg he, hc] at h; contradiction
+      | success data after =>
+        simp only [emptyValueCall, if_neg hf, if_neg he, hc]
+        exact ⟨Nat.le_of_not_gt hf, data, [], rfl, Or.inr ⟨he, Or.inl ⟨hc, rfl⟩⟩⟩
+      | successWithTrace data after nested =>
+        simp only [emptyValueCall, if_neg hf, if_neg he, hc]
+        exact ⟨Nat.le_of_not_gt hf, data, nested, rfl, Or.inr ⟨he, Or.inr hc⟩⟩
+
+/-- The two events are appended only after the recipient callback returns,
+using the source msg.sender rather than re-reading callback-modified storage. -/
+def claimEvents (ctx : Context) (requestId : Nat) (recipient : Address)
+    (payout : Nat) (world : World) : World :=
+  { world with logs := world.logs ++
+      [⟨ctx.self, "WithdrawalClaimed", [.ofNat requestId, .ofNat ctx.sender.toNat,
+        .ofNat recipient.toNat, .ofNat payout]⟩,
+       ⟨ctx.self, "Transfer", [.ofNat ctx.sender.toNat, 0, .ofNat requestId]⟩] }
+
+/-- One actual claim: checked physical storage computes the payout consumed
+by its sole CALL, then that CALL's returned world receives the source events. -/
+def ClaimEffect (callee : External) (ctx : Context) (requestId hint : Nat)
+    (recipient : Address) (before after : World) (attempts : List Attempt) : Prop :=
+  ∃ payout dirty called,
+    claimOne requestId hint recipient {before.core with sender := ctx.sender} =
+      .success payout dirty ∧
+    requestId ≠ 0 ∧
+    requestId ≤ (before.core.readSlot lastFinalizedRequestIdPosition).val ∧
+    requestClaimed (requestMetadataWord before.core requestId) = false ∧
+    requestOwner (requestMetadataWord before.core requestId) = ctx.sender ∧
+    payout < 2 ^ 256 ∧
+    (∃ removed, prepareClaim requestId hint recipient {before.core with sender := ctx.sender} =
+      .success payout removed ∧ payout ≤ (removed.readSlot lockedEtherAmountPosition).val ∧
+      dirty = removed.writeSlot lockedEtherAmountPosition
+        (.ofNat ((removed.readSlot lockedEtherAmountPosition).val - payout))) ∧
+    PayoutEffect callee ctx recipient payout {before with core := dirty} called attempts ∧
+    after = claimEvents ctx requestId recipient payout called
+
+/-- A chain records every actual intermediate world, including the callback
+world used by the next request. It is not a list of independently supplied
+successful-stage premises. -/
+inductive ClaimChain (callee : External) (ctx : Context) (recipient : Address) :
+    List Nat → List Nat → World → World → List Attempt → Prop
+  | nil (world : World) : ClaimChain callee ctx recipient [] [] world world []
+  | cons {requestId hint requestIds hints before middle after first rest} :
+      ClaimEffect callee ctx requestId hint recipient before middle first →
+      ClaimChain callee ctx recipient requestIds hints middle after rest →
+      ClaimChain callee ctx recipient (requestId :: requestIds) (hint :: hints)
+        before after (first ++ rest)
+
+
+private theorem claimStorage_success (ctx : Context) (requestId hint : Nat)
+    (recipient : Address) (before : World) (payout : Nat)
+    (h : (claimStorage ctx requestId hint recipient before).outcome = .ok payout) :
+    ∃ dirty, claimOne requestId hint recipient {before.core with sender := ctx.sender} =
+      .success payout dirty ∧
+      (claimStorage ctx requestId hint recipient before).world = {before with core := dirty} ∧
+      (claimStorage ctx requestId hint recipient before).attempts = [] := by
+  cases hc : claimOne requestId hint recipient {before.core with sender := ctx.sender} with
+  | success amount dirty =>
+    simp only [claimStorage, hc] at h ⊢
+    cases h
+    exact ⟨dirty, rfl, rfl, trivial⟩
+  | «revert» reason rollback => simp [claimStorage, hc] at h
+
+theorem claimTo_success (callee : External) (ctx : Context) (requestId hint : Nat)
+    (recipient : Address) (before : World)
+    (h : (claimTo callee ctx requestId hint recipient before).outcome = .ok ()) :
+    ClaimEffect callee ctx requestId hint recipient before
+      (claimTo callee ctx requestId hint recipient before).world
+      (claimTo callee ctx requestId hint recipient before).attempts := by
+  obtain ⟨payout, hs, ht, hw, ha⟩ := bind_success _ _ before () h
+  obtain ⟨dirty, hd, hsw, hsa⟩ := claimStorage_success ctx requestId hint recipient before payout hs
+  obtain ⟨u, hc, he, hcw, hca⟩ := bind_success _ _ _ () ht
+  cases u
+  have hp := emptyValueCall_success callee ctx recipient payout
+    (claimStorage ctx requestId hint recipient before).world hc
+  have hg := claimOne_success_guards requestId hint recipient _ dirty payout hd
+  obtain ⟨removed, hprep, hlocked, hfit, hdirty⟩ :=
+    claimOne_success_storage requestId hint recipient _ dirty payout hd
+  refine ⟨payout, dirty, (payoutCall callee ctx recipient payout (claimStorage ctx requestId hint recipient before).world).world, hd, hg.1, hg.2.1, hg.2.2.1, hg.2.2.2, hfit, ⟨removed, hprep, hlocked, hdirty⟩, ?_, ?_⟩
+  · have hat : (claimTo callee ctx requestId hint recipient before).attempts =
+        (payoutCall callee ctx recipient payout
+          (claimStorage ctx requestId hint recipient before).world).attempts := by
+        simp [claimTo, Bind.bind, bindExec, hs, hc,
+          LidoSRv3.Audit.Source.TrioReserve1.Live.emit, pureExec, hsa]
+    rw [hat, ← hsw]
+    exact hp
+  · simp [claimTo, Bind.bind, bindExec, hs, hc, LidoSRv3.Audit.Source.TrioReserve1.Live.emit, pureExec, claimEvents, List.append_assoc]
+
+/-- One-claim wrapper derives its certificate from root success as well. -/
+theorem runClaimTo_success (callee : External) (ctx : Context) (requestId hint : Nat)
+    (recipient : Address) (before : World)
+    (h : (runClaimTo callee ctx requestId hint recipient before).outcome = .ok ()) :
+    ClaimEffect callee ctx requestId hint recipient before
+      (runClaimTo callee ctx requestId hint recipient before).world
+      (runClaimTo callee ctx requestId hint recipient before).attempts := by
+  have hs : (claimTo callee ctx requestId hint recipient before).outcome = .ok () := by
+    cases ho : (claimTo callee ctx requestId hint recipient before).outcome with
+    | ok u => cases u; rfl
+    | «error» fault => simp [runClaimTo, run, ho] at h
+  simpa only [runClaimTo, run, hs] using claimTo_success callee ctx requestId hint recipient before hs
+
+theorem claimWithdrawalsLoop_success (callee : External) (ctx : Context)
+    (recipient : Address) (requestIds hints : List Nat) (before : World)
+    (h : (claimWithdrawalsLoop callee ctx requestIds hints recipient before).outcome = .ok ()) :
+    ClaimChain callee ctx recipient requestIds hints before
+      (claimWithdrawalsLoop callee ctx requestIds hints recipient before).world
+      (claimWithdrawalsLoop callee ctx requestIds hints recipient before).attempts := by
+  induction requestIds generalizing hints before with
+  | nil =>
+    cases hints with
+    | nil => exact ClaimChain.nil before
+    | cons hint hints => simp [claimWithdrawalsLoop] at h
+  | cons requestId requestIds ih =>
+    cases hints with
+    | nil => simp [claimWithdrawalsLoop] at h
+    | cons hint hints =>
+      obtain ⟨u, hc, ht, hw, ha⟩ := bind_success _ _ before () h
+      cases u
+      have first := claimTo_success callee ctx requestId hint recipient before hc
+      have rest := ih hints _ ht
+      simpa only [claimWithdrawalsLoop, Bind.bind, bindExec, hc] using ClaimChain.cons first rest
+
+/-- Necessary same-world certificate from actual root success. The recipient
+and length guards and every physical claim/CALL/event step are derived. -/
+theorem runClaimWithdrawalsTo_success (callee : External) (ctx : Context)
+    (requestIds hints : List Nat) (recipient : Address) (before : World)
+    (h : (runClaimWithdrawalsTo callee ctx requestIds hints recipient before).outcome = .ok ()) :
+    recipient ≠ zeroAddress ∧ requestIds.length = hints.length ∧
+      ClaimChain callee ctx recipient requestIds hints before
+        (runClaimWithdrawalsTo callee ctx requestIds hints recipient before).world
+        (runClaimWithdrawalsTo callee ctx requestIds hints recipient before).attempts := by
+  have hs : (claimWithdrawalsTo callee ctx requestIds hints recipient before).outcome = .ok () := by
+    cases ho : (claimWithdrawalsTo callee ctx requestIds hints recipient before).outcome with
+    | ok u => cases u; rfl
+    | «error» fault => simp [runClaimWithdrawalsTo, run, ho] at h
+  have hr : runClaimWithdrawalsTo callee ctx requestIds hints recipient before =
+      claimWithdrawalsTo callee ctx requestIds hints recipient before := by
+    simp [runClaimWithdrawalsTo, run, hs]
+  have hn : recipient ≠ zeroAddress := by
+    by_contra hn
+    simp [claimWithdrawalsTo, hn, LidoSRv3.Audit.Source.TrioReserve1.Live.require, Bind.bind, bindExec, fail] at hs
+  have hn0 : recipient ≠ 0 := hn
+  have hl : requestIds.length = hints.length := by
+    by_contra hl
+    simp [claimWithdrawalsTo, hn, hn0, hl, zeroAddress, Pure.pure, LidoSRv3.Audit.Source.TrioReserve1.Live.require, Bind.bind, bindExec, fail, pureExec] at hs
+  have he : claimWithdrawalsTo callee ctx requestIds hints recipient before =
+      claimWithdrawalsLoop callee ctx requestIds hints recipient before := by
+    simp [claimWithdrawalsTo, hn, hn0, hl, zeroAddress, Pure.pure, LidoSRv3.Audit.Source.TrioReserve1.Live.require, Bind.bind, bindExec, pureExec]
+  rw [hr, he]
+  exact ⟨hn, hl, claimWithdrawalsLoop_success callee ctx recipient requestIds hints before (by rwa [he] at hs)⟩
+
+#print axioms claimTo_success
+#print axioms runClaimWithdrawalsTo_success
 end LidoSRv3.Audit.Verity.AddressRecipientCallBridge

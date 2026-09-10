@@ -1,44 +1,35 @@
-import LidoSRv3.Audit.Spec.AddressClaimCorrespondence
-import LidoSRv3.Audit.Verity.AddressClaimBatchTx
-
-/-!
-# Pack D fail-closed vectors
-
-Swapped payout order and a wrong recipient disagree with the honest
-two-item claim-batch observe.
--/
+import LidoSRv3.Audit.Verity.AddressRecipientCallBridge
 
 namespace LidoSRv3.Tests.PackDAddressClaimMutants
+open LidoSRv3.Audit.Verity.AddressRecipientCallBridge
+open LidoSRv3.Audit.Source.TrioReserve1.Live (Fault)
 
-open LidoSRv3.Audit.Verity.AddressClaimBatchTx
-open LidoSRv3.Audit.Spec.AddressClaimCorrespondence
-open _root_.Verity
+private def ctx : Context := ⟨1000, 1001⟩
+private def before : World := { core := Verity.defaultState, balances := fun _ => 100 }
 
-/-- Honest two-item journal. -/
-private def honestJournal : List ExternalCall :=
-  [payoutEntry (2 : Address) 30, payoutEntry (2 : Address) 40]
+/-- The actual empty-calldata CALL exposes order; reversing payouts changes
+its actual request list. No fabricated storage-only journal is used. -/
+theorem swapped_payout_order_changes_actual_attempts :
+    (emptyValueCall rejectingCallee ctx 1002 30 before).attempts ++
+      (emptyValueCall rejectingCallee ctx 1002 40 before).attempts ≠
+    (emptyValueCall rejectingCallee ctx 1002 40 before).attempts ++
+      (emptyValueCall rejectingCallee ctx 1002 30 before).attempts := by decide +kernel
 
-/-- Mutant: swap the two payout amounts. -/
-private def swappedJournal : List ExternalCall :=
-  [payoutEntry (2 : Address) 40, payoutEntry (2 : Address) 30]
+/-- Changing the real CALL target changes the actual recorded request. -/
+theorem wrong_recipient_changes_actual_attempt :
+    (emptyValueCall rejectingCallee ctx 1002 30 before).attempts ≠
+      (emptyValueCall rejectingCallee ctx 1003 30 before).attempts := by decide +kernel
 
-/-- Mutant: pay the same amounts to a different recipient. -/
-private def wrongRecipientJournal : List ExternalCall :=
-  [payoutEntry (3 : Address) 30, payoutEntry (3 : Address) 40]
+/-- The source entry guard precedes any physical claim and emits no attempts. -/
+theorem zero_recipient_rejects_before_claim :
+    (runClaimWithdrawalsTo acceptingCallee ctx [1] [1] 0 before).outcome =
+      .error (.reason "ZeroRecipient") ∧
+    (runClaimWithdrawalsTo acceptingCallee ctx [1] [1] 0 before).attempts = [] := by decide +kernel
 
-theorem swapped_payout_order_kill_line_refutes_batch :
-    twoClaimPayouts = [some 30, some 40] ∧
-      observe [1, 2]
-          ((executeClaimWithdrawalsTo [1, 2] [1, 1] (2 : Address)).run twoClaimState) =
-        ⟨.committed, [true, true], 0, honestJournal⟩ ∧
-      swappedJournal ≠ honestJournal := by
-  refine ⟨by decide, two_claim_batch_observe, by decide⟩
-
-theorem wrong_recipient_kill_line_refutes_batch :
-    observe [1, 2]
-        ((executeClaimWithdrawalsTo [1, 2] [1, 1] (2 : Address)).run twoClaimState) =
-      ⟨.committed, [true, true], 0, honestJournal⟩ ∧
-      wrongRecipientJournal ≠ honestJournal := by
-  refine ⟨two_claim_batch_observe, by decide⟩
-
+/-- A genuine root failure restores any state, not only a test fixture. -/
+theorem failed_batch_restores_world (callee : External) (context : Context)
+    (ids hints : List Nat) (recipient : Verity.Address) (world : World) (fault : Fault)
+    (h : (runClaimWithdrawalsTo callee context ids hints recipient world).outcome = .error fault) :
+    (runClaimWithdrawalsTo callee context ids hints recipient world).world = world :=
+  claim_withdrawals_to_revert_restores_caller_and_callee_world callee context ids hints recipient world fault h
 end LidoSRv3.Tests.PackDAddressClaimMutants

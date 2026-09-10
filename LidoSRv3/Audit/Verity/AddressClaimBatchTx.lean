@@ -74,29 +74,42 @@ def ownerRequestValue (state : ContractState) (owner : Address) (index : Nat) : 
 def ownerRequestIndex (state : ContractState) (owner : Address) (requestId : Nat) : Nat :=
   (state.readSlot (ownerRequestIndexSlot owner requestId)).val
 
-/-- OpenZeppelin `EnumerableSet.remove`, including its swap-and-pop writes.
-`none` is the source `assert(remove(...))` failure, not a synthetic
-membership guard. -/
+/-- OZ 4.4.1 remove, including checked subtraction/indexing and pop.
+Errors retain their source panic category; absence is the caller's failed assert.
+The post-swap length is read again for pop rather than assumed unchanged. -/
+def removeOwnerRequestChecked (state : ContractState) (owner : Address) (requestId : Nat) :
+    Except String ContractState :=
+  let valueIndex := ownerRequestIndex state owner requestId
+  if valueIndex = 0 then .error "Panic(0x01)"
+  else
+    let length := ownerRequestValuesLength state owner
+    if length = 0 then .error "Panic(0x11)"
+    else
+      let lastIndex := length - 1
+      let toDeleteIndex := valueIndex - 1
+      let swapped : Except String ContractState := if toDeleteIndex != lastIndex then
+        if toDeleteIndex ≥ length then .error "Panic(0x32)"
+        else
+          let lastValue := ownerRequestValue state owner lastIndex
+          .ok ((state.writeSlot (ownerRequestValueSlot owner toDeleteIndex)
+            (.ofNat lastValue)).writeSlot (ownerRequestIndexSlot owner lastValue)
+              (.ofNat valueIndex))
+        else .ok state
+      match swapped with
+      | .error reason => .error reason
+      | .ok swapped =>
+        let popLength := ownerRequestValuesLength swapped owner
+        if popLength = 0 then .error "Panic(0x31)"
+        else
+          let after := (swapped.writeSlot (ownerRequestValueSlot owner (popLength - 1)) 0).writeSlot
+            (ownerRequestValuesLengthSlot owner) (.ofNat (popLength - 1))
+          .ok (after.writeSlot (ownerRequestIndexSlot owner requestId) 0)
+
+/-- Compatibility projection for the legacy storage-only witnesses. The live
+claim consumes the error-preserving checked execution directly. -/
 def removeOwnerRequest (state : ContractState) (owner : Address) (requestId : Nat) :
     Option ContractState :=
-  let indexPlusOne := ownerRequestIndex state owner requestId
-  if indexPlusOne = 0 then none
-  else
-    let lastIndex := ownerRequestValuesLength state owner - 1
-    let toDeleteIndex := indexPlusOne - 1
-    let lastValue := ownerRequestValue state owner lastIndex
-    -- OZ 4.4.1 `EnumerableSet.remove`: move the tail only when the removed
-    -- element is not itself the tail, then `pop` clears that final array
-    -- cell.  An unconditional swap would rewrite the removed index before
-    -- deleting it and would not model the conditional Solidity branch.
-    let swapped := if toDeleteIndex != lastIndex then
-      (state.writeSlot (ownerRequestValueSlot owner toDeleteIndex)
-        (.ofNat lastValue)).writeSlot (ownerRequestIndexSlot owner lastValue)
-          (.ofNat (toDeleteIndex + 1))
-      else state
-    let after := (swapped.writeSlot (ownerRequestValueSlot owner lastIndex) 0).writeSlot
-      (ownerRequestValuesLengthSlot owner) (.ofNat lastIndex)
-    some (after.writeSlot (ownerRequestIndexSlot owner requestId) 0)
+  (removeOwnerRequestChecked state owner requestId).toOption
 
 def insertOwnerRequest (state : ContractState) (owner : Address) (requestId : Nat) :
     Option ContractState :=
@@ -196,40 +209,114 @@ def claimableEther (request : RequestRead) : Option Nat :=
 
 /-- One pinned `_claim` storage iteration.  It returns the exact payout for the
 following live recipient CALL; it does not issue a second synthetic CALL. -/
-def claimOne (requestId hint : Nat) (_recipient : Address) : Contract Nat := fun state =>
-  let sender := state.sender
-  let request := readRequest state requestId hint
-  let lastFinalized := (state.readSlot lastFinalizedRequestIdPosition).val
-  let lastCheckpoint := (state.readSlot lastCheckpointIndexPosition).val
-  let nextCheckpointFrom := (checkpointFromWord state (hint + 1)).val
+def prepareClaim (requestId hint : Nat) (_recipient : Address) : Contract Nat := fun state =>
   if requestId = 0 then .revert "InvalidRequestId" state
-  else if requestId > lastFinalized then .revert "RequestNotFoundOrNotFinalized" state
-  else if request.claimed then .revert "RequestAlreadyClaimed" state
-  else if request.owner != sender then .revert "NotOwner" state
+  else if requestId > (state.readSlot lastFinalizedRequestIdPosition).val then
+    .revert "RequestNotFoundOrNotFinalized" state
   else
-    -- Solidity marks the packed byte and then executes
-    -- `assert(_requestsByOwner[owner].remove(requestId))`; hint calculation
-    -- follows that mutation. A later failure is rolled back by the entry frame.
-    let marked := state.writeSlot (queueMetadataPhysicalSlot requestId)
-      (markClaimed (requestMetadataWord state requestId))
-    match removeOwnerRequest marked request.owner requestId with
-    | none => .revert "Panic(0x01)" state
-    | some removed =>
-      if hint = 0 || hint > lastCheckpoint then .revert "InvalidHint" state
-      else if requestId < request.checkpointFrom then .revert "InvalidHint" state
-      else if hint < lastCheckpoint && nextCheckpointFrom ≤ requestId then
-        .revert "InvalidHint" state
-      else if request.previousCumulativeStETH > request.cumulativeStETH ||
-          request.previousCumulativeShares > request.cumulativeShares then
-        .revert "NonMonotonicRequest" state
-      else match claimableEther request with
-    | none => .revert "ZeroShares" state
-    | some payout =>
-        let locked := (state.readSlot lockedEtherAmountPosition).val
-        if payout > locked then .revert "LockedEtherUnderflow" state
+    let metadata := requestMetadataWord state requestId
+    if requestClaimed metadata then .revert "RequestAlreadyClaimed" state
+    else if requestOwner metadata != state.sender then .revert "NotOwner" state
+    else
+      let marked := state.writeSlot (queueMetadataPhysicalSlot requestId) (markClaimed metadata)
+      match removeOwnerRequestChecked marked
+          (requestOwner (requestMetadataWord marked requestId)) requestId with
+      | .error reason => .revert reason state
+      | .ok removed =>
+        -- All hint, cumulative-pair and locked-ETH reads happen after removal.
+        if hint = 0 then .revert "InvalidHint" state
         else
-          let dirty := removed.writeSlot lockedEtherAmountPosition (.ofNat (locked - payout))
-          .success payout dirty
+          let lastCheckpoint := (removed.readSlot lastCheckpointIndexPosition).val
+          if hint > lastCheckpoint then .revert "InvalidHint" state
+          else
+            let request := readRequest removed requestId hint
+            if requestId < request.checkpointFrom then .revert "InvalidHint" state
+            else if hint < lastCheckpoint &&
+                (checkpointFromWord removed (hint + 1)).val ≤ requestId then
+              .revert "InvalidHint" state
+            else if request.previousCumulativeStETH > request.cumulativeStETH then
+              .revert "Panic(0x11)" state
+            else if request.previousCumulativeShares > request.cumulativeShares then
+              .revert "Panic(0x11)" state
+            else
+              let eth := request.cumulativeStETH - request.previousCumulativeStETH
+              let shares := request.cumulativeShares - request.previousCumulativeShares
+              if shares = 0 then .revert "Panic(0x12)" state
+              else
+                let discounted := eth * E27 / shares > request.checkpointMaxShareRate
+                if discounted && shares * request.checkpointMaxShareRate ≥ 2 ^ 256 then
+                  .revert "Panic(0x11)" state
+                else
+                  let payout := if discounted then shares * request.checkpointMaxShareRate / E27 else eth
+                  .success payout removed
+
+/-- The locked balance is read after the actual set removal/calculation. The
+returned payout is the one subsequently sent by the recipient-call bridge. -/
+def claimOne (requestId hint : Nat) (recipient : Address) : Contract Nat := fun state =>
+  match prepareClaim requestId hint recipient state with
+  | .revert reason _ => .revert reason state
+  | .success payout removed =>
+    let locked := (removed.readSlot lockedEtherAmountPosition).val
+    if payout > locked then .revert "Panic(0x11)" state
+    else .success payout (removed.writeSlot lockedEtherAmountPosition (.ofNat (locked - payout)))
+
+private theorem prepareClaim_success_guards (requestId hint : Nat) (recipient : Address)
+    (state after : ContractState) (payout : Nat)
+    (h : prepareClaim requestId hint recipient state = .success payout after) :
+    requestId ≠ 0 ∧ requestId ≤ (state.readSlot lastFinalizedRequestIdPosition).val ∧
+      requestClaimed (requestMetadataWord state requestId) = false ∧
+      requestOwner (requestMetadataWord state requestId) = state.sender := by
+  by_cases h0 : requestId = 0
+  · simp only [prepareClaim, h0, if_true] at h
+    contradiction
+  by_cases h1 : requestId > (state.readSlot lastFinalizedRequestIdPosition).val
+  · simp only [prepareClaim, h0, h1, if_false, if_true] at h
+    contradiction
+  by_cases hc : requestClaimed (requestMetadataWord state requestId) = true
+  · simp only [prepareClaim, h0, h1, hc, if_false, if_true] at h
+    contradiction
+  by_cases ho : (requestOwner (requestMetadataWord state requestId) != state.sender) = true
+  · simp only [prepareClaim, h0, h1, hc, ho, if_false, if_true] at h
+    contradiction
+  exact ⟨h0, Nat.le_of_not_gt h1, Bool.eq_false_iff.mpr hc, by simpa using ho⟩
+
+/-- Success derives finalization/claimed/owner guards from physical reads. -/
+theorem claimOne_success_guards (requestId hint : Nat) (recipient : Address)
+    (state after : ContractState) (payout : Nat)
+    (h : claimOne requestId hint recipient state = .success payout after) :
+    requestId ≠ 0 ∧ requestId ≤ (state.readSlot lastFinalizedRequestIdPosition).val ∧
+      requestClaimed (requestMetadataWord state requestId) = false ∧
+      requestOwner (requestMetadataWord state requestId) = state.sender := by
+  unfold claimOne at h
+  cases hp : prepareClaim requestId hint recipient state with
+  | «revert» reason rollback => simp only [hp] at h; contradiction
+  | success amount removed =>
+    simp only [hp] at h
+    split at h
+    · contradiction
+    · cases h
+      exact prepareClaim_success_guards requestId hint recipient state removed payout hp
+
+/-- Success derives the exact final storage write, successful preparation and
+word bound from the actual locked-balance subtraction. -/
+theorem claimOne_success_storage (requestId hint : Nat) (recipient : Address)
+    (state after : ContractState) (payout : Nat)
+    (h : claimOne requestId hint recipient state = .success payout after) :
+    ∃ removed, prepareClaim requestId hint recipient state = .success payout removed ∧
+      payout ≤ (removed.readSlot lockedEtherAmountPosition).val ∧
+      payout < 2 ^ 256 ∧
+      after = removed.writeSlot lockedEtherAmountPosition
+        (.ofNat ((removed.readSlot lockedEtherAmountPosition).val - payout)) := by
+  unfold claimOne at h
+  cases hp : prepareClaim requestId hint recipient state with
+  | «revert» reason rollback => simp only [hp] at h; contradiction
+  | success amount removed =>
+    simp only [hp] at h
+    split at h
+    · contradiction
+    · cases h
+      refine ⟨removed, rfl, Nat.le_of_not_gt (by assumption), ?_, rfl⟩
+      exact Nat.lt_of_le_of_lt (Nat.le_of_not_gt (by assumption)) (removed.readSlot lockedEtherAmountPosition).isLt
 
 def claimLoop : List Nat → List Nat → Address → Contract Unit
   | [], [], _ => Verity.pure ()
@@ -282,16 +369,6 @@ def twoClaimState : ContractState :=
     | some after => after | none => state
   let state := state.writeSlot (checkpointFromPhysicalSlot 1) 1
   state.writeSlot (checkpointRatePhysicalSlot 1) (.ofNat E27)
-
-/-- Concrete storage receipt for a two-item live batch.  The actual recipient
-CALLs are represented by the live-world bridge, not a duplicate stub journal.
-The pinned Keccak backend is opaque to Lean's kernel evaluator, so this
-finite receipt remains an explicit model boundary rather than falsely
-replacing the physical `readSlot` path with a `mapUint` surrogate. -/
-axiom two_claim_batch_observe :
-    observe [1, 2]
-        ((executeClaimWithdrawalsTo [1, 2] [1, 1] (2 : Address)).run twoClaimState) =
-      ⟨.committed, [true, true], 0, []⟩
 
 /-- The transaction boundary restores the entry snapshot after any failed
 guard or payout frame, including failures reached during later iterations. -/
