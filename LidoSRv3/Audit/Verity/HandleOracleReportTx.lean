@@ -1,5 +1,6 @@
 import LidoSRv3.Audit.Source.AccountingCorrespondence
 import LidoSRv3.Audit.Source.ReportFeeProductsCorrespondence
+import ReportWriteFee
 import Verity.Core
 
 /-!
@@ -27,11 +28,12 @@ This is not an EVM theorem: slot numbers are a model-local projection of the
 pinned accounting-relevant path. Sanity checks, CL state, vault transfers,
 and extra-data processing stay outside this guarantee.
 
-The fee value `sharesToMintAsFees` is an opaque argument here; its
-computation (`_calculateProtocolFees`, `Accounting.sol:263-303`) is modeled in
-`LidoSRv3/Audit/Source/SubmitReportFeeCorrespondence.lean`
-(`SubmitReportEntry.feeEther`, guarantee P-ORACLE-SUPPLY-1) and fed in by
-`SubmitReportEntryTx.submitReportDataTx`.
+The primitive `handleOracleReport` retains a share argument for existing
+order-only callers.  The ACCOUNT entry
+`handleOracleReportFromCommittedFeeProducts` below does not: it obtains the
+fee terms from the committed physical report and its post-write router getter,
+then feeds the checked `Accounting.sol:317,323,325,331` result to the modeled
+`LIDO.mintShares` state update.
 -/
 
 namespace LidoSRv3.Audit.Verity.HandleOracleReportTx
@@ -57,6 +59,13 @@ def accountingCalledSlot : Nat := 12
 def rewardsReadSlot : Nat := 13
 -- observation slot, no Solidity storage counterpart: Accounting.sol:409 `reportRewardsMinted(` was reached
 def rewardsMintedSlot : Nat := 14
+-- Lido.sol:105-106 `_mintShares`: total share supply is increased by the
+-- minted amount.  This is real modeled Lido state, unlike slots 12-16.
+def lidoTotalSharesSlot : Nat := 17
+-- Lido.sol:107 `_shares[account] += sharesAmount`; this projection is the
+-- Accounting contract's own share balance, the recipient of `mintShares` at
+-- Accounting.sol:404.  (Recipient distribution is outside this slice.)
+def accountingSharesSlot : Nat := 18
 
 /-! ## Execution-order clock
 
@@ -116,6 +125,9 @@ lemmas below are stated in terms of `sequenceSlot`, not its numeral). -/
 theorem rewardsRead_ne_rewardsMinted : rewardsReadSlot ≠ rewardsMintedSlot := by decide
 
 theorem rewardsRead_ne_sequence : rewardsReadSlot ≠ sequenceSlot := by decide
+
+theorem lidoTotalShares_ne_accountingShares : lidoTotalSharesSlot ≠ accountingSharesSlot := by
+  decide
 
 /-! The four ticks a committed body hands out.  `handleOracleReport` and every
 mutant below share the same reset-then-stamp prefix, so these close the clock
@@ -490,16 +502,45 @@ theorem mintAfterReadDiscipline_holds : mintAfterReadDiscipline := by
           decide
   · simp [hValid]
 
-/-- Execute the checked `Accounting.sol:317,323,325,331` fee products and
-feed their actual share result to the report transaction.  A checked-arithmetic
-failure is a transaction revert, so a failed fee calculation cannot be
-silently converted into a zero-share report. -/
+/-- `Lido.mintShares(Accounting, shares)` (Lido.sol:105-107), projected onto
+the Lido total-share word and the Accounting share-balance word.  These are
+state changes, not observation flags.  `none` is the Solidity-0.8 checked
+addition panic; its exact panic bytes remain intentionally outside this
+model. -/
+def mintLidoShares (shares : Word) (state : ContractState) : Option ContractState := do
+  let total <- safeAdd (state.readSlot lidoTotalSharesSlot) shares
+  let balance <- safeAdd (state.readSlot accountingSharesSlot) shares
+  pure ((state.writeSlot lidoTotalSharesSlot total).writeSlot accountingSharesSlot balance)
+
+/-- Complete the `Accounting.sol:403-413` suffix after the report snapshot and
+router getter have already run.  The Lido state update is deliberately before
+the `reportRewardsMinted` observation, matching source order. -/
+def mintAfterCommittedReport (i : ReportInput) (result : Result) (dirty snapshot : ContractState)
+    (feeInput : LidoSRv3.Audit.Source.ReportFeeProductsCorrespondence.Input) :
+    ContractResult Result :=
+  match LidoSRv3.Audit.Source.ReportFeeProductsCorrespondence.sharesToMintAsFees feeInput with
+  -- Named limitation: this collapses source panic kind/bytes only.  It does
+  -- not convert a failed expression into a zero mint.
+  | none => .revert "FEE_ARITHMETIC" snapshot
+  | some shares =>
+      if 0 < shares.val then
+        match mintLidoShares shares dirty with
+        | none => .revert "MINT_ARITHMETIC" snapshot
+        | some minted =>
+            let notified := stampStep rewardsMintedSlot minted
+            .success ⟨result.balances, result.total, storedSteps notified result.balances⟩ notified
+      else .success result dirty
+
+/-- Execute the report write/read prefix first, then evaluate the checked
+`Accounting.sol:317,323,325,331` products and mint their result.  In
+particular, fee arithmetic is no longer evaluated before `handleOracleReport`
+has written the report and reached the rewards-distribution read. -/
 def handleOracleReportFromFeeProducts (i : ReportInput)
     (feeInput : LidoSRv3.Audit.Source.ReportFeeProductsCorrespondence.Input) :
-    Contract Result :=
-  match LidoSRv3.Audit.Source.ReportFeeProductsCorrespondence.sharesToMintAsFees feeInput with
-  | none => fun snapshot => .revert "FEE_ARITHMETIC" snapshot
-  | some shares => handleOracleReport i shares.val
+    Contract Result := fun snapshot =>
+  match (handleOracleReport i 0).run snapshot with
+  | .revert reason rollback => .revert reason rollback
+  | .success result dirty => mintAfterCommittedReport i result dirty snapshot feeInput
 
 /-- The actual checked-fee consumer retains the report's mint-after-read
 discipline.  If fee arithmetic reverts there is no committed transaction;
@@ -512,11 +553,89 @@ theorem mintAfterReadDiscipline_fromFeeProducts (i : ReportInput)
     | .success _ dirty =>
         mintAfterRead (dirty.readSlot rewardsReadSlot) (dirty.readSlot rewardsMintedSlot)
     | .revert _ _ => True := by
-  unfold handleOracleReportFromFeeProducts
+  unfold handleOracleReportFromFeeProducts mintAfterCommittedReport
   cases hFee : LidoSRv3.Audit.Source.ReportFeeProductsCorrespondence.sharesToMintAsFees feeInput with
   | none => simp
   | some shares =>
-      exact mintAfterReadDiscipline_holds i shares.val state
+      unfold handleOracleReport Contract.run
+      by_cases hValid : idsAndBalancesValid i = true
+      · simp only [hValid, Bool.false_eq_true, ↓reduceIte]
+        cases checkedTotal256 i.balancesGwei with
+        | none => simp
+        | some total =>
+          by_cases hShares : 0 < shares.val <;>
+            simp [hShares, mintLidoShares, safeAdd, mintAfterRead, stampStep, nextTick,
+              ContractState.readSlot_writeSlot_same, ContractState.readSlot_writeSlot_other,
+              balancesWrittenSlot, totalBalanceSlot, accountingCalledSlot,
+              rewardsReadSlot, rewardsMintedSlot, lidoTotalSharesSlot,
+              accountingSharesSlot, sequenceSlot] <;> try decide
+      · simp [hValid]
+
+/-! ## Physical report-write → getter → checked-fee → Lido-mint composition
+
+The previous wrapper is useful for the arithmetic unit, but its `feeInput`
+remains an explicit test input.  This entry is the ACCOUNT integration: it
+commits the physical SRLib report, reads `getStakingRewardsDistribution` from
+that *post-write* `Core`, constructs the checked Accounting fee products from
+that getter result, and only then calls the Lido mint suffix.  Thus neither
+the router total nor `totalFee` can be supplied independently of the report
+that the getter consumed.
+-/
+
+structure ReportWriteFeeMintInput where
+  layout : AccountAddress.ReportWriteFee.Layout
+  report : ReportInput
+  routerCore : AccountAddress.ReportWriteFee.Core
+  accountingReport : AccountAddress.ReportWriteFee.ReportWei
+  deriving Repr, DecidableEq
+
+/-- Reject Nat-side values that cannot denote the source uint256 read.  This
+keeps the bridge from silently reducing an out-of-range physical-model value
+modulo 2^256 before it reaches the checked fee-products model. -/
+def checkedWord (n : Nat) : Option Word :=
+  if n ≤ Verity.Core.MAX_UINT256 then some (Verity.Core.Uint256.ofNat n) else none
+
+/-- The fee-products input is made only after the post-report getter succeeds.
+In particular its `totalFee` and `feePrecisionPoints` are the values returned
+by `StakingRouter.getStakingRewardsDistribution`, rather than caller fields. -/
+def feeProductsFromCommittedGetter
+    (r : AccountAddress.ReportWriteFee.ReportWei)
+    (d : AccountAddress.ReportWriteFee.Distribution) :
+    Option LidoSRv3.Audit.Source.ReportFeeProductsCorrespondence.Input := do
+  pure {
+    clValidatorsBalance := ← checkedWord r.clValidatorsBalance
+    clPendingBalance := ← checkedWord r.clPendingBalance
+    withdrawalsVaultTransfer := ← checkedWord r.withdrawalsVaultTransfer
+    principalClBalance := ← checkedWord r.principalClBalance
+    elRewardsVaultTransfer := ← checkedWord r.elRewardsVaultTransfer
+    totalFee := ← checkedWord d.totalFee
+    feePrecisionPoints := ← checkedWord d.precisionPoints
+    postInternalEther := ← checkedWord r.postInternalEther
+    internalSharesBeforeFees := ← checkedWord r.internalSharesBeforeFees }
+
+/-- The complete ACCOUNT fee-mint path.  `reportValidatorBalances` commits
+first; the getter then reads that committed `postCore`; and the checked source
+products built from that getter are consumed by the Lido-mint suffix.  Any
+physical report/getter/uint256 conversion/fee/mint failure returns the original
+Verity snapshot, as an EVM transaction would.  Getter and fee panic bytes are
+intentionally summarized by named errors; no `Option.none` is treated as a
+zero mint. -/
+def handleOracleReportFromCommittedFeeProducts (x : ReportWriteFeeMintInput) :
+    Contract Result := fun snapshot =>
+  match AccountAddress.ReportWriteFee.reportValidatorBalances x.layout
+      x.report.registeredModuleIds x.report.reportedModuleIds x.report.balancesGwei x.routerCore with
+  | .reverted _ _ => .revert "INVALID_REPORT" snapshot
+  | .committed postCore =>
+      match (handleOracleReport x.report 0).run snapshot with
+      | .revert reason rollback => .revert reason rollback
+      | .success result dirty =>
+          match AccountAddress.ReportWriteFee.getStakingRewardsDistribution x.layout
+              x.report.registeredModuleIds postCore with
+          | .error _ => .revert "GETTER_ARITHMETIC" snapshot
+          | .ok distribution =>
+              match feeProductsFromCommittedGetter x.accountingReport distribution with
+              | none => .revert "FEE_ARITHMETIC" snapshot
+              | some feeInput => mintAfterCommittedReport x.report result dirty snapshot feeInput
 
 /-- Reordering mutant: the mint step runs before the read step, the same fault
 as a patch that calls `reportRewardsMinted` before re-reading the freshly
