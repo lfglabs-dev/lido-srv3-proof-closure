@@ -1,0 +1,63 @@
+{
+  "base": "2c2c72a91cd68a43de0777912772d12cc48a285d",
+  "source_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "scope": "Additive actual root/module batch scalar allocator and uint256[] decoder; same successful witnesses/cap/physical effects; failure World restoration",
+  "public_theorems": [
+    "LidoSRv3.Audit.Guarantees.PTopupMemoryCalls.actual_root_module_memory_effects",
+    "LidoSRv3.Audit.Guarantees.PTopupMemoryCalls.actual_root_module_memory_failure_restores"
+  ],
+  "build": {
+    "exit_code": 0,
+    "jobs": 1357,
+    "target": "LidoSRv3.Tests.TopupModuleMemoryRegression"
+  },
+  "regressions": {
+    "normal_kernel_or_exact_transport": 12,
+    "full_public_instance": 1,
+    "positive_physical_fixture_transport": true,
+    "no_native_decide": true
+  },
+  "source_identities": 1340,
+  "package_pins": {
+    "verity": "e977aaad6e1a9e92e0132d41b3d33a14135a4d46",
+    "evmyul": "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9",
+    "mathlib": "fabf563a7c95a166b8d7b6efca11c8b4dc9d911f",
+    "plausible": "63045536fe95024e6c18fc7b48e03f506701c5bc",
+    "LeanSearchClient": "c5d5b8fe6e5158def25cd28eb94e4141ad97c843",
+    "importGraph": "5c7542ed018c78194f1e2b903eaf6a792b74c03d",
+    "proofwidgets": "24b0d9dc081c5423f8eec7e866c441e5184f29d9",
+    "aesop": "e3cb2f741431ce31bf73549fb52316a57368b06f",
+    "Qq": "f46324995fca5f0483b742e4eb4daec7f4ee50d2",
+    "batteries": "fa08db58b30eb033edcdab331bba000827f9f785",
+    "Cli": "92564e5770e4d09f2d86dfbf8ada1e9c715b384c"
+  },
+  "axiom_sets": 21,
+  "axioms_foundations_only": true,
+  "reused_compiler_input_identities": 28,
+  "reused_historical_artifacts": 17,
+  "fresh_solidity_tests": 0,
+  "boundaries": [
+    "Phase returnBuffer origin and alignment not derived",
+    "Immutable copied raw-byte view; full memory-copy/alias and opcode-gas relation not established",
+    "Existing typed root/external/physical layout boundaries unchanged; no full compiled CL claim"
+  ],
+  "old_sources_edited": false,
+  "review_status": "Pending independent exact source/Solidity correspondence review; writer will stop at commit",
+  "sha256": {
+    "LidoSRv3/Audit/Source/TopupModuleMemory.lean": "7935b23340669d6fb01e7d7fb6b876cbb332bad1ddcd604c468a059e8a2a4fed",
+    "LidoSRv3/Audit/Source/TopupBatchMemory.lean": "4037cfc6a8fc3d598c270c5443b43893379ed3a330779466f627059d1de4a3c1",
+    "LidoSRv3/Audit/Guarantees/PTopupMemoryCalls.lean": "464de6b13d52e527b5c1b731a43e8bcf80da99ca15c69db3fc7557e8fcff4844",
+    "LidoSRv3/Tests/TopupModuleMemoryRegression.lean": "6dd2b4fa582631360b13f379cf0b2055124e7cb4b4257867b8909f8476b65d62",
+    "audit/topup-module-memory/README.md": "4252b7c6bd5beb05c0e86f6881e38a58f37e7dfb1ee58e5aec1108023307e7a5",
+    "audit/topup-module-memory/axioms.json": "06e49923c62eaf99d8b015006c8c8b6eeb160862d76fa7f55a3ea37e5db13b4e",
+    "audit/topup-module-memory/build.log": "824709153f620f0aaa30442dc7f745f8d177b52ac6cb949c40c63fd735814892",
+    "audit/topup-module-memory/commands.txt": "906f4ab5da736e07573c87ff79372bff999549defec2bedafa97fc7223d52f42",
+    "audit/topup-module-memory/source-axiom-check.log": "f9e04b5b290f881ecd202c81e3fdff8bc2ec6adca11548525bb7472d31f01095",
+    "audit/topup-module-memory/source-inputs.json": "dbc3524ddce045102c4864403ee6b3a60e9fc0dc8d7c42c16525bcd1a9b3310c",
+    "audit/topup-module-memory/source-ir-check.log": "1ee89a212db5cd1d2441cc4950390c36775119e73778f13df9d6df7b027cdaad",
+    "audit/topup-module-memory/source-ir-check.py": "94f73ae220294097005700443d9f14c78076afbd684d10809968d0ca0f5c1d4f",
+    "audit/topup-module-memory/source-ir-identities.json": "e404ec89aaea7c6b0182d21d09cbeb07a4f8bd1d1cd94b99ddb1337434a66ea2",
+    "audit/topup-module-memory/validate.py": "0e4a504571508591e239d09b176caf70f035e0f5c8345ab5cd2ce3f533b46cf6",
+    "audit/topup-module-memory/write-receipt.py": "7a6e4e3dae6bda5d5c88eaccc00599551b777c4bb56a058f32380c50cf0d016a"
+  }
+}
