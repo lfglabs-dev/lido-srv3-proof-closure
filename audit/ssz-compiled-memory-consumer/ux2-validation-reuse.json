@@ -1,0 +1,13 @@
+{
+  "scope": "Unchanged UX2 scanner/mutation suite reused from integrated PR309. New main-registry metadata and current UX2 generation/check plus main mutation tests rerun for this candidate. No new full UX2 mutation execution claimed.",
+  "base": "d28dca58388a6d216f4144095f75988b64b0d708",
+  "script_identities": {
+    "scripts/generate_ux2.py": "f431ce28ef50b3847b4158779becea28187cbfa7b196aab23c67b706f63744d0",
+    "scripts/test_ux2.py": "e1323511aa81219530c1c9b4acc456e0a6111345ef14972a30222f5410239860",
+    "scripts/main_guarantees.py": "f450886e2c53118c9a1c6670f5a1d531b47ec016484adf810a7bb21c733c47ee",
+    "scripts/test_main_guarantees.py": "277d391d7074f1469432b2bccc6bba6f6969577315e8d59f535fc09c13f88675",
+    "scripts/source_span_test_cases.py": "5af0882459a7cbfafae70afdd42981a71016a784034ad7a043394d2b5814b4e1"
+  },
+  "receipt": "audit/topup2-scoped-assurance/corrected-checks.json",
+  "log": "audit/topup2-scoped-assurance/corrected-ux2-mutations.log"
+}

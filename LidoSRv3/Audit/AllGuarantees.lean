@@ -1,3 +1,4 @@
+import LidoSRv3.Audit.Guarantees.PSsz1ActualMemory
 import LidoSRv3.Audit.Guarantees.PDeposit1PhysicalMetadata
 import LidoSRv3.Audit.Guarantees.PConsolidation1ActualGatewayVault
 import LidoSRv3.Audit.Guarantees.PTopup1ActualBatch

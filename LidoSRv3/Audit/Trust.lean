@@ -1,3 +1,5 @@
+import LidoSRv3.Tests.SszCompiledMemoryRegression
+import LidoSRv3.Audit.Guarantees.PSsz1ActualMemory
 import LidoSRv3.Tests.DepositPhysicalMetadataRegression
 import LidoSRv3.Audit.Guarantees.PDeposit1PhysicalMetadata
 import LidoSRv3.Tests.ConsolidationGatewayCallRegression
@@ -645,3 +647,5 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.actual_physical_metadata_before_calls
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.actual_physical_metadata_failure_restores
+
+#print axioms LidoSRv3.Audit.Guarantees.PSsz1.actual_memory_validator_branch
