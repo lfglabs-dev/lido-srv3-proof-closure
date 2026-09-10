@@ -1,0 +1,11 @@
+{
+  "command": [
+    "forge",
+    "test",
+    "--root",
+    "audit/consolidation-settlement/solidity",
+    "-vv"
+  ],
+  "exit_code": 0,
+  "log": "solidity-validation-final.log"
+}

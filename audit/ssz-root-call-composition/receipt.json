@@ -1,0 +1,59 @@
+{
+  "base": "b45cf453834a628439c9899feba760a77d3b984d",
+  "source_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "public_theorem": "LidoSRv3.Audit.Guarantees.PSsz1.actual_root_staticcall_validator_branch",
+  "scope": "Typed source-entry composition with actual physical-world low-level STATICCALL; compiled memory/full CL ABI connection remains separate. No existing claims or registry changed.",
+  "build": {
+    "command": "lake build LidoSRv3.Audit.Guarantees.PSsz1RootCall LidoSRv3.Tests.SszRootCallRegression",
+    "exit_code": 0,
+    "jobs": 806,
+    "existing_dependency_cache_reused": true
+  },
+  "kernel_regressions": 13,
+  "independently_checked_axiom_sets": 17,
+  "new_axioms": 0,
+  "source_identity_count": 790,
+  "local_source_identity_count": 11,
+  "package_pins": {
+    "verity": "e977aaad6e1a9e92e0132d41b3d33a14135a4d46",
+    "evmyul": "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9",
+    "mathlib": "fabf563a7c95a166b8d7b6efca11c8b4dc9d911f",
+    "plausible": "63045536fe95024e6c18fc7b48e03f506701c5bc",
+    "LeanSearchClient": "c5d5b8fe6e5158def25cd28eb94e4141ad97c843",
+    "importGraph": "5c7542ed018c78194f1e2b903eaf6a792b74c03d",
+    "proofwidgets": "24b0d9dc081c5423f8eec7e866c441e5184f29d9",
+    "aesop": "e3cb2f741431ce31bf73549fb52316a57368b06f",
+    "Qq": "f46324995fca5f0483b742e4eb4daec7f4ee50d2",
+    "batteries": "fa08db58b30eb033edcdab331bba000827f9f785",
+    "Cli": "92564e5770e4d09f2d86dfbf8ada1e9c715b384c"
+  },
+  "solidity": {
+    "fresh_run": true,
+    "tests_passed": 9,
+    "exit_code": 0,
+    "compiled_input_identities": 7,
+    "pinned_core_identities": 6,
+    "scope": "Unmodified pinned full _verifyValidator exercised with finite root responder; not proof of bytecode equivalence or EIP4788 deployment/authenticity"
+  },
+  "inputs": {
+    "LidoSRv3/Audit/Source/SszRootCall.lean": "68679df0481a76311596987703606612b926be4d5cae58414309f13172a48987",
+    "LidoSRv3/Audit/Guarantees/PSsz1RootCall.lean": "4a7aa1787386635500d78b07f4663f3503ca7f6e8cb0d428fb428f8d45078782",
+    "LidoSRv3/Tests/SszRootCallRegression.lean": "5fc71eafb220654121aadbb47c203a315bb486165a7dc78b3fedd97a64b9f8f7",
+    "lakefile.lean": "24a1f59c8ce4368b100a47981890cdd2a340b62bcc791bced65106b9df469eb6",
+    "lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
+    "lean-toolchain": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee",
+    "foundry.toml": "adb4990ab31a2bb53f5eeb370e4f55d962f7bc1026bce01708497a56b262356c"
+  },
+  "evidence": {
+    "audit/ssz-root-call-composition/README.md": "3cd19213b9e72d556e108112019bdbea5eb03c276485fdf85b9984c0df1f0239",
+    "audit/ssz-root-call-composition/validate.py": "53f745e9b23ebc4529c9621776e4814e58a70b8b26911614c1ea4c6d74777c61",
+    "audit/ssz-root-call-composition/source-inputs.json": "554cce6b7b8ec5a3a1f5ecdf5e6049f7fd35a92625bc78d422457dd53e0e0246",
+    "audit/ssz-root-call-composition/axioms.json": "84466bbd2f3b26e3b8644d7e13d74d0b693037d808483941a26221ff39ba4aca",
+    "audit/ssz-root-call-composition/final-build.log": "47d4bfab03d31dfb269750beebd4b16662423f09f9a5eecd0331871ad2963356",
+    "audit/ssz-root-call-composition/identity-axiom-check.log": "2558167c0edb3fd7b85d83ca37da86216bcabb79e575c2ad6049fb8b21b5fbec",
+    "audit/ssz-root-call-composition/solidity/SszRootCall.t.sol": "ed5b04da50dd98519ef85425a30477e63372eb7781cbca43ea446cd3c9761c90",
+    "audit/ssz-root-call-composition/solidity/validation.log": "b45a47158f89839004a57d61914170e7707b47c1fadc274d45c979aebedfcf50",
+    "audit/ssz-root-call-composition/solidity/compiler-input-identities.json": "9898f5e914fb7225d0238b1606db525ae4d5ed971a48b3210919e0b9451376f7"
+  },
+  "status": "Source candidate complete; independent exact-head review and root integration pending"
+}

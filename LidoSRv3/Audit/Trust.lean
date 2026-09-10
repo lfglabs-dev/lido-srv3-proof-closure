@@ -1,6 +1,10 @@
 import LidoSRv3.Tests.WithdrawalMinimalLedgerRegression
 import LidoSRv3.Audit.Guarantees.PDeposit1PhysicalLedger
 import LidoSRv3.Audit.Guarantees.PTopup1MinimalLedger
+import LidoSRv3.Tests.ConsolidationSettlementRegression
+import LidoSRv3.Audit.Guarantees.PConsolidationEth1ActualSettlement
+import LidoSRv3.Tests.SszRootCallRegression
+import LidoSRv3.Audit.Guarantees.PSsz1RootCall
 import LidoSRv3.Tests.SszCompiledMemoryRegression
 import LidoSRv3.Audit.Guarantees.PSsz1ActualMemory
 import LidoSRv3.Tests.DepositPhysicalMetadataRegression
@@ -652,6 +656,12 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.actual_physical_metadata_failure_restores
 
 #print axioms LidoSRv3.Audit.Guarantees.PSsz1.actual_memory_validator_branch
+
+#print axioms LidoSRv3.Audit.Guarantees.PSsz1.actual_root_staticcall_validator_branch
+#print axioms LidoSRv3.Audit.Source.SszRootCall.run_world
+
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1.actual_settlement_success
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1.actual_settlement_failure_restores
 
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.actual_physical_metadata_conserves
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.actual_continuation_locator_conserves
