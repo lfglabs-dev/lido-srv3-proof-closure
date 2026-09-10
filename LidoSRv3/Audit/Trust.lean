@@ -1,3 +1,4 @@
+import LidoSRv3.Tests.TopupBatchRootCallsRegression
 import LidoSRv3.Tests.WithdrawalMinimalLedgerRegression
 import LidoSRv3.Audit.Guarantees.PDeposit1PhysicalLedger
 import LidoSRv3.Audit.Guarantees.PTopup1MinimalLedger
@@ -671,3 +672,8 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_claim_withdrawals_failure_restores
 #print axioms LidoSRv3.Tests.PackDAddressClaimMutants.zero_recipient_rejects_before_claim
 #print axioms LidoSRv3.Tests.PackDAddressClaimMutants.failed_batch_restores_world
+
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2.actual_root_module_batch_bound
+#print axioms LidoSRv3.Audit.Source.TopupBatchRootCalls.failure_restores
+#print axioms LidoSRv3.Tests.TopupBatchRootCallsRegression.actual_batch_has_joint_guarantee
+#print axioms LidoSRv3.Tests.TopupBatchRootCallsRegression.two_rows_consume_ordered_limits
