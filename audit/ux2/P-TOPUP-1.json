@@ -1,5 +1,48 @@
 {
   "schema": "lido-srv3-ux2-guarantee-v1",
+  "main_result": {
+    "description": "Successful execution of the source router continuation after its module call transfers the guarded total from Lido to beacon in the same live ledger and restores the router balance. Positive success derives the exact allocation sum and nonempty keys. The full gateway/router entry connection remains open.",
+    "model": "Source post-module router continuation with concrete Lido withdrawal and beacon calls in Verity physical storage and a live balance ledger",
+    "theorems": [
+      {
+        "plane": "source",
+        "role": "registered main source-model result (audit/trio/main-guarantees.json)",
+        "status": "CHECKED",
+        "name": "LidoSRv3.Audit.Guarantees.PTopup1.actual_continuation_conserves",
+        "module": "LidoSRv3.Audit.Guarantees.PTopup1ActualContinuation",
+        "file": "LidoSRv3/Audit/Guarantees/PTopup1ActualContinuation.lean",
+        "start_line": 13,
+        "end_line": 27,
+        "doc": "/-- The source continuation's success derives the value transfer and router\nrestoration. Positive success also derives the exact mathematical allocation\nsum and nonempty keys; no successful withdrawal or beacon-stage premises are inputs. -/",
+        "statement": "theorem actual_continuation_conserves (hash : TopupRouterCredentials.Keccak)\n    (k : Queue.Keccak) (config : Pipeline.Config)\n    (staticOther : StaticCall.External) (other : External)\n    (ctx : Context) (beacon : Address) (i : Input) (before : World)\n    (bound : Pipeline.Bound config ctx before)\n    (lido_ne_router : ctx.self ≠ ctx.sender) (router_ne_beacon : ctx.sender ≠ beacon)\n    (h : (execute hash (Pipeline.external k config staticOther other) ctx beacon i before).outcome = .ok ()) :\n    ∃ total, guardSum (values i.allocations) (values i.limits) 0 = .ok total ∧\n      total ≤ i.roundedTarget.val ∧\n      CallSpec.Balances before.balances\n        (execute hash (Pipeline.external k config staticOther other) ctx beacon i before).world.balances\n        ctx.self beacon total ∧\n      (execute hash (Pipeline.external k config staticOther other) ctx beacon i before).world.balances ctx.sender =\n        before.balances ctx.sender ∧\n      (total = 0 ∨ (i.pubkeys ≠ [] ∧ total = allocSum (values i.allocations)))"
+      }
+    ],
+    "covered": [
+      "The executed router guards bound the pulled word; the concrete withdrawal derives funding and its exact transfer without an arbitrary-callee frame premise.",
+      "Actual beacon helper debits and the final router assertion force the withdrawn total to equal the actual sent value, including rejection of the empty-key positive path.",
+      "Positive success derives the exact mathematical allocation sum, nonempty keys and pointwise Lido-to-beacon conservation. Zero total keeps its source early path and final router event."
+    ],
+    "missing": [
+      "Full gateway/router entry, actual module-prefix effects and its connection to the continuation remain open; the theorem begins at the post-module state.",
+      "Zero-total equality with the mathematical allocation sum requires the preceding actual gateway batch bounds; this continuation alone also admits an unchecked wrapped sum of zero.",
+      "Exact outer Lido ABI/error bytes and full-entry observable rollback are not established by this result."
+    ],
+    "conditions": [
+      "Existing Pipeline.Bound supplies physical locator/consensus bindings, code presence and configuration separation at the continuation entry. Initialization and preservation through the preceding module call are not derived here.",
+      "Distinct Lido/router and router/beacon roles. No funding, initial beacon capacity, matching helper lengths, amount admission, successful sub-stage or callee balance-preservation premise.",
+      "Existing source CALL/ABI and declared Verity semantics apply; SHA, general compiler, gas and consensus boundaries are unchanged."
+    ],
+    "assumptions": [
+      "A-SOURCE-SHAPED",
+      "A-VERITY-SCAFFOLD",
+      "A-SOLC-TRUSTED",
+      "A-RUNTIME-PROVENANCE"
+    ],
+    "outside": [
+      "General compiler correctness, declared Verity semantics, cryptographic primitives, gas and consensus.",
+      "The historical synthetic TOPUP programs remain separate evidence; equality with their independently supplied inputs is not a source refinement target."
+    ]
+  },
   "id": "P-TOPUP-1",
   "position": 4,
   "summary": "source_topup_conserves_and_rolls_back is a single registered four-conjunct claim: (1) pulled = pushed on the source-shaped run -- genuinely assert-backed: run's value-moving tail and residual amount guards read the on-chain unchecked accumulator (the line-732 sum reduced mod 2^256, wrappedTotal = exactTotal % 2^256) for the over-target guard at line 737, the zero-sum test at line 741, the Lido-side amount guards (Lido.sol 842/873), the line-744 pull, the funded router balance, and the line-755 assert, so reaching a value-moving commit means the assert passed with the wrapped pull equal to the exact push -- and a reverting outcome maps to the abstract TxObservation rollback (A-ABSTRACT-TX); (2) the moduleExists guard is live -- an unregistered module reverts revertStakingModuleUnregistered; (3) if the unchecked sum wraps mod 2^256, run itself moves no wei (pulled = pushed = 0) -- a nonzero wrap still aborts on the value-moving tail (underfunded push or line-755 assert), while a sum that wraps to exactly zero takes the line-741 empty commit committedNoTopUp, so wrap-implies-revert is false; the honest fact is wrap precludes a value-moving commit (run_wrap_precludes_value_moving_commit / source_wrap_precludes_value_moving_commit); A-TOPUP-NOWRAP lives here, in the wrap antecedent, and in the discharged-balance-guard theorems, not in conjunct (1); (4) the wcTypeIsType2 guard is live -- a non-type-2 module reverts revertWrongWithdrawalCredentialsType. TopupTxMutants carries real kill-lines on mutants of the parent's own model: dropped_conservation_assert_kill_line_refutes_parent (a surgical mutant run with ONLY the line-755 assert deleted commits the wrapping batch with pulled = 1 ≠ 2^256+1 = pushed; mutantRunNoAssert_eq_run_of_assert_passing / mutantRunNoAssert_commits_where_assert_fires pin the single edit down in the P-DEPOSIT-1 style), dropped_module_guard_kill_line_refutes_parent and dropped_wc_guard_kill_line_refutes_parent (mutants without the moduleExists / wcTypeIsType2 require commit at witnesses where the parent demands the named revert), and unwrapped_accumulator_kill_line_refutes_parent (the assert-drop mutant's dual: a wrap-ignoring mutant run commits the wrapping batch the honest run reverts via the assert). The wave-1 projections are renamed guard_discharge_at_* and are honest positive controls, not kill-lines; wrap_to_zero_commits_no_topup is the honest wrap-to-zero empty-commit control. Verity: if allocations.length ≤ 2^256, each allocation is a uint256 word, and the source run does not revert, observe of execute equals sourceObservables and pulled/pushed match, including the wrap-to-zero empty success; NoUncheckedWrap is not a Verity parent hypothesis. Not P-TOPUP-2 amount computation.",

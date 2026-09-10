@@ -1,0 +1,1 @@
+ux2 artifact mutants ok: drift, stale, missing, unresolved/duplicate theorem, canonical order, unregistered assumption, missing source target, missing headline boundary, scope tracking, doc-comment and statement slicing, let/have binders, where-proofs, escaped identifier delimiters and ordinary delimiter controls, symlinked inputs and root, and the Lean source tree id
