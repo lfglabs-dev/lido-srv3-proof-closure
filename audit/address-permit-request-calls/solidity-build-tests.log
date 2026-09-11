@@ -1,0 +1,17 @@
+Compiling 20 files with Solc 0.8.9
+Solc 0.8.9 finished in 952.75ms
+Compiler run successful!
+
+Ran 9 tests for test/Permit.t.sol:PermitTest
+[PASS] testFuzzSevenFieldsIgnoredVoid(uint256,uint256,uint8,bytes32,bytes32,uint8) (runs: 1024, μ: 5735850, ~: 5742652)
+[PASS] testLaterStItemRestoresPermit() (gas: 5928725)
+[PASS] testNoCodeBeforePause() (gas: 5621030)
+[PASS] testPausedEmptyRestoresPermit() (gas: 5759781)
+[PASS] testPermitFailureBeforePause() (gas: 5625112)
+[PASS] testRealPermitPausedEmptyRollback() (gas: 5680726)
+[PASS] testRealTokenPermitConsumedByTwoItems() (gas: 5909775)
+[PASS] testRealTokenPermitLaterItemRollback() (gas: 5886266)
+[PASS] testVoidMalformedSuccessThenActualStBatch() (gas: 6023774)
+Suite result: ok. 9 passed; 0 failed; 0 skipped; finished in 389.35ms (431.56ms CPU time)
+
+Ran 1 test suite in 393.23ms (389.35ms CPU time): 9 tests passed, 0 failed, 0 skipped (9 total tests)
