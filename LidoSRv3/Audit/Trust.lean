@@ -64,6 +64,7 @@ import LidoSRv3.Audit.Source.TrioReserve1.Transfers
 import LidoSRv3.Audit.Guarantees.PEthConfinement1
 import LidoSRv3.Tests.EthConfinementMutants
 import LidoSRv3.Audit.Verity.MinFirstSourceEntry
+import LidoSRv3.Audit.Verity.DepositLedgerTx
 import LidoSRv3.Audit.Allocation
 import LidoSRv3.Audit.StrategyProofs
 import LidoSRv3.Audit.Common.Atomicity
@@ -1114,6 +1115,23 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.DepositAdmissionErrors.success_projection
 #print axioms LidoSRv3.Audit.Source.DepositAdmissionErrors.local_rejection
 #print axioms LidoSRv3.Audit.Source.DepositAdmissionErrors.failure_restores
+
+-- DepositLedgerTx executable-transaction correspondence: `run` and
+-- `revert` shape lemmas that document the pinned Solidity behaviour on
+-- three commitment planes (committing push, empty batch, non-conserving
+-- deployment) plus the paired kill-lines refuting a dropped assert and
+-- a skipped Lido debit. The `verity_revert_moves_no_ether` and
+-- `verity_revert_rolls_back` sisters document the transaction-boundary
+-- rollback discipline. `forEach_wrapper_unrolls_once` is the small
+-- symbolic wrapper equation used by the loop reasoning.
+#print axioms LidoSRv3.Audit.Verity.DepositLedgerTx.forEach_wrapper_unrolls_once
+#print axioms LidoSRv3.Audit.Verity.DepositLedgerTx.verity_revert_rolls_back
+#print axioms LidoSRv3.Audit.Verity.DepositLedgerTx.verity_revert_moves_no_ether
+#print axioms LidoSRv3.Audit.Verity.DepositLedgerTx.verity_tx_matches_source_committing_push
+#print axioms LidoSRv3.Audit.Verity.DepositLedgerTx.verity_tx_matches_source_empty_batch
+#print axioms LidoSRv3.Audit.Verity.DepositLedgerTx.verity_tx_matches_source_nonconserving_deployment
+#print axioms LidoSRv3.Audit.Verity.DepositLedgerTx.dropped_assert_commits_nonconserving_deployment
+#print axioms LidoSRv3.Audit.Verity.DepositLedgerTx.skipped_lido_debit_breaks_conservation
 
 -- Actual router admission consumes the entire prior physical TOPUP result.
 #print axioms LidoSRv3.Audit.Guarantees.PTopupRouterAdmissionCall.actual_router_admission_complete_prior
