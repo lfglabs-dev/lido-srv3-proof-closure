@@ -188,6 +188,8 @@ import LidoSRv3.Audit.Verity.Tests.SszTxSimulation
 import LidoSRv3.Audit.Source.SanityEnvelope
 import LidoSRv3.Tests.TopupModuleMemoryRegression
 import LidoSRv3.Tests.AddressRequestCalls
+import LidoSRv3.Audit.Source.TopupPointerOrigin
+import LidoSRv3.Tests.TopupPointerOriginMutants
 
 /-!
 Machine-readable-in-build trust report for the first audit slice.
@@ -1029,3 +1031,23 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.SszDeclaredSiblings.cursor_dichotomy
 #print axioms LidoSRv3.Audit.Source.SszDeclaredSiblings.complete_of_branch
 #print axioms LidoSRv3.Audit.Source.SszDeclaredSiblings.penultimate
+
+-- TOPUP pointer-origin memory model: `finalizeAllocation` zones for the
+-- credential (STATICCALL 32-byte copy) and module-return (raw + array)
+-- allocations. Sequential allocations are provably disjoint;
+-- independently supplied credential/module cursors may alias, and the
+-- named kill-lines refute the universal non-aliasing claims on well-
+-- formed decoder-success premises. No stub, no rename, no axiom beyond
+-- the three accepted Lean foundations.
+#print axioms LidoSRv3.Audit.Source.TopupPointerOrigin.sequential_disjoint
+#print axioms LidoSRv3.Audit.Source.TopupPointerOrigin.chained_scalar32_disjoint
+#print axioms LidoSRv3.Audit.Source.TopupPointerOrigin.credentials_zone
+#print axioms LidoSRv3.Audit.Source.TopupPointerOrigin.locator_zone
+#print axioms LidoSRv3.Audit.Source.TopupPointerOrigin.module_decode_zones
+#print axioms LidoSRv3.Audit.Source.TopupPointerOrigin.module_head_in_raw_zone
+#print axioms LidoSRv3.Audit.Source.TopupPointerOrigin.same_cursor_successful_decodes_alias
+#print axioms LidoSRv3.Audit.Source.TopupPointerOrigin.chained_credential_then_module_disjoint
+#print axioms LidoSRv3.Audit.Source.TopupPointerOrigin.chained_locator_credential_module_disjoint
+#print axioms LidoSRv3.Tests.TopupPointerOriginMutants.independent_cursor_alias_refutes_global_nonalias
+#print axioms LidoSRv3.Tests.TopupPointerOriginMutants.module_head_in_array_zone_refuted
+#print axioms LidoSRv3.Tests.TopupPointerOriginMutants.returnBuffer_eq_locator_refutes_cross_phase_nonalias
