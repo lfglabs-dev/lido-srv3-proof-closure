@@ -439,6 +439,22 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Verity.AddressAdmission.claim_rejects_empty_balance
 #print axioms LidoSRv3.Audit.Verity.AddressAdmission.claim_rejects_when_paused
 #print axioms LidoSRv3.Audit.Verity.AddressAdmission.ownerGated_not_admission_equivariant
+-- AddressAdmission low-level lookups and witness-plane invariants that
+-- underpin the equivariance proofs above. `paused_lookup`, `owner_lookup`,
+-- `balances_lookup` are the executable oracle-slot readers.
+-- `witness_balance_slot_{one,two}` and `witness_pause_disjoint_{one,two}`
+-- are `decide`-checked concrete witness invariants for the two-actor test
+-- fixture. `run_ownerGated_success` is the owner-gated success shape;
+-- `ownerGateKillLine_holds` refutes universal owner-gated admission.
+#print axioms LidoSRv3.Audit.Verity.AddressAdmission.paused_lookup
+#print axioms LidoSRv3.Audit.Verity.AddressAdmission.owner_lookup
+#print axioms LidoSRv3.Audit.Verity.AddressAdmission.balances_lookup
+#print axioms LidoSRv3.Audit.Verity.AddressAdmission.witness_balance_slot_one
+#print axioms LidoSRv3.Audit.Verity.AddressAdmission.witness_balance_slot_two
+#print axioms LidoSRv3.Audit.Verity.AddressAdmission.witness_pause_disjoint_one
+#print axioms LidoSRv3.Audit.Verity.AddressAdmission.witness_pause_disjoint_two
+#print axioms LidoSRv3.Audit.Verity.AddressAdmission.run_ownerGated_success
+#print axioms LidoSRv3.Audit.Verity.AddressAdmission.ownerGateKillLine_holds
 #print axioms LidoSRv3.Audit.Verity.ConsolidationCallFragment.raw_call_entrypoint_always_reverts
 #print axioms
   LidoSRv3.Audit.Verity.ConsolidationCallFragment.external_call_bind_entrypoint_always_reverts
