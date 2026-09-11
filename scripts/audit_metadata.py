@@ -26,7 +26,7 @@ from source_spans import span_identity
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
 SOURCE_FIDELITY = AUDIT / "SOURCE-FIDELITY.md"
-R1_REVIEW_BASE = "e016fd4c20c679c56af2e6cbd5667f69e504f946"
+R1_REVIEW_BASE = "fcc172fb9c59b7a74ee9f2e0399760232d468854"
 # Bind the report inputs to the recorded Git object and exact bytes.
 # Changed inputs must never inherit an earlier source review.
 # This exact family is every structured input used to render the R1 review
@@ -35,7 +35,7 @@ R1_REVIEW_BASE = "e016fd4c20c679c56af2e6cbd5667f69e504f946"
 R1_REPORT_INPUT_SHA256 = {
     "audit/guarantees.yaml": "97826dd74e19a67538fb8496099f90637df30260ce3b525eb3c5cde8656e91bf",
     "audit/source-map.yaml": "33040d89e1b1b93dd5cd5b7e855d45eee0883caec1629ee64fe6199a143619fb",
-    "audit/trust-native-decide-allowlist.txt": "4874951cd0717f16756f3f644c424f06bdbbfcca1561173b32fd134b1fb6730c",
+    "audit/trust-native-decide-allowlist.txt": "1f88bb489f81b07af1c1062f9d682bacff2382b72436bfef2e16a1d659765995",
 }
 CANONICAL_IDS = [
     "P-ALLOC-1", "P-ALLOC-2", "P-DEPOSIT-1", "P-TOPUP-1",
