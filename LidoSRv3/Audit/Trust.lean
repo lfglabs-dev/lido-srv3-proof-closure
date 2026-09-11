@@ -146,6 +146,7 @@ import LidoSRv3.Audit.Spec.DepositEthJournalCorrespondence
 import LidoSRv3.Tests.PackJDepositEthJournalMutants
 import LidoSRv3.Audit.Spec.TopupEthJournalCorrespondence
 import LidoSRv3.Tests.PackJTopupEthJournalMutants
+import LidoSRv3.Tests.TopupReturnBufferMutants
 import LidoSRv3.Audit.Spec.HashIdentificationChild
 import LidoSRv3.Tests.PackS1HashMutants
 import LidoSRv3.Audit.Spec.ConsolidationBridgeGap
@@ -349,6 +350,15 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Spec.TopupEthJournalCorrespondence.topup_value_moving_journal_projects
 #print axioms LidoSRv3.Audit.Spec.TopupEthJournalCorrespondence.topup_wrap_to_zero_journal_empty
 #print axioms LidoSRv3.Tests.PackJTopupEthJournalMutants.beacon_as_consolidation_kill_line_refutes_dest_restriction
+
+-- P-TOPUP-1 returnBuffer-derived-from-credentials.next witnesses (grok #367):
+-- concrete decoded outputs at credentials.next = 160 and next = 192 for the
+-- credentials-then-module chain. Both are `native_decide` closures on finite
+-- fixture data; the axioms are mutant-only regression evidence, not
+-- production-parent dependencies.
+#print axioms LidoSRv3.Tests.TopupReturnBufferMutants.decode_at_credentials_next_128
+#print axioms LidoSRv3.Tests.TopupReturnBufferMutants.decode_at_credentials_next_160
+
 #print axioms LidoSRv3.Audit.Spec.HashIdentificationChild.hash_identification_agrees_on_bytes
 #print axioms LidoSRv3.Tests.PackS1HashMutants.engine_mutant_still_disagrees
 #print axioms LidoSRv3.Audit.Spec.ConsolidationBridgeGap.official_external_call_reverts
