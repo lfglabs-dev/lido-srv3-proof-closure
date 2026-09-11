@@ -1,0 +1,11 @@
+{
+  "sources": 1311,
+  "pins": 11,
+  "artifact_hashes": 49,
+  "scoped_axioms": 6,
+  "normal_olean_sha256": {
+    "LidoSRv3/Audit/Source/DepositPhysicalAdmission": "cd8ea628ed09551272faaad249d564b2b0ecb19f42586a5936a766fed256b088",
+    "LidoSRv3/Audit/Guarantees/PDeposit1PhysicalAdmission": "8662ec6193886a083f20e4bda9976d9ba926a05ae8af1f1d63c4fb5bc8b30f8f",
+    "LidoSRv3/Tests/DepositPhysicalAdmission": "9b8cd10242cf3666244ec0f5ee51ab195600a06b62df0be27d518f111123e926"
+  }
+}
