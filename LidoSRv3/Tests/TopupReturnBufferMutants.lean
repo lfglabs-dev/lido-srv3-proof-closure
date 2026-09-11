@@ -6,9 +6,9 @@ decoder. No always-success stub, no renamed TOPUP premise. -/
 set_option autoImplicit false
 namespace LidoSRv3.Tests.TopupReturnBufferMutants
 
-open TrioReserve1 Live
-open LidoSRv3.Audit.Source.TopupPointerOrigin
-open LidoSRv3.Audit.Source.TopupReturnBuffer
+open Audit.Source TrioReserve1 Live
+open TopupPointerOrigin
+open TopupReturnBuffer
 open LidoSRv3.Tests.TopupPointerOriginMutants
 open audit.trio.deposit.ModuleCall (finalizeAllocation)
 
@@ -38,10 +38,17 @@ theorem locator_at_128 :
       .ok (locWord, word 160) := by
   decide +kernel
 
+theorem decode_at_credentials_next_160 :
+    decodeReturnAtCredentialsNext (word 160) credRaw moduleRaw =
+      .ok (credWord, word 192, [word 1, word 9], word 416) := by
+  native_decide
+
 theorem decode_after_locator_128 :
     decodeReturnAfterLocator (word 128) locRaw credRaw moduleRaw =
       .ok (locWord, word 160, credWord, word 192, [word 1, word 9], word 416) := by
-  native_decide
+  unfold decodeReturnAfterLocator
+  rw [locator_at_128]
+  simp [decode_at_credentials_next_160]
 
 theorem decode_after_locator_disjoint_128 :
     Disjoint (scalar32 (word 128) (word 160)) (scalar32 (word 160) (word 192)) ∧

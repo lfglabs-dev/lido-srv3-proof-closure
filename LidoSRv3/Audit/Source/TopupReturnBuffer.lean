@@ -34,7 +34,7 @@ def decodeReturnAtCredentialsNext (credCursor : Word) (rawCred rawMod : Bytes) :
 `credNext`. Matches the public locator→credentials thread plus the derived
 module cursor. -/
 def decodeReturnAfterLocator (locCursor : Word) (rawLoc rawCred rawMod : Bytes) :
-    Except Fault (Word × Word × Word × List Word × Word) :=
+    Except Fault (Word × Word × Word × Word × List Word × Word) :=
   match TopupCredentialCall.decodeCredentials locCursor rawLoc with
   | .error f => .error f
   | .ok (locWord, locNext) =>
@@ -53,17 +53,18 @@ theorem decodeReturnAtCredentialsNext_ok
       TopupModuleMemory.decodeReturn credNext rawMod = .ok (xs, next) := by
   unfold decodeReturnAtCredentialsNext at h
   cases hc : TopupCredentialCall.decodeCredentials credCursor rawCred with
-  | error f => simp [hc] at h
+  | «error» f => simp [hc] at h
   | ok pair =>
     rcases pair with ⟨wc', credNext'⟩
     simp only [hc] at h
     cases hm : TopupModuleMemory.decodeReturn credNext' rawMod with
-    | error f => simp [hm] at h
+    | «error» f => simp [hm] at h
     | ok pair =>
       rcases pair with ⟨xs', next'⟩
-      simp [hm] at h
-      obtain ⟨rfl, rfl, rfl, rfl⟩ := h
-      exact ⟨hc, hm⟩
+      simp only [hm] at h
+      injection h with heq
+      cases heq
+      exact ⟨rfl, hm⟩
 
 /-- Sequential credentials then module on the *derived* cursor. No
 `returnBuffer = credNext` hypothesis: the wrapper does not take
@@ -95,17 +96,18 @@ theorem decodeReturnAfterLocator_ok
         .ok (wc, credNext, xs, next) := by
   unfold decodeReturnAfterLocator at h
   cases hl : TopupCredentialCall.decodeCredentials locCursor rawLoc with
-  | error f => simp [hl] at h
+  | «error» f => simp [hl] at h
   | ok pair =>
     rcases pair with ⟨locWord', locNext'⟩
     simp only [hl] at h
     cases hm : decodeReturnAtCredentialsNext locNext' rawCred rawMod with
-    | error f => simp [hm] at h
+    | «error» f => simp [hm] at h
     | ok pair =>
       rcases pair with ⟨wc', credNext', xs', next'⟩
-      simp [hm] at h
-      obtain ⟨rfl, rfl, rfl, rfl, rfl⟩ := h
-      exact ⟨hl, hm⟩
+      simp only [hm] at h
+      injection h with heq
+      cases heq
+      exact ⟨rfl, hm⟩
 
 /-- Locator→credentials (already in the public run) plus the derived module
 cursor. Pairwise sequential, no `hchain`. -/
