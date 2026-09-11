@@ -400,6 +400,15 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1.verity_tx_revert_restores_snapshot
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1.mint_after_read_discipline
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1.mint_order_kill_line
+-- Committed-mint event consumers: when the fee mint commits with
+-- nonzero sharesToMintAsFees, the emitted event list is exactly the
+-- transfer / transferShares pair keyed on the locatorAccounting sink
+-- and the checked FeeResult.sharesToMintAsFees, i.e. the amount is not
+-- an input independent of the committed getter. Registered here so
+-- the two forms (bare ReportFeeMint.Input and the HandleOracleReportTx
+-- root form) both enter the Trust axiom discipline.
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1.committed_fee_mint_consumes_checked_result
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1.root_committed_fee_mint_consumes_checked_result
 #print axioms LidoSRv3.Audit.Verity.HandleOracleReportTx.verity_tx_simulates_pinned_source
 #print axioms LidoSRv3.Audit.Verity.HandleOracleReportTx.revert_restores_snapshot
 #print axioms LidoSRv3.Audit.Verity.HandleOracleReportTx.mintAfterReadDiscipline_holds
