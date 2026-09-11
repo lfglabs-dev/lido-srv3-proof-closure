@@ -1,0 +1,31 @@
+Compiling 24 files with Solc 0.8.25
+Solc 0.8.25 finished in 5.42s
+Compiler run successful with warnings:
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> test/PhysicalQuota.t.sol:10:1:
+   |
+10 | contract QuotaInbox {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> test/PhysicalQuota.t.sol:16:2:
+   |
+16 |  fallback() external payable {
+   |  ^ (Relevant source part starts here and spans across multiple lines).
+
+
+Ran 12 tests for test/PhysicalQuota.t.sol:PhysicalQuotaTest
+[PASS] testAcceptedCallbackCanChangeFinalQuota() (gas: 3071968)
+[PASS] testBackwardTimestamp() (gas: 1972970)
+[PASS] testCheckedReplenishmentOverflow() (gas: 3942552)
+[PASS] testCheckedUint32ProductAndAddition() (gas: 3943476)
+[PASS] testCountBeforeUpdateDivisionAndMaxGuard() (gas: 3942455)
+[PASS] testDisabledSkipsRawBadState() (gas: 1971448)
+[PASS] testFramesCastBeforeProduct() (gas: 1972472)
+[PASS] testFuzzBoundedPhysicalReplenishment(uint32,uint32,uint32,uint32,uint32,uint32,uint96) (runs: 1024, μ: 1974782, ~: 1974897)
+[PASS] testLateRefundRestoresQuotaAndAllPriorEffects() (gas: 3076966)
+[PASS] testReplenishCapPreservesUpper96() (gas: 1972737)
+[PASS] testSameQuotaQuoteVaultInboxRefund() (gas: 3062768)
+[PASS] testZeroDurationBothPaths() (gas: 3942716)
+Suite result: ok. 12 passed; 0 failed; 0 skipped; finished in 75.98ms (92.53ms CPU time)
+
+Ran 1 test suite in 80.00ms (75.98ms CPU time): 12 tests passed, 0 failed, 0 skipped (12 total tests)
