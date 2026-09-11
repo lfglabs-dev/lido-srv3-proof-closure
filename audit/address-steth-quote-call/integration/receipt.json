@@ -1,0 +1,21 @@
+{
+  "source": "ee24f9dc158ed25cec118a8ab8cd3a4fc59942f1",
+  "main": "295e6c676b61de1815b7027a49ed8bc5fe5b8b3f",
+  "union": "f7cf6fc528471919b6b5b43c9f375fa9972edf7e",
+  "jobs": 1760,
+  "global_axioms": 29,
+  "ordinary_scopes": 11,
+  "source_hashes": 111,
+  "sha256": {
+    "audit/address-steth-quote-call/integration/README.md": "7482947cfdaf7cac38c4024c211c8b9d0ecc5824e52ee3de0bac880172779998",
+    "audit/address-steth-quote-call/integration/all-trust-build.log": "d1ef8fda8de5b33312227f5f39ea4fbadeac54dba441f9b5baf185758116bbc9",
+    "audit/address-steth-quote-call/integration/identities.json": "17ac24149153585de78b085837134f5a95f2cd9dfd3989555a048e71ebf2f82c",
+    "audit/address-steth-quote-call/integration/identity-check.log": "063551eef543b27d8fdb2de729f1970a47c170fc0b2aa93a62c3dbb7d215db1e",
+    "audit/address-steth-quote-call/integration/independent-source-review-ee24.md": "ac7d4d8c84d6492ee6264f2129bd2604eaa278ff0c44d1c94be22ee9cd2bedce",
+    "audit/address-steth-quote-call/integration/readonly-validator.py": "e96f9209cbadb3a38fa2e2c44927a6cc8f68ed1e5ac5c793f664176973919633",
+    "audit/address-steth-quote-call/integration/scoped-axioms.json": "11fb5b06daa0a3d237234bbf810c0368ba6d65486ffa268676675a2fd8aacaa3",
+    "audit/address-steth-quote-call/integration/trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439",
+    "audit/address-steth-quote-call/integration/independent-integration-review-5e51.md": "3abe5139cddfeda6287444b370a0b556d1ef0871794324f86ac7391a5862d5f5"
+  },
+  "integration_review": "CLEAN exact5e517930893b5f5b00bbce2cac1c9fd36210ae8d; archive-only successor separately reviewed"
+}

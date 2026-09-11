@@ -1,0 +1,117 @@
+{
+  "ir_sha256": "4170a026329677bca075096ede2b500f76d0ec7a481d793086d3793fa88358b0",
+  "scope": "Reused byte-identical complete 2519-line GatewayWitnessHarness IR; exact22 pinned/vendored fixture bodies and metadata; no solc or Forge rerun",
+  "selector": "ef6c064c",
+  "sources": [
+    {
+      "keccak256": "c1c2a7f1563b77050dc6d507db9f4ada5d042c1f6a9ddbffdc49c77cdc0a1606",
+      "path": "@openzeppelin/contracts-v5.2/access/IAccessControl.sol",
+      "sha256": "c112f5c86fdc4e862f88d4f5694530342320923ebd5b5e7d9d8493550d337c2d"
+    },
+    {
+      "keccak256": "ca774fbe0568762efdc1a7cba31f09549c7fa96dbe97410f4843fa2f0bc000a3",
+      "path": "@openzeppelin/contracts-v5.2/access/extensions/IAccessControlEnumerable.sol",
+      "sha256": "f91dc4b5750c1bac7a6a11a6057f14f01121847e6a6284e1200d8a87a4c4ff1e"
+    },
+    {
+      "keccak256": "79796192ec90263f21b464d5bc90b777a525971d3de8232be80d9c4f9fb353b8",
+      "path": "@openzeppelin/contracts-v5.2/utils/introspection/IERC165.sol",
+      "sha256": "7c5c3f98ab876991e7dd34b84d41137e836306eb9f36f6386a631f5be3f5d6d4"
+    },
+    {
+      "keccak256": "9b161e97b8967d4bc0c08d25741889a30692cdda4b71910bf1b0e315f1962212",
+      "path": "@openzeppelin/contracts-v5.2/utils/structs/EnumerableSet.sol",
+      "sha256": "ed0804f9dcff9d2dceba8cc83f31669a84491dfcfe510050c9371aa7c48db09c"
+    },
+    {
+      "keccak256": "5bdcc82b3f038c98e518f9ee7135a6124e5ac813f9184f7c3f5214e6b3f8bd20",
+      "path": "audit/topup-gateway-witness-batch/solidity/TopupGatewayWitnessBatch.t.sol",
+      "sha256": "feddd9ebdd11e9dc1d0eb0fdf4f3da59e5e059ad7c41aa022b9875af0a20dee5"
+    },
+    {
+      "keccak256": "eb6c14b6c9c715d9585d73cea0a63dc218c3b9fd28eec6047a883f622ab09e9f",
+      "path": "contracts/0.8.25/CLValidatorVerifier.sol",
+      "sha256": "d6e89f6975e4fa02f758bf461a98ac2d689296b5c92d03ffd4e43a22d0b3d7ed"
+    },
+    {
+      "keccak256": "5e1c55e237d3c6e1e2346b518e29e143c37a78a64f4097a063ccb7a08e0ae705",
+      "path": "contracts/0.8.25/TopUpGateway.sol",
+      "sha256": "a7ffb654fb4d8d83ba14a6d9452663f786e9a21434be3ce9b7205c546526b7b4"
+    },
+    {
+      "keccak256": "02fd6bea6189cc945b2e5a53838b5d09f2cd36c7a45061baaafafd6365e57a09",
+      "path": "contracts/common/interfaces/IPausableUntil.sol",
+      "sha256": "0377e3ac9ff2d6be41f4b8f40eee7cfd452ce6de760f9b9145fdb38b94902de3"
+    },
+    {
+      "keccak256": "7b53240b5eb4d44ab94a258bd39af03b4f096afdee6a0bc2034cbf0e6f53c521",
+      "path": "contracts/common/interfaces/TopUpWitness.sol",
+      "sha256": "34135d561e4d8c3f1585cdbc15d20f568e36bb37db6c8d4444a8d0cd48cef44d"
+    },
+    {
+      "keccak256": "8a8c7644d91bef60068027b444c104eb1dcd86ac6dc8ff3c5a928e64de659550",
+      "path": "contracts/common/interfaces/ValidatorWitness.sol",
+      "sha256": "8fd24cfab7402233029756e52e59198b0d9cbf0a42e5c07d9fa2338ed731a5f7"
+    },
+    {
+      "keccak256": "6099fbcefb3b3afdaf69321338d2546962125666086a653303446ee9a8dd8caa",
+      "path": "contracts/common/lib/BLS.sol",
+      "sha256": "0187cc6a6b1aaa833317695d88795db431fa237452213e8c3872a0f444dceb7c"
+    },
+    {
+      "keccak256": "84d92a58850cdcba3e811ef39e414aee829f6437df26387aac5fdaca5484f8d2",
+      "path": "contracts/common/lib/BeaconTypes.sol",
+      "sha256": "9591e9af1a4fd398db86267f3589e763f9eb2016bf29e26cfa50988cf73a10c3"
+    },
+    {
+      "keccak256": "b9e55d38004099aeafb50d54d91427fcc3379e5a54435a7aabe7de4d6de99052",
+      "path": "contracts/common/lib/GIndex.sol",
+      "sha256": "2653bd4ba89c349f3db36f21a8afc6a24e0e233816d9b608f46d048feb601d1f"
+    },
+    {
+      "keccak256": "479f52b444430e27bf119132ae59ed55c97441959cda554f737f943d499b2756",
+      "path": "contracts/common/lib/SSZ.sol",
+      "sha256": "91ef497b972bbee0fe89043034e6bd62fa0c1059f22874d4826bc6164a22009b"
+    },
+    {
+      "keccak256": "f017977e6449d758fe7fecb36a7be79d2fc582176bcc759e9fcfbe363ea3e616",
+      "path": "contracts/common/lib/UnstructuredStorage.sol",
+      "sha256": "ca4ad93eedff40de12fdd50a88ef608650139a5543fd160dab61cad4d3c03160"
+    },
+    {
+      "keccak256": "c0012573a628eb737369c1f1af6eeaf13ce700ce1b820409631ba66859e48a33",
+      "path": "contracts/common/lib/WithdrawalCredentials.sol",
+      "sha256": "cf5e77be0c5d522d853d19a4c5284e53fa0fb149a9902f77648a8f6d5584636c"
+    },
+    {
+      "keccak256": "3f837d9fb7ba9a178e6186225d6de917503778d688ddbf55b96741370d46ed74",
+      "path": "contracts/common/utils/PausableUntil.sol",
+      "sha256": "f27405a7f52a15f7e1b10a73ae57ed69fe6514aaba821415e5584458546cf255"
+    },
+    {
+      "keccak256": "4579bd5d9965b710cafc44c6f3e9c0b4b92b65862455eebcf38b7bdfd6eb90c6",
+      "path": "contracts/openzeppelin/5.2/upgradeable/access/AccessControlUpgradeable.sol",
+      "sha256": "d32578f73ad0a24f65d8208033226cc5567a9df2a57fabadf644f6e4e7f172a4"
+    },
+    {
+      "keccak256": "c8ef3ead3920f1af737f4d0084ed559cccb494f1a2c6d6ea13281afcdb924be2",
+      "path": "contracts/openzeppelin/5.2/upgradeable/access/extensions/AccessControlEnumerableUpgradeable.sol",
+      "sha256": "b6b854fdb69cfe58d7494f6cfc1920a68b504c32e97f6028b6d62a844bc17426"
+    },
+    {
+      "keccak256": "631188737069917d2f909d29ce62c4d48611d326686ba6683e26b72a23bfac0b",
+      "path": "contracts/openzeppelin/5.2/upgradeable/proxy/utils/Initializable.sol",
+      "sha256": "a8b7eafa0fdc7cb5a644c8c61a8e4c51e031d5e1e6f268f72dbe18b768ead56e"
+    },
+    {
+      "keccak256": "dbef5f0c787055227243a7318ef74c8a5a1108ca3a07f2b3a00ef67769e1e397",
+      "path": "contracts/openzeppelin/5.2/upgradeable/utils/ContextUpgradeable.sol",
+      "sha256": "a08e16324da33a9d666dc07a22ae58031c242a3869f6808e55b4b82fc70cb209"
+    },
+    {
+      "keccak256": "6bcabbed627885274b46d17f17c6675ba638b4587406c6d1c023f9d6dbd907ed",
+      "path": "contracts/openzeppelin/5.2/upgradeable/utils/introspection/ERC165Upgradeable.sol",
+      "sha256": "76f4b4b6f5d8de71b0b29d90f2b277b88b2c45898340b20b278b9e9ed5074f77"
+    }
+  ]
+}
