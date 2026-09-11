@@ -1,0 +1,276 @@
+{
+  "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "sources": [
+    {
+      "path": "audit/address-wrapped-token-call/solidity/token/src/@openzeppelin/contracts/cryptography/ECDSA.sol",
+      "origin": "npm@3.4.0:package/cryptography/ECDSA.sol",
+      "sha256": "0c3c8f0e880bfb11298ab86b2863e7a6ce8c85e443fbf4998b8ed3b32739c853"
+    },
+    {
+      "path": "audit/address-wrapped-token-call/solidity/token/src/@openzeppelin/contracts/drafts/EIP712.sol",
+      "origin": "npm@3.4.0:package/drafts/EIP712.sol",
+      "sha256": "128b338ed9d2fd87a05f1ac21700a15cd1c8fb99054be9640076dc15bf392517"
+    },
+    {
+      "path": "audit/address-wrapped-token-call/solidity/token/src/@openzeppelin/contracts/drafts/ERC20Permit.sol",
+      "origin": "npm@3.4.0:package/drafts/ERC20Permit.sol",
+      "sha256": "f5a1eb501cf574127ad2cea3038ad050d3010989917c60dc9e45da0d5f8caa24"
+    },
+    {
+      "path": "audit/address-wrapped-token-call/solidity/token/src/@openzeppelin/contracts/drafts/IERC20Permit.sol",
+      "origin": "npm@3.4.0:package/drafts/IERC20Permit.sol",
+      "sha256": "ec032179af802dd3efbf4377ab603bf5bdbfe11dbc963a319dbf3c1654f428d7"
+    },
+    {
+      "path": "audit/address-wrapped-token-call/solidity/token/src/@openzeppelin/contracts/math/SafeMath.sol",
+      "origin": "npm@3.4.0:package/math/SafeMath.sol",
+      "sha256": "4a04d0a20a19e3ef1dcabae9cad9ba006430a4e7eec4d9b519db87999722c98a"
+    },
+    {
+      "path": "audit/address-wrapped-token-call/solidity/token/src/@openzeppelin/contracts/token/ERC20/ERC20.sol",
+      "origin": "npm@3.4.0:package/token/ERC20/ERC20.sol",
+      "sha256": "eff65ebfa1cad6260b4916ce5293ed6c7231a34d2899c04227578c172990a1f8"
+    },
+    {
+      "path": "audit/address-wrapped-token-call/solidity/token/src/@openzeppelin/contracts/token/ERC20/IERC20.sol",
+      "origin": "npm@3.4.0:package/token/ERC20/IERC20.sol",
+      "sha256": "0573c2961569aa4906845d0cd428b5b7394956170054ceeaa8f8af96cd44875c"
+    },
+    {
+      "path": "audit/address-wrapped-token-call/solidity/token/src/@openzeppelin/contracts/utils/Context.sol",
+      "origin": "npm@3.4.0:package/utils/Context.sol",
+      "sha256": "9a3d1e5be0f0ace13e2d9aa1d0a1c3a6574983983ad5de94fc412f878bf7fe89"
+    },
+    {
+      "path": "audit/address-wrapped-token-call/solidity/token/src/@openzeppelin/contracts/utils/Counters.sol",
+      "origin": "npm@3.4.0:package/utils/Counters.sol",
+      "sha256": "8d78ab699ba115f01c6e1a213e6a696d49c7ed26c4f49f23c2b80cb2895e8853"
+    },
+    {
+      "path": "audit/address-wrapped-token-call/solidity/token/src/core/WstETH.sol",
+      "origin": "17005714f151e5502c559932319a3f2f74ac2436:contracts/0.6.12/WstETH.sol",
+      "sha256": "254a8bfab14c30ac30d36fbe0174fe424798a67276abb1c52e139af28899cae0"
+    },
+    {
+      "path": "audit/address-wrapped-token-call/solidity/token/src/core/interfaces/IStETH.sol",
+      "origin": "17005714f151e5502c559932319a3f2f74ac2436:contracts/0.6.12/interfaces/IStETH.sol",
+      "sha256": "3c96c6250a67eca83d5f89c1e7a08b27f3168ec744ca3745df4ace687df6b6b2"
+    },
+    {
+      "path": "audit/address-wrapped-token-call/solidity/queue/src/@openzeppelin/contracts-v4.4/access/IAccessControl.sol",
+      "origin": "npm@4.4.1:package/access/IAccessControl.sol",
+      "sha256": "d03c1257f2094da6c86efa7aa09c1c07ebd33dd31046480c5097bc2542140e45"
+    },
+    {
+      "path": "audit/address-wrapped-token-call/solidity/queue/src/@openzeppelin/contracts-v4.4/access/IAccessControlEnumerable.sol",
+      "origin": "npm@4.4.1:package/access/IAccessControlEnumerable.sol",
+      "sha256": "655ab8dc2a9617376734d04ca293e099cc24f8ce893997e68c29cfebc4a61d39"
+    },
+    {
+      "path": "audit/address-wrapped-token-call/solidity/queue/src/@openzeppelin/contracts-v4.4/token/ERC20/IERC20.sol",
+      "origin": "npm@4.4.1:package/token/ERC20/IERC20.sol",
+      "sha256": "6eacf8ca56b41b7636489c0996d8f9608b4d298879a1fd5d876f21ad7a6711f1"
+    },
+    {
+      "path": "audit/address-wrapped-token-call/solidity/queue/src/@openzeppelin/contracts-v4.4/token/ERC20/extensions/draft-IERC20Permit.sol",
+      "origin": "npm@4.4.1:package/token/ERC20/extensions/draft-IERC20Permit.sol",
+      "sha256": "3e7aa0e0f69eec8f097ad664d525e7b3f0a3fda8dcdd97de5433ddb131db86ef"
+    },
+    {
+      "path": "audit/address-wrapped-token-call/solidity/queue/src/@openzeppelin/contracts-v4.4/utils/Context.sol",
+      "origin": "npm@4.4.1:package/utils/Context.sol",
+      "sha256": "1458c260d010a08e4c20a4a517882259a23a4baa0b5bd9add9fb6d6a1549814a"
+    },
+    {
+      "path": "audit/address-wrapped-token-call/solidity/queue/src/@openzeppelin/contracts-v4.4/utils/Strings.sol",
+      "origin": "npm@4.4.1:package/utils/Strings.sol",
+      "sha256": "8597c62818dcbc6cf85c21179b90b714fb4f70a4347ca2eed23e88c87b08b8a1"
+    },
+    {
+      "path": "audit/address-wrapped-token-call/solidity/queue/src/@openzeppelin/contracts-v4.4/utils/introspection/ERC165.sol",
+      "origin": "npm@4.4.1:package/utils/introspection/ERC165.sol",
+      "sha256": "8806a632d7b656cadb8133ff8f2acae4405b3a64d8709d93b0fa6a216a8a6154"
+    },
+    {
+      "path": "audit/address-wrapped-token-call/solidity/queue/src/@openzeppelin/contracts-v4.4/utils/introspection/IERC165.sol",
+      "origin": "npm@4.4.1:package/utils/introspection/IERC165.sol",
+      "sha256": "701e025d13ec6be09ae892eb029cd83b3064325801d73654847a5fb11c58b1e5"
+    },
+    {
+      "path": "audit/address-wrapped-token-call/solidity/queue/src/@openzeppelin/contracts-v4.4/utils/structs/EnumerableSet.sol",
+      "origin": "npm@4.4.1:package/utils/structs/EnumerableSet.sol",
+      "sha256": "42a618e7d36efd2319d1bf05fedb31f3042baf535cfb97e783128cc1fe326686"
+    },
+    {
+      "path": "audit/address-wrapped-token-call/solidity/queue/src/core/WithdrawalQueue.sol",
+      "origin": "17005714f151e5502c559932319a3f2f74ac2436:contracts/0.8.9/WithdrawalQueue.sol",
+      "sha256": "efa5a32fbc99cafdb16a38d96a9bb5b29a62e60b5610e7c317711cc58402b131"
+    },
+    {
+      "path": "audit/address-wrapped-token-call/solidity/queue/src/core/WithdrawalQueueBase.sol",
+      "origin": "17005714f151e5502c559932319a3f2f74ac2436:contracts/0.8.9/WithdrawalQueueBase.sol",
+      "sha256": "68d8919f89198c3d39272b2259a3144bf87a4aa48c570624b025fd86da47d2bb"
+    },
+    {
+      "path": "audit/address-wrapped-token-call/solidity/queue/src/core/lib/UnstructuredStorage.sol",
+      "origin": "17005714f151e5502c559932319a3f2f74ac2436:contracts/0.8.9/lib/UnstructuredStorage.sol",
+      "sha256": "955bfcb0bf265db114248bdabeabebc39bddb3fbb756e2448f6aed59f1994f56"
+    },
+    {
+      "path": "audit/address-wrapped-token-call/solidity/queue/src/core/utils/PausableUntil.sol",
+      "origin": "17005714f151e5502c559932319a3f2f74ac2436:contracts/0.8.9/utils/PausableUntil.sol",
+      "sha256": "afd11f5950050bbc8e9fad3cbea2a5bdbcc23048128c30f335a12b48084c8594"
+    },
+    {
+      "path": "audit/address-wrapped-token-call/solidity/queue/src/core/utils/Versioned.sol",
+      "origin": "17005714f151e5502c559932319a3f2f74ac2436:contracts/0.8.9/utils/Versioned.sol",
+      "sha256": "7f9ba0a2368d7531447a80e80ae28406964acf51ca0de8bfa985620e226340a8"
+    },
+    {
+      "path": "audit/address-wrapped-token-call/solidity/queue/src/core/utils/access/AccessControl.sol",
+      "origin": "17005714f151e5502c559932319a3f2f74ac2436:contracts/0.8.9/utils/access/AccessControl.sol",
+      "sha256": "e399e266f9b0e8fe99708f3fb2f656a636fb432d69ca9c247f2e84f2e762f803"
+    },
+    {
+      "path": "audit/address-wrapped-token-call/solidity/queue/src/core/utils/access/AccessControlEnumerable.sol",
+      "origin": "17005714f151e5502c559932319a3f2f74ac2436:contracts/0.8.9/utils/access/AccessControlEnumerable.sol",
+      "sha256": "e8fa2bc8e4c8046fd04b25ed4708be8159913cac4ca738cdc53022896e0566ce"
+    }
+  ],
+  "packages": {
+    "3.4.0": {
+      "name": "@openzeppelin/contracts",
+      "version": "3.4.0",
+      "shasum": "9a1669ad5f9fdfb6e273bb5a4fed10cb4cc35eb0",
+      "integrity": "sha512-qh+EiHWzfY/9CORr+eRUkeEUP1WiFUcq3974bLHwyYzLBUtK6HPaMkIUHi74S1rDTZ0sNz42DwPc5A4IJvN3rg=="
+    },
+    "4.4.1": {
+      "name": "@openzeppelin/contracts",
+      "version": "4.4.1",
+      "shasum": "3382db2cd83ab565ed9626765e7da92944b45de8",
+      "integrity": "sha512-o+pHCf/yMLSlV5MkDQEzEQL402i6SoRnktru+0rdSxVEFZcTzzGhZCAtZjUFyKGazMSv1TilzMg+RbED1N8XHQ=="
+    }
+  },
+  "compiler_artifacts": {
+    "token": {
+      "path": "audit/address-wrapped-token-call/solidity/queue/artifacts/WstETH.json",
+      "sha256": "dcb0b2a66eac8c7e763bcf431dee815672c03a99223bd172ad71e8f0c12b2eff",
+      "compiler": {
+        "version": "0.6.12+commit.27d51765"
+      },
+      "settings": {
+        "remappings": [
+          "@openzeppelin/contracts/=src/@openzeppelin/contracts/"
+        ],
+        "optimizer": {
+          "enabled": true,
+          "runs": 200
+        },
+        "metadata": {
+          "bytecodeHash": "ipfs"
+        },
+        "compilationTarget": {
+          "src/core/WstETH.sol": "WstETH"
+        },
+        "evmVersion": "istanbul",
+        "libraries": {}
+      },
+      "sources": {
+        "src/@openzeppelin/contracts/cryptography/ECDSA.sol": "0x94c4719c16ffb96dd3cdc68f6fbf78105153018adbf382241821e8188e6a4bd5",
+        "src/@openzeppelin/contracts/drafts/EIP712.sol": "0x1dd6456f505926d94adcb04fb920c3e20c469ad1c0c0f7d582f70f773f99ad39",
+        "src/@openzeppelin/contracts/drafts/ERC20Permit.sol": "0xaa17940e5c3654c6eb39b11f6667af8ad94594e9c3424a0c8bf4bb2ae452a36c",
+        "src/@openzeppelin/contracts/drafts/IERC20Permit.sol": "0x1aab7754719ba764a8a05bec47e975001400f62986474945eb3dbee6d871259f",
+        "src/@openzeppelin/contracts/math/SafeMath.sol": "0xcc78a17dd88fa5a2edc60c8489e2f405c0913b377216a5b26b35656b2d0dab52",
+        "src/@openzeppelin/contracts/token/ERC20/ERC20.sol": "0xca0c2396dbeb3503b51abf4248ebf77a1461edad513c01529df51850a012bee3",
+        "src/@openzeppelin/contracts/token/ERC20/IERC20.sol": "0x5f02220344881ce43204ae4a6281145a67bc52c2bb1290a791857df3d19d78f5",
+        "src/@openzeppelin/contracts/utils/Context.sol": "0x8d3cb350f04ff49cfb10aef08d87f19dcbaecc8027b0bed12f3275cd12f38cf0",
+        "src/@openzeppelin/contracts/utils/Counters.sol": "0x21662e4254ce4ac8570b30cc7ab31435966b3cb778a56ba4d09276881cfb2437",
+        "src/core/WstETH.sol": "0x485cc103708010c7828ef12b80313598bfc12c0293c8a49994150b21a450bef9",
+        "src/core/interfaces/IStETH.sol": "0xe5233803d6ba5442770d0284945aa27cd669c766c39b0c6b17be157e04eb9069"
+      }
+    },
+    "queue": {
+      "path": "audit/address-wrapped-token-call/solidity/queue/compiler-artifact.json",
+      "sha256": "acb9de5b664ca3fbd0990037f59acea896e978e5a3b63239df741e44e412edfa",
+      "compiler": {
+        "version": "0.8.9+commit.e5eed63a"
+      },
+      "settings": {
+        "remappings": [
+          "@openzeppelin/contracts-v4.4/=src/@openzeppelin/contracts-v4.4/"
+        ],
+        "optimizer": {
+          "enabled": true,
+          "runs": 200
+        },
+        "metadata": {
+          "bytecodeHash": "ipfs"
+        },
+        "compilationTarget": {
+          "src/WrappedRequestHarness.sol": "WrappedRequestHarness"
+        },
+        "evmVersion": "london",
+        "libraries": {}
+      },
+      "sources": {
+        "src/@openzeppelin/contracts-v4.4/access/IAccessControl.sol": "0x59ce320a585d7e1f163cd70390a0ef2ff9cec832e2aa544293a00692465a7a57",
+        "src/@openzeppelin/contracts-v4.4/access/IAccessControlEnumerable.sol": "0xba4459ab871dfa300f5212c6c30178b63898c03533a1ede28436f11546626676",
+        "src/@openzeppelin/contracts-v4.4/token/ERC20/IERC20.sol": "0x61437cb513a887a1bbad006e7b1c8b414478427d33de47c5600af3c748f108da",
+        "src/@openzeppelin/contracts-v4.4/token/ERC20/extensions/draft-IERC20Permit.sol": "0xf41ca991f30855bf80ffd11e9347856a517b977f0a6c2d52e6421a99b7840329",
+        "src/@openzeppelin/contracts-v4.4/utils/Context.sol": "0xe2e337e6dde9ef6b680e07338c493ebea1b5fd09b43424112868e9cc1706bca7",
+        "src/@openzeppelin/contracts-v4.4/utils/Strings.sol": "0x32c202bd28995dd20c4347b7c6467a6d3241c74c8ad3edcbb610cd9205916c45",
+        "src/@openzeppelin/contracts-v4.4/utils/introspection/ERC165.sol": "0xd10975de010d89fd1c78dc5e8a9a7e7f496198085c151648f20cba166b32582b",
+        "src/@openzeppelin/contracts-v4.4/utils/introspection/IERC165.sol": "0x447a5f3ddc18419d41ff92b3773fb86471b1db25773e07f877f548918a185bf1",
+        "src/@openzeppelin/contracts-v4.4/utils/structs/EnumerableSet.sol": "0x9772845c886f87a3aab315f8d6b68aa599027c20f441b131cd4afaf65b588900",
+        "src/WrappedRequestHarness.sol": "0xde8cab9e48fd067dd27f265135d62efe8da1519057a3a3622d5bf71b970d3ce4",
+        "src/core/WithdrawalQueue.sol": "0x82d318ae0f623b03c641bef1a560589ae2a87533e6b68f079191e2f70ae48039",
+        "src/core/WithdrawalQueueBase.sol": "0x2b36b2303a6b174ede30dba61731b8f65d5afd4504886e1d09e4c667398d664b",
+        "src/core/lib/UnstructuredStorage.sol": "0xe4bb1b1a3ecf62b15c386b8eec8418af1f1a0adc7038cc429e49d714c680bf3a",
+        "src/core/utils/PausableUntil.sol": "0x649e985766974846621b6b5e940f3c104313f5cdc67cf3028f6dfc11c95be154",
+        "src/core/utils/Versioned.sol": "0xc055bd49f21bc48111d6d8eb75b18249b9da88ce0c14abb8f24ebed6a5973d2f",
+        "src/core/utils/access/AccessControl.sol": "0x340b4ec2297aa8c093df6af2427db9c93f5d0b2ea7801e53f21b1884ea8b8329",
+        "src/core/utils/access/AccessControlEnumerable.sol": "0x4fc4273a8223466a575a3e53a2b8ad81a75dc2fba12195d9b8ca083bda946c58"
+      }
+    }
+  },
+  "layout": {
+    "_balances": [
+      0,
+      0
+    ],
+    "_allowances": [
+      1,
+      0
+    ],
+    "_totalSupply": [
+      2,
+      0
+    ],
+    "_name": [
+      3,
+      0
+    ],
+    "_symbol": [
+      4,
+      0
+    ],
+    "_decimals": [
+      5,
+      0
+    ],
+    "_nonces": [
+      6,
+      0
+    ],
+    "stETH": [
+      7,
+      0
+    ]
+  },
+  "selectors": {
+    "unwrap(uint256)": "0xde0e9a3e",
+    "getPooledEthByShares(uint256)": "0x7a28fb88",
+    "transfer(address,uint256)": "0xa9059cbb"
+  },
+  "scope": "Current exact Git/npm source and compiler metadata identities. Layout/selector binding and actual cross-compiler artifact path; no general compiler or deployed identity theorem."
+}

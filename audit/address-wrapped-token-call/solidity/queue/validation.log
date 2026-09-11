@@ -1,0 +1,14 @@
+No files changed, compilation skipped
+
+Ran 8 tests for test/ActualWrappedToken.t.sol:ActualWrappedTokenTest
+[PASS] testActualTokenCallerEnqueueAndBoolTwo() (gas: 5866435)
+[PASS] testArbitraryStETHCanChangeSupplyAfterBurn() (gas: 5928786)
+[PASS] testConversionDecodeFailureBeforeBurn() (gas: 5715513)
+[PASS] testFalseAndTrailingTransferAccepted() (gas: 5838679)
+[PASS] testFuzzConvertedAmountDrivesSameEnqueue(uint96,uint256) (runs: 1024, μ: 5862001, ~: 5862274)
+[PASS] testLateCallerAmountFailureRollsBackActualToken() (gas: 5809381)
+[PASS] testSupplySafeMathFailureAfterBalanceWrite() (gas: 5733552)
+[PASS] testTransferDecodeFailureRollsBackBurn() (gas: 5788956)
+Suite result: ok. 8 passed; 0 failed; 0 skipped; finished in 414.20ms (444.07ms CPU time)
+
+Ran 1 test suite in 414.73ms (414.20ms CPU time): 8 tests passed, 0 failed, 0 skipped (8 total tests)
