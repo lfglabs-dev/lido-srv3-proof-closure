@@ -299,7 +299,6 @@
         "A-ABSTRACT-TX",
         "A-SOURCE-SHAPED",
         "A-VERITY-SCAFFOLD",
-        "A-CANONICAL-REQUEST-ADDRESS",
         "A-SOLC-TRUSTED",
         "A-RUNTIME-PROVENANCE"
       ],

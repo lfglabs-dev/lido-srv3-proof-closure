@@ -47,5 +47,26 @@
       "blocked": true,
       "value": null
     }
+  },
+  "deployed_bytecode": {
+    "WithdrawalVault_implementation": {
+      "proxy": "0xB9D7934878B5FB9610B3fE8A5e441e8fad7E293f",
+      "implementation": "0xfB4521BD151BFB45DB6045D2d07e58e0f597e340",
+      "chain": "mainnet",
+      "source_relative_path": "contracts/0.8.9/WithdrawalVault.sol",
+      "fixture_path": "fixtures/deployed/WithdrawalVault-impl-runtime.bin",
+      "fixture_size_bytes": 5088,
+      "fixture_sha256": "a3e9e582928d58cdfe87a6405ad1a7967f720cafa97f98ae8d619e36b961aa7f",
+      "immutable_extractions": [
+        {
+          "immutable_name": "CONSOLIDATION_REQUEST",
+          "byte_offset": 730,
+          "width_bytes": 20,
+          "expected_value_hex": "0000bbddc7ce488642fb579f8b00f3a590007251",
+          "canonical_source": "EIP-7251 consolidation request predeploy",
+          "discharges_assumption": "A-CANONICAL-REQUEST-ADDRESS (P-CONSOLIDATION-ETH-1)"
+        }
+      ]
+    }
   }
 }
