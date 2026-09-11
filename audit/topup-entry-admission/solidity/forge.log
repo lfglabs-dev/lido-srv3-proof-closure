@@ -1,0 +1,16 @@
+Compiling 23 files with Solc 0.8.25
+Solc 0.8.25 finished in 17.20s
+Compiler run successful!
+
+Ran 8 tests for audit/topup-entry-admission/solidity/TopupEntryAdmission.t.sol:TopupEntryAdmissionTest
+[PASS] testFuzz_entry_rawRoleAndResume(uint256,uint256) (runs: 1024, μ: 16821, ~: 16790)
+[PASS] test_entry_fullWidthPause() (gas: 282400)
+[PASS] test_entry_highBitsDoNotGrantRole() (gas: 280828)
+[PASS] test_entry_noncanonicalLowByteAccepted() (gas: 405098)
+[PASS] test_entry_pauseBeforeLengths() (gas: 17638)
+[PASS] test_entry_resumeEquality() (gas: 403496)
+[PASS] test_entry_roleBeforePauseAndLengths() (gas: 16659)
+[PASS] test_entry_wrongCallerMappingNotUsed() (gas: 281539)
+Suite result: ok. 8 passed; 0 failed; 0 skipped; finished in 29.93ms (47.72ms CPU time)
+
+Ran 1 test suite in 36.70ms (29.93ms CPU time): 8 tests passed, 0 failed, 0 skipped (8 total tests)
