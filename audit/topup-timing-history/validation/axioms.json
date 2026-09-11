@@ -1,0 +1,122 @@
+{
+  "LidoSRv3.Audit.Guarantees.PTopupTimingHistory.actual_timing_credential_root_module_failure_restores": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Guarantees.PTopupTimingHistory.actual_timing_credential_root_module_memory_history": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Guarantees.PTopupTimingHistory.history_effects": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.TopupTimingHistory.execute_produced": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.TopupTimingHistory.execute_projection": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.TopupTimingHistory.failure_restores": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.TopupTimingHistory.gates_admitted": [
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.TopupTimingHistory.packed_fields": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.TopupTimingHistory.run_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.TopupTimingHistory.update_word": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupTimingHistory.age_before_last_timestamp": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupTimingHistory.checked_subtraction_before_age": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupTimingHistory.config_before_timing": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupTimingHistory.distance_before_root_age": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupTimingHistory.distance_equality_passes": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupTimingHistory.full_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupTimingHistory.future_root_not_rejected": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupTimingHistory.last_block_zero_shortcircuits": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupTimingHistory.late_failure_keeps_attempts_restores_history": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupTimingHistory.lengths_before_timing": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupTimingHistory.nonempty_zero_limits_skip_history": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupTimingHistory.positive_limits_zero_allocations_write": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupTimingHistory.public_consumer": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupTimingHistory.public_rollback": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupTimingHistory.timestamp_equality_rejected": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupTimingHistory.timing_before_lookup": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupTimingHistory.uint64_age_overflow": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupTimingHistory.uint64_max_age_succeeds": [
+    "propext"
+  ]
+}

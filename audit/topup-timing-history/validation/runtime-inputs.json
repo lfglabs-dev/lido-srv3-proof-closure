@@ -1,0 +1,23 @@
+{
+  "files": {
+    "EvmYul/FFI/ffi.c": "0ca099540b8f46888e9ae18afffb2a825ef8ef0edc0d9a239c819c32cf82a020",
+    "EvmYul/FFI/ffi.lean": "c0b6b455399a476fd3c5be3fd3e1df5788a112dd92b520397512d073b6317562",
+    "keccak256/sha3.c": "9499df301d240fdd296fb53aae554d2615f875156e39174390dc0b7dd2a25fea",
+    "keccak256/sha3.h": "ba0f5cb513018ae84959293f82a2f1b2c027457c6564e8e1b8397fa439bcce6c",
+    "sha2/sha-256.c": "7a74437adc78576b8faff060f9573ba88a6da798914f45d263c75b149add3d27",
+    "sha2/sha-256.h": "c2173d83813a0c29fcc3345ce489766efeadee6a52ca927ecd0f917a120df9fb"
+  },
+  "repositories": {
+    "keccak256": "fc8504750a5c2174a1874094dd05e6a0d8797753",
+    "sha2": "565f65009bdd98267361b17d50cddd7c9beb3e6c"
+  },
+  "scope": "Fresh native FFI IO diagnostic; unchanged independently generated f008 SHA tree/proofs; no native theorem axiom",
+  "vectors": {
+    "audit/topup-credential-call/validation/make-vector.py": "82aaa99be8e0c29bc644bd9e409b0e096c9913aaa1c5eac478950f2fad1fe8b5",
+    "audit/topup-credential-call/validation/proof-0.bin": "4789470c03fd0cc86f46cc0f58ad965873b0a30448d204aa2dbed305cc869259",
+    "audit/topup-credential-call/validation/proof-1.bin": "45448825cb6ea22e8248adfcfc7c882ded7d85955033d406f79c777197f99b61",
+    "audit/topup-credential-call/validation/proof-2.bin": "c9aeec94a036aa4edb1a60e952e725485bf6c965e95815d26837f3268e92d1c8",
+    "audit/topup-credential-call/validation/root.bin": "2fb8c2d7a6380649d49aaec0223e1371e230e1350f39cace6e730b168a515a11",
+    "audit/topup-credential-call/validation/vector.json": "a82ce8bb1e05e7d4eda1545360e6a9587bc26992654deb5727e8062f5bba5a90"
+  }
+}
