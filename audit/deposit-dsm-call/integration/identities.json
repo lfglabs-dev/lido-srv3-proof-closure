@@ -1,0 +1,11 @@
+{
+  "sources": 1314,
+  "pins": 11,
+  "artifact_hashes": 50,
+  "scoped_axioms": 6,
+  "normal_olean_sha256": {
+    "LidoSRv3/Audit/Source/DepositDsmCall": "b76de0949a7d9fbcbf90175abbc3156e861959c0c9f54d17c3613dea4ded6969",
+    "LidoSRv3/Audit/Guarantees/PDeposit1DsmCall": "b3872603d197114371c0c3e16b08cd9bcc7193c5d01488f3253620dfda4f2a75",
+    "LidoSRv3/Tests/DepositDsmCall": "ef51cd76115955dc450c0b0a7575ef236ec51a5da823f416108b70e413bdd229"
+  }
+}

@@ -1,0 +1,69 @@
+Compiling 31 files with Solc 0.8.25
+Solc 0.8.25 finished in 65.93ms
+Error: Compiler run failed:
+Error (6275): Source "../../deposit-physical-admission/solidity/src/@openzeppelin/contracts-v5.2/utils/Panic.sol" not found: File outside of allowed directories. The following are allowed: "/private/tmp/lido-deposit-dsm-call/audit/deposit-dsm-call/solidity", "/private/tmp/lido-deposit-dsm-call/audit/deposit-dsm-call/solidity/lib".
+ParserError: Source "../../deposit-physical-admission/solidity/src/@openzeppelin/contracts-v5.2/utils/Panic.sol" not found: File outside of allowed directories. The following are allowed: "/private/tmp/lido-deposit-dsm-call/audit/deposit-dsm-call/solidity", "/private/tmp/lido-deposit-dsm-call/audit/deposit-dsm-call/solidity/lib".
+ --> ../../deposit-physical-admission/solidity/src/@openzeppelin/contracts-v5.2/utils/math/Math.sol:6:1:
+  |
+6 | import {Panic} from "../Panic.sol";
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Error (6275): Source "../../deposit-physical-admission/solidity/src/@openzeppelin/contracts-v5.2/utils/math/SafeCast.sol" not found: File outside of allowed directories. The following are allowed: "/private/tmp/lido-deposit-dsm-call/audit/deposit-dsm-call/solidity", "/private/tmp/lido-deposit-dsm-call/audit/deposit-dsm-call/solidity/lib".
+ParserError: Source "../../deposit-physical-admission/solidity/src/@openzeppelin/contracts-v5.2/utils/math/SafeCast.sol" not found: File outside of allowed directories. The following are allowed: "/private/tmp/lido-deposit-dsm-call/audit/deposit-dsm-call/solidity", "/private/tmp/lido-deposit-dsm-call/audit/deposit-dsm-call/solidity/lib".
+ --> ../../deposit-physical-admission/solidity/src/@openzeppelin/contracts-v5.2/utils/math/Math.sol:7:1:
+  |
+7 | import {SafeCast} from "./SafeCast.sol";
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Error (6275): Source "../../deposit-physical-admission/solidity/src/contracts/0.8.25/sr/SRLib.sol" not found: File outside of allowed directories. The following are allowed: "/private/tmp/lido-deposit-dsm-call/audit/deposit-dsm-call/solidity", "/private/tmp/lido-deposit-dsm-call/audit/deposit-dsm-call/solidity/lib".
+ParserError: Source "../../deposit-physical-admission/solidity/src/contracts/0.8.25/sr/SRLib.sol" not found: File outside of allowed directories. The following are allowed: "/private/tmp/lido-deposit-dsm-call/audit/deposit-dsm-call/solidity", "/private/tmp/lido-deposit-dsm-call/audit/deposit-dsm-call/solidity/lib".
+  --> ../../deposit-physical-admission/solidity/src/contracts/0.8.25/sr/StakingRouter.sol:17:1:
+   |
+17 | import {SRLib} from "./SRLib.sol";
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Error (6275): Source "../../deposit-physical-admission/solidity/src/contracts/0.8.25/sr/SRStorage.sol" not found: File outside of allowed directories. The following are allowed: "/private/tmp/lido-deposit-dsm-call/audit/deposit-dsm-call/solidity", "/private/tmp/lido-deposit-dsm-call/audit/deposit-dsm-call/solidity/lib".
+ParserError: Source "../../deposit-physical-admission/solidity/src/contracts/0.8.25/sr/SRStorage.sol" not found: File outside of allowed directories. The following are allowed: "/private/tmp/lido-deposit-dsm-call/audit/deposit-dsm-call/solidity", "/private/tmp/lido-deposit-dsm-call/audit/deposit-dsm-call/solidity/lib".
+  --> ../../deposit-physical-admission/solidity/src/contracts/0.8.25/sr/StakingRouter.sol:18:1:
+   |
+18 | import {SRStorage} from "./SRStorage.sol";
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Error (6275): Source "../../deposit-physical-admission/solidity/src/contracts/0.8.25/sr/SRUtils.sol" not found: File outside of allowed directories. The following are allowed: "/private/tmp/lido-deposit-dsm-call/audit/deposit-dsm-call/solidity", "/private/tmp/lido-deposit-dsm-call/audit/deposit-dsm-call/solidity/lib".
+ParserError: Source "../../deposit-physical-admission/solidity/src/contracts/0.8.25/sr/SRUtils.sol" not found: File outside of allowed directories. The following are allowed: "/private/tmp/lido-deposit-dsm-call/audit/deposit-dsm-call/solidity", "/private/tmp/lido-deposit-dsm-call/audit/deposit-dsm-call/solidity/lib".
+  --> ../../deposit-physical-admission/solidity/src/contracts/0.8.25/sr/StakingRouter.sol:19:1:
+   |
+19 | import {SRUtils} from "./SRUtils.sol";
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Error (6275): Source "../../deposit-physical-admission/solidity/src/contracts/0.8.25/sr/ISRBase.sol" not found: File outside of allowed directories. The following are allowed: "/private/tmp/lido-deposit-dsm-call/audit/deposit-dsm-call/solidity", "/private/tmp/lido-deposit-dsm-call/audit/deposit-dsm-call/solidity/lib".
+ParserError: Source "../../deposit-physical-admission/solidity/src/contracts/0.8.25/sr/ISRBase.sol" not found: File outside of allowed directories. The following are allowed: "/private/tmp/lido-deposit-dsm-call/audit/deposit-dsm-call/solidity", "/private/tmp/lido-deposit-dsm-call/audit/deposit-dsm-call/solidity/lib".
+  --> ../../deposit-physical-admission/solidity/src/contracts/0.8.25/sr/StakingRouter.sol:20:1:
+   |
+20 | import {ISRBase} from "./ISRBase.sol";
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Error (6275): Source "../../deposit-physical-admission/solidity/src/contracts/common/lib/Math256.sol" not found: File outside of allowed directories. The following are allowed: "/private/tmp/lido-deposit-dsm-call/audit/deposit-dsm-call/solidity", "/private/tmp/lido-deposit-dsm-call/audit/deposit-dsm-call/solidity/lib".
+ParserError: Source "../../deposit-physical-admission/solidity/src/contracts/common/lib/Math256.sol" not found: File outside of allowed directories. The following are allowed: "/private/tmp/lido-deposit-dsm-call/audit/deposit-dsm-call/solidity", "/private/tmp/lido-deposit-dsm-call/audit/deposit-dsm-call/solidity/lib".
+ --> ../../deposit-physical-admission/solidity/src/contracts/common/lib/MinFirstAllocationStrategy.sol:8:1:
+  |
+8 | import {Math256} from "./Math256.sol";
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Error (6275): Source "../../deposit-physical-admission/solidity/src/contracts/openzeppelin/5.2/upgradeable/access/AccessControlUpgradeable.sol" not found: File outside of allowed directories. The following are allowed: "/private/tmp/lido-deposit-dsm-call/audit/deposit-dsm-call/solidity", "/private/tmp/lido-deposit-dsm-call/audit/deposit-dsm-call/solidity/lib".
+ParserError: Source "../../deposit-physical-admission/solidity/src/contracts/openzeppelin/5.2/upgradeable/access/AccessControlUpgradeable.sol" not found: File outside of allowed directories. The following are allowed: "/private/tmp/lido-deposit-dsm-call/audit/deposit-dsm-call/solidity", "/private/tmp/lido-deposit-dsm-call/audit/deposit-dsm-call/solidity/lib".
+ --> ../../deposit-physical-admission/solidity/src/contracts/openzeppelin/5.2/upgradeable/access/extensions/AccessControlEnumerableUpgradeable.sol:7:1:
+  |
+7 | import {AccessControlUpgradeable} from "../AccessControlUpgradeable.sol";
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Error (6275): Source "../../deposit-physical-admission/solidity/src/contracts/openzeppelin/5.2/upgradeable/proxy/utils/Initializable.sol" not found: File outside of allowed directories. The following are allowed: "/private/tmp/lido-deposit-dsm-call/audit/deposit-dsm-call/solidity", "/private/tmp/lido-deposit-dsm-call/audit/deposit-dsm-call/solidity/lib".
+ParserError: Source "../../deposit-physical-admission/solidity/src/contracts/openzeppelin/5.2/upgradeable/proxy/utils/Initializable.sol" not found: File outside of allowed directories. The following are allowed: "/private/tmp/lido-deposit-dsm-call/audit/deposit-dsm-call/solidity", "/private/tmp/lido-deposit-dsm-call/audit/deposit-dsm-call/solidity/lib".
+ --> ../../deposit-physical-admission/solidity/src/contracts/openzeppelin/5.2/upgradeable/access/extensions/AccessControlEnumerableUpgradeable.sol:9:1:
+  |
+9 | import {Initializable} from "../../proxy/utils/Initializable.sol";
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Compiling 31 files with Solc 0.8.25
+Solc 0.8.25 finished in 12.83s
+Compiler run successful!
+Error: wasn't able to find artifact for library SRLib at ../../deposit-physical-admission/solidity/src/contracts/0.8.25/sr/SRLib.sol
