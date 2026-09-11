@@ -1,0 +1,23 @@
+{
+  "source_commit": "713c8bf70df2125258b27e6d7b8baa76455f8192",
+  "initial_build_union": "f28c8beb4cc482a9e3146f4631b8cc2d534712e8",
+  "build_union": "decd74ec1a54e9159538d8016f09928b19fcf132",
+  "final_union": "a4629328e26b3768be5ab280717c7cf07732df83",
+  "main_base": "1cd11a4719ce9dec72f0c7dcffde5bcd7848f28d",
+  "files": {
+    "audit/address-steth-transfer-from-call/integration/README.md": "d04e0349ec6313712aa34367d4accc01b8e775051f893f2dc2270b9e767b7495",
+    "audit/address-steth-transfer-from-call/integration/all-trust-build.log": "c1ac8b366f4cc3935f7de8786896377dafeb809a515b202a1991a6bb7328f716",
+    "audit/address-steth-transfer-from-call/integration/failed-trust-buildlog-input.log": "053079409c9e7a8740624377f9c1bb212844cbd23c8234187efcbae48aa40a65",
+    "audit/address-steth-transfer-from-call/integration/identities.json": "4a4d24cdac2f7dfdc3d02a0be9c3c9791f71758b4a1f63278ab72d941ab1caad",
+    "audit/address-steth-transfer-from-call/integration/identity-check.log": "daea676c87052f627400f23caf24bcc69ab8d5f7f3834c32520fd27444bc2c63",
+    "audit/address-steth-transfer-from-call/integration/independent-source-review-713c.md": "f4b47ec0868e15ab84bcb21a6ad7da9d51ed153c353812473044eea771a4e40a",
+    "audit/address-steth-transfer-from-call/integration/initial-all-trust-build.log": "3a0a6625e1586be27914318c553a425eb0204e8e52d5a6732ab3dcc1215b3e9b",
+    "audit/address-steth-transfer-from-call/integration/readonly-validator.py": "141bc09eb00a5e1bebe4855022f08308e06c9f6f3a520d93508f7c979686e748",
+    "audit/address-steth-transfer-from-call/integration/trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439"
+  },
+  "configuration_sha256": {
+    "lakefile.lean": "c8b9de3b79b4aff42d8708d93e6211821980e835294a04bd9f53311f8af8e9e7",
+    "lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
+    "lean-toolchain": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee"
+  }
+}
