@@ -205,6 +205,7 @@ import LidoSRv3.Audit.Model.EthWorld
 import LidoSRv3.Audit.Verity.TrioConsolidation.Correspondence
 import LidoSRv3.Audit.Verity.TrioConsolidation.Memory
 import LidoSRv3.Audit.Verity.ConsolidationValueTx
+import LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx
 import LidoSRv3.Tests.TopupPointerOriginMutants
 
 /-!
@@ -1481,3 +1482,17 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Verity.ConsolidationValueTx.afterCalls_fresh
 #print axioms LidoSRv3.Audit.Verity.ConsolidationValueTx.afterCalls_forwardedValue
 #print axioms LidoSRv3.Audit.Verity.ConsolidationValueTx.afterCalls_noConsensusLayerVerify
+
+-- PConsolidationEth1CompositionTx: the value-composition transaction
+-- surface. `batch_splits_fee_and_refund` fixes the split; the two
+-- adversarial closures `rejected_request_restores_entry_world` and
+-- `underfunded_batch_reverts_in_gateway` document the failure planes;
+-- `honest_revert_partition` closes the revert partition on the honest
+-- shape; `dispatch_conserves_eth` and `dispatch_matches_atomic_multicall`
+-- pin the conservation and multicall-equivalence of the dispatch loop.
+#print axioms LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.batch_splits_fee_and_refund
+#print axioms LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.rejected_request_restores_entry_world
+#print axioms LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.underfunded_batch_reverts_in_gateway
+#print axioms LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.honest_revert_partition
+#print axioms LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.dispatch_conserves_eth
+#print axioms LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.dispatch_matches_atomic_multicall
