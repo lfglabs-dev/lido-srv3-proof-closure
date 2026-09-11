@@ -26,14 +26,14 @@ from source_spans import span_identity
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
 SOURCE_FIDELITY = AUDIT / "SOURCE-FIDELITY.md"
-R1_REVIEW_BASE = "f9d4b3eeb15a792fd7714831820a91488a58c2da"
+R1_REVIEW_BASE = "8ffb8f42ec3980e60df2055dbbad818616b6b141"
 # Bind the report inputs to the recorded Git object and exact bytes.
 # Changed inputs must never inherit an earlier source review.
 # This exact family is every structured input used to render the R1 review
 # report.  A normal regeneration may never pair changed family content with a
 # stale certified basis.
 R1_REPORT_INPUT_SHA256 = {
-    "audit/guarantees.yaml": "7a3f3fb38438a4f324f21ad4e3a72438b34c930a545a5c79f7bfc8c86c88feb4",
+    "audit/guarantees.yaml": "e35937555074ec426271052ff40ea34920aeabdfcd4c5248dbd37a237424ec68",
     "audit/source-map.yaml": "33040d89e1b1b93dd5cd5b7e855d45eee0883caec1629ee64fe6199a143619fb",
     "audit/trust-native-decide-allowlist.txt": "1f88bb489f81b07af1c1062f9d682bacff2382b72436bfef2e16a1d659765995",
 }
@@ -92,7 +92,7 @@ EXPECTED_CANONICAL_DETAIL_SHA256 = {
     "P-TOPUP-1": "98ee9e6bb02029b4b087702f3c2e3c0c0df70a6f26b31973add594a1fc169d3e",
     "P-ACCOUNT-1": "0bfe71a24bbb39a1c72af1020f7aab17feeb628dc0889f0688ab7499e5ee1a0b",
     "P-RESERVE-1": "5b2e39b7d0f6ae09eabea8ee1f4ff5f02337921e576bb6786bb6b9063272b010",
-    "P-CONSOLIDATION-ETH-1": "0bbd358a2b0ab770b4a88536e88ce9a32fa6bfdecbc83c70c519673505841017",
+    "P-CONSOLIDATION-ETH-1": "5b28d16589a5ef77ef5e6a2ed686ef020e0fa7698a61ebfae01a387aca35e942",
     "P-ADDRESS-1": "2aec78330a6f136e109160e4cca2c2da6e159dc2db719d28b260134d69e447aa",
     "P-TOPUP-2": "9fac92874b97a201f80be5b60508d84bedefdeed962c417aaa8b3323044b18dc",
     "P-CONSOLIDATION-1": "59d625c0e561cc5f7b12535f3ba899c6f7a906d04a8a1db26d7959401d444c73",
