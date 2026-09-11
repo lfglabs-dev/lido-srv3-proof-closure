@@ -96,7 +96,6 @@
     {
       "id": "P-DEPOSIT-1",
       "assumptions": [
-        "A-ABSTRACT-TX",
         "A-SOURCE-SHAPED",
         "A-VERITY-SCAFFOLD",
         "A-SOLC-TRUSTED",
