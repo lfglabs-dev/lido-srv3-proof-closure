@@ -1,0 +1,183 @@
+⚠ [11/661] Replayed Verity.Core
+warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1041:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+⚠ [1079/1208] Replayed Conform.Wheels
+warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: Conform/Wheels.lean:106:70: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1080/1208] Replayed EvmYul.Pretty
+warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: EvmYul/Pretty.lean:36:32: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1127/1208] Replayed EvmYul.Semantics
+warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1128/1208] Replayed EvmYul.EVM.Semantics
+warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1259/1265] Replayed LidoSRv3.Audit.Verity.AddressRecipientCallBridge
+warning: LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean:671:56: This simp argument is unused:
+  pureExec
+
+Hint: Omit it from the simp argument list.
+  simp [claimTo, Bind.bind, bindExec, hs, hc, LidoSRv3.Audit.Source.TrioReserve1.Live.emit,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲p̵u̵r̵e̵E̵x̵e̵c̵,̵ ̵hsa]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean:674:94: This simp argument is unused:
+  pureExec
+
+Hint: Omit it from the simp argument list.
+  simp [claimTo, Bind.bind, bindExec, hs, hc, LidoSRv3.Audit.Source.TrioReserve1.Live.emit,
+  ̲ p̵u̵r̵e̵E̵x̵e̵c̵,̵  ̲ ̲claimEvents, List.append_assoc]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean:732:30: This simp argument is unused:
+  hn
+
+Hint: Omit it from the simp argument list.
+  simp [claimWithdrawalsTo, hn,̵ ̵h̵n̵0, hl, zeroAddress, Pure.pure,
+  ̲  ̲ ̲ ̲ ̲ ̲LidoSRv3.Audit.Source.TrioReserve1.Live.require, Bind.bind, bindExec, fail, pureExec] at hs
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean:735:30: This simp argument is unused:
+  hn
+
+Hint: Omit it from the simp argument list.
+  simp [claimWithdrawalsTo, hn,̵ ̵h̵n̵0, hl, zeroAddress, Pure.pure,
+  ̲  ̲ ̲ ̲ ̲ ̲LidoSRv3.Audit.Source.TrioReserve1.Live.require, Bind.bind, bindExec, pureExec]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+info: LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean:739:0: 'LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claimTo_success' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean:740:0: 'LidoSRv3.Audit.Verity.AddressRecipientCallBridge.runClaimWithdrawalsTo_success' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+✖ [1265/1265] Building LidoSRv3.Audit.Source.AddressWrappedTokenCalls (1.6s)
+trace: .> LEAN_PATH=/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Cli/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/batteries/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Qq/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/aesop/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/proofwidgets/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/importGraph/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/plausible/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/mathlib/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/evmyul/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/verity/.lake/build/lib/lean:/private/tmp/lido-address-wrapped-token-call/.lake/build/lib/lean /Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean /private/tmp/lido-address-wrapped-token-call/LidoSRv3/Audit/Source/AddressWrappedTokenCalls.lean -o /private/tmp/lido-address-wrapped-token-call/.lake/build/lib/lean/LidoSRv3/Audit/Source/AddressWrappedTokenCalls.olean -i /private/tmp/lido-address-wrapped-token-call/.lake/build/lib/lean/LidoSRv3/Audit/Source/AddressWrappedTokenCalls.ilean -c /private/tmp/lido-address-wrapped-token-call/.lake/build/ir/LidoSRv3/Audit/Source/AddressWrappedTokenCalls.c --setup /private/tmp/lido-address-wrapped-token-call/.lake/build/ir/LidoSRv3/Audit/Source/AddressWrappedTokenCalls.setup.json --json
+error: LidoSRv3/Audit/Source/AddressWrappedTokenCalls.lean:250:8: Unknown constant `Verity.Core.Uint256.ofNat_val`
+error: LidoSRv3/Audit/Source/AddressWrappedTokenCalls.lean:262:42: Function expected at
+  List.take_length
+but this term has type
+  List.take (List.length ?m.89) ?m.89 = ?m.89
+
+Note: Expected a function because this term is being applied to the argument
+  (encode 32 amount.val)
+error: LidoSRv3/Audit/Source/AddressWrappedTokenCalls.lean:271:2: Tactic `split` failed: Could not split an `if` or `match` expression in the goal
+
+Hint: Use `set_option trace.split.failure true` to display additional diagnostic information
+
+quote : StaticExternal
+callee : External
+ctx : Context
+amount : Word
+w after : World
+data : Bytes
+⊢ (have r := run (tokenProgram quote callee ctx amount) w;
+    match r.outcome with
+    | Except.ok received => Reply.successWithTrace (encode 32 received.val) r.world (nested r.attempts)
+    | Except.error fault => Reply.rejectedWithTrace (ReplyABI.fault fault) (nested r.attempts)) ≠
+    Reply.success data after
+error: LidoSRv3/Audit/Source/AddressWrappedTokenCalls.lean:290:32: Application type mismatch: The argument
+  hr
+has type
+  tokenProgram quote callee ctx amount w = { outcome := Except.ok received, world := world, attempts := attempts }
+but is expected to have type
+  { outcome := Except.ok received, world := world, attempts := attempts } =
+    { outcome := Except.ok received, world := world, attempts := attempts }
+in the application
+  And.intro hr
+error: LidoSRv3/Audit/Source/AddressWrappedTokenCalls.lean:343:46: Function expected at
+  List.take_length
+but this term has type
+  List.take (List.length ?m.285) ?m.285 = ?m.285
+
+Note: Expected a function because this term is being applied to the argument
+  (encode 32 converted.val)
+error: LidoSRv3/Audit/Source/AddressWrappedTokenCalls.lean:346:76: Application type mismatch: The argument
+  saved
+has type
+  AddressWrappedRequestCalls.UnwrapEffect (calleeFor wstETH conversion tokenTransfer otherCalls) ctx wstETH amount
+    (word (decode (List.take 32 data))) transferred unwrapped ua
+but is expected to have type
+  AddressWrappedRequestCalls.UnwrapEffect (calleeFor wstETH conversion tokenTransfer otherCalls) ctx wstETH amount
+    converted transferred unwrapped ua
+in the application
+  And.intro saved
+error: LidoSRv3/Audit/Source/AddressWrappedTokenCalls.lean:346:93: Application type mismatch: The argument
+  hlo
+has type
+  100 ≤ (word (decode (List.take 32 data))).val
+but is expected to have type
+  100 ≤ converted.val
+in the application
+  And.intro hlo
+error: LidoSRv3/Audit/Source/AddressWrappedTokenCalls.lean:346:97: Application type mismatch: The argument
+  hhi
+has type
+  (word (decode (List.take 32 data))).val ≤ 1000 * 10 ^ 18
+but is expected to have type
+  converted.val ≤ 1000 * 10 ^ 18
+in the application
+  And.intro hhi
+error: LidoSRv3/Audit/Source/AddressWrappedTokenCalls.lean:346:101: Application type mismatch: The argument
+  hfit
+has type
+  (word (decode (List.take 32 data))).val < 2 ^ 128
+but is expected to have type
+  converted.val < 2 ^ 128
+in the application
+  And.intro hfit
+error: LidoSRv3/Audit/Source/AddressWrappedTokenCalls.lean:346:106: Application type mismatch: The argument
+  hquote
+has type
+  AddressRequestCalls.QuoteEffect queueQuote ctx stETH (word (decode (List.take 32 data))).val unwrapped shares qa
+but is expected to have type
+  AddressRequestCalls.QuoteEffect queueQuote ctx stETH converted.val unwrapped shares qa
+in the application
+  And.intro hquote
+error: LidoSRv3/Audit/Source/AddressWrappedTokenCalls.lean:346:113: Application type mismatch: The argument
+  henqueue
+has type
+  AddressRequestCalls.EnqueueEffect ctx (AddressRequestCalls.resolvedOwner ctx owner)
+    (word (decode (List.take 32 data))).val (shares.val % 2 ^ 128) id before.core.blockTimestamp unwrapped
+    (AddressWrappedRequestCalls.runRequest (calleeFor wstETH conversion tokenTransfer otherCalls) queueQuote ctx wstETH
+        stETH amount owner before).world
+but is expected to have type
+  AddressRequestCalls.EnqueueEffect ctx (AddressRequestCalls.resolvedOwner ctx owner) converted.val
+    (shares.val % 2 ^ 128) id before.core.blockTimestamp unwrapped
+    (runRequest conversion tokenTransfer otherCalls queueQuote ctx wstETH stETH amount owner before).world
+in the application
+  And.intro henqueue
+error: Lean exited with code 1
+Some required targets logged failures:
+- LidoSRv3.Audit.Source.AddressWrappedTokenCalls
+error: build failed

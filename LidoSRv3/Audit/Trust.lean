@@ -1,3 +1,4 @@
+import LidoSRv3.Tests.AddressWrappedTokenCalls
 import LidoSRv3.Tests.DepositDsmCall
 import LidoSRv3.Tests.AddressWrappedRequestCalls
 import LidoSRv3.Tests.DepositPhysicalAdmission
@@ -764,3 +765,8 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.actual_dsm_call_failure_restores
 #print axioms LidoSRv3.Audit.Source.DepositDsmCall.lookup_origin
 #print axioms LidoSRv3.Audit.Source.DepositDsmCall.success_effects
+
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_token_request_enqueue
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_token_request_failure_restores
+#print axioms LidoSRv3.Audit.Source.AddressWrappedTokenCalls.canonical_call
+#print axioms LidoSRv3.Audit.Source.AddressWrappedTokenCalls.joined_success
