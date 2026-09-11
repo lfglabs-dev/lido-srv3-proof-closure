@@ -1,0 +1,21 @@
+{
+  "source": "44d5e9dd54ffe10b7e9be55937810533e228385a",
+  "original_source": "367412569a2dd85972ab8bdab8304d261fa7b4ec",
+  "main": "6e74b316a1cb54f709c67f919d7df252a57dcf97",
+  "union": "af92a5e8426eb9ff001445c24d9e52f7730f3241",
+  "build_union": "88d7fa2e904e1d11876478e7e2a460763dbe6378",
+  "jobs": 1748,
+  "global_axioms": 29,
+  "ordinary_scopes": 24,
+  "source_hashes": 16,
+  "sha256": {
+    "audit/topup-physical-credential-getter/integration/README.md": "bc2e0e5b49be500913846f633933839339daa1607ea72dce33dce032166c7c50",
+    "audit/topup-physical-credential-getter/integration/all-trust-build.log": "f1819cbac54a3a479f154e3e496a3e990942fa5a837dd0bf1b0ef6f47004be37",
+    "audit/topup-physical-credential-getter/integration/build-identities.json": "50bc4d9a9aacfbb6ffc787688e9272f59c1ada13ad9fc881baadfa1bb9eecc89",
+    "audit/topup-physical-credential-getter/integration/identity-check.log": "5bb92bc270a9e26b68f64026d6643c7be1c63c0020562d7aeeddaf741c95a00a",
+    "audit/topup-physical-credential-getter/integration/independent-source-correction-review-44d5.md": "bfdb38a1b83570c0f12d46aacd284709fe6e0ab7c7b4a7adff1f6d7f3cc5e148",
+    "audit/topup-physical-credential-getter/integration/independent-source-review-3674.md": "b59eae006c2cf2a88f13c6c9635b11db16fe52d8399bcc5075376a64a5b9a81b",
+    "audit/topup-physical-credential-getter/integration/scoped-axioms.json": "15c00be954a741a287dbb6ff63f8a5f5ddc938728cb974059f8f8a3d0cc1f263",
+    "audit/topup-physical-credential-getter/integration/trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439"
+  }
+}

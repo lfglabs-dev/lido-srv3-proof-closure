@@ -1,0 +1,111 @@
+{
+  "base": "f193ebf96beef3f5e1e1568fc9f2b906c0192299",
+  "boundaries": [
+    "Role/pause/timing/root-age/locator/outer ABI omitted",
+    "Gateway-to-router topUp CALL/role binding and final gateway history writes omitted",
+    "Getter arbitrary typed callee, no source-storage/deployed-locator authentication",
+    "Ordinary no-code branch excludes precompile dispatch",
+    "Separate supplied credential/module cursors; earlier provenance/relationship/copies/aliasing/gas omitted",
+    "Existing typed root/SHA, physical hash and arbitrary module/callback boundaries unchanged",
+    "Complete error ABI and compiled-bytecode refinement not asserted"
+  ],
+  "claim_floor": [
+    "Full previous Success, physical Effects and module scalar memory conclusion retained on exactly resolved e/result",
+    "Credentials from actual call gateway=e.gateway router=ctx.sender moduleId exactword, same initial World",
+    "No new success-stage/root/frame/hash/width/sum/funding/alignment premise",
+    "Complete modeled failure rollback retains credential/root/module observations"
+  ],
+  "diff_check": {
+    "exceptions": [
+      "audit/topup-credential-call/solidity/GatewayWitnessHarness.ir"
+    ],
+    "raw_IR_identity": "byte-identical to actual output irOptimized plus one appended newline",
+    "source_nonraw": "PASS excluding exactly listed IR",
+    "unrestricted": "FAIL solely preserved raw IR EOF"
+  },
+  "schema": 1,
+  "scope": "Three additive Lean files and audit only; no baseline/wiring/All/Trust/dependency/site changes. Actual credentials static lookup then prefix then actual existing root-module-memory/physical phase on same World.",
+  "sha256": {
+    "LidoSRv3/Audit/Guarantees/PTopupCredentialCalls.lean": "21cf25030e2f0f0140c81ef920cfad19ed98c38ddb944bbe4cd05c3d26f377f1",
+    "LidoSRv3/Audit/Source/TopupCredentialCall.lean": "a2c32e30c6ceca6d30984bfaf0f5a61dc65e0340af92f559da8a72e2aa031f7c",
+    "LidoSRv3/Tests/TopupCredentialCall.lean": "02ca8a9a0d85522a91a328f6b41af9a476b0ec94e0a273a0ea83ee8e8f820df9",
+    "audit/topup-credential-call/README.md": "a50afe743bcb4832e8280dec81a593171585676353a58e80dda8c7e3f87573ef",
+    "audit/topup-credential-call/solidity/GatewayWitnessHarness.ir": "4170a026329677bca075096ede2b500f76d0ec7a481d793086d3793fa88358b0",
+    "audit/topup-credential-call/solidity/compile.py": "47e9a9b921bf6b77404a9525ae5bfc15ac1be920b7c7807b707ef771dd6871f2",
+    "audit/topup-credential-call/solidity/compiler-identities.json": "536cf6802064ec935d736c4fe908766df2e6a91c75f48bf72993ac2c13618f0c",
+    "audit/topup-credential-call/solidity/input.json": "d567ed741b51d5f7250ea4bce7ac4bd0ef20b7d621459bb2b0ee96a10fe7ff34",
+    "audit/topup-credential-call/solidity/output.json": "873a214668545f161f16683b096b77e05474fcb28abf21c28dfcb6f64a85ced6",
+    "audit/topup-credential-call/validation/axioms.json": "dc3a17bc49aef7fe519f431c419efc674474ebf16db7f7e9016f4f13d331951e",
+    "audit/topup-credential-call/validation/build-identities.json": "55a81125f8e3b29ae849a9bf69f8194bd844434a26c775c6ba495bbe8590d414",
+    "audit/topup-credential-call/validation/build.log": "4628ebe4f614bbad523e34fdbfb1cd08f06e75fb54f037463337e1cf132df6d0",
+    "audit/topup-credential-call/validation/compiler-check.json": "7952c2e8f655811835b4a7877639f23ac1f33c957e2ad92937a85235d5201afd",
+    "audit/topup-credential-call/validation/diagnostics.lean": "3e3cd1f0fb03e3e8216308d42e7a5a258ebc51244dfb3220f176df4f47ebd718",
+    "audit/topup-credential-call/validation/diagnostics.log": "0f1f7c645355c8cf3fe649df83f073981143513ba510d20724fa6820bdc20908",
+    "audit/topup-credential-call/validation/make-vector.py": "82aaa99be8e0c29bc644bd9e409b0e096c9913aaa1c5eac478950f2fad1fe8b5",
+    "audit/topup-credential-call/validation/proof-0.bin": "4789470c03fd0cc86f46cc0f58ad965873b0a30448d204aa2dbed305cc869259",
+    "audit/topup-credential-call/validation/proof-1.bin": "45448825cb6ea22e8248adfcfc7c882ded7d85955033d406f79c777197f99b61",
+    "audit/topup-credential-call/validation/proof-2.bin": "c9aeec94a036aa4edb1a60e952e725485bf6c965e95815d26837f3268e92d1c8",
+    "audit/topup-credential-call/validation/readonly-validation.log": "567c331a6283cafa9128e6795b222be81a7cafcf3b15bb08d1e43c38a9233e86",
+    "audit/topup-credential-call/validation/root.bin": "2fb8c2d7a6380649d49aaec0223e1371e230e1350f39cace6e730b168a515a11",
+    "audit/topup-credential-call/validation/run-diagnostics.py": "128486d174a7d8b3bfeaf656a671ff7f3cc8e2ee9fc69228016a600a0c1111dc",
+    "audit/topup-credential-call/validation/runtime-inputs.json": "7a952580504784ddc1dae19f87a0870a9efa3457ba8dd7ddd36fbfcdfb8a859a",
+    "audit/topup-credential-call/validation/source-inputs.json": "d4bdbad458097b927c16278d604f7593497c08857c61bbcd9bf386bbedf7930b",
+    "audit/topup-credential-call/validation/validate.py": "aa7b993b27ecd59f15ae0f9a39676a937dcdfa17dfd240d1f1f1965acbcdf5c7",
+    "audit/topup-credential-call/validation/validation.log": "567c331a6283cafa9128e6795b222be81a7cafcf3b15bb08d1e43c38a9233e86",
+    "audit/topup-credential-call/validation/vector.json": "a82ce8bb1e05e7d4eda1545360e6a9587bc26992654deb5727e8062f5bba5a90"
+  },
+  "solidity": {
+    "breakdown": {
+      "core": 17,
+      "openzeppelin_5_2": 4,
+      "unchanged_harness": 1
+    },
+    "exact_compiler_inputs": 22,
+    "fresh_IR_compile": "Unchanged inherited GatewayWitnessHarness compiled with existing Mac solc0.8.25; no production bytecode claim",
+    "inherited_fixture_tests": {
+      "count": 7,
+      "fuzz_properties": 3,
+      "runs_each": 1024,
+      "scope": "Historical accepted gateway fixture receipt, exact22 inputs only; no new runtime execution asserted"
+    },
+    "metadata_and_source_hashes": "All22 source SHA256 and metadata Keccak checked; selector independently Keccak-checked f85c6ceb",
+    "new_Forge_runtime_execution": false,
+    "profile": "viaIR optimizer200 Cancun"
+  },
+  "source_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "status": "VALIDATED_CANDIDATE_AWAITING_INDEPENDENT_FULL_SOURCE_IR_REVIEW",
+  "tests": {
+    "allowed_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "fresh_ffi_diagnostics": {
+      "cases": [
+        "Actual requested credentials consumed in independently constructed three-row SHA tree and positive physical continuation [1 ETH,0,2 ETH]",
+        "Different prefix02 credentials reject with invalidProof",
+        "Wrong returned root rejects with invalidProof",
+        "Corrupt proof rejects with invalidProof",
+        "Late module-return allocation failure after successful module CALL"
+      ],
+      "count": 5,
+      "log": "validation/diagnostics.log",
+      "scope": "IO execution, not kernel theorem evaluation; no native axiom",
+      "status": "PASS"
+    },
+    "fresh_ordinary_axiom_sets": 25,
+    "global_All_Trust": "Root integration later, not claimed here",
+    "kernel_regressions": 17,
+    "normal_named_build": {
+      "jobs": 1360,
+      "log": "validation/build.log",
+      "new_modules": 3,
+      "status": "PASS",
+      "target": "LidoSRv3.Tests.TopupCredentialCall"
+    },
+    "package_pins": 11,
+    "public_nonvacuity_instance": "LidoSRv3.Tests.TopupCredentialCall.public_consumer",
+    "source_identities": 1343,
+    "validator_compare_after_write": "PASS equal archive, default read-only mode"
+  }
+}
