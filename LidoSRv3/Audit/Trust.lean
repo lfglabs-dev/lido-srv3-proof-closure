@@ -62,6 +62,7 @@ import LidoSRv3.Audit.Source.TrioReserve1.PhysicalSequence
 import LidoSRv3.Audit.Source.TrioReserve1.AllocationFlow
 import LidoSRv3.Audit.Source.TrioReserve1.Transfers
 import LidoSRv3.Audit.Guarantees.PEthConfinement1
+import LidoSRv3.Audit.Guarantees.PMintConsumer1
 import LidoSRv3.Tests.EthConfinementMutants
 import LidoSRv3.Audit.Verity.MinFirstSourceEntry
 import LidoSRv3.Audit.Verity.DepositLedgerTx
@@ -1423,3 +1424,23 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Provenance.Deposit.deposit_contract_assumption_remains_open
 #print axioms LidoSRv3.Audit.Provenance.Deposit.source_constructor_does_not_discharge_deployment_facts
 #print axioms LidoSRv3.Audit.Provenance.Deposit.wrong_deposit_contract_pin_kill_line
+
+-- Guarantee-level residuals not yet in Trust:
+-- - PAlloc2.proportional_model_loop_preserves_rows: the +1 proportional
+--   model loop preserves the RowsCorrespond relation across every
+--   successful mutation step.
+-- - PAllocExec1.canonical_executes_allocation and
+--   PAllocExec1.canonical_allocation_composition_witness: the two
+--   canonical composition anchors for the AllocExec parent.
+-- - PEthConfinement1.coveringParentsAreRegistered: audit-only claim
+--   that the parents covering ETH confinement are all Trust-registered.
+-- - PMintConsumer1.abstract_rereads_written_router_snapshot and
+--   PMintConsumer1.verity_observe_eq_sourceView: the parent-shaped
+--   reread discipline and TX-level observe-equals-sourceView on the
+--   mint-consumer plane.
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc2.proportional_model_loop_preserves_rows
+#print axioms LidoSRv3.Audit.Guarantees.PAllocExec1.canonical_executes_allocation
+#print axioms LidoSRv3.Audit.Guarantees.PAllocExec1.canonical_allocation_composition_witness
+#print axioms LidoSRv3.Audit.Guarantees.PEthConfinement1.coveringParentsAreRegistered
+#print axioms LidoSRv3.Audit.Guarantees.PMintConsumer1.abstract_rereads_written_router_snapshot
+#print axioms LidoSRv3.Audit.Guarantees.PMintConsumer1.verity_observe_eq_sourceView
