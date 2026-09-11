@@ -1,0 +1,47 @@
+audit/account-accounting-call/DevelopmentProbe.lean:126:26: error: Invalid simp theorem: Expected a proposition, but found
+  ReportOutcome → (Core → ReportFeeMint.Outcome) → ReportFeeMint.World → ReportFeeMint.Outcome
+audit/account-accounting-call/DevelopmentProbe.lean:127:4: error: Invalid simp theorem: Expected a proposition, but found
+  Except GetterError Distribution →
+    (Distribution → Option FeeResult) →
+      (FeeResult → ReportFeeMint.Outcome) → ReportFeeMint.World → ReportFeeMint.Outcome
+audit/account-accounting-call/DevelopmentProbe.lean:125:88: error: unsolved goals
+report : ReportOutcome
+get : Core → Except GetterError Distribution
+calculate : Distribution → Option FeeResult
+mint : Core → FeeResult → ReportFeeMint.Outcome
+before post : World
+router : Core
+d : Distribution
+fee actualFee : FeeResult
+events : List Event
+hr : report = ReportOutcome.committed router
+hg : get router = Except.ok d
+hf : calculate d = some fee
+hm : mint router fee = ReportFeeMint.Outcome.committed post actualFee events
+⊢ AccountAddress.ReportFeeMint.runRoot✝ (ReportOutcome.committed router)
+      (fun router => AccountAddress.ReportFeeMint.runStages✝ (get router) calculate (mint router) before) before =
+    ReportFeeMint.Outcome.committed post actualFee events
+audit/account-accounting-call/DevelopmentProbe.lean:127:21: warning: This simp argument is unused:
+  hg
+
+Hint: Omit it from the simp argument list.
+  simp only [legacyStages, ̲pinnedMintRoot, ̲hr,
+  ̵  ̵ ̵ ̵pinnedMintStages, ̲hg̵,̵h̵f, ̲hm]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+audit/account-accounting-call/DevelopmentProbe.lean:127:24: warning: This simp argument is unused:
+  hf
+
+Hint: Omit it from the simp argument list.
+  simp only [legacyStages, ̲pinnedMintRoot, ̲hr,
+  ̵  ̵ ̵ ̵pinnedMintStages, ̲hg, ̲hf̵,̵h̵m]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+audit/account-accounting-call/DevelopmentProbe.lean:127:27: warning: This simp argument is unused:
+  hm
+
+Hint: Omit it from the simp argument list.
+  simp only [legacyStages, ̲pinnedMintRoot, ̲hr,
+  ̵  ̵ ̵ ̵pinnedMintStages, ̲hg, ̲hf,̵h̵m̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

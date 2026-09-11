@@ -1,0 +1,2 @@
+AccountAddress.ReportFeeAccountingCall.prepare (x : Input) (before : Core) :
+  Except ReportFeeMint.Error (Core × FeeResult)

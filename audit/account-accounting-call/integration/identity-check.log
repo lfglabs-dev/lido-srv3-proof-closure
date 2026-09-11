@@ -1,0 +1,2 @@
+PASS: 45 exact source identities, 11 package pins, 10 Solidity bodies, 11 foundation-only kernel axiom sets; all prior source bodies unchanged.
+PASS 67 exact source hashes; four fresh registered normal modules and both aggregator providers; new lakefile hash explicit, other configurations unchanged; dossier outputs compared without writes

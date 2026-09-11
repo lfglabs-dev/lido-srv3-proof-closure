@@ -1,0 +1,132 @@
+CHECK LidoSRv3/Audit/Guarantees/PAccount1AccountingCall.lean
+CHECK LidoSRv3/Tests/AccountAccountingCall.lean
+LidoSRv3/Tests/AccountAccountingCall.lean:12:58: error: unexpected identifier; expected '}'
+LidoSRv3/Tests/AccountAccountingCall.lean:31:29: error: Tactic `decide` proved that the proposition
+  (match result.outcome with
+    | ReportFeeTreasuryCall.Outcome.committed post fee events payments attempts =>
+      decide
+        (fee.sharesToMintAsFees = 10 ∧
+          post.steth.shares 7 = 5 ∧
+            post.steth.shares 500 = 6 ∧
+              post.steth.locatorAccounting = 7 ∧
+                post.steth.activeFlag = true ∧
+                  ↑(ReportFeePhysicalPause.pauseWord post.steth) = 2 ∧
+                    payments = [(170, 2), (190, 2), (500, 6)] ∧
+                      events.length = 8 ∧
+                        List.length attempts = 1 ∧
+                          List.length result.accountingAttempts = 1 ∧
+                            List.map
+                                (fun a =>
+                                  (a.request.target.val, a.isStatic, a.accepted, a.request.value.val,
+                                    a.request.payload))
+                                result.accountingAttempts =
+                              [(99, false, true, 0, [150, 36, 232, 62])])
+    | x => false) =
+    true
+is false
+LidoSRv3/Tests/AccountAccountingCall.lean:42:69: error: failed to synthesize
+  Decidable (AccountingCall.decodeAddress [1, 2, 3] = Except.error Live.Fault.empty)
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.
+LidoSRv3/Tests/AccountAccountingCall.lean:43:83: error: failed to synthesize
+  Decidable (AccountingCall.decodeAddress (List.replicate 31 0) = Except.error Live.Fault.empty)
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.
+LidoSRv3/Tests/AccountAccountingCall.lean:44:82: error: failed to synthesize
+  Decidable (AccountingCall.decodeAddress (List.replicate 31 0 ++ [7]) = Except.ok 7)
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.
+LidoSRv3/Tests/AccountAccountingCall.lean:45:97: error: failed to synthesize
+  Decidable (AccountingCall.decodeAddress ([255] ++ List.replicate 30 0 ++ [7, 171]) = Except.ok 7)
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.
+LidoSRv3/Tests/AccountAccountingCall.lean:46:86: error: failed to synthesize
+  Decidable (AccountingCall.decodeAddress (List.replicate 32 255) = Except.ok (2 ^ 160 - 1))
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.
+LidoSRv3/Tests/AccountAccountingCall.lean:47:103: error: Tactic `decide` proved that the proposition
+  AccountingCall.locator (original ((2 ^ 96 - 1) * 2 ^ 160 + 99)) = Verity.Core.Address.ofNat 99
+is false
+LidoSRv3/Tests/AccountAccountingCall.lean:50:29: error: Tactic `decide` proved that the proposition
+  (match (execute accounting treasury input (original ((2 ^ 96 - 1) * 2 ^ 160 + 99))).outcome with
+    | ReportFeeTreasuryCall.Outcome.committed post fee events payments attempts =>
+      decide (post.steth.locatorAccounting = 7)
+    | x => false) =
+    true
+is false
+LidoSRv3/Tests/AccountAccountingCall.lean:55:29: error: Tactic `decide` proved that the proposition
+  (match (execute accounting treasury input (original 100)).outcome with
+    |
+    ReportFeeTreasuryCall.Outcome.reverted
+        (ReportFeeTreasuryCall.Error.mint (ReportFeeMint.Error.mint Error.notAccounting)) rollback payments attempts =>
+      true
+    | x => false) =
+    true
+is false
+LidoSRv3/Tests/AccountAccountingCall.lean:58:29: error: Tactic `decide` proved that the proposition
+  (match (execute accounting treasury input (original 99 0)).outcome with
+    |
+    ReportFeeTreasuryCall.Outcome.reverted (ReportFeeTreasuryCall.Error.mint (ReportFeeMint.Error.mint Error.stopped))
+        rollback payments attempts =>
+      true
+    | x => false) =
+    true
+is false
+LidoSRv3/Tests/AccountAccountingCall.lean:59:98: error: Tactic `decide` proved that the proposition
+  List.length (execute accounting treasury input (original 99 0)).accountingAttempts = 1
+is false
+LidoSRv3/Tests/AccountAccountingCall.lean:88:29: error: Tactic `decide` proved that the proposition
+  (match failed.outcome with
+    |
+    ReportFeeTreasuryCall.Outcome.reverted
+        (ReportFeeTreasuryCall.Error.distribution (FeeDistribution.Error.transfer FeeDistribution.TransferError.toZero))
+        rollback ps ats =>
+      decide
+        (rollback.steth.locatorAccounting = 888 ∧
+          rollback.steth.activeFlag = false ∧
+            rollback.steth.storage = original.steth.storage ∧
+              rollback.router = original.router ∧
+                rollback.steth.shares 170 = 0 ∧
+                  rollback.steth.shares 7 = 5 ∧
+                    ps = [(170, 2), (190, 2), (0, 6)] ∧ List.length ats = 1 ∧ List.length failed.accountingAttempts = 1)
+    | x => false) =
+    true
+is false
+LidoSRv3/Tests/AccountAccountingCall.lean:91:14: warning: Variable name `fault` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+LidoSRv3/Tests/AccountAccountingCall.lean:91:29: warning: Variable name `ps` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+LidoSRv3/Tests/AccountAccountingCall.lean:91:32: warning: Variable name `ats` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+'AccountAddress.AccountingCall.call_success' depends on axioms: [propext, Quot.sound]
+'AccountAddress.AccountingCall.decode_getter' depends on axioms: [propext, Classical.choice, Quot.sound]
+'AccountAddress.AccountingCall.call_getter' depends on axioms: [propext, Classical.choice, Quot.sound]
+'AccountAddress.ReportFeeAccountingCall.prepare_success' depends on axioms: [propext]
+'AccountAddress.ReportFeeAccountingCall.mint_replay' depends on axioms: [propext, Classical.choice, Quot.sound]
+'AccountAddress.ReportFeeAccountingCall.finish_success_replay' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'AccountAddress.ReportFeeAccountingCall.execute_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Guarantees.PAccount1.actual_report_accounting_call' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Guarantees.PAccount1.actual_report_accounting_call_failure_restores' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Tests.AccountAccountingCall.public_success' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Tests.AccountAccountingCall.public_failure' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]

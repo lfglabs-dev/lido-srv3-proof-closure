@@ -1,0 +1,3 @@
+solidity/cache/
+solidity/artifacts/*
+!solidity/artifacts/Lido.json

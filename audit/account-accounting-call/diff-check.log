@@ -1,0 +1,4 @@
+Full staged diff-check exit2:
+audit/account-accounting-call/LidoLocator.asm:1773: new blank line at EOF.
+audit/account-accounting-call/OssifiableProxy.asm:3093: new blank line at EOF.
+PASS: staged diff-check excluding exactly those two unchanged raw compiler outputs.
