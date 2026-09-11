@@ -15,6 +15,8 @@
     "audit/topup-router-locator-call/integration/independent-source-review-6c33.md": "1bb422a614df27c343f87446afae5e25ddbb232e895729558129058c48638c03",
     "audit/topup-router-locator-call/integration/normal-artifacts.json": "6283d9c9b88720a7ca6bea16ad82c31108b447a775e443322fe8a3b6949554e0",
     "audit/topup-router-locator-call/integration/readonly-validator.py": "0f0703dc51ea2f368178639ab3ad49eed13d32ffbd32a145b8c0ca0517ab12b5",
-    "audit/topup-router-locator-call/integration/trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439"
-  }
+    "audit/topup-router-locator-call/integration/trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439",
+    "audit/topup-router-locator-call/integration/independent-integration-review-961f.md": "43a4750d1583ee6b9bdce9d86a834c544eb68c6e9a61b6ef6cffd1a914cca3b4"
+  },
+  "integration_review": "CLEAN exact961f752c7393301afc434a01e4238c51431d4061; archive-only successor separately reviewed"
 }
