@@ -1,3 +1,4 @@
+import LidoSRv3.Tests.SszDeclaredSiblingsRegression
 import LidoSRv3.Tests.TopupRouterAdmissionCallRegression
 import LidoSRv3.Tests.DepositAdmissionErrorsRegression
 import LidoSRv3.Tests.TrioConsolidation.PhysicalEntrySettlement
@@ -930,3 +931,9 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.TopupRouterAdmissionCallGates.auth_origin
 #print axioms LidoSRv3.Audit.Source.TopupRouterAdmissionCallGates.canDeposit_origin
 #print axioms LidoSRv3.Audit.Source.TopupRouterAdmissionCallGates.admitted_calls
+
+-- Complete ABI-declared siblings in the same actual compiled SSZ entry.
+#print axioms LidoSRv3.Audit.Guarantees.PSsz1.actual_compiled_cl_entry_complete_declared_branch
+#print axioms LidoSRv3.Audit.Source.SszDeclaredSiblings.cursor_dichotomy
+#print axioms LidoSRv3.Audit.Source.SszDeclaredSiblings.complete_of_branch
+#print axioms LidoSRv3.Audit.Source.SszDeclaredSiblings.penultimate

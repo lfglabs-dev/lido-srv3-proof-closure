@@ -1,0 +1,50 @@
+{
+  "source_commit": "3bdd333b3a0c9e34dd128c17427d51610a60f1b9",
+  "accepted_configuration": "43f0e7abcdf64671582351b8cae389134de4326a",
+  "sources": 1217,
+  "pins": 11,
+  "artifact_hashes": 21,
+  "scoped_axioms": 33,
+  "normal": [
+    {
+      "olean_sha256": "4ddfca981c9da9d95fe98fde0e5bc4d72a2cfac33c6f9def69fd3c712f52774a",
+      "setup_sha256": "e38d60457b04d4ac54ed373409e5f2791b864e03446875c6b71d1e9b26a00188",
+      "sha256": "1f1e820150953685d04f8da38f9c208bc18056b1b5de29bf1dbc2aec96cfb7fe",
+      "source": "LidoSRv3/Audit/Source/SszDeclaredSiblings.lean",
+      "trace_sha256": "de122a032385ddc2ca88eedd2de2538ee59c8a1991bb2c84b32332701a8265f1"
+    },
+    {
+      "olean_sha256": "c285e6630d3799033d59a6e5894669c0dc74a4ccce068fe0292a84499d934e90",
+      "setup_sha256": "bb677f61f7f33674e949af7e301a145bffbce44b9bf8f1b7aa940ab8d45a268e",
+      "sha256": "c9889ffe6fe10509b90368fcd12d3af93fb565cdb1a7b6d2eaadbfe4dca3dbc4",
+      "source": "LidoSRv3/Audit/Guarantees/PSsz1DeclaredSiblings.lean",
+      "trace_sha256": "d45186ebfce5e57438dc55aa98bb6133e93c7d87c8c058f83b4ee5b5a235b523"
+    },
+    {
+      "olean_sha256": "92291496da477c8d831121e20467adc969eeb119ef0b7e60e404d6324a75f9f0",
+      "setup_sha256": "fa2ef24cbe8d1e61f7cc69e9dbd0ef15f9dc0c73aba84ec722a50f8c7cfdfb91",
+      "sha256": "f721e363a44ecfb7f534dde8546437023170bcbf6b746e38bc58100b798563f3",
+      "source": "LidoSRv3/Tests/SszDeclaredSiblingsRegression.lean",
+      "trace_sha256": "96690545214fa21f8f522055132a080dbb21884912e1ba8d555ed0b172ccdcfa"
+    },
+    {
+      "source": "LidoSRv3/Audit/AllGuarantees.lean",
+      "source_sha256": "1f90c173a9c1ede4e118e63930803a4e843989c66fe1629ebc9e610130bd4c22",
+      "setup_sha256": "4306921f51657e4c9030c69eb7fbfa675df552d744738392806672dc0736ba92",
+      "trace_sha256": "8c22fc76478e99dc70936c6023608f129625043470af03952ac4451a2f9c46f8",
+      "olean_sha256": "d79198b01a3e010f058bb2301933fee7c9f2d9f251af512d55f9959da024b107"
+    },
+    {
+      "source": "LidoSRv3/Audit/Trust.lean",
+      "source_sha256": "c364a0619f2143e1733625c4ec4a250ab9ba41199e319d518fc49dc3374efb1c",
+      "setup_sha256": "9b78dbc2be6bb9fee9646be32ebd2dd3f8e0ac94d2f980c3d7369eaae12faa79",
+      "trace_sha256": "bfde462dc1d9e0b0aef88ddbe69e087808946a1b84ab2706b19fe0911a2ce70e",
+      "olean_sha256": "d99e101e170ceef9fd162b11923ce4c09b92a1fa9421e50a2895f214174d27a6"
+    }
+  ],
+  "configuration_sha256": {
+    "lakefile.lean": "68a2eeea808e5fe3ada64e9a89f7da8698c67893a021bdde219043fc99110411",
+    "lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
+    "lean-toolchain": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee"
+  }
+}
