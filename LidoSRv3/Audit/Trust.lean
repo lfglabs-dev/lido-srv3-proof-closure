@@ -196,6 +196,9 @@ import LidoSRv3.Audit.Source.AccountingCorrespondence
 import LidoSRv3.Audit.Source.AddressCorrespondence
 import LidoSRv3.Audit.Source.TopupPointerOrigin
 import LidoSRv3.Audit.Source.TopupKeccakOracle
+import LidoSRv3.Audit.Source.AllocCapacityCorrespondence
+import LidoSRv3.Audit.Source.BeaconRootsCorrespondence
+import LidoSRv3.Audit.Source.MinFirstAmountCorrespondence
 import LidoSRv3.Tests.TopupPointerOriginMutants
 
 /-!
@@ -1347,3 +1350,17 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.TopupKeccakOracle.zero_and_nonzero_disagree_on_keccak
 #print axioms LidoSRv3.Audit.Source.TopupKeccakOracle.memory_array_agreement_does_not_imply_keccak_agreement
 #print axioms LidoSRv3.Audit.Source.TopupKeccakOracle.verity_tx_simulates_topup2_spec_any_oracle
+
+-- Additional non-Mac source correspondence anchors:
+-- `SolidityAllocCapacity.source_execute_refines_audit_model` closes
+-- the source-to-audit-model refinement on the allocation-capacity
+-- source; `Source.BeaconRootsCorrespondence.source_beacon_roots_matches_spec`
+-- ties the source beacon-roots observation to the spec;
+-- `MinFirstAllocation.leastCount_correspondence` and
+-- `MinFirstAllocation.nextLevel_correspondence` are the top-level
+-- level-by-level correspondences for the MinFirst amount allocation
+-- (individual arithmetic helpers stay unregistered).
+#print axioms LidoSRv3.Audit.SolidityAllocCapacity.source_execute_refines_audit_model
+#print axioms LidoSRv3.Audit.Source.BeaconRootsCorrespondence.source_beacon_roots_matches_spec
+#print axioms LidoSRv3.Audit.MinFirstAllocation.leastCount_correspondence
+#print axioms LidoSRv3.Audit.MinFirstAllocation.nextLevel_correspondence
