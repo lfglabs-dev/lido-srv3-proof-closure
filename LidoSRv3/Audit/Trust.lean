@@ -1,3 +1,4 @@
+import LidoSRv3.Tests.TopupRouterLocatorCall
 import LidoSRv3.Tests.AddressStETHQuoteCalls
 import LidoSRv3.Tests.AddressPermitRequestCalls
 import LidoSRv3.Tests.TopupTimingHistory
@@ -828,3 +829,10 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.AddressStETHQuoteCalls.internalEther_bound
 #print axioms LidoSRv3.Audit.Source.AddressStETHQuoteCalls.quote_effect
 #print axioms LidoSRv3.Tests.AddressStETHQuoteCalls.public_nonempty_quote_rollback
+
+#print axioms LidoSRv3.Audit.Guarantees.PTopupRouterLocatorCall.actual_locator_timing_credential_root_module_memory_history
+#print axioms LidoSRv3.Audit.Guarantees.PTopupRouterLocatorCall.actual_locator_timing_credential_root_module_failure_restores
+#print axioms LidoSRv3.Audit.Source.TopupRouterLocatorCall.decode_fields
+#print axioms LidoSRv3.Audit.Source.TopupRouterLocatorCall.lookup_origin
+#print axioms LidoSRv3.Audit.Source.TopupRouterLocatorCall.run_success
+#print axioms LidoSRv3.Audit.Source.TopupRouterLocatorCall.failure_restores

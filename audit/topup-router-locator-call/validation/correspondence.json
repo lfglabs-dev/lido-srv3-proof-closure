@@ -1,0 +1,29 @@
+{
+  "boundaries": [
+    "Locator immutable address is supplied; arbitrary STATIC callee is not deployed locator body refinement",
+    "ctx.sender becomes decoded router for the covered inner path; no claim of executing the omitted outer gateway-to-router topUp CALL or closing role/pause",
+    "Locator cursor is an explicit scalar phase input, actual next consumed by credentials getter; module returnBuffer remains separate; full memory/gas not modeled",
+    "Inherited typed calls, SHA/root proof and physical-storage hash semantics; no new frame, stage, fit, role equality or successful lookup premise",
+    "Fresh Forge8 runtime fixtures do not constitute Lean kernel proofs or production bytecode correspondence"
+  ],
+  "compiler_artifacts": {
+    "audit/topup-credential-call/solidity/GatewayWitnessHarness.ir": "4170a026329677bca075096ede2b500f76d0ec7a481d793086d3793fa88358b0",
+    "audit/topup-credential-call/solidity/compile.py": "47e9a9b921bf6b77404a9525ae5bfc15ac1be920b7c7807b707ef771dd6871f2",
+    "audit/topup-credential-call/solidity/compiler-identities.json": "536cf6802064ec935d736c4fe908766df2e6a91c75f48bf72993ac2c13618f0c",
+    "audit/topup-credential-call/solidity/input.json": "d567ed741b51d5f7250ea4bce7ac4bd0ef20b7d621459bb2b0ee96a10fe7ff34",
+    "audit/topup-credential-call/solidity/output.json": "873a214668545f161f16683b096b77e05474fcb28abf21c28dfcb6f64a85ced6"
+  },
+  "core": "17005714f151e5502c559932319a3f2f74ac2436",
+  "fresh_fixture_receipt_sha256": "959f9f3cb1de87b04314858b43995b14cf39b495db2b348ee5e52d604188ee45",
+  "fresh_runtime_inputs": 23,
+  "full_prior_public_conjunction_byte_identity": true,
+  "selector": "ef6c064c",
+  "source_mapping": {
+    "IR1685-1695": "actual scalar allocation, checked64 next and unsigned wrap guard; bounds derived under success",
+    "existing entire335 suffix": "selected ctx.sender qualifies physical router storage/module caller/block cap/continuation; exact intermediate world, attempts and produced total retained in public",
+    "topUp163-184;IR372-479": "length/config, block distance, uint64 root-age and prior timestamp before locator",
+    "topUp185;IR480-511": "actual gateway STATICCALL immutable locator,4-byte ef6c064c, bubble then min32 allocation then signed head then canonical160",
+    "topUp189;IR512-538": "decoded expr7 is actual credentials target; _24 free pointer is next from locator allocation; actual bytes32 word consumed by witness leaf",
+    "topUp233-235;IR1113-1130": "same actual loop total controls final fresh postmodule packed history and event"
+  }
+}
