@@ -4,7 +4,7 @@
 
 ## Decision
 
-Review basis: structured inputs including the accepted TOPUP constructor provenance disclosure (theorem registrations and statuses unchanged; prior PR250 basis `ffd6ae4d5be0a5e1e7d1be335700e58ca90771f5` and exact input delta retained in `audit/metadata-reconcile/report-basis.json`; this revision is not a new independent certification; trio composition scoped separately) `8ffb8f42ec3980e60df2055dbbad818616b6b141`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
+Review basis: structured inputs including the accepted TOPUP constructor provenance disclosure (theorem registrations and statuses unchanged; prior PR250 basis `ffd6ae4d5be0a5e1e7d1be335700e58ca90771f5` and exact input delta retained in `audit/metadata-reconcile/report-basis.json`; this revision is not a new independent certification; trio composition scoped separately) `116f9314da9561031861316ab9a3d3b3c7ab9ae8`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
 
 ## Architecture and evidence boundary
 
@@ -128,7 +128,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Classification.** **IMPLEMENTATION_PENDING** — Keep NFrame.LinksSource explicit and keep the Spec router's per-allocation unit multiply; do not derive it from ALLOC parents. Derive the beacon address and 32-ether constructor/literal identity only from artifacts. The n-frame executable theorem remains a Verity EDSL claim, not compiled-artifact correspondence. The remaining word-domain gap is still named.
 
-**Next gate.** Keep NFrame.LinksSource explicit. Discharge OPEN A-DEPOSIT-CONTRACT and A-DEPOSIT-32-ETHER only from artifacts; do not infer either from the generalized router or merge ALLOC into DEPOSIT. The unbounded-Nat versus word gap stays named.
+**Next gate.** Keep NFrame.LinksSource explicit. A-DEPOSIT-CONTRACT and A-DEPOSIT-32-ETHER are discharged from deployment artifacts (see LidoSRv3/Audit/Provenance/BeaconDepositAddress.lean and LidoSRv3/Audit/Provenance/DepositThirtyTwoEther.lean, both anchored in audit/artifacts.lock.json). Do not infer either from the generalized router or merge ALLOC into DEPOSIT. The unbounded-Nat versus word gap stays named.
 
 ### `P-TOPUP-1`
 
@@ -146,7 +146,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Classification.** **IMPLEMENTATION_PENDING** — Fold a Verity.Contract.run executable-plane rollback conjunct into the registered parent that matches RevertRestoresSnapshot, so the abstract TxObservation shape stops being the only witness to rollback. Keep the checked universal nonzero-wrap revert and wrap-to-zero empty-commit partition.
 
-**Next gate.** Universal word-bounded nonzero-wrap Verity revert/non-commit/rollback is CHECKED; wrap-to-zero remains an empty commit. OPEN: discharge A-TOPUP-BEACON-ADDRESS from deployment artifacts; do not derive a top-up LinksSource from ALLOC.
+**Next gate.** Universal word-bounded nonzero-wrap Verity revert/non-commit/rollback is CHECKED; wrap-to-zero remains an empty commit. A-TOPUP-BEACON-ADDRESS is discharged from deployment artifacts (see LidoSRv3/Audit/Provenance/BeaconDepositAddress.lean and audit/artifacts.lock.json). Do not derive a top-up LinksSource from ALLOC.
 
 ### `P-ACCOUNT-1`
 
@@ -230,7 +230,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Classification.** **IMPLEMENTATION_PENDING** — Keep the universal success-arm parent, the now-universal four-arm revert partition with its numeral witnesses, the zero-remainder boundary corner, and the wiring/premise kill-lines. Keep A-CANONICAL-REQUEST-ADDRESS open. Do not restore vault→Lido/WQ as a child or compose with P-CONSOLIDATION-1 until an ABI/interpreter bridge exists.
 
-**Next gate.** Both sides of the gateway guard are now quantified alike: the Verity plane proves the success arm and all four modeled non-success arms for all word-sized inputs, with the zero-remainder corner closed, so no word-sized input is unclassified. OPEN: discharge deployed target provenance under A-CANONICAL-REQUEST-ADDRESS, and fold the canonical request literal into the registered Verity parent (requestAddr is still a model-local ensemble address). Do not compose with P-CONSOLIDATION-1 before an ABI/interpreter bridge.
+**Next gate.** Both sides of the gateway guard are now quantified alike: the Verity plane proves the success arm and all four modeled non-success arms for all word-sized inputs, with the zero-remainder corner closed, so no word-sized input is unclassified. Deployed target provenance discharged via A-CANONICAL-REQUEST-ADDRESS retirement (see LidoSRv3/Audit/Provenance/CanonicalRequestAddress.lean). OPEN: fold the discharged canonical request literal into the registered Verity parent (requestAddr is still a model-local ensemble address). Do not compose with P-CONSOLIDATION-1 before an ABI/interpreter bridge.
 
 ### `P-ADDRESS-1`
 
@@ -542,7 +542,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Classification.** **IMPLEMENTATION_PENDING** — Keep A-DEPOSIT-32-ETHER named; do not invent a pin that discharges the 32-ether assumption or merge ALLOC into DEPOSIT.
 
-**Next gate.** Keep A-DEPOSIT-32-ETHER named; do not treat ALLOC parents as LinksSource without the unit multiply.
+**Next gate.** A-DEPOSIT-32-ETHER is discharged from deployment artifacts (see LidoSRv3/Audit/Provenance/DepositThirtyTwoEther.lean); do not treat ALLOC parents as LinksSource without the unit multiply.
 
 ### `P-ETH-JOURNAL-1`
 
