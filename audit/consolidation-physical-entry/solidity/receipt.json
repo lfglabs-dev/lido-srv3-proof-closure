@@ -1,0 +1,53 @@
+{
+  "scope": "Actual inherited role/balance/pause modifiers plus typed quota/settlement suffix. DSM/locator/witness remain excluded. Cached vault/inbox/refund artifacts reused; no production bytecode identity claim.",
+  "command": [
+    "forge",
+    "test",
+    "--root",
+    "/var/folders/yv/6bf89_m973jc11pm6lb2qx700000gn/T/lido-physical-entry-forge-rxguurv6",
+    "--use",
+    "/Users/thomas/.svm/0.8.25/solc-0.8.25",
+    "--offline",
+    "--fuzz-runs",
+    "1024",
+    "--match-contract",
+    "PhysicalEntryTest",
+    "-vv"
+  ],
+  "config": "[profile.default]\nsrc=\"contracts\"\ntest=\"test\"\nlibs=[]\noptimizer=true\noptimizer_runs=200\nvia_ir=true\nevm_version=\"cancun\"\nbuild_info=true\nextra_output=[\"irOptimized\", \"storageLayout\"]\nfs_permissions=[{access=\"read\",path=\"./\"}]\n",
+  "forge_version": "forge Version: 1.5.0-v1.5.0\nCommit SHA: 1c57854462289b2e71ee7654cd6666217ed86ffd\nBuild Timestamp: 2025-11-24T06:07:42.598695000Z (1763964462)\nBuild Profile: maxperf\n",
+  "sources": {
+    "@openzeppelin/contracts-v5.2/access/AccessControl.sol": "1086a1ad3788972b885ff3f209da510615dde6214d46b29e1cd2a4924f66c06d",
+    "@openzeppelin/contracts-v5.2/access/IAccessControl.sol": "c112f5c86fdc4e862f88d4f5694530342320923ebd5b5e7d9d8493550d337c2d",
+    "@openzeppelin/contracts-v5.2/access/extensions/AccessControlEnumerable.sol": "d6c882c624699389abe9a4d8b6ad1f3d304ad6610221ac1cbd32f909e402629f",
+    "@openzeppelin/contracts-v5.2/access/extensions/IAccessControlEnumerable.sol": "f91dc4b5750c1bac7a6a11a6057f14f01121847e6a6284e1200d8a87a4c4ff1e",
+    "@openzeppelin/contracts-v5.2/utils/Context.sol": "847fda5460fee70f56f4200f59b82ae622bb03c79c77e67af010e31b7e2cc5b6",
+    "@openzeppelin/contracts-v5.2/utils/introspection/ERC165.sol": "7fdc4dc9e3872f6a4c1ec9cfa9583a1fc18ccd7a416397a6e698bd5bbf92f32b",
+    "@openzeppelin/contracts-v5.2/utils/introspection/IERC165.sol": "7c5c3f98ab876991e7dd34b84d41137e836306eb9f36f6386a631f5be3f5d6d4",
+    "@openzeppelin/contracts-v5.2/utils/structs/EnumerableSet.sol": "ed0804f9dcff9d2dceba8cc83f31669a84491dfcfe510050c9371aa7c48db09c",
+    "contracts/0.8.25/consolidation/ConsolidationGateway.sol": "86eee98160b1b24c84a7ebf37cc053aa09cea7a4b78f43d5c12651e4ca923426",
+    "contracts/0.8.25/vaults/interfaces/IPredepositGuarantee.sol": "121d88c8332021e4d163c807c4edef5d6b4744832ec1d9498259d62cd2af9d87",
+    "contracts/0.8.25/vaults/interfaces/IStakingVault.sol": "3a812ce040da103a50824cf1ad35823a655e9bb1920f8d8c8219d290ee0c7cc6",
+    "contracts/0.8.25/vaults/predeposit_guarantee/CLProofVerifier.sol": "88d74cc68ca9e6bda442ccba0d34a386669db2c02a2c2796fd14e7b871b69e8c",
+    "contracts/common/interfaces/IDepositContract.sol": "d7b36c2de36cfc68a3fa0812add4e9c55879188a08317166a0ab0f63baaffc63",
+    "contracts/common/interfaces/ILidoLocator.sol": "cc65faee8789012cbb58c0073c770bddb37c9a7fc2594ff2e200fc7894a2dc7a",
+    "contracts/common/interfaces/IPausableUntil.sol": "0377e3ac9ff2d6be41f4b8f40eee7cfd452ce6de760f9b9145fdb38b94902de3",
+    "contracts/common/lib/BLS.sol": "0187cc6a6b1aaa833317695d88795db431fa237452213e8c3872a0f444dceb7c",
+    "contracts/common/lib/BeaconTypes.sol": "9591e9af1a4fd398db86267f3589e763f9eb2016bf29e26cfa50988cf73a10c3",
+    "contracts/common/lib/GIndex.sol": "2653bd4ba89c349f3db36f21a8afc6a24e0e233816d9b608f46d048feb601d1f",
+    "contracts/common/lib/RateLimit.sol": "c102dc48ae659a045c90cee749bbed8e9363fefadcd32e86f8b99fba701747d4",
+    "contracts/common/lib/SSZ.sol": "91ef497b972bbee0fe89043034e6bd62fa0c1059f22874d4826bc6164a22009b",
+    "contracts/common/lib/UnstructuredStorage.sol": "ca4ad93eedff40de12fdd50a88ef608650139a5543fd160dab61cad4d3c03160",
+    "contracts/common/utils/PausableUntil.sol": "f27405a7f52a15f7e1b10a73ae57ed69fe6514aaba821415e5584458546cf255",
+    "test/PhysicalEntry.t.sol": "c5c4276f630ca37809fa3d5591d1035ee0ff0ecbbeedcd2771330eb9892d2288",
+    "test/PhysicalEntryHarness.sol": "986d2b9e6090b06b27b8cd55266ecfd5addc5898ae6da603d452502f030aa7aa",
+    "test/PhysicalQuotaHarness.sol": "71650b4cf3c939fe172872fabdf9c0371209be1c2d98d9fa26fc3edb179846bc"
+  },
+  "artifacts": {
+    "PhysicalEntryHarness": "dc7667cdf2978f0db88b0e35b7dbbb38d6d7ff02a030a16970282b37faffda4b",
+    "PhysicalEntryTest": "740c26fb9936a710806a775174a74ed41333edac68e5ca448f61a432f76abfb2"
+  },
+  "legacy_sha256": "73ce6952e41e72726e7900e4cbf2c24234d22ddb0678ca89e21c64b498b1f0b7",
+  "log_sha256": "969e1f327af18e62e34373fde5630f9d711a24030f28feee7c2724f70cf4ae39",
+  "build_info_sha256": "32cd9c72526c94bc0c0e1da3378a8a111ea6bea23645b0beac8321e40ce376a8"
+}

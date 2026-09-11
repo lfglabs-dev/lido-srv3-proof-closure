@@ -1,0 +1,17 @@
+Compiling 25 files with Solc 0.8.25
+Solc 0.8.25 finished in 6.46s
+Compiler run successful!
+
+Ran 8 tests for test/PhysicalEntry.t.sol:PhysicalEntryTest
+[PASS] testAcceptedCallbackCanChangeFinalQuota() (gas: 3225654)
+[PASS] testActualCallerKey() (gas: 2106310)
+[PASS] testActualPauseBeforeZeroAndEquality() (gas: 2105226)
+[PASS] testActualRoleBeforePauseAndZero() (gas: 2103432)
+[PASS] testFullPauseWordAndMaxBoundary() (gas: 2104566)
+[PASS] testFuzzRawRoleAndResume(uint256,uint256) (runs: 1024, μ: 2102301, ~: 2103042)
+[PASS] testLateRefundRestoresQuotaAndAllPriorEffects() (gas: 3230700)
+[PASS] testSameQuotaQuoteVaultInboxRefund() (gas: 3216469)
+Suite result: ok. 8 passed; 0 failed; 0 skipped; finished in 75.57ms (82.38ms CPU time)
+
+Ran 1 test suite in 75.84ms (75.57ms CPU time): 8 tests passed, 0 failed, 0 skipped (8 total tests)
+PASS retained full new compiler inputs/build-info/artifacts/IR; cached legacy artifact reused

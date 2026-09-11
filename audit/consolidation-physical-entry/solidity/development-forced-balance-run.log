@@ -1,0 +1,31 @@
+Compiling 25 files with Solc 0.8.25
+Solc 0.8.25 finished in 6.56s
+Compiler run successful!
+
+Ran 9 tests for test/PhysicalEntry.t.sol:PhysicalEntryTest
+[PASS] testAcceptedCallbackCanChangeFinalQuota() (gas: 3258337)
+[PASS] testActualCallerKey() (gas: 2139015)
+[PASS] testActualPauseBeforeZeroAndEquality() (gas: 2137931)
+[PASS] testActualRoleBeforePauseAndZero() (gas: 2136115)
+[PASS] testFullPauseWordAndMaxBoundary() (gas: 2137249)
+[PASS] testFuzzRawRoleAndResume(uint256,uint256) (runs: 1024, μ: 2135179, ~: 2135747)
+[FAIL: exact competing guard] testInstrumentedBalancePriority() (gas: 1056978472)
+[PASS] testLateRefundRestoresQuotaAndAllPriorEffects() (gas: 3263383)
+[PASS] testSameQuotaQuoteVaultInboxRefund() (gas: 3249152)
+Suite result: FAILED. 8 passed; 1 failed; 0 skipped; finished in 81.96ms (100.25ms CPU time)
+
+Ran 1 test suite in 85.78ms (81.96ms CPU time): 8 tests passed, 1 failed, 0 skipped (9 total tests)
+
+Failing tests:
+Encountered 1 failing test in test/PhysicalEntry.t.sol:PhysicalEntryTest
+[FAIL: exact competing guard] testInstrumentedBalancePriority() (gas: 1056978472)
+
+Encountered a total of 1 failing tests, 8 tests succeeded
+
+Tip: Run `forge test --rerun` to retry only the 1 failed test
+Traceback (most recent call last):
+  File "/private/tmp/lido-consolidation-physical-entry/audit/consolidation-physical-entry/solidity/run.py", line 39, in <module>
+    result.check_returncode()
+  File "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 460, in check_returncode
+    raise CalledProcessError(self.returncode, self.args, self.stdout,
+subprocess.CalledProcessError: Command '['forge', 'test', '--root', '/var/folders/yv/6bf89_m973jc11pm6lb2qx700000gn/T/lido-physical-entry-forge-70az2qr0', '--use', '/Users/thomas/.svm/0.8.25/solc-0.8.25', '--offline', '--fuzz-runs', '1024', '--match-contract', 'PhysicalEntryTest', '-vv']' returned non-zero exit status 1.

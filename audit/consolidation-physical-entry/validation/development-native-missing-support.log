@@ -1,0 +1,3 @@
+libc++abi: terminating due to uncaught exception of type lean::exception: Could not find native implementation of external declaration 'ffi.ByteArray.zeroes' (symbols 'lp_evmyul_ffi_ByteArray_zeroes___boxed' or 'lp_evmyul_ffi_ByteArray_zeroes').
+For declarations from `Init`, `Std`, or `Lean`, you need to set `supportInterpreter := true` in the relevant `lean_exe` statement in your `lakefile.lean`.
+audit/consolidation-physical-entry/validation/diagnostics.lean:21:64: error: unexpected identifier; expected '}'

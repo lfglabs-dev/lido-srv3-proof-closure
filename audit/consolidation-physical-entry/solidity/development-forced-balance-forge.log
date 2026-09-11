@@ -1,0 +1,25 @@
+Compiling 25 files with Solc 0.8.25
+Solc 0.8.25 finished in 6.56s
+Compiler run successful!
+
+Ran 9 tests for test/PhysicalEntry.t.sol:PhysicalEntryTest
+[PASS] testAcceptedCallbackCanChangeFinalQuota() (gas: 3258337)
+[PASS] testActualCallerKey() (gas: 2139015)
+[PASS] testActualPauseBeforeZeroAndEquality() (gas: 2137931)
+[PASS] testActualRoleBeforePauseAndZero() (gas: 2136115)
+[PASS] testFullPauseWordAndMaxBoundary() (gas: 2137249)
+[PASS] testFuzzRawRoleAndResume(uint256,uint256) (runs: 1024, μ: 2135179, ~: 2135747)
+[FAIL: exact competing guard] testInstrumentedBalancePriority() (gas: 1056978472)
+[PASS] testLateRefundRestoresQuotaAndAllPriorEffects() (gas: 3263383)
+[PASS] testSameQuotaQuoteVaultInboxRefund() (gas: 3249152)
+Suite result: FAILED. 8 passed; 1 failed; 0 skipped; finished in 81.96ms (100.25ms CPU time)
+
+Ran 1 test suite in 85.78ms (81.96ms CPU time): 8 tests passed, 1 failed, 0 skipped (9 total tests)
+
+Failing tests:
+Encountered 1 failing test in test/PhysicalEntry.t.sol:PhysicalEntryTest
+[FAIL: exact competing guard] testInstrumentedBalancePriority() (gas: 1056978472)
+
+Encountered a total of 1 failing tests, 8 tests succeeded
+
+Tip: Run `forge test --rerun` to retry only the 1 failed test
