@@ -1,0 +1,46 @@
+{
+  "base": "b3b63586ecd72467dadc2e5ccdca220d820f15fb",
+  "scope": "SOURCE: local admission exact bytes and first-failing physical origin consumed with entire328 success/exact journals/original rollback. Separate independent review/integration required.",
+  "checks": {
+    "normal_jobs": 1334,
+    "actual_source_identities": 1317,
+    "package_pins": 11,
+    "ordinary_foundation_scopes": 25,
+    "direct_kernel_regressions": 11,
+    "transport_execution_theorems": 4,
+    "public_instances": 3,
+    "retained_solidity_cases": 15,
+    "retained_fuzz_cases": 4,
+    "runs_each": 1024,
+    "retained_compiler_closures": 2,
+    "sources_per_closure": 28,
+    "retained_receipt_hashes": 99,
+    "fresh_forge_compiler_native_runs": 0
+  },
+  "files": {
+    "LidoSRv3/Audit/Guarantees/PDeposit1AdmissionErrors.lean": "51e0edc5f7bbe33dd0c4152c8fffbff41796b456a970f496d803a76897e4bb16",
+    "LidoSRv3/Audit/Source/DepositAdmissionErrors.lean": "da03dfac0afcb72fb0cb532559e0bf6f5e923202b8eccdd9f6c6aa45c1ef3c7e",
+    "LidoSRv3/Tests/DepositAdmissionErrorsRegression.lean": "a8d169416528a93c2cb9ae9688626a89ee012cc0c0b4d09c9003e3f5a67a9a7b",
+    "audit/deposit-admission-errors/README.md": "37227ea8fa0818414a2b94dfdf42ee40fec31f585f0f29e9c6a306eae18771e1",
+    "audit/deposit-admission-errors/validation/axioms.json": "d57cf1170295173f0dd8a3cfa06a17e585c2a8727d87154d5f6c80cbe8c85edb",
+    "audit/deposit-admission-errors/validation/compiler-identities.json": "7cd8f17605e3af6e70ca440a5bea2e7aa5740d2ca04f216e6d692d835051b8c7",
+    "audit/deposit-admission-errors/validation/correspondence.json": "c8f99ae0cec14dd98363a495d66de1ddec62257802366004d4b32088d97409e9",
+    "audit/deposit-admission-errors/validation/development-proof-shapes.log": "aa1f779012ce8ade595590066ada6c89f77fdccc0719be26553ce2739d6b669f",
+    "audit/deposit-admission-errors/validation/development-test-trace-metavariable.log": "c116c8e4d5f00496e42c4c4c16a38c7096ee4b667649711cddf2ce769592b00e",
+    "audit/deposit-admission-errors/validation/development-transport-match.log": "c17f5429de2177a556486ec7cbfd4e30a01c2cbc3e2fe4678590bbeefd513e16",
+    "audit/deposit-admission-errors/validation/normal-identities.json": "1fdeacad42a41dc4943a74609154be4674a342d44c6dab947394a715cd51544d",
+    "audit/deposit-admission-errors/validation/reuse-identities.json": "951f2e0d09fd773f44b988f00c9999766b8d03d5f858a4f985fb71f61e23cb49",
+    "audit/deposit-admission-errors/validation/source-build.log": "03984ab28a14db8157710b2522a19042033952df847d1afad33a44a4ce2116ee",
+    "audit/deposit-admission-errors/validation/source-inputs.json": "94832463246ae7373c3c9cd9c3b543fefccd17ba75963cbdd79f8c205f714742",
+    "audit/deposit-admission-errors/validation/test-build.log": "55091bf330f922d6b24132bfb6e6cf3b9c22f42b86d73b72d5ea93f60954cda8",
+    "audit/deposit-admission-errors/validation/validate.py": "3c06dda25fb95bf7658345f05e2c5c9d40c8e37fcc99864f115a75db714eacb3",
+    "audit/deposit-admission-errors/validation/validation.log": "c9d2660f34b0c457ab36fa9025a21bcebfb64e03b5f2beb3b51f61f75686d09d",
+    "audit/deposit-admission-errors/write-receipt.py": "01f447b161a2be209f7fb72dfb3c4eaf24708a0e423809349eab2ad6da6f55cc"
+  },
+  "config_sha256": {
+    "lakefile.lean": "68a2eeea808e5fe3ada64e9a89f7da8698c67893a021bdde219043fc99110411",
+    "lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
+    "lean-toolchain": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee"
+  },
+  "raw_whitespace": {}
+}

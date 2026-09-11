@@ -1,0 +1,9 @@
+{
+  "reviewed_commit": "a3c0ede3af44bd8890981157aca49a178d35cf80",
+  "reviewed_tree": "75c4497c3a21f0a87ae273b4145c713c8ade1778",
+  "verdict": "CLEAN",
+  "files": {
+    "audit/deposit-admission-errors/integration/independent-integration-review-a3c0.md": "c6c7aa91a5214b056ae1dd338fb623a24150af3f2bf56da341f846442e637b2f"
+  },
+  "scope": "Verbatim exact independent integration review; all preceding source, validation, dossier and configuration blobs unchanged."
+}
