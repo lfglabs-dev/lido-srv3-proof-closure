@@ -27,16 +27,6 @@
       "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
     },
     {
-      "id": "A-TOPUP-NOWRAP",
-      "accepted": true,
-      "risk": "An exact natural-number sum equals its unchecked uint256 reading only below 2^256. This registry condition is retained for results that use that equality; the current P-TOPUP-1 parent explicitly models wrapping and does not require a general no-wrap premise.",
-      "justification": "The current parent proves that a wrapping total moves no value: a nonzero wrapped total reverts, while a total wrapping to zero can finish without moving ETH.",
-      "severity": "HIGH",
-      "violation_impact": "Wrapping invalidates an unqualified exact-sum interpretation, not the current parent\u2019s explicit wrapping result.",
-      "validation": "Check the current parent and its nonzero-wrap and zero-wrap results. Retain NoUncheckedWrap only where a consuming theorem actually requires it.",
-      "removal_path": "Review each consuming theorem before removing this registry identifier; retain the explicit wrapping behavior in the current parent."
-    },
-    {
       "id": "A-TOPUP-BEACON-ADDRESS",
       "accepted": true,
       "risk": "The model-local beacon deposit target is not proved equal to the immutable/deployed production beacon deposit contract.",
@@ -107,16 +97,6 @@
       "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
     },
     {
-      "id": "A-YUL-INTERFACE",
-      "accepted": true,
-      "risk": "Handwritten Yul and direct bytecode require explicit interface composition, not a fabricated source projection.",
-      "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
-      "severity": "MEDIUM",
-      "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
-      "validation": "Validated by the linked source spans, executable mutants, or explicit reproduction command where available.",
-      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
-    },
-    {
       "id": "A-SHA256-FFI",
       "accepted": true,
       "risk": "SHA-256 precompile behavior relies on opaque native FFI and host-library behavior; differential vectors do not close this crypto risk.",
@@ -146,16 +126,6 @@
       "violation_impact": "A correctly accounted fee could still be sent to the wrong deployed address.",
       "validation": "Compare constructor/deployment artifacts with the pinned upstream predeploy literal; do not treat the source pin as deployed-immutable identity.",
       "removal_path": "Prove the configured immutable and deployed target both equal the canonical EIP-7251 address."
-    },
-    {
-      "id": "A-PERFECT-HASH",
-      "accepted": true,
-      "risk": "The structural deposit encoding `sourceNode` is assumed injective on pinned-width well-formed deposits; without it, determination yields witness equality but not deposit uniqueness.",
-      "justification": "SHA-256 remains opaque (`A-SHA256-FFI`); injectivity of the structural root encoding on well-formed deposits is an explicit hypothesis (`PerfectDepositEncoding`) rather than a cryptographic consequence.",
-      "severity": "HIGH",
-      "violation_impact": "Two distinct well-formed deposits could share the same structural root, breaking the unregistered uniqueness child `deposit_unique_of_perfect`. The registered `deposit_root_iff` parent still yields witness equality.",
-      "validation": "Recorded as `PerfectDepositEncoding` in `LidoSRv3.Audit.SszDepositEquivalence` and used only by the unregistered uniqueness child; removal requires a proved injectivity theorem or a narrower deposit model.",
-      "removal_path": "Prove `sourceNode` injective on well-formed deposits from the structural encoding, or refine the deposit model so injectivity is definitional."
     },
     {
       "id": "A-SOLC-TRUSTED",
