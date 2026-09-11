@@ -156,7 +156,6 @@
       "assumptions": [
         "A-ABSTRACT-TX",
         "A-SOURCE-SHAPED",
-        "A-TOPUP-NOWRAP",
         "A-VERITY-SCAFFOLD",
         "A-TOPUP-BEACON-ADDRESS",
         "A-SOLC-TRUSTED",
@@ -506,10 +505,8 @@
       "id": "P-SSZ-1",
       "assumptions": [
         "A-SHA256-FFI",
-        "A-PERFECT-HASH",
         "A-MULTI-NODE-TRANSPORT",
         "A-SOLC-TRUSTED",
-        "A-YUL-INTERFACE",
         "A-RUNTIME-PROVENANCE"
       ],
       "reproduction": {
