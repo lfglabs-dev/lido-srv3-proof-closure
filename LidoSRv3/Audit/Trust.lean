@@ -138,6 +138,7 @@ import LidoSRv3.Audit.Provenance.SszPerfectHashOrphaned
 import LidoSRv3.Tests.PackGTopupProvenanceMutants
 import LidoSRv3.Audit.Provenance.ConsolidationRequest
 import LidoSRv3.Audit.Provenance.CanonicalRequestAddress
+import LidoSRv3.Audit.Provenance.BeaconDepositAddress
 import LidoSRv3.Tests.PackGEth1ProvenanceMutants
 import LidoSRv3.Audit.Spec.DepositEthJournalCorrespondence
 import LidoSRv3.Tests.PackJDepositEthJournalMutants
@@ -1608,3 +1609,22 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Provenance.CanonicalRequestAddress.deployed_consolidation_request_immutable_equals_canonical
 #print axioms LidoSRv3.Audit.Provenance.CanonicalRequestAddress.model_consolidation_predeploy_equals_canonical
 #print axioms LidoSRv3.Audit.Provenance.CanonicalRequestAddress.model_predeploy_equals_deployed_immutable
+
+-- A-TOPUP-BEACON-ADDRESS + A-DEPOSIT-CONTRACT discharge (see
+-- `audit/findings/A-TOPUP-BEACON-ADDRESS-and-A-DEPOSIT-CONTRACT-discharged.md` and
+-- `LidoSRv3/Audit/Provenance/BeaconDepositAddress.lean`): the Lean model
+-- literals `LidoSRv3.Audit.Verity.TopupTx.beaconAddress`,
+-- `PTopup1.canonicalBeaconDepositAddress`, and
+-- `PDeposit1.canonicalDepositContractAddress` all equal the
+-- `DEPOSIT_CONTRACT` immutable extracted from the deployed
+-- StakingRouter runtime bytecode at byte offset 7525 width 20 (fixture
+-- and hash pinned in `audit/artifacts.lock.json`; reproduction in
+-- `scripts/verify_beacon_deposit_immutable.py`). A-TOPUP-BEACON-ADDRESS
+-- is retired from `P-TOPUP-1.assumptions`; A-DEPOSIT-CONTRACT is retired
+-- from `P-DEPOSIT-1.assumptions` and `P-ALLOC-EXEC-1.assumptions`.
+#print axioms LidoSRv3.Audit.Provenance.BeaconDepositAddress.deployed_beacon_deposit_immutable_equals_canonical
+#print axioms LidoSRv3.Audit.Provenance.BeaconDepositAddress.topup_verity_beacon_equals_canonical
+#print axioms LidoSRv3.Audit.Provenance.BeaconDepositAddress.topup_canonical_pin_equals_canonical
+#print axioms LidoSRv3.Audit.Provenance.BeaconDepositAddress.deposit_canonical_pin_equals_canonical
+#print axioms LidoSRv3.Audit.Provenance.BeaconDepositAddress.topup_verity_beacon_equals_deployed_immutable
+#print axioms LidoSRv3.Audit.Provenance.BeaconDepositAddress.deposit_canonical_pin_equals_deployed_immutable
