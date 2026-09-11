@@ -1,3 +1,4 @@
+import LidoSRv3.Tests.AccountAccountingCall
 import LidoSRv3.Tests.AddressStETHTransferFromCalls
 import LidoSRv3.Tests.TopupEntryAdmission
 import LidoSRv3.Tests.AddressStETHTransferCalls
@@ -882,3 +883,16 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.TopupEntryAdmission.roleSlot_bytes
 #print axioms LidoSRv3.Audit.Source.TopupEntryAdmission.gates_success
 #print axioms LidoSRv3.Tests.TopupEntryAdmission.public_rollback
+
+-- Actual physical locator accounting CALL consumed by full report/mint/distribution.
+#print axioms AccountAddress.AccountingCall.call_success
+#print axioms AccountAddress.AccountingCall.decode_getter
+#print axioms AccountAddress.AccountingCall.call_getter
+#print axioms AccountAddress.ReportFeeAccountingCall.prepare_success
+#print axioms AccountAddress.ReportFeeAccountingCall.mint_replay
+#print axioms AccountAddress.ReportFeeAccountingCall.finish_success_replay
+#print axioms AccountAddress.ReportFeeAccountingCall.execute_success
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1.actual_report_accounting_call
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1.actual_report_accounting_call_failure_restores
+#print axioms LidoSRv3.Tests.AccountAccountingCall.public_success
+#print axioms LidoSRv3.Tests.AccountAccountingCall.public_failure
