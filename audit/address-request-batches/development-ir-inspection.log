@@ -1,0 +1,10 @@
+Command: forge inspect --root audit/address-request-batches/solidity BatchHarness ir
+Exit status: failed (the surrounding multi-command shell continued).
+Captured stderr:
+Error: Compiler run failed:
+Error: Internal compiler error (/solidity/libsolidity/codegen/ir/IRVariable.cpp:52):Invalid stack item name: slot
+
+The output file BatchHarness.ir was empty and is retained as development-ir.stdout.
+The experimental IR request is not the selected legacy compilation pipeline.
+No IR evidence is credited; actual full legacy assembly inspection succeeded.
+No fixture/source/compiler profile changed to hide this failure.

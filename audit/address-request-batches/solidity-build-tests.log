@@ -1,0 +1,19 @@
+Compiling 19 files with Solc 0.8.9
+Solc 0.8.9 finished in 820.48ms
+Compiler run successful!
+
+Ran 11 tests for test/Batches.t.sol:BatchTest
+[PASS] testActualWrappedLaterAllowanceRollback() (gas: 5671655)
+[PASS] testActualWrappedLaterAmountRollback() (gas: 5699449)
+[PASS] testActualWrappedTwoItems() (gas: 5685376)
+[PASS] testEmptyAtResumeEquality() (gas: 5447329)
+[PASS] testFuzzStETHOrderedBatch(uint8,uint64) (runs: 1024, μ: 5735149, ~: 5718094)
+[PASS] testPauseBeforeEmptyBoth() (gas: 5443409)
+[PASS] testPauseCallbackNotRecheckedStETH() (gas: 5749487)
+[PASS] testPauseCallbackNotRecheckedWrapped() (gas: 5714486)
+[PASS] testStETHGuardBeforeCall() (gas: 5424068)
+[PASS] testStETHLaterAmountRollback() (gas: 5609953)
+[PASS] testStETHOrderedOwnerAndIds() (gas: 5719620)
+Suite result: ok. 11 passed; 0 failed; 0 skipped; finished in 447.19ms (483.92ms CPU time)
+
+Ran 1 test suite in 451.43ms (447.19ms CPU time): 11 tests passed, 0 failed, 0 skipped (11 total tests)
