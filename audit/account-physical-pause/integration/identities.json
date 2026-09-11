@@ -1,0 +1,12 @@
+{
+  "source_commit": "62669fad69b4bae620458eff7130b2d5e0017720",
+  "sources": 40,
+  "pins": 11,
+  "artifact_hashes": 39,
+  "scoped_axioms": 9,
+  "normal_olean_sha256": {
+    "ReportFeePhysicalPause": "6c15de15ffa02347eaed45ef496689fb95e45e5ea1e6de2e898d033ee75a2402",
+    "LidoSRv3.Audit.Guarantees.PAccount1PhysicalPause": "55043e711d1850692dc16ab2c53f5e17185f4583809462cae420769d9ac50b93",
+    "LidoSRv3.Tests.AccountPhysicalPause": "d5adb8663716221efcbae94c252f4433d481ad3d0e2200f22e2ff75ea0f680e3"
+  }
+}
