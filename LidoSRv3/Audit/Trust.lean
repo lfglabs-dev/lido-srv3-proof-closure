@@ -1496,3 +1496,26 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.honest_revert_partition
 #print axioms LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.dispatch_conserves_eth
 #print axioms LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.dispatch_matches_atomic_multicall
+
+-- PackN{1..6} mutant lots: additional theorems documenting honest
+-- parents holding and kill-lines refuting mutant lots. Only theorems
+-- with axiom lists inside {propext, Classical.choice, Quot.sound} or
+-- empty are registered here; native_decide-bearing mutants stay out.
+#print axioms LidoSRv3.Tests.PackN1AllocExecMutants.honest_router_parent_holds
+#print axioms LidoSRv3.Tests.PackN1AllocExecMutants.canonical_router_word_bounds
+#print axioms LidoSRv3.Tests.PackN2EthJournalMutants.honest_success_parent_holds
+#print axioms LidoSRv3.Tests.PackN2EthJournalMutants.lido_hop_not_journal_approved
+#print axioms LidoSRv3.Tests.PackN2EthJournalMutants.mutant_lido_maps_to_lidoPull
+#print axioms LidoSRv3.Tests.PackN2EthJournalMutants.mutant_lido_candidate_is_spec_image
+#print axioms LidoSRv3.Tests.PackN3OracleMintMutants.cap_premise_is_load_bearing
+#print axioms LidoSRv3.Tests.PackN3OracleMintMutants.raw_fee_mutant_breaches_cap
+#print axioms LidoSRv3.Tests.PackN3OracleMintMutants.honest_frame_passes_vector
+#print axioms LidoSRv3.Tests.PackN3OracleMintMutants.honest_computed_path_passes_vector
+#print axioms LidoSRv3.Tests.PackN4AddressBatchMutants.honest_rename_parent_holds
+#print axioms LidoSRv3.Tests.PackN4AddressBatchMutants.fixed_dest_unbounded_rename_kill_line
+#print axioms LidoSRv3.Tests.PackN4AddressBatchMutants.three_claim_batch_ready
+#print axioms LidoSRv3.Tests.PackN4AddressBatchMutants.three_claim_batch_parent_instance
+-- (plus_one_channel_is_a_different_keccak_map intentionally kept out:
+-- transitively depends on `Compiler.Proofs.solidityMappingSlot_injective`
+-- which is outside the check_trust_axioms.py allowlist.)
+#print axioms LidoSRv3.Tests.PackN6ConsolValueMutants.zero_value_call_sum
