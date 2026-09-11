@@ -1,0 +1,118 @@
+{
+  "LidoSRv3.Audit.Guarantees.PSsz1.actual_compiled_cl_entry_complete_declared_branch": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.SszCompiledClEntry.afterRoot_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.SszCompiledClEntry.beforeRoot_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.SszCompiledClEntry.rootCall_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.SszDeclaredSiblings.advance_succ": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.SszDeclaredSiblings.advance_zero": [
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.SszDeclaredSiblings.all_steps": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.SszDeclaredSiblings.complete_of_branch": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.SszDeclaredSiblings.cursor_arithmetic": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.SszDeclaredSiblings.cursor_dichotomy": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.SszDeclaredSiblings.declared_get": [
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.SszDeclaredSiblings.declared_length": [
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.SszDeclaredSiblings.declared_succ": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.SszDeclaredSiblings.end_eq": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.SszDeclaredSiblings.penultimate": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.SszDeclaredSiblings.wrapper_depth": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.SszDeclaredSiblingsRegression.exact_initial_wrap": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.SszDeclaredSiblingsRegression.final_endpoint_equality": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.SszDeclaredSiblingsRegression.immediate_wrap_complete": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.SszDeclaredSiblingsRegression.later_wrap_exits_first": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.SszDeclaredSiblingsRegression.maximal_count_arithmetic": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.SszDeclaredSiblingsRegression.maximal_count_dichotomy": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.SszDeclaredSiblingsRegression.one_count_view": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.SszDeclaredSiblingsRegression.ordinary_aligned": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.SszDeclaredSiblingsRegression.ordinary_unaligned": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.SszDeclaredSiblingsRegression.public_retained_vector": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.SszDeclaredSiblingsRegression.retained_complete_list": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.SszDeclaredSiblingsRegression.retained_count_bytes": [],
+  "LidoSRv3.Tests.SszDeclaredSiblingsRegression.retained_header_bytes": [],
+  "LidoSRv3.Tests.SszDeclaredSiblingsRegression.retained_penultimate_bytes": [],
+  "LidoSRv3.Tests.SszDeclaredSiblingsRegression.retained_penultimate_index": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.SszDeclaredSiblingsRegression.wrapped_endpoint_zero": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.SszDeclaredSiblingsRegression.zero_count_view": [
+    "propext"
+  ]
+}
