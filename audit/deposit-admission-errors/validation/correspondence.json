@@ -1,0 +1,13 @@
+{
+  "boundary": "No allocation/capture closure; no unified complete trace or full-memory/gas/bytecode claim. Existing supplied allocation/maxEB/phase cursors/context/hash/library qualifications remain. Accepted ALLOC and RESERVE unchanged.",
+  "composition": "One actual lookup, local physical gate, one unchanged ModulePhysicalMetadata continuation. Public all-outcome theorem retains entire328 Effects plus exact successful result, first-failing local error origin/bytes/no-module-attempt and universal original rollback. Downstream faults unmodified; no global reason remapping.",
+  "core": "17005714f151e5502c559932319a3f2f74ac2436",
+  "errors": {
+    "inactive": "645cc9f6",
+    "invalidEnum": "4e487b71 + uint256(0x21)",
+    "unauthorized": "ea8e4eb5",
+    "unregistered": "d41d6282"
+  },
+  "ir": "Full DsmHarness fun_deposit3323 onward: auth then membership then enum Panic21 then inactive4bytes then WC/getDepositableEther/allocation; exact auth4232\u20134244; membership4119 onward. Full AdmissionHarness5030 lines and DsmHarness retained at accepted345.",
+  "source": "StakingRouter.deposit943\u2013950; _checkAppAuth1177\u20131179; SRUtils membership45\u201347; physical enum/status reads and actual packed WC remain unchanged."
+}

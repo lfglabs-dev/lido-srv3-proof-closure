@@ -1,0 +1,106 @@
+{
+  "LidoSRv3.Audit.Guarantees.PDeposit1.actual_dsm_call_admission_bytes_suffix": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.DepositAdmissionErrors.execute_of_admitted_lookup": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.DepositAdmissionErrors.failure_restores": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.DepositAdmissionErrors.gate_none_program": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.DepositAdmissionErrors.gate_origin": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.DepositAdmissionErrors.local_rejection": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.DepositAdmissionErrors.success_projection": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.DepositAdmissionErrorsRegression.active_allows_type255": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.DepositAdmissionErrorsRegression.all_status_bytes": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.DepositAdmissionErrorsRegression.authorization_before_membership_and_enum": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.DepositAdmissionErrorsRegression.downstream_arithmetic_not_remapped": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.DepositAdmissionErrorsRegression.dsm_before_all_guards": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.DepositAdmissionErrorsRegression.enum_before_inactive": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.DepositAdmissionErrorsRegression.inactive_exact": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.DepositAdmissionErrorsRegression.late_outcome": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.DepositAdmissionErrorsRegression.late_transport": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.DepositAdmissionErrorsRegression.lengths": [],
+  "LidoSRv3.Tests.DepositAdmissionErrorsRegression.local_no_module_attempt": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.DepositAdmissionErrorsRegression.membership_before_enum": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.DepositAdmissionErrorsRegression.positive_execution": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.DepositAdmissionErrorsRegression.positive_transport": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.DepositAdmissionErrorsRegression.public_late_original": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.DepositAdmissionErrorsRegression.public_local_origin": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.DepositAdmissionErrorsRegression.public_nonempty": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.DepositAdmissionErrorsRegression.short_dsm_before_auth": [
+    "Quot.sound",
+    "propext"
+  ]
+}

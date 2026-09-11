@@ -1,4 +1,5 @@
 import LidoSRv3.Tests.TopupRouterAdmissionCallRegression
+import LidoSRv3.Tests.DepositAdmissionErrorsRegression
 import LidoSRv3.Tests.TrioConsolidation.PhysicalEntrySettlement
 import LidoSRv3.Tests.TrioConsolidation.PhysicalQuotaSettlement
 import LidoSRv3.Tests.AccountAccountingCall
@@ -915,6 +916,13 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms audit.trio.consolidation.PhysicalEntrySettlement.gates_success
 #print axioms audit.trio.consolidation.PhysicalEntrySettlement.execute_success
 #print axioms audit.trio.consolidation.PhysicalEntrySettlement.failure_restores
+
+-- Exact deposit admission error origins consume the complete DSM suffix.
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.actual_dsm_call_admission_bytes_suffix
+#print axioms LidoSRv3.Audit.Source.DepositAdmissionErrors.gate_origin
+#print axioms LidoSRv3.Audit.Source.DepositAdmissionErrors.success_projection
+#print axioms LidoSRv3.Audit.Source.DepositAdmissionErrors.local_rejection
+#print axioms LidoSRv3.Audit.Source.DepositAdmissionErrors.failure_restores
 
 -- Actual router admission consumes the entire prior physical TOPUP result.
 #print axioms LidoSRv3.Audit.Guarantees.PTopupRouterAdmissionCall.actual_router_admission_complete_prior
