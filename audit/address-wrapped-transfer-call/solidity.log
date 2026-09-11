@@ -1,0 +1,21 @@
+Compiling 19 files with Solc 0.8.9
+Solc 0.8.9 finished in 728.53ms
+Compiler run successful!
+
+Ran 13 tests for test/ActualWrappedTransfer.t.sol:ActualWrappedTransferTest
+[PASS] testActualTokenCallerEnqueueAndBoolTwo() (gas: 5866609)
+[PASS] testArbitraryStETHCanChangeSupplyAfterBurn() (gas: 5928873)
+[PASS] testBalanceErrorPrecedesAllowance() (gas: 5691531)
+[PASS] testConversionDecodeFailureBeforeBurn() (gas: 5715600)
+[PASS] testFalseAndTrailingTransferAccepted() (gas: 5838766)
+[PASS] testFuzzConvertedAmountDrivesSameEnqueue(uint96,uint256) (runs: 1024, μ: 5862108, ~: 5862381)
+[PASS] testInsufficientAllowanceRollsBackPrecedingTransfer() (gas: 5727132)
+[PASS] testLateCallerAmountFailureRollsBackActualToken() (gas: 5809446)
+[PASS] testRecipientOverflowPrecedesAllowance() (gas: 5694281)
+[PASS] testSelfTransferFreshRecipientAndNestedAllowance() (gas: 5685695)
+[PASS] testSupplySafeMathFailureAfterBalanceWrite() (gas: 5733705)
+[PASS] testTransferDecodeFailureRollsBackBurn() (gas: 5789043)
+[PASS] testZeroAddressGuardPriorityAndZeroAmountAllowed() (gas: 5709858)
+Suite result: ok. 13 passed; 0 failed; 0 skipped; finished in 419.50ms (460.52ms CPU time)
+
+Ran 1 test suite in 422.88ms (419.50ms CPU time): 13 tests passed, 0 failed, 0 skipped (13 total tests)

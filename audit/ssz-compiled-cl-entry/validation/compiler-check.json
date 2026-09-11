@@ -1,0 +1,48 @@
+{
+  "inputs": [
+    {
+      "keccak256": "0x20df4d8e319fd85ccd19952e3f8bfb8ad6e88b63aff637cb53f29dc0a49c2366",
+      "path": "audit/ssz-root-call-composition/solidity/SszRootCall.t.sol",
+      "pin": "2c2c72a91cd68a43de0777912772d12cc48a285d",
+      "sha256": "ed5b04da50dd98519ef85425a30477e63372eb7781cbca43ea446cd3c9761c90"
+    },
+    {
+      "keccak256": "0xeb6c14b6c9c715d9585d73cea0a63dc218c3b9fd28eec6047a883f622ab09e9f",
+      "path": "lido-core/contracts/0.8.25/CLValidatorVerifier.sol",
+      "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+      "sha256": "d6e89f6975e4fa02f758bf461a98ac2d689296b5c92d03ffd4e43a22d0b3d7ed"
+    },
+    {
+      "keccak256": "0x8a8c7644d91bef60068027b444c104eb1dcd86ac6dc8ff3c5a928e64de659550",
+      "path": "lido-core/contracts/common/interfaces/ValidatorWitness.sol",
+      "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+      "sha256": "8fd24cfab7402233029756e52e59198b0d9cbf0a42e5c07d9fa2338ed731a5f7"
+    },
+    {
+      "keccak256": "0x6099fbcefb3b3afdaf69321338d2546962125666086a653303446ee9a8dd8caa",
+      "path": "lido-core/contracts/common/lib/BLS.sol",
+      "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+      "sha256": "0187cc6a6b1aaa833317695d88795db431fa237452213e8c3872a0f444dceb7c"
+    },
+    {
+      "keccak256": "0x84d92a58850cdcba3e811ef39e414aee829f6437df26387aac5fdaca5484f8d2",
+      "path": "lido-core/contracts/common/lib/BeaconTypes.sol",
+      "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+      "sha256": "9591e9af1a4fd398db86267f3589e763f9eb2016bf29e26cfa50988cf73a10c3"
+    },
+    {
+      "keccak256": "0xb9e55d38004099aeafb50d54d91427fcc3379e5a54435a7aabe7de4d6de99052",
+      "path": "lido-core/contracts/common/lib/GIndex.sol",
+      "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+      "sha256": "2653bd4ba89c349f3db36f21a8afc6a24e0e233816d9b608f46d048feb601d1f"
+    },
+    {
+      "keccak256": "0x479f52b444430e27bf119132ae59ed55c97441959cda554f737f943d499b2756",
+      "path": "lido-core/contracts/common/lib/SSZ.sol",
+      "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+      "sha256": "91ef497b972bbee0fe89043034e6bd62fa0c1059f22874d4826bc6164a22009b"
+    }
+  ],
+  "ir_sha256": "aba7b84e915d3279916e7d18150f047e553c8f712b1e30ea96235e11998679e3",
+  "scope": "Retained root Mac solc0.8.25 replay, no new compiler execution by this validator; Linux binary not reexecuted; source/IR correspondence requires review."
+}
