@@ -1,3 +1,4 @@
+import LidoSRv3.Tests.TrioConsolidation.PhysicalEntrySettlement
 import LidoSRv3.Tests.TrioConsolidation.PhysicalQuotaSettlement
 import LidoSRv3.Tests.AccountAccountingCall
 import LidoSRv3.Tests.AddressStETHTransferFromCalls
@@ -905,3 +906,11 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms audit.trio.consolidation.PhysicalQuotaSettlement.packed_fields
 #print axioms audit.trio.consolidation.PhysicalQuotaSettlement.updatedTime_success
 #print axioms audit.trio.consolidation.PhysicalQuotaSettlement.transition_success
+
+-- Physical consolidation entry consumes the entire quota/settlement result.
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1.actual_physical_entry_quota_settlement_requests
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1.actual_physical_entry_failure_restores
+#print axioms audit.trio.consolidation.PhysicalEntrySettlement.roleSlot_bytes
+#print axioms audit.trio.consolidation.PhysicalEntrySettlement.gates_success
+#print axioms audit.trio.consolidation.PhysicalEntrySettlement.execute_success
+#print axioms audit.trio.consolidation.PhysicalEntrySettlement.failure_restores
