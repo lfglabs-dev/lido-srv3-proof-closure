@@ -1,0 +1,18 @@
+{
+  "files": {
+    "EvmYul/FFI/ffi.c": "0ca099540b8f46888e9ae18afffb2a825ef8ef0edc0d9a239c819c32cf82a020",
+    "EvmYul/FFI/ffi.lean": "c0b6b455399a476fd3c5be3fd3e1df5788a112dd92b520397512d073b6317562",
+    "keccak256/sha3.c": "9499df301d240fdd296fb53aae554d2615f875156e39174390dc0b7dd2a25fea",
+    "keccak256/sha3.h": "ba0f5cb513018ae84959293f82a2f1b2c027457c6564e8e1b8397fa439bcce6c",
+    "sha2/sha-256.c": "7a74437adc78576b8faff060f9573ba88a6da798914f45d263c75b149add3d27",
+    "sha2/sha-256.h": "c2173d83813a0c29fcc3345ce489766efeadee6a52ca927ecd0f917a120df9fb"
+  },
+  "repositories": {
+    "keccak256": "fc8504750a5c2174a1874094dd05e6a0d8797753",
+    "sha2": "565f65009bdd98267361b17d50cddd7c9beb3e6c"
+  },
+  "vectors": {
+    "mapping-vectors.json": "0d5cd8d50aab8341b369745b60c3556a199c6727e165485f4ef93bb8d197f1f5",
+    "mapping-vectors.tsv": "8905f5bc236f77e252d66f799d95ffe2ecb92e57ee37aacf2c3b9e9b308fa2bd"
+  }
+}
