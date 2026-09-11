@@ -1,0 +1,16 @@
+{
+  "core": "17005714f151e5502c559932319a3f2f74ac2436",
+  "full_gateway_ir_sha256": "5e70f37cb88b40841267d35873d318eb5a73192776255b78f89a03fc5eadab99",
+  "gateway_source": "pure guards/count189-199; omitted preconditions201,locator203,witness205-207; consume209 then quote211,vault220,refund222",
+  "ir": "actual inherited entry quota1158 precedes quote1159; full consume1699-1780; getStorageLimit2061-2076; calculateCurrentLimit2089-2129; all full compiler bodies retained",
+  "layout_bits": {
+    "frameDurationInSec": 96,
+    "itemsPerFrame": 128,
+    "maxLimit": 0,
+    "preserved_upper": 160,
+    "prevLimit": 32,
+    "prevTimestamp": 64
+  },
+  "proof": "actual quota owner ctx.self; full unchanged Success and Effects consumed on postQuota; public rollback restores original credited entry; no final quota frame or stage-success premise",
+  "runtime": "12 cases/1024 bounded initialized-state replenishment fuzz plus explicit arbitrary bad-state extremes; 2-source cached0.8.9 vault; quote/inbox/refund observe quota; late failure restores; accepted callback may mutate quota"
+}

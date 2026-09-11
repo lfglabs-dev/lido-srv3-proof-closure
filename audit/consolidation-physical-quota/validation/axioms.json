@@ -1,0 +1,102 @@
+{
+  "LidoSRv3.Audit.Guarantees.PConsolidationEth1.actual_physical_quota_failure_restores": [
+    "propext"
+  ],
+  "LidoSRv3.Audit.Guarantees.PConsolidationEth1.actual_physical_quota_settlement_requests": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TrioConsolidation.PhysicalQuotaSettlement.accepted_callback_changes_quota": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TrioConsolidation.PhysicalQuotaSettlement.backwards_time": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TrioConsolidation.PhysicalQuotaSettlement.checked_uint32_time_product": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TrioConsolidation.PhysicalQuotaSettlement.checked_uint32_timestamp_add": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TrioConsolidation.PhysicalQuotaSettlement.count_before_update_division": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TrioConsolidation.PhysicalQuotaSettlement.disabled_skips_bad_duration_time": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TrioConsolidation.PhysicalQuotaSettlement.frames_cast_before_product": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TrioConsolidation.PhysicalQuotaSettlement.inconsistent_previous_limit": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TrioConsolidation.PhysicalQuotaSettlement.late_refund_failure": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TrioConsolidation.PhysicalQuotaSettlement.nonempty_actual_success": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TrioConsolidation.PhysicalQuotaSettlement.physical_owner_before_vault_authorization": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TrioConsolidation.PhysicalQuotaSettlement.public_nonempty": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TrioConsolidation.PhysicalQuotaSettlement.public_original_rollback": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TrioConsolidation.PhysicalQuotaSettlement.replenish_cap_and_keep_upper96": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TrioConsolidation.PhysicalQuotaSettlement.restored_addition_overflow": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TrioConsolidation.PhysicalQuotaSettlement.restored_multiplication_overflow": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TrioConsolidation.PhysicalQuotaSettlement.zero_duration_current": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TrioConsolidation.PhysicalQuotaSettlement.zero_duration_update_after_early_return": [
+    "propext"
+  ],
+  "audit.trio.consolidation.PhysicalQuotaSettlement.current_bound": [
+    "propext"
+  ],
+  "audit.trio.consolidation.PhysicalQuotaSettlement.execute_success": [
+    "propext"
+  ],
+  "audit.trio.consolidation.PhysicalQuotaSettlement.failure_restores": [
+    "propext"
+  ],
+  "audit.trio.consolidation.PhysicalQuotaSettlement.field_bound": [
+    "propext"
+  ],
+  "audit.trio.consolidation.PhysicalQuotaSettlement.packed_fields": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "audit.trio.consolidation.PhysicalQuotaSettlement.prepare_success": [
+    "Quot.sound",
+    "propext"
+  ],
+  "audit.trio.consolidation.PhysicalQuotaSettlement.quota_effects": [
+    "Quot.sound",
+    "propext"
+  ],
+  "audit.trio.consolidation.PhysicalQuotaSettlement.transition_none": [
+    "propext"
+  ],
+  "audit.trio.consolidation.PhysicalQuotaSettlement.transition_success": [
+    "Quot.sound",
+    "propext"
+  ],
+  "audit.trio.consolidation.PhysicalQuotaSettlement.updatedTime_success": [
+    "Quot.sound",
+    "propext"
+  ]
+}

@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/private/tmp/lido-consolidation-physical-quota/audit/consolidation-physical-quota/validation/validate.py", line 108, in <module>
+    assert calc.index('checked_sub_uint256(')<calc.index('leave')<calc.index('checked_div_uint256(')<calc.index('checked_add_uint256(')
+ValueError: substring not found

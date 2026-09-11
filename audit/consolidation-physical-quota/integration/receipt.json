@@ -1,0 +1,23 @@
+{
+  "source_commit": "82051ab0a552734712b8f33e3f96f0074bf9ee39",
+  "accepted_main": "d353e85438b3456604a76ee417f9359627751240",
+  "union_commit": "b38eefd62eeae02a85bc44ac66749e62ab32f952",
+  "checks": {
+    "normal_jobs": 1785,
+    "global_disclosed_axioms": 29,
+    "ordinary_foundation_scopes": 30,
+    "actual_sources": 1252,
+    "package_pins": 11,
+    "source_hashes": 42,
+    "normal_modules": 5
+  },
+  "files": {
+    "audit/consolidation-physical-quota/integration/README.md": "0dc73b663677a326778af98a6aa240c89ca2f7224936cf3b455fb591b108bfa3",
+    "audit/consolidation-physical-quota/integration/global-trust.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439",
+    "audit/consolidation-physical-quota/integration/independent-source-review-8205.md": "b13c0cd1c70c754fbec458481a78b52cf32f1b71655075d2fdefc1d2f261c09e",
+    "audit/consolidation-physical-quota/integration/normal-build.log": "20943995574c454359d4354b8674da72dcacc9c41c985ceaa3bc5a3baec4d060",
+    "audit/consolidation-physical-quota/integration/normal-identities.json": "b519b7ed3333d28aef01c75421a0165066331803bc314facdc9a64f339c4e67d",
+    "audit/consolidation-physical-quota/integration/validate-integration.py": "ff7efd0db7099ffd0c0354f25308d1c065c40acf262f71ae9d1f7d196dfe0c22",
+    "audit/consolidation-physical-quota/integration/validation.log": "58b65e9411d442ff0555d0a3db69878180764d710ff0680be732d1eaba4d5c96"
+  }
+}
