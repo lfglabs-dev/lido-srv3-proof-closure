@@ -240,6 +240,13 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Spec.AllocationCorrespondence.alloc2_spec_step_amount_correspondence
 #print axioms LidoSRv3.Audit.Spec.AllocationCorrespondence.topup2_per_key_remains_gwei
 #print axioms LidoSRv3.Audit.Guarantees.PTopup2.verity_tx_simulates_topup2_spec
+-- PTopup2 aggregate arithmetic bounds used by the multi-batch cap
+-- discipline: per-key `consumeBudget` upper bound, and three
+-- aggregate-vs-individual / module-limit / block-cap monotone bounds.
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2.consumeBudget_per_key_le
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_individual
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_module_limit
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap_of_well_formed
 #print axioms LidoSRv3.Audit.Spec.AllocationCorrespondence.spec_amounts_do_not_imply_linkssource
 #print axioms LidoSRv3.Tests.PackAAllocSpecMutants.target_as_capacity_kill_line_refutes_alloc1_spec
 #print axioms LidoSRv3.Tests.PackAAllocSpecMutants.spec_amounts_kill_line_refutes_linkssource
@@ -366,6 +373,18 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.PackN4AddressBatchMutants.swapped_three_payout_order_kill_line_refutes_parent
 #print axioms LidoSRv3.Tests.PackN4AddressBatchMutants.fixed_dest_rename_kill_line_refutes_parent
 #print axioms LidoSRv3.Audit.Guarantees.PSszLive1.modeled_beacon_roots_live_ssz_consume
+-- PSszLive1 admission surface: `production_witness_admission_from_core_gindex`
+-- is the executable identity that the production admission holds iff
+-- the core gindex is looked up; `gateway_admission_sound` +
+-- `admitted_construction_under_lookup` are the accompanying soundness
+-- lemmas, and `admission_false_of_lookup_none` is the paired
+-- negative-direction closure. Together they pin the production
+-- admission gate as decidable on the pinned lookup, not on a supplied
+-- Boolean.
+#print axioms LidoSRv3.Audit.Guarantees.PSszLive1.production_witness_admission_from_core_gindex
+#print axioms LidoSRv3.Audit.Guarantees.PSszLive1.gateway_admission_sound
+#print axioms LidoSRv3.Audit.Guarantees.PSszLive1.admission_false_of_lookup_none
+#print axioms LidoSRv3.Audit.Guarantees.PSszLive1.admitted_construction_under_lookup
 #print axioms LidoSRv3.Audit.Verity.SszTxSimulation.digest_preimages_length
 #print axioms LidoSRv3.Audit.Spec.Eip4788AnchorChild.eip4788_parent_root_identified
 #print axioms LidoSRv3.Audit.Verity.BeaconRootsTx.spec_source_verity_beacon_roots
@@ -692,6 +711,18 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.verity_nonzero_wrap_reverts_and_restores
 #print axioms
   LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source_with_nonzero_wrap_close
+-- PTopup1 provenance / audit-only claims about what the pinned source
+-- alone does *not* determine: `pinned_constructor_span_does_not_
+-- determine_beacon_address` refutes any attempt to derive the beacon
+-- address from constructor-span provenance alone;
+-- `no_source_only_beacon_address_derivation` states the same at the
+-- source level; `source_allocation_guards_required` and
+-- `source_over_target_guard_required` pin the two allocation guards
+-- (module-selected, over-target) as necessary rather than accidental.
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.pinned_constructor_span_does_not_determine_beacon_address
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.no_source_only_beacon_address_derivation
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_allocation_guards_required
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_over_target_guard_required
 #print axioms LidoSRv3.Audit.Verity.TopupHybrid.verity_tx_simulates_source
 #print axioms LidoSRv3.Tests.TopupHybridMutants.hybrid_simulation_covers_nonzero_wrap
 #print axioms LidoSRv3.Tests.TopupHybridMutants.hybrid_simulation_covers_wrap_to_zero
@@ -977,6 +1008,10 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 
 #print axioms LidoSRv3.Audit.Guarantees.PTopupTimingHistory.actual_timing_credential_root_module_memory_history
 #print axioms LidoSRv3.Audit.Guarantees.PTopupTimingHistory.actual_timing_credential_root_module_failure_restores
+-- `history_effects` is the abstract history-effect equation for a
+-- successful timing-history step on the gateway address and total
+-- forwarded amount.
+#print axioms LidoSRv3.Audit.Guarantees.PTopupTimingHistory.history_effects
 #print axioms LidoSRv3.Audit.Source.TopupTimingHistory.execute_projection
 #print axioms LidoSRv3.Audit.Source.TopupTimingHistory.packed_fields
 #print axioms LidoSRv3.Tests.TopupTimingHistory.public_consumer
