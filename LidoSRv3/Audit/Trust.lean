@@ -134,6 +134,7 @@ import LidoSRv3.Audit.Provenance.Deposit
 import LidoSRv3.Tests.PackGDepositProvenanceMutants
 import LidoSRv3.Audit.Provenance.TopupBeacon
 import LidoSRv3.Audit.Provenance.TopupNoWrapOrphaned
+import LidoSRv3.Audit.Provenance.SszPerfectHashOrphaned
 import LidoSRv3.Tests.PackGTopupProvenanceMutants
 import LidoSRv3.Audit.Provenance.ConsolidationRequest
 import LidoSRv3.Tests.PackGEth1ProvenanceMutants
@@ -1582,3 +1583,14 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Provenance.TopupNoWrapOrphaned.source_parent_ignores_no_unchecked_wrap
 #print axioms LidoSRv3.Audit.Provenance.TopupNoWrapOrphaned.source_parent_applies_universally
 #print axioms LidoSRv3.Audit.Provenance.TopupNoWrapOrphaned.verity_parent_ignores_no_unchecked_wrap
+
+-- A-PERFECT-HASH orphanage proof (see
+-- `audit/findings/A-PERFECT-HASH-orphaned.md`): the two registered
+-- P-SSZ-1 parents do not consume `PerfectDepositEncoding`. The registry
+-- text already records that this premise "is used only by the
+-- unregistered uniqueness child" (`deposit_unique_of_perfect`).
+-- Retirement of A-PERFECT-HASH from `assumptions.yaml` and P-SSZ-1 is
+-- a policy decision (advances R1 review basis) and is left explicit.
+#print axioms LidoSRv3.Audit.Provenance.SszPerfectHashOrphaned.abstract_parent_ignores_perfect_deposit_encoding
+#print axioms LidoSRv3.Audit.Provenance.SszPerfectHashOrphaned.abstract_parent_applies_universally
+#print axioms LidoSRv3.Audit.Provenance.SszPerfectHashOrphaned.verity_parent_ignores_perfect_deposit_encoding
