@@ -127,6 +127,7 @@ import LidoSRv3.Audit.Spec.OracleFrameCorrespondence
 import LidoSRv3.Tests.PackEOracleFrameMutants
 import LidoSRv3.Audit.Spec.ConsolidationObserveCorrespondence
 import LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel
+import LidoSRv3.Audit.Verity.ConsolidationFee
 import LidoSRv3.Tests.PackFConsolidationObserveMutants
 import LidoSRv3.Audit.Provenance.Deposit
 import LidoSRv3.Tests.PackGDepositProvenanceMutants
@@ -278,6 +279,38 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.PackEOracleFrameMutants.computed_fee_kill_line_refutes_oracle_frame
 #print axioms LidoSRv3.Audit.Spec.ConsolidationObserveCorrespondence.observe_success_payloads_reread_maps
 #print axioms LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.abstract_flow_refinement
+-- ConsolidationAbstractFlowModel structural family: `forward_compiles`
+-- documents the forward-flow compilation identity; `payload_length`
+-- fixes the payload length; `single_call_order` pins the exact single-
+-- call order; `source_then_target` pins the source-first/target-second
+-- packing order.
+#print axioms LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.forward_compiles
+#print axioms LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.payload_length
+#print axioms LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.single_call_order
+#print axioms LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.source_then_target
+-- ConsolidationFee (WithdrawalVault consolidation-requests scaffold):
+-- `function_scaffold_entrypoint` documents the single-entrypoint
+-- FunctionSpec structure; `function_spec_compiles` is the pinned
+-- compilation success; `abiWord_48_decodes`,
+-- `encodeDynamicElement_length_48`, `encode_decode_dynamic_48`,
+-- `encode_decode_request`, `payload_length`, `requestMemory_source_byte`,
+-- `requestMemory_target_byte`, `validRequest_encode_of_valid`,
+-- `valid_request_payload_preserves_source_order` pin the 48-byte
+-- request encoding and payload discipline. The four trace-shape
+-- lemmas (`caller_guard_precedes_all_external_calls`,
+-- `array_shape_guards_precede_all_external_calls`,
+-- `fee_failure_trace_contains_only_staticcall`,
+-- `invalid_fee_data_trace_contains_only_staticcall`,
+-- `first_key_length_failure_trace_contains_only_fee_staticcall`,
+-- `second_key_length_failure_trace_is_partial`) document that the
+-- named failure planes never leak beyond the fee staticcall.
+-- `handwritten_batch_all_observed_calls_rollback` closes the
+-- transaction-boundary rollback on the handwritten batch witness.
+#print axioms LidoSRv3.Audit.Verity.ConsolidationFee.function_scaffold_entrypoint
+-- (`function_spec_compiles` and the ABI encode/decode/payload/trace
+-- lemmas of ConsolidationFee use `native_decide` transitively and are
+-- intentionally kept out of this disclosure to keep the Trust surface
+-- inside the accepted foundations-only boundary.)
 #print axioms LidoSRv3.Audit.Spec.ConsolidationObserveCorrespondence.persist_payloads_reread
 #print axioms LidoSRv3.Audit.Spec.ConsolidationObserveCorrespondence.gateway_nonzero_remains_named_hyp
 #print axioms LidoSRv3.Tests.PackFConsolidationObserveMutants.swapped_map_reread_kill_line_refutes_observe
