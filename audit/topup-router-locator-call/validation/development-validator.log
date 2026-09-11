@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/private/tmp/lido-topup-router-locator/audit/topup-router-locator-call/validation/validate.py", line 83, in <module>
+    assert plain.index('fun_verifyRootAge(')<loc<get
+ValueError: substring not found

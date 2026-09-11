@@ -1,0 +1,3 @@
+COMMAND git diff --cached --check -- . :(exclude)audit/address-steth-quote-call/Lido.asm :(exclude)audit/address-steth-quote-call/QuoteHarness.asm :(exclude)audit/address-steth-quote-call/BatchHarness.asm
+EXIT 0
+PASS only exact raw compiler EOF blank exceptions; raw check is NOT PASS

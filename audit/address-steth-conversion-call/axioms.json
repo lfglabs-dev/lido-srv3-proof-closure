@@ -1,0 +1,46 @@
+{
+  "LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_physical_conversion_failure_restores": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_physical_conversion_permit_batch": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressStETHConversionCalls.body_success": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressStETHConversionCalls.canonical_call": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressStETHConversionCalls.conversion_effect": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressStETHConversionCalls.item_effect": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressStETHConversionCalls.token_effect": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.AddressStETHConversionCalls.public_empty_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.AddressStETHConversionCalls.public_paused_rollback": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ]
+}

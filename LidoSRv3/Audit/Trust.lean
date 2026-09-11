@@ -1,3 +1,6 @@
+import LidoSRv3.Tests.AddressStETHConversionCalls
+import LidoSRv3.Tests.TopupRouterLocatorCall
+import LidoSRv3.Tests.AddressStETHQuoteCalls
 import LidoSRv3.Tests.AddressPermitRequestCalls
 import LidoSRv3.Tests.TopupTimingHistory
 import LidoSRv3.Tests.AddressRequestBatches
@@ -819,3 +822,25 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_permit_failure_restores
 #print axioms LidoSRv3.Audit.Source.AddressPermitRequestCalls.call_success
 #print axioms LidoSRv3.Tests.AddressPermitRequestCalls.public_paused_rollback
+
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_steth_physical_quote_permit_batch
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_physical_quote_permit_batch
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_steth_physical_quote_failure_restores
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_physical_quote_failure_restores
+#print axioms LidoSRv3.Audit.Source.AddressStETHQuoteCalls.internalEther_bound
+#print axioms LidoSRv3.Audit.Source.AddressStETHQuoteCalls.quote_effect
+#print axioms LidoSRv3.Tests.AddressStETHQuoteCalls.public_nonempty_quote_rollback
+
+#print axioms LidoSRv3.Audit.Guarantees.PTopupRouterLocatorCall.actual_locator_timing_credential_root_module_memory_history
+#print axioms LidoSRv3.Audit.Guarantees.PTopupRouterLocatorCall.actual_locator_timing_credential_root_module_failure_restores
+#print axioms LidoSRv3.Audit.Source.TopupRouterLocatorCall.decode_fields
+#print axioms LidoSRv3.Audit.Source.TopupRouterLocatorCall.lookup_origin
+#print axioms LidoSRv3.Audit.Source.TopupRouterLocatorCall.run_success
+#print axioms LidoSRv3.Audit.Source.TopupRouterLocatorCall.failure_restores
+
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_physical_conversion_permit_batch
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_physical_conversion_failure_restores
+#print axioms LidoSRv3.Audit.Source.AddressStETHConversionCalls.canonical_call
+#print axioms LidoSRv3.Audit.Source.AddressStETHConversionCalls.conversion_effect
+#print axioms LidoSRv3.Audit.Source.AddressStETHConversionCalls.item_effect
+#print axioms LidoSRv3.Tests.AddressStETHConversionCalls.public_paused_rollback

@@ -1,0 +1,16 @@
+Compiling 23 files with Solc 0.8.25
+Solc 0.8.25 finished in 11.25s
+Compiler run successful!
+
+Ran 8 tests for audit/topup-router-locator-call/solidity/TopupRouterLocator.t.sol:TopupRouterLocatorTest
+[PASS] test_locator_exactCallerSelectorAddressConsumed() (gas: 3154281)
+[PASS] test_locator_failureBytesBubble() (gas: 2815521)
+[PASS] test_locator_lengthsBeforeTimingAndLookup() (gas: 2814243)
+[PASS] test_locator_noncanonicalAddressRejected() (gas: 2818099)
+[PASS] test_locator_ordinaryNoCodeRejected() (gas: 2462538)
+[PASS] test_locator_shortReplyRejected() (gas: 2795707)
+[PASS] test_locator_temporalGuardBeforeLookup() (gas: 2814880)
+[PASS] test_locator_trailingBytesIgnored() (gas: 2951640)
+Suite result: ok. 8 passed; 0 failed; 0 skipped; finished in 5.92ms (14.87ms CPU time)
+
+Ran 1 test suite in 9.43ms (5.92ms CPU time): 8 tests passed, 0 failed, 0 skipped (8 total tests)
