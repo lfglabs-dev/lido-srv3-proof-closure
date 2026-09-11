@@ -145,7 +145,7 @@
         "kind": "IMPLEMENTATION_PENDING",
         "work": "Keep NFrame.LinksSource explicit and keep the Spec router's per-allocation unit multiply; do not derive it from ALLOC parents. Derive the beacon address and 32-ether constructor/literal identity only from artifacts. The n-frame executable theorem remains a Verity EDSL claim, not compiled-artifact correspondence. The remaining word-domain gap is still named."
       },
-      "next_gate": "Keep NFrame.LinksSource explicit. Discharge OPEN A-DEPOSIT-CONTRACT and A-DEPOSIT-32-ETHER only from artifacts; do not infer either from the generalized router or merge ALLOC into DEPOSIT. The unbounded-Nat versus word gap stays named.",
+      "next_gate": "Keep NFrame.LinksSource explicit. A-DEPOSIT-CONTRACT and A-DEPOSIT-32-ETHER are discharged from deployment artifacts (see LidoSRv3/Audit/Provenance/BeaconDepositAddress.lean and LidoSRv3/Audit/Provenance/DepositThirtyTwoEther.lean, both anchored in audit/artifacts.lock.json). Do not infer either from the generalized router or merge ALLOC into DEPOSIT. The unbounded-Nat versus word gap stays named.",
       "roadmap_priority": "DONE"
     },
     {
@@ -193,7 +193,7 @@
         "kind": "IMPLEMENTATION_PENDING",
         "work": "Fold a Verity.Contract.run executable-plane rollback conjunct into the registered parent that matches RevertRestoresSnapshot, so the abstract TxObservation shape stops being the only witness to rollback. Keep the checked universal nonzero-wrap revert and wrap-to-zero empty-commit partition."
       },
-      "next_gate": "Universal word-bounded nonzero-wrap Verity revert/non-commit/rollback is CHECKED; wrap-to-zero remains an empty commit. OPEN: discharge A-TOPUP-BEACON-ADDRESS from deployment artifacts; do not derive a top-up LinksSource from ALLOC.",
+      "next_gate": "Universal word-bounded nonzero-wrap Verity revert/non-commit/rollback is CHECKED; wrap-to-zero remains an empty commit. A-TOPUP-BEACON-ADDRESS is discharged from deployment artifacts (see LidoSRv3/Audit/Provenance/BeaconDepositAddress.lean and audit/artifacts.lock.json). Do not derive a top-up LinksSource from ALLOC.",
       "roadmap_priority": "DONE"
     },
     {
@@ -348,7 +348,7 @@
         "kind": "IMPLEMENTATION_PENDING",
         "work": "Keep the universal success-arm parent, the now-universal four-arm revert partition with its numeral witnesses, the zero-remainder boundary corner, and the wiring/premise kill-lines. Keep A-CANONICAL-REQUEST-ADDRESS open. Do not restore vault\u2192Lido/WQ as a child or compose with P-CONSOLIDATION-1 until an ABI/interpreter bridge exists."
       },
-      "next_gate": "Both sides of the gateway guard are now quantified alike: the Verity plane proves the success arm and all four modeled non-success arms for all word-sized inputs, with the zero-remainder corner closed, so no word-sized input is unclassified. OPEN: discharge deployed target provenance under A-CANONICAL-REQUEST-ADDRESS, and fold the canonical request literal into the registered Verity parent (requestAddr is still a model-local ensemble address). Do not compose with P-CONSOLIDATION-1 before an ABI/interpreter bridge.",
+      "next_gate": "Both sides of the gateway guard are now quantified alike: the Verity plane proves the success arm and all four modeled non-success arms for all word-sized inputs, with the zero-remainder corner closed, so no word-sized input is unclassified. Deployed target provenance discharged via A-CANONICAL-REQUEST-ADDRESS retirement (see LidoSRv3/Audit/Provenance/CanonicalRequestAddress.lean). OPEN: fold the discharged canonical request literal into the registered Verity parent (requestAddr is still a model-local ensemble address). Do not compose with P-CONSOLIDATION-1 before an ABI/interpreter bridge.",
       "roadmap_priority": "DONE"
     },
     {
@@ -1011,7 +1011,7 @@
         "kind": "IMPLEMENTATION_PENDING",
         "work": "Keep A-DEPOSIT-32-ETHER named; do not invent a pin that discharges the 32-ether assumption or merge ALLOC into DEPOSIT."
       },
-      "next_gate": "Keep A-DEPOSIT-32-ETHER named; do not treat ALLOC parents as LinksSource without the unit multiply."
+      "next_gate": "A-DEPOSIT-32-ETHER is discharged from deployment artifacts (see LidoSRv3/Audit/Provenance/DepositThirtyTwoEther.lean); do not treat ALLOC parents as LinksSource without the unit multiply."
     },
     {
       "id": "P-ETH-JOURNAL-1",
