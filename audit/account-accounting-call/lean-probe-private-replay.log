@@ -1,0 +1,39 @@
+audit/account-accounting-call/DevelopmentProbe.lean:105:2: error(lean.unknownIdentifier): Unknown identifier `_private.ReportFeeMint`
+audit/account-accounting-call/DevelopmentProbe.lean:105:24: error: Invalid field notation: Identifier or numeral expected
+audit/account-accounting-call/DevelopmentProbe.lean:105:25: error: unexpected identifier after decimal point; consider parenthesizing the number
+audit/account-accounting-call/DevelopmentProbe.lean:115:49: error: unexpected identifier after decimal point; consider parenthesizing the number
+audit/account-accounting-call/DevelopmentProbe.lean:115:26: error(lean.unknownIdentifier): Unknown identifier `_private.ReportFeeMint`
+audit/account-accounting-call/DevelopmentProbe.lean:115:48: error: Invalid field notation: Identifier or numeral expected
+audit/account-accounting-call/DevelopmentProbe.lean:114:88: error: unsolved goals
+report : ReportOutcome
+get : Core → Except GetterError Distribution
+calculate : Distribution → Option FeeResult
+mint : Core → FeeResult → ReportFeeMint.Outcome
+before post : World
+router : Core
+d : Distribution
+fee actualFee : FeeResult
+events : List Event
+hr : report = ReportOutcome.committed router
+hg : get router = Except.ok d
+hf : calculate d = some fee
+hm : mint router fee = ReportFeeMint.Outcome.committed post actualFee events
+⊢ sorry = ReportFeeMint.Outcome.committed post actualFee events
+audit/account-accounting-call/DevelopmentProbe.lean:115:13: warning: declaration uses `sorry`
+audit/account-accounting-call/DevelopmentProbe.lean:119:77: error: unexpected token 'set_option'; expected '#guard_msgs', 'abbrev', 'add_decl_doc', 'axiom', 'binder_predicate', 'builtin_cbv_simproc', 'builtin_cbv_simproc_decl', 'builtin_dsimproc', 'builtin_dsimproc_decl', 'builtin_grind_propagator', 'builtin_initialize', 'builtin_simproc', 'builtin_simproc_decl', 'cbv_simproc', 'cbv_simproc_decl', 'class', 'coinductive', 'declare_command_config_elab', 'declare_command_config_elab_legacy', 'declare_config_elab', 'declare_config_elab_legacy', 'declare_core_config_elab', 'declare_simp_like_tactic', 'declare_syntax_cat', 'declare_term_config_elab', 'def', 'def_eval_config_item', 'dsimproc', 'dsimproc_decl', 'elab', 'elab_rules', 'example', 'grind_propagator', 'inductive', 'infix', 'infixl', 'infixr', 'initialize', 'instance', 'macro', 'macro_rules', 'notation', 'opaque', 'postfix', 'prefix', 'recommended_spelling', 'register_builtin_option', 'register_error_explanation', 'register_grind_attr', 'register_label_attr', 'register_linter_set', 'register_option', 'register_simp_attr', 'register_sym_simp_attr', 'register_tactic_tag', 'register_try?_tactic', 'simproc', 'simproc_decl', 'structure', 'syntax', 'tactic_extension', 'theorem' or 'unif_hint'
+audit/account-accounting-call/DevelopmentProbe.lean:127:2: error: Type mismatch
+  legacy_success
+    (reportValidatorBalances x.layout x.registeredModuleIds x.reportedModuleIds x.balancesGwei before.router)
+    (getStakingRewardsDistribution x.layout x.registeredModuleIds)
+    (ReportFeeMint.checkedFeeProductsFromCommittedGetter x.report)
+    (fun r f => ReportFeeMint.mintCommittedFee x.accountingAddress { router := r, steth := before.steth } f) before post
+    router d fee actualFee events hr hg hf hm
+has type
+  legacyStages (reportValidatorBalances x.layout x.registeredModuleIds x.reportedModuleIds x.balancesGwei before.router)
+      (getStakingRewardsDistribution x.layout x.registeredModuleIds)
+      (ReportFeeMint.checkedFeeProductsFromCommittedGetter x.report)
+      (fun r f => ReportFeeMint.mintCommittedFee x.accountingAddress { router := r, steth := before.steth } f) before =
+    ReportFeeMint.Outcome.committed post actualFee events
+but is expected to have type
+  ReportFeeMint.handleOracleReportFromCommittedFeeProducts x before =
+    ReportFeeMint.Outcome.committed post actualFee events

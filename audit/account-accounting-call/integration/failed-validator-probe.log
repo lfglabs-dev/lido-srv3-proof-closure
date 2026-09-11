@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "/tmp/lido-account-call-integration-validate.py", line 32, in <module>
+    exec(compile(source,str(out/'validate.py'),'exec'),{'__file__':str(out/'validate.py'),'__name__':'__main__'})
+  File "/private/tmp/lido-account-accounting-call-integrated/audit/account-accounting-call/validate.py", line 72, in <module>
+    computed=checker.environment_dependencies(names,'LidoSRv3.Tests.AccountAccountingCall',None)
+  File "/private/tmp/lido-account-accounting-call-integrated/scripts/check_trust_axioms.py", line 358, in environment_dependencies
+    output = lean_probe_output(TRUST_DEPENDENCY_PROBE, "trust-dependency",
+  File "/private/tmp/lido-account-accounting-call-integrated/audit/account-accounting-call/validate.py", line 68, in capture_probe
+    output=original_probe(*args,**kwargs)
+  File "/private/tmp/lido-account-accounting-call-integrated/scripts/check_trust_axioms.py", line 249, in lean_probe_output
+    names_file.write_text("\n".join(names) + "\n", encoding="utf-8")
+  File "/tmp/lido-account-call-integration-validate.py", line 27, in compare
+    assert path.resolve().is_relative_to(out.resolve()),path
+AssertionError: /var/folders/yv/6bf89_m973jc11pm6lb2qx700000gn/T/tmpkeu47ns8/names.txt

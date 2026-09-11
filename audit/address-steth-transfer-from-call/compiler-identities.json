@@ -1,0 +1,172 @@
+{
+  "parent": "f1d91e3a8ad9829e92ab2e8ff443e391449a36bc",
+  "core_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "scope": "Reused complete old compiler objects and source bytes, fresh 0.8.9 test compilation only. This is correspondence evidence, not a bytecode-refinement theorem.",
+  "address-steth-conversion-call_receipt_hashes": 91,
+  "address-steth-quote-call_receipt_hashes": 111,
+  "address-steth-transfer-call_receipt_hashes": 45,
+  "original_full_lido_inputs": {
+    "core_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+    "sources": {
+      "contracts/0.4.24/Lido.sol": "3bf84b96fb155af2290e6b26bc0138de356442a9abe3ea0f5274497f9fbffc10",
+      "@aragon/os/contracts/apps/AragonApp.sol": "613d5cb8af90c0d2e1f7b6f2908495a46e9be81cf4417095c543bc43a27d27c2",
+      "@aragon/os/contracts/apps/AppStorage.sol": "8e91fc929525676dd70fb9770499e93d148d27a97664d53f96c635d41783a7b1",
+      "@aragon/os/contracts/common/UnstructuredStorage.sol": "6bbbb8fb3d32ba56d6f967f0eb437941aedae143c6dcedecac87d81a81ffd000",
+      "@aragon/os/contracts/kernel/IKernel.sol": "d626355aef13b741acf2b0f51bfb03eefe2dce9517e28623dafcf5478f43e255",
+      "@aragon/os/contracts/acl/IACL.sol": "0d6092f108df51af376d55c64e482d514182a0fc1933f354c4afbd7a82160c01",
+      "@aragon/os/contracts/common/IVaultRecoverable.sol": "780ce73c985b926a7e9bcf956060572c78ef8d55b545fc546325dc865291e479",
+      "@aragon/os/contracts/acl/ACLSyntaxSugar.sol": "8a16dec5bd7ce42d05e8fda25202864995db194b648d671525b9a7b54d7eee67",
+      "@aragon/os/contracts/common/Autopetrified.sol": "03548b960ee4bd0743da2c371c34910a6d736ca4b30ba30a23a1e2d3dfff7ee8",
+      "@aragon/os/contracts/common/Petrifiable.sol": "e565fd0513d66f4657d9a445ad76d63e6785dece37382ce12661bcc5f126e2cd",
+      "@aragon/os/contracts/common/Initializable.sol": "9b6f2892b7ddafee6c4c6ff41d6314e0cfa8a3090cd764a815bcf72a3f764318",
+      "@aragon/os/contracts/common/TimeHelpers.sol": "09242e7e0f60a92d40a37c787a4d24c239c31eaf9ccbebf92bfc37e1d05e78a7",
+      "@aragon/os/contracts/common/Uint256Helpers.sol": "5b545ff91be8d1d3a5f1c6b4fd45c6db4bc901cb6c503ad754361a475dce0d38",
+      "@aragon/os/contracts/common/ConversionHelpers.sol": "4d4fb3e35f192c6005f2146867f094433d575179415769127fd1869d7e86bc06",
+      "@aragon/os/contracts/common/ReentrancyGuard.sol": "c377f4d240a679b485ff16d44f6c61552ccc76f5d17e3885154c294da89371ab",
+      "@aragon/os/contracts/common/VaultRecoverable.sol": "5072a07438a6d55dd98f24c5c9e391be897990c750f4301fd4f9ddab5e253e78",
+      "@aragon/os/contracts/lib/token/ERC20.sol": "1db31dfde01bcdf4c253010a0a46491a7a8ab698d20e8bdd5bc12cc743deec7d",
+      "@aragon/os/contracts/common/EtherTokenConstant.sol": "630cece2f24d3b9072d3743570d01029cafaa6fab5abbee0015c81abfd92fc8f",
+      "@aragon/os/contracts/common/IsContract.sol": "209acf5e2e50d9dae4f53b1f96febd03c48ed8ef5b3b88085010db628be7cdc2",
+      "@aragon/os/contracts/common/SafeERC20.sol": "022bdbc71e31f0a2042f33ede9b340efc04abf972a2c26f6677c0bf70aff2893",
+      "@aragon/os/contracts/evmscript/EVMScriptRunner.sol": "e2aae282297c55d9c72e0dd5ad30102e196fe4d8f34eb3eb74153f90dc62650d",
+      "@aragon/os/contracts/evmscript/IEVMScriptExecutor.sol": "cdc198208cd2765e5b287b56bfa8bd790998412b880aad6234476c5660c0f06f",
+      "@aragon/os/contracts/evmscript/IEVMScriptRegistry.sol": "f2f3b2f5b30d7b8c77b4b79ab34b8945be27a9f2c42de75bd2e2e02d4ee58550",
+      "@aragon/os/contracts/kernel/KernelConstants.sol": "4c154c4e292dfcdcdc0b1ad0738c29769d7db1b129f6b135ea6a713b975223b3",
+      "@aragon/os/contracts/lib/math/SafeMath.sol": "ff141c591b220f5c9973f0bcbd5bad55f6121491aa490186e987c1ef0c9b7bae",
+      "contracts/common/interfaces/ILidoLocator.sol": "cc65faee8789012cbb58c0073c770bddb37c9a7fc2594ff2e200fc7894a2dc7a",
+      "contracts/0.4.24/StETHPermit.sol": "cc4e37048f98024a92c337b6209ba3dd7c2cc4e8cfbc526b6f755057fac9baef",
+      "contracts/common/lib/SignatureUtils.sol": "b3d93a1bcd82ea289ce7b8dde4b50e98e6719b26a3271f50f9766d650b143c7d",
+      "contracts/common/lib/ECDSA.sol": "9bf07e0a958e4eb956e22214d4a37537527f20966b325d1954a32f99c8945ab4",
+      "contracts/common/interfaces/IEIP712StETH.sol": "449180685b8dc86d2ed43eeb92c375938e5d3b17b41ccce011f79bb0f5807a61",
+      "contracts/0.4.24/StETH.sol": "63ebed0e205b602fe2e427bb09c111479f98253bd02f96ac052b38202d3713bd",
+      "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol": "103f9ae7c0715bb0e07f1258958a2c34e78800d49c877c0082fef0763ce1a576",
+      "contracts/0.4.24/utils/Pausable.sol": "ae1be0a85b0171321429ad1079908c2bf89eb9551ee56bbded51f8b2cc0d1c36",
+      "contracts/0.4.24/utils/UnstructuredStorageExt.sol": "11dbb51c4885d38eee1fdd632a45f79223647785ee80c0877a1d7123d7a3aea6",
+      "contracts/common/lib/Math256.sol": "028e9b0c87fea3ec6fd5aac9e7a5724a18b4a175d5ab70159f24428dd28ea6b6",
+      "contracts/0.4.24/utils/Versioned.sol": "73804e634f20285f9ed1c323e3c56833048f893d1afe6219afd689076e58dedf",
+      "contracts/0.4.24/lib/StakeLimitUtils.sol": "97b006a62f169eefe66279e2827ba5d5663fd74042602a5337a73509468503e3"
+    },
+    "npm_provenance": {
+      "@aragon/os": {
+        "version": "4.4.0",
+        "tarball": "https://registry.npmjs.org/@aragon/os/-/os-4.4.0.tgz",
+        "integrity": "sha512-EYyMj5pX0Qxu7axHAPe4hqwwDINDn+6ZZ4DqJP0tAKYKDmTxHcW8m/7DDctIM3uRqXr8HlYrNOGd6zE/hhHetQ==",
+        "sha256": "8dd3e780239d8ac64eaeed9409326b6977c3c44a8eb8de2c550634aad70b1f00"
+      },
+      "openzeppelin-solidity": {
+        "version": "2.0.0",
+        "tarball": "https://registry.npmjs.org/openzeppelin-solidity/-/openzeppelin-solidity-2.0.0.tgz",
+        "integrity": "sha512-SolpxQFArtiYnlSNg3dZ9sz0WVlKtPqSOcJkXRllaZp4+Lpfqz3vxF0yoh7g75TszKPyadqoJmU7+GM/vwh9SA==",
+        "sha256": "596fd493fe437053f195b93792f1fedd9453c6a833c87dc60577f9a89fbb3f82"
+      }
+    }
+  },
+  "Lido_deployment_sha256": "5e322826827db4f4709535b88f4514baebbc40230dcfb8af7c458505170480f3",
+  "WstETH_deployment_sha256": "dcb0b2a66eac8c7e763bcf431dee815672c03a99223bd172ad71e8f0c12b2eff",
+  "reused_full_assemblies": {
+    "audit/address-steth-quote-call/Lido.asm": "e60a2b8a05518e890f44981da0a4c01c786ae80cc20f3676c2a5849632934a5a",
+    "audit/address-steth-quote-call/BatchHarness.asm": "22c0031f780ffda981c40ba1777c0632c03595cae84f1887cd3a5dc8d7a94d5c",
+    "audit/address-wrapped-token-call/solidity/token/WstETH.asm": "e5f8e7c5ff27b9bfc44065212414630a85f12dc4d49456bed62c38425f24a4c2"
+  },
+  "unchanged_queue_inputs": 18,
+  "BatchHarness": {
+    "sha256": "dec04ac9f1e7698eb2c26dd885fe8fd011b404c2893195fdc25493a9fadc0701",
+    "compiler": {
+      "version": "0.8.9+commit.e5eed63a"
+    },
+    "settings": {
+      "remappings": [
+        "@openzeppelin/=src/@openzeppelin/"
+      ],
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "metadata": {
+        "bytecodeHash": "ipfs"
+      },
+      "compilationTarget": {
+        "src/BatchHarness.sol": "BatchHarness"
+      },
+      "evmVersion": "london",
+      "libraries": {}
+    },
+    "source_count": 18
+  },
+  "TransferFromTest": {
+    "sha256": "a2fb427525bcd670cebd3c8b462de905e208168ca50d74fbfe39f9c2b1d344fd",
+    "compiler": {
+      "version": "0.8.9+commit.e5eed63a"
+    },
+    "settings": {
+      "remappings": [
+        "@openzeppelin/=src/@openzeppelin/"
+      ],
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "metadata": {
+        "bytecodeHash": "ipfs"
+      },
+      "compilationTarget": {
+        "test/TransferFrom.t.sol": "TransferFromTest"
+      },
+      "evmVersion": "london",
+      "libraries": {}
+    },
+    "source_count": 19
+  },
+  "nested_vectors": [
+    {
+      "owner": "0",
+      "spender": "0",
+      "inner_preimage": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001",
+      "inner_hash": "0xa6eef7e35abe7026729641147f7915573c7e97b47efa546f5f6e3230263bcb49",
+      "outer_preimage": "0000000000000000000000000000000000000000000000000000000000000000a6eef7e35abe7026729641147f7915573c7e97b47efa546f5f6e3230263bcb49",
+      "outer_hash": "0xe5d06582d467054dda5404b9e1ec93f72b608a4970ba970773776c69ca5664f7"
+    },
+    {
+      "owner": "1",
+      "spender": "99",
+      "inner_preimage": "00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001",
+      "inner_hash": "0xcc69885fda6bcc1a4ace058b4a62bf5e179ea78fd58a1ccd71c22cc9b688792f",
+      "outer_preimage": "0000000000000000000000000000000000000000000000000000000000000063cc69885fda6bcc1a4ace058b4a62bf5e179ea78fd58a1ccd71c22cc9b688792f",
+      "outer_hash": "0xff67a398ecff03b66263bf0fe462d7e9454f0ea652ad311ddbbbff1dae964b28"
+    },
+    {
+      "owner": "99",
+      "spender": "1",
+      "inner_preimage": "00000000000000000000000000000000000000000000000000000000000000630000000000000000000000000000000000000000000000000000000000000001",
+      "inner_hash": "0x7c7197a53a0befa974ce9630c55061b014920062366501d4000c085e9953098e",
+      "outer_preimage": "00000000000000000000000000000000000000000000000000000000000000017c7197a53a0befa974ce9630c55061b014920062366501d4000c085e9953098e",
+      "outer_hash": "0xbf647baa02000d1d21bc4135452d25e88d2282f2eaedc90a1056a043102b09bc"
+    },
+    {
+      "owner": "1461501637330902918203684832716283019655932542975",
+      "spender": "1461501637330902918203684832716283019655932542975",
+      "inner_preimage": "000000000000000000000000ffffffffffffffffffffffffffffffffffffffff0000000000000000000000000000000000000000000000000000000000000001",
+      "inner_hash": "0x73df27e0fa8bbb6c6a588f907379871e0f69a2bae64ea632056f6dabc259f362",
+      "outer_preimage": "000000000000000000000000ffffffffffffffffffffffffffffffffffffffff73df27e0fa8bbb6c6a588f907379871e0f69a2bae64ea632056f6dabc259f362",
+      "outer_hash": "0x4233c29e78663f7ecc2ce2bfaada6ca8a0d1dac6601afb2e1235b6fe26bb589e"
+    }
+  ],
+  "active_slot": "0x644132c4ddd5bb6f0655d5fe2870dcec7870e6be4758890f366b83441f9fdece",
+  "event_topics": {
+    "Approval(address,address,uint256)": "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925",
+    "Transfer(address,address,uint256)": "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+    "TransferShares(address,address,uint256)": "0x9d9c909296d9c674451c0c24f02cb64981eb3b727f99865939192f880a755dcb"
+  },
+  "assembly_checks": [
+    "transferFrom149 calls allowance492 before transfer494; caller operand is actual msg.sender; true32 return493",
+    "full Lido nested allowance base1 clean160 owner/spender, two64-byte Keccak preimages, fullWord SLOAD",
+    "infinite not(0) skips approve, finite allowance guard then raw safe-by-guard SUB; owner/spender guards then SSTORE+Approval LOG3",
+    "accepted transfer494\u2192forward137\u2192movement603\u2192events605 reused byte-identically, debit before fresh recipient SLOAD/checkadd",
+    "same actual allowance-returned World consumed by conversion and movement; no nonalias or stage/frame premise"
+  ],
+  "permit_fixture_boundary": "New FixtureDomain only supplies standard domain/hash; actual full Lido permit/nonces/signature/_approve execute. No general formal permit/crypto theorem.",
+  "tools": {
+    "forge": "forge Version: 1.5.0-v1.5.0\nCommit SHA: 1c57854462289b2e71ee7654cd6666217ed86ffd\nBuild Timestamp: 2025-11-24T06:07:42.598695000Z (1763964462)\nBuild Profile: maxperf",
+    "cast": "cast Version: 1.5.0-v1.5.0\nCommit SHA: 1c57854462289b2e71ee7654cd6666217ed86ffd\nBuild Timestamp: 2025-11-24T06:07:42.598695000Z (1763964462)\nBuild Profile: maxperf"
+  }
+}

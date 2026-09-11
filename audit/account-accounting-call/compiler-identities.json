@@ -1,0 +1,157 @@
+{
+  "borrowed_provider": "ee24f9dc158ed25cec118a8ab8cd3a4fc59942f1",
+  "borrowed_path": "/tmp/lido-address-steth-quote",
+  "borrowed_receipt_hashes": 111,
+  "full_Lido_inputs": 37,
+  "core_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "lido_compiler": {
+    "version": "0.4.24+commit.e67f0147"
+  },
+  "lido_settings": {
+    "remappings": [
+      "@aragon/os/=src/@aragon/os/",
+      "openzeppelin-solidity/=src/openzeppelin-solidity/"
+    ],
+    "optimizer": {
+      "enabled": true,
+      "runs": 200
+    },
+    "compilationTarget": {
+      "src/contracts/0.4.24/Lido.sol": "Lido"
+    },
+    "evmVersion": "byzantium",
+    "libraries": {}
+  },
+  "full_Lido_assembly_path": "audit/account-physical-pause/Lido.asm",
+  "full_Lido_assembly_sha256": "e60a2b8a05518e890f44981da0a4c01c786ae80cc20f3676c2a5849632934a5a",
+  "Lido_deployment_artifact_sha256": "5e322826827db4f4709535b88f4514baebbc40230dcfb8af7c458505170480f3",
+  "fresh_source_bodies": 9,
+  "fresh_artifacts": {
+    "LidoLocator": {
+      "sources": 2,
+      "artifact_sha256": "102d73322a9122477d12e491053e56bade4cdd02d877adfcea0990c5803db722",
+      "compiler": {
+        "version": "0.8.9+commit.e5eed63a"
+      },
+      "settings": {
+        "remappings": [
+          "@openzeppelin/contracts-v4.4/=src/@openzeppelin/contracts-v4.4/",
+          "contracts/=src/contracts/"
+        ],
+        "optimizer": {
+          "enabled": true,
+          "runs": 200
+        },
+        "metadata": {
+          "bytecodeHash": "ipfs"
+        },
+        "compilationTarget": {
+          "src/contracts/0.8.9/LidoLocator.sol": "LidoLocator"
+        },
+        "evmVersion": "byzantium",
+        "libraries": {}
+      }
+    },
+    "OssifiableProxy": {
+      "sources": 7,
+      "artifact_sha256": "96f8324719ab95e1503e8ce448ae4a5b53cb61ac008ad2b2965550381f6dd55c",
+      "compiler": {
+        "version": "0.8.9+commit.e5eed63a"
+      },
+      "settings": {
+        "remappings": [
+          "@openzeppelin/contracts-v4.4/=src/@openzeppelin/contracts-v4.4/",
+          "contracts/=src/contracts/"
+        ],
+        "optimizer": {
+          "enabled": true,
+          "runs": 200
+        },
+        "metadata": {
+          "bytecodeHash": "ipfs"
+        },
+        "compilationTarget": {
+          "src/contracts/0.8.9/proxy/OssifiableProxy.sol": "OssifiableProxy"
+        },
+        "evmVersion": "byzantium",
+        "libraries": {}
+      }
+    },
+    "DistributionHarness": {
+      "sources": 1,
+      "artifact_sha256": "8903112ee795af2ec5988c2988bddf892e8cc22d6982ca04a03d040915b2337c",
+      "compiler": {
+        "version": "0.8.9+commit.e5eed63a"
+      },
+      "settings": {
+        "remappings": [
+          "@openzeppelin/contracts-v4.4/=src/@openzeppelin/contracts-v4.4/",
+          "contracts/=src/contracts/"
+        ],
+        "optimizer": {
+          "enabled": true,
+          "runs": 200
+        },
+        "metadata": {
+          "bytecodeHash": "ipfs"
+        },
+        "compilationTarget": {
+          "src/DistributionHarness.sol": "DistributionHarness"
+        },
+        "evmVersion": "byzantium",
+        "libraries": {}
+      }
+    },
+    "AccountingCallTest": {
+      "sources": 11,
+      "artifact_sha256": "cadc08f437aeb9983f686bdb74ce2b2780bcbb6f0aa4d71d11b64b2992523ab1",
+      "compiler": {
+        "version": "0.8.9+commit.e5eed63a"
+      },
+      "settings": {
+        "remappings": [
+          "@openzeppelin/contracts-v4.4/=src/@openzeppelin/contracts-v4.4/",
+          "contracts/=src/contracts/"
+        ],
+        "optimizer": {
+          "enabled": true,
+          "runs": 200
+        },
+        "metadata": {
+          "bytecodeHash": "ipfs"
+        },
+        "compilationTarget": {
+          "test/AccountingCall.t.sol": "AccountingCallTest"
+        },
+        "evmVersion": "byzantium",
+        "libraries": {}
+      }
+    },
+    "RawLocator": {
+      "sources": 11,
+      "artifact_sha256": "d9188b81abcc40e635f5605b595da4f76a5d53abf5c0af68c35a4e90954725b7",
+      "compiler": {
+        "version": "0.8.9+commit.e5eed63a"
+      },
+      "settings": {
+        "remappings": [
+          "@openzeppelin/contracts-v4.4/=src/@openzeppelin/contracts-v4.4/",
+          "contracts/=src/contracts/"
+        ],
+        "optimizer": {
+          "enabled": true,
+          "runs": 200
+        },
+        "metadata": {
+          "bytecodeHash": "ipfs"
+        },
+        "compilationTarget": {
+          "test/AccountingCall.t.sol": "RawLocator"
+        },
+        "evmVersion": "byzantium",
+        "libraries": {}
+      }
+    }
+  },
+  "forge": "forge Version: 1.5.0-v1.5.0\nCommit SHA: 1c57854462289b2e71ee7654cd6666217ed86ffd\nBuild Timestamp: 2025-11-24T06:07:42.598695000Z (1763964462)\nBuild Profile: maxperf"
+}

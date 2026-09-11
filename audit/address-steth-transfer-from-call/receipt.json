@@ -1,0 +1,128 @@
+{
+  "parent": "f1d91e3a8ad9829e92ab2e8ff443e391449a36bc",
+  "core_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "status": "Author source candidate. Normal/scoped/compiler/finite evidence PASS; independent exact-source review and integration still required. No All/Trust or publication acceptance.",
+  "scope": "Actual direct stETH.transferFrom specialized in the existing physical-quote permit and direct batch runner; entire old direct conclusion retained, same-world allowance then physical transfer then quote/enqueue, universal prepermit rollback.",
+  "checks": {
+    "normal_jobs": 1282,
+    "new_source_public_theorems": 12,
+    "kernel_examples": 15,
+    "public_kernel_instances": 2,
+    "ordinary_scopes": 14,
+    "source_identities": 1265,
+    "package_pins": 11,
+    "normal_build_records": 18,
+    "native_nested_keccak_vectors": 4,
+    "native_execution_groups": 8,
+    "solidity_tests": 12,
+    "solidity_fuzz_runs": 1024,
+    "solidity_fuzz_seed": "0x20260911",
+    "parent_hashes": 45,
+    "conversion_hashes": 91,
+    "quote_hashes": 111,
+    "full_lido_inputs": 37,
+    "unchanged_queue_inputs": 18,
+    "fresh_fixture_inputs": 19,
+    "reused_full_assemblies": 3,
+    "packet_hashes": 50,
+    "new_diff_check": "PASS; no new whitespace exception"
+  },
+  "commands": [
+    {
+      "command": "lake build LidoSRv3.Audit.Guarantees.PAddress1StETHTransferFromCalls",
+      "log": "public-build-2.log",
+      "exit": 0
+    },
+    {
+      "command": "lake build LidoSRv3.Tests.AddressStETHTransferFromCalls",
+      "log": "test-build-2.log",
+      "exit": 0
+    },
+    {
+      "command": "python3 audit/address-steth-transfer-from-call/validate.py",
+      "log": "validation-2.log",
+      "exit": 0
+    },
+    {
+      "command": "python3 audit/address-steth-transfer-from-call/run-diagnostics.py",
+      "log": "native-1.log",
+      "exit": 0
+    },
+    {
+      "command": "forge test --root audit/address-steth-transfer-from-call/solidity --fuzz-seed 0x20260911 -vv",
+      "log": "solidity-test-1.log",
+      "exit": 0
+    },
+    {
+      "command": "python3 audit/address-steth-transfer-from-call/check-evidence.py",
+      "log": "compiler-check-1.log",
+      "exit": 0
+    }
+  ],
+  "boundaries": [
+    "Implementation specialization at selected target, not runtime authentication",
+    "Canonical generated CALLs and inherited typed World/semantic events/gas-memory-ABI-deployment boundaries",
+    "Formal permit External; actual Solidity permit tests use explicit FixtureDomain external provider",
+    "No new initial allowance, fit, separation, stage or frame premise; hypothetical storage aliases remain sequential",
+    "FFI nonempty successes are executable diagnostics, not kernel-evaluated positive public instances",
+    "Old arbitrary external and wrapped statements untouched; no ALLOC or all-guarantee closure"
+  ],
+  "failed_experiments": [
+    "source-build-1.log: record syntax/temporary elaborator recovery sorry, not credited",
+    "public-build-1.log: simp True versus rfl",
+    "test-build-1.log: no Decidable log equality, replaced kernel reflexivity",
+    "validation-1.log: copied old new-public filename, fixed allowlist"
+  ],
+  "files": {
+    "LidoSRv3/Audit/Guarantees/PAddress1StETHTransferFromCalls.lean": "73f31b336f20714d53ec488968cfd45873dc53a33434999306ef108a8374c9c6",
+    "LidoSRv3/Audit/Source/AddressStETHTransferFromCalls.lean": "c1c72d9cdafbe0a86f7dfed504f889d864877e205266b8817d3c4f3ec7e89ce2",
+    "LidoSRv3/Tests/AddressStETHTransferFromCalls.lean": "87a5888f9adac4251adadcc32123306e32f31ac2fa4bee5a36e1dfce1b60e003",
+    "audit/address-steth-transfer-from-call/.gitignore": "438ab5281ba8dc41f14c55e37bb1e6b3cacefaf69bac1c381eeb1c32e3c3f364",
+    "audit/address-steth-transfer-from-call/BatchHarness-compiler-artifact.json": "dec04ac9f1e7698eb2c26dd885fe8fd011b404c2893195fdc25493a9fadc0701",
+    "audit/address-steth-transfer-from-call/README.md": "1d93857bea7d06749f252218dbf78a4a59b359086c7def8579c5df49d7c919fb",
+    "audit/address-steth-transfer-from-call/TransferFromTest-compiler-artifact.json": "a2fb427525bcd670cebd3c8b462de905e208168ca50d74fbfe39f9c2b1d344fd",
+    "audit/address-steth-transfer-from-call/axioms.json": "64c0af45c5d617a3b82385e2d4717efceb48222ff15266ae60d5ca13dc0584a3",
+    "audit/address-steth-transfer-from-call/check-evidence.py": "500bc9a8aa9fb9040d82e03ef3b3107f76bc2e89e8ec8c3e73ff001bcec053eb",
+    "audit/address-steth-transfer-from-call/compiler-check-1.log": "d45dfdd4eeec8e2182ddd2cdc4b665eab6f9375ba104a3e75e524b6f782a5763",
+    "audit/address-steth-transfer-from-call/compiler-identities.json": "8d6a6ff28de3e3c8c6fc2c6ee4e91c1596a72247e1dc16cefa31d5a2280edfae",
+    "audit/address-steth-transfer-from-call/diagnostics.lean": "e4bd2af535065a5f4a44274495a3db9894f39436cd25271454933fc8929f1c0e",
+    "audit/address-steth-transfer-from-call/diff-check.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "audit/address-steth-transfer-from-call/native-1.log": "2c125a56c3f9df33f705c7a463f68a2240294645b4f6b5cdc2255f8c3248bce0",
+    "audit/address-steth-transfer-from-call/nested-vectors.json": "691febb867ebb5c9bd57db647163fcd762bf580f46b2b9bbc3d2164a2ce14b20",
+    "audit/address-steth-transfer-from-call/normal-build-identities.json": "1477d730f5d1e8b8aba9479e5d63796d07d12cdd6195addf5d581feb99a81d86",
+    "audit/address-steth-transfer-from-call/public-build-1.log": "880548ced3b08d94fae863d5e790ec94303103ad84f4f1db5a078eba9df0ce5a",
+    "audit/address-steth-transfer-from-call/public-build-2.log": "2fd068aa11ec33631e3832021b25181e31e29d67960fd89f2a33ae3fbd4b8247",
+    "audit/address-steth-transfer-from-call/run-diagnostics.py": "8edcb7ba913e14dad6c8ecc41cb4fa348f7ae477fb59aaf192807ee64412dd7a",
+    "audit/address-steth-transfer-from-call/runtime-inputs.json": "ee823f952f85b2299d1bbe973a7fb1465a7775849e187a4bf7be5e7e44c325cb",
+    "audit/address-steth-transfer-from-call/solidity-test-1.log": "31e85520c1e6ed538fc7dabc636158f01274bc8a3a811d79a5a97ce846f3d1c3",
+    "audit/address-steth-transfer-from-call/solidity/artifacts/Lido.json": "5e322826827db4f4709535b88f4514baebbc40230dcfb8af7c458505170480f3",
+    "audit/address-steth-transfer-from-call/solidity/artifacts/WstETH.json": "dcb0b2a66eac8c7e763bcf431dee815672c03a99223bd172ad71e8f0c12b2eff",
+    "audit/address-steth-transfer-from-call/solidity/foundry.toml": "c35fed90f52f94781187c820a35f5f01f2ab416eea1cc78ef09d6cdc8c3afa72",
+    "audit/address-steth-transfer-from-call/solidity/src/@openzeppelin/contracts-v4.4/access/IAccessControl.sol": "d03c1257f2094da6c86efa7aa09c1c07ebd33dd31046480c5097bc2542140e45",
+    "audit/address-steth-transfer-from-call/solidity/src/@openzeppelin/contracts-v4.4/access/IAccessControlEnumerable.sol": "655ab8dc2a9617376734d04ca293e099cc24f8ce893997e68c29cfebc4a61d39",
+    "audit/address-steth-transfer-from-call/solidity/src/@openzeppelin/contracts-v4.4/token/ERC20/IERC20.sol": "6eacf8ca56b41b7636489c0996d8f9608b4d298879a1fd5d876f21ad7a6711f1",
+    "audit/address-steth-transfer-from-call/solidity/src/@openzeppelin/contracts-v4.4/token/ERC20/extensions/draft-IERC20Permit.sol": "3e7aa0e0f69eec8f097ad664d525e7b3f0a3fda8dcdd97de5433ddb131db86ef",
+    "audit/address-steth-transfer-from-call/solidity/src/@openzeppelin/contracts-v4.4/utils/Context.sol": "1458c260d010a08e4c20a4a517882259a23a4baa0b5bd9add9fb6d6a1549814a",
+    "audit/address-steth-transfer-from-call/solidity/src/@openzeppelin/contracts-v4.4/utils/Strings.sol": "8597c62818dcbc6cf85c21179b90b714fb4f70a4347ca2eed23e88c87b08b8a1",
+    "audit/address-steth-transfer-from-call/solidity/src/@openzeppelin/contracts-v4.4/utils/introspection/ERC165.sol": "8806a632d7b656cadb8133ff8f2acae4405b3a64d8709d93b0fa6a216a8a6154",
+    "audit/address-steth-transfer-from-call/solidity/src/@openzeppelin/contracts-v4.4/utils/introspection/IERC165.sol": "701e025d13ec6be09ae892eb029cd83b3064325801d73654847a5fb11c58b1e5",
+    "audit/address-steth-transfer-from-call/solidity/src/@openzeppelin/contracts-v4.4/utils/structs/EnumerableSet.sol": "42a618e7d36efd2319d1bf05fedb31f3042baf535cfb97e783128cc1fe326686",
+    "audit/address-steth-transfer-from-call/solidity/src/BatchHarness.sol": "40c2c6cd382762622421c1d0b19aa728f9e6848e865778487ab406027d26f87e",
+    "audit/address-steth-transfer-from-call/solidity/src/WrappedRequestHarness.sol": "59e8c469bfe8b014b62d5fbfc5a150bbad395f5138b2fbd1cf6b898dfe45127b",
+    "audit/address-steth-transfer-from-call/solidity/src/core/WithdrawalQueue.sol": "efa5a32fbc99cafdb16a38d96a9bb5b29a62e60b5610e7c317711cc58402b131",
+    "audit/address-steth-transfer-from-call/solidity/src/core/WithdrawalQueueBase.sol": "68d8919f89198c3d39272b2259a3144bf87a4aa48c570624b025fd86da47d2bb",
+    "audit/address-steth-transfer-from-call/solidity/src/core/lib/UnstructuredStorage.sol": "955bfcb0bf265db114248bdabeabebc39bddb3fbb756e2448f6aed59f1994f56",
+    "audit/address-steth-transfer-from-call/solidity/src/core/utils/PausableUntil.sol": "afd11f5950050bbc8e9fad3cbea2a5bdbcc23048128c30f335a12b48084c8594",
+    "audit/address-steth-transfer-from-call/solidity/src/core/utils/Versioned.sol": "7f9ba0a2368d7531447a80e80ae28406964acf51ca0de8bfa985620e226340a8",
+    "audit/address-steth-transfer-from-call/solidity/src/core/utils/access/AccessControl.sol": "e399e266f9b0e8fe99708f3fb2f656a636fb432d69ca9c247f2e84f2e762f803",
+    "audit/address-steth-transfer-from-call/solidity/src/core/utils/access/AccessControlEnumerable.sol": "e8fa2bc8e4c8046fd04b25ed4708be8159913cac4ca738cdc53022896e0566ce",
+    "audit/address-steth-transfer-from-call/solidity/test/TransferFrom.t.sol": "3c90005c90ee84bcdf035ecbdf5171a4a71d540b6971917d540b8c645d25de7f",
+    "audit/address-steth-transfer-from-call/source-build-1.log": "6c1601080288f62d87baa8b5aa02bfaaa865e0114c185a8b1b71238620c5723e",
+    "audit/address-steth-transfer-from-call/source-inputs.json": "8f31841eae67a4d5c2437cb20780e2f67c742803cec4121ddea2cdf182c22b30",
+    "audit/address-steth-transfer-from-call/test-build-1.log": "8748e2a021dda3a0d9cceb2cb98455152d47efc27d3bac81c0d57552848f92e1",
+    "audit/address-steth-transfer-from-call/test-build-2.log": "bc01f7dd74955b0afb005e4af3f806777fec75118e0916301d489b6c57581fb1",
+    "audit/address-steth-transfer-from-call/validate.py": "3a85e1ad5858130afc62a41667fb67b48763376f0bb9a7cdd667847422c4624d",
+    "audit/address-steth-transfer-from-call/validation-1.log": "68ad279df603d9c6c3cdfa6cd345a8277cb9762dfb07af509bd34b661192c891",
+    "audit/address-steth-transfer-from-call/validation-2.log": "a59f00d5d6d6276937d8f3117779362c483e135c070d8668b006438a737de7a1"
+  }
+}

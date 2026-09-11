@@ -1,0 +1,32 @@
+audit/trio/account-address/ReportFeeAccountingCall.lean:118:9: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  ReportFeeMint.mintCommittedFee x.accountingAddress { router := router, steth := before.steth } fee
+in the target expression
+  (match some fee with
+    | none => ReportFeeMint.Outcome.reverted ReportFeeMint.Error.feeArithmetic before
+    | some f =>
+      match ReportFeeMint.mintCommittedFee x.accountingAddress { router := router, steth := before.steth } f with
+      | ReportFeeMint.Outcome.reverted fault rollback => ReportFeeMint.Outcome.reverted fault before
+      | ReportFeeMint.Outcome.committed post f es => ReportFeeMint.Outcome.committed post f es) =
+    ReportFeeMint.Outcome.committed post actualFee events
+
+x : Input
+before post : World
+router : Core
+fee actualFee : FeeResult
+events : List Event
+hm :
+  ReportFeeMint.mintCommittedFee x.accountingAddress { router := router, steth := before.steth } fee =
+    ReportFeeMint.Outcome.committed post actualFee events
+distribution : Distribution
+hr :
+  reportValidatorBalances x.layout x.registeredModuleIds x.reportedModuleIds x.balancesGwei before.router =
+    ReportOutcome.committed router
+hg : getStakingRewardsDistribution x.layout x.registeredModuleIds router = Except.ok distribution
+hf : ReportFeeMint.checkedFeeProductsFromCommittedGetter x.report distribution = some fee
+⊢ (match some fee with
+    | none => ReportFeeMint.Outcome.reverted ReportFeeMint.Error.feeArithmetic before
+    | some f =>
+      match ReportFeeMint.mintCommittedFee x.accountingAddress { router := router, steth := before.steth } f with
+      | ReportFeeMint.Outcome.reverted fault rollback => ReportFeeMint.Outcome.reverted fault before
+      | ReportFeeMint.Outcome.committed post f es => ReportFeeMint.Outcome.committed post f es) =
+    ReportFeeMint.Outcome.committed post actualFee events

@@ -1,0 +1,34 @@
+Compiling 11 files with Solc 0.8.9
+Solc 0.8.9 finished in 428.39ms
+Compiler run successful with warnings:
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> test/AccountingCall.t.sol:10:1:
+   |
+10 | contract RawLocator {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> test/AccountingCall.t.sol:13:2:
+   |
+13 |  fallback() external payable {
+   |  ^ (Relevant source part starts here and spans across multiple lines).
+
+
+Ran 15 tests for test/AccountingCall.t.sol:AccountingCallTest
+[PASS] testAccountingAuthThenPhysicalPause() (gas: 31727)
+[PASS] testActualImplementationChangeConsumedByAuth() (gas: 497853)
+[PASS] testCallAllowsMutableCalleeOutsideSpecializedProof() (gas: 498814)
+[PASS] testFuzzLegacyDirtyHigh96(uint96) (runs: 256, μ: 498935, ~: 498935)
+[PASS] testFuzzPhysicalTargetHigh96(uint96) (runs: 256, μ: 145832, ~: 145832)
+[PASS] testLegacyDirtyAddressHighBitsAccepted() (gas: 498763)
+[PASS] testLegacyEmptyReturnRejected() (gas: 345554)
+[PASS] testLegacyRevertBytesBubbled() (gas: 376101)
+[PASS] testLegacyShortReturnRejected() (gas: 363223)
+[PASS] testLegacyTrailingByteAccepted() (gas: 519608)
+[PASS] testNoCodeRejectsBeforePause() (gas: 30050)
+[PASS] testPinnedLocatorKeccak() (gas: 233)
+[PASS] testRealImmutableGetterViaRealProxy() (gas: 163629)
+[PASS] testRealProxyLateTreasuryGuardRollsBack() (gas: 594676)
+[PASS] testZeroFeeSkipsAbsentAccountingAndPause() (gas: 26033)
+Suite result: ok. 15 passed; 0 failed; 0 skipped; finished in 34.39ms (52.17ms CPU time)
+
+Ran 1 test suite in 144.25ms (34.39ms CPU time): 15 tests passed, 0 failed, 0 skipped (15 total tests)
