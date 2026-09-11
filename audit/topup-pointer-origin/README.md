@@ -15,7 +15,7 @@ Trust, or import-DAG file is edited. Integration is a later agent’s job.
 
 CLAIM: grok owns topup-pointer-origin since 2026-09-11
 
-STATUS: proving module_head_in_raw_zone
+STATUS: ready
 
 ## Obligation
 
@@ -94,7 +94,9 @@ lake env lean LidoSRv3/Tests/TopupPointerOriginMutants.lean
 `propext` / `Classical.choice` / `Quot.sound` (or nothing). Observed:
 definitions and `Disjoint` lemmas are axiom-free; allocation/decode
 theorems use `propext`/`Quot.sound`; `chained_scalar32_disjoint` also
-uses `Classical.choice`. No `sorryAx`.
+uses `Classical.choice`. `module_head_offset_bounds` and
+`module_head_in_raw_zone` use `propext`/`Quot.sound` only. Concrete head
+witness `module_head_encodeReturn_at_128` uses `propext` only. No `sorryAx`.
 
 `lake build LidoSRv3Test` is the package-wide test target; it does not need a
 lakefile edit because `LidoSRv3.Tests` is a glob.
