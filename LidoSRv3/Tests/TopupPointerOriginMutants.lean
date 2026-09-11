@@ -87,6 +87,54 @@ theorem independent_cursor_alias_refutes_global_nonalias :
     (h (word 128) (word 160) (word 352) credRaw moduleRaw credWord
       [word 1, word 9] (word 256) credentials_at_128 module_at_128 ha)
 
+/-- Concrete ABI head of `encodeReturn [1, 9]` at cursor 128:
+`decode (raw.take 32) = 32`, so `head = 160`. That address lies in the
+raw zone `[128, 256)` and not in the array zone `[256, 352)`
+(`StakingRouter.sol:717–719` / IR3323–3347). -/
+theorem module_head_encodeReturn_at_128 :
+    (word 128).val + decode (moduleRaw.take 32) = 160 ∧
+      (ofAllocation (word 128) (word moduleRaw.length).val (word 256)).contains 160 ∧
+      ¬ (ofAllocation (word 256) 96 (word 352)).contains 160 := by
+  have h128 : (word 128).val = 128 := by decide
+  have h256 : (word 256).val = 256 := by decide
+  have h352 : (word 352).val = 352 := by decide
+  have hoff : decode (moduleRaw.take 32) = 32 := by decide +kernel
+  refine ⟨?_, ?_, ?_⟩
+  · rw [h128, hoff]
+  · simp [AllocatedZone.contains, ofAllocation, h128, h256]
+  · intro h
+    simp [AllocatedZone.contains, ofAllocation, h256, h352] at h
+    have : ¬ (256 : Nat) ≤ 160 := by decide
+    exact this h.1
+
+/-- Instantiation of `module_head_in_raw_zone` on that witness. -/
+theorem module_head_in_raw_zone_at_128 :
+    ∃ postRaw,
+      finalizeAllocation (word 128) (word moduleRaw.length).val = .ok postRaw ∧
+        (ofAllocation (word 128) (word moduleRaw.length).val postRaw).contains
+          ((word 128).val + decode (moduleRaw.take 32)) ∧
+        ¬ (ofAllocation postRaw
+            (32 * decode ((moduleRaw.drop (decode (moduleRaw.take 32))).take 32) + 32)
+            (word 352)).contains
+          ((word 128).val + decode (moduleRaw.take 32)) :=
+  module_head_in_raw_zone (word 128) (word 352) moduleRaw [word 1, word 9] module_at_128
+
+/-- Kill-line: the universal claim “on `decodeReturn` success the ABI head
+belongs to the array zone” is false. The head sits in the raw zone. -/
+theorem module_head_in_array_zone_refuted :
+    ¬ (∀ (cursor next : Word) (raw : Bytes) (xs : List Word) (postRaw : Word),
+        TopupModuleMemory.decodeReturn cursor raw = .ok (xs, next) →
+        finalizeAllocation cursor (word raw.length).val = .ok postRaw →
+        (ofAllocation postRaw
+          (32 * decode ((raw.drop (decode (raw.take 32))).take 32) + 32) next).contains
+          (cursor.val + decode (raw.take 32))) := by
+  intro h
+  have hex := module_head_in_raw_zone (word 128) (word 352) moduleRaw
+    [word 1, word 9] module_at_128
+  rcases hex with ⟨postRaw, hpost⟩
+  exact hpost.2.2 (h (word 128) (word 352) moduleRaw [word 1, word 9] postRaw
+    module_at_128 hpost.1)
+
 /-- `mstore(64)` slot is a legal credentials cursor. -/
 theorem free_memory_pointer_slot_admitted :
     TopupCredentialCall.decodeCredentials (word 64) credRaw = .ok (credWord, word 96) ∧
@@ -101,5 +149,8 @@ theorem free_memory_pointer_slot_admitted :
 #print axioms existing_topup_cursors_alias
 #print axioms same_cursor_alias_instance
 #print axioms independent_cursor_alias_refutes_global_nonalias
+#print axioms module_head_encodeReturn_at_128
+#print axioms module_head_in_raw_zone_at_128
+#print axioms module_head_in_array_zone_refuted
 #print axioms free_memory_pointer_slot_admitted
 end LidoSRv3.Tests.TopupPointerOriginMutants
