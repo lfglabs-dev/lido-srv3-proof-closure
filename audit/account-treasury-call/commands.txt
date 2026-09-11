@@ -1,0 +1,6 @@
+python3 audit/account-treasury-call/build.py
+python3 audit/account-treasury-call/validate.py
+forge test --root audit/account-treasury-call/solidity --match-contract TreasuryCallTest -vv
+forge inspect --root audit/account-treasury-call/solidity DistributionHarness assembly
+python3 audit/account-treasury-call/solidity/check.py
+python3 audit/account-treasury-call/write-receipt.py
