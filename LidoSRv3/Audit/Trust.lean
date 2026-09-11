@@ -748,6 +748,24 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PSsz1.sourceWitness_binds_sourceNode
 #print axioms LidoSRv3.Audit.Guarantees.PSsz1.verity_tx_simulates_ssz_encoding
 #print axioms LidoSRv3.Audit.Guarantees.PSsz1.verity_tx_two_batch_rolls_back
+-- SSZ auxiliary source-level lemmas and richer verity-tx correspondences
+-- now that the Mac-agent SSZ lane is released to Spark. `toByteArray_size`
+-- pins the ByteArray-length invariant, `srcInputs_exactWidths` ties the
+-- input widths to the pinned config, `sourceWitness_index_le_maxUint248`
+-- guarantees the sourceWitness index fits the 248-bit bound.
+-- `composed_ssz_encoding_full` composes the ComposedSszInput with
+-- verified widths, and `verity_tx_one_object_matches_sourceView` states
+-- the observe/sourceView equality at the TX level for one derived
+-- object. `traverseBranch_sourceCombineSwapped_eq` and
+-- `swapped_traverse_ne_structuralEncoding` are the paired
+-- symbolic-cursor / structural-encoding kill-lines.
+#print axioms LidoSRv3.Audit.Guarantees.PSsz1.toByteArray_size
+#print axioms LidoSRv3.Audit.Guarantees.PSsz1.srcInputs_exactWidths
+#print axioms LidoSRv3.Audit.Guarantees.PSsz1.sourceWitness_index_le_maxUint248
+#print axioms LidoSRv3.Audit.Guarantees.PSsz1.composed_ssz_encoding_full
+#print axioms LidoSRv3.Audit.Guarantees.PSsz1.verity_tx_one_object_matches_sourceView
+#print axioms LidoSRv3.Audit.Guarantees.PSsz1.traverseBranch_sourceCombineSwapped_eq
+#print axioms LidoSRv3.Audit.Guarantees.PSsz1.swapped_traverse_ne_structuralEncoding
 #print axioms LidoSRv3.Audit.Verity.SszEncodingTx.verity_tx_simulates_pinned_source
 #print axioms LidoSRv3.Audit.Verity.SszEncodingTx.encoding_commits_structural_witness
 #print axioms LidoSRv3.Audit.Verity.SszEncodingTx.revert_restores_snapshot
