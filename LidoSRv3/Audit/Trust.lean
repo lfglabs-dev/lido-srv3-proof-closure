@@ -64,6 +64,7 @@ import LidoSRv3.Audit.Source.TrioReserve1.Transfers
 import LidoSRv3.Audit.Guarantees.PEthConfinement1
 import LidoSRv3.Tests.EthConfinementMutants
 import LidoSRv3.Audit.Verity.MinFirstSourceEntry
+import LidoSRv3.Audit.Verity.DepositLedgerTx
 import LidoSRv3.Audit.Allocation
 import LidoSRv3.Audit.StrategyProofs
 import LidoSRv3.Audit.Common.Atomicity
@@ -240,6 +241,13 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Spec.AllocationCorrespondence.alloc2_spec_step_amount_correspondence
 #print axioms LidoSRv3.Audit.Spec.AllocationCorrespondence.topup2_per_key_remains_gwei
 #print axioms LidoSRv3.Audit.Guarantees.PTopup2.verity_tx_simulates_topup2_spec
+-- PTopup2 aggregate arithmetic bounds used by the multi-batch cap
+-- discipline: per-key `consumeBudget` upper bound, and three
+-- aggregate-vs-individual / module-limit / block-cap monotone bounds.
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2.consumeBudget_per_key_le
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_individual
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_module_limit
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap_of_well_formed
 #print axioms LidoSRv3.Audit.Spec.AllocationCorrespondence.spec_amounts_do_not_imply_linkssource
 #print axioms LidoSRv3.Tests.PackAAllocSpecMutants.target_as_capacity_kill_line_refutes_alloc1_spec
 #print axioms LidoSRv3.Tests.PackAAllocSpecMutants.spec_amounts_kill_line_refutes_linkssource
@@ -366,6 +374,18 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.PackN4AddressBatchMutants.swapped_three_payout_order_kill_line_refutes_parent
 #print axioms LidoSRv3.Tests.PackN4AddressBatchMutants.fixed_dest_rename_kill_line_refutes_parent
 #print axioms LidoSRv3.Audit.Guarantees.PSszLive1.modeled_beacon_roots_live_ssz_consume
+-- PSszLive1 admission surface: `production_witness_admission_from_core_gindex`
+-- is the executable identity that the production admission holds iff
+-- the core gindex is looked up; `gateway_admission_sound` +
+-- `admitted_construction_under_lookup` are the accompanying soundness
+-- lemmas, and `admission_false_of_lookup_none` is the paired
+-- negative-direction closure. Together they pin the production
+-- admission gate as decidable on the pinned lookup, not on a supplied
+-- Boolean.
+#print axioms LidoSRv3.Audit.Guarantees.PSszLive1.production_witness_admission_from_core_gindex
+#print axioms LidoSRv3.Audit.Guarantees.PSszLive1.gateway_admission_sound
+#print axioms LidoSRv3.Audit.Guarantees.PSszLive1.admission_false_of_lookup_none
+#print axioms LidoSRv3.Audit.Guarantees.PSszLive1.admitted_construction_under_lookup
 #print axioms LidoSRv3.Audit.Verity.SszTxSimulation.digest_preimages_length
 #print axioms LidoSRv3.Audit.Spec.Eip4788AnchorChild.eip4788_parent_root_identified
 #print axioms LidoSRv3.Audit.Verity.BeaconRootsTx.spec_source_verity_beacon_roots
@@ -692,6 +712,18 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.verity_nonzero_wrap_reverts_and_restores
 #print axioms
   LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source_with_nonzero_wrap_close
+-- PTopup1 provenance / audit-only claims about what the pinned source
+-- alone does *not* determine: `pinned_constructor_span_does_not_
+-- determine_beacon_address` refutes any attempt to derive the beacon
+-- address from constructor-span provenance alone;
+-- `no_source_only_beacon_address_derivation` states the same at the
+-- source level; `source_allocation_guards_required` and
+-- `source_over_target_guard_required` pin the two allocation guards
+-- (module-selected, over-target) as necessary rather than accidental.
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.pinned_constructor_span_does_not_determine_beacon_address
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.no_source_only_beacon_address_derivation
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_allocation_guards_required
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_over_target_guard_required
 #print axioms LidoSRv3.Audit.Verity.TopupHybrid.verity_tx_simulates_source
 #print axioms LidoSRv3.Tests.TopupHybridMutants.hybrid_simulation_covers_nonzero_wrap
 #print axioms LidoSRv3.Tests.TopupHybridMutants.hybrid_simulation_covers_wrap_to_zero
@@ -724,6 +756,31 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Verity.Topup2Tx.tx_all_success_value_exact
 #print axioms LidoSRv3.Audit.Verity.Topup2Tx.tx_revert_restores_world
 #print axioms LidoSRv3.Audit.Verity.Topup2Tx.tx_committed_world_is_commit_fold
+-- Topup2DistributionTx: the four `sourceRunIndependent_eq_sourceRun`
+-- family lemmas document that the top-level source-run and its helpers
+-- (consume, limits, candidates) do not depend on the `DenoteOracle`
+-- once the decode premises are supplied — i.e. the memory-array
+-- reads are oracle-independent on the currently-registered path.
+#print axioms LidoSRv3.Audit.Verity.Topup2DistributionTx.sourceConsumeIndependent_eq_sourceConsume
+#print axioms LidoSRv3.Audit.Verity.Topup2DistributionTx.sourceLimitsIndependent_eq_sourceLimits
+#print axioms LidoSRv3.Audit.Verity.Topup2DistributionTx.sourceCandidatesIndependent_eq_sourceCandidates
+#print axioms LidoSRv3.Audit.Verity.Topup2DistributionTx.sourceRunIndependent_eq_sourceRun
+-- Topup2Tx additional executable-transaction shape lemmas:
+-- `denoteTransaction_revert_world` restores the entry world on any
+-- revert; `forEachCall_callsIn_take` decomposes the fold on
+-- `callsIn`; `plannedSites_value_sum` and `valueSum_take_le` are
+-- the aggregate ledger bounds; `callsIn_all_success_eq_planned`
+-- documents the all-success shape; `tx_all_rollback_preserves_world`
+-- is the paired revert-preservation counterpart of
+-- `tx_committed_world_is_commit_fold`; `gateway_abort_is_failed_call`
+-- names the specific failed-call cause.
+#print axioms LidoSRv3.Audit.Verity.Topup2Tx.denoteTransaction_revert_world
+#print axioms LidoSRv3.Audit.Verity.Topup2Tx.forEachCall_callsIn_take
+#print axioms LidoSRv3.Audit.Verity.Topup2Tx.plannedSites_value_sum
+#print axioms LidoSRv3.Audit.Verity.Topup2Tx.valueSum_take_le
+#print axioms LidoSRv3.Audit.Verity.Topup2Tx.callsIn_all_success_eq_planned
+#print axioms LidoSRv3.Audit.Verity.Topup2Tx.tx_all_rollback_preserves_world
+#print axioms LidoSRv3.Audit.Verity.Topup2Tx.gateway_abort_is_failed_call
 #print axioms LidoSRv3.Tests.Topup2TxMutants.over_cap_aggregate_rejected
 #print axioms LidoSRv3.Tests.Topup2TxMutants.double_send_rejected
 #print axioms LidoSRv3.Tests.Topup2TxMutants.reverting_adversary_cannot_leak_state
@@ -977,6 +1034,10 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 
 #print axioms LidoSRv3.Audit.Guarantees.PTopupTimingHistory.actual_timing_credential_root_module_memory_history
 #print axioms LidoSRv3.Audit.Guarantees.PTopupTimingHistory.actual_timing_credential_root_module_failure_restores
+-- `history_effects` is the abstract history-effect equation for a
+-- successful timing-history step on the gateway address and total
+-- forwarded amount.
+#print axioms LidoSRv3.Audit.Guarantees.PTopupTimingHistory.history_effects
 #print axioms LidoSRv3.Audit.Source.TopupTimingHistory.execute_projection
 #print axioms LidoSRv3.Audit.Source.TopupTimingHistory.packed_fields
 #print axioms LidoSRv3.Tests.TopupTimingHistory.public_consumer
@@ -1079,6 +1140,23 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.DepositAdmissionErrors.success_projection
 #print axioms LidoSRv3.Audit.Source.DepositAdmissionErrors.local_rejection
 #print axioms LidoSRv3.Audit.Source.DepositAdmissionErrors.failure_restores
+
+-- DepositLedgerTx executable-transaction correspondence: `run` and
+-- `revert` shape lemmas that document the pinned Solidity behaviour on
+-- three commitment planes (committing push, empty batch, non-conserving
+-- deployment) plus the paired kill-lines refuting a dropped assert and
+-- a skipped Lido debit. The `verity_revert_moves_no_ether` and
+-- `verity_revert_rolls_back` sisters document the transaction-boundary
+-- rollback discipline. `forEach_wrapper_unrolls_once` is the small
+-- symbolic wrapper equation used by the loop reasoning.
+#print axioms LidoSRv3.Audit.Verity.DepositLedgerTx.forEach_wrapper_unrolls_once
+#print axioms LidoSRv3.Audit.Verity.DepositLedgerTx.verity_revert_rolls_back
+#print axioms LidoSRv3.Audit.Verity.DepositLedgerTx.verity_revert_moves_no_ether
+#print axioms LidoSRv3.Audit.Verity.DepositLedgerTx.verity_tx_matches_source_committing_push
+#print axioms LidoSRv3.Audit.Verity.DepositLedgerTx.verity_tx_matches_source_empty_batch
+#print axioms LidoSRv3.Audit.Verity.DepositLedgerTx.verity_tx_matches_source_nonconserving_deployment
+#print axioms LidoSRv3.Audit.Verity.DepositLedgerTx.dropped_assert_commits_nonconserving_deployment
+#print axioms LidoSRv3.Audit.Verity.DepositLedgerTx.skipped_lido_debit_breaks_conservation
 
 -- Actual router admission consumes the entire prior physical TOPUP result.
 #print axioms LidoSRv3.Audit.Guarantees.PTopupRouterAdmissionCall.actual_router_admission_complete_prior
