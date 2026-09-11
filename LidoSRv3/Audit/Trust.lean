@@ -192,6 +192,8 @@ import LidoSRv3.Audit.Verity.Tests.SszTxSimulation
 import LidoSRv3.Audit.Source.SanityEnvelope
 import LidoSRv3.Tests.TopupModuleMemoryRegression
 import LidoSRv3.Tests.AddressRequestCalls
+import LidoSRv3.Audit.Source.AccountingCorrespondence
+import LidoSRv3.Audit.Source.AddressCorrespondence
 import LidoSRv3.Audit.Source.TopupPointerOrigin
 import LidoSRv3.Tests.TopupPointerOriginMutants
 
@@ -1286,3 +1288,36 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.TopupPointerOriginMutants.independent_cursor_alias_refutes_global_nonalias
 #print axioms LidoSRv3.Tests.TopupPointerOriginMutants.module_head_in_array_zone_refuted
 #print axioms LidoSRv3.Tests.TopupPointerOriginMutants.returnBuffer_eq_locator_refutes_cross_phase_nonalias
+
+-- SolidityAccounting source-level identities on the accounting words:
+-- `checkedTotal64_le` enforces the checked-uint64 upper bound;
+-- `checkedTotal256_refines_source` documents the checked-uint256
+-- refinement of the source aggregate; `source_report_before_reward_retired`
+-- retains the deprecated source-report shape as a historical anchor;
+-- `source_to_verityTx` closes the source-to-verity-tx correspondence.
+#print axioms LidoSRv3.Audit.SolidityAccounting.checkedTotal64_le
+#print axioms LidoSRv3.Audit.SolidityAccounting.checkedTotal256_refines_source
+#print axioms LidoSRv3.Audit.SolidityAccounting.source_report_before_reward_retired
+#print axioms LidoSRv3.Audit.SolidityAccounting.source_to_verityTx
+
+-- SolidityAddress source-level building blocks:
+-- `renameAddress_{involutive,injective}` are the elementary permutation
+-- identities; `not_singleton_actor_entry_point` documents the exclusion-
+-- by-omission choice for singleton actors;
+-- `addressEquivarianceEntryScope_total` sets total scope over the
+-- registered four writers; `pause_balance_admitted_is_permissionless`
+-- attests the pause/balance admissibility for `requestWithdrawals` and
+-- `unwrap`; `renameInput_preserves_indexed_facts` and `run_rename` pin
+-- the rename equivariance shape at the input and executor levels;
+-- `source_admission_nondiscriminatory` and
+-- `source_success_post_state_equivariant` are the top-level admission /
+-- committed-post-state equivariance parents on the pinned source.
+#print axioms LidoSRv3.Audit.SolidityAddress.renameAddress_involutive
+#print axioms LidoSRv3.Audit.SolidityAddress.renameAddress_injective
+#print axioms LidoSRv3.Audit.SolidityAddress.not_singleton_actor_entry_point
+#print axioms LidoSRv3.Audit.SolidityAddress.addressEquivarianceEntryScope_total
+#print axioms LidoSRv3.Audit.SolidityAddress.pause_balance_admitted_is_permissionless
+#print axioms LidoSRv3.Audit.SolidityAddress.renameInput_preserves_indexed_facts
+#print axioms LidoSRv3.Audit.SolidityAddress.run_rename
+#print axioms LidoSRv3.Audit.SolidityAddress.source_admission_nondiscriminatory
+#print axioms LidoSRv3.Audit.SolidityAddress.source_success_post_state_equivariant
