@@ -1,4 +1,6 @@
+import LidoSRv3.Tests.DepositPhysicalAdmission
 import Tests.Verity.ReportFeeDistributionTest
+import Tests.Verity.ReportFeeTreasuryCallTest
 import audit.trio.deposit.Tests.Verity.ModulePhysicalMetadataTest
 import LidoSRv3.Tests.ConsolidationSettlementRequestsRegression
 import Tests.Verity.ReportFeeCheckedSplitTest
@@ -740,3 +742,13 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_request_withdrawal_failure_restores
 #print axioms LidoSRv3.Audit.Source.AddressRequestCalls.enqueue_success
 #print axioms LidoSRv3.Tests.AddressRequestCalls.public_late_rollback_instance
+
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1.actual_report_fee_mint_treasury_call
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1.actual_report_treasury_failure_restores
+#print axioms AccountAddress.TreasuryCall.call_success
+#print axioms AccountAddress.ReportFeeTreasuryCall.distribute_success
+
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.actual_registered_module_call_metadata_suffix
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.actual_registered_module_failure_restores
+#print axioms LidoSRv3.Audit.Source.DepositPhysicalAdmission.selected_fields
+#print axioms LidoSRv3.Audit.Source.DepositPhysicalAdmission.selectedOctets_head

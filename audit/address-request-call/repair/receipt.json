@@ -32,7 +32,7 @@
     "LidoSRv3/Tests/AddressRequestCalls": "1509296a21164c34966cd46a12103038e3615fab138f266e9e780515babcba86"
   },
   "sha256": {
-    "audit/address-request-call/repair/README.md": "1fb9f407eb246bc3da7a7c594783af2bed36ab6cbdd51c50e47e66c1f6d09367",
+    "audit/address-request-call/repair/README.md": "37eb67eca0c08763a023b0622ef19490e08ffb8ae1ed4be3d21a542c4be59195",
     "audit/address-request-call/repair/all-trust-build.log": "76e3602cd8dc85d65a85fd7d35166fd269f0ff57223aecb7c7c2d6927a990f2b",
     "audit/address-request-call/repair/axioms.json": "bd6b6aa76addd4b08a78bc64df56b23455591d6bd98dee97734ec54c115671c4",
     "audit/address-request-call/repair/blocked-constant-inventory-a3ae.json": "0e1ef48214d189758575f8906f47607c1e48d13b417965297fee9b79512036ec",

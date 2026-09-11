@@ -1,0 +1,388 @@
+{
+  "scope": "Current final targeted build source/artifact identities and Lake traces. The final command actively compiled tests and validated current cached source/public targets. These are recorded after the successful command, not alleged contemporaneous hashes of earlier development runs.",
+  "entries": [
+    {
+      "source": "LidoSRv3/Audit/Source/DepositPhysicalAdmission.lean",
+      "source_sha256": "a9624331c3cea50b666ae9f8a6c852809b4b679a23cb37ef960c45eb2fdff155",
+      "artifacts": {
+        ".olean": {
+          "sha256": "cd8ea628ed09551272faaad249d564b2b0ecb19f42586a5936a766fed256b088"
+        },
+        ".ilean": {
+          "sha256": "e26f8b310b5953570287c829d9a3e8f9c2074cb248e0ea5acc62981f87502fa0"
+        },
+        ".trace": {
+          "sha256": "9f9bf3b0d5f2f19161afdf1560f243108a28478d10ee6acd1d4a4ed706eaba36",
+          "lake_trace": {
+            "synthetic": false,
+            "schemaVersion": "2025-09-10",
+            "outputs": {
+              "o": [
+                "e4cc0c38f47c89ef.olean"
+              ],
+              "m": false,
+              "i": "21c7022f8d0eece0.ilean",
+              "c": "7eae1217361fef3b.c"
+            },
+            "log": [
+              {
+                "message": ".> LEAN_PATH=/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Cli/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/batteries/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Qq/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/aesop/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/proofwidgets/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/importGraph/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/plausible/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/mathlib/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/evmyul/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/verity/.lake/build/lib/lean:/private/tmp/lido-deposit-physical-admission/.lake/build/lib/lean /Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean /private/tmp/lido-deposit-physical-admission/LidoSRv3/Audit/Source/DepositPhysicalAdmission.lean -o /private/tmp/lido-deposit-physical-admission/.lake/build/lib/lean/LidoSRv3/Audit/Source/DepositPhysicalAdmission.olean -i /private/tmp/lido-deposit-physical-admission/.lake/build/lib/lean/LidoSRv3/Audit/Source/DepositPhysicalAdmission.ilean -c /private/tmp/lido-deposit-physical-admission/.lake/build/ir/LidoSRv3/Audit/Source/DepositPhysicalAdmission.c --setup /private/tmp/lido-deposit-physical-admission/.lake/build/ir/LidoSRv3/Audit/Source/DepositPhysicalAdmission.setup.json --json",
+                "level": "trace"
+              }
+            ],
+            "inputs": [
+              [
+                "LidoSRv3.Audit.Source.DepositPhysicalAdmission:deps",
+                [
+                  [
+                    "deps",
+                    [
+                      [
+                        "\u00ablido-srv3-proof-closure\u00bb/LidoSRv3:extraDep",
+                        [
+                          [
+                            "@\u00ablido-srv3-proof-closure\u00bb:extraDep",
+                            "00000000000006bb"
+                          ]
+                        ]
+                      ],
+                      [
+                        "imports",
+                        [
+                          [
+                            "LidoSRv3.Audit.Guarantees.PDeposit1ModuleCalls transitive imports (legacy)",
+                            "3842321e8009b436"
+                          ],
+                          [
+                            "LidoSRv3.Audit.Guarantees.PDeposit1ModuleCalls:importAllArts",
+                            "77a4830596249e48"
+                          ]
+                        ]
+                      ]
+                    ]
+                  ],
+                  [
+                    "libs",
+                    [
+                      [
+                        "import dynlibs",
+                        "00000000000006bb"
+                      ],
+                      [
+                        "package external libraries",
+                        "00000000000006bb"
+                      ],
+                      [
+                        "module dynlibs",
+                        "00000000000006bb"
+                      ],
+                      [
+                        "module plugins",
+                        "00000000000006bb"
+                      ]
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "Lean 4.31.0, commit 68218e876d2a38b1985b8590fff244a83c321783",
+                "fc45ac412f28501c"
+              ],
+              [
+                "/private/tmp/lido-deposit-physical-admission/LidoSRv3/Audit/Source/DepositPhysicalAdmission.lean",
+                "bc94ad0838479608"
+              ],
+              [
+                "options",
+                "00000000000006bb"
+              ],
+              [
+                "isModule: false",
+                "feefd2a0d3a1847e"
+              ],
+              [
+                "Module.name: LidoSRv3.Audit.Source.DepositPhysicalAdmission",
+                "bae03319e6c4d6c3"
+              ],
+              [
+                "Package.id?: (some lido-srv3-proof-closure)",
+                "1792847f4a06c449"
+              ],
+              [
+                "Module.leanArgs: #[]",
+                "00000000000006bb"
+              ]
+            ],
+            "depHash": "722eaf26ba096229"
+          }
+        }
+      }
+    },
+    {
+      "source": "LidoSRv3/Audit/Guarantees/PDeposit1PhysicalAdmission.lean",
+      "source_sha256": "c43d81a74c8ecc102c2200c4d393816dbcc96ee203ec17e04844bdf8b7b95f11",
+      "artifacts": {
+        ".olean": {
+          "sha256": "8662ec6193886a083f20e4bda9976d9ba926a05ae8af1f1d63c4fb5bc8b30f8f"
+        },
+        ".ilean": {
+          "sha256": "f7633646b5698873c18f173852cb7750c22809b5a246955f398fe240eeb14c78"
+        },
+        ".trace": {
+          "sha256": "9047146712724569f5413633264e82cd0b3c9971861e3508d3b16ede334a4c56",
+          "lake_trace": {
+            "synthetic": false,
+            "schemaVersion": "2025-09-10",
+            "outputs": {
+              "o": [
+                "be3598029e7e0af7.olean"
+              ],
+              "m": false,
+              "i": "896a6cb8d6f792f8.ilean",
+              "c": "aeb1361d0284da69.c"
+            },
+            "log": [
+              {
+                "message": ".> LEAN_PATH=/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Cli/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/batteries/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Qq/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/aesop/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/proofwidgets/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/importGraph/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/plausible/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/mathlib/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/evmyul/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/verity/.lake/build/lib/lean:/private/tmp/lido-deposit-physical-admission/.lake/build/lib/lean /Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean /private/tmp/lido-deposit-physical-admission/LidoSRv3/Audit/Guarantees/PDeposit1PhysicalAdmission.lean -o /private/tmp/lido-deposit-physical-admission/.lake/build/lib/lean/LidoSRv3/Audit/Guarantees/PDeposit1PhysicalAdmission.olean -i /private/tmp/lido-deposit-physical-admission/.lake/build/lib/lean/LidoSRv3/Audit/Guarantees/PDeposit1PhysicalAdmission.ilean -c /private/tmp/lido-deposit-physical-admission/.lake/build/ir/LidoSRv3/Audit/Guarantees/PDeposit1PhysicalAdmission.c --setup /private/tmp/lido-deposit-physical-admission/.lake/build/ir/LidoSRv3/Audit/Guarantees/PDeposit1PhysicalAdmission.setup.json --json",
+                "level": "trace"
+              }
+            ],
+            "inputs": [
+              [
+                "LidoSRv3.Audit.Guarantees.PDeposit1PhysicalAdmission:deps",
+                [
+                  [
+                    "deps",
+                    [
+                      [
+                        "\u00ablido-srv3-proof-closure\u00bb/LidoSRv3:extraDep",
+                        [
+                          [
+                            "@\u00ablido-srv3-proof-closure\u00bb:extraDep",
+                            "00000000000006bb"
+                          ]
+                        ]
+                      ],
+                      [
+                        "imports",
+                        [
+                          [
+                            "LidoSRv3.Audit.Source.DepositPhysicalAdmission transitive imports (legacy)",
+                            "e422cbcf5f15bd19"
+                          ],
+                          [
+                            "LidoSRv3.Audit.Source.DepositPhysicalAdmission:importAllArts",
+                            "60889e03f6cdc1ac"
+                          ]
+                        ]
+                      ]
+                    ]
+                  ],
+                  [
+                    "libs",
+                    [
+                      [
+                        "import dynlibs",
+                        "00000000000006bb"
+                      ],
+                      [
+                        "package external libraries",
+                        "00000000000006bb"
+                      ],
+                      [
+                        "module dynlibs",
+                        "00000000000006bb"
+                      ],
+                      [
+                        "module plugins",
+                        "00000000000006bb"
+                      ]
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "Lean 4.31.0, commit 68218e876d2a38b1985b8590fff244a83c321783",
+                "fc45ac412f28501c"
+              ],
+              [
+                "/private/tmp/lido-deposit-physical-admission/LidoSRv3/Audit/Guarantees/PDeposit1PhysicalAdmission.lean",
+                "965eccc982fb0d2b"
+              ],
+              [
+                "options",
+                "00000000000006bb"
+              ],
+              [
+                "isModule: false",
+                "feefd2a0d3a1847e"
+              ],
+              [
+                "Module.name: LidoSRv3.Audit.Guarantees.PDeposit1PhysicalAdmission",
+                "15bf9a0bbbac380e"
+              ],
+              [
+                "Package.id?: (some lido-srv3-proof-closure)",
+                "1792847f4a06c449"
+              ],
+              [
+                "Module.leanArgs: #[]",
+                "00000000000006bb"
+              ]
+            ],
+            "depHash": "f84b2cbc923c0e0b"
+          }
+        }
+      }
+    },
+    {
+      "source": "LidoSRv3/Tests/DepositPhysicalAdmission.lean",
+      "source_sha256": "22f36fbef47d678b0d366730cb9e35f130d1941498a1dfe74aafbcaae7cbc3e7",
+      "artifacts": {
+        ".olean": {
+          "sha256": "9b8cd10242cf3666244ec0f5ee51ab195600a06b62df0be27d518f111123e926"
+        },
+        ".ilean": {
+          "sha256": "cb2d6ff8ae4604d08df19bffeb23d06a219286341ff7e05850bddbb639669a2e"
+        },
+        ".trace": {
+          "sha256": "ad0b45ce49434b8e562511fe125dd17d4bc592bcf0281180a1ed180227bd6798",
+          "lake_trace": {
+            "synthetic": false,
+            "schemaVersion": "2025-09-10",
+            "outputs": {
+              "o": [
+                "b1bf5ab159631e79.olean"
+              ],
+              "m": false,
+              "i": "8dcd75ae0a80a184.ilean",
+              "c": "5536336aef468308.c"
+            },
+            "log": [
+              {
+                "message": ".> LEAN_PATH=/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Cli/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/batteries/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Qq/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/aesop/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/proofwidgets/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/importGraph/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/plausible/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/mathlib/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/evmyul/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/verity/.lake/build/lib/lean:/private/tmp/lido-deposit-physical-admission/.lake/build/lib/lean /Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean /private/tmp/lido-deposit-physical-admission/LidoSRv3/Tests/DepositPhysicalAdmission.lean -o /private/tmp/lido-deposit-physical-admission/.lake/build/lib/lean/LidoSRv3/Tests/DepositPhysicalAdmission.olean -i /private/tmp/lido-deposit-physical-admission/.lake/build/lib/lean/LidoSRv3/Tests/DepositPhysicalAdmission.ilean -c /private/tmp/lido-deposit-physical-admission/.lake/build/ir/LidoSRv3/Tests/DepositPhysicalAdmission.c --setup /private/tmp/lido-deposit-physical-admission/.lake/build/ir/LidoSRv3/Tests/DepositPhysicalAdmission.setup.json --json",
+                "level": "trace"
+              },
+              {
+                "message": "LidoSRv3/Tests/DepositPhysicalAdmission.lean:109:0: 'LidoSRv3.Audit.Source.DepositPhysicalAdmission.selected_fields' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]",
+                "level": "info"
+              },
+              {
+                "message": "LidoSRv3/Tests/DepositPhysicalAdmission.lean:110:0: 'LidoSRv3.Audit.Source.DepositPhysicalAdmission.selectedOctets_head' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]",
+                "level": "info"
+              },
+              {
+                "message": "LidoSRv3/Tests/DepositPhysicalAdmission.lean:111:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.actual_registered_module_call_metadata_suffix' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]",
+                "level": "info"
+              },
+              {
+                "message": "LidoSRv3/Tests/DepositPhysicalAdmission.lean:112:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.actual_registered_module_failure_restores' depends on axioms: [propext, Quot.sound]",
+                "level": "info"
+              },
+              {
+                "message": "LidoSRv3/Tests/DepositPhysicalAdmission.lean:113:0: 'LidoSRv3.Tests.DepositPhysicalAdmission.public_positive' depends on axioms: [propext, Classical.choice, Quot.sound]",
+                "level": "info"
+              },
+              {
+                "message": "LidoSRv3/Tests/DepositPhysicalAdmission.lean:114:0: 'LidoSRv3.Tests.DepositPhysicalAdmission.public_rejection_restores' depends on axioms: [propext, Quot.sound]",
+                "level": "info"
+              }
+            ],
+            "inputs": [
+              [
+                "LidoSRv3.Tests.DepositPhysicalAdmission:deps",
+                [
+                  [
+                    "deps",
+                    [
+                      [
+                        "\u00ablido-srv3-proof-closure\u00bb/LidoSRv3Test:extraDep",
+                        [
+                          [
+                            "@\u00ablido-srv3-proof-closure\u00bb:extraDep",
+                            "00000000000006bb"
+                          ]
+                        ]
+                      ],
+                      [
+                        "imports",
+                        [
+                          [
+                            "LidoSRv3.Audit.Guarantees.PDeposit1PhysicalAdmission transitive imports (legacy)",
+                            "0fcee79c28007886"
+                          ],
+                          [
+                            "LidoSRv3.Audit.Guarantees.PDeposit1PhysicalAdmission:importAllArts",
+                            "3946bd7032e036eb"
+                          ],
+                          [
+                            "audit.trio.deposit.Tests.Verity.ModulePhysicalMetadataTest transitive imports (legacy)",
+                            "e422cbcf5f15bd19"
+                          ],
+                          [
+                            "audit.trio.deposit.Tests.Verity.ModulePhysicalMetadataTest:importAllArts",
+                            "30604880cd5857e3"
+                          ]
+                        ]
+                      ]
+                    ]
+                  ],
+                  [
+                    "libs",
+                    [
+                      [
+                        "import dynlibs",
+                        "00000000000006bb"
+                      ],
+                      [
+                        "package external libraries",
+                        "00000000000006bb"
+                      ],
+                      [
+                        "module dynlibs",
+                        "00000000000006bb"
+                      ],
+                      [
+                        "module plugins",
+                        "00000000000006bb"
+                      ]
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "Lean 4.31.0, commit 68218e876d2a38b1985b8590fff244a83c321783",
+                "fc45ac412f28501c"
+              ],
+              [
+                "/private/tmp/lido-deposit-physical-admission/LidoSRv3/Tests/DepositPhysicalAdmission.lean",
+                "8fb766856f9dcf54"
+              ],
+              [
+                "options",
+                "00000000000006bb"
+              ],
+              [
+                "isModule: false",
+                "feefd2a0d3a1847e"
+              ],
+              [
+                "Module.name: LidoSRv3.Tests.DepositPhysicalAdmission",
+                "db2449c957b2b352"
+              ],
+              [
+                "Package.id?: (some lido-srv3-proof-closure)",
+                "1792847f4a06c449"
+              ],
+              [
+                "Module.leanArgs: #[]",
+                "00000000000006bb"
+              ]
+            ],
+            "depHash": "86a3c9f740f76195"
+          }
+        }
+      }
+    }
+  ]
+}

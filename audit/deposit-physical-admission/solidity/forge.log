@@ -1,0 +1,20 @@
+Compiling 1 files with Solc 0.8.25
+Solc 0.8.25 finished in 10.28s
+Compiler run successful with warnings:
+Warning (2018): Function state mutability can be restricted to view
+  --> test/Admission.t.sol:14:2:
+   |
+14 |  function checkError(uint256 id,address dsm,bytes memory expected) internal {
+   |  ^ (Relevant source part starts here and spans across multiple lines).
+
+
+Ran 6 tests for test/Admission.t.sol:AdmissionTest
+[PASS] testAuthorizationBeforeMembershipAndEnum() (gas: 13660)
+[PASS] testEveryStatusByteAndEveryCredentialType() (gas: 3597982)
+[PASS] testFuzzOtherConfigFieldsCannotChangeAdmissionType(uint256,uint8,uint224,uint16) (runs: 1024, μ: 11715, ~: 11715)
+[PASS] testFuzzPhysicalReads(uint256,bytes32,bytes32,uint256) (runs: 1024, μ: 11750, ~: 11762)
+[PASS] testLastModuleIdIsNotMembership() (gas: 18128)
+[PASS] testRootAndNon32Immutable() (gas: 10691)
+Suite result: ok. 6 passed; 0 failed; 0 skipped; finished in 26.77ms (62.97ms CPU time)
+
+Ran 1 test suite in 142.43ms (26.77ms CPU time): 6 tests passed, 0 failed, 0 skipped (6 total tests)
