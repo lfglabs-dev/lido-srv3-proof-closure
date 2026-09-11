@@ -1,0 +1,14 @@
+[profile.default]
+src="src"
+test="test"
+out="artifacts"
+solc="/Users/thomas/.svm/0.8.9/solc-0.8.9"
+optimizer=true
+optimizer_runs=200
+evm_version="byzantium"
+code_size_limit=100000
+extra_output=["metadata","evm.assembly"]
+remappings=["contracts/=src/contracts/","@openzeppelin/contracts-v4.4/=src/@openzeppelin/contracts-v4.4/"]
+fs_permissions=[{access="read",path="./artifacts"}]
+[profile.default.fuzz]
+runs=256

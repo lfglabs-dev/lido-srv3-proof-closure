@@ -1,0 +1,216 @@
+audit/trio/account-address/ReportFeeAccountingCall.lean:114:14: error(lean.invalidDottedIdent): Invalid dotted identifier notation: The expected type of `.reverted` could not be determined
+
+Hint: Using one of these would be unambiguous:
+  [apply] `FeeDistribution.Outcome.reverted`
+  [apply] `FeeDistribution.TransferOutcome.reverted`
+  [apply] `PAccount1.Outcome.reverted`
+  [apply] `ReportFeeDistribution.Outcome.reverted`
+  [apply] `ReportFeeMint.Outcome.reverted`
+  [apply] `ReportFeeTreasuryCall.DistributionOutcome.reverted`
+  [apply] `ReportFeeTreasuryCall.Outcome.reverted`
+  [apply] `ReportOutcome.reverted`
+  [apply] `Outcome.reverted`
+audit/trio/account-address/ReportFeeAccountingCall.lean:116:29: error(lean.invalidDottedIdent): Invalid dotted identifier notation: The expected type of `.reverted` could not be determined
+
+Hint: Using one of these would be unambiguous:
+  [apply] `FeeDistribution.Outcome.reverted`
+  [apply] `FeeDistribution.TransferOutcome.reverted`
+  [apply] `PAccount1.Outcome.reverted`
+  [apply] `ReportFeeDistribution.Outcome.reverted`
+  [apply] `ReportFeeMint.Outcome.reverted`
+  [apply] `ReportFeeTreasuryCall.DistributionOutcome.reverted`
+  [apply] `ReportFeeTreasuryCall.Outcome.reverted`
+  [apply] `ReportOutcome.reverted`
+  [apply] `Outcome.reverted`
+audit/trio/account-address/ReportFeeAccountingCall.lean:117:32: error(lean.invalidDottedIdent): Invalid dotted identifier notation: The expected type of `.committed` could not be determined
+
+Hint: Using one of these would be unambiguous:
+  [apply] `FeeDistribution.Outcome.committed`
+  [apply] `FeeDistribution.TransferOutcome.committed`
+  [apply] `PAccount1.Outcome.committed`
+  [apply] `ReportFeeDistribution.Outcome.committed`
+  [apply] `ReportFeeMint.Outcome.committed`
+  [apply] `ReportFeeTreasuryCall.DistributionOutcome.committed`
+  [apply] `ReportFeeTreasuryCall.Outcome.committed`
+  [apply] `ReportOutcome.committed`
+  [apply] `Outcome.committed`
+audit/trio/account-address/ReportFeeAccountingCall.lean:140:10: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  if f.sharesToMintAsFees = 0 then ?m.101 else ?m.102
+in the target expression
+  (match
+      match ReportFeeMint.Outcome.committed minted f mes with
+      | ReportFeeMint.Outcome.reverted fault rollback =>
+        ReportFeeTreasuryCall.Outcome.reverted (ReportFeeTreasuryCall.Error.mint fault)
+          (ReportFeePhysicalPause.project derived) [] []
+      | ReportFeeMint.Outcome.committed minted fee mintEvents =>
+        if fee.sharesToMintAsFees = 0 then ReportFeeTreasuryCall.Outcome.committed minted fee mintEvents [] []
+        else
+          match ReportFeeTreasuryCall.distribute e x.accountingAddress fee minted with
+          | ReportFeeTreasuryCall.DistributionOutcome.reverted fault payments attempts =>
+            ReportFeeTreasuryCall.Outcome.reverted fault (ReportFeePhysicalPause.project derived) payments attempts
+          | ReportFeeTreasuryCall.DistributionOutcome.committed post events payments attempts =>
+            ReportFeeTreasuryCall.Outcome.committed post fee (mintEvents ++ events) payments attempts with
+    | ReportFeeTreasuryCall.Outcome.reverted fault rollback payments attempts =>
+      ReportFeeTreasuryCall.Outcome.reverted fault derived payments attempts
+    | ReportFeeTreasuryCall.Outcome.committed post fee events payments attempts =>
+      ReportFeeTreasuryCall.Outcome.committed post fee events payments attempts) =
+    ReportFeeTreasuryCall.Outcome.committed post fee events payments attempts
+
+case committed.isTrue
+e : TreasuryCall.Environment
+x : Input
+entry derived post : World
+router : Core
+inputFee fee : FeeResult
+events : List Event
+payments : Payments
+attempts : Attempts
+hp : Prepared x derived.router router inputFee
+minted : ReportFeeMint.World
+f : FeeResult
+mes : List Event
+hm :
+  ReportFeeMint.mintCommittedFee x.accountingAddress
+      (let __src := ReportFeePhysicalPause.project derived;
+      { router := router, steth := __src.steth })
+      inputFee =
+    ReportFeeMint.Outcome.committed minted f mes
+oldMint :
+  ReportFeeMint.handleOracleReportFromCommittedFeeProducts x (ReportFeePhysicalPause.project derived) =
+    ReportFeeMint.Outcome.committed minted f mes
+hz : f.sharesToMintAsFees = 0
+h :
+  ReportFeeTreasuryCall.Outcome.committed minted f mes [] [] =
+    ReportFeeTreasuryCall.Outcome.committed post fee events payments attempts
+⊢ (match
+      match ReportFeeMint.Outcome.committed minted f mes with
+      | ReportFeeMint.Outcome.reverted fault rollback =>
+        ReportFeeTreasuryCall.Outcome.reverted (ReportFeeTreasuryCall.Error.mint fault)
+          (ReportFeePhysicalPause.project derived) [] []
+      | ReportFeeMint.Outcome.committed minted fee mintEvents =>
+        if fee.sharesToMintAsFees = 0 then ReportFeeTreasuryCall.Outcome.committed minted fee mintEvents [] []
+        else
+          match ReportFeeTreasuryCall.distribute e x.accountingAddress fee minted with
+          | ReportFeeTreasuryCall.DistributionOutcome.reverted fault payments attempts =>
+            ReportFeeTreasuryCall.Outcome.reverted fault (ReportFeePhysicalPause.project derived) payments attempts
+          | ReportFeeTreasuryCall.DistributionOutcome.committed post events payments attempts =>
+            ReportFeeTreasuryCall.Outcome.committed post fee (mintEvents ++ events) payments attempts with
+    | ReportFeeTreasuryCall.Outcome.reverted fault rollback payments attempts =>
+      ReportFeeTreasuryCall.Outcome.reverted fault derived payments attempts
+    | ReportFeeTreasuryCall.Outcome.committed post fee events payments attempts =>
+      ReportFeeTreasuryCall.Outcome.committed post fee events payments attempts) =
+    ReportFeeTreasuryCall.Outcome.committed post fee events payments attempts
+audit/trio/account-address/ReportFeeAccountingCall.lean:144:10: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  if f.sharesToMintAsFees = 0 then ?m.107 else ?m.108
+in the target expression
+  (match
+      match ReportFeeMint.Outcome.committed minted f mes with
+      | ReportFeeMint.Outcome.reverted fault rollback =>
+        ReportFeeTreasuryCall.Outcome.reverted (ReportFeeTreasuryCall.Error.mint fault)
+          (ReportFeePhysicalPause.project derived) [] []
+      | ReportFeeMint.Outcome.committed minted fee mintEvents =>
+        if fee.sharesToMintAsFees = 0 then ReportFeeTreasuryCall.Outcome.committed minted fee mintEvents [] []
+        else
+          match ReportFeeTreasuryCall.distribute e x.accountingAddress fee minted with
+          | ReportFeeTreasuryCall.DistributionOutcome.reverted fault payments attempts =>
+            ReportFeeTreasuryCall.Outcome.reverted fault (ReportFeePhysicalPause.project derived) payments attempts
+          | ReportFeeTreasuryCall.DistributionOutcome.committed post events payments attempts =>
+            ReportFeeTreasuryCall.Outcome.committed post fee (mintEvents ++ events) payments attempts with
+    | ReportFeeTreasuryCall.Outcome.reverted fault rollback payments attempts =>
+      ReportFeeTreasuryCall.Outcome.reverted fault derived payments attempts
+    | ReportFeeTreasuryCall.Outcome.committed post fee events payments attempts =>
+      ReportFeeTreasuryCall.Outcome.committed post fee events payments attempts) =
+    ReportFeeTreasuryCall.Outcome.committed post fee events payments attempts
+
+case committed.isFalse
+e : TreasuryCall.Environment
+x : Input
+entry derived post : World
+router : Core
+inputFee fee : FeeResult
+events : List Event
+payments : Payments
+attempts : Attempts
+hp : Prepared x derived.router router inputFee
+minted : ReportFeeMint.World
+f : FeeResult
+mes : List Event
+hm :
+  ReportFeeMint.mintCommittedFee x.accountingAddress
+      (let __src := ReportFeePhysicalPause.project derived;
+      { router := router, steth := __src.steth })
+      inputFee =
+    ReportFeeMint.Outcome.committed minted f mes
+oldMint :
+  ReportFeeMint.handleOracleReportFromCommittedFeeProducts x (ReportFeePhysicalPause.project derived) =
+    ReportFeeMint.Outcome.committed minted f mes
+hn : ¬f.sharesToMintAsFees = 0
+h :
+  (match ReportFeeTreasuryCall.distribute e x.accountingAddress f minted with
+    | ReportFeeTreasuryCall.DistributionOutcome.reverted fault payments attempts =>
+      ReportFeeTreasuryCall.Outcome.reverted fault entry payments attempts
+    | ReportFeeTreasuryCall.DistributionOutcome.committed post events payments attempts =>
+      ReportFeeTreasuryCall.Outcome.committed post f (mes ++ events) payments attempts) =
+    ReportFeeTreasuryCall.Outcome.committed post fee events payments attempts
+⊢ (match
+      match ReportFeeMint.Outcome.committed minted f mes with
+      | ReportFeeMint.Outcome.reverted fault rollback =>
+        ReportFeeTreasuryCall.Outcome.reverted (ReportFeeTreasuryCall.Error.mint fault)
+          (ReportFeePhysicalPause.project derived) [] []
+      | ReportFeeMint.Outcome.committed minted fee mintEvents =>
+        if fee.sharesToMintAsFees = 0 then ReportFeeTreasuryCall.Outcome.committed minted fee mintEvents [] []
+        else
+          match ReportFeeTreasuryCall.distribute e x.accountingAddress fee minted with
+          | ReportFeeTreasuryCall.DistributionOutcome.reverted fault payments attempts =>
+            ReportFeeTreasuryCall.Outcome.reverted fault (ReportFeePhysicalPause.project derived) payments attempts
+          | ReportFeeTreasuryCall.DistributionOutcome.committed post events payments attempts =>
+            ReportFeeTreasuryCall.Outcome.committed post fee (mintEvents ++ events) payments attempts with
+    | ReportFeeTreasuryCall.Outcome.reverted fault rollback payments attempts =>
+      ReportFeeTreasuryCall.Outcome.reverted fault derived payments attempts
+    | ReportFeeTreasuryCall.Outcome.committed post fee events payments attempts =>
+      ReportFeeTreasuryCall.Outcome.committed post fee events payments attempts) =
+    ReportFeeTreasuryCall.Outcome.committed post fee events payments attempts
+audit/trio/account-address/ReportFeeAccountingCall.lean:284:6: error: Tactic `split` failed: Could not split an `if` or `match` expression in the type
+  (have ready :=
+        have __src := ReportFeePhysicalPause.project before;
+        { router := router✝, steth := __src.steth };
+      have called := AccountingCall.call accounting ready;
+      match called.outcome with
+      | Except.error fault =>
+        { outcome := ReportFeeTreasuryCall.Outcome.reverted (ReportFeeTreasuryCall.Error.locator fault) before [] [],
+          accountingAttempts := called.attempts }
+      | Except.ok (returned, resolved) =>
+        { outcome := finish treasury x before (withAccounting returned resolved) fee✝,
+          accountingAttempts := called.attempts }).outcome =
+    ReportFeeTreasuryCall.Outcome.reverted fault rollback payments attempts
+of `h`
+
+Hint: Use `set_option trace.split.failure true` to display additional diagnostic information
+
+case h_2.isFalse
+accounting : AccountingCall.Environment
+treasury : TreasuryCall.Environment
+x : Input
+before rollback : World
+fault : ReportFeeTreasuryCall.Error
+payments : Payments
+attempts : Attempts
+x✝ : Except ReportFeeMint.Error (Core × FeeResult)
+router✝ : Core
+fee✝ : FeeResult
+heq✝ : prepare x before.router = Except.ok (router✝, fee✝)
+h✝ : ¬fee✝.sharesToMintAsFees = 0
+h :
+  (have ready :=
+        have __src := ReportFeePhysicalPause.project before;
+        { router := router✝, steth := __src.steth };
+      have called := AccountingCall.call accounting ready;
+      match called.outcome with
+      | Except.error fault =>
+        { outcome := ReportFeeTreasuryCall.Outcome.reverted (ReportFeeTreasuryCall.Error.locator fault) before [] [],
+          accountingAttempts := called.attempts }
+      | Except.ok (returned, resolved) =>
+        { outcome := finish treasury x before (withAccounting returned resolved) fee✝,
+          accountingAttempts := called.attempts }).outcome =
+    ReportFeeTreasuryCall.Outcome.reverted fault rollback payments attempts
+⊢ rollback = before

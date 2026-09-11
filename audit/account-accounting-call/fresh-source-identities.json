@@ -1,0 +1,26 @@
+{
+  "core_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "sources": {
+    "contracts/0.8.9/proxy/OssifiableProxy.sol": "3fb48bc4a40c887dd581178d05316745c1b1c393a8e64787ef2a7075f1e7ce6d",
+    "@openzeppelin/contracts-v4.4/proxy/ERC1967/ERC1967Proxy.sol": "db6c986d393626060fa219d1072a1913eb16872224307e9261fc90c296e3770d",
+    "@openzeppelin/contracts-v4.4/proxy/ERC1967/ERC1967Upgrade.sol": "a8e55634074e89c6925a57f3274aebca184bfc99ffca39967ce967696f49dbe9",
+    "@openzeppelin/contracts-v4.4/utils/StorageSlot.sol": "b8d43f55a3afc09327fb9d802f714a8bec64e3a259ad42f5b3d877deb29aaaef",
+    "@openzeppelin/contracts-v4.4/utils/Address.sol": "0228dd7c0a0d1342b88eab6e5a4a07ae4350818ba1650be0a374064b02218f37",
+    "@openzeppelin/contracts-v4.4/proxy/beacon/IBeacon.sol": "6afea1d83856ed8e0495fe78109f674f925cfdc79fe2e24e854b1237e742f011",
+    "@openzeppelin/contracts-v4.4/proxy/Proxy.sol": "f3750834a47fd89ab623ba00877c556895bb71f203e615da9987697cbabbeed6",
+    "contracts/0.8.9/LidoLocator.sol": "bace7fa9194a90acef3cff6cdac3c68382c21783af35afd63a5d41477a54f577",
+    "contracts/common/interfaces/ILidoLocator.sol": "cc65faee8789012cbb58c0073c770bddb37c9a7fc2594ff2e200fc7894a2dc7a"
+  },
+  "openzeppelin_version": "4.4.1",
+  "openzeppelin_tarball_sha256": "cf6bb5c157329077dd01172b53b266d2554d4b1375cd6db46c6702541b9e34a8",
+  "openzeppelin_pack_record": {
+    "name": "@openzeppelin/contracts",
+    "version": "4.4.1",
+    "filename": "openzeppelin-contracts-4.4.1.tgz",
+    "shasum": "3382db2cd83ab565ed9626765e7da92944b45de8",
+    "integrity": "sha512-o+pHCf/yMLSlV5MkDQEzEQL402i6SoRnktru+0rdSxVEFZcTzzGhZCAtZjUFyKGazMSv1TilzMg+RbED1N8XHQ==",
+    "size": 182320,
+    "unpackedSize": 1414176,
+    "entryCount": 267
+  }
+}

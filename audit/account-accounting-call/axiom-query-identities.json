@@ -1,0 +1,19 @@
+{
+  "checker_sha256": "d15d8aad37a92efdac1e7b51f3fbe93d79616d9b4f6629080e0338e98c2ed4e7",
+  "probe_template_sha256": "e2337926939cc44b36a92ffd3d663a8318fecf46ada95bc757d5edbc637a130d",
+  "module_loaded_as_data": "LidoSRv3.Tests.AccountAccountingCall",
+  "probe_syntax_import": "Lean",
+  "names": [
+    "AccountAddress.AccountingCall.call_getter",
+    "AccountAddress.AccountingCall.call_success",
+    "AccountAddress.AccountingCall.decode_getter",
+    "AccountAddress.ReportFeeAccountingCall.execute_success",
+    "AccountAddress.ReportFeeAccountingCall.finish_success_replay",
+    "AccountAddress.ReportFeeAccountingCall.mint_replay",
+    "AccountAddress.ReportFeeAccountingCall.prepare_success",
+    "LidoSRv3.Audit.Guarantees.PAccount1.actual_report_accounting_call",
+    "LidoSRv3.Audit.Guarantees.PAccount1.actual_report_accounting_call_failure_restores",
+    "LidoSRv3.Tests.AccountAccountingCall.public_failure",
+    "LidoSRv3.Tests.AccountAccountingCall.public_success"
+  ]
+}

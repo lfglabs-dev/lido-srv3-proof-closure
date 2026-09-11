@@ -1,0 +1,7 @@
+AccountAddress.AccountingCall.call_getter (e : AccountAddress.AccountingCall.Environment)
+  (w : AccountAddress.AccountingCall.World) (g : AccountAddress.AccountingCall.Getter)
+  (h : e.code (AccountAddress.AccountingCall.locator w) = some g) :
+  (AccountAddress.AccountingCall.call e w).outcome = Except.ok (w, g.accounting.val) ∧
+    (AccountAddress.AccountingCall.call e w).attempts =
+      [{ request := AccountAddress.AccountingCall.request w, isStatic := false, accepted := true,
+          returned := LidoSRv3.Audit.Source.TrioReserve1.Live.encode 32 g.accounting.val }]
