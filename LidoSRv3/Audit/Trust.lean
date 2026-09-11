@@ -452,6 +452,18 @@ list, there are no undisclosed project-level assumptions or proof escapes.
   LidoSRv3.Audit.Guarantees.PConsolidation1.verity_tx_journal_forwards_msg_value
 #print axioms
   LidoSRv3.Audit.Guarantees.PConsolidation1.verity_tx_preserves_eth_balance
+-- Registered kill-lines for the consolidation parent's premise-necessity
+-- surface: the gateway-admitted nonzero premise is genuinely load-bearing
+-- (no in-scope caller run derives it), and the packed source/target
+-- concat order is refuted by a swapped-order witness. Each pins its
+-- parent hypothesis as necessary rather than accidentally satisfied.
+-- (`fee_blind_commit_kill_line_refutes_parent` is intentionally kept
+-- out of this disclosure: its `native_decide` dependencies are not
+-- in the accepted test/mutant-only disclosure set.)
+#print axioms
+  LidoSRv3.Audit.Guarantees.PConsolidation1.gateway_admitted_nonzero_kill_line
+#print axioms
+  LidoSRv3.Audit.Guarantees.PConsolidation1.packing_order_kills_swapped_concat
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.function_spec_bridge_constructors
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.committed_journal_forwards_msg_value
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.committed_preserves_eth_balance
@@ -526,6 +538,15 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Spec.DepositNFrameCorrespondence.router_links_source
 #print axioms
   LidoSRv3.Tests.DepositNFrameTxMutants.fixed_two_only_refutes_nframe_parent
+-- Foundational arithmetic identities for the value-conservation ledger
+-- used by the P-CONSOLIDATION-ETH-1 supplementals: `totalAmount` is
+-- `foldl (+) 0 . map amount`, and the ledger conservation identity
+-- `fee + (msgValue - fee) = msgValue` under `fee ≤ msgValue`.
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1.totalAmount_nil
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1.totalAmount_cons
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1.totalAmount_append
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1.totalAmount_replicate
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1.composed_eth_conservation
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1.eth_flow_confined
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1.consolidation_fee_path_confined
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1.eth_flow_parent
