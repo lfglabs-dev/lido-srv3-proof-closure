@@ -132,6 +132,58 @@ theorem module_head_in_array_zone_refuted :
   exact hpost.2.2 (h (word 128) (word 352) moduleRaw [word 1, word 9] postRaw
     module_at_128 hpost.1)
 
+/-- Chained `returnBuffer = credentials.next`: cursor 128 → 160, module copy
+at 160. Raw zone `[160,288)` is disjoint from credentials `[128,160)`. -/
+theorem module_at_160 :
+    TopupModuleMemory.decodeReturn (word 160) moduleRaw =
+      .ok ([word 1, word 9], word 384) := by
+  decide +kernel
+
+theorem chained_returnBuffer_from_credentials_next :
+    TopupCredentialCall.decodeCredentials (word 128) credRaw = .ok (credWord, word 160) ∧
+      TopupModuleMemory.decodeReturn (word 160) moduleRaw =
+        .ok ([word 1, word 9], word 384) ∧
+      ∃ postRaw,
+        finalizeAllocation (word 160) (word moduleRaw.length).val = .ok postRaw ∧
+          Disjoint (scalar32 (word 128) (word 160))
+            (ofAllocation (word 160) (word moduleRaw.length).val postRaw) := by
+  refine ⟨credentials_at_128, module_at_160, ?_⟩
+  have hex := chained_credential_then_module_disjoint (word 128) (word 160) (word 160)
+    (word 384) credRaw moduleRaw credWord [word 1, word 9]
+    credentials_at_128 module_at_160 rfl
+  rcases hex with ⟨postRaw, ha, hd, _⟩
+  exact ⟨postRaw, ha, hd⟩
+
+/-- Existing TOPUP fixtures pass `returnBuffer = 128`, the same cursor as the
+locator/credentials start. `PTopupMemoryCalls` only requires `decodeReturn`
+success at that buffer; it stays true while the locator zone aliases the
+module raw zone. -/
+theorem ptopup_module_success_with_returnBuffer_eq_locator :
+    TopupModuleMemory.decodeReturn (word 128) moduleRaw =
+      .ok ([word 1, word 9], word 352) ∧
+      finalizeAllocation (word 128) 32 = .ok (word 160) ∧
+      ¬ Disjoint (scalar32 (word 128) (word 160))
+          (ofAllocation (word 128) (word moduleRaw.length).val (word 256)) :=
+  ⟨module_at_128, by decide +kernel, existing_topup_cursors_alias.2.2⟩
+
+/-- Kill-line: successful locator allocation plus successful module decode
+do not imply disjoint zones. `returnBuffer` may equal the locator cursor. -/
+theorem returnBuffer_eq_locator_refutes_cross_phase_nonalias :
+    ¬ (∀ (locatorCursor locatorNext returnBuffer next : Word) (raw : Bytes)
+        (xs : List Word) (postRaw : Word),
+        finalizeAllocation locatorCursor 32 = .ok locatorNext →
+        TopupModuleMemory.decodeReturn returnBuffer raw = .ok (xs, next) →
+        finalizeAllocation returnBuffer (word raw.length).val = .ok postRaw →
+        Disjoint (scalar32 locatorCursor locatorNext)
+          (ofAllocation returnBuffer (word raw.length).val postRaw)) := by
+  intro h
+  have hl : finalizeAllocation (word 128) 32 = .ok (word 160) := by decide +kernel
+  have ha : finalizeAllocation (word 128) (word moduleRaw.length).val = .ok (word 256) := by
+    decide +kernel
+  exact existing_topup_cursors_alias.2.2
+    (h (word 128) (word 160) (word 128) (word 352) moduleRaw [word 1, word 9]
+      (word 256) hl module_at_128 ha)
+
 /-- `mstore(64)` slot is a legal credentials cursor. -/
 theorem free_memory_pointer_slot_admitted :
     TopupCredentialCall.decodeCredentials (word 64) credRaw = .ok (credWord, word 96) ∧
@@ -149,5 +201,9 @@ theorem free_memory_pointer_slot_admitted :
 #print axioms module_head_encodeReturn_at_128
 #print axioms module_head_in_raw_zone_at_128
 #print axioms module_head_in_array_zone_refuted
+#print axioms module_at_160
+#print axioms chained_returnBuffer_from_credentials_next
+#print axioms ptopup_module_success_with_returnBuffer_eq_locator
+#print axioms returnBuffer_eq_locator_refutes_cross_phase_nonalias
 #print axioms free_memory_pointer_slot_admitted
 end LidoSRv3.Tests.TopupPointerOriginMutants

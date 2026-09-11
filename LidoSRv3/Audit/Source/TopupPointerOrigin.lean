@@ -358,6 +358,54 @@ theorem free_memory_slot_finalize32 (next : Word)
   · simp [AllocatedZone.contains, scalar32, ofAllocation, hv, he]
   · simp [AllocatedZone.contains, scalar32, ofAllocation, hv, he]
 
+/-- If the module `returnBuffer` is the credentials allocator's next pointer
+(`TopUpGateway.sol:185` IR512–538 feeds `mload(64)` to the next STATICCALL;
+the same free-pointer cell would then be the `allocateDeposits` copy cursor
+at IR1082–1086), the credentials zone and the module raw zone of the same
+execution are sequential, hence disjoint. The public `run` functions do not
+supply this equation: `returnBuffer` remains a later phase input. -/
+theorem chained_credential_then_module_disjoint
+    (credCursor credNext retBuf next : Word) (rawCred rawMod : Bytes) (wc : Word)
+    (xs : List Word)
+    (hc : TopupCredentialCall.decodeCredentials credCursor rawCred = .ok (wc, credNext))
+    (hm : TopupModuleMemory.decodeReturn retBuf rawMod = .ok (xs, next))
+    (hchain : retBuf = credNext) :
+    ∃ postRaw : Word,
+      finalizeAllocation retBuf (word rawMod.length).val = .ok postRaw ∧
+        Disjoint (scalar32 credCursor credNext)
+          (ofAllocation retBuf (word rawMod.length).val postRaw) ∧
+        (scalar32 credCursor credNext).next = retBuf.val := by
+  have hex := (TopupModuleMemory.decode_success retBuf next rawMod xs hm).right
+  rcases hex with ⟨postRaw, hpost⟩
+  have ha := hpost.left
+  refine ⟨postRaw, ha, ?_, ?_⟩
+  · refine sequential_disjoint _ _ ?_
+    rw [ofAllocation_origin, scalar32_next, hchain]
+  · rw [scalar32_next, hchain]
+
+/-- Locator then credentials then module, when each cursor is the previous
+`next`. Locator→credentials is already how `TopupRouterLocatorCall.run`
+threads `mload(64)`. The last equation `returnBuffer = credNext` is the
+missing public-run chain. -/
+theorem chained_locator_credential_module_disjoint
+    (locCursor locNext credNext retBuf next : Word) (rawCred rawMod : Bytes)
+    (wc : Word) (xs : List Word)
+    (hl : finalizeAllocation locCursor 32 = .ok locNext)
+    (hc : TopupCredentialCall.decodeCredentials locNext rawCred = .ok (wc, credNext))
+    (hm : TopupModuleMemory.decodeReturn retBuf rawMod = .ok (xs, next))
+    (hchain : retBuf = credNext) :
+    Disjoint (scalar32 locCursor locNext) (scalar32 locNext credNext) ∧
+      ∃ postRaw : Word,
+        finalizeAllocation retBuf (word rawMod.length).val = .ok postRaw ∧
+          Disjoint (scalar32 locNext credNext)
+            (ofAllocation retBuf (word rawMod.length).val postRaw) := by
+  have ha := (credentials_zone locNext wc credNext rawCred hc).1
+  refine ⟨(chained_scalar32_disjoint locCursor locNext credNext hl ha).1, ?_⟩
+  have hex := chained_credential_then_module_disjoint locNext credNext retBuf next
+    rawCred rawMod wc xs hc hm hchain
+  rcases hex with ⟨postRaw, hpost⟩
+  exact ⟨postRaw, hpost.1, hpost.2.1⟩
+
 #print axioms ofAllocation_origin
 #print axioms ofAllocation_next
 #print axioms scalar32_origin
@@ -375,4 +423,6 @@ theorem free_memory_slot_finalize32 (next : Word)
 #print axioms module_head_in_raw_zone
 #print axioms same_cursor_successful_decodes_alias
 #print axioms free_memory_slot_finalize32
+#print axioms chained_credential_then_module_disjoint
+#print axioms chained_locator_credential_module_disjoint
 end LidoSRv3.Audit.Source.TopupPointerOrigin

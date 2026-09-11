@@ -58,6 +58,20 @@ and `returnBuffer` as separate `Word`s. Existing tests instantiate both at
 | `module_head_encodeReturn_at_128` | `encodeReturn [1,9]` @ cursor 128: head `160 ∈ [128,256)` and `160 ∉ [256,352)`. |
 | `module_head_in_array_zone_refuted` | Kill-line: “successful decode ⇒ head ∈ array zone” is false. |
 
+### (c) `returnBuffer` is still a phase input; chaining it is optional
+
+`TopupRouterLocatorCall.run` already threads locator `next` into the credentials
+cursor. `returnBuffer` is forwarded unchanged. The following are therefore not
+a derivation of the public `run` cursor, and not a `guarantees.yaml` close.
+
+| Theorem | Claim |
+| --- | --- |
+| `chained_credential_then_module_disjoint` | If `returnBuffer = credentials.next`, credentials `[cursor, next)` and the module raw zone are sequential, hence disjoint. |
+| `chained_locator_credential_module_disjoint` | Locator→credentials (already in the public run) plus that same equation ⇒ the three zones are pairwise sequential. |
+| `chained_returnBuffer_from_credentials_next` | Witness: credentials @ 128 then module @ 160. |
+| `ptopup_module_success_with_returnBuffer_eq_locator` | `decodeReturn` @ 128 still succeeds when that cursor is the locator cursor; `PTopupMemoryCalls` only asks for that success. |
+| `returnBuffer_eq_locator_refutes_cross_phase_nonalias` | Kill-line: locator allocation + module decode success ⇏ disjoint zones. |
+
 This is not a renamed premise and not an always-success stub. It is a
 reproducible witness that an unexcluded alias is compatible with the existing
 TOPUP decoder-success premises, so those premises do not establish
@@ -97,7 +111,11 @@ definitions and `Disjoint` lemmas are axiom-free; allocation/decode
 theorems use `propext`/`Quot.sound`; `chained_scalar32_disjoint` also
 uses `Classical.choice`. `module_head_offset_bounds` and
 `module_head_in_raw_zone` use `propext`/`Quot.sound` only. Concrete head
-witness `module_head_encodeReturn_at_128` uses `propext` only. No `sorryAx`.
+witness `module_head_encodeReturn_at_128` uses `propext` only.
+`chained_credential_then_module_disjoint` uses `propext`/`Quot.sound`;
+`chained_locator_credential_module_disjoint` also uses `Classical.choice`
+(via `chained_scalar32_disjoint`). Locator-alias mutants use `propext` only.
+No `sorryAx`.
 
 `lake build LidoSRv3Test` is the package-wide test target; it does not need a
 lakefile edit because `LidoSRv3.Tests` is a glob.
