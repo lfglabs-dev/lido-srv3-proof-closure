@@ -1,0 +1,23 @@
+{
+  "source_commit": "3bdd333b3a0c9e34dd128c17427d51610a60f1b9",
+  "accepted_main": "43f0e7abcdf64671582351b8cae389134de4326a",
+  "union_commit": "b3df7baa69843f8c603cfc3262319d3b8a5045a9",
+  "checks": {
+    "normal_jobs": 1798,
+    "global_disclosed_axioms": 29,
+    "ordinary_foundation_scopes": 33,
+    "actual_sources": 1217,
+    "package_pins": 11,
+    "source_hashes": 21,
+    "normal_modules": 5
+  },
+  "files": {
+    "audit/ssz-declared-siblings/integration/README.md": "840e2b8d448065f5203d7eed3221d6b4f9c39653c0cf9c5e1591e59425af315a",
+    "audit/ssz-declared-siblings/integration/global-trust.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439",
+    "audit/ssz-declared-siblings/integration/independent-source-review-3bdd.md": "ca1a23de4c1e2d322e1e963d55b01d4de2fc7b6b0507a1b08ca9cf1d8e07e656",
+    "audit/ssz-declared-siblings/integration/normal-build.log": "138af1bda282fd507c71bd1b85f2fe566b400934d77d4ac5d282fe93d3b443f0",
+    "audit/ssz-declared-siblings/integration/normal-identities.json": "88a2faa73bb15497400ec9d8a4825bb747443b7dd5503c7498ab9009648e6b70",
+    "audit/ssz-declared-siblings/integration/validate-integration.py": "d84315aa7e1735ccb95a1bca02b2904f94edda22736229e6e7f408dc20f553b3",
+    "audit/ssz-declared-siblings/integration/validation.log": "eec52ce284e7040068773b413346a6220ffb891518abac20ea50b88594272b6e"
+  }
+}
