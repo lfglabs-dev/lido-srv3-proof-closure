@@ -1,3 +1,4 @@
+import LidoSRv3.Tests.AddressPermitRequestCalls
 import LidoSRv3.Tests.TopupTimingHistory
 import LidoSRv3.Tests.AddressRequestBatches
 import LidoSRv3.Tests.TopupPhysicalCredentialGetter
@@ -811,3 +812,10 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.TopupTimingHistory.execute_projection
 #print axioms LidoSRv3.Audit.Source.TopupTimingHistory.packed_fields
 #print axioms LidoSRv3.Tests.TopupTimingHistory.public_consumer
+
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_steth_permit_batch
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_permit_batch
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_steth_permit_failure_restores
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_permit_failure_restores
+#print axioms LidoSRv3.Audit.Source.AddressPermitRequestCalls.call_success
+#print axioms LidoSRv3.Tests.AddressPermitRequestCalls.public_paused_rollback
