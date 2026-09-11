@@ -27,16 +27,6 @@
       "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
     },
     {
-      "id": "A-DEPOSIT-32-ETHER",
-      "accepted": true,
-      "risk": "The production MAX_EFFECTIVE_BALANCE_WC_TYPE_01 constructor value and BeaconChainDepositor DEPOSIT_SIZE are not jointly proved to equal 32 ether.",
-      "justification": "The source model exposes both scales as configuration fields and proves mismatch reverts rather than inventing deployment equality.",
-      "severity": "HIGH",
-      "violation_impact": "The production deposit path can revert or fail its intended per-validator value convention.",
-      "validation": "Pin the constructor argument and source literal in reproducible deployment artifacts.",
-      "removal_path": "Prove both production values equal 32 * 10^18 wei."
-    },
-    {
       "id": "A-CONSOLIDATION-GATEWAY-NONZERO",
       "accepted": true,
       "risk": "The vault-level theorem assumes that an authorized vault call carries nonzero msg.value. This is a premise on the vault input, not a consequence of the outer gateway payment being positive.",
