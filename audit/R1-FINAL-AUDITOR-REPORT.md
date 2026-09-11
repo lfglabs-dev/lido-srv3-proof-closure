@@ -24,7 +24,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 | [`P-TOPUP-1`](#p-topup-1) | CHECKED | CHECKED | 1 open | **IMPLEMENTATION_PENDING** |
 | [`P-ACCOUNT-1`](#p-account-1) | CHECKED | CHECKED | 7 open | **IMPLEMENTATION_PENDING** |
 | [`P-RESERVE-1`](#p-reserve-1) | CHECKED | CHECKED | 7 open | **IMPLEMENTATION_PENDING** |
-| [`P-CONSOLIDATION-ETH-1`](#p-consolidation-eth-1) | CHECKED | CHECKED | 12 open | **IMPLEMENTATION_PENDING** |
+| [`P-CONSOLIDATION-ETH-1`](#p-consolidation-eth-1) | CHECKED | CHECKED | 11 open | **IMPLEMENTATION_PENDING** |
 | [`P-ADDRESS-1`](#p-address-1) | CHECKED | CHECKED | 8 open | **IMPLEMENTATION_PENDING** |
 | [`P-TOPUP-2`](#p-topup-2) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
 | [`P-CONSOLIDATION-1`](#p-consolidation-1) | CHECKED | CHECKED | 7 open | **IMPLEMENTATION_PENDING** |
@@ -214,7 +214,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Assumptions.** `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
 
-**Limitations — 12 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+**Limitations — 11 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
 - VaultHub / Dashboard / TriggerableWithdrawalsGateway / StakingVault withdraw sites (named out of scope)
 - Bus/Gateway/Vault intermediate hops and live executeConsolidation ABI
@@ -225,7 +225,6 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 - the universal revert arms are stated for the modeled non-success shapes only; a reverting refund/Lido sink or a reverting request predeploy is not one of them (the rejecting-predeploy rollback stays a numeral witness)
 - the dispatch-fuel arm quantifies over the model's own dispatcher bound (fuelBudget=32 under A-ABSTRACT-TX); it is a frame-count artifact of the abstract transaction model and carries no deployed gas-metering meaning
 - vault→Lido/WithdrawalQueue protocol-return confinement is out of this parent (former P-CONSOLIDATION-ETH-1a retired; not the consolidation fee/refund happy path and not P-RESERVE-1 buffer accounting)
-- pinned canonical consolidation-request source literal (0x0000BBdDc7CE488642fb579F8B00f3a590007251), named A-CANONICAL-REQUEST-ADDRESS; fee-leg evidence uses the configured immutable/slot only and does not identify it with a deployment
 - canonical-address identity is not yet folded into the registered Verity parent; requestAddr remains a model-local ensemble address
 - renamed public id P-CONSOLIDATION-ETH-1 (was P-ETH-1): not a general SRv3 ETH guarantee
 
