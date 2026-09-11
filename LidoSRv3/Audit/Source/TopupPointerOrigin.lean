@@ -20,7 +20,7 @@ zones then alias. Existing TOPUP success premises do not mention `Disjoint`.
 set_option autoImplicit false
 namespace LidoSRv3.Audit.Source.TopupPointerOrigin
 open TrioReserve1 Live
-open audit.trio.deposit.ModuleCall (round32 finalizeAllocation finalizeAllocation_ok)
+open audit.trio.deposit.ModuleCall (round32 finalizeAllocation finalizeAllocation_ok signed signedLt)
 
 /-- Half-open interval `[origin, next)` produced by one successful
 `finalizeAllocation`. `requested` is the size argument before `round32`. -/
@@ -200,6 +200,101 @@ theorem module_return_copied_size (cursor next : Word) (raw : Bytes) (xs : List 
         Bool.eq_false_iff.mpr hh
       exact (TopupModuleMemory.raw_bounds cursor (word raw.length) postRaw ha hh').1
 
+/-- IR3323–3347 signed length-word bound, recovered from `decodeReturn`
+success without reopening `finalizeAllocation`. The ABI offset is a
+uint64 and the length-word `[location, location+32)` sits inside the
+copied return (`offset + 32 ≤ size`), so the head pointer does not wrap. -/
+theorem module_head_offset_bounds (cursor next : Word) (raw : Bytes) (xs : List Word)
+    (h : TopupModuleMemory.decodeReturn cursor raw = .ok (xs, next)) :
+    decode (raw.take 32) < 2 ^ 64 ∧
+      decode (raw.take 32) + 32 ≤ (word raw.length).val ∧
+      (word (cursor.val + decode (raw.take 32))).val =
+        cursor.val + decode (raw.take 32) := by
+  have h' := h
+  unfold TopupModuleMemory.decodeReturn at h'
+  cases ha : finalizeAllocation cursor (word raw.length).val with
+  | «error» fault =>
+    simp [ha, bind, Except.bind] at h'
+  | ok postRaw =>
+    simp only [ha, bind, Except.bind] at h'
+    rw [audit.trio.deposit.ModuleCall.end_sub_base] at h'
+    split at h'
+    · exact nomatch h'
+    · rename_i hh
+      have hh' : signedLt (word raw.length) (word 32) = false :=
+        Bool.eq_false_iff.mpr hh
+      have hb := TopupModuleMemory.raw_bounds cursor (word raw.length) postRaw ha hh'
+      have hraw := hb.2.1
+      have hr := hb.2.2
+      split at h'
+      · exact nomatch h'
+      · rename_i hoff
+        split at h'
+        · exact nomatch h'
+        · rename_i hloc
+          have hcur : cursor.val < 2 ^ 64 := by omega
+          have hsize : (word raw.length).val < 2 ^ 64 := by omega
+          have hoff' : decode (raw.take 32) < 2 ^ 64 := by omega
+          have hptr : (word (cursor.val + decode (raw.take 32))).val =
+              cursor.val + decode (raw.take 32) := by
+            simp only [word, Verity.Core.Uint256.val_ofNat, Verity.Core.Uint256.modulus,
+              Verity.Core.UINT256_MODULUS]
+            apply Nat.mod_eq_of_lt
+            omega
+          have hendptr : (word (cursor.val + (word raw.length).val)).val =
+              cursor.val + (word raw.length).val := by
+            change (cursor.val + (word raw.length).val) % 2 ^ 256 = _
+            apply Nat.mod_eq_of_lt
+            omega
+          have hlptr :
+              (word ((word (cursor.val + decode (raw.take 32))).val + 31)).val =
+                cursor.val + decode (raw.take 32) + 31 := by
+            rw [hptr]
+            simp only [word, Verity.Core.Uint256.val_ofNat, Verity.Core.Uint256.modulus,
+              Verity.Core.UINT256_MODULUS]
+            apply Nat.mod_eq_of_lt
+            omega
+          have hl : decode (raw.take 32) + 32 ≤ (word raw.length).val := by
+            have hbool : signedLt
+                (word ((word (cursor.val + decode (raw.take 32))).val + 31))
+                (word (cursor.val + (word raw.length).val)) = true := by
+              simpa using hloc
+            have ht := of_decide_eq_true hbool
+            simp only [signed, hlptr, hendptr] at ht
+            rw [if_pos (by omega), if_pos (by omega)] at ht
+            omega
+          exact ⟨hoff', hl, hptr⟩
+
+/-- On successful `decodeReturn` (`StakingRouter.sol:717–719`
+`allocateDeposits` returndata; IR3323–3347
+`abi_decode_array_uint256_dyn_memory_ptr_fromMemory`, signed length-word
+bound `slt(add(offset, 0x1f), end)`; head formed at IR3348–3353 as
+`add(headStart, mload(headStart))`), the ABI head pointer
+`cursor.val + decode (raw.take 32)` belongs to the raw-return zone
+`[cursor, postRaw)` of the same execution and does not belong to the
+subsequent `uint256[]` zone `[postRaw, next)`. -/
+theorem module_head_in_raw_zone (cursor next : Word) (raw : Bytes) (xs : List Word)
+    (h : TopupModuleMemory.decodeReturn cursor raw = .ok (xs, next)) :
+    ∃ postRaw : Word,
+      let rawZ := ofAllocation cursor (word raw.length).val postRaw
+      let arrZ := ofAllocation postRaw
+        (32 * decode ((raw.drop (decode (raw.take 32))).take 32) + 32) next
+      let head := cursor.val + decode (raw.take 32)
+      finalizeAllocation cursor (word raw.length).val = .ok postRaw ∧
+        rawZ.contains head ∧ ¬ arrZ.contains head := by
+  have hex := (TopupModuleMemory.decode_success cursor next raw xs h).right
+  rcases hex with ⟨postRaw, hpost⟩
+  have ha := hpost.left
+  have hraw := hpost.right.left
+  have hb := module_head_offset_bounds cursor next raw xs h
+  have hl := hb.2.1
+  refine ⟨postRaw, ha, ?_, ?_⟩
+  · simp [AllocatedZone.contains, ofAllocation]
+    exact ⟨Nat.le_add_right _ _, by omega⟩
+  · intro hc
+    simp [AllocatedZone.contains, ofAllocation] at hc
+    omega
+
 /-- Same independently supplied cursor succeeding for credentials and for
 the module return decoder. The two zones both contain that cursor, so they
 alias. `TopupCredentialCall.run` / `TopupBatchMemory.run` take
@@ -257,6 +352,8 @@ theorem free_memory_slot_finalize32 (next : Word)
 #print axioms locator_zone
 #print axioms module_decode_zones
 #print axioms module_return_copied_size
+#print axioms module_head_offset_bounds
+#print axioms module_head_in_raw_zone
 #print axioms same_cursor_successful_decodes_alias
 #print axioms free_memory_slot_finalize32
 end LidoSRv3.Audit.Source.TopupPointerOrigin
