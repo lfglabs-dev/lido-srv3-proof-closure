@@ -1,0 +1,20 @@
+{
+  "source": "f00863276fbe279c566328ed4ae90f5bf223a38e",
+  "main": "ae30a086154dc78196034657953b9a09cc75b48b",
+  "union": "1c1636f5509d01b030a1a74dabd812b6f90bfccd",
+  "build_union": "b07663267fea4b1970aebd23e85c29b3ec318872",
+  "jobs": 1745,
+  "global_axioms": 29,
+  "ordinary_scopes": 25,
+  "sha256": {
+    "audit/topup-credential-call/integration/README.md": "16e2e0ad475f0a9cdf9d97c71db73c51803fd3708d01bdd90d43197d7237ca1c",
+    "audit/topup-credential-call/integration/all-trust-build.log": "ca1a10291775e18d85b25c44f5c37d3efae0a19f13a97752cf95213ba8fb7c3b",
+    "audit/topup-credential-call/integration/build-identities.json": "8471ca6c58b0dee8b952575c78b5e5297a98e8d1e1c5e751b32c326631590bdc",
+    "audit/topup-credential-call/integration/identities.json": "c63b5580b08d65aa2c5012512dcf797e4707b49f4903a72d899329cea2d1383c",
+    "audit/topup-credential-call/integration/independent-source-review-f008.md": "110e08a79f2086181c9198751e991f0426323e6b0d521ca3b8972eb6ff094d75",
+    "audit/topup-credential-call/integration/scoped-axioms.json": "dc3a17bc49aef7fe519f431c419efc674474ebf16db7f7e9016f4f13d331951e",
+    "audit/topup-credential-call/integration/trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439",
+    "audit/topup-credential-call/integration/independent-integration-review-f4b4.md": "47ad6128dc03923cfe2c3a2b928feb08552a3fadfee6e176b3bb41d0203afccc"
+  },
+  "integration_review": "CLEAN exactf4b4c07c5af3c70e18e08ae60401d479aa75f3f8; archive-only successor separately reviewed"
+}

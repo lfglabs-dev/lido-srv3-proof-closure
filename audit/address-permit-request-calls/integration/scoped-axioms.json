@@ -1,0 +1,41 @@
+{
+  "LidoSRv3.Audit.Guarantees.PAddress1.actual_steth_permit_batch": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Guarantees.PAddress1.actual_steth_permit_failure_restores": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_permit_batch": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_permit_failure_restores": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressPermitRequestCalls.call_success": [
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressPermitRequestCalls.calldata_length": [
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressPermitRequestCalls.joined_success": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.AddressPermitRequestCalls.public_empty_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.AddressPermitRequestCalls.public_paused_rollback": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ]
+}

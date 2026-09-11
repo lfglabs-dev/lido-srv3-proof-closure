@@ -1,0 +1,80 @@
+{
+  "base": "367412569a2dd85972ab8bdab8304d261fa7b4ec",
+  "boundaries": [
+    "Role/pause/locator/deployment/outer ABI and gateway-to-router topUp CALL composition remain outside",
+    "Outer router return allocator IR1102-1110 not executed or assumed successful; same existing module continuation intermediate World",
+    "Semantic Log only; history event memory/LOG byte encoding and gas not modeled; prior scalar cursors retained",
+    "Arbitrary callbacks can change block metadata and packed word; final read is post-world, no frame premise",
+    "Existing typed proof/SHA/hash/selected dispatch/physical continuation boundaries unchanged; no stage/fit/width/funding/monotonicity premise"
+  ],
+  "checks": {
+    "axioms": "foundations only: propext/Classical.choice/Quot.sound",
+    "fresh_ordinary_scopes": 28,
+    "global_All_Trust": "Not run or claimed; root integration scope",
+    "kernel_regressions": 16,
+    "new_normal_modules": 3,
+    "normal_build": "PASS 1369 jobs",
+    "package_pins": 11,
+    "public_consumer_instances": 1,
+    "public_rollback_instances": 1,
+    "read_only_validation": "PASS",
+    "source_identities": 1352
+  },
+  "claims": [
+    "Physical length/config guards before timing before actual getter/root/module",
+    "Zero lastBlock short-circuits uint256 subtraction; checked uint64 child+age before old-root and lastTimestamp tests",
+    "Unconditional execution projection to complete prior actual getter/root/module/memory consumer; entire prior public conjunction retained verbatim",
+    "Same actual loop output retained and consumed to condition history on totalLimits, never allocation sum",
+    "Fresh post-module packed uint32 timestamp/block write, other bits preserved; semantic full-timestamp event; zero skips",
+    "Universal full initial World rollback on all errors, with actual attempt journals"
+  ],
+  "compiler": {
+    "fresh_execution": false,
+    "identities": "Exact source SHA256 vs pinned Git / accepted vendoring and original inherited harness; metadata Keccak; full retained input/output/IR bytes at base",
+    "inherited_Forge": "No rerun; original seven tests including three1024-fuzz properties reused only at unchanged identities and original scope",
+    "input_count": 22,
+    "ir_lines": 2519,
+    "new_correspondence": "Root namespace and event topic independently hashed; complete relevant entry/distance/age/history IR read, exact uint64 ADD and packed-mask checks",
+    "profile": "solc0.8.25+b61c2a91 viaIR optimizer200 Cancun; fixture profile, not production bytecode identity",
+    "retained": "audit/topup-credential-call/solidity/GatewayWitnessHarness.ir"
+  },
+  "core_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "diff_check": "Candidate additions PASS; inherited raw IR remains byte-identical and is not copied; no new whitespace exception",
+  "ffi": {
+    "cases": [
+      "Actual independent3-root positive [1ETH,0,2ETH] physical continuation plus history",
+      "Same real roots positive witness limits/allocation zeros still write history",
+      "Altered physical credential invalidProof",
+      "Altered actual root invalidProof",
+      "Block subtraction failure before missing registry lookup",
+      "Aggregate4ETH>3ETH target after per-row2ETH checks, full root rollback",
+      "uint64 age overflow before lookup"
+    ],
+    "fresh_diagnostics": 7,
+    "proof_credit": "Native IO diagnostics, not kernel proof or native axiom",
+    "runtime": "Fresh temporary native library on final normal artifacts; six source hashes and two subrepo pins",
+    "status": "PASS",
+    "vectors": "Inherited independent f008 Python SHA tree/proofs, exact unchanged bytes"
+  },
+  "schema": 1,
+  "scope": "Three new Lean modules and own audit only; actual physical temporal gates and history connected to full3674 consumer; no global wiring",
+  "sha256": {
+    "LidoSRv3/Audit/Guarantees/PTopupTimingHistory.lean": "e8c9b517e4fa1df0db33e51dd0b0cc6beaaf769561489ccb75b71deb39b6b250",
+    "LidoSRv3/Audit/Source/TopupTimingHistory.lean": "6d2e520be376d948b740d24be934ca3bd47f7de90a4bc3b0ee40bb3a28684888",
+    "LidoSRv3/Tests/TopupTimingHistory.lean": "ecef71d9bb55f9f0b6b43af3c5d9bf6ac0c576b9dd164dd95cd1a71f4e8e56ad",
+    "audit/topup-timing-history/README.md": "007bda38d9d75274404a44ecbf156d0a95eda2f0fc224c64667f758505ba1294",
+    "audit/topup-timing-history/validation/axioms.json": "9051ef4f6d79ee831b7de6e6afed010d6f49a903138697ae8fbed92359ff3ab3",
+    "audit/topup-timing-history/validation/build-identities.json": "2a106200c02a7786f68f7a03309bb4374875a35c960290875d4462bf250fec44",
+    "audit/topup-timing-history/validation/build.log": "47d5d6faa49f91c6347832eaf59dae5e793edf7804f7e3ca9059bd6cfa6ae1d0",
+    "audit/topup-timing-history/validation/compiler-check.json": "3202a3e70b24080235f4560c39eb39337023579741289a6c155c7fd3fdb614a7",
+    "audit/topup-timing-history/validation/correspondence.json": "acdaa963b7bf8f7c62982c663a4d74af4525ae3d61da980fcef29a5d1d3c4281",
+    "audit/topup-timing-history/validation/diagnostics.lean": "6c44adb83ee407745470f0366bb2dfd708ae6aca4a183da0866d3e65991fa0aa",
+    "audit/topup-timing-history/validation/diagnostics.log": "8944a177a0981da1a12428289297207efb40abdd6936750b8d668588f20b2158",
+    "audit/topup-timing-history/validation/readonly-validation.log": "9e5c232935c1669d8aaeed448e640cec33f39bccfa0f642a22316a7450abda41",
+    "audit/topup-timing-history/validation/run-diagnostics.py": "aa22b5bc5886888c5648d8f9ed87a60840ba0f21c676d598dc0a675666c89423",
+    "audit/topup-timing-history/validation/runtime-inputs.json": "e812a3dc6e878dd02ed703b87c6f2dbdcdb7ca9a2941b39049c84509e04b0020",
+    "audit/topup-timing-history/validation/source-inputs.json": "35ed297f89e2c6e305033175cc540c5b508a62881c5fb1c4fecad87fba3b8e7e",
+    "audit/topup-timing-history/validation/validate.py": "fe4faaa6dc9a37941b7ceac39683fd5a17bedd0b7e5ae6ad838c46663c863cbc",
+    "audit/topup-timing-history/validation/validation.log": "9e5c232935c1669d8aaeed448e640cec33f39bccfa0f642a22316a7450abda41"
+  }
+}
