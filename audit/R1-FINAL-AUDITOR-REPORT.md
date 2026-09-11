@@ -4,7 +4,7 @@
 
 ## Decision
 
-Review basis: structured inputs including the accepted TOPUP constructor provenance disclosure (theorem registrations and statuses unchanged; prior PR250 basis `ffd6ae4d5be0a5e1e7d1be335700e58ca90771f5` and exact input delta retained in `audit/metadata-reconcile/report-basis.json`; this revision is not a new independent certification; trio composition scoped separately) `e016fd4c20c679c56af2e6cbd5667f69e504f946`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
+Review basis: structured inputs including the accepted TOPUP constructor provenance disclosure (theorem registrations and statuses unchanged; prior PR250 basis `ffd6ae4d5be0a5e1e7d1be335700e58ca90771f5` and exact input delta retained in `audit/metadata-reconcile/report-basis.json`; this revision is not a new independent certification; trio composition scoped separately) `fcc172fb9c59b7a74ee9f2e0399760232d468854`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
 
 ## Architecture and evidence boundary
 
@@ -748,6 +748,8 @@ LidoSRv3.Tests.PackCSszMutants.engine_mutant_disagrees_with_sha256engine._native
 LidoSRv3.Tests.PackFConsolidationObserveMutants.swapped_map_reread_kill_line_refutes_observe._native.native_decide.ax_1_1
 LidoSRv3.Tests.PackGTopupProvenanceMutants.dead_beacon_model_kill_line_disagrees_with_pin._native.native_decide.ax_1_1
 LidoSRv3.Tests.PackJTopupEthJournalMutants.beacon_as_consolidation_kill_line_refutes_dest_restriction._native.native_decide.ax_1_1
+LidoSRv3.Tests.TopupReturnBufferMutants.decode_at_credentials_next_128._native.native_decide.ax_1_1
+LidoSRv3.Tests.TopupReturnBufferMutants.decode_at_credentials_next_160._native.native_decide.ax_1_1
 ```
 
 ## Recommendation

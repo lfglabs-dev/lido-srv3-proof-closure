@@ -26,7 +26,7 @@ from source_spans import span_identity
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
 SOURCE_FIDELITY = AUDIT / "SOURCE-FIDELITY.md"
-R1_REVIEW_BASE = "e016fd4c20c679c56af2e6cbd5667f69e504f946"
+R1_REVIEW_BASE = "fcc172fb9c59b7a74ee9f2e0399760232d468854"
 # Bind the report inputs to the recorded Git object and exact bytes.
 # Changed inputs must never inherit an earlier source review.
 # This exact family is every structured input used to render the R1 review
