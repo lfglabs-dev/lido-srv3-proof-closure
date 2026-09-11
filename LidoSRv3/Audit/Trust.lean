@@ -336,6 +336,16 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAddressBatch1.p_address_batch_1_fuel_bounded_live_claim_batch
 #print axioms LidoSRv3.Audit.Guarantees.PAddressBatch1.p_address_batch_1_unbounded_recipient_rename
 #print axioms LidoSRv3.Audit.Guarantees.PAddressBatch1.p_address_batch_1_fuel_bounded_recipient_rename
+-- Physical keccak-slot derivation for the live claim-batch channels
+-- (queue amounts / metadata / checkpoint from / checkpoint rate). The
+-- underlying source-map identities are proved hyp-free in
+-- AddressClaimKeccakSlots; the registered parent lifts them to the
+-- PhysicalClaimSlots invariant, which every state satisfies by the
+-- definition of the live executable lenses.
+#print axioms LidoSRv3.Audit.Guarantees.PAddressBatch1.p_address_batch_1_physical_keccak_slots
+#print axioms LidoSRv3.Audit.Spec.AddressClaimKeccakSlots.physical_queue_slots_are_keccak_derivation
+#print axioms LidoSRv3.Audit.Spec.AddressClaimKeccakSlots.physical_checkpoint_slots_are_keccak_derivation
+#print axioms LidoSRv3.Audit.Spec.AddressClaimKeccakSlots.physical_claim_slots
 #print axioms LidoSRv3.Tests.PackN4AddressBatchMutants.swapped_three_payout_order_kill_line_refutes_parent
 #print axioms LidoSRv3.Tests.PackN4AddressBatchMutants.fixed_dest_rename_kill_line_refutes_parent
 #print axioms LidoSRv3.Audit.Guarantees.PSszLive1.modeled_beacon_roots_live_ssz_consume
