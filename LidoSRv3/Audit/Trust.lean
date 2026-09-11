@@ -168,6 +168,7 @@ import LidoSRv3.Audit.Spec.OracleMintCorrespondence
 import LidoSRv3.Audit.Source.SubmitReportFeeCorrespondence
 import LidoSRv3.Audit.Verity.SubmitReportEntryTx
 import LidoSRv3.Audit.Guarantees.POracleSupply1
+import LidoSRv3.Audit.Guarantees.POracleSanity1
 import LidoSRv3.Tests.PackN3OracleMintMutants
 import LidoSRv3.Tests.PackP3SubmitReportEntryMutants
 import LidoSRv3.Audit.Spec.AddressClaimFuelCorrespondence
@@ -328,6 +329,17 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.PackN3OracleMintMutants.raw_fee_mutant_killed
 #print axioms LidoSRv3.Tests.PackN3OracleMintMutants.free_argument_does_not_satisfy_computed_observe
 #print axioms LidoSRv3.Audit.Guarantees.POracleSupply1.oracle_supply_submit_report_data_computed_entry
+-- Additional POracleSupply1 cross-parent citations wired into Trust:
+-- `account_parent_cited_order_only` cites the order-only mint discipline
+-- from PAccount1; `eugene_child_cited_operator_bond` cites the sanity
+-- envelope's operator-bond conjunct as an unregistered child, both to
+-- keep the cross-referenced surface inside the axiom discipline.
+-- POracleSanity1 registers the bounded `oracle_sanity_commit_envelope`
+-- parent (15 quantitative Nat facts on the report window under
+-- `checkerAccepts`).
+#print axioms LidoSRv3.Audit.Guarantees.POracleSupply1.account_parent_cited_order_only
+#print axioms LidoSRv3.Audit.Guarantees.POracleSupply1.eugene_child_cited_operator_bond
+#print axioms LidoSRv3.Audit.Guarantees.POracleSanity1.oracle_sanity_commit_envelope
 #print axioms LidoSRv3.Audit.SolidityAccounting.SubmitReportEntry.entry_mint_le_pinned_shares
 #print axioms LidoSRv3.Audit.SolidityAccounting.SubmitReportEntry.entry_mint_eq_pinned_of_exact
 #print axioms LidoSRv3.Tests.PackP3SubmitReportEntryMutants.still_free_entry_kill_line_refutes_parent
