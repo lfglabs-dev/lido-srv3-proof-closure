@@ -13,6 +13,8 @@
     "audit/topup-credential-call/integration/identities.json": "c63b5580b08d65aa2c5012512dcf797e4707b49f4903a72d899329cea2d1383c",
     "audit/topup-credential-call/integration/independent-source-review-f008.md": "110e08a79f2086181c9198751e991f0426323e6b0d521ca3b8972eb6ff094d75",
     "audit/topup-credential-call/integration/scoped-axioms.json": "dc3a17bc49aef7fe519f431c419efc674474ebf16db7f7e9016f4f13d331951e",
-    "audit/topup-credential-call/integration/trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439"
-  }
+    "audit/topup-credential-call/integration/trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439",
+    "audit/topup-credential-call/integration/independent-integration-review-f4b4.md": "47ad6128dc03923cfe2c3a2b928feb08552a3fadfee6e176b3bb41d0203afccc"
+  },
+  "integration_review": "CLEAN exactf4b4c07c5af3c70e18e08ae60401d479aa75f3f8; archive-only successor separately reviewed"
 }
