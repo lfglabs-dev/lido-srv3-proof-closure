@@ -1,0 +1,38 @@
+{
+  "source": "39f48452bd5bdfff2478fffabe4b53efb20ad21e",
+  "main_base": "9b9a757fe4e4b748decc452a2e30cb322ac28772",
+  "union": "55f209e44f68e65708a155f88431119a28965331",
+  "AllTrust": {
+    "command": "lake build LidoSRv3.Audit.AllGuarantees LidoSRv3.Audit.Trust",
+    "jobs": 1722,
+    "exit": 0
+  },
+  "trust": {
+    "command": "python3 scripts/check_trust_axioms.py",
+    "exit": 0,
+    "exact_axioms": 29,
+    "dependencies_recomputed": true,
+    "native_claims_reevaluated": true
+  },
+  "identities": {
+    "sources": 1311,
+    "pins": 11,
+    "artifact_hashes": 49,
+    "scoped_axioms": 6,
+    "normal_olean_sha256": {
+      "LidoSRv3/Audit/Source/DepositPhysicalAdmission": "cd8ea628ed09551272faaad249d564b2b0ecb19f42586a5936a766fed256b088",
+      "LidoSRv3/Audit/Guarantees/PDeposit1PhysicalAdmission": "8662ec6193886a083f20e4bda9976d9ba926a05ae8af1f1d63c4fb5bc8b30f8f",
+      "LidoSRv3/Tests/DepositPhysicalAdmission": "9b8cd10242cf3666244ec0f5ee51ab195600a06b62df0be27d518f111123e926"
+    }
+  },
+  "fresh_root_solidity_tests": 0,
+  "reused_reviewed_solidity_tests": 6,
+  "sha256": {
+    "audit/deposit-physical-admission/integration/README.md": "64a43de60ea609da01e199d1cecfc290cf905c5ea15cffe20e73544f2f7d906b",
+    "audit/deposit-physical-admission/integration/all-trust-build.log": "2789fd631203a2018c617613db2e03742da483e6a5d66b75aad294d84790f590",
+    "audit/deposit-physical-admission/integration/identities.json": "6c6a35972e8cc6f700dae4dc9154edba258b4c86034e72fbfc3fbbc7e39ee0b1",
+    "audit/deposit-physical-admission/integration/independent-source-review-39f4.md": "c37efb46ff225791363c6f3275591418d7937ee039a1b06555beb31b5f3099af",
+    "audit/deposit-physical-admission/integration/scoped-axioms.json": "6143642f8642c350ba20e38c98f39af52a36cdbb413a9b8186933341e0cf3c1d",
+    "audit/deposit-physical-admission/integration/trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439"
+  }
+}
