@@ -1,0 +1,19 @@
+Compiling 19 files with Solc 0.8.9
+Solc 0.8.9 finished in 836.77ms
+Compiler run successful!
+
+Ran 11 tests for test/Transfer.t.sol:TransferTest
+[PASS] testActualFullLidoTransferReturnAndEvents() (gas: 5056535)
+[PASS] testActualSignedWrappedBatchDistinctLidoTargets() (gas: 15577551)
+[PASS] testAliasFreshReadAndZeroEvents() (gas: 5075520)
+[PASS] testConversionAndGuardPriority() (gas: 1057048165)
+[PASS] testFuzzFullLidoPhysicalTransfer(uint64,uint64,uint64,bool) (runs: 1024, μ: 5049625, ~: 5050891)
+[PASS] testInsufficientAndRecipientOverflowRollback() (gas: 5053398)
+[PASS] testLateActualTransferFailureRestoresRealPermitBurnAndEarlierItem() (gas: 15561929)
+[PASS] testPhysicalPauseAfterReverseBeforeMovementRestoresPermit() (gas: 15369650)
+[PASS] testSelectedActualTargetNoCode() (gas: 15355669)
+[PASS] testWholePauseWordNonzero() (gas: 5059289)
+[PASS] testZeroSharesNonzeroEtherStillTransfersZero() (gas: 5057126)
+Suite result: ok. 11 passed; 0 failed; 0 skipped; finished in 859.71ms (919.25ms CPU time)
+
+Ran 1 test suite in 863.69ms (859.71ms CPU time): 11 tests passed, 0 failed, 0 skipped (11 total tests)

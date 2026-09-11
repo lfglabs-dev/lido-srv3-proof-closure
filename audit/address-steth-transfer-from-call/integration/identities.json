@@ -1,0 +1,81 @@
+{
+  "source_commit": "713c8bf70df2125258b27e6d7b8baa76455f8192",
+  "sources": 1265,
+  "pins": 11,
+  "artifact_hashes": 50,
+  "scoped_axioms": 14,
+  "normal": [
+    {
+      "path": "LidoSRv3/Audit/Source/AddressStETHTransferFromCalls.lean",
+      "sha256": "c1c72d9cdafbe0a86f7dfed504f889d864877e205266b8817d3c4f3ec7e89ce2"
+    },
+    {
+      "path": ".lake/build/lib/lean/LidoSRv3/Audit/Source/AddressStETHTransferFromCalls.olean",
+      "sha256": "4ed372a4307d34c48391879cfebe49db0b89a38a51ce16a99ae4fe946a4e71f0"
+    },
+    {
+      "path": ".lake/build/lib/lean/LidoSRv3/Audit/Source/AddressStETHTransferFromCalls.ilean",
+      "sha256": "f633126574cd1a3beafe40edef0b2a6efa589fe6b4cefd8b2d625ee3f01e2ac7"
+    },
+    {
+      "path": ".lake/build/lib/lean/LidoSRv3/Audit/Source/AddressStETHTransferFromCalls.trace",
+      "sha256": "a7270ad2f2fb16c557a463bca67ccc8f9090b3ffe7883b71b9a4cc2976b02675"
+    },
+    {
+      "path": ".lake/build/ir/LidoSRv3/Audit/Source/AddressStETHTransferFromCalls.setup.json",
+      "sha256": "dd5f360209797c483ffddfa93c1a5962c3368d715e39c7a53b61a6ba1a801ca2"
+    },
+    {
+      "path": "LidoSRv3/Audit/Guarantees/PAddress1StETHTransferFromCalls.lean",
+      "sha256": "73f31b336f20714d53ec488968cfd45873dc53a33434999306ef108a8374c9c6"
+    },
+    {
+      "path": ".lake/build/lib/lean/LidoSRv3/Audit/Guarantees/PAddress1StETHTransferFromCalls.olean",
+      "sha256": "bd7037d442cf9b4de6acfc3725f882ee34a299d4a84e62c7e1bf48f3126eae6e"
+    },
+    {
+      "path": ".lake/build/lib/lean/LidoSRv3/Audit/Guarantees/PAddress1StETHTransferFromCalls.ilean",
+      "sha256": "a08ad930fcbb689b23780bac40f55f7a0a7621ab58b9a62c19d0a1b55b052b01"
+    },
+    {
+      "path": ".lake/build/lib/lean/LidoSRv3/Audit/Guarantees/PAddress1StETHTransferFromCalls.trace",
+      "sha256": "dccd5748d59a1842f71e57e5a4d5e40996ecd20671d8015c1db17a3c878413c2"
+    },
+    {
+      "path": ".lake/build/ir/LidoSRv3/Audit/Guarantees/PAddress1StETHTransferFromCalls.setup.json",
+      "sha256": "47128eca78da4061c78ece5b11ff18758981529aee9a1b4112186a53cf5fc83a"
+    },
+    {
+      "path": "LidoSRv3/Tests/AddressStETHTransferFromCalls.lean",
+      "sha256": "87a5888f9adac4251adadcc32123306e32f31ac2fa4bee5a36e1dfce1b60e003"
+    },
+    {
+      "path": ".lake/build/lib/lean/LidoSRv3/Tests/AddressStETHTransferFromCalls.olean",
+      "sha256": "3ecc8ae083b114a27c3ec8dec449132fbf239e3e64eb4baefc474008ac718183"
+    },
+    {
+      "path": ".lake/build/lib/lean/LidoSRv3/Tests/AddressStETHTransferFromCalls.ilean",
+      "sha256": "5c3a15c7629de66ccaf9251ec766b1a4c01da5aab222374bcd7fd4aef2bb11bd"
+    },
+    {
+      "path": ".lake/build/lib/lean/LidoSRv3/Tests/AddressStETHTransferFromCalls.trace",
+      "sha256": "303354f9a9bef3e38ffd5c42ae520fda3f0abb3adbd36263991bcfa66b07e103"
+    },
+    {
+      "path": ".lake/build/ir/LidoSRv3/Tests/AddressStETHTransferFromCalls.setup.json",
+      "sha256": "dc77d12df3f338027d74b2e9d6eaef30d9d47db3a1633728fb40018621491748"
+    },
+    {
+      "path": "lakefile.lean",
+      "sha256": "c8b9de3b79b4aff42d8708d93e6211821980e835294a04bd9f53311f8af8e9e7"
+    },
+    {
+      "path": "lake-manifest.json",
+      "sha256": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42"
+    },
+    {
+      "path": "lean-toolchain",
+      "sha256": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee"
+    }
+  ]
+}

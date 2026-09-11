@@ -1,0 +1,2 @@
+PASS 23 exact runtime inputs, 2 actual artifacts/metadata, 8 cases including 1024 fuzz; no compiler or Forge rerun
+PASS retained independent SHA tree/proofs exact base; native success log present; no FFI rerun
