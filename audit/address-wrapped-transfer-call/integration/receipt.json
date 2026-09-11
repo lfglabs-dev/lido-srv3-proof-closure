@@ -14,6 +14,8 @@
     "audit/address-wrapped-transfer-call/integration/independent-source-review-a9c6.md": "6535339b817cc11b67f0af64a7b77ae37b6bce3a89c36dbe7874cd95ff7db08b",
     "audit/address-wrapped-transfer-call/integration/scoped-axioms.json": "247c087ea0d46f461c7b02514ada978107f5764c807ef91e3b93019667709a83",
     "audit/address-wrapped-transfer-call/integration/trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439",
-    "audit/address-wrapped-transfer-call/integration/validate-readonly.py": "a5102a622e276948156cfe4aab5b2d44b9f070837e074505546f1ff6da33d715"
-  }
+    "audit/address-wrapped-transfer-call/integration/validate-readonly.py": "a5102a622e276948156cfe4aab5b2d44b9f070837e074505546f1ff6da33d715",
+    "audit/address-wrapped-transfer-call/integration/independent-integration-review-13c6.md": "1c9ad13557f51e8a3b60e737a1f8ce2b0663ce83f1b4680724464d0999a9437a"
+  },
+  "integration_review": "CLEAN exact13c6935186bebbe9e38dde066a6b89d18a20af91; archive-only successor separately reviewed"
 }
