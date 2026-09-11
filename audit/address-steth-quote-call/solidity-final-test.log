@@ -1,0 +1,21 @@
+Compiling 1 files with Solc 0.8.9
+Solc 0.8.9 finished in 739.32ms
+Compiler run successful!
+
+Ran 13 tests for test/Quote.t.sol:QuoteTest
+[PASS] testActualLidoFormulaPackedWords() (gas: 5033112)
+[PASS] testActualQueueCastsOversizedPhysicalQuote() (gas: 10186950)
+[PASS] testAllPackedFieldsMaximum() (gas: 5033089)
+[PASS] testFuzzActualFullLido(uint128,uint128,uint128,uint128,uint128,uint128,uint128) (runs: 1024, μ: 5034446, ~: 5034446)
+[PASS] testPinnedKeccakSlots() (gas: 143)
+[PASS] testRawUnderflowAndMultiplyOverflow() (gas: 5033163)
+[PASS] testStLateQuoteInvalidRestoresPermitAndEarlierItem() (gas: 1040753961)
+[PASS] testStPermitConsumesPostCallbackPhysicalQuotes() (gas: 10294367)
+[PASS] testStrictMaximumErrorBeforeZero() (gas: 5035251)
+[PASS] testWrappedLateQuoteRollbackIncludesRealPermit() (gas: 1040754450)
+[PASS] testWrappedRealPermitAndActualReverseAndQuote() (gas: 10297308)
+[PASS] testZeroInternalEtherInvalidEmpty() (gas: 1057022617)
+[PASS] testZeroSharesReturnsZero() (gas: 5033021)
+Suite result: ok. 13 passed; 0 failed; 0 skipped; finished in 821.06ms (869.55ms CPU time)
+
+Ran 1 test suite in 825.49ms (821.06ms CPU time): 13 tests passed, 0 failed, 0 skipped (13 total tests)

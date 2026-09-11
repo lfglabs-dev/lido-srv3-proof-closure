@@ -1,0 +1,367 @@
+⚠ [11/627] Replayed Verity.Core
+warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1041:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+⚠ [1079/1169] Replayed Conform.Wheels
+warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: Conform/Wheels.lean:106:70: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1080/1169] Replayed EvmYul.Pretty
+warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: EvmYul/Pretty.lean:36:32: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1127/1169] Replayed EvmYul.Semantics
+warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1128/1169] Replayed EvmYul.EVM.Semantics
+warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1259/1274] Replayed LidoSRv3.Audit.Verity.AddressRecipientCallBridge
+warning: LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean:671:56: This simp argument is unused:
+  pureExec
+
+Hint: Omit it from the simp argument list.
+  simp [claimTo, Bind.bind, bindExec, hs, hc, LidoSRv3.Audit.Source.TrioReserve1.Live.emit,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲p̵u̵r̵e̵E̵x̵e̵c̵,̵ ̵hsa]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean:674:94: This simp argument is unused:
+  pureExec
+
+Hint: Omit it from the simp argument list.
+  simp [claimTo, Bind.bind, bindExec, hs, hc, LidoSRv3.Audit.Source.TrioReserve1.Live.emit,
+  ̲ p̵u̵r̵e̵E̵x̵e̵c̵,̵  ̲ ̲claimEvents, List.append_assoc]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean:732:30: This simp argument is unused:
+  hn
+
+Hint: Omit it from the simp argument list.
+  simp [claimWithdrawalsTo, hn,̵ ̵h̵n̵0, hl, zeroAddress, Pure.pure,
+  ̲  ̲ ̲ ̲ ̲ ̲LidoSRv3.Audit.Source.TrioReserve1.Live.require, Bind.bind, bindExec, fail, pureExec] at hs
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean:735:30: This simp argument is unused:
+  hn
+
+Hint: Omit it from the simp argument list.
+  simp [claimWithdrawalsTo, hn,̵ ̵h̵n̵0, hl, zeroAddress, Pure.pure,
+  ̲  ̲ ̲ ̲ ̲ ̲LidoSRv3.Audit.Source.TrioReserve1.Live.require, Bind.bind, bindExec, pureExec]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+info: LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean:739:0: 'LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claimTo_success' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean:740:0: 'LidoSRv3.Audit.Verity.AddressRecipientCallBridge.runClaimWithdrawalsTo_success' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+✖ [1274/1274] Building LidoSRv3.Audit.Source.AddressStETHQuoteCalls (1.8s)
+trace: .> LEAN_PATH=/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Cli/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/batteries/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Qq/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/aesop/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/proofwidgets/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/importGraph/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/plausible/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/mathlib/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/evmyul/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/verity/.lake/build/lib/lean:/private/tmp/lido-address-steth-quote/.lake/build/lib/lean /Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean /private/tmp/lido-address-steth-quote/LidoSRv3/Audit/Source/AddressStETHQuoteCalls.lean -o /private/tmp/lido-address-steth-quote/.lake/build/lib/lean/LidoSRv3/Audit/Source/AddressStETHQuoteCalls.olean -i /private/tmp/lido-address-steth-quote/.lake/build/lib/lean/LidoSRv3/Audit/Source/AddressStETHQuoteCalls.ilean -c /private/tmp/lido-address-steth-quote/.lake/build/ir/LidoSRv3/Audit/Source/AddressStETHQuoteCalls.c --setup /private/tmp/lido-address-steth-quote/.lake/build/ir/LidoSRv3/Audit/Source/AddressStETHQuoteCalls.setup.json --json
+error: LidoSRv3/Audit/Source/AddressStETHQuoteCalls.lean:80:4: Unknown identifier `LidoSRv3.Audit.Verity.AddressRecipientCallBridge.sharesByPooledEthSelector`
+error: LidoSRv3/Audit/Source/AddressStETHQuoteCalls.lean:88:6: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  List.take 32 (encode 32 amount.val)
+in the target expression
+  (if
+        True ∧
+          True ∧
+            List.take 4
+                  (encode 4 Verity.AddressRecipientCallBridge.getSharesByPooledEthSelector ++ encode 32 amount.val) =
+                encode 4 421561425 ∧
+              True then
+      match
+        body target
+          (word
+            (decode
+              (List.take 32
+                (List.drop 4
+                  (encode 4 Verity.AddressRecipientCallBridge.getSharesByPooledEthSelector ++ encode 32 amount.val)))))
+          w with
+      | Except.error e => Except.error e
+      | Except.ok shares => Except.ok (encode 32 shares.val)
+    else Except.error (Fault.bubbled [])) =
+    match body target amount w with
+    | Except.error e => Except.error e
+    | Except.ok shares => Except.ok (encode 32 shares.val)
+
+target : Address
+ctx : Context
+amount : Word
+w : World
+ht : List.take 4 (encode 4 421561425 ++ encode 32 amount.val) = encode 4 421561425
+hd : List.drop 4 (encode 4 421561425 ++ encode 32 amount.val) = encode 32 amount.val
+⊢ (if
+        True ∧
+          True ∧
+            List.take 4
+                  (encode 4 Verity.AddressRecipientCallBridge.getSharesByPooledEthSelector ++ encode 32 amount.val) =
+                encode 4 421561425 ∧
+              True then
+      match
+        body target
+          (word
+            (decode
+              (List.take 32
+                (List.drop 4
+                  (encode 4 Verity.AddressRecipientCallBridge.getSharesByPooledEthSelector ++ encode 32 amount.val)))))
+          w with
+      | Except.error e => Except.error e
+      | Except.ok shares => Except.ok (encode 32 shares.val)
+    else Except.error (Fault.bubbled [])) =
+    match body target amount w with
+    | Except.error e => Except.error e
+    | Except.ok shares => Except.ok (encode 32 shares.val)
+warning: LidoSRv3/Audit/Source/AddressStETHQuoteCalls.lean:86:13: This simp argument is unused:
+  ht
+
+Hint: Omit it from the simp argument list.
+  simp only [ht̵,̵h̵d, ̲List.length_append, ̲ABI.encode_length, ̲Verity.Core.Uint256.val_zero,
+  ̵  ̵ ̵ ̵Nat.reduceAdd,
+  ̲ ̲ ̲ ̲ ̲le_refl, ̲and_self, ̲if_true]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/AddressStETHQuoteCalls.lean:86:16: This simp argument is unused:
+  hd
+
+Hint: Omit it from the simp argument list.
+  simp only [ht,h̵d̵,̵ ̲List.length_append, ̲ABI.encode_length, ̲Verity.Core.Uint256.val_zero,
+  ̵  ̵ ̵ ̵Nat.reduceAdd,
+  ̲ ̲ ̲ ̲ ̲le_refl, ̲and_self, ̲if_true]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/AddressStETHQuoteCalls.lean:87:26: This simp argument is unused:
+  and_self
+
+Hint: Omit it from the simp argument list.
+  simp only [ht, ̲hd, ̲List.length_append, ̲ABI.encode_length, ̲Verity.Core.Uint256.val_zero,
+      Nat.reduceAdd, ̲le_refl,a̵n̵d̵_̵s̵e̵l̵f̵,̵ ̲if_true]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/AddressStETHQuoteCalls.lean:87:35: This simp argument is unused:
+  if_true
+
+Hint: Omit it from the simp argument list.
+  simp only [ht, ̲hd, ̲List.length_append, ̲ABI.encode_length, ̲Verity.Core.Uint256.val_zero,
+      Nat.reduceAdd, ̲le_refl, ̲and_self,̵i̵f̵_̵t̵r̵u̵e̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+error: LidoSRv3/Audit/Source/AddressStETHQuoteCalls.lean:102:3: unexpected token 'error'; expected '_' or identifier
+error: LidoSRv3/Audit/Source/AddressStETHQuoteCalls.lean:102:2: Missing alternative name: Expected `error` or `ok`
+error: LidoSRv3/Audit/Source/AddressStETHQuoteCalls.lean:101:2: Alternative `error` has not been provided
+error: LidoSRv3/Audit/Source/AddressStETHQuoteCalls.lean:101:2: Alternative `ok` has not been provided
+error: LidoSRv3/Audit/Source/AddressStETHQuoteCalls.lean:129:26: Invalid field notation: Type of
+  received
+is not known; cannot resolve field `val`
+
+Hint: Consider replacing the field projection with a call to one of the following:
+  • `AddUnits.val`
+  • `Char.val`
+  • `Fin.val`
+  • `Finset.val`
+  • `Float.val`
+  • `Float32.val`
+  • `FloatSpec.val`
+  • `NonScalar.val`
+  • `PNat.val`
+  • `Subtype.val`
+  • `Units.val`
+  • `Array.Mem.val`
+  • `EvmYul.UInt256.val`
+  • `LLVM.AttributeIndex.val`
+  • `LLVM.CodegenFileType.val`
+  • `LLVM.DLLStorageClass.val`
+  • `LLVM.IntPredicate.val`
+  • `LLVM.Linkage.val`
+  • `LLVM.Visibility.val`
+  • `Lean.ElabBlock.val`
+  • `Lean.ElabInline.val`
+  • `Lean.ExprStructEq.val`
+  • `OrderHom.Subtype.val`
+  • `ST.Out.val`
+  • `Vector.Mem.val`
+  • `Lean.Doc.Parser.val`
+  • `Lean.Doc.WithSyntax.val`
+  • `Lean.Elab.FieldInfo.val`
+  • `Lean.Language.DynamicSnapshot.val`
+  • `Lean.Language.SyntaxGuarded.val`
+  • `Lean.Meta.InstanceEntry.val`
+  • `Lean.Meta.UnificationHintEntry.val`
+  • `Lean.Server.WithRpcRef.val`
+  • `Std.Time.Timestamp.val`
+  • `Std.Time.WallTime.val`
+  • `Verity.Core.Address.val`
+  • `Verity.Core.BytesN.val`
+  • `Verity.Core.UIntN.val`
+  • `Verity.Core.Uint16.val`
+  • `Verity.Core.Uint256.val`
+  • `Batteries.BinomialHeap.Imp.FindMin.val`
+  • `Lean.Elab.ComputedFields.Context.val`
+  • `Lean.Elab.Term.LetRecToLift.val`
+  • `Lean.Elab.Term.NamedArg.val`
+  • `Lean.Meta.Match.Example.val`
+  • `Lean.Meta.Match.Pattern.val`
+  • `Lean.Meta.Sym.BitVecValue.val`
+  • `Lean.Meta.Sym.FinValue.val`
+  • `Lean.Meta.SynthInstance.Instance.val`
+  • `Std.Sat.AIG.Fanin.val`
+  • `Std.Time.Internal.UnitVal.val`
+  • `Lean.Compiler.LCNF.FixedParams.AbsValue.val`
+  • `Lean.Elab.Term.StructInst.FieldView.val`
+  • `Lean.Meta.Try.Collector.InductionCandidate.val`
+  • `Mathlib.Tactic.Ring.Common.Result.val`
+  • `Std.Tactic.BVDecide.BVExpr.WithCache.val`
+  • `Lean.Meta.Grind.Arith.Cutsat.SymbolicBound.val`
+error: LidoSRv3/Audit/Source/AddressStETHQuoteCalls.lean:130:64: Invalid field notation: Type of
+  received
+is not known; cannot resolve field `val`
+
+Hint: Consider replacing the field projection with a call to one of the following:
+  • `AddUnits.val`
+  • `Char.val`
+  • `Fin.val`
+  • `Finset.val`
+  • `Float.val`
+  • `Float32.val`
+  • `FloatSpec.val`
+  • `NonScalar.val`
+  • `PNat.val`
+  • `Subtype.val`
+  • `Units.val`
+  • `Array.Mem.val`
+  • `EvmYul.UInt256.val`
+  • `LLVM.AttributeIndex.val`
+  • `LLVM.CodegenFileType.val`
+  • `LLVM.DLLStorageClass.val`
+  • `LLVM.IntPredicate.val`
+  • `LLVM.Linkage.val`
+  • `LLVM.Visibility.val`
+  • `Lean.ElabBlock.val`
+  • `Lean.ElabInline.val`
+  • `Lean.ExprStructEq.val`
+  • `OrderHom.Subtype.val`
+  • `ST.Out.val`
+  • `Vector.Mem.val`
+  • `Lean.Doc.Parser.val`
+  • `Lean.Doc.WithSyntax.val`
+  • `Lean.Elab.FieldInfo.val`
+  • `Lean.Language.DynamicSnapshot.val`
+  • `Lean.Language.SyntaxGuarded.val`
+  • `Lean.Meta.InstanceEntry.val`
+  • `Lean.Meta.UnificationHintEntry.val`
+  • `Lean.Server.WithRpcRef.val`
+  • `Std.Time.Timestamp.val`
+  • `Std.Time.WallTime.val`
+  • `Verity.Core.Address.val`
+  • `Verity.Core.BytesN.val`
+  • `Verity.Core.UIntN.val`
+  • `Verity.Core.Uint16.val`
+  • `Verity.Core.Uint256.val`
+  • `Batteries.BinomialHeap.Imp.FindMin.val`
+  • `Lean.Elab.ComputedFields.Context.val`
+  • `Lean.Elab.Term.LetRecToLift.val`
+  • `Lean.Elab.Term.NamedArg.val`
+  • `Lean.Meta.Match.Example.val`
+  • `Lean.Meta.Match.Pattern.val`
+  • `Lean.Meta.Sym.BitVecValue.val`
+  • `Lean.Meta.Sym.FinValue.val`
+  • `Lean.Meta.SynthInstance.Instance.val`
+  • `Std.Sat.AIG.Fanin.val`
+  • `Std.Time.Internal.UnitVal.val`
+  • `Lean.Compiler.LCNF.FixedParams.AbsValue.val`
+  • `Lean.Elab.Term.StructInst.FieldView.val`
+  • `Lean.Meta.Try.Collector.InductionCandidate.val`
+  • `Mathlib.Tactic.Ring.Common.Result.val`
+  • `Std.Tactic.BVDecide.BVExpr.WithCache.val`
+  • `Lean.Meta.Grind.Arith.Cutsat.SymbolicBound.val`
+error: LidoSRv3/Audit/Source/AddressStETHQuoteCalls.lean:131:70: Invalid field notation: Type of
+  received
+is not known; cannot resolve field `val`
+
+Hint: Consider replacing the field projection with a call to one of the following:
+  • `AddUnits.val`
+  • `Char.val`
+  • `Fin.val`
+  • `Finset.val`
+  • `Float.val`
+  • `Float32.val`
+  • `FloatSpec.val`
+  • `NonScalar.val`
+  • `PNat.val`
+  • `Subtype.val`
+  • `Units.val`
+  • `Array.Mem.val`
+  • `EvmYul.UInt256.val`
+  • `LLVM.AttributeIndex.val`
+  • `LLVM.CodegenFileType.val`
+  • `LLVM.DLLStorageClass.val`
+  • `LLVM.IntPredicate.val`
+  • `LLVM.Linkage.val`
+  • `LLVM.Visibility.val`
+  • `Lean.ElabBlock.val`
+  • `Lean.ElabInline.val`
+  • `Lean.ExprStructEq.val`
+  • `OrderHom.Subtype.val`
+  • `ST.Out.val`
+  • `Vector.Mem.val`
+  • `Lean.Doc.Parser.val`
+  • `Lean.Doc.WithSyntax.val`
+  • `Lean.Elab.FieldInfo.val`
+  • `Lean.Language.DynamicSnapshot.val`
+  • `Lean.Language.SyntaxGuarded.val`
+  • `Lean.Meta.InstanceEntry.val`
+  • `Lean.Meta.UnificationHintEntry.val`
+  • `Lean.Server.WithRpcRef.val`
+  • `Std.Time.Timestamp.val`
+  • `Std.Time.WallTime.val`
+  • `Verity.Core.Address.val`
+  • `Verity.Core.BytesN.val`
+  • `Verity.Core.UIntN.val`
+  • `Verity.Core.Uint16.val`
+  • `Verity.Core.Uint256.val`
+  • `Batteries.BinomialHeap.Imp.FindMin.val`
+  • `Lean.Elab.ComputedFields.Context.val`
+  • `Lean.Elab.Term.LetRecToLift.val`
+  • `Lean.Elab.Term.NamedArg.val`
+  • `Lean.Meta.Match.Example.val`
+  • `Lean.Meta.Match.Pattern.val`
+  • `Lean.Meta.Sym.BitVecValue.val`
+  • `Lean.Meta.Sym.FinValue.val`
+  • `Lean.Meta.SynthInstance.Instance.val`
+  • `Std.Sat.AIG.Fanin.val`
+  • `Std.Time.Internal.UnitVal.val`
+  • `Lean.Compiler.LCNF.FixedParams.AbsValue.val`
+  • `Lean.Elab.Term.StructInst.FieldView.val`
+  • `Lean.Meta.Try.Collector.InductionCandidate.val`
+  • `Mathlib.Tactic.Ring.Common.Result.val`
+  • `Std.Tactic.BVDecide.BVExpr.WithCache.val`
+  • `Lean.Meta.Grind.Arith.Cutsat.SymbolicBound.val`
+error: LidoSRv3/Audit/Source/AddressStETHQuoteCalls.lean:147:2: No goals to be solved
+error: Lean exited with code 1
+Some required targets logged failures:
+- LidoSRv3.Audit.Source.AddressStETHQuoteCalls
+error: build failed

@@ -1,0 +1,11 @@
+fatal: path 'LidoSRv3/Audit/Guarantees/PAddress1StETHQuoteCalls.lean' exists on disk, but not in '6e87eb6e7d6465936d3fab76c3fc7fab5ec51194'
+Traceback (most recent call last):
+  File "/private/tmp/lido-address-steth-quote/audit/address-steth-quote-call/validate.py", line 32, in <module>
+    if relative not in NEW:assert git(ROOT,'show',BASE+':'+relative)==local.read_bytes(),relative
+  File "/private/tmp/lido-address-steth-quote/audit/address-steth-quote-call/validate.py", line 9, in git
+    def git(repo,*args):return subprocess.check_output(['git','-C',str(repo),*args])
+  File "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 424, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+  File "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 528, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', '-C', '/private/tmp/lido-address-steth-quote', 'show', '6e87eb6e7d6465936d3fab76c3fc7fab5ec51194:LidoSRv3/Audit/Guarantees/PAddress1StETHQuoteCalls.lean']' returned non-zero exit status 128.
