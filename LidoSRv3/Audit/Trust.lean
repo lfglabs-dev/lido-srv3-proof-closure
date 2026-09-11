@@ -1,3 +1,4 @@
+import LidoSRv3.Tests.AddressStETHTransferFromCalls
 import LidoSRv3.Tests.TopupEntryAdmission
 import LidoSRv3.Tests.AddressStETHTransferCalls
 import LidoSRv3.Tests.AccountPhysicalPause
@@ -865,6 +866,16 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.AddressStETHTransferCalls.public_empty_success
 #print axioms LidoSRv3.Tests.AddressStETHTransferCalls.public_paused_rollback
 
+-- Physical stETH allowance-first direct withdrawal batches.
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_steth_transfer_from_quote_permit_batch
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_steth_transfer_from_quote_batch
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_steth_transfer_from_quote_permit_failure_restores
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_steth_transfer_from_quote_failure_restores
+#print axioms LidoSRv3.Audit.Source.AddressStETHTransferFromCalls.allowanceSlot_keccak
+#print axioms LidoSRv3.Audit.Source.AddressStETHTransferFromCalls.spend_success
+#print axioms LidoSRv3.Audit.Source.AddressStETHTransferFromCalls.transfer_effect
+#print axioms LidoSRv3.Tests.AddressStETHTransferFromCalls.public_empty_success
+#print axioms LidoSRv3.Tests.AddressStETHTransferFromCalls.public_nonempty_allowance_rollback
 -- Physical gateway role and resume gates consumed by the complete TOPUP phase.
 #print axioms LidoSRv3.Audit.Guarantees.PTopupEntryAdmission.actual_physical_entry_locator_timing_credential_root_module_memory_history
 #print axioms LidoSRv3.Audit.Guarantees.PTopupEntryAdmission.actual_physical_entry_failure_restores

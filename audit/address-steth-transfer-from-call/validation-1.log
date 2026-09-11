@@ -1,0 +1,11 @@
+fatal: path 'LidoSRv3/Audit/Guarantees/PAddress1StETHTransferFromCalls.lean' exists on disk, but not in 'f1d91e3a8ad9829e92ab2e8ff443e391449a36bc'
+Traceback (most recent call last):
+  File "/private/tmp/lido-address-steth-transfer-from/audit/address-steth-transfer-from-call/validate.py", line 33, in <module>
+    if relative not in NEW:assert git(ROOT,'show',BASE+':'+relative)==local.read_bytes(),relative
+  File "/private/tmp/lido-address-steth-transfer-from/audit/address-steth-transfer-from-call/validate.py", line 10, in git
+    def git(repo,*args):return subprocess.check_output(['git','-C',str(repo),*args])
+  File "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 424, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+  File "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 528, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', '-C', '/private/tmp/lido-address-steth-transfer-from', 'show', 'f1d91e3a8ad9829e92ab2e8ff443e391449a36bc:LidoSRv3/Audit/Guarantees/PAddress1StETHTransferFromCalls.lean']' returned non-zero exit status 128.
