@@ -49,18 +49,25 @@ def liftConsumer : SszCompiledConsumer.Error → Error
   | .proof e => .proof e
 
 /-- IR 40-55: selector `0x2e77b4ba`, the six-word head, the witness offset at
-word 100 and its eight-word head extent. -/
-def header (st : EVM.State) : Except Error UInt256 := do
+word 100 and its eight-word head extent. Explicit `if`/`.error`/`.ok` nest
+(same seven guards, same order) so constructor analysis does not stop at
+`do`/`throw` join-points. -/
+def header (st : EVM.State) : Except Error UInt256 :=
   let size := UInt256.ofNat st.executionEnv.calldata.size
-  if st.executionEnv.weiValue.toNat ≠ 0 then throw (.abi .abi)
-  if size.toNat < 4 then throw (.abi .abi)
-  if (st.calldataload (UInt256.ofNat 0)).toNat / 2 ^ 224 ≠ 0x2e77b4ba then throw (.abi .abi)
-  if UInt256.sltBool (size - UInt256.ofNat 4) (UInt256.ofNat 192) then throw (.abi .abi)
-  if UInt256.sltBool (size - UInt256.ofNat 4) (UInt256.ofNat 96) then throw (.abi .abi)
-  let offset := st.calldataload (UInt256.ofNat 100)
-  if offset.toNat > 2 ^ 64 - 1 then throw (.abi .abi)
-  if UInt256.sltBool (size - offset - UInt256.ofNat 4) (UInt256.ofNat 256) then throw (.abi .abi)
-  pure offset
+  if st.executionEnv.weiValue.toNat ≠ 0 then .error (.abi .abi)
+  else if size.toNat < 4 then .error (.abi .abi)
+  else if (st.calldataload (UInt256.ofNat 0)).toNat / 2 ^ 224 ≠ 0x2e77b4ba then
+    .error (.abi .abi)
+  else if UInt256.sltBool (size - UInt256.ofNat 4) (UInt256.ofNat 192) then
+    .error (.abi .abi)
+  else if UInt256.sltBool (size - UInt256.ofNat 4) (UInt256.ofNat 96) then
+    .error (.abi .abi)
+  else
+    let offset := st.calldataload (UInt256.ofNat 100)
+    if offset.toNat > 2 ^ 64 - 1 then .error (.abi .abi)
+    else if UInt256.sltBool (size - offset - UInt256.ofNat 4) (UInt256.ofNat 256) then
+      .error (.abi .abi)
+    else .ok offset
 
 /-- IR 70-97: `_proof[_proof.length - 2] != parentSlotProposer` after the pair
 SHA: checked subtraction (panic 0x11), bounds check (panic 0x32), load, compare. -/
