@@ -199,6 +199,8 @@ import LidoSRv3.Audit.Source.TopupKeccakOracle
 import LidoSRv3.Audit.Source.AllocCapacityCorrespondence
 import LidoSRv3.Audit.Source.BeaconRootsCorrespondence
 import LidoSRv3.Audit.Source.MinFirstAmountCorrespondence
+import LidoSRv3.Audit.Model.EthConfinement
+import LidoSRv3.Audit.Model.EthWorld
 import LidoSRv3.Tests.TopupPointerOriginMutants
 
 /-!
@@ -1364,3 +1366,35 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.BeaconRootsCorrespondence.source_beacon_roots_matches_spec
 #print axioms LidoSRv3.Audit.MinFirstAllocation.leastCount_correspondence
 #print axioms LidoSRv3.Audit.MinFirstAllocation.nextLevel_correspondence
+
+-- EthConfinement (P-CONSOLIDATION-ETH-1 supporting model):
+-- `routeAssignmentsMatch`, `coverageAgreesWithSpecApproval` document
+-- the route/coverage discipline; `residualIsExactlyTheUncoveredInventory`
+-- pins the residual to the uncovered inventory;
+-- `residualHopsAreUnclassified` documents the residual-hop
+-- classification; `route_confined` and `confined` are the top-level
+-- confinement statements; `confinement_does_not_bound_unmodeled_value`
+-- and `residual_hops_carry_unclassified_value` document what the
+-- confinement claim does NOT establish.
+#print axioms LidoSRv3.Audit.Model.EthConfinement.routeAssignmentsMatch
+#print axioms LidoSRv3.Audit.Model.EthConfinement.coverageAgreesWithSpecApproval
+#print axioms LidoSRv3.Audit.Model.EthConfinement.residualIsExactlyTheUncoveredInventory
+#print axioms LidoSRv3.Audit.Model.EthConfinement.residualHopsAreUnclassified
+#print axioms LidoSRv3.Audit.Model.EthConfinement.route_confined
+#print axioms LidoSRv3.Audit.Model.EthConfinement.confined
+#print axioms LidoSRv3.Audit.Model.EthConfinement.confinement_does_not_bound_unmodeled_value
+#print axioms LidoSRv3.Audit.Model.EthConfinement.residual_hops_carry_unclassified_value
+
+-- EthWorld (P-CONSOLIDATION-ETH-1 supporting model):
+-- `spec_destination_surjective` documents that every spec destination
+-- is reachable; `withdrawal_predeploy_outside_spec` and
+-- `intermediate_hops_outside_spec` pin the excluded destinations;
+-- `terminal_destinations_in_spec` closes the terminal-destination
+-- side; `inventory_count` and `unsupported_count` document the
+-- inventory-vs-unsupported counts.
+#print axioms LidoSRv3.Audit.Model.EthWorld.spec_destination_surjective
+#print axioms LidoSRv3.Audit.Model.EthWorld.withdrawal_predeploy_outside_spec
+#print axioms LidoSRv3.Audit.Model.EthWorld.intermediate_hops_outside_spec
+#print axioms LidoSRv3.Audit.Model.EthWorld.terminal_destinations_in_spec
+#print axioms LidoSRv3.Audit.Model.EthWorld.inventory_count
+#print axioms LidoSRv3.Audit.Model.EthWorld.unsupported_count
