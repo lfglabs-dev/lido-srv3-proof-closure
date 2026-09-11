@@ -1,0 +1,38 @@
+[
+  {
+    "path": "audit/trio/account-address/ReportFeePhysicalPause.lean",
+    "sha256": "aa6b97c6e30bb2dfcb2c87b5ae6c7b276d157a575f61a09824eebb5d420af260"
+  },
+  {
+    "path": ".lake/build/lib/lean/ReportFeePhysicalPause.olean",
+    "sha256": "4ba4886623e8b20e5d3178dc67e6c612fbbb10cf32dbcd3d46c1b2963d34f33f"
+  },
+  {
+    "path": ".lake/build/lib/lean/ReportFeePhysicalPause.ilean",
+    "sha256": "f04817d0e9161e88df2db5c2385b2948c1f71a6ba936abb162729e9761e01bdc"
+  },
+  {
+    "path": "LidoSRv3/Audit/Guarantees/PAccount1PhysicalPause.lean",
+    "sha256": "26533279dbb04b2d2941849dbb34d0e7432580cf05b2a2f0eea5c574bc65b543"
+  },
+  {
+    "path": ".lake/build/lib/lean/LidoSRv3/Audit/Guarantees/PAccount1PhysicalPause.olean",
+    "sha256": "917a2c04ef23c488e8f52f477c74614979e9172a2996c58b13ea5be654198033"
+  },
+  {
+    "path": ".lake/build/lib/lean/LidoSRv3/Audit/Guarantees/PAccount1PhysicalPause.ilean",
+    "sha256": "51e036201a8cc12a7f8c034880766d88aaeb88e865bdf4c82091e47f5e8c3919"
+  },
+  {
+    "path": "LidoSRv3/Tests/AccountPhysicalPause.lean",
+    "sha256": "b97aa610661a1b2f1ec73fc7d55c480b20405517ce67feef74dae04a5d65bb16"
+  },
+  {
+    "path": ".lake/build/lib/lean/LidoSRv3/Tests/AccountPhysicalPause.olean",
+    "sha256": "10f760bfdd0bef46e269778e1cffbda5b1118d1b4241dd1d0583a03489ac30a9"
+  },
+  {
+    "path": ".lake/build/lib/lean/LidoSRv3/Tests/AccountPhysicalPause.ilean",
+    "sha256": "70946e03fa2b7181c8d5cc9d1943edb66d69cfe3689380d39e46f79d8e3de838"
+  }
+]

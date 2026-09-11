@@ -1,0 +1,4 @@
+COMMAND git diff --cached --check
+EXIT 2
+audit/account-physical-pause/DistributionHarness.asm:1609: new blank line at EOF.
+audit/account-physical-pause/Lido.asm:16951: new blank line at EOF.

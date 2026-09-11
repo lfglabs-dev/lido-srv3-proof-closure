@@ -1,3 +1,4 @@
+import LidoSRv3.Tests.AccountPhysicalPause
 import LidoSRv3.Tests.AddressStETHConversionCalls
 import LidoSRv3.Tests.TopupRouterLocatorCall
 import LidoSRv3.Tests.AddressStETHQuoteCalls
@@ -844,3 +845,11 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.AddressStETHConversionCalls.conversion_effect
 #print axioms LidoSRv3.Audit.Source.AddressStETHConversionCalls.item_effect
 #print axioms LidoSRv3.Tests.AddressStETHConversionCalls.public_paused_rollback
+
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1.actual_report_physical_pause
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1.actual_report_physical_pause_failure_restores
+#print axioms AccountAddress.ReportFeePhysicalPause.projection
+#print axioms AccountAddress.ReportFeePhysicalPause.mint_frame
+#print axioms AccountAddress.ReportFeePhysicalPause.chain_physical
+#print axioms LidoSRv3.Tests.AccountPhysicalPause.public_success
+#print axioms LidoSRv3.Tests.AccountPhysicalPause.public_failure

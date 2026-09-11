@@ -1,0 +1,25 @@
+{
+  "source": "62669fad69b4bae620458eff7130b2d5e0017720",
+  "main": "66c699faabb5d9a248108f6cf6f7032c1e4da58b",
+  "union": "ee6e49ecd77017fcbe796e579d5e13e2dad3a16b",
+  "build_union": "3b72bb5096634caca8f1473902a18ed8e927fd40",
+  "jobs": 1769,
+  "global_axioms": 29,
+  "ordinary_scopes": 9,
+  "source_hashes": 39,
+  "configuration_sha256": {
+    "lakefile.lean": "c8b9de3b79b4aff42d8708d93e6211821980e835294a04bd9f53311f8af8e9e7",
+    "lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
+    "lean-toolchain": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee"
+  },
+  "sha256": {
+    "audit/account-physical-pause/integration/README.md": "ccb77a9e6e4eb4a5e0af2363af75e6e5189927a7c21b5bf1197c683702c2f017",
+    "audit/account-physical-pause/integration/all-trust-build.log": "e169e3abaf7c323e40e85210d14631c2ab3f7a77a4803071ffe71627ca026a93",
+    "audit/account-physical-pause/integration/identities.json": "edf1d86c8068088d0c3c53e997e113b21538815b1b430019452f7558801ce137",
+    "audit/account-physical-pause/integration/identity-check.log": "f5ea46757af51479826c3771f603bfd4691a7fa8fe9b1040d05bca5167e8fa56",
+    "audit/account-physical-pause/integration/independent-source-review-6266.md": "33c12873dd3f9ba26581f2f0f9d180fa9f70ade30c7cd183f0841ff6d88fdddf",
+    "audit/account-physical-pause/integration/readonly-validator.py": "973c5ab845f9dc1a207e5b750448097a71655dda3c0423cf1aa9b68c75627a82",
+    "audit/account-physical-pause/integration/scoped-axioms.json": "72d212679a622cf6b409196d578c5132659fde32c38e8038ca36f0f770f75364",
+    "audit/account-physical-pause/integration/trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439"
+  }
+}
