@@ -1,0 +1,23 @@
+[
+  {
+    "olean_sha256": "e2ef373d06e529bb14f61e4f133bd77bc6a4099425bd8470daa0da29b59c4888",
+    "setup_sha256": "8bae316d90e26b3eb1ad9b938615ae80502ec7067983461094ba0736ab5612c4",
+    "source": "audit/trio/consolidation/PhysicalEntrySettlement.lean",
+    "source_sha256": "da42faf7960d926e5f9927c2a48bda883214fd3fddc808359b14a06079be7fb3",
+    "trace_sha256": "e290073178542c6da072e1316757f4ff4d245c975d818c9d49f0c7cb88dadba5"
+  },
+  {
+    "olean_sha256": "e24bd7dab13195ee6645b21afb1e5e3eca91da5c3e0931ae53ee1cd2b1936b98",
+    "setup_sha256": "feed0d1b38d646ef9d1f1d97984698b8dd150921965354171e491b1d81578644",
+    "source": "LidoSRv3/Audit/Guarantees/PConsolidationEth1PhysicalEntry.lean",
+    "source_sha256": "fff7199d86d09ab40b0d6e105680109876c796f76a229f090175ce0a8be9215c",
+    "trace_sha256": "ab7a408166ec633e30eea59faecc35347c6cecb9f6a4194a3a23e9ccd12f8a53"
+  },
+  {
+    "olean_sha256": "937bbad227fb78ab5d41e4b81ee3048571d1d1b8d06301127298756dbce72490",
+    "setup_sha256": "9793e8bd22a049ea43b7babf1e4f4cd393064b1ba2b56539a1143fb734fd7010",
+    "source": "LidoSRv3/Tests/TrioConsolidation/PhysicalEntrySettlement.lean",
+    "source_sha256": "f0aeb7d6761bce8a8f8ce553776365357e4247e3e66b9ad5cb2ecd6237d093bc",
+    "trace_sha256": "95c4a7775f170e87700b34b0c2a30220339b7c68dffa7b3ce4ec004506be6aa6"
+  }
+]
