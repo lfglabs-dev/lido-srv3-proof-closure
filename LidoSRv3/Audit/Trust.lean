@@ -1398,3 +1398,28 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Model.EthWorld.terminal_destinations_in_spec
 #print axioms LidoSRv3.Audit.Model.EthWorld.inventory_count
 #print axioms LidoSRv3.Audit.Model.EthWorld.unsupported_count
+
+-- Provenance.ConsolidationRequest: 5 additional provenance-anchor
+-- theorems. `ensemble_request_is_verity_requestAddr` and
+-- `verity_requestAddr_remains_ensemble` document that the modeled
+-- request address is exactly the Verity ensemble address;
+-- `canonical_request_literal` pins the EIP-7251 canonical literal
+-- as a text-level constant; `rewrite_preserves_other` documents that
+-- the ensemble rewrite preserves other fields;
+-- `canonical_request_assumption_remains_open` explicitly records the
+-- residual assumption A-CANONICAL-REQUEST-ADDRESS as open.
+#print axioms LidoSRv3.Audit.Provenance.ConsolidationRequest.ensemble_request_is_verity_requestAddr
+#print axioms LidoSRv3.Audit.Provenance.ConsolidationRequest.verity_requestAddr_remains_ensemble
+#print axioms LidoSRv3.Audit.Provenance.ConsolidationRequest.canonical_request_literal
+#print axioms LidoSRv3.Audit.Provenance.ConsolidationRequest.rewrite_preserves_other
+#print axioms LidoSRv3.Audit.Provenance.ConsolidationRequest.canonical_request_assumption_remains_open
+
+-- Provenance.Deposit: 3 audit-only claims documenting the open
+-- deployment-facts boundary. `deposit_contract_assumption_remains_open`
+-- keeps A-DEPOSIT-CONTRACT explicit; `source_constructor_does_not_
+-- discharge_deployment_facts` refutes source-only derivation;
+-- `wrong_deposit_contract_pin_kill_line` refutes an incorrect
+-- deposit-contract pin as a kill-line witness.
+#print axioms LidoSRv3.Audit.Provenance.Deposit.deposit_contract_assumption_remains_open
+#print axioms LidoSRv3.Audit.Provenance.Deposit.source_constructor_does_not_discharge_deployment_facts
+#print axioms LidoSRv3.Audit.Provenance.Deposit.wrong_deposit_contract_pin_kill_line
