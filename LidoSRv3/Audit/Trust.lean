@@ -372,6 +372,10 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.PackN5SszLiveMutants.ignore_timestamp_kill_line_refutes_consume_parent
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidationValue1.official_denote_succeeds_and_justified_forwards_msg_value
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidationValue1.justified_interpreter_forwards_exactly_msg_value
+-- `preservesEthBalance_of_success` lifts the vault-side value-forwarding
+-- invariant onto the composed inputs record: under
+-- gateway-admitted-nonzero + committed run, self-balance stays put.
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidationValue1.preservesEthBalance_of_success
 #print axioms LidoSRv3.Audit.Verity.ConsolidationOfficialDenoteSuccess.official_denote_succeeds_on_value_bearing_request_calls
 #print axioms LidoSRv3.Tests.PackN6ConsolValueMutants.official_denote_success_kill_line_refutes_parent
 #print axioms LidoSRv3.Tests.PackN6ConsolValueMutants.zero_value_calls_refute_exact_forwarding
@@ -445,6 +449,23 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Verity.ConsolidationCallFragment.success_hypotheses_are_vacuous
 #print axioms LidoSRv3.Audit.Guarantees.PAddress1.universal_address_writer_equivariance
 #print axioms LidoSRv3.Audit.Guarantees.PAddress1.abstract_source_verity_tx_address_equivariance
+-- Address-renaming permutation lemmas that underpin every address-space
+-- equivariance argument in PAddress1: `address_renaming a₁ a₂` is its own
+-- inverse (involutive), injective, surjective, and therefore bijective.
+-- Registered here so the elementary permutation surface enters the Trust
+-- axiom discipline together with the top-level equivariance parent.
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.address_renaming_involutive
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.address_renaming_injective
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.address_renaming_surjective
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.address_renaming_bijective
+-- `admission_and_post_state_equivariance` is the composed decomposition
+-- lemma showing that admission non-discrimination + post-state
+-- equivariance implies the full `address_nondiscrimination` conclusion.
+-- `universal_post_state_equivariance` is the source-side committed-post
+-- equivariance on the live SolidityAddress `run`, keyed on a₁ ≠ 0 and
+-- a₂ ≠ 0.
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.admission_and_post_state_equivariance
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.universal_post_state_equivariance
 #print axioms LidoSRv3.Audit.Verity.AddressTx.pinned_source_observable_correspondence
 #print axioms LidoSRv3.Audit.Verity.AddressTx.executed_address_writes_follow_renamed_source
 #print axioms LidoSRv3.Audit.Verity.AddressTx.every_revert_restores_snapshot
