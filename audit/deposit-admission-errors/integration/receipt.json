@@ -1,0 +1,23 @@
+{
+  "source_commit": "a279b5661f5b1f6c588bacd2918dd2e0cd14cb2d",
+  "accepted_main": "4207bb0578b0a6821cd1d78b1f3a4bb08f277905",
+  "union_commit": "7c301481a34754c52f0fba9648a7e71fa292f59a",
+  "checks": {
+    "normal_jobs": 1791,
+    "global_disclosed_axioms": 29,
+    "ordinary_foundation_scopes": 25,
+    "actual_sources": 1317,
+    "package_pins": 11,
+    "source_hashes": 18,
+    "normal_modules": 5
+  },
+  "files": {
+    "audit/deposit-admission-errors/integration/README.md": "9ec4af0fe2991ce2d446f099e9898f8409a8032d802e1f853cc7c16a99492184",
+    "audit/deposit-admission-errors/integration/global-trust.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439",
+    "audit/deposit-admission-errors/integration/independent-source-review-a279.md": "bb00b6388e124acaea1b74e80fd0cdaff110691d611d7c7cfa15172c9222d6bc",
+    "audit/deposit-admission-errors/integration/normal-build.log": "82e4f2028863428735f9c0d58286e0a0c4c1f3eca56b67862407155090432fbe",
+    "audit/deposit-admission-errors/integration/normal-identities.json": "f967b875890df078077bec3a2f3f3bfcf56a9e17d87db64a3f1d86dc562b2fce",
+    "audit/deposit-admission-errors/integration/validate-integration.py": "3a1e738c20b3e7e7ef92efc1f57833a7d18b753055ff89aa02a9b2cd888efe94",
+    "audit/deposit-admission-errors/integration/validation.log": "c75e2a8d90970cf9102cbbc0ecc12b3e0def32852ce4926e6bc69f0f02103bae"
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "source_commit": "a279b5661f5b1f6c588bacd2918dd2e0cd14cb2d",
+  "accepted_configuration": "4207bb0578b0a6821cd1d78b1f3a4bb08f277905",
+  "sources": 1317,
+  "pins": 11,
+  "artifact_hashes": 18,
+  "scoped_axioms": 25,
+  "normal": [
+    {
+      "olean_sha256": "6fef3c9be984e75df65acd3821e7059d0fadb528474888c26ba6fdb683d4551d",
+      "setup_sha256": "f04fcfdd37c67edac1a9c4e6d90f774ffbfb4a7daa2316bbca8392a16c9a8ed9",
+      "source": "LidoSRv3/Audit/Source/DepositAdmissionErrors.lean",
+      "source_sha256": "da03dfac0afcb72fb0cb532559e0bf6f5e923202b8eccdd9f6c6aa45c1ef3c7e",
+      "trace_sha256": "2fe63f54dc979e665e4ab26827cf9b943d7740e776cd167be09a2951861cd93e"
+    },
+    {
+      "olean_sha256": "e7a037874e52737bc4b17e8db0fe193f49c81ae1bff9176e949f5ef602d48e60",
+      "setup_sha256": "e5325d0e6d5ae8da8eac07636a7aa2b0102eadfa94ef8d89d7836d25d374f43f",
+      "source": "LidoSRv3/Audit/Guarantees/PDeposit1AdmissionErrors.lean",
+      "source_sha256": "51e0edc5f7bbe33dd0c4152c8fffbff41796b456a970f496d803a76897e4bb16",
+      "trace_sha256": "9b04320053364e8094d14892ae76ddca0f0021ed23a26b1a9386b418e3d147c2"
+    },
+    {
+      "olean_sha256": "e7897eb33af9813776c631f5171a983d8953b589e82820ffc5161b22a5ea762c",
+      "setup_sha256": "7f2eac2707738cb08a5253a603d14232ef61101d909d850c5046d878d40f9213",
+      "source": "LidoSRv3/Tests/DepositAdmissionErrorsRegression.lean",
+      "source_sha256": "a8d169416528a93c2cb9ae9688626a89ee012cc0c0b4d09c9003e3f5a67a9a7b",
+      "trace_sha256": "3323444759c0966b238f50fe9b4e934c35920ed4d2592ea5e03b493821239050"
+    },
+    {
+      "source": "LidoSRv3/Audit/AllGuarantees.lean",
+      "source_sha256": "2497b78649d7e21b6d35d77fdd02a148a9e8c714d126941152a21f1adc90a2b0",
+      "setup_sha256": "3e588df5e9524bb6d0fbb977cdb4601161c5c7f1e2c1c1cb6f08b41aaf91c3d8",
+      "trace_sha256": "c17f36553c15b3901e7f72808e4be04ac89c770ec3a03b2930bb12a92cbc0781",
+      "olean_sha256": "efc4556744e5321ca0225d36ad828330a64a50d869b10b49da5b3ef4f0e2a1ed"
+    },
+    {
+      "source": "LidoSRv3/Audit/Trust.lean",
+      "source_sha256": "065139da2136780422c60a78d300af2b0be21b296688815a5d8681f04916aa02",
+      "setup_sha256": "348ed1aa19c97d368e7271e708efca4e92c3d6114779d0c5613ba522b8194600",
+      "trace_sha256": "28da0914489922d26a4eefa4c9d08c9b4211e91e3a513fc46eba98352a5c3804",
+      "olean_sha256": "5153edc4d25a7af4810fd7af4b2f17b4e6f668b3cc6827518edab618444769fd"
+    }
+  ],
+  "configuration_sha256": {
+    "lakefile.lean": "68a2eeea808e5fe3ada64e9a89f7da8698c67893a021bdde219043fc99110411",
+    "lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
+    "lean-toolchain": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee"
+  }
+}
