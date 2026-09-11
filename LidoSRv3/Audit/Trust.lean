@@ -133,6 +133,7 @@ import LidoSRv3.Tests.PackFConsolidationObserveMutants
 import LidoSRv3.Audit.Provenance.Deposit
 import LidoSRv3.Tests.PackGDepositProvenanceMutants
 import LidoSRv3.Audit.Provenance.TopupBeacon
+import LidoSRv3.Audit.Provenance.TopupNoWrapOrphaned
 import LidoSRv3.Tests.PackGTopupProvenanceMutants
 import LidoSRv3.Audit.Provenance.ConsolidationRequest
 import LidoSRv3.Tests.PackGEth1ProvenanceMutants
@@ -1570,3 +1571,14 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- rely on `native_decide` transitively and are intentionally kept
 -- out of this disclosure to keep the Trust surface inside the
 -- foundations-only boundary the checker enforces.)
+
+-- A-TOPUP-NOWRAP orphanage proof (see
+-- `audit/findings/A-TOPUP-NOWRAP-orphaned.md`): the two registered
+-- P-TOPUP-1 parents do not consume `NoUncheckedWrap`. The registered
+-- theorems below apply on **any** input (including wrapping ones),
+-- ignoring the `¬ NoUncheckedWrap inp` premise. Retirement of
+-- A-TOPUP-NOWRAP from `assumptions.yaml` and P-TOPUP-1 is a policy
+-- decision (advances R1 review basis) and is left explicit.
+#print axioms LidoSRv3.Audit.Provenance.TopupNoWrapOrphaned.source_parent_ignores_no_unchecked_wrap
+#print axioms LidoSRv3.Audit.Provenance.TopupNoWrapOrphaned.source_parent_applies_universally
+#print axioms LidoSRv3.Audit.Provenance.TopupNoWrapOrphaned.verity_parent_ignores_no_unchecked_wrap
