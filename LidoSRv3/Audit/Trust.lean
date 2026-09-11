@@ -1,3 +1,4 @@
+import LidoSRv3.Tests.TopupEntryAdmission
 import LidoSRv3.Tests.AddressStETHTransferCalls
 import LidoSRv3.Tests.AccountPhysicalPause
 import LidoSRv3.Tests.AddressStETHConversionCalls
@@ -863,3 +864,10 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.AddressStETHTransferCalls.token_effect
 #print axioms LidoSRv3.Tests.AddressStETHTransferCalls.public_empty_success
 #print axioms LidoSRv3.Tests.AddressStETHTransferCalls.public_paused_rollback
+
+-- Physical gateway role and resume gates consumed by the complete TOPUP phase.
+#print axioms LidoSRv3.Audit.Guarantees.PTopupEntryAdmission.actual_physical_entry_locator_timing_credential_root_module_memory_history
+#print axioms LidoSRv3.Audit.Guarantees.PTopupEntryAdmission.actual_physical_entry_failure_restores
+#print axioms LidoSRv3.Audit.Source.TopupEntryAdmission.roleSlot_bytes
+#print axioms LidoSRv3.Audit.Source.TopupEntryAdmission.gates_success
+#print axioms LidoSRv3.Tests.TopupEntryAdmission.public_rollback

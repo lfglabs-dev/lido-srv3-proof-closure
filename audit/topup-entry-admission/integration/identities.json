@@ -1,0 +1,30 @@
+{
+  "source_commit": "bdeb3d23b20dfeafb32c0e893dc260432183da08",
+  "sources": 1358,
+  "pins": 11,
+  "artifact_hashes": 32,
+  "scoped_axioms": 18,
+  "normal": [
+    {
+      "olean_sha256": "d742937a04aea4e6da78d55ee410e1365ca73c25a4087ff17625f13cf08bc67e",
+      "setup_sha256": "9f46f7bc82f7ef22738e02a0be479a9d9556d6d8095b4719ca59839247820052",
+      "sha256": "88738c0838595403d1bc671a36000efe1c9aa5fd82c6d4452299d274526a624e",
+      "source": "LidoSRv3/Audit/Source/TopupEntryAdmission.lean",
+      "trace_sha256": "e701a87495dce47568b11ab64a3593f04e6f7b10bc336314b459cfcbb1492f5c"
+    },
+    {
+      "olean_sha256": "1c86202a8cac6528b4db23f081288f78d25e1caf3bfb72f9ef3dbab7f86800b7",
+      "setup_sha256": "27ea8e84facd7f363e19c30753503acf107c880c677597bf0c6ba95380ca5d55",
+      "sha256": "facea35689055a1b4d59b31c2195059bd4ddc8972c54c7a6b49f832ae29f4b13",
+      "source": "LidoSRv3/Audit/Guarantees/PTopupEntryAdmission.lean",
+      "trace_sha256": "a21ecf7f650974c93c5b32d9d3611db915482ce35c510b6ff389a8fb344925fc"
+    },
+    {
+      "olean_sha256": "85dac84db49c361a54db625de9f2b3a0745fc810b16e9056c9cdaf049fd0efb5",
+      "setup_sha256": "5d6d9293825c9e9e82a30a1be6722961f0973ee396129d3bcf79c105d279bdbf",
+      "sha256": "da9e1060022410425aa6aedc122bc35a6cc044721b1275828a6bc3476255f212",
+      "source": "LidoSRv3/Tests/TopupEntryAdmission.lean",
+      "trace_sha256": "caeaa9745dabe2230a17b35cac2e7a40c4473ea8eedd8bc3c3177b74b135e67e"
+    }
+  ]
+}
