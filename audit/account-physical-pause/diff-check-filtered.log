@@ -1,0 +1,3 @@
+COMMAND git diff --cached --check -- . :(exclude)audit/account-physical-pause/Lido.asm :(exclude)audit/account-physical-pause/DistributionHarness.asm
+EXIT 0
+PASS only exact preserved compiler EOF blanks excluded; raw check is NOT PASS

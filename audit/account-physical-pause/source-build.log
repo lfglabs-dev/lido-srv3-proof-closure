@@ -1,0 +1,154 @@
+ℹ [4/39] Replayed StETHMintShares
+info: audit/trio/account-address/StETHMintShares.lean:330:0: 'AccountAddress.StETHMintShares.committed_mint_effect' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [5/39] Replayed ReportFeeMint
+info: audit/trio/account-address/ReportFeeMint.lean:417:0: 'AccountAddress.ReportFeeMint.checkedFeeResultOf_split' depends on axioms: [propext, Quot.sound]
+info: audit/trio/account-address/ReportFeeMint.lean:418:0: 'AccountAddress.ReportFeeMint.checkedFeeProducts_split_origin' depends on axioms: [propext, Quot.sound]
+info: audit/trio/account-address/ReportFeeMint.lean:419:0: 'AccountAddress.ReportFeeMint.committed_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: audit/trio/account-address/ReportFeeMint.lean:420:0: 'AccountAddress.ReportFeeMint.failure_restores' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [6/39] Replayed ReportFeeCastInvariant
+info: audit/trio/account-address/ReportFeeCastInvariant.lean:116:0: 'AccountAddress.ReportFeeCastInvariant.rows_allocation_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: audit/trio/account-address/ReportFeeCastInvariant.lean:117:0: 'AccountAddress.ReportFeeCastInvariant.report_allocation_le_total' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: audit/trio/account-address/ReportFeeCastInvariant.lean:118:0: 'AccountAddress.ReportFeeCastInvariant.report_exact_casts' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: audit/trio/account-address/ReportFeeCastInvariant.lean:119:0: 'AccountAddress.ReportFeeCastInvariant.composition_exact_casts' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [7/39] Replayed ReportFeeCheckedSplit
+info: audit/trio/account-address/ReportFeeCheckedSplit.lean:62:0: 'AccountAddress.ReportFeeCheckedSplit.checked_products_split' depends on axioms: [propext, Quot.sound]
+info: audit/trio/account-address/ReportFeeCheckedSplit.lean:63:0: 'AccountAddress.ReportFeeCheckedSplit.committed_checked_split' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [8/39] Replayed FeeDistribution
+info: audit/trio/account-address/FeeDistribution.lean:312:0: 'AccountAddress.FeeDistribution.success_chain' depends on axioms: [propext]
+info: audit/trio/account-address/FeeDistribution.lean:313:0: 'AccountAddress.FeeDistribution.success_paid' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: audit/trio/account-address/FeeDistribution.lean:324:0: 'AccountAddress.FeeDistribution.success_storage' depends on axioms: [propext]
+info: audit/trio/account-address/FeeDistribution.lean:325:0: 'AccountAddress.FeeDistribution.transfer_success' depends on axioms: [propext, Quot.sound]
+info: audit/trio/account-address/FeeDistribution.lean:326:0: 'AccountAddress.FeeDistribution.modules_success' depends on axioms: [propext, Quot.sound]
+info: audit/trio/account-address/FeeDistribution.lean:327:0: 'AccountAddress.FeeDistribution.execute_success' depends on axioms: [propext, Quot.sound]
+ℹ [9/39] Replayed ReportFeeDistribution
+info: audit/trio/account-address/ReportFeeDistribution.lean:131:0: 'AccountAddress.ReportFeeDistribution.execute_success_ledger' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: audit/trio/account-address/ReportFeeDistribution.lean:132:0: 'AccountAddress.ReportFeeDistribution.minted_budget' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: audit/trio/account-address/ReportFeeDistribution.lean:133:0: 'AccountAddress.ReportFeeDistribution.execute_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: audit/trio/account-address/ReportFeeDistribution.lean:134:0: 'AccountAddress.ReportFeeDistribution.failure_restores' depends on axioms: [propext, Classical.choice, Quot.sound]
+⚠ [20/39] Replayed Verity.Core
+warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1041:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+ℹ [23/39] Replayed TreasuryCall
+info: audit/trio/account-address/TreasuryCall.lean:74:0: 'AccountAddress.TreasuryCall.call_success' depends on axioms: [propext, Quot.sound]
+ℹ [24/39] Replayed ReportFeeTreasuryCall
+info: audit/trio/account-address/ReportFeeTreasuryCall.lean:157:0: 'AccountAddress.ReportFeeTreasuryCall.distribute_success' depends on axioms: [propext, Quot.sound]
+info: audit/trio/account-address/ReportFeeTreasuryCall.lean:158:0: 'AccountAddress.ReportFeeTreasuryCall.execute_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: audit/trio/account-address/ReportFeeTreasuryCall.lean:159:0: 'AccountAddress.ReportFeeTreasuryCall.failure_restores' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [25/39] Replayed LidoSRv3.Audit.Guarantees.PAccount1TreasuryCall
+info: LidoSRv3/Audit/Guarantees/PAccount1TreasuryCall.lean:29:0: 'LidoSRv3.Audit.Guarantees.PAccount1.actual_report_fee_mint_treasury_call' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Guarantees/PAccount1TreasuryCall.lean:30:0: 'LidoSRv3.Audit.Guarantees.PAccount1.actual_report_treasury_failure_restores' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [32/39] Replayed LidoSRv3.Audit.Guarantees.PAccount1
+info: LidoSRv3/Audit/Guarantees/PAccount1.lean:180:0: 'LidoSRv3.Audit.Guarantees.PAccount1.actual_report_fee_mint' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Guarantees/PAccount1.lean:181:0: 'LidoSRv3.Audit.Guarantees.PAccount1.actual_report_fee_mint_failure_restores' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [33/39] Replayed LidoSRv3.Audit.Guarantees.PAccount1ActualFeeCasts
+info: LidoSRv3/Audit/Guarantees/PAccount1ActualFeeCasts.lean:23:0: 'LidoSRv3.Audit.Guarantees.PAccount1.actual_report_fee_mint_casts' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [34/39] Replayed LidoSRv3.Audit.Guarantees.PAccount1CheckedFeeSplit
+info: LidoSRv3/Audit/Guarantees/PAccount1CheckedFeeSplit.lean:20:0: 'LidoSRv3.Audit.Guarantees.PAccount1.actual_report_fee_mint_checked_split' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [35/39] Replayed LidoSRv3.Audit.Guarantees.PAccount1FeeDistribution
+info: LidoSRv3/Audit/Guarantees/PAccount1FeeDistribution.lean:32:0: 'LidoSRv3.Audit.Guarantees.PAccount1.actual_report_fee_mint_distribution' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Guarantees/PAccount1FeeDistribution.lean:33:0: 'LidoSRv3.Audit.Guarantees.PAccount1.actual_report_fee_distribution_failure_restores' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [36/39] Replayed Tests.Verity.ReportFeeMintTest
+info: audit/trio/account-address/Tests/Verity/ReportFeeMintTest.lean:66:0: 'AccountActualMintRegression.event_failure_restores_updates' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: audit/trio/account-address/Tests/Verity/ReportFeeMintTest.lean:67:0: 'AccountActualMintRegression.mapping_overflow_restores_packed_word' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: audit/trio/account-address/Tests/Verity/ReportFeeMintTest.lean:68:0: 'AccountActualMintRegression.same_world_mint_and_rate' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: audit/trio/account-address/Tests/Verity/ReportFeeMintTest.lean:69:0: 'AccountActualMintRegression.mismatched_accounting_rejects' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: audit/trio/account-address/Tests/Verity/ReportFeeMintTest.lean:70:0: 'AccountActualMintRegression.zero_fee_skips_mint_auth' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: audit/trio/account-address/Tests/Verity/ReportFeeMintTest.lean:71:0: 'AccountActualMintRegression.packed_overflow_restores_router' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: audit/trio/account-address/Tests/Verity/ReportFeeMintTest.lean:72:0: 'AccountActualMintRegression.fee_word_overflow_rejects' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: audit/trio/account-address/Tests/Verity/ReportFeeMintTest.lean:73:0: 'AccountActualMintRegression.distribution_product_checked' does not depend on any axioms
+ℹ [37/39] Replayed Tests.Verity.ReportFeeCheckedSplitTest
+info: audit/trio/account-address/Tests/Verity/ReportFeeCheckedSplitTest.lean:67:0: 'AccountCheckedSplitRegression.nontrivial_rounding' does not depend on any axioms
+info: audit/trio/account-address/Tests/Verity/ReportFeeCheckedSplitTest.lean:68:0: 'AccountCheckedSplitRegression.zero_row_retains_position' does not depend on any axioms
+info: audit/trio/account-address/Tests/Verity/ReportFeeCheckedSplitTest.lean:69:0: 'AccountCheckedSplitRegression.zero_mint_skips_distribution' does not depend on any axioms
+info: audit/trio/account-address/Tests/Verity/ReportFeeCheckedSplitTest.lean:70:0: 'AccountCheckedSplitRegression.checked_product_rejects' does not depend on any axioms
+info: audit/trio/account-address/Tests/Verity/ReportFeeCheckedSplitTest.lean:71:0: 'AccountCheckedSplitRegression.checked_sum_rejects' does not depend on any axioms
+info: audit/trio/account-address/Tests/Verity/ReportFeeCheckedSplitTest.lean:72:0: 'AccountCheckedSplitRegression.checked_treasury_subtraction_rejects' does not depend on any axioms
+info: audit/trio/account-address/Tests/Verity/ReportFeeCheckedSplitTest.lean:73:0: 'AccountCheckedSplitRegression.actual_multirow_mint_split' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: audit/trio/account-address/Tests/Verity/ReportFeeCheckedSplitTest.lean:74:0: 'AccountCheckedSplitRegression.actual_multirow_joint_consumer' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: audit/trio/account-address/Tests/Verity/ReportFeeCheckedSplitTest.lean:75:0: 'AccountCheckedSplitRegression.actual_zero_skip_retained' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: audit/trio/account-address/Tests/Verity/ReportFeeCheckedSplitTest.lean:76:0: 'AccountCheckedSplitRegression.actual_arithmetic_reject_restores' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [38/39] Replayed Tests.Verity.ReportFeeDistributionTest
+info: audit/trio/account-address/Tests/Verity/ReportFeeDistributionTest.lean:79:0: 'AccountFeeDistributionRegression.actual_distribution' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: audit/trio/account-address/Tests/Verity/ReportFeeDistributionTest.lean:80:0: 'AccountFeeDistributionRegression.actual_public_consumer' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: audit/trio/account-address/Tests/Verity/ReportFeeDistributionTest.lean:81:0: 'AccountFeeDistributionRegression.self_and_duplicate_recipients' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: audit/trio/account-address/Tests/Verity/ReportFeeDistributionTest.lean:82:0: 'AccountFeeDistributionRegression.late_overflow_rolls_back_prior_mint_and_transfer' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: audit/trio/account-address/Tests/Verity/ReportFeeDistributionTest.lean:83:0: 'AccountFeeDistributionRegression.zero_mint_skips_bad_treasury' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: audit/trio/account-address/Tests/Verity/ReportFeeDistributionTest.lean:84:0: 'AccountFeeDistributionRegression.zero_treasury_skips_read' depends on axioms: [propext]
+info: audit/trio/account-address/Tests/Verity/ReportFeeDistributionTest.lean:85:0: 'AccountFeeDistributionRegression.guard_order_from_zero_before_stopped' depends on axioms: [propext]
+info: audit/trio/account-address/Tests/Verity/ReportFeeDistributionTest.lean:86:0: 'AccountFeeDistributionRegression.conversion_reject_restores_debit' depends on axioms: [propext]
+info: audit/trio/account-address/Tests/Verity/ReportFeeDistributionTest.lean:87:0: 'AccountFeeDistributionRegression.wrapped_share_rate_after_transfer' depends on axioms: [propext]
+ℹ [39/39] Replayed Tests.Verity.ReportFeeTreasuryCallTest
+info: audit/trio/account-address/Tests/Verity/ReportFeeTreasuryCallTest.lean:84:0: 'AccountTreasuryCallRegression.actual_call_and_payment' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: audit/trio/account-address/Tests/Verity/ReportFeeTreasuryCallTest.lean:85:0: 'AccountTreasuryCallRegression.public_consumer' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: audit/trio/account-address/Tests/Verity/ReportFeeTreasuryCallTest.lean:86:0: 'AccountTreasuryCallRegression.malformed_address' depends on axioms: [propext]
+info: audit/trio/account-address/Tests/Verity/ReportFeeTreasuryCallTest.lean:87:0: 'AccountTreasuryCallRegression.short_return' depends on axioms: [propext]
+info: audit/trio/account-address/Tests/Verity/ReportFeeTreasuryCallTest.lean:88:0: 'AccountTreasuryCallRegression.zero_address_decodes' depends on axioms: [propext]
+info: audit/trio/account-address/Tests/Verity/ReportFeeTreasuryCallTest.lean:89:0: 'AccountTreasuryCallRegression.malformed_after_modules_rolls_back' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: audit/trio/account-address/Tests/Verity/ReportFeeTreasuryCallTest.lean:90:0: 'AccountTreasuryCallRegression.no_code_before_external' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: audit/trio/account-address/Tests/Verity/ReportFeeTreasuryCallTest.lean:91:0: 'AccountTreasuryCallRegression.revert_bytes_bubble' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: audit/trio/account-address/Tests/Verity/ReportFeeTreasuryCallTest.lean:92:0: 'AccountTreasuryCallRegression.static_write_rejects' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: audit/trio/account-address/Tests/Verity/ReportFeeTreasuryCallTest.lean:93:0: 'AccountTreasuryCallRegression.decoded_zero_then_transfer_guard' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: audit/trio/account-address/Tests/Verity/ReportFeeTreasuryCallTest.lean:94:0: 'AccountTreasuryCallRegression.zero_mint_no_attempt' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: audit/trio/account-address/Tests/Verity/ReportFeeTreasuryCallTest.lean:95:0: 'AccountTreasuryCallRegression.zero_treasury_no_attempt' depends on axioms: [propext]
+Build completed successfully (39 jobs).
+CHECK audit/trio/account-address/ReportFeePhysicalPause.lean
+audit/trio/account-address/ReportFeePhysicalPause.lean:149:4: error: Type mismatch: After simplification, term
+  ha
+ has type
+  Or (fee.sharesToMintAsFees = 0) (active before.steth = true)
+but is expected to have type
+  Or (fee.sharesToMintAsFees = 0)
+    (active
+        { storage := before.steth.storage, shares := before.steth.shares,
+          locatorAccounting := before.steth.locatorAccounting, selfAddress := before.steth.selfAddress,
+          activeFlag := active before.steth } =
+      true)
+Traceback (most recent call last):
+  File "/private/tmp/lido-account-physical-pause/audit/account-physical-pause/build.py", line 9, in <module>
+    subprocess.run(['lake','env','lean','-o',str(out)+'.olean','-i',str(out)+'.ilean',path],cwd=R,check=True)
+  File "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 528, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['lake', 'env', 'lean', '-o', '/private/tmp/lido-account-physical-pause/.lake/build/lib/lean/ReportFeePhysicalPause.olean', '-i', '/private/tmp/lido-account-physical-pause/.lake/build/lib/lean/ReportFeePhysicalPause.ilean', 'audit/trio/account-address/ReportFeePhysicalPause.lean']' returned non-zero exit status 1.

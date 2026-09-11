@@ -1,3 +1,12 @@
+import LidoSRv3.Audit.Guarantees.PAccount1PhysicalPause
+import LidoSRv3.Audit.Guarantees.PAddress1StETHConversionCalls
+import LidoSRv3.Audit.Guarantees.PTopupRouterLocatorCall
+import LidoSRv3.Audit.Guarantees.PAddress1StETHQuoteCalls
+import LidoSRv3.Audit.Guarantees.PAddress1PermitRequestCalls
+import LidoSRv3.Audit.Guarantees.PTopupTimingHistory
+import LidoSRv3.Audit.Guarantees.PAddress1RequestBatches
+import LidoSRv3.Audit.Guarantees.PTopupPhysicalCredentialGetter
+import LidoSRv3.Audit.Guarantees.PTopupCredentialCalls
 import LidoSRv3.Audit.Guarantees.PAddress1WrappedTransferCalls
 import LidoSRv3.Audit.Guarantees.PSsz1CompiledClEntry
 import LidoSRv3.Audit.Guarantees.PAddress1WrappedTokenCalls

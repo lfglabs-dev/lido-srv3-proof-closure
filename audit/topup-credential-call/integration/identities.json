@@ -1,0 +1,32 @@
+{
+  "source": "f00863276fbe279c566328ed4ae90f5bf223a38e",
+  "sources": 1343,
+  "pins": 11,
+  "ordinary_scopes": 25,
+  "compiler_inputs": 22,
+  "source_hashes": 27,
+  "normal_modules": [
+    {
+      "olean_sha256": "899e2c080ad3418ea3a1abe9e54616b5774c325429104ac45219b1d3a9fb5695",
+      "setup_sha256": "e9c2d3f2c748dec6ac841d8b72bf96be2b87bd4b82ba29ae54817b3ec11d785a",
+      "sha256": "a2c32e30c6ceca6d30984bfaf0f5a61dc65e0340af92f559da8a72e2aa031f7c",
+      "source": "LidoSRv3/Audit/Source/TopupCredentialCall.lean",
+      "trace_sha256": "e3d35d8b688f7286230baf13e6f0a0b7572b09b4f3bd425b928be7196202e284"
+    },
+    {
+      "olean_sha256": "d6e8fdaa714f70d1684e68d788c190121cfe0cdc2371c9981aa0f85e15733987",
+      "setup_sha256": "2f1b6bd5e14f14b9c59dbc5eebba649e736e46555143642f59155868c4f294e3",
+      "sha256": "21cf25030e2f0f0140c81ef920cfad19ed98c38ddb944bbe4cd05c3d26f377f1",
+      "source": "LidoSRv3/Audit/Guarantees/PTopupCredentialCalls.lean",
+      "trace_sha256": "9d21e9d58bb2a1f7a2aca93672d6bb1e36552deae125cae8646ebd9d01853d8e"
+    },
+    {
+      "olean_sha256": "b10e503efb80909d29e6d9448eb6756ebb4293814002fcd03dda6a19d275fa64",
+      "setup_sha256": "74de59f3cd9706a1cd34e3fd46f07466ac79f258bf468d7d9f699965809ee48f",
+      "sha256": "02ca8a9a0d85522a91a328f6b41af9a476b0ec94e0a273a0ea83ee8e8f820df9",
+      "source": "LidoSRv3/Tests/TopupCredentialCall.lean",
+      "trace_sha256": "1491404baf9137d7a50a170a77b558c8822210d9cd479aebfc01561a4bbf9ce8"
+    }
+  ],
+  "validation_note": "Source validator executed default comparison mode, redirecting only path-dependent build-identities.json outside checkout; passed all checks. A following receipt postcheck initially used hashes instead of actual sha256 field; corrected hash-only postcheck, no re-elaboration or scope/global rerun."
+}

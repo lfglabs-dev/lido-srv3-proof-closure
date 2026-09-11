@@ -1,0 +1,81 @@
+LidoSRv3/Tests/AccountPhysicalPause.lean:8:41: error(lean.unknownIdentifier): Unknown constant `LidoSRv3.Audit.Source.TrioReserve1.Live`
+LidoSRv3/Tests/AccountPhysicalPause.lean:14:16: error: unexpected token '['; expected '}'
+LidoSRv3/Tests/AccountPhysicalPause.lean:59:81: error(lean.unknownIdentifier): Unknown identifier `Live.encode`
+LidoSRv3/Tests/AccountPhysicalPause.lean:65:29: error: Tactic `decide` failed for proposition
+  (match failed with
+    |
+    ReportFeeTreasuryCall.Outcome.reverted
+        (ReportFeeTreasuryCall.Error.distribution (FeeDistribution.Error.transfer FeeDistribution.TransferError.toZero))
+        rollback ps ats =>
+      decide
+        (rollback.steth.activeFlag = false ∧
+          rollback.steth.storage = (physical 2 false).steth.storage ∧
+            rollback.router = (physical 2 false).router ∧
+              rollback.steth.shares 170 = 0 ∧
+                rollback.steth.shares 7 = 5 ∧ ps = [(170, 2), (190, 2), (0, 6)] ∧ List.length ats = 1)
+    | x => false) =
+    true
+because its `Decidable` instance
+  instDecidableEqBool
+    (match failed with
+    |
+    ReportFeeTreasuryCall.Outcome.reverted
+        (ReportFeeTreasuryCall.Error.distribution (FeeDistribution.Error.transfer FeeDistribution.TransferError.toZero))
+        rollback ps ats =>
+      decide
+        (rollback.steth.activeFlag = false ∧
+          rollback.steth.storage = (physical 2 false).steth.storage ∧
+            rollback.router = (physical 2 false).router ∧
+              rollback.steth.shares 170 = 0 ∧
+                rollback.steth.shares 7 = 5 ∧ ps = [(170, 2), (190, 2), (0, 6)] ∧ List.length ats = 1)
+    | x => false)
+    true
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match
+    match failed with
+    |
+    ReportFeeTreasuryCall.Outcome.reverted
+        (ReportFeeTreasuryCall.Error.distribution (FeeDistribution.Error.transfer FeeDistribution.TransferError.toZero))
+        rollback ps ats =>
+      decide
+        (rollback.steth.activeFlag = false ∧
+          rollback.steth.storage = (physical 2 false).steth.storage ∧
+            rollback.router = (physical 2 false).router ∧
+              rollback.steth.shares 170 = 0 ∧
+                rollback.steth.shares 7 = 5 ∧ ps = [(170, 2), (190, 2), (0, 6)] ∧ List.length ats = 1)
+    | x => false,
+    true with
+  | false, false => isTrue ⋯
+  | false, true => isFalse ⋯
+  | true, false => isFalse ⋯
+  | true, true => isTrue ⋯
+LidoSRv3/Tests/AccountPhysicalPause.lean:68:14: warning: Variable name `fault` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+LidoSRv3/Tests/AccountPhysicalPause.lean:68:29: warning: Variable name `ps` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+LidoSRv3/Tests/AccountPhysicalPause.lean:68:32: warning: Variable name `ats` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+'AccountAddress.ReportFeePhysicalPause.projection' depends on axioms: [propext]
+'AccountAddress.ReportFeePhysicalPause.total_slot_distinct' does not depend on any axioms
+'AccountAddress.ReportFeePhysicalPause.mint_frame' depends on axioms: [propext, Classical.choice, Quot.sound]
+'AccountAddress.ReportFeePhysicalPause.chain_physical' depends on axioms: [propext]
+'AccountAddress.ReportFeePhysicalPause.execute_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Guarantees.PAccount1.actual_report_physical_pause' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Guarantees.PAccount1.actual_report_physical_pause_failure_restores' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Tests.AccountPhysicalPause.public_success' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'LidoSRv3.Tests.AccountPhysicalPause.public_failure' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
