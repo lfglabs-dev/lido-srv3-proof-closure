@@ -1,0 +1,19 @@
+Compiling 19 files with Solc 0.8.9
+Solc 0.8.9 finished in 748.15ms
+Compiler run successful!
+
+Ran 11 tests for test/Conversion.t.sol:ConversionTest
+[PASS] testDynamicTargetNoCodeRollsBackRealPermit() (gas: 20705412)
+[PASS] testDynamicTargetsRatesRealPermitAndCapturedAmounts() (gas: 20928482)
+[PASS] testFullLidoPackedReverse() (gas: 5033904)
+[PASS] testFuzzFullPinnedLidoReverse(uint128,uint128,uint128,uint128,uint128,uint128,uint128) (runs: 1024, μ: 10172030, ~: 5035379)
+[PASS] testLaterReverseInvalidRestoresEarlierItemRealPermitAndTarget() (gas: 1025146044)
+[PASS] testRawMultiplyOverflowAndOversizedReturn() (gas: 5034102)
+[PASS] testRawUnderflowDivisor() (gas: 5033896)
+[PASS] testStrictMaxBeforeZeroDivisor() (gas: 5036813)
+[PASS] testZeroConversionCapturedBeforeCallbackQueueGuard() (gas: 20760792)
+[PASS] testZeroEtherSuccessfulZero() (gas: 5033880)
+[PASS] testZeroSharesDivisorInvalidEmpty() (gas: 1057022641)
+Suite result: ok. 11 passed; 0 failed; 0 skipped; finished in 811.84ms (876.24ms CPU time)
+
+Ran 1 test suite in 815.48ms (811.84ms CPU time): 11 tests passed, 0 failed, 0 skipped (11 total tests)

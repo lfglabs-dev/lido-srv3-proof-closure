@@ -1,0 +1,3 @@
+COMMAND git diff --cached --check
+EXIT 2
+audit/address-steth-conversion-call/ConversionHarness.asm:17140: new blank line at EOF.

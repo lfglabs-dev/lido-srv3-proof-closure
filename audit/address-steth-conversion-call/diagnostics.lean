@@ -1,0 +1,2 @@
+import LidoSRv3.Tests.AddressStETHConversionCalls
+#eval LidoSRv3.Tests.AddressStETHConversionCalls.diagnostics
