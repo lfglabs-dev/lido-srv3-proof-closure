@@ -598,6 +598,21 @@ list, there are no undisclosed project-level assumptions or proof escapes.
   LidoSRv3.Audit.Guarantees.PDeposit1.manyKey_entry_state_guards_are_load_bearing
 #print axioms
   LidoSRv3.Audit.Guarantees.PDeposit1.manyKey_underfunded_entry_reverts_at_not_enough_ether
+-- PDeposit1 ledger identities: on any well-linked source/inputs pair,
+-- the linked total equals the executable pushed value (and, under
+-- noWrap, the depositsValue). The `exactTotal` variants add
+-- multiplicative per-batch discipline. `canonical_links_source` is
+-- the concrete canonical witness under which the composed hypotheses
+-- fire, and `two_batch_conjunct_d_is_n_eq_two` records the
+-- two-batch limitation as a definitional fact of `DepositNFrameTx.
+-- ofTwoBatches` rather than a hidden premise.
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.linked_total_eq_pushedValue
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.linked_total_eq_depositsValue
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.canonical_links_source
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.NFrame.exactTotal_eq_exactKeys_mul
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.NFrame.linked_exactTotal_eq_pushedValue
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.NFrame.linked_exactTotal_eq_depositsValue
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.NFrame.two_batch_conjunct_d_is_n_eq_two
 #print axioms LidoSRv3.Audit.Verity.DepositParentTx.execute_observes_source
 #print axioms
   LidoSRv3.Audit.Verity.DepositParentTx.revert_after_intermediate_writes_restores_snapshot
