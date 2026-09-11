@@ -1,0 +1,52 @@
+{
+  "rejected_source": "a3ae099cdaa185245a19a16121f9fd025e0fd806",
+  "main_base": "10e2b693d00cbbeab65f60cd8964ced87297336a",
+  "union": "687fd842ad05a1f64a7a9d927dfcf495e3522429",
+  "canonical_slot_repairs": 3,
+  "checked_slot_preimages": 10,
+  "checked_selectors": 4,
+  "AllTrust": {
+    "command": "lake build LidoSRv3.Audit.AllGuarantees LidoSRv3.Audit.Trust",
+    "jobs": 1715,
+    "exit": 0
+  },
+  "trust": {
+    "command": "python3 scripts/check_trust_axioms.py",
+    "exact_axioms": 29,
+    "exit": 0,
+    "dependencies_recomputed": true,
+    "native_claims_reevaluated": true
+  },
+  "repaired_source_identities": 1245,
+  "package_pins": 11,
+  "fresh_scoped_axiom_sets": 7,
+  "fresh_ffi_diagnostics": 12,
+  "ffi_is_kernel_evidence": false,
+  "original_historical_artifact_hashes": 44,
+  "fresh_solidity_tests": 0,
+  "reused_solidity_tests": 12,
+  "normal_olean_sha256": {
+    "LidoSRv3/Audit/Verity/AddressRecipientCallBridge": "1a4864048d5a61afcf1cf4186bfc15583b3401d2ae1e8b7e096493044085dc0e",
+    "LidoSRv3/Audit/Source/AddressRequestCalls": "ee978c9f103f0717e40cb9c09c55570fdd26f9312437f40cba27799efceb2b77",
+    "LidoSRv3/Audit/Guarantees/PAddress1RequestCalls": "d4603013719b99384f10fb15e8d9ccedfea6dd6361ddd58b07977a1605bf4ed9",
+    "LidoSRv3/Tests/AddressRequestCalls": "1509296a21164c34966cd46a12103038e3615fab138f266e9e780515babcba86"
+  },
+  "sha256": {
+    "audit/address-request-call/repair/README.md": "1fb9f407eb246bc3da7a7c594783af2bed36ab6cbdd51c50e47e66c1f6d09367",
+    "audit/address-request-call/repair/all-trust-build.log": "76e3602cd8dc85d65a85fd7d35166fd269f0ff57223aecb7c7c2d6927a990f2b",
+    "audit/address-request-call/repair/axioms.json": "bd6b6aa76addd4b08a78bc64df56b23455591d6bd98dee97734ec54c115671c4",
+    "audit/address-request-call/repair/blocked-constant-inventory-a3ae.json": "0e1ef48214d189758575f8906f47607c1e48d13b417965297fee9b79512036ec",
+    "audit/address-request-call/repair/blocked-source-review-a3ae.md": "bcb2d10922dba186bfe3c819aafe69ac6a8da2b469128d6e9b568db63df6be8d",
+    "audit/address-request-call/repair/check-slots.py": "f01c2f89a774d78bd1a5c1a715c30f50cc1b10ae8aa7243054309297851d1b0d",
+    "audit/address-request-call/repair/diagnostics.lean": "946153ef3f08779e210d4e3c5386a4773d31682f15b1cbd2d52051bf0fac55d5",
+    "audit/address-request-call/repair/diagnostics.log": "94ab37e6f578f757c785896018343560b51d00b35abadbfd3307700ff8260004",
+    "audit/address-request-call/repair/identity-check.log": "a95bcb8db7dfa40c2ed63204bb626a36feff527a3a1d9623d6ace60c26b0feee",
+    "audit/address-request-call/repair/published-consumer-scope-a3ae.log": "74c866c1483d70ff4d34ef8689628b34e42ffce2ddd29a7a54e6f5ab23840044",
+    "audit/address-request-call/repair/run-diagnostics.py": "3330d11ffc841c834a00e8094ef76f694afebfb93f740c3eb4c979ea8c54d4a5",
+    "audit/address-request-call/repair/runtime-inputs.json": "ee823f952f85b2299d1bbe973a7fb1465a7775849e187a4bf7be5e7e44c325cb",
+    "audit/address-request-call/repair/slot-check.json": "0479a7f560334d00cfd68a567d8e7f51fefd43a5fe6461ef9e4f0b4202196707",
+    "audit/address-request-call/repair/source-inputs.json": "dd5e990a9dc9b737b6f15337eabcbc6f281061c2e2d0e4dcfb90df56359b28d3",
+    "audit/address-request-call/repair/trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439",
+    "audit/address-request-call/repair/validate.py": "3915eedd44f61877067c48d309a413384f74bd2af5a520c8377b61436b220932"
+  }
+}
