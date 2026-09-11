@@ -1,0 +1,73 @@
+{
+  "base": "eee5d6700e5d99cc35eab7bf3e1e2b51a2465857",
+  "source_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "scope": "Same ACCOUNT report/mint/modules then actual typed readonly treasury request on their real returned ACCOUNT World, canonical decoded recipient actually paid, preserved ledger/events/rollback",
+  "public_theorems": [
+    "LidoSRv3.Audit.Guarantees.PAccount1.actual_report_fee_mint_treasury_call",
+    "LidoSRv3.Audit.Guarantees.PAccount1.actual_report_treasury_failure_restores"
+  ],
+  "build": {
+    "cached_prerequisite_jobs": 35,
+    "new_sequential_modules": 4,
+    "exit_code": 0
+  },
+  "kernel_regressions_and_consumer": 12,
+  "source_identities": 37,
+  "package_pins": {
+    "verity": "e977aaad6e1a9e92e0132d41b3d33a14135a4d46",
+    "evmyul": "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9",
+    "mathlib": "fabf563a7c95a166b8d7b6efca11c8b4dc9d911f",
+    "plausible": "63045536fe95024e6c18fc7b48e03f506701c5bc",
+    "LeanSearchClient": "c5d5b8fe6e5158def25cd28eb94e4141ad97c843",
+    "importGraph": "5c7542ed018c78194f1e2b903eaf6a792b74c03d",
+    "proofwidgets": "24b0d9dc081c5423f8eec7e866c441e5184f29d9",
+    "aesop": "e3cb2f741431ce31bf73549fb52316a57368b06f",
+    "Qq": "f46324995fca5f0483b742e4eb4daec7f4ee50d2",
+    "batteries": "fa08db58b30eb033edcdab331bba000827f9f785",
+    "Cli": "92564e5770e4d09f2d86dfbf8ada1e9c715b384c"
+  },
+  "pinned_solidity_bodies": 5,
+  "axiom_sets": 18,
+  "foundations_only": true,
+  "fresh_solidity_tests": 9,
+  "compiler_input_identities": 32,
+  "original_steth_dependencies": 29,
+  "profile": "solc0.8.9 + inherited StETH0.4.24, optimizer200, common fixture Byzantium",
+  "boundaries": [
+    "Actual ACCOUNT World remains separate from Live.World; abstract shares map unchanged",
+    "Locator immutable and code metadata supplied context, no deployment/context provenance proof",
+    "Arbitrary readonly locator implementation and existing copied-byte/memory/gas boundaries; no full compiled report/Lido claim"
+  ],
+  "existing_sources_modified": false,
+  "review_status": "Pending independent exact commit/source/Solidity review; author stopped after commit",
+  "sha256": {
+    "audit/trio/account-address/TreasuryCall.lean": "0b32dc017b515a7d8fd5ecb01c0fc7aa87ed82f3d0d9b4b0771e8139fc7949a5",
+    "audit/trio/account-address/ReportFeeTreasuryCall.lean": "c89a139f6593068a4ce9259add72132ded35a31929c1fe67d504b856b5aa690b",
+    "audit/trio/account-address/Tests/Verity/ReportFeeTreasuryCallTest.lean": "90be2368bfc742ba1491d46670465194012c6b4cd4bbcdc3859cbef21968256a",
+    "LidoSRv3/Audit/Guarantees/PAccount1TreasuryCall.lean": "9f234000ee3e14411fc1a9e4b1005b70e663f6205eb3990f08f03e8716ad8443",
+    "audit/account-treasury-call/.gitignore": "130bf331217e1ca609e4101fd355bcd5afbf274a54b6bed0dd1ef945a53d6869",
+    "audit/account-treasury-call/README.md": "2364fee910b908cbe58423513757cb19dc29525388c95fd62d962c3103fdc959",
+    "audit/account-treasury-call/axioms.json": "6008fd0efc25e95fa869de1a9e7edc4e2c3eae74edb5d35cdedee23beae728b1",
+    "audit/account-treasury-call/build.log": "21abf1a0a6bf68419fa8590a00c169acc92df170759cd76a0ff0b3996badec40",
+    "audit/account-treasury-call/build.py": "0e0d0fc1e2550a45252d6f13d40f2d52b3c5a304b8a45f26f1a890304154d795",
+    "audit/account-treasury-call/commands.txt": "2d421ca4ae8abbab9ae1ecc5fda672abacafd037cdde4a7f351a41a5a6d51eb9",
+    "audit/account-treasury-call/solidity/DistributionHarness.asm": "857ec4b5adfada15315d0aeda8f0688479358894fce31194a0f64680c051b250",
+    "audit/account-treasury-call/solidity/check.py": "21c0a83486614f34962d57083ff91396b54b8e001c3b51d044ee2a713734e81e",
+    "audit/account-treasury-call/solidity/compiled-DistributionHarness.json": "c7312fc030aa0d6c4487c7fe1c41ad008f56d17aff1537f7b0480faed2224b29",
+    "audit/account-treasury-call/solidity/compiled-RawTreasury.json": "8b066f2dfff8e65197d69f28c1f46618624db35b0edaaf869c836be6ea81f8c7",
+    "audit/account-treasury-call/solidity/compiled-StethHarness.json": "34f1df2e074b9b1de1306ae7e647537bfeef8b6c0af617c3b679ee45eb0a8533",
+    "audit/account-treasury-call/solidity/compiled-TreasuryCallTest.json": "f9142d10e4e1aaa2e20ec4820ecb06156637e3ac6027dc6d1439d282fa9a206b",
+    "audit/account-treasury-call/solidity/foundry.toml": "69e86a5a8d64d4d3f990b608392d674edd0f3c0dc8cf6aed78896a570e9766d7",
+    "audit/account-treasury-call/solidity/src/DistributionHarness.sol": "82d6ba4dc40e3e7f6d658e10404a5fcad1b37aa6e40489f3d26e1e9f1abe07fd",
+    "audit/account-treasury-call/solidity/src/StethHarness.sol": "46f207a42695bb790792fdad461d6d7422a9a4fa2359f70bb5606e06a5882d3d",
+    "audit/account-treasury-call/solidity/test/TreasuryCall.t.sol": "0bebc0e3258fb267c89c180601c62af338cdf39fd7e83fb59778743b49f2b0af",
+    "audit/account-treasury-call/solidity/validation.json": "7f8a119e7879ed2a817a49007aa2b0ad992cac49237ce52250ab92a79d22afaf",
+    "audit/account-treasury-call/solidity-check.log": "1a8769734837b454d378610c37ca3d7ac026f98498cbbfc81669ffaf5163025e",
+    "audit/account-treasury-call/solidity-identities.json": "347adc7fb84988ce205ad41a31775ccf6d08e1050c08ef219e9f65529dc8cdb9",
+    "audit/account-treasury-call/solidity-test.log": "62a4d42efad269c8bb7a4422e314773d2917eb403f49c092e8b84b466c81edf0",
+    "audit/account-treasury-call/source-axiom-check.log": "6c3ebd3d93c630474ee2a627639844de3dc155b83a562f0780d4d55579bbc724",
+    "audit/account-treasury-call/source-inputs.json": "b323aa12dc4565f0408c693820bd48949fd3e436ecec42230f138575eefc3790",
+    "audit/account-treasury-call/validate.py": "426405a6c83467ab907ca11fb7f7c1385cb0ab049253e147cfa4075fda57df73",
+    "audit/account-treasury-call/write-receipt.py": "798399e99c485ec75bce643bf8cb718363dc4ab2f1f48f3c2665d32b9e88efc1"
+  }
+}
