@@ -1,0 +1,2 @@
+import LidoSRv3.Tests.AddressPermitRequestCalls
+#eval LidoSRv3.Tests.AddressPermitRequestCalls.diagnostics
