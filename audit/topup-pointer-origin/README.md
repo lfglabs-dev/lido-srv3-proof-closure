@@ -67,7 +67,7 @@ a derivation of the public `run` cursor, and not a `guarantees.yaml` close.
 
 | Theorem | Claim |
 | --- | --- |
-| `chained_credential_then_module_disjoint` | If `returnBuffer = credentials.next`, credentials `[cursor, next)` and the module raw zone are sequential, hence disjoint. |
+| `chained_credential_then_module_disjoint` | If `returnBuffer = credentials.next` after a successful credentials decode, the credentials zone is valid, `next = cursor+32`, and the module raw zone is sequential, hence disjoint. |
 | `chained_locator_credential_module_disjoint` | Locator→credentials (already in the public run) plus that same equation ⇒ the three zones are pairwise sequential. |
 | `chained_returnBuffer_from_credentials_next` | Witness: credentials @ 128 then module @ 160. |
 | `ptopup_module_success_with_returnBuffer_eq_locator` | `decodeReturn` @ 128 still succeeds when that cursor is the locator cursor; `PTopupMemoryCalls` only asks for that success. |
