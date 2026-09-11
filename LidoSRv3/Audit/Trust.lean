@@ -137,6 +137,7 @@ import LidoSRv3.Audit.Provenance.TopupNoWrapOrphaned
 import LidoSRv3.Audit.Provenance.SszPerfectHashOrphaned
 import LidoSRv3.Tests.PackGTopupProvenanceMutants
 import LidoSRv3.Audit.Provenance.ConsolidationRequest
+import LidoSRv3.Audit.Provenance.CanonicalRequestAddress
 import LidoSRv3.Tests.PackGEth1ProvenanceMutants
 import LidoSRv3.Audit.Spec.DepositEthJournalCorrespondence
 import LidoSRv3.Tests.PackJDepositEthJournalMutants
@@ -1594,3 +1595,16 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Provenance.SszPerfectHashOrphaned.abstract_parent_ignores_perfect_deposit_encoding
 #print axioms LidoSRv3.Audit.Provenance.SszPerfectHashOrphaned.abstract_parent_applies_universally
 #print axioms LidoSRv3.Audit.Provenance.SszPerfectHashOrphaned.verity_parent_ignores_perfect_deposit_encoding
+
+-- A-CANONICAL-REQUEST-ADDRESS discharge (see
+-- `audit/findings/A-CANONICAL-REQUEST-ADDRESS-discharged.md` and
+-- `LidoSRv3/Audit/Provenance/CanonicalRequestAddress.lean`): the
+-- Lean model literal `consolidationPredeploy` equals the CONSOLIDATION_REQUEST
+-- immutable extracted from the deployed WithdrawalVault runtime bytecode
+-- at byte offset 730 width 20 (fixture and hash pinned in
+-- `audit/artifacts.lock.json`; reproduction in
+-- `scripts/verify_consolidation_request_immutable.py`). A-CANONICAL-REQUEST-ADDRESS
+-- is retired from `P-CONSOLIDATION-ETH-1.assumptions`.
+#print axioms LidoSRv3.Audit.Provenance.CanonicalRequestAddress.deployed_consolidation_request_immutable_equals_canonical
+#print axioms LidoSRv3.Audit.Provenance.CanonicalRequestAddress.model_consolidation_predeploy_equals_canonical
+#print axioms LidoSRv3.Audit.Provenance.CanonicalRequestAddress.model_predeploy_equals_deployed_immutable
