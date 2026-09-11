@@ -1,0 +1,51 @@
+[
+  {
+    "olean_sha256": "d5cdf537a499e07f7dbd009af0feffebccdc4503deb99fb5e242d38ecb53dfab",
+    "setup_sha256": "205900e81290fe9281300bf2b4e012596da7167cbfc5d6c04ff7c5ec8933520a",
+    "sha256": "73011ee40979829b244cd2346e23f9a24b88b7006f22938a5694bcd079a46647",
+    "source": "LidoSRv3/Audit/Source/SszSoladyFls.lean",
+    "trace_sha256": "eb757f511a35096aaa303782caf21eaffd2ce9d27e822748211a7154f005ae1f"
+  },
+  {
+    "olean_sha256": "6c3383f54cb6ee62a3178f0310208300084f54bd0e0b3f0f141582b6d5c02fa0",
+    "setup_sha256": "00e94aae6e5c85e5b08f656c817f1898169ea325d4d15b5e67ef9a83c17fdc46",
+    "sha256": "9b58af30b481d66f11a5879429d317a161226a4a77d6d99b33b7238d97bc5347",
+    "source": "LidoSRv3/Audit/Source/SszCompiledGIndex.lean",
+    "trace_sha256": "87d1ed2f83e8f194868902bc013918e2e4aa961d6845943d9e7014fd1d5c652a"
+  },
+  {
+    "olean_sha256": "3fa478662835ada074d506e8a10b8e36b6eddf0e157fd55e898502de72670474",
+    "setup_sha256": "3507d5a1d080c5e371eb4f1d0d4bacc7f0e85466b5d56a78330623eae1c03e26",
+    "sha256": "0984e6f07a71d9441fb994cde86ef33c4f5d8bd8a4ac848c78569f70c0be9311",
+    "source": "LidoSRv3/Audit/Source/SszCompiledFrame.lean",
+    "trace_sha256": "336876077bcff66777cda295da767ab019aab6023120d60994de087fa153a953"
+  },
+  {
+    "olean_sha256": "a4b632dcf97e8c2cf3b231024d8c3ce33c5f310ac48c82b5799b127dcd8a0ea1",
+    "setup_sha256": "5d74cd3262a5b7780f4163bcd031f8ceb692d1690bbd81de860d25b99f8e8b41",
+    "sha256": "7f3fb7f06f5b2636379b4626a4ecfa14f993aaec44a44ea86c1f9ad69b88aec4",
+    "source": "LidoSRv3/Audit/Source/SszCompiledReply.lean",
+    "trace_sha256": "dc6e75adac3dcfe985b6ffa64b6b8405c82114935eecfedbdba8d0d4bc6e5b4e"
+  },
+  {
+    "olean_sha256": "4106f868a0ddda16f2c5a9579c32554edf63ec9bd51e6dc3798e6d4e1b94d560",
+    "setup_sha256": "d8f6e1e463d872a540337603214584d8dd9804021e4a6ca1a585eb8f7c4d18cd",
+    "sha256": "fc3421058d0f3b22c7738174e383192d30983b48f5b0117f4de531eb785369dc",
+    "source": "LidoSRv3/Audit/Source/SszCompiledClEntry.lean",
+    "trace_sha256": "0267e5725c4c0a38a5aed9aef4e565a5023df8c15c6a98d7b12c5c597c2eb1e0"
+  },
+  {
+    "olean_sha256": "9b7968941c6a80bd0671f203cb68b5969c9ad5cad36ce7d7b1af7ca9ffaf38b7",
+    "setup_sha256": "843b7692778c9bbaa1e122f61f888c97a7d463c9f30f24f84eef6147c151903c",
+    "sha256": "678dcbb1033904f47bab8b115b958300b003a1d2df89f713838ec9e86b4cce1b",
+    "source": "LidoSRv3/Audit/Guarantees/PSsz1CompiledClEntry.lean",
+    "trace_sha256": "2557a50f1df1f85322d85c56e5a6e4c3ff6a1081a7adbea613cd13068319bb87"
+  },
+  {
+    "olean_sha256": "9b9ae1f3e0e26c55c8b2cc3e39a0e4cf574b86feb4aacd7a8aa7ff2f45484651",
+    "setup_sha256": "301caf4e5c618f96c080cadc1d01d62e7ccd7a42c4b26a833e46ff3f8218d962",
+    "sha256": "73282e16b8a979def8caf75ec9cefe4879a7a2ae4d40d06d7197fefc3b0e8d98",
+    "source": "LidoSRv3/Tests/SszCompiledClEntryRegression.lean",
+    "trace_sha256": "686c40a8c1e034f35d6e2f03d16cf4baa007f034938ddc3182575333f31967e6"
+  }
+]

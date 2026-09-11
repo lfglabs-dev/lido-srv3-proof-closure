@@ -1,0 +1,123 @@
+{
+  "LidoSRv3.Audit.Guarantees.PSsz1.actual_compiled_cl_entry_branch": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Guarantees.PSsz1.actual_compiled_cl_entry_tree": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.SszCompiledClEntry.afterRoot_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.SszCompiledClEntry.beforeRoot_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.SszCompiledClEntry.rootCall_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.SszCompiledClEntry.run_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.SszCompiledFrame.allocate_frame": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.SszCompiledFrame.fields_effects": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.SszCompiledFrame.merkle_effects": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.SszCompiledFrame.pairStore_effects": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.SszCompiledFrame.write_pad_read": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.SszCompiledGIndex.pinned_words": [
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.SszCompiledGIndex.wrapper_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.SszCompiledReply.reply_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.SszCompiledReply.root_word_typed": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.SszSoladyFls.sourceFls_eq": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.SszSoladyFls.table_lookup": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.SszCompiledClEntryRegression.compiled_index_decoded": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.SszCompiledClEntryRegression.compiled_index_max_out_of_range": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.SszCompiledClEntryRegression.compiled_index_out_of_range": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.SszCompiledClEntryRegression.compiled_index_pinned": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.SszCompiledClEntryRegression.compiled_index_wraps": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.SszCompiledClEntryRegression.decoder_words": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.SszCompiledClEntryRegression.entry_selector": [],
+  "LidoSRv3.Tests.SszCompiledClEntryRegression.fls_header": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.SszCompiledClEntryRegression.fls_pinned_base": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.SszCompiledClEntryRegression.fls_pinned_validator": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.SszCompiledClEntryRegression.fls_power_boundary": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.SszCompiledClEntryRegression.fls_top": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.SszCompiledClEntryRegression.fls_zero_sentinel": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.SszCompiledClEntryRegression.pinned_immutables": [
+    "propext"
+  ]
+}
