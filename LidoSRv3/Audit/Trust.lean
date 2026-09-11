@@ -1,3 +1,6 @@
+import LidoSRv3.Tests.AddressRequestBatches
+import LidoSRv3.Tests.TopupPhysicalCredentialGetter
+import LidoSRv3.Tests.TopupCredentialCall
 import LidoSRv3.Tests.AddressWrappedTransferCalls
 import LidoSRv3.Tests.SszCompiledClEntryRegression
 import LidoSRv3.Tests.AddressWrappedTokenCalls
@@ -784,3 +787,20 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_transfer_request_failure_restores
 #print axioms LidoSRv3.Audit.Source.AddressWrappedTransferCalls.canonical_outer_call
 #print axioms LidoSRv3.Audit.Source.AddressWrappedTransferCalls.joined_success
+
+#print axioms LidoSRv3.Audit.Guarantees.PTopupCredentialCalls.actual_credential_root_module_memory_effects
+#print axioms LidoSRv3.Audit.Guarantees.PTopupCredentialCalls.actual_credential_root_module_failure_restores
+#print axioms LidoSRv3.Audit.Source.TopupCredentialCall.lookup_origin
+#print axioms LidoSRv3.Tests.TopupCredentialCall.public_consumer
+
+#print axioms LidoSRv3.Audit.Guarantees.PTopupPhysicalCredentialGetter.actual_physical_credential_root_module_memory_effects
+#print axioms LidoSRv3.Audit.Guarantees.PTopupPhysicalCredentialGetter.actual_physical_credential_root_module_failure_restores
+#print axioms LidoSRv3.Audit.Source.TopupPhysicalCredentialGetter.dispatch_request
+#print axioms LidoSRv3.Tests.TopupPhysicalCredentialGetter.public_consumer
+
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_steth_request_batch
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_request_batch
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_steth_batch_failure_restores
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_batch_failure_restores
+#print axioms LidoSRv3.Audit.Source.AddressRequestBatches.loop_success
+#print axioms LidoSRv3.Tests.AddressRequestBatches.public_empty_steth

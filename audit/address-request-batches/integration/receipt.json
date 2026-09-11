@@ -1,0 +1,20 @@
+{
+  "source": "274d8cc9aa543aa4aafda84937689676e0839cfe",
+  "main": "e3e833bbeaadccf1cf311ee55a775d0d1fa45905",
+  "union": "9b8946a15a61125fb8f3d0f7fa4d22ed52c2184e",
+  "build_union": "4b034905a8e2e372b9c1275074e5ec9cdb077397",
+  "jobs": 1751,
+  "global_axioms": 29,
+  "ordinary_scopes": 9,
+  "source_hashes": 52,
+  "sha256": {
+    "audit/address-request-batches/integration/README.md": "9a1cc113d761c06911c0f1aeffcc2e66a079660f8a69c97797ca4fe009088fe2",
+    "audit/address-request-batches/integration/all-trust-build.log": "32321c278a19698a7dbbf1c55d8925fa5e8d6224bd9a16b8e625c4d1f284861d",
+    "audit/address-request-batches/integration/identities.json": "f591ff3855952a5250aa0f95f9a1275e20e4d4e58a3a51640b89795238491ff4",
+    "audit/address-request-batches/integration/identity-check.log": "13e403f4aa0a2d254b29eb069e6bbfa7319140d03029e9958e06e3389a62c0a5",
+    "audit/address-request-batches/integration/independent-source-review-274d.md": "31571f85d874d5db85ae61324249c7bce093bd3228eb8e97c5362e2c70535dd5",
+    "audit/address-request-batches/integration/readonly-validator.py": "1f1f1823b5fd3ab70aec56d5d40a549319e3b1f47a51f80fe31db8ea594752b6",
+    "audit/address-request-batches/integration/scoped-axioms.json": "bdc6673eade8adb6f69a614ebf44b30e21624776268a80b2034f0c2d8a4f6902",
+    "audit/address-request-batches/integration/trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439"
+  }
+}
