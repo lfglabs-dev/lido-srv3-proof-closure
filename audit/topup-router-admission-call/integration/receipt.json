@@ -1,0 +1,26 @@
+{
+  "source_commit": "ed043832023c75e04adf76ea05c3ac96f3353897",
+  "accepted_main": "6e59055f72a4da135915844f6f504b02f10c6fcb",
+  "union_commit": "74d4ca3911b2a7d2514abefc1010c7a08073a83e",
+  "checks": {
+    "normal_jobs": 1795,
+    "premain347_normal_jobs": 1792,
+    "global_disclosed_axioms": 29,
+    "ordinary_foundation_scopes": 39,
+    "actual_sources": 1361,
+    "package_pins": 11,
+    "source_hashes": 42,
+    "normal_modules": 6
+  },
+  "files": {
+    "audit/topup-router-admission-call/integration/README.md": "69d78a2273f84a6dfd8e8cb7880a3bd09fd9a926ab5c1c0a874e0ae305488d99",
+    "audit/topup-router-admission-call/integration/global-trust.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439",
+    "audit/topup-router-admission-call/integration/independent-source-review-ed04.md": "d3f39eec5802dbb5e2d41d454113eea650a9c9155e4a632104bbb89a123135ed",
+    "audit/topup-router-admission-call/integration/normal-build.log": "3ae82bdd9d4bb760e3d9ddacbc371a0c59de438a673d59cca67b394faa72baab",
+    "audit/topup-router-admission-call/integration/normal-identities.json": "2a2896c4dc03aaf793a751537eef78836de32c2ce3f299cc1d2997217a875032",
+    "audit/topup-router-admission-call/integration/premain347-normal-build.log": "0dd3dd1ec33cebd5d7a847ac6dfc4b859e2c19070f5a74675556689c29f68c28",
+    "audit/topup-router-admission-call/integration/premain347-normal-identities.json": "72197adda4964957ba9227e3aed3df7ceba630c23ba789ae7c88b8375c66c4b9",
+    "audit/topup-router-admission-call/integration/validate-integration.py": "061e91ed85f74691dd0cfbfd5c1c033672dbd6f2cb448236ef3580d806318d6e",
+    "audit/topup-router-admission-call/integration/validation.log": "f5aded41b2f28740709c212c5c3e652c71fd3fd5ed8cef4d4588c7ea9aa0dae1"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "reviewed_commit": "840b7874e80b61a5ad0923642f19eb8a54c10a49",
+  "reviewed_tree": "645e8639ddf530818d649ab0aaeb499605a64bea",
+  "verdict": "CLEAN",
+  "files": {
+    "audit/topup-router-admission-call/integration/independent-integration-review-840b.md": "6c23b08fe82a96241dc58e8723f84dfb3dd89eb832df43efdc3a700a8eb70df7"
+  },
+  "scope": "Verbatim independent exact integration review; all preceding source, configuration, validation and dossier objects unchanged."
+}

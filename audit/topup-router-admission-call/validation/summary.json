@@ -1,0 +1,13 @@
+{
+  "actual_source_inputs": 1361,
+  "base": "d353e85438b3456604a76ee417f9359627751240",
+  "base_tree": "d4b640dafad39f2b4293d0be5782aeab8d612dfd",
+  "full_prior_conjunction": true,
+  "normal_modules": 4,
+  "ordinary_scopes": 39,
+  "package_pins": 11,
+  "solidity_fuzz_runs": 256,
+  "solidity_tests": 17,
+  "status": "PASS",
+  "unchanged_trust_checker_sha256": "d15d8aad37a92efdac1e7b51f3fbe93d79616d9b4f6629080e0338e98c2ed4e7"
+}

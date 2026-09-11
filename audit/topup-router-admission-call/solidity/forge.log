@@ -1,0 +1,25 @@
+Compiling 29 files with Solc 0.8.25
+Solc 0.8.25 finished in 14.77s
+Compiler run successful!
+
+Ran 17 tests for audit/topup-router-admission-call/solidity/TopupRouterAdmissionCall.t.sol:TopupRouterAdmissionCallTest
+[PASS] testFuzz_statusByte(uint8) (runs: 256, μ: 82386, ~: 33900)
+[PASS] test_authBubbleBeforeEmpty() (gas: 55090)
+[PASS] test_authCanonicalAddress() (gas: 38630)
+[PASS] test_authDecodedCaller() (gas: 38217)
+[PASS] test_authOrdinaryNoCode() (gas: 21921)
+[PASS] test_authShort() (gas: 36677)
+[PASS] test_authStaticWriteRejected() (gas: 1040440963)
+[PASS] test_inputOrder() (gas: 85400)
+[PASS] test_lateFailureRollsBackModule() (gas: 426049)
+[PASS] test_positiveTargetSkipsBoolCall() (gas: 470642)
+[PASS] test_statusAndTypeOrder() (gas: 78722)
+[PASS] test_zeroTargetBubble() (gas: 100878)
+[PASS] test_zeroTargetFalseBeforeModule() (gas: 79360)
+[PASS] test_zeroTargetNoncanonicalBool() (gas: 83777)
+[PASS] test_zeroTargetShortBool() (gas: 81346)
+[PASS] test_zeroTargetStaticWrite() (gas: 1040441667)
+[PASS] test_zeroTargetTrueTrailingDataCommitsModule() (gas: 463658)
+Suite result: ok. 17 passed; 0 failed; 0 skipped; finished in 16.59ms (17.77ms CPU time)
+
+Ran 1 test suite in 19.96ms (16.59ms CPU time): 17 tests passed, 0 failed, 0 skipped (17 total tests)
