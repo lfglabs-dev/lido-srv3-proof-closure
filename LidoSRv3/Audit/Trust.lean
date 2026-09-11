@@ -195,6 +195,7 @@ import LidoSRv3.Tests.AddressRequestCalls
 import LidoSRv3.Audit.Source.AccountingCorrespondence
 import LidoSRv3.Audit.Source.AddressCorrespondence
 import LidoSRv3.Audit.Source.TopupPointerOrigin
+import LidoSRv3.Audit.Source.TopupKeccakOracle
 import LidoSRv3.Tests.TopupPointerOriginMutants
 
 /-!
@@ -1321,3 +1322,28 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.SolidityAddress.run_rename
 #print axioms LidoSRv3.Audit.SolidityAddress.source_admission_nondiscriminatory
 #print axioms LidoSRv3.Audit.SolidityAddress.source_success_post_state_equivariant
+
+-- TopupKeccakOracle (grok/lido-topup-keccak-20260911 cherry-pick):
+-- Source-level oracle-independence family for the P-TOPUP-2
+-- memoryArrayElement / readArrayWith path. Shows that two arbitrary
+-- `DenoteOracle`s agree on every `memoryArrayElement` observation
+-- (`memory_array_read_is_oracle_independent`,
+-- `read_array_with_is_oracle_independent`), that the public
+-- `Topup2DistributionTx` decoders equal the arbitrary-oracle lookup
+-- (`readWord_eq_readWordWith`, `readArray_eq_readArrayWith`), that
+-- `.keccak256` IS the oracle hook (`evalKeccak_eq`,
+-- `zero_and_nonzero_disagree_on_keccak`), and the kill-line
+-- `memory_array_agreement_does_not_imply_keccak_agreement` refutes
+-- lifting memoryArrayElement agreement to keccak agreement. The
+-- registered parent `verity_tx_simulates_topup2_spec_any_oracle`
+-- restates the P-TOPUP-2 parent under an arbitrary oracle on the
+-- decode premises. Does NOT close the named P-TOPUP-2 fidelity gap
+-- "keccak memory-array oracle" — that residual remains.
+#print axioms LidoSRv3.Audit.Source.TopupKeccakOracle.memory_array_read_is_oracle_independent
+#print axioms LidoSRv3.Audit.Source.TopupKeccakOracle.read_array_with_is_oracle_independent
+#print axioms LidoSRv3.Audit.Source.TopupKeccakOracle.readWord_eq_readWordWith
+#print axioms LidoSRv3.Audit.Source.TopupKeccakOracle.readArray_eq_readArrayWith
+#print axioms LidoSRv3.Audit.Source.TopupKeccakOracle.evalKeccak_eq
+#print axioms LidoSRv3.Audit.Source.TopupKeccakOracle.zero_and_nonzero_disagree_on_keccak
+#print axioms LidoSRv3.Audit.Source.TopupKeccakOracle.memory_array_agreement_does_not_imply_keccak_agreement
+#print axioms LidoSRv3.Audit.Source.TopupKeccakOracle.verity_tx_simulates_topup2_spec_any_oracle
