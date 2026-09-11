@@ -1,0 +1,11 @@
+{
+  "sources": 1246,
+  "pins": 11,
+  "artifact_hashes": 46,
+  "scoped_axioms": 5,
+  "normal_olean_sha256": {
+    "LidoSRv3/Audit/Source/AddressWrappedRequestCalls": "21484d43d7389e40bc25530c0e170de09430f8c7504d5793690af57e6a887e7e",
+    "LidoSRv3/Audit/Guarantees/PAddress1WrappedRequestCalls": "553aed10e7d0abe8e8dbc3e0e0f335e5a04be81c72be253e0d19a551af0b0a31",
+    "LidoSRv3/Tests/AddressWrappedRequestCalls": "bb0db7046abc82d344e36af0045c82a013a7d6a76ae08a1f18cc4219bf8c9567"
+  }
+}

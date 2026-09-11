@@ -1,0 +1,39 @@
+{
+  "source": "19c52ff56f40e374b568eba38658c15067f76abe",
+  "main_base": "b77355c3245910348f8eb46f46ba47d88e225612",
+  "union": "751500a2f558a63bd8905bd4b8db79ddad71ba5b",
+  "AllTrust": {
+    "command": "lake build LidoSRv3.Audit.AllGuarantees LidoSRv3.Audit.Trust",
+    "jobs": 1725,
+    "exit": 0
+  },
+  "trust": {
+    "command": "python3 scripts/check_trust_axioms.py",
+    "exit": 0,
+    "exact_axioms": 29,
+    "dependencies_recomputed": true,
+    "native_claims_reevaluated": true
+  },
+  "identities": {
+    "sources": 1246,
+    "pins": 11,
+    "artifact_hashes": 46,
+    "scoped_axioms": 5,
+    "normal_olean_sha256": {
+      "LidoSRv3/Audit/Source/AddressWrappedRequestCalls": "21484d43d7389e40bc25530c0e170de09430f8c7504d5793690af57e6a887e7e",
+      "LidoSRv3/Audit/Guarantees/PAddress1WrappedRequestCalls": "553aed10e7d0abe8e8dbc3e0e0f335e5a04be81c72be253e0d19a551af0b0a31",
+      "LidoSRv3/Tests/AddressWrappedRequestCalls": "bb0db7046abc82d344e36af0045c82a013a7d6a76ae08a1f18cc4219bf8c9567"
+    }
+  },
+  "fresh_root_solidity_tests": 0,
+  "fresh_root_ffi_diagnostics": 0,
+  "reused_reviewed_solidity_tests": 9,
+  "sha256": {
+    "audit/address-wrapped-request-call/integration/README.md": "e7730ad201b7763c7854ac619a619c051982f06286adc18f5b91142789cf54db",
+    "audit/address-wrapped-request-call/integration/all-trust-build.log": "f730d732b89f5e8daf4a231e4df2002ceed29259431f95ac10808ed8f1ebd9ab",
+    "audit/address-wrapped-request-call/integration/identities.json": "ec5adbc8dbfb82bc719fb11fe1ca77ca247265f70527aab081afa46351826eee",
+    "audit/address-wrapped-request-call/integration/independent-source-review-19c5.md": "a2819e64fd81f108178e907bab0f156c7706892a4ac0b53611a48c44026d66eb",
+    "audit/address-wrapped-request-call/integration/scoped-axioms.json": "3c0e40cee0c8cd90889b28e4749fb840419aec31c975a50c1ed54d8555fe2b59",
+    "audit/address-wrapped-request-call/integration/trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439"
+  }
+}
