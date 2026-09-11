@@ -206,6 +206,7 @@ import LidoSRv3.Audit.Verity.TrioConsolidation.Correspondence
 import LidoSRv3.Audit.Verity.TrioConsolidation.Memory
 import LidoSRv3.Audit.Verity.ConsolidationValueTx
 import LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx
+import LidoSRv3.Audit.Verity.ReserveRelationalTx
 import LidoSRv3.Tests.TopupPointerOriginMutants
 
 /-!
@@ -1547,3 +1548,25 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- `noAvailableMinMutant_is_detected` all rely on `native_decide` and
 -- are intentionally kept out of this disclosure to keep the Trust
 -- surface inside the foundations-only boundary the checker enforces.)
+
+-- HandleOracleReportTx auxiliary slot-inequality lemmas that support
+-- the mint-after-read discipline.
+#print axioms LidoSRv3.Audit.Verity.HandleOracleReportTx.rewardsRead_ne_rewardsMinted
+#print axioms LidoSRv3.Audit.Verity.HandleOracleReportTx.rewardsRead_ne_sequence
+
+-- ReserveRelationalTx slot-inequality and decode-write bridge.
+#print axioms LidoSRv3.Audit.Verity.ReserveRelationalTx.lockedEtherSlot_ne_lastFinalizedSlot
+#print axioms LidoSRv3.Audit.Verity.ReserveRelationalTx.decode_writeSlot_reserve
+
+-- SubmitReportEntryTx executable-shape lemmas: `entry_is_computed_wrapper`,
+-- the two disallowed-sender / hash-mismatch revert closures, and the
+-- observe-simulates-source-at-computed-mint tx observation.
+#print axioms LidoSRv3.Audit.Verity.SubmitReportEntryTx.entry_is_computed_wrapper
+#print axioms LidoSRv3.Audit.Verity.SubmitReportEntryTx.entry_reverts_on_disallowed_sender
+#print axioms LidoSRv3.Audit.Verity.SubmitReportEntryTx.entry_reverts_on_hash_mismatch
+#print axioms LidoSRv3.Audit.Verity.SubmitReportEntryTx.entry_observe_simulates_source_at_computed_mint
+
+-- (OfficialSemantics checkedFold_* / wrappingMutant_is_detected all
+-- rely on `native_decide` transitively and are intentionally kept
+-- out of this disclosure to keep the Trust surface inside the
+-- foundations-only boundary the checker enforces.)
