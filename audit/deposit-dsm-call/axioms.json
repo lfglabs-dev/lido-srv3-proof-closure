@@ -1,0 +1,28 @@
+{
+  "LidoSRv3.Audit.Guarantees.PDeposit1.actual_dsm_call_failure_restores": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Guarantees.PDeposit1.actual_dsm_call_registered_module_suffix": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.DepositDsmCall.lookup_origin": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.DepositDsmCall.public_late_restores": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.DepositDsmCall.public_positive": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.DepositDsmCall.public_rejection_restores": [
+    "Quot.sound",
+    "propext"
+  ]
+}
