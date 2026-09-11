@@ -23,7 +23,7 @@ Additive lot: no existing Lean, registry, Trust, or import-DAG file is edited.
 set_option autoImplicit false
 namespace LidoSRv3.Audit.Source.TopupKeccakOracle
 
-open Verity
+open _root_.Verity
 open Compiler.CompilationModel
 open Compiler.CompilationModel.Denote
 open LidoSRv3.Audit.Verity.Topup2DistributionTx
@@ -74,7 +74,7 @@ theorem read_array_with_is_oracle_independent
     readArrayWith oracle₁ state name base length =
       readArrayWith oracle₂ state name base length := by
   unfold readArrayWith
-  congr 1
+  refine congrArg (List.range length).mapM ?_
   funext index
   exact memory_array_read_is_oracle_independent oracle₁ oracle₂ state name base length index
 
@@ -94,7 +94,7 @@ theorem readArray_eq_readArrayWith
     readArray state name base length =
       readArrayWith oracle state name base length := by
   unfold readArray readArrayWith
-  congr 1
+  refine congrArg (List.range length).mapM ?_
   funext index
   exact readWord_eq_readWordWith oracle state name base length index
 
