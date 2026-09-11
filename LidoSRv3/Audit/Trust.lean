@@ -1,3 +1,9 @@
+import LidoSRv3.Tests.AddressWrappedTokenCalls
+import LidoSRv3.Tests.DepositDsmCall
+import LidoSRv3.Tests.AddressWrappedRequestCalls
+import LidoSRv3.Tests.DepositPhysicalAdmission
+import Tests.Verity.ReportFeeDistributionTest
+import Tests.Verity.ReportFeeTreasuryCallTest
 import audit.trio.deposit.Tests.Verity.ModulePhysicalMetadataTest
 import LidoSRv3.Tests.ConsolidationSettlementRequestsRegression
 import Tests.Verity.ReportFeeCheckedSplitTest
@@ -159,6 +165,8 @@ import LidoSRv3.Tests.AllocationTxMutants
 import LidoSRv3.Tests.AddressSourceMutants
 import LidoSRv3.Audit.Verity.Tests.SszTxSimulation
 import LidoSRv3.Audit.Source.SanityEnvelope
+import LidoSRv3.Tests.TopupModuleMemoryRegression
+import LidoSRv3.Tests.AddressRequestCalls
 
 /-!
 Machine-readable-in-build trust report for the first audit slice.
@@ -722,3 +730,43 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.actual_module_call_failure_restores
 #print axioms audit.trio.deposit.ModuleCall.decodeReturn_size_bounds
 #print axioms audit.trio.deposit.ModulePhysicalMetadata.success_effects
+
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1.actual_report_fee_mint_distribution
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1.actual_report_fee_distribution_failure_restores
+#print axioms AccountAddress.ReportFeeDistribution.minted_budget
+#print axioms AccountAddress.FeeDistribution.PaymentChain.ledger
+
+#print axioms LidoSRv3.Audit.Guarantees.PTopupMemoryCalls.actual_root_module_memory_effects
+#print axioms LidoSRv3.Audit.Guarantees.PTopupMemoryCalls.actual_root_module_memory_failure_restores
+#print axioms LidoSRv3.Audit.Source.TopupModuleMemory.raw_bounds
+#print axioms LidoSRv3.Audit.Source.TopupModuleMemory.decode_success
+
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_request_withdrawal_enqueue
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_request_withdrawal_failure_restores
+#print axioms LidoSRv3.Audit.Source.AddressRequestCalls.enqueue_success
+#print axioms LidoSRv3.Tests.AddressRequestCalls.public_late_rollback_instance
+
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1.actual_report_fee_mint_treasury_call
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1.actual_report_treasury_failure_restores
+#print axioms AccountAddress.TreasuryCall.call_success
+#print axioms AccountAddress.ReportFeeTreasuryCall.distribute_success
+
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.actual_registered_module_call_metadata_suffix
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.actual_registered_module_failure_restores
+#print axioms LidoSRv3.Audit.Source.DepositPhysicalAdmission.selected_fields
+#print axioms LidoSRv3.Audit.Source.DepositPhysicalAdmission.selectedOctets_head
+
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_request_withdrawal_enqueue
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_request_withdrawal_failure_restores
+#print axioms LidoSRv3.Audit.Source.AddressWrappedRequestCalls.unwrap_success
+#print axioms LidoSRv3.Audit.Source.AddressWrappedRequestCalls.request_success
+
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.actual_dsm_call_registered_module_suffix
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.actual_dsm_call_failure_restores
+#print axioms LidoSRv3.Audit.Source.DepositDsmCall.lookup_origin
+#print axioms LidoSRv3.Audit.Source.DepositDsmCall.success_effects
+
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_token_request_enqueue
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_token_request_failure_restores
+#print axioms LidoSRv3.Audit.Source.AddressWrappedTokenCalls.canonical_call
+#print axioms LidoSRv3.Audit.Source.AddressWrappedTokenCalls.joined_success

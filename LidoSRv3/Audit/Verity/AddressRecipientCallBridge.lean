@@ -214,13 +214,13 @@ def withRequestOwner (word : Uint256) (owner : Address) : Uint256 :=
 /-- `keccak256("lido.WithdrawalQueueERC721.tokenApprovals")`, the actual
 unstructured mapping base deleted by `_transfer` at source line 247. -/
 def tokenApprovalsPosition : Nat :=
-  0x528f2b9d452f4b604589d1a9e64c321ee1035a867d38a1359d022af391cf7df5
+  0x528f2b9d45274be04589d1a9e644321ee1435a867d38a1359d022af391cf7d75
 
 def lastRequestIdPosition : Nat :=
-  0x8ee26abbbdf5335e3953ccf2204a79e845eecb5ab51f8398526746e4ea068041
+  0x8ee26abbbdf533de3953ccf2204279e845eecb5ab51f8398522746e4ea068041
 
 def lastReportTimestampPosition : Nat :=
-  0x6825d6bead788134d1ac062bbb7f1f0e4a9e13182688453e79955a721d58c45d
+  0x6825d6bead7081b4d1ac062bbb771f0e4ade13182688453e79955a721d58c4dd
 
 /-- `isApprovedForAll[owner][operator]` is a Solidity nested mapping. -/
 def operatorApprovalsPosition : Nat :=

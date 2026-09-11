@@ -1,0 +1,32 @@
+Compiling 1 files with Solc 0.8.25
+Solc 0.8.25 finished in 12.17s
+Compiler run successful!
+
+Ran 1 test for test/Dsm.t.sol:DsmTest
+[FAIL: no code/short return] testNoCodeSuccessThenDecoderRejection() (gas: 4324444)
+Traces:
+  [4324444] DsmTest::testNoCodeSuccessThenDecoderRejection()
+    ├─ [4280606] → new DsmHarness@0xF62849F9A0B5Bf2913b396098F7c7019b51A820a
+    │   ├─ emit Initialized(version: 18446744073709551615 [1.844e19])
+    │   └─ ← [Return] 21259 bytes of code
+    ├─ [4447] DsmHarness::admitted(7) [staticcall]
+    │   ├─ [0] 0x0000000000000000000000000000000000123456::depositSecurityModule() [staticcall]
+    │   │   └─ ← [Stop]
+    │   └─ ← [Revert] call to non-contract address 0x0000000000000000000000000000000000123456
+    └─ ← [Revert] no code/short return
+
+Backtrace:
+  at DsmHarness.admitted
+  at DsmTest.testNoCodeSuccessThenDecoderRejection
+
+Suite result: FAILED. 0 passed; 1 failed; 0 skipped; finished in 4.08ms (1.21ms CPU time)
+
+Ran 1 test suite in 145.57ms (4.08ms CPU time): 0 tests passed, 1 failed, 0 skipped (1 total tests)
+
+Failing tests:
+Encountered 1 failing test in test/Dsm.t.sol:DsmTest
+[FAIL: no code/short return] testNoCodeSuccessThenDecoderRejection() (gas: 4324444)
+
+Encountered a total of 1 failing tests, 0 tests succeeded
+
+Tip: Run `forge test --rerun` to retry only the 1 failed test

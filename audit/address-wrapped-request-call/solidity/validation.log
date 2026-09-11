@@ -1,0 +1,17 @@
+Compiling 1 files with Solc 0.8.9
+Solc 0.8.9 finished in 571.95ms
+Compiler run successful!
+
+Ran 9 tests for test/WrappedRequest.t.sol:WrappedRequestTest
+[PASS] testActualChainFalseBoolTrailingUnwrapAndEvents() (gas: 4914706)
+[PASS] testAmountBoundsAfterUnwrapBeforeQuote() (gas: 4909658)
+[PASS] testBoolDecoderBeforeUnwrap() (gas: 4654945)
+[PASS] testBubbledCallFailures() (gas: 4672866)
+[PASS] testCallerDoesNotInventZeroWrappedGuard() (gas: 4785731)
+[PASS] testFuzzActualReturnedAmountAndShares(uint256,uint96,uint256,uint160) (runs: 1024, μ: 4829877, ~: 4830849)
+[PASS] testLateOwnerSetFailureRestoresBothCalls() (gas: 4744936)
+[PASS] testStaticWriteFailureRestoresBothCalls() (gas: 1040582247)
+[PASS] testUnwrapDecoderBeforeBounds() (gas: 4649663)
+Suite result: ok. 9 passed; 0 failed; 0 skipped; finished in 166.24ms (168.30ms CPU time)
+
+Ran 1 test suite in 166.56ms (166.24ms CPU time): 9 tests passed, 0 failed, 0 skipped (9 total tests)

@@ -1,0 +1,20 @@
+Compiling 2 files with Solc 0.8.9
+Solc 0.8.9 finished in 522.24ms
+Compiler run successful!
+
+Ran 12 tests for test/Request.t.sol:RequestTest
+[PASS] testAmountGuards() (gas: 3967755)
+[PASS] testCumulativeOverflowRollback() (gas: 4041092)
+[PASS] testDuplicateOwnerSetLateRollback() (gas: 4058835)
+[PASS] testFalseBoolAndOrderedEvents() (gas: 4133201)
+[PASS] testFuzzOwnerAmountAndShares(uint160,uint128,uint96) (runs: 1024, μ: 4146945, ~: 4147431)
+[PASS] testIdOverflowRollback() (gas: 4016266)
+[PASS] testMaximumSetLengthWrapsLegacy() (gas: 4065583)
+[PASS] testNoncanonicalBoolRollback() (gas: 4009672)
+[PASS] testOccupiedHighBytePreserved() (gas: 4106982)
+[PASS] testPostTransferWorldAndTruncatedShares() (gas: 4173405)
+[PASS] testShortBoolRollback() (gas: 3989674)
+[PASS] testStaticGetterRejectsWriteRollback() (gas: 1040556873)
+Suite result: ok. 12 passed; 0 failed; 0 skipped; finished in 147.38ms (162.74ms CPU time)
+
+Ran 1 test suite in 152.52ms (147.38ms CPU time): 12 tests passed, 0 failed, 0 skipped (12 total tests)

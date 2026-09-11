@@ -1,0 +1,53 @@
+{
+  "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "checks": [
+    {
+      "name": "lastRequestIdPosition",
+      "preimage": "lido.WithdrawalQueue.lastRequestId",
+      "source": "contracts/0.8.9/WithdrawalQueueBase.sol",
+      "value": "0x8ee26abbbdf533de3953ccf2204279e845eecb5ab51f8398522746e4ea068041",
+      "lean_file": "LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean",
+      "present_in_request_assembly": true
+    },
+    {
+      "name": "lastReportTimestampPosition",
+      "preimage": "lido.WithdrawalQueue.lastReportTimestamp",
+      "source": "contracts/0.8.9/WithdrawalQueueBase.sol",
+      "value": "0x6825d6bead7081b4d1ac062bbb771f0e4ade13182688453e79955a721d58c4dd",
+      "lean_file": "LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean",
+      "present_in_request_assembly": true
+    },
+    {
+      "name": "queuePosition",
+      "preimage": "lido.WithdrawalQueue.queue",
+      "source": "contracts/0.8.9/WithdrawalQueueBase.sol",
+      "value": "0xe21b95c4eb1b99fd548b219e3b5c175a8efb31f910cb76456b20e14eba8cfe43",
+      "lean_file": "LidoSRv3/Audit/Verity/AddressClaimBatchTx.lean",
+      "present_in_request_assembly": true
+    },
+    {
+      "name": "requestsByOwnerPosition",
+      "preimage": "lido.WithdrawalQueue.requestsByOwner",
+      "source": "contracts/0.8.9/WithdrawalQueueBase.sol",
+      "value": "0x4b9bfe0774f05ab288bd50bd23f74ae80a797f1d0c82d419d43ebda4fdc2fe1f",
+      "lean_file": "LidoSRv3/Audit/Verity/AddressClaimBatchTx.lean",
+      "present_in_request_assembly": true
+    },
+    {
+      "name": "transferFromSelector",
+      "signature": "transferFrom(address,address,uint256)",
+      "value": "0x23b872dd"
+    },
+    {
+      "name": "getSharesByPooledEthSelector",
+      "signature": "getSharesByPooledEth(uint256)",
+      "value": "0x19208451"
+    },
+    {
+      "name": "unwrapCalldata",
+      "signature": "unwrap(uint256)",
+      "value": "0xde0e9a3e"
+    }
+  ],
+  "verdict": "PASS"
+}

@@ -1,0 +1,37 @@
+{
+  "LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_token_request_enqueue": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_token_request_failure_restores": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressWrappedTokenCalls.burn_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressWrappedTokenCalls.canonical_call": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressWrappedTokenCalls.joined_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressWrappedTokenCalls.token_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.AddressWrappedTokenCalls.public_zero_rollback": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ]
+}

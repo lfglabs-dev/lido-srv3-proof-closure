@@ -1,0 +1,106 @@
+{
+  "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "checks": [
+    {
+      "name": "lastRequestIdPosition",
+      "preimage": "lido.WithdrawalQueue.lastRequestId",
+      "source": "contracts/0.8.9/WithdrawalQueueBase.sol",
+      "value": "0x8ee26abbbdf533de3953ccf2204279e845eecb5ab51f8398522746e4ea068041",
+      "lean_file": "LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean",
+      "present_in_request_assembly": true
+    },
+    {
+      "name": "lastReportTimestampPosition",
+      "preimage": "lido.WithdrawalQueue.lastReportTimestamp",
+      "source": "contracts/0.8.9/WithdrawalQueueBase.sol",
+      "value": "0x6825d6bead7081b4d1ac062bbb771f0e4ade13182688453e79955a721d58c4dd",
+      "lean_file": "LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean",
+      "present_in_request_assembly": true
+    },
+    {
+      "name": "queuePosition",
+      "preimage": "lido.WithdrawalQueue.queue",
+      "source": "contracts/0.8.9/WithdrawalQueueBase.sol",
+      "value": "0xe21b95c4eb1b99fd548b219e3b5c175a8efb31f910cb76456b20e14eba8cfe43",
+      "lean_file": "LidoSRv3/Audit/Verity/AddressClaimBatchTx.lean",
+      "present_in_request_assembly": true
+    },
+    {
+      "name": "requestsByOwnerPosition",
+      "preimage": "lido.WithdrawalQueue.requestsByOwner",
+      "source": "contracts/0.8.9/WithdrawalQueueBase.sol",
+      "value": "0x4b9bfe0774f05ab288bd50bd23f74ae80a797f1d0c82d419d43ebda4fdc2fe1f",
+      "lean_file": "LidoSRv3/Audit/Verity/AddressClaimBatchTx.lean",
+      "present_in_request_assembly": true
+    },
+    {
+      "name": "checkpointsPosition",
+      "preimage": "lido.WithdrawalQueue.checkpoints",
+      "source": "contracts/0.8.9/WithdrawalQueueBase.sol",
+      "value": "0x445f3cbbc114a35d080f2a1953516d74e74d5106860bc2317840ba265f03b51a",
+      "lean_file": "LidoSRv3/Audit/Verity/AddressClaimBatchTx.lean",
+      "present_in_request_assembly": false
+    },
+    {
+      "name": "lastFinalizedRequestIdPosition",
+      "preimage": "lido.WithdrawalQueue.lastFinalizedRequestId",
+      "source": "contracts/0.8.9/WithdrawalQueueBase.sol",
+      "value": "0x992f2e0c24ce59a21f2dab8bba13b25c2f872129df7f4d45372155e717db0c48",
+      "lean_file": "LidoSRv3/Audit/Verity/AddressClaimBatchTx.lean",
+      "present_in_request_assembly": true
+    },
+    {
+      "name": "lastCheckpointIndexPosition",
+      "preimage": "lido.WithdrawalQueue.lastCheckpointIndex",
+      "source": "contracts/0.8.9/WithdrawalQueueBase.sol",
+      "value": "0x9d8be19d6a54e40bd767aa61b0f462241f5562ef6967d7045485bccac825b240",
+      "lean_file": "LidoSRv3/Audit/Verity/AddressClaimBatchTx.lean",
+      "present_in_request_assembly": true
+    },
+    {
+      "name": "lockedEtherAmountPosition",
+      "preimage": "lido.WithdrawalQueue.lockedEtherAmount",
+      "source": "contracts/0.8.9/WithdrawalQueueBase.sol",
+      "value": "0x0e27eaa2e71c8572ab988fef0b54cd45bbd1740de1e22343fb6cda7536edc12f",
+      "lean_file": "LidoSRv3/Audit/Verity/AddressClaimBatchTx.lean",
+      "present_in_request_assembly": false
+    },
+    {
+      "name": "tokenApprovalsPosition",
+      "preimage": "lido.WithdrawalQueueERC721.tokenApprovals",
+      "source": "contracts/0.8.9/WithdrawalQueueERC721.sol",
+      "value": "0x528f2b9d45274be04589d1a9e644321ee1435a867d38a1359d022af391cf7d75",
+      "lean_file": "LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean",
+      "present_in_request_assembly": false
+    },
+    {
+      "name": "operatorApprovalsPosition",
+      "preimage": "lido.WithdrawalQueueERC721.operatorApprovals",
+      "source": "contracts/0.8.9/WithdrawalQueueERC721.sol",
+      "value": "0xe6a0e71d546599dab4b90490502c456cf7c806a5710690dde406c1a77d7f25e7",
+      "lean_file": "LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean",
+      "present_in_request_assembly": false
+    },
+    {
+      "name": "transferFromSelector",
+      "signature": "transferFrom(address,address,uint256)",
+      "value": "0x23b872dd"
+    },
+    {
+      "name": "getSharesByPooledEthSelector",
+      "signature": "getSharesByPooledEth(uint256)",
+      "value": "0x19208451"
+    },
+    {
+      "name": "getPooledEthBySharesSelector",
+      "signature": "getPooledEthByShares(uint256)",
+      "value": "0x7a28fb88"
+    },
+    {
+      "name": "erc20TransferSelector",
+      "signature": "transfer(address,uint256)",
+      "value": "0xa9059cbb"
+    }
+  ],
+  "verdict": "PASS"
+}

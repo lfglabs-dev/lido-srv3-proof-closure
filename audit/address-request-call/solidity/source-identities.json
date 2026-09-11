@@ -1,0 +1,100 @@
+{
+  "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "npm_integrity": "sha512-o+pHCf/yMLSlV5MkDQEzEQL402i6SoRnktru+0rdSxVEFZcTzzGhZCAtZjUFyKGazMSv1TilzMg+RbED1N8XHQ==",
+  "sources": {
+    "audit/address-request-call/solidity/src/@openzeppelin/contracts-v4.4/access/IAccessControl.sol": {
+      "origin": "npm:@openzeppelin/contracts@4.4.1/access/IAccessControl.sol",
+      "sha256": "d03c1257f2094da6c86efa7aa09c1c07ebd33dd31046480c5097bc2542140e45"
+    },
+    "audit/address-request-call/solidity/src/@openzeppelin/contracts-v4.4/access/IAccessControlEnumerable.sol": {
+      "origin": "npm:@openzeppelin/contracts@4.4.1/access/IAccessControlEnumerable.sol",
+      "sha256": "655ab8dc2a9617376734d04ca293e099cc24f8ce893997e68c29cfebc4a61d39"
+    },
+    "audit/address-request-call/solidity/src/@openzeppelin/contracts-v4.4/token/ERC20/IERC20.sol": {
+      "origin": "npm:@openzeppelin/contracts@4.4.1/token/ERC20/IERC20.sol",
+      "sha256": "6eacf8ca56b41b7636489c0996d8f9608b4d298879a1fd5d876f21ad7a6711f1"
+    },
+    "audit/address-request-call/solidity/src/@openzeppelin/contracts-v4.4/token/ERC20/extensions/draft-IERC20Permit.sol": {
+      "origin": "npm:@openzeppelin/contracts@4.4.1/token/ERC20/extensions/draft-IERC20Permit.sol",
+      "sha256": "3e7aa0e0f69eec8f097ad664d525e7b3f0a3fda8dcdd97de5433ddb131db86ef"
+    },
+    "audit/address-request-call/solidity/src/@openzeppelin/contracts-v4.4/utils/Context.sol": {
+      "origin": "npm:@openzeppelin/contracts@4.4.1/utils/Context.sol",
+      "sha256": "1458c260d010a08e4c20a4a517882259a23a4baa0b5bd9add9fb6d6a1549814a"
+    },
+    "audit/address-request-call/solidity/src/@openzeppelin/contracts-v4.4/utils/Strings.sol": {
+      "origin": "npm:@openzeppelin/contracts@4.4.1/utils/Strings.sol",
+      "sha256": "8597c62818dcbc6cf85c21179b90b714fb4f70a4347ca2eed23e88c87b08b8a1"
+    },
+    "audit/address-request-call/solidity/src/@openzeppelin/contracts-v4.4/utils/introspection/ERC165.sol": {
+      "origin": "npm:@openzeppelin/contracts@4.4.1/utils/introspection/ERC165.sol",
+      "sha256": "8806a632d7b656cadb8133ff8f2acae4405b3a64d8709d93b0fa6a216a8a6154"
+    },
+    "audit/address-request-call/solidity/src/@openzeppelin/contracts-v4.4/utils/introspection/IERC165.sol": {
+      "origin": "npm:@openzeppelin/contracts@4.4.1/utils/introspection/IERC165.sol",
+      "sha256": "701e025d13ec6be09ae892eb029cd83b3064325801d73654847a5fb11c58b1e5"
+    },
+    "audit/address-request-call/solidity/src/@openzeppelin/contracts-v4.4/utils/structs/EnumerableSet.sol": {
+      "origin": "npm:@openzeppelin/contracts@4.4.1/utils/structs/EnumerableSet.sol",
+      "sha256": "42a618e7d36efd2319d1bf05fedb31f3042baf535cfb97e783128cc1fe326686"
+    },
+    "audit/address-request-call/solidity/src/CompilerProbe.sol": {
+      "origin": "local harness/probe; never claimed production source",
+      "sha256": "8574cd334756001f07cb14e9eff63bc2a3db3cb9a5861410f1353bef2a50a8ff"
+    },
+    "audit/address-request-call/solidity/src/RequestHarness.sol": {
+      "origin": "local harness/probe; never claimed production source",
+      "sha256": "74f61b14eecc6a394ea5e36c848a7489cce7b41c1f13cdd46e547e399f3158d8"
+    },
+    "audit/address-request-call/solidity/src/core/WithdrawalQueue.sol": {
+      "origin": "contracts/0.8.9/WithdrawalQueue.sol",
+      "sha256": "efa5a32fbc99cafdb16a38d96a9bb5b29a62e60b5610e7c317711cc58402b131"
+    },
+    "audit/address-request-call/solidity/src/core/WithdrawalQueueBase.sol": {
+      "origin": "contracts/0.8.9/WithdrawalQueueBase.sol",
+      "sha256": "68d8919f89198c3d39272b2259a3144bf87a4aa48c570624b025fd86da47d2bb"
+    },
+    "audit/address-request-call/solidity/src/core/lib/UnstructuredStorage.sol": {
+      "origin": "contracts/0.8.9/lib/UnstructuredStorage.sol",
+      "sha256": "955bfcb0bf265db114248bdabeabebc39bddb3fbb756e2448f6aed59f1994f56"
+    },
+    "audit/address-request-call/solidity/src/core/utils/PausableUntil.sol": {
+      "origin": "contracts/0.8.9/utils/PausableUntil.sol",
+      "sha256": "afd11f5950050bbc8e9fad3cbea2a5bdbcc23048128c30f335a12b48084c8594"
+    },
+    "audit/address-request-call/solidity/src/core/utils/Versioned.sol": {
+      "origin": "contracts/0.8.9/utils/Versioned.sol",
+      "sha256": "7f9ba0a2368d7531447a80e80ae28406964acf51ca0de8bfa985620e226340a8"
+    },
+    "audit/address-request-call/solidity/src/core/utils/access/AccessControl.sol": {
+      "origin": "contracts/0.8.9/utils/access/AccessControl.sol",
+      "sha256": "e399e266f9b0e8fe99708f3fb2f656a636fb432d69ca9c247f2e84f2e762f803"
+    },
+    "audit/address-request-call/solidity/src/core/utils/access/AccessControlEnumerable.sol": {
+      "origin": "contracts/0.8.9/utils/access/AccessControlEnumerable.sol",
+      "sha256": "e8fa2bc8e4c8046fd04b25ed4708be8159913cac4ca738cdc53022896e0566ce"
+    },
+    "audit/address-request-call/solidity/test/Request.t.sol": {
+      "origin": "local tests",
+      "sha256": "6d074a7bce3b0833883a4f1600e4a3bedd7eefe860bbc72f12ff4f3ca5523705"
+    }
+  },
+  "compiler_settings": {
+    "remappings": [
+      "@openzeppelin/contracts-v4.4/=src/@openzeppelin/contracts-v4.4/"
+    ],
+    "optimizer": {
+      "enabled": true,
+      "runs": 200
+    },
+    "metadata": {
+      "bytecodeHash": "ipfs"
+    },
+    "compilationTarget": {
+      "src/RequestHarness.sol": "RequestHarness"
+    },
+    "evmVersion": "london",
+    "libraries": {}
+  },
+  "solc_version": "0.8.9+commit.e5eed63a"
+}

@@ -1,0 +1,351 @@
+{
+  "storage": [
+    {
+      "astId": 4296,
+      "contract": "src/AdmissionHarness.sol:AdmissionHarness",
+      "label": "layoutProbe",
+      "offset": 0,
+      "slot": "0",
+      "type": "t_struct(RouterState)8186_storage"
+    }
+  ],
+  "types": {
+    "t_address": {
+      "encoding": "inplace",
+      "label": "address",
+      "numberOfBytes": "20"
+    },
+    "t_array(t_bytes32)dyn_storage": {
+      "encoding": "dynamic_array",
+      "label": "bytes32[]",
+      "numberOfBytes": "32",
+      "base": "t_bytes32"
+    },
+    "t_bytes32": {
+      "encoding": "inplace",
+      "label": "bytes32",
+      "numberOfBytes": "32"
+    },
+    "t_enum(StakingModuleStatus)8032": {
+      "encoding": "inplace",
+      "label": "enum StakingModuleStatus",
+      "numberOfBytes": "1"
+    },
+    "t_mapping(t_bytes32,t_uint256)": {
+      "encoding": "mapping",
+      "key": "t_bytes32",
+      "label": "mapping(bytes32 => uint256)",
+      "numberOfBytes": "32",
+      "value": "t_uint256"
+    },
+    "t_mapping(t_uint256,t_struct(ModuleState)8168_storage)": {
+      "encoding": "mapping",
+      "key": "t_uint256",
+      "label": "mapping(uint256 => struct ModuleState)",
+      "numberOfBytes": "32",
+      "value": "t_struct(ModuleState)8168_storage"
+    },
+    "t_string_storage": {
+      "encoding": "bytes",
+      "label": "string",
+      "numberOfBytes": "32"
+    },
+    "t_struct(ModuleState)8168_storage": {
+      "encoding": "inplace",
+      "label": "struct ModuleState",
+      "numberOfBytes": "128",
+      "members": [
+        {
+          "astId": 8156,
+          "contract": "src/AdmissionHarness.sol:AdmissionHarness",
+          "label": "config",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_struct(ModuleStateConfig)8126_storage"
+        },
+        {
+          "astId": 8160,
+          "contract": "src/AdmissionHarness.sol:AdmissionHarness",
+          "label": "deposits",
+          "offset": 0,
+          "slot": "1",
+          "type": "t_struct(ModuleStateDeposits)8140_storage"
+        },
+        {
+          "astId": 8164,
+          "contract": "src/AdmissionHarness.sol:AdmissionHarness",
+          "label": "accounting",
+          "offset": 0,
+          "slot": "2",
+          "type": "t_struct(ModuleStateAccounting)8148_storage"
+        },
+        {
+          "astId": 8167,
+          "contract": "src/AdmissionHarness.sol:AdmissionHarness",
+          "label": "name",
+          "offset": 0,
+          "slot": "3",
+          "type": "t_string_storage"
+        }
+      ]
+    },
+    "t_struct(ModuleStateAccounting)8148_storage": {
+      "encoding": "inplace",
+      "label": "struct ModuleStateAccounting",
+      "numberOfBytes": "32",
+      "members": [
+        {
+          "astId": 8144,
+          "contract": "src/AdmissionHarness.sol:AdmissionHarness",
+          "label": "validatorsBalanceGwei",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_uint64"
+        },
+        {
+          "astId": 8147,
+          "contract": "src/AdmissionHarness.sol:AdmissionHarness",
+          "label": "exitedValidatorsCount",
+          "offset": 8,
+          "slot": "0",
+          "type": "t_uint64"
+        }
+      ]
+    },
+    "t_struct(ModuleStateConfig)8126_storage": {
+      "encoding": "inplace",
+      "label": "struct ModuleStateConfig",
+      "numberOfBytes": "32",
+      "members": [
+        {
+          "astId": 8106,
+          "contract": "src/AdmissionHarness.sol:AdmissionHarness",
+          "label": "moduleAddress",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_address"
+        },
+        {
+          "astId": 8109,
+          "contract": "src/AdmissionHarness.sol:AdmissionHarness",
+          "label": "moduleFee",
+          "offset": 20,
+          "slot": "0",
+          "type": "t_uint16"
+        },
+        {
+          "astId": 8112,
+          "contract": "src/AdmissionHarness.sol:AdmissionHarness",
+          "label": "treasuryFee",
+          "offset": 22,
+          "slot": "0",
+          "type": "t_uint16"
+        },
+        {
+          "astId": 8115,
+          "contract": "src/AdmissionHarness.sol:AdmissionHarness",
+          "label": "stakeShareLimit",
+          "offset": 24,
+          "slot": "0",
+          "type": "t_uint16"
+        },
+        {
+          "astId": 8118,
+          "contract": "src/AdmissionHarness.sol:AdmissionHarness",
+          "label": "priorityExitShareThreshold",
+          "offset": 26,
+          "slot": "0",
+          "type": "t_uint16"
+        },
+        {
+          "astId": 8122,
+          "contract": "src/AdmissionHarness.sol:AdmissionHarness",
+          "label": "status",
+          "offset": 28,
+          "slot": "0",
+          "type": "t_enum(StakingModuleStatus)8032"
+        },
+        {
+          "astId": 8125,
+          "contract": "src/AdmissionHarness.sol:AdmissionHarness",
+          "label": "withdrawalCredentialsType",
+          "offset": 29,
+          "slot": "0",
+          "type": "t_uint8"
+        }
+      ]
+    },
+    "t_struct(ModuleStateDeposits)8140_storage": {
+      "encoding": "inplace",
+      "label": "struct ModuleStateDeposits",
+      "numberOfBytes": "32",
+      "members": [
+        {
+          "astId": 8130,
+          "contract": "src/AdmissionHarness.sol:AdmissionHarness",
+          "label": "lastDepositAt",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_uint64"
+        },
+        {
+          "astId": 8133,
+          "contract": "src/AdmissionHarness.sol:AdmissionHarness",
+          "label": "lastDepositBlock",
+          "offset": 8,
+          "slot": "0",
+          "type": "t_uint64"
+        },
+        {
+          "astId": 8136,
+          "contract": "src/AdmissionHarness.sol:AdmissionHarness",
+          "label": "maxDepositsPerBlock",
+          "offset": 16,
+          "slot": "0",
+          "type": "t_uint64"
+        },
+        {
+          "astId": 8139,
+          "contract": "src/AdmissionHarness.sol:AdmissionHarness",
+          "label": "minDepositBlockDistance",
+          "offset": 24,
+          "slot": "0",
+          "type": "t_uint64"
+        }
+      ]
+    },
+    "t_struct(RouterState)8186_storage": {
+      "encoding": "inplace",
+      "label": "struct RouterState",
+      "numberOfBytes": "192",
+      "members": [
+        {
+          "astId": 8173,
+          "contract": "src/AdmissionHarness.sol:AdmissionHarness",
+          "label": "moduleStates",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_mapping(t_uint256,t_struct(ModuleState)8168_storage)"
+        },
+        {
+          "astId": 8176,
+          "contract": "src/AdmissionHarness.sol:AdmissionHarness",
+          "label": "moduleIds",
+          "offset": 0,
+          "slot": "1",
+          "type": "t_struct(UintSet)4150_storage"
+        },
+        {
+          "astId": 8179,
+          "contract": "src/AdmissionHarness.sol:AdmissionHarness",
+          "label": "accounting",
+          "offset": 0,
+          "slot": "3",
+          "type": "t_struct(RouterStateAccounting)8152_storage"
+        },
+        {
+          "astId": 8181,
+          "contract": "src/AdmissionHarness.sol:AdmissionHarness",
+          "label": "withdrawalCredentials",
+          "offset": 0,
+          "slot": "4",
+          "type": "t_bytes32"
+        },
+        {
+          "astId": 8183,
+          "contract": "src/AdmissionHarness.sol:AdmissionHarness",
+          "label": "lastModuleId",
+          "offset": 0,
+          "slot": "5",
+          "type": "t_uint24"
+        },
+        {
+          "astId": 8185,
+          "contract": "src/AdmissionHarness.sol:AdmissionHarness",
+          "label": "maxTopUpPerBlockGwei",
+          "offset": 3,
+          "slot": "5",
+          "type": "t_uint64"
+        }
+      ]
+    },
+    "t_struct(RouterStateAccounting)8152_storage": {
+      "encoding": "inplace",
+      "label": "struct RouterStateAccounting",
+      "numberOfBytes": "32",
+      "members": [
+        {
+          "astId": 8151,
+          "contract": "src/AdmissionHarness.sol:AdmissionHarness",
+          "label": "validatorsBalanceGwei",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_uint64"
+        }
+      ]
+    },
+    "t_struct(Set)3678_storage": {
+      "encoding": "inplace",
+      "label": "struct EnumerableSet.Set",
+      "numberOfBytes": "64",
+      "members": [
+        {
+          "astId": 3673,
+          "contract": "src/AdmissionHarness.sol:AdmissionHarness",
+          "label": "_values",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_array(t_bytes32)dyn_storage"
+        },
+        {
+          "astId": 3677,
+          "contract": "src/AdmissionHarness.sol:AdmissionHarness",
+          "label": "_positions",
+          "offset": 0,
+          "slot": "1",
+          "type": "t_mapping(t_bytes32,t_uint256)"
+        }
+      ]
+    },
+    "t_struct(UintSet)4150_storage": {
+      "encoding": "inplace",
+      "label": "struct EnumerableSet.UintSet",
+      "numberOfBytes": "64",
+      "members": [
+        {
+          "astId": 4149,
+          "contract": "src/AdmissionHarness.sol:AdmissionHarness",
+          "label": "_inner",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_struct(Set)3678_storage"
+        }
+      ]
+    },
+    "t_uint16": {
+      "encoding": "inplace",
+      "label": "uint16",
+      "numberOfBytes": "2"
+    },
+    "t_uint24": {
+      "encoding": "inplace",
+      "label": "uint24",
+      "numberOfBytes": "3"
+    },
+    "t_uint256": {
+      "encoding": "inplace",
+      "label": "uint256",
+      "numberOfBytes": "32"
+    },
+    "t_uint64": {
+      "encoding": "inplace",
+      "label": "uint64",
+      "numberOfBytes": "8"
+    },
+    "t_uint8": {
+      "encoding": "inplace",
+      "label": "uint8",
+      "numberOfBytes": "1"
+    }
+  }
+}

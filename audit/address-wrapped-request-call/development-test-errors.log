@@ -1,0 +1,137 @@
+⚠ [11/652] Replayed Verity.Core
+warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1041:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+⚠ [1079/1208] Replayed Conform.Wheels
+warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: Conform/Wheels.lean:106:70: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1080/1208] Replayed EvmYul.Pretty
+warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: EvmYul/Pretty.lean:36:32: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1127/1208] Replayed EvmYul.Semantics
+warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1128/1208] Replayed EvmYul.EVM.Semantics
+warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1259/1263] Replayed LidoSRv3.Audit.Verity.AddressRecipientCallBridge
+warning: LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean:671:56: This simp argument is unused:
+  pureExec
+
+Hint: Omit it from the simp argument list.
+  simp [claimTo, Bind.bind, bindExec, hs, hc, LidoSRv3.Audit.Source.TrioReserve1.Live.emit,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲p̵u̵r̵e̵E̵x̵e̵c̵,̵ ̵hsa]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean:674:94: This simp argument is unused:
+  pureExec
+
+Hint: Omit it from the simp argument list.
+  simp [claimTo, Bind.bind, bindExec, hs, hc, LidoSRv3.Audit.Source.TrioReserve1.Live.emit,
+  ̲ p̵u̵r̵e̵E̵x̵e̵c̵,̵  ̲ ̲claimEvents, List.append_assoc]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean:732:30: This simp argument is unused:
+  hn
+
+Hint: Omit it from the simp argument list.
+  simp [claimWithdrawalsTo, hn,̵ ̵h̵n̵0, hl, zeroAddress, Pure.pure,
+  ̲  ̲ ̲ ̲ ̲ ̲LidoSRv3.Audit.Source.TrioReserve1.Live.require, Bind.bind, bindExec, fail, pureExec] at hs
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean:735:30: This simp argument is unused:
+  hn
+
+Hint: Omit it from the simp argument list.
+  simp [claimWithdrawalsTo, hn,̵ ̵h̵n̵0, hl, zeroAddress, Pure.pure,
+  ̲  ̲ ̲ ̲ ̲ ̲LidoSRv3.Audit.Source.TrioReserve1.Live.require, Bind.bind, bindExec, pureExec]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+info: LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean:739:0: 'LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claimTo_success' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean:740:0: 'LidoSRv3.Audit.Verity.AddressRecipientCallBridge.runClaimWithdrawalsTo_success' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+✖ [1263/1263] Building LidoSRv3.Tests.AddressWrappedRequestCalls (2.0s)
+trace: .> LEAN_PATH=/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Cli/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/batteries/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Qq/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/aesop/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/proofwidgets/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/importGraph/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/plausible/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/mathlib/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/evmyul/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/verity/.lake/build/lib/lean:/private/tmp/lido-address-wrapped-request/.lake/build/lib/lean /Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean /private/tmp/lido-address-wrapped-request/LidoSRv3/Tests/AddressWrappedRequestCalls.lean -o /private/tmp/lido-address-wrapped-request/.lake/build/lib/lean/LidoSRv3/Tests/AddressWrappedRequestCalls.olean -i /private/tmp/lido-address-wrapped-request/.lake/build/lib/lean/LidoSRv3/Tests/AddressWrappedRequestCalls.ilean -c /private/tmp/lido-address-wrapped-request/.lake/build/ir/LidoSRv3/Tests/AddressWrappedRequestCalls.c --setup /private/tmp/lido-address-wrapped-request/.lake/build/ir/LidoSRv3/Tests/AddressWrappedRequestCalls.setup.json --json
+error: LidoSRv3/Tests/AddressWrappedRequestCalls.lean:13:79: unexpected identifier; expected '}'
+error: LidoSRv3/Tests/AddressWrappedRequestCalls.lean:47:125: Tactic `decide` failed for proposition
+  (request (callee (encode 32 0) (encode 32 123)) quoteReject ctx 3 2 (word 7) 0 before).world.logs.length = 2
+because its `Decidable` instance
+  instDecidableEqNat
+    (request (callee (encode 32 0) (encode 32 123)) quoteReject ctx 3 2 (word 7) 0 before).world.logs.length 2
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match h :
+    (request (callee (encode 32 0) (encode 32 123)) quoteReject ctx 3 2 (word 7) 0 before).world.logs.length.beq 2 with
+  | true => isTrue ⋯
+  | false => isFalse ⋯
+error: LidoSRv3/Tests/AddressWrappedRequestCalls.lean:48:69: Tactic `decide` failed for proposition
+  (exec (encode 32 0) (encode 32 123)).world.logs = []
+because its `Decidable` instance
+  (exec (encode 32 0) (encode 32 123)).world.logs.instDecidableEqNil
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match (exec (encode 32 0) (encode 32 123)).world.logs with
+  | [] => isTrue ⋯
+  | head :: tail => isFalse ⋯
+error: LidoSRv3/Tests/AddressWrappedRequestCalls.lean:63:19: failed to synthesize instance of type class
+  Inhabited Log
+
+Hint: Adding the command `deriving instance Inhabited for LidoSRv3.Audit.Source.TrioReserve1.Live.Log` may allow Lean to derive the missing instance.
+error: LidoSRv3/Tests/AddressWrappedRequestCalls.lean:64:19: Invalid field `fields`: The environment does not contain `LidoSRv3.Audit.Source.TrioReserve1.Live.Log.fields`, so it is not possible to project the field `fields` from an expression
+  requested
+of type `Log`
+error: LidoSRv3/Tests/AddressWrappedRequestCalls.lean:83:59: failed to synthesize instance of type class
+  BEq (List Log)
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+info: LidoSRv3/Tests/AddressWrappedRequestCalls.lean:89:0: 'LidoSRv3.Audit.Source.AddressWrappedRequestCalls.unwrap_success' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/AddressWrappedRequestCalls.lean:90:0: 'LidoSRv3.Audit.Source.AddressWrappedRequestCalls.request_success' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/AddressWrappedRequestCalls.lean:91:0: 'LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_request_withdrawal_enqueue' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/AddressWrappedRequestCalls.lean:92:0: 'LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_request_withdrawal_failure_restores' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/AddressWrappedRequestCalls.lean:93:0: 'LidoSRv3.Tests.AddressWrappedRequestCalls.public_rollback' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+error: Lean exited with code 1
+Some required targets logged failures:
+- LidoSRv3.Tests.AddressWrappedRequestCalls
+error: build failed
