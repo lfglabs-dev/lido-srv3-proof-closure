@@ -529,7 +529,35 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_claim_withdrawals_to_chain
 #print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_claim_recipient_effect
 #print axioms LidoSRv3.Audit.Verity.AddressClaimBatchTx.every_revert_restores_snapshot
+-- AddressClaimBatchTx one-step storage results: `claimOne_success_guards`
+-- derives the four pinned admission guards from a successful `claimOne`
+-- (requestId, finalisation bound, non-claimed bit, owner==sender);
+-- `claimOne_success_storage` derives the exact `lockedEther` subtraction
+-- write and the word bound on the payout.
+#print axioms LidoSRv3.Audit.Verity.AddressClaimBatchTx.claimOne_success_guards
+#print axioms LidoSRv3.Audit.Verity.AddressClaimBatchTx.claimOne_success_storage
+-- AddressRecipientCallBridge: bridge module that lifts each pinned
+-- AddressClaimBatchTx storage-only iteration into a real recipient
+-- CALL against the callee world, and pins snapshot-restoration on
+-- every failure path per entrypoint (claim/transfer/request/unwrap)
+-- plus the shared entry receipt for the empty-value EOA CALL.
+#print axioms LidoSRv3.Audit.Verity.AddressRecipientCallBridge.eoa_empty_value_call_receipt
+#print axioms LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claim_withdrawals_to_revert_restores_caller_and_callee_world
+#print axioms LidoSRv3.Audit.Verity.AddressRecipientCallBridge.transfer_revert_restores_world
+#print axioms LidoSRv3.Audit.Verity.AddressRecipientCallBridge.request_revert_restores_caller_and_callee_world
+#print axioms LidoSRv3.Audit.Verity.AddressRecipientCallBridge.unwrap_bridge_receipt
+#print axioms LidoSRv3.Audit.Verity.AddressRecipientCallBridge.unwrap_revert_restores_caller_and_callee_world
+#print axioms LidoSRv3.Audit.Verity.AddressRecipientCallBridge.revert_restores_caller_and_callee_world
 #print axioms LidoSRv3.Audit.Verity.AddressTransferTx.tx_refines_source_witness
+-- AddressTransferTx additional executable-level witnesses: successful
+-- `run` commits the owner handoff, is post-state equivariant under
+-- address renaming on the witness, rejects wrong-caller access, and
+-- projects the abstract model / source / verity address-equivariance
+-- slice back onto the transfer entrypoint.
+#print axioms LidoSRv3.Audit.Verity.AddressTransferTx.run_commits_owner_handoff
+#print axioms LidoSRv3.Audit.Verity.AddressTransferTx.run_post_state_equivariant_witness
+#print axioms LidoSRv3.Audit.Verity.AddressTransferTx.wrong_caller_reverts
+#print axioms LidoSRv3.Audit.Verity.AddressTransferTx.model_source_tx_address_equivariance_slice
 #print axioms LidoSRv3.Audit.Source.AddressTransferCorrespondence.fixed_caller_mutant_rejected
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_router_balance_unchanged
