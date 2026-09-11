@@ -74,7 +74,7 @@ all inherited later stages.
 Normal named `lake build LidoSRv3.Tests.TopupPhysicalCredentialGetter` passes
 1,366 jobs. Seventeen kernel regressions cover physical preimages and selected
 word, canonical request dispatch and trailing calldata, module/caller/target
-roles, no status/enum guard, all uint8 types, nonzero maximal position, early
+roles, no status/enum guard, representative type bytes including 255, nonzero maximal position, early
 registration error, short/wrong-selector rejection, full actual batch and trace,
 unregistered-before-return-decoder, type1 rejected by the gateway, and late
 post-module rollback. A concrete success instantiates the complete new public

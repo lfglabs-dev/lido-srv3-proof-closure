@@ -1,0 +1,8 @@
+Compiler run failed:
+Error (7104): Builtin function "timestamp" must be called.
+ --> src/BatchHarness.sol:8:25:
+  |
+8 |   assembly {sstore(slot,timestamp)}
+  |                         ^^^^^^^^^
+
+Error: Compilation failed

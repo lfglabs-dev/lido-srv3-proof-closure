@@ -1,0 +1,17 @@
+{
+  "sources": 1215,
+  "pins": 11,
+  "artifact_hashes": 45,
+  "scoped_axioms": 31,
+  "normal_olean_sha256": {
+    "LidoSRv3/Audit/Source/SszSoladyFls.lean": "d5cdf537a499e07f7dbd009af0feffebccdc4503deb99fb5e242d38ecb53dfab",
+    "LidoSRv3/Audit/Source/SszCompiledGIndex.lean": "389a35e4c632b30e991439f14983fa91c878a04e345e5d6417a138ac2c1a968e",
+    "LidoSRv3/Audit/Source/SszCompiledFrame.lean": "3fa478662835ada074d506e8a10b8e36b6eddf0e157fd55e898502de72670474",
+    "LidoSRv3/Audit/Source/SszCompiledReply.lean": "a4b632dcf97e8c2cf3b231024d8c3ce33c5f310ac48c82b5799b127dcd8a0ea1",
+    "LidoSRv3/Audit/Source/SszCompiledClEntry.lean": "4106f868a0ddda16f2c5a9579c32554edf63ec9bd51e6dc3798e6d4e1b94d560",
+    "LidoSRv3/Audit/Guarantees/PSsz1CompiledClEntry.lean": "9b7968941c6a80bd0671f203cb68b5969c9ad5cad36ce7d7b1af7ca9ffaf38b7",
+    "LidoSRv3/Tests/SszCompiledClEntryRegression.lean": "9b9ae1f3e0e26c55c8b2cc3e39a0e4cf574b86feb4aacd7a8aa7ff2f45484651"
+  },
+  "compiler_inputs": 7,
+  "retained_ir_sha256": "aba7b84e915d3279916e7d18150f047e553c8f712b1e30ea96235e11998679e3"
+}

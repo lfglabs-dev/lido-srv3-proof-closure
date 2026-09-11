@@ -1,0 +1,47 @@
+{
+  "LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_transfer_request_enqueue": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_transfer_request_failure_restores": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressWrappedTransferCalls.canonical_call": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressWrappedTransferCalls.canonical_outer_call": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressWrappedTransferCalls.joined_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressWrappedTransferCalls.move_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressWrappedTransferCalls.spend_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressWrappedTransferCalls.transferFrom_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.AddressWrappedTransferCalls.public_zero_sender_rollback": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ]
+}

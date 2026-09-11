@@ -1,3 +1,8 @@
+import LidoSRv3.Audit.Guarantees.PAddress1RequestBatches
+import LidoSRv3.Audit.Guarantees.PTopupPhysicalCredentialGetter
+import LidoSRv3.Audit.Guarantees.PTopupCredentialCalls
+import LidoSRv3.Audit.Guarantees.PAddress1WrappedTransferCalls
+import LidoSRv3.Audit.Guarantees.PSsz1CompiledClEntry
 import LidoSRv3.Audit.Guarantees.PAddress1WrappedTokenCalls
 import LidoSRv3.Audit.Guarantees.PDeposit1DsmCall
 import LidoSRv3.Audit.Guarantees.PAddress1WrappedRequestCalls
