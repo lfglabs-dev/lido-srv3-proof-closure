@@ -206,6 +206,7 @@ import LidoSRv3.Audit.Verity.TrioConsolidation.Correspondence
 import LidoSRv3.Audit.Verity.TrioConsolidation.Memory
 import LidoSRv3.Audit.Verity.ConsolidationValueTx
 import LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx
+import LidoSRv3.Audit.Verity.ReserveRelationalTx
 import LidoSRv3.Tests.TopupPointerOriginMutants
 
 /-!
@@ -1519,3 +1520,53 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- transitively depends on `Compiler.Proofs.solidityMappingSlot_injective`
 -- which is outside the check_trust_axioms.py allowlist.)
 #print axioms LidoSRv3.Tests.PackN6ConsolValueMutants.zero_value_call_sum
+
+-- MinFirstDistributionTx x3: `sourceAllocateLoop_eq_allocateLoop`
+-- bridges the source and executor loops; `modelAllocateToBestCandidate_
+-- corresponds` and `sourceAllocateLoop_model_correspondence` close the
+-- source-vs-independent-model correspondence.
+#print axioms LidoSRv3.Audit.Verity.MinFirstDistributionTx.sourceAllocateLoop_eq_allocateLoop
+#print axioms LidoSRv3.Audit.Verity.MinFirstDistributionTx.modelAllocateToBestCandidate_corresponds
+#print axioms LidoSRv3.Audit.Verity.MinFirstDistributionTx.sourceAllocateLoop_model_correspondence
+
+-- MinFirstAmountTx x2: `tx_observes_source` closes the tx-level
+-- observation correspondence; `tx_underflow_reverts_to_snapshot`
+-- pins the transaction-boundary rollback on the underflow branch.
+#print axioms LidoSRv3.Audit.Verity.MinFirstAmountTx.tx_observes_source
+#print axioms LidoSRv3.Audit.Verity.MinFirstAmountTx.tx_underflow_reverts_to_snapshot
+
+-- AllocationTx x3: `bindLiveOne_decodes_summary` documents the live
+-- summary decoding step; `verity_tx_simulates_live_summary_from_storage`
+-- ties the tx-level simulation to the pinned live-summary/storage
+-- path; `live_injected_after_writes_rolls_back` documents the
+-- injected-after-writes rollback discipline.
+#print axioms LidoSRv3.Audit.Verity.AllocationTx.bindLiveOne_decodes_summary
+#print axioms LidoSRv3.Audit.Verity.AllocationTx.verity_tx_simulates_live_summary_from_storage
+#print axioms LidoSRv3.Audit.Verity.AllocationTx.live_injected_after_writes_rolls_back
+
+-- (AllocCapacity.oneModule_{observes_minimum,underflow_reverts} and
+-- `noAvailableMinMutant_is_detected` all rely on `native_decide` and
+-- are intentionally kept out of this disclosure to keep the Trust
+-- surface inside the foundations-only boundary the checker enforces.)
+
+-- HandleOracleReportTx auxiliary slot-inequality lemmas that support
+-- the mint-after-read discipline.
+#print axioms LidoSRv3.Audit.Verity.HandleOracleReportTx.rewardsRead_ne_rewardsMinted
+#print axioms LidoSRv3.Audit.Verity.HandleOracleReportTx.rewardsRead_ne_sequence
+
+-- ReserveRelationalTx slot-inequality and decode-write bridge.
+#print axioms LidoSRv3.Audit.Verity.ReserveRelationalTx.lockedEtherSlot_ne_lastFinalizedSlot
+#print axioms LidoSRv3.Audit.Verity.ReserveRelationalTx.decode_writeSlot_reserve
+
+-- SubmitReportEntryTx executable-shape lemmas: `entry_is_computed_wrapper`,
+-- the two disallowed-sender / hash-mismatch revert closures, and the
+-- observe-simulates-source-at-computed-mint tx observation.
+#print axioms LidoSRv3.Audit.Verity.SubmitReportEntryTx.entry_is_computed_wrapper
+#print axioms LidoSRv3.Audit.Verity.SubmitReportEntryTx.entry_reverts_on_disallowed_sender
+#print axioms LidoSRv3.Audit.Verity.SubmitReportEntryTx.entry_reverts_on_hash_mismatch
+#print axioms LidoSRv3.Audit.Verity.SubmitReportEntryTx.entry_observe_simulates_source_at_computed_mint
+
+-- (OfficialSemantics checkedFold_* / wrappingMutant_is_detected all
+-- rely on `native_decide` transitively and are intentionally kept
+-- out of this disclosure to keep the Trust surface inside the
+-- foundations-only boundary the checker enforces.)
