@@ -58,6 +58,36 @@ theorem run_attempts_of_rootCall_ok
     (run fuel cfg external world context).attempts = out.attempts := by
   simp [run, hbr, hrc]
 
+/-- A `beforeRoot` failure is the `run` outcome (IR 43-100). -/
+theorem run_outcome_of_beforeRoot_error
+    (fuel : Nat) (cfg : Configuration) (external : StaticCall.External)
+    (world : Live.World) (context : EVM.State) (e : SszCompiledClEntry.Error)
+    (h : beforeRoot fuel context = .error e) :
+    (run fuel cfg external world context).outcome = .error e := by
+  simp [run, h]
+
+/-- A `rootCall` failure is the `run` outcome (IR 101-114). -/
+theorem run_outcome_of_rootCall_error
+    (fuel : Nat) (cfg : Configuration) (external : StaticCall.External)
+    (world : Live.World) (context : EVM.State) (b : Before)
+    (e : SszCompiledClEntry.Error)
+    (hbr : beforeRoot fuel context = .ok b)
+    (hrc : rootCall external world b.state b.timestamp = .error e) :
+    (run fuel cfg external world context).outcome = .error e := by
+  simp [run, hbr, hrc]
+
+/-- Once `rootCall` returns, `run.outcome` is exactly `afterRoot`
+(IR 116-417) on that state, flag and index. -/
+theorem run_outcome_of_rootCall_ok
+    (fuel : Nat) (cfg : Configuration) (external : StaticCall.External)
+    (world : Live.World) (context : EVM.State) (b : Before)
+    (st : EVM.State) (out : RootOutcome)
+    (hbr : beforeRoot fuel context = .ok b)
+    (hrc : rootCall external world b.state b.timestamp = .ok (st, out)) :
+    (run fuel cfg external world context).outcome =
+      afterRoot fuel cfg st b.head out.success b.index := by
+  simp [run, hbr, hrc]
+
 /-- Prefix failure of `run` (beforeRoot or rootCall) has an empty journal. -/
 theorem run_attempts_empty_of_prefix_error
     (fuel : Nat) (cfg : Configuration) (external : StaticCall.External)
@@ -75,6 +105,9 @@ theorem run_attempts_empty_of_prefix_error
 #print axioms run_attempts_of_beforeRoot_error
 #print axioms run_attempts_of_rootCall_error
 #print axioms run_attempts_of_rootCall_ok
+#print axioms run_outcome_of_beforeRoot_error
+#print axioms run_outcome_of_rootCall_error
+#print axioms run_outcome_of_rootCall_ok
 #print axioms run_attempts_empty_of_prefix_error
 
 end LidoSRv3.Audit.Source.SszCompiledRunAttempts

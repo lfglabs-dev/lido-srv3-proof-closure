@@ -40,6 +40,9 @@ EIP-4788 authenticity stays declared.
 | `run_attempts_of_beforeRoot_error` | `run` / IR 43-100 | `beforeRoot` error ⇒ `attempts = []` |
 | `run_attempts_of_rootCall_error` | `run` / IR 101-114 overflow | `rootCall` error ⇒ `attempts = []` |
 | `run_attempts_of_rootCall_ok` | `run` / IR 101-114 | `rootCall` ok ⇒ `attempts = out.attempts` |
+| `run_outcome_of_beforeRoot_error` | `run` / IR 43-100 | `beforeRoot` error ⇒ `outcome = error e` |
+| `run_outcome_of_rootCall_error` | `run` / IR 101-114 | `rootCall` error ⇒ `outcome = error e` |
+| `run_outcome_of_rootCall_ok` | `run` / IR 116-417 | `rootCall` ok ⇒ `outcome = afterRoot …` |
 | `run_attempts_empty_of_prefix_error` | both prefix phases | prefix error ⇒ empty journal |
 
 The successful-`rootCall` journal is retained even if `afterRoot` later
@@ -52,6 +55,7 @@ reverts (the `run` constructor copies `out.attempts` before `afterRoot`).
 | `beforeRoot_error_empty_journal_kill_line` | Prefix ABI/slot failure still journals a STATICCALL |
 | `rootCall_error_empty_journal_kill_line` | Allocator overflow still journals a STATICCALL |
 | `rootCall_ok_journal_is_outcome_kill_line` | Journal is an independent caller-supplied list |
+| `beforeRoot_error_kills_run_ok` | A `beforeRoot` failure is still a successful `run` |
 
 ## Hypotheses (declared, not proved here)
 
