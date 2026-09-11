@@ -1,3 +1,6 @@
+import LidoSRv3.Audit.Guarantees.PSsz1CompiledClEntry
+import LidoSRv3.Audit.Guarantees.PAddress1WrappedTokenCalls
+import LidoSRv3.Audit.Guarantees.PDeposit1DsmCall
 import LidoSRv3.Audit.Guarantees.PAddress1WrappedRequestCalls
 import LidoSRv3.Audit.Guarantees.PDeposit1PhysicalAdmission
 import LidoSRv3.Audit.Guarantees.PAccount1FeeDistribution

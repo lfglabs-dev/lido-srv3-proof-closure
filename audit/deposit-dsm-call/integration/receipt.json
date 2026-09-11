@@ -1,0 +1,42 @@
+{
+  "source": "73c6360efdcd5b25a7188b4ed3de292001128f1d",
+  "main_base": "9383467fe19c621cc5c37ea54e1d5585b9ba49ee",
+  "AllTrust": {
+    "command": "lake build LidoSRv3.Audit.AllGuarantees LidoSRv3.Audit.Trust",
+    "jobs": 1728,
+    "exit": 0
+  },
+  "trust": {
+    "command": "python3 scripts/check_trust_axioms.py",
+    "exit": 0,
+    "exact_axioms": 29,
+    "dependencies_recomputed": true,
+    "native_claims_reevaluated": true
+  },
+  "identities": {
+    "sources": 1314,
+    "pins": 11,
+    "artifact_hashes": 50,
+    "scoped_axioms": 6,
+    "normal_olean_sha256": {
+      "LidoSRv3/Audit/Source/DepositDsmCall": "b76de0949a7d9fbcbf90175abbc3156e861959c0c9f54d17c3613dea4ded6969",
+      "LidoSRv3/Audit/Guarantees/PDeposit1DsmCall": "b3872603d197114371c0c3e16b08cd9bcc7193c5d01488f3253620dfda4f2a75",
+      "LidoSRv3/Tests/DepositDsmCall": "ef51cd76115955dc450c0b0a7575ef236ec51a5da823f416108b70e413bdd229"
+    }
+  },
+  "fresh_root_solidity_tests": 0,
+  "reused_reviewed_normal_solidity_tests": 9,
+  "retained_traced_no_code_exit": 1,
+  "filtered_diff_exceptions": [
+    "audit/deposit-dsm-call/solidity/DsmHarness.ir blank EOF",
+    "audit/deposit-dsm-call/development.log original diagnostic trailing whitespace lines1308,1310,1312"
+  ],
+  "sha256": {
+    "audit/deposit-dsm-call/integration/README.md": "ecd7e984674eaf15b8ba64a178591d58ba11e1605b19cba4b6c0bef6c35ae4d7",
+    "audit/deposit-dsm-call/integration/all-trust-build.log": "3d4a6234b6eb10e54aba999cb79ec08b0adb1b91046a34a3065d4d30731f1e61",
+    "audit/deposit-dsm-call/integration/identities.json": "bd1c26bcf8338b4db7a9b1e44b9964d73d18a4a4ffb784ca5142b8f0b10f1349",
+    "audit/deposit-dsm-call/integration/independent-source-review-73c6.md": "6251211d7c7bd0a8bc0f3ee1a2e0bf991f65c06b3c4f53f6b2f5bd982c52a8d0",
+    "audit/deposit-dsm-call/integration/scoped-axioms.json": "372ea30096b39f39c83f8661328e9e0666d3227f1ac122c4918346f058b1cbd0",
+    "audit/deposit-dsm-call/integration/trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439"
+  }
+}

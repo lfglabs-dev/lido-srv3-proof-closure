@@ -1,0 +1,523 @@
+⚠ [1071/1159] Replayed Conform.Wheels
+warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: Conform/Wheels.lean:106:70: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1073/1159] Replayed EvmYul.Pretty
+warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: EvmYul/Pretty.lean:36:32: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1114/1159] Replayed EvmYul.Semantics
+warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1115/1159] Replayed EvmYul.EVM.Semantics
+warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+ℹ [1133/1159] Replayed LidoSRv3.Audit.Source.SszWitnessAbi
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:326:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.run_success_input_binding' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:327:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.pubkey_environment' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:328:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.pair_environment' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:329:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.merkle_environment' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:330:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.call_environment' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:331:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.fields_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:332:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.run_success_origin' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:334:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.read64_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:335:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.readBool_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:336:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.tail_success_length' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1134/1159] Replayed LidoSRv3.Audit.Source.SszShaCommitted
+info: LidoSRv3/Audit/Source/SszShaCommitted.lean:337:0: 'LidoSRv3.Audit.Source.SszShaCommitted.run_success_computed_merkle' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/SszShaCommitted.lean:338:0: 'LidoSRv3.Audit.Source.SszShaCommitted.pubkey_success_words' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszShaCommitted.lean:339:0: 'LidoSRv3.Audit.Source.SszShaCommitted.merkle_success_digest' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszShaCommitted.lean:340:0: 'LidoSRv3.Audit.Source.SszShaCommitted.call_words' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszShaCommitted.lean:341:0: 'LidoSRv3.Audit.Source.SszShaCommitted.pair_success_words' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszShaCommitted.lean:342:0: 'LidoSRv3.Audit.Source.SszShaCommitted.pair_success_digest' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszShaCommitted.lean:343:0: 'LidoSRv3.Audit.Source.SszShaCommitted.call_success_output' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszShaCommitted.lean:344:0: 'LidoSRv3.Audit.Source.SszShaCommitted.pair_success_output' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszShaCommitted.lean:345:0: 'LidoSRv3.Audit.Source.SszShaCommitted.call_success_gas' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszShaCommitted.lean:346:0: 'LidoSRv3.Audit.Source.SszShaCommitted.call_success_depth' depends on axioms: [propext, Classical.choice, Quot.sound]
+⚠ [1135/1159] Replayed LidoSRv3.Audit.Source.SszPubkeyBytes
+warning: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:32:91: This simp argument is unused:
+  Nat.zero_add
+
+Hint: Omit it from the simp argument list.
+  simp only [ByteArray.size, ̲Array.size_append, ̲Array.size_replicate, ̲hlower, ̲Nat.sub_zero,̵N̵a̵t̵.̵z̵e̵r̵o̵_̵a̵d̵d̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:44:78: This simp argument is unused:
+  Nat.sub_zero
+
+Hint: Omit it from the simp argument list.
+  simp only [ByteArray.size, ̲Array.size_append, ̲Array.size_replicate, ̲hlower, ̲Nat.s̵u̵b̵_̵zero,̵N̵a̵t̵.̵z̵e̵r̵o̵_add]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+info: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:232:0: 'LidoSRv3.Audit.Source.SszPubkeyBytes.key_size' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:233:0: 'LidoSRv3.Audit.Source.SszPubkeyBytes.block_size' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:234:0: 'LidoSRv3.Audit.Source.SszPubkeyBytes.block_eq_raw' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:235:0: 'LidoSRv3.Audit.Source.SszPubkeyBytes.pubkey_digest_typed' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:236:0: 'LidoSRv3.Audit.Source.SszPubkeyBytes.computed_leaf_typed' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:237:0: 'LidoSRv3.Audit.Source.SszPubkeyBytes.witness_key_length' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:238:0: 'LidoSRv3.Audit.Source.SszPubkeyBytes.run_success_computed_leaf' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:239:0: 'LidoSRv3.Audit.Source.SszPubkeyBytes.pubkey_success_digest' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:240:0: 'LidoSRv3.Audit.Source.SszPubkeyBytes.memory_exact' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:241:0: 'LidoSRv3.Audit.Source.SszPubkeyBytes.read_exact' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:242:0: 'LidoSRv3.Audit.Source.SszPubkeyBytes.copy_padded' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1136/1159] Replayed LidoSRv3.Audit.Source.SszProofCommitted
+info: LidoSRv3/Audit/Source/SszProofCommitted.lean:300:0: 'LidoSRv3.Audit.Source.SszProofCommitted.proofWords_length_le' depends on axioms: [propext]
+info: LidoSRv3/Audit/Source/SszProofCommitted.lean:301:0: 'LidoSRv3.Audit.Source.SszProofCommitted.verify_success_depth' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/SszProofCommitted.lean:302:0: 'LidoSRv3.Audit.Source.SszProofCommitted.run_success_branch' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszProofCommitted.lean:303:0: 'LidoSRv3.Audit.Source.SszProofCommitted.verify_success_branch' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/SszProofCommitted.lean:304:0: 'LidoSRv3.Audit.Source.SszProofCommitted.loop_success_fold' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszProofCommitted.lean:305:0: 'LidoSRv3.Audit.Source.SszProofCommitted.step_success_effects' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/SszProofCommitted.lean:306:0: 'LidoSRv3.Audit.Source.SszProofCommitted.step_call_digest' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszProofCommitted.lean:307:0: 'LidoSRv3.Audit.Source.SszProofCommitted.step_success_shape' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszProofCommitted.lean:308:0: 'LidoSRv3.Audit.Source.SszProofCommitted.prepared_memory' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszProofCommitted.lean:309:0: 'LidoSRv3.Audit.Source.SszProofCommitted.prepared_read' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1137/1159] Replayed LidoSRv3.Audit.Source.SszCompiledMemory
+info: LidoSRv3/Audit/Source/SszCompiledMemory.lean:576:0: 'LidoSRv3.Audit.Source.SszCompiledMemory.write_word_read' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledMemory.lean:577:0: 'LidoSRv3.Audit.Source.SszCompiledMemory.store_load' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledMemory.lean:578:0: 'LidoSRv3.Audit.Source.SszCompiledMemory.xi_uses_fresh' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledMemory.lean:579:0: 'LidoSRv3.Audit.Source.SszCompiledMemory.prologue_free_pointer' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledMemory.lean:580:0: 'LidoSRv3.Audit.Source.SszCompiledMemory.allocate_success_bound' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledMemory.lean:581:0: 'LidoSRv3.Audit.Source.SszCompiledMemory.allocate_effects' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledMemory.lean:582:0: 'LidoSRv3.Audit.Source.SszCompiledMemory.pair_memory' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledMemory.lean:583:0: 'LidoSRv3.Audit.Source.SszCompiledMemory.pubkey_memory' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1138/1159] Replayed LidoSRv3.Audit.Source.SszCompiledConsumer
+info: LidoSRv3/Audit/Source/SszCompiledConsumer.lean:130:0: 'LidoSRv3.Audit.Source.SszCompiledConsumer.begin_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1139/1159] Replayed LidoSRv3.Audit.Source.SszCompiledMerkle
+info: LidoSRv3/Audit/Source/SszCompiledMerkle.lean:583:0: 'LidoSRv3.Audit.Source.SszCompiledMerkle.run_success_branch' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledMerkle.lean:584:0: 'LidoSRv3.Audit.Source.SszCompiledMerkle.run_computed_leaf' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledMerkle.lean:585:0: 'LidoSRv3.Audit.Source.SszCompiledMerkle.begin_values' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledMerkle.lean:586:0: 'LidoSRv3.Audit.Source.SszCompiledMerkle.fields_effects' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledMerkle.lean:587:0: 'LidoSRv3.Audit.Source.SszCompiledMerkle.merkle_effects' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledMerkle.lean:588:0: 'LidoSRv3.Audit.Source.SszCompiledMerkle.allocate_frame' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledMerkle.lean:589:0: 'LidoSRv3.Audit.Source.SszCompiledMerkle.pairStore_effects' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1140/1159] Replayed LidoSRv3.Audit.Source.SszCompiledFrame
+info: LidoSRv3/Audit/Source/SszCompiledFrame.lean:776:0: 'LidoSRv3.Audit.Source.SszCompiledFrame.write_pad_read' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledFrame.lean:777:0: 'LidoSRv3.Audit.Source.SszCompiledFrame.allocate_frame' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledFrame.lean:778:0: 'LidoSRv3.Audit.Source.SszCompiledFrame.pairStore_effects' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledFrame.lean:779:0: 'LidoSRv3.Audit.Source.SszCompiledFrame.merkle_effects' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledFrame.lean:780:0: 'LidoSRv3.Audit.Source.SszCompiledFrame.fields_effects' depends on axioms: [propext, Classical.choice, Quot.sound]
+⚠ [1151/1159] Replayed Verity.Core
+warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1041:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+ℹ [1155/1159] Replayed LidoSRv3.Audit.Source.SszRootCall
+info: LidoSRv3/Audit/Source/SszRootCall.lean:206:0: 'LidoSRv3.Audit.Source.SszRootCall.run_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszRootCall.lean:207:0: 'LidoSRv3.Audit.Source.SszRootCall.slot_failure_no_call' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/SszRootCall.lean:208:0: 'LidoSRv3.Audit.Source.SszRootCall.run_world' depends on axioms: [propext, Quot.sound]
+ℹ [1156/1159] Replayed LidoSRv3.Audit.Source.SszCompiledReply
+info: LidoSRv3/Audit/Source/SszCompiledReply.lean:490:0: 'LidoSRv3.Audit.Source.SszCompiledReply.reply_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledReply.lean:491:0: 'LidoSRv3.Audit.Source.SszCompiledReply.root_word_typed' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1157/1159] Replayed LidoSRv3.Audit.Source.SszSoladyFls
+info: LidoSRv3/Audit/Source/SszSoladyFls.lean:149:0: 'LidoSRv3.Audit.Source.SszSoladyFls.sourceFls_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszSoladyFls.lean:150:0: 'LidoSRv3.Audit.Source.SszSoladyFls.table_lookup' depends on axioms: [propext]
+⚠ [1158/1159] Replayed LidoSRv3.Audit.Source.SszCompiledGIndex
+warning: LidoSRv3/Audit/Source/SszCompiledGIndex.lean:238:20: '(unfold word; rfl)' tactic does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: LidoSRv3/Audit/Source/SszCompiledGIndex.lean:238:20: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+info: LidoSRv3/Audit/Source/SszCompiledGIndex.lean:269:0: 'LidoSRv3.Audit.Source.SszCompiledGIndex.wrapper_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledGIndex.lean:270:0: 'LidoSRv3.Audit.Source.SszCompiledGIndex.pinned_words' depends on axioms: [propext]
+✖ [1159/1159] Building LidoSRv3.Audit.Source.SszCompiledClEntry (2.1s)
+trace: .> LEAN_PATH=/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Cli/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/batteries/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Qq/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/aesop/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/proofwidgets/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/importGraph/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/plausible/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/mathlib/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/evmyul/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/verity/.lake/build/lib/lean:/private/tmp/lido-ssz-compiled-entry-repair/.lake/build/lib/lean /Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean /private/tmp/lido-ssz-compiled-entry-repair/LidoSRv3/Audit/Source/SszCompiledClEntry.lean -o /private/tmp/lido-ssz-compiled-entry-repair/.lake/build/lib/lean/LidoSRv3/Audit/Source/SszCompiledClEntry.olean -i /private/tmp/lido-ssz-compiled-entry-repair/.lake/build/lib/lean/LidoSRv3/Audit/Source/SszCompiledClEntry.ilean -c /private/tmp/lido-ssz-compiled-entry-repair/.lake/build/ir/LidoSRv3/Audit/Source/SszCompiledClEntry.c --setup /private/tmp/lido-ssz-compiled-entry-repair/.lake/build/ir/LidoSRv3/Audit/Source/SszCompiledClEntry.setup.json --json
+error: LidoSRv3/Audit/Source/SszCompiledClEntry.lean:360:51: omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  0 ≤ e ≤ 2
+  0 ≤ d ≤ 1
+  c ≥ 0
+  b ≥ 0
+  0 ≤ a ≤ 18446744073709551615
+where
+ a := ↑(expected.state.calldataload (UInt256.ofNat 4)).toNat
+ b := ↑(prologue context).memory.size
+ c := ↑(branch.length - 2)
+ d := ↑{ state := expected.state, head := head, branch := branch,
+        timestamp := expected.state.calldataload (UInt256.ofNat 4),
+        index := (prologue context).calldataload (UInt256.ofNat 132) }.branch.length
+ e := ↑(prologue context).activeWords.toNat
+error: LidoSRv3/Audit/Source/SszCompiledClEntry.lean:419:8: Ambiguous term
+  load_words
+Possible interpretations:
+  SszCompiledFrame.load_words ?m.217 ?m.218
+    ?m.219 : (MachineState.mload ?m.217 (UInt256.ofNat ?m.218)).2.activeWords.toNat =
+    max (MachineState.activeWords ?m.217).toNat ((?m.218 + 63) / 32)
+  
+  SszCompiledMemory.load_words ?m.217 ?m.218
+    ?m.219 : (MachineState.mload ?m.217 (UInt256.ofNat ?m.218)).2.activeWords.toNat =
+    max (MachineState.activeWords ?m.217).toNat ((?m.218 + 63) / 32)
+error: LidoSRv3/Audit/Source/SszCompiledClEntry.lean:427:8: Ambiguous term
+  store_words
+Possible interpretations:
+  SszCompiledFrame.store_words ?m.326 ?m.327 ?m.328
+    ?m.329 : (MachineState.mstore ?m.326 (UInt256.ofNat ?m.327) ?m.328).activeWords.toNat =
+    max (MachineState.activeWords ?m.326).toNat ((?m.327 + 63) / 32)
+  
+  SszCompiledMemory.store_words ?m.326 ?m.327 ?m.328
+    ?m.329 : (MachineState.mstore ?m.326 (UInt256.ofNat ?m.327) ?m.328).activeWords.toNat =
+    max (MachineState.activeWords ?m.326).toNat ((?m.327 + 63) / 32)
+error: LidoSRv3/Audit/Source/SszCompiledClEntry.lean:434:8: Ambiguous term
+  store_words
+Possible interpretations:
+  SszCompiledFrame.store_words ?m.431 ?m.432 ?m.433
+    ?m.434 : (MachineState.mstore ?m.431 (UInt256.ofNat ?m.432) ?m.433).activeWords.toNat =
+    max (MachineState.activeWords ?m.431).toNat ((?m.432 + 63) / 32)
+  
+  SszCompiledMemory.store_words ?m.431 ?m.432 ?m.433
+    ?m.434 : (MachineState.mstore ?m.431 (UInt256.ofNat ?m.432) ?m.433).activeWords.toNat =
+    max (MachineState.activeWords ?m.431).toNat ((?m.432 + 63) / 32)
+error: LidoSRv3/Audit/Source/SszCompiledClEntry.lean:449:10: Ambiguous term
+  store_words
+Possible interpretations:
+  SszCompiledFrame.store_words ?m.604 64 ?m.607
+    ?m.608 : (MachineState.mstore ?m.604 (UInt256.ofNat 64) ?m.607).activeWords.toNat =
+    max (MachineState.activeWords ?m.604).toNat ((64 + 63) / 32)
+  
+  SszCompiledMemory.store_words ?m.604 64 ?m.607
+    ?m.608 : (MachineState.mstore ?m.604 (UInt256.ofNat 64) ?m.607).activeWords.toNat =
+    max (MachineState.activeWords ?m.604).toNat ((64 + 63) / 32)
+error: LidoSRv3/Audit/Source/SszCompiledClEntry.lean:460:10: Ambiguous term
+  load_words
+Possible interpretations:
+  SszCompiledFrame.load_words ?m.726 128
+    ?m.729 : (MachineState.mload ?m.726 (UInt256.ofNat 128)).2.activeWords.toNat =
+    max (MachineState.activeWords ?m.726).toNat ((128 + 63) / 32)
+  
+  SszCompiledMemory.load_words ?m.726 128
+    ?m.729 : (MachineState.mload ?m.726 (UInt256.ofNat 128)).2.activeWords.toNat =
+    max (MachineState.activeWords ?m.726).toNat ((128 + 63) / 32)
+error: LidoSRv3/Audit/Source/SszCompiledClEntry.lean:489:35: Application type mismatch: The argument
+  hc
+has type
+  (SszRootCall.call external (callerOf st) (BitVec.ofNat 64 ts.toNat) world).outcome = Except.ok data
+but is expected to have type
+  Except.ok data = Except.ok data
+in the application
+  And.intro hc
+error: LidoSRv3/Audit/Source/SszCompiledClEntry.lean:574:62: omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  33 ≤ i ≤ 95
+  g ≥ 0
+  f ≥ 0
+  f - g ≤ 0
+  e ≥ 0
+  d ≥ 0
+  d - f ≤ 0
+  d - 32*i ≥ -287
+  0 ≤ c ≤ 18446744073709551615
+  c - i ≤ 0
+  32 ≤ b ≤ 18446744073709551615
+  -511 ≤ b - 32*i ≤ -480
+  0 ≤ a ≤ 18446744073709551615
+where
+ a := ↑st.activeWords.toNat
+ b := ↑st.returnData.size
+ c := ↑st2.activeWords.toNat
+ d := ↑st2.memory.size
+ e := ↑(SszCompiledGIndex.packWord gi)
+ f := ↑st3.memory.size
+ g := ↑key.state.memory.size
+ i := ↑(192 + (st.returnData.size + 31) / 32 * 32 + 32 + 256 + 31) / 32
+error: LidoSRv3/Audit/Source/SszCompiledClEntry.lean:522:51: unsolved goals
+fuel : ℕ
+cfg : Configuration
+st afterState : EVM.State
+head : UInt256
+success : Bool
+n : UInt256
+h✝⁷ :
+  (do
+      let __discr ← Except.mapError Error.reply (copyReply st)
+      match __discr with
+        | (data, st) => do
+          let __discr ← Except.mapError Error.reply (decodeRoot st success data)
+          match __discr with
+            | (root, st) => do
+              let slot ← Except.mapError Error.abi (SszWitnessAbi.read64 st (UInt256.ofNat 36))
+              let raw ←
+                Except.mapError Error.gindex
+                    (SszCompiledGIndex.wrapper (SszCompiledGIndex.cfgWords cfg) slot.toNat n.toNat)
+              have rawIndex : UInt256 := UInt256.ofNat raw
+              let __discr ← Except.mapError Error.allocation (allocate st 256)
+              match __discr with
+                | (ptr, st) => do
+                  let keySlice ← Except.mapError Error.abi (SszWitnessAbi.tail st head (UInt256.ofNat 36) 1)
+                  let key ← Except.mapError Error.bls (pubkeyRun fuel st keySlice.offset keySlice.length)
+                  have st : EVM.State := store key.state ptr.toNat key.digest
+                  let st ← Except.mapError liftConsumer (SszCompiledFrame.storeFields st head ptr)
+                  let leaf ← Except.mapError liftConsumer (merkle fuel st ptr)
+                  let branch ← Except.mapError Error.abi (SszWitnessAbi.tail leaf.state head (UInt256.ofNat 4) 32)
+                  Except.mapError Error.proof
+                      (SszProofCalldataLoop.verify fuel leaf.state rawIndex leaf.digest root branch.offset
+                        branch.length)) =
+    Except.ok afterState
+hf : Stored st 64 (UInt256.ofNat 192)
+hz : Stored st 96 (UInt256.ofNat 0)
+hw : st.activeWords.toNat < 2 ^ 64
+hffi : SszProofCommitted.ShaWidth
+data : UInt256
+st1 : EVM.State
+hpr : Except.mapError Error.reply (copyReply st) = Except.ok (data, st1)
+h✝⁶ :
+  (do
+      let __discr ← Except.mapError Error.reply (decodeRoot st1 success data)
+      let slot ← Except.mapError Error.abi (SszWitnessAbi.read64 __discr.2 (UInt256.ofNat 36))
+      let raw ←
+        Except.mapError Error.gindex (SszCompiledGIndex.wrapper (SszCompiledGIndex.cfgWords cfg) slot.toNat n.toNat)
+      let __discr_1 ← Except.mapError Error.allocation (allocate __discr.2 256)
+      let keySlice ← Except.mapError Error.abi (SszWitnessAbi.tail __discr_1.2 head (UInt256.ofNat 36) 1)
+      let key ← Except.mapError Error.bls (pubkeyRun fuel __discr_1.2 keySlice.offset keySlice.length)
+      let st ←
+        Except.mapError liftConsumer
+            (SszCompiledFrame.storeFields (store key.state __discr_1.1.toNat key.digest) head __discr_1.1)
+      let leaf ← Except.mapError liftConsumer (merkle fuel st __discr_1.1)
+      let branch ← Except.mapError Error.abi (SszWitnessAbi.tail leaf.state head (UInt256.ofNat 4) 32)
+      Except.mapError Error.proof
+          (SszProofCalldataLoop.verify fuel leaf.state (UInt256.ofNat raw) leaf.digest __discr.1 branch.offset
+            branch.length)) =
+    Except.ok afterState
+hc : copyReply st = Except.ok (data, st1)
+st2 : EVM.State
+hsucc : success = true
+h32 : 32 ≤ st.returnData.size
+hsize : st.returnData.size ≤ 2 ^ 64 - 1
+hF : 192 + (st.returnData.size + 31) / 32 * 32 + 32 ≤ 2 ^ 64 - 1
+hf2 : Stored st2 64 (UInt256.ofNat (192 + (st.returnData.size + 31) / 32 * 32 + 32))
+hw2 : st2.activeWords.toNat < 2 ^ 64
+henv2 : st2.executionEnv = st.executionEnv
+hmem2 : 192 + (st.returnData.size + 31) / 32 * 32 + 32 ≤ st2.memory.size + 31
+hpr2 :
+  Except.mapError Error.reply (decodeRoot st1 success data) =
+    Except.ok (UInt256.ofNat (fromByteArrayBigEndian (st.returnData.extract 0 32)), st2)
+h✝⁵ :
+  (do
+      let slot ← Except.mapError Error.abi (SszWitnessAbi.read64 st2 (UInt256.ofNat 36))
+      let raw ←
+        Except.mapError Error.gindex (SszCompiledGIndex.wrapper (SszCompiledGIndex.cfgWords cfg) slot.toNat n.toNat)
+      let __discr ← Except.mapError Error.allocation (allocate st2 256)
+      let keySlice ← Except.mapError Error.abi (SszWitnessAbi.tail __discr.2 head (UInt256.ofNat 36) 1)
+      let key ← Except.mapError Error.bls (pubkeyRun fuel __discr.2 keySlice.offset keySlice.length)
+      let st_1 ←
+        Except.mapError liftConsumer
+            (SszCompiledFrame.storeFields (store key.state __discr.1.toNat key.digest) head __discr.1)
+      let leaf ← Except.mapError liftConsumer (merkle fuel st_1 __discr.1)
+      let branch ← Except.mapError Error.abi (SszWitnessAbi.tail leaf.state head (UInt256.ofNat 4) 32)
+      Except.mapError Error.proof
+          (SszProofCalldataLoop.verify fuel leaf.state (UInt256.ofNat raw) leaf.digest
+            (UInt256.ofNat (fromByteArrayBigEndian (st.returnData.extract 0 32))) branch.offset branch.length)) =
+    Except.ok afterState
+hd : decodeRoot st1 success data = Except.ok (UInt256.ofNat (fromByteArrayBigEndian (st.returnData.extract 0 32)), st2)
+slot : BitVec 64
+hslot : Except.mapError Error.abi (SszWitnessAbi.read64 st2 (UInt256.ofNat 36)) = Except.ok slot
+h✝⁴ :
+  (do
+      let raw ←
+        Except.mapError Error.gindex (SszCompiledGIndex.wrapper (SszCompiledGIndex.cfgWords cfg) slot.toNat n.toNat)
+      let __discr ← Except.mapError Error.allocation (allocate st2 256)
+      let keySlice ← Except.mapError Error.abi (SszWitnessAbi.tail __discr.2 head (UInt256.ofNat 36) 1)
+      let key ← Except.mapError Error.bls (pubkeyRun fuel __discr.2 keySlice.offset keySlice.length)
+      let st_1 ←
+        Except.mapError liftConsumer
+            (SszCompiledFrame.storeFields (store key.state __discr.1.toNat key.digest) head __discr.1)
+      let leaf ← Except.mapError liftConsumer (merkle fuel st_1 __discr.1)
+      let branch ← Except.mapError Error.abi (SszWitnessAbi.tail leaf.state head (UInt256.ofNat 4) 32)
+      Except.mapError Error.proof
+          (SszProofCalldataLoop.verify fuel leaf.state (UInt256.ofNat raw) leaf.digest
+            (UInt256.ofNat (fromByteArrayBigEndian (st.returnData.extract 0 32))) branch.offset branch.length)) =
+    Except.ok afterState
+hslot' : SszWitnessAbi.read64 st2 (UInt256.ofNat 36) = Except.ok slot
+raw : ℕ
+hraw :
+  Except.mapError Error.gindex (SszCompiledGIndex.wrapper (SszCompiledGIndex.cfgWords cfg) slot.toNat n.toNat) =
+    Except.ok raw
+h✝³ :
+  (do
+      let __discr ← Except.mapError Error.allocation (allocate st2 256)
+      let keySlice ← Except.mapError Error.abi (SszWitnessAbi.tail __discr.2 head (UInt256.ofNat 36) 1)
+      let key ← Except.mapError Error.bls (pubkeyRun fuel __discr.2 keySlice.offset keySlice.length)
+      let st_1 ←
+        Except.mapError liftConsumer
+            (SszCompiledFrame.storeFields (store key.state __discr.1.toNat key.digest) head __discr.1)
+      let leaf ← Except.mapError liftConsumer (merkle fuel st_1 __discr.1)
+      let branch ← Except.mapError Error.abi (SszWitnessAbi.tail leaf.state head (UInt256.ofNat 4) 32)
+      Except.mapError Error.proof
+          (SszProofCalldataLoop.verify fuel leaf.state (UInt256.ofNat raw) leaf.digest
+            (UInt256.ofNat (fromByteArrayBigEndian (st.returnData.extract 0 32))) branch.offset branch.length)) =
+    Except.ok afterState
+hraw' : SszCompiledGIndex.wrapper (SszCompiledGIndex.cfgWords cfg) slot.toNat n.toNat = Except.ok raw
+gi : PackedIndex
+hgi : sourceWrapper cfg slot.toFin ⟨n.toNat, ⋯⟩ = Except.ok gi
+hrawgi : raw = SszCompiledGIndex.packWord gi
+st3 : EVM.State
+hw2' : st2.activeWords.toNat < 2 ^ 251
+free2 : (load st2 64).1 = UInt256.ofNat (192 + (st.returnData.size + 31) / 32 * 32 + 32)
+hbound : 192 + (st.returnData.size + 31) / 32 * 32 + 32 + 256 ≤ 2 ^ 64 - 1
+hf3 : Stored st3 64 (UInt256.ofNat (192 + (st.returnData.size + 31) / 32 * 32 + 32 + 256))
+words3 :
+  st3.activeWords.toNat = max st2.activeWords.toNat ((192 + (st.returnData.size + 31) / 32 * 32 + 32 + 256 + 31) / 32)
+hw3 : st3.activeWords.toNat < 2 ^ 64
+henv3 : st3.executionEnv = st2.executionEnv
+hmono3 : st2.memory.size ≤ st3.memory.size
+right✝ :
+  ∀ (offset : ℕ) (value : UInt256),
+    Stored st2 offset value →
+      96 ≤ offset → offset + 32 ≤ 192 + (st.returnData.size + 31) / 32 * 32 + 32 → Stored st3 offset value
+hpr3 :
+  Except.mapError Error.allocation (allocate st2 256) =
+    Except.ok (UInt256.ofNat (192 + (st.returnData.size + 31) / 32 * 32 + 32), st3)
+h✝² :
+  (do
+      let keySlice ← Except.mapError Error.abi (SszWitnessAbi.tail st3 head (UInt256.ofNat 36) 1)
+      let key ← Except.mapError Error.bls (pubkeyRun fuel st3 keySlice.offset keySlice.length)
+      let st_1 ←
+        Except.mapError liftConsumer
+            (SszCompiledFrame.storeFields
+              (store key.state (UInt256.ofNat (192 + (st.returnData.size + 31) / 32 * 32 + 32)).toNat key.digest) head
+              (UInt256.ofNat (192 + (st.returnData.size + 31) / 32 * 32 + 32)))
+      let leaf ←
+        Except.mapError liftConsumer (merkle fuel st_1 (UInt256.ofNat (192 + (st.returnData.size + 31) / 32 * 32 + 32)))
+      let branch ← Except.mapError Error.abi (SszWitnessAbi.tail leaf.state head (UInt256.ofNat 4) 32)
+      Except.mapError Error.proof
+          (SszProofCalldataLoop.verify fuel leaf.state (UInt256.ofNat raw) leaf.digest
+            (UInt256.ofNat (fromByteArrayBigEndian (st.returnData.extract 0 32))) branch.offset branch.length)) =
+    Except.ok afterState
+halloc : allocate st2 256 = Except.ok (UInt256.ofNat (192 + (st.returnData.size + 31) / 32 * 32 + 32), st3)
+keySlice : SszWitnessAbi.Slice
+hks : Except.mapError Error.abi (SszWitnessAbi.tail st3 head (UInt256.ofNat 36) 1) = Except.ok keySlice
+h✝¹ :
+  (do
+      let key ← Except.mapError Error.bls (pubkeyRun fuel st3 keySlice.offset keySlice.length)
+      let st_1 ←
+        Except.mapError liftConsumer
+            (SszCompiledFrame.storeFields
+              (store key.state (UInt256.ofNat (192 + (st.returnData.size + 31) / 32 * 32 + 32)).toNat key.digest) head
+              (UInt256.ofNat (192 + (st.returnData.size + 31) / 32 * 32 + 32)))
+      let leaf ←
+        Except.mapError liftConsumer (merkle fuel st_1 (UInt256.ofNat (192 + (st.returnData.size + 31) / 32 * 32 + 32)))
+      let branch ← Except.mapError Error.abi (SszWitnessAbi.tail leaf.state head (UInt256.ofNat 4) 32)
+      Except.mapError Error.proof
+          (SszProofCalldataLoop.verify fuel leaf.state (UInt256.ofNat raw) leaf.digest
+            (UInt256.ofNat (fromByteArrayBigEndian (st.returnData.extract 0 32))) branch.offset branch.length)) =
+    Except.ok afterState
+hks' : SszWitnessAbi.tail st3 head (UInt256.ofNat 36) 1 = Except.ok keySlice
+key : SszBlsComposition.Result
+hkey : Except.mapError Error.bls (pubkeyRun fuel st3 keySlice.offset keySlice.length) = Except.ok key
+hkey' : pubkeyRun fuel st3 keySlice.offset keySlice.length = Except.ok key
+hkw : key.state.activeWords.toNat = max st3.activeWords.toNat 2
+hkenv : key.state.executionEnv = st3.executionEnv
+hkmem :
+  key.state.memory.readWithPadding 64 32 = st3.memory.readWithPadding 64 32 ∧ st3.memory.size ≤ key.state.memory.size
+hkdig :
+  key.digest = SszPubkeyBytes.pubkeyDigest st3 keySlice.offset ∧
+    key.state.returnData =
+        SszShaCallMemory.shaOutput (SszPubkeyBytes.blockBytes st3.executionEnv.calldata keySlice.offset.toNat) ∧
+      keySlice.length = 48
+hkf : Stored key.state 64 (UInt256.ofNat (192 + (st.returnData.size + 31) / 32 * 32 + 32 + 256))
+hkwb : key.state.activeWords.toNat < 2 ^ 64
+wnF :
+  (UInt256.ofNat (192 + (st.returnData.size + 31) / 32 * 32 + 32)).toNat =
+    192 + (st.returnData.size + 31) / 32 * 32 + 32
+h✝ :
+  (do
+      let st_1 ←
+        Except.mapError liftConsumer
+            (SszCompiledFrame.storeFields (store key.state (192 + (st.returnData.size + 31) / 32 * 32 + 32) key.digest)
+              head (UInt256.ofNat (192 + (st.returnData.size + 31) / 32 * 32 + 32)))
+      let leaf ←
+        Except.mapError liftConsumer (merkle fuel st_1 (UInt256.ofNat (192 + (st.returnData.size + 31) / 32 * 32 + 32)))
+      let branch ← Except.mapError Error.abi (SszWitnessAbi.tail leaf.state head (UInt256.ofNat 4) 32)
+      Except.mapError Error.proof
+          (SszProofCalldataLoop.verify fuel leaf.state (UInt256.ofNat raw) leaf.digest
+            (UInt256.ofNat (fromByteArrayBigEndian (st.returnData.extract 0 32))) branch.offset branch.length)) =
+    Except.ok afterState
+st5 : EVM.State
+hfields :
+  Except.mapError liftConsumer
+      (SszCompiledFrame.storeFields (store key.state (192 + (st.returnData.size + 31) / 32 * 32 + 32) key.digest) head
+        (UInt256.ofNat (192 + (st.returnData.size + 31) / 32 * 32 + 32))) =
+    Except.ok st5
+h :
+  (do
+      let leaf ←
+        Except.mapError liftConsumer (merkle fuel st5 (UInt256.ofNat (192 + (st.returnData.size + 31) / 32 * 32 + 32)))
+      let branch ← Except.mapError Error.abi (SszWitnessAbi.tail leaf.state head (UInt256.ofNat 4) 32)
+      Except.mapError Error.proof
+          (SszProofCalldataLoop.verify fuel leaf.state (UInt256.ofNat raw) leaf.digest
+            (UInt256.ofNat (fromByteArrayBigEndian (st.returnData.extract 0 32))) branch.offset branch.length)) =
+    Except.ok afterState
+hfields' :
+  SszCompiledFrame.storeFields (store key.state (192 + (st.returnData.size + 31) / 32 * 32 + 32) key.digest) head
+      (UInt256.ofNat (192 + (st.returnData.size + 31) / 32 * 32 + 32)) =
+    Except.ok st5
+hkstored :
+  Stored (store key.state (192 + (st.returnData.size + 31) / 32 * 32 + 32) key.digest)
+    (192 + (st.returnData.size + 31) / 32 * 32 + 32) key.digest
+⊢ success = true ∧
+    32 ≤ st.returnData.size ∧
+      ∃ slot gi keySlice f branch,
+        SszWitnessAbi.read64 st (UInt256.ofNat 36) = Except.ok slot ∧
+          sourceWrapper cfg slot.toFin ⟨n.toNat, ⋯⟩ = Except.ok gi ∧
+            SszWitnessAbi.tail st head (UInt256.ofNat 36) 1 = Except.ok keySlice ∧
+              keySlice.length = 48 ∧
+                SszWitnessAbi.FieldsMatch st head f ∧
+                  SszWitnessAbi.tail st head (UInt256.ofNat 4) 32 = Except.ok branch ∧
+                    branch.length ≤ 2 ^ 64 - 1 ∧
+                      SszProofCommitted.proofWords branch.length st.executionEnv.calldata branch.offset
+                            (SszProofCommitted.endOffset branch.offset branch.length) ≠
+                          [] ∧
+                        SszProofFold.Branch SszProofCalldataStep.ffiPair (↑gi.index)
+                            (validatorLeaf st keySlice.offset f)
+                            (SszProofCommitted.proofWords branch.length st.executionEnv.calldata branch.offset
+                              (SszProofCommitted.endOffset branch.offset branch.length))
+                            (UInt256.ofNat (fromByteArrayBigEndian (st.returnData.extract 0 32))) ∧
+                          afterState.executionEnv = st.executionEnv
+info: LidoSRv3/Audit/Source/SszCompiledClEntry.lean:726:0: 'LidoSRv3.Audit.Source.SszCompiledClEntry.run_success' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+error: Lean exited with code 1
+Some required targets logged failures:
+- LidoSRv3.Audit.Source.SszCompiledClEntry
+error: build failed

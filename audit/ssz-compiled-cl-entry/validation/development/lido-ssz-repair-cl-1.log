@@ -1,0 +1,661 @@
+⚠ [1071/1159] Replayed Conform.Wheels
+warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: Conform/Wheels.lean:106:70: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1073/1159] Replayed EvmYul.Pretty
+warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: EvmYul/Pretty.lean:36:32: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1114/1159] Replayed EvmYul.Semantics
+warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1115/1159] Replayed EvmYul.EVM.Semantics
+warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+ℹ [1133/1159] Replayed LidoSRv3.Audit.Source.SszWitnessAbi
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:326:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.run_success_input_binding' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:327:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.pubkey_environment' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:328:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.pair_environment' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:329:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.merkle_environment' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:330:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.call_environment' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:331:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.fields_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:332:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.run_success_origin' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:334:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.read64_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:335:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.readBool_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:336:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.tail_success_length' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1134/1159] Replayed LidoSRv3.Audit.Source.SszShaCommitted
+info: LidoSRv3/Audit/Source/SszShaCommitted.lean:337:0: 'LidoSRv3.Audit.Source.SszShaCommitted.run_success_computed_merkle' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/SszShaCommitted.lean:338:0: 'LidoSRv3.Audit.Source.SszShaCommitted.pubkey_success_words' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszShaCommitted.lean:339:0: 'LidoSRv3.Audit.Source.SszShaCommitted.merkle_success_digest' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszShaCommitted.lean:340:0: 'LidoSRv3.Audit.Source.SszShaCommitted.call_words' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszShaCommitted.lean:341:0: 'LidoSRv3.Audit.Source.SszShaCommitted.pair_success_words' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszShaCommitted.lean:342:0: 'LidoSRv3.Audit.Source.SszShaCommitted.pair_success_digest' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszShaCommitted.lean:343:0: 'LidoSRv3.Audit.Source.SszShaCommitted.call_success_output' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszShaCommitted.lean:344:0: 'LidoSRv3.Audit.Source.SszShaCommitted.pair_success_output' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszShaCommitted.lean:345:0: 'LidoSRv3.Audit.Source.SszShaCommitted.call_success_gas' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszShaCommitted.lean:346:0: 'LidoSRv3.Audit.Source.SszShaCommitted.call_success_depth' depends on axioms: [propext, Classical.choice, Quot.sound]
+⚠ [1135/1159] Replayed LidoSRv3.Audit.Source.SszPubkeyBytes
+warning: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:32:91: This simp argument is unused:
+  Nat.zero_add
+
+Hint: Omit it from the simp argument list.
+  simp only [ByteArray.size, ̲Array.size_append, ̲Array.size_replicate, ̲hlower, ̲Nat.sub_zero,̵N̵a̵t̵.̵z̵e̵r̵o̵_̵a̵d̵d̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:44:78: This simp argument is unused:
+  Nat.sub_zero
+
+Hint: Omit it from the simp argument list.
+  simp only [ByteArray.size, ̲Array.size_append, ̲Array.size_replicate, ̲hlower, ̲Nat.s̵u̵b̵_̵zero,̵N̵a̵t̵.̵z̵e̵r̵o̵_add]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+info: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:232:0: 'LidoSRv3.Audit.Source.SszPubkeyBytes.key_size' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:233:0: 'LidoSRv3.Audit.Source.SszPubkeyBytes.block_size' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:234:0: 'LidoSRv3.Audit.Source.SszPubkeyBytes.block_eq_raw' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:235:0: 'LidoSRv3.Audit.Source.SszPubkeyBytes.pubkey_digest_typed' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:236:0: 'LidoSRv3.Audit.Source.SszPubkeyBytes.computed_leaf_typed' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:237:0: 'LidoSRv3.Audit.Source.SszPubkeyBytes.witness_key_length' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:238:0: 'LidoSRv3.Audit.Source.SszPubkeyBytes.run_success_computed_leaf' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:239:0: 'LidoSRv3.Audit.Source.SszPubkeyBytes.pubkey_success_digest' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:240:0: 'LidoSRv3.Audit.Source.SszPubkeyBytes.memory_exact' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:241:0: 'LidoSRv3.Audit.Source.SszPubkeyBytes.read_exact' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:242:0: 'LidoSRv3.Audit.Source.SszPubkeyBytes.copy_padded' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1136/1159] Replayed LidoSRv3.Audit.Source.SszProofCommitted
+info: LidoSRv3/Audit/Source/SszProofCommitted.lean:300:0: 'LidoSRv3.Audit.Source.SszProofCommitted.proofWords_length_le' depends on axioms: [propext]
+info: LidoSRv3/Audit/Source/SszProofCommitted.lean:301:0: 'LidoSRv3.Audit.Source.SszProofCommitted.verify_success_depth' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/SszProofCommitted.lean:302:0: 'LidoSRv3.Audit.Source.SszProofCommitted.run_success_branch' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszProofCommitted.lean:303:0: 'LidoSRv3.Audit.Source.SszProofCommitted.verify_success_branch' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/SszProofCommitted.lean:304:0: 'LidoSRv3.Audit.Source.SszProofCommitted.loop_success_fold' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszProofCommitted.lean:305:0: 'LidoSRv3.Audit.Source.SszProofCommitted.step_success_effects' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/SszProofCommitted.lean:306:0: 'LidoSRv3.Audit.Source.SszProofCommitted.step_call_digest' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszProofCommitted.lean:307:0: 'LidoSRv3.Audit.Source.SszProofCommitted.step_success_shape' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszProofCommitted.lean:308:0: 'LidoSRv3.Audit.Source.SszProofCommitted.prepared_memory' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszProofCommitted.lean:309:0: 'LidoSRv3.Audit.Source.SszProofCommitted.prepared_read' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1137/1159] Replayed LidoSRv3.Audit.Source.SszCompiledMemory
+info: LidoSRv3/Audit/Source/SszCompiledMemory.lean:576:0: 'LidoSRv3.Audit.Source.SszCompiledMemory.write_word_read' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledMemory.lean:577:0: 'LidoSRv3.Audit.Source.SszCompiledMemory.store_load' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledMemory.lean:578:0: 'LidoSRv3.Audit.Source.SszCompiledMemory.xi_uses_fresh' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledMemory.lean:579:0: 'LidoSRv3.Audit.Source.SszCompiledMemory.prologue_free_pointer' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledMemory.lean:580:0: 'LidoSRv3.Audit.Source.SszCompiledMemory.allocate_success_bound' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledMemory.lean:581:0: 'LidoSRv3.Audit.Source.SszCompiledMemory.allocate_effects' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledMemory.lean:582:0: 'LidoSRv3.Audit.Source.SszCompiledMemory.pair_memory' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledMemory.lean:583:0: 'LidoSRv3.Audit.Source.SszCompiledMemory.pubkey_memory' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1138/1159] Replayed LidoSRv3.Audit.Source.SszCompiledConsumer
+info: LidoSRv3/Audit/Source/SszCompiledConsumer.lean:130:0: 'LidoSRv3.Audit.Source.SszCompiledConsumer.begin_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1139/1159] Replayed LidoSRv3.Audit.Source.SszCompiledMerkle
+info: LidoSRv3/Audit/Source/SszCompiledMerkle.lean:583:0: 'LidoSRv3.Audit.Source.SszCompiledMerkle.run_success_branch' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledMerkle.lean:584:0: 'LidoSRv3.Audit.Source.SszCompiledMerkle.run_computed_leaf' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledMerkle.lean:585:0: 'LidoSRv3.Audit.Source.SszCompiledMerkle.begin_values' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledMerkle.lean:586:0: 'LidoSRv3.Audit.Source.SszCompiledMerkle.fields_effects' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledMerkle.lean:587:0: 'LidoSRv3.Audit.Source.SszCompiledMerkle.merkle_effects' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledMerkle.lean:588:0: 'LidoSRv3.Audit.Source.SszCompiledMerkle.allocate_frame' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledMerkle.lean:589:0: 'LidoSRv3.Audit.Source.SszCompiledMerkle.pairStore_effects' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1140/1159] Replayed LidoSRv3.Audit.Source.SszCompiledFrame
+info: LidoSRv3/Audit/Source/SszCompiledFrame.lean:776:0: 'LidoSRv3.Audit.Source.SszCompiledFrame.write_pad_read' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledFrame.lean:777:0: 'LidoSRv3.Audit.Source.SszCompiledFrame.allocate_frame' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledFrame.lean:778:0: 'LidoSRv3.Audit.Source.SszCompiledFrame.pairStore_effects' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledFrame.lean:779:0: 'LidoSRv3.Audit.Source.SszCompiledFrame.merkle_effects' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledFrame.lean:780:0: 'LidoSRv3.Audit.Source.SszCompiledFrame.fields_effects' depends on axioms: [propext, Classical.choice, Quot.sound]
+⚠ [1151/1159] Replayed Verity.Core
+warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1041:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+ℹ [1155/1159] Replayed LidoSRv3.Audit.Source.SszRootCall
+info: LidoSRv3/Audit/Source/SszRootCall.lean:206:0: 'LidoSRv3.Audit.Source.SszRootCall.run_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszRootCall.lean:207:0: 'LidoSRv3.Audit.Source.SszRootCall.slot_failure_no_call' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/SszRootCall.lean:208:0: 'LidoSRv3.Audit.Source.SszRootCall.run_world' depends on axioms: [propext, Quot.sound]
+ℹ [1156/1159] Replayed LidoSRv3.Audit.Source.SszCompiledReply
+info: LidoSRv3/Audit/Source/SszCompiledReply.lean:490:0: 'LidoSRv3.Audit.Source.SszCompiledReply.reply_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledReply.lean:491:0: 'LidoSRv3.Audit.Source.SszCompiledReply.root_word_typed' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1157/1159] Replayed LidoSRv3.Audit.Source.SszSoladyFls
+info: LidoSRv3/Audit/Source/SszSoladyFls.lean:149:0: 'LidoSRv3.Audit.Source.SszSoladyFls.sourceFls_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszSoladyFls.lean:150:0: 'LidoSRv3.Audit.Source.SszSoladyFls.table_lookup' depends on axioms: [propext]
+⚠ [1158/1159] Replayed LidoSRv3.Audit.Source.SszCompiledGIndex
+warning: LidoSRv3/Audit/Source/SszCompiledGIndex.lean:238:20: '(unfold word; rfl)' tactic does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: LidoSRv3/Audit/Source/SszCompiledGIndex.lean:238:20: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+info: LidoSRv3/Audit/Source/SszCompiledGIndex.lean:269:0: 'LidoSRv3.Audit.Source.SszCompiledGIndex.wrapper_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledGIndex.lean:270:0: 'LidoSRv3.Audit.Source.SszCompiledGIndex.pinned_words' depends on axioms: [propext]
+✖ [1159/1159] Building LidoSRv3.Audit.Source.SszCompiledClEntry (9.5s)
+trace: .> LEAN_PATH=/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Cli/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/batteries/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Qq/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/aesop/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/proofwidgets/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/importGraph/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/plausible/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/mathlib/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/evmyul/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/verity/.lake/build/lib/lean:/private/tmp/lido-ssz-compiled-entry-repair/.lake/build/lib/lean /Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean /private/tmp/lido-ssz-compiled-entry-repair/LidoSRv3/Audit/Source/SszCompiledClEntry.lean -o /private/tmp/lido-ssz-compiled-entry-repair/.lake/build/lib/lean/LidoSRv3/Audit/Source/SszCompiledClEntry.olean -i /private/tmp/lido-ssz-compiled-entry-repair/.lake/build/lib/lean/LidoSRv3/Audit/Source/SszCompiledClEntry.ilean -c /private/tmp/lido-ssz-compiled-entry-repair/.lake/build/ir/LidoSRv3/Audit/Source/SszCompiledClEntry.c --setup /private/tmp/lido-ssz-compiled-entry-repair/.lake/build/ir/LidoSRv3/Audit/Source/SszCompiledClEntry.setup.json --json
+error: LidoSRv3/Audit/Source/SszCompiledClEntry.lean:206:12: (deterministic) timeout at `whnf`, maximum number of heartbeats (200000) has been reached
+
+Note: Use `set_option maxHeartbeats <num>` to set the limit.
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.
+error: LidoSRv3/Audit/Source/SszCompiledClEntry.lean:208:45: (deterministic) timeout at `«synthesize pending MVars»`, maximum number of heartbeats (200000) has been reached
+
+Note: Use `set_option maxHeartbeats <num>` to set the limit.
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.
+error: LidoSRv3/Audit/Source/SszCompiledClEntry.lean:240:6: Ambiguous term
+  write_word_shape
+Possible interpretations:
+  SszCompiledFrame.write_word_shape ByteArray.empty 64 (UInt256.ofNat 128)
+    (Nat.le_trans ?m.53
+      (Nat.le_add_left 576
+        ByteArray.empty.size)) : ((UInt256.ofNat 128).toByteArray.write 0 ByteArray.empty 64 32).data =
+    ByteArray.empty.data.extract 0 64 ++ Array.replicate (64 - ByteArray.empty.size) 0 ++
+        (UInt256.ofNat 128).toByteArray.data ++
+      ByteArray.empty.data.extract (64 + 32) ByteArray.empty.size
+  
+  SszCompiledMemory.write_word_shape ByteArray.empty 64 (UInt256.ofNat 128)
+    (Nat.le_trans ?m.53
+      (Nat.le_add_left 576
+        ByteArray.empty.size)) : ((UInt256.ofNat 128).toByteArray.write 0 ByteArray.empty 64 32).data =
+    ByteArray.empty.data.extract 0 64 ++ Array.replicate (64 - ByteArray.empty.size) 0 ++
+        (UInt256.ofNat 128).toByteArray.data ++
+      ByteArray.empty.data.extract (64 + 32) ByteArray.empty.size
+error: LidoSRv3/Audit/Source/SszCompiledClEntry.lean:234:85: unsolved goals
+context : EVM.State
+h64 : (UInt256.ofNat 64).toNat = 64
+⊢ ((UInt256.ofNat 128).toByteArray.write 0 ByteArray.empty 64 32).data.size = 96
+error: LidoSRv3/Audit/Source/SszCompiledClEntry.lean:246:48: Function expected at
+  Stored
+but this term has type
+  ?m.1
+
+Note: Expected a function because this term is being applied to the argument
+  (prologue context)
+
+Hint: The identifier `Stored` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+error: LidoSRv3/Audit/Source/SszCompiledClEntry.lean:249:2: No goals to be solved
+error: LidoSRv3/Audit/Source/SszCompiledClEntry.lean:307:6: Function expected at
+  Stored
+but this term has type
+  ?m.1
+
+Note: Expected a function because this term is being applied to the argument
+  b.state
+
+Hint: The identifier `Stored` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+error: LidoSRv3/Audit/Source/SszCompiledClEntry.lean:308:34: unsolved goals
+case unit.refl
+x✝ : Sort u_1
+Stored : x✝
+fuel : ℕ
+context : EVM.State
+henvp : (prologue context).executionEnv = context.executionEnv
+head : UInt256
+hh : header (prologue context) = Except.ok head
+branch : SszWitnessAbi.Slice
+hbr : Except.mapError Error.abi (SszWitnessAbi.tail (prologue context) head (UInt256.ofNat 4) 32) = Except.ok branch
+hbr' : SszWitnessAbi.tail (prologue context) head (UInt256.ofNat 4) 32 = Except.ok branch
+slot : BitVec 64
+hs : Except.mapError Error.abi (SszWitnessAbi.read64 (prologue context) (UInt256.ofNat 36)) = Except.ok slot
+hs' : SszWitnessAbi.read64 (prologue context) (UInt256.ofNat 36) = Except.ok slot
+proposer : BitVec 64
+hp : Except.mapError Error.abi (SszWitnessAbi.read64 (prologue context) (UInt256.ofNat 68)) = Except.ok proposer
+hp' : SszWitnessAbi.read64 (prologue context) (UInt256.ofNat 68) = Except.ok proposer
+expected : SszBlsComposition.Result
+hpair : Except.mapError Error.bls (pairRun fuel (prologue context) (chunk slot) (chunk proposer)) = Except.ok expected
+hpair' : pairRun fuel (prologue context) (chunk slot) (chunk proposer) = Except.ok expected
+hsib : slotSibling expected.state branch expected.digest = Except.ok PUnit.unit
+h✝⁵ :
+  (have st := prologue context;
+    do
+    let h ← header st
+    have n : UInt256 := st.calldataload (UInt256.ofNat 132)
+    let branch ← Except.mapError Error.abi (SszWitnessAbi.tail st h (UInt256.ofNat 4) 32)
+    let slot ← Except.mapError Error.abi (SszWitnessAbi.read64 st (UInt256.ofNat 36))
+    let proposer ← Except.mapError Error.abi (SszWitnessAbi.read64 st (UInt256.ofNat 68))
+    let expected ← Except.mapError Error.bls (pairRun fuel st (chunk slot) (chunk proposer))
+    slotSibling expected.state branch expected.digest
+    let __discr ← Except.mapError Error.abi (SszWitnessAbi.read64 expected.state (UInt256.ofNat 4))
+    have x : BitVec 64 := __discr
+    pure
+        { state := expected.state, head := h, branch := branch,
+          timestamp := expected.state.calldataload (UInt256.ofNat 4), index := n }) =
+    Except.ok
+      { state := expected.state, head := head, branch := branch,
+        timestamp := expected.state.calldataload (UInt256.ofNat 4),
+        index := (prologue context).calldataload (UInt256.ofNat 132) }
+h✝⁴ :
+  (do
+      let branch ← Except.mapError Error.abi (SszWitnessAbi.tail (prologue context) head (UInt256.ofNat 4) 32)
+      let slot ← Except.mapError Error.abi (SszWitnessAbi.read64 (prologue context) (UInt256.ofNat 36))
+      let proposer ← Except.mapError Error.abi (SszWitnessAbi.read64 (prologue context) (UInt256.ofNat 68))
+      let expected ← Except.mapError Error.bls (pairRun fuel (prologue context) (chunk slot) (chunk proposer))
+      slotSibling expected.state branch expected.digest
+      let _ ← Except.mapError Error.abi (SszWitnessAbi.read64 expected.state (UInt256.ofNat 4))
+      pure
+          { state := expected.state, head := head, branch := branch,
+            timestamp := expected.state.calldataload (UInt256.ofNat 4),
+            index := (prologue context).calldataload (UInt256.ofNat 132) }) =
+    Except.ok
+      { state := expected.state, head := head, branch := branch,
+        timestamp := expected.state.calldataload (UInt256.ofNat 4),
+        index := (prologue context).calldataload (UInt256.ofNat 132) }
+h✝³ :
+  (do
+      let slot ← Except.mapError Error.abi (SszWitnessAbi.read64 (prologue context) (UInt256.ofNat 36))
+      let proposer ← Except.mapError Error.abi (SszWitnessAbi.read64 (prologue context) (UInt256.ofNat 68))
+      let expected ← Except.mapError Error.bls (pairRun fuel (prologue context) (chunk slot) (chunk proposer))
+      slotSibling expected.state branch expected.digest
+      let _ ← Except.mapError Error.abi (SszWitnessAbi.read64 expected.state (UInt256.ofNat 4))
+      pure
+          { state := expected.state, head := head, branch := branch,
+            timestamp := expected.state.calldataload (UInt256.ofNat 4),
+            index := (prologue context).calldataload (UInt256.ofNat 132) }) =
+    Except.ok
+      { state := expected.state, head := head, branch := branch,
+        timestamp := expected.state.calldataload (UInt256.ofNat 4),
+        index := (prologue context).calldataload (UInt256.ofNat 132) }
+h✝² :
+  (do
+      let proposer ← Except.mapError Error.abi (SszWitnessAbi.read64 (prologue context) (UInt256.ofNat 68))
+      let expected ← Except.mapError Error.bls (pairRun fuel (prologue context) (chunk slot) (chunk proposer))
+      slotSibling expected.state branch expected.digest
+      let _ ← Except.mapError Error.abi (SszWitnessAbi.read64 expected.state (UInt256.ofNat 4))
+      pure
+          { state := expected.state, head := head, branch := branch,
+            timestamp := expected.state.calldataload (UInt256.ofNat 4),
+            index := (prologue context).calldataload (UInt256.ofNat 132) }) =
+    Except.ok
+      { state := expected.state, head := head, branch := branch,
+        timestamp := expected.state.calldataload (UInt256.ofNat 4),
+        index := (prologue context).calldataload (UInt256.ofNat 132) }
+h✝¹ :
+  (do
+      let expected ← Except.mapError Error.bls (pairRun fuel (prologue context) (chunk slot) (chunk proposer))
+      slotSibling expected.state branch expected.digest
+      let _ ← Except.mapError Error.abi (SszWitnessAbi.read64 expected.state (UInt256.ofNat 4))
+      pure
+          { state := expected.state, head := head, branch := branch,
+            timestamp := expected.state.calldataload (UInt256.ofNat 4),
+            index := (prologue context).calldataload (UInt256.ofNat 132) }) =
+    Except.ok
+      { state := expected.state, head := head, branch := branch,
+        timestamp := expected.state.calldataload (UInt256.ofNat 4),
+        index := (prologue context).calldataload (UInt256.ofNat 132) }
+h✝ :
+  (do
+      slotSibling expected.state branch expected.digest
+      let _ ← Except.mapError Error.abi (SszWitnessAbi.read64 expected.state (UInt256.ofNat 4))
+      pure
+          { state := expected.state, head := head, branch := branch,
+            timestamp := expected.state.calldataload (UInt256.ofNat 4),
+            index := (prologue context).calldataload (UInt256.ofNat 132) }) =
+    Except.ok
+      { state := expected.state, head := head, branch := branch,
+        timestamp := expected.state.calldataload (UInt256.ofNat 4),
+        index := (prologue context).calldataload (UInt256.ofNat 132) }
+h :
+  (do
+      let _ ← Except.mapError Error.abi (SszWitnessAbi.read64 expected.state (UInt256.ofNat 4))
+      pure
+          { state := expected.state, head := head, branch := branch,
+            timestamp := expected.state.calldataload (UInt256.ofNat 4),
+            index := (prologue context).calldataload (UInt256.ofNat 132) }) =
+    Except.ok
+      { state := expected.state, head := head, branch := branch,
+        timestamp := expected.state.calldataload (UInt256.ofNat 4),
+        index := (prologue context).calldataload (UInt256.ofNat 132) }
+hts64 : (expected.state.calldataload (UInt256.ofNat 4)).toNat < 2 ^ 64
+hts :
+  Except.mapError Error.abi (SszWitnessAbi.read64 expected.state (UInt256.ofNat 4)) =
+    Except.ok (BitVec.ofNat 64 (expected.state.calldataload (UInt256.ofNat 4)).toNat)
+hts' :
+  SszWitnessAbi.read64 expected.state (UInt256.ofNat 4) =
+    Except.ok (BitVec.ofNat 64 (expected.state.calldataload (UInt256.ofNat 4)).toNat)
+hdigest : expected.digest = pairDigest (chunk slot) (chunk proposer)
+hwords : expected.state.activeWords.toNat = max (prologue context).activeWords.toNat 2
+henv : expected.state.executionEnv = (prologue context).executionEnv
+henv' : expected.state.executionEnv = context.executionEnv
+hsize : expected.state.memory.size = (prologue context).memory.size
+⊢ ∃ slot proposer,
+    header context =
+        Except.ok
+          { state := expected.state, head := head, branch := branch,
+              timestamp := expected.state.calldataload (UInt256.ofNat 4),
+              index := (prologue context).calldataload (UInt256.ofNat 132) }.head ∧
+      SszWitnessAbi.tail context
+            { state := expected.state, head := head, branch := branch,
+                timestamp := expected.state.calldataload (UInt256.ofNat 4),
+                index := (prologue context).calldataload (UInt256.ofNat 132) }.head
+            (UInt256.ofNat 4) 32 =
+          Except.ok
+            { state := expected.state, head := head, branch := branch,
+                timestamp := expected.state.calldataload (UInt256.ofNat 4),
+                index := (prologue context).calldataload (UInt256.ofNat 132) }.branch ∧
+        SszWitnessAbi.read64 context (UInt256.ofNat 36) = Except.ok slot ∧
+          SszWitnessAbi.read64 context (UInt256.ofNat 68) = Except.ok proposer ∧
+            2 ≤
+                { state := expected.state, head := head, branch := branch,
+                      timestamp := expected.state.calldataload (UInt256.ofNat 4),
+                      index := (prologue context).calldataload (UInt256.ofNat 132) }.branch.length ∧
+              context.calldataload
+                    ({ state := expected.state, head := head, branch := branch,
+                            timestamp := expected.state.calldataload (UInt256.ofNat 4),
+                            index := (prologue context).calldataload (UInt256.ofNat 132) }.branch.offset +
+                      UInt256.ofNat
+                        (({ state := expected.state, head := head, branch := branch,
+                                  timestamp := expected.state.calldataload (UInt256.ofNat 4),
+                                  index := (prologue context).calldataload (UInt256.ofNat 132) }.branch.length -
+                            2) *
+                          32)) =
+                  pairDigest (chunk slot) (chunk proposer) ∧
+                SszWitnessAbi.read64 context (UInt256.ofNat 4) =
+                    Except.ok (BitVec.ofNat 64 (context.calldataload (UInt256.ofNat 4)).toNat) ∧
+                  { state := expected.state, head := head, branch := branch,
+                          timestamp := expected.state.calldataload (UInt256.ofNat 4),
+                          index := (prologue context).calldataload (UInt256.ofNat 132) }.timestamp =
+                      context.calldataload (UInt256.ofNat 4) ∧
+                    { state := expected.state, head := head, branch := branch,
+                              timestamp := expected.state.calldataload (UInt256.ofNat 4),
+                              index := (prologue context).calldataload (UInt256.ofNat 132) }.timestamp.toNat <
+                        2 ^ 64 ∧
+                      { state := expected.state, head := head, branch := branch,
+                              timestamp := expected.state.calldataload (UInt256.ofNat 4),
+                              index := (prologue context).calldataload (UInt256.ofNat 132) }.index =
+                          context.calldataload (UInt256.ofNat 132) ∧
+                        { state := expected.state, head := head, branch := branch,
+                                  timestamp := expected.state.calldataload (UInt256.ofNat 4),
+                                  index := (prologue context).calldataload (UInt256.ofNat 132) }.state.executionEnv =
+                            context.executionEnv ∧
+                          { state := expected.state, head := head, branch := branch,
+                                      timestamp := expected.state.calldataload (UInt256.ofNat 4),
+                                      index :=
+                                        (prologue context).calldataload (UInt256.ofNat 132) }.state.activeWords.toNat =
+                              3 ∧
+                            sorry ∧
+                              { state := expected.state, head := head, branch := branch,
+                                        timestamp := expected.state.calldataload (UInt256.ofNat 4),
+                                        index :=
+                                          (prologue context).calldataload (UInt256.ofNat 132) }.state.memory.size =
+                                96
+error: LidoSRv3/Audit/Source/SszCompiledClEntry.lean:384:2: No goals to be solved
+error: LidoSRv3/Audit/Source/SszCompiledClEntry.lean:389:10: Function expected at
+  Stored
+but this term has type
+  ?m.1
+
+Note: Expected a function because this term is being applied to the argument
+  st
+
+Hint: The identifier `Stored` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+error: LidoSRv3/Audit/Source/SszCompiledClEntry.lean:395:4: Function expected at
+  Stored
+but this term has type
+  ?m.1
+
+Note: Expected a function because this term is being applied to the argument
+  st'
+
+Hint: The identifier `Stored` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+error: LidoSRv3/Audit/Source/SszCompiledClEntry.lean:396:4: Function expected at
+  Stored
+but this term has type
+  ?m.1
+
+Note: Expected a function because this term is being applied to the argument
+  st'
+
+Hint: The identifier `Stored` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+error: LidoSRv3/Audit/Source/SszCompiledClEntry.lean:398:42: unsolved goals
+x✝ : Sort u_1
+Stored : x✝
+external : StaticCall.External
+world : Live.World
+st st' : EVM.State
+ts : UInt256
+out : RootOutcome
+h :
+  (if ((load st 64).1 + UInt256.ofNat 64).toNat > 2 ^ 64 - 1 ∨ (load st 64).1 + UInt256.ofNat 64 < (load st 64).1 then
+      Except.error (Error.allocation AllocationError.panic41)
+    else
+      Except.ok
+        ({
+            toState :=
+              (load
+                    (store
+                      (store (store (load st 64).2 ((load st 64).1 + UInt256.ofNat 32).toNat ts) (load st 64).1.toNat
+                        (UInt256.ofNat 32))
+                      64 ((load st 64).1 + UInt256.ofNat 64))
+                    (load st 64).1.toNat).2.toState,
+            gasAvailable :=
+              (load
+                    (store
+                      (store (store (load st 64).2 ((load st 64).1 + UInt256.ofNat 32).toNat ts) (load st 64).1.toNat
+                        (UInt256.ofNat 32))
+                      64 ((load st 64).1 + UInt256.ofNat 64))
+                    (load st 64).1.toNat).2.gasAvailable,
+            activeWords :=
+              UInt256.ofNat
+                (MachineState.M
+                  (MachineState.M
+                    (load
+                            (store
+                              (store (store (load st 64).2 ((load st 64).1 + UInt256.ofNat 32).toNat ts)
+                                (load st 64).1.toNat (UInt256.ofNat 32))
+                              64 ((load st 64).1 + UInt256.ofNat 64))
+                            (load st 64).1.toNat).2.activeWords.toNat
+                    ((load st 64).1 + UInt256.ofNat 32).toNat
+                    (load
+                          (store
+                            (store (store (load st 64).2 ((load st 64).1 + UInt256.ofNat 32).toNat ts)
+                              (load st 64).1.toNat (UInt256.ofNat 32))
+                            64 ((load st 64).1 + UInt256.ofNat 64))
+                          (load st 64).1.toNat).1.toNat)
+                  0 0),
+            memory :=
+              (load
+                    (store
+                      (store (store (load st 64).2 ((load st 64).1 + UInt256.ofNat 32).toNat ts) (load st 64).1.toNat
+                        (UInt256.ofNat 32))
+                      64 ((load st 64).1 + UInt256.ofNat 64))
+                    (load st 64).1.toNat).2.memory,
+            returnData :=
+              (match
+                  (audit.trio.consolidation.lowLevelStaticCall external
+                      (callerOf
+                        (load
+                            (store
+                              (store (store (load st 64).2 ((load st 64).1 + UInt256.ofNat 32).toNat ts)
+                                (load st 64).1.toNat (UInt256.ofNat 32))
+                              64 ((load st 64).1 + UInt256.ofNat 64))
+                            (load st 64).1.toNat).2)
+                      SszRootCall.target
+                      (liveBytes
+                        ((load
+                                  (store
+                                    (store (store (load st 64).2 ((load st 64).1 + UInt256.ofNat 32).toNat ts)
+                                      (load st 64).1.toNat (UInt256.ofNat 32))
+                                    64 ((load st 64).1 + UInt256.ofNat 64))
+                                  (load st 64).1.toNat).2.memory.readWithPadding
+                          ((load st 64).1 + UInt256.ofNat 32).toNat
+                          (load
+                                (store
+                                  (store (store (load st 64).2 ((load st 64).1 + UInt256.ofNat 32).toNat ts)
+                                    (load st 64).1.toNat (UInt256.ofNat 32))
+                                  64 ((load st 64).1 + UInt256.ofNat 64))
+                                (load st 64).1.toNat).1.toNat))
+                      world).outcome with
+                | Except.ok data => (true, machineBytes data)
+                | Except.error data => (false, machineBytes data)).2,
+            H_return :=
+              (load
+                    (store
+                      (store (store (load st 64).2 ((load st 64).1 + UInt256.ofNat 32).toNat ts) (load st 64).1.toNat
+                        (UInt256.ofNat 32))
+                      64 ((load st 64).1 + UInt256.ofNat 64))
+                    (load st 64).1.toNat).2.H_return,
+            pc :=
+              (load
+                    (store
+                      (store (store (load st 64).2 ((load st 64).1 + UInt256.ofNat 32).toNat ts) (load st 64).1.toNat
+                        (UInt256.ofNat 32))
+                      64 ((load st 64).1 + UInt256.ofNat 64))
+                    (load st 64).1.toNat).2.pc,
+            stack :=
+              (load
+                    (store
+                      (store (store (load st 64).2 ((load st 64).1 + UInt256.ofNat 32).toNat ts) (load st 64).1.toNat
+                        (UInt256.ofNat 32))
+                      64 ((load st 64).1 + UInt256.ofNat 64))
+                    (load st 64).1.toNat).2.stack,
+            execLength :=
+              (load
+                    (store
+                      (store (store (load st 64).2 ((load st 64).1 + UInt256.ofNat 32).toNat ts) (load st 64).1.toNat
+                        (UInt256.ofNat 32))
+                      64 ((load st 64).1 + UInt256.ofNat 64))
+                    (load st 64).1.toNat).2.execLength },
+          {
+            success :=
+              (match
+                  (audit.trio.consolidation.lowLevelStaticCall external
+                      (callerOf
+                        (load
+                            (store
+                              (store (store (load st 64).2 ((load st 64).1 + UInt256.ofNat 32).toNat ts)
+                                (load st 64).1.toNat (UInt256.ofNat 32))
+                              64 ((load st 64).1 + UInt256.ofNat 64))
+                            (load st 64).1.toNat).2)
+                      SszRootCall.target
+                      (liveBytes
+                        ((load
+                                  (store
+                                    (store (store (load st 64).2 ((load st 64).1 + UInt256.ofNat 32).toNat ts)
+                                      (load st 64).1.toNat (UInt256.ofNat 32))
+                                    64 ((load st 64).1 + UInt256.ofNat 64))
+                                  (load st 64).1.toNat).2.memory.readWithPadding
+                          ((load st 64).1 + UInt256.ofNat 32).toNat
+                          (load
+                                (store
+                                  (store (store (load st 64).2 ((load st 64).1 + UInt256.ofNat 32).toNat ts)
+                                    (load st 64).1.toNat (UInt256.ofNat 32))
+                                  64 ((load st 64).1 + UInt256.ofNat 64))
+                                (load st 64).1.toNat).1.toNat))
+                      world).outcome with
+                | Except.ok data => (true, machineBytes data)
+                | Except.error data => (false, machineBytes data)).1,
+            attempts :=
+              (audit.trio.consolidation.lowLevelStaticCall external
+                  (callerOf
+                    (load
+                        (store
+                          (store (store (load st 64).2 ((load st 64).1 + UInt256.ofNat 32).toNat ts)
+                            (load st 64).1.toNat (UInt256.ofNat 32))
+                          64 ((load st 64).1 + UInt256.ofNat 64))
+                        (load st 64).1.toNat).2)
+                  SszRootCall.target
+                  (liveBytes
+                    ((load
+                              (store
+                                (store (store (load st 64).2 ((load st 64).1 + UInt256.ofNat 32).toNat ts)
+                                  (load st 64).1.toNat (UInt256.ofNat 32))
+                                64 ((load st 64).1 + UInt256.ofNat 64))
+                              (load st 64).1.toNat).2.memory.readWithPadding
+                      ((load st 64).1 + UInt256.ofNat 32).toNat
+                      (load
+                            (store
+                              (store (store (load st 64).2 ((load st 64).1 + UInt256.ofNat 32).toNat ts)
+                                (load st 64).1.toNat (UInt256.ofNat 32))
+                              64 ((load st 64).1 + UInt256.ofNat 64))
+                            (load st 64).1.toNat).1.toNat))
+                  world).attempts })) =
+    Except.ok (st', out)
+hf : sorry
+hsize : st.memory.size = 96
+hw : st.activeWords.toNat = 3
+hts : ts.toNat < 2 ^ 64
+e160 : (UInt256.ofNat 128 + UInt256.ofNat 32).toNat = 160
+e128 : (UInt256.ofNat 128).toNat = 128
+enext : UInt256.ofNat 128 + UInt256.ofNat 64 = UInt256.ofNat 192
+e192 : (UInt256.ofNat 192).toNat = 192
+e32 : (UInt256.ofNat 32).toNat = 32
+hw251 : st.activeWords.toNat < 2 ^ 251
+⊢ out.attempts = (SszRootCall.call external (callerOf st) (BitVec.ofNat 64 ts.toNat) world).attempts ∧
+    (out.success = true →
+        ∃ data,
+          (SszRootCall.call external (callerOf st) (BitVec.ofNat 64 ts.toNat) world).outcome = Except.ok data ∧
+            st'.returnData = machineBytes data) ∧
+      sorry ∧ sorry ∧ st'.activeWords.toNat < 2 ^ 64 ∧ st'.executionEnv = st.executionEnv
+error: LidoSRv3/Audit/Source/SszCompiledClEntry.lean:501:10: Function expected at
+  Stored
+but this term has type
+  ?m.1
+
+Note: Expected a function because this term is being applied to the argument
+  st
+
+Hint: The identifier `Stored` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+error: LidoSRv3/Audit/Source/SszCompiledClEntry.lean:501:50: Function expected at
+  Stored
+but this term has type
+  ?m.1
+
+Note: Expected a function because this term is being applied to the argument
+  st
+
+Hint: The identifier `Stored` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+error: LidoSRv3/Audit/Source/SszCompiledClEntry.lean:533:2: `dsimp` made no progress
+
+Note: The target expression is not type-correct under the `instances` transparency level, which may have triggered the failure. This is usually caused by unfolding of semireducible definitions in prior tactic steps. Use `set_option linter.tacticCheckInstances true` to investigate the source of the issue.
+Full error:
+  Application type mismatch: The argument
+    n.val.isLt
+  has type
+    @LT.lt ℕ instLTNat (↑n.val) UInt256.size
+  but is expected to have type
+    @LT.lt ℕ instLTNat n.toNat wordModulus
+  in the application
+    ⟨n.toNat, ⋯⟩
+error: LidoSRv3/Audit/Source/SszCompiledClEntry.lean:715:32: Unknown identifier `slot`
+error: LidoSRv3/Audit/Source/SszCompiledClEntry.lean:716:13: maximum recursion depth has been reached
+use `set_option maxRecDepth <num>` to increase limit
+use `set_option diagnostics true` to get diagnostic information
+info: LidoSRv3/Audit/Source/SszCompiledClEntry.lean:720:0: 'LidoSRv3.Audit.Source.SszCompiledClEntry.run_success' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+error: Lean exited with code 1
+Some required targets logged failures:
+- LidoSRv3.Audit.Source.SszCompiledClEntry
+error: build failed
