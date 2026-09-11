@@ -756,6 +756,31 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Verity.Topup2Tx.tx_all_success_value_exact
 #print axioms LidoSRv3.Audit.Verity.Topup2Tx.tx_revert_restores_world
 #print axioms LidoSRv3.Audit.Verity.Topup2Tx.tx_committed_world_is_commit_fold
+-- Topup2DistributionTx: the four `sourceRunIndependent_eq_sourceRun`
+-- family lemmas document that the top-level source-run and its helpers
+-- (consume, limits, candidates) do not depend on the `DenoteOracle`
+-- once the decode premises are supplied — i.e. the memory-array
+-- reads are oracle-independent on the currently-registered path.
+#print axioms LidoSRv3.Audit.Verity.Topup2DistributionTx.sourceConsumeIndependent_eq_sourceConsume
+#print axioms LidoSRv3.Audit.Verity.Topup2DistributionTx.sourceLimitsIndependent_eq_sourceLimits
+#print axioms LidoSRv3.Audit.Verity.Topup2DistributionTx.sourceCandidatesIndependent_eq_sourceCandidates
+#print axioms LidoSRv3.Audit.Verity.Topup2DistributionTx.sourceRunIndependent_eq_sourceRun
+-- Topup2Tx additional executable-transaction shape lemmas:
+-- `denoteTransaction_revert_world` restores the entry world on any
+-- revert; `forEachCall_callsIn_take` decomposes the fold on
+-- `callsIn`; `plannedSites_value_sum` and `valueSum_take_le` are
+-- the aggregate ledger bounds; `callsIn_all_success_eq_planned`
+-- documents the all-success shape; `tx_all_rollback_preserves_world`
+-- is the paired revert-preservation counterpart of
+-- `tx_committed_world_is_commit_fold`; `gateway_abort_is_failed_call`
+-- names the specific failed-call cause.
+#print axioms LidoSRv3.Audit.Verity.Topup2Tx.denoteTransaction_revert_world
+#print axioms LidoSRv3.Audit.Verity.Topup2Tx.forEachCall_callsIn_take
+#print axioms LidoSRv3.Audit.Verity.Topup2Tx.plannedSites_value_sum
+#print axioms LidoSRv3.Audit.Verity.Topup2Tx.valueSum_take_le
+#print axioms LidoSRv3.Audit.Verity.Topup2Tx.callsIn_all_success_eq_planned
+#print axioms LidoSRv3.Audit.Verity.Topup2Tx.tx_all_rollback_preserves_world
+#print axioms LidoSRv3.Audit.Verity.Topup2Tx.gateway_abort_is_failed_call
 #print axioms LidoSRv3.Tests.Topup2TxMutants.over_cap_aggregate_rejected
 #print axioms LidoSRv3.Tests.Topup2TxMutants.double_send_rejected
 #print axioms LidoSRv3.Tests.Topup2TxMutants.reverting_adversary_cannot_leak_state
