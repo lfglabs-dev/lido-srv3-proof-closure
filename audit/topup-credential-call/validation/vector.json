@@ -1,0 +1,16 @@
+{
+  "credentials": "0200000000000000000000000000000000000000000000000000000000003039",
+  "leaves": [
+    "20eb1ac59cdc7b33edd131ba2ac21085669e6701dd85e34d4d1a3fc8fdee559a",
+    "909365f8c6b76e4256aabcbf7ec5f1ac93262fe8ffebde70e547d30f906853d5",
+    "f4df708d9c909841ad2f4b1338096b71f4199455a03f57c1d3ae0f7e7a8aed98"
+  ],
+  "root": "fe5e220b080eb9faa612c8668e99f9c39011d3bb79b43b9b677d01c7f3660d19",
+  "indices": [
+    1572301627719680,
+    1572301627719681,
+    1572301627719682
+  ],
+  "depth": 50,
+  "scope": "Python hashlib independent three-leaf sparse branches, actual positive fixture witness bytes; no Lean hash function used."
+}

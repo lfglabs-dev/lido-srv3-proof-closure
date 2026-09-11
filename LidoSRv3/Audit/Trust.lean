@@ -1,3 +1,4 @@
+import LidoSRv3.Tests.TopupCredentialCall
 import LidoSRv3.Tests.AddressWrappedTransferCalls
 import LidoSRv3.Tests.SszCompiledClEntryRegression
 import LidoSRv3.Tests.AddressWrappedTokenCalls
@@ -784,3 +785,8 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_transfer_request_failure_restores
 #print axioms LidoSRv3.Audit.Source.AddressWrappedTransferCalls.canonical_outer_call
 #print axioms LidoSRv3.Audit.Source.AddressWrappedTransferCalls.joined_success
+
+#print axioms LidoSRv3.Audit.Guarantees.PTopupCredentialCalls.actual_credential_root_module_memory_effects
+#print axioms LidoSRv3.Audit.Guarantees.PTopupCredentialCalls.actual_credential_root_module_failure_restores
+#print axioms LidoSRv3.Audit.Source.TopupCredentialCall.lookup_origin
+#print axioms LidoSRv3.Tests.TopupCredentialCall.public_consumer
