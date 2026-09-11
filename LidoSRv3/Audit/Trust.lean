@@ -139,6 +139,7 @@ import LidoSRv3.Tests.PackGTopupProvenanceMutants
 import LidoSRv3.Audit.Provenance.ConsolidationRequest
 import LidoSRv3.Audit.Provenance.CanonicalRequestAddress
 import LidoSRv3.Audit.Provenance.BeaconDepositAddress
+import LidoSRv3.Audit.Provenance.DepositThirtyTwoEther
 import LidoSRv3.Tests.PackGEth1ProvenanceMutants
 import LidoSRv3.Audit.Spec.DepositEthJournalCorrespondence
 import LidoSRv3.Tests.PackJDepositEthJournalMutants
@@ -1628,3 +1629,23 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Provenance.BeaconDepositAddress.deposit_canonical_pin_equals_canonical
 #print axioms LidoSRv3.Audit.Provenance.BeaconDepositAddress.topup_verity_beacon_equals_deployed_immutable
 #print axioms LidoSRv3.Audit.Provenance.BeaconDepositAddress.deposit_canonical_pin_equals_deployed_immutable
+
+-- A-DEPOSIT-32-ETHER discharge (see
+-- `audit/findings/A-DEPOSIT-32-ETHER-discharged.md` and
+-- `LidoSRv3/Audit/Provenance/DepositThirtyTwoEther.lean`): the deployed
+-- StakingRouter production configuration jointly binds
+-- `MAX_EFFECTIVE_BALANCE_WC_TYPE_01` (constructor immutable) and
+-- `BeaconChainDepositor.DEPOSIT_SIZE` (compile-time constant) to
+-- `32 * 10^18` wei. Every runtime read of these two uint256 values
+-- compiles to `PUSH32 <32-ether-word>`; the fixture contains exactly
+-- five such PUSH32 sites (offsets 5521, 12112, 14036, 15415, 20126),
+-- each holding the 32-byte big-endian encoding of 32*10^18 (fixture
+-- and hash pinned in `audit/artifacts.lock.json`; reproduction in
+-- `scripts/verify_deposit_thirty_two_ether.py`). A-DEPOSIT-32-ETHER
+-- is retired from `P-DEPOSIT-1.assumptions` and
+-- `P-ALLOC-EXEC-1.assumptions`.
+#print axioms LidoSRv3.Audit.Provenance.DepositThirtyTwoEther.deployed_thirty_two_ether_push_folds_to_thirty_two_ether
+#print axioms LidoSRv3.Audit.Provenance.DepositThirtyTwoEther.deployed_maxEBType1_equals_pushed_value
+#print axioms LidoSRv3.Audit.Provenance.DepositThirtyTwoEther.deployed_depositSize_equals_pushed_value
+#print axioms LidoSRv3.Audit.Provenance.DepositThirtyTwoEther.deployed_maxEBType1_equals_depositSize
+#print axioms LidoSRv3.Audit.Provenance.DepositThirtyTwoEther.deployed_production_config_thirty_two_ether
