@@ -7,7 +7,7 @@ no claim that keccak correspondence is closed. -/
 set_option autoImplicit false
 namespace LidoSRv3.Tests.TopupKeccakOracleMutants
 
-open Verity
+open _root_.Verity
 open LidoSRv3.Audit.Source.TopupKeccakOracle
 open LidoSRv3.Audit.Verity.Topup2DistributionTx
 
