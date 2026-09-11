@@ -1,0 +1,15 @@
+{
+  "timestamp": 123,
+  "slot": 100,
+  "proposer": 7,
+  "index": 1234,
+  "typed_index": 1572301627720914,
+  "proof_length": 50,
+  "leaf": "82848a5ec43c5480f237f8607d8238e2f271643141c47dfe9d3e861e71cecebf",
+  "root": "ecb7b6a829d748829defa44fd180846b08ebffadd4bfb307f42fd242d581fb7c",
+  "calldata_sha256": "5f4a59d8b2abefa217f868fe20e23da3f3f1319486dfd8329c728f0759a59973",
+  "calldata_bytes": 2180,
+  "proof_start": 484,
+  "key_start": 2116,
+  "method": "Python hashlib SHA256 and explicit ABI words; no Lean digest reused"
+}

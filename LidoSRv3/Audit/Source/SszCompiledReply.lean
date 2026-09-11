@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Source.SszCompiledFrame
+import LidoSRv3.Audit.Source.SszRootCall
 
 /-! `_getParentBlockRoot` (CLValidatorVerifier.sol:103-107) after the STATICCALL,
 transcribed from the inspected SszRootCallHarness runtime IR
@@ -11,6 +12,7 @@ the machine's actual returndata; the decoded word is proved to be the typed
 namespace LidoSRv3.Audit.Source.SszCompiledReply
 open EvmYul EvmYul.EVM SszWordBytes SszScratchByteArray SszCompiledMemory SszCompiledMerkle
 open SszCompiledFrame
+set_option maxRecDepth 4096
 
 inductive Error where
   | panic41 | rootNotFound | abiDecodeFailure
@@ -30,8 +32,8 @@ def copyReply (st : EVM.State) : Except Error (UInt256 × EVM.State) :=
       let st := store st 64 newFree
       let st := store st memPtr.toNat (UInt256.ofNat size)
       let st : EVM.State := { st with toSharedState := { st.toSharedState with toMachineState :=
-        st.toMachineState.returndatacopy (memPtr + UInt256.ofNat 32) (UInt256.ofNat 0)
-          (UInt256.ofNat size) } }
+        (st.toMachineState.returndatacopy (memPtr + UInt256.ofNat 32) (UInt256.ofNat 0)
+          (UInt256.ofNat size)) } }
       .ok (memPtr, st)
 
 /-- IR 146-166: `!success || data.length == 0` (the length load only on success),
@@ -95,8 +97,6 @@ theorem word_of_bytes (B : ByteArray) (h : B.size = 32) :
   unfold fixedBE fromByteArrayBigEndian fromBytesBigEndian
   change (fixedLE 32 (fromBytes' B.toList.reverse)).reverse.toByteArray = B
   rw [← hlen, fixedLE_fromBytes', List.reverse_reverse, byteList_data, list_toByteArray_data]
-  apply ByteArray.ext
-  exact Array.toArray_toList
 
 theorem bitvec_roundtrip (b : SszValidatorLeaf.Byte) : (UInt8.ofNat b.toNat).toBitVec = b := by
   rw [UInt8.toBitVec_ofNat']
@@ -107,7 +107,7 @@ theorem bitvec_roundtrip (b : SszValidatorLeaf.Byte) : (UInt8.ofNat b.toNat).toB
 theorem typedBytes_bytes (l : List SszValidatorLeaf.Byte) :
     SszScratchEvmMemory.typedBytes (SszTypedFfiBridge.bytes l) = l := by
   unfold SszScratchEvmMemory.typedBytes SszTypedFfiBridge.bytes
-  rw [List.data_toByteArray, Array.toList_toArray, List.map_map]
+  rw [List.data_toByteArray, List.toList_toArray, List.map_map]
   simp only [Function.comp_def, bitvec_roundtrip, List.map_id']
 
 theorem typedBytes_append (a b : ByteArray) :
@@ -147,7 +147,7 @@ theorem root_word_typed (D : ByteArray) (h : 32 ≤ D.size) :
 theorem fromBytes_typed (data : List UInt8) :
     SszRootCall.fromBytes data = SszScratchEvmMemory.typedBytes ⟨data.toArray⟩ := by
   unfold SszRootCall.fromBytes SszScratchEvmMemory.typedBytes
-  rw [Array.toList_toArray]
+  rw [List.toList_toArray]
   apply List.map_congr_left
   intro b _
   show BitVec.ofNat 8 b.toBitVec.toNat = b.toBitVec
@@ -201,7 +201,7 @@ theorem write_read_inside (src dest : ByteArray) (s d n : Nat)
     simp only [ByteArray.data_append, ByteArray.data_extract, Array.append_assoc]
   have hpre : (⟨dest.data.extract 0 d ++ Array.replicate (d - dest.size) 0⟩ : ByteArray).size = d := by
     change (dest.data.extract 0 d ++ Array.replicate (d - dest.size) 0).size = d
-    simp only [Array.size_append, Array.size_extract, Array.size_replicate]
+    simp only [Array.size_append, Array.size_extract, Array.size_replicate, ByteArray.size_data]
     omega
   have hmid : (src.extract s (s + n)).size = n := by
     rw [ByteArray.size_extract]
@@ -212,7 +212,7 @@ theorem write_read_inside (src dest : ByteArray) (s d n : Nat)
     omega
   refine ⟨?_, hsz⟩
   rw [SszShaCallBytes.read_fit (src.write s dest d n) d 32 (by omega) (by omega), hshape]
-  show (_ ++ _).extract (d + 0) (d + 32) = _
+  change ByteArray.extract _ (d + 0) (d + 32) = _
   rw [ByteArray.extract_append_size_add' hpre.symm,
     extract_append_before (src.extract s (s + n)) ⟨dest.data.extract (d + n) dest.size⟩ 0 32
       (by rw [hmid]; omega)]
@@ -226,14 +226,14 @@ theorem stored_returndatacopy (st : EVM.State) (mstart size offset : Nat) (value
     (h : Stored st offset value) (hoff : offset + 32 ≤ mstart)
     (hm : mstart < 2 ^ 64) (hs : size < 2 ^ 64) :
     Stored { st with toSharedState := { st.toSharedState with toMachineState :=
-      st.toMachineState.returndatacopy (UInt256.ofNat mstart) (UInt256.ofNat 0)
-        (UInt256.ofNat size) } } offset value := by
+      (st.toMachineState.returndatacopy (UInt256.ofNat mstart) (UInt256.ofNat 0)
+        (UInt256.ofNat size)) } } offset value := by
   have h0 : (UInt256.ofNat 0).toNat = 0 := by decide +kernel
   have hmn := word_nat mstart hm
   have hsn := word_nat size hs
   have hmem : ({ st with toSharedState := { st.toSharedState with toMachineState :=
-      st.toMachineState.returndatacopy (UInt256.ofNat mstart) (UInt256.ofNat 0)
-        (UInt256.ofNat size) } } : EVM.State).memory =
+      (st.toMachineState.returndatacopy (UInt256.ofNat mstart) (UInt256.ofNat 0)
+        (UInt256.ofNat size)) } } : EVM.State).memory =
       st.returnData.write 0 st.memory mstart size := by
     change st.returnData.write (UInt256.ofNat 0).toNat st.memory (UInt256.ofNat mstart).toNat
       (UInt256.ofNat size).toNat = _
@@ -271,15 +271,15 @@ theorem stored_reply_word (st : EVM.State) (mstart : Nat)
     (hm : mstart < 2 ^ 64) (hs : st.returnData.size < 2 ^ 64) (h32 : 32 ≤ st.returnData.size)
     (hmem : mstart ≤ st.memory.size + 576) :
     Stored { st with toSharedState := { st.toSharedState with toMachineState :=
-      st.toMachineState.returndatacopy (UInt256.ofNat mstart) (UInt256.ofNat 0)
-        (UInt256.ofNat st.returnData.size) } } mstart
+      (st.toMachineState.returndatacopy (UInt256.ofNat mstart) (UInt256.ofNat 0)
+        (UInt256.ofNat st.returnData.size)) } } mstart
       (UInt256.ofNat (fromByteArrayBigEndian (st.returnData.extract 0 32))) := by
   have h0 : (UInt256.ofNat 0).toNat = 0 := by decide +kernel
   have hmn := word_nat mstart hm
   have hsn := word_nat _ hs
   have hmemeq : ({ st with toSharedState := { st.toSharedState with toMachineState :=
-      st.toMachineState.returndatacopy (UInt256.ofNat mstart) (UInt256.ofNat 0)
-        (UInt256.ofNat st.returnData.size) } } : EVM.State).memory =
+      (st.toMachineState.returndatacopy (UInt256.ofNat mstart) (UInt256.ofNat 0)
+        (UInt256.ofNat st.returnData.size)) } } : EVM.State).memory =
       st.returnData.write 0 st.memory mstart st.returnData.size := by
     change st.returnData.write (UInt256.ofNat 0).toNat st.memory (UInt256.ofNat mstart).toNat
       (UInt256.ofNat st.returnData.size).toNat = _
@@ -293,7 +293,6 @@ theorem stored_reply_word (st : EVM.State) (mstart : Nat)
   · rw [hmemeq]
     omega
   · rw [hmemeq, hread, word_of_bytes _ hB]
-    rfl
   · change mstart < (UInt256.ofNat (MachineState.M st.activeWords.toNat (UInt256.ofNat mstart).toNat
       (UInt256.ofNat st.returnData.size).toNat)).toNat * 32
     rw [hmn, hsn]
@@ -310,8 +309,8 @@ theorem stored_reply_word (st : EVM.State) (mstart : Nat)
 theorem returndatacopy_words (st : EVM.State) (mstart size : Nat)
     (hm : mstart < 2 ^ 64) (hs : size < 2 ^ 64) (hw : st.activeWords.toNat < 2 ^ 64) :
     ({ st with toSharedState := { st.toSharedState with toMachineState :=
-      st.toMachineState.returndatacopy (UInt256.ofNat mstart) (UInt256.ofNat 0)
-        (UInt256.ofNat size) } } : EVM.State).activeWords.toNat < 2 ^ 64 := by
+      (st.toMachineState.returndatacopy (UInt256.ofNat mstart) (UInt256.ofNat 0)
+        (UInt256.ofNat size)) } } : EVM.State).activeWords.toNat < 2 ^ 64 := by
   have hmn := word_nat mstart hm
   have hsn := word_nat size hs
   change (UInt256.ofNat (MachineState.M st.activeWords.toNat (UInt256.ofNat mstart).toNat
@@ -332,8 +331,8 @@ theorem returndatacopy_size (st : EVM.State) (mstart : Nat)
     (hmem : mstart ≤ st.memory.size + 576) :
     mstart + st.returnData.size ≤
       ({ st with toSharedState := { st.toSharedState with toMachineState :=
-        st.toMachineState.returndatacopy (UInt256.ofNat mstart) (UInt256.ofNat 0)
-          (UInt256.ofNat st.returnData.size) } } : EVM.State).memory.size := by
+        (st.toMachineState.returndatacopy (UInt256.ofNat mstart) (UInt256.ofNat 0)
+          (UInt256.ofNat st.returnData.size)) } } : EVM.State).memory.size := by
   have h0 : (UInt256.ofNat 0).toNat = 0 := by decide +kernel
   have hmn := word_nat mstart hm
   have hsn := word_nat _ hs
@@ -421,7 +420,7 @@ theorem reply_success (st st1 st2 : EVM.State) (success : Bool) (data root : UIn
             (UInt256.ofNat (192 + (st.returnData.size + 31) / 32 * 32 + 32))) 192
             (UInt256.ofNat st.returnData.size)) 64
             (UInt256.ofNat (192 + (st.returnData.size + 31) / 32 * 32 + 32)) :=
-          stored_preserved _ 192 64 _ _ hfa (by decide) (by omega)
+          SszCompiledFrame.stored_preserved _ 192 64 _ _ hfa (by decide) (by omega)
         have hlb : Stored (store (store (load st 64).2 64
             (UInt256.ofNat (192 + (st.returnData.size + 31) / 32 * 32 + 32))) 192
             (UInt256.ofNat st.returnData.size)) 192 (UInt256.ofNat st.returnData.size) :=
@@ -451,7 +450,7 @@ theorem reply_success (st st1 st2 : EVM.State) (success : Bool) (data root : UIn
           simp only [h192, e224, h224] at hd
           rw [stored_load st1 192 _ hs1 (by decide) w251,
             if_neg (ofNat_ne_zero _ hne0 (by omega))] at hd
-          have hs1' := stored_after_load st1 192 192 _ hs1 (by decide)
+          have hs1' := SszCompiledFrame.stored_after_load st1 192 192 _ hs1 (by decide)
           have w1' := load_bounded st1 192 (by decide) w1
           rw [stored_load _ 192 _ hs1' (by decide) (by omega),
             add_sub_self_word 192 st.returnData.size (by unfold UInt256.size; omega),
@@ -469,18 +468,20 @@ theorem reply_success (st st1 st2 : EVM.State) (success : Bool) (data root : UIn
                 (Nat.le_trans (by decide) (Nat.le_add_left 576 _))
             have hsz : 224 + st.returnData.size ≤ st1.memory.size := by
               rw [← hst]
-              exact returndatacopy_size _ 224 (by decide) (by show st.returnData.size < 2 ^ 64; omega)
-                (by show 32 ≤ st.returnData.size; exact h32)
-                (Nat.le_trans (by decide) (Nat.le_add_left 576 _))
-            have hroot' := stored_after_load _ 192 224 _
-              (stored_after_load st1 192 224 _ hroot (by decide)) (by decide)
+              change 224 + st.returnData.size ≤
+                (st.returnData.write 0 _ 224 (UInt256.ofNat st.returnData.size).toNat).size
+              rw [word_nat st.returnData.size (by omega)]
+              exact (write_read_inside st.returnData _ 0 224 st.returnData.size h32
+                (by omega) (Nat.le_trans (by decide) (Nat.le_add_left 576 _))).2
+            have hroot' := SszCompiledFrame.stored_after_load _ 192 224 _
+              (SszCompiledFrame.stored_after_load st1 192 224 _ hroot (by decide)) (by decide)
             have w2 := load_bounded (load st1 192).2 192 (by decide) w1'
             rw [stored_load _ 224 _ hroot' (by decide) (by omega)] at hd
             obtain ⟨hr, hst2⟩ := prod_ok hd
             subst hr
             subst hst2
-            have hs64' := stored_after_load _ 224 64 _ (stored_after_load _ 192 64 _
-              (stored_after_load st1 192 64 _ hs64 (by decide)) (by decide)) (by decide)
+            have hs64' := SszCompiledFrame.stored_after_load _ 224 64 _ (SszCompiledFrame.stored_after_load _ 192 64 _
+              (SszCompiledFrame.stored_after_load st1 192 64 _ hs64 (by decide)) (by decide)) (by decide)
             refine ⟨by simpa using hsucc, h32, hsize, hF, rfl, hs64', ?_, henv1, ?_⟩
             · exact load_bounded _ 224 (by decide) w2
             · change 192 + (st.returnData.size + 31) / 32 * 32 + 32 ≤ st1.memory.size + 31

@@ -1,0 +1,112 @@
+{
+  "accepted_base": "2c2c72a91cd68a43de0777912772d12cc48a285d",
+  "boundaries": [
+    "Public success plus inherited ShaWidth, no new root/index/frame/stage premise",
+    "Typed static external on Live.World; no EIP-4788 storage-history or deployed-code authentication claim",
+    "Constructor configuration boundary and opaque SHA engine retained",
+    "No complete declared ABI proof-list equality, outer opcode gas, compiled-bytecode equivalence or complete error ABI",
+    "No new failure-world rollback theorem"
+  ],
+  "compiler": {
+    "inputs": 7,
+    "ir_sha256": "aba7b84e915d3279916e7d18150f047e553c8f712b1e30ea96235e11998679e3",
+    "pinned_core": "17005714f151e5502c559932319a3f2f74ac2436",
+    "profile": "viaIR optimizer 200 Cancun; no claim of production bytecode identity",
+    "replay": "Root independently replayed existing Mac solc 0.8.25 with materialized exact pinned inputs; retained output reproduces complete IR plus documented newline. Source writer reused that evidence and checked identities, not a second compiler execution.",
+    "solidity_execution": "No fresh Forge execution in repair; unchanged historical nine-test root-call harness receipt reused only as inherited fixture evidence."
+  },
+  "diff_check": {
+    "exceptions": [
+      "audit/ssz-compiled-cl-entry/solidity/inspected-cl-entry-ir.yul",
+      "audit/ssz-compiled-cl-entry/validation/development/lido-ssz-repair-cl-1.log",
+      "audit/ssz-compiled-cl-entry/validation/development/lido-ssz-repair-cl-2.log",
+      "audit/ssz-compiled-cl-entry/validation/development/lido-ssz-repair-reply-1.log"
+    ],
+    "historical_log_identity": "All retained development logs byte-equal actual /tmp command outputs",
+    "source_and_nonraw": "PASS with precisely those four paths excluded",
+    "unrestricted": "FAIL only preserved raw-output whitespace"
+  },
+  "initial_candidate": "9723377c3a936c522ec10e88dadcab7e1a7b25b0",
+  "initial_candidate_status": "Reply parser/type/normalization failures; ClEntry/public not compiled. Preserved original commit and diagnostic history are not accepted proof evidence.",
+  "schema": 1,
+  "scope": "Seven additive Lean modules; only Reply, ClEntry and regression source changed from initial candidate. Shared baseline, public statements, dependencies and All/Trust unchanged.",
+  "sha256": {
+    "LidoSRv3/Audit/Guarantees/PSsz1CompiledClEntry.lean": "678dcbb1033904f47bab8b115b958300b003a1d2df89f713838ec9e86b4cce1b",
+    "LidoSRv3/Audit/Source/SszCompiledClEntry.lean": "fc3421058d0f3b22c7738174e383192d30983b48f5b0117f4de531eb785369dc",
+    "LidoSRv3/Audit/Source/SszCompiledFrame.lean": "0984e6f07a71d9441fb994cde86ef33c4f5d8bd8a4ac848c78569f70c0be9311",
+    "LidoSRv3/Audit/Source/SszCompiledGIndex.lean": "9b58af30b481d66f11a5879429d317a161226a4a77d6d99b33b7238d97bc5347",
+    "LidoSRv3/Audit/Source/SszCompiledReply.lean": "7f3fb7f06f5b2636379b4626a4ecfa14f993aaec44a44ea86c1f9ad69b88aec4",
+    "LidoSRv3/Audit/Source/SszSoladyFls.lean": "73011ee40979829b244cd2346e23f9a24b88b7006f22938a5694bcd079a46647",
+    "LidoSRv3/Tests/SszCompiledClEntryRegression.lean": "73282e16b8a979def8caf75ec9cefe4879a7a2ae4d40d06d7197fefc3b0e8d98",
+    "audit/ssz-compiled-cl-entry/README.md": "3edb99058fbc1704d23a08a421960af36d614374f8d92bc1d8f775e3e77115f1",
+    "audit/ssz-compiled-cl-entry/solidity/compiled-metadata.json": "7994d5ac66c929a57e3c18b70e3db9f90fd52c5e790a4d94abf1ae989094ba8e",
+    "audit/ssz-compiled-cl-entry/solidity/compiler-input-identities.json": "0ce79a7fd588cfa8a85683b5f3af8ad9b9d1f1dae9f470c9ba50a50aa0a6429d",
+    "audit/ssz-compiled-cl-entry/solidity/inspected-cl-entry-ir.yul": "aba7b84e915d3279916e7d18150f047e553c8f712b1e30ea96235e11998679e3",
+    "audit/ssz-compiled-cl-entry/solidity/standard-json-input.json": "1f964989f16709eb683852ac2fa865aa8ea0f2ae290329dfdf6bc2191979ed2f",
+    "audit/ssz-compiled-cl-entry/validation/axioms.json": "cf3defeea9f653411862c1cab8a98fe1ffbc865b6052c57cf36d0aa65711fc6b",
+    "audit/ssz-compiled-cl-entry/validation/build-identities.json": "19a6a8e7fe54594ea78e1408a168efdb6d07726b8623bbff9123457aa8ccc228",
+    "audit/ssz-compiled-cl-entry/validation/compiler-check.json": "c953a05951e3609a14433560013c8a980c3d2e4992d8ae84ed27c50729078d6b",
+    "audit/ssz-compiled-cl-entry/validation/continuous-ssz-fd2279-972-snapshot-diagnostics.md": "1b7942ff74a965e5a82cf1a3af523f369b0c66c14231180f0f4130f123c4f66d",
+    "audit/ssz-compiled-cl-entry/validation/continuous-ssz-fd2279-second-snapshot-diagnostics.md": "542f2cfb7d590b97742723166747b7c5f2f27bcae42d4fdee03ba9aee0964369",
+    "audit/ssz-compiled-cl-entry/validation/continuous-ssz972-root-compiler-identities.json": "b482c9b066e120271d0bd59219f35845e21f7a225298e842b9191a4d48a15e91",
+    "audit/ssz-compiled-cl-entry/validation/development/lido-ssz-repair-cl-1.log": "3c909c368e9e059311aace58080921038a077e4183cff0506304cdf55b200922",
+    "audit/ssz-compiled-cl-entry/validation/development/lido-ssz-repair-cl-2.log": "48b5811b4e069aad896dd8d39ae8579dc6c1b6e638ecfc154c020ea5d7600dfd",
+    "audit/ssz-compiled-cl-entry/validation/development/lido-ssz-repair-cl-3.log": "637854e92fed80b96e3a7ab420f01924b297271c591240b937a34f852992146a",
+    "audit/ssz-compiled-cl-entry/validation/development/lido-ssz-repair-cl-4.log": "e08a0d2d738c541ea1faa4099581547ddc6df1c649e1f922628a6f65b48c9614",
+    "audit/ssz-compiled-cl-entry/validation/development/lido-ssz-repair-diagnostic-1.log": "4a1839284394d3ea4c94b79219b05de7218e9c7c3aa7f04f64c9bf5488429683",
+    "audit/ssz-compiled-cl-entry/validation/development/lido-ssz-repair-public-1.log": "a3b506ceb60f3f7481bc61174450446debe67a27735e0f53b842b2527b6004fa",
+    "audit/ssz-compiled-cl-entry/validation/development/lido-ssz-repair-regression-2.log": "0735d7efdbe72d4e92d9622bf10b2cf8cf332d6c2b753e181c54cbe90deac392",
+    "audit/ssz-compiled-cl-entry/validation/development/lido-ssz-repair-reply-1.log": "056abdf803dddd28b03d2138047cf7e19823ad49d15faa3cbddb99f5b7633ec1",
+    "audit/ssz-compiled-cl-entry/validation/development/lido-ssz-repair-reply-2.log": "09c7fefd58ccce4903198424ad719685e9c5fe294b1cb0487d646c230f6a67a4",
+    "audit/ssz-compiled-cl-entry/validation/development/lido-ssz-repair-reply-3.log": "72d62d6e883a1449da18a688f718968b3ff411907089e14aa76ce7ed9451a8ec",
+    "audit/ssz-compiled-cl-entry/validation/development/lido-ssz-repair-reply-4.log": "99d503c0a65adbe3fb5738bf948bfaf007d548d173a0ee9ecf0f73a356224342",
+    "audit/ssz-compiled-cl-entry/validation/development/lido-ssz-repair-reply-5.log": "abbba2fac599a6c7f84ed576b60c9be1d872755f0d03f2e621a978f1db27f133",
+    "audit/ssz-compiled-cl-entry/validation/diagnostics.lean": "05bec53cf1ec79e2123ceb803cc5ed2c65116664f329e9f0a69718b2238750b2",
+    "audit/ssz-compiled-cl-entry/validation/diagnostics.log": "c9811da37b983a97b9ca0a8458253f5d6bbbdeeb716641d528231b2f345d54ef",
+    "audit/ssz-compiled-cl-entry/validation/final-build.log": "3b5d5e5c829374164e9b8aba4dcd63fe7bde0add0d9584ebb0e0e0449b0a8666",
+    "audit/ssz-compiled-cl-entry/validation/identity-axiom-check.log": "b2e115bfdf338a68923d169c75a590552eba98d15eb14c108ad1a96aa1c790d4",
+    "audit/ssz-compiled-cl-entry/validation/make-vector.py": "2ad946abb6cbcbb55ce968f084bc3b13623d874e25f2fba3a4c97ee77b6d3e53",
+    "audit/ssz-compiled-cl-entry/validation/materialized-compiler-input.json": "8838448e22b78bc8eabe586c7b39726e62e6e60f2388040cb49a4904b5f5eb39",
+    "audit/ssz-compiled-cl-entry/validation/readonly-validation.log": "b2e115bfdf338a68923d169c75a590552eba98d15eb14c108ad1a96aa1c790d4",
+    "audit/ssz-compiled-cl-entry/validation/root-solc-output.json": "6a4bf41e1e023e5b3564e20dd68c0c4dfe185c56cc0f382119b2ad59a91030f7",
+    "audit/ssz-compiled-cl-entry/validation/run-diagnostics.py": "bb187630b600a444cdad5ded53f94e3b5b2f506671a015be6e0664f37c0732fd",
+    "audit/ssz-compiled-cl-entry/validation/runtime-inputs.json": "96a8d5cd6707f385a042b844290a4554dc0a402e232b0f5099f7280fb84c85a8",
+    "audit/ssz-compiled-cl-entry/validation/source-inputs.json": "65ca7d3bf2a04a313736b75c960099043cc955f3073b8a50a92d700d2aa6f855",
+    "audit/ssz-compiled-cl-entry/validation/valid-calldata.bin": "5f4a59d8b2abefa217f868fe20e23da3f3f1319486dfd8329c728f0759a59973",
+    "audit/ssz-compiled-cl-entry/validation/valid-root.bin": "0c0a28a069fe94dd87ecc20941a2d3cda651f133bf0b0f4697a93095cd7b3917",
+    "audit/ssz-compiled-cl-entry/validation/validate.py": "2b88f36ade0edededd02614ce4cbfe56803dc7b58a2390799c839338528cdc64",
+    "audit/ssz-compiled-cl-entry/validation/vector.json": "0754b06d6d435839fbbd66658244ca7263acf8a2eb6070121c936fffbc7440e7"
+  },
+  "status": "NATIVE_SUCCESSOR_VALIDATED_AWAITING_INDEPENDENT_REVIEW",
+  "validation": {
+    "actual_source_closure": 1215,
+    "axiom_allowlist": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "default_readonly_validator": "PASS after regeneration, equal archived identities/scopes",
+    "fresh_ordinary_axiom_sets": 31,
+    "global_all_trust": "Not run in source checkout; root integration owns combined environment.",
+    "named_kernel_regressions": 14,
+    "normal_targeted_build": {
+      "cache": "Final warm replay follows successful native recompilations retained in development logs; normal kernel checking.",
+      "jobs": 1232,
+      "log": "validation/final-build.log",
+      "modules": 7,
+      "status": "PASS"
+    },
+    "pinned_packages": 11,
+    "whole_entry_ffi_diagnostics": {
+      "cases": [
+        "independently constructed leaf/proof/root and actual memory-backed timestamp request succeed",
+        "corrupted returned root rejects in proof stage",
+        "corrupted proof byte rejects in proof stage",
+        "changed timestamp rejects through exact-request external interpreter"
+      ],
+      "count": 4,
+      "proof_credit": "IO diagnostics only, no native theorem axiom, no claim of kernel evaluation of whole success",
+      "status": "PASS"
+    }
+  }
+}

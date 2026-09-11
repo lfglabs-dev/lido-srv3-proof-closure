@@ -27,6 +27,9 @@ not represented. -/
 namespace LidoSRv3.Audit.Source.SszCompiledClEntry
 open EvmYul EvmYul.EVM SszCompiledMemory SszCompiledConsumer SszBlsComposition
 open SszCompiledFrame SszCompiledReply SszWrapperIndex TrioReserve1
+open SszCompiledMerkle (Stored)
+set_option autoImplicit false
+set_option maxRecDepth 4096
 
 inductive Error where
   | abi (error : SszWitnessAbi.Error)
@@ -203,9 +206,13 @@ theorem fieldsMatch_env (st st' : EVM.State) (h : st'.executionEnv = st.executio
     (head : UInt256) (f : SszBlsComposition.Fields) (fm : SszWitnessAbi.FieldsMatch st' head f) :
     SszWitnessAbi.FieldsMatch st head f := by
   rcases fm with ⟨a, b, c, d, e, g⟩
-  exact ⟨by rwa [calldataload_env st st' h] at a, by rwa [calldataload_env st st' h] at b,
-    by rwa [calldataload_env st st' h] at c, by rwa [calldataload_env st st' h] at d,
-    by rwa [calldataload_env st st' h] at e, by rwa [calldataload_env st st' h] at g⟩
+  constructor
+  · simpa only [EvmYul.State.calldataload, h] using a
+  · simpa only [EvmYul.State.calldataload, h] using b
+  · simpa only [EvmYul.State.calldataload, h] using c
+  · simpa only [EvmYul.State.calldataload, h] using d
+  · simpa only [EvmYul.State.calldataload, h] using e
+  · simpa only [EvmYul.State.calldataload, h] using g
 
 theorem pubkeyDigest_env (st st' : EVM.State) (h : st'.executionEnv = st.executionEnv)
     (offset : UInt256) : SszPubkeyBytes.pubkeyDigest st' offset = SszPubkeyBytes.pubkeyDigest st offset := by
@@ -237,7 +244,7 @@ theorem prologue_size (context : EVM.State) : (prologue context).memory.size = 9
     (UInt256.ofNat 64).toNat 32).size = 96
   rw [h64]
   change ((UInt256.ofNat 128).toByteArray.write 0 ByteArray.empty 64 32).data.size = 96
-  rw [write_word_shape ByteArray.empty 64 (UInt256.ofNat 128)
+  rw [SszCompiledFrame.write_word_shape ByteArray.empty 64 (UInt256.ofNat 128)
     (Nat.le_trans (by decide : 64 ≤ 576) (Nat.le_add_left 576 ByteArray.empty.size))]
   simp only [Array.size_append, Array.size_extract, Array.size_replicate, ByteArray.size_data,
     SszWordBytes.actual_word_size, ByteArray.size_empty]
@@ -249,7 +256,7 @@ theorem prologue_stored (context : EVM.State) : Stored (prologue context) 64 (UI
   change ((UInt256.ofNat 128).toByteArray.write 0 (fresh context).memory
     (UInt256.ofNat 64).toNat 32).readWithPadding 64 32 = _
   rw [h64]
-  exact write_word_read (fresh context).memory 64 (UInt256.ofNat 128)
+  exact SszCompiledFrame.write_word_read (fresh context).memory 64 (UInt256.ofNat 128)
     (Nat.le_trans (by decide : 64 ≤ 576) (Nat.le_add_left 576 (fresh context).memory.size))
 
 /-- One real pair call keeps the byte-array size (its scratch writes stay inside
@@ -309,7 +316,7 @@ theorem beforeRoot_success (fuel : Nat) (context : EVM.State) (b : Before)
   have henvp : (prologue context).executionEnv = context.executionEnv := prologue_environment context
   unfold beforeRoot at h
   obtain ⟨head, hh, h⟩ := bind_success h
-  dsimp only at h
+  try dsimp only at h
   obtain ⟨branch, hbr, h⟩ := bind_success h
   have hbr' := map_success Error.abi _ _ hbr
   obtain ⟨slot, hs, h⟩ := bind_success h
@@ -342,7 +349,7 @@ theorem beforeRoot_success (fuel : Nat) (context : EVM.State) (b : Before)
   have hstored := SszCompiledMerkle.pair_stored fuel (prologue context) (chunk slot) (chunk proposer)
     expected 64 _ hpair' (prologue_stored context) (Nat.le_refl 64)
   unfold slotSibling at hsib
-  dsimp only at hsib
+  try dsimp only at hsib
   split at hsib
   · cases hsib
   · rename_i hlen
@@ -350,7 +357,7 @@ theorem beforeRoot_success (fuel : Nat) (context : EVM.State) (b : Before)
     · cases hsib
     · split at hsib
       · rename_i hsibeq
-        refine ⟨slot, proposer, ?_, ?_, ?_, ?_, by omega, ?_, ?_, ?_, hts64, ?_, henv', ?_, hstored, ?_⟩
+        refine ⟨slot, proposer, ?_, ?_, ?_, ?_, by change 2 ≤ branch.length; omega, ?_, ?_, ?_, hts64, ?_, henv', ?_, hstored, ?_⟩
         · rw [← header_env context (prologue context) henvp]
           exact hh
         · rw [← tail_env context (prologue context) henvp]
@@ -381,7 +388,6 @@ theorem payload_of_word (ts : UInt256) (hts : ts.toNat < 2 ^ 64) :
   unfold SszTypedFfiBridge.bytes at hb
   rw [hd, ← SszWordBytes.actual_word_bytes] at hb
   rw [← hb, list_toByteArray_data]
-  exact Array.toList_toArray
 
 theorem rootCall_success (external : StaticCall.External) (world : Live.World)
     (st st' : EVM.State) (ts : UInt256) (out : RootOutcome)
@@ -403,14 +409,15 @@ theorem rootCall_success (external : StaticCall.External) (world : Live.World)
   have e32 : (UInt256.ofNat 32).toNat = 32 := by decide +kernel
   have hw251 : st.activeWords.toNat < 2 ^ 251 := by omega
   unfold rootCall at h
-  dsimp only at h
+  try dsimp only at h
   rw [stored_load st 64 _ hf (by decide) hw251] at h
   simp only [e160, e128, enext, e192] at h
   -- the three stores
   have wa : (load st 64).2.activeWords.toNat < 2 ^ 64 := load_bounded st 64 (by decide) (by omega)
   have wa3 : (load st 64).2.activeWords.toNat = 3 := by
     change (st.toMachineState.mload (UInt256.ofNat 64)).2.activeWords.toNat = 3
-    rw [load_words _ _ (by decide), hw]
+    rw [SszCompiledFrame.load_words _ _ (by decide), hw]
+    decide +kernel
   have s160 : Stored (store (load st 64).2 160 ts) 160 ts :=
     stored_written _ 160 _ (by decide) (by show 160 ≤ st.memory.size + 576; omega)
   have z96 : Stored (store (load st 64).2 160 ts) 96 (UInt256.ofNat 0) :=
@@ -418,14 +425,16 @@ theorem rootCall_success (external : StaticCall.External) (world : Live.World)
       (by show st.memory.size ≤ 96; omega) (by decide)
   have wb : (store (load st 64).2 160 ts).activeWords.toNat = 6 := by
     change ((load st 64).2.toMachineState.mstore (UInt256.ofNat 160) ts).activeWords.toNat = 6
-    rw [store_words _ _ _ (by decide), wa3]
+    rw [SszCompiledFrame.store_words _ _ _ (by decide), wa3]
+    decide +kernel
   have s128 : Stored (store (store (load st 64).2 160 ts) 128 (UInt256.ofNat 32)) 128 (UInt256.ofNat 32) :=
     stored_written _ 128 _ (by decide) (by have := s160.1; omega)
   have s160' := stored_preserved _ 128 160 (UInt256.ofNat 32) ts s160 (by decide) (by omega)
   have z96' := stored_preserved _ 128 96 (UInt256.ofNat 32) _ z96 (by decide) (by omega)
   have wc : (store (store (load st 64).2 160 ts) 128 (UInt256.ofNat 32)).activeWords.toNat = 6 := by
     change ((store (load st 64).2 160 ts).toMachineState.mstore (UInt256.ofNat 128) _).activeWords.toNat = 6
-    rw [store_words _ _ _ (by decide), wb]
+    rw [SszCompiledFrame.store_words _ _ _ (by decide), wb]
+    decide +kernel
   -- the guard
   split at h
   · cases h
@@ -440,7 +449,7 @@ theorem rootCall_success (external : StaticCall.External) (world : Live.World)
         (UInt256.ofNat 192)).activeWords.toNat = 6 := by
       change ((store (store (load st 64).2 160 ts) 128 (UInt256.ofNat 32)).toMachineState.mstore
         (UInt256.ofNat 64) _).activeWords.toNat = 6
-      rw [store_words _ 64 _ (by decide), wc]
+      rw [SszCompiledFrame.store_words _ 64 _ (by decide), wc]
       try decide
     -- the length load
     rw [stored_load _ 128 _ s128' (by decide) (by omega), e32] at h
@@ -451,7 +460,7 @@ theorem rootCall_success (external : StaticCall.External) (world : Live.World)
         (UInt256.ofNat 192)) 128).2.activeWords.toNat = 6 := by
       change ((store (store (store (load st 64).2 160 ts) 128 (UInt256.ofNat 32)) 64
         (UInt256.ofNat 192)).toMachineState.mload (UInt256.ofNat 128)).2.activeWords.toNat = 6
-      rw [load_words _ 128 (by decide), wd]
+      rw [SszCompiledFrame.load_words _ 128 (by decide), wd]
       try decide
     have s64l := stored_after_load _ 128 64 _ s64 (by decide)
     have z96l := stored_after_load _ 128 96 _ z96'' (by decide)
@@ -476,16 +485,16 @@ theorem rootCall_success (external : StaticCall.External) (world : Live.World)
     cases hc : (SszRootCall.call external (callerOf st) (BitVec.ofNat 64 ts.toNat) world).outcome with
     | ok data =>
       rw [hc] at h
-      dsimp only at h
+      try dsimp only at h
       obtain ⟨hst, hout⟩ := Prod.mk.inj (Except.ok.inj h)
       subst hst
       subst hout
-      refine ⟨rfl, fun _ => ⟨data, hc, rfl⟩, ?_, ?_, hsmall, rfl⟩
+      refine ⟨rfl, fun _ => ⟨data, rfl, rfl⟩, ?_, ?_, hsmall, rfl⟩
       · exact stored_of_same_memory _ _ 64 _ s64l rfl hgrow
       · exact stored_of_same_memory _ _ 96 _ z96l rfl hgrow
     | error data =>
       rw [hc] at h
-      dsimp only at h
+      try dsimp only at h
       obtain ⟨hst, hout⟩ := Prod.mk.inj (Except.ok.inj h)
       subst hst
       subst hout
@@ -517,11 +526,11 @@ theorem afterRoot_success (fuel : Nat) (cfg : Configuration) (st afterState : EV
   unfold afterRoot at h
   obtain ⟨pr, hpr, h⟩ := bind_success h
   rcases pr with ⟨data, st1⟩
-  dsimp only at h
+  try dsimp only at h
   have hc := map_success Error.reply _ _ hpr
   obtain ⟨pr2, hpr2, h⟩ := bind_success h
   rcases pr2 with ⟨root, st2⟩
-  dsimp only at h
+  try dsimp only at h
   have hd := map_success Error.reply _ _ hpr2
   obtain ⟨hsucc, h32, hsize, hF, hroot, hf2, hw2, henv2, hmem2⟩ :=
     reply_success st st1 st2 success data root hc hd hf hz hw
@@ -530,12 +539,12 @@ theorem afterRoot_success (fuel : Nat) (cfg : Configuration) (st afterState : EV
   have hslot' := map_success Error.abi _ _ hslot
   obtain ⟨raw, hraw, h⟩ := bind_success h
   have hraw' := map_success Error.gindex _ _ hraw
-  dsimp only at h
+  try dsimp only at h
   obtain ⟨gi, hgi, hrawgi⟩ :=
     SszCompiledGIndex.wrapper_success cfg slot.toFin ⟨n.toNat, n.val.isLt⟩ raw hraw'
   obtain ⟨pr3, hpr3, h⟩ := bind_success h
   rcases pr3 with ⟨ptr, st3⟩
-  dsimp only at h
+  try dsimp only at h
   have halloc := map_success Error.allocation _ _ hpr3
   have hw2' : st2.activeWords.toNat < 2 ^ 251 := by omega
   have free2 := stored_load st2 64 _ hf2 (by decide) hw2'
@@ -547,7 +556,7 @@ theorem afterRoot_success (fuel : Nat) (cfg : Configuration) (st afterState : EV
   have hks' := map_success Error.abi _ _ hks
   obtain ⟨key, hkey, h⟩ := bind_success h
   have hkey' := map_success Error.bls _ _ hkey
-  dsimp only at h
+  try dsimp only at h
   have hkw := SszShaCommitted.pubkey_success_words fuel st3 keySlice.offset keySlice.length key hkey'
   have hkenv := SszWitnessAbi.pubkey_environment fuel st3 keySlice.offset keySlice.length key hkey'
   have hkmem := pubkey_memory fuel st3 keySlice.offset keySlice.length key hkey' (by have := hf3.1; omega)
@@ -565,8 +574,9 @@ theorem afterRoot_success (fuel : Nat) (cfg : Configuration) (st afterState : EV
   have hkstored : Stored (store key.state (192 + (st.returnData.size + 31) / 32 * 32 + 32) key.digest)
       (192 + (st.returnData.size + 31) / 32 * 32 + 32) key.digest :=
     stored_written _ _ _ (by omega) (by have := hkmem.2; omega)
-  have hkf' := stored_preserved _ _ 64 _ _ hkf (by omega) (by omega)
-  have hkwb' := store_bounded key.state _ key.digest (by omega) hkwb
+  have hkf' := stored_preserved key.state
+    (192 + (st.returnData.size + 31) / 32 * 32 + 32) 64 key.digest _ hkf (by omega) (by omega)
+  have hkwb' := store_bounded key.state (192 + (st.returnData.size + 31) / 32 * 32 + 32) key.digest (by omega) hkwb
   obtain ⟨f, fm, s64, sP, s32, s64', s96, s128, s160, s192, s224, hw5, henv5⟩ :=
     fields_effects (store key.state (192 + (st.returnData.size + 31) / 32 * 32 + 32) key.digest) st5
       head (192 + (st.returnData.size + 31) / 32 * 32 + 32) key.digest hfields' (by omega) (by omega)
@@ -609,7 +619,8 @@ theorem afterRoot_success (fuel : Nat) (cfg : Configuration) (st afterState : EV
     exact hslot'
   · rw [← tail_env st st3 (henv3.trans henv2)]
     exact hks'
-  · exact fieldsMatch_env st _ henvk head f fm
+  · exact fieldsMatch_env st
+      (store key.state (192 + (st.returnData.size + 31) / 32 * 32 + 32) key.digest) henvk head f fm
   · rw [← tail_env st leaf.state henvl']
     exact hbr'
 
@@ -665,20 +676,20 @@ theorem run_success (fuel : Nat) (cfg : Configuration) (external : StaticCall.Ex
   cases hb : beforeRoot fuel context with
   | error e =>
     rw [hb] at hrun
-    dsimp only at hrun
+    try dsimp only at hrun
     cases hrun
   | ok b =>
     rw [hb] at hrun
-    dsimp only at hrun
+    try dsimp only at hrun
     cases hr : rootCall external world b.state b.timestamp with
     | error e =>
       rw [hr] at hrun
-      dsimp only at hrun
+      try dsimp only at hrun
       cases hrun
     | ok pr =>
       rcases pr with ⟨st, out⟩
       rw [hr] at hrun
-      dsimp only at hrun
+      try dsimp only at hrun
       have hatt : (run fuel cfg external world context).attempts = out.attempts := by
         simp only [run, hb, hr]
       obtain ⟨slot, proposer, hhead, hbr, hs, hp, hlen2, hsib, hts, htsv, hts64, hidx, henvb, hwb,
@@ -699,7 +710,7 @@ theorem run_success (fuel : Nat) (cfg : Configuration) (external : StaticCall.Ex
         (BitVec.ofNat 64 (context.calldataload (UInt256.ofNat 4)).toNat) world data hcall hlen
       rw [read64_env context st henvs] at hslot'
       have hslot_eq : slot' = slot := Except.ok.inj (hslot'.symm.trans hs)
-      subst hslot_eq
+      subst slot'
       rw [tail_env context st henvs] at hbr' hks
       have hbr_eq : branch' = b.branch := Except.ok.inj (hbr'.symm.trans hbr)
       subst hbr_eq

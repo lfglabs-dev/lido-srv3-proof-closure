@@ -40,9 +40,16 @@ theorem compiled_index_out_of_range :
     wrapper (cfgWords (pinnedConfiguration ⟨0, by decide⟩)) 100 (2 ^ 40) = .error .indexOutOfRange := by
   decide +kernel
 
-/-- The checked `(i % w) + n` wraps for a huge offset: panic 0x11 precedes the range guard. -/
+/-- The aligned pinned base has zero remainder, so a maximal offset reaches
+the range guard without overflowing the first checked addition. -/
+theorem compiled_index_max_out_of_range :
+    wrapper (cfgWords (pinnedConfiguration ⟨0, by decide⟩)) 100 (2 ^ 256 - 1) = .error .indexOutOfRange := by
+  decide +kernel
+
+/-- A nonaligned base makes the first checked addition overflow before the range guard. -/
 theorem compiled_index_wraps :
-    wrapper (cfgWords (pinnedConfiguration ⟨0, by decide⟩)) 100 (2 ^ 256 - 1) = .error .panic11 := by
+    wrapper ⟨2819, (150 * 2^40 + 1) * 256 + 40,
+      (150 * 2^40 + 1) * 256 + 40, 0⟩ 100 (2^256-1) = .error .panic11 := by
   decide +kernel
 
 /-- Decoder arithmetic on words: `sub(add(data, len), data)` and the signed compare. -/

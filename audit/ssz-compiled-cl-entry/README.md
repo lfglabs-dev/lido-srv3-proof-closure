@@ -85,18 +85,82 @@ tree form restates it in the typed digest vocabulary of the root-call theorems.
   compiled-bytecode correspondence remain outside; `fuel` is the interpreter
   parameter.
 
-## Validation
+## Validated native successor of the initial candidate
 
-Focused Lean check (Lean 4.31, existing dependency cache):
+The original imported commit `9723377c3a936c522ec10e88dadcab7e1a7b25b0`
+was **not compilable**: GIndex and Frame passed after the remote fixes, but
+Reply still had parser/type/normalization failures and ClEntry/public had not
+been validated. The two retained independent snapshot diagnostic reports and
+`validation/development/` preserve that history and the unsuccessful native
+repair attempts. Their error-recovery `sorryAx` output is not proof evidence.
+
+After the remote writer stopped and ownership transferred, the native repair
+corrected Reply's record syntax, imported the actual RootCall definition,
+normalized byte-array sizes/word casts and qualified overlapping lemmas. ClEntry
+now imports the intended Stored predicate explicitly, disables autoImplicit,
+and proves its concrete frame/environment transports with unambiguous terms.
+No public theorem statement or executable guard/operand was weakened. No
+initial memory, successful stage, root equality or index equality premise was
+added. The nested-state proofs use maxRecDepth4096 with normal kernel checking;
+no maxHeartbeats increase or skipKernelTC is retained.
+
+The initial regression predicting Panic11 for a maximal offset under the
+aligned pinned base was false: zero remainder plus that offset reaches the
+range guard without overflow. The repaired regression checks IndexOutOfRange
+there and separately checks Panic11 with a nonaligned base. Both are kernel
+checks of the unchanged index executor.
+
+Final normal validation:
 
 ```sh
-lake build LidoSRv3.Audit.Guarantees.PSsz1CompiledClEntry LidoSRv3.Tests.SszCompiledClEntryRegression
+lake build LidoSRv3.Audit.Source.SszSoladyFls LidoSRv3.Audit.Source.SszCompiledGIndex LidoSRv3.Audit.Source.SszCompiledFrame LidoSRv3.Audit.Source.SszCompiledReply LidoSRv3.Audit.Source.SszCompiledClEntry LidoSRv3.Audit.Guarantees.PSsz1CompiledClEntry LidoSRv3.Tests.SszCompiledClEntryRegression
+python3 audit/ssz-compiled-cl-entry/validation/validate.py
+python3 audit/ssz-compiled-cl-entry/validation/make-vector.py
+python3 audit/ssz-compiled-cl-entry/validation/run-diagnostics.py
 ```
 
-Kernel regressions (`decide +kernel`): literal `fls` on the header, pinned and
-boundary values; compiled index of the pinned configuration equals the packed
-typed value `1430·2^40 + offset`, power 40; range/wrap rejections; decoder word
-arithmetic. The machine-level phases run the opaque SHA FFI and are not
-kernel-evaluated, as for the existing compiled increments. No forge run was
-executed in this lot; the existing 9-test `SszRootCall.t.sol` receipt exercises
-the same harness.
+All seven normal modules pass, with the final targeted warm-cache build reporting
+1,232 jobs. The current actual regression import closure checks 1,215 sources,
+eleven exact package pins and seven normal artifacts. Thirty-one fresh named
+ordinary axiom sets use only propext/Classical.choice/Quot.sound. These scoped
+results are not a claim that the future combined global Trust environment is
+foundations-only. Fourteen named kernel regressions cover fls, configured GI,
+range/overflow order and decoder arithmetic/selector. No whole successful
+execution is described as a kernel-evaluated instance.
+
+Four **whole-entry FFI diagnostics** pass. `make-vector.py` independently builds
+ABI calldata (2,180 bytes), a validator leaf and 50 sibling words with Python
+hashlib SHA256, including the actual slot/proposer sibling. The ordinary entry
+executes the actual memory-backed timestamp root request and consumes the
+returned root to accept that proof. Corrupting the root or one proof byte fails
+at proof verification; changing the timestamp causes the finite external
+interpreter, which checks the exact request, to reject. Initial machine memory
+is deliberately nonempty before the entry prologue. The diagnostics invoke the
+existing EvmYul FFI via a fresh temporary native library; runtime inputs are
+hashed separately and these IO checks add no theorem axioms.
+
+All seven retained compiler input bodies are checked against the exact pinned
+Git objects and recorded Keccak/SHA256 values. Root independently replayed the
+materialized input with its existing **Mac** solc0.8.25 binary and reproduced the
+complete retained IR byte-for-byte, including the single appended newline.
+`continuous-ssz972-root-compiler-identities.json` identifies that replay; the
+original recorded Linux binary was not executed again. The materialized input
+and actual replay output are retained for comparison. I read the full relevant
+entry/decoder/allocator/GI/fls/SHA/proof-loop IR paths and pinned CL/GIndex source;
+independent exact full source/IR review remains the next gate.
+
+No Forge run was performed in this repair. The unchanged seven-input harness
+and historical nine-test `audit/ssz-root-call-composition/receipt.json` are reused
+as inherited fixture evidence only; they are not a new Solidity execution or a
+proof of bytecode equivalence. Full custom-error/revert byte strings and the
+success consumer's failure-world rollback are not newly proved. Root owns
+AllGuarantees/Trust integration, global checks, independent review and release.
+
+`validation/validate.py --write` regenerates identity JSON after a normal build;
+its default invocation compares without replacing the archived JSON. The raw
+compiler IR's existing blank EOF is preserved. Historical raw compiler/build
+logs remain verbatim. In addition to the IR EOF, only development logs
+`lido-ssz-repair-cl-1.log`, `lido-ssz-repair-cl-2.log` and
+`lido-ssz-repair-reply-1.log` retain trailing whitespace from Lean error output.
+The unrestricted diff check reports those four raw-output files; source and
+nonraw files pass. The receipt records this exception explicitly.
