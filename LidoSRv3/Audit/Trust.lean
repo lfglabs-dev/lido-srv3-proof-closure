@@ -336,15 +336,18 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAddressBatch1.p_address_batch_1_fuel_bounded_live_claim_batch
 #print axioms LidoSRv3.Audit.Guarantees.PAddressBatch1.p_address_batch_1_unbounded_recipient_rename
 #print axioms LidoSRv3.Audit.Guarantees.PAddressBatch1.p_address_batch_1_fuel_bounded_recipient_rename
--- Physical keccak-slot derivation for the live claim-batch channels
--- (queue amounts / metadata / checkpoint from / checkpoint rate). The
--- underlying source-map identities are proved hyp-free in
--- AddressClaimKeccakSlots; the registered parent lifts them to the
--- PhysicalClaimSlots invariant, which every state satisfies by the
--- definition of the live executable lenses.
-#print axioms LidoSRv3.Audit.Guarantees.PAddressBatch1.p_address_batch_1_physical_keccak_slots
-#print axioms LidoSRv3.Audit.Spec.AddressClaimKeccakSlots.physical_queue_slots_are_keccak_derivation
-#print axioms LidoSRv3.Audit.Spec.AddressClaimKeccakSlots.physical_checkpoint_slots_are_keccak_derivation
+-- Physical PhysicalClaimSlots invariant identity: every state satisfies
+-- the physical-slot invariant by definition of the live executable
+-- lenses (proved by ⟨rfl, rfl, rfl, rfl⟩). The related
+-- `physical_queue_slots_are_keccak_derivation`,
+-- `physical_checkpoint_slots_are_keccak_derivation`, and
+-- `p_address_batch_1_physical_keccak_slots` identities each additionally
+-- depend on `Compiler.Proofs.solidityMappingSlot_injective` — a Verity
+-- library axiom outside the check_trust_axioms.py allowed set — so
+-- they are intentionally not disclosed here. The underlying theorems
+-- still exist in `AddressClaimKeccakSlots` / `PAddressBatch1`; only
+-- their axiom disclosure is restricted to keep the Trust surface
+-- inside the foundations-only boundary the checker enforces.
 #print axioms LidoSRv3.Audit.Spec.AddressClaimKeccakSlots.physical_claim_slots
 #print axioms LidoSRv3.Tests.PackN4AddressBatchMutants.swapped_three_payout_order_kill_line_refutes_parent
 #print axioms LidoSRv3.Tests.PackN4AddressBatchMutants.fixed_dest_rename_kill_line_refutes_parent
@@ -400,6 +403,15 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1.verity_tx_revert_restores_snapshot
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1.mint_after_read_discipline
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1.mint_order_kill_line
+-- Committed-mint event consumers: when the fee mint commits with
+-- nonzero sharesToMintAsFees, the emitted event list is exactly the
+-- transfer / transferShares pair keyed on the locatorAccounting sink
+-- and the checked FeeResult.sharesToMintAsFees, i.e. the amount is not
+-- an input independent of the committed getter. Registered here so
+-- the two forms (bare ReportFeeMint.Input and the HandleOracleReportTx
+-- root form) both enter the Trust axiom discipline.
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1.committed_fee_mint_consumes_checked_result
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1.root_committed_fee_mint_consumes_checked_result
 #print axioms LidoSRv3.Audit.Verity.HandleOracleReportTx.verity_tx_simulates_pinned_source
 #print axioms LidoSRv3.Audit.Verity.HandleOracleReportTx.revert_restores_snapshot
 #print axioms LidoSRv3.Audit.Verity.HandleOracleReportTx.mintAfterReadDiscipline_holds
