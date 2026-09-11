@@ -1,3 +1,4 @@
+import LidoSRv3.Tests.TopupRouterAdmissionCallRegression
 import LidoSRv3.Tests.TrioConsolidation.PhysicalEntrySettlement
 import LidoSRv3.Tests.TrioConsolidation.PhysicalQuotaSettlement
 import LidoSRv3.Tests.AccountAccountingCall
@@ -914,3 +915,10 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms audit.trio.consolidation.PhysicalEntrySettlement.gates_success
 #print axioms audit.trio.consolidation.PhysicalEntrySettlement.execute_success
 #print axioms audit.trio.consolidation.PhysicalEntrySettlement.failure_restores
+
+-- Actual router admission consumes the entire prior physical TOPUP result.
+#print axioms LidoSRv3.Audit.Guarantees.PTopupRouterAdmissionCall.actual_router_admission_complete_prior
+#print axioms LidoSRv3.Audit.Guarantees.PTopupRouterAdmissionCall.actual_gateway_entry_failure_restores
+#print axioms LidoSRv3.Audit.Source.TopupRouterAdmissionCallGates.auth_origin
+#print axioms LidoSRv3.Audit.Source.TopupRouterAdmissionCallGates.canDeposit_origin
+#print axioms LidoSRv3.Audit.Source.TopupRouterAdmissionCallGates.admitted_calls
