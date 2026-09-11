@@ -1,0 +1,26 @@
+{
+  "LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_request_withdrawal_enqueue": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_request_withdrawal_failure_restores": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressWrappedRequestCalls.request_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressWrappedRequestCalls.unwrap_success": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.AddressWrappedRequestCalls.public_rollback": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ]
+}

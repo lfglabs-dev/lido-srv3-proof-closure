@@ -1,3 +1,4 @@
+import LidoSRv3.Tests.AddressWrappedRequestCalls
 import LidoSRv3.Tests.DepositPhysicalAdmission
 import Tests.Verity.ReportFeeDistributionTest
 import Tests.Verity.ReportFeeTreasuryCallTest
@@ -752,3 +753,8 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.actual_registered_module_failure_restores
 #print axioms LidoSRv3.Audit.Source.DepositPhysicalAdmission.selected_fields
 #print axioms LidoSRv3.Audit.Source.DepositPhysicalAdmission.selectedOctets_head
+
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_request_withdrawal_enqueue
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_request_withdrawal_failure_restores
+#print axioms LidoSRv3.Audit.Source.AddressWrappedRequestCalls.unwrap_success
+#print axioms LidoSRv3.Audit.Source.AddressWrappedRequestCalls.request_success
