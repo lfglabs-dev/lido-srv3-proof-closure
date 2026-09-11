@@ -257,6 +257,14 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Spec.SszCorrespondence.verifyProof_implies_gindex
 #print axioms LidoSRv3.Audit.Spec.SszCorrespondence.gindex_concat_matches_spec
 #print axioms LidoSRv3.Audit.Verity.SszAbstractDigest.abstract_digest_refinement
+-- SszAbstractDigest structural family: `deposit_data_root_compiles`
+-- shows the abstract digest expression reduces on the pinned config;
+-- `seven_calls` counts the exact 7 SHA256 invocations; `digest_composition`
+-- and `promotion_widths` document the composition and the promotion widths.
+#print axioms LidoSRv3.Audit.Verity.SszAbstractDigest.deposit_data_root_compiles
+#print axioms LidoSRv3.Audit.Verity.SszAbstractDigest.seven_calls
+#print axioms LidoSRv3.Audit.Verity.SszAbstractDigest.digest_composition
+#print axioms LidoSRv3.Audit.Verity.SszAbstractDigest.promotion_widths
 #print axioms LidoSRv3.Tests.PackCSszMutants.skip_gindex_kill_line_refutes_structural_child
 #print axioms LidoSRv3.Tests.PackCSszMutants.engine_mutant_disagrees_with_sha256engine
 #print axioms LidoSRv3.Audit.Spec.AddressClaimCorrespondence.actual_claim_payout_matches_locked_write
@@ -826,12 +834,41 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Verity.SszEncodingTx.verity_tx_simulates_pinned_source
 #print axioms LidoSRv3.Audit.Verity.SszEncodingTx.encoding_commits_structural_witness
 #print axioms LidoSRv3.Audit.Verity.SszEncodingTx.revert_restores_snapshot
+-- SszEncodingTx additional executable-transaction correspondences:
+-- `readSlot_writeWords`, `readSlot_writeDigests` decompose the storage
+-- reads; `revert_restores_snapshot_two` is the paired two-item revert
+-- witness; `encoding_uses_source_concat`, `encoding_uses_exact_digest`
+-- pin the source-concat and exact-digest choices; `encoding_accepts_iff_root_matches`
+-- ties acceptance to the root; `encoding_requires_pinned_widths` and
+-- `encoding_requires_structural_bind` document the requirements;
+-- `sourceObs_committed_fields` and `structuralOk_implies_conjunct`
+-- close the observation and structural implication side.
+#print axioms LidoSRv3.Audit.Verity.SszEncodingTx.readSlot_writeWords
+#print axioms LidoSRv3.Audit.Verity.SszEncodingTx.readSlot_writeDigests
+#print axioms LidoSRv3.Audit.Verity.SszEncodingTx.revert_restores_snapshot_two
+#print axioms LidoSRv3.Audit.Verity.SszEncodingTx.encoding_uses_source_concat
+#print axioms LidoSRv3.Audit.Verity.SszEncodingTx.encoding_uses_exact_digest
+#print axioms LidoSRv3.Audit.Verity.SszEncodingTx.encoding_accepts_iff_root_matches
+#print axioms LidoSRv3.Audit.Verity.SszEncodingTx.encoding_requires_pinned_widths
+#print axioms LidoSRv3.Audit.Verity.SszEncodingTx.encoding_requires_structural_bind
+#print axioms LidoSRv3.Audit.Verity.SszEncodingTx.sourceObs_committed_fields
+#print axioms LidoSRv3.Audit.Verity.SszEncodingTx.structuralOk_implies_conjunct
 #print axioms LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_matches_spec
 #print axioms LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_value_of_fits
 #print axioms LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_depth_overflow
 #print axioms LidoSRv3.Audit.Verity.SszTxSimulation.ssz_tx_simulation_correct
 #print axioms LidoSRv3.Audit.Verity.SszTxSimulation.sha256_call_world_rollback
 #print axioms LidoSRv3.Audit.Verity.SszTxSimulation.root_mutant_rejected
+-- SszTxSimulation additional acceptances: `sha256_site_is_address_two_staticcall`
+-- pins the modeled SHA256 call site to address 2 STATICCALL;
+-- `sha256_denoteCall_preserves_world` documents that a SHA256
+-- staticcall preserves the world; `accepted_iff_root_matches` is the
+-- acceptance-vs-root equivalence; `verification_failure_rolls_back`
+-- is the paired transaction-boundary rollback on failed verification.
+#print axioms LidoSRv3.Audit.Verity.SszTxSimulation.sha256_site_is_address_two_staticcall
+#print axioms LidoSRv3.Audit.Verity.SszTxSimulation.sha256_denoteCall_preserves_world
+#print axioms LidoSRv3.Audit.Verity.SszTxSimulation.accepted_iff_root_matches
+#print axioms LidoSRv3.Audit.Verity.SszTxSimulation.verification_failure_rolls_back
 #print axioms
   LidoSRv3.Audit.Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root
 #print axioms LidoSRv3.Audit.MinFirst.candidate_mem
