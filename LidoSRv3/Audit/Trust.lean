@@ -188,6 +188,8 @@ import LidoSRv3.Audit.Verity.Tests.SszTxSimulation
 import LidoSRv3.Audit.Source.SanityEnvelope
 import LidoSRv3.Tests.TopupModuleMemoryRegression
 import LidoSRv3.Tests.AddressRequestCalls
+import LidoSRv3.Audit.Source.TopupPointerOrigin
+import LidoSRv3.Tests.TopupPointerOriginMutants
 
 /-!
 Machine-readable-in-build trust report for the first audit slice.
@@ -372,6 +374,10 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.PackN5SszLiveMutants.ignore_timestamp_kill_line_refutes_consume_parent
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidationValue1.official_denote_succeeds_and_justified_forwards_msg_value
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidationValue1.justified_interpreter_forwards_exactly_msg_value
+-- `preservesEthBalance_of_success` lifts the vault-side value-forwarding
+-- invariant onto the composed inputs record: under
+-- gateway-admitted-nonzero + committed run, self-balance stays put.
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidationValue1.preservesEthBalance_of_success
 #print axioms LidoSRv3.Audit.Verity.ConsolidationOfficialDenoteSuccess.official_denote_succeeds_on_value_bearing_request_calls
 #print axioms LidoSRv3.Tests.PackN6ConsolValueMutants.official_denote_success_kill_line_refutes_parent
 #print axioms LidoSRv3.Tests.PackN6ConsolValueMutants.zero_value_calls_refute_exact_forwarding
@@ -435,6 +441,22 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Verity.AddressAdmission.claim_rejects_empty_balance
 #print axioms LidoSRv3.Audit.Verity.AddressAdmission.claim_rejects_when_paused
 #print axioms LidoSRv3.Audit.Verity.AddressAdmission.ownerGated_not_admission_equivariant
+-- AddressAdmission low-level lookups and witness-plane invariants that
+-- underpin the equivariance proofs above. `paused_lookup`, `owner_lookup`,
+-- `balances_lookup` are the executable oracle-slot readers.
+-- `witness_balance_slot_{one,two}` and `witness_pause_disjoint_{one,two}`
+-- are `decide`-checked concrete witness invariants for the two-actor test
+-- fixture. `run_ownerGated_success` is the owner-gated success shape;
+-- `ownerGateKillLine_holds` refutes universal owner-gated admission.
+#print axioms LidoSRv3.Audit.Verity.AddressAdmission.paused_lookup
+#print axioms LidoSRv3.Audit.Verity.AddressAdmission.owner_lookup
+#print axioms LidoSRv3.Audit.Verity.AddressAdmission.balances_lookup
+#print axioms LidoSRv3.Audit.Verity.AddressAdmission.witness_balance_slot_one
+#print axioms LidoSRv3.Audit.Verity.AddressAdmission.witness_balance_slot_two
+#print axioms LidoSRv3.Audit.Verity.AddressAdmission.witness_pause_disjoint_one
+#print axioms LidoSRv3.Audit.Verity.AddressAdmission.witness_pause_disjoint_two
+#print axioms LidoSRv3.Audit.Verity.AddressAdmission.run_ownerGated_success
+#print axioms LidoSRv3.Audit.Verity.AddressAdmission.ownerGateKillLine_holds
 #print axioms LidoSRv3.Audit.Verity.ConsolidationCallFragment.raw_call_entrypoint_always_reverts
 #print axioms
   LidoSRv3.Audit.Verity.ConsolidationCallFragment.external_call_bind_entrypoint_always_reverts
@@ -445,6 +467,23 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Verity.ConsolidationCallFragment.success_hypotheses_are_vacuous
 #print axioms LidoSRv3.Audit.Guarantees.PAddress1.universal_address_writer_equivariance
 #print axioms LidoSRv3.Audit.Guarantees.PAddress1.abstract_source_verity_tx_address_equivariance
+-- Address-renaming permutation lemmas that underpin every address-space
+-- equivariance argument in PAddress1: `address_renaming a₁ a₂` is its own
+-- inverse (involutive), injective, surjective, and therefore bijective.
+-- Registered here so the elementary permutation surface enters the Trust
+-- axiom discipline together with the top-level equivariance parent.
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.address_renaming_involutive
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.address_renaming_injective
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.address_renaming_surjective
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.address_renaming_bijective
+-- `admission_and_post_state_equivariance` is the composed decomposition
+-- lemma showing that admission non-discrimination + post-state
+-- equivariance implies the full `address_nondiscrimination` conclusion.
+-- `universal_post_state_equivariance` is the source-side committed-post
+-- equivariance on the live SolidityAddress `run`, keyed on a₁ ≠ 0 and
+-- a₂ ≠ 0.
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.admission_and_post_state_equivariance
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.universal_post_state_equivariance
 #print axioms LidoSRv3.Audit.Verity.AddressTx.pinned_source_observable_correspondence
 #print axioms LidoSRv3.Audit.Verity.AddressTx.executed_address_writes_follow_renamed_source
 #print axioms LidoSRv3.Audit.Verity.AddressTx.every_revert_restores_snapshot
@@ -490,7 +529,35 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_claim_withdrawals_to_chain
 #print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_claim_recipient_effect
 #print axioms LidoSRv3.Audit.Verity.AddressClaimBatchTx.every_revert_restores_snapshot
+-- AddressClaimBatchTx one-step storage results: `claimOne_success_guards`
+-- derives the four pinned admission guards from a successful `claimOne`
+-- (requestId, finalisation bound, non-claimed bit, owner==sender);
+-- `claimOne_success_storage` derives the exact `lockedEther` subtraction
+-- write and the word bound on the payout.
+#print axioms LidoSRv3.Audit.Verity.AddressClaimBatchTx.claimOne_success_guards
+#print axioms LidoSRv3.Audit.Verity.AddressClaimBatchTx.claimOne_success_storage
+-- AddressRecipientCallBridge: bridge module that lifts each pinned
+-- AddressClaimBatchTx storage-only iteration into a real recipient
+-- CALL against the callee world, and pins snapshot-restoration on
+-- every failure path per entrypoint (claim/transfer/request/unwrap)
+-- plus the shared entry receipt for the empty-value EOA CALL.
+#print axioms LidoSRv3.Audit.Verity.AddressRecipientCallBridge.eoa_empty_value_call_receipt
+#print axioms LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claim_withdrawals_to_revert_restores_caller_and_callee_world
+#print axioms LidoSRv3.Audit.Verity.AddressRecipientCallBridge.transfer_revert_restores_world
+#print axioms LidoSRv3.Audit.Verity.AddressRecipientCallBridge.request_revert_restores_caller_and_callee_world
+#print axioms LidoSRv3.Audit.Verity.AddressRecipientCallBridge.unwrap_bridge_receipt
+#print axioms LidoSRv3.Audit.Verity.AddressRecipientCallBridge.unwrap_revert_restores_caller_and_callee_world
+#print axioms LidoSRv3.Audit.Verity.AddressRecipientCallBridge.revert_restores_caller_and_callee_world
 #print axioms LidoSRv3.Audit.Verity.AddressTransferTx.tx_refines_source_witness
+-- AddressTransferTx additional executable-level witnesses: successful
+-- `run` commits the owner handoff, is post-state equivariant under
+-- address renaming on the witness, rejects wrong-caller access, and
+-- projects the abstract model / source / verity address-equivariance
+-- slice back onto the transfer entrypoint.
+#print axioms LidoSRv3.Audit.Verity.AddressTransferTx.run_commits_owner_handoff
+#print axioms LidoSRv3.Audit.Verity.AddressTransferTx.run_post_state_equivariant_witness
+#print axioms LidoSRv3.Audit.Verity.AddressTransferTx.wrong_caller_reverts
+#print axioms LidoSRv3.Audit.Verity.AddressTransferTx.model_source_tx_address_equivariance_slice
 #print axioms LidoSRv3.Audit.Source.AddressTransferCorrespondence.fixed_caller_mutant_rejected
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_router_balance_unchanged
@@ -531,6 +598,21 @@ list, there are no undisclosed project-level assumptions or proof escapes.
   LidoSRv3.Audit.Guarantees.PDeposit1.manyKey_entry_state_guards_are_load_bearing
 #print axioms
   LidoSRv3.Audit.Guarantees.PDeposit1.manyKey_underfunded_entry_reverts_at_not_enough_ether
+-- PDeposit1 ledger identities: on any well-linked source/inputs pair,
+-- the linked total equals the executable pushed value (and, under
+-- noWrap, the depositsValue). The `exactTotal` variants add
+-- multiplicative per-batch discipline. `canonical_links_source` is
+-- the concrete canonical witness under which the composed hypotheses
+-- fire, and `two_batch_conjunct_d_is_n_eq_two` records the
+-- two-batch limitation as a definitional fact of `DepositNFrameTx.
+-- ofTwoBatches` rather than a hidden premise.
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.linked_total_eq_pushedValue
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.linked_total_eq_depositsValue
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.canonical_links_source
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.NFrame.exactTotal_eq_exactKeys_mul
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.NFrame.linked_exactTotal_eq_pushedValue
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.NFrame.linked_exactTotal_eq_depositsValue
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.NFrame.two_batch_conjunct_d_is_n_eq_two
 #print axioms LidoSRv3.Audit.Verity.DepositParentTx.execute_observes_source
 #print axioms
   LidoSRv3.Audit.Verity.DepositParentTx.revert_after_intermediate_writes_restores_snapshot
@@ -992,3 +1074,23 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.SszDeclaredSiblings.cursor_dichotomy
 #print axioms LidoSRv3.Audit.Source.SszDeclaredSiblings.complete_of_branch
 #print axioms LidoSRv3.Audit.Source.SszDeclaredSiblings.penultimate
+
+-- TOPUP pointer-origin memory model: `finalizeAllocation` zones for the
+-- credential (STATICCALL 32-byte copy) and module-return (raw + array)
+-- allocations. Sequential allocations are provably disjoint;
+-- independently supplied credential/module cursors may alias, and the
+-- named kill-lines refute the universal non-aliasing claims on well-
+-- formed decoder-success premises. No stub, no rename, no axiom beyond
+-- the three accepted Lean foundations.
+#print axioms LidoSRv3.Audit.Source.TopupPointerOrigin.sequential_disjoint
+#print axioms LidoSRv3.Audit.Source.TopupPointerOrigin.chained_scalar32_disjoint
+#print axioms LidoSRv3.Audit.Source.TopupPointerOrigin.credentials_zone
+#print axioms LidoSRv3.Audit.Source.TopupPointerOrigin.locator_zone
+#print axioms LidoSRv3.Audit.Source.TopupPointerOrigin.module_decode_zones
+#print axioms LidoSRv3.Audit.Source.TopupPointerOrigin.module_head_in_raw_zone
+#print axioms LidoSRv3.Audit.Source.TopupPointerOrigin.same_cursor_successful_decodes_alias
+#print axioms LidoSRv3.Audit.Source.TopupPointerOrigin.chained_credential_then_module_disjoint
+#print axioms LidoSRv3.Audit.Source.TopupPointerOrigin.chained_locator_credential_module_disjoint
+#print axioms LidoSRv3.Tests.TopupPointerOriginMutants.independent_cursor_alias_refutes_global_nonalias
+#print axioms LidoSRv3.Tests.TopupPointerOriginMutants.module_head_in_array_zone_refuted
+#print axioms LidoSRv3.Tests.TopupPointerOriginMutants.returnBuffer_eq_locator_refutes_cross_phase_nonalias
