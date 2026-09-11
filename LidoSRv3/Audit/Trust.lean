@@ -99,6 +99,8 @@ import LidoSRv3.Audit.Guarantees.PTopup2ActualBatch
 import LidoSRv3.Tests.TopupTxMutants
 import LidoSRv3.Audit.Verity.TopupHybrid
 import LidoSRv3.Tests.TopupHybridMutants
+import LidoSRv3.Audit.Verity.TopupBeaconFundedTx
+import LidoSRv3.Audit.Verity.TopupFundedSourceTx
 import LidoSRv3.Audit.Guarantees.PTopup2
 import LidoSRv3.Audit.Guarantees.PTopup2Verity
 import LidoSRv3.Audit.Verity.Topup2Tx
@@ -733,6 +735,30 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_allocation_guards_required
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_over_target_guard_required
 #print axioms LidoSRv3.Audit.Verity.TopupHybrid.verity_tx_simulates_source
+-- TopupHybrid additional adequacy: the source's value observation is
+-- adequate to close the hybrid simulation on the modeled surface.
+#print axioms LidoSRv3.Audit.Verity.TopupHybrid.source_value_observation_adequate
+-- TopupBeaconFundedTx four core aggregate/conservation identities
+-- covering the beacon-funded slice: `accounting_count` fixes the
+-- observed accounting size; `gateway_amount_exact` pins the exact
+-- forwarded amount to the gateway; `positive_conservation` documents
+-- positive-value conservation across the boundary; `wrapped_zero`
+-- excludes the wrap-to-zero degenerate case.
+#print axioms LidoSRv3.Audit.Verity.TopupBeaconFundedTx.accounting_count
+#print axioms LidoSRv3.Audit.Verity.TopupBeaconFundedTx.gateway_amount_exact
+#print axioms LidoSRv3.Audit.Verity.TopupBeaconFundedTx.positive_conservation
+#print axioms LidoSRv3.Audit.Verity.TopupBeaconFundedTx.wrapped_zero
+-- TopupFundedSourceTx seven core lemmas covering the funded-source
+-- slice: balance projection, ledger round-trip, gateway projection
+-- bound, accounting calls shape, push run shape, positive
+-- conservation, and the wrap-to-zero exclusion.
+#print axioms LidoSRv3.Audit.Verity.TopupFundedSourceTx.project_balance
+#print axioms LidoSRv3.Audit.Verity.TopupFundedSourceTx.ledger_roundtrip
+#print axioms LidoSRv3.Audit.Verity.TopupFundedSourceTx.gateway_projection_bound
+#print axioms LidoSRv3.Audit.Verity.TopupFundedSourceTx.accounting_calls
+#print axioms LidoSRv3.Audit.Verity.TopupFundedSourceTx.push_run
+#print axioms LidoSRv3.Audit.Verity.TopupFundedSourceTx.positive_conservation
+#print axioms LidoSRv3.Audit.Verity.TopupFundedSourceTx.wrapped_zero
 #print axioms LidoSRv3.Tests.TopupHybridMutants.hybrid_simulation_covers_nonzero_wrap
 #print axioms LidoSRv3.Tests.TopupHybridMutants.hybrid_simulation_covers_wrap_to_zero
 #print axioms LidoSRv3.Tests.TopupTxMutants.mutant_none_reproduces_execute
