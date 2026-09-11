@@ -27,26 +27,6 @@
       "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
     },
     {
-      "id": "A-TOPUP-BEACON-ADDRESS",
-      "accepted": true,
-      "risk": "The model-local beacon deposit target is not proved equal to the immutable/deployed production beacon deposit contract.",
-      "justification": "Call-target correctness and deployment provenance are separate obligations.",
-      "severity": "HIGH",
-      "violation_impact": "Conserved top-up value could be sent to the wrong address.",
-      "validation": "Pin constructor/deployment artifacts and compare the immutable target with the canonical beacon deposit contract.",
-      "removal_path": "Prove the deployed immutable equals 0x00000000219ab540356cBB839Cbe05303d7705Fa."
-    },
-    {
-      "id": "A-DEPOSIT-CONTRACT",
-      "accepted": true,
-      "risk": "The deposit transaction's DEPOSIT_CONTRACT immutable is not derived from deployment artifacts.",
-      "justification": "The executable model uses a configured destination; production address identity is a provenance fact.",
-      "severity": "HIGH",
-      "violation_impact": "Correctly accounted deposits could be delivered to a noncanonical contract.",
-      "validation": "Check constructor arguments and deployed immutable extraction.",
-      "removal_path": "Prove DEPOSIT_CONTRACT equals the canonical beacon deposit contract in the deployed artifact."
-    },
-    {
       "id": "A-DEPOSIT-32-ETHER",
       "accepted": true,
       "risk": "The production MAX_EFFECTIVE_BALANCE_WC_TYPE_01 constructor value and BeaconChainDepositor DEPOSIT_SIZE are not jointly proved to equal 32 ether.",

@@ -67,6 +67,25 @@
           "discharges_assumption": "A-CANONICAL-REQUEST-ADDRESS (P-CONSOLIDATION-ETH-1)"
         }
       ]
+    },
+    "StakingRouter_implementation": {
+      "proxy": "0xFdDf38947aFB03C621C71b06C9C70bce73f12999",
+      "implementation": "0xDD76927045435C7605cf6f5F978cfb8CABDb5F80",
+      "chain": "mainnet",
+      "source_relative_path": "contracts/0.8.25/sr/StakingRouter.sol",
+      "fixture_path": "fixtures/deployed/StakingRouter-impl-runtime.bin",
+      "fixture_size_bytes": 21087,
+      "fixture_sha256": "c30ed4e63cb0a57dca577484afff0765fcaa9840d75b440067fd55c7d4fc7013",
+      "immutable_extractions": [
+        {
+          "immutable_name": "DEPOSIT_CONTRACT (aka top-up beacon deposit target)",
+          "byte_offset": 7525,
+          "width_bytes": 20,
+          "expected_value_hex": "00000000219ab540356cbb839cbe05303d7705fa",
+          "canonical_source": "Ethereum beacon deposit contract",
+          "discharges_assumption": "A-TOPUP-BEACON-ADDRESS (P-TOPUP-1) and A-DEPOSIT-CONTRACT (P-DEPOSIT-1, P-ALLOC-EXEC-1)"
+        }
+      ]
     }
   }
 }

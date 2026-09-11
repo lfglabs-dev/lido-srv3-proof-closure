@@ -117,7 +117,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Source/artifact provenance.** `MAPPED`; 7 immutable pinned source span(s) in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance.
 
-**Assumptions.** `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-DEPOSIT-CONTRACT`, `A-DEPOSIT-32-ETHER`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
+**Assumptions.** `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-DEPOSIT-32-ETHER`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
 
 **Limitations — 6 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
@@ -140,7 +140,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Source/artifact provenance.** `MAPPED`; 14 immutable pinned source span(s) in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance.
 
-**Assumptions.** `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-TOPUP-BEACON-ADDRESS`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
+**Assumptions.** `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
 
 **Limitations — 1 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
@@ -536,7 +536,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Source/artifact provenance.** No independent source-map target; supplemental evidence only. A source-map entry is source provenance, not deployed-artifact provenance.
 
-**Assumptions.** `A-SOURCE-SHAPED`, `A-DEPOSIT-CONTRACT`, `A-DEPOSIT-32-ETHER`, `A-CLASSICAL-CHOICE`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
+**Assumptions.** `A-SOURCE-SHAPED`, `A-DEPOSIT-32-ETHER`, `A-CLASSICAL-CHOICE`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
 
 **Limitations — 3 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
