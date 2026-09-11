@@ -140,6 +140,7 @@ import LidoSRv3.Audit.Provenance.ConsolidationRequest
 import LidoSRv3.Audit.Provenance.CanonicalRequestAddress
 import LidoSRv3.Audit.Provenance.BeaconDepositAddress
 import LidoSRv3.Audit.Provenance.DepositThirtyTwoEther
+import LidoSRv3.Audit.Provenance.DepositAbstractTxOrphaned
 import LidoSRv3.Tests.PackGEth1ProvenanceMutants
 import LidoSRv3.Audit.Spec.DepositEthJournalCorrespondence
 import LidoSRv3.Tests.PackJDepositEthJournalMutants
@@ -1649,3 +1650,22 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Provenance.DepositThirtyTwoEther.deployed_depositSize_equals_pushed_value
 #print axioms LidoSRv3.Audit.Provenance.DepositThirtyTwoEther.deployed_maxEBType1_equals_depositSize
 #print axioms LidoSRv3.Audit.Provenance.DepositThirtyTwoEther.deployed_production_config_thirty_two_ether
+
+-- A-ABSTRACT-TX orphelinat for P-DEPOSIT-1 (see
+-- `audit/findings/A-ABSTRACT-TX-orphaned-from-P-DEPOSIT-1.md` and
+-- `LidoSRv3/Audit/Provenance/DepositAbstractTxOrphaned.lean`): both
+-- registered P-DEPOSIT-1 parents
+-- (`PDeposit1.source_deposit_conserves_and_rolls_back` and
+-- `PDeposit1.NFrame.verity_tx_composes_nframe_deposit`) apply
+-- universally without consuming any hypothesis representing the
+-- abstract `TxObservation` model's faithfulness — the `_hAbstractTxFaithful`
+-- premise below is introduced only to make the orphanage explicit and is
+-- ignored by the parent's proof term. `A-ABSTRACT-TX` is retired from
+-- `P-DEPOSIT-1.assumptions` in `audit/guarantees.yaml`; the registry
+-- entry stays because `P-TOPUP-1` and `P-CONSOLIDATION-ETH-1` still
+-- fold `RevertRestoresSnapshot` / abstract-TX conjuncts into their
+-- registered parents.
+#print axioms LidoSRv3.Audit.Provenance.DepositAbstractTxOrphaned.source_parent_ignores_abstract_tx
+#print axioms LidoSRv3.Audit.Provenance.DepositAbstractTxOrphaned.source_parent_applies_universally
+#print axioms LidoSRv3.Audit.Provenance.DepositAbstractTxOrphaned.verity_parent_ignores_abstract_tx
+#print axioms LidoSRv3.Audit.Provenance.DepositAbstractTxOrphaned.verity_parent_applies_universally
