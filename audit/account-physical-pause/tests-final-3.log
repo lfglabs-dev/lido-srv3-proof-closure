@@ -1,0 +1,28 @@
+LidoSRv3/Tests/AccountPhysicalPause.lean:72:14: warning: Variable name `fault` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+LidoSRv3/Tests/AccountPhysicalPause.lean:72:29: warning: Variable name `ps` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+LidoSRv3/Tests/AccountPhysicalPause.lean:72:32: warning: Variable name `ats` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+'AccountAddress.ReportFeePhysicalPause.projection' depends on axioms: [propext]
+'AccountAddress.ReportFeePhysicalPause.total_slot_distinct' does not depend on any axioms
+'AccountAddress.ReportFeePhysicalPause.mint_frame' depends on axioms: [propext, Classical.choice, Quot.sound]
+'AccountAddress.ReportFeePhysicalPause.chain_physical' depends on axioms: [propext]
+'AccountAddress.ReportFeePhysicalPause.execute_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Audit.Guarantees.PAccount1.actual_report_physical_pause' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Guarantees.PAccount1.actual_report_physical_pause_failure_restores' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Tests.AccountPhysicalPause.public_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LidoSRv3.Tests.AccountPhysicalPause.public_failure' depends on axioms: [propext, Classical.choice, Quot.sound]
