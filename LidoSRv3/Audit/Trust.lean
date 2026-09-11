@@ -202,6 +202,9 @@ import LidoSRv3.Audit.Source.BeaconRootsCorrespondence
 import LidoSRv3.Audit.Source.MinFirstAmountCorrespondence
 import LidoSRv3.Audit.Model.EthConfinement
 import LidoSRv3.Audit.Model.EthWorld
+import LidoSRv3.Audit.Verity.TrioConsolidation.Correspondence
+import LidoSRv3.Audit.Verity.TrioConsolidation.Memory
+import LidoSRv3.Audit.Verity.ConsolidationValueTx
 import LidoSRv3.Tests.TopupPointerOriginMutants
 
 /-!
@@ -1444,3 +1447,37 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PEthConfinement1.coveringParentsAreRegistered
 #print axioms LidoSRv3.Audit.Guarantees.PMintConsumer1.abstract_rereads_written_router_snapshot
 #print axioms LidoSRv3.Audit.Guarantees.PMintConsumer1.verity_observe_eq_sourceView
+
+-- TrioConsolidation.Correspondence x4: bounded correspondence lemmas
+-- pinning the translated array lengths, the zipRequests preparation
+-- (prepared / prepared_valid), and the prepared_vault_guards closure
+-- of the source exit shape.
+#print axioms LidoSRv3.Audit.Verity.TrioConsolidation.Correspondence.translated_array_lengths
+#print axioms LidoSRv3.Audit.Verity.TrioConsolidation.Correspondence.zipRequests_prepared
+#print axioms LidoSRv3.Audit.Verity.TrioConsolidation.Correspondence.zipRequests_prepared_valid
+#print axioms LidoSRv3.Audit.Verity.TrioConsolidation.Correspondence.prepared_vault_guards_close_source_exit
+
+-- TrioConsolidation.Memory x2: the memory-decoding correspondence
+-- (`decode_stateForGroups`) and the grouped transaction simulation
+-- (`grouped_tx_simulates`) closing the memory plane on the Trio path.
+#print axioms LidoSRv3.Audit.Verity.TrioConsolidation.Memory.decode_stateForGroups
+#print axioms LidoSRv3.Audit.Verity.TrioConsolidation.Memory.grouped_tx_simulates
+
+-- ConsolidationValueTx: the value-forwarding transaction slice.
+-- `forwardCalls_apply`, `forwardCalls_run` document the loop
+-- semantics; `afterCalls_calls`, `afterCalls_balance_val` and
+-- `afterCall_balance_val` document the post-call observations;
+-- `requestCalls_value_sum`, `committed_call_value_sum` document the
+-- value-sum equalities; `afterCalls_fresh`, `afterCalls_forwardedValue`,
+-- `afterCalls_noConsensusLayerVerify` document the fresh /
+-- forwardedValue / no-consensus-layer-verify post-conditions.
+#print axioms LidoSRv3.Audit.Verity.ConsolidationValueTx.forwardCalls_apply
+#print axioms LidoSRv3.Audit.Verity.ConsolidationValueTx.forwardCalls_run
+#print axioms LidoSRv3.Audit.Verity.ConsolidationValueTx.afterCalls_calls
+#print axioms LidoSRv3.Audit.Verity.ConsolidationValueTx.afterCalls_balance_val
+#print axioms LidoSRv3.Audit.Verity.ConsolidationValueTx.afterCall_balance_val
+#print axioms LidoSRv3.Audit.Verity.ConsolidationValueTx.requestCalls_value_sum
+#print axioms LidoSRv3.Audit.Verity.ConsolidationValueTx.committed_call_value_sum
+#print axioms LidoSRv3.Audit.Verity.ConsolidationValueTx.afterCalls_fresh
+#print axioms LidoSRv3.Audit.Verity.ConsolidationValueTx.afterCalls_forwardedValue
+#print axioms LidoSRv3.Audit.Verity.ConsolidationValueTx.afterCalls_noConsensusLayerVerify
