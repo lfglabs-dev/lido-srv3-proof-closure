@@ -1,3 +1,4 @@
+import LidoSRv3.Tests.AddressStETHTransferCalls
 import LidoSRv3.Tests.AccountPhysicalPause
 import LidoSRv3.Tests.AddressStETHConversionCalls
 import LidoSRv3.Tests.TopupRouterLocatorCall
@@ -853,3 +854,12 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms AccountAddress.ReportFeePhysicalPause.chain_physical
 #print axioms LidoSRv3.Tests.AccountPhysicalPause.public_success
 #print axioms LidoSRv3.Tests.AccountPhysicalPause.public_failure
+
+-- Actual physical stETH transfer consumed by the wrapped permit batch.
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_physical_steth_transfer_permit_batch
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_physical_steth_transfer_failure_restores
+#print axioms LidoSRv3.Audit.Source.AddressStETHTransferCalls.balanceSlot_keccak
+#print axioms LidoSRv3.Audit.Source.AddressStETHTransferCalls.call_effect
+#print axioms LidoSRv3.Audit.Source.AddressStETHTransferCalls.token_effect
+#print axioms LidoSRv3.Tests.AddressStETHTransferCalls.public_empty_success
+#print axioms LidoSRv3.Tests.AddressStETHTransferCalls.public_paused_rollback
