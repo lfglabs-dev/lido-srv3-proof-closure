@@ -1,0 +1,32 @@
+{
+  "boundaries": [
+    "Typed gateway/router entry composition retains omitted outer router CALL and memory/gas boundary; IR1102-1110 allocator is not executed by this model",
+    "LOG represented by existing semantic Log; memory allocation, topic/data byte refinement and gas not claimed",
+    "arbitrary callback metadata preserved; timestamp/block history reads actual returned World; no frame premise"
+  ],
+  "compiler_artifacts": {
+    "audit/topup-credential-call/solidity/GatewayWitnessHarness.ir": "4170a026329677bca075096ede2b500f76d0ec7a481d793086d3793fa88358b0",
+    "audit/topup-credential-call/solidity/compile.py": "47e9a9b921bf6b77404a9525ae5bfc15ac1be920b7c7807b707ef771dd6871f2",
+    "audit/topup-credential-call/solidity/compiler-identities.json": "536cf6802064ec935d736c4fe908766df2e6a91c75f48bf72993ac2c13618f0c",
+    "audit/topup-credential-call/solidity/input.json": "d567ed741b51d5f7250ea4bce7ac4bd0ef20b7d621459bb2b0ee96a10fe7ff34",
+    "audit/topup-credential-call/solidity/output.json": "873a214668545f161f16683b096b77e05474fcb28abf21c28dfcb6f64a85ced6"
+  },
+  "core": "17005714f151e5502c559932319a3f2f74ac2436",
+  "error_selectors": {
+    "MinBlockDistanceNotMet": "f1a39894",
+    "RootIsTooOld": "eaa6022d",
+    "RootPrecedesLastTopUp": "b11461d6"
+  },
+  "event_topic": "4f63efa973ce717a91d9f49d732d45ad08e7847c64ed5633ad99f38424322c55",
+  "full_prior_public_conjunction_byte_identity": true,
+  "gateway_root": "0x22e512057841e2bc1e6d80030c8bb8b4935377af2e64ba9bf8e6a3e88fb32200",
+  "original_fixture_receipt_sha256": "574d6521222d86653acce547434f03fc590c45510adab6775fe02b2870ed65b7",
+  "source_mapping": {
+    "Storage42-48": "uint32 timestamp bits64/block bits96; uint16 distance128/age144",
+    "_isBlockDistancePassed323-325;IR2152-2170": "zero last block skips subtraction; checked_sub_uint256; distance comparison",
+    "_verifyRootAge380-388;IR450-479": "uint64 ADD overflow before RootIsTooOld then RootPrecedesLastTopUp; no future-time guard",
+    "topUp163-175;IR372-479": "physical lengths/config then short-circuit checked distance then uint64 checked age, old root, prior timestamp",
+    "topUp204-228;IR590-995": "same executed loop output; actual witness limits accumulator retained",
+    "topUp231-235;IR1113-1130": "executed totalLimits nonzero, fresh packed post-world read, coalesced write, full timestamp event"
+  }
+}
