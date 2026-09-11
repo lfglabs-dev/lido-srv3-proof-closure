@@ -1,0 +1,150 @@
+{
+  "LidoSRv3.Audit.Guarantees.PTopupRouterAdmissionCall.actual_gateway_entry_failure_restores": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Guarantees.PTopupRouterAdmissionCall.actual_router_admission_complete_prior": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.TopupRouterAdmissionCall.failure_restores": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.TopupRouterAdmissionCall.run_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.TopupRouterAdmissionCall.walk_prior": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.TopupRouterAdmissionCall.walk_relation": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.TopupRouterAdmissionCallGates.admitted_calls": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.TopupRouterAdmissionCallGates.auth_origin": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.TopupRouterAdmissionCallGates.canDeposit_origin": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.TopupRouterAdmissionCallGates.decodeBool_fields": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.TopupRouterAdmissionCallGates.physical_success": [
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.TopupRouterAdmissionCallGates.run_admitted": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterAdmissionCallRegression.active_before_type": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterAdmissionCallRegression.auth_bubble_before_inputs": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterAdmissionCallRegression.auth_forbidden": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterAdmissionCallRegression.auth_noncanonical": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterAdmissionCallRegression.auth_wrong_caller": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterAdmissionCallRegression.bool_allocation_first": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterAdmissionCallRegression.bool_noncanonical": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterAdmissionCallRegression.bool_short": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterAdmissionCallRegression.bool_trailing": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterAdmissionCallRegression.bool_true_false": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterAdmissionCallRegression.complete_late_failure": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterAdmissionCallRegression.complete_nonempty_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterAdmissionCallRegression.complete_positive_target": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterAdmissionCallRegression.complete_world_and_journal": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterAdmissionCallRegression.complete_zero_rejection_before_module": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterAdmissionCallRegression.enum_before_active_type": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterAdmissionCallRegression.exact_static_requests": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterAdmissionCallRegression.inputs_empty_first": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterAdmissionCallRegression.inputs_lengths": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterAdmissionCallRegression.inputs_pubkey": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterAdmissionCallRegression.positive_target_skips_canDeposit": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterAdmissionCallRegression.public_consumer": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterAdmissionCallRegression.public_rollback": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterAdmissionCallRegression.registration_before_enum": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterAdmissionCallRegression.wrong_type": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterAdmissionCallRegression.zero_target_denied": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterAdmissionCallRegression.zero_target_forbidden": [
+    "propext"
+  ]
+}
