@@ -1,0 +1,2 @@
+import LidoSRv3.Tests.AddressRequestBatches
+#eval LidoSRv3.Tests.AddressRequestBatches.diagnostics

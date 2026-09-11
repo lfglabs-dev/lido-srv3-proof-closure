@@ -1,0 +1,400 @@
+{
+  "scope": "Exact final normal source/artifacts after successful validation; earlier failed attempts are not assigned retrospective hashes.",
+  "entries": [
+    {
+      "source": "LidoSRv3/Audit/Source/AddressRequestBatches.lean",
+      "sha256": "b79fac256179d87e1282bc38ded633c995069b4727042454620c70d59660687f",
+      "artifacts": {
+        ".olean": {
+          "sha256": "1f3aef1b0a21760dad92277229097bb2323b9a68cba01e085bbb3270f3861c48"
+        },
+        ".ilean": {
+          "sha256": "16bcbaa081fa09acb2f959e9046c843cee94e3c33d8af8afb36290b7c5b29a57"
+        },
+        ".trace": {
+          "sha256": "4063f6f7c538687bf3ff84607af9a3a4af0c7ad3d5d03a1b6d026f6bcb12d3fb",
+          "lake_trace": {
+            "synthetic": false,
+            "schemaVersion": "2025-09-10",
+            "outputs": {
+              "o": [
+                "ca7aa27166879c99.olean"
+              ],
+              "m": false,
+              "i": "790b9a636b58cc4b.ilean",
+              "c": "c460e11a19d36012.c"
+            },
+            "log": [
+              {
+                "message": ".> LEAN_PATH=/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Cli/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/batteries/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Qq/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/aesop/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/proofwidgets/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/importGraph/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/plausible/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/mathlib/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/evmyul/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/verity/.lake/build/lib/lean:/private/tmp/lido-address-request-batches/.lake/build/lib/lean /Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean /private/tmp/lido-address-request-batches/LidoSRv3/Audit/Source/AddressRequestBatches.lean -o /private/tmp/lido-address-request-batches/.lake/build/lib/lean/LidoSRv3/Audit/Source/AddressRequestBatches.olean -i /private/tmp/lido-address-request-batches/.lake/build/lib/lean/LidoSRv3/Audit/Source/AddressRequestBatches.ilean -c /private/tmp/lido-address-request-batches/.lake/build/ir/LidoSRv3/Audit/Source/AddressRequestBatches.c --setup /private/tmp/lido-address-request-batches/.lake/build/ir/LidoSRv3/Audit/Source/AddressRequestBatches.setup.json --json",
+                "level": "trace"
+              }
+            ],
+            "inputs": [
+              [
+                "LidoSRv3.Audit.Source.AddressRequestBatches:deps",
+                [
+                  [
+                    "deps",
+                    [
+                      [
+                        "\u00ablido-srv3-proof-closure\u00bb/LidoSRv3:extraDep",
+                        [
+                          [
+                            "@\u00ablido-srv3-proof-closure\u00bb:extraDep",
+                            "00000000000006bb"
+                          ]
+                        ]
+                      ],
+                      [
+                        "imports",
+                        [
+                          [
+                            "LidoSRv3.Audit.Guarantees.PAddress1RequestCalls transitive imports (legacy)",
+                            "9632e82e8ce37e53"
+                          ],
+                          [
+                            "LidoSRv3.Audit.Guarantees.PAddress1RequestCalls:importAllArts",
+                            "8b2ae44ebbd56ca9"
+                          ],
+                          [
+                            "LidoSRv3.Audit.Guarantees.PAddress1WrappedTransferCalls transitive imports (legacy)",
+                            "1c38f4fcd6c32e61"
+                          ],
+                          [
+                            "LidoSRv3.Audit.Guarantees.PAddress1WrappedTransferCalls:importAllArts",
+                            "e6f40a7a30fc3417"
+                          ]
+                        ]
+                      ]
+                    ]
+                  ],
+                  [
+                    "libs",
+                    [
+                      [
+                        "import dynlibs",
+                        "00000000000006bb"
+                      ],
+                      [
+                        "package external libraries",
+                        "00000000000006bb"
+                      ],
+                      [
+                        "module dynlibs",
+                        "00000000000006bb"
+                      ],
+                      [
+                        "module plugins",
+                        "00000000000006bb"
+                      ]
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "Lean 4.31.0, commit 68218e876d2a38b1985b8590fff244a83c321783",
+                "fc45ac412f28501c"
+              ],
+              [
+                "/private/tmp/lido-address-request-batches/LidoSRv3/Audit/Source/AddressRequestBatches.lean",
+                "a37d6fccff464697"
+              ],
+              [
+                "options",
+                "00000000000006bb"
+              ],
+              [
+                "isModule: false",
+                "feefd2a0d3a1847e"
+              ],
+              [
+                "Module.name: LidoSRv3.Audit.Source.AddressRequestBatches",
+                "7e3dbad9189ccb41"
+              ],
+              [
+                "Package.id?: (some lido-srv3-proof-closure)",
+                "1792847f4a06c449"
+              ],
+              [
+                "Module.leanArgs: #[]",
+                "00000000000006bb"
+              ]
+            ],
+            "depHash": "daa5a7a3d1d7e91a"
+          }
+        }
+      }
+    },
+    {
+      "source": "LidoSRv3/Audit/Guarantees/PAddress1RequestBatches.lean",
+      "sha256": "1cf659eeda7c0161f231925b827f304212cb52f2871f3702903e4b7ce3bbe19e",
+      "artifacts": {
+        ".olean": {
+          "sha256": "664a5186e28f5c37b035aa1ae98e2b3d5d12f22742d469ca9f9f8b9029ecc480"
+        },
+        ".ilean": {
+          "sha256": "7344ca2ac28952b7e0cdde865b48013268f17425d53cbcf222c222b104a3df86"
+        },
+        ".trace": {
+          "sha256": "c8ff6c0105053d85ed6bb6b4d4681a0dc68ecf14c486c2142c7e355b35d2857c",
+          "lake_trace": {
+            "synthetic": false,
+            "schemaVersion": "2025-09-10",
+            "outputs": {
+              "o": [
+                "9a1a25b3705e3d92.olean"
+              ],
+              "m": false,
+              "i": "2ffa7142b01d6d87.ilean",
+              "c": "54bb9de2f39fe821.c"
+            },
+            "log": [
+              {
+                "message": ".> LEAN_PATH=/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Cli/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/batteries/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Qq/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/aesop/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/proofwidgets/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/importGraph/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/plausible/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/mathlib/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/evmyul/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/verity/.lake/build/lib/lean:/private/tmp/lido-address-request-batches/.lake/build/lib/lean /Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean /private/tmp/lido-address-request-batches/LidoSRv3/Audit/Guarantees/PAddress1RequestBatches.lean -o /private/tmp/lido-address-request-batches/.lake/build/lib/lean/LidoSRv3/Audit/Guarantees/PAddress1RequestBatches.olean -i /private/tmp/lido-address-request-batches/.lake/build/lib/lean/LidoSRv3/Audit/Guarantees/PAddress1RequestBatches.ilean -c /private/tmp/lido-address-request-batches/.lake/build/ir/LidoSRv3/Audit/Guarantees/PAddress1RequestBatches.c --setup /private/tmp/lido-address-request-batches/.lake/build/ir/LidoSRv3/Audit/Guarantees/PAddress1RequestBatches.setup.json --json",
+                "level": "trace"
+              }
+            ],
+            "inputs": [
+              [
+                "LidoSRv3.Audit.Guarantees.PAddress1RequestBatches:deps",
+                [
+                  [
+                    "deps",
+                    [
+                      [
+                        "\u00ablido-srv3-proof-closure\u00bb/LidoSRv3:extraDep",
+                        [
+                          [
+                            "@\u00ablido-srv3-proof-closure\u00bb:extraDep",
+                            "00000000000006bb"
+                          ]
+                        ]
+                      ],
+                      [
+                        "imports",
+                        [
+                          [
+                            "LidoSRv3.Audit.Source.AddressRequestBatches transitive imports (legacy)",
+                            "1cd8a080bb9d67f6"
+                          ],
+                          [
+                            "LidoSRv3.Audit.Source.AddressRequestBatches:importAllArts",
+                            "5beca37f42f3fb59"
+                          ]
+                        ]
+                      ]
+                    ]
+                  ],
+                  [
+                    "libs",
+                    [
+                      [
+                        "import dynlibs",
+                        "00000000000006bb"
+                      ],
+                      [
+                        "package external libraries",
+                        "00000000000006bb"
+                      ],
+                      [
+                        "module dynlibs",
+                        "00000000000006bb"
+                      ],
+                      [
+                        "module plugins",
+                        "00000000000006bb"
+                      ]
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "Lean 4.31.0, commit 68218e876d2a38b1985b8590fff244a83c321783",
+                "fc45ac412f28501c"
+              ],
+              [
+                "/private/tmp/lido-address-request-batches/LidoSRv3/Audit/Guarantees/PAddress1RequestBatches.lean",
+                "c2868a92d179032c"
+              ],
+              [
+                "options",
+                "00000000000006bb"
+              ],
+              [
+                "isModule: false",
+                "feefd2a0d3a1847e"
+              ],
+              [
+                "Module.name: LidoSRv3.Audit.Guarantees.PAddress1RequestBatches",
+                "fffb563f3a074ae0"
+              ],
+              [
+                "Package.id?: (some lido-srv3-proof-closure)",
+                "1792847f4a06c449"
+              ],
+              [
+                "Module.leanArgs: #[]",
+                "00000000000006bb"
+              ]
+            ],
+            "depHash": "3b613728f01092e8"
+          }
+        }
+      }
+    },
+    {
+      "source": "LidoSRv3/Tests/AddressRequestBatches.lean",
+      "sha256": "f1682a72f367e261af9fec227ee3679e616cacb7ed7eb941249c1d91d9efae54",
+      "artifacts": {
+        ".olean": {
+          "sha256": "cb8896e197bd819c6de8d1b6e45255317fa4104820645d93aea372034fcf3d48"
+        },
+        ".ilean": {
+          "sha256": "60d519e727ca279ffe5f89cf09b87638276b0e5ca2e294e2cd9477fbf9111740"
+        },
+        ".trace": {
+          "sha256": "20a9687554ca17a545e7cdeb74c4e83357a100d955a3c9a4c82de2e0892f165f",
+          "lake_trace": {
+            "synthetic": false,
+            "schemaVersion": "2025-09-10",
+            "outputs": {
+              "o": [
+                "abf5a6be7e4dfeb6.olean"
+              ],
+              "m": false,
+              "i": "bf921527eb0230c0.ilean",
+              "c": "712827533b33c9f5.c"
+            },
+            "log": [
+              {
+                "message": ".> LEAN_PATH=/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Cli/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/batteries/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Qq/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/aesop/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/proofwidgets/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/importGraph/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/plausible/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/mathlib/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/evmyul/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/verity/.lake/build/lib/lean:/private/tmp/lido-address-request-batches/.lake/build/lib/lean /Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean /private/tmp/lido-address-request-batches/LidoSRv3/Tests/AddressRequestBatches.lean -o /private/tmp/lido-address-request-batches/.lake/build/lib/lean/LidoSRv3/Tests/AddressRequestBatches.olean -i /private/tmp/lido-address-request-batches/.lake/build/lib/lean/LidoSRv3/Tests/AddressRequestBatches.ilean -c /private/tmp/lido-address-request-batches/.lake/build/ir/LidoSRv3/Tests/AddressRequestBatches.c --setup /private/tmp/lido-address-request-batches/.lake/build/ir/LidoSRv3/Tests/AddressRequestBatches.setup.json --json",
+                "level": "trace"
+              },
+              {
+                "message": "LidoSRv3/Tests/AddressRequestBatches.lean:100:0: 'LidoSRv3.Audit.Source.AddressRequestBatches.loop_success' depends on axioms: [propext]",
+                "level": "info"
+              },
+              {
+                "message": "LidoSRv3/Tests/AddressRequestBatches.lean:101:0: 'LidoSRv3.Audit.Source.AddressRequestBatches.entry_success' depends on axioms: [propext]",
+                "level": "info"
+              },
+              {
+                "message": "LidoSRv3/Tests/AddressRequestBatches.lean:102:0: 'LidoSRv3.Audit.Source.AddressRequestBatches.owner_idempotent' depends on axioms: [propext]",
+                "level": "info"
+              },
+              {
+                "message": "LidoSRv3/Tests/AddressRequestBatches.lean:103:0: 'LidoSRv3.Audit.Guarantees.PAddress1.actual_steth_request_batch' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]",
+                "level": "info"
+              },
+              {
+                "message": "LidoSRv3/Tests/AddressRequestBatches.lean:104:0: 'LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_request_batch' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]",
+                "level": "info"
+              },
+              {
+                "message": "LidoSRv3/Tests/AddressRequestBatches.lean:105:0: 'LidoSRv3.Audit.Guarantees.PAddress1.actual_steth_batch_failure_restores' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]",
+                "level": "info"
+              },
+              {
+                "message": "LidoSRv3/Tests/AddressRequestBatches.lean:106:0: 'LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_batch_failure_restores' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]",
+                "level": "info"
+              },
+              {
+                "message": "LidoSRv3/Tests/AddressRequestBatches.lean:107:0: 'LidoSRv3.Tests.AddressRequestBatches.public_empty_steth' depends on axioms: [propext, Classical.choice, Quot.sound]",
+                "level": "info"
+              },
+              {
+                "message": "LidoSRv3/Tests/AddressRequestBatches.lean:108:0: 'LidoSRv3.Tests.AddressRequestBatches.public_paused_wrapped_rollback' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]",
+                "level": "info"
+              }
+            ],
+            "inputs": [
+              [
+                "LidoSRv3.Tests.AddressRequestBatches:deps",
+                [
+                  [
+                    "deps",
+                    [
+                      [
+                        "\u00ablido-srv3-proof-closure\u00bb/LidoSRv3Test:extraDep",
+                        [
+                          [
+                            "@\u00ablido-srv3-proof-closure\u00bb:extraDep",
+                            "00000000000006bb"
+                          ]
+                        ]
+                      ],
+                      [
+                        "imports",
+                        [
+                          [
+                            "LidoSRv3.Audit.Guarantees.PAddress1RequestBatches transitive imports (legacy)",
+                            "290df376d13a355c"
+                          ],
+                          [
+                            "LidoSRv3.Audit.Guarantees.PAddress1RequestBatches:importAllArts",
+                            "f6e044d477504694"
+                          ]
+                        ]
+                      ]
+                    ]
+                  ],
+                  [
+                    "libs",
+                    [
+                      [
+                        "import dynlibs",
+                        "00000000000006bb"
+                      ],
+                      [
+                        "package external libraries",
+                        "00000000000006bb"
+                      ],
+                      [
+                        "module dynlibs",
+                        "00000000000006bb"
+                      ],
+                      [
+                        "module plugins",
+                        "00000000000006bb"
+                      ]
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "Lean 4.31.0, commit 68218e876d2a38b1985b8590fff244a83c321783",
+                "fc45ac412f28501c"
+              ],
+              [
+                "/private/tmp/lido-address-request-batches/LidoSRv3/Tests/AddressRequestBatches.lean",
+                "2d6f4b60eb96d15e"
+              ],
+              [
+                "options",
+                "00000000000006bb"
+              ],
+              [
+                "isModule: false",
+                "feefd2a0d3a1847e"
+              ],
+              [
+                "Module.name: LidoSRv3.Tests.AddressRequestBatches",
+                "ec455f5ef7ccc26b"
+              ],
+              [
+                "Package.id?: (some lido-srv3-proof-closure)",
+                "1792847f4a06c449"
+              ],
+              [
+                "Module.leanArgs: #[]",
+                "00000000000006bb"
+              ]
+            ],
+            "depHash": "ad138a934ead1357"
+          }
+        }
+      }
+    }
+  ]
+}
