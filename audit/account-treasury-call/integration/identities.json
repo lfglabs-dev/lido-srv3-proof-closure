@@ -1,0 +1,12 @@
+{
+  "sources": 37,
+  "pins": 11,
+  "artifact_hashes": 28,
+  "scoped_axioms": 18,
+  "normal_olean_sha256": {
+    "TreasuryCall": "e120bdeb428f9f35a0eaf6f0b4707bc42fbd118d314136d4fa705161791cba5b",
+    "ReportFeeTreasuryCall": "8e39ee0172f3d72b90cadbf51d21a5f1b924c80a660890f048ad6cc488641d81",
+    "Tests/Verity/ReportFeeTreasuryCallTest": "0c86ccbc2ca56751350ccb1ac953425fd2b596ad107803c03ae33d948cde6c33",
+    "LidoSRv3/Audit/Guarantees/PAccount1TreasuryCall": "a67c6903a1987918761213bf6b8381a09b815c1a213fc758554d5a2f86c9801d"
+  }
+}

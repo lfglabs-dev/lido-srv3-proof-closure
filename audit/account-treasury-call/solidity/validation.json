@@ -1,0 +1,142 @@
+{
+  "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "fresh_tests": 9,
+  "original_dependency_identities": 29,
+  "copied_fixture_sources_identical": true,
+  "accounting_distribution_body_identical": true,
+  "compiled_sources": {
+    "../../account-fee-distribution/solidity/vendor/@aragon/os/contracts/acl/ACLSyntaxSugar.sol": "8a16dec5bd7ce42d05e8fda25202864995db194b648d671525b9a7b54d7eee67",
+    "../../account-fee-distribution/solidity/vendor/@aragon/os/contracts/acl/IACL.sol": "0d6092f108df51af376d55c64e482d514182a0fc1933f354c4afbd7a82160c01",
+    "../../account-fee-distribution/solidity/vendor/@aragon/os/contracts/apps/AppStorage.sol": "8e91fc929525676dd70fb9770499e93d148d27a97664d53f96c635d41783a7b1",
+    "../../account-fee-distribution/solidity/vendor/@aragon/os/contracts/apps/AragonApp.sol": "613d5cb8af90c0d2e1f7b6f2908495a46e9be81cf4417095c543bc43a27d27c2",
+    "../../account-fee-distribution/solidity/vendor/@aragon/os/contracts/common/Autopetrified.sol": "03548b960ee4bd0743da2c371c34910a6d736ca4b30ba30a23a1e2d3dfff7ee8",
+    "../../account-fee-distribution/solidity/vendor/@aragon/os/contracts/common/ConversionHelpers.sol": "4d4fb3e35f192c6005f2146867f094433d575179415769127fd1869d7e86bc06",
+    "../../account-fee-distribution/solidity/vendor/@aragon/os/contracts/common/EtherTokenConstant.sol": "630cece2f24d3b9072d3743570d01029cafaa6fab5abbee0015c81abfd92fc8f",
+    "../../account-fee-distribution/solidity/vendor/@aragon/os/contracts/common/IVaultRecoverable.sol": "780ce73c985b926a7e9bcf956060572c78ef8d55b545fc546325dc865291e479",
+    "../../account-fee-distribution/solidity/vendor/@aragon/os/contracts/common/Initializable.sol": "9b6f2892b7ddafee6c4c6ff41d6314e0cfa8a3090cd764a815bcf72a3f764318",
+    "../../account-fee-distribution/solidity/vendor/@aragon/os/contracts/common/IsContract.sol": "209acf5e2e50d9dae4f53b1f96febd03c48ed8ef5b3b88085010db628be7cdc2",
+    "../../account-fee-distribution/solidity/vendor/@aragon/os/contracts/common/Petrifiable.sol": "e565fd0513d66f4657d9a445ad76d63e6785dece37382ce12661bcc5f126e2cd",
+    "../../account-fee-distribution/solidity/vendor/@aragon/os/contracts/common/ReentrancyGuard.sol": "c377f4d240a679b485ff16d44f6c61552ccc76f5d17e3885154c294da89371ab",
+    "../../account-fee-distribution/solidity/vendor/@aragon/os/contracts/common/SafeERC20.sol": "022bdbc71e31f0a2042f33ede9b340efc04abf972a2c26f6677c0bf70aff2893",
+    "../../account-fee-distribution/solidity/vendor/@aragon/os/contracts/common/TimeHelpers.sol": "09242e7e0f60a92d40a37c787a4d24c239c31eaf9ccbebf92bfc37e1d05e78a7",
+    "../../account-fee-distribution/solidity/vendor/@aragon/os/contracts/common/Uint256Helpers.sol": "5b545ff91be8d1d3a5f1c6b4fd45c6db4bc901cb6c503ad754361a475dce0d38",
+    "../../account-fee-distribution/solidity/vendor/@aragon/os/contracts/common/UnstructuredStorage.sol": "6bbbb8fb3d32ba56d6f967f0eb437941aedae143c6dcedecac87d81a81ffd000",
+    "../../account-fee-distribution/solidity/vendor/@aragon/os/contracts/common/VaultRecoverable.sol": "5072a07438a6d55dd98f24c5c9e391be897990c750f4301fd4f9ddab5e253e78",
+    "../../account-fee-distribution/solidity/vendor/@aragon/os/contracts/evmscript/EVMScriptRunner.sol": "e2aae282297c55d9c72e0dd5ad30102e196fe4d8f34eb3eb74153f90dc62650d",
+    "../../account-fee-distribution/solidity/vendor/@aragon/os/contracts/evmscript/IEVMScriptExecutor.sol": "cdc198208cd2765e5b287b56bfa8bd790998412b880aad6234476c5660c0f06f",
+    "../../account-fee-distribution/solidity/vendor/@aragon/os/contracts/evmscript/IEVMScriptRegistry.sol": "f2f3b2f5b30d7b8c77b4b79ab34b8945be27a9f2c42de75bd2e2e02d4ee58550",
+    "../../account-fee-distribution/solidity/vendor/@aragon/os/contracts/kernel/IKernel.sol": "d626355aef13b741acf2b0f51bfb03eefe2dce9517e28623dafcf5478f43e255",
+    "../../account-fee-distribution/solidity/vendor/@aragon/os/contracts/kernel/KernelConstants.sol": "4c154c4e292dfcdcdc0b1ad0738c29769d7db1b129f6b135ea6a713b975223b3",
+    "../../account-fee-distribution/solidity/vendor/@aragon/os/contracts/lib/math/SafeMath.sol": "ff141c591b220f5c9973f0bcbd5bad55f6121491aa490186e987c1ef0c9b7bae",
+    "../../account-fee-distribution/solidity/vendor/@aragon/os/contracts/lib/token/ERC20.sol": "1db31dfde01bcdf4c253010a0a46491a7a8ab698d20e8bdd5bc12cc743deec7d",
+    "../../account-fee-distribution/solidity/vendor/contracts/0.4.24/StETH.sol": "63ebed0e205b602fe2e427bb09c111479f98253bd02f96ac052b38202d3713bd",
+    "../../account-fee-distribution/solidity/vendor/contracts/0.4.24/utils/Pausable.sol": "ae1be0a85b0171321429ad1079908c2bf89eb9551ee56bbded51f8b2cc0d1c36",
+    "../../account-fee-distribution/solidity/vendor/contracts/0.4.24/utils/UnstructuredStorageExt.sol": "11dbb51c4885d38eee1fdd632a45f79223647785ee80c0877a1d7123d7a3aea6",
+    "../../account-fee-distribution/solidity/vendor/contracts/common/lib/Math256.sol": "028e9b0c87fea3ec6fd5aac9e7a5724a18b4a175d5ab70159f24428dd28ea6b6",
+    "../../account-fee-distribution/solidity/vendor/openzeppelin-solidity/contracts/token/ERC20/IERC20.sol": "103f9ae7c0715bb0e07f1258958a2c34e78800d49c877c0082fef0763ce1a576",
+    "src/StethHarness.sol": "46f207a42695bb790792fdad461d6d7422a9a4fa2359f70bb5606e06a5882d3d",
+    "src/DistributionHarness.sol": "82d6ba4dc40e3e7f6d658e10404a5fcad1b37aa6e40489f3d26e1e9f1abe07fd",
+    "test/TreasuryCall.t.sol": "0bebc0e3258fb267c89c180601c62af338cdf39fd7e83fb59778743b49f2b0af"
+  },
+  "compiled": {
+    "StethHarness": {
+      "compiler": {
+        "version": "0.4.24+commit.e67f0147"
+      },
+      "settings": {
+        "remappings": [
+          "@aragon/os/=../../account-fee-distribution/solidity/vendor/@aragon/os/",
+          "contracts/=../../account-fee-distribution/solidity/vendor/contracts/",
+          "openzeppelin-solidity/=../../account-fee-distribution/solidity/vendor/openzeppelin-solidity/"
+        ],
+        "optimizer": {
+          "enabled": true,
+          "runs": 200
+        },
+        "compilationTarget": {
+          "src/StethHarness.sol": "StethHarness"
+        },
+        "evmVersion": "byzantium",
+        "libraries": {}
+      },
+      "artifact_sha256": "34f1df2e074b9b1de1306ae7e647537bfeef8b6c0af617c3b679ee45eb0a8533"
+    },
+    "DistributionHarness": {
+      "compiler": {
+        "version": "0.8.9+commit.e5eed63a"
+      },
+      "settings": {
+        "remappings": [
+          "@aragon/os/=../../account-fee-distribution/solidity/vendor/@aragon/os/",
+          "contracts/=../../account-fee-distribution/solidity/vendor/contracts/",
+          "openzeppelin-solidity/=../../account-fee-distribution/solidity/vendor/openzeppelin-solidity/"
+        ],
+        "optimizer": {
+          "enabled": true,
+          "runs": 200
+        },
+        "metadata": {
+          "bytecodeHash": "ipfs"
+        },
+        "compilationTarget": {
+          "src/DistributionHarness.sol": "DistributionHarness"
+        },
+        "evmVersion": "byzantium",
+        "libraries": {}
+      },
+      "artifact_sha256": "c7312fc030aa0d6c4487c7fe1c41ad008f56d17aff1537f7b0480faed2224b29"
+    },
+    "RawTreasury": {
+      "compiler": {
+        "version": "0.8.9+commit.e5eed63a"
+      },
+      "settings": {
+        "remappings": [
+          "@aragon/os/=../../account-fee-distribution/solidity/vendor/@aragon/os/",
+          "contracts/=../../account-fee-distribution/solidity/vendor/contracts/",
+          "openzeppelin-solidity/=../../account-fee-distribution/solidity/vendor/openzeppelin-solidity/"
+        ],
+        "optimizer": {
+          "enabled": true,
+          "runs": 200
+        },
+        "metadata": {
+          "bytecodeHash": "ipfs"
+        },
+        "compilationTarget": {
+          "test/TreasuryCall.t.sol": "RawTreasury"
+        },
+        "evmVersion": "byzantium",
+        "libraries": {}
+      },
+      "artifact_sha256": "8b066f2dfff8e65197d69f28c1f46618624db35b0edaaf869c836be6ea81f8c7"
+    },
+    "TreasuryCallTest": {
+      "compiler": {
+        "version": "0.8.9+commit.e5eed63a"
+      },
+      "settings": {
+        "remappings": [
+          "@aragon/os/=../../account-fee-distribution/solidity/vendor/@aragon/os/",
+          "contracts/=../../account-fee-distribution/solidity/vendor/contracts/",
+          "openzeppelin-solidity/=../../account-fee-distribution/solidity/vendor/openzeppelin-solidity/"
+        ],
+        "optimizer": {
+          "enabled": true,
+          "runs": 200
+        },
+        "metadata": {
+          "bytecodeHash": "ipfs"
+        },
+        "compilationTarget": {
+          "test/TreasuryCall.t.sol": "TreasuryCallTest"
+        },
+        "evmVersion": "byzantium",
+        "libraries": {}
+      },
+      "artifact_sha256": "f9142d10e4e1aaa2e20ec4820ecb06156637e3ac6027dc6d1439d282fa9a206b"
+    }
+  },
+  "assembly_sha256": "857ec4b5adfada15315d0aeda8f0688479358894fce31194a0f64680c051b250",
+  "scope": "Actual exact Accounting distribution fragment, unchanged inherited StETH/setup fixture; real STATICCALL caller/selector/post-module effects, arbitrary return bytes/ABI/revert/readonly guards. Not full Accounting deployment or compiled report/mint equivalence; no-code test credits rejection/rollback, not intercepted revert bytes."
+}

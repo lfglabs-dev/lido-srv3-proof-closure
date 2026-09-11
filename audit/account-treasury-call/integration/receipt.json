@@ -1,0 +1,39 @@
+{
+  "source": "a7ea281e72298cc09239ed8a5e94f92eae2d03ce",
+  "main_base": "10e2b693d00cbbeab65f60cd8964ced87297336a",
+  "union": "0e9116c415e687dd9b322549bfdcbe88fa86500d",
+  "AllTrust": {
+    "command": "lake build LidoSRv3.Audit.AllGuarantees LidoSRv3.Audit.Trust",
+    "exit": 0,
+    "jobs": 1716
+  },
+  "trust": {
+    "command": "python3 scripts/check_trust_axioms.py",
+    "exit": 0,
+    "exact_axioms": 29,
+    "dependencies_recomputed": true,
+    "native_claims_reevaluated": true
+  },
+  "identities": {
+    "sources": 37,
+    "pins": 11,
+    "artifact_hashes": 28,
+    "scoped_axioms": 18,
+    "normal_olean_sha256": {
+      "TreasuryCall": "e120bdeb428f9f35a0eaf6f0b4707bc42fbd118d314136d4fa705161791cba5b",
+      "ReportFeeTreasuryCall": "8e39ee0172f3d72b90cadbf51d21a5f1b924c80a660890f048ad6cc488641d81",
+      "Tests/Verity/ReportFeeTreasuryCallTest": "0c86ccbc2ca56751350ccb1ac953425fd2b596ad107803c03ae33d948cde6c33",
+      "LidoSRv3/Audit/Guarantees/PAccount1TreasuryCall": "a67c6903a1987918761213bf6b8381a09b815c1a213fc758554d5a2f86c9801d"
+    }
+  },
+  "fresh_root_solidity_tests": 0,
+  "reused_reviewed_solidity_tests": 9,
+  "sha256": {
+    "audit/account-treasury-call/integration/README.md": "33f8dcbc1191d1f44679aad3880b4c263f8bdf475ad8aa4b3c27dd956b4b011c",
+    "audit/account-treasury-call/integration/all-trust-build.log": "2a4162b7c56dacd4e769ae7ac734f724dd3e671d4426d2aaf20ec57384583203",
+    "audit/account-treasury-call/integration/identities.json": "c21d91aca5582394111950fcdb8f1cf0066f2a83e950dc45281288562b6622e1",
+    "audit/account-treasury-call/integration/independent-source-review-a7ea.md": "5722b6ac4dc2bc9c2e7c900ebd248e5554e6feafd96a3d1656754dc37387ba89",
+    "audit/account-treasury-call/integration/scoped-axioms.json": "6008fd0efc25e95fa869de1a9e7edc4e2c3eae74edb5d35cdedee23beae728b1",
+    "audit/account-treasury-call/integration/trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439"
+  }
+}
