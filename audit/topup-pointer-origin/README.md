@@ -9,6 +9,7 @@ Trust, or import-DAG file is edited. Integration is a later agent’s job.
 | --- | --- |
 | Campaign base `origin/main` | `e9d6288ae84ba4191a8c705a85220b35cc44e7ca` |
 | Work-branch parent (lot a/b) | `b9182478fcc7385a6a2579d615315cf172a1f6cd` |
+| Head-in-raw-zone lot | `3ce4b37be1f2cbf1e1dbb1d16c471c9e81d4b393` |
 | Pinned Solidity `lidofinance/core` | `17005714f151e5502c559932319a3f2f74ac2436` |
 | Lean toolchain | `leanprover/lean4:v4.31.0` |
 | Verity pin (`lakefile.lean`) | `e977aaad6e1a9e92e0132d41b3d33a14135a4d46` |
