@@ -1,0 +1,35 @@
+{
+  "scope": "Final targeted source/public/tests and current normal artifacts; inherited cached sources verified by validate.py. No whole dependency rebuild claim.",
+  "entries": [
+    {
+      "source": "LidoSRv3/Audit/Source/DepositDsmCall.lean",
+      "source_sha256": "c87186dd4c675e0de6c0ffad170ce3dbe6cf32003265820719bba077a7fb9835",
+      "artifacts": {
+        ".olean": "b76de0949a7d9fbcbf90175abbc3156e861959c0c9f54d17c3613dea4ded6969",
+        ".ilean": "f85b7f21c2b52515d4d7337b00dd2e89b951e077903905ff5a6eac2a6796ef5c",
+        ".trace": "9d8703a8adf94a0560ef723e6f5152c1464ce81a8c37de1ed6eafe99b1e9ac75",
+        "setup": "476fa8c41518831ace6a8ef32610e5e0c56946cbf4ff2c1252187dcf4b429d63"
+      }
+    },
+    {
+      "source": "LidoSRv3/Audit/Guarantees/PDeposit1DsmCall.lean",
+      "source_sha256": "83029bac1e8a06113a2bad2b24b4b326de099b3e66978c8c1683ebb40a45e577",
+      "artifacts": {
+        ".olean": "b3872603d197114371c0c3e16b08cd9bcc7193c5d01488f3253620dfda4f2a75",
+        ".ilean": "3b5c0c9c68e83769ddf9e7d0fe8f1749fd0fc5d23828bc8f0e5dd07b4ddf5fe8",
+        ".trace": "edf11117528a2da1668e2bfed5c0da9e00999ffdc877302d60bd43875040f80b",
+        "setup": "6704f58fabcfc393477dc5cf77ea9c4a86d525bf5cd1cbeabb1a725d774536ba"
+      }
+    },
+    {
+      "source": "LidoSRv3/Tests/DepositDsmCall.lean",
+      "source_sha256": "9e34ad950e2616ced7ab9fcf0331f55540df3ec0142f2692e16df67d5172f8a0",
+      "artifacts": {
+        ".olean": "ef51cd76115955dc450c0b0a7575ef236ec51a5da823f416108b70e413bdd229",
+        ".ilean": "8023ffc0486465129e25394af6850497e490a00cbb5acd83cad1855ed9192ee2",
+        ".trace": "a9b262756027bf92cfe110c283df7d7ac9308a62ad554b78048fcb507b0d7ba9",
+        "setup": "868062f6a4841a8ca86bd3b6b85cab7bab4765326ac90685cf0d976ff06e1d3a"
+      }
+    }
+  ]
+}
