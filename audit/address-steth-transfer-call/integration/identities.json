@@ -1,0 +1,12 @@
+{
+  "source_commit": "f1d91e3a8ad9829e92ab2e8ff443e391449a36bc",
+  "sources": 1263,
+  "pins": 11,
+  "artifact_hashes": 45,
+  "scoped_axioms": 13,
+  "normal_olean_sha256": {
+    "LidoSRv3/Audit/Guarantees/PAddress1StETHTransferCalls.lean": "1497c6eb2cd0f03c0620e15f0a50b9e4174a3cbafbe17038f5424d6297d594ea",
+    "LidoSRv3/Audit/Source/AddressStETHTransferCalls.lean": "82028c2a960a28f5cf49c2fece43bad9fe58fbd81f2506aee3dde407df453e64",
+    "LidoSRv3/Tests/AddressStETHTransferCalls.lean": "f7040753d0279b6be15fbbfc8a9dae44cdbe30e708ec06f31aff4234f0b80ab1"
+  }
+}

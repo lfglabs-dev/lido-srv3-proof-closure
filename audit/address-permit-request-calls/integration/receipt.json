@@ -1,0 +1,22 @@
+{
+  "source": "6e87eb6e7d6465936d3fab76c3fc7fab5ec51194",
+  "main": "ece595799ac83a3b35e1ab1e620dbf01ae67812b",
+  "union": "6ca10c3de0e67ea90b7c115d711f077a1239d2e4",
+  "build_union": "7be1bdf7f5977a58579cf9aeb4c6d4dc7bccaf8f",
+  "jobs": 1757,
+  "global_axioms": 29,
+  "ordinary_scopes": 9,
+  "source_hashes": 50,
+  "sha256": {
+    "audit/address-permit-request-calls/integration/README.md": "823e9cdc169d8ebdffd299d5753d73f5a226864600b8e756de08f4bf7dfa6cdb",
+    "audit/address-permit-request-calls/integration/all-trust-build.log": "9509b57a37f2b60fd93f548e7f1cce15ac559e672e03f73f3791fd9f536ed7ae",
+    "audit/address-permit-request-calls/integration/identities.json": "1a4d6350ec45f0007b2278f4c85bc11ccf7d81138083229012405cc3c46bcfc5",
+    "audit/address-permit-request-calls/integration/identity-check.log": "50af3bff3a2c7132f628f0832115fec0051a55c37ffcb9bce6c7b0b8d477d04e",
+    "audit/address-permit-request-calls/integration/independent-source-review-6e87.md": "77b0f4cec0b81a5075cacbd450c806dd6bcdd61710642f0d4dc580f653a2c1fc",
+    "audit/address-permit-request-calls/integration/readonly-validator.py": "323e0a9bf2bdcf9a097cd3ee509ce78eb71f2150fd927af96f53c8086d8b0a34",
+    "audit/address-permit-request-calls/integration/scoped-axioms.json": "18467deb953fe96728cf6d062f70cb041ac2c4f7a9a4e83d62c801d3296d0d40",
+    "audit/address-permit-request-calls/integration/trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439",
+    "audit/address-permit-request-calls/integration/independent-integration-review-1382.md": "17bfec2b399420d2eb29a4a73bce0b0081c2124f5578b80f3c6c4a59cfb4bc3a"
+  },
+  "integration_review": "CLEAN exact1382ffae4373e610fbc5e150e7875fb906f88237; archive-only successor separately reviewed"
+}

@@ -1,0 +1,123 @@
+{
+  "LidoSRv3.Audit.Guarantees.PTopupRouterLocatorCall.actual_locator_timing_credential_root_module_failure_restores": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Guarantees.PTopupRouterLocatorCall.actual_locator_timing_credential_root_module_memory_history": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.TopupRouterLocatorCall.decode_fields": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.TopupRouterLocatorCall.failure_restores": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.TopupRouterLocatorCall.lookup_origin": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.TopupRouterLocatorCall.run_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterLocatorCall.allocation_before_head_and_canonical": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterLocatorCall.canonical_high_rejected": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterLocatorCall.canonical_zero_and_max": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterLocatorCall.count_before_timing_lookup": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterLocatorCall.forbidden_static_state_change": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterLocatorCall.full_success_overwrites_wrong_router": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterLocatorCall.full_transcript_and_cursor": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterLocatorCall.late_failure_journal": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterLocatorCall.lengths_before_timing_lookup": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterLocatorCall.lookup_bubbles_before_allocation": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterLocatorCall.nonempty_zero_limits_no_history": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterLocatorCall.ordinary_nocode_empty_then_decoder": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterLocatorCall.positive_limits_zero_allocations_history": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterLocatorCall.public_consumer": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterLocatorCall.public_rollback": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterLocatorCall.request_exact": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterLocatorCall.second_allocation_consumes_next": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterLocatorCall.short_rejected": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterLocatorCall.timing_before_locator": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterLocatorCall.trailing_ignored": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupRouterLocatorCall.zero_router_reaches_physical_registration": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ]
+}

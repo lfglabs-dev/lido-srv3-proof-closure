@@ -1,0 +1,67 @@
+{
+  "LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_physical_steth_transfer_failure_restores": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_physical_steth_transfer_permit_batch": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressStETHTransferCalls.balanceSlot_keccak": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressStETHTransferCalls.call_effect": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressStETHTransferCalls.canonical_call": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressStETHTransferCalls.item_effect": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressStETHTransferCalls.move_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressStETHTransferCalls.program_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressStETHTransferCalls.reply_not_trace": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressStETHTransferCalls.reply_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressStETHTransferCalls.token_effect": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.AddressStETHTransferCalls.public_empty_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.AddressStETHTransferCalls.public_paused_rollback": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ]
+}

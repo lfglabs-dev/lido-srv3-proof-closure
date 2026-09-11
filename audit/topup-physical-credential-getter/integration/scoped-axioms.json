@@ -1,0 +1,96 @@
+{
+  "LidoSRv3.Audit.Guarantees.PTopupPhysicalCredentialGetter.actual_physical_credential_root_module_failure_restores": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Guarantees.PTopupPhysicalCredentialGetter.actual_physical_credential_root_module_memory_effects": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.TopupPhysicalCredentialGetter.body_success": [
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.TopupPhysicalCredentialGetter.dispatch_request": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.TopupPhysicalCredentialGetter.response_fields": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.TopupPhysicalCredentialGetter.selected_fields": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupPhysicalCredentialGetter.all_type_bytes_returned": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupPhysicalCredentialGetter.arbitrary_caller_allowed": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupPhysicalCredentialGetter.canonical_actual_dispatch": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupPhysicalCredentialGetter.full_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupPhysicalCredentialGetter.full_trace": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupPhysicalCredentialGetter.late_failure": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupPhysicalCredentialGetter.no_active_or_enum_guard": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupPhysicalCredentialGetter.nonzero_position_only": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupPhysicalCredentialGetter.physical_slots": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupPhysicalCredentialGetter.public_consumer": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupPhysicalCredentialGetter.short_head": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupPhysicalCredentialGetter.target_qualifies_storage": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupPhysicalCredentialGetter.trailing_calldata": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupPhysicalCredentialGetter.type_not02_rejected_by_gateway": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupPhysicalCredentialGetter.unknown_module": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupPhysicalCredentialGetter.unregistered_before_config": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupPhysicalCredentialGetter.unregistered_bubbles_before_decoder": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupPhysicalCredentialGetter.wrong_selector": [
+    "propext"
+  ]
+}
