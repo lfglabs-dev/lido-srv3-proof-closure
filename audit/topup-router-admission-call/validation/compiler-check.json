@@ -1,0 +1,187 @@
+{
+  "cached_sources": [
+    {
+      "cached_path": "/tmp/lido-ssz-proof-committed/lido-core/contracts/0.8.25/lib/BeaconChainDepositor.sol",
+      "path": "contracts/0.8.25/lib/BeaconChainDepositor.sol",
+      "sha256": "b4afeac2e4dab53d2b6d1cebcf41bfc670eb1ea069cb1d5bc0e07f1932bf9fe0"
+    },
+    {
+      "cached_path": "/tmp/lido-ssz-proof-committed/lido-core/contracts/0.8.25/sr/ISRBase.sol",
+      "path": "contracts/0.8.25/sr/ISRBase.sol",
+      "sha256": "63466ac2f70f94c6b1045c628a7b677975aad56b95d7b8634758e97bdbebeb64"
+    },
+    {
+      "cached_path": "/tmp/lido-ssz-proof-committed/lido-core/contracts/0.8.25/sr/SRLib.sol",
+      "path": "contracts/0.8.25/sr/SRLib.sol",
+      "sha256": "2a53ec2d183f3c3d8b6257f18dc7143e8afbc8d3d2f8a48bd0e5e0580b5b47ab"
+    },
+    {
+      "cached_path": "/tmp/lido-ssz-proof-committed/lido-core/contracts/0.8.25/sr/SRStorage.sol",
+      "path": "contracts/0.8.25/sr/SRStorage.sol",
+      "sha256": "62e922f76a1db7756684d73db3151a02f6d8f0de51fac27922f0a4095ceb9d95"
+    },
+    {
+      "cached_path": "/tmp/lido-ssz-proof-committed/lido-core/contracts/0.8.25/sr/SRTypes.sol",
+      "path": "contracts/0.8.25/sr/SRTypes.sol",
+      "sha256": "22c28be7ceaf6ed841f18fc19296372ab246b1cfecc87902d49ee1670ed4aed6"
+    },
+    {
+      "cached_path": "/tmp/lido-ssz-proof-committed/lido-core/contracts/0.8.25/sr/SRUtils.sol",
+      "path": "contracts/0.8.25/sr/SRUtils.sol",
+      "sha256": "1f59e455e510e5eb9c19bdf64dd7357c3e4a8c445c5baaa2f3691ecb7115d295"
+    },
+    {
+      "cached_path": "/tmp/lido-ssz-proof-committed/lido-core/contracts/0.8.25/sr/StakingRouter.sol",
+      "path": "contracts/0.8.25/sr/StakingRouter.sol",
+      "sha256": "4d5b83fc73736db6755ebbb58811ed499c3e6de622cce11a3ad8548800a34155"
+    },
+    {
+      "cached_path": "/tmp/lido-ssz-proof-committed/lido-core/contracts/common/interfaces/ILidoLocator.sol",
+      "path": "contracts/common/interfaces/ILidoLocator.sol",
+      "sha256": "cc65faee8789012cbb58c0073c770bddb37c9a7fc2594ff2e200fc7894a2dc7a"
+    },
+    {
+      "cached_path": "/tmp/lido-ssz-proof-committed/lido-core/contracts/common/interfaces/IStakingModule.sol",
+      "path": "contracts/common/interfaces/IStakingModule.sol",
+      "sha256": "4a98e89e763d19b45cb1ea422cec1c554fbd43c9f39c6bcc7a18aad64d46e193"
+    },
+    {
+      "cached_path": "/tmp/lido-ssz-proof-committed/lido-core/contracts/common/interfaces/IStakingModuleV2.sol",
+      "path": "contracts/common/interfaces/IStakingModuleV2.sol",
+      "sha256": "eacc19c668dd2ad94c7c0cffc5957181b8bf1ed2321c14c34c9845ea054a64ce"
+    },
+    {
+      "cached_path": "/tmp/lido-ssz-proof-committed/lido-core/contracts/common/lib/Math256.sol",
+      "path": "contracts/common/lib/Math256.sol",
+      "sha256": "028e9b0c87fea3ec6fd5aac9e7a5724a18b4a175d5ab70159f24428dd28ea6b6"
+    },
+    {
+      "cached_path": "/tmp/lido-ssz-proof-committed/lido-core/contracts/common/lib/MemUtils.sol",
+      "path": "contracts/common/lib/MemUtils.sol",
+      "sha256": "dc4f389cfd1ae1b4dd5fe908432159103544ece1ca9f694093f64def5db7acca"
+    },
+    {
+      "cached_path": "/tmp/lido-ssz-proof-committed/lido-core/contracts/common/lib/MinFirstAllocationStrategy.sol",
+      "path": "contracts/common/lib/MinFirstAllocationStrategy.sol",
+      "sha256": "90aae2101a74b1aec03470da771f673dc4310ae415e31391d81c589403166b9c"
+    },
+    {
+      "cached_path": "/tmp/lido-ssz-proof-committed/lido-core/contracts/common/lib/WithdrawalCredentials.sol",
+      "path": "contracts/common/lib/WithdrawalCredentials.sol",
+      "sha256": "cf5e77be0c5d522d853d19a4c5284e53fa0fb149a9902f77648a8f6d5584636c"
+    },
+    {
+      "cached_path": "/tmp/lido-ssz-proof-committed/lido-core/contracts/openzeppelin/5.2/upgradeable/access/AccessControlUpgradeable.sol",
+      "path": "contracts/openzeppelin/5.2/upgradeable/access/AccessControlUpgradeable.sol",
+      "sha256": "d32578f73ad0a24f65d8208033226cc5567a9df2a57fabadf644f6e4e7f172a4"
+    },
+    {
+      "cached_path": "/tmp/lido-ssz-proof-committed/lido-core/contracts/openzeppelin/5.2/upgradeable/access/extensions/AccessControlEnumerableUpgradeable.sol",
+      "path": "contracts/openzeppelin/5.2/upgradeable/access/extensions/AccessControlEnumerableUpgradeable.sol",
+      "sha256": "b6b854fdb69cfe58d7494f6cfc1920a68b504c32e97f6028b6d62a844bc17426"
+    },
+    {
+      "cached_path": "/tmp/lido-ssz-proof-committed/lido-core/contracts/openzeppelin/5.2/upgradeable/proxy/utils/Initializable.sol",
+      "path": "contracts/openzeppelin/5.2/upgradeable/proxy/utils/Initializable.sol",
+      "sha256": "a8b7eafa0fdc7cb5a644c8c61a8e4c51e031d5e1e6f268f72dbe18b768ead56e"
+    },
+    {
+      "cached_path": "/tmp/lido-ssz-proof-committed/lido-core/contracts/openzeppelin/5.2/upgradeable/utils/ContextUpgradeable.sol",
+      "path": "contracts/openzeppelin/5.2/upgradeable/utils/ContextUpgradeable.sol",
+      "sha256": "a08e16324da33a9d666dc07a22ae58031c242a3869f6808e55b4b82fc70cb209"
+    },
+    {
+      "cached_path": "/tmp/lido-ssz-proof-committed/lido-core/contracts/openzeppelin/5.2/upgradeable/utils/introspection/ERC165Upgradeable.sol",
+      "path": "contracts/openzeppelin/5.2/upgradeable/utils/introspection/ERC165Upgradeable.sol",
+      "sha256": "76f4b4b6f5d8de71b0b29d90f2b277b88b2c45898340b20b278b9e9ed5074f77"
+    },
+    {
+      "cached_path": "/tmp/lido-topup-wei-deps/package/access/IAccessControl.sol",
+      "path": "@openzeppelin/contracts-v5.2/access/IAccessControl.sol",
+      "sha256": "c112f5c86fdc4e862f88d4f5694530342320923ebd5b5e7d9d8493550d337c2d"
+    },
+    {
+      "cached_path": "/tmp/lido-topup-wei-deps/package/access/extensions/IAccessControlEnumerable.sol",
+      "path": "@openzeppelin/contracts-v5.2/access/extensions/IAccessControlEnumerable.sol",
+      "sha256": "f91dc4b5750c1bac7a6a11a6057f14f01121847e6a6284e1200d8a87a4c4ff1e"
+    },
+    {
+      "cached_path": "/tmp/lido-topup-wei-deps/package/utils/Panic.sol",
+      "path": "@openzeppelin/contracts-v5.2/utils/Panic.sol",
+      "sha256": "270fc8401c1a13fae6a7a4a2dd6e381b95d658896701e51f0d3e2688acab3dec"
+    },
+    {
+      "cached_path": "/tmp/lido-topup-wei-deps/package/utils/StorageSlot.sol",
+      "path": "@openzeppelin/contracts-v5.2/utils/StorageSlot.sol",
+      "sha256": "75704538dcb223239280c6726d9a31cf769a7816718517c997fc7d63bdb70778"
+    },
+    {
+      "cached_path": "/tmp/lido-topup-wei-deps/package/utils/introspection/IERC165.sol",
+      "path": "@openzeppelin/contracts-v5.2/utils/introspection/IERC165.sol",
+      "sha256": "7c5c3f98ab876991e7dd34b84d41137e836306eb9f36f6386a631f5be3f5d6d4"
+    },
+    {
+      "cached_path": "/tmp/lido-topup-wei-deps/package/utils/math/Math.sol",
+      "path": "@openzeppelin/contracts-v5.2/utils/math/Math.sol",
+      "sha256": "68cf79a637995d5ed243c4a5856b42a5e134ee8786a05034e24d75927fc40ebc"
+    },
+    {
+      "cached_path": "/tmp/lido-topup-wei-deps/package/utils/math/SafeCast.sol",
+      "path": "@openzeppelin/contracts-v5.2/utils/math/SafeCast.sol",
+      "sha256": "9769274bf53f26a7c7896c526ea1980dc9bea5bf5c2a5fd04870008c4afc1de9"
+    },
+    {
+      "cached_path": "/tmp/lido-topup-wei-deps/package/utils/structs/EnumerableSet.sol",
+      "path": "@openzeppelin/contracts-v5.2/utils/structs/EnumerableSet.sol",
+      "sha256": "ed0804f9dcff9d2dceba8cc83f31669a84491dfcfe510050c9371aa7c48db09c"
+    },
+    {
+      "cached_path": "audit/topup-batch-consumer/solidity/TopupBatchConsumer.t.sol",
+      "path": "audit/topup-batch-consumer/solidity/TopupBatchConsumer.t.sol",
+      "sha256": "0c3f42e784be4363182206ac098f5d12a57e74e2e2fea8e7c45b91936c6133f4"
+    }
+  ],
+  "fresh_artifacts": [
+    {
+      "name": "AdmissionEndpoint",
+      "sha256": "ad4695d9cbd3e5cb51166db4ae0e3c784664ee195db3caf53485c752e3c3ec36",
+      "source_count": 29
+    },
+    {
+      "name": "BatchModule",
+      "sha256": "77faeaca50004a494a11016175f8213b4c1b6e9329364ffe353b1ffbaf4fc786",
+      "source_count": 28
+    },
+    {
+      "name": "BatchRouter",
+      "sha256": "670660c0d6c407b37cf7093a4dd2325a95e6f44df138f3cec3c0b10bd4b4ddb6",
+      "source_count": 28
+    },
+    {
+      "name": "StakingRouter",
+      "sha256": "08f2ea29d2549eceb3d29b7831771d01af6f431ab80adedecc1a89b93abb51d7",
+      "source_count": 27
+    },
+    {
+      "name": "TopupRouterAdmissionCallTest",
+      "sha256": "58d244c3bda65b8cc9f166e9d2cd055038b06c1fe4b95c1e64816c82328f246f",
+      "source_count": 29
+    }
+  ],
+  "ir_lines": 5046,
+  "ir_sha256": "d6524cf4acee60c821188ea342b9f06412825c0840b45e2317afbfd283b390cf",
+  "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "scope": "28 cached full input identities reused from accepted no-code packet; 29 fresh Forge sources and five metadata-checked artifacts; complete fresh router/callee fixture IR; no cached/fresh bytecode identity claim.",
+  "selectors": {
+    "ArraysLengthMismatch()": "fc235960",
+    "EmptyKeysList()": "c4d88632",
+    "LidoDepositsPaused()": "5609c247",
+    "NotAuthorized()": "ea8e4eb5",
+    "StakingModuleNotActive()": "645cc9f6",
+    "StakingModuleUnregistered()": "d41d6282",
+    "WrongPubkeyLength()": "500585ad",
+    "WrongWithdrawalCredentialsType()": "2e5c948c",
+    "canDeposit()": "e78a5875",
+    "topUpGateway()": "644862de"
+  }
+}

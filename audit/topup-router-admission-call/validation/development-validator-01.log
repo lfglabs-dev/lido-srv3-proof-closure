@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/private/tmp/lido-topup-router-admission-call/audit/topup-router-admission-call/validation/validate.py", line 72, in <module>
+    assert output['contracts'][oldkey]['BatchRouter']['irOptimized']+'\n'==(ROOT/'audit/topup-module-nocode/router-ir.txt').read_text()
+AssertionError
