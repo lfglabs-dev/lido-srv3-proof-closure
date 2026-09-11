@@ -1,0 +1,5 @@
+COMMAND git diff --cached --check
+EXIT 2
+audit/address-steth-quote-call/BatchHarness.asm:13650: new blank line at EOF.
+audit/address-steth-quote-call/Lido.asm:16951: new blank line at EOF.
+audit/address-steth-quote-call/QuoteHarness.asm:16353: new blank line at EOF.
