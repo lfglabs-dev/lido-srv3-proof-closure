@@ -1,0 +1,82 @@
+{
+  "AccountAddress.ReportFeeTreasuryCall.distribute_success": [
+    "Quot.sound",
+    "propext"
+  ],
+  "AccountAddress.ReportFeeTreasuryCall.execute_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "AccountAddress.ReportFeeTreasuryCall.failure_restores": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "AccountAddress.TreasuryCall.call_success": [
+    "Quot.sound",
+    "propext"
+  ],
+  "AccountTreasuryCallRegression.actual_call_and_payment": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "AccountTreasuryCallRegression.decoded_zero_then_transfer_guard": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "AccountTreasuryCallRegression.malformed_address": [
+    "propext"
+  ],
+  "AccountTreasuryCallRegression.malformed_after_modules_rolls_back": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "AccountTreasuryCallRegression.no_code_before_external": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "AccountTreasuryCallRegression.public_consumer": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "AccountTreasuryCallRegression.revert_bytes_bubble": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "AccountTreasuryCallRegression.short_return": [
+    "propext"
+  ],
+  "AccountTreasuryCallRegression.static_write_rejects": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "AccountTreasuryCallRegression.zero_address_decodes": [
+    "propext"
+  ],
+  "AccountTreasuryCallRegression.zero_mint_no_attempt": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "AccountTreasuryCallRegression.zero_treasury_no_attempt": [
+    "propext"
+  ],
+  "LidoSRv3.Audit.Guarantees.PAccount1.actual_report_fee_mint_treasury_call": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Guarantees.PAccount1.actual_report_treasury_failure_restores": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ]
+}

@@ -1,4 +1,5 @@
 import Tests.Verity.ReportFeeDistributionTest
+import Tests.Verity.ReportFeeTreasuryCallTest
 import audit.trio.deposit.Tests.Verity.ModulePhysicalMetadataTest
 import LidoSRv3.Tests.ConsolidationSettlementRequestsRegression
 import Tests.Verity.ReportFeeCheckedSplitTest
@@ -734,3 +735,8 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PTopupMemoryCalls.actual_root_module_memory_failure_restores
 #print axioms LidoSRv3.Audit.Source.TopupModuleMemory.raw_bounds
 #print axioms LidoSRv3.Audit.Source.TopupModuleMemory.decode_success
+
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1.actual_report_fee_mint_treasury_call
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1.actual_report_treasury_failure_restores
+#print axioms AccountAddress.TreasuryCall.call_success
+#print axioms AccountAddress.ReportFeeTreasuryCall.distribute_success
