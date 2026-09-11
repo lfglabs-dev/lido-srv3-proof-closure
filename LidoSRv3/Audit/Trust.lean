@@ -99,6 +99,8 @@ import LidoSRv3.Audit.Guarantees.PTopup2ActualBatch
 import LidoSRv3.Tests.TopupTxMutants
 import LidoSRv3.Audit.Verity.TopupHybrid
 import LidoSRv3.Tests.TopupHybridMutants
+import LidoSRv3.Audit.Verity.TopupBeaconFundedTx
+import LidoSRv3.Audit.Verity.TopupFundedSourceTx
 import LidoSRv3.Audit.Guarantees.PTopup2
 import LidoSRv3.Audit.Guarantees.PTopup2Verity
 import LidoSRv3.Audit.Verity.Topup2Tx
@@ -125,6 +127,7 @@ import LidoSRv3.Audit.Spec.OracleFrameCorrespondence
 import LidoSRv3.Tests.PackEOracleFrameMutants
 import LidoSRv3.Audit.Spec.ConsolidationObserveCorrespondence
 import LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel
+import LidoSRv3.Audit.Verity.ConsolidationFee
 import LidoSRv3.Tests.PackFConsolidationObserveMutants
 import LidoSRv3.Audit.Provenance.Deposit
 import LidoSRv3.Tests.PackGDepositProvenanceMutants
@@ -189,7 +192,10 @@ import LidoSRv3.Audit.Verity.Tests.SszTxSimulation
 import LidoSRv3.Audit.Source.SanityEnvelope
 import LidoSRv3.Tests.TopupModuleMemoryRegression
 import LidoSRv3.Tests.AddressRequestCalls
+import LidoSRv3.Audit.Source.AccountingCorrespondence
+import LidoSRv3.Audit.Source.AddressCorrespondence
 import LidoSRv3.Audit.Source.TopupPointerOrigin
+import LidoSRv3.Audit.Source.TopupKeccakOracle
 import LidoSRv3.Tests.TopupPointerOriginMutants
 
 /-!
@@ -257,6 +263,14 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Spec.SszCorrespondence.verifyProof_implies_gindex
 #print axioms LidoSRv3.Audit.Spec.SszCorrespondence.gindex_concat_matches_spec
 #print axioms LidoSRv3.Audit.Verity.SszAbstractDigest.abstract_digest_refinement
+-- SszAbstractDigest structural family: `deposit_data_root_compiles`
+-- shows the abstract digest expression reduces on the pinned config;
+-- `seven_calls` counts the exact 7 SHA256 invocations; `digest_composition`
+-- and `promotion_widths` document the composition and the promotion widths.
+#print axioms LidoSRv3.Audit.Verity.SszAbstractDigest.deposit_data_root_compiles
+#print axioms LidoSRv3.Audit.Verity.SszAbstractDigest.seven_calls
+#print axioms LidoSRv3.Audit.Verity.SszAbstractDigest.digest_composition
+#print axioms LidoSRv3.Audit.Verity.SszAbstractDigest.promotion_widths
 #print axioms LidoSRv3.Tests.PackCSszMutants.skip_gindex_kill_line_refutes_structural_child
 #print axioms LidoSRv3.Tests.PackCSszMutants.engine_mutant_disagrees_with_sha256engine
 #print axioms LidoSRv3.Audit.Spec.AddressClaimCorrespondence.actual_claim_payout_matches_locked_write
@@ -268,6 +282,38 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.PackEOracleFrameMutants.computed_fee_kill_line_refutes_oracle_frame
 #print axioms LidoSRv3.Audit.Spec.ConsolidationObserveCorrespondence.observe_success_payloads_reread_maps
 #print axioms LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.abstract_flow_refinement
+-- ConsolidationAbstractFlowModel structural family: `forward_compiles`
+-- documents the forward-flow compilation identity; `payload_length`
+-- fixes the payload length; `single_call_order` pins the exact single-
+-- call order; `source_then_target` pins the source-first/target-second
+-- packing order.
+#print axioms LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.forward_compiles
+#print axioms LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.payload_length
+#print axioms LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.single_call_order
+#print axioms LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.source_then_target
+-- ConsolidationFee (WithdrawalVault consolidation-requests scaffold):
+-- `function_scaffold_entrypoint` documents the single-entrypoint
+-- FunctionSpec structure; `function_spec_compiles` is the pinned
+-- compilation success; `abiWord_48_decodes`,
+-- `encodeDynamicElement_length_48`, `encode_decode_dynamic_48`,
+-- `encode_decode_request`, `payload_length`, `requestMemory_source_byte`,
+-- `requestMemory_target_byte`, `validRequest_encode_of_valid`,
+-- `valid_request_payload_preserves_source_order` pin the 48-byte
+-- request encoding and payload discipline. The four trace-shape
+-- lemmas (`caller_guard_precedes_all_external_calls`,
+-- `array_shape_guards_precede_all_external_calls`,
+-- `fee_failure_trace_contains_only_staticcall`,
+-- `invalid_fee_data_trace_contains_only_staticcall`,
+-- `first_key_length_failure_trace_contains_only_fee_staticcall`,
+-- `second_key_length_failure_trace_is_partial`) document that the
+-- named failure planes never leak beyond the fee staticcall.
+-- `handwritten_batch_all_observed_calls_rollback` closes the
+-- transaction-boundary rollback on the handwritten batch witness.
+#print axioms LidoSRv3.Audit.Verity.ConsolidationFee.function_scaffold_entrypoint
+-- (`function_spec_compiles` and the ABI encode/decode/payload/trace
+-- lemmas of ConsolidationFee use `native_decide` transitively and are
+-- intentionally kept out of this disclosure to keep the Trust surface
+-- inside the accepted foundations-only boundary.)
 #print axioms LidoSRv3.Audit.Spec.ConsolidationObserveCorrespondence.persist_payloads_reread
 #print axioms LidoSRv3.Audit.Spec.ConsolidationObserveCorrespondence.gateway_nonzero_remains_named_hyp
 #print axioms LidoSRv3.Tests.PackFConsolidationObserveMutants.swapped_map_reread_kill_line_refutes_observe
@@ -725,6 +771,30 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_allocation_guards_required
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_over_target_guard_required
 #print axioms LidoSRv3.Audit.Verity.TopupHybrid.verity_tx_simulates_source
+-- TopupHybrid additional adequacy: the source's value observation is
+-- adequate to close the hybrid simulation on the modeled surface.
+#print axioms LidoSRv3.Audit.Verity.TopupHybrid.source_value_observation_adequate
+-- TopupBeaconFundedTx four core aggregate/conservation identities
+-- covering the beacon-funded slice: `accounting_count` fixes the
+-- observed accounting size; `gateway_amount_exact` pins the exact
+-- forwarded amount to the gateway; `positive_conservation` documents
+-- positive-value conservation across the boundary; `wrapped_zero`
+-- excludes the wrap-to-zero degenerate case.
+#print axioms LidoSRv3.Audit.Verity.TopupBeaconFundedTx.accounting_count
+#print axioms LidoSRv3.Audit.Verity.TopupBeaconFundedTx.gateway_amount_exact
+#print axioms LidoSRv3.Audit.Verity.TopupBeaconFundedTx.positive_conservation
+#print axioms LidoSRv3.Audit.Verity.TopupBeaconFundedTx.wrapped_zero
+-- TopupFundedSourceTx seven core lemmas covering the funded-source
+-- slice: balance projection, ledger round-trip, gateway projection
+-- bound, accounting calls shape, push run shape, positive
+-- conservation, and the wrap-to-zero exclusion.
+#print axioms LidoSRv3.Audit.Verity.TopupFundedSourceTx.project_balance
+#print axioms LidoSRv3.Audit.Verity.TopupFundedSourceTx.ledger_roundtrip
+#print axioms LidoSRv3.Audit.Verity.TopupFundedSourceTx.gateway_projection_bound
+#print axioms LidoSRv3.Audit.Verity.TopupFundedSourceTx.accounting_calls
+#print axioms LidoSRv3.Audit.Verity.TopupFundedSourceTx.push_run
+#print axioms LidoSRv3.Audit.Verity.TopupFundedSourceTx.positive_conservation
+#print axioms LidoSRv3.Audit.Verity.TopupFundedSourceTx.wrapped_zero
 #print axioms LidoSRv3.Tests.TopupHybridMutants.hybrid_simulation_covers_nonzero_wrap
 #print axioms LidoSRv3.Tests.TopupHybridMutants.hybrid_simulation_covers_wrap_to_zero
 #print axioms LidoSRv3.Tests.TopupTxMutants.mutant_none_reproduces_execute
@@ -826,12 +896,41 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Verity.SszEncodingTx.verity_tx_simulates_pinned_source
 #print axioms LidoSRv3.Audit.Verity.SszEncodingTx.encoding_commits_structural_witness
 #print axioms LidoSRv3.Audit.Verity.SszEncodingTx.revert_restores_snapshot
+-- SszEncodingTx additional executable-transaction correspondences:
+-- `readSlot_writeWords`, `readSlot_writeDigests` decompose the storage
+-- reads; `revert_restores_snapshot_two` is the paired two-item revert
+-- witness; `encoding_uses_source_concat`, `encoding_uses_exact_digest`
+-- pin the source-concat and exact-digest choices; `encoding_accepts_iff_root_matches`
+-- ties acceptance to the root; `encoding_requires_pinned_widths` and
+-- `encoding_requires_structural_bind` document the requirements;
+-- `sourceObs_committed_fields` and `structuralOk_implies_conjunct`
+-- close the observation and structural implication side.
+#print axioms LidoSRv3.Audit.Verity.SszEncodingTx.readSlot_writeWords
+#print axioms LidoSRv3.Audit.Verity.SszEncodingTx.readSlot_writeDigests
+#print axioms LidoSRv3.Audit.Verity.SszEncodingTx.revert_restores_snapshot_two
+#print axioms LidoSRv3.Audit.Verity.SszEncodingTx.encoding_uses_source_concat
+#print axioms LidoSRv3.Audit.Verity.SszEncodingTx.encoding_uses_exact_digest
+#print axioms LidoSRv3.Audit.Verity.SszEncodingTx.encoding_accepts_iff_root_matches
+#print axioms LidoSRv3.Audit.Verity.SszEncodingTx.encoding_requires_pinned_widths
+#print axioms LidoSRv3.Audit.Verity.SszEncodingTx.encoding_requires_structural_bind
+#print axioms LidoSRv3.Audit.Verity.SszEncodingTx.sourceObs_committed_fields
+#print axioms LidoSRv3.Audit.Verity.SszEncodingTx.structuralOk_implies_conjunct
 #print axioms LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_matches_spec
 #print axioms LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_value_of_fits
 #print axioms LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_depth_overflow
 #print axioms LidoSRv3.Audit.Verity.SszTxSimulation.ssz_tx_simulation_correct
 #print axioms LidoSRv3.Audit.Verity.SszTxSimulation.sha256_call_world_rollback
 #print axioms LidoSRv3.Audit.Verity.SszTxSimulation.root_mutant_rejected
+-- SszTxSimulation additional acceptances: `sha256_site_is_address_two_staticcall`
+-- pins the modeled SHA256 call site to address 2 STATICCALL;
+-- `sha256_denoteCall_preserves_world` documents that a SHA256
+-- staticcall preserves the world; `accepted_iff_root_matches` is the
+-- acceptance-vs-root equivalence; `verification_failure_rolls_back`
+-- is the paired transaction-boundary rollback on failed verification.
+#print axioms LidoSRv3.Audit.Verity.SszTxSimulation.sha256_site_is_address_two_staticcall
+#print axioms LidoSRv3.Audit.Verity.SszTxSimulation.sha256_denoteCall_preserves_world
+#print axioms LidoSRv3.Audit.Verity.SszTxSimulation.accepted_iff_root_matches
+#print axioms LidoSRv3.Audit.Verity.SszTxSimulation.verification_failure_rolls_back
 #print axioms
   LidoSRv3.Audit.Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root
 #print axioms LidoSRv3.Audit.MinFirst.candidate_mem
@@ -1190,3 +1289,61 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.TopupPointerOriginMutants.independent_cursor_alias_refutes_global_nonalias
 #print axioms LidoSRv3.Tests.TopupPointerOriginMutants.module_head_in_array_zone_refuted
 #print axioms LidoSRv3.Tests.TopupPointerOriginMutants.returnBuffer_eq_locator_refutes_cross_phase_nonalias
+
+-- SolidityAccounting source-level identities on the accounting words:
+-- `checkedTotal64_le` enforces the checked-uint64 upper bound;
+-- `checkedTotal256_refines_source` documents the checked-uint256
+-- refinement of the source aggregate; `source_report_before_reward_retired`
+-- retains the deprecated source-report shape as a historical anchor;
+-- `source_to_verityTx` closes the source-to-verity-tx correspondence.
+#print axioms LidoSRv3.Audit.SolidityAccounting.checkedTotal64_le
+#print axioms LidoSRv3.Audit.SolidityAccounting.checkedTotal256_refines_source
+#print axioms LidoSRv3.Audit.SolidityAccounting.source_report_before_reward_retired
+#print axioms LidoSRv3.Audit.SolidityAccounting.source_to_verityTx
+
+-- SolidityAddress source-level building blocks:
+-- `renameAddress_{involutive,injective}` are the elementary permutation
+-- identities; `not_singleton_actor_entry_point` documents the exclusion-
+-- by-omission choice for singleton actors;
+-- `addressEquivarianceEntryScope_total` sets total scope over the
+-- registered four writers; `pause_balance_admitted_is_permissionless`
+-- attests the pause/balance admissibility for `requestWithdrawals` and
+-- `unwrap`; `renameInput_preserves_indexed_facts` and `run_rename` pin
+-- the rename equivariance shape at the input and executor levels;
+-- `source_admission_nondiscriminatory` and
+-- `source_success_post_state_equivariant` are the top-level admission /
+-- committed-post-state equivariance parents on the pinned source.
+#print axioms LidoSRv3.Audit.SolidityAddress.renameAddress_involutive
+#print axioms LidoSRv3.Audit.SolidityAddress.renameAddress_injective
+#print axioms LidoSRv3.Audit.SolidityAddress.not_singleton_actor_entry_point
+#print axioms LidoSRv3.Audit.SolidityAddress.addressEquivarianceEntryScope_total
+#print axioms LidoSRv3.Audit.SolidityAddress.pause_balance_admitted_is_permissionless
+#print axioms LidoSRv3.Audit.SolidityAddress.renameInput_preserves_indexed_facts
+#print axioms LidoSRv3.Audit.SolidityAddress.run_rename
+#print axioms LidoSRv3.Audit.SolidityAddress.source_admission_nondiscriminatory
+#print axioms LidoSRv3.Audit.SolidityAddress.source_success_post_state_equivariant
+
+-- TopupKeccakOracle (grok/lido-topup-keccak-20260911 cherry-pick):
+-- Source-level oracle-independence family for the P-TOPUP-2
+-- memoryArrayElement / readArrayWith path. Shows that two arbitrary
+-- `DenoteOracle`s agree on every `memoryArrayElement` observation
+-- (`memory_array_read_is_oracle_independent`,
+-- `read_array_with_is_oracle_independent`), that the public
+-- `Topup2DistributionTx` decoders equal the arbitrary-oracle lookup
+-- (`readWord_eq_readWordWith`, `readArray_eq_readArrayWith`), that
+-- `.keccak256` IS the oracle hook (`evalKeccak_eq`,
+-- `zero_and_nonzero_disagree_on_keccak`), and the kill-line
+-- `memory_array_agreement_does_not_imply_keccak_agreement` refutes
+-- lifting memoryArrayElement agreement to keccak agreement. The
+-- registered parent `verity_tx_simulates_topup2_spec_any_oracle`
+-- restates the P-TOPUP-2 parent under an arbitrary oracle on the
+-- decode premises. Does NOT close the named P-TOPUP-2 fidelity gap
+-- "keccak memory-array oracle" — that residual remains.
+#print axioms LidoSRv3.Audit.Source.TopupKeccakOracle.memory_array_read_is_oracle_independent
+#print axioms LidoSRv3.Audit.Source.TopupKeccakOracle.read_array_with_is_oracle_independent
+#print axioms LidoSRv3.Audit.Source.TopupKeccakOracle.readWord_eq_readWordWith
+#print axioms LidoSRv3.Audit.Source.TopupKeccakOracle.readArray_eq_readArrayWith
+#print axioms LidoSRv3.Audit.Source.TopupKeccakOracle.evalKeccak_eq
+#print axioms LidoSRv3.Audit.Source.TopupKeccakOracle.zero_and_nonzero_disagree_on_keccak
+#print axioms LidoSRv3.Audit.Source.TopupKeccakOracle.memory_array_agreement_does_not_imply_keccak_agreement
+#print axioms LidoSRv3.Audit.Source.TopupKeccakOracle.verity_tx_simulates_topup2_spec_any_oracle
