@@ -1,0 +1,12 @@
+∃ u,
+      PhysicalQuotaSettlement.prepare ctx msgValue groups before = .ok (GatewaySettlement.requestCount groups) ∧
+      GatewaySettlement.requestCount groups < Verity.Core.UINT256_MODULUS ∧
+      PhysicalQuotaSettlement.transition (PhysicalQuotaSettlement.stored ctx.self before)
+        before.core.blockTimestamp.val (GatewaySettlement.requestCount groups) = .ok u ∧
+      PhysicalQuotaSettlement.QuotaEffects ctx.self before (GatewaySettlement.requestCount groups) u ∧
+      let afterQuota := PhysicalQuotaSettlement.postQuota ctx.self before u
+      PhysicalQuotaSettlement.execute callee sexternal ctx vault gateway inbox recipient msgValue groups before =
+        PhysicalQuotaSettlement.ofPrior (GatewaySettlement.requestCount groups) u
+          (GatewaySettlement.execute callee callee sexternal ctx vault gateway inbox recipient msgValue groups afterQuota) ∧
+      GatewaySettlement.Success callee callee sexternal ctx vault gateway inbox recipient msgValue groups afterQuota ∧
+      SettlementRequests.Effects callee sexternal ctx vault gateway inbox recipient msgValue groups afterQuota

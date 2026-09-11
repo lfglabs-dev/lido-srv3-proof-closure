@@ -1,0 +1,110 @@
+{
+  "LidoSRv3.Audit.Guarantees.PConsolidationEth1.actual_physical_entry_failure_restores": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Guarantees.PConsolidationEth1.actual_physical_entry_quota_settlement_requests": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TrioConsolidation.PhysicalEntrySettlement.actual_nonempty_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TrioConsolidation.PhysicalEntrySettlement.admitted_zero_value_reaches_old_guard": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TrioConsolidation.PhysicalEntrySettlement.balance_underflow_before_pause": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TrioConsolidation.PhysicalEntrySettlement.full_word_pause_after_balance": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TrioConsolidation.PhysicalEntrySettlement.high_bits_only_not_role": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TrioConsolidation.PhysicalEntrySettlement.late_refund_failure": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TrioConsolidation.PhysicalEntrySettlement.max_pause_at_max": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TrioConsolidation.PhysicalEntrySettlement.max_pause_before_max": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TrioConsolidation.PhysicalEntrySettlement.noncanonical_lowbyte_accepted": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TrioConsolidation.PhysicalEntrySettlement.pause_before_zero_value": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TrioConsolidation.PhysicalEntrySettlement.public_nonempty": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TrioConsolidation.PhysicalEntrySettlement.public_original_rollback": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TrioConsolidation.PhysicalEntrySettlement.resume_equality": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TrioConsolidation.PhysicalEntrySettlement.role_before_balance_and_pause": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TrioConsolidation.PhysicalEntrySettlement.role_before_empty_and_zero": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TrioConsolidation.PhysicalEntrySettlement.unauthorized_exact_bytes": [
+    "propext"
+  ],
+  "audit.trio.consolidation.PhysicalEntrySettlement.execute_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "audit.trio.consolidation.PhysicalEntrySettlement.failure_restores": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "audit.trio.consolidation.PhysicalEntrySettlement.gates_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "audit.trio.consolidation.PhysicalEntrySettlement.roleSlot_bytes": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ]
+}
