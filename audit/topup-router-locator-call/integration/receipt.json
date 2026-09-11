@@ -1,0 +1,20 @@
+{
+  "source": "6c332904a894c51f1cc57e23c9ec8cdc969453a8",
+  "main": "88dc7ae70ceffd463a29cc44175c58e82e2155a9",
+  "union": "3c528f10f802036d10b5715f3c394ddf1322fe15",
+  "build_union": "a95f5e2f2b2e5987b7324307ccbe5b60f466278f",
+  "jobs": 1763,
+  "global_axioms": 29,
+  "ordinary_scopes": 27,
+  "source_hashes": 24,
+  "sha256": {
+    "audit/topup-router-locator-call/integration/README.md": "c1c2103ea0353656796f1677fe795bcc1fbb604b61ebf1f9e26171ef411e069d",
+    "audit/topup-router-locator-call/integration/all-trust-build.log": "a53880f207f91832722214bbd90380afad2c090ec8f33fe2767138cc93d3f0ad",
+    "audit/topup-router-locator-call/integration/identities.json": "3d802870bb45eb44359aba4603f5ed6aceb216f63a55d4c7f599063031d9c7ea",
+    "audit/topup-router-locator-call/integration/identity-check.log": "8c9bea7dbef6e839c7cdefb45ee6918a457ee56a8e52e70553975828e57b6d1b",
+    "audit/topup-router-locator-call/integration/independent-source-review-6c33.md": "1bb422a614df27c343f87446afae5e25ddbb232e895729558129058c48638c03",
+    "audit/topup-router-locator-call/integration/normal-artifacts.json": "6283d9c9b88720a7ca6bea16ad82c31108b447a775e443322fe8a3b6949554e0",
+    "audit/topup-router-locator-call/integration/readonly-validator.py": "0f0703dc51ea2f368178639ab3ad49eed13d32ffbd32a145b8c0ca0517ab12b5",
+    "audit/topup-router-locator-call/integration/trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439"
+  }
+}
