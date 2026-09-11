@@ -1,0 +1,102 @@
+{
+  "LidoSRv3.Audit.Guarantees.PTopupCredentialCalls.actual_credential_root_module_failure_restores": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Guarantees.PTopupCredentialCalls.actual_credential_root_module_memory_effects": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.TopupCredentialCall.copied_signed_guard": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.TopupCredentialCall.decode_fields": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.TopupCredentialCall.failure_restores": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.TopupCredentialCall.lookup_origin": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.TopupCredentialCall.run_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupCredentialCall.actual_word_overwrites_supplied": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupCredentialCall.allocation_before_short": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupCredentialCall.allocation_boundary": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupCredentialCall.decoded_first_word": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupCredentialCall.exact_getter": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupCredentialCall.full_batch_ordered_observations": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupCredentialCall.full_batch_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupCredentialCall.late_failure_keeps_calls_restores": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupCredentialCall.lengths_before_lookup": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupCredentialCall.lookup_failure_before_loop": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupCredentialCall.ordinary_no_code_attempt": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupCredentialCall.public_consumer": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupCredentialCall.request_bytes": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupCredentialCall.short_rejected": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupCredentialCall.trailing_ignored": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupCredentialCall.wrong_caller": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupCredentialCall.wrong_id": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.TopupCredentialCall.wrong_prefix_before_loop": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ]
+}
