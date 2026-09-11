@@ -1,0 +1,124 @@
+Compiling 1 files with Solc 0.4.24
+Solc 0.4.24 finished in 636.78ms
+Compiler run successful with warnings:
+Warning: This declaration shadows an existing declaration.
+src/contracts/common/interfaces/ILidoLocator.sol:37:9: Warning: This declaration shadows an existing declaration.
+        address elRewardsVault,
+        ^--------------------^
+src/contracts/common/interfaces/ILidoLocator.sol:11:5: The shadowed declaration is here:
+    function elRewardsVault() external view returns(address);
+    ^-------------------------------------------------------^
+
+Warning: This declaration shadows an existing declaration.
+src/contracts/common/interfaces/ILidoLocator.sol:38:9: Warning: This declaration shadows an existing declaration.
+        address oracleReportSanityChecker,
+        ^-------------------------------^
+src/contracts/common/interfaces/ILidoLocator.sol:13:5: The shadowed declaration is here:
+    function oracleReportSanityChecker() external view returns(address);
+    ^------------------------------------------------------------------^
+
+Warning: This declaration shadows an existing declaration.
+src/contracts/common/interfaces/ILidoLocator.sol:39:9: Warning: This declaration shadows an existing declaration.
+        address stakingRouter,
+        ^-------------------^
+src/contracts/common/interfaces/ILidoLocator.sol:15:5: The shadowed declaration is here:
+    function stakingRouter() external view returns(address);
+    ^------------------------------------------------------^
+
+Warning: This declaration shadows an existing declaration.
+src/contracts/common/interfaces/ILidoLocator.sol:40:9: Warning: This declaration shadows an existing declaration.
+        address treasury,
+        ^--------------^
+src/contracts/common/interfaces/ILidoLocator.sol:16:5: The shadowed declaration is here:
+    function treasury() external view returns(address);
+    ^-------------------------------------------------^
+
+Warning: This declaration shadows an existing declaration.
+src/contracts/common/interfaces/ILidoLocator.sol:41:9: Warning: This declaration shadows an existing declaration.
+        address withdrawalQueue,
+        ^---------------------^
+src/contracts/common/interfaces/ILidoLocator.sol:18:5: The shadowed declaration is here:
+    function withdrawalQueue() external view returns(address);
+    ^--------------------------------------------------------^
+
+Warning: This declaration shadows an existing declaration.
+src/contracts/common/interfaces/ILidoLocator.sol:42:9: Warning: This declaration shadows an existing declaration.
+        address withdrawalVault
+        ^---------------------^
+src/contracts/common/interfaces/ILidoLocator.sol:19:5: The shadowed declaration is here:
+    function withdrawalVault() external view returns(address);
+    ^--------------------------------------------------------^
+
+Warning: This declaration shadows an existing declaration.
+src/contracts/common/interfaces/ILidoLocator.sol:48:9: Warning: This declaration shadows an existing declaration.
+        address accountingOracle,
+        ^----------------------^
+src/contracts/common/interfaces/ILidoLocator.sol:9:5: The shadowed declaration is here:
+    function accountingOracle() external view returns(address);
+    ^---------------------------------------------------------^
+
+Warning: This declaration shadows an existing declaration.
+src/contracts/common/interfaces/ILidoLocator.sol:49:9: Warning: This declaration shadows an existing declaration.
+        address oracleReportSanityChecker,
+        ^-------------------------------^
+src/contracts/common/interfaces/ILidoLocator.sol:13:5: The shadowed declaration is here:
+    function oracleReportSanityChecker() external view returns(address);
+    ^------------------------------------------------------------------^
+
+Warning: This declaration shadows an existing declaration.
+src/contracts/common/interfaces/ILidoLocator.sol:50:9: Warning: This declaration shadows an existing declaration.
+        address burner,
+        ^------------^
+src/contracts/common/interfaces/ILidoLocator.sol:14:5: The shadowed declaration is here:
+    function burner() external view returns(address);
+    ^-----------------------------------------------^
+
+Warning: This declaration shadows an existing declaration.
+src/contracts/common/interfaces/ILidoLocator.sol:51:9: Warning: This declaration shadows an existing declaration.
+        address withdrawalQueue,
+        ^---------------------^
+src/contracts/common/interfaces/ILidoLocator.sol:18:5: The shadowed declaration is here:
+    function withdrawalQueue() external view returns(address);
+    ^--------------------------------------------------------^
+
+Warning: This declaration shadows an existing declaration.
+src/contracts/common/interfaces/ILidoLocator.sol:52:9: Warning: This declaration shadows an existing declaration.
+        address postTokenRebaseReceiver,
+        ^-----------------------------^
+src/contracts/common/interfaces/ILidoLocator.sol:20:5: The shadowed declaration is here:
+    function postTokenRebaseReceiver() external view returns(address);
+    ^----------------------------------------------------------------^
+
+Warning: This declaration shadows an existing declaration.
+src/contracts/common/interfaces/ILidoLocator.sol:53:9: Warning: This declaration shadows an existing declaration.
+        address stakingRouter,
+        ^-------------------^
+src/contracts/common/interfaces/ILidoLocator.sol:15:5: The shadowed declaration is here:
+    function stakingRouter() external view returns(address);
+    ^------------------------------------------------------^
+
+Warning: This declaration shadows an existing declaration.
+src/contracts/common/interfaces/ILidoLocator.sol:54:9: Warning: This declaration shadows an existing declaration.
+        address vaultHub
+        ^--------------^
+src/contracts/common/interfaces/ILidoLocator.sol:25:5: The shadowed declaration is here:
+    function vaultHub() external view returns (address);
+    ^--------------------------------------------------^
+
+Warning: Functions in interfaces should be declared external.
+src/@aragon/os/contracts/acl/IACL.sol:13:5: Warning: Functions in interfaces should be declared external.
+    function hasPermission(address who, address where, bytes32 what, bytes how) public view returns (bool);
+    ^-----------------------------------------------------------------------------------------------------^
+Warning: Functions in interfaces should be declared external.
+src/@aragon/os/contracts/evmscript/IEVMScriptRegistry.sol:24:5: Warning: Functions in interfaces should be declared external.
+    function getScriptExecutor(bytes script) public view returns (IEVMScriptExecutor);
+    ^--------------------------------------------------------------------------------^
+Warning: The "shr" instruction is only available for Constantinople-compatible VMs. You are currently compiling for "byzantium", where it will be interpreted as an invalid instruction.
+src/contracts/common/lib/ECDSA.sol:55:22: Warning: The "shr" instruction is only available for Constantinople-compatible VMs. You are currently compiling for "byzantium", where it will be interpreted as an invalid instruction.
+            v := add(shr(255, vs), 27)
+                     ^----------^
+Warning: Unused function parameter. Remove or comment out the variable name to silence this warning.
+src/@aragon/os/contracts/common/VaultRecoverable.sol:49:34: Warning: Unused function parameter. Remove or comment out the variable name to silence this warning.
+    function allowRecoverability(address token) public view returns (bool) {
+                                 ^-----------^
+Warning: unable to lint. Solar only supports Solidity versions prior to 0.8.0

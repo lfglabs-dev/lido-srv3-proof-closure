@@ -1,0 +1,114 @@
+⚠ [11/293] Replayed Verity.Core
+warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1041:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+⚠ [1079/1187] Replayed Conform.Wheels
+warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: Conform/Wheels.lean:106:70: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1080/1187] Replayed EvmYul.Pretty
+warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: EvmYul/Pretty.lean:36:32: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1127/1187] Replayed EvmYul.Semantics
+warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1128/1187] Replayed EvmYul.EVM.Semantics
+warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1259/1276] Replayed LidoSRv3.Audit.Verity.AddressRecipientCallBridge
+warning: LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean:671:56: This simp argument is unused:
+  pureExec
+
+Hint: Omit it from the simp argument list.
+  simp [claimTo, Bind.bind, bindExec, hs, hc, LidoSRv3.Audit.Source.TrioReserve1.Live.emit,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲p̵u̵r̵e̵E̵x̵e̵c̵,̵ ̵hsa]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean:674:94: This simp argument is unused:
+  pureExec
+
+Hint: Omit it from the simp argument list.
+  simp [claimTo, Bind.bind, bindExec, hs, hc, LidoSRv3.Audit.Source.TrioReserve1.Live.emit,
+  ̲ p̵u̵r̵e̵E̵x̵e̵c̵,̵  ̲ ̲claimEvents, List.append_assoc]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean:732:30: This simp argument is unused:
+  hn
+
+Hint: Omit it from the simp argument list.
+  simp [claimWithdrawalsTo, hn,̵ ̵h̵n̵0, hl, zeroAddress, Pure.pure,
+  ̲  ̲ ̲ ̲ ̲ ̲LidoSRv3.Audit.Source.TrioReserve1.Live.require, Bind.bind, bindExec, fail, pureExec] at hs
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean:735:30: This simp argument is unused:
+  hn
+
+Hint: Omit it from the simp argument list.
+  simp [claimWithdrawalsTo, hn,̵ ̵h̵n̵0, hl, zeroAddress, Pure.pure,
+  ̲  ̲ ̲ ̲ ̲ ̲LidoSRv3.Audit.Source.TrioReserve1.Live.require, Bind.bind, bindExec, pureExec]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+info: LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean:739:0: 'LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claimTo_success' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean:740:0: 'LidoSRv3.Audit.Verity.AddressRecipientCallBridge.runClaimWithdrawalsTo_success' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+✖ [1276/1276] Building LidoSRv3.Tests.AddressStETHQuoteCalls (3.5s)
+trace: .> LEAN_PATH=/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Cli/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/batteries/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Qq/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/aesop/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/proofwidgets/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/importGraph/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/plausible/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/mathlib/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/evmyul/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/verity/.lake/build/lib/lean:/private/tmp/lido-address-steth-quote/.lake/build/lib/lean /Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean /private/tmp/lido-address-steth-quote/LidoSRv3/Tests/AddressStETHQuoteCalls.lean -o /private/tmp/lido-address-steth-quote/.lake/build/lib/lean/LidoSRv3/Tests/AddressStETHQuoteCalls.olean -i /private/tmp/lido-address-steth-quote/.lake/build/lib/lean/LidoSRv3/Tests/AddressStETHQuoteCalls.ilean -c /private/tmp/lido-address-steth-quote/.lake/build/ir/LidoSRv3/Tests/AddressStETHQuoteCalls.c --setup /private/tmp/lido-address-steth-quote/.lake/build/ir/LidoSRv3/Tests/AddressStETHQuoteCalls.setup.json --json
+error: LidoSRv3/Tests/AddressStETHQuoteCalls.lean:33:28: unexpected token ':='; expected ':'
+error: LidoSRv3/Tests/AddressStETHQuoteCalls.lean:43:40: Unknown identifier `AddressWrappedTokenCalls.balanceSlot`
+error: LidoSRv3/Tests/AddressStETHQuoteCalls.lean:47:60: Unknown identifier `AddressWrappedTransferCalls.allowanceSlot`
+error: LidoSRv3/Tests/AddressStETHQuoteCalls.lean:58:45: Unknown identifier `AddressWrappedTransferCalls.allowanceSlot`
+error: LidoSRv3/Tests/AddressStETHQuoteCalls.lean:63:43: Unknown identifier `AddressWrappedTransferCalls.allowanceSlot`
+info: LidoSRv3/Tests/AddressStETHQuoteCalls.lean:74:0: 'LidoSRv3.Audit.Source.AddressStETHQuoteCalls.internalEther_bound' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/AddressStETHQuoteCalls.lean:75:0: 'LidoSRv3.Audit.Source.AddressStETHQuoteCalls.body_success' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/AddressStETHQuoteCalls.lean:76:0: 'LidoSRv3.Audit.Source.AddressStETHQuoteCalls.canonical_call' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/AddressStETHQuoteCalls.lean:77:0: 'LidoSRv3.Audit.Source.AddressStETHQuoteCalls.quote_effect' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/AddressStETHQuoteCalls.lean:78:0: 'LidoSRv3.Audit.Guarantees.PAddress1.actual_steth_physical_quote_permit_batch' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/AddressStETHQuoteCalls.lean:79:0: 'LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_physical_quote_permit_batch' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/AddressStETHQuoteCalls.lean:80:0: 'LidoSRv3.Audit.Guarantees.PAddress1.actual_steth_physical_quote_failure_restores' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/AddressStETHQuoteCalls.lean:81:0: 'LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_physical_quote_failure_restores' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/AddressStETHQuoteCalls.lean:82:0: 'LidoSRv3.Tests.AddressStETHQuoteCalls.public_empty_success' does not depend on any axioms
+info: LidoSRv3/Tests/AddressStETHQuoteCalls.lean:83:0: 'LidoSRv3.Tests.AddressStETHQuoteCalls.public_paused_rollback' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+error: Lean exited with code 1
+Some required targets logged failures:
+- LidoSRv3.Tests.AddressStETHQuoteCalls
+error: build failed
