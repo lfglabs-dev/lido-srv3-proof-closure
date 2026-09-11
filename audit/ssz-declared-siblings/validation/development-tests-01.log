@@ -1,0 +1,398 @@
+⚠ [438/563] Replayed LidoSRv3.Audit.SszDepositEquivalence
+warning: LidoSRv3/Audit/SszDepositEquivalence.lean:93:4: This simp argument is unused:
+  Ssz.traverseBranch
+
+Hint: Omit it from the simp argument list.
+  simp [structuralEncoding, structuralWitness, structuralCombine, Ssz.validatorRoot,̵
+  ̵ ̵ ̵ ̵ ̵S̵s̵z̵.̵t̵r̵a̵v̵e̵r̵s̵e̵B̵r̵a̵n̵c̵h̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/SszDepositEquivalence.lean:213:12: This simp argument is unused:
+  sourceWitness
+
+Hint: Omit it from the simp argument list.
+  simp [̵s̵o̵u̵r̵c̵e̵W̵i̵t̵n̵e̵s̵s̵,̵ ̵s̵t̵r̵u̵c̵t̵u̵r̵a̵l̵W̵i̵t̵n̵e̵s̵s̵]̵[̲s̲t̲r̲u̲c̲t̲u̲r̲a̲l̲W̲i̲t̲n̲e̲s̲s̲]̲
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/SszDepositEquivalence.lean:213:27: This simp argument is unused:
+  structuralWitness
+
+Hint: Omit it from the simp argument list.
+  simp [sourceWitness,̵ ̵s̵t̵r̵u̵c̵t̵u̵r̵a̵l̵W̵i̵t̵n̵e̵s̵s̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [500/563] Replayed Verity.Core
+warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1041:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+⚠ [511/563] Replayed LidoSRv3.Audit.Verity.SszTxSimulation
+warning: LidoSRv3/Audit/Verity/SszTxSimulation.lean:317:8: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+info: LidoSRv3/Audit/Verity/SszTxSimulation.lean:346:0: LidoSRv3.Audit.Verity.SszTxSimulation.ssz_tx_simulation_correct {State : Type} (input : TxInputs) (before after : State)
+  (attempts : List CallAttempt) (trace : CommitTrace) (hwidths : exactTxWidths input) :
+  exactTxWidths input ∧
+    (digestPreimages input.toInputs).length = 7 ∧
+      (runVerification input = VerificationOutcome.accept ↔ computedRoot input = input.expectedDepositDataRoot) ∧
+        (runVerification input = VerificationOutcome.revertRootMismatch →
+          (transactionObservation input before after attempts trace).committedState = before)
+info: LidoSRv3/Audit/Verity/SszTxSimulation.lean:347:0: LidoSRv3.Audit.Verity.SszTxSimulation.sha256_call_world_rollback (input : Inputs) (adversary : AdversaryModel)
+  (state : CallState) : (DenoteExternalCalls.denote (sha256Calls input) adversary state).snd.world = state.world
+info: LidoSRv3/Audit/Verity/SszTxSimulation.lean:348:0: Compiler.CompilationModel.Denote.Sha256.denote_success_compose (oracle : StaticCallOracle)
+  (fipsSha256 : ByteArray → ByteArray) (world : Verity.ContractState) (inputOffset inputSize outputOffset : Nat)
+  (digest : Digest) (sha256_correct : sha256_correct oracle fipsSha256)
+  (hcall : oracle (request world.memory inputOffset inputSize outputOffset) = StaticCallResult.success digest) :
+  Denote.Sha256.denote oracle world inputOffset inputSize outputOffset =
+    Outcome.success (digestWord (fipsSha256 (memorySlice world.memory inputOffset inputSize)))
+      (writeDigest world outputOffset (fipsSha256 (memorySlice world.memory inputOffset inputSize)))
+⚠ [1128/1195] Replayed Conform.Wheels
+warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: Conform/Wheels.lean:106:70: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1170/1234] Replayed EvmYul.Pretty
+warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: EvmYul/Pretty.lean:36:32: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1196/1234] Replayed EvmYul.Semantics
+warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1197/1234] Replayed EvmYul.EVM.Semantics
+warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+ℹ [1215/1234] Replayed LidoSRv3.Audit.Source.SszWitnessAbi
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:326:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.run_success_input_binding' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:327:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.pubkey_environment' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:328:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.pair_environment' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:329:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.merkle_environment' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:330:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.call_environment' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:331:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.fields_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:332:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.run_success_origin' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:334:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.read64_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:335:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.readBool_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:336:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.tail_success_length' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1216/1234] Replayed LidoSRv3.Audit.Source.SszShaCommitted
+info: LidoSRv3/Audit/Source/SszShaCommitted.lean:337:0: 'LidoSRv3.Audit.Source.SszShaCommitted.run_success_computed_merkle' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/SszShaCommitted.lean:338:0: 'LidoSRv3.Audit.Source.SszShaCommitted.pubkey_success_words' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszShaCommitted.lean:339:0: 'LidoSRv3.Audit.Source.SszShaCommitted.merkle_success_digest' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszShaCommitted.lean:340:0: 'LidoSRv3.Audit.Source.SszShaCommitted.call_words' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszShaCommitted.lean:341:0: 'LidoSRv3.Audit.Source.SszShaCommitted.pair_success_words' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszShaCommitted.lean:342:0: 'LidoSRv3.Audit.Source.SszShaCommitted.pair_success_digest' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszShaCommitted.lean:343:0: 'LidoSRv3.Audit.Source.SszShaCommitted.call_success_output' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszShaCommitted.lean:344:0: 'LidoSRv3.Audit.Source.SszShaCommitted.pair_success_output' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszShaCommitted.lean:345:0: 'LidoSRv3.Audit.Source.SszShaCommitted.call_success_gas' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszShaCommitted.lean:346:0: 'LidoSRv3.Audit.Source.SszShaCommitted.call_success_depth' depends on axioms: [propext, Classical.choice, Quot.sound]
+⚠ [1217/1234] Replayed LidoSRv3.Audit.Source.SszPubkeyBytes
+warning: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:32:91: This simp argument is unused:
+  Nat.zero_add
+
+Hint: Omit it from the simp argument list.
+  simp only [ByteArray.size, ̲Array.size_append, ̲Array.size_replicate, ̲hlower, ̲Nat.sub_zero,̵N̵a̵t̵.̵z̵e̵r̵o̵_̵a̵d̵d̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:44:78: This simp argument is unused:
+  Nat.sub_zero
+
+Hint: Omit it from the simp argument list.
+  simp only [ByteArray.size, ̲Array.size_append, ̲Array.size_replicate, ̲hlower, ̲Nat.s̵u̵b̵_̵zero,̵N̵a̵t̵.̵z̵e̵r̵o̵_add]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+info: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:232:0: 'LidoSRv3.Audit.Source.SszPubkeyBytes.key_size' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:233:0: 'LidoSRv3.Audit.Source.SszPubkeyBytes.block_size' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:234:0: 'LidoSRv3.Audit.Source.SszPubkeyBytes.block_eq_raw' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:235:0: 'LidoSRv3.Audit.Source.SszPubkeyBytes.pubkey_digest_typed' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:236:0: 'LidoSRv3.Audit.Source.SszPubkeyBytes.computed_leaf_typed' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:237:0: 'LidoSRv3.Audit.Source.SszPubkeyBytes.witness_key_length' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:238:0: 'LidoSRv3.Audit.Source.SszPubkeyBytes.run_success_computed_leaf' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:239:0: 'LidoSRv3.Audit.Source.SszPubkeyBytes.pubkey_success_digest' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:240:0: 'LidoSRv3.Audit.Source.SszPubkeyBytes.memory_exact' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:241:0: 'LidoSRv3.Audit.Source.SszPubkeyBytes.read_exact' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszPubkeyBytes.lean:242:0: 'LidoSRv3.Audit.Source.SszPubkeyBytes.copy_padded' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1218/1234] Replayed LidoSRv3.Audit.Source.SszProofCommitted
+info: LidoSRv3/Audit/Source/SszProofCommitted.lean:300:0: 'LidoSRv3.Audit.Source.SszProofCommitted.proofWords_length_le' depends on axioms: [propext]
+info: LidoSRv3/Audit/Source/SszProofCommitted.lean:301:0: 'LidoSRv3.Audit.Source.SszProofCommitted.verify_success_depth' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/SszProofCommitted.lean:302:0: 'LidoSRv3.Audit.Source.SszProofCommitted.run_success_branch' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszProofCommitted.lean:303:0: 'LidoSRv3.Audit.Source.SszProofCommitted.verify_success_branch' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/SszProofCommitted.lean:304:0: 'LidoSRv3.Audit.Source.SszProofCommitted.loop_success_fold' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszProofCommitted.lean:305:0: 'LidoSRv3.Audit.Source.SszProofCommitted.step_success_effects' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/SszProofCommitted.lean:306:0: 'LidoSRv3.Audit.Source.SszProofCommitted.step_call_digest' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszProofCommitted.lean:307:0: 'LidoSRv3.Audit.Source.SszProofCommitted.step_success_shape' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszProofCommitted.lean:308:0: 'LidoSRv3.Audit.Source.SszProofCommitted.prepared_memory' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszProofCommitted.lean:309:0: 'LidoSRv3.Audit.Source.SszProofCommitted.prepared_read' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1219/1234] Replayed LidoSRv3.Audit.Source.SszCompiledMemory
+info: LidoSRv3/Audit/Source/SszCompiledMemory.lean:576:0: 'LidoSRv3.Audit.Source.SszCompiledMemory.write_word_read' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledMemory.lean:577:0: 'LidoSRv3.Audit.Source.SszCompiledMemory.store_load' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledMemory.lean:578:0: 'LidoSRv3.Audit.Source.SszCompiledMemory.xi_uses_fresh' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledMemory.lean:579:0: 'LidoSRv3.Audit.Source.SszCompiledMemory.prologue_free_pointer' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledMemory.lean:580:0: 'LidoSRv3.Audit.Source.SszCompiledMemory.allocate_success_bound' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledMemory.lean:581:0: 'LidoSRv3.Audit.Source.SszCompiledMemory.allocate_effects' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledMemory.lean:582:0: 'LidoSRv3.Audit.Source.SszCompiledMemory.pair_memory' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledMemory.lean:583:0: 'LidoSRv3.Audit.Source.SszCompiledMemory.pubkey_memory' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1220/1234] Replayed LidoSRv3.Audit.Source.SszCompiledConsumer
+info: LidoSRv3/Audit/Source/SszCompiledConsumer.lean:130:0: 'LidoSRv3.Audit.Source.SszCompiledConsumer.begin_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1221/1234] Replayed LidoSRv3.Audit.Source.SszCompiledMerkle
+info: LidoSRv3/Audit/Source/SszCompiledMerkle.lean:583:0: 'LidoSRv3.Audit.Source.SszCompiledMerkle.run_success_branch' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledMerkle.lean:584:0: 'LidoSRv3.Audit.Source.SszCompiledMerkle.run_computed_leaf' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledMerkle.lean:585:0: 'LidoSRv3.Audit.Source.SszCompiledMerkle.begin_values' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledMerkle.lean:586:0: 'LidoSRv3.Audit.Source.SszCompiledMerkle.fields_effects' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledMerkle.lean:587:0: 'LidoSRv3.Audit.Source.SszCompiledMerkle.merkle_effects' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledMerkle.lean:588:0: 'LidoSRv3.Audit.Source.SszCompiledMerkle.allocate_frame' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledMerkle.lean:589:0: 'LidoSRv3.Audit.Source.SszCompiledMerkle.pairStore_effects' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1222/1234] Replayed LidoSRv3.Audit.Source.SszCompiledFrame
+info: LidoSRv3/Audit/Source/SszCompiledFrame.lean:776:0: 'LidoSRv3.Audit.Source.SszCompiledFrame.write_pad_read' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledFrame.lean:777:0: 'LidoSRv3.Audit.Source.SszCompiledFrame.allocate_frame' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledFrame.lean:778:0: 'LidoSRv3.Audit.Source.SszCompiledFrame.pairStore_effects' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledFrame.lean:779:0: 'LidoSRv3.Audit.Source.SszCompiledFrame.merkle_effects' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledFrame.lean:780:0: 'LidoSRv3.Audit.Source.SszCompiledFrame.fields_effects' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1226/1234] Replayed LidoSRv3.Audit.Source.SszRootCall
+info: LidoSRv3/Audit/Source/SszRootCall.lean:206:0: 'LidoSRv3.Audit.Source.SszRootCall.run_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszRootCall.lean:207:0: 'LidoSRv3.Audit.Source.SszRootCall.slot_failure_no_call' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/SszRootCall.lean:208:0: 'LidoSRv3.Audit.Source.SszRootCall.run_world' depends on axioms: [propext, Quot.sound]
+ℹ [1227/1234] Replayed LidoSRv3.Audit.Source.SszCompiledReply
+info: LidoSRv3/Audit/Source/SszCompiledReply.lean:490:0: 'LidoSRv3.Audit.Source.SszCompiledReply.reply_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledReply.lean:491:0: 'LidoSRv3.Audit.Source.SszCompiledReply.root_word_typed' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1228/1234] Replayed LidoSRv3.Audit.Source.SszSoladyFls
+info: LidoSRv3/Audit/Source/SszSoladyFls.lean:149:0: 'LidoSRv3.Audit.Source.SszSoladyFls.sourceFls_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszSoladyFls.lean:150:0: 'LidoSRv3.Audit.Source.SszSoladyFls.table_lookup' depends on axioms: [propext]
+⚠ [1229/1234] Replayed LidoSRv3.Audit.Source.SszCompiledGIndex
+warning: LidoSRv3/Audit/Source/SszCompiledGIndex.lean:238:20: '(unfold word; rfl)' tactic does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: LidoSRv3/Audit/Source/SszCompiledGIndex.lean:238:20: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+info: LidoSRv3/Audit/Source/SszCompiledGIndex.lean:269:0: 'LidoSRv3.Audit.Source.SszCompiledGIndex.wrapper_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszCompiledGIndex.lean:270:0: 'LidoSRv3.Audit.Source.SszCompiledGIndex.pinned_words' depends on axioms: [propext]
+ℹ [1230/1234] Replayed LidoSRv3.Audit.Source.SszCompiledClEntry
+info: LidoSRv3/Audit/Source/SszCompiledClEntry.lean:731:0: 'LidoSRv3.Audit.Source.SszCompiledClEntry.run_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1231/1234] Replayed LidoSRv3.Audit.Guarantees.PSsz1CompiledClEntry
+info: LidoSRv3/Audit/Guarantees/PSsz1CompiledClEntry.lean:114:0: 'LidoSRv3.Audit.Guarantees.PSsz1.actual_compiled_cl_entry_branch' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Guarantees/PSsz1CompiledClEntry.lean:115:0: 'LidoSRv3.Audit.Guarantees.PSsz1.actual_compiled_cl_entry_tree' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+⚠ [1232/1234] Replayed LidoSRv3.Audit.Source.SszDeclaredSiblings
+warning: LidoSRv3/Audit/Source/SszDeclaredSiblings.lean:11:41: Variable name `ha` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+info: LidoSRv3/Audit/Source/SszDeclaredSiblings.lean:156:0: 'LidoSRv3.Audit.Source.SszDeclaredSiblings.declared_get' depends on axioms: [propext]
+info: LidoSRv3/Audit/Source/SszDeclaredSiblings.lean:157:0: 'LidoSRv3.Audit.Source.SszDeclaredSiblings.wrapper_depth' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszDeclaredSiblings.lean:158:0: 'LidoSRv3.Audit.Source.SszDeclaredSiblings.complete_of_branch' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/SszDeclaredSiblings.lean:159:0: 'LidoSRv3.Audit.Source.SszDeclaredSiblings.penultimate' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszDeclaredSiblings.lean:161:0: 'LidoSRv3.Audit.Source.SszDeclaredSiblings.advance_zero' depends on axioms: [propext]
+info: LidoSRv3/Audit/Source/SszDeclaredSiblings.lean:162:0: 'LidoSRv3.Audit.Source.SszDeclaredSiblings.advance_succ' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/SszDeclaredSiblings.lean:163:0: 'LidoSRv3.Audit.Source.SszDeclaredSiblings.end_eq' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/SszDeclaredSiblings.lean:164:0: 'LidoSRv3.Audit.Source.SszDeclaredSiblings.declared_succ' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/SszDeclaredSiblings.lean:165:0: 'LidoSRv3.Audit.Source.SszDeclaredSiblings.all_steps' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/SszDeclaredSiblings.lean:166:0: 'LidoSRv3.Audit.Source.SszDeclaredSiblings.cursor_dichotomy' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/SszDeclaredSiblings.lean:168:0: 'LidoSRv3.Audit.Source.SszDeclaredSiblings.cursor_arithmetic' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/SszDeclaredSiblings.lean:169:0: 'LidoSRv3.Audit.Source.SszDeclaredSiblings.declared_length' depends on axioms: [propext]
+ℹ [1233/1234] Replayed LidoSRv3.Audit.Guarantees.PSsz1DeclaredSiblings
+info: LidoSRv3/Audit/Guarantees/PSsz1DeclaredSiblings.lean:84:0: 'LidoSRv3.Audit.Guarantees.PSsz1.actual_compiled_cl_entry_complete_declared_branch' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+✖ [1234/1234] Building LidoSRv3.Tests.SszDeclaredSiblingsRegression (2.7s)
+trace: .> LEAN_PATH=/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Cli/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/batteries/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Qq/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/aesop/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/proofwidgets/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/importGraph/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/plausible/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/mathlib/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/evmyul/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/verity/.lake/build/lib/lean:/private/tmp/lido-ssz-declared-siblings/.lake/build/lib/lean /Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean /private/tmp/lido-ssz-declared-siblings/LidoSRv3/Tests/SszDeclaredSiblingsRegression.lean -o /private/tmp/lido-ssz-declared-siblings/.lake/build/lib/lean/LidoSRv3/Tests/SszDeclaredSiblingsRegression.olean -i /private/tmp/lido-ssz-declared-siblings/.lake/build/lib/lean/LidoSRv3/Tests/SszDeclaredSiblingsRegression.ilean -c /private/tmp/lido-ssz-declared-siblings/.lake/build/ir/LidoSRv3/Tests/SszDeclaredSiblingsRegression.c --setup /private/tmp/lido-ssz-declared-siblings/.lake/build/ir/LidoSRv3/Tests/SszDeclaredSiblingsRegression.setup.json --json
+error: LidoSRv3/Tests/SszDeclaredSiblingsRegression.lean:11:108: Tactic `decide` failed for proposition
+  proofWords 4 bytes (u 0) (endOffset (u 0) 4) = declaredWords bytes (u 0) 4
+because its `Decidable` instance
+  Stack.instDecidableEq (proofWords 4 bytes (u 0) (endOffset (u 0) 4)) (declaredWords bytes (u 0) 4)
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match h : (↑(rawWord bytes (u 0)).val).beq ↑((fun j => rawWord bytes (u 0 + UInt256.ofNat (32 * j))) 0).val with
+  | true => isTrue ⋯
+  | false => isFalse ⋯
+error: LidoSRv3/Tests/SszDeclaredSiblingsRegression.lean:12:110: Tactic `decide` failed for proposition
+  proofWords 4 bytes (u 3) (endOffset (u 3) 4) = declaredWords bytes (u 3) 4
+because its `Decidable` instance
+  Stack.instDecidableEq (proofWords 4 bytes (u 3) (endOffset (u 3) 4)) (declaredWords bytes (u 3) 4)
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match h : (↑(rawWord bytes (u 3)).val).beq ↑((fun j => rawWord bytes (u 3 + UInt256.ofNat (32 * j))) 0).val with
+  | true => isTrue ⋯
+  | false => isFalse ⋯
+error: LidoSRv3/Tests/SszDeclaredSiblingsRegression.lean:17:86: Tactic `decide` failed for proposition
+  proofWords 4 bytes (u (2 ^ 256 - 16)) (endOffset (u (2 ^ 256 - 16)) 4) = declaredWords bytes (u (2 ^ 256 - 16)) 4 ∧
+    (proofWords 4 bytes (u (2 ^ 256 - 16)) (endOffset (u (2 ^ 256 - 16)) 4)).length = 4
+because its `Decidable` instance
+  instDecidableAnd
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match h :
+    (↑(rawWord bytes (u (2 ^ 256 - 16))).val).beq
+      ↑((fun j => rawWord bytes (u (2 ^ 256 - 16) + UInt256.ofNat (32 * j))) 0).val with
+  | true => isTrue ⋯
+  | false => isFalse ⋯
+error: LidoSRv3/Tests/SszDeclaredSiblingsRegression.lean:20:82: Tactic `decide` failed for proposition
+  proofWords 3 bytes (u (2 ^ 256 - 32)) (endOffset (u (2 ^ 256 - 32)) 3) =
+    [rawWord bytes (u (2 ^ 256 - 32)), rawWord bytes (u 0), rawWord bytes (u 32)]
+because its `Decidable` instance
+  Stack.instDecidableEq (proofWords 3 bytes (u (2 ^ 256 - 32)) (endOffset (u (2 ^ 256 - 32)) 3))
+    [rawWord bytes (u (2 ^ 256 - 32)), rawWord bytes (u 0), rawWord bytes (u 32)]
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match h : (↑(rawWord bytes (u (2 ^ 256 - 32))).val).beq ↑(rawWord bytes (u (2 ^ 256 - 32))).val with
+  | true => isTrue ⋯
+  | false => isFalse ⋯
+error: LidoSRv3/Tests/SszDeclaredSiblingsRegression.lean:24:60: Tactic `decide` failed for proposition
+  proofWords 4 bytes (u (2 ^ 256 - 64)) (endOffset (u (2 ^ 256 - 64)) 4) = [rawWord bytes (u (2 ^ 256 - 64))] ∧
+    (declaredWords bytes (u (2 ^ 256 - 64)) 4).length = 4
+because its `Decidable` instance
+  instDecidableAnd
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match h : (↑(rawWord bytes (u (2 ^ 256 - 64))).val).beq ↑(rawWord bytes (u (2 ^ 256 - 64))).val with
+  | true => isTrue ⋯
+  | false => isFalse ⋯
+error: LidoSRv3/Tests/SszDeclaredSiblingsRegression.lean:27:42: Tactic `decide` failed for proposition
+  proofWords 4 bytes (u (2 ^ 256 - 128)) (endOffset (u (2 ^ 256 - 128)) 4) = [rawWord bytes (u (2 ^ 256 - 128))]
+because its `Decidable` instance
+  Stack.instDecidableEq (proofWords 4 bytes (u (2 ^ 256 - 128)) (endOffset (u (2 ^ 256 - 128)) 4))
+    [rawWord bytes (u (2 ^ 256 - 128))]
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match h : (↑(rawWord bytes (u (2 ^ 256 - 128))).val).beq ↑(rawWord bytes (u (2 ^ 256 - 128))).val with
+  | true => isTrue ⋯
+  | false => isFalse ⋯
+error: LidoSRv3/Tests/SszDeclaredSiblingsRegression.lean:31:47: Tactic `decide` failed for proposition
+  proofWords 1 bytes (u (2 ^ 256 - 16)) (endOffset (u (2 ^ 256 - 16)) 1) = declaredWords bytes (u (2 ^ 256 - 16)) 1
+because its `Decidable` instance
+  Stack.instDecidableEq (proofWords 1 bytes (u (2 ^ 256 - 16)) (endOffset (u (2 ^ 256 - 16)) 1))
+    (declaredWords bytes (u (2 ^ 256 - 16)) 1)
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match h :
+    (↑(rawWord bytes (u (2 ^ 256 - 16))).val).beq
+      ↑((fun j => rawWord bytes (u (2 ^ 256 - 16) + UInt256.ofNat (32 * j))) 0).val with
+  | true => isTrue ⋯
+  | false => isFalse ⋯
+error: LidoSRv3/Tests/SszDeclaredSiblingsRegression.lean:55:119: Tactic `decide` failed for proposition
+  Option.map UInt256.toNat (SszCompiledClEntry.header vectorContext).toOption = some 192
+because its `Decidable` instance
+  (Option.map UInt256.toNat (SszCompiledClEntry.header vectorContext).toOption).instDecidableEq (some 192)
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match Option.map UInt256.toNat (SszCompiledClEntry.header vectorContext).toOption with
+  | none =>
+    match some 192 with
+    | none => isTrue ⋯
+    | some val => isFalse ⋯
+  | some a =>
+    match some 192 with
+    | none => isFalse ⋯
+    | some b =>
+      match instDecidableEqNat a b with
+      | isTrue h => isTrue ⋯
+      | isFalse n => isFalse ⋯
+error: LidoSRv3/Tests/SszDeclaredSiblingsRegression.lean:57:63: Tactic `decide` failed for proposition
+  Option.map (fun s => (s.offset.toNat, s.length)) (SszWitnessAbi.tail vectorContext (u 192) (u 4) 32).toOption =
+    some (484, 50)
+because its `Decidable` instance
+  (Option.map (fun s => (s.offset.toNat, s.length))
+        (SszWitnessAbi.tail vectorContext (u 192) (u 4) 32).toOption).instDecidableEq
+    (some (484, 50))
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match
+    Option.map (fun s => (s.offset.toNat, s.length)) (SszWitnessAbi.tail vectorContext (u 192) (u 4) 32).toOption with
+  | none =>
+    match some (484, 50) with
+    | none => isTrue ⋯
+    | some val => isFalse ⋯
+  | some a =>
+    match some (484, 50) with
+    | none => isFalse ⋯
+    | some b =>
+      match (fun a b => instDecidableEqProd a b) a b with
+      | isTrue h => isTrue ⋯
+      | isFalse n => isFalse ⋯
+error: LidoSRv3/Tests/SszDeclaredSiblingsRegression.lean:59:106: Tactic `decide` failed for proposition
+  proofWords 50 vectorCalldata (u 484) (endOffset (u 484) 50) = declaredWords vectorCalldata (u 484) 50 ∧
+    (declaredWords vectorCalldata (u 484) 50).length = 50
+because its `Decidable` instance
+  instDecidableAnd
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match h :
+    (↑(rawWord vectorCalldata (u 484)).val).beq
+      ↑((fun j => rawWord vectorCalldata (u 484 + UInt256.ofNat (32 * j))) 0).val with
+  | true => isTrue ⋯
+  | false => isFalse ⋯
+error: LidoSRv3/Tests/SszDeclaredSiblingsRegression.lean:60:173: Tactic `decide` failed for proposition
+  (declaredWords vectorCalldata (u 484) 50)[48]? =
+    some (u 54126936111950391062754205919416086212205915651432365687816415813518451140713)
+because its `Decidable` instance
+  (declaredWords vectorCalldata (u 484) 50)[48]?.instDecidableEq
+    (some (u 54126936111950391062754205919416086212205915651432365687816415813518451140713))
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match h :
+    (↑((fun j => rawWord vectorCalldata (u 484 + UInt256.ofNat (32 * j))) 48).val).beq
+      ↑(u 54126936111950391062754205919416086212205915651432365687816415813518451140713).val with
+  | true => isTrue ⋯
+  | false => isFalse ⋯
+info: LidoSRv3/Tests/SszDeclaredSiblingsRegression.lean:71:0: 'LidoSRv3.Tests.SszDeclaredSiblingsRegression.maximal_count_dichotomy' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/SszDeclaredSiblingsRegression.lean:72:0: 'LidoSRv3.Tests.SszDeclaredSiblingsRegression.public_retained_vector' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+error: Lean exited with code 1
+Some required targets logged failures:
+- LidoSRv3.Tests.SszDeclaredSiblingsRegression
+error: build failed

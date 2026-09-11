@@ -1,0 +1,127 @@
+{
+  "compiler_inputs": [
+    {
+      "keccak256": "0x20df4d8e319fd85ccd19952e3f8bfb8ad6e88b63aff637cb53f29dc0a49c2366",
+      "path": "audit/ssz-root-call-composition/solidity/SszRootCall.t.sol",
+      "pin": "4207bb0578b0a6821cd1d78b1f3a4bb08f277905",
+      "sha256": "ed5b04da50dd98519ef85425a30477e63372eb7781cbca43ea446cd3c9761c90"
+    },
+    {
+      "keccak256": "0xeb6c14b6c9c715d9585d73cea0a63dc218c3b9fd28eec6047a883f622ab09e9f",
+      "path": "lido-core/contracts/0.8.25/CLValidatorVerifier.sol",
+      "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+      "sha256": "d6e89f6975e4fa02f758bf461a98ac2d689296b5c92d03ffd4e43a22d0b3d7ed"
+    },
+    {
+      "keccak256": "0x8a8c7644d91bef60068027b444c104eb1dcd86ac6dc8ff3c5a928e64de659550",
+      "path": "lido-core/contracts/common/interfaces/ValidatorWitness.sol",
+      "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+      "sha256": "8fd24cfab7402233029756e52e59198b0d9cbf0a42e5c07d9fa2338ed731a5f7"
+    },
+    {
+      "keccak256": "0x6099fbcefb3b3afdaf69321338d2546962125666086a653303446ee9a8dd8caa",
+      "path": "lido-core/contracts/common/lib/BLS.sol",
+      "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+      "sha256": "0187cc6a6b1aaa833317695d88795db431fa237452213e8c3872a0f444dceb7c"
+    },
+    {
+      "keccak256": "0x84d92a58850cdcba3e811ef39e414aee829f6437df26387aac5fdaca5484f8d2",
+      "path": "lido-core/contracts/common/lib/BeaconTypes.sol",
+      "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+      "sha256": "9591e9af1a4fd398db86267f3589e763f9eb2016bf29e26cfa50988cf73a10c3"
+    },
+    {
+      "keccak256": "0xb9e55d38004099aeafb50d54d91427fcc3379e5a54435a7aabe7de4d6de99052",
+      "path": "lido-core/contracts/common/lib/GIndex.sol",
+      "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+      "sha256": "2653bd4ba89c349f3db36f21a8afc6a24e0e233816d9b608f46d048feb601d1f"
+    },
+    {
+      "keccak256": "0x479f52b444430e27bf119132ae59ed55c97441959cda554f737f943d499b2756",
+      "path": "lido-core/contracts/common/lib/SSZ.sol",
+      "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+      "sha256": "91ef497b972bbee0fe89043034e6bd62fa0c1059f22874d4826bc6164a22009b"
+    }
+  ],
+  "files": {
+    "LidoSRv3/Audit/Guarantees/PSsz1CompiledClEntry.lean": "678dcbb1033904f47bab8b115b958300b003a1d2df89f713838ec9e86b4cce1b",
+    "LidoSRv3/Audit/Source/SszCompiledClEntry.lean": "fc3421058d0f3b22c7738174e383192d30983b48f5b0117f4de531eb785369dc",
+    "LidoSRv3/Audit/Source/SszCompiledFrame.lean": "0984e6f07a71d9441fb994cde86ef33c4f5d8bd8a4ac848c78569f70c0be9311",
+    "LidoSRv3/Audit/Source/SszCompiledGIndex.lean": "9b58af30b481d66f11a5879429d317a161226a4a77d6d99b33b7238d97bc5347",
+    "LidoSRv3/Audit/Source/SszCompiledReply.lean": "7f3fb7f06f5b2636379b4626a4ecfa14f993aaec44a44ea86c1f9ad69b88aec4",
+    "LidoSRv3/Audit/Source/SszSoladyFls.lean": "73011ee40979829b244cd2346e23f9a24b88b7006f22938a5694bcd079a46647",
+    "LidoSRv3/Tests/SszCompiledClEntryRegression.lean": "73282e16b8a979def8caf75ec9cefe4879a7a2ae4d40d06d7197fefc3b0e8d98",
+    "audit/ssz-compiled-cl-entry/README.md": "3edb99058fbc1704d23a08a421960af36d614374f8d92bc1d8f775e3e77115f1",
+    "audit/ssz-compiled-cl-entry/integration/README.md": "3dfacc2b73d95c31cc3ae239b22d8a49da4d7e019530e1d0144751262b6255ae",
+    "audit/ssz-compiled-cl-entry/integration/all-trust-build.log": "765eabde2102fb4687150e645022fd0ec2c91e91d043c5c240acce6d9c79a489",
+    "audit/ssz-compiled-cl-entry/integration/build-identities.json": "d20688adc46e019e2ca7d59fb7dd2318e8eb5c32293fb05e59521dbf1a0792a8",
+    "audit/ssz-compiled-cl-entry/integration/identities.json": "72e2f5fe3175e53ba20beb4f72595c537a42793e49bd14d15ca2369c749f6f96",
+    "audit/ssz-compiled-cl-entry/integration/independent-source-review-51c1.md": "7cf93d7fafa08c71429f139c673e14b2b00c877e791d60f216ae4ab3583fffa4",
+    "audit/ssz-compiled-cl-entry/integration/scoped-axioms.json": "cf3defeea9f653411862c1cab8a98fe1ffbc865b6052c57cf36d0aa65711fc6b",
+    "audit/ssz-compiled-cl-entry/integration/trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439",
+    "audit/ssz-compiled-cl-entry/solidity/compiled-metadata.json": "7994d5ac66c929a57e3c18b70e3db9f90fd52c5e790a4d94abf1ae989094ba8e",
+    "audit/ssz-compiled-cl-entry/solidity/compiler-input-identities.json": "0ce79a7fd588cfa8a85683b5f3af8ad9b9d1f1dae9f470c9ba50a50aa0a6429d",
+    "audit/ssz-compiled-cl-entry/solidity/inspected-cl-entry-ir.yul": "aba7b84e915d3279916e7d18150f047e553c8f712b1e30ea96235e11998679e3",
+    "audit/ssz-compiled-cl-entry/solidity/standard-json-input.json": "1f964989f16709eb683852ac2fa865aa8ea0f2ae290329dfdf6bc2191979ed2f",
+    "audit/ssz-compiled-cl-entry/validation/axioms.json": "cf3defeea9f653411862c1cab8a98fe1ffbc865b6052c57cf36d0aa65711fc6b",
+    "audit/ssz-compiled-cl-entry/validation/build-identities.json": "19a6a8e7fe54594ea78e1408a168efdb6d07726b8623bbff9123457aa8ccc228",
+    "audit/ssz-compiled-cl-entry/validation/compiler-check.json": "c953a05951e3609a14433560013c8a980c3d2e4992d8ae84ed27c50729078d6b",
+    "audit/ssz-compiled-cl-entry/validation/continuous-ssz-fd2279-972-snapshot-diagnostics.md": "1b7942ff74a965e5a82cf1a3af523f369b0c66c14231180f0f4130f123c4f66d",
+    "audit/ssz-compiled-cl-entry/validation/continuous-ssz-fd2279-second-snapshot-diagnostics.md": "542f2cfb7d590b97742723166747b7c5f2f27bcae42d4fdee03ba9aee0964369",
+    "audit/ssz-compiled-cl-entry/validation/continuous-ssz972-root-compiler-identities.json": "b482c9b066e120271d0bd59219f35845e21f7a225298e842b9191a4d48a15e91",
+    "audit/ssz-compiled-cl-entry/validation/development/lido-ssz-repair-cl-1.log": "3c909c368e9e059311aace58080921038a077e4183cff0506304cdf55b200922",
+    "audit/ssz-compiled-cl-entry/validation/development/lido-ssz-repair-cl-2.log": "48b5811b4e069aad896dd8d39ae8579dc6c1b6e638ecfc154c020ea5d7600dfd",
+    "audit/ssz-compiled-cl-entry/validation/development/lido-ssz-repair-cl-3.log": "637854e92fed80b96e3a7ab420f01924b297271c591240b937a34f852992146a",
+    "audit/ssz-compiled-cl-entry/validation/development/lido-ssz-repair-cl-4.log": "e08a0d2d738c541ea1faa4099581547ddc6df1c649e1f922628a6f65b48c9614",
+    "audit/ssz-compiled-cl-entry/validation/development/lido-ssz-repair-diagnostic-1.log": "4a1839284394d3ea4c94b79219b05de7218e9c7c3aa7f04f64c9bf5488429683",
+    "audit/ssz-compiled-cl-entry/validation/development/lido-ssz-repair-public-1.log": "a3b506ceb60f3f7481bc61174450446debe67a27735e0f53b842b2527b6004fa",
+    "audit/ssz-compiled-cl-entry/validation/development/lido-ssz-repair-regression-2.log": "0735d7efdbe72d4e92d9622bf10b2cf8cf332d6c2b753e181c54cbe90deac392",
+    "audit/ssz-compiled-cl-entry/validation/development/lido-ssz-repair-reply-1.log": "056abdf803dddd28b03d2138047cf7e19823ad49d15faa3cbddb99f5b7633ec1",
+    "audit/ssz-compiled-cl-entry/validation/development/lido-ssz-repair-reply-2.log": "09c7fefd58ccce4903198424ad719685e9c5fe294b1cb0487d646c230f6a67a4",
+    "audit/ssz-compiled-cl-entry/validation/development/lido-ssz-repair-reply-3.log": "72d62d6e883a1449da18a688f718968b3ff411907089e14aa76ce7ed9451a8ec",
+    "audit/ssz-compiled-cl-entry/validation/development/lido-ssz-repair-reply-4.log": "99d503c0a65adbe3fb5738bf948bfaf007d548d173a0ee9ecf0f73a356224342",
+    "audit/ssz-compiled-cl-entry/validation/development/lido-ssz-repair-reply-5.log": "abbba2fac599a6c7f84ed576b60c9be1d872755f0d03f2e621a978f1db27f133",
+    "audit/ssz-compiled-cl-entry/validation/diagnostics.lean": "05bec53cf1ec79e2123ceb803cc5ed2c65116664f329e9f0a69718b2238750b2",
+    "audit/ssz-compiled-cl-entry/validation/diagnostics.log": "c9811da37b983a97b9ca0a8458253f5d6bbbdeeb716641d528231b2f345d54ef",
+    "audit/ssz-compiled-cl-entry/validation/final-build.log": "3b5d5e5c829374164e9b8aba4dcd63fe7bde0add0d9584ebb0e0e0449b0a8666",
+    "audit/ssz-compiled-cl-entry/validation/identity-axiom-check.log": "b2e115bfdf338a68923d169c75a590552eba98d15eb14c108ad1a96aa1c790d4",
+    "audit/ssz-compiled-cl-entry/validation/make-vector.py": "2ad946abb6cbcbb55ce968f084bc3b13623d874e25f2fba3a4c97ee77b6d3e53",
+    "audit/ssz-compiled-cl-entry/validation/materialized-compiler-input.json": "8838448e22b78bc8eabe586c7b39726e62e6e60f2388040cb49a4904b5f5eb39",
+    "audit/ssz-compiled-cl-entry/validation/readonly-validation.log": "b2e115bfdf338a68923d169c75a590552eba98d15eb14c108ad1a96aa1c790d4",
+    "audit/ssz-compiled-cl-entry/validation/root-solc-output.json": "6a4bf41e1e023e5b3564e20dd68c0c4dfe185c56cc0f382119b2ad59a91030f7",
+    "audit/ssz-compiled-cl-entry/validation/run-diagnostics.py": "bb187630b600a444cdad5ded53f94e3b5b2f506671a015be6e0664f37c0732fd",
+    "audit/ssz-compiled-cl-entry/validation/runtime-inputs.json": "96a8d5cd6707f385a042b844290a4554dc0a402e232b0f5099f7280fb84c85a8",
+    "audit/ssz-compiled-cl-entry/validation/source-inputs.json": "65ca7d3bf2a04a313736b75c960099043cc955f3073b8a50a92d700d2aa6f855",
+    "audit/ssz-compiled-cl-entry/validation/valid-calldata.bin": "5f4a59d8b2abefa217f868fe20e23da3f3f1319486dfd8329c728f0759a59973",
+    "audit/ssz-compiled-cl-entry/validation/valid-root.bin": "0c0a28a069fe94dd87ecc20941a2d3cda651f133bf0b0f4697a93095cd7b3917",
+    "audit/ssz-compiled-cl-entry/validation/validate.py": "2b88f36ade0edededd02614ce4cbfe56803dc7b58a2390799c839338528cdc64",
+    "audit/ssz-compiled-cl-entry/validation/vector.json": "0754b06d6d435839fbbd66658244ca7263acf8a2eb6070121c936fffbc7440e7"
+  },
+  "normal_oleans": {
+    "LidoSRv3/Audit/Guarantees/PSsz1CompiledClEntry.lean": "9b7968941c6a80bd0671f203cb68b5969c9ad5cad36ce7d7b1af7ca9ffaf38b7",
+    "LidoSRv3/Audit/Source/SszCompiledClEntry.lean": "4106f868a0ddda16f2c5a9579c32554edf63ec9bd51e6dc3798e6d4e1b94d560",
+    "LidoSRv3/Audit/Source/SszCompiledFrame.lean": "3fa478662835ada074d506e8a10b8e36b6eddf0e157fd55e898502de72670474",
+    "LidoSRv3/Audit/Source/SszCompiledGIndex.lean": "389a35e4c632b30e991439f14983fa91c878a04e345e5d6417a138ac2c1a968e",
+    "LidoSRv3/Audit/Source/SszCompiledReply.lean": "a4b632dcf97e8c2cf3b231024d8c3ce33c5f310ac48c82b5799b127dcd8a0ea1",
+    "LidoSRv3/Audit/Source/SszSoladyFls.lean": "d5cdf537a499e07f7dbd009af0feffebccdc4503deb99fb5e242d38ecb53dfab",
+    "LidoSRv3/Tests/SszCompiledClEntryRegression.lean": "9b9ae1f3e0e26c55c8b2cc3e39a0e4cf574b86feb4aacd7a8aa7ff2f45484651"
+  },
+  "penultimate_sha256": "77aac29b716ffacd32d0c7fd066a638bf2428c4dd74c3a4126f88dabef35e869",
+  "runtime": {
+    "repositories": {
+      "keccak256": "fc8504750a5c2174a1874094dd05e6a0d8797753",
+      "sha2": "565f65009bdd98267361b17d50cddd7c9beb3e6c"
+    },
+    "scope": "Existing FFI compiled into temporary diagnostic dylib; no kernel claim",
+    "sha256": {
+      ".lake/packages/evmyul/EvmYul/FFI/ffi.c": "0ca099540b8f46888e9ae18afffb2a825ef8ef0edc0d9a239c819c32cf82a020",
+      ".lake/packages/evmyul/EvmYul/FFI/ffi.lean": "c0b6b455399a476fd3c5be3fd3e1df5788a112dd92b520397512d073b6317562",
+      ".lake/packages/evmyul/keccak256/sha3.c": "9499df301d240fdd296fb53aae554d2615f875156e39174390dc0b7dd2a25fea",
+      ".lake/packages/evmyul/keccak256/sha3.h": "ba0f5cb513018ae84959293f82a2f1b2c027457c6564e8e1b8397fa439bcce6c",
+      ".lake/packages/evmyul/sha2/sha-256.c": "7a74437adc78576b8faff060f9573ba88a6da798914f45d263c75b149add3d27",
+      ".lake/packages/evmyul/sha2/sha-256.h": "c2173d83813a0c29fcc3345ce489766efeadee6a52ca927ecd0f917a120df9fb"
+    }
+  },
+  "scope": "Exact accepted330 source/review/replay/diagnostic bytes and seven current normal oleans; no Solidity, compiler or FFI execution repeated.",
+  "vector_count": 50
+}
