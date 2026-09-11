@@ -15,6 +15,8 @@
     "audit/address-steth-conversion-call/integration/independent-source-review-107e.md": "25b0c85090b7ab268e4b207a87324c5c2f2d10de7ee0e291517f8f365c80f413",
     "audit/address-steth-conversion-call/integration/readonly-validator.py": "1ff9388b2d8d685daa32fa5e1c075a26f22b519d02bd7bb106418f3ad41353ca",
     "audit/address-steth-conversion-call/integration/scoped-axioms.json": "625b39b25b4a58961652e44f47715110b5bbe3ef86e75b6db147504f62b8d364",
-    "audit/address-steth-conversion-call/integration/trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439"
-  }
+    "audit/address-steth-conversion-call/integration/trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439",
+    "audit/address-steth-conversion-call/integration/independent-integration-review-778f.md": "34a433a7418b97c7b097c0ed06828ca0134242472a61a8133c9cb19058289174"
+  },
+  "integration_review": "CLEAN exact778f6aae58391c545bc802b34b5e3747ca973ebb; archive-only successor separately reviewed"
 }
