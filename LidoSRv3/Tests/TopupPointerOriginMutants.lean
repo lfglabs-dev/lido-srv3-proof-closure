@@ -102,10 +102,7 @@ theorem module_head_encodeReturn_at_128 :
   refine ⟨?_, ?_, ?_⟩
   · rw [h128, hoff]
   · simp [AllocatedZone.contains, ofAllocation, h128, h256]
-  · intro h
-    simp [AllocatedZone.contains, ofAllocation, h256, h352] at h
-    have : ¬ (256 : Nat) ≤ 160 := by decide
-    exact this h.1
+  · simp [AllocatedZone.contains, ofAllocation, h256, h352]
 
 /-- Instantiation of `module_head_in_raw_zone` on that witness. -/
 theorem module_head_in_raw_zone_at_128 :
