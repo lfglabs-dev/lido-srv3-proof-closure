@@ -374,11 +374,14 @@ theorem chained_credential_then_module_disjoint
       finalizeAllocation retBuf (word rawMod.length).val = .ok postRaw ∧
         Disjoint (scalar32 credCursor credNext)
           (ofAllocation retBuf (word rawMod.length).val postRaw) ∧
+        (scalar32 credCursor credNext).valid ∧
+        (scalar32 credCursor credNext).next = credCursor.val + 32 ∧
         (scalar32 credCursor credNext).next = retBuf.val := by
+  have hz := credentials_zone credCursor wc credNext rawCred hc
   have hex := (TopupModuleMemory.decode_success retBuf next rawMod xs hm).right
   rcases hex with ⟨postRaw, hpost⟩
   have ha := hpost.left
-  refine ⟨postRaw, ha, ?_, ?_⟩
+  refine ⟨postRaw, ha, ?_, hz.2.2.2.1, hz.2.2.1, ?_⟩
   · refine sequential_disjoint _ _ ?_
     rw [ofAllocation_origin, scalar32_next, hchain]
   · rw [scalar32_next, hchain]
