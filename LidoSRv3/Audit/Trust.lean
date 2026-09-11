@@ -1,3 +1,4 @@
+import LidoSRv3.Tests.TopupTimingHistory
 import LidoSRv3.Tests.AddressRequestBatches
 import LidoSRv3.Tests.TopupPhysicalCredentialGetter
 import LidoSRv3.Tests.TopupCredentialCall
@@ -804,3 +805,9 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_batch_failure_restores
 #print axioms LidoSRv3.Audit.Source.AddressRequestBatches.loop_success
 #print axioms LidoSRv3.Tests.AddressRequestBatches.public_empty_steth
+
+#print axioms LidoSRv3.Audit.Guarantees.PTopupTimingHistory.actual_timing_credential_root_module_memory_history
+#print axioms LidoSRv3.Audit.Guarantees.PTopupTimingHistory.actual_timing_credential_root_module_failure_restores
+#print axioms LidoSRv3.Audit.Source.TopupTimingHistory.execute_projection
+#print axioms LidoSRv3.Audit.Source.TopupTimingHistory.packed_fields
+#print axioms LidoSRv3.Tests.TopupTimingHistory.public_consumer
