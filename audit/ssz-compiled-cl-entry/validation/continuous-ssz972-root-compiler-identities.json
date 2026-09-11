@@ -1,0 +1,83 @@
+{
+  "candidate": "9723377c3a936c522ec10e88dadcab7e1a7b25b0",
+  "inputs": [
+    {
+      "path": "audit/ssz-root-call-composition/solidity/SszRootCall.t.sol",
+      "sha256": "ed5b04da50dd98519ef85425a30477e63372eb7781cbca43ea446cd3c9761c90",
+      "bytes": 6462,
+      "pin": "2c2c72a91cd68a43de0777912772d12cc48a285d",
+      "metadata_keccak_equal": true
+    },
+    {
+      "path": "lido-core/contracts/0.8.25/CLValidatorVerifier.sol",
+      "sha256": "d6e89f6975e4fa02f758bf461a98ac2d689296b5c92d03ffd4e43a22d0b3d7ed",
+      "bytes": 4816,
+      "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+      "metadata_keccak_equal": true
+    },
+    {
+      "path": "lido-core/contracts/common/interfaces/ValidatorWitness.sol",
+      "sha256": "8fd24cfab7402233029756e52e59198b0d9cbf0a42e5c07d9fa2338ed731a5f7",
+      "bytes": 673,
+      "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+      "metadata_keccak_equal": true
+    },
+    {
+      "path": "lido-core/contracts/common/lib/BLS.sol",
+      "sha256": "0187cc6a6b1aaa833317695d88795db431fa237452213e8c3872a0f444dceb7c",
+      "bytes": 27412,
+      "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+      "metadata_keccak_equal": true
+    },
+    {
+      "path": "lido-core/contracts/common/lib/BeaconTypes.sol",
+      "sha256": "9591e9af1a4fd398db86267f3589e763f9eb2016bf29e26cfa50988cf73a10c3",
+      "bytes": 583,
+      "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+      "metadata_keccak_equal": true
+    },
+    {
+      "path": "lido-core/contracts/common/lib/GIndex.sol",
+      "sha256": "2653bd4ba89c349f3db36f21a8afc6a24e0e233816d9b608f46d048feb601d1f",
+      "bytes": 3363,
+      "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+      "metadata_keccak_equal": true
+    },
+    {
+      "path": "lido-core/contracts/common/lib/SSZ.sol",
+      "sha256": "91ef497b972bbee0fe89043034e6bd62fa0c1059f22874d4826bc6164a22009b",
+      "bytes": 9809,
+      "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+      "metadata_keccak_equal": true
+    }
+  ],
+  "artifact_sha256": "aba7b84e915d3279916e7d18150f047e553c8f712b1e30ea96235e11998679e3",
+  "settings": {
+    "evmVersion": "cancun",
+    "metadata": {
+      "bytecodeHash": "ipfs"
+    },
+    "optimizer": {
+      "enabled": true,
+      "runs": 200
+    },
+    "outputSelection": {
+      "audit/ssz-root-call-composition/solidity/SszRootCall.t.sol": {
+        "SszRootCallHarness": [
+          "irOptimized",
+          "evm.deployedBytecode.object",
+          "metadata",
+          "evm.methodIdentifiers"
+        ]
+      }
+    },
+    "remappings": [
+      "contracts/=lido-core/contracts/"
+    ],
+    "viaIR": true
+  },
+  "local_solc_version": "solc, the solidity compiler commandline interface\nVersion: 0.8.25+commit.b61c2a91.Darwin.appleclang\n",
+  "local_solc_sha256": "cc3f94a70ac681b0304084acc1980aabe2a1bb3240d44ce76a8df0e1e77a2110",
+  "ir_exact_reproduction": true,
+  "scope": "Root independently checks seven pinned Git bodies/SHA256/metadataKeccak; replaces source URL references with those exact contents for local Mac solc replay. Original Linux compiler binary not re-executed; same-version Mac output matches full retained IR byte-for-byte including the documented appended newline. No Lean/full source correspondence verdict implied."
+}

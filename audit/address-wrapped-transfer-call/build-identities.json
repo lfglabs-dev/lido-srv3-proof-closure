@@ -1,0 +1,392 @@
+{
+  "scope": "Exact final source bytes and normal successful compilation artifacts, captured after validation; development logs are not assigned retrospective source hashes.",
+  "entries": [
+    {
+      "source": "LidoSRv3/Audit/Source/AddressWrappedTransferCalls.lean",
+      "sha256": "73891187e372834cfbfa77e103c513195aa06f2c71ee9812ee505531564cbe63",
+      "artifacts": {
+        ".olean": {
+          "sha256": "d0044e6b0357d204589a612da3de9a9e64564a8c2366d6ac2cd206b6f5bef28f"
+        },
+        ".ilean": {
+          "sha256": "347297c22be5338f1fa9aa97dcd8b218fd408643e6563bf653bca730110d849a"
+        },
+        ".trace": {
+          "sha256": "cc6c7b93ec8acaa434d7909c5c63806c0ca85bf23bd5dc97745884118ab02e23",
+          "lake_trace": {
+            "synthetic": false,
+            "schemaVersion": "2025-09-10",
+            "outputs": {
+              "o": [
+                "14d340592ed46410.olean"
+              ],
+              "m": false,
+              "i": "6889f00cd7b57108.ilean",
+              "c": "423c602bb127e864.c"
+            },
+            "log": [
+              {
+                "message": ".> LEAN_PATH=/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Cli/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/batteries/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Qq/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/aesop/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/proofwidgets/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/importGraph/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/plausible/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/mathlib/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/evmyul/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/verity/.lake/build/lib/lean:/private/tmp/lido-address-wrapped-transfer-call/.lake/build/lib/lean /Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean /private/tmp/lido-address-wrapped-transfer-call/LidoSRv3/Audit/Source/AddressWrappedTransferCalls.lean -o /private/tmp/lido-address-wrapped-transfer-call/.lake/build/lib/lean/LidoSRv3/Audit/Source/AddressWrappedTransferCalls.olean -i /private/tmp/lido-address-wrapped-transfer-call/.lake/build/lib/lean/LidoSRv3/Audit/Source/AddressWrappedTransferCalls.ilean -c /private/tmp/lido-address-wrapped-transfer-call/.lake/build/ir/LidoSRv3/Audit/Source/AddressWrappedTransferCalls.c --setup /private/tmp/lido-address-wrapped-transfer-call/.lake/build/ir/LidoSRv3/Audit/Source/AddressWrappedTransferCalls.setup.json --json",
+                "level": "trace"
+              }
+            ],
+            "inputs": [
+              [
+                "LidoSRv3.Audit.Source.AddressWrappedTransferCalls:deps",
+                [
+                  [
+                    "deps",
+                    [
+                      [
+                        "\u00ablido-srv3-proof-closure\u00bb/LidoSRv3:extraDep",
+                        [
+                          [
+                            "@\u00ablido-srv3-proof-closure\u00bb:extraDep",
+                            "00000000000006bb"
+                          ]
+                        ]
+                      ],
+                      [
+                        "imports",
+                        [
+                          [
+                            "LidoSRv3.Audit.Guarantees.PAddress1WrappedTokenCalls transitive imports (legacy)",
+                            "88f070e80bc81d6a"
+                          ],
+                          [
+                            "LidoSRv3.Audit.Guarantees.PAddress1WrappedTokenCalls:importAllArts",
+                            "c422b1d4978f0330"
+                          ]
+                        ]
+                      ]
+                    ]
+                  ],
+                  [
+                    "libs",
+                    [
+                      [
+                        "import dynlibs",
+                        "00000000000006bb"
+                      ],
+                      [
+                        "package external libraries",
+                        "00000000000006bb"
+                      ],
+                      [
+                        "module dynlibs",
+                        "00000000000006bb"
+                      ],
+                      [
+                        "module plugins",
+                        "00000000000006bb"
+                      ]
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "Lean 4.31.0, commit 68218e876d2a38b1985b8590fff244a83c321783",
+                "fc45ac412f28501c"
+              ],
+              [
+                "/private/tmp/lido-address-wrapped-transfer-call/LidoSRv3/Audit/Source/AddressWrappedTransferCalls.lean",
+                "0a858cd7f8772a8e"
+              ],
+              [
+                "options",
+                "00000000000006bb"
+              ],
+              [
+                "isModule: false",
+                "feefd2a0d3a1847e"
+              ],
+              [
+                "Module.name: LidoSRv3.Audit.Source.AddressWrappedTransferCalls",
+                "d8597bdf510962c7"
+              ],
+              [
+                "Package.id?: (some lido-srv3-proof-closure)",
+                "1792847f4a06c449"
+              ],
+              [
+                "Module.leanArgs: #[]",
+                "00000000000006bb"
+              ]
+            ],
+            "depHash": "6b80235bf1f3ce7d"
+          }
+        }
+      }
+    },
+    {
+      "source": "LidoSRv3/Audit/Guarantees/PAddress1WrappedTransferCalls.lean",
+      "sha256": "dd05f082b4508b0941f0a17a1149cf34b2212eeede3bd2c17383b65fa0950a44",
+      "artifacts": {
+        ".olean": {
+          "sha256": "125a569f98b38b27ddf1f99f85246fb83dc02da6ce37ed1a3ef775a5468e1ac3"
+        },
+        ".ilean": {
+          "sha256": "a2f4e3aac16857b54a4b77a535f14b72baf5d0c6560c023f140af1825289594c"
+        },
+        ".trace": {
+          "sha256": "a81c9414badebe1390631b1a947d5e1051ff7e822f62c65fc47428e554332c92",
+          "lake_trace": {
+            "synthetic": false,
+            "schemaVersion": "2025-09-10",
+            "outputs": {
+              "o": [
+                "c189751d22315764.olean"
+              ],
+              "m": false,
+              "i": "a36d712ea0bf7e2f.ilean",
+              "c": "047208112cb49876.c"
+            },
+            "log": [
+              {
+                "message": ".> LEAN_PATH=/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Cli/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/batteries/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Qq/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/aesop/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/proofwidgets/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/importGraph/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/plausible/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/mathlib/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/evmyul/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/verity/.lake/build/lib/lean:/private/tmp/lido-address-wrapped-transfer-call/.lake/build/lib/lean /Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean /private/tmp/lido-address-wrapped-transfer-call/LidoSRv3/Audit/Guarantees/PAddress1WrappedTransferCalls.lean -o /private/tmp/lido-address-wrapped-transfer-call/.lake/build/lib/lean/LidoSRv3/Audit/Guarantees/PAddress1WrappedTransferCalls.olean -i /private/tmp/lido-address-wrapped-transfer-call/.lake/build/lib/lean/LidoSRv3/Audit/Guarantees/PAddress1WrappedTransferCalls.ilean -c /private/tmp/lido-address-wrapped-transfer-call/.lake/build/ir/LidoSRv3/Audit/Guarantees/PAddress1WrappedTransferCalls.c --setup /private/tmp/lido-address-wrapped-transfer-call/.lake/build/ir/LidoSRv3/Audit/Guarantees/PAddress1WrappedTransferCalls.setup.json --json",
+                "level": "trace"
+              }
+            ],
+            "inputs": [
+              [
+                "LidoSRv3.Audit.Guarantees.PAddress1WrappedTransferCalls:deps",
+                [
+                  [
+                    "deps",
+                    [
+                      [
+                        "\u00ablido-srv3-proof-closure\u00bb/LidoSRv3:extraDep",
+                        [
+                          [
+                            "@\u00ablido-srv3-proof-closure\u00bb:extraDep",
+                            "00000000000006bb"
+                          ]
+                        ]
+                      ],
+                      [
+                        "imports",
+                        [
+                          [
+                            "LidoSRv3.Audit.Source.AddressWrappedTransferCalls transitive imports (legacy)",
+                            "114ea3bc1d1d9063"
+                          ],
+                          [
+                            "LidoSRv3.Audit.Source.AddressWrappedTransferCalls:importAllArts",
+                            "1dfd379477f2f8fa"
+                          ]
+                        ]
+                      ]
+                    ]
+                  ],
+                  [
+                    "libs",
+                    [
+                      [
+                        "import dynlibs",
+                        "00000000000006bb"
+                      ],
+                      [
+                        "package external libraries",
+                        "00000000000006bb"
+                      ],
+                      [
+                        "module dynlibs",
+                        "00000000000006bb"
+                      ],
+                      [
+                        "module plugins",
+                        "00000000000006bb"
+                      ]
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "Lean 4.31.0, commit 68218e876d2a38b1985b8590fff244a83c321783",
+                "fc45ac412f28501c"
+              ],
+              [
+                "/private/tmp/lido-address-wrapped-transfer-call/LidoSRv3/Audit/Guarantees/PAddress1WrappedTransferCalls.lean",
+                "b25a3accbe7447c5"
+              ],
+              [
+                "options",
+                "00000000000006bb"
+              ],
+              [
+                "isModule: false",
+                "feefd2a0d3a1847e"
+              ],
+              [
+                "Module.name: LidoSRv3.Audit.Guarantees.PAddress1WrappedTransferCalls",
+                "18d32b9404942349"
+              ],
+              [
+                "Package.id?: (some lido-srv3-proof-closure)",
+                "1792847f4a06c449"
+              ],
+              [
+                "Module.leanArgs: #[]",
+                "00000000000006bb"
+              ]
+            ],
+            "depHash": "4ebd3529347d61a9"
+          }
+        }
+      }
+    },
+    {
+      "source": "LidoSRv3/Tests/AddressWrappedTransferCalls.lean",
+      "sha256": "f4597b41392bc1de32b864ff30cbc52ecc51e5b92fb31cf223ff26deb4536d69",
+      "artifacts": {
+        ".olean": {
+          "sha256": "a7d003a653aa72cc4084097a7cafc3275213ca0c9e26fa0f17826ca3e96aab2a"
+        },
+        ".ilean": {
+          "sha256": "19167b66984e19c230900e12393427d3dd1478e5ad56a444ef6496c0aa70c777"
+        },
+        ".trace": {
+          "sha256": "83c7eb97f198f6e2c56bde6069e3847bcd7b800d7b5a8183b7f322b45d9eb909",
+          "lake_trace": {
+            "synthetic": false,
+            "schemaVersion": "2025-09-10",
+            "outputs": {
+              "o": [
+                "5f3ab3301eeb65ac.olean"
+              ],
+              "m": false,
+              "i": "466b19ee412d382e.ilean",
+              "c": "836a38cf8bbcd03a.c"
+            },
+            "log": [
+              {
+                "message": ".> LEAN_PATH=/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Cli/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/batteries/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Qq/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/aesop/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/proofwidgets/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/importGraph/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/plausible/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/mathlib/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/evmyul/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/verity/.lake/build/lib/lean:/private/tmp/lido-address-wrapped-transfer-call/.lake/build/lib/lean /Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean /private/tmp/lido-address-wrapped-transfer-call/LidoSRv3/Tests/AddressWrappedTransferCalls.lean -o /private/tmp/lido-address-wrapped-transfer-call/.lake/build/lib/lean/LidoSRv3/Tests/AddressWrappedTransferCalls.olean -i /private/tmp/lido-address-wrapped-transfer-call/.lake/build/lib/lean/LidoSRv3/Tests/AddressWrappedTransferCalls.ilean -c /private/tmp/lido-address-wrapped-transfer-call/.lake/build/ir/LidoSRv3/Tests/AddressWrappedTransferCalls.c --setup /private/tmp/lido-address-wrapped-transfer-call/.lake/build/ir/LidoSRv3/Tests/AddressWrappedTransferCalls.setup.json --json",
+                "level": "trace"
+              },
+              {
+                "message": "LidoSRv3/Tests/AddressWrappedTransferCalls.lean:111:0: 'LidoSRv3.Audit.Source.AddressWrappedTransferCalls.move_success' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]",
+                "level": "info"
+              },
+              {
+                "message": "LidoSRv3/Tests/AddressWrappedTransferCalls.lean:112:0: 'LidoSRv3.Audit.Source.AddressWrappedTransferCalls.spend_success' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]",
+                "level": "info"
+              },
+              {
+                "message": "LidoSRv3/Tests/AddressWrappedTransferCalls.lean:113:0: 'LidoSRv3.Audit.Source.AddressWrappedTransferCalls.transferFrom_success' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]",
+                "level": "info"
+              },
+              {
+                "message": "LidoSRv3/Tests/AddressWrappedTransferCalls.lean:114:0: 'LidoSRv3.Audit.Source.AddressWrappedTransferCalls.canonical_call' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]",
+                "level": "info"
+              },
+              {
+                "message": "LidoSRv3/Tests/AddressWrappedTransferCalls.lean:115:0: 'LidoSRv3.Audit.Source.AddressWrappedTransferCalls.canonical_outer_call' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]",
+                "level": "info"
+              },
+              {
+                "message": "LidoSRv3/Tests/AddressWrappedTransferCalls.lean:116:0: 'LidoSRv3.Audit.Source.AddressWrappedTransferCalls.joined_success' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]",
+                "level": "info"
+              },
+              {
+                "message": "LidoSRv3/Tests/AddressWrappedTransferCalls.lean:117:0: 'LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_transfer_request_enqueue' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]",
+                "level": "info"
+              },
+              {
+                "message": "LidoSRv3/Tests/AddressWrappedTransferCalls.lean:118:0: 'LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_transfer_request_failure_restores' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]",
+                "level": "info"
+              },
+              {
+                "message": "LidoSRv3/Tests/AddressWrappedTransferCalls.lean:119:0: 'LidoSRv3.Tests.AddressWrappedTransferCalls.public_zero_sender_rollback' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]",
+                "level": "info"
+              }
+            ],
+            "inputs": [
+              [
+                "LidoSRv3.Tests.AddressWrappedTransferCalls:deps",
+                [
+                  [
+                    "deps",
+                    [
+                      [
+                        "\u00ablido-srv3-proof-closure\u00bb/LidoSRv3Test:extraDep",
+                        [
+                          [
+                            "@\u00ablido-srv3-proof-closure\u00bb:extraDep",
+                            "00000000000006bb"
+                          ]
+                        ]
+                      ],
+                      [
+                        "imports",
+                        [
+                          [
+                            "LidoSRv3.Audit.Guarantees.PAddress1WrappedTransferCalls transitive imports (legacy)",
+                            "1c38f4fcd6c32e61"
+                          ],
+                          [
+                            "LidoSRv3.Audit.Guarantees.PAddress1WrappedTransferCalls:importAllArts",
+                            "e6f40a7a30fc3417"
+                          ]
+                        ]
+                      ]
+                    ]
+                  ],
+                  [
+                    "libs",
+                    [
+                      [
+                        "import dynlibs",
+                        "00000000000006bb"
+                      ],
+                      [
+                        "package external libraries",
+                        "00000000000006bb"
+                      ],
+                      [
+                        "module dynlibs",
+                        "00000000000006bb"
+                      ],
+                      [
+                        "module plugins",
+                        "00000000000006bb"
+                      ]
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "Lean 4.31.0, commit 68218e876d2a38b1985b8590fff244a83c321783",
+                "fc45ac412f28501c"
+              ],
+              [
+                "/private/tmp/lido-address-wrapped-transfer-call/LidoSRv3/Tests/AddressWrappedTransferCalls.lean",
+                "5e7342641c52fb95"
+              ],
+              [
+                "options",
+                "00000000000006bb"
+              ],
+              [
+                "isModule: false",
+                "feefd2a0d3a1847e"
+              ],
+              [
+                "Module.name: LidoSRv3.Tests.AddressWrappedTransferCalls",
+                "8eacde2341510015"
+              ],
+              [
+                "Package.id?: (some lido-srv3-proof-closure)",
+                "1792847f4a06c449"
+              ],
+              [
+                "Module.leanArgs: #[]",
+                "00000000000006bb"
+              ]
+            ],
+            "depHash": "a69dc904be1c2595"
+          }
+        }
+      }
+    }
+  ]
+}

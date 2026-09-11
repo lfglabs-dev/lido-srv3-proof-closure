@@ -1,3 +1,5 @@
+import LidoSRv3.Tests.AddressWrappedTransferCalls
+import LidoSRv3.Tests.SszCompiledClEntryRegression
 import LidoSRv3.Tests.AddressWrappedTokenCalls
 import LidoSRv3.Tests.DepositDsmCall
 import LidoSRv3.Tests.AddressWrappedRequestCalls
@@ -770,3 +772,15 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_token_request_failure_restores
 #print axioms LidoSRv3.Audit.Source.AddressWrappedTokenCalls.canonical_call
 #print axioms LidoSRv3.Audit.Source.AddressWrappedTokenCalls.joined_success
+
+#print axioms LidoSRv3.Audit.Guarantees.PSsz1.actual_compiled_cl_entry_branch
+#print axioms LidoSRv3.Audit.Guarantees.PSsz1.actual_compiled_cl_entry_tree
+#print axioms LidoSRv3.Audit.Source.SszCompiledClEntry.beforeRoot_success
+#print axioms LidoSRv3.Audit.Source.SszCompiledClEntry.rootCall_success
+#print axioms LidoSRv3.Audit.Source.SszCompiledClEntry.afterRoot_success
+#print axioms LidoSRv3.Audit.Source.SszCompiledClEntry.run_success
+
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_transfer_request_enqueue
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_transfer_request_failure_restores
+#print axioms LidoSRv3.Audit.Source.AddressWrappedTransferCalls.canonical_outer_call
+#print axioms LidoSRv3.Audit.Source.AddressWrappedTransferCalls.joined_success

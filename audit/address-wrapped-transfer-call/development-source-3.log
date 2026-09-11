@@ -1,0 +1,111 @@
+⚠ [11/661] Replayed Verity.Core
+warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1041:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+⚠ [1079/1208] Replayed Conform.Wheels
+warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: Conform/Wheels.lean:106:70: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1080/1208] Replayed EvmYul.Pretty
+warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: EvmYul/Pretty.lean:36:32: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1127/1208] Replayed EvmYul.Semantics
+warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1128/1208] Replayed EvmYul.EVM.Semantics
+warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1259/1267] Replayed LidoSRv3.Audit.Verity.AddressRecipientCallBridge
+warning: LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean:671:56: This simp argument is unused:
+  pureExec
+
+Hint: Omit it from the simp argument list.
+  simp [claimTo, Bind.bind, bindExec, hs, hc, LidoSRv3.Audit.Source.TrioReserve1.Live.emit,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲p̵u̵r̵e̵E̵x̵e̵c̵,̵ ̵hsa]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean:674:94: This simp argument is unused:
+  pureExec
+
+Hint: Omit it from the simp argument list.
+  simp [claimTo, Bind.bind, bindExec, hs, hc, LidoSRv3.Audit.Source.TrioReserve1.Live.emit,
+  ̲ p̵u̵r̵e̵E̵x̵e̵c̵,̵  ̲ ̲claimEvents, List.append_assoc]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean:732:30: This simp argument is unused:
+  hn
+
+Hint: Omit it from the simp argument list.
+  simp [claimWithdrawalsTo, hn,̵ ̵h̵n̵0, hl, zeroAddress, Pure.pure,
+  ̲  ̲ ̲ ̲ ̲ ̲LidoSRv3.Audit.Source.TrioReserve1.Live.require, Bind.bind, bindExec, fail, pureExec] at hs
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean:735:30: This simp argument is unused:
+  hn
+
+Hint: Omit it from the simp argument list.
+  simp [claimWithdrawalsTo, hn,̵ ̵h̵n̵0, hl, zeroAddress, Pure.pure,
+  ̲  ̲ ̲ ̲ ̲ ̲LidoSRv3.Audit.Source.TrioReserve1.Live.require, Bind.bind, bindExec, pureExec]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+info: LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean:739:0: 'LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claimTo_success' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean:740:0: 'LidoSRv3.Audit.Verity.AddressRecipientCallBridge.runClaimWithdrawalsTo_success' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+✖ [1267/1267] Building LidoSRv3.Audit.Source.AddressWrappedTransferCalls (1.7s)
+trace: .> LEAN_PATH=/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Cli/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/batteries/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Qq/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/aesop/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/proofwidgets/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/importGraph/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/plausible/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/mathlib/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/evmyul/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/verity/.lake/build/lib/lean:/private/tmp/lido-address-wrapped-transfer-call/.lake/build/lib/lean /Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean /private/tmp/lido-address-wrapped-transfer-call/LidoSRv3/Audit/Source/AddressWrappedTransferCalls.lean -o /private/tmp/lido-address-wrapped-transfer-call/.lake/build/lib/lean/LidoSRv3/Audit/Source/AddressWrappedTransferCalls.olean -i /private/tmp/lido-address-wrapped-transfer-call/.lake/build/lib/lean/LidoSRv3/Audit/Source/AddressWrappedTransferCalls.ilean -c /private/tmp/lido-address-wrapped-transfer-call/.lake/build/ir/LidoSRv3/Audit/Source/AddressWrappedTransferCalls.c --setup /private/tmp/lido-address-wrapped-transfer-call/.lake/build/ir/LidoSRv3/Audit/Source/AddressWrappedTransferCalls.setup.json --json
+error: LidoSRv3/Audit/Source/AddressWrappedTransferCalls.lean:151:50: Unknown constant `Verity.Address.ofNat`
+error: LidoSRv3/Audit/Source/AddressWrappedTransferCalls.lean:161:67: unsolved goals
+wstETH : Address
+otherCalls : External
+caller fromAddr recipient : Address
+amount : Word
+w : World
+h36 : 36 = 4 + 32
+h68 : 68 = 4 + 32 + 32
+⊢ transferReply { self := wstETH, sender := caller } (Verity.Core.Address.ofNat (decode (encode 32 fromAddr.val)))
+      (Verity.Core.Address.ofNat (decode (encode 32 recipient.val))) amount w =
+    transferReply { self := wstETH, sender := caller } fromAddr recipient amount w
+warning: LidoSRv3/Audit/Source/AddressWrappedTransferCalls.lean:173:30: This simp argument is unused:
+  canonical_address
+
+Hint: Omit it from the simp argument list.
+  simp only [̵h̵3̵6̵,̵h̵6̵8̵,̵←̵ ̵L̵i̵s̵t̵.̵d̵r̵o̵p̵_̵d̵r̵o̵p̵,̵d̵r̵o̵p̵_̵e̵n̵c̵o̵d̵e̵d̵,̵t̵a̵k̵e̵_̵e̵n̵c̵o̵d̵e̵d̵,̵[̲h̲3̲6̲,̲ ̲h̲6̲8̲,̲ ̲←̲ ̲L̲i̲s̲t̲.̲d̲r̲o̲p̲_̲d̲r̲o̲p̲,̲ ̲d̲r̲o̲p̲_̲e̲n̲c̲o̲d̲e̲d̲,̲ ̲t̲a̲k̲e̲_̲e̲n̲c̲o̲d̲e̲d̲,̲
+      (show (encode 32 amount.val).take 32 = encode 32 amount.val from by
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲simpa only [ABI.encode_length] using (List.take_length (l := encode 32 amount.val))),
+      V̵e̵r̵i̵t̵y̵.̵C̵o̵r̵e̵.̵A̵d̵d̵r̵e̵s̵s̵.̵t̵o̵N̵a̵t̵,̵c̵a̵n̵o̵n̵i̵c̵a̵l̵_̵a̵d̵d̵r̵e̵s̵s̵,̵A̵d̵d̵r̵e̵s̵s̵W̵r̵a̵p̵p̵e̵d̵T̵o̵k̵e̵n̵C̵a̵l̵l̵s̵.̵c̵a̵n̵o̵n̵i̵c̵a̵l̵_̵d̵e̵c̵o̵d̵e̵]̵V̲e̲r̲i̲t̲y̲.̲C̲o̲r̲e̲.̲A̲d̲d̲r̲e̲s̲s̲.̲t̲o̲N̲a̲t̲,̲ ̲A̲d̲d̲r̲e̲s̲s̲W̲r̲a̲p̲p̲e̲d̲T̲o̲k̲e̲n̲C̲a̲l̲l̲s̲.̲c̲a̲n̲o̲n̲i̲c̲a̲l̲_̲d̲e̲c̲o̲d̲e̲]̲
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+error: Lean exited with code 1
+Some required targets logged failures:
+- LidoSRv3.Audit.Source.AddressWrappedTransferCalls
+error: build failed

@@ -1,0 +1,64 @@
+{
+ "language": "Solidity",
+ "settings": {
+  "evmVersion": "cancun",
+  "metadata": {
+   "bytecodeHash": "ipfs"
+  },
+  "optimizer": {
+   "enabled": true,
+   "runs": 200
+  },
+  "outputSelection": {
+   "audit/ssz-root-call-composition/solidity/SszRootCall.t.sol": {
+    "SszRootCallHarness": [
+     "irOptimized",
+     "evm.deployedBytecode.object",
+     "metadata",
+     "evm.methodIdentifiers"
+    ]
+   }
+  },
+  "remappings": [
+   "contracts/=lido-core/contracts/"
+  ],
+  "viaIR": true
+ },
+ "sources": {
+  "audit/ssz-root-call-composition/solidity/SszRootCall.t.sol": {
+   "urls": [
+    "audit/ssz-root-call-composition/solidity/SszRootCall.t.sol"
+   ]
+  },
+  "lido-core/contracts/0.8.25/CLValidatorVerifier.sol": {
+   "urls": [
+    "lido-core/contracts/0.8.25/CLValidatorVerifier.sol"
+   ]
+  },
+  "lido-core/contracts/common/interfaces/ValidatorWitness.sol": {
+   "urls": [
+    "lido-core/contracts/common/interfaces/ValidatorWitness.sol"
+   ]
+  },
+  "lido-core/contracts/common/lib/BLS.sol": {
+   "urls": [
+    "lido-core/contracts/common/lib/BLS.sol"
+   ]
+  },
+  "lido-core/contracts/common/lib/BeaconTypes.sol": {
+   "urls": [
+    "lido-core/contracts/common/lib/BeaconTypes.sol"
+   ]
+  },
+  "lido-core/contracts/common/lib/GIndex.sol": {
+   "urls": [
+    "lido-core/contracts/common/lib/GIndex.sol"
+   ]
+  },
+  "lido-core/contracts/common/lib/SSZ.sol": {
+   "urls": [
+    "lido-core/contracts/common/lib/SSZ.sol"
+   ]
+  }
+ }
+}

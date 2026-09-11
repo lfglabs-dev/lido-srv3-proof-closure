@@ -1,0 +1,19 @@
+{
+  "source": "a9c6e2b1f7d3edcf5764082d7e266bb1df8fb42a",
+  "main": "cefc3c5452861e252cc17201d264734209251fcb",
+  "union": "0dbc9f9d5af8e31aac03ea66c889bbee34fa7401",
+  "jobs": 1742,
+  "global_axioms": 29,
+  "ordinary_scopes": 9,
+  "source_hashes": 50,
+  "sha256": {
+    "audit/address-wrapped-transfer-call/integration/README.md": "937607cd53bc2b26a5d7dd597aa0aa5e9de15fb062f125fc903017535bf2fddb",
+    "audit/address-wrapped-transfer-call/integration/all-trust-build.log": "939b6a93ecdadebfc5c88a53810cd65a41f1cb1a56768d9ad43b2ed774978062",
+    "audit/address-wrapped-transfer-call/integration/identities.json": "76d93d227a481cf46fb006bef99f6beea8c35692bc22f0fe430d6235923d2849",
+    "audit/address-wrapped-transfer-call/integration/identity-check.log": "2603c68cbf47ae2c4fdc1b820042be1ee3fd9b9cfce2771584033d8fa8ee22f0",
+    "audit/address-wrapped-transfer-call/integration/independent-source-review-a9c6.md": "6535339b817cc11b67f0af64a7b77ae37b6bce3a89c36dbe7874cd95ff7db08b",
+    "audit/address-wrapped-transfer-call/integration/scoped-axioms.json": "247c087ea0d46f461c7b02514ada978107f5764c807ef91e3b93019667709a83",
+    "audit/address-wrapped-transfer-call/integration/trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439",
+    "audit/address-wrapped-transfer-call/integration/validate-readonly.py": "a5102a622e276948156cfe4aab5b2d44b9f070837e074505546f1ff6da33d715"
+  }
+}
