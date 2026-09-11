@@ -1,0 +1,14 @@
+COMMAND ["lake", "env", "lean", "--root=/private/tmp/lido-address-request-call/.lake/packages/evmyul", "--setup=/var/folders/yv/6bf89_m973jc11pm6lb2qx700000gn/T/lido-address-ffi-b6b1q3om/ffi.setup.json", "-c", "/var/folders/yv/6bf89_m973jc11pm6lb2qx700000gn/T/lido-address-ffi-b6b1q3om/ffi.c", "/private/tmp/lido-address-request-call/.lake/packages/evmyul/EvmYul/FFI/ffi.lean"]
+COMMAND ["cc", "-fPIC", "-I/Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/include", "-I/private/tmp/lido-address-request-call/.lake/packages/evmyul/sha2", "-I/private/tmp/lido-address-request-call/.lake/packages/evmyul/keccak256", "-c", "/private/tmp/lido-address-request-call/.lake/packages/evmyul/EvmYul/FFI/ffi.c", "-o", "/var/folders/yv/6bf89_m973jc11pm6lb2qx700000gn/T/lido-address-ffi-b6b1q3om/native0.o"]
+COMMAND ["cc", "-fPIC", "-I/Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/include", "-I/private/tmp/lido-address-request-call/.lake/packages/evmyul/sha2", "-I/private/tmp/lido-address-request-call/.lake/packages/evmyul/keccak256", "-c", "/private/tmp/lido-address-request-call/.lake/packages/evmyul/sha2/sha-256.c", "-o", "/var/folders/yv/6bf89_m973jc11pm6lb2qx700000gn/T/lido-address-ffi-b6b1q3om/native1.o"]
+COMMAND ["cc", "-fPIC", "-I/Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/include", "-I/private/tmp/lido-address-request-call/.lake/packages/evmyul/sha2", "-I/private/tmp/lido-address-request-call/.lake/packages/evmyul/keccak256", "-c", "/private/tmp/lido-address-request-call/.lake/packages/evmyul/keccak256/sha3.c", "-o", "/var/folders/yv/6bf89_m973jc11pm6lb2qx700000gn/T/lido-address-ffi-b6b1q3om/native2.o"]
+COMMAND ["lake", "env", "leanc", "-shared", "-DLEAN_EXPORTING", "-o", "/var/folders/yv/6bf89_m973jc11pm6lb2qx700000gn/T/lido-address-ffi-b6b1q3om/ffi.dylib", "/var/folders/yv/6bf89_m973jc11pm6lb2qx700000gn/T/lido-address-ffi-b6b1q3om/ffi.c", "/var/folders/yv/6bf89_m973jc11pm6lb2qx700000gn/T/lido-address-ffi-b6b1q3om/native0.o", "/var/folders/yv/6bf89_m973jc11pm6lb2qx700000gn/T/lido-address-ffi-b6b1q3om/native1.o", "/var/folders/yv/6bf89_m973jc11pm6lb2qx700000gn/T/lido-address-ffi-b6b1q3om/native2.o"]
+COMMAND ["lake", "env", "lean", "--load-dynlib=/var/folders/yv/6bf89_m973jc11pm6lb2qx700000gn/T/lido-address-ffi-b6b1q3om/ffi.dylib", "audit/address-request-call/diagnostics.lean"]
+EXEC PASS: false bool success
+EXEC PASS: ordered attempts
+EXEC PASS: ordered semantic events
+EXEC PASS: owner zero and amount
+EXEC PASS: post-transfer id and shares truncation
+EXEC PASS: entry TIMESTAMP survives adversarial model metadata
+EXEC PASS: legacy maximum set length accepts
+EXEC PASS: legacy length wraps
