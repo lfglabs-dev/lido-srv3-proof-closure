@@ -1,3 +1,4 @@
+import LidoSRv3.Tests.TrioConsolidation.PhysicalQuotaSettlement
 import LidoSRv3.Tests.AccountAccountingCall
 import LidoSRv3.Tests.AddressStETHTransferFromCalls
 import LidoSRv3.Tests.TopupEntryAdmission
@@ -896,3 +897,11 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1.actual_report_accounting_call_failure_restores
 #print axioms LidoSRv3.Tests.AccountAccountingCall.public_success
 #print axioms LidoSRv3.Tests.AccountAccountingCall.public_failure
+
+-- Actual physical quota World consumed by the complete settlement/request suffix.
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1.actual_physical_quota_settlement_requests
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1.actual_physical_quota_failure_restores
+#print axioms audit.trio.consolidation.PhysicalQuotaSettlement.quota_effects
+#print axioms audit.trio.consolidation.PhysicalQuotaSettlement.packed_fields
+#print axioms audit.trio.consolidation.PhysicalQuotaSettlement.updatedTime_success
+#print axioms audit.trio.consolidation.PhysicalQuotaSettlement.transition_success

@@ -1,0 +1,2 @@
+PASS 1252 actual sources, 11 pins, 30 ordinary foundation-only scopes;3 normal modules;24 fresh compiler inputs/full IR/4 artifacts;2 legacy cached inputs;12 Solidity tests/1024 fuzz;entire prior consumer unchanged
+PASS all42 source receipt hashes and3 configuration identities; fresh actual normal artifacts recorded; dossier unchanged
