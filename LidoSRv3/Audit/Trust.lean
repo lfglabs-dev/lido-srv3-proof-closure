@@ -202,6 +202,10 @@ import LidoSRv3.Audit.Source.BeaconRootsCorrespondence
 import LidoSRv3.Audit.Source.MinFirstAmountCorrespondence
 import LidoSRv3.Audit.Model.EthConfinement
 import LidoSRv3.Audit.Model.EthWorld
+import LidoSRv3.Audit.Verity.TrioConsolidation.Correspondence
+import LidoSRv3.Audit.Verity.TrioConsolidation.Memory
+import LidoSRv3.Audit.Verity.ConsolidationValueTx
+import LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx
 import LidoSRv3.Tests.TopupPointerOriginMutants
 
 /-!
@@ -1444,3 +1448,74 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PEthConfinement1.coveringParentsAreRegistered
 #print axioms LidoSRv3.Audit.Guarantees.PMintConsumer1.abstract_rereads_written_router_snapshot
 #print axioms LidoSRv3.Audit.Guarantees.PMintConsumer1.verity_observe_eq_sourceView
+
+-- TrioConsolidation.Correspondence x4: bounded correspondence lemmas
+-- pinning the translated array lengths, the zipRequests preparation
+-- (prepared / prepared_valid), and the prepared_vault_guards closure
+-- of the source exit shape.
+#print axioms LidoSRv3.Audit.Verity.TrioConsolidation.Correspondence.translated_array_lengths
+#print axioms LidoSRv3.Audit.Verity.TrioConsolidation.Correspondence.zipRequests_prepared
+#print axioms LidoSRv3.Audit.Verity.TrioConsolidation.Correspondence.zipRequests_prepared_valid
+#print axioms LidoSRv3.Audit.Verity.TrioConsolidation.Correspondence.prepared_vault_guards_close_source_exit
+
+-- TrioConsolidation.Memory x2: the memory-decoding correspondence
+-- (`decode_stateForGroups`) and the grouped transaction simulation
+-- (`grouped_tx_simulates`) closing the memory plane on the Trio path.
+#print axioms LidoSRv3.Audit.Verity.TrioConsolidation.Memory.decode_stateForGroups
+#print axioms LidoSRv3.Audit.Verity.TrioConsolidation.Memory.grouped_tx_simulates
+
+-- ConsolidationValueTx: the value-forwarding transaction slice.
+-- `forwardCalls_apply`, `forwardCalls_run` document the loop
+-- semantics; `afterCalls_calls`, `afterCalls_balance_val` and
+-- `afterCall_balance_val` document the post-call observations;
+-- `requestCalls_value_sum`, `committed_call_value_sum` document the
+-- value-sum equalities; `afterCalls_fresh`, `afterCalls_forwardedValue`,
+-- `afterCalls_noConsensusLayerVerify` document the fresh /
+-- forwardedValue / no-consensus-layer-verify post-conditions.
+#print axioms LidoSRv3.Audit.Verity.ConsolidationValueTx.forwardCalls_apply
+#print axioms LidoSRv3.Audit.Verity.ConsolidationValueTx.forwardCalls_run
+#print axioms LidoSRv3.Audit.Verity.ConsolidationValueTx.afterCalls_calls
+#print axioms LidoSRv3.Audit.Verity.ConsolidationValueTx.afterCalls_balance_val
+#print axioms LidoSRv3.Audit.Verity.ConsolidationValueTx.afterCall_balance_val
+#print axioms LidoSRv3.Audit.Verity.ConsolidationValueTx.requestCalls_value_sum
+#print axioms LidoSRv3.Audit.Verity.ConsolidationValueTx.committed_call_value_sum
+#print axioms LidoSRv3.Audit.Verity.ConsolidationValueTx.afterCalls_fresh
+#print axioms LidoSRv3.Audit.Verity.ConsolidationValueTx.afterCalls_forwardedValue
+#print axioms LidoSRv3.Audit.Verity.ConsolidationValueTx.afterCalls_noConsensusLayerVerify
+
+-- PConsolidationEth1CompositionTx: the value-composition transaction
+-- surface. `batch_splits_fee_and_refund` fixes the split; the two
+-- adversarial closures `rejected_request_restores_entry_world` and
+-- `underfunded_batch_reverts_in_gateway` document the failure planes;
+-- `honest_revert_partition` closes the revert partition on the honest
+-- shape; `dispatch_conserves_eth` and `dispatch_matches_atomic_multicall`
+-- pin the conservation and multicall-equivalence of the dispatch loop.
+#print axioms LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.batch_splits_fee_and_refund
+#print axioms LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.rejected_request_restores_entry_world
+#print axioms LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.underfunded_batch_reverts_in_gateway
+#print axioms LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.honest_revert_partition
+#print axioms LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.dispatch_conserves_eth
+#print axioms LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.dispatch_matches_atomic_multicall
+
+-- PackN{1..6} mutant lots: additional theorems documenting honest
+-- parents holding and kill-lines refuting mutant lots. Only theorems
+-- with axiom lists inside {propext, Classical.choice, Quot.sound} or
+-- empty are registered here; native_decide-bearing mutants stay out.
+#print axioms LidoSRv3.Tests.PackN1AllocExecMutants.honest_router_parent_holds
+#print axioms LidoSRv3.Tests.PackN1AllocExecMutants.canonical_router_word_bounds
+#print axioms LidoSRv3.Tests.PackN2EthJournalMutants.honest_success_parent_holds
+#print axioms LidoSRv3.Tests.PackN2EthJournalMutants.lido_hop_not_journal_approved
+#print axioms LidoSRv3.Tests.PackN2EthJournalMutants.mutant_lido_maps_to_lidoPull
+#print axioms LidoSRv3.Tests.PackN2EthJournalMutants.mutant_lido_candidate_is_spec_image
+#print axioms LidoSRv3.Tests.PackN3OracleMintMutants.cap_premise_is_load_bearing
+#print axioms LidoSRv3.Tests.PackN3OracleMintMutants.raw_fee_mutant_breaches_cap
+#print axioms LidoSRv3.Tests.PackN3OracleMintMutants.honest_frame_passes_vector
+#print axioms LidoSRv3.Tests.PackN3OracleMintMutants.honest_computed_path_passes_vector
+#print axioms LidoSRv3.Tests.PackN4AddressBatchMutants.honest_rename_parent_holds
+#print axioms LidoSRv3.Tests.PackN4AddressBatchMutants.fixed_dest_unbounded_rename_kill_line
+#print axioms LidoSRv3.Tests.PackN4AddressBatchMutants.three_claim_batch_ready
+#print axioms LidoSRv3.Tests.PackN4AddressBatchMutants.three_claim_batch_parent_instance
+-- (plus_one_channel_is_a_different_keccak_map intentionally kept out:
+-- transitively depends on `Compiler.Proofs.solidityMappingSlot_injective`
+-- which is outside the check_trust_axioms.py allowlist.)
+#print axioms LidoSRv3.Tests.PackN6ConsolValueMutants.zero_value_call_sum
