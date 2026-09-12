@@ -19,7 +19,7 @@ theorem residue_decreases_on_progress :
     let rs := rows [0, 0] [100, 100]
     allocateToBestCandidate rs (w 5) = some (rows [3, 0] [100, 100], w 3) ∧
       remainingCapacitySum (rows [3, 0] [100, 100]) < remainingCapacitySum rs := by
-  native_decide
+  decide +kernel
 
 /-- A row-count measure does not decrease on that same step, so it cannot
 justify termination of `allocate`. -/
@@ -27,7 +27,7 @@ theorem row_count_measure_does_not_decrease :
     let rs := rows [0, 0] [100, 100]
     allocateToBestCandidate rs (w 5) = some (rows [3, 0] [100, 100], w 3) ∧
       (rows [3, 0] [100, 100]).length = rs.length := by
-  native_decide
+  decide +kernel
 
 /-- Fuel-exhaustion mutant that reports leftover `0` instead of the actual
 remainder. Conservation fails on a nonempty demand with zero fuel. -/
@@ -46,7 +46,11 @@ theorem fuel_exhaustion_zero_remainder_mutant_refutes_conservation :
   have hrun : mutantFuel0ZeroRemainder 0 (rows [0] [10]) (w 5) 0 =
       some (rows [0] [10], 0, 0) := rfl
   have hcons := h (rows [0] [10]) (w 5) 0 0 (rows [0] [10]) hrun
-  simp [w] at hcons
+  have h5 : (w 5).val = 5 := by
+    simp [w, Verity.Core.Uint256.val_ofNat, Verity.Core.Uint256.modulus,
+      Verity.Core.UINT256_MODULUS]
+  rw [h5] at hcons
+  exact (by decide : 0 + 0 ≠ 5) hcons
 
 #print axioms LidoSRv3.Audit.Spec.AllocLoopTermination.sourceAllocateLoop_terminates
 #print axioms LidoSRv3.Audit.Spec.AllocLoopTermination.source_allocate_conserves_without_fuel

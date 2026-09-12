@@ -104,7 +104,7 @@ theorem map_payoutEntry_eq {recipient : Address} :
       receipts.map (fun r => payoutEntry recipient r.payout) =
         (receipts.map UnitReceipt.payout).map (payoutEntry recipient)
   | [] => rfl
-  | _ :: rest => by simpa using map_payoutEntry_eq (recipient := recipient) rest
+  | _ :: rest => by simp [map_payoutEntry_eq (recipient := recipient) rest]
 
 /-- Packed pre-reads, claimed bit, locked decrement and `_sendValue` frame
 of one successful `_claim` (`WithdrawalQueueBase.sol:460-480`). -/
