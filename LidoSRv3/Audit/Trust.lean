@@ -73,6 +73,7 @@ import LidoSRv3.Audit.Common.Bounded
 import LidoSRv3.Audit.Guarantees.PAlloc1
 import LidoSRv3.Audit.Guarantees.PAlloc1TargetMultBounded
 import LidoSRv3.Audit.Guarantees.PTopup1SRStoragePremise
+import LidoSRv3.Audit.Guarantees.PReserve1LidoStoragePremise
 import LidoSRv3.Audit.Guarantees.PAlloc1Phase3
 import LidoSRv3.Audit.Guarantees.PAlloc2
 import LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound
@@ -800,6 +801,13 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1SRStoragePremise.callerIsTopUpGateway_derived_under_pinned_sr_shape
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1SRStoragePremise.moduleExists_derived_under_pinned_sr_shape
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1SRStoragePremise.wcTypeIsType2_derived_under_pinned_sr_shape
+-- General rule (Thomas 2026-09-12) applied to P-RESERVE-1 two booleans
+-- canDeposit / authorizedRouter: naming scaffold PinnedLidoReserveCallShape
+-- names the pinned Lido.sol:815-816 canDeposit definition and the
+-- Lido.sol:872 Aragon-ACL check. Full live-storage derivation is the
+-- follow-up disclosed in fidelity.missing.
+#print axioms LidoSRv3.Audit.Guarantees.PReserve1LidoStoragePremise.canDeposit_derived_under_pinned_lido_shape
+#print axioms LidoSRv3.Audit.Guarantees.PReserve1LidoStoragePremise.authorizedRouter_derived_under_pinned_lido_shape
 #print axioms LidoSRv3.Tests.ConsolidationEthUnboundedFuelMutants.truncated_fuel_batchSize_plus_three_exhausted
 #print axioms LidoSRv3.Tests.ConsolidationEthUnboundedFuelMutants.truncated_fuel_must_be_refused
 #print axioms LidoSRv3.Tests.ConsolidationEthUnboundedFuelMutants.parent_fuel_premise_excludes_batch_29
