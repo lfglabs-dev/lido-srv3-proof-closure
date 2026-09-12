@@ -79,6 +79,7 @@ import LidoSRv3.Audit.Source.LidoStakingStateStorage
 import LidoSRv3.Audit.Guarantees.PAddress1BridgeCallPremise
 import LidoSRv3.Audit.Source.BridgeCallResultSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
+import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
 import LidoSRv3.Audit.Guarantees.PAlloc1Phase3
 import LidoSRv3.Audit.Guarantees.PAlloc2
@@ -840,6 +841,11 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- names the pinned WithdrawalVaultEIP7685.sol:79-81 STATICCALL entry
 -- point. Real live-STATICCALL model is the follow-up.
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise.feePerRequest_derived_under_pinned_fee_staticcall_shape
+-- Real-derivation step for P-CONSOLIDATION-ETH-1 fee STATICCALL (2026-09-13):
+-- source-level consolidationFeeFromStaticcall derives feePerRequest from a
+-- named PredeployStaticcallResult, not caller Nat.
+#print axioms LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.consolidationFeeFromStaticcall_eq
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise.feePerRequest_derived_from_staticcall_result
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape
