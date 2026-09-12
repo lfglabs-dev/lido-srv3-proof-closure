@@ -4,7 +4,7 @@
 
 ## Decision
 
-Review basis: structured inputs including the accepted TOPUP constructor provenance disclosure (theorem registrations and statuses unchanged; prior PR250 basis `ffd6ae4d5be0a5e1e7d1be335700e58ca90771f5` and exact input delta retained in `audit/metadata-reconcile/report-basis.json`; this revision is not a new independent certification; trio composition scoped separately) `341e60627a0848e2c66ff23135f34c63829ea831`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
+Review basis: structured inputs including the accepted TOPUP constructor provenance disclosure (theorem registrations and statuses unchanged; prior PR250 basis `ffd6ae4d5be0a5e1e7d1be335700e58ca90771f5` and exact input delta retained in `audit/metadata-reconcile/report-basis.json`; this revision is not a new independent certification; trio composition scoped separately) `f3372daabd8dcdbcae37d22286cf8fcda3f1f803`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
 
 ## Architecture and evidence boundary
 
@@ -26,7 +26,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 | [`P-RESERVE-1`](#p-reserve-1) | CHECKED | CHECKED | 13 open | **IMPLEMENTATION_PENDING** |
 | [`P-CONSOLIDATION-ETH-1`](#p-consolidation-eth-1) | CHECKED | CHECKED | 12 open | **IMPLEMENTATION_PENDING** |
 | [`P-ADDRESS-1`](#p-address-1) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
-| [`P-TOPUP-2`](#p-topup-2) | CHECKED | CHECKED | 11 open | **IMPLEMENTATION_PENDING** |
+| [`P-TOPUP-2`](#p-topup-2) | CHECKED | CHECKED | 14 open | **IMPLEMENTATION_PENDING** |
 | [`P-CONSOLIDATION-1`](#p-consolidation-1) | CHECKED | CHECKED | 8 open | **IMPLEMENTATION_PENDING** |
 | [`P-SSZ-1`](#p-ssz-1) | CHECKED | CHECKED | 9 open | **IMPLEMENTATION_PENDING** |
 | [`P-SSZ-1.deposit-data-root`](#p-ssz-1deposit-data-root) | CHECKED | PARTIAL | 1 open | **IMPLEMENTATION_PENDING** |
@@ -39,6 +39,8 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 | [`P-CONSOLIDATION-1.fee-refinement.tx`](#p-consolidation-1fee-refinementtx) | OPEN | OPEN | 1 open | **IMPLEMENTATION_PENDING** |
 | [`P-SSZ-1.tx-execution-simulation`](#p-ssz-1tx-execution-simulation) | CHECKED | PARTIAL | 1 open | **IMPLEMENTATION_PENDING** |
 | [`P-SSZ-1.encoding-simulation`](#p-ssz-1encoding-simulation) | CHECKED | CHECKED | 1 open | **IMPLEMENTATION_PENDING** |
+| [`P-TOPUP-2.leftover-budget-walk`](#p-topup-2leftover-budget-walk) | CHECKED | PARTIAL | 1 open | **IMPLEMENTATION_PENDING** |
+| [`P-TOPUP-2.router-inversion`](#p-topup-2router-inversion) | OPEN | OPEN | 1 open | **IMPLEMENTATION_PENDING** |
 | [`P-ADDRESS-1.denote-admission`](#p-address-1denote-admission) | OPEN | CHECKED | 3 open | **IMPLEMENTATION_PENDING** |
 | [`P-RESERVE-RELATIONAL`](#p-reserve-relational) | CHECKED | CHECKED | 0 open | **NONE** |
 | [`P-ALLOC-EXEC-1`](#p-alloc-exec-1) | CHECKED | PARTIAL | 2 open | **IMPLEMENTATION_PENDING** |
@@ -273,15 +275,15 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 ### `P-TOPUP-2`
 
-**Accepted theorem planes.** Abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap`. Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PTopup2.verity_tx_simulates_topup2_spec`.
+**Accepted theorem planes.** Abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PTopup2.router_source_cap_within_block_cap`. Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PTopup2.verity_tx_simulates_topup2_spec`.
 
-**Proof shape / exact domain statement.** aggregate_bounded_by_block_cap proves the leftover-budget walk cannot exceed maxTopUpPerBlockGwei. per_key_bounded_by_candidate additionally proves a pointwise Forall2 bound between every produced allocation and its requested/evaluated candidate. block_cap_kill_line_refutes_parent drops the cap term. Verity correspondence now decodes an explicit gwei-normalized topUpLimits array, checks it equals the independently evaluated per-key limits, and uses it to cap requests; it remains conditional on count <= 32. The count>32 no-check mutant is guard-necessity evidence outside that parent's premises, not a parent refutation. A-TOPUP-NOWRAP is removed from this row because its recorded line-732 risk belongs to P-TOPUP-1. Live wei conversion, module allocateDeposits policy, and SSZ remain open. This is a single-call bound: same-block accumulation across calls is excluded; no sequential-call or last-top-up-state policy is proved by this parent.
+**Proof shape / exact domain statement.** Chantier 4 (mandate 2026-09-12) changes the registered abstract parent from aggregate_bounded_by_block_cap (a fact about consumeBudget, a leftover-budget walk StakingRouter.topUp does not execute; its transitionBudget carries a valueWei/GWEI term with no source since topUp is not payable) to router_source_cap_within_block_cap on the real router mechanism at StakingRouter.sol:696-737 as modeled by SolidityTopup.run. The new parent's ENUNCE names the actual source constants smDepositableEthAmountRounded (line 706), smDepositableEthAmount (line 700), and maxTopUpPerBlockWei (line 696), and composes the router's aggregate guard at line 737 with the definitional cap chain to yield: accumulated inp ≤ maxTopUpPerBlockGwei * gwei. **Public-claim narrowing signaled to Thomas per mandate 2026-09-12:** the bound is on the WRAPPED sum (accumulated inp = allocSumUnchecked inp.allocations, mod 2^256), NOT on the exact sum. Under a nonzero wrap the exact sum can far exceed the cap while the router commits (the value-moving tail then aborts via Lido-side amount guards or the line-755 assert — P-TOPUP-1's third conjunct). per_key_bounded_by_candidate remains as an unregistered arithmetic fact about consumeBudget. The old aggregate_bounded_by_block_cap is demoted to child P-TOPUP-2.leftover-budget-walk. block_cap_kill_line_refutes_parent remains a mutant kill-line refuting the demoted-parent statement. Verity correspondence stays on verity_tx_simulates_topup2_spec. The gwei-normalized topUpLimits check, the count<=32 guard, and the maxValidatorsPerTopUp guard are unchanged. A-TOPUP-NOWRAP remains removed. Live wei conversion, module allocateDeposits policy, SSZ, and the derivation of the aggregate hypothesis hAggr from (run cfg inp).reverts = false all remain open. This is a single-call bound; same-block accumulation across calls is excluded.
 
 **Source/artifact provenance.** `MAPPED`; 3 immutable pinned source span(s) in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance.
 
 **Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
 
-**Limitations — 11 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+**Limitations — 14 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
 - _verifyValidator / 0x02 module WC / block-distance / RootPrecedesLastTopUp (the same-block accumulation half is closed by grok #409 — see covered).
 - live wei conversion and the module-selected allocateDeposits return/policy
@@ -294,10 +296,13 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 - Verity `sourceRun` sees numeric arrays only; the pinned `:160-223` prefix guards `onlyRole(TOP_UP_ROLE)` (D-AUTH-1), strictly increasing indices (D-SORT-1), type-0x02 WC (D-WC-1), 48-byte pubkeys (D-PUBKEY-1), and `maxValidatorsPerTopUp` (D-MAX-1) are not exercised at the Verity plane. Grok differential #417.
 - Verity `sourceRun` stays in gwei; the pinned line 226 multiplies by `1 gwei` before the router call. Comparing `used` to on-chain `topUpLimits[i]` is a 10^9 disagreement unless the harness converts. Grok differential #417 flags this as D-UNITS-1.
 - Verity `used` is the leftover-consumed total; the pinned `totalLimits +=` sits in `unchecked` and gates `_setLastTopUpData` (D-TOTAL-1). Grok differential #417.
+- chantier 4 public-claim narrowing (mandate 2026-09-12): router_source_cap_within_block_cap bounds the WRAPPED accumulator SolidityTopup.accumulated inp = allocSumUnchecked inp.allocations (mod 2^256), NOT the exact sum. Under a nonzero wrap the exact sum can far exceed maxTopUpPerBlockGwei * gwei while SolidityTopup.run still commits; the value-moving tail then aborts via Lido-side amount guards or the line-755 assert — P-TOPUP-1's third conjunct — but the abort is not covered by this P-TOPUP-2 parent.
+- chantier 4 open sub-obligation (mandate 2026-09-12): the aggregate hypothesis hAggr : accumulated inp ≤ smDepositableEthAmountRounded cfg inp of router_source_cap_within_block_cap is NOT yet derived from (SolidityTopup.run cfg inp).reverts = false. A full inversion of `run` past the earlier guards (lines 686-715) plus the runPush disjunct's implicit `allocationLoop = none ∧ ¬ (smDep < accumulated)` is required. The subordinate row P-TOPUP-2.router-inversion tracks that obligation.
+- chantier 4 disclosure (mandate 2026-09-12): the old registered abstract parent aggregate_bounded_by_block_cap proved a bound on consumeBudget, a leftover-budget walk that StakingRouter.topUp does not execute; its transitionBudget also carried a valueWei/GWEI term with no source (topUp is not payable — no `payable` modifier and no `msg.value` reference on StakingRouter.sol:679-756). The old theorem is retained in-file as arithmetic evidence but is no longer the registered parent (demoted to child P-TOPUP-2.leftover-budget-walk).
 
-**Classification.** **IMPLEMENTATION_PENDING** — Keep the checked block-cap parent, its pointwise per-key child, explicit gwei-normalized per-key limit input, and the mutant-budget kill-line. Next model the wei conversion and module-selected allocateDeposits result. Keep the 32-guard witness labeled as premise/guard necessity; do not compose with P-TOPUP-1.
+**Classification.** **IMPLEMENTATION_PENDING** — Keep the new registered abstract parent router_source_cap_within_block_cap on the real router source constants. Retain the demoted aggregate_bounded_by_block_cap as arithmetic-only child evidence. Next steps: derive hAggr from (run cfg inp).reverts = false via a `run` inversion; bind the WRAPPED-vs-exact narrowing to P-TOPUP-1's wrap-close conjunct; model the wei conversion and module-selected allocateDeposits return; keep the 32-guard witness labeled as premise/guard necessity; do not compose with P-TOPUP-1.
 
-**Next gate.** Explicit gwei-normalized per-key topUpLimits input and independent Verity sourceView correspondence are CHECKED. OPEN: model the live wei conversion and module-selected allocateDeposits return before widening; keep the 32-guard as premise/guard necessity; do not compose with P-TOPUP-1.
+**Next gate.** Chantier 4 (mandate 2026-09-12): registered abstract parent is router_source_cap_within_block_cap on the real router source constants (StakingRouter.sol:696/700/706/737 as modeled by SolidityTopup.run); the aggregate hypothesis hAggr remains an open sub-obligation until a run-inversion helper derives it from (run cfg inp).reverts = false. OPEN: hAggr derivation; live wei conversion and module-selected allocateDeposits return; the WRAPPED-vs-exact-sum narrowing; the count>32 no-check witness kept as premise/guard necessity; do not compose with P-TOPUP-1.
 
 ### `P-CONSOLIDATION-1`
 
@@ -528,6 +533,42 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 **Classification.** **IMPLEMENTATION_PENDING** — Do not re-promote to registered Verity parent. Retain as regression/child evidence only; the compiled-entry parent lives in P-SSZ-1.
 
 **Next gate.** Preserve this child; the compiled-entry Verity parent of P-SSZ-1 is actual_compiled_cl_entry_complete_declared_branch.
+
+### `P-TOPUP-2.leftover-budget-walk`
+
+**Accepted theorem planes.** Abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap`. Verity `PARTIAL`: `—`.
+
+**Proof shape / exact domain statement.** Demoted from P-TOPUP-2 registered abstract parent per mandate 2026-09-12 chantier 4. aggregate_bounded_by_block_cap proves (transition b cfg).sum ≤ cfg.maxTopUpPerBlockGwei by induction over consumeBudget with transitionBudget = min(b.valueWei/GWEI, min(cfg.moduleAllocationLimitGwei, cfg.maxTopUpPerBlockGwei)); it is an arithmetic fact about consumeBudget only. StakingRouter.topUp (pinned Solidity 686-756) does not execute a leftover-budget walk; it enforces per-index (line 728) and aggregate (line 737) revert guards on the module-returned allocations. Also transitionBudget's min-with-valueWei/GWEI term has no source: topUp is not payable. The demoted theorem must NOT be re-promoted to the registered parent; the compiled-router parent lives in P-TOPUP-2 as router_source_cap_within_block_cap.
+
+**Source/artifact provenance.** No independent source-map target; supplemental evidence only. A source-map entry is source provenance, not deployed-artifact provenance.
+
+**Assumptions.** `A-SOURCE-SHAPED`
+
+**Limitations — 1 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+
+- StakingRouter.topUp does not execute consumeBudget or transitionBudget — this subordinate is arithmetic evidence about a walk the router does not run; the router mechanism is in the new registered parent router_source_cap_within_block_cap
+
+**Classification.** **IMPLEMENTATION_PENDING** — Do not re-promote to registered parent. Retain as arithmetic-only child evidence; the router-mechanism parent lives in P-TOPUP-2.
+
+**Next gate.** Preserve as child; the router-mechanism abstract parent of P-TOPUP-2 is router_source_cap_within_block_cap.
+
+### `P-TOPUP-2.router-inversion`
+
+**Accepted theorem planes.** Abstract `OPEN`: `—`. Verity `OPEN`: `—`.
+
+**Proof shape / exact domain statement.** Chantier 4 open sub-obligation (mandate 2026-09-12): the registered abstract parent router_source_cap_within_block_cap takes hAggr : SolidityTopup.accumulated inp ≤ SolidityTopup.smDepositableEthAmountRounded cfg inp as a caller-supplied hypothesis. A committing_implies_router_guards_pass inversion — deriving hAggr and allocationLoop = none from (run cfg inp).reverts = false — remains open. Adding it requires peeling the nine early guards at StakingRouter.sol:686-715 and inverting the runPush disjunct's implicit `allocationLoop = none ∧ ¬ (smDep < accumulated)` postcondition. Until then, callers of router_source_cap_within_block_cap must supply hAggr independently.
+
+**Source/artifact provenance.** No independent source-map target; supplemental evidence only. A source-map entry is source provenance, not deployed-artifact provenance.
+
+**Assumptions.** `A-SOURCE-SHAPED`
+
+**Limitations — 1 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+
+- derivation of hAggr from (SolidityTopup.run cfg inp).reverts = false via a full inversion of `run` past guards 686-715 and the runPush disjunct's implicit allocationLoop = none ∧ ¬ (smDep < accumulated) postcondition
+
+**Classification.** **IMPLEMENTATION_PENDING** — Add committing_implies_router_guards_pass in TopupCorrespondence.lean, mirroring committedNoTopUp_implies_zero_total's run_inversion pattern, and compose it into router_source_cap_within_block_cap so the registered parent takes only (run cfg inp).reverts = false.
+
+**Next gate.** Preserve this open child; it tracks the open derivation of the aggregate hypothesis of the registered P-TOPUP-2 abstract parent.
 
 ### `P-ADDRESS-1.denote-admission`
 
