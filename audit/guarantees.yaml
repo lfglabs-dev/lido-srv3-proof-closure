@@ -1212,10 +1212,11 @@
           "packed word decodes as (150 * 2^40 << 8) | 40; productionIndex is not toy slot 2",
           "eip4788ParentRoot equals the modeled EIP-4788 BEACON_ROOTS timestamp-indexed ring-history read",
           "gateway admit iff ageCheck and production-GI verify against the identified root; none admits nothing",
-          "timestamp-ignoring lookup mutant refutes the full consume parent; wrong-packed-word and skip-lookup kill-lines remain"
+          "timestamp-ignoring lookup mutant refutes the full consume parent; wrong-packed-word and skip-lookup kill-lines remain",
+          "A-SHA256-FFI kernel-independent (isolation via PR #400): every registered SSZ theorem has #print axioms output that is a subset of {propext, Classical.choice, Quot.sound}, with no sha256_correct axiom. The registered claims are structural/compositional around the SHA-256 boundary and do not themselves depend on the assumption. See LidoSRv3/Audit/Provenance/SszSha256Isolation.lean for the six orphelinat theorems and audit/findings/A-SHA256-FFI-isolated.md for the discharge narrative. The registry entry is retained per scripts/audit_metadata.py:316 (mandatory scope-boundary disclosure)."
         ],
         "missing": [
-          "A-SHA256-FFI remains: combine is abstract; SHA-256 functional correctness is not claimed",
+          "SHA-256 functional correctness remains an out-of-scope scope-boundary disclosure (retained at registry level per audit schema; see LidoSRv3/Audit/Provenance/SszSha256Isolation.lean for the isolation showing no registered SSZ theorem kernel-depends on sha256_correct). combine is abstract; the produced-digest-equals-FIPS-SHA-256 claim is never asserted.",
           "the constructor pin is an in-repo literal, not a live-deployment identity",
           "the BEACON_ROOTS model is not a deployed-address or codehash identity",
           ".verityTx CHECKED is the modeled list lookup (executeRead = rfl), not Contract.run at the EIP-4788 precompile address; history cells are caller-supplied",
