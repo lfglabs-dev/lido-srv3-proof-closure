@@ -239,11 +239,64 @@ For each candidate, execute the same pattern as chantier 4bis
 - Correction receipt: `audit/findings/CORRECTION-2026-09-12-reclassings.md`.
 - Site corrections: `audit/SITE-CORRECTIONS.md`.
 
-## Status
+## Status (updated 2026-09-12)
 
-**All six candidates are OPEN. Goal not achieved.** The mandate's
-eight chantiers (1, 2, 3, 4, 4bis, 5, 6, 7, 8) are all merged (PRs
-#427 through #435). This general-rule application is the ongoing
-follow-up. Track progress by grep for `spark/lido-fix-general-*`
-branches and by reviewing each candidate's `fidelity.missing`
-residual entry after its composition PR merges.
+**Three-and-a-half of six candidates addressed; goal not achieved.**
+The mandate's eight chantiers (1–8 + 4bis) are all merged (PRs
+#427–#435). General-rule application progress:
+
+### ✅ Merged compositions
+
+1. **DEPOSIT-1 LinksSource** — PR #437.
+   Registered Verity parent switched to
+   `verity_tx_composes_nframe_deposit_under_router_shape` in
+   `LidoSRv3/Audit/Guarantees/PDeposit1LinksSourceComposition.lean`.
+   Consumes grok #405 `nframe_linksSource_of_router_fields`. Residual:
+   pinned `StakingRouter.topUp` caller-shape.
+2. **CONSOLIDATION-ETH-1 batchSize** — PR #438.
+   New consumer `verity_tx_success_at_derived_fuel_under_bus_ceiling`
+   in `LidoSRv3/Audit/Verity/ConsolidationEthUnboundedFuel.lean`.
+   Names `mainnetBusBatchCeiling = 200`. Consumes grok #410
+   `verity_tx_success_shape_unbounded`. Residual: live-Bus binding.
+3. **ALLOC-1 CheckedBounds `target_multiplication` conjunct** — PR #439.
+   New subordinate `PAlloc1TargetMultBounded` proves
+   `shareLimit * totalValidators ≤ MAX_UINT256` from pinned uint16/
+   uint64 type bounds. Residual: three other CheckedBounds conjuncts
+   (`active_subtraction`, `total_addition`, `available_arithmetic`)
+   have per-module dynamic dependencies and remain follow-ups.
+
+### 🔲 Open candidates (substantial source-model work required)
+
+4. **RESERVE-1 `canDeposit`/`authorizedRouter`** — needs Lido storage
+   model for `STAKING_STATE_POSITION`, `_isBunkerActive`, Aragon
+   ACL. Estimated ~200-400 Lean lines + prerequisite Lido-storage
+   sub-model.
+5. **TOPUP-1 `moduleExists`/`wcTypeIsType2`/`callerIsTopUpGateway`** —
+   needs SRStorage model. Estimated ~150-300 Lean lines.
+6. **ADDRESS-1 `externalCallSucceeds`** — needs Bridge-to-source
+   derivation lemmas. `AddressRecipientCallBridge` module already
+   registered as subordinate (chantier 6, PR #432); the fold into
+   the registered parent's `externalCallSucceeds` boolean is the
+   missing piece. Estimated ~200-400 Lean lines.
+7. **CONSOLIDATION-ETH-1 fee STATICCALL** — needs live-STATICCALL
+   binding on `CONSOLIDATION_REQUEST` predeploy. Estimated ~200-400
+   Lean lines.
+8. **ALLOC-1 three remaining CheckedBounds conjuncts** —
+   `active_subtraction`, `total_addition`, `available_arithmetic`
+   each have per-module dynamic dependencies (`depositedCount`,
+   `depositableCount`, sums of `allocationEntry`) requiring
+   additional invariants beyond static type bounds. Estimated
+   ~200-300 Lean lines total.
+
+### Method note
+
+The three completed compositions (DEPOSIT-1, CONSOLIDATION-ETH-1
+batchSize, ALLOC-1 target_multiplication) all had a pre-existing
+grok consumer OR were resolvable via pure type-bound arithmetic.
+The five remaining candidates require ORIGINATING new source-model
+work (Lido storage, SRStorage, Bridge-to-source lemmas, live-STATICCALL
+bindings, per-module dynamic invariants). Each is a separate PR of
+substantial size.
+
+**Goal never terminates as long as any of these five candidates
+remains open** — per Thomas 2026-09-12 general rule.
