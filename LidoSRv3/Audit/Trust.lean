@@ -140,6 +140,7 @@ import LidoSRv3.Audit.Provenance.HandwrittenMinFirstOrphaned
 import LidoSRv3.Audit.Provenance.AbstractTxIsolation
 import LidoSRv3.Audit.Source.AddressSingleton
 import LidoSRv3.Audit.Source.ReserveUnfinalizedCall
+import LidoSRv3.Audit.Source.AccountFeeShares
 import LidoSRv3.Tests.PackGTopupProvenanceMutants
 import LidoSRv3.Audit.Provenance.ConsolidationRequest
 import LidoSRv3.Audit.Provenance.CanonicalRequestAddress
@@ -1697,6 +1698,20 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.ReserveUnfinalizedCall.failed_call_not_fresh
 #print axioms LidoSRv3.Audit.Source.ReserveUnfinalizedCall.spend_preserves_from_live_call
 #print axioms LidoSRv3.Audit.Source.ReserveUnfinalizedCall.decode_abiWord_small
+
+-- P-ACCOUNT-1 sharesToMintAsFees derived from pinned fee products
+-- (grok #402 / see `audit/account-fee-shares/README.md`).
+-- `handleOracleReportDerived` obtains `sharesToMintAsFees` from pinned
+-- `_calculateProtocolFees` products (Accounting.sol:317,323,325,331 via
+-- ReportFeeProductsCorrespondence) rather than a free `Nat`. Product panic
+-- is fail-closed. Mint-after-read is cited from the unchanged parent.
+-- Closes P-ACCOUNT-1's fidelity.missing entry "fee computation
+-- (sharesToMintAsFees is an argument)".
+#print axioms LidoSRv3.Audit.Source.AccountFeeShares.handleOracleReportDerived_eq_parent
+#print axioms LidoSRv3.Audit.Source.AccountFeeShares.handleOracleReportDerived_mint_after_read
+#print axioms LidoSRv3.Audit.Source.AccountFeeShares.product_panic_reverts
+#print axioms LidoSRv3.Audit.Source.AccountFeeShares.free_argument_mints_when_source_is_zero
+#print axioms LidoSRv3.Audit.Source.AccountFeeShares.getter_outputs_feed_products
 
 -- A-CANONICAL-REQUEST-ADDRESS discharge (see
 -- `audit/findings/A-CANONICAL-REQUEST-ADDRESS-discharged.md` and

@@ -4,7 +4,7 @@
 
 ## Decision
 
-Review basis: structured inputs including the accepted TOPUP constructor provenance disclosure (theorem registrations and statuses unchanged; prior PR250 basis `ffd6ae4d5be0a5e1e7d1be335700e58ca90771f5` and exact input delta retained in `audit/metadata-reconcile/report-basis.json`; this revision is not a new independent certification; trio composition scoped separately) `1eec75949d84a3d9738449989d8835442ed34481`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
+Review basis: structured inputs including the accepted TOPUP constructor provenance disclosure (theorem registrations and statuses unchanged; prior PR250 basis `ffd6ae4d5be0a5e1e7d1be335700e58ca90771f5` and exact input delta retained in `audit/metadata-reconcile/report-basis.json`; this revision is not a new independent certification; trio composition scoped separately) `a40d873be67ded43dd7f6ebad3285a69ed53b941`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
 
 ## Architecture and evidence boundary
 
@@ -22,7 +22,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 | [`P-ALLOC-2`](#p-alloc-2) | CHECKED | CHECKED | 4 open | **IMPLEMENTATION_PENDING** |
 | [`P-DEPOSIT-1`](#p-deposit-1) | CHECKED | CHECKED | 4 open | **IMPLEMENTATION_PENDING** |
 | [`P-TOPUP-1`](#p-topup-1) | CHECKED | CHECKED | 1 open | **IMPLEMENTATION_PENDING** |
-| [`P-ACCOUNT-1`](#p-account-1) | CHECKED | CHECKED | 7 open | **IMPLEMENTATION_PENDING** |
+| [`P-ACCOUNT-1`](#p-account-1) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
 | [`P-RESERVE-1`](#p-reserve-1) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
 | [`P-CONSOLIDATION-ETH-1`](#p-consolidation-eth-1) | CHECKED | CHECKED | 11 open | **IMPLEMENTATION_PENDING** |
 | [`P-ADDRESS-1`](#p-address-1) | CHECKED | CHECKED | 7 open | **IMPLEMENTATION_PENDING** |
@@ -158,12 +158,11 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
 
-**Limitations — 7 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+**Limitations — 6 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
 - SRStorage membership and unique uint24 module ids
 - accountingOracle caller and REPORT_EXITED_VALIDATORS_ROLE
 - submitReportData / _handleConsensusReportData
-- fee computation (sharesToMintAsFees is an argument)
 - packed uint64 accounting words
 - re-read of the written router snapshot for rewards
 - full live-report success is still not modeled; the demoted child now states only local accepted constructor order through sourceTraceRetired

@@ -223,13 +223,13 @@
           "independent tx storage-flag ticks for Result.steps/View.steps with no successfulSteps bridge",
           "handleOracleReport-shaped validity/overflow guards; observe reads writeArray balances",
           "Contract.run rollback after intermediate writes",
-          "child source_report_before_reward: constructor ordering of an accepted positive-fee report on the source if-tree"
+          "child source_report_before_reward: constructor ordering of an accepted positive-fee report on the source if-tree",
+          "sharesToMintAsFees derived from pinned fee products (grok #402): handleOracleReportDerived obtains sharesToMintAsFees from pinned _calculateProtocolFees products (Accounting.sol:317,323,325,331 via ReportFeeProductsCorrespondence) rather than a free Nat. Product panic is fail-closed; mint-after-read is cited from the unchanged parent. Discharged via LidoSRv3/Audit/Source/AccountFeeShares.lean; kill-lines in LidoSRv3/Tests/AccountFeeSharesMutants.lean. Axioms only propext / Quot.sound. totalFee / precisionPoints remain getter outputs (StakingRouter.getStakingRewardsDistribution 808-873); the live written-snapshot re-read stays a separate missing entry."
         ],
         "missing": [
           "SRStorage membership and unique uint24 module ids",
           "accountingOracle caller and REPORT_EXITED_VALIDATORS_ROLE",
           "submitReportData / _handleConsensusReportData",
-          "fee computation (sharesToMintAsFees is an argument)",
           "packed uint64 accounting words",
           "re-read of the written router snapshot for rewards",
           "full live-report success is still not modeled; the demoted child now states only local accepted constructor order through sourceTraceRetired"
