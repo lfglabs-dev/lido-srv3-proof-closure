@@ -20,7 +20,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 | --- | --- | --- | --- | --- |
 | [`P-ALLOC-1`](#p-alloc-1) | CHECKED | CHECKED | 4 open | **IMPLEMENTATION_PENDING** |
 | [`P-ALLOC-2`](#p-alloc-2) | CHECKED | CHECKED | 4 open | **IMPLEMENTATION_PENDING** |
-| [`P-DEPOSIT-1`](#p-deposit-1) | CHECKED | CHECKED | 4 open | **IMPLEMENTATION_PENDING** |
+| [`P-DEPOSIT-1`](#p-deposit-1) | CHECKED | CHECKED | 3 open | **IMPLEMENTATION_PENDING** |
 | [`P-TOPUP-1`](#p-topup-1) | CHECKED | CHECKED | 1 open | **IMPLEMENTATION_PENDING** |
 | [`P-ACCOUNT-1`](#p-account-1) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
 | [`P-RESERVE-1`](#p-reserve-1) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
@@ -119,9 +119,8 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
 
-**Limitations — 4 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+**Limitations — 3 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
-- LinksSource is a caller-supplied hypothesis: Wave 4 kill-line alloc_derived_linkssource_kill_line_refutes_bridge shows P-ALLOC-1 CheckedBounds and P-ALLOC-2 step premises plus key-count composition still do not imply LinksSource, because ALLOC does not constrain per-batch wei (firstAmount) and does not constrain publicKeysBatchLength
 - the two-batch executable limitation is closed by DepositNFrameTx; the remaining word-domain gap is the abstract parent quantifying over unbounded Nat inputs whose committed aggregates exceed one word while the executable noWrap premise bounds the aggregate -- witnessed by abstract_parent_covers_inputs_the_verity_plane_omits at an out-of-domain exhibit that has no in-range substitute (in_range_commit_is_word_bounded)
 - the source pull is not bounded by this row outside ConservingConfig: LinksSource pins only DEPOSIT_SIZE and neither it nor Preconditions relates MAX_EFFECTIVE_BALANCE_WC_TYPE_01 to it, so for the non-conserving deployments the registered parent still admits, the line-972 pull quantity actualDepositsCount * maxEBType1 exceeds any word bound this row proves (linked_hypotheses_do_not_bound_the_line_972_product, with a uint256-encodable immutable); this is a statement about the computed quantity, not a settled transfer and not a reached multiplication -- the skewed deployment turns away at the earlier line-959 ZeroDeposits guard (skewed_pull_witness_turned_away_before_line_972), and an encodable module allocation bounds the product inside one word (line_972_product_le_module_allocation, encodable_allocation_bounds_line_972_product) -- and no in-range input commits a word-exceeding push at all (in_range_commit_is_word_bounded), so it is a separate theorem and not a bound
 - the registered composed parent still carries LinksSource and success Preconditions, making its internal revert conjunct vacuous even though the separate public hypothesis-free rollback theorem is checked
