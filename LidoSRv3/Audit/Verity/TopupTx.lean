@@ -37,11 +37,22 @@ def allocationTotalSlot : Nat := 7101
 def pulledTotalSlot : Nat := 7102
 
 /-- Placeholder address for `LIDO` (`StakingRouter.sol:744`); a model pin, not
-the deployed Lido address. -/
+the deployed Lido address. The grok TOPUP-1 differential (#414 D-ADDR-1)
+notes that its harness deploys a fresh mock at a different address; target
+equality between this model literal and any specific deployed Lido contract
+is NOT claimed by this transaction. -/
 def lidoAddress : Address := (0xF00D : Address)
 /-- `DEPOSIT_CONTRACT` (`StakingRouter.sol:750`), the canonical beacon deposit
-contract address. This is a source pin only: constructor assignment / deployed
-provenance remains deliberately OPEN (A-TOPUP-BEACON-ADDRESS). -/
+contract address. This literal is anchored to the deployed `StakingRouter`
+runtime `DEPOSIT_CONTRACT` immutable at byte offset 7525 via
+`LidoSRv3/Audit/Provenance/BeaconDepositAddress.lean`
+(A-TOPUP-BEACON-ADDRESS retired in PR #391, fixture SHA-256
+`c30ed4e63cb0a57dca577484afff0765fcaa9840d75b440067fd55c7d4fc7013` in
+`audit/artifacts.lock.json`). The grok TOPUP-1 differential (#414 D-ADDR-1)
+compares this literal against a mock deployed at a fresh address in its
+harness; target equality between this literal and the mock is expectedly
+NOT claimed, but the literal DOES equal the canonical Ethereum beacon
+deposit contract (see `topup_verity_beacon_equals_deployed_immutable`). -/
 def beaconAddress : Address := (0x00000000219ab540356cBB839Cbe05303d7705Fa : Address)
 
 /-- The four arguments of the Beacon-chain deposit precompile call at
