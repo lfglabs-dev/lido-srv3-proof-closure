@@ -84,6 +84,7 @@ import LidoSRv3.Audit.Guarantees.PConsolidation1
 import LidoSRv3.Audit.Verity.ConsolidationTx
 import LidoSRv3.Tests.ConsolidationTxMutants
 import LidoSRv3.Audit.Guarantees.PDeposit1
+import LidoSRv3.Audit.Guarantees.PDeposit1LinksSourceComposition
 import LidoSRv3.Audit.Spec.DepositNFrameCorrespondence
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1
 import LidoSRv3.Audit.Verity.PConsolidationEth1RefundTx
@@ -744,6 +745,12 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.DepositParentTxMutants.root_failure_observes_idle
 #print axioms
   LidoSRv3.Audit.Guarantees.PDeposit1.NFrame.verity_tx_composes_nframe_deposit
+-- General rule (Thomas 2026-09-12) applied to DEPOSIT-1 LinksSource:
+-- registered composition derives LinksSource from router-shape fields
+-- (grok #405 consumer nframe_linksSource_of_router_fields), instead of
+-- taking it as a free caller hypothesis.
+#print axioms
+  LidoSRv3.Audit.Guarantees.PDeposit1.NFrame.verity_tx_composes_nframe_deposit_under_router_shape
 #print axioms LidoSRv3.Audit.Verity.DepositNFrameTx.nframe_deposit_parent
 #print axioms
   LidoSRv3.Audit.Verity.DepositNFrameTx.wrapping_fold_reverts_without_journal
