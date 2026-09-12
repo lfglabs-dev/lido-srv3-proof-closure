@@ -23,8 +23,10 @@ spec gap. Parents, `guarantees.yaml`, and Trust are not edited.
 reads, claimed bits, locked-ETH decrement, ordered `_sendValue` CALLs)
 was a two-item witness. This lot proves the receipt for every successful
 list by induction: observe is the ordered map of the unit `_claim`
-receipt (`WithdrawalQueueBase.sol:460-480`). The two-item `twoClaimState`
-parent is an instance. A mutant that reorders the CALLs is refused.
+receipt (`WithdrawalQueueBase.sol:460-480`). The two-item parent shape
+`[1, 2]` / hints `[1, 1]` / payouts `[30, 40]` is that instance. A
+mutant that reorders the CALLs is refused. The concrete physical
+`twoClaimState` run stays the known keccak-opaque kernel boundary.
 
 (ii) `PAlloc2.source_allocate_loop_conserves_requested` holds only for
 `sourceAllocateLoop` runs that already terminate under caller-supplied
@@ -63,8 +65,8 @@ Axioms of every export (`#print axioms`): `propext` / `Quot.sound` /
 - **base SHA:** `1a40db36df3990da9287ac7b03b7e9a1e9bcffe4` (`origin/main`)
 - **toolchain:** `leanprover/lean4:v4.31.0` (`68218e876d2a38b1985b8590fff244a83c321783`)
 - **targets:** `lake build LidoSRv3.Audit.Verity.AddressClaimBatchUnbounded`
-  `LidoSRv3.Audit.Spec.AllocLoopTermination` succeeded; `lake build LidoSRv3Test`
-  follows in this lot.
+  `LidoSRv3.Audit.Spec.AllocLoopTermination`, both mutant modules, and
+  `lake build LidoSRv3Test` succeeded. `#print axioms` as above.
 
 ## Spark raccord (do not apply in this lot)
 
