@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Source.ReserveCorrespondence
+import LidoSRv3.Audit.Source.LidoStakingStateStorage
 
 /-! # P-RESERVE-1 canDeposit/authorizedRouter naming scaffold
 
@@ -66,5 +67,48 @@ theorem authorizedRouter_derived_under_pinned_lido_shape
     (hPinned : PinnedLidoReserveCallShape inputs) :
     inputs.authorizedRouter = true :=
   hPinned.authorizedRouterBecausePinned
+
+/-! ## Real-derivation composition (2026-09-13, first step)
+
+The scaffold above still routes both booleans through
+straight-line projections of `PinnedLidoReserveCallShape`. The
+composition below takes a REAL Lido storage state (via
+`LidoStakingStateStorage.LidoStakingState`) and derives
+`inputs.canDeposit = true` from a source-level function
+`canDepositFromStorage`, not from a caller-supplied constant.
+
+The premise now names two separate booleans (`isStakingPaused`,
+`isBunkerActive`) — each an EXPLICIT source read from a pinned
+Solidity slot — instead of one anonymous `canDeposit` field. This
+is a first step toward eliminating the free-boolean-in-parent
+condition, though the two component booleans are still supplied
+externally (their full derivation from live storage / packed word
+decoding / bunker slot reads is the next follow-up). -/
+
+/-- Real-derivation premise: the `inputs.canDeposit` field is
+functionally determined by a source-level `LidoStakingState` via
+the source-defined `canDepositFromStorage`. -/
+structure CanDepositFromLidoState
+    (inputs : WithdrawInputs)
+    (state : LidoSRv3.Audit.Source.LidoStakingStateStorage.LidoStakingState) : Prop where
+  canDepositMatchesSource :
+    inputs.canDeposit =
+      LidoSRv3.Audit.Source.LidoStakingStateStorage.canDepositFromStorage state
+
+/-- Real-derivation composition: under the pinned storage premise
+(`!isStakingPaused ∧ !isBunkerActive`) AND the state-linkage
+premise `CanDepositFromLidoState`, the input's `canDeposit` boolean
+is `true` — derived via the source-defined function
+`canDepositFromStorage`, not caller-supplied. -/
+theorem canDeposit_derived_from_lido_state
+    {inputs : WithdrawInputs}
+    {state : LidoSRv3.Audit.Source.LidoStakingStateStorage.LidoStakingState}
+    (hLink : CanDepositFromLidoState inputs state)
+    (hStakingNotPaused : state.isStakingPaused = false)
+    (hBunkerNotActive : state.isBunkerActive = false) :
+    inputs.canDeposit = true := by
+  rw [hLink.canDepositMatchesSource]
+  exact LidoSRv3.Audit.Source.LidoStakingStateStorage.canDeposit_true_of_pinned_storage
+    hStakingNotPaused hBunkerNotActive
 
 end LidoSRv3.Audit.Guarantees.PReserve1LidoStoragePremise

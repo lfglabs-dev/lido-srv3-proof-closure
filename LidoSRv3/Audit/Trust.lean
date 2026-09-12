@@ -74,6 +74,7 @@ import LidoSRv3.Audit.Guarantees.PAlloc1
 import LidoSRv3.Audit.Guarantees.PAlloc1TargetMultBounded
 import LidoSRv3.Audit.Guarantees.PTopup1SRStoragePremise
 import LidoSRv3.Audit.Guarantees.PReserve1LidoStoragePremise
+import LidoSRv3.Audit.Source.LidoStakingStateStorage
 import LidoSRv3.Audit.Guarantees.PAddress1BridgeCallPremise
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -811,6 +812,12 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- follow-up disclosed in fidelity.missing.
 #print axioms LidoSRv3.Audit.Guarantees.PReserve1LidoStoragePremise.canDeposit_derived_under_pinned_lido_shape
 #print axioms LidoSRv3.Audit.Guarantees.PReserve1LidoStoragePremise.authorizedRouter_derived_under_pinned_lido_shape
+-- Real-derivation step for P-RESERVE-1 canDeposit (2026-09-13): source-level
+-- canDepositFromStorage function derives inputs.canDeposit from a named
+-- LidoStakingState (isStakingPaused ∧ isBunkerActive), not a caller constant.
+#print axioms LidoSRv3.Audit.Source.LidoStakingStateStorage.canDepositFromStorage_iff
+#print axioms LidoSRv3.Audit.Source.LidoStakingStateStorage.canDeposit_true_of_pinned_storage
+#print axioms LidoSRv3.Audit.Guarantees.PReserve1LidoStoragePremise.canDeposit_derived_from_lido_state
 -- General rule (Thomas 2026-09-12) applied to P-ADDRESS-1 externalCallSucceeds
 -- boolean: naming scaffold PinnedBridgeCallShape names the pinned Bridge CALL
 -- entry point. Real Bridge-to-source glue is the follow-up.
