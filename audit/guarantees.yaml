@@ -378,10 +378,10 @@
           "four storage-writing Contract.run entrypoints and behavioral source correspondence on entrypoint-specific address-write observables",
           "separate live-shaped claimWithdrawalsTo Contract.run loop over parallel request/hint lists, exact pinned unstructured-storage constants, packed owner/claimed request-word decoding, current/previous request and checkpoint reads, locked-ETH updates, ordered value-bearing empty-calldata payout CALL journal, and universal failed-run snapshot rollback",
           "bounded two-request batch observe theorem and fixed-payout-recipient journal kill-line",
-          "snapshot rollback and wrong-recipient, address-writer, and admission-boundary mutants"
+          "snapshot rollback and wrong-recipient, address-writer, and admission-boundary mutants",
+          "live singleton-actor exclusion (grok #403): requiresFixedActor ep is False for every modeled writer (requestWithdrawals, unwrap, claimWithdrawalsTo, transferFrom) \u2014 two admitted callers with distinct addresses exist for each tag, so no fixed actor can be the caller of every admitted run. The fixed-owner mutant (caller = 7 required for requestWithdrawals) refutes the exclusion is a tautological False. Discharged via LidoSRv3/Audit/Source/AddressSingleton.lean; kill-lines in LidoSRv3/Tests/AddressSingletonMutants.lean. Axioms only propext."
         ],
         "missing": [
-          "singleton-actor exclusion is by omission: singletonActorEntryPoint is False for every modeled tag, so the parent carries no live exclusion proof",
           "unbounded source-to-Verity correspondence and caller-swap equivariance theorem for the live claimWithdrawalsTo batch; the checked observe receipt is two-item",
           "keccak-level physical mapping-slot derivation for queue/checkpoint struct words; ContractState mapUint channels model keyed POSITION/POSITION+1 words",
           "EnumerableSet owner-request removal, Transfer/WithdrawalClaimed events, adversarial recipient code, and machine-level CALL semantics",
