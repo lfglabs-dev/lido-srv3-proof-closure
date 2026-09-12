@@ -12,7 +12,7 @@
 >   about the model, not about that deployment.
 > - `CHECKED` means *the named Lean theorem builds*. It does not mean audited,
 >   verified on chain, or closed.
-> - **Every row below still has open fidelity gaps — 105 in total.** The last
+> - **Every row below still has open fidelity gaps — 106 in total.** The last
 >   column counts them per row; `audit/guarantees.yaml` names each one.
 
 This repo holds Lean evidence for eleven Staking Router v3 guarantees on that
@@ -43,7 +43,7 @@ check` fails closed if a count here drifts from the registry.
 | 5 | `P-ACCOUNT-1` | CHECKED | CHECKED | 6 open |
 | 6 | `P-RESERVE-1` | CHECKED | CHECKED | 14 open |
 | 7 | `P-CONSOLIDATION-ETH-1` | CHECKED | CHECKED | 18 open |
-| 8 | `P-ADDRESS-1` | CHECKED | CHECKED | 11 open |
+| 8 | `P-ADDRESS-1` | CHECKED | CHECKED | 12 open |
 | 9 | `P-TOPUP-2` | CHECKED | CHECKED | 15 open |
 | 10 | `P-CONSOLIDATION-1` | CHECKED | CHECKED | 8 open |
 | 11 | `P-SSZ-1` | CHECKED | CHECKED | 9 open |
