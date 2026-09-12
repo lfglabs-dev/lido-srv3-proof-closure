@@ -96,10 +96,13 @@ inductive ExecuteOutcome where
 private def checkedTimestampAdd (addedAt delay : Nat) : Option Nat :=
   if addedAt + delay < 2 ^ 256 then some (addedAt + delay) else none
 
-/-- `ConsolidationBus.executeConsolidation`. A false `gatewayAccepts` models
-a reverting downstream call. Although Solidity deletes the pending entry
-before that call, EVM transaction rollback restores the entry, represented by
-the original `state` in the revert arm. -/
+/-- `ConsolidationBus.executeConsolidation` (pinned at lidofinance/core@17005714
+lines 383-406). After the delay/batch checks, the source does:
+  delete _pendingBatches[batchHash];
+  CONSOLIDATION_GATEWAY.addConsolidationRequests{value: msg.value}(groups, msg.sender);
+  emit RequestsExecuted(batchHash, msg.value);
+A false `gatewayAccepts` models the gateway call reverting (any reason). Rollback
+of the preceding delete is represented by returning the original `state`. -/
 def executeConsolidation (oracle : HashOracle) (gatewayAccepts : Bool)
     (caller now delay : Nat) (msgValue : Word) (groups : List WitnessGroup)
     (state : BusState) : ExecuteOutcome :=
@@ -182,5 +185,50 @@ theorem execute_committed_deletes (oracle : HashOracle)
             · simp [executeConsolidation, hp, ht, hearly] at h
               rw [← h.1]
               simp [BusState.deletePending]
+
+/-!
+## Caller-supplied premise usage: gatewayAccepts (pinned source @17005714)
+
+In `ConsolidationBus.executeConsolidation` (pinned lines 383-406):
+- After delay check, `delete _pendingBatches[batchHash]`.
+- Then `CONSOLIDATION_GATEWAY.addConsolidationRequests{value: msg.value}(groups, msg.sender)`.
+- On any failure of that call the whole tx reverts (EVM restores the delete).
+- On success: `emit RequestsExecuted(batchHash, msg.value)`.
+
+`gatewayAccepts : Bool` is the caller-supplied premise that models the success
+of the downstream payable call (the "actually executed transfer" leg).
+- `true` → committed path produces the exact `GatewayCall` and `RequestsExecuted`.
+- `false` → `.gatewayReverted` with original state restored.
+
+The property below is a useful source-level fact about the executed transfer:
+on the success path of the premise, the value forwarded to the gateway equals
+the `msgValue` supplied by the executor (full amount is forwarded; no
+retention at the Bus).
+-/
+
+theorem executeConsolidation_committed_forwards_msgValue
+    (oracle : HashOracle) (gatewayAccepts : Bool)
+    (caller now delay : Nat) (msgValue : Word) (groups : List WitnessGroup)
+    (before after : BusState) (call : GatewayCall) (event : RequestsExecuted)
+    (h : executeConsolidation oracle gatewayAccepts caller now delay msgValue
+           groups before = .committed after call event) :
+    call.value = msgValue := by
+  cases hp : before.pending (oracle.hash (publisherGroups groups)) with
+  | none => simp [executeConsolidation, hp] at h
+  | some batch =>
+      cases ht : checkedTimestampAdd batch.addedAt delay with
+      | none => simp [executeConsolidation, hp, ht] at h
+      | some executeAfter =>
+          by_cases hearly : now < executeAfter
+          · simp [executeConsolidation, hp, ht, hearly] at h
+          · cases hacc : gatewayAccepts
+            · simp [executeConsolidation, hp, ht, hearly, hacc] at h
+            · simp [executeConsolidation, hp, ht, hearly, hacc] at h
+              -- On the committed arm the produced call is
+              -- `⟨groups, caller, msgValue⟩`; injection gives
+              -- `call = ⟨groups, caller, msgValue⟩`, so `call.value = msgValue`.
+              obtain ⟨_, hcall, _⟩ := h
+              subst hcall
+              rfl
 
 end audit.trio.consolidation

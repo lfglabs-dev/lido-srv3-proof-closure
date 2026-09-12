@@ -44,4 +44,18 @@ example : ∃ after call event,
     ⟨41, word 6⟩, rfl, ?_⟩
   simp [BusState.deletePending]
 
+/-- Exercise the new source property for the caller-supplied `gatewayAccepts`
+premise (replaced/anchored from pin 17005714). On the committed path the
+forwarded GatewayCall value equals the supplied msgValue (full transfer). -/
+example : executeConsolidation oracle true 9 110 10 (word 6) witnessBatch queued =
+    .committed (queued.deletePending 41) ⟨witnessBatch, 9, word 6⟩ ⟨41, word 6⟩ := by
+  rfl
+
+example (h : executeConsolidation oracle true 9 110 10 (word 6) witnessBatch queued =
+           .committed (queued.deletePending 41) ⟨witnessBatch, 9, word 6⟩ ⟨41, word 6⟩) :
+    (executeConsolidation_committed_forwards_msgValue
+      oracle true 9 110 10 (word 6) witnessBatch queued (queued.deletePending 41)
+      ⟨witnessBatch, 9, word 6⟩ ⟨41, word 6⟩ h) = rfl := by
+  rfl
+
 end LidoSRv3.Tests.TrioConsolidation.Bus
