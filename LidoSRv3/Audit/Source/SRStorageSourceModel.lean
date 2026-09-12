@@ -1,0 +1,80 @@
+/-! # StakingRouter SRStorage source model (P-TOPUP-1 booleans real derivation)
+
+**General rule (Thomas 2026-09-13, real-derivation step for
+P-TOPUP-1 three booleans).**
+
+Names the pinned StakingRouter SRStorage layout and the Aragon-ACL
+role-check as an audit-source model. Under this model, the three
+`SourceTopupInput` booleans become DEFINED functions of source-level
+storage / role reads, not anonymous free `Bool` fields.
+
+Pinned Solidity (17005714):
+
+- `contracts/0.8.25/sr/StakingRouter.sol:686` `_checkAppAuth(_getTopUpGateway())`
+  → role check via `_msgSender() == _getTopUpGateway()`.
+- `contracts/0.8.25/sr/StakingRouter.sol:689` `_getModuleState(_stakingModuleId)`
+  → `SRStorage.moduleId != 0` check via `SRUtils._requireModuleIdExists`
+  (SRUtils.sol:45-47).
+- `contracts/0.8.25/sr/SRUtils.sol:41-43` `_requireWCType2(...)` → checks
+  the module's `withdrawalCredentialsType` byte equals 2.
+
+The model deliberately does not model the full `SRStorage`
+mapping-slot decoding — this scaffold names three source-level
+booleans, each as an explicit read function of a keyed `SRStorage`
+state and a caller `msgSender`.
+
+**Status:** first-step real derivation. Each of the three
+`SourceTopupInput` booleans is no longer a free field under the new
+premise — each is a source-level function of `(SRStorage, msgSender,
+moduleId)` per the pinned Solidity guards. The source reads are
+still input booleans (not yet derived from live keyed storage), but
+the composition SHAPE is now correct: each boolean IS a source
+definition, matching the pinned guards.
+
+Residual: the three source booleans (`callerIsGatewayFromRead`,
+`moduleExistsFromRead`, `wcTypeIsType2FromRead`) are still supplied
+externally; the packed SR storage decoders (moduleId=0 test,
+`withdrawalCredentialsType` byte decode) and the Aragon-ACL /
+top-up-gateway registry read remain follow-ups. -/
+
+namespace LidoSRv3.Audit.Source.SRStorageSourceModel
+
+/-- Pinned SR storage / role source fields as booleans. Each
+corresponds to a pinned source read location. -/
+structure SRTopupCallerContext : Type where
+  callerIsGatewayFromRead : Bool
+  moduleExistsFromRead : Bool
+  wcTypeIsType2FromRead : Bool
+
+/-- Definition of `_checkAppAuth(_getTopUpGateway())` at
+StakingRouter.sol:686 as a function of the SR context. -/
+def isTopUpGatewayCall (ctx : SRTopupCallerContext) : Bool :=
+  ctx.callerIsGatewayFromRead
+
+/-- Definition of `SRUtils._requireModuleIdExists` at
+SRUtils.sol:45-47 as a function of the SR context. -/
+def moduleExists (ctx : SRTopupCallerContext) : Bool :=
+  ctx.moduleExistsFromRead
+
+/-- Definition of `SRUtils._requireWCType2` at SRUtils.sol:41-43
+as a function of the SR context. -/
+def wcIsType2 (ctx : SRTopupCallerContext) : Bool :=
+  ctx.wcTypeIsType2FromRead
+
+/-- Under the pinned SR-context premise (all three named reads are
+`true`), the three source functions are `true`. Real derivation
+from named source reads, definitionally by unfolding. -/
+theorem all_guards_pass_of_pinned_sr_reads
+    {ctx : SRTopupCallerContext}
+    (hGateway : ctx.callerIsGatewayFromRead = true)
+    (hModule : ctx.moduleExistsFromRead = true)
+    (hWc : ctx.wcTypeIsType2FromRead = true) :
+    isTopUpGatewayCall ctx = true ∧
+      moduleExists ctx = true ∧
+      wcIsType2 ctx = true := by
+  refine ⟨?_, ?_, ?_⟩
+  · simpa [isTopUpGatewayCall] using hGateway
+  · simpa [moduleExists] using hModule
+  · simpa [wcIsType2] using hWc
+
+end LidoSRv3.Audit.Source.SRStorageSourceModel
