@@ -71,12 +71,32 @@
     {
       "id": "A-SHA256-FFI",
       "accepted": true,
-      "risk": "SHA-256 precompile behavior relies on opaque native FFI and host-library behavior; the audit does not prove SHA-256/precompile functional correctness. All registered SSZ theorems are structural or compositional around the SHA-256 boundary and do not themselves depend on this assumption -- see LidoSRv3/Audit/Provenance/SszSha256Isolation.lean for the isolation. The assumption is retained as a mandatory scope-boundary disclosure per audit_metadata.py.",
-      "justification": "The project proves SSZ preimage shape, digest chain composition, memory copies, address-2 call sequences, and revert restoration, but does not re-prove SHA-256/precompile functional correctness. Every registered SSZ theorem's #print axioms output contains only subsets of {propext, Classical.choice, Quot.sound}, with no sha256_correct axiom.",
+      "risk": "SHA-256 precompile behavior relies on opaque native FFI and host-library behavior; the audit does not prove SHA-256/precompile functional correctness. The isolation attempted by PR #400 (`SszSha256Isolation.lean`) is UNSOUND per the corrected mandate 2026-09-12 rule: `sha256` is an opaque definition in `Compiler.Sha256.Engine` \u2014 embedding an assumption in a type/definition means the assumption is still consumed, even though `#print axioms` reports only foundational axioms. This entry is reinstated in every SSZ consumer's list and the isolation is documented as reclassing, not discharging.",
+      "justification": "The project proves SSZ preimage shape but does not re-prove SHA-256/precompile functional correctness. Every registered SSZ theorem's opaque `sha256` symbol is a definition; the abstract sha256 does not equal any specific hash function.",
       "severity": "HIGH",
-      "violation_impact": "Digest-value and proof-verification claims fail if SHA-256 behavior differs. But no registered SSZ theorem in this audit claims digest values or proof verification (they claim structural composition around the digest), so the impact is scoped to the guarantee-level fidelity gaps that name SHA-256 functional correctness as an out-of-scope item.",
-      "validation": "Pin the FFI/precompile interface and run known-answer vectors; do not promote vectors to a cryptographic proof. LidoSRv3/Audit/Provenance/SszSha256Isolation.lean records that the current registered SSZ theorem chain does not need any sha256_correct hypothesis.",
-      "removal_path": "The mandatory scope-boundary check in scripts/audit_metadata.py requires this assumption in the registry regardless. Consumer-list retirements from every guarantee's assumptions field are performed via the isolation proof above."
+      "violation_impact": "Digest-value and proof-verification claims fail if SHA-256 behavior differs from the abstract oracle.",
+      "validation": "Pin the FFI/precompile interface and run known-answer vectors; do not promote vectors to a cryptographic proof.",
+      "removal_path": "Prove or import a separately certified SHA-256/precompile refinement theorem \u2014 one that changes the ENUNCE of the registered SSZ parent, not a wrapper that ignores an unused `Sha256Faithful` premise."
+    },
+    {
+      "id": "A-CONSOLIDATION-GATEWAY-NONZERO",
+      "accepted": true,
+      "risk": "The vault-level theorem assumes that an authorized vault call carries nonzero msg.value. This is a premise on the vault input, not a consequence of the outer gateway payment being positive. The Bus theorem `executeConsolidation_committed_forwards_msgValue` (audit/trio/consolidation/Bus.lean:203, added in PR #263) shows the Bus forwards the executor-supplied `msgValue` unchanged on the committed path, but that `msgValue` itself is a free parameter of the Bus theorem \u2014 the vault still receives `count * fee`, which is zero when the EIP-7251 fee is zero. Reclassed, not discharged.",
+      "justification": "The gateway forwards `count * fee` to the vault and refunds the remainder. A positive outer payment does not imply a positive forwarded fee.",
+      "severity": "MEDIUM",
+      "violation_impact": "Without this premise, the modeled vault can accept a nonempty zero-fee batch with zero forwarded value. The positive-fee conclusion does not apply.",
+      "validation": "Check the value forwarded by ConsolidationGateway.addConsolidationRequests at the pinned lines 212-222. An ABI bridge alone does not derive positivity; it also needs a justified positive total fee.",
+      "removal_path": "Derive positivity of the vault's forwarded value from a justified fee condition (the EIP-7251 fee being nonzero, live-read via STATICCALL) and a composed calling path; or separately revise the theorem's positive-fee claim. PR #263 provides the Bus forwarding lemma but does not close either of those two obligations."
+    },
+    {
+      "id": "A-ABSTRACT-TX",
+      "accepted": true,
+      "risk": "Common success/revert semantics are abstract and are not executable EVM trace semantics. The `LidoSRv3.Audit.TxObservation` model has `.reverted \u21a6 before` and `.committedTrace = \u27e8[], [], []\u27e9` by definition; the isolation attempted by PR #393/#401 (SszSha256Isolation-style orphelinat) is unsound per the corrected mandate 2026-09-12 rule: an assumption embedded in a type/definition remains an assumption even when `#print axioms` does not see it.",
+      "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
+      "severity": "MEDIUM",
+      "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
+      "validation": "Validated by the linked source spans, executable mutants, or explicit reproduction command where available.",
+      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface \u2014 one that changes the ENUNCE of the registered parent, not merely a wrapper that re-applies it."
     }
   ]
 }

@@ -4,7 +4,7 @@
 
 ## Decision
 
-Review basis: structured inputs including the accepted TOPUP constructor provenance disclosure (theorem registrations and statuses unchanged; prior PR250 basis `ffd6ae4d5be0a5e1e7d1be335700e58ca90771f5` and exact input delta retained in `audit/metadata-reconcile/report-basis.json`; this revision is not a new independent certification; trio composition scoped separately) `61cac44e3d9e2369d3514ba3b9fc4d6044edf5d7`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
+Review basis: structured inputs including the accepted TOPUP constructor provenance disclosure (theorem registrations and statuses unchanged; prior PR250 basis `ffd6ae4d5be0a5e1e7d1be335700e58ca90771f5` and exact input delta retained in `audit/metadata-reconcile/report-basis.json`; this revision is not a new independent certification; trio composition scoped separately) `e7b11d6c8686ef074175a728e380fe456496271d`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
 
 ## Architecture and evidence boundary
 
@@ -22,12 +22,12 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 | [`P-ALLOC-2`](#p-alloc-2) | CHECKED | CHECKED | 4 open | **IMPLEMENTATION_PENDING** |
 | [`P-DEPOSIT-1`](#p-deposit-1) | CHECKED | CHECKED | 8 open | **IMPLEMENTATION_PENDING** |
 | [`P-TOPUP-1`](#p-topup-1) | CHECKED | CHECKED | 4 open | **IMPLEMENTATION_PENDING** |
-| [`P-ACCOUNT-1`](#p-account-1) | CHECKED | CHECKED | 5 open | **IMPLEMENTATION_PENDING** |
-| [`P-RESERVE-1`](#p-reserve-1) | CHECKED | CHECKED | 12 open | **IMPLEMENTATION_PENDING** |
-| [`P-CONSOLIDATION-ETH-1`](#p-consolidation-eth-1) | CHECKED | CHECKED | 11 open | **IMPLEMENTATION_PENDING** |
+| [`P-ACCOUNT-1`](#p-account-1) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
+| [`P-RESERVE-1`](#p-reserve-1) | CHECKED | CHECKED | 13 open | **IMPLEMENTATION_PENDING** |
+| [`P-CONSOLIDATION-ETH-1`](#p-consolidation-eth-1) | CHECKED | CHECKED | 12 open | **IMPLEMENTATION_PENDING** |
 | [`P-ADDRESS-1`](#p-address-1) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
 | [`P-TOPUP-2`](#p-topup-2) | CHECKED | CHECKED | 11 open | **IMPLEMENTATION_PENDING** |
-| [`P-CONSOLIDATION-1`](#p-consolidation-1) | CHECKED | CHECKED | 7 open | **IMPLEMENTATION_PENDING** |
+| [`P-CONSOLIDATION-1`](#p-consolidation-1) | CHECKED | CHECKED | 8 open | **IMPLEMENTATION_PENDING** |
 | [`P-SSZ-1`](#p-ssz-1) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
 | [`P-SSZ-1.deposit-data-root`](#p-ssz-1deposit-data-root) | CHECKED | PARTIAL | 1 open | **IMPLEMENTATION_PENDING** |
 | [`P-SSZ-1.gindex-concat`](#p-ssz-1gindex-concat) | CHECKED | PARTIAL | 1 open | **IMPLEMENTATION_PENDING** |
@@ -142,11 +142,11 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Source/artifact provenance.** `MAPPED`; 14 immutable pinned source span(s) in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance.
 
-**Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
+**Assumptions.** `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
 
 **Limitations — 4 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
-- abstract-TX rollback plane conjunct RevertRestoresSnapshot is definitional in TxObservation (A-ABSTRACT-TX): a Verity.Contract.run executable-plane rollback equivalent is not yet folded into this registered parent, so a modelling mismatch in the abstract observation type would silently mis-classify a reverting run.
+- A-ABSTRACT-TX: the `RevertRestoresSnapshot` conjunct of the registered parent uses `LidoSRv3.Audit.TxObservation`, whose `.reverted ↦ before` and `.committedTrace = ⟨[], [], []⟩` are DEFINITIONAL. Per mandate 2026-09-12: an assumption embedded in a type/definition remains an assumption even when `#print axioms` reports only foundational axioms. The isolation attempted by PR #401 (`AbstractTxIsolation.lean`) is RECLASSED, not discharged. A-ABSTRACT-TX is reinstated in this guarantee's assumptions list until the abstract observation model is replaced by an executable `Verity.Contract.run` rollback conjunct in the registered parent's statement (not a wrapper).
 - Verity plane covers only the allocation-and-spend suffix (StakingRouter.sol:722-756): `executeGuarded` starts at `allocateDeposits` (line 717). The source-line 686-716 prefix guards `NotAuthorized()` (caller ≠ top-up gateway), `EmptyKeysList()` (keyIndices.length = 0), and `WrongWithdrawalCredentialsType()` (WC bit not type 2) are proved on the Source plane by `source_module_guard_required` / `source_wc_type2_guard_required` conjuncts of `source_topup_conserves_and_rolls_back` but not exercised on the Verity executable plane. Grok differential #414 flags this via D-AUTH-1, D-WC-1, D-EMPTY-1.
 - Verity plane journal starts after the `allocateDeposits` call, so the `allocateDeposits`-then-`withdrawDepositableEther`-then-per-key-`deposit` journal shape is not fully compared to the pinned `topUp` at StakingRouter.sol:686-756. Grok differential #414 flags this via D-CALL-1.
 - Model `lidoAddress` in `TopupTx` (`0xF00D`) is a pure model placeholder for `LIDO` (`StakingRouter.sol:744`) with no deployment-identity binding. The grok differential harness (#414 D-ADDR-1) deploys a fresh mock at a different address; target equality between the literal and the deployed Lido proxy is not claimed. (The beacon-address half of the original D-ADDR-1 is covered: `TopupTx.beaconAddress` is anchored to the deployed StakingRouter DEPOSIT_CONTRACT immutable via `BeaconDepositAddress.lean`.)
@@ -165,13 +165,14 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
 
-**Limitations — 5 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+**Limitations — 6 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
 - SRStorage membership and unique uint24 module ids
 - accountingOracle caller and REPORT_EXITED_VALIDATORS_ROLE
 - submitReportData / _handleConsensusReportData
 - re-read of the written router snapshot for rewards
 - full live-report success is still not modeled; the demoted child now states only local accepted constructor order through sourceTraceRetired
+- packed uint64 accounting words. RECLASSED in PR #418, REINSTATED here per mandate 2026-09-12: only the degenerate `pack ⟨b, 0, 0⟩` case is linked to the parent write; the full uint64|uint64|uint128 packing with nonzero exited/pending fields is not established for the registered `mint_after_read_discipline` / `verity_tx_simulates_oracle_report` theorems.
 
 **Classification.** **IMPLEMENTATION_PENDING** — Keep the checked mint-after-read discipline theorem and its call-site-reordering kill-line as the registered parent, and keep the step ticks sourced from the sequenceSlot clock rather than from call-site constants; keep source_report_before_reward as the demoted source-plane child. Do not widen to submitReportData.
 
@@ -187,7 +188,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
 
-**Limitations — 12 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+**Limitations — 13 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
 - canDeposit / bunker / router authorization (now proved as scopedWithdrawGuards on any committed call, but the two booleans are still free inputs, not live bunker/pause/msg.sender checks)
 - packed uint128 buffered ether and ETH transfer
@@ -201,6 +202,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 - Verity does not model the packed uint128 pair `buffered`/`depositedPostReport` (Lido.sol:131-132). A seeded `depositedPostReport = uint128.max + 1 ether` still fits uint256 SafeMath in the model; the pin's 0.4.24 `<< 128` wraps the high half. The registered parent cannot see the pack wrap. Grok differential #419 flags this as D-PACK-1.
 - Verity omits `_seedDepositsCount` bookkeeping (Lido.sol:877-882) and the `Unbuffered` / `DepositedPostReportUpdated` events. Grok differential #419 flags this as D-SEED-1 / D-EVENT-1.
 - Verity allocation helper uses `safeSub` and returns `ALLOCATION_ARITHMETIC` on overflow; the pinned 0.4.24 helper does raw `remaining -=` (unchecked wrap). The `min` bounds make that branch unreachable on the grok harness vectors. Grok differential #419 flags this as D-WRAP-1.
+- live WithdrawalQueue.unfinalizedStETH call (freshness is now an explicit freshQueueCache hypothesis with a stale-cache kill-line, not an implicit assumption). RECLASSED in PR #408, REINSTATED here per mandate 2026-09-12: a consumer module that re-derives the freshness under a renamed hypothesis does not change the registered parent's statement.
 **Trio source composition.** Independent ordered status, authorization/locator, live queue/frame calls, ABI decoding, partition arithmetic, spending and receiver-tail relations cover every withdrawal outcome and root rollback. Physical protection is separately proved for the concrete bound queue/consensus/receiver pipeline, including final physical accounting and the next live queue demand. Generic arbitrary successful callbacks are not promised reserve protection.
 
 **Composition validation.** SOURCE COMPOSITION CANDIDATE; final independent review and official exact-source gates pending. Legacy primary guarantee registrations remain unchanged.
@@ -222,9 +224,9 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Source/artifact provenance.** `MAPPED`; 6 immutable pinned source span(s) in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance.
 
-**Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
+**Assumptions.** `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
 
-**Limitations — 11 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+**Limitations — 12 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
 - VaultHub / Dashboard / TriggerableWithdrawalsGateway / StakingVault withdraw sites (named out of scope)
 - Bus/Gateway/Vault intermediate hops and live executeConsolidation ABI
@@ -237,6 +239,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 - vault→Lido/WithdrawalQueue protocol-return confinement is out of this parent (former P-CONSOLIDATION-ETH-1a retired; not the consolidation fee/refund happy path and not P-RESERVE-1 buffer accounting)
 - canonical-address identity is not yet folded into the registered Verity parent; requestAddr remains a model-local ensemble address
 - renamed public id P-CONSOLIDATION-ETH-1 (was P-ETH-1): not a general SRv3 ETH guarantee
+- A-ABSTRACT-TX: the dispatcher fuel arm `fuelBudget = 32` in `verity_tx_universal_revert_partition` is a frame-count artifact of the abstract transaction model, not of any deployed gas metering. Per mandate 2026-09-12: the abstract-TX assumption embedded in the fuelBudget definition remains an assumption even after PR #401's isolation. A-ABSTRACT-TX reinstated in this guarantee's assumptions list.
 
 **Classification.** **IMPLEMENTATION_PENDING** — Keep the universal success-arm parent, the now-universal four-arm revert partition with its numeral witnesses, the zero-remainder boundary corner, and the wiring/premise kill-lines. Keep A-CANONICAL-REQUEST-ADDRESS open. Do not restore vault→Lido/WQ as a child or compose with P-CONSOLIDATION-1 until an ABI/interpreter bridge exists.
 
@@ -301,9 +304,9 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Source/artifact provenance.** `MAPPED`; 10 immutable pinned source span(s) in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance.
 
-**Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
+**Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-CONSOLIDATION-GATEWAY-NONZERO`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
 
-**Limitations — 7 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+**Limitations — 8 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
 - beacon eligibility, quota, witness, and gateway grouping
 - 96-byte packed pubkey calldata and real request-contract calls
@@ -312,6 +315,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 - Composition with P-CONSOLIDATION-ETH-1 requires the ABI/interpreter bridge; the vault-side nonzero forwarded value is now derivable via executeConsolidation_committed_forwards_msgValue in the Bus module.
 - preservesEthBalance counterparty credit: the vault-side forwarding invariant is CHECKED on the executed plane, but the request predeploy's own balance credit is another contract's state; the multi-contract side stays with P-CONSOLIDATION-VALUE-1 / P-CONSOLIDATION-ETH-1
 - gateway→vault composition remains an ABI/interpreter bridge gap: the Bus theorem executeConsolidation_committed_forwards_msgValue (audit/trio/consolidation/Bus.lean) proves call.value = msgValue on the committed path, deriving the vault-side nonzero forwarded value from a positive outer gateway payment; but the composition into P-CONSOLIDATION-1's hGatewayAdmittedNonzero premise still requires the ABI/interpreter bridge between the Bus module and this parent.
+- A-CONSOLIDATION-GATEWAY-NONZERO is a caller-supplied premise on the vault input: an authorized call carries nonzero forwarded msg.value. Positive outer gateway payment alone does not derive it. RECLASSED in PR #411, REINSTATED in this commit per mandate 2026-09-12.
 
 **Classification.** **IMPLEMENTATION_PENDING** — Keep the checked vault-loop and value-bearing CALL theorems. Derive hGatewayAdmittedNonzero for the vault input from a justified positive forwarded total fee and a composed gateway path, or revise the positive-fee claim. A positive outer payment alone is insufficient. Keep the checked entry-credit overflow guard and its boundary regressions.
 
@@ -325,7 +329,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Source/artifact provenance.** `MAPPED`; 16 immutable pinned source span(s) in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance.
 
-**Assumptions.** `A-MULTI-NODE-TRANSPORT`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
+**Assumptions.** `A-SHA256-FFI`, `A-MULTI-NODE-TRANSPORT`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
 
 **Limitations — 6 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
@@ -348,7 +352,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Source/artifact provenance.** No independent source-map target; supplemental evidence only. A source-map entry is source provenance, not deployed-artifact provenance.
 
-**Assumptions.** `A-MULTI-NODE-TRANSPORT`
+**Assumptions.** `A-SHA256-FFI`, `A-MULTI-NODE-TRANSPORT`
 
 **Limitations — 1 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
@@ -384,7 +388,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Source/artifact provenance.** No independent source-map target; supplemental evidence only. A source-map entry is source provenance, not deployed-artifact provenance.
 
-**Assumptions.** `A-MULTI-NODE-TRANSPORT`
+**Assumptions.** `A-SHA256-FFI`, `A-MULTI-NODE-TRANSPORT`
 
 **Limitations — 1 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
@@ -491,7 +495,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Source/artifact provenance.** No independent source-map target; supplemental evidence only. A source-map entry is source provenance, not deployed-artifact provenance.
 
-**Assumptions.** `A-VERITY-SCAFFOLD`
+**Assumptions.** `A-SHA256-FFI`, `A-VERITY-SCAFFOLD`
 
 **Limitations — 1 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
@@ -649,11 +653,11 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Source/artifact provenance.** No independent source-map target; supplemental evidence only. A source-map entry is source provenance, not deployed-artifact provenance.
 
-**Assumptions.** `A-SOURCE-SHAPED`, `A-CLASSICAL-CHOICE`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
+**Assumptions.** `A-SHA256-FFI`, `A-SOURCE-SHAPED`, `A-CLASSICAL-CHOICE`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
 
 **Limitations — 5 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
-- SHA-256 functional correctness remains an out-of-scope scope-boundary disclosure (retained at registry level per audit schema; see LidoSRv3/Audit/Provenance/SszSha256Isolation.lean for the isolation showing no registered SSZ theorem kernel-depends on sha256_correct). combine is abstract; the produced-digest-equals-FIPS-SHA-256 claim is never asserted.
+- A-SHA256-FFI on the opaque Compiler.Sha256.Engine.sha256 definition: SszSha256Isolation.lean shows no registered SSZ theorem's #print axioms mentions sha256_correct, but the opaque symbol is consumed by the registered parents and by combine, so the assumption is embedded in the definitional shape of the model. RECLASSED in PR #400, REINSTATED per mandate 2026-09-12. combine is abstract; the produced-digest-equals-FIPS-SHA-256 claim is never asserted.
 - the constructor pin is an in-repo literal, not a live-deployment identity
 - the BEACON_ROOTS model is not a deployed-address or codehash identity
 - .verityTx CHECKED is the modeled list lookup (executeRead = rfl), not Contract.run at the EIP-4788 precompile address; history cells are caller-supplied
@@ -671,11 +675,11 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Source/artifact provenance.** No independent source-map target; supplemental evidence only. A source-map entry is source provenance, not deployed-artifact provenance.
 
-**Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-CLASSICAL-CHOICE`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
+**Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-CONSOLIDATION-GATEWAY-NONZERO`, `A-CLASSICAL-CHOICE`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
 
 **Limitations — 6 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
-- hGatewayAdmittedNonzero remains a composition premise of the parent theorem; the Bus theorem executeConsolidation_committed_forwards_msgValue (audit/trio/consolidation/Bus.lean, from PR #263) derives it from a positive outer gateway payment, but the composition into this parent still requires the ABI/interpreter bridge between the Bus module and P-CONSOLIDATION-VALUE-1.
+- A-CONSOLIDATION-GATEWAY-NONZERO remains a caller premise, not discharged. The Bus theorem `executeConsolidation_committed_forwards_msgValue` from PR #263 (audit/trio/consolidation/Bus.lean:203) proves `call.value = msgValue` on the committed path, but `msgValue` is a free parameter — positivity of the vault-side forwarded value is not established. RECLASSED in PR #411, REINSTATED here per mandate 2026-09-12.
 - AcceptingPredeploy is a callee-model hypothesis (identity state transition and always-success returndata)
 - official success is the single-request bind (msg.value = 1 * fee), not an n-request batch
 - link target and fee are CallEnv parameters, not a deployed-address identity
