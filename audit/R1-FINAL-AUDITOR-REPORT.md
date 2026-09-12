@@ -4,7 +4,7 @@
 
 ## Decision
 
-Review basis: structured inputs including the accepted TOPUP constructor provenance disclosure (theorem registrations and statuses unchanged; prior PR250 basis `ffd6ae4d5be0a5e1e7d1be335700e58ca90771f5` and exact input delta retained in `audit/metadata-reconcile/report-basis.json`; this revision is not a new independent certification; trio composition scoped separately) `360464cf5f5bb43bc99bef8f8f8902c6c46ae838`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
+Review basis: structured inputs including the accepted TOPUP constructor provenance disclosure (theorem registrations and statuses unchanged; prior PR250 basis `ffd6ae4d5be0a5e1e7d1be335700e58ca90771f5` and exact input delta retained in `audit/metadata-reconcile/report-basis.json`; this revision is not a new independent certification; trio composition scoped separately) `fd37b03f0994b658583be49e94e51c9b4115071c`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
 
 ## Architecture and evidence boundary
 
@@ -23,7 +23,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 | [`P-DEPOSIT-1`](#p-deposit-1) | CHECKED | CHECKED | 9 open | **IMPLEMENTATION_PENDING** |
 | [`P-TOPUP-1`](#p-topup-1) | CHECKED | CHECKED | 7 open | **IMPLEMENTATION_PENDING** |
 | [`P-ACCOUNT-1`](#p-account-1) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
-| [`P-RESERVE-1`](#p-reserve-1) | CHECKED | CHECKED | 13 open | **IMPLEMENTATION_PENDING** |
+| [`P-RESERVE-1`](#p-reserve-1) | CHECKED | CHECKED | 14 open | **IMPLEMENTATION_PENDING** |
 | [`P-CONSOLIDATION-ETH-1`](#p-consolidation-eth-1) | CHECKED | CHECKED | 18 open | **IMPLEMENTATION_PENDING** |
 | [`P-ADDRESS-1`](#p-address-1) | CHECKED | CHECKED | 11 open | **IMPLEMENTATION_PENDING** |
 | [`P-TOPUP-2`](#p-topup-2) | CHECKED | CHECKED | 15 open | **IMPLEMENTATION_PENDING** |
@@ -196,7 +196,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
 
-**Limitations — 13 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+**Limitations — 14 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
 - canDeposit / bunker / router authorization (now proved as scopedWithdrawGuards on any committed call, but the two booleans are still free inputs, not live bunker/pause/msg.sender checks)
 - packed uint128 buffered ether and ETH transfer
@@ -211,6 +211,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 - Verity omits `_seedDepositsCount` bookkeeping (Lido.sol:877-882) and the `Unbuffered` / `DepositedPostReportUpdated` events. Grok differential #419 flags this as D-SEED-1 / D-EVENT-1.
 - Verity allocation helper uses `safeSub` and returns `ALLOCATION_ARITHMETIC` on overflow; the pinned 0.4.24 helper does raw `remaining -=` (unchecked wrap). The `min` bounds make that branch unreachable on the grok harness vectors. Grok differential #419 flags this as D-WRAP-1.
 - live WithdrawalQueue.unfinalizedStETH call (freshness is now an explicit freshQueueCache hypothesis with a stale-cache kill-line, not an implicit assumption). RECLASSED in PR #408, REINSTATED here per mandate 2026-09-12: a consumer module that re-derives the freshness under a renamed hypothesis does not change the registered parent's statement.
+- general-rule residual (Thomas 2026-09-12): the P-RESERVE-1 `PinnedLidoReserveCallShape` scaffold (see covered) names each pinned Lido/ACL read but does NOT yet execute them against live storage. A real derivation requires: (a) a live `STAKING_STATE_POSITION.getStorageStakeLimitStruct().isStakingPaused()` source model to derive `!isStakingPaused` from a keyed storage read; (b) a `_isBunkerActive` source model; (c) an Aragon-ACL `hasPermission(msg.sender, address(this), STAKING_ROUTER_ROLE)` source chain to derive `authorizedRouter` from a role-registry keyed read. None are tree-resident yet. Until these live source models are added, the two `WithdrawInputs` booleans remain free even under the scaffold — the scaffold's value is naming the composition entry point, not eliminating the free-boolean-in-parent condition.
 **Trio source composition.** Independent ordered status, authorization/locator, live queue/frame calls, ABI decoding, partition arithmetic, spending and receiver-tail relations cover every withdrawal outcome and root rollback. Physical protection is separately proved for the concrete bound queue/consensus/receiver pipeline, including final physical accounting and the next live queue demand. Generic arbitrary successful callbacks are not promised reserve protection.
 
 **Composition validation.** SOURCE COMPOSITION CANDIDATE; final independent review and official exact-source gates pending. Legacy primary guarantee registrations remain unchanged.
