@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Source.TopupCorrespondence
+import LidoSRv3.Audit.Source.SRStorageSourceModel
 
 /-! # P-TOPUP-1 three-boolean derivation from pinned SR-storage reads
 
@@ -126,5 +127,55 @@ theorem run_does_not_take_notAuthorized_branch_under_pinned_sr_shape
       inp.callerIsTopUpGateway = true := by
   right
   exact hPinned.roleReadIsGateway
+
+/-! ## Real-derivation composition (2026-09-13, first step)
+
+The scaffold above still routes the three booleans through
+projections of `PinnedSRTopupCallShape`. The composition below
+takes a REAL SR context (via
+`SRStorageSourceModel.SRTopupCallerContext`) and derives the three
+`SourceTopupInput` booleans from source-level definitions
+(`isTopUpGatewayCall`, `moduleExists`, `wcIsType2`), not from
+caller-supplied constants.
+
+The premise now names three separate booleans (`callerIsGatewayFromRead`,
+`moduleExistsFromRead`, `wcTypeIsType2FromRead`) — each an EXPLICIT
+source read from a pinned SR / Aragon location — instead of three
+anonymous `Bool` fields. -/
+
+/-- Real-derivation premise: the three `SourceTopupInput` booleans
+are functionally determined by a source-level SR context via the
+source-defined functions in `SRStorageSourceModel`. -/
+structure ThreeBooleansFromSRContext
+    (inp : SourceTopupInput)
+    (ctx : LidoSRv3.Audit.Source.SRStorageSourceModel.SRTopupCallerContext) : Prop where
+  callerMatchesSource : inp.callerIsTopUpGateway =
+    LidoSRv3.Audit.Source.SRStorageSourceModel.isTopUpGatewayCall ctx
+  moduleExistsMatchesSource : inp.moduleExists =
+    LidoSRv3.Audit.Source.SRStorageSourceModel.moduleExists ctx
+  wcTypeMatchesSource : inp.wcTypeIsType2 =
+    LidoSRv3.Audit.Source.SRStorageSourceModel.wcIsType2 ctx
+
+/-- Real-derivation composition: under the pinned SR-storage premise
+(all three source-context reads are true) AND the linkage premise
+`ThreeBooleansFromSRContext`, the three input booleans are `true` —
+derived via source-defined functions, not caller-supplied constants. -/
+theorem three_booleans_derived_from_sr_context
+    {inp : SourceTopupInput}
+    {ctx : LidoSRv3.Audit.Source.SRStorageSourceModel.SRTopupCallerContext}
+    (hLink : ThreeBooleansFromSRContext inp ctx)
+    (hGateway : ctx.callerIsGatewayFromRead = true)
+    (hModule : ctx.moduleExistsFromRead = true)
+    (hWc : ctx.wcTypeIsType2FromRead = true) :
+    inp.callerIsTopUpGateway = true ∧
+      inp.moduleExists = true ∧
+      inp.wcTypeIsType2 = true := by
+  refine ⟨?_, ?_, ?_⟩
+  · rw [hLink.callerMatchesSource]
+    exact (LidoSRv3.Audit.Source.SRStorageSourceModel.all_guards_pass_of_pinned_sr_reads hGateway hModule hWc).1
+  · rw [hLink.moduleExistsMatchesSource]
+    exact (LidoSRv3.Audit.Source.SRStorageSourceModel.all_guards_pass_of_pinned_sr_reads hGateway hModule hWc).2.1
+  · rw [hLink.wcTypeMatchesSource]
+    exact (LidoSRv3.Audit.Source.SRStorageSourceModel.all_guards_pass_of_pinned_sr_reads hGateway hModule hWc).2.2
 
 end LidoSRv3.Audit.Guarantees.PTopup1SRStoragePremise

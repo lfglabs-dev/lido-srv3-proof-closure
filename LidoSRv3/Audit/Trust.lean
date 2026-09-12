@@ -73,6 +73,7 @@ import LidoSRv3.Audit.Common.Bounded
 import LidoSRv3.Audit.Guarantees.PAlloc1
 import LidoSRv3.Audit.Guarantees.PAlloc1TargetMultBounded
 import LidoSRv3.Audit.Guarantees.PTopup1SRStoragePremise
+import LidoSRv3.Audit.Source.SRStorageSourceModel
 import LidoSRv3.Audit.Guarantees.PReserve1LidoStoragePremise
 import LidoSRv3.Audit.Source.LidoStakingStateStorage
 import LidoSRv3.Audit.Guarantees.PAddress1BridgeCallPremise
@@ -805,6 +806,12 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1SRStoragePremise.callerIsTopUpGateway_derived_under_pinned_sr_shape
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1SRStoragePremise.moduleExists_derived_under_pinned_sr_shape
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1SRStoragePremise.wcTypeIsType2_derived_under_pinned_sr_shape
+-- Real-derivation step for P-TOPUP-1 three booleans (2026-09-13):
+-- source-level SRStorageSourceModel functions (isTopUpGatewayCall, moduleExists,
+-- wcIsType2) derive the three inputs from a named SRTopupCallerContext, not
+-- caller constants.
+#print axioms LidoSRv3.Audit.Source.SRStorageSourceModel.all_guards_pass_of_pinned_sr_reads
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1SRStoragePremise.three_booleans_derived_from_sr_context
 -- General rule (Thomas 2026-09-12) applied to P-RESERVE-1 two booleans
 -- canDeposit / authorizedRouter: naming scaffold PinnedLidoReserveCallShape
 -- names the pinned Lido.sol:815-816 canDeposit definition and the
