@@ -4,7 +4,7 @@
 
 ## Decision
 
-Review basis: structured inputs including the accepted TOPUP constructor provenance disclosure (theorem registrations and statuses unchanged; prior PR250 basis `ffd6ae4d5be0a5e1e7d1be335700e58ca90771f5` and exact input delta retained in `audit/metadata-reconcile/report-basis.json`; this revision is not a new independent certification; trio composition scoped separately) `2ff731c0b786eff50eb21b200aeeb44aae3b476b`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
+Review basis: structured inputs including the accepted TOPUP constructor provenance disclosure (theorem registrations and statuses unchanged; prior PR250 basis `ffd6ae4d5be0a5e1e7d1be335700e58ca90771f5` and exact input delta retained in `audit/metadata-reconcile/report-basis.json`; this revision is not a new independent certification; trio composition scoped separately) `341e60627a0848e2c66ff23135f34c63829ea831`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
 
 ## Architecture and evidence boundary
 
@@ -28,7 +28,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 | [`P-ADDRESS-1`](#p-address-1) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
 | [`P-TOPUP-2`](#p-topup-2) | CHECKED | CHECKED | 11 open | **IMPLEMENTATION_PENDING** |
 | [`P-CONSOLIDATION-1`](#p-consolidation-1) | CHECKED | CHECKED | 8 open | **IMPLEMENTATION_PENDING** |
-| [`P-SSZ-1`](#p-ssz-1) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
+| [`P-SSZ-1`](#p-ssz-1) | CHECKED | CHECKED | 9 open | **IMPLEMENTATION_PENDING** |
 | [`P-SSZ-1.deposit-data-root`](#p-ssz-1deposit-data-root) | CHECKED | PARTIAL | 1 open | **IMPLEMENTATION_PENDING** |
 | [`P-SSZ-1.gindex-concat`](#p-ssz-1gindex-concat) | CHECKED | PARTIAL | 1 open | **IMPLEMENTATION_PENDING** |
 | [`P-SSZ-1.abstract-digest`](#p-ssz-1abstract-digest) | CHECKED | PARTIAL | 1 open | **IMPLEMENTATION_PENDING** |
@@ -38,6 +38,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 | [`P-DEPOSIT-1.verity-tx-rollback.tx`](#p-deposit-1verity-tx-rollbacktx) | CHECKED | CHECKED | 0 open | **NONE** |
 | [`P-CONSOLIDATION-1.fee-refinement.tx`](#p-consolidation-1fee-refinementtx) | OPEN | OPEN | 1 open | **IMPLEMENTATION_PENDING** |
 | [`P-SSZ-1.tx-execution-simulation`](#p-ssz-1tx-execution-simulation) | CHECKED | PARTIAL | 1 open | **IMPLEMENTATION_PENDING** |
+| [`P-SSZ-1.encoding-simulation`](#p-ssz-1encoding-simulation) | CHECKED | CHECKED | 1 open | **IMPLEMENTATION_PENDING** |
 | [`P-ADDRESS-1.denote-admission`](#p-address-1denote-admission) | OPEN | CHECKED | 3 open | **IMPLEMENTATION_PENDING** |
 | [`P-RESERVE-RELATIONAL`](#p-reserve-relational) | CHECKED | CHECKED | 0 open | **NONE** |
 | [`P-ALLOC-EXEC-1`](#p-alloc-exec-1) | CHECKED | PARTIAL | 2 open | **IMPLEMENTATION_PENDING** |
@@ -325,15 +326,15 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 ### `P-SSZ-1`
 
-**Accepted theorem planes.** Abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PSsz1.deposit_root_iff`. Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PSsz1.verity_tx_simulates_ssz_encoding`.
+**Accepted theorem planes.** Abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PSsz1.deposit_root_iff`. Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PSsz1.actual_compiled_cl_entry_complete_declared_branch`.
 
-**Proof shape / exact domain statement.** Bidirectional structural deposit-root equivalence is registered as deposit_root_iff: the named Spec SszWitness.Correspondence on well-formed deposits (pinned 48/32/96-byte widths). Construction binds sourceWitness src to sourceNode src at .clValidatorVerifier; determination recovers witness = sourceWitness src from depositVerified witness root with root = sourceNode src. Deposit uniqueness is the named PerfectDepositEncoding (A-PERFECT-HASH) child deposit_unique_of_perfect, not a parent conjunct. sourceNode_mutant_kill_line_refutes_parent is the parent-shaped kill-line (encode mutated to sourceNode + 1; wellFormedDeposit retained). This complements composed_ssz_encoding, which still registers the single traversal conjunct composedEncodingOk on ComposedSszInput (the mutant-exercised deposit-data-root reconstruction under sourceCombine). swapped_combine_kill_line_refutes_parent remains the traversal-child kill-line; inconsistent_witness_kill_line and inconsistent_operation_index_kill_line remain bindOperation-level negatives. SHA-256 functional correctness stays A-SHA256-FFI; the imported Yul fragment stays OPEN under A-YUL-INTERFACE.
+**Proof shape / exact domain statement.** Chantier 3 (mandate 2026-09-12) changes the registered Verity parent from verity_tx_simulates_ssz_encoding (traversal on a dummy validator at gindex 2 with an injective Nat.pair combine — an object that CLValidatorVerifier._verifyValidator never checks) to actual_compiled_cl_entry_complete_declared_branch, which authenticates the actual compiled entry SszCompiledClEntry.run (the compiled harness of _verifyValidator, selector 0x2e77b4ba). On a successful whole-entry run and the inherited SHA-256-output-width side condition (ShaWidth), the parent yields the executed slot/proposer read from calldata, one BEACON_ROOTS STATICCALL and its reply guard, the typed sourceWrapper generalized index of the executed slot/validator-index words, the decoded 48-byte key octets / fields / credential leaf assembled at the pinned _validatorHashTreeRoot layout, an independent Merkle branch fold from that leaf to the first word of the returned bytes, and the complete ABI-declared sibling sequence (declaredWords = length branch, depth = log2 gindex, 3 ≤ length ≤ 247, and the penultimate sibling matches the paired slot/proposer chunk). The demoted parent verity_tx_simulates_ssz_encoding is retained as child P-SSZ-1.encoding-simulation on ComposedSszInput/EncodingInput at gindex 2 with Nat.pair combine; deposit_root_iff, composed_ssz_encoding, PerfectDepositEncoding uniqueness, sourceNode/swapped-combine kill-lines, sourceWitness_binds_sourceNode non-vacuity, and the pinned deposit-data-root layout all remain as unregistered or subordinate evidence. Explicit boundaries retained: BEACON_ROOTS callee is the accepted StaticCall.External interpreter on typed Live.World (EIP-4788 history-ring authenticity is not represented); immutables are typed Configuration pack words; SHA-256 is the opaque engine FFI with the inherited output-width condition; opcode gas and compiled-bytecode correspondence remain outside. SHA-256 functional correctness stays A-SHA256-FFI; the imported Yul fragment stays OPEN under A-YUL-INTERFACE.
 
 **Source/artifact provenance.** `MAPPED`; 16 immutable pinned source span(s) in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance.
 
 **Assumptions.** `A-SHA256-FFI`, `A-MULTI-NODE-TRANSPORT`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
 
-**Limitations — 6 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+**Limitations — 9 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
 - SSZ.verifyProof on production gindices
 - SHA-256 functional correctness of the opaque model/precompile symbol
@@ -341,10 +342,13 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 - imported-to-deployed helper/wrapper Yul fragment binding
 - the state-root anchor (lhs), the concat operand's pow byte (rhsPow), and the tx child's fork version / claimed root remain independently supplied, non-deposit chain-level values
 - the general Verity EncodingInput API still permits independent fields, but verity_tx_one_object_matches_sourceView provides a TX-level derived-input theorem from one ComposedSszInput
+- chantier 3 disclosure (mandate 2026-09-12): the demoted parent verity_tx_simulates_ssz_encoding (child P-SSZ-1.encoding-simulation) still models a dummy validator at gindex 2 with an injective Nat.pair combine — an object CLValidatorVerifier._verifyValidator never checks; it is retained only as child regression evidence and is not the registered Verity parent of P-SSZ-1
+- chantier 3 disclosure (mandate 2026-09-12): the new registered parent actual_compiled_cl_entry_complete_declared_branch consumes ShaWidth (SszProofCommitted.ShaWidth) as an inherited SHA-output-width side condition on the opaque engine.sha256 FFI; SHA-256 functional correctness of that opaque symbol remains A-SHA256-FFI, and no refinement to an independently certified SHA-256/precompile has been proved
+- chantier 3 disclosure (mandate 2026-09-12): EIP-4788 history-ring authenticity is not represented; the BEACON_ROOTS callee is the accepted StaticCall.External interpreter on typed Live.World rather than the pinned EIP-4788 precompile contract, and its return bytes are threaded as the branch root without a live-deployment or codehash binding
 
-**Classification.** **IMPLEMENTATION_PENDING** — Keep the checked Spec SszWitness.Correspondence parent, its sourceNode-mutant kill-line, and the named PerfectDepositEncoding uniqueness child. Keep the one-object four-child witness/root/concat/digest composition. Do not implement SSZ.verifyProof or a cryptographic SHA-256 proof.
+**Classification.** **IMPLEMENTATION_PENDING** — Keep the checked Spec SszWitness.Correspondence abstract parent, its sourceNode-mutant kill-line, and the named PerfectDepositEncoding uniqueness child. Keep the compiled-entry Verity parent actual_compiled_cl_entry_complete_declared_branch and its declared-siblings extension. Keep the one-object four-child witness/root/concat/digest composition as unregistered/subordinate evidence. Do not implement SSZ.verifyProof or a cryptographic SHA-256 proof. Next steps under this chantier: bind BEACON_ROOTS to a pinned EIP-4788 precompile identity; refine engine.sha256 against a separately certified SHA-256; and extend the compiled-entry theorem to the SSZ.verifyProof surface on production gindices.
 
-**Next gate.** Registered parent is Spec SszWitness.Correspondence with a parent-shaped sourceNode mutant kill-line. OPEN: hash identification, SSZ.verifyProof / production gindices, and EIP-4788 / gateway. Keep SHA correctness and Yul visibly OPEN.
+**Next gate.** Chantier 3 (mandate 2026-09-12): registered Verity parent is actual_compiled_cl_entry_complete_declared_branch on the compiled _verifyValidator entry; the previous verity_tx_simulates_ssz_encoding is demoted to child P-SSZ-1.encoding-simulation. Abstract parent remains deposit_root_iff. OPEN: hash identification, SSZ.verifyProof / production gindices, and EIP-4788 / gateway. Keep SHA correctness and Yul visibly OPEN.
 
 ### `P-SSZ-1.deposit-data-root`
 
@@ -506,6 +510,24 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 **Classification.** **IMPLEMENTATION_PENDING** — Implement and compose the listed missing fidelity without widening the guarantee.
 
 **Next gate.** Preserve this child; it is composed into P-SSZ-1.
+
+### `P-SSZ-1.encoding-simulation`
+
+**Accepted theorem planes.** Abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PSsz1.verity_tx_simulates_ssz_encoding`. Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PSsz1.verity_tx_simulates_ssz_encoding`.
+
+**Proof shape / exact domain statement.** Demoted from P-SSZ-1 registered Verity parent per mandate 2026-09-12 chantier 3. verity_tx_simulates_ssz_encoding proves the five-conjunct predicate ObservesSourceView ∧ CommitPersistsWitnessObservables ∧ ConcatMatchesSpec ∧ DigestChainIsExact ∧ RevertRestoresSnapshot on an EncodingInput; the underlying model operates on a dummy validator at gindex 2 with an injective Nat.pair combine and does NOT authenticate the actual compiled _verifyValidator (selector 0x2e77b4ba) execution. The new registered Verity parent of P-SSZ-1 is actual_compiled_cl_entry_complete_declared_branch, which runs the compiled entry. This subordinate row is retained as regression/child evidence and must not be re-promoted to registered Verity parent.
+
+**Source/artifact provenance.** No independent source-map target; supplemental evidence only. A source-map entry is source provenance, not deployed-artifact provenance.
+
+**Assumptions.** `A-SHA256-FFI`, `A-VERITY-SCAFFOLD`, `A-MULTI-NODE-TRANSPORT`
+
+**Limitations — 1 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+
+- actual compiled _verifyValidator (selector 0x2e77b4ba) authentication — moved to P-SSZ-1 registered Verity parent actual_compiled_cl_entry_complete_declared_branch
+
+**Classification.** **IMPLEMENTATION_PENDING** — Do not re-promote to registered Verity parent. Retain as regression/child evidence only; the compiled-entry parent lives in P-SSZ-1.
+
+**Next gate.** Preserve this child; the compiled-entry Verity parent of P-SSZ-1 is actual_compiled_cl_entry_complete_declared_branch.
 
 ### `P-ADDRESS-1.denote-admission`
 
