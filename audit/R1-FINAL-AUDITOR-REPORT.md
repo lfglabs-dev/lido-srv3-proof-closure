@@ -634,7 +634,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Limitations — 5 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
-- A-SHA256-FFI remains: combine is abstract; SHA-256 functional correctness is not claimed
+- SHA-256 functional correctness remains an out-of-scope scope-boundary disclosure (retained at registry level per audit schema; see LidoSRv3/Audit/Provenance/SszSha256Isolation.lean for the isolation showing no registered SSZ theorem kernel-depends on sha256_correct). combine is abstract; the produced-digest-equals-FIPS-SHA-256 claim is never asserted.
 - the constructor pin is an in-repo literal, not a live-deployment identity
 - the BEACON_ROOTS model is not a deployed-address or codehash identity
 - .verityTx CHECKED is the modeled list lookup (executeRead = rfl), not Contract.run at the EIP-4788 precompile address; history cells are caller-supplied
