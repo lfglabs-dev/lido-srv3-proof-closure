@@ -780,6 +780,12 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Verity.ConsolidationEthUnboundedFuel.verity_tx_success_shape_unbounded
 #print axioms LidoSRv3.Audit.Verity.ConsolidationEthUnboundedFuel.registered_parent_is_instance_at_32
 #print axioms LidoSRv3.Audit.Verity.ConsolidationEthUnboundedFuel.registered_parent_recovered_at_32
+-- General rule (Thomas 2026-09-12) applied to P-CONSOLIDATION-ETH-1
+-- batchSize: derived-fuel success under mainnet Bus batchSize ceiling.
+-- The registered parent's exhausted arm at batchSize ≥ 29 is a
+-- fuelBudget = 32 model artifact; the mainnet Bus ceiling is 200,
+-- so batches up to 200 fit at derived fuel batchSize + 4.
+#print axioms LidoSRv3.Audit.Verity.ConsolidationEthUnboundedFuel.verity_tx_success_at_derived_fuel_under_bus_ceiling
 #print axioms LidoSRv3.Tests.ConsolidationEthUnboundedFuelMutants.truncated_fuel_batchSize_plus_three_exhausted
 #print axioms LidoSRv3.Tests.ConsolidationEthUnboundedFuelMutants.truncated_fuel_must_be_refused
 #print axioms LidoSRv3.Tests.ConsolidationEthUnboundedFuelMutants.parent_fuel_premise_excludes_batch_29
