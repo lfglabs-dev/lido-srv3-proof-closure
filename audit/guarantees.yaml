@@ -76,7 +76,8 @@
           "named kill-lines refuting the registered parent's proportional-step conjunct: Tests.MinFirstDistributionTxMutants.selection_kill_line_refutes_parent (first-open mutant scan substituted for Model.candidate?) and Tests.MinFirstDistributionTxMutants.headroom_clamp_kill_line_refutes_parent (checkedAmountNoCapacityCap substituted at the checkedAmount premise only); TX-level mutantSourceView vs runView retained as TX-observe computational evidence",
           "handwritten +1 Strategy selection (demoted child)",
           "executor allocateLoop plus a separately defined sourceAllocateLoop with copied equations and a proved equality bridge; observe reads writeArray buckets",
-          "Contract.run rollback after intermediate writes"
+          "Contract.run rollback after intermediate writes",
+          "unconditional loop termination (grok #416): source_allocate_conserves_without_fuel proves conservation with no fuel premise; sourceAllocateLoop_terminates proves termination from the decreasing remaining-capacity sum (MinFirstAllocationStrategy.allocate:106). Registered parent conservation previously required caller-supplied fuel to return some; this lot lifts that premise. Discharged via LidoSRv3/Audit/Spec/AllocLoopTermination.lean. Axioms only propext / Classical.choice / Quot.sound."
         ],
         "missing": [
           "Solidity allocate does not test active (filtered upstream)",
@@ -379,10 +380,10 @@
           "separate live-shaped claimWithdrawalsTo Contract.run loop over parallel request/hint lists, exact pinned unstructured-storage constants, packed owner/claimed request-word decoding, current/previous request and checkpoint reads, locked-ETH updates, ordered value-bearing empty-calldata payout CALL journal, and universal failed-run snapshot rollback",
           "bounded two-request batch observe theorem and fixed-payout-recipient journal kill-line",
           "snapshot rollback and wrong-recipient, address-writer, and admission-boundary mutants",
-          "live singleton-actor exclusion (grok #403): requiresFixedActor ep is False for every modeled writer (requestWithdrawals, unwrap, claimWithdrawalsTo, transferFrom) \u2014 two admitted callers with distinct addresses exist for each tag, so no fixed actor can be the caller of every admitted run. The fixed-owner mutant (caller = 7 required for requestWithdrawals) refutes the exclusion is a tautological False. Discharged via LidoSRv3/Audit/Source/AddressSingleton.lean; kill-lines in LidoSRv3/Tests/AddressSingletonMutants.lean. Axioms only propext."
+          "live singleton-actor exclusion (grok #403): requiresFixedActor ep is False for every modeled writer (requestWithdrawals, unwrap, claimWithdrawalsTo, transferFrom) \u2014 two admitted callers with distinct addresses exist for each tag, so no fixed actor can be the caller of every admitted run. The fixed-owner mutant (caller = 7 required for requestWithdrawals) refutes the exclusion is a tautological False. Discharged via LidoSRv3/Audit/Source/AddressSingleton.lean; kill-lines in LidoSRv3/Tests/AddressSingletonMutants.lean. Axioms only propext.",
+          "unbounded observe receipt (grok #416): the live AddressClaimBatchTx loop already iterates arbitrary request/hint lists; observe is proved to equal the ordered map of the unit _claim receipt (WithdrawalQueueBase.sol:460-480) for every successful list. The two-item parent shape is that instance. Reordered-calls mutant is refused. Caller-swap equivariance remains a separate concern. Discharged via LidoSRv3/Audit/Verity/AddressClaimBatchUnbounded.lean. Axioms only propext / Quot.sound / Classical.choice."
         ],
         "missing": [
-          "unbounded source-to-Verity correspondence and caller-swap equivariance theorem for the live claimWithdrawalsTo batch; the checked observe receipt is two-item",
           "keccak-level physical mapping-slot derivation for queue/checkpoint struct words; ContractState mapUint channels model keyed POSITION/POSITION+1 words",
           "EnumerableSet owner-request removal, Transfer/WithdrawalClaimed events, adversarial recipient code, and machine-level CALL semantics",
           "packed WithdrawalQueue ERC-721 transfer and WstETH/ERC-20 storage, approvals, balances, and allowances outside the bounded claim request words",

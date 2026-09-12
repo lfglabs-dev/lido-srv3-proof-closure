@@ -145,6 +145,8 @@ import LidoSRv3.Audit.Source.AccountPackedWords
 import LidoSRv3.Tests.AccountPackedWordsMutants
 import LidoSRv3.Audit.Verity.TopupUnboundedCount
 import LidoSRv3.Audit.Verity.TopupMultiCallBlockCap
+import LidoSRv3.Audit.Verity.AddressClaimBatchUnbounded
+import LidoSRv3.Audit.Spec.AllocLoopTermination
 import LidoSRv3.Audit.Source.DepositLinksSource
 import LidoSRv3.Tests.PackGTopupProvenanceMutants
 import LidoSRv3.Audit.Provenance.ConsolidationRequest
@@ -1757,6 +1759,28 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Verity.TopupMultiCallBlockCap.setter_refuses_zero
 #print axioms LidoSRv3.Audit.Verity.TopupMultiCallBlockCap.no_lock_two_call_exceeds_cap
 #print axioms LidoSRv3.Audit.Verity.TopupMultiCallBlockCap.router_only_two_call_exceeds_cap
+
+-- P-ADDRESS-1 unbounded observe receipt (grok #416): the live
+-- AddressClaimBatchTx loop already iterates arbitrary request/hint
+-- lists; this lot proves the observe receipt for every successful list
+-- by induction (WithdrawalQueue.sol:244-256): observe is the ordered
+-- map of the unit _claim receipt (WithdrawalQueueBase.sol:460-480).
+-- The two-item parent shape is that instance. A mutant that reorders
+-- the CALLs is refused. Closes P-ADDRESS-1's fidelity.missing entry
+-- "unbounded source-to-Verity correspondence ... the checked observe
+-- receipt is two-item".
+#print axioms LidoSRv3.Audit.Verity.AddressClaimBatchUnbounded.observe_eq_map_unit
+#print axioms LidoSRv3.Audit.Verity.AddressClaimBatchUnbounded.two_item_parent_instance
+#print axioms LidoSRv3.Audit.Verity.AddressClaimBatchUnbounded.reordered_calls_refute_two_item
+
+-- P-ALLOC-2 unconditional termination (grok #416): parent conservation
+-- previously held only for `sourceAllocateLoop` runs that returned
+-- some under caller-supplied fuel. This lot proves unconditional
+-- termination from the decreasing remaining-capacity sum drawn from
+-- MinFirstAllocationStrategy.allocate:106, then conservation with no
+-- fuel premise. Solidity also has a real bound: allocationSize.
+#print axioms LidoSRv3.Audit.Spec.AllocLoopTermination.sourceAllocateLoop_terminates
+#print axioms LidoSRv3.Audit.Spec.AllocLoopTermination.source_allocate_conserves_without_fuel
 
 -- P-DEPOSIT-1 LinksSource firstAmount / publicKeysBatchLength derived
 -- from pinned router shape (grok #405 / see `audit/deposit-linkssource/
