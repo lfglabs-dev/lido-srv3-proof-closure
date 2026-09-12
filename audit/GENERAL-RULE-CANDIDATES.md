@@ -239,64 +239,115 @@ For each candidate, execute the same pattern as chantier 4bis
 - Correction receipt: `audit/findings/CORRECTION-2026-09-12-reclassings.md`.
 - Site corrections: `audit/SITE-CORRECTIONS.md`.
 
-## Status (updated 2026-09-12)
+## Status (updated 2026-09-13 — every candidate has at least a scaffold)
 
-**Three-and-a-half of six candidates addressed; goal not achieved.**
-The mandate's eight chantiers (1–8 + 4bis) are all merged (PRs
-#427–#435). General-rule application progress:
+**All six candidates have naming scaffolds registered; three have
+real compositions; goal still not achieved.** The mandate's eight
+chantiers (1–8 + 4bis) are all merged (PRs #427–#435). General-rule
+application progress:
 
-### ✅ Merged compositions
+### ✅ Real compositions (3, cheap because grok/type-bound work
+existed)
 
 1. **DEPOSIT-1 LinksSource** — PR #437.
    Registered Verity parent switched to
    `verity_tx_composes_nframe_deposit_under_router_shape` in
    `LidoSRv3/Audit/Guarantees/PDeposit1LinksSourceComposition.lean`.
-   Consumes grok #405 `nframe_linksSource_of_router_fields`. Residual:
-   pinned `StakingRouter.topUp` caller-shape.
+   Consumes grok #405 `nframe_linksSource_of_router_fields`.
+   Residual: pinned `StakingRouter.topUp` caller-shape.
 2. **CONSOLIDATION-ETH-1 batchSize** — PR #438.
    New consumer `verity_tx_success_at_derived_fuel_under_bus_ceiling`
    in `LidoSRv3/Audit/Verity/ConsolidationEthUnboundedFuel.lean`.
    Names `mainnetBusBatchCeiling = 200`. Consumes grok #410
    `verity_tx_success_shape_unbounded`. Residual: live-Bus binding.
-3. **ALLOC-1 CheckedBounds `target_multiplication` conjunct** — PR #439.
-   New subordinate `PAlloc1TargetMultBounded` proves
+3. **ALLOC-1 CheckedBounds `target_multiplication` conjunct** —
+   PR #439. New subordinate `PAlloc1TargetMultBounded` proves
    `shareLimit * totalValidators ≤ MAX_UINT256` from pinned uint16/
-   uint64 type bounds. Residual: three other CheckedBounds conjuncts
-   (`active_subtraction`, `total_addition`, `available_arithmetic`)
-   have per-module dynamic dependencies and remain follow-ups.
+   uint64 type bounds.
 
-### 🔲 Open candidates (substantial source-model work required)
+### 🔷 Naming scaffolds (5, honest but not real derivations)
 
-4. **RESERVE-1 `canDeposit`/`authorizedRouter`** — needs Lido storage
-   model for `STAKING_STATE_POSITION`, `_isBunkerActive`, Aragon
-   ACL. Estimated ~200-400 Lean lines + prerequisite Lido-storage
-   sub-model.
-5. **TOPUP-1 `moduleExists`/`wcTypeIsType2`/`callerIsTopUpGateway`** —
-   needs SRStorage model. Estimated ~150-300 Lean lines.
-6. **ADDRESS-1 `externalCallSucceeds`** — needs Bridge-to-source
-   derivation lemmas. `AddressRecipientCallBridge` module already
-   registered as subordinate (chantier 6, PR #432); the fold into
-   the registered parent's `externalCallSucceeds` boolean is the
-   missing piece. Estimated ~200-400 Lean lines.
-7. **CONSOLIDATION-ETH-1 fee STATICCALL** — needs live-STATICCALL
-   binding on `CONSOLIDATION_REQUEST` predeploy. Estimated ~200-400
-   Lean lines.
-8. **ALLOC-1 three remaining CheckedBounds conjuncts** —
-   `active_subtraction`, `total_addition`, `available_arithmetic`
-   each have per-module dynamic dependencies (`depositedCount`,
-   `depositableCount`, sums of `allocationEntry`) requiring
-   additional invariants beyond static type bounds. Estimated
-   ~200-300 Lean lines total.
+Each scaffold introduces a `Pinned*Shape` structure naming the
+pinned Solidity read that would justify the free boolean / free
+input / model bound. The scaffold's derivation theorems are
+straight-line projections; the composition entry point is named
+but the underlying live-storage / bridge / STATICCALL derivation
+is not yet tree-resident.
+
+4. **P-TOPUP-1 three booleans** — PR #441.
+   `PinnedSRTopupCallShape` in
+   `LidoSRv3/Audit/Guarantees/PTopup1SRStoragePremise.lean`. Names
+   `_checkAppAuth(_getTopUpGateway())`, `SRStorage.isModuleExists`,
+   `WithdrawalCredentials.isType2` as pinned reads.
+5. **P-RESERVE-1 canDeposit/authorizedRouter** — PR #442.
+   `PinnedLidoReserveCallShape` in
+   `LidoSRv3/Audit/Guarantees/PReserve1LidoStoragePremise.lean`.
+   Names `Lido.canDeposit()` (STAKING_STATE_POSITION +
+   _isBunkerActive) and Aragon-ACL role check as pinned reads.
+6. **P-ADDRESS-1 externalCallSucceeds** — PR #443.
+   `PinnedBridgeCallShape` in
+   `LidoSRv3/Audit/Guarantees/PAddress1BridgeCallPremise.lean`.
+   Names pinned Bridge CALL entry point (per-writer
+   `externalCallBindTo` frames in `AddressRecipientCallBridge`).
+7. **P-CONSOLIDATION-ETH-1 fee STATICCALL** — PR #444.
+   `PinnedFeeStaticcallShape` in
+   `LidoSRv3/Audit/Guarantees/PConsolidationEth1FeeStaticcallPremise.lean`.
+   Names `WithdrawalVaultEIP7685.sol:79-81`
+   `_getFeeFromContract(CONSOLIDATION_REQUEST)` STATICCALL as
+   entry point.
+8. **P-ALLOC-1 three remaining CheckedBounds conjuncts** — PR #445.
+   `PinnedSRAllocationBoundsShape` in
+   `LidoSRv3/Audit/Guarantees/PAlloc1RemainingBoundsScaffold.lean`.
+   Names SRStorage `addValidators`/`_updateExitedCounters`
+   monotonicity, `MAX_STAKING_MODULES_COUNT = 32`, and per-module
+   uint64 struct bounds as pinned entry points for the three
+   remaining `CheckedBounds` conjuncts.
+
+### 🔲 Follow-ups (each requires substantial multi-day source-model
+work)
+
+For each scaffold above, the follow-up is to REPLACE the projection
+theorem with a real derivation from a live-source model:
+
+- **RESERVE-1** live `STAKING_STATE_POSITION`,
+  `_isBunkerActive`, Aragon-ACL source models (~400-600 Lean lines).
+- **TOPUP-1** live `SRStorage.getModuleState`, Aragon-ACL,
+  `WithdrawalCredentials.isType2` source models (~400-600 lines).
+- **ADDRESS-1** per-writer Bridge-to-source glue lemmas
+  connecting `Bridge.callee = .success` to
+  `Input.externalCallSucceeds = true` (~400-600 lines).
+- **CONSOLIDATION-ETH-1 fee** live-STATICCALL executable model
+  on the pinned CONSOLIDATION_REQUEST address + ABI decoder +
+  EIP-7251-schedule model (~400-600 lines).
+- **ALLOC-1** three remaining CheckedBounds: live SRStorage
+  monotonicity invariant + `modulesCountSlot` type bound +
+  pinned StakingModule uint64 type bounds (~400-600 lines).
+
+### Differential PRs (BLOCKED, running punch list)
+
+The four grok differential PRs #412 (DEPOSIT-1), #414 (TOPUP-1),
+#417 (TOPUP-2), #419 (RESERVE-1) are correctly kept OPEN/BLOCKED
+per Thomas's rule "Une PR différentielle marquée « BLOCKED: model
+divergence » est prioritaire sur tout le reste". Their BLOCKED
+state is the running punch list. Each divergence is HONESTLY
+disclosed in the corresponding guarantee's `fidelity.missing`
+entries (chantier 2 for TOPUP-1, chantier 4/4bis for TOPUP-2,
+chantier 6 for ADDRESS-1, DEPOSIT-1 disclosures in guarantees.yaml).
+The differential PRs stay open until the model corrections land per
+the scaffolds/compositions above.
 
 ### Method note
 
-The three completed compositions (DEPOSIT-1, CONSOLIDATION-ETH-1
-batchSize, ALLOC-1 target_multiplication) all had a pre-existing
-grok consumer OR were resolvable via pure type-bound arithmetic.
-The five remaining candidates require ORIGINATING new source-model
-work (Lido storage, SRStorage, Bridge-to-source lemmas, live-STATICCALL
-bindings, per-module dynamic invariants). Each is a separate PR of
-substantial size.
+The three completed real compositions all had a pre-existing grok
+consumer OR were resolvable via pure type-bound arithmetic. The
+five remaining candidates (all with scaffolds now) require
+ORIGINATING new source-model work — each is a separate multi-day
+follow-up. The scaffolds registered in this session (#441-#445)
+make the composition entry points explicit so future
+live-storage/bridge/STATICCALL derivations have a clear attachment
+point.
 
-**Goal never terminates as long as any of these five candidates
-remains open** — per Thomas 2026-09-12 general rule.
+**Goal never terminates** — per Thomas 2026-09-12 general rule.
+Every scaffold above is honestly labeled "Status: naming scaffold,
+not a full composition" so future readers can identify each as
+scaffolding-in-progress rather than closed composition.
