@@ -16,3 +16,19 @@ src = "solidity/minfirst/src"
 test = "solidity/minfirst/test"
 out = "solidity/out/minfirst"
 cache_path = "solidity/cache/minfirst"
+
+# Pinned Lido.withdrawDepositableEther vs modelWithdrawDepositableEther via FFI.
+# The 0.4.24 Lido pin is compiled by scripts/test_reserve_source_differential.sh
+# (Foundry 1.8 does not resolve solc 0.4.24); the test deploys that bytecode.
+[profile.reserve_source]
+src = "solidity/reserve/src"
+test = "solidity/reserve/test"
+out = "solidity/out/reserve"
+cache_path = "solidity/cache/reserve"
+solc_version = "0.8.25"
+via_ir = false
+evm_version = "cancun"
+fs_permissions = [{ access = "read", path = "./" }]
+remappings = [
+  "contracts/=lido-core/contracts/"
+]
