@@ -141,6 +141,7 @@ import LidoSRv3.Audit.Provenance.AbstractTxIsolation
 import LidoSRv3.Audit.Source.AddressSingleton
 import LidoSRv3.Audit.Source.ReserveUnfinalizedCall
 import LidoSRv3.Audit.Source.AccountFeeShares
+import LidoSRv3.Audit.Source.DepositLinksSource
 import LidoSRv3.Tests.PackGTopupProvenanceMutants
 import LidoSRv3.Audit.Provenance.ConsolidationRequest
 import LidoSRv3.Audit.Provenance.CanonicalRequestAddress
@@ -1712,6 +1713,25 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.AccountFeeShares.product_panic_reverts
 #print axioms LidoSRv3.Audit.Source.AccountFeeShares.free_argument_mints_when_source_is_zero
 #print axioms LidoSRv3.Audit.Source.AccountFeeShares.getter_outputs_feed_products
+
+-- P-DEPOSIT-1 LinksSource firstAmount / publicKeysBatchLength derived
+-- from pinned router shape (grok #405 / see `audit/deposit-linkssource/
+-- README.md`). `derivedKeys` is fail-closed on misaligned length,
+-- truncated length, disagreed PUBLIC_KEY_LENGTH, zero PUBKEY_LENGTH.
+-- `derivedBatchAmount = actualDepositsCount * DEPOSIT_SIZE` (per
+-- BeaconChainDepositor.sol:53-63/57) links firstAmount from the
+-- committed source path. Kill-lines show ALLOC key counts DO NOT
+-- constrain firstAmount or publicKeysBatchLength (Wave 4
+-- `alloc_derived_linkssource_kill_line_refutes_bridge` stays true).
+-- Closes P-DEPOSIT-1's fidelity.missing entry "LinksSource is a
+-- caller-supplied hypothesis...".
+#print axioms LidoSRv3.Audit.Source.DepositLinksSource.linksSource_of_router_fields
+#print axioms LidoSRv3.Audit.Source.DepositLinksSource.nframe_linksSource_of_router_fields
+#print axioms LidoSRv3.Audit.Source.DepositLinksSource.derivedTwoBatchInputs_linksSource
+#print axioms LidoSRv3.Audit.Source.DepositLinksSource.committed_implies_derivedKeys
+#print axioms LidoSRv3.Audit.Source.DepositLinksSource.committed_pushed_is_derived_amount
+#print axioms LidoSRv3.Audit.Source.DepositLinksSource.alloc_key_counts_do_not_constrain_firstAmount
+#print axioms LidoSRv3.Audit.Source.DepositLinksSource.alloc_matching_count_does_not_constrain_publicKeysBatchLength
 
 -- A-CANONICAL-REQUEST-ADDRESS discharge (see
 -- `audit/findings/A-CANONICAL-REQUEST-ADDRESS-discharged.md` and
