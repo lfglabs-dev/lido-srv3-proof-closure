@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Guarantees.Registry
+import LidoSRv3.Audit.Source.TopupCorrespondence
 import Mathlib.Data.List.Forall2
 
 namespace LidoSRv3.Audit.Guarantees.PTopup2
@@ -242,6 +243,90 @@ parent. It has been removed rather than restated; `aggregate_bounded_by_block_ca
 above is the registered parent, and its kill-line mutant is stated against
 `transitionBudget`/`consumeBudget`, the functions the parent's proof actually
 uses. -/
+
+/-! ## Chantier 4 (mandate 2026-09-12): P-TOPUP-2 registered abstract parent on the real router mechanism
+
+The prior registered abstract parent `aggregate_bounded_by_block_cap`
+proves a property of `consumeBudget` — a leftover-budget walk that
+`StakingRouter.topUp` does not execute. The pinned router mechanism at
+`StakingRouter.sol:703-737` (as modeled by `SolidityTopup.run`) instead
+applies per-index guards inside its allocation loop (line 728) and an
+aggregate cap check on the WRAPPED accumulator (line 737); there is no
+leftover-budget walk. The `valueWei/GWEI` term in the old parent's
+`transitionBudget` (line 105) has NO source: `StakingRouter.topUp` is
+not payable (no `payable` modifier and no `msg.value` reference on
+lines 679-756 of the pinned Solidity).
+
+**Public-claim narrowing signaled to Thomas per mandate 2026-09-12
+chantier 4:** the aggregate check at line 737 is on the WRAPPED sum
+(`SolidityTopup.accumulated inp = allocSumUnchecked inp.allocations`,
+mod 2^256), NOT on the exact sum. Under a nonzero wrap the exact sum
+can far exceed the cap while `run` still commits (the value-moving
+tail then aborts via Lido-side amount guards or the line-755 assert —
+P-TOPUP-1's third conjunct). So the honest P-TOPUP-2 aggregate bound
+is on the wrapped sum.
+
+`router_source_cap_within_block_cap` below is the new registered
+abstract parent. Its ENUNCE names the ACTUAL router source constants
+(`smDepositableEthAmount`, `smDepositableEthAmountRounded`,
+`maxTopUpPerBlockWei`) from source lines 696, 700, 706 — not
+`consumeBudget` / `transitionBudget`, which the router does not
+execute. Combined with the router's aggregate guard at line 737 (given
+as a hypothesis `hAggr`; a full derivation of `hAggr` from
+`(run cfg inp).reverts = false` requires an inversion of `run` that
+is disclosed as an open sub-obligation in
+`fidelity.missing`), the theorem yields the router mechanism's actual
+bound: the WRAPPED accumulator is at most `maxTopUpPerBlockGwei * 1
+gwei = maxTopUpPerBlockWei`. -/
+
+/-- The rounded cap at source line 706 is ≤ `maxTopUpPerBlockWei` at
+source line 696, via the min at source line 700 and the subtraction
+at line 706. Pure definitional chain of source constants. -/
+theorem source_smDepRounded_le_maxTopUpPerBlockWei
+    (cfg : SolidityTopup.SourceTopupConfig)
+    (inp : SolidityTopup.SourceTopupInput) :
+    SolidityTopup.smDepositableEthAmountRounded cfg inp ≤
+      SolidityTopup.maxTopUpPerBlockWei cfg inp := by
+  -- StakingRouter.sol:706  smDepositableEthAmountRounded = smDepositableEthAmount - (that % 1 gwei)
+  have hRound : SolidityTopup.smDepositableEthAmountRounded cfg inp ≤
+      SolidityTopup.smDepositableEthAmount cfg inp := Nat.sub_le _ _
+  -- StakingRouter.sol:700  smDepositableEthAmount = min(_getModuleDepositAllocation(...), maxTopUpPerBlockWei)
+  have hMin : SolidityTopup.smDepositableEthAmount cfg inp ≤
+      SolidityTopup.maxTopUpPerBlockWei cfg inp := Nat.min_le_right _ _
+  exact Nat.le_trans hRound hMin
+
+/-- **P-TOPUP-2, abstract plane (chantier 4, mandate 2026-09-12): new
+registered abstract parent on the real router mechanism.**
+
+Given the router's aggregate guard at `StakingRouter.sol:737`
+(hAggr: the WRAPPED accumulator does not exceed the rounded cap; on
+the source `SolidityTopup.run` model this is the negation of the
+`if_pos` branch at line 630 of `run`), the WRAPPED accumulator is
+bounded by `maxTopUpPerBlockGwei * gwei = maxTopUpPerBlockWei`
+(source line 696).
+
+The bound is on `SolidityTopup.accumulated inp`, i.e., the WRAPPED
+sum `allocSumUnchecked` (mod 2^256), NOT on the exact sum. Under a
+nonzero wrap the exact sum can far exceed the cap; that's the
+public-claim narrowing signaled to Thomas per mandate 2026-09-12.
+
+Deriving `hAggr` from `(SolidityTopup.run cfg inp).reverts = false`
+requires a full inversion of `run` past its earlier guards (lines
+686-715) and the `runPush` disjunct's implicit consequence
+`allocationLoop = none ∧ ¬ (smDep < accumulated)`. That derivation is
+disclosed as an open sub-obligation in `fidelity.missing` and is
+subordinate row `P-TOPUP-2.router-inversion` (not yet proved). -/
+theorem router_source_cap_within_block_cap
+    {cfg : SolidityTopup.SourceTopupConfig} {inp : SolidityTopup.SourceTopupInput}
+    (hAggr : SolidityTopup.accumulated inp ≤
+      SolidityTopup.smDepositableEthAmountRounded cfg inp) :
+    SolidityTopup.accumulated inp ≤ inp.maxTopUpPerBlockGwei * cfg.gwei := by
+  -- Compose the aggregate guard with the definitional cap chain
+  -- (source lines 696, 700, 706).
+  have hCap := source_smDepRounded_le_maxTopUpPerBlockWei cfg inp
+  -- maxTopUpPerBlockWei cfg inp = inp.maxTopUpPerBlockGwei * cfg.gwei is `rfl`
+  -- from the definition at TopupCorrespondence.lean:337-339.
+  exact Nat.le_trans hAggr hCap
 
 /-- P-TOPUP-2 is closed on the abstract Nat cap and on a composed faithful
 `Contract.run` transaction that computes allocation/share observables.
