@@ -138,6 +138,7 @@ import LidoSRv3.Audit.Provenance.SszPerfectHashOrphaned
 import LidoSRv3.Audit.Provenance.SszSha256Isolation
 import LidoSRv3.Audit.Provenance.HandwrittenMinFirstOrphaned
 import LidoSRv3.Audit.Provenance.AbstractTxIsolation
+import LidoSRv3.Audit.Source.AddressSingleton
 import LidoSRv3.Tests.PackGTopupProvenanceMutants
 import LidoSRv3.Audit.Provenance.ConsolidationRequest
 import LidoSRv3.Audit.Provenance.CanonicalRequestAddress
@@ -1666,6 +1667,20 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Provenance.AbstractTxIsolation.topup_source_parent_applies_universally
 #print axioms LidoSRv3.Audit.Provenance.AbstractTxIsolation.topup_verity_parent_ignores_abstract_tx
 #print axioms LidoSRv3.Audit.Provenance.AbstractTxIsolation.consol_eth1_abstract_parent_ignores_abstract_tx
+
+-- P-ADDRESS-1 live singleton-actor exclusion (grok #403 / see
+-- `audit/address-singleton/README.md`): `requiresFixedActor ep` is a
+-- live exclusion — a tag is a protocol singleton only if some fixed
+-- address is the caller of every admitted run. `no_fixed_actor`
+-- refutes that for all four modeled writers
+-- (requestWithdrawals, unwrap, claimWithdrawalsTo, transferFrom).
+-- Closes P-ADDRESS-1's fidelity.missing entry "singleton-actor
+-- exclusion is by omission: singletonActorEntryPoint is False for
+-- every modeled tag, so the parent carries no live exclusion proof".
+#print axioms LidoSRv3.Audit.Source.AddressSingleton.no_fixed_actor
+#print axioms LidoSRv3.Audit.Source.AddressSingleton.no_fixed_actor_of_admitted
+#print axioms LidoSRv3.Audit.Source.AddressSingleton.fixed_owner_mutant_requires_actor
+#print axioms LidoSRv3.Audit.Source.AddressSingleton.parent_omission_is_definitional
 
 -- A-CANONICAL-REQUEST-ADDRESS discharge (see
 -- `audit/findings/A-CANONICAL-REQUEST-ADDRESS-discharged.md` and
