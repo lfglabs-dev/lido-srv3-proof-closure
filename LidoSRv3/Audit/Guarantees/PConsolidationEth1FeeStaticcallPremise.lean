@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Verity.ConsolidationEthUnboundedFuel
+import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 
 /-! # P-CONSOLIDATION-ETH-1 fee STATICCALL naming scaffold
 
@@ -65,5 +66,33 @@ theorem feePerRequest_derived_under_pinned_fee_staticcall_shape
     (hPinned : PinnedFeeStaticcallShape feePerRequest pinnedFeeReadValue) :
     feePerRequest = pinnedFeeReadValue :=
   hPinned
+
+/-! ## Real-derivation composition (2026-09-13, first step)
+
+Real derivation past the naming scaffold: `feePerRequest` routes
+through the source-defined function `consolidationFeeFromStaticcall`
+on a named `PredeployStaticcallResult`. -/
+
+/-- Linkage premise: the parent's `feePerRequest` is functionally
+determined by a source-level STATICCALL result via
+`consolidationFeeFromStaticcall`. -/
+structure FeeFromStaticcall
+    (feePerRequest : Nat)
+    (result : LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.PredeployStaticcallResult) : Prop where
+  feeMatchesStaticcall :
+    feePerRequest =
+      LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.consolidationFeeFromStaticcall result
+
+/-- Real-derivation composition: under the linkage premise,
+`feePerRequest` equals the source-derived ABI-decoded value. Real
+derivation from a named source function, not a caller-supplied
+constant. -/
+theorem feePerRequest_derived_from_staticcall_result
+    {feePerRequest : Nat}
+    {result : LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.PredeployStaticcallResult}
+    (hLink : FeeFromStaticcall feePerRequest result) :
+    feePerRequest = result.abiDecodedFee := by
+  rw [hLink.feeMatchesStaticcall,
+      LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.consolidationFeeFromStaticcall_eq]
 
 end LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
