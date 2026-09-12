@@ -17,16 +17,6 @@
       "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
     },
     {
-      "id": "A-CONSOLIDATION-GATEWAY-NONZERO",
-      "accepted": true,
-      "risk": "The vault-level theorem assumes that an authorized vault call carries nonzero msg.value. This is a premise on the vault input, not a consequence of the outer gateway payment being positive.",
-      "justification": "The gateway forwards count * fee to the vault and refunds the remainder. A positive outer payment does not imply a positive forwarded fee.",
-      "severity": "MEDIUM",
-      "violation_impact": "Without this premise, the modeled vault can accept a nonempty zero-fee batch with zero forwarded value. The positive-fee conclusion does not apply.",
-      "validation": "Check the value forwarded by ConsolidationGateway.addConsolidationRequests at the pinned lines 212-222. An ABI bridge alone does not derive positivity; it also needs a justified positive total fee.",
-      "removal_path": "Derive positivity of the vault\u2019s forwarded value from a justified fee condition and a composed calling path, or separately revise the theorem\u2019s positive-fee claim."
-    },
-    {
       "id": "A-VERITY-SCAFFOLD",
       "accepted": true,
       "risk": "The Verity 4.31 scaffold is non-certified.",

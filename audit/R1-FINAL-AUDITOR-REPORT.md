@@ -286,7 +286,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Source/artifact provenance.** `MAPPED`; 10 immutable pinned source span(s) in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance.
 
-**Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-CONSOLIDATION-GATEWAY-NONZERO`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
+**Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
 
 **Limitations — 7 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
@@ -294,9 +294,9 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 - 96-byte packed pubkey calldata and real request-contract calls
 - Bus publisher/executor path
 - keccak memory-array oracle
-- A-CONSOLIDATION-GATEWAY-NONZERO is a caller-supplied premise on the vault input: an authorized call carries nonzero forwarded msg.value. Positive outer gateway payment alone does not derive it.
-- Composition with P-CONSOLIDATION-ETH-1 requires the ABI/interpreter bridge and a justified positive forwarded fee; the bridge alone does not discharge the nonzero-value premise.
+- Composition with P-CONSOLIDATION-ETH-1 requires the ABI/interpreter bridge; the vault-side nonzero forwarded value is now derivable via executeConsolidation_committed_forwards_msgValue in the Bus module.
 - preservesEthBalance counterparty credit: the vault-side forwarding invariant is CHECKED on the executed plane, but the request predeploy's own balance credit is another contract's state; the multi-contract side stays with P-CONSOLIDATION-VALUE-1 / P-CONSOLIDATION-ETH-1
+- gateway→vault composition remains an ABI/interpreter bridge gap: the Bus theorem executeConsolidation_committed_forwards_msgValue (audit/trio/consolidation/Bus.lean) proves call.value = msgValue on the committed path, deriving the vault-side nonzero forwarded value from a positive outer gateway payment; but the composition into P-CONSOLIDATION-1's hGatewayAdmittedNonzero premise still requires the ABI/interpreter bridge between the Bus module and this parent.
 
 **Classification.** **IMPLEMENTATION_PENDING** — Keep the checked vault-loop and value-bearing CALL theorems. Derive hGatewayAdmittedNonzero for the vault input from a justified positive forwarded total fee and a composed gateway path, or revise the positive-fee claim. A positive outer payment alone is insufficient. Keep the checked entry-credit overflow guard and its boundary regressions.
 
@@ -656,11 +656,11 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Source/artifact provenance.** No independent source-map target; supplemental evidence only. A source-map entry is source provenance, not deployed-artifact provenance.
 
-**Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-CONSOLIDATION-GATEWAY-NONZERO`, `A-CLASSICAL-CHOICE`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
+**Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-CLASSICAL-CHOICE`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
 
 **Limitations — 6 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
-- A-CONSOLIDATION-GATEWAY-NONZERO remains a caller premise, not discharged
+- hGatewayAdmittedNonzero remains a composition premise of the parent theorem; the Bus theorem executeConsolidation_committed_forwards_msgValue (audit/trio/consolidation/Bus.lean, from PR #263) derives it from a positive outer gateway payment, but the composition into this parent still requires the ABI/interpreter bridge between the Bus module and P-CONSOLIDATION-VALUE-1.
 - AcceptingPredeploy is a callee-model hypothesis (identity state transition and always-success returndata)
 - official success is the single-request bind (msg.value = 1 * fee), not an n-request batch
 - link target and fee are CallEnv parameters, not a deployed-address identity
