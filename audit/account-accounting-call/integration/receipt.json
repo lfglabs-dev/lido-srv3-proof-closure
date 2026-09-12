@@ -1,0 +1,21 @@
+{
+  "source_commit": "a4abd69d7acbcae9ff927d45057337029b21eb93",
+  "build_union": "4e53291614459778c968ed5e8eda9204b11cb0a3",
+  "main_base": "21caf4911ff14ec6a36742eb789eb08e391f1c59",
+  "files": {
+    "audit/account-accounting-call/integration/README.md": "3b898bc2644711bb2eb191f33980641d6659f276195f9c7cf9259fa28a89ad8a",
+    "audit/account-accounting-call/integration/all-trust-build.log": "4fc17290531a38d9661124ff791d72df56fb52bbc072b558aad9a303051f0d9a",
+    "audit/account-accounting-call/integration/failed-validator-probe.log": "287c1a3c02d16af7211917f389582f3d7fa2033367c0e081654ef1cc60ea8361",
+    "audit/account-accounting-call/integration/failed-validator-receipt-key.log": "818de12be6dec2af0ee16a75ed1a858c04f04df48836867952b00e899b74e5b7",
+    "audit/account-accounting-call/integration/identities.json": "5147d70807a353ced29f29ea61c5160a62a2d2c4bf09d14b99d694cd18cbe03d",
+    "audit/account-accounting-call/integration/identity-check.log": "b7689440691c8e902315352a7bdaf66696fedc47c6bb15a4aacc1ecf0309886f",
+    "audit/account-accounting-call/integration/independent-source-review-a4ab.md": "99ba1b56d801da95d7df9267792ce91420c3800ee7837ad9d787518831251cda",
+    "audit/account-accounting-call/integration/readonly-validator.py": "44c0986d658aab5736ac223e9691fec33768412e07da651c4149ac0a308f522b",
+    "audit/account-accounting-call/integration/trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439"
+  },
+  "configuration_sha256": {
+    "lakefile.lean": "68a2eeea808e5fe3ada64e9a89f7da8698c67893a021bdde219043fc99110411",
+    "lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
+    "lean-toolchain": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee"
+  }
+}

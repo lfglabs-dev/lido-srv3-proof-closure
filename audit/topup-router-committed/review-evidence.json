@@ -1,0 +1,37 @@
+{
+  "reviewed_source": "80e21927d68f9522d3016418319ca543cecb5072",
+  "source_parent": "9c5b239b2d93cea0b8917de220550f01dded4f24",
+  "reviewer": "a8310864-7c6b-4f89-a7e5-cfe723e49f26",
+  "source_verdict": "CLEAN",
+  "initial_event": "29f63f57-bca1-4814-a978-f394f79f629c",
+  "final_event": "c0a53b99-fa2d-4b4e-aa3c-c193ad35bb87",
+  "initial_sequence": 1105,
+  "final_sequence": 2394,
+  "source_writer": "STOPPED",
+  "independent_reviewer": "ACK; execution null verified",
+  "checker": {
+    "scope": "Source and pin comparisons only; no proof or EVM execution",
+    "checks": 1489,
+    "errors": []
+  },
+  "checker_scope": "Fresh identity check only; no compilation or Solidity rerun",
+  "candidate_source_files": {
+    "LidoSRv3/Audit/Source/TopupRouterCommitted.lean": "444c2b43d16a3b17996068a5dbdf203ac432478ace2cd4ad413af60b4784165f",
+    "LidoSRv3/Tests/TopupRouterCommittedMutants.lean": "5a373f9b95db6c9dadb94636d1681e24c553a7c02f26ad295339a85652df4d67",
+    "audit/topup-router-committed/README.md": "9e193741430793dcc72d4b8a36648125e89e08c86300d18ffb225f97af9cc4c2",
+    "audit/topup-router-committed/check_receipt.py": "f75ec0c6d6a1664fa264ceac5fbde170adaf1ffbe6758c98dbebbfe786ed5fe1",
+    "audit/topup-router-committed/dependency-inputs.json": "9da678d5e0138af16655f2739e163e88abafe49651d3c2356d45cb6abb3a386e",
+    "audit/topup-router-committed/failed-positive-branch-diagnostic.log": "45f80da817d455e4242f51d1ee2ac99895ad96103237744159be51a267fe9c79",
+    "audit/topup-router-committed/inherited-validation.json": "a9a39269bc4780ab52eb16b141ac5d1c1fadf1aae701e277aeb75c18a7f8cca1",
+    "audit/topup-router-committed/receipt.json": "5d8f8c0d8819ea69837d111abb579ea47d4b43dcaed0f69b866c6de2b3355980",
+    "audit/topup-router-committed/source-validation.log": "c10f8893a5be549828ae712da9cc0fe2dc79fecc4669044d81641f73773a4ba2",
+    "audit/topup-router-committed/validation.log": "fce133ee930e03f31c764b0c9161637c57a6aa972cfc09794bfc3262cc50a8d6"
+  },
+  "review_files": {
+    "independent-review.md": "eaeb038cd37cc003766cc6c20d9e860829295f07c21113183fd99f83241ec873",
+    "independent-initial-review.md": "bfa24c40b72d14ff42661cfeb4d6028c71d958d26901ca81355e4fed7edb26fe",
+    "independent-review-events.json": "6f2ca969596defc36c1ce0747d2ee361d3860fba8154a5b6c7d9722c86a940a0",
+    "review-response.md": "d51d4c6f4604e4c164b295480d216d45aeb859d0aef76e0e38b8f61749803172"
+  },
+  "all_eight": "OPEN"
+}

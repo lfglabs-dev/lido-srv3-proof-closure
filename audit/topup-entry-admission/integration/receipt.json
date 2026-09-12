@@ -1,0 +1,19 @@
+{
+  "source_commit": "bdeb3d23b20dfeafb32c0e893dc260432183da08",
+  "build_union": "c7a4f4a32533c75f15a4c865033ef15419f118fb",
+  "main_base": "7d00a45b01e1a88d193fe3917d2a3ec772586488",
+  "files": {
+    "audit/topup-entry-admission/integration/README.md": "c67a9ed71e26ef7dbee44f76f19c4c4721e9aa9683c0665e636747d247b94a54",
+    "audit/topup-entry-admission/integration/all-trust-build.log": "8abb3f909b51d714fdbc158bb15abd6468fed3856764bffda63d9cdf9f9ef44c",
+    "audit/topup-entry-admission/integration/identities.json": "fc9c1f470434673b58d45a05f21354e6aee18f20560c5dc38bfaa596b7f2ad90",
+    "audit/topup-entry-admission/integration/identity-check.log": "8ad8708de9b4a49e056872691915b24d5028a8f64f6c6496c44d6794fa005829",
+    "audit/topup-entry-admission/integration/independent-source-review-bdeb.md": "09d45120aff8fec233ed5fbf751e83d09c9a99ffcab775347d3219aaab0fdf5c",
+    "audit/topup-entry-admission/integration/readonly-validator.py": "90d18b710c5add8c8060d23f8eda202346b550b0518a837ce7dc041791d51081",
+    "audit/topup-entry-admission/integration/trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439"
+  },
+  "configuration_sha256": {
+    "lakefile.lean": "c8b9de3b79b4aff42d8708d93e6211821980e835294a04bd9f53311f8af8e9e7",
+    "lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
+    "lean-toolchain": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee"
+  }
+}

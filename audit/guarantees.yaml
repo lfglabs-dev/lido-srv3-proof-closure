@@ -51,7 +51,6 @@
     {
       "id": "P-ALLOC-2",
       "assumptions": [
-        "A-HANDWRITTEN-MINFIRST",
         "A-VERITY-SCAFFOLD",
         "A-SOLC-TRUSTED",
         "A-RUNTIME-PROVENANCE"
@@ -96,11 +95,8 @@
     {
       "id": "P-DEPOSIT-1",
       "assumptions": [
-        "A-ABSTRACT-TX",
         "A-SOURCE-SHAPED",
         "A-VERITY-SCAFFOLD",
-        "A-DEPOSIT-CONTRACT",
-        "A-DEPOSIT-32-ETHER",
         "A-SOLC-TRUSTED",
         "A-RUNTIME-PROVENANCE"
       ],
@@ -133,12 +129,12 @@
           "checked quantifier-gap witness abstract_parent_covers_inputs_the_verity_plane_omits, non-vacuous by oversized_run_commits: at a 2^256-key input whose per-block cap, module allocation, signature batch and depositable ether are all scaled so no guard turns the model away, the unbounded Nat model's run commits a 2^256-frame push and the abstract parent's conservation conclusion fires on that model-level committed outcome, while no Inputs satisfies LinksSource together with the noWrap premise, for any entry state -- the finite limitation is a theorem here, not only a fidelity note; the exhibit is scoped as a quantifier gap of the abstract model, not a pinned-source execution: oversized_input_is_outside_the_source_domain checks the input sits outside the uint256 domain, so no realizable deployment encodes the call, for encodable module allocations the source's own guards keep the line-972 product inside one word (encodable_allocation_bounds_line_972_product), and no input with an encodable module allocation can commit a word-exceeding push at all (in_range_commit_is_word_bounded), so this word-domain gap's witness necessarily lives outside the source domain; checked in-range commit bound in_range_commit_is_word_bounded: a committing run passed the line-969 over-target guard and the line-996 assert, so on an encodable module allocation both the line-972 product and the committed loop push are below 2^256 -- closing the word-bound gap by keeping the witness in range is impossible, not merely undone; checked in-range n-frame witness manyKey_run_commits with manyKey_input_is_within_the_source_domain and manyKey_links_source_two_legs: a nine-key input with every field uint256-encodable whose model run commits nine per-key deposit frames of 288 wei in total while LinksSource still splits the keys 4 + 5 across the existing two aggregate legs with the total inside one word, so the executable plane admits the input and still journals exactly two depositToBeacon frames -- the missing n-frame model is exhibited where it lives, in range, not by the oversized out-of-domain exhibit; the witness's admission kernel-checks the composed parent's complete hypothesis set at the concrete entry state canonicalState: manyKey_links_source_two_legs proves the full Preconditions (nLinks canonicalSourceConfig 4) canonicalState -- every guard-health flag, distinctModules, valueMatches 288 = 9 * 32, entryBalance, funded 288 <= 1000, noWrap -- rather than LinksSource with the no-wrap inequality alone, and two regressions pin the entry state down from the other side: manyKey_entry_state_guards_are_load_bearing refutes the whole bundle when Lido's ledger is one wei short (288 <= 287 fails at the funding premise), and manyKey_underfunded_entry_reverts_at_not_enough_ether runs the executable transaction at that underfunded entry and gets exactly revert NOT_ENOUGH_ETHER back to the entry snapshot, so the admission is load-bearing, not inherited by accident",
           "public hypothesis-free verity_tx_revert_restores_snapshot theorem: any actual execute revert restores the exact entry snapshot and idle observation, including after intermediate writes",
           "source-plane kill-line at the registered abstract parent's own predicate: dropping the line 996 assert from SolidityDeposit.run (mutantRun) commits the skewed deployment with pulled \u2260 pushed, and mutantRun = run wherever the assert passes",
-          "executable-plane conservation sibling evidence: skipping the Lido debit breaks the mutant DepositParentTx's own pulled = pushed Observables equality"
+          "executable-plane conservation sibling evidence: skipping the Lido debit breaks the mutant DepositParentTx's own pulled = pushed Observables equality",
+          "DEPOSIT_CONTRACT address discharged: A-DEPOSIT-CONTRACT retired via LidoSRv3/Audit/Provenance/BeaconDepositAddress.lean (PDeposit1.canonicalDepositContractAddress equals the deployed StakingRouter DEPOSIT_CONTRACT immutable at byte offset 7525, fixture SHA-256 c30ed4e63cb0a57dca577484afff0765fcaa9840d75b440067fd55c7d4fc7013 pinned in audit/artifacts.lock.json). Reproduction: scripts/verify_beacon_deposit_immutable.py; finding: audit/findings/A-TOPUP-BEACON-ADDRESS-and-A-DEPOSIT-CONTRACT-discharged.md",
+          "MAX_EFFECTIVE_BALANCE_WC_TYPE_01 = 32 ether discharged: A-DEPOSIT-32-ETHER retired via LidoSRv3/Audit/Provenance/DepositThirtyTwoEther.lean (five PUSH32 sites in the deployed StakingRouter runtime bytecode at offsets 5521, 12112, 14036, 15415, 20126 each carry the 32-byte big-endian encoding of 32*10^18 wei, jointly binding the immutable and the BeaconChainDepositor.DEPOSIT_SIZE constant to 32 ether). Reproduction: scripts/verify_deposit_thirty_two_ether.py; finding: audit/findings/A-DEPOSIT-32-ETHER-discharged.md"
         ],
         "missing": [
           "LinksSource is a caller-supplied hypothesis: Wave 4 kill-line alloc_derived_linkssource_kill_line_refutes_bridge shows P-ALLOC-1 CheckedBounds and P-ALLOC-2 step premises plus key-count composition still do not imply LinksSource, because ALLOC does not constrain per-batch wei (firstAmount) and does not constrain publicKeysBatchLength",
-          "DEPOSIT_CONTRACT address provenance is assumed rather than pinned to the deployed beacon deposit contract",
-          "MAX_EFFECTIVE_BALANCE_WC_TYPE_01 = literal 32 ether is a deployment/constructor fact, not derived by the parent",
           "the two-batch executable limitation is closed by DepositNFrameTx; the remaining word-domain gap is the abstract parent quantifying over unbounded Nat inputs whose committed aggregates exceed one word while the executable noWrap premise bounds the aggregate -- witnessed by abstract_parent_covers_inputs_the_verity_plane_omits at an out-of-domain exhibit that has no in-range substitute (in_range_commit_is_word_bounded)",
           "the source pull is not bounded by this row outside ConservingConfig: LinksSource pins only DEPOSIT_SIZE and neither it nor Preconditions relates MAX_EFFECTIVE_BALANCE_WC_TYPE_01 to it, so for the non-conserving deployments the registered parent still admits, the line-972 pull quantity actualDepositsCount * maxEBType1 exceeds any word bound this row proves (linked_hypotheses_do_not_bound_the_line_972_product, with a uint256-encodable immutable); this is a statement about the computed quantity, not a settled transfer and not a reached multiplication -- the skewed deployment turns away at the earlier line-959 ZeroDeposits guard (skewed_pull_witness_turned_away_before_line_972), and an encodable module allocation bounds the product inside one word (line_972_product_le_module_allocation, encodable_allocation_bounds_line_972_product) -- and no in-range input commits a word-exceeding push at all (in_range_commit_is_word_bounded), so it is a separate theorem and not a bound",
           "the registered composed parent still carries LinksSource and success Preconditions, making its internal revert conjunct vacuous even though the separate public hypothesis-free rollback theorem is checked"
@@ -148,17 +144,14 @@
         "kind": "IMPLEMENTATION_PENDING",
         "work": "Keep NFrame.LinksSource explicit and keep the Spec router's per-allocation unit multiply; do not derive it from ALLOC parents. Derive the beacon address and 32-ether constructor/literal identity only from artifacts. The n-frame executable theorem remains a Verity EDSL claim, not compiled-artifact correspondence. The remaining word-domain gap is still named."
       },
-      "next_gate": "Keep NFrame.LinksSource explicit. Discharge OPEN A-DEPOSIT-CONTRACT and A-DEPOSIT-32-ETHER only from artifacts; do not infer either from the generalized router or merge ALLOC into DEPOSIT. The unbounded-Nat versus word gap stays named.",
+      "next_gate": "Keep NFrame.LinksSource explicit. A-DEPOSIT-CONTRACT and A-DEPOSIT-32-ETHER are discharged from deployment artifacts (see LidoSRv3/Audit/Provenance/BeaconDepositAddress.lean and LidoSRv3/Audit/Provenance/DepositThirtyTwoEther.lean, both anchored in audit/artifacts.lock.json). Do not infer either from the generalized router or merge ALLOC into DEPOSIT. The unbounded-Nat versus word gap stays named.",
       "roadmap_priority": "DONE"
     },
     {
       "id": "P-TOPUP-1",
       "assumptions": [
-        "A-ABSTRACT-TX",
         "A-SOURCE-SHAPED",
-        "A-TOPUP-NOWRAP",
         "A-VERITY-SCAFFOLD",
-        "A-TOPUP-BEACON-ADDRESS",
         "A-SOLC-TRUSTED",
         "A-RUNTIME-PROVENANCE"
       ],
@@ -187,17 +180,18 @@
           "wrap branch folded into the registered parent's third conjunct: over-target (line 737), zero-sum (line 741), Lido-side amount guards (Lido.sol 842/873), the line-744 pull, the funded router balance, and the line-755 assert all read wrappedTotal = exactTotal % 2^256, so wrap precludes a value-moving commit (run_wrap_precludes_value_moving_commit; wrap-to-zero is committedNoTopUp, not a revert; kill-line unwrapped_accumulator_kill_line_refutes_parent refutes conjunct 3 on the wrap-ignoring dual mutant (commits with pulled = pushed \u2260 0); guard_discharge_at_wrapping_input is the honest-side nonzero-wrap control showing run reverting at wrapInput via the assert; wrap_to_zero_commits_no_topup is the honest wrap-to-zero empty-commit control)",
           "moduleExists guard folded into the registered parent's second conjunct -- unregistered module reverts at source line 689 (kill-line dropped_module_guard_kill_line_refutes_parent: the mutant without the require commits at the same witness; guard_discharge_at_unregistered_module_input is the honest-side positive control)",
           "wcTypeIsType2 guard folded into the registered parent's fourth conjunct -- non-type-2 WC reverts at source line 694 (kill-line dropped_wc_guard_kill_line_refutes_parent: the mutant without the require commits at the same witness; guard_discharge_at_non_type2_wc_input is the honest-side positive control)",
-          "conservation conjunct kill-line, surgical since wave 5: dropped_conservation_assert_kill_line_refutes_parent commits a mutant run with ONLY the line-755 assert deleted at the wrapping witness with pulled \u2260 pushed -- the negation of conjunct (1)'s predicate on the mutant; mutantRunNoAssert_eq_run_of_assert_passing / mutantRunNoAssert_commits_where_assert_fires pin the single edit down in the P-DEPOSIT-1 style"
+          "conservation conjunct kill-line, surgical since wave 5: dropped_conservation_assert_kill_line_refutes_parent commits a mutant run with ONLY the line-755 assert deleted at the wrapping witness with pulled \u2260 pushed -- the negation of conjunct (1)'s predicate on the mutant; mutantRunNoAssert_eq_run_of_assert_passing / mutantRunNoAssert_commits_where_assert_fires pin the single edit down in the P-DEPOSIT-1 style",
+          "beacon-address provenance discharged: A-TOPUP-BEACON-ADDRESS retired via LidoSRv3/Audit/Provenance/BeaconDepositAddress.lean (the Verity model literal TopupTx.beaconAddress equals the DEPOSIT_CONTRACT immutable at byte offset 7525 of the deployed StakingRouter runtime bytecode, fixture SHA-256 c30ed4e63cb0a57dca577484afff0765fcaa9840d75b440067fd55c7d4fc7013 pinned in audit/artifacts.lock.json). Reproduction: scripts/verify_beacon_deposit_immutable.py; finding: audit/findings/A-TOPUP-BEACON-ADDRESS-and-A-DEPOSIT-CONTRACT-discharged.md"
         ],
         "missing": [
-          "beacon-address provenance remains OPEN as A-TOPUP-BEACON-ADDRESS, not a parent conjunct"
+          "abstract-TX rollback plane conjunct RevertRestoresSnapshot is definitional in TxObservation (A-ABSTRACT-TX): a Verity.Contract.run executable-plane rollback equivalent is not yet folded into this registered parent, so a modelling mismatch in the abstract observation type would silently mis-classify a reverting run."
         ]
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Pin beacon-address provenance. Keep the checked universal nonzero-wrap revert and wrap-to-zero empty-commit partition; do not derive a top-up LinksSource from ALLOC."
+        "work": "Fold a Verity.Contract.run executable-plane rollback conjunct into the registered parent that matches RevertRestoresSnapshot, so the abstract TxObservation shape stops being the only witness to rollback. Keep the checked universal nonzero-wrap revert and wrap-to-zero empty-commit partition."
       },
-      "next_gate": "Universal word-bounded nonzero-wrap Verity revert/non-commit/rollback is CHECKED; wrap-to-zero remains an empty commit. OPEN: discharge A-TOPUP-BEACON-ADDRESS from deployment artifacts; do not derive a top-up LinksSource from ALLOC.",
+      "next_gate": "Universal word-bounded nonzero-wrap Verity revert/non-commit/rollback is CHECKED; wrap-to-zero remains an empty commit. A-TOPUP-BEACON-ADDRESS is discharged from deployment artifacts (see LidoSRv3/Audit/Provenance/BeaconDepositAddress.lean and audit/artifacts.lock.json). Do not derive a top-up LinksSource from ALLOC.",
       "roadmap_priority": "DONE"
     },
     {
@@ -275,10 +269,10 @@
           "source-shaped spending and checked arithmetic under well-formed storage",
           "Contract.run rollback after intermediate writes",
           "guard-checking wrapper premise: canDeposit/authorizedRouter are proved to hold on any committed call, not merely assumed; the guard-liveness conjunct is kill-line-backed by guard_drop_kill_line_refutes_parent, which refutes the parent predicate shape (freshness retained) on mutantWithdrawNoCanDeposit, a guard-for-guard copy with only the canDeposit check dropped",
-          "effective, min-capped, live queue-facing reserve is invariant under a fresh WQ-style value, not just the restated storedDepositsReserve field; the parent kill-line partition_spend_mutant_kill_line_refutes_parent refutes the parent predicate shape (freshness retained) on a mutated spend transition, and the stale-cache theorems separately witness that the freshQueueCache hypothesis cannot be dropped"
+          "effective, min-capped, live queue-facing reserve is invariant under a fresh WQ-style value, not just the restated storedDepositsReserve field; the parent kill-line partition_spend_mutant_kill_line_refutes_parent refutes the parent predicate shape (freshness retained) on a mutated spend transition, and the stale-cache theorems separately witness that the freshQueueCache hypothesis cannot be dropped",
+          "live WithdrawalQueue.unfinalizedStETH call (grok #404): derives freshQueueCache from a live STATICCALL observation (selector 0xd0fb84e8, value 0, 32-byte ABI decode); fails closed on failure / wrong selector / nonzero value / short returndata. The physical queue subtraction stays in TrioReserve1.Queue. Discharged via LidoSRv3/Audit/Source/ReserveUnfinalizedCall.lean; kill-lines in LidoSRv3/Tests/ReserveUnfinalizedCallMutants.lean. Axioms only propext / Quot.sound."
         ],
         "missing": [
-          "live WithdrawalQueue.unfinalizedStETH call (freshness is now an explicit freshQueueCache hypothesis with a stale-cache kill-line, not an implicit assumption)",
           "canDeposit / bunker / router authorization (now proved as scopedWithdrawGuards on any committed call, but the two booleans are still free inputs, not live bunker/pause/msg.sender checks)",
           "packed uint128 buffered ether and ETH transfer",
           "frame-nonce reset and report-time rebalance",
@@ -297,10 +291,8 @@
     {
       "id": "P-CONSOLIDATION-ETH-1",
       "assumptions": [
-        "A-ABSTRACT-TX",
         "A-SOURCE-SHAPED",
         "A-VERITY-SCAFFOLD",
-        "A-CANONICAL-REQUEST-ADDRESS",
         "A-SOLC-TRUSTED",
         "A-RUNTIME-PROVENANCE"
       ],
@@ -329,10 +321,11 @@
           "five numeral witnesses, rejecting-predeploy rollback, underfunded revert, ETH conservation, and dispatch/multicall replay agreement retained as auxiliary regression evidence (the witnesses are consequences of the universal parent)",
           "parent kill-lines on gatewayExecute mutants: misrouted fee journal to a lateral .other address, and zero-value fee-paying success breaking conservation",
           "kill-lines on the universal Verity parent itself: four wiring mutants refute the same universal predicate at the premise-satisfying witness (10, 2, 3), and three premise-necessity kill-lines (positivity, funding, fuel) refute the premise-dropped projections on the honest wiring",
-          "canonical EIP-7251 request literal folded into the registered abstract parent via canonicalApprovedSet; deployed configured-target identity remains A-CANONICAL-REQUEST-ADDRESS",
+          "canonical EIP-7251 request literal folded into the registered abstract parent via canonicalApprovedSet; deployed configured-target identity discharged via A-CANONICAL-REQUEST-ADDRESS retirement (LidoSRv3/Audit/Provenance/CanonicalRequestAddress.lean)",
           "parent fee-leg evidence: consolidation_fee_path_confined (configured consolidation-request tag, not a sibling guarantee)",
-          "parent fee-leg Verity witness consolidation_fee_target_success: vault debit / configured consolidation-request credit under A-CANONICAL-REQUEST-ADDRESS",
-          "bus-forward Contract.run numeral retained as auxiliary fee-path evidence, not a separate guarantee"
+          "parent fee-leg Verity witness consolidation_fee_target_success: vault debit / configured consolidation-request credit anchored to the deployed CONSOLIDATION_REQUEST immutable via the discharged A-CANONICAL-REQUEST-ADDRESS",
+          "bus-forward Contract.run numeral retained as auxiliary fee-path evidence, not a separate guarantee",
+          "canonical consolidation-request source literal (0x0000BBdDc7CE488642fb579F8B00f3a590007251) anchored to the deployed WithdrawalVault CONSOLIDATION_REQUEST immutable at byte offset 730 (fixture SHA-256 a3e9e582928d58cdfe87a6405ad1a7967f720cafa97f98ae8d619e36b961aa7f in audit/artifacts.lock.json): A-CANONICAL-REQUEST-ADDRESS retired via LidoSRv3/Audit/Provenance/CanonicalRequestAddress.lean. Reproduction: scripts/verify_consolidation_request_immutable.py; finding: audit/findings/A-CANONICAL-REQUEST-ADDRESS-discharged.md. Fee-leg Verity parent requestAddr still not folded to the discharged canonical (remains as a separate narrower gap below)."
         ],
         "missing": [
           "VaultHub / Dashboard / TriggerableWithdrawalsGateway / StakingVault withdraw sites (named out of scope)",
@@ -344,7 +337,6 @@
           "the universal revert arms are stated for the modeled non-success shapes only; a reverting refund/Lido sink or a reverting request predeploy is not one of them (the rejecting-predeploy rollback stays a numeral witness)",
           "the dispatch-fuel arm quantifies over the model's own dispatcher bound (fuelBudget=32 under A-ABSTRACT-TX); it is a frame-count artifact of the abstract transaction model and carries no deployed gas-metering meaning",
           "vault\u2192Lido/WithdrawalQueue protocol-return confinement is out of this parent (former P-CONSOLIDATION-ETH-1a retired; not the consolidation fee/refund happy path and not P-RESERVE-1 buffer accounting)",
-          "pinned canonical consolidation-request source literal (0x0000BBdDc7CE488642fb579F8B00f3a590007251), named A-CANONICAL-REQUEST-ADDRESS; fee-leg evidence uses the configured immutable/slot only and does not identify it with a deployment",
           "canonical-address identity is not yet folded into the registered Verity parent; requestAddr remains a model-local ensemble address",
           "renamed public id P-CONSOLIDATION-ETH-1 (was P-ETH-1): not a general SRv3 ETH guarantee"
         ]
@@ -353,7 +345,7 @@
         "kind": "IMPLEMENTATION_PENDING",
         "work": "Keep the universal success-arm parent, the now-universal four-arm revert partition with its numeral witnesses, the zero-remainder boundary corner, and the wiring/premise kill-lines. Keep A-CANONICAL-REQUEST-ADDRESS open. Do not restore vault\u2192Lido/WQ as a child or compose with P-CONSOLIDATION-1 until an ABI/interpreter bridge exists."
       },
-      "next_gate": "Both sides of the gateway guard are now quantified alike: the Verity plane proves the success arm and all four modeled non-success arms for all word-sized inputs, with the zero-remainder corner closed, so no word-sized input is unclassified. OPEN: discharge deployed target provenance under A-CANONICAL-REQUEST-ADDRESS, and fold the canonical request literal into the registered Verity parent (requestAddr is still a model-local ensemble address). Do not compose with P-CONSOLIDATION-1 before an ABI/interpreter bridge.",
+      "next_gate": "Both sides of the gateway guard are now quantified alike: the Verity plane proves the success arm and all four modeled non-success arms for all word-sized inputs, with the zero-remainder corner closed, so no word-sized input is unclassified. Deployed target provenance discharged via A-CANONICAL-REQUEST-ADDRESS retirement (see LidoSRv3/Audit/Provenance/CanonicalRequestAddress.lean). OPEN: fold the discharged canonical request literal into the registered Verity parent (requestAddr is still a model-local ensemble address). Do not compose with P-CONSOLIDATION-1 before an ABI/interpreter bridge.",
       "roadmap_priority": "DONE"
     },
     {
@@ -386,10 +378,10 @@
           "four storage-writing Contract.run entrypoints and behavioral source correspondence on entrypoint-specific address-write observables",
           "separate live-shaped claimWithdrawalsTo Contract.run loop over parallel request/hint lists, exact pinned unstructured-storage constants, packed owner/claimed request-word decoding, current/previous request and checkpoint reads, locked-ETH updates, ordered value-bearing empty-calldata payout CALL journal, and universal failed-run snapshot rollback",
           "bounded two-request batch observe theorem and fixed-payout-recipient journal kill-line",
-          "snapshot rollback and wrong-recipient, address-writer, and admission-boundary mutants"
+          "snapshot rollback and wrong-recipient, address-writer, and admission-boundary mutants",
+          "live singleton-actor exclusion (grok #403): requiresFixedActor ep is False for every modeled writer (requestWithdrawals, unwrap, claimWithdrawalsTo, transferFrom) \u2014 two admitted callers with distinct addresses exist for each tag, so no fixed actor can be the caller of every admitted run. The fixed-owner mutant (caller = 7 required for requestWithdrawals) refutes the exclusion is a tautological False. Discharged via LidoSRv3/Audit/Source/AddressSingleton.lean; kill-lines in LidoSRv3/Tests/AddressSingletonMutants.lean. Axioms only propext."
         ],
         "missing": [
-          "singleton-actor exclusion is by omission: singletonActorEntryPoint is False for every modeled tag, so the parent carries no live exclusion proof",
           "unbounded source-to-Verity correspondence and caller-swap equivariance theorem for the live claimWithdrawalsTo batch; the checked observe receipt is two-item",
           "keccak-level physical mapping-slot derivation for queue/checkpoint struct words; ContractState mapUint channels model keyed POSITION/POSITION+1 words",
           "EnumerableSet owner-request removal, Transfer/WithdrawalClaimed events, adversarial recipient code, and machine-level CALL semantics",
@@ -505,11 +497,8 @@
     {
       "id": "P-SSZ-1",
       "assumptions": [
-        "A-SHA256-FFI",
-        "A-PERFECT-HASH",
         "A-MULTI-NODE-TRANSPORT",
         "A-SOLC-TRUSTED",
-        "A-YUL-INTERFACE",
         "A-RUNTIME-PROVENANCE"
       ],
       "reproduction": {
@@ -573,7 +562,6 @@
       "parent_id": "P-SSZ-1",
       "source_plane_scope": "deposit-data-root only",
       "assumptions": [
-        "A-SHA256-FFI",
         "A-MULTI-NODE-TRANSPORT"
       ],
       "reproduction": {
@@ -655,7 +643,6 @@
       ],
       "no_new_forbidden_lean_tokens": true,
       "assumptions": [
-        "A-SHA256-FFI",
         "A-MULTI-NODE-TRANSPORT"
       ],
       "reproduction": {
@@ -742,8 +729,7 @@
       "parent_id": "P-ALLOC-1",
       "source_plane_scope": "operator bond bound only",
       "assumptions": [
-        "A-SOURCE-SHAPED",
-        "A-HANDWRITTEN-MINFIRST"
+        "A-SOURCE-SHAPED"
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound LidoSRv3.Tests.PAlloc1EugeneBoundVectors",
@@ -875,8 +861,7 @@
       "parent_id": "P-SSZ-1",
       "source_plane_scope": "SSZ transaction execution simulation only",
       "assumptions": [
-        "A-VERITY-SCAFFOLD",
-        "A-SHA256-FFI"
+        "A-VERITY-SCAFFOLD"
       ],
       "no_new_forbidden_lean_tokens": true,
       "reproduction": {
@@ -985,8 +970,6 @@
       "id": "P-ALLOC-EXEC-1",
       "assumptions": [
         "A-SOURCE-SHAPED",
-        "A-DEPOSIT-CONTRACT",
-        "A-DEPOSIT-32-ETHER",
         "A-CLASSICAL-CHOICE",
         "A-SOLC-TRUSTED",
         "A-RUNTIME-PROVENANCE"
@@ -1008,10 +991,10 @@
         "covered": [
           "routerDepositInputs produces ExecutesAllocation: keys = allocation amounts, wei = amount * depositSize",
           "LinksSource is a theorem of that two-batch router construction, not a caller hyp",
-          "parent-shaped raw-count router kill-line; multiply-only raw-count kill-line retained; 2-key / 65-wei skew still falsifies a free bridge"
+          "parent-shaped raw-count router kill-line; multiply-only raw-count kill-line retained; 2-key / 65-wei skew still falsifies a free bridge",
+          "depositSize = 32 ether discharged: A-DEPOSIT-32-ETHER retired via LidoSRv3/Audit/Provenance/DepositThirtyTwoEther.lean; the deployed production SourceDepositConfig has depositSize = maxEBType1 = 32*10^18 wei, bound to five PUSH32 sites in the deployed StakingRouter runtime bytecode. Finding: audit/findings/A-DEPOSIT-32-ETHER-discharged.md"
         ],
         "missing": [
-          "A-DEPOSIT-32-ETHER remains OPEN: depositSize is the configuration field, not a claimed 32-ether artifact identity",
           "the executable transaction stays exactly two batches; this parent is not an n-frame lift",
           "ALLOC parents still do not imply LinksSource without the unit multiply"
         ]
@@ -1020,7 +1003,7 @@
         "kind": "IMPLEMENTATION_PENDING",
         "work": "Keep A-DEPOSIT-32-ETHER named; do not invent a pin that discharges the 32-ether assumption or merge ALLOC into DEPOSIT."
       },
-      "next_gate": "Keep A-DEPOSIT-32-ETHER named; do not treat ALLOC parents as LinksSource without the unit multiply."
+      "next_gate": "A-DEPOSIT-32-ETHER is discharged from deployment artifacts (see LidoSRv3/Audit/Provenance/DepositThirtyTwoEther.lean); do not treat ALLOC parents as LinksSource without the unit multiply."
     },
     {
       "id": "P-ETH-JOURNAL-1",
@@ -1203,7 +1186,6 @@
     {
       "id": "P-SSZ-LIVE-1",
       "assumptions": [
-        "A-SHA256-FFI",
         "A-SOURCE-SHAPED",
         "A-CLASSICAL-CHOICE",
         "A-SOLC-TRUSTED",

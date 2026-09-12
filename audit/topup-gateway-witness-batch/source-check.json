@@ -1,0 +1,62 @@
+{
+  "scope": "Selected lexical order and exact identities only; not a translation/refinement proof",
+  "source_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "source_sha256": {
+    "lido-core/contracts/0.8.25/TopUpGateway.sol": "a7ffb654fb4d8d83ba14a6d9452663f786e9a21434be3ce9b7205c546526b7b4",
+    "lido-core/contracts/0.8.25/CLValidatorVerifier.sol": "d6e89f6975e4fa02f758bf461a98ac2d689296b5c92d03ffd4e43a22d0b3d7ed",
+    "lido-core/contracts/common/interfaces/ValidatorWitness.sol": "8fd24cfab7402233029756e52e59198b0d9cbf0a42e5c07d9fa2338ed731a5f7",
+    "lido-core/contracts/common/interfaces/TopUpWitness.sol": "34135d561e4d8c3f1585cdbc15d20f568e36bb37db6c8d4444a8d0cd48cef44d",
+    "LidoSRv3/Audit/Source/TopupGatewayWitnessBatch.lean": "f7eac7edd92983bd4e81dbb96c1ea8f6bb5822efe84a4d3634062ddab50f8a89",
+    "LidoSRv3/Audit/Source/TopupGatewayConfigWords.lean": "bf7a38e8981d368c60f8edee6595c1a5d43b73c414416eb46983f1da6dd39301"
+  },
+  "source_order": {
+    "lido-core/contracts/0.8.25/TopUpGateway.sol": [
+      "function topUp(",
+      "uint256 validatorsCount = _topUps.validatorIndices.length;",
+      "if (validatorsCount == 0)",
+      "_topUps.keyIndices.length != validatorsCount",
+      "if (validatorsCount > $.maxValidatorsPerTopUp)",
+      "_requireBlockDistancePassed();",
+      "_verifyRootAge(_topUps.beaconRootData);",
+      "stakingRouter.getStakingModuleWithdrawalCredentials(_topUps.moduleId)",
+      "_requireWithdrawalCredentials02(withdrawalCredentials);",
+      "if (vw.pubkey.length != PUBKEY_LENGTH)",
+      "if (i != 0 && validatorIndex <= prevValidatorIndex)",
+      "_verifyValidatorWasActivated(_topUps.beaconRootData.slot, vw);",
+      "_verifyValidator(_topUps.beaconRootData, vw, validatorIndex, withdrawalCredentials);",
+      "pubkeys[i] = vw.pubkey;",
+      "topUpLimits[i] = _evaluateTopUpLimit(vw, _topUps.pendingBalanceGwei[i]) * 1 gwei;",
+      "totalLimits += topUpLimits[i];",
+      "stakingRouter.topUp(",
+      "if (totalLimits > 0)",
+      "function _verifyValidatorWasActivated(",
+      "uint64 epoch = uint64(_slot / SLOTS_PER_EPOCH);",
+      "function _evaluateTopUpLimit(",
+      "if (_validator.exitEpoch != FAR_FUTURE_EPOCH || _validator.slashed)",
+      "uint256 currentTotal = _validator.effectiveBalance + _pendingBalanceGwei;"
+    ],
+    "LidoSRv3/Audit/Source/TopupGatewayWitnessBatch.lean": [
+      "def rowLimit",
+      "if r.witness.pubkey.length \u2260 48",
+      "else if ordered previous r.index = false",
+      "activated beacon.slot slotsPerEpoch r.witness",
+      "sourceEntry precompile oracle scratch gi beacon r.witness r.proof r.index credentials",
+      "match TopupWeiBounds.evaluate cfg (fields r)",
+      "def loop",
+      "let n \u2190 rowLimit",
+      "let wei := n * TopupWeiBounds.gwei % TopupWeiBounds.wordModulus",
+      "((acc + wei) % TopupWeiBounds.wordModulus) rs"
+    ],
+    "LidoSRv3/Audit/Source/TopupGatewayConfigWords.lean": [
+      "def gatewayRoot",
+      "0x22e512057841e2bc1e6d80030c8bb8b4935377af2e64ba9bf8e6a3e88fb32200",
+      "def decode",
+      "first.val % (2^64)",
+      "first.val / (2^160) % (2^64)",
+      "second.val % (2^64)",
+      "def readConfig",
+      "w.core.readContractSlot gateway.val gatewayRoot",
+      "w.core.readContractSlot gateway.val (gatewayRoot+1)"
+    ]
+  }
+}

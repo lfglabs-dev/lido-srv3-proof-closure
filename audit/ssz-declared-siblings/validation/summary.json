@@ -1,0 +1,15 @@
+{
+  "base": "4207bb0578b0a6821cd1d78b1f3a4bb08f277905",
+  "base_tree": "f67fb673536a4c1be3908c4437b23a9c59cc0bed",
+  "full_prior_conclusion": true,
+  "new_ffi_runs": 0,
+  "new_solc_runs": 0,
+  "new_test_theorems": 16,
+  "normal_modules": 3,
+  "ordinary_scopes": 33,
+  "package_pins": 11,
+  "retained_compiler_inputs": 7,
+  "retained_ffi_diagnostics": 4,
+  "source_inputs": 1217,
+  "status": "PASS"
+}

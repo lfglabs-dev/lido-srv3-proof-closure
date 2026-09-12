@@ -1,0 +1,34 @@
+{
+  "scope": "actual typed SRStorage/WithdrawalCredentials getter and compiler layout, not full topUp/refinement/deployment",
+  "source_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "solc": "0.8.25",
+  "forge": "forge Version: 1.5.0-v1.5.0\nCommit SHA: 1c57854462289b2e71ee7654cd6666217ed86ffd\nBuild Timestamp: 2025-11-24T06:07:42.598695000Z (1763964462)\nBuild Profile: maxperf",
+  "tests": 4,
+  "fuzz_tests": 2,
+  "fuzz_runs_each": 1024,
+  "seed": "0x20260909",
+  "exit_codes": {
+    "forge_test": 0,
+    "forge_inspect": 0
+  },
+  "openzeppelin": {
+    "version": "5.2.0",
+    "tar_sha256": "7a7f3060fc71bf080f88cd2f574d9e4813a2409de4dff1badfadc7dec13e9441",
+    "all_extracted_files_compared_to_tar": true
+  },
+  "files_sha256": {
+    "README.md": "6f29becdba0a95e0e46d1553cd7615323f209f7282e27b6b454be033ff60d829",
+    "TopupRouterCredentials.t.sol": "e6a776dfc9e1548f6686d63bafd5d5237eca8d8a3a7fd2a7718b615ee31c4669",
+    "storage-layout.json": "26f2d3380d683b00196bebf668e358ddedd9fb5a99b8e5b449ba862ce0fcde5c",
+    "validation.log": "9afe26b858123e76637f82d126f622c0d4b998fde0eb8c6acdd5acd988f43a7f"
+  },
+  "sources_sha256": {
+    "foundry.toml": "adb4990ab31a2bb53f5eeb370e4f55d962f7bc1026bce01708497a56b262356c",
+    "lido-core/yarn.lock": "d17f979eed36218b0bed85cf560bdc2e5d182e0c67aff6eabf2c68be8597c921",
+    "lido-core/contracts/0.8.25/sr/SRStorage.sol": "62e922f76a1db7756684d73db3151a02f6d8f0de51fac27922f0a4095ceb9d95",
+    "lido-core/contracts/0.8.25/sr/SRTypes.sol": "22c28be7ceaf6ed841f18fc19296372ab246b1cfecc87902d49ee1670ed4aed6",
+    "lido-core/contracts/common/lib/WithdrawalCredentials.sol": "cf5e77be0c5d522d853d19a4c5284e53fa0fb149a9902f77648a8f6d5584636c",
+    "lido-core/contracts/common/interfaces/IStakingModule.sol": "4a98e89e763d19b45cb1ea422cec1c554fbd43c9f39c6bcc7a18aad64d46e193",
+    "lido-core/contracts/common/interfaces/IStakingModuleV2.sol": "eacc19c668dd2ad94c7c0cffc5957181b8bf1ed2321c14c34c9845ea054a64ce"
+  }
+}

@@ -1,0 +1,17 @@
+Compiling 29 files with Solc 0.8.25
+Solc 0.8.25 finished in 12.42s
+Compiler run successful!
+
+Ran 9 tests for test/Dsm.t.sol:DsmTest
+[PASS] testActualRequestAndPhysicalAdmission() (gas: 87517)
+[PASS] testAllShortLengthsRejectBeforeAuthorization() (gas: 256490)
+[PASS] testCanonicalZeroThenAuthorization() (gas: 67023)
+[PASS] testDecodedAddressControlsAuthorization() (gas: 93484)
+[PASS] testForbiddenWriteFailsStaticCall() (gas: 1040435241)
+[PASS] testFuzzCanonicalAndTrailing(address,bytes) (runs: 1024, μ: 120542, ~: 105517)
+[PASS] testFuzzDirtyHighBitsReject(uint96,address) (runs: 1024, μ: 83757, ~: 83757)
+[PASS] testNoCodeSuccessThenDecoderRejection() (gas: 4324154)
+[PASS] testRevertBeforeAuthorizationAndMembership() (gas: 81090)
+Suite result: ok. 9 passed; 0 failed; 0 skipped; finished in 25.59ms (52.90ms CPU time)
+
+Ran 1 test suite in 143.73ms (25.59ms CPU time): 9 tests passed, 0 failed, 0 skipped (9 total tests)

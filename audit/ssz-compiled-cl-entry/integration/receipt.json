@@ -1,0 +1,50 @@
+{
+  "source": "51c118b36cb28f3bf5e2ade031b5c55428e2707e",
+  "initial": "9723377c3a936c522ec10e88dadcab7e1a7b25b0",
+  "main_base": "f193ebf96beef3f5e1e1568fc9f2b906c0192299",
+  "union": "6dc13bc0c7a63c5dec158c93f4f1de2b0e331758",
+  "AllTrust": {
+    "command": "lake build LidoSRv3.Audit.AllGuarantees LidoSRv3.Audit.Trust",
+    "jobs": 1739,
+    "exit": 0
+  },
+  "trust": {
+    "command": "python3 scripts/check_trust_axioms.py",
+    "exit": 0,
+    "exact_axioms": 29,
+    "dependencies_recomputed": true,
+    "native_claims_reevaluated": true
+  },
+  "identities": {
+    "sources": 1215,
+    "pins": 11,
+    "artifact_hashes": 45,
+    "scoped_axioms": 31,
+    "normal_olean_sha256": {
+      "LidoSRv3/Audit/Source/SszSoladyFls.lean": "d5cdf537a499e07f7dbd009af0feffebccdc4503deb99fb5e242d38ecb53dfab",
+      "LidoSRv3/Audit/Source/SszCompiledGIndex.lean": "389a35e4c632b30e991439f14983fa91c878a04e345e5d6417a138ac2c1a968e",
+      "LidoSRv3/Audit/Source/SszCompiledFrame.lean": "3fa478662835ada074d506e8a10b8e36b6eddf0e157fd55e898502de72670474",
+      "LidoSRv3/Audit/Source/SszCompiledReply.lean": "a4b632dcf97e8c2cf3b231024d8c3ce33c5f310ac48c82b5799b127dcd8a0ea1",
+      "LidoSRv3/Audit/Source/SszCompiledClEntry.lean": "4106f868a0ddda16f2c5a9579c32554edf63ec9bd51e6dc3798e6d4e1b94d560",
+      "LidoSRv3/Audit/Guarantees/PSsz1CompiledClEntry.lean": "9b7968941c6a80bd0671f203cb68b5969c9ad5cad36ce7d7b1af7ca9ffaf38b7",
+      "LidoSRv3/Tests/SszCompiledClEntryRegression.lean": "9b9ae1f3e0e26c55c8b2cc3e39a0e4cf574b86feb4aacd7a8aa7ff2f45484651"
+    },
+    "compiler_inputs": 7,
+    "retained_ir_sha256": "aba7b84e915d3279916e7d18150f047e553c8f712b1e30ea96235e11998679e3"
+  },
+  "fresh_integration_solidity_tests": 0,
+  "fresh_integration_ffi_diagnostics": 0,
+  "fresh_integration_solc_runs": 0,
+  "reused_reviewed_native_diagnostics": 4,
+  "reused_reviewed_kernel_regressions": 14,
+  "retained_root_mac_compiler_replay": true,
+  "sha256": {
+    "audit/ssz-compiled-cl-entry/integration/README.md": "3dfacc2b73d95c31cc3ae239b22d8a49da4d7e019530e1d0144751262b6255ae",
+    "audit/ssz-compiled-cl-entry/integration/all-trust-build.log": "765eabde2102fb4687150e645022fd0ec2c91e91d043c5c240acce6d9c79a489",
+    "audit/ssz-compiled-cl-entry/integration/build-identities.json": "d20688adc46e019e2ca7d59fb7dd2318e8eb5c32293fb05e59521dbf1a0792a8",
+    "audit/ssz-compiled-cl-entry/integration/identities.json": "72e2f5fe3175e53ba20beb4f72595c537a42793e49bd14d15ca2369c749f6f96",
+    "audit/ssz-compiled-cl-entry/integration/independent-source-review-51c1.md": "7cf93d7fafa08c71429f139c673e14b2b00c877e791d60f216ae4ab3583fffa4",
+    "audit/ssz-compiled-cl-entry/integration/scoped-axioms.json": "cf3defeea9f653411862c1cab8a98fe1ffbc865b6052c57cf36d0aa65711fc6b",
+    "audit/ssz-compiled-cl-entry/integration/trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439"
+  }
+}

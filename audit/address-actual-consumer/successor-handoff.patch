@@ -1,0 +1,524 @@
+diff --git a/LidoSRv3/Audit/Guarantees/PAddress1.lean b/LidoSRv3/Audit/Guarantees/PAddress1.lean
+index 8ecda884..0a244ed5 100644
+--- a/LidoSRv3/Audit/Guarantees/PAddress1.lean
++++ b/LidoSRv3/Audit/Guarantees/PAddress1.lean
+@@ -296,84 +296,6 @@ theorem abstract_source_verity_tx_address_equivariance :
+     LidoSRv3.Audit.Verity.AddressTx.composed_verity_tx_address_equivariance.2.2.2.2.1,
+     LidoSRv3.Audit.Verity.AddressTx.composed_verity_tx_address_equivariance.2.2.2.2.2.2.2⟩
+ 
+-/-- Bounded live `claimWithdrawalsTo` evidence. This is the recipient-CALL
+-bridge, not the storage-only batch abstraction: it
+-commits both packed claims, both ordered empty-calldata value CALLs, their two
+-events per claim, and the returned callee world. This remains a bounded model
+-slice; it is deliberately not claimed to establish universal renaming. -/
+-theorem bounded_live_claim_recipient_call_surface :
+-    (let result := LidoSRv3.Audit.Verity.AddressRecipientCallBridge.runClaimWithdrawalsTo
+-      LidoSRv3.Audit.Verity.AddressRecipientCallBridge.acceptingCallee
+-      LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claimBridgeContext [1, 2] [1, 1]
+-      (2 : Verity.Address) LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claimBridgeWorld
+-    result.outcome = .ok () ∧
+-      result.world.core.readSlot
+-        (LidoSRv3.Audit.Verity.AddressClaimBatchTx.queueMetadataPhysicalSlot 1) =
+-          LidoSRv3.Audit.Verity.AddressClaimBatchTx.markClaimed
+-            (LidoSRv3.Audit.Verity.AddressClaimBatchTx.requestMetadataWord
+-              LidoSRv3.Audit.Verity.AddressClaimBatchTx.twoClaimState 1) ∧
+-      result.world.core.readSlot
+-        (LidoSRv3.Audit.Verity.AddressClaimBatchTx.queueMetadataPhysicalSlot 2) =
+-          LidoSRv3.Audit.Verity.AddressClaimBatchTx.markClaimed
+-            (LidoSRv3.Audit.Verity.AddressClaimBatchTx.requestMetadataWord
+-              LidoSRv3.Audit.Verity.AddressClaimBatchTx.twoClaimState 2) ∧
+-      result.world.core.readSlot LidoSRv3.Audit.Verity.AddressClaimBatchTx.lockedEtherAmountPosition = 0 ∧
+-      result.world.balances LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claimBridgeContext.self = 0 ∧
+-      result.world.balances (2 : Verity.Address) = 70 ∧
+-      result.world.logs =
+-        [⟨LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claimBridgeContext.self, "WithdrawalClaimed", [1, 1, 2, 30]⟩,
+-         ⟨LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claimBridgeContext.self, "Transfer", [1, 0, 1]⟩,
+-         ⟨LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claimBridgeContext.self, "WithdrawalClaimed", [2, 1, 2, 40]⟩,
+-         ⟨LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claimBridgeContext.self, "Transfer", [1, 0, 2]⟩] ∧
+-      result.attempts =
+-        [⟨⟨LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claimBridgeContext.self, (2 : Verity.Address), 30, []⟩, true, [], []⟩,
+-         ⟨⟨LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claimBridgeContext.self, (2 : Verity.Address), 40, []⟩, true, [], []⟩]) ∧
+-    (∀ (callee : LidoSRv3.Audit.Verity.AddressRecipientCallBridge.External)
+-      (ctx : LidoSRv3.Audit.Verity.AddressRecipientCallBridge.Context)
+-      (requestIds hints : List Nat) (recipient : Verity.Address)
+-      (before : LidoSRv3.Audit.Verity.AddressRecipientCallBridge.World)
+-      (fault : LidoSRv3.Audit.Source.TrioReserve1.Live.Fault),
+-      (LidoSRv3.Audit.Verity.AddressRecipientCallBridge.runClaimWithdrawalsTo
+-        callee ctx requestIds hints recipient before).outcome = .error fault →
+-      (LidoSRv3.Audit.Verity.AddressRecipientCallBridge.runClaimWithdrawalsTo
+-        callee ctx requestIds hints recipient before).world = before) := by
+-  exact ⟨LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claim_withdrawals_to_bridge_receipt,
+-    LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claim_withdrawals_to_revert_restores_caller_and_callee_world⟩
+-
+-/-- Remaining OPEN obligation for P-ADDRESS-1.  A caller/recipient renaming
+-must consume the *live* receipt, not merely the source post-state: it has to
+-relate the two physical claimed words, caller and recipient balances, and the
+-ordered CALL/event/attempt journals.  No theorem proves this definition yet. -/
+-def live_claim_receipt_renaming_obligation : Prop :=
+-  ∀ (ρ : Verity.Address → Verity.Address), ρ 0 = 0 → ρ 1 = 1 → ρ 99 = 99 →
+-    ρ 2 ≠ 0 →
+-    let result := LidoSRv3.Audit.Verity.AddressRecipientCallBridge.runClaimWithdrawalsTo
+-      LidoSRv3.Audit.Verity.AddressRecipientCallBridge.acceptingCallee
+-      LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claimBridgeContext [1, 2] [1, 1]
+-      (ρ 2) LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claimBridgeWorld
+-    result.outcome = .ok () ∧
+-      result.world.core.readSlot
+-        (LidoSRv3.Audit.Verity.AddressClaimBatchTx.queueMetadataPhysicalSlot 1) =
+-          LidoSRv3.Audit.Verity.AddressClaimBatchTx.markClaimed
+-            (LidoSRv3.Audit.Verity.AddressClaimBatchTx.requestMetadataWord
+-              LidoSRv3.Audit.Verity.AddressClaimBatchTx.twoClaimState 1) ∧
+-      result.world.core.readSlot
+-        (LidoSRv3.Audit.Verity.AddressClaimBatchTx.queueMetadataPhysicalSlot 2) =
+-          LidoSRv3.Audit.Verity.AddressClaimBatchTx.markClaimed
+-            (LidoSRv3.Audit.Verity.AddressClaimBatchTx.requestMetadataWord
+-              LidoSRv3.Audit.Verity.AddressClaimBatchTx.twoClaimState 2) ∧
+-      result.world.core.readSlot LidoSRv3.Audit.Verity.AddressClaimBatchTx.lockedEtherAmountPosition = 0 ∧
+-      result.world.balances LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claimBridgeContext.self = 0 ∧
+-      result.world.balances (ρ 2) = 70 ∧
+-      result.world.logs =
+-        [⟨LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claimBridgeContext.self, "WithdrawalClaimed", [1, 1, .ofNat (ρ 2).toNat, 30]⟩,
+-         ⟨LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claimBridgeContext.self, "Transfer", [1, 0, 1]⟩,
+-         ⟨LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claimBridgeContext.self, "WithdrawalClaimed", [2, 1, .ofNat (ρ 2).toNat, 40]⟩,
+-         ⟨LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claimBridgeContext.self, "Transfer", [1, 0, 2]⟩] ∧
+-      result.attempts =
+-        [⟨⟨LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claimBridgeContext.self, ρ 2, 30, []⟩, true, [], []⟩,
+-         ⟨⟨LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claimBridgeContext.self, ρ 2, 40, []⟩, true, [], []⟩]
+-
+ /-- Bounded horizontal slice only: MODEL→SOURCE→official-Denote composition
+ for the owner-operated WithdrawalQueue ERC-721 ownership handoff. This retained
+ regression theorem is subordinate to the universal parent composition above. -/
+diff --git a/LidoSRv3/Audit/Verity/AddressClaimBatchTx.lean b/LidoSRv3/Audit/Verity/AddressClaimBatchTx.lean
+index 6714ac4d..96eb26ef 100644
+--- a/LidoSRv3/Audit/Verity/AddressClaimBatchTx.lean
++++ b/LidoSRv3/Audit/Verity/AddressClaimBatchTx.lean
+@@ -74,29 +74,42 @@ def ownerRequestValue (state : ContractState) (owner : Address) (index : Nat) :
+ def ownerRequestIndex (state : ContractState) (owner : Address) (requestId : Nat) : Nat :=
+   (state.readSlot (ownerRequestIndexSlot owner requestId)).val
+ 
+-/-- OpenZeppelin `EnumerableSet.remove`, including its swap-and-pop writes.
+-`none` is the source `assert(remove(...))` failure, not a synthetic
+-membership guard. -/
++/-- OZ 4.4.1 remove, including checked subtraction/indexing and pop.
++Errors retain their source panic category; absence is the caller's failed assert.
++The post-swap length is read again for pop rather than assumed unchanged. -/
++def removeOwnerRequestChecked (state : ContractState) (owner : Address) (requestId : Nat) :
++    Except String ContractState :=
++  let valueIndex := ownerRequestIndex state owner requestId
++  if valueIndex = 0 then .error "Panic(0x01)"
++  else
++    let length := ownerRequestValuesLength state owner
++    if length = 0 then .error "Panic(0x11)"
++    else
++      let lastIndex := length - 1
++      let toDeleteIndex := valueIndex - 1
++      let swapped : Except String ContractState := if toDeleteIndex != lastIndex then
++        if toDeleteIndex ≥ length then .error "Panic(0x32)"
++        else
++          let lastValue := ownerRequestValue state owner lastIndex
++          .ok ((state.writeSlot (ownerRequestValueSlot owner toDeleteIndex)
++            (.ofNat lastValue)).writeSlot (ownerRequestIndexSlot owner lastValue)
++              (.ofNat valueIndex))
++        else .ok state
++      match swapped with
++      | .error reason => .error reason
++      | .ok swapped =>
++        let popLength := ownerRequestValuesLength swapped owner
++        if popLength = 0 then .error "Panic(0x31)"
++        else
++          let after := (swapped.writeSlot (ownerRequestValueSlot owner (popLength - 1)) 0).writeSlot
++            (ownerRequestValuesLengthSlot owner) (.ofNat (popLength - 1))
++          .ok (after.writeSlot (ownerRequestIndexSlot owner requestId) 0)
++
++/-- Compatibility projection for the legacy storage-only witnesses. The live
++claim consumes the error-preserving checked execution directly. -/
+ def removeOwnerRequest (state : ContractState) (owner : Address) (requestId : Nat) :
+     Option ContractState :=
+-  let indexPlusOne := ownerRequestIndex state owner requestId
+-  if indexPlusOne = 0 then none
+-  else
+-    let lastIndex := ownerRequestValuesLength state owner - 1
+-    let toDeleteIndex := indexPlusOne - 1
+-    let lastValue := ownerRequestValue state owner lastIndex
+-    -- OZ 4.4.1 `EnumerableSet.remove`: move the tail only when the removed
+-    -- element is not itself the tail, then `pop` clears that final array
+-    -- cell.  An unconditional swap would rewrite the removed index before
+-    -- deleting it and would not model the conditional Solidity branch.
+-    let swapped := if toDeleteIndex != lastIndex then
+-      (state.writeSlot (ownerRequestValueSlot owner toDeleteIndex)
+-        (.ofNat lastValue)).writeSlot (ownerRequestIndexSlot owner lastValue)
+-          (.ofNat (toDeleteIndex + 1))
+-      else state
+-    let after := (swapped.writeSlot (ownerRequestValueSlot owner lastIndex) 0).writeSlot
+-      (ownerRequestValuesLengthSlot owner) (.ofNat lastIndex)
+-    some (after.writeSlot (ownerRequestIndexSlot owner requestId) 0)
++  (removeOwnerRequestChecked state owner requestId).toOption
+ 
+ def insertOwnerRequest (state : ContractState) (owner : Address) (requestId : Nat) :
+     Option ContractState :=
+@@ -196,40 +209,114 @@ def claimableEther (request : RequestRead) : Option Nat :=
+ 
+ /-- One pinned `_claim` storage iteration.  It returns the exact payout for the
+ following live recipient CALL; it does not issue a second synthetic CALL. -/
+-def claimOne (requestId hint : Nat) (_recipient : Address) : Contract Nat := fun state =>
+-  let sender := state.sender
+-  let request := readRequest state requestId hint
+-  let lastFinalized := (state.readSlot lastFinalizedRequestIdPosition).val
+-  let lastCheckpoint := (state.readSlot lastCheckpointIndexPosition).val
+-  let nextCheckpointFrom := (checkpointFromWord state (hint + 1)).val
++def prepareClaim (requestId hint : Nat) (_recipient : Address) : Contract Nat := fun state =>
+   if requestId = 0 then .revert "InvalidRequestId" state
+-  else if requestId > lastFinalized then .revert "RequestNotFoundOrNotFinalized" state
+-  else if request.claimed then .revert "RequestAlreadyClaimed" state
+-  else if request.owner != sender then .revert "NotOwner" state
++  else if requestId > (state.readSlot lastFinalizedRequestIdPosition).val then
++    .revert "RequestNotFoundOrNotFinalized" state
+   else
+-    -- Solidity marks the packed byte and then executes
+-    -- `assert(_requestsByOwner[owner].remove(requestId))`; hint calculation
+-    -- follows that mutation. A later failure is rolled back by the entry frame.
+-    let marked := state.writeSlot (queueMetadataPhysicalSlot requestId)
+-      (markClaimed (requestMetadataWord state requestId))
+-    match removeOwnerRequest marked request.owner requestId with
+-    | none => .revert "Panic(0x01)" state
+-    | some removed =>
+-      if hint = 0 || hint > lastCheckpoint then .revert "InvalidHint" state
+-      else if requestId < request.checkpointFrom then .revert "InvalidHint" state
+-      else if hint < lastCheckpoint && nextCheckpointFrom ≤ requestId then
+-        .revert "InvalidHint" state
+-      else if request.previousCumulativeStETH > request.cumulativeStETH ||
+-          request.previousCumulativeShares > request.cumulativeShares then
+-        .revert "NonMonotonicRequest" state
+-      else match claimableEther request with
+-    | none => .revert "ZeroShares" state
+-    | some payout =>
+-        let locked := (state.readSlot lockedEtherAmountPosition).val
+-        if payout > locked then .revert "LockedEtherUnderflow" state
++    let metadata := requestMetadataWord state requestId
++    if requestClaimed metadata then .revert "RequestAlreadyClaimed" state
++    else if requestOwner metadata != state.sender then .revert "NotOwner" state
++    else
++      let marked := state.writeSlot (queueMetadataPhysicalSlot requestId) (markClaimed metadata)
++      match removeOwnerRequestChecked marked
++          (requestOwner (requestMetadataWord marked requestId)) requestId with
++      | .error reason => .revert reason state
++      | .ok removed =>
++        -- All hint, cumulative-pair and locked-ETH reads happen after removal.
++        if hint = 0 then .revert "InvalidHint" state
+         else
+-          let dirty := removed.writeSlot lockedEtherAmountPosition (.ofNat (locked - payout))
+-          .success payout dirty
++          let lastCheckpoint := (removed.readSlot lastCheckpointIndexPosition).val
++          if hint > lastCheckpoint then .revert "InvalidHint" state
++          else
++            let request := readRequest removed requestId hint
++            if requestId < request.checkpointFrom then .revert "InvalidHint" state
++            else if hint < lastCheckpoint &&
++                (checkpointFromWord removed (hint + 1)).val ≤ requestId then
++              .revert "InvalidHint" state
++            else if request.previousCumulativeStETH > request.cumulativeStETH then
++              .revert "Panic(0x11)" state
++            else if request.previousCumulativeShares > request.cumulativeShares then
++              .revert "Panic(0x11)" state
++            else
++              let eth := request.cumulativeStETH - request.previousCumulativeStETH
++              let shares := request.cumulativeShares - request.previousCumulativeShares
++              if shares = 0 then .revert "Panic(0x12)" state
++              else
++                let discounted := eth * E27 / shares > request.checkpointMaxShareRate
++                if discounted && shares * request.checkpointMaxShareRate ≥ 2 ^ 256 then
++                  .revert "Panic(0x11)" state
++                else
++                  let payout := if discounted then shares * request.checkpointMaxShareRate / E27 else eth
++                  .success payout removed
++
++/-- The locked balance is read after the actual set removal/calculation. The
++returned payout is the one subsequently sent by the recipient-call bridge. -/
++def claimOne (requestId hint : Nat) (recipient : Address) : Contract Nat := fun state =>
++  match prepareClaim requestId hint recipient state with
++  | .revert reason _ => .revert reason state
++  | .success payout removed =>
++    let locked := (removed.readSlot lockedEtherAmountPosition).val
++    if payout > locked then .revert "Panic(0x11)" state
++    else .success payout (removed.writeSlot lockedEtherAmountPosition (.ofNat (locked - payout)))
++
++private theorem prepareClaim_success_guards (requestId hint : Nat) (recipient : Address)
++    (state after : ContractState) (payout : Nat)
++    (h : prepareClaim requestId hint recipient state = .success payout after) :
++    requestId ≠ 0 ∧ requestId ≤ (state.readSlot lastFinalizedRequestIdPosition).val ∧
++      requestClaimed (requestMetadataWord state requestId) = false ∧
++      requestOwner (requestMetadataWord state requestId) = state.sender := by
++  by_cases h0 : requestId = 0
++  · simp only [prepareClaim, h0, if_true] at h
++    contradiction
++  by_cases h1 : requestId > (state.readSlot lastFinalizedRequestIdPosition).val
++  · simp only [prepareClaim, h0, h1, if_false, if_true] at h
++    contradiction
++  by_cases hc : requestClaimed (requestMetadataWord state requestId) = true
++  · simp only [prepareClaim, h0, h1, hc, if_false, if_true] at h
++    contradiction
++  by_cases ho : (requestOwner (requestMetadataWord state requestId) != state.sender) = true
++  · simp only [prepareClaim, h0, h1, hc, ho, if_false, if_true] at h
++    contradiction
++  exact ⟨h0, Nat.le_of_not_gt h1, Bool.eq_false_iff.mpr hc, by simpa using ho⟩
++
++/-- Success derives finalization/claimed/owner guards from physical reads. -/
++theorem claimOne_success_guards (requestId hint : Nat) (recipient : Address)
++    (state after : ContractState) (payout : Nat)
++    (h : claimOne requestId hint recipient state = .success payout after) :
++    requestId ≠ 0 ∧ requestId ≤ (state.readSlot lastFinalizedRequestIdPosition).val ∧
++      requestClaimed (requestMetadataWord state requestId) = false ∧
++      requestOwner (requestMetadataWord state requestId) = state.sender := by
++  unfold claimOne at h
++  cases hp : prepareClaim requestId hint recipient state with
++  | revert reason rollback => simp only [hp] at h; contradiction
++  | success amount removed =>
++    simp only [hp] at h
++    split at h
++    · contradiction
++    · cases h
++      exact prepareClaim_success_guards requestId hint recipient state removed amount hp
++
++/-- Success derives the exact final storage write, successful preparation and
++word bound from the actual locked-balance subtraction. -/
++theorem claimOne_success_storage (requestId hint : Nat) (recipient : Address)
++    (state after : ContractState) (payout : Nat)
++    (h : claimOne requestId hint recipient state = .success payout after) :
++    ∃ removed, prepareClaim requestId hint recipient state = .success payout removed ∧
++      payout ≤ (removed.readSlot lockedEtherAmountPosition).val ∧
++      payout < 2 ^ 256 ∧
++      after = removed.writeSlot lockedEtherAmountPosition
++        (.ofNat ((removed.readSlot lockedEtherAmountPosition).val - payout)) := by
++  unfold claimOne at h
++  cases hp : prepareClaim requestId hint recipient state with
++  | revert reason rollback => simp only [hp] at h; contradiction
++  | success amount removed =>
++    simp only [hp] at h
++    split at h
++    · contradiction
++    · cases h
++      refine ⟨removed, hp, Nat.le_of_not_gt (by assumption), ?_, rfl⟩
++      exact Nat.lt_of_le_of_lt (Nat.le_of_not_gt (by assumption)) (by omega)
+ 
+ def claimLoop : List Nat → List Nat → Address → Contract Unit
+   | [], [], _ => Verity.pure ()
+@@ -283,16 +370,6 @@ def twoClaimState : ContractState :=
+   let state := state.writeSlot (checkpointFromPhysicalSlot 1) 1
+   state.writeSlot (checkpointRatePhysicalSlot 1) (.ofNat E27)
+ 
+-/-- Concrete storage receipt for a two-item live batch.  The actual recipient
+-CALLs are represented by the live-world bridge, not a duplicate stub journal.
+-The pinned Keccak backend is opaque to Lean's kernel evaluator, so this
+-finite receipt remains an explicit model boundary rather than falsely
+-replacing the physical `readSlot` path with a `mapUint` surrogate. -/
+-axiom two_claim_batch_observe :
+-    observe [1, 2]
+-        ((executeClaimWithdrawalsTo [1, 2] [1, 1] (2 : Address)).run twoClaimState) =
+-      ⟨.committed, [true, true], 0, []⟩
+-
+ /-- The transaction boundary restores the entry snapshot after any failed
+ guard or payout frame, including failures reached during later iterations. -/
+ theorem every_revert_restores_snapshot (requestIds hints : List Nat) (recipient : Address)
+diff --git a/LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean b/LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean
+index 25dcc0a3..73b09c86 100644
+--- a/LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean
++++ b/LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean
+@@ -119,14 +119,12 @@ executes the sole frame against a callee that may accept, reject, or change
+ its own world. -/
+ def claimTo (callee : External) (ctx : Context) (requestId hint : Nat)
+     (recipient : Address) : Exec Unit := do
+-  let owner : Address ← fun world =>
+-    ⟨.ok (requestOwner (requestMetadataWord world.core requestId)), world, []⟩
+   let payout ← claimStorage ctx requestId hint recipient
+   payoutCall callee ctx recipient payout
+   -- WithdrawalQueueBase emits this before ERC-721's transfer/burn event.
+   emit ctx "WithdrawalClaimed" [(.ofNat requestId), (.ofNat ctx.sender.toNat),
+     (.ofNat recipient.toNat), (.ofNat payout)]
+-  emit ctx "Transfer" [(.ofNat owner.toNat), 0, (.ofNat requestId)]
++  emit ctx "Transfer" [(.ofNat ctx.sender.toNat), 0, (.ofNat requestId)]
+ 
+ def runClaimTo (callee : External) (ctx : Context) (requestId hint : Nat)
+     (recipient : Address) (before : World) :=
+@@ -188,47 +186,6 @@ def claimBridgeWorld : World :=
+       codeSize := fun address => if address = (2 : Address).toNat then 1 else 0 }
+     balances := fun address => if address = claimBridgeContext.self then 70 else 0 }
+ 
+-/-- End-to-end receipt for the smallest recipient bridge.  The storage claim,
+-the exact empty-calldata CALL, and the callee-returned world agree on both the
+-30 wei value and address 2. -/
+-axiom claim_bridge_receipt :
+-    let result := runClaimTo acceptingCallee claimBridgeContext 1 1 (2 : Address)
+-      claimBridgeWorld
+-    result.outcome = .ok () ∧
+-      result.world.core.readSlot (queueMetadataPhysicalSlot 1) =
+-        markClaimed (requestMetadataWord twoClaimState 1) ∧
+-      result.world.core.selfBalance = 70 ∧
+-      result.world.balances claimBridgeContext.self = 40 ∧
+-      result.world.balances (2 : Address) = 30 ∧
+-      result.world.logs =
+-        [⟨claimBridgeContext.self, "WithdrawalClaimed", [1, 1, 2, 30]⟩,
+-         ⟨claimBridgeContext.self, "Transfer", [1, 0, 1]⟩] ∧
+-      result.attempts = [⟨⟨claimBridgeContext.self, (2 : Address), 30, []⟩,
+-        true, [], []⟩]
+-
+-/-- The public two-item entrypoint retains both physical claimed writes and
+-executes two recipient CALLs in source loop order.  The callee's returned
+-world is the committed result, rather than a Boolean call-success premise. -/
+-axiom claim_withdrawals_to_bridge_receipt :
+-    let result := runClaimWithdrawalsTo acceptingCallee claimBridgeContext [1, 2] [1, 1]
+-      (2 : Address) claimBridgeWorld
+-    result.outcome = .ok () ∧
+-      result.world.core.readSlot (queueMetadataPhysicalSlot 1) =
+-        markClaimed (requestMetadataWord twoClaimState 1) ∧
+-      result.world.core.readSlot (queueMetadataPhysicalSlot 2) =
+-        markClaimed (requestMetadataWord twoClaimState 2) ∧
+-      result.world.core.readSlot lockedEtherAmountPosition = 0 ∧
+-      result.world.balances claimBridgeContext.self = 0 ∧
+-      result.world.balances (2 : Address) = 70 ∧
+-      result.world.logs =
+-        [⟨claimBridgeContext.self, "WithdrawalClaimed", [1, 1, 2, 30]⟩,
+-         ⟨claimBridgeContext.self, "Transfer", [1, 0, 1]⟩,
+-         ⟨claimBridgeContext.self, "WithdrawalClaimed", [2, 1, 2, 40]⟩,
+-         ⟨claimBridgeContext.self, "Transfer", [1, 0, 2]⟩] ∧
+-      result.attempts =
+-        [⟨⟨claimBridgeContext.self, (2 : Address), 30, []⟩, true, [], []⟩,
+-         ⟨⟨claimBridgeContext.self, (2 : Address), 40, []⟩, true, [], []⟩]
+-
+ theorem claim_withdrawals_to_revert_restores_caller_and_callee_world
+     (callee : External) (ctx : Context) (requestIds hints : List Nat)
+     (recipient : Address) (before : World) (fault : Fault)
+@@ -324,20 +281,6 @@ def transferBridgeWorld : World :=
+   { core := core
+     balances := fun _ => 0 }
+ 
+-/-- Owner-operated `transferFrom` receipt: no approval flag is supplied. The
+-caller is the request owner, so the physical token-approval word is deleted
+-and only the owner field of the packed request metadata becomes address 2. -/
+-axiom transfer_bridge_receipt :
+-    let result := runTransferFrom transferBridgeContext (1 : Address) (2 : Address) 1
+-      transferBridgeWorld
+-    result.outcome = .ok () ∧
+-      result.world.core.readMapUint tokenApprovalsPosition 1 = 0 ∧
+-      requestOwner (requestMetadataWord result.world.core 1) = (2 : Address) ∧
+-      result.world.core.readSlot (queueMetadataPhysicalSlot 1) =
+-        withRequestOwner (requestMetadataWord transferBridgeWorld.core 1) (2 : Address) ∧
+-      result.world.logs = [⟨transferBridgeContext.self, "Transfer", [1, 2, 1]⟩] ∧
+-      result.attempts = []
+-
+ /-- The direct ownership handoff is a top-level transaction too: every failed
+ guard returns the entry world, including every unrelated account's state. -/
+ theorem transfer_revert_restores_world
+@@ -455,26 +398,6 @@ def requestBridgeWorld : World :=
+       blockTimestamp := 5 }).writeSlot lastReportTimestampPosition 9
+     balances := fun _ => 0 }
+ 
+-/-- One-item `requestWithdrawals` receipt. The owner fallback is caller 1,
+-and the successful post-call enqueue writes request id 1 with cumulative
+-amount/shares `(100, 10)` and the packed owner/timestamp/report word. -/
+-axiom request_bridge_receipt :
+-    let result := runRequestWithdrawals requestCallee requestBridgeContext (2 : Address)
+-      100 zeroAddress requestBridgeWorld
+-    result.outcome = .ok 1 ∧
+-      result.world.core.readSlot lastRequestIdPosition = 1 ∧
+-      requestAmountsWord result.world.core 1 = packEnqueuedAmounts 100 10 ∧
+-      requestMetadataWord result.world.core 1 = packEnqueuedMetadata (1 : Address) 5 9 ∧
+-      result.world.logs =
+-        [⟨requestBridgeContext.self, "WithdrawalRequested", [1, 1, 1, 100, 10]⟩,
+-         ⟨requestBridgeContext.self, "Transfer", [0, 1, 1]⟩] ∧
+-      result.attempts =
+-        [⟨⟨requestBridgeContext.self, (2 : Address), 0,
+-            stETHTransferFromCalldata requestBridgeContext.sender requestBridgeContext.self 100⟩,
+-            true, abiWord 1, []⟩,
+-         ⟨⟨requestBridgeContext.self, (2 : Address), 0, stETHSharesCalldata 100⟩,
+-            true, abiWord 10, []⟩]
+-
+ theorem request_revert_restores_caller_and_callee_world
+     (callee : External) (ctx : Context) (stETH : Address) (amount : Nat)
+     (suppliedOwner : Address) (before : World) (fault : Fault)
+@@ -609,4 +532,87 @@ theorem revert_restores_caller_and_callee_world
+   cases result with
+   | mk outcome after attempts => cases outcome <;> simp_all
+ 
++/-! ## Actual successful execution certificates
++
++These theorems invert the executable itself. They neither rely on finite
++receipt axioms nor ask the caller to supply successful intermediate stages.
++-/
++
++private theorem bind_success {α β : Type} (first : Exec α) (next : α → Exec β)
++    (before : World) (value : β)
++    (h : (bindExec first next before).outcome = .ok value) :
++    ∃ a, (first before).outcome = .ok a ∧
++      (next a (first before).world).outcome = .ok value ∧
++      (bindExec first next before).world = (next a (first before).world).world ∧
++      (bindExec first next before).attempts =
++        (first before).attempts ++ (next a (first before).world).attempts := by
++  cases hx : (first before).outcome with
++  | error fault => simp [bindExec, hx] at h
++  | ok a => exact ⟨a, hx, by simpa [bindExec, hx] using h,
++      by simp [bindExec, hx], by simp [bindExec, hx]⟩
++
++/-- The accepted recipient CALL: actual bytes, provisional transfer and either
++EOA execution or the precise returned callee world. No recipient net-credit
++claim is made for arbitrary successful callbacks. -/
++def PayoutEffect (callee : External) (ctx : Context) (recipient : Address)
++    (payout : Nat) (before after : World) (attempts : List Attempt) : Prop :=
++  let request : Request := ⟨ctx.self, recipient, .ofNat payout, []⟩
++  let credited := transfer before ctx.self recipient (Uint256.ofNat payout).val
++  before.balances ctx.self ≥ (Uint256.ofNat payout).val ∧
++    ∃ returned nested,
++      attempts = [⟨request, true, returned, nested⟩] ∧
++      (((before.core.codeSize recipient.val).val = 0 ∧
++          after = credited ∧ returned = [] ∧ nested = []) ∨
++       ((before.core.codeSize recipient.val).val ≠ 0 ∧
++         ((callee request credited = .success returned after ∧ nested = []) ∨
++           callee request credited = .successWithTrace returned after nested)))
++
++theorem emptyValueCall_success (callee : External) (ctx : Context)
++    (recipient : Address) (payout : Nat) (before : World)
++    (h : (emptyValueCall callee ctx recipient payout before).outcome = .ok ()) :
++    PayoutEffect callee ctx recipient payout before
++      (emptyValueCall callee ctx recipient payout before).world
++      (emptyValueCall callee ctx recipient payout before).attempts := by
++  unfold emptyValueCall at h ⊢
++  split at h ⊢ <;> simp_all [PayoutEffect]
++  split at h ⊢
++  · simp_all [PayoutEffect]
++  · split at h ⊢ <;> simp_all [PayoutEffect]
++
++/-- The two events are appended only after the recipient callback returns,
++using the source msg.sender rather than re-reading callback-modified storage. -/
++def claimEvents (ctx : Context) (requestId : Nat) (recipient : Address)
++    (payout : Nat) (world : World) : World :=
++  { world with logs := world.logs ++
++      [⟨ctx.self, "WithdrawalClaimed", [.ofNat requestId, .ofNat ctx.sender.toNat,
++        .ofNat recipient.toNat, .ofNat payout]⟩,
++       ⟨ctx.self, "Transfer", [.ofNat ctx.sender.toNat, 0, .ofNat requestId]⟩] }
++
++/-- One actual claim: checked physical storage computes the payout consumed
++by its sole CALL, then that CALL's returned world receives the source events. -/
++def ClaimEffect (callee : External) (ctx : Context) (requestId hint : Nat)
++    (recipient : Address) (before after : World) (attempts : List Attempt) : Prop :=
++  ∃ payout dirty called,
++    claimOne requestId hint recipient {before.core with sender := ctx.sender} =
++      .success payout dirty ∧
++    requestId ≠ 0 ∧
++    requestId ≤ (before.core.readSlot lastFinalizedRequestIdPosition).val ∧
++    requestClaimed (requestMetadataWord before.core requestId) = false ∧
++    requestOwner (requestMetadataWord before.core requestId) = ctx.sender ∧
++    payout < 2 ^ 256 ∧
++    PayoutEffect callee ctx recipient payout {before with core := dirty} called attempts ∧
++    after = claimEvents ctx requestId recipient payout called
++
++/-- A chain records every actual intermediate world, including the callback
++world used by the next request. It is not a list of independently supplied
++successful-stage premises. -/
++inductive ClaimChain (callee : External) (ctx : Context) (recipient : Address) :
++    List Nat → List Nat → World → World → List Attempt → Prop
++  | nil (world : World) : ClaimChain callee ctx recipient [] [] world world []
++  | cons {requestId hint requestIds hints before middle after first rest} :
++      ClaimEffect callee ctx requestId hint recipient before middle first →
++      ClaimChain callee ctx recipient requestIds hints middle after rest →
++      ClaimChain callee ctx recipient (requestId :: requestIds) (hint :: hints)
++        before after (first ++ rest)
++
+ end LidoSRv3.Audit.Verity.AddressRecipientCallBridge

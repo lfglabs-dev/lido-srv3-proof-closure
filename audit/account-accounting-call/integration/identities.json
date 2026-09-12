@@ -1,0 +1,60 @@
+{
+  "source_commit": "a4abd69d7acbcae9ff927d45057337029b21eb93",
+  "sources": 45,
+  "pins": 11,
+  "solidity_bodies": 10,
+  "scoped_axioms": 11,
+  "source_receipt_hashes": 67,
+  "normal": {
+    "AccountingCall": {
+      "source": "audit/trio/account-address/AccountingCall.lean",
+      "source_sha256": "6d940eeca7bd37ad977b92109e2e60910731da60f47bb1b177106b7e8008a271",
+      "olean_sha256": "21a9d6dcc7c475a096b02a7bf8ecfd03b602d03d963fd1ef3bcce94196591ad2",
+      "ilean_sha256": "9bdc0b936ff4b2f7fe313ce1b514985d7d6d881115520c2094a7063349eafb24",
+      "setup_sha256": "c031660d86ee73c046c1fac8cc039cccc716ff7fa6d6044d75b5eb378d3c113d",
+      "trace_sha256": "244043fe8c273d1425b8ab3fbb23e68bf9d4e4f0bc39d99a71f18775a559c6d6"
+    },
+    "ReportFeeAccountingCall": {
+      "source": "audit/trio/account-address/ReportFeeAccountingCall.lean",
+      "source_sha256": "d93dedab1208f0e7921118f8e5a038d695c7e014cdc1d37b05593dada0001b63",
+      "olean_sha256": "228dc6e760e2c76b983678e45d0aa4b90cb5eb0dd2a60623e43067739ed682e8",
+      "ilean_sha256": "e96ace6e7fbc6e174fa951de93a05764122c0bc87fe0486ba73c59e1203023fb",
+      "setup_sha256": "4f98883e602a58ebd7342f56047bb7cd1e3273b7885b0003b876827dc2516f22",
+      "trace_sha256": "991b157be48e0ca35e88633163583f406a30a6823bd2ec33226d79b5fd745563"
+    },
+    "LidoSRv3.Audit.Guarantees.PAccount1AccountingCall": {
+      "source": "LidoSRv3/Audit/Guarantees/PAccount1AccountingCall.lean",
+      "source_sha256": "4217706dd33f8be80bb64f054906ac95fe93c1a999132b8ad1d4d847beb2e494",
+      "olean_sha256": "3b89acfb438d57522d6988312fb652f72399b6f8638f584551eaf318873214bb",
+      "ilean_sha256": "7e6b4cd2d07c1bc68ea385542884077dc531714459d9b0f9becc178d0249e33e",
+      "setup_sha256": "24a16941fe77f16758e0e1e09b260851d12d7117d4c8e45762d7f88d0452bcd6",
+      "trace_sha256": "30978ef3289e10ed2aeb849034c4e19f8e47d273bec74146ef6f93cabdeddc62"
+    },
+    "LidoSRv3.Tests.AccountAccountingCall": {
+      "source": "LidoSRv3/Tests/AccountAccountingCall.lean",
+      "source_sha256": "e2f96e0f48e48755a1c7052d821a404929307400ce5a1d1fe22b96b765e520f8",
+      "olean_sha256": "5700bad4f2196d475114369234fe974e2d1f2bca262da6486800d6f9b89ff03d",
+      "ilean_sha256": "d5fb7ce4716a28b468b548ab31c0197738b5d643d13be90b1277d46d475bba6b",
+      "setup_sha256": "e04851a0495778c3313bf1f2185d4e6782385776a99a41b29c7ddf1c5e02fad3",
+      "trace_sha256": "d8421e2605e9de006c06a2e6a46ad6045536800377c69cf1ffe48c7f88396bb4"
+    },
+    "LidoSRv3.Audit.AllGuarantees": {
+      "source_sha256": "3f15feef2f3aecf989729f77fb544314e98a1e314704aafd351f6898acb953fb",
+      "olean_sha256": "70f15f263000aaef8c0f98edca91acaa1437e402a2c80f6ce59210b0fafd7d4d",
+      "setup_sha256": "dc8be8f7cdd1c7acbf5251b4481c6a4815ba8ef18c5343fa8ac11ecb98f17843",
+      "trace_sha256": "0bbc1605552bd8f05ae1523381df705aa52fde943a55ccebd8d6abadbba414c4"
+    },
+    "LidoSRv3.Audit.Trust": {
+      "source_sha256": "456ce9cbca2cf05b3e0c8bfd093863424b5645a4cffff6926b1dc5f45e3f3b7c",
+      "olean_sha256": "aed9a6850171951173e30e8c1ce3aa3b37d67651b1a792ed3e855461a90c2d2f",
+      "setup_sha256": "2e4f0e272964b63b8f2b73447b1c93f39410c465637f2a9fa6261d4a9c66d72e",
+      "trace_sha256": "b0c5c2d18c7867a7852a08b768b650da340b9183996c1b47ffc2592d76482c21"
+    }
+  },
+  "configuration_sha256": {
+    "lakefile.lean": "68a2eeea808e5fe3ada64e9a89f7da8698c67893a021bdde219043fc99110411",
+    "lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
+    "lean-toolchain": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee"
+  },
+  "note": "Four fresh registered normal artifacts replace source-stage manual compile identities. Actual normal setup/providers and all scoped dependencies are rechecked; old manual olean equality is not asserted."
+}

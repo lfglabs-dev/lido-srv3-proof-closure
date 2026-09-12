@@ -1,0 +1,33 @@
+{
+  "status": "local_targeted_validation_passed",
+  "created_at_utc": "2026-09-09T12:09:00.340025+00:00",
+  "baseline": "b74ccaa9b3d2409acd19f463ae59ceb8cda2d7d8",
+  "source_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "command": "lake build LidoSRv3.Audit.Source.TopupLiveWithdrawal LidoSRv3.Tests.TopupLiveWithdrawalMutants",
+  "exit_code": 0,
+  "lake_jobs": 58,
+  "theorem_count": 4,
+  "regression_count": 11,
+  "axioms_by_theorem": [
+    "info: LidoSRv3/Tests/TopupLiveWithdrawalMutants.lean:91:0: 'LidoSRv3.Audit.Source.TopupLiveWithdrawal.transfer_balances' depends on axioms: [propext, Quot.sound]",
+    "info: LidoSRv3/Tests/TopupLiveWithdrawalMutants.lean:92:0: 'LidoSRv3.Audit.Source.TopupLiveWithdrawal.zero_noop' depends on axioms: [propext]",
+    "info: LidoSRv3/Tests/TopupLiveWithdrawalMutants.lean:93:0: 'LidoSRv3.Audit.Source.TopupLiveWithdrawal.zero_seed_tail' depends on axioms: [propext]",
+    "info: LidoSRv3/Tests/TopupLiveWithdrawalMutants.lean:94:0: 'LidoSRv3.Audit.Source.TopupLiveWithdrawal.positive_success' depends on axioms: [propext, Classical.choice, Quot.sound]"
+  ],
+  "inputs_sha256": {
+    "LidoSRv3/Audit/Source/TopupLiveWithdrawal.lean": "c8f154fe5ce744e87812090a7fdfb889c9ad28660491d8b1c686bb0a51f27d79",
+    "LidoSRv3/Tests/TopupLiveWithdrawalMutants.lean": "2ec4aaf9ca09be1490cb7abb5e6cab37c055f24f7be0608591f1be983ce99a81",
+    "audit/topup-live-withdrawal/README.md": "14d3c7c9f1c48fb6a0eb383f418802640a675036917e70c5da4d83ed33c5181f",
+    "LidoSRv3/Audit/Source/TrioReserve1/Pipeline.lean": "1ede76ec371c8f87606aa29378fd10e2a93797e2cc7489d2157598f35d71b9c0",
+    "LidoSRv3/Audit/Source/TrioReserve1/Live.lean": "f0479c959ca823fd95db8aab2a833ec8f7094abd0ada9a715f7e8c9052c468bb",
+    "LidoSRv3/Audit/Source/TrioReserve1/Router.lean": "b272e74a80bda456d4adaaf8006593f46822551162be97282918488f901e8470",
+    "LidoSRv3/Audit/Source/TrioReserve1/CallFlow.lean": "02dbb2abe1326bcd2d29a75af4df615e54cc79c1425cfc899eb27ca2014280e0",
+    "lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
+    "lean-toolchain": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee"
+  },
+  "validation_log_sha256": "1084d6f525afa976355a37a63e9e7282395633f7b488314bddb5d3c19d436e8d",
+  "scope": "New TOPUP withdrawal suffix using delivered concrete Pipeline; no registered TopupTx replacement or beacon-loop composition",
+  "independent_review": "pending",
+  "forge_validation": "not run for this increment",
+  "full_repository_build": false
+}

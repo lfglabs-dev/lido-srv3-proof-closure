@@ -1,0 +1,11 @@
+{
+  "reviewed_integration": "bc12e32cfa6e60a8268df538e14279ac51c88fdb",
+  "source_commit": "f1d91e3a8ad9829e92ab2e8ff443e391449a36bc",
+  "main_base": "53871e66833bd45190eb83dffc15439ceafa9c42",
+  "verdict": "CLEAN",
+  "archive_only": true,
+  "files": {
+    "independent-integration-review-bc12.md": "ad0c53bdcd63d3972650afbe8a70344d04ceaff6c11851246020d41bdd1f1a95",
+    "receipt.json": "988bab230bf33e43a12ffa2ea1fa64793a050501847e0af495a07fa7f93a8b8b"
+  }
+}

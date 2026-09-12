@@ -1,0 +1,72 @@
+{
+  "LidoSRv3.Audit.Guarantees.PAddress1.actual_steth_transfer_from_quote_batch": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Guarantees.PAddress1.actual_steth_transfer_from_quote_failure_restores": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Guarantees.PAddress1.actual_steth_transfer_from_quote_permit_batch": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Guarantees.PAddress1.actual_steth_transfer_from_quote_permit_failure_restores": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressStETHTransferFromCalls.allowanceSlot_keccak": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressStETHTransferFromCalls.canonical_call": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressStETHTransferFromCalls.item_effect": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressStETHTransferFromCalls.program_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressStETHTransferFromCalls.reply_not_trace": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressStETHTransferFromCalls.reply_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressStETHTransferFromCalls.spend_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressStETHTransferFromCalls.transfer_effect": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.AddressStETHTransferFromCalls.public_empty_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.AddressStETHTransferFromCalls.public_nonempty_allowance_rollback": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ]
+}

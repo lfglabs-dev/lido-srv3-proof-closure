@@ -1,0 +1,56 @@
+{
+  "base": "85a1f338990020f1b41cfbcf260609ed90675252",
+  "solidity_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "status": "Implementation frozen for independent review; not self-reviewed or integrated",
+  "public_build": {
+    "jobs": 1267,
+    "exit": 0
+  },
+  "exact_axiom_sets": 11,
+  "source_identities": 1250,
+  "package_pins": 11,
+  "kernel_regressions": 3,
+  "general_rollback_theorem": true,
+  "runtime_checks": {
+    "count": 5,
+    "exit": 0,
+    "method": "FFI runtime evaluation, not kernel proof evidence"
+  },
+  "solidity_tests": {
+    "count": 5,
+    "exit": 0,
+    "scope": "Pinned actual WithdrawalQueueBase + source-shaped public loop harness, not full WQERC721 deployment"
+  },
+  "sha256": {
+    "LidoSRv3/Audit/Guarantees/PAddress1.lean": "57b71f61b137cb51db49be7520e79adaf3c7b2836a6c5ec643198aa3d68607d6",
+    "LidoSRv3/Audit/Spec/AddressClaimCorrespondence.lean": "40e2c363cb4b186533c4025964093be5dcb769e8b46ad8930c155ce70663bad5",
+    "LidoSRv3/Audit/Verity/AddressClaimBatchTx.lean": "1c32b7b5fac3bf15ea84d95e7c32e155b7f0f54349ebe0825e406b3356e760db",
+    "LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean": "bc73349bb407fc4a808059436214d1a96fd9bcd22313758098ecf7fef724c0f4",
+    "LidoSRv3/Audit/Verity/AddressTx.lean": "7b66ae235e42353340d4a76be47f94a68a8fd41f8fc282576aea75ed224009f1",
+    "LidoSRv3/Tests/PackDAddressClaimMutants.lean": "b82fa40e60af385ce1c605099fab6b195a7173090e316b55a28afff9e7a0b999",
+    "audit/address-actual-consumer/.gitignore": "1959c5745954385deb9274fa5e72fff36187d704a9b904e9e16215accea60f74",
+    "audit/address-actual-consumer/KernelProbe.lean": "6cf018e970e136b882f63735d24e40b65fc60ba744a685c89c26cffd8a43a7e0",
+    "audit/address-actual-consumer/README.md": "86e0bbdf38d76da8d16f3c1a2e8b558a9abf381718e9f162ac624f0e186dfe3c",
+    "audit/address-actual-consumer/RuntimeRegression.lean": "4ad623aeeb807fac30299e3fcf84f5924ca42be7c147464bc6284f5408b7c69f",
+    "audit/address-actual-consumer/axioms.json": "fbd8d38ed5315d87e3b5948abedf164753067f3ffd04b81405d82a1fca00069d",
+    "audit/address-actual-consumer/identity-axiom-check.log": "e7977c8aa8649dd97228b53bb0f7561791b44b81f5c227c2145419fabcab3383",
+    "audit/address-actual-consumer/legacy-unproved-statements.md": "5b2d10c554fc95506bcb6d8b9f1b98f9b100c4d04db672e2b1fa97c31c1680cc",
+    "audit/address-actual-consumer/public-build.log": "75b94e011133c9093b1c2a281b26924db7550bccd610d65b50feca1127cf2b59",
+    "audit/address-actual-consumer/run-runtime.sh": "36fda775992f79c2343dfba0fc4bbcfaa276d93c1a50727e2cc3ac4fa08b330d",
+    "audit/address-actual-consumer/runtime-check.log": "ad691abbf30ef4fe0852b322e5853921f7dd24efdd0a2ed564f6c23768844073",
+    "audit/address-actual-consumer/solidity-check.log": "ab7d99f14674d6704bc7dbc82c697ebe1a9392f42f484cae38921a8b682ce8e9",
+    "audit/address-actual-consumer/solidity-source-identities.json": "6952eea3b52d200114c2e7ffd1bf06789b1da99330e80a9ea72b1b3731b42ac5",
+    "audit/address-actual-consumer/solidity/foundry.toml": "143b14982bd4ce75040dd9d285f6e9652ddcca88e722a092c317126cdb63bea6",
+    "audit/address-actual-consumer/solidity/src/ClaimHarness.sol": "3bf7e62d1938f4cb68ad89b9c57c0317cd655c6b1142aa51c39e824836f8c8ce",
+    "audit/address-actual-consumer/solidity/src/WithdrawalQueueBase.sol": "68d8919f89198c3d39272b2259a3144bf87a4aa48c570624b025fd86da47d2bb",
+    "audit/address-actual-consumer/solidity/src/lib/UnstructuredStorage.sol": "955bfcb0bf265db114248bdabeabebc39bddb3fbb756e2448f6aed59f1994f56",
+    "audit/address-actual-consumer/solidity/test/Claim.t.sol": "e6aa1d99cc3afe6a676c96771ba9f4895376bc80e20a8726ebae0b7ce782ba4d",
+    "audit/address-actual-consumer/solidity/vendor/EnumerableSet.sol": "42a618e7d36efd2319d1bf05fedb31f3042baf535cfb97e783128cc1fe326686",
+    "audit/address-actual-consumer/source-inputs.json": "84fcccca9616701e004ecf000d08d79d2ddf2847b8432d619cfde50b0bd28f3a",
+    "audit/address-actual-consumer/successor-handoff.patch": "51dd5bbd2ab3b4f6bb6e0711fb60084f24872e892e366244915cd64ee7e6262b",
+    "audit/address-actual-consumer/validate.py": "0bf7614a3b7f6d735de9ec66291456c9ef14ac21695fd9ef42810c54de91df01",
+    "audit/address-actual-consumer/vendor-identity.json": "c14aa852f8135415bf74da71ba7d00d0f020fd0b0b8abb65eb30c223cee85316",
+    "audit/address-actual-consumer/vendor/ERC20-3.4.0.sol": "eff65ebfa1cad6260b4916ce5293ed6c7231a34d2899c04227578c172990a1f8",
+    "audit/address-actual-consumer/vendor/EnumerableSet-4.4.1.sol": "42a618e7d36efd2319d1bf05fedb31f3042baf535cfb97e783128cc1fe326686"
+  }
+}

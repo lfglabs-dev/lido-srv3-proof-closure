@@ -1,0 +1,43 @@
+{
+  "compiler": {
+    "version": "0.8.9+commit.e5eed63a"
+  },
+  "settings": {
+    "remappings": [
+      "@openzeppelin/contracts-v4.4/=src/@openzeppelin/contracts-v4.4/"
+    ],
+    "optimizer": {
+      "enabled": true,
+      "runs": 200
+    },
+    "metadata": {
+      "bytecodeHash": "ipfs"
+    },
+    "compilationTarget": {
+      "src/WrappedRequestHarness.sol": "WrappedRequestHarness"
+    },
+    "evmVersion": "london",
+    "libraries": {}
+  },
+  "source_count": 17,
+  "source_hashes": {
+    "src/@openzeppelin/contracts-v4.4/access/IAccessControl.sol": "0x59ce320a585d7e1f163cd70390a0ef2ff9cec832e2aa544293a00692465a7a57",
+    "src/@openzeppelin/contracts-v4.4/access/IAccessControlEnumerable.sol": "0xba4459ab871dfa300f5212c6c30178b63898c03533a1ede28436f11546626676",
+    "src/@openzeppelin/contracts-v4.4/token/ERC20/IERC20.sol": "0x61437cb513a887a1bbad006e7b1c8b414478427d33de47c5600af3c748f108da",
+    "src/@openzeppelin/contracts-v4.4/token/ERC20/extensions/draft-IERC20Permit.sol": "0xf41ca991f30855bf80ffd11e9347856a517b977f0a6c2d52e6421a99b7840329",
+    "src/@openzeppelin/contracts-v4.4/utils/Context.sol": "0xe2e337e6dde9ef6b680e07338c493ebea1b5fd09b43424112868e9cc1706bca7",
+    "src/@openzeppelin/contracts-v4.4/utils/Strings.sol": "0x32c202bd28995dd20c4347b7c6467a6d3241c74c8ad3edcbb610cd9205916c45",
+    "src/@openzeppelin/contracts-v4.4/utils/introspection/ERC165.sol": "0xd10975de010d89fd1c78dc5e8a9a7e7f496198085c151648f20cba166b32582b",
+    "src/@openzeppelin/contracts-v4.4/utils/introspection/IERC165.sol": "0x447a5f3ddc18419d41ff92b3773fb86471b1db25773e07f877f548918a185bf1",
+    "src/@openzeppelin/contracts-v4.4/utils/structs/EnumerableSet.sol": "0x9772845c886f87a3aab315f8d6b68aa599027c20f441b131cd4afaf65b588900",
+    "src/WrappedRequestHarness.sol": "0xde8cab9e48fd067dd27f265135d62efe8da1519057a3a3622d5bf71b970d3ce4",
+    "src/core/WithdrawalQueue.sol": "0x82d318ae0f623b03c641bef1a560589ae2a87533e6b68f079191e2f70ae48039",
+    "src/core/WithdrawalQueueBase.sol": "0x2b36b2303a6b174ede30dba61731b8f65d5afd4504886e1d09e4c667398d664b",
+    "src/core/lib/UnstructuredStorage.sol": "0xe4bb1b1a3ecf62b15c386b8eec8418af1f1a0adc7038cc429e49d714c680bf3a",
+    "src/core/utils/PausableUntil.sol": "0x649e985766974846621b6b5e940f3c104313f5cdc67cf3028f6dfc11c95be154",
+    "src/core/utils/Versioned.sol": "0xc055bd49f21bc48111d6d8eb75b18249b9da88ce0c14abb8f24ebed6a5973d2f",
+    "src/core/utils/access/AccessControl.sol": "0x340b4ec2297aa8c093df6af2427db9c93f5d0b2ea7801e53f21b1884ea8b8329",
+    "src/core/utils/access/AccessControlEnumerable.sol": "0x4fc4273a8223466a575a3e53a2b8ad81a75dc2fba12195d9b8ca083bda946c58"
+  },
+  "scope": "All final artifact metadata source Keccak hashes checked against exact fixture bytes. Legacy solc0.8.9 optimizer200 London fixture; not production Istanbul deployment identity."
+}

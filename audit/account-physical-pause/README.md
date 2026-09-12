@@ -1,0 +1,50 @@
+# ACCOUNT physical pause interpretation and preserved fee effects
+
+Author candidate, pending independent exact-source review. Base is main336 merge `295e6c67` (full parent recorded in receipt). Only the three requested new modules and this dossier change. No lakefile registration, old source, facade, site or roadmap changes. `build.py` performs the normal registered prerequisite build and sequentially compiles the new flat source module, public module and tests.
+
+## Executed interpretation and public result
+
+`ReportFeePhysicalPause.execute` **executes the entire accepted324 ReportFeeTreasuryCall runner** on `project before`. Projection changes exactly one legacy metadata field: `steth.activeFlag := ((steth.storage.read ACTIVE_FLAG_POSITION).val != 0)`. Router, StETH physical Core, abstract shares map, locatorAccounting and selfAddress are all preserved, proved by `projection`. No supplied flag/storage equality, active input, successful mint, successful transfer, nonzero fee, nonalias or frame premise is added. Every incoming state is admitted to this interpretation; failures are still executable outcomes.
+
+Projection is a pure state interpretation, not an extra early EVM SLOAD instruction trace. The actual reused mint guards retain admission→authorization→pause→recipient/mint checks. Transfers retain address/amount admission→sender/recipient guards→pause→balance/arithmetic checks. A zero-fee branch never requires active pause or executes mint/distribution/treasury. It can nevertheless normalize the nonphysical legacy flag metadata in the returned model state. **There is no promise that this metadata-bearing success World equals the unprojected old World.** The explicit projection relation is the claim; physical storage and arguments are not altered by projection. This also means an arbitrary readonly treasury interpreter observes the actually executed projected intermediate World, not the original supplied flag.
+
+The public `actual_report_physical_pause` retains `OldEffect`, the **entire324 public success conclusion** on the explicit projected entry: actual report/getter/checked fee/mint execution, full ReportFeeDistribution.Success, pointwise Ledger, actual treasury request/returned address/transfer ReadEffects, events, payments and attempts. It adds `PhysicalEffect`:
+
+- Final and actual minted states have the derived flag/physical-word invariant, and their pause word equals the original entry word.
+- Positive actual fee mint derives physical active=true; zero mint is explicitly allowed.
+- Every actual payment is retained in an enhanced Payments chain with its old transfer call/effect, actual intermediate state, physical pause word and derived active guard.
+- ModuleWorldInvariant proves the same invariant for the exact module result used by324 ReadEffects/TreasuryCall. The readonly external has no post-world channel, so it cannot invalidate the state before the actual treasury payment.
+
+`actual_report_physical_pause_failure_restores` restores the **original full incoming World**, including the untrusted original flag metadata, after any failure. Late decoded-zero treasury failure therefore restores report writes, mint, prior module payments and metadata, while preserving attempted-call diagnostics exactly as324 does. Old arbitrary-flag versions and their domains remain untouched.
+
+## Source and physical-word correspondence
+
+Core pin `17005714f151e5502c559932319a3f2f74ac2436`:
+
+- `contracts/0.4.24/utils/Pausable.sol:15–19`: `ACTIVE_FLAG_POSITION = 0x644132c4ddd5bb6f0655d5fe2870dcec7870e6be4758890f366b83441f9fdece`, keccak256("lido.Pausable.activeFlag"). `_whenNotStopped` requires `getStorageBool()`.
+- Original Aragon `UnstructuredStorage.sol:9–11`: the bool-returning getter is `assembly { data := sload(position) }`.
+- Full unmodified Lido0.4.24 legacy assembly `Lido.asm:11002–11027`, tag397→917, calls storage tag430/SLOAD then ISZERO/ISZERO/JUMPI. **The entire 256-bit word is tested for nonzero**, not low-byte masking, parity, or canonical1. Word2 and high-bit-only values are active. Word0 is stopped. Typed storage Word bounds already capture EVM uint256; Nat test construction explicitly truncates modulo2^256.
+- `Lido.sol:894–900`; `Lido.asm:5646–5688`, tag193: `_auth(_accounting())`, `_whenNotStopped`, `_mintShares`, then mint event conversion. Guard order is unchanged; supplied locatorAccounting context remains the accepted authorization boundary in Lean.
+- `StETH.sol:365–369,494–507`; full Lido assembly13392–13673: sender/recipient guards precede pause; balance and sequential abstract-map transfer writes follow it. No recipient callback occurs in this source.
+- `StETH.sol:92–93,518–527`: mint writes the low128 part of the total/external-share word at `0x6038150aecaa250d524370a0fdcdec13f2690e0723eaf277f41d7cae26b359e6`. `total_slot_distinct` proves these **actual literal positions differ**; no nonalias hypothesis is supplied. `mint_frame` derives retained flag and pause word from the actual successful mint branch. Every successful transfer preserves the physical Core and flag, so induction establishes the invariant through the entire payment chain.
+
+The existing StETH state keeps its accepted abstract shares map, distinct modeled router/StETH components, physical packed total-share word and supplied contract/auth context. This lot does not turn the abstract shares map into a physical Keccak mapping or prove deployment separation. Existing fee casts/splits/arithmetic/report bounds and rate-conversion semantics are retained. No new rate-correctness premise or replacement arithmetic is introduced. The full-report omitted prefix and later reward/rebase suffix remain omitted.
+
+## Exact compiler reuse and fresh actual execution
+
+`check-evidence.py` verifies all111 hashes from frozen quoteee24 (`/tmp/lido-address-steth-quote`, exact Git provider `ee24f9dc158ed25cec118a8ab8cd3a4fc59942f1`), all37 original full-Lido compiler input Keccaks, actual deployment artifact bytes and complete assembly. This source was subsequently integrated as quote337; no new cryptographic/compiler boundary is claimed. The full original Lido assembly is retained here byte-for-byte. Lido compiler0.4.24+e67f0147, optimizer200, Byzantium, all source/settings/provenance hashes are recorded in compiler-identities.json. Original unrelated ECDSA/SHR compiler warning is part of the reused evidence; no signature-body claim is added.
+
+Fresh0.8.9+e5eed63a optimizer200 Byzantium tests deploy that **unmodified full Lido**, not the old StethHarness with a rate override. The new DistributionHarness preserves the exact previously checked pinned Accounting `_distributeFee` body. Its wrapper/interface only changes fixture `mintSetup` to the actual `Lido.mintShares`; mock locator supplies the existing auth address and actual readonly treasury request. There is no `_whenNotStopped`, bool getter, mint, transfer or rate override in deployed Lido. Setup writes real unstructured words and seeds physical shares; runtime `sharesOf` confirms the fixture map setup, without adding a formal physical-map theorem.
+
+The treasury fixture verifies actual Accounting caller/selector/length, already executed module balances and `Lido.isStopped()==false` before returning the paid treasury address. Late zero-address return and forbidden STATICCALL SSTORE exercise complete rollback. These fixtures cover actual mint/distribution phases, not a full deployed Accounting oracle report. Full bytecode refinement, generic malformed ABI/memory/gas behavior and a unified instruction trace are not claimed. Compiler source/profile correspondence and concrete execution are distinct from the Lean theorem.
+
+## Validation
+
+- `build-pass.log`: registered prerequisite39 jobs PASS, then all three new modules compile in ordinary Lean, sequentially. No registration/source mutation. Source/public/test olean/ilean hashes are recorded. Fifteen test `decide +kernel` regressions plus one literal-slot inequality; two public kernel instances, including **nonempty complete successful report→mint→module→treasury flow** and whole-entry late failure.
+- `validation-final.log`:40 actual imported/new source identities,11 package pins,nine fresh ordinary scoped axiom closures (propext/Classical.choice/Quot.sound only), and six pinned core Solidity bodies. Current normal imported oleans and all old actual source providers are checked byte-identical. No new sorry/admit/axiom/native_decide. No native FFI is required for this ACCOUNT model; all positive formal tests use kernel checking.
+- `solidity-test.log`:13 real Solidity cases PASS, including1024 arbitrary uint256 bool-word fuzz runs, word0/2/highbit, exact pause/total Keccak distinctness, actual full-Lido mint/module/readonly treasury payments, auth-before-pause and recipient-before-pause error bytes, high-word preservation, late whole rollback, forbidden static write and zero-mint skip.
+- `compiler-final-check.log`: full37-input Lido reuse, same deployed bytecode, literal pause Keccak, unchanged pinned distribution body, new caller/test/locator metadata source Keccaks and full compiler assembly identities.
+
+Actual failed development attempts are retained. Initial source/public/test driver runs (`source-build.log`, `public-build.log`, `test-build.log`, `final-build.log`) stopped at a projection-expression simplification mismatch; the proposition was unchanged and exact definitional equality fixed it (`source-fix.log`). Early test elaborations (`tests-final.log`, `tests-final-2.log`) had an invalid namespace-open form and an inline record-field parser issue; diagnostics printed temporary sorryAx from those **failed** elaborations. They are not passing evidence. Extracting the typed external function fixed parsing; `tests-final-3.log`, final build-pass and fresh scoped validation contain only foundation axioms. No premise or promised property was weakened.
+
+Raw compiler EOF blank lines are preserved, with raw diff-check status and exact exceptions recorded separately from filtered PASS. This author stops at freeze for independent source review; it is not a merge or publication receipt.

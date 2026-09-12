@@ -1,0 +1,9 @@
+# PR281 exact review and validation evidence
+
+This documentary increment makes the actual complete independent report and the native build/event receipts available at immutable Git references. It adds no source theorem or executable change. The original source33b6053794ac96251a9f0713dbee7ec8b5c9612e was merged as7db9187e5d701977209735b8b6ae4441774b5e3d; all four files of that live CALL increment are byte-identical at the reviewed source, that merge and this documentary base. The current disjoint CONSOL writer does not own these documentary files and was not interrupted.
+
+The report is the full7301-byte readback from the reviewer's actual output, not the short Hermes coordination summary. Native event105/46517ef6-efc5-4f60-96d7-0db0be05d8a0 and durable jobd944b0e8-00f0-4e8f-9057-37a066da2ad8 establish the exact scoped CLEAN verdict and1277-target result. The original nested tool envelope is preserved; validation.log only normalizes escaped newlines for readability. No new build or Solidity test is claimed.
+
+Root accepts the review only for the disclosed model increment. Its phrases about root rollback/source correspondence do not establish a compiled EVM theorem. Actual low-level no-code CALL behavior, supplied STATICCALL fee, assumed arbitrary-callee frame laws, payable-entry credit, ABI error/log encoding, actual gateway-vault hop and EIP7251 implementation remain required internal obligations. The refund helper and payload transport are distinct results, not a full transaction composition. Test examples use native_decide; the inspected increment theorems depend only on propext/Quot.sound. No claim that the examples themselves are kernel-only is made.
+
+All eight incomplete guarantees, including CONSOLIDATION-1 and CONSOLIDATION-ETH-1, remain OPEN. ALLOC-1/ALLOC-2/RESERVE-1 and public identifiers are unchanged. Independent review of this exact documentary commit is required before integration; site426 must remain unmerged and undeployed.

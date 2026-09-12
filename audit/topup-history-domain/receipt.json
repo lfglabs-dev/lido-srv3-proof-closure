@@ -1,0 +1,97 @@
+{
+  "schema": "lido-topup-history-domain-v1",
+  "created_utc": "2026-09-10T00:01:51.960435+00:00",
+  "integration_base": "bc108ac37b9bffb744e30df1378e05a5aa9f3e20",
+  "checkout_head_at_validation": "191a807d07607fa08c2eb80b32db995014d89095",
+  "source_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "main_result": "Existing truncating source timing update cannot establish unrestricted same-block post-return exclusion. Not aggregate ETH-cap or authenticated-history refutation.",
+  "all_eight_guarantees": "OPEN",
+  "lean": {
+    "command": [
+      "lake",
+      "build",
+      "LidoSRv3.Audit.Source.TopupHistoryDomain"
+    ],
+    "exit_code": 0,
+    "targeted_jobs": 496,
+    "fresh_source_seconds": 2.4,
+    "public_theorems": 3,
+    "axiom_queries": 3,
+    "axioms": [
+      "propext",
+      "Quot.sound"
+    ],
+    "scope": "One new source rebuilt with reused import caches; no full rebuild."
+  },
+  "solidity": {
+    "tests": 3,
+    "fuzz_runs": 0,
+    "compiler": "0.8.25",
+    "settings": "viaIR optimizer200 Cancun",
+    "inputs": 23,
+    "scope": "Unmodified public gateway/verifier, explicit root mock/router recorder; positive delay; no direct history storage mutation."
+  },
+  "validated_inputs": {
+    "/tmp/lido-topup-wei-deps/package/access/IAccessControl.sol": "c112f5c86fdc4e862f88d4f5694530342320923ebd5b5e7d9d8493550d337c2d",
+    "/tmp/lido-topup-wei-deps/package/access/extensions/IAccessControlEnumerable.sol": "f91dc4b5750c1bac7a6a11a6057f14f01121847e6a6284e1200d8a87a4c4ff1e",
+    "/tmp/lido-topup-wei-deps/package/utils/introspection/IERC165.sol": "7c5c3f98ab876991e7dd34b84d41137e836306eb9f36f6386a631f5be3f5d6d4",
+    "/tmp/lido-topup-wei-deps/package/utils/structs/EnumerableSet.sol": "ed0804f9dcff9d2dceba8cc83f31669a84491dfcfe510050c9371aa7c48db09c",
+    "LidoSRv3/Audit/Source/TopupCallHistory.lean": "5e3ce8abcafb33e56e3ebb01fe71bd16a41d9c845d38968401ac64907b8b798d",
+    "LidoSRv3/Audit/Source/TopupHistoryDomain.lean": "3116637d8dfac8f1cfc79caec243a0bbf4a7bd7d46349496bd536558fa7fe774",
+    "LidoSRv3/Audit/Source/TopupWeiBounds.lean": "254edfae1e8948850b65d682cc03d94fa0fdc05323b463767c6d79b9d2746372",
+    "audit/topup-gateway-witness-batch/solidity/TopupGatewayWitnessBatch.t.sol": "feddd9ebdd11e9dc1d0eb0fdf4f3da59e5e059ad7c41aa022b9875af0a20dee5",
+    "audit/topup-history-domain/README.md": "1c3e66abcfc7f344e51d6275fcadb80c59cc56982663c914fac1d00d09a32301",
+    "audit/topup-history-domain/check_receipt.py": "c63e61ef299303d4124a8d6d0b381131adf1e2c6b428a388c8c730269603ccc8",
+    "audit/topup-history-domain/solidity/TopupHistoryDomain.t.sol": "5c9f1e315a17f6287e089e787637190debf0a179df36fed9a070ffc65e287b09",
+    "foundry.toml": "adb4990ab31a2bb53f5eeb370e4f55d962f7bc1026bce01708497a56b262356c",
+    "lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
+    "lakefile.lean": "8ea3781110b3234bdfcf2b2c87c5c064fa7d2aee018da57bcab100f8baf1ab87",
+    "lean-toolchain": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee",
+    "lido-core/contracts/0.8.25/CLValidatorVerifier.sol": "d6e89f6975e4fa02f758bf461a98ac2d689296b5c92d03ffd4e43a22d0b3d7ed",
+    "lido-core/contracts/0.8.25/TopUpGateway.sol": "a7ffb654fb4d8d83ba14a6d9452663f786e9a21434be3ce9b7205c546526b7b4",
+    "lido-core/contracts/common/interfaces/IPausableUntil.sol": "0377e3ac9ff2d6be41f4b8f40eee7cfd452ce6de760f9b9145fdb38b94902de3",
+    "lido-core/contracts/common/interfaces/TopUpWitness.sol": "34135d561e4d8c3f1585cdbc15d20f568e36bb37db6c8d4444a8d0cd48cef44d",
+    "lido-core/contracts/common/interfaces/ValidatorWitness.sol": "8fd24cfab7402233029756e52e59198b0d9cbf0a42e5c07d9fa2338ed731a5f7",
+    "lido-core/contracts/common/lib/BLS.sol": "0187cc6a6b1aaa833317695d88795db431fa237452213e8c3872a0f444dceb7c",
+    "lido-core/contracts/common/lib/BeaconTypes.sol": "9591e9af1a4fd398db86267f3589e763f9eb2016bf29e26cfa50988cf73a10c3",
+    "lido-core/contracts/common/lib/GIndex.sol": "2653bd4ba89c349f3db36f21a8afc6a24e0e233816d9b608f46d048feb601d1f",
+    "lido-core/contracts/common/lib/SSZ.sol": "91ef497b972bbee0fe89043034e6bd62fa0c1059f22874d4826bc6164a22009b",
+    "lido-core/contracts/common/lib/UnstructuredStorage.sol": "ca4ad93eedff40de12fdd50a88ef608650139a5543fd160dab61cad4d3c03160",
+    "lido-core/contracts/common/lib/WithdrawalCredentials.sol": "cf5e77be0c5d522d853d19a4c5284e53fa0fb149a9902f77648a8f6d5584636c",
+    "lido-core/contracts/common/utils/PausableUntil.sol": "f27405a7f52a15f7e1b10a73ae57ed69fe6514aaba821415e5584458546cf255",
+    "lido-core/contracts/openzeppelin/5.2/upgradeable/access/AccessControlUpgradeable.sol": "d32578f73ad0a24f65d8208033226cc5567a9df2a57fabadf644f6e4e7f172a4",
+    "lido-core/contracts/openzeppelin/5.2/upgradeable/access/extensions/AccessControlEnumerableUpgradeable.sol": "b6b854fdb69cfe58d7494f6cfc1920a68b504c32e97f6028b6d62a844bc17426",
+    "lido-core/contracts/openzeppelin/5.2/upgradeable/proxy/utils/Initializable.sol": "a8b7eafa0fdc7cb5a644c8c61a8e4c51e031d5e1e6f268f72dbe18b768ead56e",
+    "lido-core/contracts/openzeppelin/5.2/upgradeable/utils/ContextUpgradeable.sol": "a08e16324da33a9d666dc07a22ae58031c242a3869f6808e55b4b82fc70cb209",
+    "lido-core/contracts/openzeppelin/5.2/upgradeable/utils/introspection/ERC165Upgradeable.sol": "76f4b4b6f5d8de71b0b29d90f2b277b88b2c45898340b20b278b9e9ed5074f77"
+  },
+  "evidence_hashes": {
+    "audit/topup-history-domain/validation.log": "b6bd9369e92ffdf15ef4df76382b3773a8382b5f3fdda07fa7b3861ca7bbcbe2",
+    "audit/topup-history-domain/dependency-inputs.json": "b09c75f5b75b95137b2a1266a49ac3f7f2fc7f36ab6e5ee00bac74a5c924ff7e",
+    "audit/topup-history-domain/source-check.json": "2b4cc47e1984ef139fa8742d67da3e4601a16666f6132bdb48fd7a7be15151ce",
+    "audit/topup-history-domain/solidity/validation.log": "4e926e95ae642caeb142a92c0d0bd1c5406e1d75c8cb3e98d818672a70671895",
+    "audit/topup-history-domain/solidity/compiler-input-identities.json": "993e809e497937c302ef0318e2c182ab8f7f06c72ed0ba1ebbaf4995d8475aab"
+  },
+  "package_pins": {
+    ".lake/packages/verity": "e977aaad6e1a9e92e0132d41b3d33a14135a4d46",
+    ".lake/packages/evmyul": "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9",
+    ".lake/packages/mathlib": "fabf563a7c95a166b8d7b6efca11c8b4dc9d911f",
+    ".lake/packages/plausible": "63045536fe95024e6c18fc7b48e03f506701c5bc",
+    ".lake/packages/LeanSearchClient": "c5d5b8fe6e5158def25cd28eb94e4141ad97c843",
+    ".lake/packages/importGraph": "5c7542ed018c78194f1e2b903eaf6a792b74c03d",
+    ".lake/packages/proofwidgets": "24b0d9dc081c5423f8eec7e866c441e5184f29d9",
+    ".lake/packages/aesop": "e3cb2f741431ce31bf73549fb52316a57368b06f",
+    ".lake/packages/Qq": "f46324995fca5f0483b742e4eb4daec7f4ee50d2",
+    ".lake/packages/batteries": "fa08db58b30eb033edcdab331bba000827f9f785",
+    ".lake/packages/Cli": "92564e5770e4d09f2d86dfbf8ada1e9c715b384c"
+  },
+  "internal_open": [
+    "Actual router/module/beacon funding and whole inter-call/nested history",
+    "Full initialization/physical packed state and runtime/rollback composition"
+  ],
+  "external_boundaries": [
+    "Fixture root mock and synthetic header are not authenticated consensus",
+    "Production deployment/governance/domain decisions are not established"
+  ],
+  "independent_review": "Pending exact-commit review; no integration or site acceptance"
+}

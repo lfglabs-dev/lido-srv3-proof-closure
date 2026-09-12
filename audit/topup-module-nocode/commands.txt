@@ -1,0 +1,4 @@
+lake build LidoSRv3.Audit.Guarantees.PTopup2ModuleFailure LidoSRv3.Tests.TopupBatchRootCallsRegression LidoSRv3.Tests.TopupModuleCallMutants
+python3 audit/topup-module-nocode/validate.py
+FOUNDRY_SRC=audit/topup-module-nocode/solidity FOUNDRY_TEST=audit/topup-module-nocode/solidity forge test --remappings contracts/=/tmp/lido-ssz-proof-committed/lido-core/contracts/ --remappings @openzeppelin/contracts-v5.2/=/tmp/lido-topup-wei-deps/package/ --match-test test_actualPinnedModuleEOACallThenEmptyDecodeRevert --out /tmp/lido-nocode-solidity-out --cache-path /tmp/lido-nocode-solidity-cache --threads 2 -vvvv
+/Users/thomas/.svm/0.8.25/solc-0.8.25 --standard-json < /tmp/lido-nocode-solc-input.json > /tmp/lido-nocode-solc-output.json

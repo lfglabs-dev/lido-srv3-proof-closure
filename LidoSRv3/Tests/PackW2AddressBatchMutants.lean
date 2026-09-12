@@ -1,5 +1,10 @@
 import LidoSRv3.Audit.Spec.AddressClaimBatchCorrespondence
-import LidoSRv3.Audit.Verity.AddressClaimBatchTx
+import LidoSRv3.Audit.Model.AddressClaimJournalLegacy
+
+/-! Historical claim-journal results below use the preserved
+`Model.AddressClaimJournalLegacy` executor. References to the live loop in
+retained comments denote that historical model, not the new physical CALL
+consumer. These results do not establish arbitrary recipient callbacks. -/
 
 /-!
 # Wave 2 W2-ADDR fail-closed vectors
@@ -10,7 +15,7 @@ honest observe journal. Pack D remains the two-item kill-line.
 
 namespace LidoSRv3.Tests.PackW2AddressBatchMutants
 
-open LidoSRv3.Audit.Verity.AddressClaimBatchTx
+open LidoSRv3.Audit.Model.AddressClaimJournalLegacy
 open LidoSRv3.Audit.Spec.AddressClaimBatchCorrespondence
 open _root_.Verity
 

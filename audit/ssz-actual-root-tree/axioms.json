@@ -1,0 +1,22 @@
+{
+  "LidoSRv3.Audit.Guarantees.PSsz1.actual_root_staticcall_validator_tree": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.SszActualLeafTree.branch_output_tree": [],
+  "LidoSRv3.Audit.Source.SszActualLeafTree.leaf_success_tree": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.SszActualRootTreeRegression.partial_entry_has_tree": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.SszActualRootTreeRegression.partial_entry_succeeds": [
+    "Quot.sound",
+    "propext"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "reviewed_commit": "b86e8d9b45990131e87d44bc85827ca19400a095",
+  "reviewed_tree": "48b8fbe24ca95726cf1c96441bbb4e497177c495",
+  "verdict": "CLEAN",
+  "files": {
+    "audit/ssz-declared-siblings/integration/independent-integration-review-b86e.md": "449acad5b7c1f3d170d851a02fcc12d438fa6f197dd54a8a39bd0f1c0b965795"
+  },
+  "scope": "Verbatim independent exact integration review; all earlier source, wiring, configuration and evidence objects remain unchanged."
+}

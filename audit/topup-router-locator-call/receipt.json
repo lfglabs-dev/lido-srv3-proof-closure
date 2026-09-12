@@ -1,0 +1,53 @@
+{
+  "base": "295e6c676b61de1815b7027a49ed8bc5fe5b8b3f",
+  "core": "17005714f151e5502c559932319a3f2f74ac2436",
+  "development_failures": "No proof credit; README and development-validator.log distinguish corrected iterations from final normal/scoped/runtime PASS",
+  "files": {
+    "LidoSRv3/Audit/Guarantees/PTopupRouterLocatorCall.lean": "31fb2d1b9d20e450222c9b33e55fdffd169081998e1bd0ff4b5dceacd3da0009",
+    "LidoSRv3/Audit/Source/TopupRouterLocatorCall.lean": "e108e1dd5a68624cfec7d6c4338f7f87658d3fee7e1d6acc22a7456d3614dfee",
+    "LidoSRv3/Tests/TopupRouterLocatorCall.lean": "836ad88dd44858e4bb1dc0213fb6334b6444db56fb719a5ca92df9dd5466a180",
+    "audit/topup-router-locator-call/README.md": "76a972fa2d75acc8eb8cae66aa165b544dbc1c3cdf9560ff3f8c674fb4da634b",
+    "audit/topup-router-locator-call/solidity/ExactRouterLocator.json": "eec99ce2e8953d413bac63946b3cb2dc5aab6070b35e7f021c3974b8963a68ab",
+    "audit/topup-router-locator-call/solidity/GatewayWitnessHarness.json": "8f9e4de51b79d7e5026ddfe90ae713b0b8a5862bcf2002424ac233bf3a17fc5c",
+    "audit/topup-router-locator-call/solidity/TopupRouterLocator.t.sol": "19cf2cc5827918bf25f7327e85c90353d2b2b884cdd93e2db03e7e156298fb18",
+    "audit/topup-router-locator-call/solidity/TopupRouterLocatorTest.json": "4556015f1d6c90427bbcf877e656b97cf4487bdb0498bec0d8b83b0f38892030",
+    "audit/topup-router-locator-call/solidity/forge.log": "67c7f3cf3bf44cdf9186af6b15676b7156543ffc586986dda21804125c63d210",
+    "audit/topup-router-locator-call/solidity/receipt.json": "959f9f3cb1de87b04314858b43995b14cf39b495db2b348ee5e52d604188ee45",
+    "audit/topup-router-locator-call/solidity/run.py": "6680fdbc886af29958430d88de80ac6d1af8ec4151d4244459b5042eb455e82b",
+    "audit/topup-router-locator-call/validation/axioms.json": "3ab51f97e49d031466648b841f5ec2bb8da5d9e26069b0fed6653b6e09927594",
+    "audit/topup-router-locator-call/validation/build-identities.json": "9c15bdbda0d7a29e8cc3c0f4fe10374a835d20427c1ff6e04fe9e34bfd07b856",
+    "audit/topup-router-locator-call/validation/build.log": "b755338448e7e8aa19468e1392178fcfd64986c0eaf938711fcdd38df0c6e836",
+    "audit/topup-router-locator-call/validation/compiler-check.json": "12dc3a9700a16cff6e66e95c3ec9606ebae247bedeef045def4ff84b212dc1e9",
+    "audit/topup-router-locator-call/validation/correspondence.json": "38a09da54def5060e2e7f0158b592531cfb150b96d621a5f1320e27677671d7f",
+    "audit/topup-router-locator-call/validation/development-validator.log": "e69587597ed185b2a5950554e0a49398d9c4d09a355e9220da2f6649fecf55e4",
+    "audit/topup-router-locator-call/validation/diagnostics.lean": "4d0b82f736dd838d38003155f6b7f955c1661a11678bbfba430b63b6a286746e",
+    "audit/topup-router-locator-call/validation/diagnostics.log": "c359eaebe0e8594cfaaf26e10210100521c802ffaebbd11058f479273f47fc28",
+    "audit/topup-router-locator-call/validation/readonly-validation.log": "9089857f7b7515c735ccd67a5414d8e016c90da1086063050e3160b0d706b72e",
+    "audit/topup-router-locator-call/validation/run-diagnostics.py": "fb704cd08a611ea07c4ad0c55e04c86b981e2c23a28b3b640b83524b485c62c1",
+    "audit/topup-router-locator-call/validation/runtime-inputs.json": "660b85061056c2c010d9f222e6de98b52b5abd226ca5d451dd16af5920dbf5c6",
+    "audit/topup-router-locator-call/validation/source-inputs.json": "d656434c60b7e930b25aada8156851bce1ee8e9679b21401bd2181aaad238839",
+    "audit/topup-router-locator-call/validation/validate.py": "ba6d329655fa56b5ea9b15212d8bbc706d33ea0bade9dfd561b427ece3c59cd8"
+  },
+  "normal_build": {
+    "jobs": 1372,
+    "kernel_computation_regressions": 19,
+    "modules": 3,
+    "public_instance": true,
+    "public_rollback": true,
+    "target": "LidoSRv3.Tests.TopupRouterLocatorCall"
+  },
+  "scope": "Source-only additive candidate, awaiting independent exact full-source/IR review; no integration/global/site claim",
+  "validation": {
+    "actual_source_closure": 1355,
+    "final_default_check": "PASS",
+    "fresh_ffi_diagnostics": 8,
+    "fresh_forge_artifacts": 3,
+    "fresh_forge_sources": 23,
+    "fresh_forge_tests": 8,
+    "only_foundations": true,
+    "ordinary_scopes": 27,
+    "package_pins": 11,
+    "unchanged_compiler_input_bodies": 22,
+    "unchanged_complete_gateway_ir_lines": 2519
+  }
+}

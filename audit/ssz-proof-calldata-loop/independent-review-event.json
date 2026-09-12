@@ -1,0 +1,39 @@
+{
+  "content": "Clarifying bounded-lot integration vs campaign, and correcting the 28a/b27/a9 and \u201ceight OPEN\u201d facts. No campaign CLEAN.Confirming 28a ABSENT vs b27/a9 identity. Writing a supplement: bounded-lot integration vs campaign, plus the two factual corrections. Original report stays intact.Resuming the interrupted integration-clarification: preserve the original report, confirm 28a/b27/a9, and write the supplement. No campaign CLEAN.Confirming 28a vs b27 vs a9 source identity, then writing the supplement without touching the original report.Lineage confirmed: 28a ABSENT for the three 280 Lean files; b27 committed them; a9 is log-only. Reading lot READMEs for the exact claimed domains, then writing the supplement.Lineage and README domains confirmed. Writing the supplement; original report stays intact.**Within-domain (README/receipt): no defect requiring correction before bounded-lot integration.** Campaign stays OPEN. Not CLEAN.\n\n**Tooling:** Grok CLI **0.1.211** (`2f2cd6d5c`). UUID `a582` is not a git hash. HEAD `c3cd5450af78a73daed221082b6d368fa9d18e90`. Predecessor `ee65607d` loop not continued. No merge/comments. PR283 queued.\n\nOriginal report preserved: [`output/280-282-independent-review.md`](/workspaces/mission-a5b20c8c/output/280-282-independent-review.md)  \nSupplement: [`output/280-282-integration-supplement.md`](/workspaces/mission-a5b20c8c/output/280-282-integration-supplement.md)\n\n### Factual corrections\n- **28a is not the 280 Lean commit.** The three new 280 files are **ABSENT** at `28a11871` (PR279 merge / validation parent). They were committed at **`b27f19da`**. **`a9f097c8` is log-only** (`validation.log`, `axioms.log`, solidity log). Before/after hashes bind the same b27/a9 source (`064e7bca\u2026` / `ebc58764\u2026` / `67d9e112\u2026`).\n- **Eight OPEN** = **DEPOSIT1, TOPUP1, TOPUP2, ACCOUNT1, ADDRESS1, CONSOL1, CONSOLETH1, SSZ1** \u2014 campaign guarantees, not eight SSZ findings. SSZ residual work stays regardless of count.\n- **No returndata-size guard** in source; that is not a request to add one. **FFI32** is an explicit model-trust/domain condition.\n\n### Within-domain vs campaign\nInside the exact 280/282 README + receipt claims (`verify_success_iff`, CALL-only `2684*n+1`, same opaque FFI pair, typed\u2194word codec, `primitive_typed_success` iff typed `sourceVerify`), this review found **no** implementation, proof, or evidence defect that must be fixed before an incremental merge of these lots.\n\nThat does **not** close SSZ1 or the other seven guarantees. SHA crypto, Yul, ABI/X, surrounding opcode gas, World/rollback, raw entry, provenance remain OPEN.\n\nVERDICT: BLOCKED",
+  "event_id": "70d0a5eb-b90f-46c2-b8f4-211e19199ec5",
+  "event_type": "assistant_message",
+  "id": 3702477,
+  "metadata": {
+    "completion_evidence": {
+      "classification_source": "structured",
+      "completion_confidence": "high",
+      "completion_signal": "process_exit",
+      "failure_class": null,
+      "native_terminal_seen": false,
+      "pending_tools": null,
+      "provider_error_source": null,
+      "terminal_reason": "TurnComplete",
+      "transport_failure_stage": null
+    },
+    "cost": {
+      "amount_cents": 12,
+      "currency": "USD",
+      "source": "estimated"
+    },
+    "cost_cents": 12,
+    "model": "grok-4.6",
+    "model_normalized": "grok-4.6",
+    "success": true,
+    "usage": {
+      "cache_creation_input_tokens": "[redacted]",
+      "cache_read_input_tokens": "[redacted]",
+      "input_tokens": "[redacted]",
+      "output_tokens": "[redacted]"
+    }
+  },
+  "mission_id": "a5b20c8c-062e-4d1e-9324-196da0a86c8b",
+  "sequence": 4210,
+  "timestamp": "2026-09-09T22:12:59.465934537+00:00",
+  "tool_call_id": null,
+  "tool_name": null
+}

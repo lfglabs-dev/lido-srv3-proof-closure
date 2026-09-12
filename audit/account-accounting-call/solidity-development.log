@@ -1,0 +1,8 @@
+Compiling 11 files with Solc 0.8.9
+Solc 0.8.9 finished in 41.63ms
+Error: Compiler run failed:
+Error (5887): "msg.value" and "callvalue()" can only be used in payable public functions. Make the function "payable" or use an internal function to avoid this error.
+  --> test/AccountingCall.t.sol:14:30:
+   |
+14 |   require(msg.sender==token&&msg.value==0&&msg.data.length==4&&msg.sig==bytes4(0x9624e83e),"CALL_SHAPE");
+   |                              ^^^^^^^^^

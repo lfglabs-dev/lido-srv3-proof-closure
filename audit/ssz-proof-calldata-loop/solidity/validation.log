@@ -1,0 +1,13 @@
+Compiling 5 files with Solc 0.8.25
+Solc 0.8.25 finished in 1.39s
+Compiler run successful!
+
+Ran 5 tests for audit/ssz-proof-calldata-loop/solidity/SszProofCalldataLoop.t.sol:SszProofCalldataLoopTest
+[PASS] testFuzz_fullHeapPath(uint8,bytes32,uint16,uint8,uint8) (runs: 1024, μ: 71892, ~: 19323)
+[PASS] test_emptyPriorityAndInsufficientCallBudget() (gas: 315936)
+[PASS] test_everySmallHeapLeafAndMetadata() (gas: 621806197)
+[PASS] test_lateErrorsAndMutations() (gas: 794126)
+[PASS] test_maximumDecodedDepth247() (gas: 525755)
+Suite result: ok. 5 passed; 0 failed; 0 skipped; finished in 170.76ms (325.57ms CPU time)
+
+Ran 1 test suite in 175.19ms (170.76ms CPU time): 5 tests passed, 0 failed, 0 skipped (5 total tests)

@@ -1,0 +1,15 @@
+{
+  "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "checks": [
+    {
+      "path": "contracts/0.8.25/sr/StakingRouter.sol",
+      "sha256": "4d5b83fc73736db6755ebbb58811ed499c3e6de622cce11a3ad8548800a34155",
+      "matches_git_object": true
+    },
+    {
+      "path": "contracts/0.4.24/Lido.sol",
+      "sha256": "3bf84b96fb155af2290e6b26bc0138de356442a9abe3ea0f5274497f9fbffc10",
+      "matches_git_object": true
+    }
+  ]
+}

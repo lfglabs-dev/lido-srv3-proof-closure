@@ -1,0 +1,21 @@
+Compiling 2 files with Solc 0.8.9
+Solc 0.8.9 finished in 198.76ms
+Compiler run successful!
+
+Ran 13 tests for test/PhysicalPause.t.sol:PhysicalPauseTest
+[PASS] testAuthBeforePause() (gas: 9194)
+[PASS] testForbiddenStaticWriteWholeRollback() (gas: 1040450323)
+[PASS] testFullWordNonzeroNotLowByte() (gas: 16576)
+[PASS] testFuzzActualFullLidoBool(uint256) (runs: 1024, μ: 5664, ~: 5664)
+[PASS] testHighBitMintPaymentsPreserveWord() (gas: 164303)
+[PASS] testLateTreasuryRecipientFailureWholeRollback() (gas: 180179)
+[PASS] testMintPauseBeforeRecipientGuard() (gas: 11331)
+[PASS] testNoncanonicalWordMintPaymentsReadonlyTreasury() (gas: 178311)
+[PASS] testPausedMintFailsAndRestores() (gas: 34300)
+[PASS] testPinnedPauseKeccakAndDistinctTotal() (gas: 233)
+[PASS] testTransferPauseBeforeBalanceGuard() (gas: 7513)
+[PASS] testTransferRecipientGuardBeforePause() (gas: 7137)
+[PASS] testZeroMintSkipsPhysicalPauseAndStaticCall() (gas: 61029)
+Suite result: ok. 13 passed; 0 failed; 0 skipped; finished in 17.23ms (15.42ms CPU time)
+
+Ran 1 test suite in 136.11ms (17.23ms CPU time): 13 tests passed, 0 failed, 0 skipped (13 total tests)

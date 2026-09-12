@@ -1,0 +1,55 @@
+{
+  "LidoSRv3.Audit.Guarantees.PAddress1.actual_steth_physical_quote_failure_restores": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Guarantees.PAddress1.actual_steth_physical_quote_permit_batch": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_physical_quote_failure_restores": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_physical_quote_permit_batch": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressStETHQuoteCalls.body_success": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressStETHQuoteCalls.canonical_call": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressStETHQuoteCalls.internalEther_bound": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.AddressStETHQuoteCalls.quote_effect": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.AddressStETHQuoteCalls.public_empty_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.AddressStETHQuoteCalls.public_nonempty_quote_rollback": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.AddressStETHQuoteCalls.public_paused_rollback": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ]
+}

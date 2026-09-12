@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/private/tmp/lido-consolidation-physical-quota/audit/consolidation-physical-quota/validation/validate.py", line 53, in <module>
+    normal.append({'source':rel+'.lean','source_sha256':sha((ROOT/(rel+'.lean')).read_bytes()),'setup_sha256':sha(st.read_bytes()),'trace_sha256':sha(tr.read_bytes()),'olean_sha256':sha(o.read_bytes())})
+  File "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py", line 1249, in read_bytes
+    with self.open(mode='rb') as f:
+  File "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py", line 1242, in open
+    return io.open(self, mode, buffering, encoding, errors, newline,
+  File "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py", line 1110, in _opener
+    return self._accessor.open(self, flags, mode)
+FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/lido-consolidation-physical-quota/.lake/build/lib/lean/LidoSRv3/Tests/TrioConsolidation/PhysicalQuotaSettlement.olean'

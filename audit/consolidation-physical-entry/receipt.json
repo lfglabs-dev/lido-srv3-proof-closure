@@ -1,0 +1,71 @@
+{
+  "base": "82051ab0a552734712b8f33e3f96f0074bf9ee39",
+  "scope": "SOURCE candidate: physical actual caller role then checked entry balance then resumed gate; entire8205 quota/settlement/decoded requests on actual post-quota World; original credited-entry rollback. Independent review/integration required.",
+  "checks": {
+    "normal_jobs": 1272,
+    "actual_source_identities": 1255,
+    "package_pins": 11,
+    "ordinary_foundation_scopes": 22,
+    "kernel_regressions": 14,
+    "public_instances": 2,
+    "fresh_solidity_cases": 8,
+    "fuzz_runs": 1024,
+    "fresh_compiler_inputs": 25,
+    "fresh_artifacts": 2,
+    "full_gateway_ir_lines": 2610,
+    "reused_support_artifacts": 3,
+    "native_execution_groups": 6,
+    "independent_nested_keccak_vectors": 4
+  },
+  "files": {
+    "LidoSRv3/Audit/Guarantees/PConsolidationEth1PhysicalEntry.lean": "fff7199d86d09ab40b0d6e105680109876c796f76a229f090175ce0a8be9215c",
+    "LidoSRv3/Tests/TrioConsolidation/PhysicalEntrySettlement.lean": "f0aeb7d6761bce8a8f8ce553776365357e4247e3e66b9ad5cb2ecd6237d093bc",
+    "audit/consolidation-physical-entry/README.md": "70c4859758f4b3d6b0e6183457e351c1fe5488bb83e56346fb99f072345d2886",
+    "audit/consolidation-physical-entry/solidity/PhysicalEntry.t.sol": "c5c4276f630ca37809fa3d5591d1035ee0ff0ecbbeedcd2771330eb9892d2288",
+    "audit/consolidation-physical-entry/solidity/PhysicalEntryHarness.ir": "13cacaaa84e0e85f79dcd8ac6518b02901979da986a37a33ae4b6802abf1279c",
+    "audit/consolidation-physical-entry/solidity/PhysicalEntryHarness.json": "dc7667cdf2978f0db88b0e35b7dbbb38d6d7ff02a030a16970282b37faffda4b",
+    "audit/consolidation-physical-entry/solidity/PhysicalEntryHarness.sol": "986d2b9e6090b06b27b8cd55266ecfd5addc5898ae6da603d452502f030aa7aa",
+    "audit/consolidation-physical-entry/solidity/PhysicalEntryTest.json": "740c26fb9936a710806a775174a74ed41333edac68e5ca448f61a432f76abfb2",
+    "audit/consolidation-physical-entry/solidity/build-info.json": "32cd9c72526c94bc0c0e1da3378a8a111ea6bea23645b0beac8321e40ce376a8",
+    "audit/consolidation-physical-entry/solidity/development-forced-balance-PhysicalEntry.t.sol": "c60a5fd384ca1c862265da5927f02c570f04565b0f8b4b6200e4b711e05d8e35",
+    "audit/consolidation-physical-entry/solidity/development-forced-balance-PhysicalEntryHarness.sol": "793577bf822b6ebd70d98245d52a9469b5fdaf619ccdce36babb36e643748c05",
+    "audit/consolidation-physical-entry/solidity/development-forced-balance-forge.log": "2e80eb32e81c1bb400697ada867d8950e8d60865f0d22e669c9e13159f435a15",
+    "audit/consolidation-physical-entry/solidity/development-forced-balance-run.log": "521ff5b19e675b90e14074d5d271f96335c10e3993d40662743ce6cd6a586ff9",
+    "audit/consolidation-physical-entry/solidity/development-forced-balance.md": "53c2d973cef3cb9c87eab00e548393f610f794d0bbcb47795ce276fd6ed7b4ad",
+    "audit/consolidation-physical-entry/solidity/forge.log": "969e1f327af18e62e34373fde5630f9d711a24030f28feee7c2724f70cf4ae39",
+    "audit/consolidation-physical-entry/solidity/receipt.json": "afe6b7e5f1960342e0dbdbe7cca3259518ef64a2a54b9ec29a7ad01406745ba4",
+    "audit/consolidation-physical-entry/solidity/run.log": "262d702858ed2b016971d68acbd00e8a8dbf2ed7f2b2a456e4bf589c66c07f47",
+    "audit/consolidation-physical-entry/solidity/run.py": "303b3d52f84f7cd1dcd3f95d63d314966494a3929b93adbdd51fd2480f9f7738",
+    "audit/consolidation-physical-entry/validation/axioms.json": "5763c5c852d6d8712dff61c70f5d3181f178959ef76988e293cfae12457b6bce",
+    "audit/consolidation-physical-entry/validation/compiler-identities.json": "dedf8a990735dab3653a050dd09e04fa626c4e9abdd14a47ea54753030d68593",
+    "audit/consolidation-physical-entry/validation/correspondence.json": "9f6804de1a7081b5b4f13cc0f431324afc0eb4b4a3b1d9e231756186fc9acdb6",
+    "audit/consolidation-physical-entry/validation/development-native-missing-support.log": "4b445f45497cad6f166859140610353735ce685de0b5eec6eb92f5857b3c2eef",
+    "audit/consolidation-physical-entry/validation/development-native-record-layout.log": "a48538f08761d6020ac830622e958cb54362c008153f72dd6bda9dc14a2b00ac",
+    "audit/consolidation-physical-entry/validation/development-reflexive-true.log": "329e89df5fb4cf85475115573ae5e5b22f126987bd551a81292572dd1300dbaf",
+    "audit/consolidation-physical-entry/validation/development-validation-conclusion-whitespace.log": "15429a1a980c038a1bf18687dd677180e6af02ae31e48f24546f3a1816ed63d7",
+    "audit/consolidation-physical-entry/validation/diagnostics.lean": "2674b9954082ddd95b40a61b6e07c70ef61ed5f1b95855ec07f6ad5ea83fe0e9",
+    "audit/consolidation-physical-entry/validation/mapping-vectors.json": "1319e81ca069623288d6f4a5779bcb00ecfee8945efe4375adf4cada06c4d8e9",
+    "audit/consolidation-physical-entry/validation/mapping-vectors.tsv": "66dc3af0bb798e7bbb8b119bef26031deeea4e70f143a21a84a0ed9504011cc2",
+    "audit/consolidation-physical-entry/validation/native.log": "0ff712e6ad07a1b6e26bff8e6731a8e2fac62ae05c3e6cf7478c9e568f506dd1",
+    "audit/consolidation-physical-entry/validation/normal-identities.json": "a28c17cc44063804659806d0d1bb40a550e509edf31503e16b960509c1f2f82b",
+    "audit/consolidation-physical-entry/validation/prior-conclusion.txt": "b62382f566519a0d598e986e1305226cd7e3d3fc436f44390af9b76ce12e8085",
+    "audit/consolidation-physical-entry/validation/reuse-identities.json": "3c6804d6908e68bba69858d45d32bf6662dde9875057b93c56dcdfbebcbdbd67",
+    "audit/consolidation-physical-entry/validation/run-diagnostics.py": "ed7cbe4d1f957d8e21453516b870244435c5f99b5f3db3f1e957b690efd88a3a",
+    "audit/consolidation-physical-entry/validation/source-inputs.json": "0e10e2442f0fbd9142c0194d5a391408577f26df6e5d12c9349cdc558ca4d7c5",
+    "audit/consolidation-physical-entry/validation/test-build.log": "6339c1a38fd04a28e96606bd9149700a0d1093e420d42497e9d5858a245898ad",
+    "audit/consolidation-physical-entry/validation/validate.py": "3842cb9df0599b05f7d0c13390239831e74e7ab51fbb73b49dc3c0a8bc44ccaf",
+    "audit/consolidation-physical-entry/validation/validation.log": "5a7a3d02474f242f570ad726dbfae7db78b67483f531aabac1efac4deb0ddc6b",
+    "audit/consolidation-physical-entry/write-receipt.py": "7fd481af5fd33d534e2c5092996ccafa88a9a3b61f33bb4a38937b12b3f1e197",
+    "audit/trio/consolidation/PhysicalEntrySettlement.lean": "da42faf7960d926e5f9927c2a48bda883214fd3fddc808359b14a06079be7fb3"
+  },
+  "config_sha256": {
+    "lakefile.lean": "c8b9de3b79b4aff42d8708d93e6211821980e835294a04bd9f53311f8af8e9e7",
+    "lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
+    "lean-toolchain": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee"
+  },
+  "raw_whitespace": {
+    "audit/consolidation-physical-entry/solidity/PhysicalEntryHarness.ir": [
+      "EOF2610"
+    ]
+  }
+}

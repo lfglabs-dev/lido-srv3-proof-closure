@@ -1,0 +1,59 @@
+# Independent exact ADDRESS physical-transfer integration review
+
+**CLEAN exact `bc12e32cfa6e60a8268df538e14279ac51c88fdb`**, tree `91da646e2435b7081ab815d8d1ad25b6a06ce38b`, sole parent final union `266f17237ac41851e41ad2bced6bf721bebf68dc`. Reviewed clean frozen `/tmp/lido-address-steth-transfer-integrated` with source author/root writer stopped. No blocking source-consumption, integration, domain, provider or evidence-identity finding. This is bounded physical-transfer integration acceptance, not whole ADDRESS/EVM closure. STOP.
+
+## Full reading and independent provenance
+
+I authored none of the new physical-transfer implementation or integration. Read all three new Lean modules completely:228 source lines,52 public lines,114 test lines, including every proof, fourteen kernel computations, both public instances and the complete native program. Read the full retained independent f1d9 source/Solidity/assembly review, integration README/receipt, validator and read-only wrapper, identities and relevant complete build/provider records. Revisited the actual pinned StETH transfer/movement functions and the inherited token, conversion, quote and transcript connections. Complete earlier quoteee24 and conversion107e/778f/199a reviews apply after exact identity.
+
+The f1d9 reviewer authored neither this increment nor quote/conversion, but disclosed authorship of earlier wrapped-token1d07 and transferFrom a9c6. Their independent source reviews remain the stated provenance for those unchanged antecedents; the f1d9 report does not relabel its own reinspection independent. I preserve that qualification. The archived f1d9 report is byte-identical to the external continuous-address-steth-transfer-f1d9-independent-review.md.
+
+For the separate ACCOUNT work in this union, I read the full independent6266 source, d954 integration and7f36 final archive reviews. They explicitly distinguish physical pause interpretation from the inherited abstract share map and document the provider registration. Their earlier unrelated authorship exclusions remain intact. This transfer review does not replace those independent ACCOUNT reviews or extend their scope.
+
+## Exact union and configuration
+
+Complete recursive Git path/mode/object comparison proves build union865223dbe33ba799c80a3dc197fdf904c28f7dc4 is exactly the sourcef1d91e3a8ad9829e92ab2e8ff443e391449a36bc and accepted ACCOUNT7f369fc63f5cdf32436693130e298a8e835d3f33 merge. Each changed source entry remains sourcef1d9, every other accepted entry remains7f36, and the path set is their union. Final union266f has exactly the same tree as build union8652. Main34053871e66833bd45190eb83dffc15439ceafa9c42 has exactly the accepted7f36 tree. There is no source/configuration drift between the checked build union and the final merge.
+
+The only bc12 integration code edits are two import/query files: AllGuarantees prepends the public transfer import; Trust prepends its test import and adds seven intended queries plus a descriptive comment. Every old import/query remains. Nine integration archive files are added. The lakefile is not newly changed by bc12: it equals accepted7f36 and differs from sourcef1d9 only by the already reviewed ReportFeePhysicalPause root in AccountAddressChecks. Manifest/toolchain equal sourcef1d9. All three current configuration hashes match the receipt.
+
+Independent current hash checks pass45 transfer source plus8 integration hashes,91 conversion source plus9 integration hashes,111 quote source plus9 integration hashes,39 ACCOUNT source plus8 integration hashes, and both ACCOUNT final-review receipt hashes. Old source bodies and evidence are unchanged. No later source or site work is included implicitly.
+
+## Actual physical transfer and complete consumer
+
+PhysicalConversionPermitEffect is the entire107e successful public conclusion specialized only by the new callee: complete PhysicalQuotePermitEffect, its full prior permit JoinedEffect/forward transcript, and the reverse-conversion transcript on the same actual World, IDs and attempts. The successful public theorem retains it as the first conjunct, then maps that exact old transcript to stronger Items. No separate run or unrelated arithmetic certificate replaces the execution.
+
+The actual wrappedStep supplies the concrete callee as tokenTransfer. canonical_call decodes the generated68-byte request (a9059cbb, queue recipient, captured full Word amount, zero value) at the dynamically selected target. call_effect applies that equality to the actual inherited CallEffect on its zero-value-call World. reply_success derives encoded true32 and ProgramEffect from the executed callee; successWithTrace is impossible for this concrete body. The inherited WstETH decoder reads true and discards the decoded result. The specialization does not insert a new bool-is-true admission check or narrow older arbitrary-transfer results.
+
+The reverse result belongs to the preburn slot7-selected target/world. Burn consumes the original wrapped amount. The transfer freshly rereads slot7 from the actual burned World and consumes the same captured received amount. Its returned World feeds the later queue amount guards, actual forward quote at the queue target, real uint128 cast and physical enqueue. Both enhanced TokenEffect and Item retain their complete predecessors, including exact burn, call/return, bounds, timestamps, IDs, owner-set/cumulative operations, events and direct/nested journals. Neither target equality nor rate equality is assumed.
+
+program first executes the already reviewed full-Lido forward quote body on that actual selected target/world. Strict input width/raw arithmetic/zero-divisor errors therefore precede sender, recipient, pause and funding guards. move then checks sender!=0, recipient!=0, recipient!=self, the entire active SLOAD word!=0, sender shares and funding; writes the debit; freshly reads recipient shares; checks addition; writes credit; and appends Transfer then TransferShares with the original token amount and captured shares. The raw active literal is the pinned Pausable slot and admits any nonzero Word. No allowance-spending step is invented for transfer.
+
+The physical balance mapping is full Lido's base0, not inferred from standalone StETH. balanceSlot_keccak establishes the two32-byte address/base preimage. Sequential qualified reads/writes preserve same-address and hypothetical hash aliases. The proof does not claim an unaffected fixed-slot/allowance/rate frame under hypothetical mapping collisions, and its active closures do not use mapping injectivity. SafeMath funding/recipient-addition bounds are derived from the executed checks. Intermediate recipient-overflow Exec state may be dirty, but reply invokes Live.run and exports a rejected reply without that state; the public failure theorem restores the entire original pre-permit World, including earlier items, burns, transfers and permit effects. Attempts remain observations.
+
+The only public success/failure premise is the corresponding whole-run outcome. No new nonalias, callback frame, funding, fit, equal-rate, equal-target, nonzero-divisor, successful-stage or cryptographic premise is supplied. Old arbitrary mutable-callee domains remain available. This is concrete implementation specialization, not runtime bytecode authentication at any arbitrary selected address.
+
+## Solidity and validation reuse
+
+The complete f1d9 source review directly followed pinned StETH/Lido/Pausable/Aragon/SafeMath/WstETH and queue bodies and the complete relevant full legacy transfer/return/event paths. It checked full-Lido mapping base0, raw pause semantics, forward conversion before guards, debit before fresh recipient read, original-amount/derived-share events and true return. I reuse that full compiler-path review after source/dossier/artifact identity; I do not claim to have reexecuted its compiler tests. The preserved quote/conversion source reviews independently supply their complete physical rate correspondence.
+
+That source evidence binds37 original Lido inputs,18 unchanged queue inputs and19 new test inputs, exact actual Lido/WstETH artifacts, metadata/settings and full inherited assemblies. Direct tests use unmodified full Lido; composed tests use real WstETH and two distinct full-Lido targets, without the older ConversionHarness/controller override. Seeded state and finite signed permits remain fixture boundaries. Compiler profiles and raw historical exceptions are retained, without production-bytecode or full event/error-byte equivalence claims.
+
+Normal source evidence remains1280 jobs, fourteen kernel computations and two public kernel instances: empty success and paused rollback. Nonempty success is runtime evidence. Four actual mapping vectors and six native groups cover real two-item effects/events, late rollback, self-transfer fresh read, checked overflow, qualified target and no-code. Eleven Solidity tests include1024 bounded fuzz runs; these are not exhaustive256-bit proofs. No compiler, Forge or FFI replay was performed here.
+
+## Current normal wiring and independent checks
+
+The retained aggregate log actively builds all three new modules and both aggregators as jobs1768–1772 and reports1772 jobs complete. Actual AllGuarantees setup selects the local source/public transfer oleans; Trust selects all three. I compared each selected provider source/olean to the frozen candidate and current output. All three new integrated olean hashes match the receipt. All five new/aggregate setups have empty options/plugins; their normal traces are nonsynthetic, refer to correct local sources and contain no kernel-skip option. Source-checkout trace bytes are not asserted identical to path-dependent integration traces.
+
+I also checked all three retained registered ACCOUNT oleans and their actual AllGuarantees/Trust providers against the accepted ACCOUNT integration identities, including the flat ReportFeePhysicalPause module. Thus the inherited lakefile registration is actually consumed.
+
+After fully reading the writer, I ran only validate.py with Python bytecode disabled and candidate write_text calls intercepted as exact existing-byte comparisons. External temporary ordinary dependency probes remained permitted. PASS:1263 actual imported/new source identities,11 exact package pins and13 active transitive scopes, matching the archived source and integration manifests and containing only propext/Classical.choice/Quot.sound. Every consumed old local source equals107e. No candidate dossier/cache/source output was written and no Lean module rebuild occurred.
+
+The retained global check reports the unchanged29 exact disclosed axioms:23 test/mutant native-decision exceptions, three production exceptions and foundations. This is distinct from the13 foundation-only transfer scopes. I reused the global check and build under the verified identical build/final-union tree rather than claiming fresh global or compiler execution.
+
+## Disposition
+
+The exact integration delta passes diff-check. New transfer source/dossier whitespace also retains its reviewed PASS; larger inherited raw assembly EOF exceptions remain at unchanged identities. No unconditional cleanliness claim is made for those older raw artifacts.
+
+Initial deployment/storage/configured identities, runtime code recognition, permit authentication, arbitrary malformed dispatch, full ABI/memory/allocator/gas/EVM instruction and general event/error-byte refinement remain the stated boundaries. The physical transfer improvement does not turn inherited abstract ACCOUNT share maps into physical mapping proofs. Site426 is untouched.
+
+CLEAN at exactbc12 for this bounded integration. Only this external report was written. No candidate/cache/source mutation, rebuild, compiler/Forge/native rerun, push, merge, site action or deployment. STOP for root's separate archive-only step.

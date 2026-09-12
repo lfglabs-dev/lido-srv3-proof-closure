@@ -1,0 +1,51 @@
+{
+  "LidoSRv3.Audit.Guarantees.PAddress1.actual_claim_recipient_effect": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Guarantees.PAddress1.actual_claim_withdrawals_failure_restores": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Guarantees.PAddress1.actual_claim_withdrawals_to_chain": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Verity.AddressClaimBatchTx.claimOne_success_guards": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Verity.AddressClaimBatchTx.claimOne_success_storage": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Verity.AddressRecipientCallBridge.emptyValueCall_success": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.PackDAddressClaimMutants.failed_batch_restores_world": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.PackDAddressClaimMutants.swapped_payout_order_changes_actual_attempts": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.PackDAddressClaimMutants.wrong_recipient_changes_actual_attempt": [
+    "propext"
+  ],
+  "LidoSRv3.Tests.PackDAddressClaimMutants.zero_recipient_rejects_before_claim": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Spec.AddressClaimCorrespondence.actual_claim_payout_matches_locked_write": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ]
+}

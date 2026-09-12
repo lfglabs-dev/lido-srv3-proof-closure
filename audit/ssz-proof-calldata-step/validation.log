@@ -1,0 +1,54 @@
+$ lake env lean LidoSRv3/Audit/Source/SszWordBytes.lean -o /tmp/lido-ssz-step-validated-wordbytes.olean
+Exit code: 0
+$ lake env lean LidoSRv3/Audit/Source/SszProofCalldataStep.lean -o /tmp/lido-ssz-step-validated-calldata.olean
+Exit code: 0
+$ lake build LidoSRv3.Tests.SszProofCalldataStepMutants
+⚠ [1071/1128] Replayed Conform.Wheels
+warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: Conform/Wheels.lean:106:70: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1073/1128] Replayed EvmYul.Pretty
+warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: EvmYul/Pretty.lean:36:32: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1114/1128] Replayed EvmYul.Semantics
+warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1115/1128] Replayed EvmYul.EVM.Semantics
+warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+ℹ [1128/1128] Built LidoSRv3.Tests.SszProofCalldataStepMutants (126s)
+info: LidoSRv3/Tests/SszProofCalldataStepMutants.lean:135:0: 'LidoSRv3.Audit.Source.SszWordBytes.actual_word_bytes' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszProofCalldataStepMutants.lean:136:0: 'LidoSRv3.Audit.Source.SszWordBytes.actual_word_decode' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszProofCalldataStepMutants.lean:137:0: 'LidoSRv3.Audit.Source.SszWordBytes.actual_memory_decode' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszProofCalldataStepMutants.lean:138:0: 'LidoSRv3.Audit.Source.SszProofCalldataStep.actual_sibling' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszProofCalldataStepMutants.lean:139:0: 'LidoSRv3.Audit.Source.SszProofCalldataStep.prepared_memory' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszProofCalldataStepMutants.lean:140:0: 'LidoSRv3.Audit.Source.SszProofCalldataStep.prepared_call' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszProofCalldataStepMutants.lean:141:0: 'LidoSRv3.Audit.Source.SszProofCalldataStep.layout_continue' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszProofCalldataStepMutants.lean:142:0: 'LidoSRv3.Audit.Source.SszProofCalldataStep.sourceStep_success' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/SszProofCalldataStepMutants.lean:143:0: 'LidoSRv3.Audit.Source.SszProofCalldataStep.sourceStep_extra' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszProofCalldataStepMutants.lean:144:0: 'LidoSRv3.Audit.Source.SszProofCalldataStep.decode_width' depends on axioms: [propext, Quot.sound]
+Build completed successfully (1128 jobs).
+Exit code: 0

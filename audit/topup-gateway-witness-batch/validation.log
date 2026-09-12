@@ -1,0 +1,86 @@
+⚠ [504/528] Replayed Verity.Core
+warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1041:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+⚠ [1144/1242] Replayed Conform.Wheels
+warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: Conform/Wheels.lean:106:70: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1145/1242] Replayed EvmYul.Pretty
+warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: EvmYul/Pretty.lean:36:32: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1192/1242] Replayed EvmYul.Semantics
+warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1193/1242] Replayed EvmYul.EVM.Semantics
+warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1240/1285] Replayed LidoSRv3.Audit.Verity.TopupTx
+warning: LidoSRv3/Audit/Verity/TopupTx.lean:293:8: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: LidoSRv3/Audit/Verity/TopupTx.lean:872:13: This simp argument is unused:
+  uint256Modulus
+
+Hint: Omit it from the simp argument list.
+  simp [pushEntry, scheduledDeposit, linkedCallEntryTo, linkedCallEntry, e̵v̵m̵W̵o̵r̵d̵,̵ ̵u̵i̵n̵t̵2̵5̵6̵M̵o̵d̵u̵l̵u̵s̵]̵e̲v̲m̲W̲o̲r̲d̲]̲
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/TopupTx.lean:965:19: This simp argument is unused:
+  Nat.mod_eq_of_lt hNoWrap
+
+Hint: Omit it from the simp argument list.
+  simp [evmWord,̵ ̵N̵a̵t̵.̵m̵o̵d̵_̵e̵q̵_̵o̵f̵_̵l̵t̵ ̵h̵N̵o̵W̵r̵a̵p̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/TopupTx.lean:1279:5: Variable name `hwcLen` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+ℹ [1285/1285] Built LidoSRv3.Tests.TopupGatewayWitnessBatchMutants (11s)
+info: LidoSRv3/Tests/TopupGatewayWitnessBatchMutants.lean:103:0: 'LidoSRv3.Audit.Source.TopupGatewayWitnessBatch.checkLengths_iff' depends on axioms: [propext]
+info: LidoSRv3/Tests/TopupGatewayWitnessBatchMutants.lean:104:0: 'LidoSRv3.Audit.Source.TopupGatewayWitnessBatch.epoch_cast_exact' depends on axioms: [propext]
+info: LidoSRv3/Tests/TopupGatewayWitnessBatchMutants.lean:105:0: 'LidoSRv3.Audit.Source.TopupGatewayWitnessBatch.evaluate_headroom' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TopupGatewayWitnessBatchMutants.lean:106:0: 'LidoSRv3.Audit.Source.TopupGatewayWitnessBatch.loop_run' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/TopupGatewayWitnessBatchMutants.lean:107:0: 'LidoSRv3.Audit.Source.TopupGatewayWitnessBatch.canonical_row_entry' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TopupGatewayWitnessBatchMutants.lean:108:0: 'LidoSRv3.Audit.Source.TopupGatewayWitnessBatch.canonical_batch' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TopupGatewayWitnessBatchMutants.lean:109:0: 'LidoSRv3.Audit.Source.TopupGatewayWitnessBatch.loop_spec' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/TopupGatewayWitnessBatchMutants.lean:110:0: 'LidoSRv3.Audit.Source.TopupGatewayWitnessBatch.router_checked_from_loop' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/TopupGatewayWitnessBatchMutants.lean:111:0: 'LidoSRv3.Audit.Source.TopupGatewayWitnessBatch.router_keys_exact' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/TopupGatewayWitnessBatchMutants.lean:112:0: 'LidoSRv3.Audit.Source.TopupGatewayWitnessBatch.wei_word_values' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/TopupGatewayWitnessBatchMutants.lean:113:0: 'LidoSRv3.Audit.Source.TopupGatewayConfigWords.decode_packed' depends on axioms: [propext, Quot.sound]
+Build completed successfully (1285 jobs).

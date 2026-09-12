@@ -1,0 +1,62 @@
+{
+  "scope": "Concrete withdrawal followed by existing source-byte caller loop; Lido debit, restored router balance and exact calldata-bearing journal. Not actual beacon execution or full TOPUP-1.",
+  "accepted_base": "42210924cd58ff751d2472f5ea998383fed4be7f",
+  "checkout_head_at_receipt": "f71fbcab599118c5e66484824bcee0e2c5a42f90",
+  "created_at_utc": "2026-09-09T12:44:00.597246+00:00",
+  "source_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "verity_pin": "e977aaad6e1a9e92e0132d41b3d33a14135a4d46",
+  "command": "lake build LidoSRv3.Audit.Source.TopupFundedSource LidoSRv3.Audit.Verity.TopupFundedSourceTx LidoSRv3.Tests.TopupFundedSourceMutants",
+  "exit_code": 0,
+  "lake_jobs": 1266,
+  "new_source_theorems": 14,
+  "new_regressions": 14,
+  "principal_axiom_queries": 8,
+  "allowed_axioms_observed": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "dependency_files_unchanged_since_accepted_base": [
+    "LidoSRv3/Audit/Verity/TopupTx.lean",
+    "LidoSRv3/Audit/Source/TopupLiveWithdrawal.lean",
+    "LidoSRv3/Audit/Source/TopupWeiBounds.lean",
+    "LidoSRv3/Audit/Source/DepositDataRootCorrespondence.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/Pipeline.lean",
+    "LidoSRv3/Audit/Source/TrioReserve1/Live.lean",
+    "LidoSRv3/Tests/TopupLiveWithdrawalMutants.lean",
+    "lake-manifest.json",
+    "lean-toolchain"
+  ],
+  "files_sha256": {
+    "LidoSRv3/Audit/Source/TopupFundedSource.lean": "821059b47c41a0cc3cedc2713a6fde256fff455a1f6c4871e3f3aa71ea7cc3c6",
+    "LidoSRv3/Audit/Verity/TopupFundedSourceTx.lean": "019f6255dd60caa74af208f664a6dae2255292f6b3b7c020b2501084274bafcb",
+    "LidoSRv3/Tests/TopupFundedSourceMutants.lean": "377554c2a3e14ecc96d8de6d655d1b1d2c5be1458ed0c139d84926d194efb8b2",
+    "audit/topup-funded-source/README.md": "488dc3720b40d8642308a95a85d765723b7096e8dc0de9ba2c8d1ef58eb993d5",
+    "LidoSRv3/Audit/Verity/TopupTx.lean": "142c68fce97927bce27ce777f9d075fa04f4b4a2801fc765540f68fa00491d01",
+    "LidoSRv3/Audit/Source/TopupLiveWithdrawal.lean": "c8f154fe5ce744e87812090a7fdfb889c9ad28660491d8b1c686bb0a51f27d79",
+    "LidoSRv3/Audit/Source/TopupWeiBounds.lean": "254edfae1e8948850b65d682cc03d94fa0fdc05323b463767c6d79b9d2746372",
+    "LidoSRv3/Audit/Source/DepositDataRootCorrespondence.lean": "d80aa66141ed44056fd8c46b21de06be559dd5c7d1e18e5d7c3b540157dcd486",
+    "LidoSRv3/Audit/Source/TrioReserve1/Pipeline.lean": "1ede76ec371c8f87606aa29378fd10e2a93797e2cc7489d2157598f35d71b9c0",
+    "LidoSRv3/Audit/Source/TrioReserve1/Live.lean": "f0479c959ca823fd95db8aab2a833ec8f7094abd0ada9a715f7e8c9052c468bb",
+    "LidoSRv3/Tests/TopupLiveWithdrawalMutants.lean": "2ec4aaf9ca09be1490cb7abb5e6cab37c055f24f7be0608591f1be983ce99a81",
+    "lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
+    "lean-toolchain": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee",
+    ".lake/packages/verity/Contracts/Common.lean": "837df97f38a2da768e46eeba017bf10661ce2796a6aa04aa7381adf09da00306"
+  },
+  "logs_sha256": {
+    "validation.log": "eed10822010ebf40cb6840ae8d4eac8cd326832c4ac77ddb7d8d0a80feaee640",
+    "axioms.log": "237de980693eb6329e6b6c2d3c9105eb5d11bbe75a4654674b60eca91845622c",
+    "source-check.json": "1f664a1b0754472e365cba498447b139300cc8aedefbb8524ac042592a1766ce"
+  },
+  "domain": "Positive composer explicitly assumes oldRouterBalance + mathematicalSum < 2^256; separate gateway/initial-asset invariant bridge can derive it. Wrapped-zero domain retained without no-wrap premise.",
+  "remaining_boundaries": [
+    "generic cfg needs pinnedConfig for source unit/field correspondence",
+    "generic Guards excludes earlier gwei alignment; gateway bridge includes it",
+    "Live.attempts and core.calls are separate channels",
+    "actual beacon callee/credits/storage/ABI and SHA implementation absent",
+    "physical gateway/entry/registered-parent/EVM/runtime bridge open"
+  ],
+  "independent_review": "pending exact candidate",
+  "forge": "not run",
+  "full_repository_build": false
+}

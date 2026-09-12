@@ -1,0 +1,4 @@
+info: LidoSRv3/Tests/TopupLiveWithdrawalMutants.lean:91:0: 'LidoSRv3.Audit.Source.TopupLiveWithdrawal.transfer_balances' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/TopupLiveWithdrawalMutants.lean:92:0: 'LidoSRv3.Audit.Source.TopupLiveWithdrawal.zero_noop' depends on axioms: [propext]
+info: LidoSRv3/Tests/TopupLiveWithdrawalMutants.lean:93:0: 'LidoSRv3.Audit.Source.TopupLiveWithdrawal.zero_seed_tail' depends on axioms: [propext]
+info: LidoSRv3/Tests/TopupLiveWithdrawalMutants.lean:94:0: 'LidoSRv3.Audit.Source.TopupLiveWithdrawal.positive_success' depends on axioms: [propext, Classical.choice, Quot.sound]

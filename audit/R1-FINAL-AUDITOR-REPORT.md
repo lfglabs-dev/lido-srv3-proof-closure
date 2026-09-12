@@ -4,7 +4,7 @@
 
 ## Decision
 
-Review basis: structured inputs after the PR250 vault-premise editorial correction (theorem registrations and statuses unchanged; this revision is not a new independent certification; prior input history remains in Git; trio composition scoped separately) `ffd6ae4d5be0a5e1e7d1be335700e58ca90771f5`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
+Review basis: structured inputs including the accepted TOPUP constructor provenance disclosure (theorem registrations and statuses unchanged; prior PR250 basis `ffd6ae4d5be0a5e1e7d1be335700e58ca90771f5` and exact input delta retained in `audit/metadata-reconcile/report-basis.json`; this revision is not a new independent certification; trio composition scoped separately) `6513b185e45e5a8d31bc3e7170e074fd331c517b`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
 
 ## Architecture and evidence boundary
 
@@ -20,12 +20,12 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 | --- | --- | --- | --- | --- |
 | [`P-ALLOC-1`](#p-alloc-1) | CHECKED | CHECKED | 4 open | **IMPLEMENTATION_PENDING** |
 | [`P-ALLOC-2`](#p-alloc-2) | CHECKED | CHECKED | 4 open | **IMPLEMENTATION_PENDING** |
-| [`P-DEPOSIT-1`](#p-deposit-1) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
+| [`P-DEPOSIT-1`](#p-deposit-1) | CHECKED | CHECKED | 4 open | **IMPLEMENTATION_PENDING** |
 | [`P-TOPUP-1`](#p-topup-1) | CHECKED | CHECKED | 1 open | **IMPLEMENTATION_PENDING** |
 | [`P-ACCOUNT-1`](#p-account-1) | CHECKED | CHECKED | 7 open | **IMPLEMENTATION_PENDING** |
-| [`P-RESERVE-1`](#p-reserve-1) | CHECKED | CHECKED | 7 open | **IMPLEMENTATION_PENDING** |
-| [`P-CONSOLIDATION-ETH-1`](#p-consolidation-eth-1) | CHECKED | CHECKED | 12 open | **IMPLEMENTATION_PENDING** |
-| [`P-ADDRESS-1`](#p-address-1) | CHECKED | CHECKED | 8 open | **IMPLEMENTATION_PENDING** |
+| [`P-RESERVE-1`](#p-reserve-1) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
+| [`P-CONSOLIDATION-ETH-1`](#p-consolidation-eth-1) | CHECKED | CHECKED | 11 open | **IMPLEMENTATION_PENDING** |
+| [`P-ADDRESS-1`](#p-address-1) | CHECKED | CHECKED | 7 open | **IMPLEMENTATION_PENDING** |
 | [`P-TOPUP-2`](#p-topup-2) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
 | [`P-CONSOLIDATION-1`](#p-consolidation-1) | CHECKED | CHECKED | 7 open | **IMPLEMENTATION_PENDING** |
 | [`P-SSZ-1`](#p-ssz-1) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
@@ -40,7 +40,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 | [`P-SSZ-1.tx-execution-simulation`](#p-ssz-1tx-execution-simulation) | CHECKED | PARTIAL | 1 open | **IMPLEMENTATION_PENDING** |
 | [`P-ADDRESS-1.denote-admission`](#p-address-1denote-admission) | OPEN | CHECKED | 3 open | **IMPLEMENTATION_PENDING** |
 | [`P-RESERVE-RELATIONAL`](#p-reserve-relational) | CHECKED | CHECKED | 0 open | **NONE** |
-| [`P-ALLOC-EXEC-1`](#p-alloc-exec-1) | CHECKED | PARTIAL | 3 open | **IMPLEMENTATION_PENDING** |
+| [`P-ALLOC-EXEC-1`](#p-alloc-exec-1) | CHECKED | PARTIAL | 2 open | **IMPLEMENTATION_PENDING** |
 | [`P-ETH-JOURNAL-1`](#p-eth-journal-1) | CHECKED | PARTIAL | 3 open | **IMPLEMENTATION_PENDING** |
 | [`P-VAULT-ETH-1`](#p-vault-eth-1) | CHECKED | CHECKED | 4 open | **IMPLEMENTATION_PENDING** |
 | [`P-ORACLE-SUPPLY-1`](#p-oracle-supply-1) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
@@ -88,7 +88,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Source/artifact provenance.** `MAPPED`; 4 immutable pinned source span(s) in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance.
 
-**Assumptions.** `A-HANDWRITTEN-MINFIRST`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
+**Assumptions.** `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
 
 **Limitations — 4 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
@@ -117,20 +117,18 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Source/artifact provenance.** `MAPPED`; 7 immutable pinned source span(s) in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance.
 
-**Assumptions.** `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-DEPOSIT-CONTRACT`, `A-DEPOSIT-32-ETHER`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
+**Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
 
-**Limitations — 6 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+**Limitations — 4 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
 - LinksSource is a caller-supplied hypothesis: Wave 4 kill-line alloc_derived_linkssource_kill_line_refutes_bridge shows P-ALLOC-1 CheckedBounds and P-ALLOC-2 step premises plus key-count composition still do not imply LinksSource, because ALLOC does not constrain per-batch wei (firstAmount) and does not constrain publicKeysBatchLength
-- DEPOSIT_CONTRACT address provenance is assumed rather than pinned to the deployed beacon deposit contract
-- MAX_EFFECTIVE_BALANCE_WC_TYPE_01 = literal 32 ether is a deployment/constructor fact, not derived by the parent
 - the two-batch executable limitation is closed by DepositNFrameTx; the remaining word-domain gap is the abstract parent quantifying over unbounded Nat inputs whose committed aggregates exceed one word while the executable noWrap premise bounds the aggregate -- witnessed by abstract_parent_covers_inputs_the_verity_plane_omits at an out-of-domain exhibit that has no in-range substitute (in_range_commit_is_word_bounded)
 - the source pull is not bounded by this row outside ConservingConfig: LinksSource pins only DEPOSIT_SIZE and neither it nor Preconditions relates MAX_EFFECTIVE_BALANCE_WC_TYPE_01 to it, so for the non-conserving deployments the registered parent still admits, the line-972 pull quantity actualDepositsCount * maxEBType1 exceeds any word bound this row proves (linked_hypotheses_do_not_bound_the_line_972_product, with a uint256-encodable immutable); this is a statement about the computed quantity, not a settled transfer and not a reached multiplication -- the skewed deployment turns away at the earlier line-959 ZeroDeposits guard (skewed_pull_witness_turned_away_before_line_972), and an encodable module allocation bounds the product inside one word (line_972_product_le_module_allocation, encodable_allocation_bounds_line_972_product) -- and no in-range input commits a word-exceeding push at all (in_range_commit_is_word_bounded), so it is a separate theorem and not a bound
 - the registered composed parent still carries LinksSource and success Preconditions, making its internal revert conjunct vacuous even though the separate public hypothesis-free rollback theorem is checked
 
 **Classification.** **IMPLEMENTATION_PENDING** — Keep NFrame.LinksSource explicit and keep the Spec router's per-allocation unit multiply; do not derive it from ALLOC parents. Derive the beacon address and 32-ether constructor/literal identity only from artifacts. The n-frame executable theorem remains a Verity EDSL claim, not compiled-artifact correspondence. The remaining word-domain gap is still named.
 
-**Next gate.** Keep NFrame.LinksSource explicit. Discharge OPEN A-DEPOSIT-CONTRACT and A-DEPOSIT-32-ETHER only from artifacts; do not infer either from the generalized router or merge ALLOC into DEPOSIT. The unbounded-Nat versus word gap stays named.
+**Next gate.** Keep NFrame.LinksSource explicit. A-DEPOSIT-CONTRACT and A-DEPOSIT-32-ETHER are discharged from deployment artifacts (see LidoSRv3/Audit/Provenance/BeaconDepositAddress.lean and LidoSRv3/Audit/Provenance/DepositThirtyTwoEther.lean, both anchored in audit/artifacts.lock.json). Do not infer either from the generalized router or merge ALLOC into DEPOSIT. The unbounded-Nat versus word gap stays named.
 
 ### `P-TOPUP-1`
 
@@ -138,17 +136,17 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Proof shape / exact domain statement.** source_topup_conserves_and_rolls_back is a single registered four-conjunct claim: (1) pulled = pushed on the source-shaped run -- genuinely assert-backed: run's value-moving tail and residual amount guards read the on-chain unchecked accumulator (the line-732 sum reduced mod 2^256, wrappedTotal = exactTotal % 2^256) for the over-target guard at line 737, the zero-sum test at line 741, the Lido-side amount guards (Lido.sol 842/873), the line-744 pull, the funded router balance, and the line-755 assert, so reaching a value-moving commit means the assert passed with the wrapped pull equal to the exact push -- and a reverting outcome maps to the abstract TxObservation rollback (A-ABSTRACT-TX); (2) the moduleExists guard is live -- an unregistered module reverts revertStakingModuleUnregistered; (3) if the unchecked sum wraps mod 2^256, run itself moves no wei (pulled = pushed = 0) -- a nonzero wrap still aborts on the value-moving tail (underfunded push or line-755 assert), while a sum that wraps to exactly zero takes the line-741 empty commit committedNoTopUp, so wrap-implies-revert is false; the honest fact is wrap precludes a value-moving commit (run_wrap_precludes_value_moving_commit / source_wrap_precludes_value_moving_commit); A-TOPUP-NOWRAP lives here, in the wrap antecedent, and in the discharged-balance-guard theorems, not in conjunct (1); (4) the wcTypeIsType2 guard is live -- a non-type-2 module reverts revertWrongWithdrawalCredentialsType. TopupTxMutants carries real kill-lines on mutants of the parent's own model: dropped_conservation_assert_kill_line_refutes_parent (a surgical mutant run with ONLY the line-755 assert deleted commits the wrapping batch with pulled = 1 ≠ 2^256+1 = pushed; mutantRunNoAssert_eq_run_of_assert_passing / mutantRunNoAssert_commits_where_assert_fires pin the single edit down in the P-DEPOSIT-1 style), dropped_module_guard_kill_line_refutes_parent and dropped_wc_guard_kill_line_refutes_parent (mutants without the moduleExists / wcTypeIsType2 require commit at witnesses where the parent demands the named revert), and unwrapped_accumulator_kill_line_refutes_parent (the assert-drop mutant's dual: a wrap-ignoring mutant run commits the wrapping batch the honest run reverts via the assert). The wave-1 projections are renamed guard_discharge_at_* and are honest positive controls, not kill-lines; wrap_to_zero_commits_no_topup is the honest wrap-to-zero empty-commit control. Verity: if allocations.length ≤ 2^256, each allocation is a uint256 word, and the source run does not revert, observe of execute equals sourceObservables and pulled/pushed match, including the wrap-to-zero empty success; NoUncheckedWrap is not a Verity parent hypothesis. Not P-TOPUP-2 amount computation.
 
-**Source/artifact provenance.** `MAPPED`; 13 immutable pinned source span(s) in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance.
+**Source/artifact provenance.** `MAPPED`; 14 immutable pinned source span(s) in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance.
 
-**Assumptions.** `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-TOPUP-NOWRAP`, `A-VERITY-SCAFFOLD`, `A-TOPUP-BEACON-ADDRESS`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
+**Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
 
 **Limitations — 1 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
-- beacon-address provenance remains OPEN as A-TOPUP-BEACON-ADDRESS, not a parent conjunct
+- abstract-TX rollback plane conjunct RevertRestoresSnapshot is definitional in TxObservation (A-ABSTRACT-TX): a Verity.Contract.run executable-plane rollback equivalent is not yet folded into this registered parent, so a modelling mismatch in the abstract observation type would silently mis-classify a reverting run.
 
-**Classification.** **IMPLEMENTATION_PENDING** — Pin beacon-address provenance. Keep the checked universal nonzero-wrap revert and wrap-to-zero empty-commit partition; do not derive a top-up LinksSource from ALLOC.
+**Classification.** **IMPLEMENTATION_PENDING** — Fold a Verity.Contract.run executable-plane rollback conjunct into the registered parent that matches RevertRestoresSnapshot, so the abstract TxObservation shape stops being the only witness to rollback. Keep the checked universal nonzero-wrap revert and wrap-to-zero empty-commit partition.
 
-**Next gate.** Universal word-bounded nonzero-wrap Verity revert/non-commit/rollback is CHECKED; wrap-to-zero remains an empty commit. OPEN: discharge A-TOPUP-BEACON-ADDRESS from deployment artifacts; do not derive a top-up LinksSource from ALLOC.
+**Next gate.** Universal word-bounded nonzero-wrap Verity revert/non-commit/rollback is CHECKED; wrap-to-zero remains an empty commit. A-TOPUP-BEACON-ADDRESS is discharged from deployment artifacts (see LidoSRv3/Audit/Provenance/BeaconDepositAddress.lean and audit/artifacts.lock.json). Do not derive a top-up LinksSource from ALLOC.
 
 ### `P-ACCOUNT-1`
 
@@ -184,9 +182,8 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
 
-**Limitations — 7 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+**Limitations — 6 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
-- live WithdrawalQueue.unfinalizedStETH call (freshness is now an explicit freshQueueCache hypothesis with a stale-cache kill-line, not an implicit assumption)
 - canDeposit / bunker / router authorization (now proved as scopedWithdrawGuards on any committed call, but the two booleans are still free inputs, not live bunker/pause/msg.sender checks)
 - packed uint128 buffered ether and ETH transfer
 - frame-nonce reset and report-time rebalance
@@ -214,9 +211,9 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Source/artifact provenance.** `MAPPED`; 6 immutable pinned source span(s) in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance.
 
-**Assumptions.** `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-CANONICAL-REQUEST-ADDRESS`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
+**Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
 
-**Limitations — 12 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+**Limitations — 11 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
 - VaultHub / Dashboard / TriggerableWithdrawalsGateway / StakingVault withdraw sites (named out of scope)
 - Bus/Gateway/Vault intermediate hops and live executeConsolidation ABI
@@ -227,13 +224,12 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 - the universal revert arms are stated for the modeled non-success shapes only; a reverting refund/Lido sink or a reverting request predeploy is not one of them (the rejecting-predeploy rollback stays a numeral witness)
 - the dispatch-fuel arm quantifies over the model's own dispatcher bound (fuelBudget=32 under A-ABSTRACT-TX); it is a frame-count artifact of the abstract transaction model and carries no deployed gas-metering meaning
 - vault→Lido/WithdrawalQueue protocol-return confinement is out of this parent (former P-CONSOLIDATION-ETH-1a retired; not the consolidation fee/refund happy path and not P-RESERVE-1 buffer accounting)
-- pinned canonical consolidation-request source literal (0x0000BBdDc7CE488642fb579F8B00f3a590007251), named A-CANONICAL-REQUEST-ADDRESS; fee-leg evidence uses the configured immutable/slot only and does not identify it with a deployment
 - canonical-address identity is not yet folded into the registered Verity parent; requestAddr remains a model-local ensemble address
 - renamed public id P-CONSOLIDATION-ETH-1 (was P-ETH-1): not a general SRv3 ETH guarantee
 
 **Classification.** **IMPLEMENTATION_PENDING** — Keep the universal success-arm parent, the now-universal four-arm revert partition with its numeral witnesses, the zero-remainder boundary corner, and the wiring/premise kill-lines. Keep A-CANONICAL-REQUEST-ADDRESS open. Do not restore vault→Lido/WQ as a child or compose with P-CONSOLIDATION-1 until an ABI/interpreter bridge exists.
 
-**Next gate.** Both sides of the gateway guard are now quantified alike: the Verity plane proves the success arm and all four modeled non-success arms for all word-sized inputs, with the zero-remainder corner closed, so no word-sized input is unclassified. OPEN: discharge deployed target provenance under A-CANONICAL-REQUEST-ADDRESS, and fold the canonical request literal into the registered Verity parent (requestAddr is still a model-local ensemble address). Do not compose with P-CONSOLIDATION-1 before an ABI/interpreter bridge.
+**Next gate.** Both sides of the gateway guard are now quantified alike: the Verity plane proves the success arm and all four modeled non-success arms for all word-sized inputs, with the zero-remainder corner closed, so no word-sized input is unclassified. Deployed target provenance discharged via A-CANONICAL-REQUEST-ADDRESS retirement (see LidoSRv3/Audit/Provenance/CanonicalRequestAddress.lean). OPEN: fold the discharged canonical request literal into the registered Verity parent (requestAddr is still a model-local ensemble address). Do not compose with P-CONSOLIDATION-1 before an ABI/interpreter bridge.
 
 ### `P-ADDRESS-1`
 
@@ -245,9 +241,8 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
 
-**Limitations — 8 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+**Limitations — 7 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
-- singleton-actor exclusion is by omission: singletonActorEntryPoint is False for every modeled tag, so the parent carries no live exclusion proof
 - unbounded source-to-Verity correspondence and caller-swap equivariance theorem for the live claimWithdrawalsTo batch; the checked observe receipt is two-item
 - keccak-level physical mapping-slot derivation for queue/checkpoint struct words; ContractState mapUint channels model keyed POSITION/POSITION+1 words
 - EnumerableSet owner-request removal, Transfer/WithdrawalClaimed events, adversarial recipient code, and machine-level CALL semantics
@@ -315,7 +310,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Source/artifact provenance.** `MAPPED`; 16 immutable pinned source span(s) in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance.
 
-**Assumptions.** `A-SHA256-FFI`, `A-PERFECT-HASH`, `A-MULTI-NODE-TRANSPORT`, `A-SOLC-TRUSTED`, `A-YUL-INTERFACE`, `A-RUNTIME-PROVENANCE`
+**Assumptions.** `A-MULTI-NODE-TRANSPORT`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
 
 **Limitations — 6 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
@@ -338,7 +333,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Source/artifact provenance.** No independent source-map target; supplemental evidence only. A source-map entry is source provenance, not deployed-artifact provenance.
 
-**Assumptions.** `A-SHA256-FFI`, `A-MULTI-NODE-TRANSPORT`
+**Assumptions.** `A-MULTI-NODE-TRANSPORT`
 
 **Limitations — 1 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
@@ -374,7 +369,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Source/artifact provenance.** No independent source-map target; supplemental evidence only. A source-map entry is source provenance, not deployed-artifact provenance.
 
-**Assumptions.** `A-SHA256-FFI`, `A-MULTI-NODE-TRANSPORT`
+**Assumptions.** `A-MULTI-NODE-TRANSPORT`
 
 **Limitations — 1 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
@@ -410,7 +405,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Source/artifact provenance.** No independent source-map target; supplemental evidence only. A source-map entry is source provenance, not deployed-artifact provenance.
 
-**Assumptions.** `A-SOURCE-SHAPED`, `A-HANDWRITTEN-MINFIRST`
+**Assumptions.** `A-SOURCE-SHAPED`
 
 **Limitations — 1 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
@@ -481,7 +476,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Source/artifact provenance.** No independent source-map target; supplemental evidence only. A source-map entry is source provenance, not deployed-artifact provenance.
 
-**Assumptions.** `A-VERITY-SCAFFOLD`, `A-SHA256-FFI`
+**Assumptions.** `A-VERITY-SCAFFOLD`
 
 **Limitations — 1 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
@@ -536,17 +531,16 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Source/artifact provenance.** No independent source-map target; supplemental evidence only. A source-map entry is source provenance, not deployed-artifact provenance.
 
-**Assumptions.** `A-SOURCE-SHAPED`, `A-DEPOSIT-CONTRACT`, `A-DEPOSIT-32-ETHER`, `A-CLASSICAL-CHOICE`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
+**Assumptions.** `A-SOURCE-SHAPED`, `A-CLASSICAL-CHOICE`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
 
-**Limitations — 3 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+**Limitations — 2 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
-- A-DEPOSIT-32-ETHER remains OPEN: depositSize is the configuration field, not a claimed 32-ether artifact identity
 - the executable transaction stays exactly two batches; this parent is not an n-frame lift
 - ALLOC parents still do not imply LinksSource without the unit multiply
 
 **Classification.** **IMPLEMENTATION_PENDING** — Keep A-DEPOSIT-32-ETHER named; do not invent a pin that discharges the 32-ether assumption or merge ALLOC into DEPOSIT.
 
-**Next gate.** Keep A-DEPOSIT-32-ETHER named; do not treat ALLOC parents as LinksSource without the unit multiply.
+**Next gate.** A-DEPOSIT-32-ETHER is discharged from deployment artifacts (see LidoSRv3/Audit/Provenance/DepositThirtyTwoEther.lean); do not treat ALLOC parents as LinksSource without the unit multiply.
 
 ### `P-ETH-JOURNAL-1`
 
@@ -640,7 +634,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Source/artifact provenance.** No independent source-map target; supplemental evidence only. A source-map entry is source provenance, not deployed-artifact provenance.
 
-**Assumptions.** `A-SHA256-FFI`, `A-SOURCE-SHAPED`, `A-CLASSICAL-CHOICE`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
+**Assumptions.** `A-SOURCE-SHAPED`, `A-CLASSICAL-CHOICE`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
 
 **Limitations — 5 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
@@ -748,6 +742,8 @@ LidoSRv3.Tests.PackCSszMutants.engine_mutant_disagrees_with_sha256engine._native
 LidoSRv3.Tests.PackFConsolidationObserveMutants.swapped_map_reread_kill_line_refutes_observe._native.native_decide.ax_1_1
 LidoSRv3.Tests.PackGTopupProvenanceMutants.dead_beacon_model_kill_line_disagrees_with_pin._native.native_decide.ax_1_1
 LidoSRv3.Tests.PackJTopupEthJournalMutants.beacon_as_consolidation_kill_line_refutes_dest_restriction._native.native_decide.ax_1_1
+LidoSRv3.Tests.TopupReturnBufferMutants.decode_at_credentials_next_128._native.native_decide.ax_1_1
+LidoSRv3.Tests.TopupReturnBufferMutants.decode_at_credentials_next_160._native.native_decide.ax_1_1
 ```
 
 ## Recommendation

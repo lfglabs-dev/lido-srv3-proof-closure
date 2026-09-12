@@ -1,0 +1,22 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "CallSite.sol": {
+      "content": "pragma solidity 0.8.25; interface IWithdrawalVault { function addConsolidationRequests(bytes[] calldata sourcePubkeys, bytes[] calldata targetPubkeys) external payable; } contract CallSite { function execute(IWithdrawalVault withdrawalVault, bytes[] memory sourcePubkeys, bytes[] memory targetPubkeys, uint256 totalFee) external { withdrawalVault.addConsolidationRequests{value: totalFee}(sourcePubkeys, targetPubkeys); } }"
+    }
+  },
+  "settings": {
+    "optimizer": {
+      "enabled": true,
+      "runs": 200
+    },
+    "outputSelection": {
+      "*": {
+        "*": [
+          "evm.methodIdentifiers",
+          "irOptimized"
+        ]
+      }
+    }
+  }
+}

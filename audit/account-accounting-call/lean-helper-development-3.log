@@ -1,0 +1,12 @@
+audit/trio/account-address/AccountingCall.lean:66:77: error: unsolved goals
+g : Getter
+w : World
+⊢ List.take 4 (List.map (fun i => UInt8.ofNat (2519001150 / 256 ^ (3 - i) % 256)) (List.range 4)) =
+    List.map (fun i => UInt8.ofNat (2519001150 / 256 ^ (3 - i) % 256)) (List.range 4)
+audit/trio/account-address/AccountingCall.lean:96:43: error(lean.unknownIdentifier): Unknown identifier `lt_trans`
+audit/trio/account-address/AccountingCall.lean:94:78: error: unsolved goals
+g : Getter
+hb : g.accounting.val < 2 ^ 160
+hb32 : g.accounting.val < 256 ^ 32
+ht : List.take 32 (Live.encode 32 g.accounting.val) = Live.encode 32 g.accounting.val
+⊢ 32 ≤ 32 % Verity.Core.Uint256.modulus

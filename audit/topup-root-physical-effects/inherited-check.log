@@ -1,0 +1,1 @@
+PASS: 45 unchanged compiler source/fixture identities across 3 inherited receipts; no fresh Solidity run.

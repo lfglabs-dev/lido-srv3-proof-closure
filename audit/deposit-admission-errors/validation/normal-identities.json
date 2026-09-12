@@ -1,0 +1,23 @@
+[
+  {
+    "olean_sha256": "3629b85b2bdbd7f83a2c77e2bce128abe7eec13faf97e0681c83f16cfaba8cc9",
+    "setup_sha256": "177e4100e3a0be98d829ba3496e690330c11d70e96914d3a0b2cd8f22afd2d8f",
+    "source": "LidoSRv3/Audit/Source/DepositAdmissionErrors.lean",
+    "source_sha256": "da03dfac0afcb72fb0cb532559e0bf6f5e923202b8eccdd9f6c6aa45c1ef3c7e",
+    "trace_sha256": "51577d9dbf0ea98b731b43be184086ad28e953f9e20f9a3c53d603c6429a9af0"
+  },
+  {
+    "olean_sha256": "e7a037874e52737bc4b17e8db0fe193f49c81ae1bff9176e949f5ef602d48e60",
+    "setup_sha256": "4dc3c5d88daa3ba2de69ace499adbbc3855490afb2b88b630688228d3abb25c3",
+    "source": "LidoSRv3/Audit/Guarantees/PDeposit1AdmissionErrors.lean",
+    "source_sha256": "51e0edc5f7bbe33dd0c4152c8fffbff41796b456a970f496d803a76897e4bb16",
+    "trace_sha256": "0942ee717dbcb4e3d4b0de7829acae0b03ce1a60e02d5100c6b2e3667ff5ffa4"
+  },
+  {
+    "olean_sha256": "e7897eb33af9813776c631f5171a983d8953b589e82820ffc5161b22a5ea762c",
+    "setup_sha256": "8fc535733b253db60aa7f8544ac908dfeafbef57e10564acacca993eff702478",
+    "source": "LidoSRv3/Tests/DepositAdmissionErrorsRegression.lean",
+    "source_sha256": "a8d169416528a93c2cb9ae9688626a89ee012cc0c0b4d09c9003e3f5a67a9a7b",
+    "trace_sha256": "d1eeddfe14602b93d27d6724a1eda9f7594ba83f6c30d3f0ad65270214995f58"
+  }
+]

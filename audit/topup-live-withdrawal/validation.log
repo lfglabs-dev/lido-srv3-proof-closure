@@ -1,0 +1,19 @@
+$ lake build LidoSRv3.Audit.Source.TopupLiveWithdrawal LidoSRv3.Tests.TopupLiveWithdrawalMutants
+⚠ [12/58] Replayed Verity.Core
+warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1041:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+ℹ [58/58] Built LidoSRv3.Tests.TopupLiveWithdrawalMutants (1.3s)
+info: LidoSRv3/Tests/TopupLiveWithdrawalMutants.lean:91:0: 'LidoSRv3.Audit.Source.TopupLiveWithdrawal.transfer_balances' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/TopupLiveWithdrawalMutants.lean:92:0: 'LidoSRv3.Audit.Source.TopupLiveWithdrawal.zero_noop' depends on axioms: [propext]
+info: LidoSRv3/Tests/TopupLiveWithdrawalMutants.lean:93:0: 'LidoSRv3.Audit.Source.TopupLiveWithdrawal.zero_seed_tail' depends on axioms: [propext]
+info: LidoSRv3/Tests/TopupLiveWithdrawalMutants.lean:94:0: 'LidoSRv3.Audit.Source.TopupLiveWithdrawal.positive_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+Build completed successfully (58 jobs).
+
+exit_code=0

@@ -1,0 +1,14 @@
+Compiler run failed:
+Error (6275): Source "../../address-wrapped-token-call/solidity/queue/src/@openzeppelin/contracts-v4.4/utils/introspection/IERC165.sol" not found: File outside of allowed directories.
+ --> ../../address-wrapped-token-call/solidity/queue/src/@openzeppelin/contracts-v4.4/utils/introspection/ERC165.sol:6:1:
+  |
+6 | import "./IERC165.sol";
+  | ^^^^^^^^^^^^^^^^^^^^^^^
+
+Error (6275): Source "address-wrapped-token-call/solidity/queue/test/ActualWrappedToken.t.sol" not found: File not found.
+ --> test/ActualWrappedTransfer.t.sol:2:1:
+  |
+2 | import "../../../address-wrapped-token-call/solidity/queue/test/ActualWrappedToken.t.sol";
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Error: Compilation failed

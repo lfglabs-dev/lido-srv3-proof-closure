@@ -1,0 +1,13 @@
+Compiling 28 files with Solc 0.8.25
+Solc 0.8.25 finished in 10.43s
+Compiler run successful!
+
+Ran 5 tests for audit/topup-batch-consumer/solidity/TopupBatchConsumer.t.sol:TopupBatchConsumerTest
+[PASS] testFuzz_actualPackedCapRead(uint24,uint64,uint168) (runs: 1024, μ: 8473, ~: 8473)
+[PASS] test_aboveCapRollsBackActualModuleWrites() (gas: 470453)
+[PASS] test_actualRouterConsumesCapAndArguments() (gas: 452703)
+[PASS] test_limitAndAlignmentGuardsPrecedeCap() (gas: 899021)
+[PASS] test_zeroTargetPauseGuardBeforeModule() (gas: 462592)
+Suite result: ok. 5 passed; 0 failed; 0 skipped; finished in 20.23ms (17.24ms CPU time)
+
+Ran 1 test suite in 142.09ms (20.23ms CPU time): 5 tests passed, 0 failed, 0 skipped (5 total tests)

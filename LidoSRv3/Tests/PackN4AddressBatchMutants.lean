@@ -3,6 +3,11 @@ import LidoSRv3.Audit.Spec.AddressClaimBatchCorrespondence
 import LidoSRv3.Audit.Spec.AddressClaimUnboundedCorrespondence
 import LidoSRv3.Audit.Spec.AddressClaimKeccakSlots
 
+/-! Historical claim-journal results below use the preserved
+`Model.AddressClaimJournalLegacy` executor. References to the live loop in
+retained comments denote that historical model, not the new physical CALL
+consumer. These results do not establish arbitrary recipient callbacks. -/
+
 /-!
 # Pack N4 fail-closed vector
 
@@ -17,7 +22,7 @@ namespace LidoSRv3.Tests.PackN4AddressBatchMutants
 
 open _root_.Verity
 open _root_.Verity.EVM.Uint256
-open LidoSRv3.Audit.Verity.AddressClaimBatchTx
+open LidoSRv3.Audit.Model.AddressClaimJournalLegacy
 open LidoSRv3.Audit.Spec.AddressClaimBatchCorrespondence
 open LidoSRv3.Audit.Spec.AddressClaimFuelCorrespondence
 open LidoSRv3.Audit.Spec.AddressClaimUnboundedCorrespondence
@@ -249,7 +254,7 @@ theorem raw_key_mutant_fails_physical_slot
       state.readSlot requestId ≠
         state.readSlot (queueAmountsPhysicalSlot requestId)) :
     requestAmountsWordRawKey state requestId ≠
-      requestAmountsWord state requestId := by
+      LidoSRv3.Audit.Verity.AddressClaimBatchTx.requestAmountsWord state requestId := by
   have hphys :=
     (PAddressBatch1.p_address_batch_1_physical_keccak_slots state
       requestId hint recipient h).1
@@ -261,10 +266,10 @@ theorem aliased_plus_one_map_fails_physical_slot
     (state : ContractState) (requestId hint : Nat) (recipient : Address)
     (h : PhysicalClaimSlots state)
     (hdistinct :
-      state.readMapUint (checkpointsPosition + 1) (.ofNat requestId) ≠
+      state.readMapUint (LidoSRv3.Audit.Verity.AddressClaimBatchTx.checkpointsPosition + 1) (.ofNat requestId) ≠
         state.readSlot (queueMetadataPhysicalSlot requestId)) :
     requestMetadataWordAliasedMap state requestId ≠
-      requestMetadataWord state requestId := by
+      LidoSRv3.Audit.Verity.AddressClaimBatchTx.requestMetadataWord state requestId := by
   have hphys :=
     (PAddressBatch1.p_address_batch_1_physical_keccak_slots state
       requestId hint recipient h).2.1

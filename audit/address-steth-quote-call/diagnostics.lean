@@ -1,0 +1,2 @@
+import LidoSRv3.Tests.AddressStETHQuoteCalls
+#eval LidoSRv3.Tests.AddressStETHQuoteCalls.diagnostics

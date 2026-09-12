@@ -1,0 +1,122 @@
+{
+  "core": "17005714f151e5502c559932319a3f2f74ac2436",
+  "full_ir_lines": 2456,
+  "inputs": [
+    {
+      "path": "@openzeppelin/contracts-v5.2/access/AccessControl.sol",
+      "sha256": "1086a1ad3788972b885ff3f209da510615dde6214d46b29e1cd2a4924f66c06d"
+    },
+    {
+      "path": "@openzeppelin/contracts-v5.2/access/IAccessControl.sol",
+      "sha256": "c112f5c86fdc4e862f88d4f5694530342320923ebd5b5e7d9d8493550d337c2d"
+    },
+    {
+      "path": "@openzeppelin/contracts-v5.2/access/extensions/AccessControlEnumerable.sol",
+      "sha256": "d6c882c624699389abe9a4d8b6ad1f3d304ad6610221ac1cbd32f909e402629f"
+    },
+    {
+      "path": "@openzeppelin/contracts-v5.2/access/extensions/IAccessControlEnumerable.sol",
+      "sha256": "f91dc4b5750c1bac7a6a11a6057f14f01121847e6a6284e1200d8a87a4c4ff1e"
+    },
+    {
+      "path": "@openzeppelin/contracts-v5.2/utils/Context.sol",
+      "sha256": "847fda5460fee70f56f4200f59b82ae622bb03c79c77e67af010e31b7e2cc5b6"
+    },
+    {
+      "path": "@openzeppelin/contracts-v5.2/utils/introspection/ERC165.sol",
+      "sha256": "7fdc4dc9e3872f6a4c1ec9cfa9583a1fc18ccd7a416397a6e698bd5bbf92f32b"
+    },
+    {
+      "path": "@openzeppelin/contracts-v5.2/utils/introspection/IERC165.sol",
+      "sha256": "7c5c3f98ab876991e7dd34b84d41137e836306eb9f36f6386a631f5be3f5d6d4"
+    },
+    {
+      "path": "@openzeppelin/contracts-v5.2/utils/structs/EnumerableSet.sol",
+      "sha256": "ed0804f9dcff9d2dceba8cc83f31669a84491dfcfe510050c9371aa7c48db09c"
+    },
+    {
+      "path": "contracts/0.8.25/consolidation/ConsolidationGateway.sol",
+      "sha256": "86eee98160b1b24c84a7ebf37cc053aa09cea7a4b78f43d5c12651e4ca923426"
+    },
+    {
+      "path": "contracts/0.8.25/vaults/interfaces/IPredepositGuarantee.sol",
+      "sha256": "121d88c8332021e4d163c807c4edef5d6b4744832ec1d9498259d62cd2af9d87"
+    },
+    {
+      "path": "contracts/0.8.25/vaults/interfaces/IStakingVault.sol",
+      "sha256": "3a812ce040da103a50824cf1ad35823a655e9bb1920f8d8c8219d290ee0c7cc6"
+    },
+    {
+      "path": "contracts/0.8.25/vaults/predeposit_guarantee/CLProofVerifier.sol",
+      "sha256": "88d74cc68ca9e6bda442ccba0d34a386669db2c02a2c2796fd14e7b871b69e8c"
+    },
+    {
+      "path": "contracts/common/interfaces/IDepositContract.sol",
+      "sha256": "d7b36c2de36cfc68a3fa0812add4e9c55879188a08317166a0ab0f63baaffc63"
+    },
+    {
+      "path": "contracts/common/interfaces/ILidoLocator.sol",
+      "sha256": "cc65faee8789012cbb58c0073c770bddb37c9a7fc2594ff2e200fc7894a2dc7a"
+    },
+    {
+      "path": "contracts/common/interfaces/IPausableUntil.sol",
+      "sha256": "0377e3ac9ff2d6be41f4b8f40eee7cfd452ce6de760f9b9145fdb38b94902de3"
+    },
+    {
+      "path": "contracts/common/lib/BLS.sol",
+      "sha256": "0187cc6a6b1aaa833317695d88795db431fa237452213e8c3872a0f444dceb7c"
+    },
+    {
+      "path": "contracts/common/lib/BeaconTypes.sol",
+      "sha256": "9591e9af1a4fd398db86267f3589e763f9eb2016bf29e26cfa50988cf73a10c3"
+    },
+    {
+      "path": "contracts/common/lib/GIndex.sol",
+      "sha256": "2653bd4ba89c349f3db36f21a8afc6a24e0e233816d9b608f46d048feb601d1f"
+    },
+    {
+      "path": "contracts/common/lib/RateLimit.sol",
+      "sha256": "c102dc48ae659a045c90cee749bbed8e9363fefadcd32e86f8b99fba701747d4"
+    },
+    {
+      "path": "contracts/common/lib/SSZ.sol",
+      "sha256": "91ef497b972bbee0fe89043034e6bd62fa0c1059f22874d4826bc6164a22009b"
+    },
+    {
+      "path": "contracts/common/lib/UnstructuredStorage.sol",
+      "sha256": "ca4ad93eedff40de12fdd50a88ef608650139a5543fd160dab61cad4d3c03160"
+    },
+    {
+      "path": "contracts/common/utils/PausableUntil.sol",
+      "sha256": "f27405a7f52a15f7e1b10a73ae57ed69fe6514aaba821415e5584458546cf255"
+    },
+    {
+      "path": "test/PhysicalQuota.t.sol",
+      "sha256": "e98b978cdb7c0f613b341b7881ae4a40a159d42c0b5577ab0c5f795ecd91bb10"
+    },
+    {
+      "path": "test/PhysicalQuotaHarness.sol",
+      "sha256": "71650b4cf3c939fe172872fabdf9c0371209be1c2d98d9fa26fc3edb179846bc"
+    }
+  ],
+  "ir_sha256": "5e70f37cb88b40841267d35873d318eb5a73192776255b78f89a03fc5eadab99",
+  "legacy_sha256": "73ce6952e41e72726e7900e4cbf2c24234d22ddb0678ca89e21c64b498b1f0b7",
+  "legacy_sources": {
+    "src/SettlementVaultHarness.sol": {
+      "keccak256": "0xd4dedba88c75a9fe91987f1d5652849649f1e93b8f3e2b93ac8e25a7fd7c888d",
+      "license": "GPL-3.0",
+      "urls": [
+        "bzz-raw://300682f209393e109185800d0adfbaa13ed6d896728dd5e8fa071c3bf105d2d5",
+        "dweb:/ipfs/Qmcfr8ayr7SoknWX8uJosYB7Dc2r3s9sU4dBqxTR4NCnKk"
+      ]
+    },
+    "src/WithdrawalVaultEIP7685.sol": {
+      "keccak256": "0xa6996ad9bfea2e2ef8e979b8935e84261af251b565dc5757de0fa4d4976f5912",
+      "license": "GPL-3.0",
+      "urls": [
+        "bzz-raw://e97e6b7e12aacd781f95959bcf861d82f6dc50c51139d978dc97d4192c81e04f",
+        "dweb:/ipfs/QmS2VRTXum5BneRTVYuGH624mULegP1tSaXJ2byhqcLdT2"
+      ]
+    }
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "AccountAddress.ReportFeeCastInvariant.casts_of_allocation_le_total": [
+    "Quot.sound",
+    "propext"
+  ],
+  "AccountAddress.ReportFeeCastInvariant.composition_exact_casts": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "AccountAddress.ReportFeeCastInvariant.report_allocation_le_total": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "AccountAddress.ReportFeeCastInvariant.report_exact_casts": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "AccountAddress.ReportFeeCastInvariant.rows_allocation_bound": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "AccountAddress.Tests.Verity.ReportFeeCastInvariantTest.actual_positive_mint_casts": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "AccountAddress.Tests.Verity.ReportFeeCastInvariantTest.duplicate_registered_ids": [
+    "propext"
+  ],
+  "AccountAddress.Tests.Verity.ReportFeeCastInvariantTest.max_admitted_row_and_fee_fields": [
+    "propext"
+  ],
+  "AccountAddress.Tests.Verity.ReportFeeCastInvariantTest.module_slot_collision": [
+    "propext"
+  ],
+  "AccountAddress.Tests.Verity.ReportFeeCastInvariantTest.public_consumer": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "AccountAddress.Tests.Verity.ReportFeeCastInvariantTest.router_slot_collision": [
+    "propext"
+  ],
+  "AccountAddress.Tests.Verity.ReportFeeCastInvariantTest.zero_report_and_skipped_getter": [
+    "propext"
+  ],
+  "LidoSRv3.Audit.Guarantees.PAccount1.actual_report_fee_mint_casts": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ]
+}

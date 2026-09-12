@@ -1,0 +1,92 @@
+{
+  "AccountAddress.FeeDistribution.execute_success": [
+    "Quot.sound",
+    "propext"
+  ],
+  "AccountAddress.FeeDistribution.modules_success": [
+    "Quot.sound",
+    "propext"
+  ],
+  "AccountAddress.FeeDistribution.success_chain": [
+    "propext"
+  ],
+  "AccountAddress.FeeDistribution.success_paid": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "AccountAddress.FeeDistribution.success_storage": [
+    "propext"
+  ],
+  "AccountAddress.FeeDistribution.transfer_success": [
+    "Quot.sound",
+    "propext"
+  ],
+  "AccountAddress.ReportFeeDistribution.execute_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "AccountAddress.ReportFeeDistribution.execute_success_ledger": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "AccountAddress.ReportFeeDistribution.failure_restores": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "AccountAddress.ReportFeeDistribution.minted_budget": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "AccountFeeDistributionRegression.actual_distribution": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "AccountFeeDistributionRegression.actual_public_consumer": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "AccountFeeDistributionRegression.conversion_reject_restores_debit": [
+    "propext"
+  ],
+  "AccountFeeDistributionRegression.guard_order_from_zero_before_stopped": [
+    "propext"
+  ],
+  "AccountFeeDistributionRegression.late_overflow_rolls_back_prior_mint_and_transfer": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "AccountFeeDistributionRegression.self_and_duplicate_recipients": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "AccountFeeDistributionRegression.wrapped_share_rate_after_transfer": [
+    "propext"
+  ],
+  "AccountFeeDistributionRegression.zero_mint_skips_bad_treasury": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "AccountFeeDistributionRegression.zero_treasury_skips_read": [
+    "propext"
+  ],
+  "LidoSRv3.Audit.Guarantees.PAccount1.actual_report_fee_distribution_failure_restores": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Guarantees.PAccount1.actual_report_fee_mint_distribution": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ]
+}

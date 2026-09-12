@@ -1,0 +1,35 @@
+{
+  "base": "b45cf453834a628439c9899feba760a77d3b984d",
+  "solidity_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "scope": "8 redundant conditions removed without replacement from actual withdrawal ledger; physical metadata\u2192withdrawal\u2192beacon ledger composition, existing locator relation and role inequalities retained; no changed executable source models",
+  "build": {
+    "jobs": 1641,
+    "exit": 0
+  },
+  "trust": {
+    "exact_axioms": 29,
+    "exit": 0
+  },
+  "kernel_regressions": 4,
+  "source_identities": 1316,
+  "package_pins": 11,
+  "independent_axiom_sets": 10,
+  "sha256": {
+    "audit/withdrawal-minimal-ledger/axioms.json": "50bea65739a6131675afdff6fa7b6c599290d317694176a90823ea8eebe145e3",
+    "audit/withdrawal-minimal-ledger/trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439",
+    "audit/withdrawal-minimal-ledger/facade-build.log": "2d38f4a5203e705018587b6edb18c4f3ae74395585fd00b28f2af806c959cd08",
+    "audit/withdrawal-minimal-ledger/README.md": "6061af8809302d212f4ebba984de02b68d43cb490b82e9bae6f7f3fdb066fc76",
+    "audit/withdrawal-minimal-ledger/validate.py": "f57015ad24754b037fcd48ea2d1f46595c4cfa13cdf1634b93d7ad94e277e19f",
+    "audit/withdrawal-minimal-ledger/identity-axiom-check.log": "feb89daf1bd3b2bae156133a471a892ec2f5ff6911d5694cc91c953f944532ee",
+    "audit/withdrawal-minimal-ledger/source-inputs.json": "39c10282f67c0018d73a59f0986078f069ffe4ca4e0518c19a1529ddd03844c8",
+    "lakefile.lean": "b9d604f413a4fab278fa423f8b8ff5cfaad0ef34e6a832b7fa17cbbc81f760dd",
+    "LidoSRv3/Audit/AllGuarantees.lean": "634ee86f36d519baeff8a687445164cbfedcdcbb21dd950becba846ce2faad3b",
+    "LidoSRv3/Audit/Trust.lean": "1233f814cccf9fe98f619c9bbc2f78cb62dc393663284c93074bb1ef8cd811a7",
+    "LidoSRv3/Audit/Guarantees/PDeposit1PhysicalLedger.lean": "7de6121392839cade4c7b418c13006a0cd81566c8651e86eb1b02b6f899bef5a",
+    "LidoSRv3/Audit/Guarantees/PTopup1MinimalLedger.lean": "727e226a9af2c73fef447c7d645e35357eb7b9212cf8de5fa2aeb092f80f454d",
+    "LidoSRv3/Audit/Source/TopupPipelineMinimalLedger.lean": "6c75c1b6ec93c28414edf4589e9f65e64ff1d1f5c1e51746d707092baaebcbc4",
+    "LidoSRv3/Tests/WithdrawalMinimalLedgerRegression.lean": "ea6d49a379199ff997246985a632aaafff8d2651b9f598c799cacf6ac35d616c",
+    "audit/trio/deposit/PhysicalMetadataLedger.lean": "d0b0115b69f4d0dad8deeb9820df1f6136fe8537b620a06ece039dd430a91a3a",
+    "audit/trio/deposit/WithdrawalLedgerMinimal.lean": "7f2c605b1a7ae4d0522513c3609e7ced9e48237fa1781459fa153ddf24c7dcd8"
+  }
+}

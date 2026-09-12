@@ -1,0 +1,68 @@
+{
+  "base": "64f73f101187992db5b9b446852c3063a5a6d5b7",
+  "source_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "scope": "Correct the consumed ordinary no-code module CALL, exact model empty decoder failure/rollback and diagnostic root/module attempts; retain successful claims and precompile/typed covered-phase boundaries",
+  "public_theorems": [
+    "LidoSRv3.Audit.Guarantees.PTopup2.actual_module_no_code_failure",
+    "LidoSRv3.Audit.Guarantees.PTopup2.actual_root_batch_no_code_failure"
+  ],
+  "build": {
+    "jobs": 1302,
+    "exit_code": 0,
+    "targets": [
+      "LidoSRv3.Audit.Guarantees.PTopup2ModuleFailure",
+      "LidoSRv3.Tests.TopupBatchRootCallsRegression",
+      "LidoSRv3.Tests.TopupModuleCallMutants"
+    ]
+  },
+  "source_identities": 1285,
+  "package_pins": {
+    "verity": "e977aaad6e1a9e92e0132d41b3d33a14135a4d46",
+    "evmyul": "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9",
+    "mathlib": "fabf563a7c95a166b8d7b6efca11c8b4dc9d911f",
+    "plausible": "63045536fe95024e6c18fc7b48e03f506701c5bc",
+    "LeanSearchClient": "c5d5b8fe6e5158def25cd28eb94e4141ad97c843",
+    "importGraph": "5c7542ed018c78194f1e2b903eaf6a792b74c03d",
+    "proofwidgets": "24b0d9dc081c5423f8eec7e866c441e5184f29d9",
+    "aesop": "e3cb2f741431ce31bf73549fb52316a57368b06f",
+    "Qq": "f46324995fca5f0483b742e4eb4daec7f4ee50d2",
+    "batteries": "fa08db58b30eb033edcdab331bba000827f9f785",
+    "Cli": "92564e5770e4d09f2d86dfbf8ada1e9c715b384c"
+  },
+  "recomputed_foundations_only_axiom_sets": 26,
+  "new_kernel_regressions": 1,
+  "new_general_world_regression": 1,
+  "preserved_kernel_batch_regressions": 11,
+  "preserved_public_success_instantiation": 1,
+  "solidity": {
+    "fresh_pinned_router_case": 1,
+    "status": "PASS",
+    "preceding_module_getters_mocked": true,
+    "allocateDeposits_call_unmocked": true,
+    "compiler_source_identities": 28,
+    "byte_exact_revert_test": false,
+    "foundry_diagnostic": "Injected non-contract message in caught revert; test only credits actual expected CALL then rejection",
+    "ir_empty_decoder_guard": "if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }",
+    "profile": "solc0.8.25 optimizer200 viaIR Cancun"
+  },
+  "review_status": "Pending independent exact-source/Solidity review; author not self-approving",
+  "sha256": {
+    "LidoSRv3/Audit/Guarantees/PTopup2ModuleFailure.lean": "04a82bfef50d9e7f92323de0dedeccdb532d4c2902e9a788ab49f42ccd03ade7",
+    "LidoSRv3/Audit/Source/TopupModuleCall.lean": "4748a14cccf561ab340d3698244ac7897cb2db75506c9146e76555b021c6347e",
+    "LidoSRv3/Tests/TopupBatchRootCallsRegression.lean": "bdfe3af63e504293cd8f40a8bd69da081c2787ccd8ffaf7b9329ef26ee0b0c9d",
+    "LidoSRv3/Tests/TopupModuleCallMutants.lean": "f86d9e8aff710030531321b5a5ae54d4c8b1a8cfc3de6ccbd48ca55f65bce9ff",
+    "audit/topup-module-nocode/README.md": "812f2ba33f31349b0352a4ac6abc34edd226bb8e9b8d79b3ef90d1287dbdd8df",
+    "audit/topup-module-nocode/axioms.json": "66209f184ed41403b6bf1e6f772c1bfb71e17d0d779fa1ddc6044bc46a645603",
+    "audit/topup-module-nocode/commands.txt": "47ee011909a626d7167a5e4a10cad004bc1373cf2abd662ff85b97ceef162025",
+    "audit/topup-module-nocode/compiler-metadata.json": "42dc63e3acf233feedb21c854a0d194314186f7dbfea9588e6f1cd250edaa598",
+    "audit/topup-module-nocode/compiler-settings.json": "8957a5560d70507755a97575d3b4feb55c79210ee67576b703792e2b0dfb31bf",
+    "audit/topup-module-nocode/compiler-source-identities.json": "2fb2107f3677592398183b6b29efefecc0c3bb918d5b0d7d67696a6546c5ac15",
+    "audit/topup-module-nocode/router-ir.txt": "f0b1bbeecb5774f2b891b91524b1beddc72e133e99fa7f170f6543c5e122c7ef",
+    "audit/topup-module-nocode/solidity-test.log": "0450f20c226d619d87b9c0ef2e15b1e02a2c6241134c41d393f391587544f45a",
+    "audit/topup-module-nocode/solidity/ModuleNoCode.t.sol": "a3d370234e6fe57fa768bdf62c1f5a7f3b19aae5204695d6e41f9d44448516dd",
+    "audit/topup-module-nocode/source-axiom-check.log": "8655446d31ee2e0103fc4eeeae70ca3296bc24b55c6e5fe74587cd67e7a61cee",
+    "audit/topup-module-nocode/source-inputs.json": "5b38e4da1f0c542b28cdc80cddd10f2e376c9095cc841cd708d0a24ecd98d409",
+    "audit/topup-module-nocode/target-build.log": "de5ff758c221037203610f59bf0f753f49ca97294ccd496909b285a20b6dc6a8",
+    "audit/topup-module-nocode/validate.py": "ba5d6134031f69ec192f4bfa4ed1bd04dfe6491cf219dda5e260d8abe356ab3d"
+  }
+}

@@ -1,0 +1,12 @@
+Compiling 5 files with Solc 0.8.25
+Solc 0.8.25 finished in 507.48ms
+Compiler run successful!
+
+Ran 4 tests for audit/ssz-scratch-evm-memory/solidity/SszScratchEvmMemory.t.sol:SszScratchEvmMemoryTest
+[PASS] testFuzz_actualLengthGuard(uint8) (runs: 1024, μ: 7157, ~: 7138)
+[PASS] testFuzz_rawOffsetsDirtyScratchAndPadding(bytes32,bytes16,uint8,uint8,bytes32,bytes32,bytes32) (runs: 1024, μ: 39450, ~: 33045)
+[PASS] test_all48KeyPositions() (gas: 671191)
+[PASS] test_sixMemoryMutations() (gas: 51598)
+Suite result: ok. 4 passed; 0 failed; 0 skipped; finished in 74.07ms (86.07ms CPU time)
+
+Ran 1 test suite in 138.77ms (74.07ms CPU time): 4 tests passed, 0 failed, 0 skipped (4 total tests)

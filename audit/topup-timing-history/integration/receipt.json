@@ -1,0 +1,22 @@
+{
+  "source": "2efb510497b38da2782b9ffc80e6c68d3c3f784c",
+  "main": "52a4483b7e7030f0a8c76b056da8de8d3a2ec85f",
+  "union": "343441117899e40cd76c54f906e7124ec52bddcc",
+  "build_union": "b60f5f2b5164d4d096d57550d3a06653cb655cf8",
+  "jobs": 1754,
+  "global_axioms": 29,
+  "ordinary_scopes": 28,
+  "source_hashes": 17,
+  "sha256": {
+    "audit/topup-timing-history/integration/README.md": "3e7d6c5061e23be23e16e23234dcba98aaa3d487463587e2591030250b2fc4eb",
+    "audit/topup-timing-history/integration/all-trust-build.log": "65896f75033eac777f48ceffa880f3c0bf5aad935a38e8450cb318b688758aae",
+    "audit/topup-timing-history/integration/build-identities.json": "90f77f8afe63a5e34205a51e0c747153e27d7142d5c951c8119721fcbdd1147a",
+    "audit/topup-timing-history/integration/identity-check.log": "5175c4adaddc1efb3e7811947e7dfeb0e659cc47853a24b82cc57c9f330d30f3",
+    "audit/topup-timing-history/integration/independent-source-review-2efb.md": "fbb6a1dc1417ff7e98994086fc8f1cf7a466aa88f54f7c528201c7c248fe0945",
+    "audit/topup-timing-history/integration/initial-import-failure.log": "ecdb6582d865cfcdb55e4bec0bb5a3574887f40b35d94172964708a5b356b9e9",
+    "audit/topup-timing-history/integration/readonly-validator.py": "c405b38bc5ccffbe48857d71d9e99157e26e14526f9a417709535107be8c4852",
+    "audit/topup-timing-history/integration/trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439",
+    "audit/topup-timing-history/integration/independent-integration-review-6fd1.md": "c5b1df705dd0921f71f8f87f6f63229391155cad19a2a00773464901cf9a3876"
+  },
+  "integration_review": "CLEAN exact6fd115a71b0405cfc3233d28f4875ac8d93cbe3f; archive-only successor separately reviewed"
+}

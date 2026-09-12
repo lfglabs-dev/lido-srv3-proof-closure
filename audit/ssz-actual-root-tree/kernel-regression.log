@@ -1,0 +1,4 @@
+'LidoSRv3.Tests.SszActualRootTreeRegression.partial_entry_succeeds' depends on axioms: [propext, Quot.sound]
+'LidoSRv3.Tests.SszActualRootTreeRegression.partial_entry_has_tree' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]

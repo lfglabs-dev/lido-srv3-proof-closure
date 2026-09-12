@@ -7,16 +7,6 @@
   },
   "assumptions": [
     {
-      "id": "A-ABSTRACT-TX",
-      "accepted": true,
-      "risk": "Common success/revert semantics are abstract and are not executable EVM trace semantics.",
-      "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
-      "severity": "MEDIUM",
-      "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
-      "validation": "Validated by the linked source spans, executable mutants, or explicit reproduction command where available.",
-      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
-    },
-    {
       "id": "A-SOURCE-SHAPED",
       "accepted": true,
       "risk": "Source-shaped inputs are not extracted from independently verified pinned Solidity spans.",
@@ -27,46 +17,6 @@
       "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
     },
     {
-      "id": "A-TOPUP-NOWRAP",
-      "accepted": true,
-      "risk": "An exact natural-number sum equals its unchecked uint256 reading only below 2^256. This registry condition is retained for results that use that equality; the current P-TOPUP-1 parent explicitly models wrapping and does not require a general no-wrap premise.",
-      "justification": "The current parent proves that a wrapping total moves no value: a nonzero wrapped total reverts, while a total wrapping to zero can finish without moving ETH.",
-      "severity": "HIGH",
-      "violation_impact": "Wrapping invalidates an unqualified exact-sum interpretation, not the current parent\u2019s explicit wrapping result.",
-      "validation": "Check the current parent and its nonzero-wrap and zero-wrap results. Retain NoUncheckedWrap only where a consuming theorem actually requires it.",
-      "removal_path": "Review each consuming theorem before removing this registry identifier; retain the explicit wrapping behavior in the current parent."
-    },
-    {
-      "id": "A-TOPUP-BEACON-ADDRESS",
-      "accepted": true,
-      "risk": "The model-local beacon deposit target is not proved equal to the immutable/deployed production beacon deposit contract.",
-      "justification": "Call-target correctness and deployment provenance are separate obligations.",
-      "severity": "HIGH",
-      "violation_impact": "Conserved top-up value could be sent to the wrong address.",
-      "validation": "Pin constructor/deployment artifacts and compare the immutable target with the canonical beacon deposit contract.",
-      "removal_path": "Prove the deployed immutable equals 0x00000000219ab540356cBB839Cbe05303d7705Fa."
-    },
-    {
-      "id": "A-DEPOSIT-CONTRACT",
-      "accepted": true,
-      "risk": "The deposit transaction's DEPOSIT_CONTRACT immutable is not derived from deployment artifacts.",
-      "justification": "The executable model uses a configured destination; production address identity is a provenance fact.",
-      "severity": "HIGH",
-      "violation_impact": "Correctly accounted deposits could be delivered to a noncanonical contract.",
-      "validation": "Check constructor arguments and deployed immutable extraction.",
-      "removal_path": "Prove DEPOSIT_CONTRACT equals the canonical beacon deposit contract in the deployed artifact."
-    },
-    {
-      "id": "A-DEPOSIT-32-ETHER",
-      "accepted": true,
-      "risk": "The production MAX_EFFECTIVE_BALANCE_WC_TYPE_01 constructor value and BeaconChainDepositor DEPOSIT_SIZE are not jointly proved to equal 32 ether.",
-      "justification": "The source model exposes both scales as configuration fields and proves mismatch reverts rather than inventing deployment equality.",
-      "severity": "HIGH",
-      "violation_impact": "The production deposit path can revert or fail its intended per-validator value convention.",
-      "validation": "Pin the constructor argument and source literal in reproducible deployment artifacts.",
-      "removal_path": "Prove both production values equal 32 * 10^18 wei."
-    },
-    {
       "id": "A-CONSOLIDATION-GATEWAY-NONZERO",
       "accepted": true,
       "risk": "The vault-level theorem assumes that an authorized vault call carries nonzero msg.value. This is a premise on the vault input, not a consequence of the outer gateway payment being positive.",
@@ -75,16 +25,6 @@
       "violation_impact": "Without this premise, the modeled vault can accept a nonempty zero-fee batch with zero forwarded value. The positive-fee conclusion does not apply.",
       "validation": "Check the value forwarded by ConsolidationGateway.addConsolidationRequests at the pinned lines 212-222. An ABI bridge alone does not derive positivity; it also needs a justified positive total fee.",
       "removal_path": "Derive positivity of the vault\u2019s forwarded value from a justified fee condition and a composed calling path, or separately revise the theorem\u2019s positive-fee claim."
-    },
-    {
-      "id": "A-HANDWRITTEN-MINFIRST",
-      "accepted": true,
-      "risk": "The handwritten MinFirst model lacks established Solidity and EVM equivalence.",
-      "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
-      "severity": "MEDIUM",
-      "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
-      "validation": "Validated by the linked source spans, executable mutants, or explicit reproduction command where available.",
-      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
     },
     {
       "id": "A-VERITY-SCAFFOLD",
@@ -107,26 +47,6 @@
       "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
     },
     {
-      "id": "A-YUL-INTERFACE",
-      "accepted": true,
-      "risk": "Handwritten Yul and direct bytecode require explicit interface composition, not a fabricated source projection.",
-      "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
-      "severity": "MEDIUM",
-      "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
-      "validation": "Validated by the linked source spans, executable mutants, or explicit reproduction command where available.",
-      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
-    },
-    {
-      "id": "A-SHA256-FFI",
-      "accepted": true,
-      "risk": "SHA-256 precompile behavior relies on opaque native FFI and host-library behavior; differential vectors do not close this crypto risk.",
-      "justification": "The project proves SSZ preimage shape but does not re-prove SHA-256/precompile functional correctness.",
-      "severity": "HIGH",
-      "violation_impact": "Digest-value and proof-verification claims fail if SHA-256 behavior differs.",
-      "validation": "Pin the FFI/precompile interface and run known-answer vectors; do not promote vectors to a cryptographic proof.",
-      "removal_path": "Prove or import a separately certified SHA-256/precompile refinement theorem."
-    },
-    {
       "id": "A-RUNTIME-PROVENANCE",
       "accepted": true,
       "risk": "Canonical runtime, codehash, fork configuration, and address provenance are unavailable; Mock-derived evidence is non-production evidence.",
@@ -136,26 +56,6 @@
       "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
       "validation": "Applies to every guarantee. scripts/check_deployed_code.py reads each proxy implementation slot, hashes the on-chain bytecode and compares the verified source with the pinned lido-core checkout; PROVENANCE.md explains the procedure.",
       "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
-    },
-    {
-      "id": "A-CANONICAL-REQUEST-ADDRESS",
-      "accepted": true,
-      "risk": "The model-local consolidation-request target is not proved equal to the pinned EIP-7251 predeploy at 0x0000BBdDc7CE488642fb579F8B00f3a590007251.",
-      "justification": "The pinned upstream source names this address, but fee-target proofs establish movement only to a configured immutable slot; deployment provenance is a separate obligation.",
-      "severity": "HIGH",
-      "violation_impact": "A correctly accounted fee could still be sent to the wrong deployed address.",
-      "validation": "Compare constructor/deployment artifacts with the pinned upstream predeploy literal; do not treat the source pin as deployed-immutable identity.",
-      "removal_path": "Prove the configured immutable and deployed target both equal the canonical EIP-7251 address."
-    },
-    {
-      "id": "A-PERFECT-HASH",
-      "accepted": true,
-      "risk": "The structural deposit encoding `sourceNode` is assumed injective on pinned-width well-formed deposits; without it, determination yields witness equality but not deposit uniqueness.",
-      "justification": "SHA-256 remains opaque (`A-SHA256-FFI`); injectivity of the structural root encoding on well-formed deposits is an explicit hypothesis (`PerfectDepositEncoding`) rather than a cryptographic consequence.",
-      "severity": "HIGH",
-      "violation_impact": "Two distinct well-formed deposits could share the same structural root, breaking the unregistered uniqueness child `deposit_unique_of_perfect`. The registered `deposit_root_iff` parent still yields witness equality.",
-      "validation": "Recorded as `PerfectDepositEncoding` in `LidoSRv3.Audit.SszDepositEquivalence` and used only by the unregistered uniqueness child; removal requires a proved injectivity theorem or a narrower deposit model.",
-      "removal_path": "Prove `sourceNode` injective on well-formed deposits from the structural encoding, or refine the deposit model so injectivity is definitional."
     },
     {
       "id": "A-SOLC-TRUSTED",
@@ -177,6 +77,16 @@
       "violation_impact": "Only a foundational inconsistency in Lean's classical axioms would invalidate the affected theorems; no project-specific claim rests on it.",
       "validation": "LidoSRv3.Audit.Trust prints the axiom dependencies of every registered theorem, so any dependency outside {propext, Classical.choice, Quot.sound} is visible in the build log.",
       "removal_path": "Re-prove the affected theorems constructively; not required, since classical reasoning is in scope for this development."
+    },
+    {
+      "id": "A-SHA256-FFI",
+      "accepted": true,
+      "risk": "SHA-256 precompile behavior relies on opaque native FFI and host-library behavior; the audit does not prove SHA-256/precompile functional correctness. All registered SSZ theorems are structural or compositional around the SHA-256 boundary and do not themselves depend on this assumption -- see LidoSRv3/Audit/Provenance/SszSha256Isolation.lean for the isolation. The assumption is retained as a mandatory scope-boundary disclosure per audit_metadata.py.",
+      "justification": "The project proves SSZ preimage shape, digest chain composition, memory copies, address-2 call sequences, and revert restoration, but does not re-prove SHA-256/precompile functional correctness. Every registered SSZ theorem's #print axioms output contains only subsets of {propext, Classical.choice, Quot.sound}, with no sha256_correct axiom.",
+      "severity": "HIGH",
+      "violation_impact": "Digest-value and proof-verification claims fail if SHA-256 behavior differs. But no registered SSZ theorem in this audit claims digest values or proof verification (they claim structural composition around the digest), so the impact is scoped to the guarantee-level fidelity gaps that name SHA-256 functional correctness as an out-of-scope item.",
+      "validation": "Pin the FFI/precompile interface and run known-answer vectors; do not promote vectors to a cryptographic proof. LidoSRv3/Audit/Provenance/SszSha256Isolation.lean records that the current registered SSZ theorem chain does not need any sha256_correct hypothesis.",
+      "removal_path": "The mandatory scope-boundary check in scripts/audit_metadata.py requires this assumption in the registry regardless. Consumer-list retirements from every guarantee's assumptions field are performed via the isolation proof above."
     }
   ]
 }

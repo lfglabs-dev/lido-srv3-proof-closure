@@ -1,0 +1,56 @@
+{
+  "source_commit": "a2a92c4332757296b881f73ac7781bfdb2d283d8",
+  "registration_commit": "b92a3389b83fa22a6c61ad1499061dc15c07023f",
+  "main_merge_included": "bc2416618a2d10d8dada15e4106422d8107761a8",
+  "source_and_dependency_checks": 1579,
+  "commands": [
+    {
+      "command": "lake build +LidoSRv3.Audit.AllGuarantees +LidoSRv3.Audit.Guarantees.PTopup2ActualBatch +LidoSRv3.Tests.TopupBatchConsumerRegression",
+      "exit_code": 0,
+      "jobs": 1413
+    },
+    {
+      "command": "python3 scripts/check_trust_axioms.py",
+      "exit_code": 0,
+      "exact_axioms": 29,
+      "native_fixture_axioms": 23,
+      "accepted_production_exceptions": 3
+    },
+    {
+      "command": "python3 audit/topup-batch-consumer/check_receipt.py",
+      "exit_code": 0,
+      "checks": 1536
+    },
+    {
+      "command": "python3 scripts/test_main_guarantees.py",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 scripts/generate_ux2.py check",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 scripts/test_ux2.py",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 scripts/check_public_claim_surfaces.py",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 scripts/check_proof_escapes.py",
+      "exit_code": 0,
+      "namespace_files": 537,
+      "native_inventory_count": 291
+    }
+  ],
+  "scope": "Public registration and trust surface validated. TOPUP value proof/Forge inputs unchanged from e4c92461; no fresh Forge run. Merge bc241661 only adds DEPOSIT audit paths, outside the unchanged inputs covered by these source/facade/Trust/UX2 validations. The 291-site escape inventory covers LidoSRv3 namespace/root, not isolated audit/trio fixtures. All eight guarantees remain OPEN.",
+  "files": {
+    "trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439",
+    "facade-build.log": "e5ce9085927c048eaa099e5cc6e7339ad54583aaa304513a703b288b536650b7",
+    "ux2-tests.log": "dcff63c24c43ca580e855cf0be5661ec9e44160428d19d4d84c08713fb43ebc7",
+    "trust-build-trace.json": "4f62b3de505d482d3344547c44a5193fdcb5f9799a23fe5bc8c2502bb9ca2a56",
+    "source-identity-check.json": "984dbaea88eb7daa3c8174beae27199b35a137967bd9fbd290a2eb117825980c",
+    "source-inputs.json": "b0521e8d54ccfb32c4df7d84bf92ba12991da14223b84a473cf3bfb978410097"
+  }
+}

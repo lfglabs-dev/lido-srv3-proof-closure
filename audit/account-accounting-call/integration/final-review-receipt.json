@@ -1,0 +1,11 @@
+{
+  "reviewed_integration": "1ed9add5aa439e57e1cea1077849fe8df64678b9",
+  "source_commit": "a4abd69d7acbcae9ff927d45057337029b21eb93",
+  "main_base": "21caf4911ff14ec6a36742eb789eb08e391f1c59",
+  "verdict": "CLEAN",
+  "archive_only": true,
+  "files": {
+    "independent-integration-review-1ed9.md": "c153b6068bc21a63e4cc7b8b1659ea1a9a32e95e9e6c19716b38f30ea5eefc25",
+    "receipt.json": "54b7fa0743838187f4dde4fe61efcfba1aab7cb35f94316b9a1b43bca7c415b1"
+  }
+}

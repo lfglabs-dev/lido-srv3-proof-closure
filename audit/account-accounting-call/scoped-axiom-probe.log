@@ -1,0 +1,12 @@
+TAX	AccountAddress.AccountingCall.call_getter	theorem	propext,Classical.choice,Quot.sound
+TAX	AccountAddress.AccountingCall.call_success	theorem	propext,Classical.choice,Quot.sound
+TAX	AccountAddress.AccountingCall.decode_getter	theorem	propext,Classical.choice,Quot.sound
+TAX	AccountAddress.ReportFeeAccountingCall.execute_success	theorem	propext,Classical.choice,Quot.sound
+TAX	AccountAddress.ReportFeeAccountingCall.finish_success_replay	theorem	propext,Classical.choice,Quot.sound
+TAX	AccountAddress.ReportFeeAccountingCall.mint_replay	theorem	propext,Classical.choice,Quot.sound
+TAX	AccountAddress.ReportFeeAccountingCall.prepare_success	theorem	propext
+TAX	LidoSRv3.Audit.Guarantees.PAccount1.actual_report_accounting_call	theorem	propext,Classical.choice,Quot.sound
+TAX	LidoSRv3.Audit.Guarantees.PAccount1.actual_report_accounting_call_failure_restores	theorem	propext,Classical.choice,Quot.sound
+TAX	LidoSRv3.Tests.AccountAccountingCall.public_failure	theorem	propext,Classical.choice,Quot.sound
+TAX	LidoSRv3.Tests.AccountAccountingCall.public_success	theorem	propext,Classical.choice,Quot.sound
+TAX-END	11

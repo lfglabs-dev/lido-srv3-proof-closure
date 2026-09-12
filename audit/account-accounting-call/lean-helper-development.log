@@ -1,0 +1,16 @@
+audit/trio/account-address/AccountingCall.lean:40:29: error(lean.invalidField): Invalid field `data`: The environment does not contain `LidoSRv3.Audit.Source.TrioReserve1.Live.Request.data`, so it is not possible to project the field `data` from an expression
+  req
+of type `Live.Request`
+audit/trio/account-address/AccountingCall.lean:65:77: error: unsolved goals
+g : Getter
+w : World
+⊢ sorry () = Live.encode 4 2519001150
+audit/trio/account-address/AccountingCall.lean:66:8: warning: declaration uses `sorry`
+audit/trio/account-address/AccountingCall.lean:85:26: error: Application type mismatch: The argument
+  getter_request g before
+has type
+  getter g (request before) before = Reply.success before (Live.encode 32 g.accounting.val)
+but is expected to have type
+  True
+in the application
+  And.intro (getter_request g before)

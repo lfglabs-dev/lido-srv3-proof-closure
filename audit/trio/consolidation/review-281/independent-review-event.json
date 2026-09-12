@@ -1,0 +1,33 @@
+{
+  "content": "Review complete. Report written to `/workspaces/mission-a11c0430/output/review-pr281-33b60537-live-call.md` (outside tracked sources; tree clean, no mutations).\n\nKey evidence:\n- HEAD `33b6053794ac96251a9f0713dbee7ec8b5c9612e` verified; producer `2bbddb66` directly below; `lido-core` submodule at pin `17005714f151e5502c559932319a3f2f74ac2436`.\n- `lake build` of all three target modules at the exact head: exit 0, 1277 jobs, including the 191-line `native_decide` test file.\n- Compiler `#print axioms` for every increment theorem: subsets of {propext, Quot.sound} only, exactly matching the packet; no Classical.choice/sorryAx on new theorems.\n- Line-by-line Solidity correspondence confirmed: line-115 callee/payload/value, `RequestAdditionFailed` + world restore, line-120 `ConsolidationRequestAdded` on success only, guard order 203-205/60-66, `preservesEthBalance` exit = entry \u2212 msg.value, root rollback via `Live.run`, refund hop 295-307 with `address(0)`\u2192sender and value split via `checkFee_additive`.\n- Residuals (code-check divergence of low-level `.call`, supplied STATICCALL fee, named faults, explicit callee frame premises, open ABI hop and EIP-7251 body) are stated, not hidden. P-CONSOLIDATION stays OPEN.\n\nVERDICT: CLEAN",
+  "event_id": "46517ef6-efc5-4f60-96d7-0db0be05d8a0",
+  "event_type": "assistant_message",
+  "id": 3704243,
+  "metadata": {
+    "completion_evidence": {
+      "classification_source": "structured",
+      "completion_confidence": "high",
+      "completion_signal": "native_terminal",
+      "failure_class": null,
+      "native_terminal_seen": true,
+      "pending_tools": null,
+      "provider_error_source": null,
+      "terminal_reason": "TurnComplete",
+      "transport_failure_stage": null
+    },
+    "cost": {
+      "amount_cents": 0,
+      "currency": "USD",
+      "source": "unknown"
+    },
+    "cost_cents": 0,
+    "model": "kimi/k3",
+    "model_normalized": "kimi/k3",
+    "success": true
+  },
+  "mission_id": "a11c0430-8bca-4a4a-84b4-93f564e05030",
+  "sequence": 105,
+  "timestamp": "2026-09-10T00:18:59.766224586+00:00",
+  "tool_call_id": null,
+  "tool_name": null
+}

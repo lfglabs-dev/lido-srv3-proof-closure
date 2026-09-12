@@ -1,0 +1,2 @@
+PASS 1352 sources, 11 pins, 28 ordinary foundation-only scopes, 22 exact reused compiler inputs, 3 normal modules
+PASS all17 source hashes; path-dependent normal build identities recorded externally; candidate manifests unchanged

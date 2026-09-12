@@ -1,0 +1,15 @@
+Compiling 1 files with Solc 0.8.25
+Solc 0.8.25 finished in 6.89s
+Compiler run successful!
+
+Ran 7 tests for audit/topup-gateway-witness-batch/solidity/TopupGatewayWitnessBatch.t.sol:TopupGatewayWitnessBatchTest
+[PASS] testFuzz_actualConfigWordReads(uint256,uint256) (runs: 1024, μ: 9054, ~: 9054)
+[PASS] testFuzz_actualWitnessesProduceRouterArguments(bytes32,uint64,uint64,uint64,uint64,bool,bool) (runs: 1024, μ: 409438, ~: 406878)
+[PASS] testFuzz_headroomAndMinimum(bytes32,uint64,uint64) (runs: 1024, μ: 412234, ~: 412365)
+[PASS] test_arrayAdmissionAndZeroEpochDivisor() (gas: 2552283)
+[PASS] test_excludedStillVerifiedButSkipPendingOverflow() (gas: 460538)
+[PASS] test_guardPriorityAndVerifiedFields() (gas: 599817)
+[PASS] test_positiveLimitsAndPendingPairs() (gas: 411574)
+Suite result: ok. 7 passed; 0 failed; 0 skipped; finished in 780.85ms (1.58s CPU time)
+
+Ran 1 test suite in 784.82ms (780.85ms CPU time): 7 tests passed, 0 failed, 0 skipped (7 total tests)

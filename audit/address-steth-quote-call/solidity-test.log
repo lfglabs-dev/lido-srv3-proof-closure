@@ -1,0 +1,62 @@
+Compiling 19 files with Solc 0.8.9
+Solc 0.8.9 finished in 21.67ms
+Error: Compiler run failed:
+Error (6275): Source "@openzeppelin/contracts-v4.4/token/ERC20/IERC20.sol" not found: File not found.
+ --> src/core/WithdrawalQueue.sol:9:1:
+  |
+9 | import {IERC20} from "@openzeppelin/contracts-v4.4/token/ERC20/IERC20.sol";
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Error (6275): Source "@openzeppelin/contracts-v4.4/token/ERC20/extensions/draft-IERC20Permit.sol" not found: File not found.
+  --> src/core/WithdrawalQueue.sol:10:1:
+   |
+10 | import {IERC20Permit} from "@openzeppelin/contracts-v4.4/token/ERC20/extensions/draft-IERC20Permit.sol";
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Error (6275): Source "@openzeppelin/contracts-v4.4/utils/structs/EnumerableSet.sol" not found: File not found.
+  --> src/core/WithdrawalQueue.sol:11:1:
+   |
+11 | import {EnumerableSet} from "@openzeppelin/contracts-v4.4/utils/structs/EnumerableSet.sol";
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Error (6275): Source "@openzeppelin/contracts-v4.4/utils/structs/EnumerableSet.sol" not found: File not found.
+ --> src/core/WithdrawalQueueBase.sol:7:1:
+  |
+7 | import "@openzeppelin/contracts-v4.4/utils/structs/EnumerableSet.sol";
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Error (6275): Source "@openzeppelin/contracts-v4.4/access/IAccessControl.sol" not found: File not found.
+  --> src/core/utils/access/AccessControl.sol:10:1:
+   |
+10 | import "@openzeppelin/contracts-v4.4/access/IAccessControl.sol";
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Error (6275): Source "@openzeppelin/contracts-v4.4/utils/Context.sol" not found: File not found.
+  --> src/core/utils/access/AccessControl.sol:11:1:
+   |
+11 | import "@openzeppelin/contracts-v4.4/utils/Context.sol";
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Error (6275): Source "@openzeppelin/contracts-v4.4/utils/Strings.sol" not found: File not found.
+  --> src/core/utils/access/AccessControl.sol:12:1:
+   |
+12 | import "@openzeppelin/contracts-v4.4/utils/Strings.sol";
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Error (6275): Source "@openzeppelin/contracts-v4.4/utils/introspection/ERC165.sol" not found: File not found.
+  --> src/core/utils/access/AccessControl.sol:13:1:
+   |
+13 | import "@openzeppelin/contracts-v4.4/utils/introspection/ERC165.sol";
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Error (6275): Source "@openzeppelin/contracts-v4.4/access/IAccessControlEnumerable.sol" not found: File not found.
+  --> src/core/utils/access/AccessControlEnumerable.sol:10:1:
+   |
+10 | import "@openzeppelin/contracts-v4.4/access/IAccessControlEnumerable.sol";
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Error (6275): Source "@openzeppelin/contracts-v4.4/utils/structs/EnumerableSet.sol" not found: File not found.
+  --> src/core/utils/access/AccessControlEnumerable.sol:11:1:
+   |
+11 | import "@openzeppelin/contracts-v4.4/utils/structs/EnumerableSet.sol";
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

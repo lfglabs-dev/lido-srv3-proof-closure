@@ -1,0 +1,62 @@
+{
+  "reused_parent": "ee24f9dc158ed25cec118a8ab8cd3a4fc59942f1",
+  "reused_receipt_hashes": 111,
+  "original_lido_inputs": 37,
+  "ConversionHarness": {
+    "compiler": {
+      "version": "0.4.24+commit.e67f0147"
+    },
+    "settings": {
+      "remappings": [
+        "@aragon/os/=src/@aragon/os/",
+        "openzeppelin-solidity/=src/openzeppelin-solidity/"
+      ],
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "compilationTarget": {
+        "src/ConversionHarness.sol": "ConversionHarness"
+      },
+      "evmVersion": "byzantium",
+      "libraries": {}
+    },
+    "source_count": 38,
+    "artifact_sha256": "c434fd9508c3db1ae75aa3fdc373566452520168233dcab2ff9b7d328378346f"
+  },
+  "BatchHarness": {
+    "compiler": {
+      "version": "0.8.9+commit.e5eed63a"
+    },
+    "settings": {
+      "remappings": [
+        "@openzeppelin/=src/@openzeppelin/"
+      ],
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "metadata": {
+        "bytecodeHash": "ipfs"
+      },
+      "compilationTarget": {
+        "src/BatchHarness.sol": "BatchHarness"
+      },
+      "evmVersion": "london",
+      "libraries": {}
+    },
+    "source_count": 18,
+    "artifact_sha256": "dec04ac9f1e7698eb2c26dd885fe8fd011b404c2893195fdc25493a9fadc0701"
+  },
+  "Lido_reused_artifact_sha256": "5e322826827db4f4709535b88f4514baebbc40230dcfb8af7c458505170480f3",
+  "WstETH_reused_artifact_sha256": "dcb0b2a66eac8c7e763bcf431dee815672c03a99223bd172ad71e8f0c12b2eff",
+  "reused_full_assemblies": {
+    "audit/address-steth-quote-call/Lido.asm": "e60a2b8a05518e890f44981da0a4c01c786ae80cc20f3676c2a5849632934a5a",
+    "audit/address-steth-quote-call/BatchHarness.asm": "22c0031f780ffda981c40ba1777c0632c03595cae84f1887cd3a5dc8d7a94d5c",
+    "audit/address-wrapped-token-call/solidity/token/WstETH.asm": "e5f8e7c5ff27b9bfc44065212414630a85f12dc4d49456bed62c38425f24a4c2"
+  },
+  "tools": {
+    "forge": "forge Version: 1.5.0-v1.5.0\nCommit SHA: 1c57854462289b2e71ee7654cd6666217ed86ffd\nBuild Timestamp: 2025-11-24T06:07:42.598695000Z (1763964462)\nBuild Profile: maxperf",
+    "cast": "cast Version: 1.5.0-v1.5.0\nCommit SHA: 1c57854462289b2e71ee7654cd6666217ed86ffd\nBuild Timestamp: 2025-11-24T06:07:42.598695000Z (1763964462)\nBuild Profile: maxperf"
+  }
+}

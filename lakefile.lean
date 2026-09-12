@@ -69,6 +69,8 @@ lean_lib «LidoSRv3» where
     .one `LidoSRv3.Audit.Verity.SubmitReportEntryTx,
     .one `LidoSRv3.Audit.Verity.Topup2DistributionTx,
     .one `LidoSRv3.Audit.Verity.Topup2Tx,
+    .one `LidoSRv3.Audit.Verity.TopupBeaconFundedTx,
+    .one `LidoSRv3.Audit.Verity.TopupFundedSourceTx,
     .one `LidoSRv3.Audit.Verity.TopupHybrid,
     .one `LidoSRv3.Audit.Verity.TopupPackedStorage,
     .one `LidoSRv3.Audit.Verity.TopupParent,
@@ -85,6 +87,25 @@ lean_lib «LidoSRv3Test» where
     .one `LidoSRv3.Audit.Regression.AllocCapacityLegacy
   ]
 
+/-- Narrow DEPOSIT actual-callee necessary-success check; kept outside the
+default package while P-DEPOSIT-1 integration consumes the theorem. -/
+lean_lib «TrioDepositCommitted» where
+  roots := #[`audit.trio.deposit.LiveBeaconCommitted,
+    `audit.trio.deposit.Tests.Verity.LiveBeaconCommitted]
+  globs := #[.one `audit.trio.deposit.ModuleCall,
+    .one `audit.trio.deposit.ModulePhysicalMetadata,
+    .one `audit.trio.deposit.Tests.Verity.ModulePhysicalMetadataTest,
+    .one `audit.trio.deposit.Deposit,
+    .one `audit.trio.deposit.RouterDeposit,
+    .one `audit.trio.deposit.WithdrawDepositableEther,
+    .one `audit.trio.deposit.LiveBeacon,
+    .one `audit.trio.deposit.WithdrawalLedger,
+    .one `audit.trio.deposit.WithdrawalLedgerMinimal,
+    .one `audit.trio.deposit.PhysicalMetadataLedger,
+    .one `audit.trio.deposit.PhysicalMetadata,
+    .one `audit.trio.deposit.LiveBeaconCommitted,
+    .one `audit.trio.deposit.Tests.Verity.LiveBeaconCommitted]
+
 /-- Trust inspection. Imports production and test modules; not part of the facade. -/
 lean_lib «LidoSRv3Audit» where
   roots := #[`LidoSRv3.Audit.Trust]
@@ -92,8 +113,12 @@ lean_lib «LidoSRv3Audit» where
 /-- Isolated accounting/address slices, with kernel-checked regression proofs. -/
 lean_lib «AccountAddressChecks» where
   srcDir := "audit/trio/account-address"
-  roots := #[`PAccount1, `PAddress1, `Tests.Verity.PAccount1Test,
-    `Tests.Verity.PAddress1Test]
+  roots := #[`PAccount1, `ReportWriteFee, `StETHMintShares, `ReportFeeMint, `ReportFeeCastInvariant, `ReportFeeCheckedSplit, `FeeDistribution, `ReportFeeDistribution, `TreasuryCall, `ReportFeeTreasuryCall, `ReportFeePhysicalPause, `AccountingCall, `ReportFeeAccountingCall, `PAddress1, `PAddress1Physical,
+    `Tests.Verity.PAccount1Test, `Tests.Verity.ReportWriteFeeTest,
+    `Tests.Verity.StETHMintSharesTest, `Tests.Verity.ReportFeeMintTest,
+    `Tests.Verity.ReportFeeCastInvariantTest, `Tests.Verity.ReportFeeCheckedSplitTest,
+    `Tests.Verity.ReportFeeDistributionTest, `Tests.Verity.ReportFeeTreasuryCallTest,
+    `Tests.Verity.PAddress1Test, `Tests.Verity.PAddress1PhysicalTest]
 
 /-- Cross-check the staged indexed parent against the integrated source/ABI parent. -/
 lean_lib «TrioIntegrationChecks» where

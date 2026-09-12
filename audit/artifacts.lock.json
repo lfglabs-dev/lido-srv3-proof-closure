@@ -47,5 +47,56 @@
       "blocked": true,
       "value": null
     }
+  },
+  "deployed_bytecode": {
+    "WithdrawalVault_implementation": {
+      "proxy": "0xB9D7934878B5FB9610B3fE8A5e441e8fad7E293f",
+      "implementation": "0xfB4521BD151BFB45DB6045D2d07e58e0f597e340",
+      "chain": "mainnet",
+      "source_relative_path": "contracts/0.8.9/WithdrawalVault.sol",
+      "fixture_path": "fixtures/deployed/WithdrawalVault-impl-runtime.bin",
+      "fixture_size_bytes": 5088,
+      "fixture_sha256": "a3e9e582928d58cdfe87a6405ad1a7967f720cafa97f98ae8d619e36b961aa7f",
+      "immutable_extractions": [
+        {
+          "immutable_name": "CONSOLIDATION_REQUEST",
+          "byte_offset": 730,
+          "width_bytes": 20,
+          "expected_value_hex": "0000bbddc7ce488642fb579f8b00f3a590007251",
+          "canonical_source": "EIP-7251 consolidation request predeploy",
+          "discharges_assumption": "A-CANONICAL-REQUEST-ADDRESS (P-CONSOLIDATION-ETH-1)"
+        }
+      ]
+    },
+    "StakingRouter_implementation": {
+      "proxy": "0xFdDf38947aFB03C621C71b06C9C70bce73f12999",
+      "implementation": "0xDD76927045435C7605cf6f5F978cfb8CABDb5F80",
+      "chain": "mainnet",
+      "source_relative_path": "contracts/0.8.25/sr/StakingRouter.sol",
+      "fixture_path": "fixtures/deployed/StakingRouter-impl-runtime.bin",
+      "fixture_size_bytes": 21087,
+      "fixture_sha256": "c30ed4e63cb0a57dca577484afff0765fcaa9840d75b440067fd55c7d4fc7013",
+      "immutable_extractions": [
+        {
+          "immutable_name": "DEPOSIT_CONTRACT (aka top-up beacon deposit target)",
+          "byte_offset": 7525,
+          "width_bytes": 20,
+          "expected_value_hex": "00000000219ab540356cbb839cbe05303d7705fa",
+          "canonical_source": "Ethereum beacon deposit contract",
+          "discharges_assumption": "A-TOPUP-BEACON-ADDRESS (P-TOPUP-1) and A-DEPOSIT-CONTRACT (P-DEPOSIT-1, P-ALLOC-EXEC-1)"
+        },
+        {
+          "immutable_name": "MAX_EFFECTIVE_BALANCE_WC_TYPE_01 (constructor immutable) jointly with BeaconChainDepositor.DEPOSIT_SIZE (constant)",
+          "extraction_kind": "push32_payload_enumeration",
+          "byte_offsets": [5521, 12112, 14036, 15415, 20126],
+          "width_bytes": 32,
+          "expected_value_hex": "000000000000000000000000000000000000000000000001bc16d674ec800000",
+          "expected_value_decimal": "32000000000000000000",
+          "canonical_source": "32 ether (uint256 wei)",
+          "discharges_assumption": "A-DEPOSIT-32-ETHER (P-DEPOSIT-1, P-ALLOC-EXEC-1)",
+          "notes": "solc emits every read of the uint256 constant DEPOSIT_SIZE and of the uint256 immutable MAX_EFFECTIVE_BALANCE_WC_TYPE_01 as PUSH32 (opcode 0x7f) followed by the 32-byte value. Enumerating every PUSH32 whose 32-byte payload equals the 32-ether encoding therefore covers every runtime read of these two values; the enumeration yields exactly the five offsets above, and each payload folds big-endian to 32*10^18 wei."
+        }
+      ]
+    }
   }
 }

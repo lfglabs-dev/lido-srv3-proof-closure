@@ -1,0 +1,39 @@
+{
+  "source": "1d0709e937934bd9d8eaaaa84dd59504d9810255",
+  "main_base": "03727cb5fd25694aaa8d38ab9bd54c8420e7a214",
+  "union": "fef1020189db6faf33672a037778e8155736cb00",
+  "AllTrust": {
+    "command": "lake build LidoSRv3.Audit.AllGuarantees LidoSRv3.Audit.Trust",
+    "jobs": 1732,
+    "exit": 0
+  },
+  "trust": {
+    "command": "python3 scripts/check_trust_axioms.py",
+    "exit": 0,
+    "exact_axioms": 29,
+    "dependencies_recomputed": true,
+    "native_claims_reevaluated": true
+  },
+  "identities": {
+    "sources": 1250,
+    "pins": 11,
+    "artifact_hashes": 66,
+    "scoped_axioms": 7,
+    "normal_olean_sha256": {
+      "LidoSRv3/Audit/Source/AddressWrappedTokenCalls": "2710808d179127d3387169cd72cd57f91e2ef3b4d3218762207a14fc11c98bb7",
+      "LidoSRv3/Audit/Guarantees/PAddress1WrappedTokenCalls": "2f310df0243d2df758d5456de3ea49a26363d9d5406095519414319ecab6910d",
+      "LidoSRv3/Tests/AddressWrappedTokenCalls": "73fbf4db32dc2526b7c620773acc8e3d10d8b98a4867cc2da74797b63aaf0923"
+    }
+  },
+  "fresh_root_solidity_tests": 0,
+  "fresh_root_ffi_diagnostics": 0,
+  "reused_reviewed_solidity_tests": 11,
+  "sha256": {
+    "audit/address-wrapped-token-call/integration/README.md": "00094bfd8d37afce7bc819c8c7e84265cf79b4eb3c6932bd87eb393d7b26b602",
+    "audit/address-wrapped-token-call/integration/all-trust-build.log": "e54ea2843ce17ad21afb6960f23ce2eacfdd79c444ef0762f483325d6e30e555",
+    "audit/address-wrapped-token-call/integration/identities.json": "402603d2b8377d6aec53306d4084f2520678eba2f83ea2c7879a683a7cd095b7",
+    "audit/address-wrapped-token-call/integration/independent-source-review-1d07.md": "41d6b3283c8277a048a3f9cf9251c3ad29d4ea6806c4812861f63db2d29936bf",
+    "audit/address-wrapped-token-call/integration/scoped-axioms.json": "088754d9a60dcceedf3770e8ad11524eff63b05820a03509ffb8683bf8c66d9d",
+    "audit/address-wrapped-token-call/integration/trust-check.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439"
+  }
+}

@@ -1,0 +1,5 @@
+PASS: 45 exact source identities, 11 package pins, 10 Solidity bodies, 11 foundation-only kernel axiom sets; all prior source bodies unchanged.
+Traceback (most recent call last):
+  File "/tmp/lido-account-call-integration-validate.py", line 37, in <module>
+    for path,h in receipt['files'].items():assert sha(root/path)==h,path
+KeyError: 'files'

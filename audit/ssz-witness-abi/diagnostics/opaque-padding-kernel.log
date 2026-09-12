@@ -1,0 +1,221 @@
+⚠ [1071/1134] Replayed Conform.Wheels
+warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: Conform/Wheels.lean:106:70: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1073/1134] Replayed EvmYul.Pretty
+warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: EvmYul/Pretty.lean:36:32: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1114/1134] Replayed EvmYul.Semantics
+warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1115/1134] Replayed EvmYul.EVM.Semantics
+warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+ℹ [1133/1134] Replayed LidoSRv3.Audit.Source.SszWitnessAbi
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:206:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.fields_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:207:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.run_success_origin' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:209:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.read64_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:210:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.readBool_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:211:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.tail_success_length' depends on axioms: [propext, Classical.choice, Quot.sound]
+✖ [1134/1134] Building LidoSRv3.Tests.SszWitnessAbiMutants (14s)
+trace: .> LEAN_PATH=/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Cli/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/batteries/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Qq/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/aesop/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/proofwidgets/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/importGraph/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/plausible/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/mathlib/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/evmyul/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/verity/.lake/build/lib/lean:/private/tmp/lido-ssz-witness-abi/.lake/build/lib/lean /Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean /private/tmp/lido-ssz-witness-abi/LidoSRv3/Tests/SszWitnessAbiMutants.lean -o /private/tmp/lido-ssz-witness-abi/.lake/build/lib/lean/LidoSRv3/Tests/SszWitnessAbiMutants.olean -i /private/tmp/lido-ssz-witness-abi/.lake/build/lib/lean/LidoSRv3/Tests/SszWitnessAbiMutants.ilean -c /private/tmp/lido-ssz-witness-abi/.lake/build/ir/LidoSRv3/Tests/SszWitnessAbiMutants.c --setup /private/tmp/lido-ssz-witness-abi/.lake/build/ir/LidoSRv3/Tests/SszWitnessAbiMutants.setup.json --json
+error: LidoSRv3/Tests/SszWitnessAbiMutants.lean:25:61: Tactic `decide` failed for proposition
+  header (st false 100 1 48 256) = Except.ok (w 128)
+because its `Decidable` instance
+  instDecidableEqExcept_batteries (header (st false 100 1 48 256)) (Except.ok (w 128))
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match header (st false 100 1 48 256), Except.ok (w 128) with
+  | Except.error a, Except.error b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+  | Except.error a, Except.ok a_1 => isFalse ⋯
+  | Except.ok a, Except.error a_1 => isFalse ⋯
+  | Except.ok a, Except.ok b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+error: LidoSRv3/Tests/SszWitnessAbiMutants.lean:27:60: Tactic `decide` failed for proposition
+  header (st true 100 1 48 256) = Except.ok (w 256)
+because its `Decidable` instance
+  instDecidableEqExcept_batteries (header (st true 100 1 48 256)) (Except.ok (w 256))
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match header (st true 100 1 48 256), Except.ok (w 256) with
+  | Except.error a, Except.error b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+  | Except.error a, Except.ok a_1 => isFalse ⋯
+  | Except.ok a, Except.error a_1 => isFalse ⋯
+  | Except.ok a, Except.ok b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+error: LidoSRv3/Tests/SszWitnessAbiMutants.lean:34:64: Tactic `decide` failed for proposition
+  Except.map (fun s => (s.offset.toNat, s.length)) (tail (st true 100 1 48 256) (w 256) (w 36) 1) = Except.ok (164, 48)
+because its `Decidable` instance
+  instDecidableEqExcept_batteries
+    (Except.map (fun s => (s.offset.toNat, s.length)) (tail (st true 100 1 48 256) (w 256) (w 36) 1))
+    (Except.ok (164, 48))
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match Except.map (fun s => (s.offset.toNat, s.length)) (tail (st true 100 1 48 256) (w 256) (w 36) 1),
+    Except.ok (164, 48) with
+  | Except.error a, Except.error b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+  | Except.error a, Except.ok a_1 => isFalse ⋯
+  | Except.ok a, Except.error a_1 => isFalse ⋯
+  | Except.ok a, Except.ok b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+error: LidoSRv3/Tests/SszWitnessAbiMutants.lean:37:62: Tactic `decide` failed for proposition
+  Except.map (fun s => (s.offset.toNat, s.length)) (tail (st false 100 1 48 256) (w 128) (w 36) 1) = Except.ok (484, 48)
+because its `Decidable` instance
+  instDecidableEqExcept_batteries
+    (Except.map (fun s => (s.offset.toNat, s.length)) (tail (st false 100 1 48 256) (w 128) (w 36) 1))
+    (Except.ok (484, 48))
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match Except.map (fun s => (s.offset.toNat, s.length)) (tail (st false 100 1 48 256) (w 128) (w 36) 1),
+    Except.ok (484, 48) with
+  | Except.error a, Except.error b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+  | Except.error a, Except.ok a_1 => isFalse ⋯
+  | Except.ok a, Except.error a_1 => isFalse ⋯
+  | Except.ok a, Except.ok b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+error: LidoSRv3/Tests/SszWitnessAbiMutants.lean:40:61: Tactic `decide` failed for proposition
+  Except.map (fun s => (s.offset.toNat, s.length)) (tail (st false 100 1 48 256) (w 128) (w 4) 32) = Except.ok (420, 1)
+because its `Decidable` instance
+  instDecidableEqExcept_batteries
+    (Except.map (fun s => (s.offset.toNat, s.length)) (tail (st false 100 1 48 256) (w 128) (w 4) 32))
+    (Except.ok (420, 1))
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match Except.map (fun s => (s.offset.toNat, s.length)) (tail (st false 100 1 48 256) (w 128) (w 4) 32),
+    Except.ok (420, 1) with
+  | Except.error a, Except.error b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+  | Except.error a, Except.ok a_1 => isFalse ⋯
+  | Except.ok a, Except.error a_1 => isFalse ⋯
+  | Except.ok a, Except.ok b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+error: LidoSRv3/Tests/SszWitnessAbiMutants.lean:44:93: Tactic `decide` failed for proposition
+  read64 (st false (2 ^ 64 - 1) 1 48 256) (w 196) = Except.ok (BitVec.ofNat 64 (2 ^ 64 - 1))
+because its `Decidable` instance
+  instDecidableEqExcept_batteries (read64 (st false (2 ^ 64 - 1) 1 48 256) (w 196))
+    (Except.ok (BitVec.ofNat 64 (2 ^ 64 - 1)))
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match read64 (st false (2 ^ 64 - 1) 1 48 256) (w 196), Except.ok (BitVec.ofNat 64 (2 ^ 64 - 1)) with
+  | Except.error a, Except.error b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+  | Except.error a, Except.ok a_1 => isFalse ⋯
+  | Except.ok a, Except.error a_1 => isFalse ⋯
+  | Except.ok a, Except.ok b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+error: LidoSRv3/Tests/SszWitnessAbiMutants.lean:46:72: Tactic `decide` failed for proposition
+  read64 (st false (2 ^ 64) 1 48 256) (w 196) = Except.error Error.abi
+because its `Decidable` instance
+  instDecidableEqExcept_batteries (read64 (st false (2 ^ 64) 1 48 256) (w 196)) (Except.error Error.abi)
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match read64 (st false (2 ^ 64) 1 48 256) (w 196), Except.error Error.abi with
+  | Except.error a, Except.error b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+  | Except.error a, Except.ok a_1 => isFalse ⋯
+  | Except.ok a, Except.error a_1 => isFalse ⋯
+  | Except.ok a, Except.ok b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+error: LidoSRv3/Tests/SszWitnessAbiMutants.lean:48:71: Tactic `decide` failed for proposition
+  readBool (st false 100 2 48 256) (w 356) = Except.error Error.abi
+because its `Decidable` instance
+  instDecidableEqExcept_batteries (readBool (st false 100 2 48 256) (w 356)) (Except.error Error.abi)
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match readBool (st false 100 2 48 256) (w 356), Except.error Error.abi with
+  | Except.error a, Except.error b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+  | Except.error a, Except.ok a_1 => isFalse ⋯
+  | Except.ok a, Except.error a_1 => isFalse ⋯
+  | Except.ok a, Except.ok b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+error: LidoSRv3/Tests/SszWitnessAbiMutants.lean:54:92: Tactic `decide` failed for proposition
+  tag (run 0 (st false (2 ^ 64) 2 48 (2 ^ 64 - 1))) = some (Error.bls SszBlsComposition.Error.sha256PrecompileFailed)
+because its `Decidable` instance
+  (tag (run 0 (st false (2 ^ 64) 2 48 (2 ^ 64 - 1)))).instDecidableEq
+    (some (Error.bls SszBlsComposition.Error.sha256PrecompileFailed))
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match tag (run 0 (st false (2 ^ 64) 2 48 (2 ^ 64 - 1))) with
+  | none =>
+    match some (Error.bls SszBlsComposition.Error.sha256PrecompileFailed) with
+    | none => isTrue ⋯
+    | some val => isFalse ⋯
+  | some a =>
+    match some (Error.bls SszBlsComposition.Error.sha256PrecompileFailed) with
+    | none => isFalse ⋯
+    | some b =>
+      match instDecidableEqError a b with
+      | isTrue h => isTrue ⋯
+      | isFalse n => isFalse ⋯
+error: LidoSRv3/Tests/SszWitnessAbiMutants.lean:56:95: Tactic `decide` failed for proposition
+  tag (run 0 (st false (2 ^ 64) 2 47 (2 ^ 64 - 1))) = some (Error.bls SszBlsComposition.Error.invalidPubkeyLength)
+because its `Decidable` instance
+  (tag (run 0 (st false (2 ^ 64) 2 47 (2 ^ 64 - 1)))).instDecidableEq
+    (some (Error.bls SszBlsComposition.Error.invalidPubkeyLength))
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match tag (run 0 (st false (2 ^ 64) 2 47 (2 ^ 64 - 1))) with
+  | none =>
+    match some (Error.bls SszBlsComposition.Error.invalidPubkeyLength) with
+    | none => isTrue ⋯
+    | some val => isFalse ⋯
+  | some a =>
+    match some (Error.bls SszBlsComposition.Error.invalidPubkeyLength) with
+    | none => isFalse ⋯
+    | some b =>
+      match instDecidableEqError a b with
+      | isTrue h => isTrue ⋯
+      | isFalse n => isFalse ⋯
+error: LidoSRv3/Tests/SszWitnessAbiMutants.lean:58:97: Tactic `decide` failed for proposition
+  tag (run 0 (st true (2 ^ 64) 2 48 (2 ^ 64 - 1))) = some (Error.bls SszBlsComposition.Error.sha256PrecompileFailed)
+because its `Decidable` instance
+  (tag (run 0 (st true (2 ^ 64) 2 48 (2 ^ 64 - 1)))).instDecidableEq
+    (some (Error.bls SszBlsComposition.Error.sha256PrecompileFailed))
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match tag (run 0 (st true (2 ^ 64) 2 48 (2 ^ 64 - 1))) with
+  | none =>
+    match some (Error.bls SszBlsComposition.Error.sha256PrecompileFailed) with
+    | none => isTrue ⋯
+    | some val => isFalse ⋯
+  | some a =>
+    match some (Error.bls SszBlsComposition.Error.sha256PrecompileFailed) with
+    | none => isFalse ⋯
+    | some b =>
+      match instDecidableEqError a b with
+      | isTrue h => isTrue ⋯
+      | isFalse n => isFalse ⋯
+info: LidoSRv3/Tests/SszWitnessAbiMutants.lean:60:0: 'LidoSRv3.Tests.SszWitnessAbiMutants.negative_key_slice' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/SszWitnessAbiMutants.lean:61:0: 'LidoSRv3.Tests.SszWitnessAbiMutants.key_failure_before_dirty_fields' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/SszWitnessAbiMutants.lean:62:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.run_success_origin' depends on axioms: [propext, Classical.choice, Quot.sound]
+error: Lean exited with code 1
+Some required targets logged failures:
+- LidoSRv3.Tests.SszWitnessAbiMutants
+error: build failed

@@ -1,0 +1,83 @@
+{
+  "compiler": {
+    "version": "0.8.25+commit.b61c2a91"
+  },
+  "language": "Solidity",
+  "settings": {
+    "remappings": [
+      "@openzeppelin/contracts-v5.2/=/tmp/lido-topup-wei-deps/package/",
+      "contracts/=lido-core/contracts/"
+    ],
+    "optimizer": {
+      "enabled": true,
+      "runs": 200
+    },
+    "metadata": {
+      "bytecodeHash": "ipfs"
+    },
+    "compilationTarget": {
+      "audit/topup-module-call/solidity/TopupModuleCall.t.sol": "TopupModuleCallTest"
+    },
+    "evmVersion": "cancun",
+    "libraries": {},
+    "viaIR": true
+  },
+  "sources": {
+    "/tmp/lido-topup-wei-deps/package/utils/structs/EnumerableSet.sol": {
+      "keccak256": "0x9b161e97b8967d4bc0c08d25741889a30692cdda4b71910bf1b0e315f1962212",
+      "urls": [
+        "bzz-raw://821500c39d095eaa25b06f46e65f1d0e97c4c96b39227f79077dee7d9e84051f",
+        "dweb:/ipfs/QmSTeGorKzSWF6HAmxo32uCZiEuKNvreQdUiX1AaYtUMTz"
+      ],
+      "license": "MIT"
+    },
+    "audit/topup-module-call/solidity/ModuleVectors.sol": {
+      "keccak256": "0xdbd8ad1c61099669a058b6868c32f9309cfb9427d5606f1c492025f380ab6496",
+      "urls": [
+        "bzz-raw://b7836b020ec2c6ab3bcc9e610580e4704b09d710b043a46f4a6a81f771119162",
+        "dweb:/ipfs/QmZxr1u219ApJYYPz2HJa62hu6YxW9DjS9k7ADSMpUY4zN"
+      ],
+      "license": null
+    },
+    "audit/topup-module-call/solidity/TopupModuleCall.t.sol": {
+      "keccak256": "0xf3ce7d124a5cb617807665c6d5cb63d7dc30c1d3df64d29418f1ea78b4ad1d52",
+      "urls": [
+        "bzz-raw://cb9893fe3784b60127d3e8eb1c6d64b5a772ca4f6f55e1ea7013aeb97b7c62f0",
+        "dweb:/ipfs/QmPB96Gv7pbBTNNTiSP7PyDKqghMQ4EijdLdvgn6ndUoFf"
+      ],
+      "license": "MIT"
+    },
+    "lido-core/contracts/0.8.25/sr/SRStorage.sol": {
+      "keccak256": "0x39238b6ec00dbbba1be6d12e43e48bd1d7016a8775a714afe5485afb1ab7bf03",
+      "urls": [
+        "bzz-raw://8afdb261e54bb1a03263bb26d01adadae5e9304c25e4b4f3df42a7b6f958fc00",
+        "dweb:/ipfs/Qmd8MwdsWPFJ53ELzGDT4b8ZtPSTnKPBg9bju2erFRpMFM"
+      ],
+      "license": "GPL-3.0"
+    },
+    "lido-core/contracts/0.8.25/sr/SRTypes.sol": {
+      "keccak256": "0xfb467a0c8bb5d72186f62e66bc9c5b448ac677c3a835a10753e2fce868f3acea",
+      "urls": [
+        "bzz-raw://527e7bf40daf7c5c9c580fa263f6ae6421d2c36d2939e1d9e529eca34e105707",
+        "dweb:/ipfs/QmXwZSa2qMcJ4rqJi5Mu27Q7GvG8Aw7mhEiLvxkkGaeME3"
+      ],
+      "license": "GPL-3.0"
+    },
+    "lido-core/contracts/common/interfaces/IStakingModule.sol": {
+      "keccak256": "0xe3e35ede05e6e7109275e77609d26cd5377c83505237155af19a5b49b7f1041f",
+      "urls": [
+        "bzz-raw://c74cdb835e1ffe397c419bcfbbedcce6b3c3fbc3f90dad97f8517cdab353e873",
+        "dweb:/ipfs/Qmc4KVeyDXiD7nPUNKVqsFdmYCENmR1AoQsktrFKZeDXk8"
+      ],
+      "license": "GPL-3.0"
+    },
+    "lido-core/contracts/common/interfaces/IStakingModuleV2.sol": {
+      "keccak256": "0x57b261d2d140860c4aeec309e359a20e4edb4adce1787a260830224f0f82bcb6",
+      "urls": [
+        "bzz-raw://e5181a3ff9185274f1416f12ce900a93a6e06c15df6f44843390a6bf5fcfb057",
+        "dweb:/ipfs/Qmf4TUiXUuNJziGZnCZVFsFsHT5UMuevPGfTTLTy6WX5Ca"
+      ],
+      "license": "GPL-3.0"
+    }
+  }
+}

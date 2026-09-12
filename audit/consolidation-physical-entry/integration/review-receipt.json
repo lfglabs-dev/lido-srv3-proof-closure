@@ -1,0 +1,10 @@
+{
+  "reviewed_commit": "142198055d7e93f10ea42d9f2895518657cbd5af",
+  "reviewed_tree": "31bbcf3f0e6cf7f8660669b90e913a7f57f4124d",
+  "verdict": "CLEAN",
+  "reviewer": "independent /root/direct_steth_exact_review; source and root integration writers stopped",
+  "files": {
+    "audit/consolidation-physical-entry/integration/independent-integration-review-1421.md": "97fc510fa4b064eacd458f52ed402652443b630b074daaf8cb430e760905245d"
+  },
+  "scope": "Archive-only delta; exact final review required before merge. No source, configuration or build-input changes."
+}

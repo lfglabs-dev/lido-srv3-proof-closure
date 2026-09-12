@@ -1,0 +1,45 @@
+⚠ [1070/1087] Replayed Conform.Wheels
+warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: Conform/Wheels.lean:106:70: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1072/1087] Replayed EvmYul.Pretty
+warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: EvmYul/Pretty.lean:36:32: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1123/1126] Replayed EvmYul.Semantics
+warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1124/1126] Replayed EvmYul.EVM.Semantics
+warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+ℹ [1126/1126] Replayed LidoSRv3.Tests.SszShaCallMemoryMutants
+info: LidoSRv3/Tests/SszShaCallMemoryMutants.lean:133:0: 'LidoSRv3.Audit.Source.SszShaCallMemory.bls_call_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszShaCallMemoryMutants.lean:134:0: 'LidoSRv3.Audit.Source.SszShaCallMemory.gas_fits' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszShaCallMemoryMutants.lean:135:0: 'LidoSRv3.Audit.Source.SszShaCallMemory.theta_sha' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszShaCallMemoryMutants.lean:136:0: 'LidoSRv3.Audit.Source.SszShaCallMemory.call_sha_bytes' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszShaCallMemoryMutants.lean:137:0: 'LidoSRv3.Audit.Source.SszShaCallMemory.prepared_words' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszShaCallMemoryMutants.lean:138:0: 'LidoSRv3.Audit.Source.SszShaCallMemory.scratch_call_bytes' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszShaCallMemoryMutants.lean:139:0: 'LidoSRv3.Audit.Source.SszShaCallMemory.scratch_call_mload' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszShaCallMemoryMutants.lean:140:0: 'LidoSRv3.Audit.Source.SszShaCallBytes.mload32' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszShaCallMemoryMutants.lean:141:0: 'LidoSRv3.Audit.Source.SszShaCallBytes.mload_wrap' depends on axioms: [propext]
+Build completed successfully (1126 jobs).

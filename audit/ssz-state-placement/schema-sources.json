@@ -1,0 +1,38 @@
+{
+  "repository": "https://github.com/ethereum/consensus-specs",
+  "release_tag": "v1.6.0",
+  "commit": "f96d3e7acf35125295d234da4b0c67591fdef49c",
+  "provenance": "Additional explicitly selected official schema snapshot, not a Lido dependency or deployed-fork identity",
+  "files": [
+    {
+      "path": "specs/electra/beacon-chain.md",
+      "url": "https://raw.githubusercontent.com/ethereum/consensus-specs/f96d3e7acf35125295d234da4b0c67591fdef49c/specs/electra/beacon-chain.md",
+      "sha256": "a488a6084ad4e43d4957356ce7579e9ea246e445b5f237da757d142675529eb7"
+    },
+    {
+      "path": "specs/fulu/beacon-chain.md",
+      "url": "https://raw.githubusercontent.com/ethereum/consensus-specs/f96d3e7acf35125295d234da4b0c67591fdef49c/specs/fulu/beacon-chain.md",
+      "sha256": "a4b1aae638842a21de4ea4e2edb0d86819c2337bfba0f9501fd7725f160f62ce"
+    },
+    {
+      "path": "specs/phase0/beacon-chain.md",
+      "url": "https://raw.githubusercontent.com/ethereum/consensus-specs/f96d3e7acf35125295d234da4b0c67591fdef49c/specs/phase0/beacon-chain.md",
+      "sha256": "190e7fd81ddf4beda0a849a8d2ade1fa20b46b4405b6100352aab9633ee9cba8"
+    },
+    {
+      "path": "ssz/simple-serialize.md",
+      "url": "https://raw.githubusercontent.com/ethereum/consensus-specs/f96d3e7acf35125295d234da4b0c67591fdef49c/ssz/simple-serialize.md",
+      "sha256": "66f7119747f30e23be2a74dc77d19fa07251742955ce4de9daf764b2b4401a2e"
+    },
+    {
+      "path": "ssz/merkle-proofs.md",
+      "url": "https://raw.githubusercontent.com/ethereum/consensus-specs/f96d3e7acf35125295d234da4b0c67591fdef49c/ssz/merkle-proofs.md",
+      "sha256": "ea67a158e28f5115cf985266efdb78f82277d1ab73efab4657313d63ffb03f7f"
+    },
+    {
+      "path": "LICENSE",
+      "url": "https://raw.githubusercontent.com/ethereum/consensus-specs/f96d3e7acf35125295d234da4b0c67591fdef49c/LICENSE",
+      "sha256": "36ffd9dc085d529a7e60e1276d73ae5a030b020313e6c5408593a6ae2af39673"
+    }
+  ]
+}

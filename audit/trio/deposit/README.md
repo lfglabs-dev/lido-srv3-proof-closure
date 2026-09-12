@@ -56,13 +56,41 @@ RESERVE-1, registry, YAML, trust, or `AllGuarantees` file is changed.
 Production Lean lives beside this file.  Executable regressions live under
 `Tests/Verity` and are selected by the local Lake target.
 
+`LiveBeacon.lean` is the live-callee suffix. After the same executed
+allocation/module prefix, the Lido pull runs as the delivered RESERVE-1
+executor with the nonzero seed `actualDepositsCount`, and every beacon deposit
+is an actual CALL to the accepted PR273 source callee
+(`TopupBeaconCallee.dispatch sha256`) in the same `Live.World`, through PR273's
+`TopupBeaconBatch.loop`. There is no Boolean beacon acceptance oracle, no
+manual router debit/beacon credit and no auxiliary balance counter: the router
+balance is the live ledger entry, and the line 996 assertion reads it.
+`LinksSource` is now derived from the executed prefix
+(`Deposit.prepareDepositABI_composes_beacon_values`,
+`RouterDeposit.linksSource_of_prepareDepositABI`,
+`RouterDeposit.execute_ok_conservation_derived`), not supplied by the caller.
+`LiveBeacon.positive_success` derives, from source/physical inputs only:
+Lido debit and beacon credit of `actualKeys * DEPOSIT_SIZE`, restoration of
+the arbitrary old router balance, preservation of every other account, the
+beacon count increment, one chronological journal (receiver callback, then one
+accepted CALL per key with the serialized source payload and the pinned value)
+and the per-deposit branch/event effect chain. `failure_restores` is the root
+rollback; the executable regressions include a late tree-full rejection after
+an accepted first deposit and a `maxEBType1 ≠ DEPOSIT_SIZE` run that reaches
+and fails the modeled assertion. The signature batch width, beacon capacity,
+beacon code and account distinctness are explicit success-domain conditions;
+the returned public-key width is derived.
+
 ## Remaining composition obligations
 
 The executable relation now binds allocation, returned keys, the live Lido
 withdrawal, and beacon calls in one source-ordered root transition. Remaining
 gaps are correspondence from this mixed source model to one compiled EVM
 transaction, physical router storage for the abstract allocation transcript and
-router metadata, and deployed contract/code identity.
+router metadata, the SHA-256/precompile boundary (opaque `sha256`), the
+generated ABI decoder of the deposit contract, and deployed contract/code
+identity. `RouterDeposit.beaconLoop` keeps its Boolean acceptance oracle and
+router counters as the previously accepted data-only model; `LiveBeacon` is the
+live replacement, not a rewrite of it.
 
 The rollback theorem establishes the behavior of the model wrapper, which
 restores its input World on failure; it is not an EVM rollback correspondence

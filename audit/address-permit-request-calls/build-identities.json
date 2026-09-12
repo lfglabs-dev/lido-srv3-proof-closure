@@ -1,0 +1,392 @@
+{
+  "scope": "Final successful normal artifact/source identities; development errors are retained separately.",
+  "entries": [
+    {
+      "source": "LidoSRv3/Audit/Source/AddressPermitRequestCalls.lean",
+      "sha256": "0085be89682dd7dab7fc2da96a5c31cb56bc13696c749b77b851d767034fb258",
+      "artifacts": {
+        ".olean": {
+          "sha256": "45f8328d3b78f42d3647b7c37ac140a7008afd286249a4753082f9054f888c0d"
+        },
+        ".ilean": {
+          "sha256": "4206bfdc2abeeeff017cf72212b678d84ea6606602c4415b85ef34448b4b7235"
+        },
+        ".trace": {
+          "sha256": "3a4184dc495b53eaea134be6094f4d7979a14f926973f6f743d1e21ab2cda541",
+          "lake_trace": {
+            "synthetic": false,
+            "schemaVersion": "2025-09-10",
+            "outputs": {
+              "o": [
+                "4ec1526b9e06b8ac.olean"
+              ],
+              "m": false,
+              "i": "7105a46b907c97f7.ilean",
+              "c": "d92bf5d2f6fcad66.c"
+            },
+            "log": [
+              {
+                "message": ".> LEAN_PATH=/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Cli/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/batteries/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Qq/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/aesop/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/proofwidgets/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/importGraph/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/plausible/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/mathlib/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/evmyul/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/verity/.lake/build/lib/lean:/private/tmp/lido-address-permit-batches/.lake/build/lib/lean /Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean /private/tmp/lido-address-permit-batches/LidoSRv3/Audit/Source/AddressPermitRequestCalls.lean -o /private/tmp/lido-address-permit-batches/.lake/build/lib/lean/LidoSRv3/Audit/Source/AddressPermitRequestCalls.olean -i /private/tmp/lido-address-permit-batches/.lake/build/lib/lean/LidoSRv3/Audit/Source/AddressPermitRequestCalls.ilean -c /private/tmp/lido-address-permit-batches/.lake/build/ir/LidoSRv3/Audit/Source/AddressPermitRequestCalls.c --setup /private/tmp/lido-address-permit-batches/.lake/build/ir/LidoSRv3/Audit/Source/AddressPermitRequestCalls.setup.json --json",
+                "level": "trace"
+              }
+            ],
+            "inputs": [
+              [
+                "LidoSRv3.Audit.Source.AddressPermitRequestCalls:deps",
+                [
+                  [
+                    "deps",
+                    [
+                      [
+                        "\u00ablido-srv3-proof-closure\u00bb/LidoSRv3:extraDep",
+                        [
+                          [
+                            "@\u00ablido-srv3-proof-closure\u00bb:extraDep",
+                            "00000000000006bb"
+                          ]
+                        ]
+                      ],
+                      [
+                        "imports",
+                        [
+                          [
+                            "LidoSRv3.Audit.Guarantees.PAddress1RequestBatches transitive imports (legacy)",
+                            "290df376d13a355c"
+                          ],
+                          [
+                            "LidoSRv3.Audit.Guarantees.PAddress1RequestBatches:importAllArts",
+                            "f6e044d477504694"
+                          ]
+                        ]
+                      ]
+                    ]
+                  ],
+                  [
+                    "libs",
+                    [
+                      [
+                        "import dynlibs",
+                        "00000000000006bb"
+                      ],
+                      [
+                        "package external libraries",
+                        "00000000000006bb"
+                      ],
+                      [
+                        "module dynlibs",
+                        "00000000000006bb"
+                      ],
+                      [
+                        "module plugins",
+                        "00000000000006bb"
+                      ]
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "Lean 4.31.0, commit 68218e876d2a38b1985b8590fff244a83c321783",
+                "fc45ac412f28501c"
+              ],
+              [
+                "/private/tmp/lido-address-permit-batches/LidoSRv3/Audit/Source/AddressPermitRequestCalls.lean",
+                "d47bdbc49ac80836"
+              ],
+              [
+                "options",
+                "00000000000006bb"
+              ],
+              [
+                "isModule: false",
+                "feefd2a0d3a1847e"
+              ],
+              [
+                "Module.name: LidoSRv3.Audit.Source.AddressPermitRequestCalls",
+                "139ab26ea6d2f4c8"
+              ],
+              [
+                "Package.id?: (some lido-srv3-proof-closure)",
+                "1792847f4a06c449"
+              ],
+              [
+                "Module.leanArgs: #[]",
+                "00000000000006bb"
+              ]
+            ],
+            "depHash": "896b64abec6cb7c0"
+          }
+        }
+      }
+    },
+    {
+      "source": "LidoSRv3/Audit/Guarantees/PAddress1PermitRequestCalls.lean",
+      "sha256": "a024e9d59b9203fa711f610bc1a1cbc672e5f0843bb1be7b6df3f0b4e003e1d3",
+      "artifacts": {
+        ".olean": {
+          "sha256": "0519393d120db5763b56f5994081038b99fee1436513a62c0d93f0d63e700cbc"
+        },
+        ".ilean": {
+          "sha256": "467b355b2cb88cb554e7439de8acfbd7107877927a564b60bbe18e1d5116525a"
+        },
+        ".trace": {
+          "sha256": "ddbbf12072cbf2bb5bc2ddda0f9535c761ae81ff0346972ac691b4f6cb7c5c0a",
+          "lake_trace": {
+            "synthetic": false,
+            "schemaVersion": "2025-09-10",
+            "outputs": {
+              "o": [
+                "55c7baa658714862.olean"
+              ],
+              "m": false,
+              "i": "d30ad10615d69f5b.ilean",
+              "c": "9d9255b6eda765c0.c"
+            },
+            "log": [
+              {
+                "message": ".> LEAN_PATH=/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Cli/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/batteries/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Qq/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/aesop/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/proofwidgets/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/importGraph/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/plausible/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/mathlib/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/evmyul/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/verity/.lake/build/lib/lean:/private/tmp/lido-address-permit-batches/.lake/build/lib/lean /Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean /private/tmp/lido-address-permit-batches/LidoSRv3/Audit/Guarantees/PAddress1PermitRequestCalls.lean -o /private/tmp/lido-address-permit-batches/.lake/build/lib/lean/LidoSRv3/Audit/Guarantees/PAddress1PermitRequestCalls.olean -i /private/tmp/lido-address-permit-batches/.lake/build/lib/lean/LidoSRv3/Audit/Guarantees/PAddress1PermitRequestCalls.ilean -c /private/tmp/lido-address-permit-batches/.lake/build/ir/LidoSRv3/Audit/Guarantees/PAddress1PermitRequestCalls.c --setup /private/tmp/lido-address-permit-batches/.lake/build/ir/LidoSRv3/Audit/Guarantees/PAddress1PermitRequestCalls.setup.json --json",
+                "level": "trace"
+              }
+            ],
+            "inputs": [
+              [
+                "LidoSRv3.Audit.Guarantees.PAddress1PermitRequestCalls:deps",
+                [
+                  [
+                    "deps",
+                    [
+                      [
+                        "\u00ablido-srv3-proof-closure\u00bb/LidoSRv3:extraDep",
+                        [
+                          [
+                            "@\u00ablido-srv3-proof-closure\u00bb:extraDep",
+                            "00000000000006bb"
+                          ]
+                        ]
+                      ],
+                      [
+                        "imports",
+                        [
+                          [
+                            "LidoSRv3.Audit.Source.AddressPermitRequestCalls transitive imports (legacy)",
+                            "2313662a03b01d25"
+                          ],
+                          [
+                            "LidoSRv3.Audit.Source.AddressPermitRequestCalls:importAllArts",
+                            "b41f3062c7a2ba8d"
+                          ]
+                        ]
+                      ]
+                    ]
+                  ],
+                  [
+                    "libs",
+                    [
+                      [
+                        "import dynlibs",
+                        "00000000000006bb"
+                      ],
+                      [
+                        "package external libraries",
+                        "00000000000006bb"
+                      ],
+                      [
+                        "module dynlibs",
+                        "00000000000006bb"
+                      ],
+                      [
+                        "module plugins",
+                        "00000000000006bb"
+                      ]
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "Lean 4.31.0, commit 68218e876d2a38b1985b8590fff244a83c321783",
+                "fc45ac412f28501c"
+              ],
+              [
+                "/private/tmp/lido-address-permit-batches/LidoSRv3/Audit/Guarantees/PAddress1PermitRequestCalls.lean",
+                "2e959069e73e27dc"
+              ],
+              [
+                "options",
+                "00000000000006bb"
+              ],
+              [
+                "isModule: false",
+                "feefd2a0d3a1847e"
+              ],
+              [
+                "Module.name: LidoSRv3.Audit.Guarantees.PAddress1PermitRequestCalls",
+                "49b84aa550ef6786"
+              ],
+              [
+                "Package.id?: (some lido-srv3-proof-closure)",
+                "1792847f4a06c449"
+              ],
+              [
+                "Module.leanArgs: #[]",
+                "00000000000006bb"
+              ]
+            ],
+            "depHash": "1d85108f90c79d4c"
+          }
+        }
+      }
+    },
+    {
+      "source": "LidoSRv3/Tests/AddressPermitRequestCalls.lean",
+      "sha256": "7ad484cd4e334bb0f108fe5314030d816359c6a3920d6b2c76bebd135a11547a",
+      "artifacts": {
+        ".olean": {
+          "sha256": "487e1eb8f9255192856543847b127d9a25c11cc2ef9bab86aa4429f8d995000c"
+        },
+        ".ilean": {
+          "sha256": "ad59619081b5e834abc1969736e024c231609428351fc05e50086a8316277501"
+        },
+        ".trace": {
+          "sha256": "a077de2815f92e7d99e732397a92dc80442992eee38db1da744cb0d5a15b6ae8",
+          "lake_trace": {
+            "synthetic": false,
+            "schemaVersion": "2025-09-10",
+            "outputs": {
+              "o": [
+                "d2ec7656839ed384.olean"
+              ],
+              "m": false,
+              "i": "f57754fe507994a4.ilean",
+              "c": "f9febcd7d8c43039.c"
+            },
+            "log": [
+              {
+                "message": ".> LEAN_PATH=/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Cli/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/batteries/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Qq/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/aesop/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/proofwidgets/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/importGraph/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/plausible/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/mathlib/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/evmyul/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/verity/.lake/build/lib/lean:/private/tmp/lido-address-permit-batches/.lake/build/lib/lean /Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean /private/tmp/lido-address-permit-batches/LidoSRv3/Tests/AddressPermitRequestCalls.lean -o /private/tmp/lido-address-permit-batches/.lake/build/lib/lean/LidoSRv3/Tests/AddressPermitRequestCalls.olean -i /private/tmp/lido-address-permit-batches/.lake/build/lib/lean/LidoSRv3/Tests/AddressPermitRequestCalls.ilean -c /private/tmp/lido-address-permit-batches/.lake/build/ir/LidoSRv3/Tests/AddressPermitRequestCalls.c --setup /private/tmp/lido-address-permit-batches/.lake/build/ir/LidoSRv3/Tests/AddressPermitRequestCalls.setup.json --json",
+                "level": "trace"
+              },
+              {
+                "message": "LidoSRv3/Tests/AddressPermitRequestCalls.lean:86:0: 'LidoSRv3.Audit.Source.AddressPermitRequestCalls.calldata_length' depends on axioms: [propext]",
+                "level": "info"
+              },
+              {
+                "message": "LidoSRv3/Tests/AddressPermitRequestCalls.lean:87:0: 'LidoSRv3.Audit.Source.AddressPermitRequestCalls.call_success' depends on axioms: [propext]",
+                "level": "info"
+              },
+              {
+                "message": "LidoSRv3/Tests/AddressPermitRequestCalls.lean:88:0: 'LidoSRv3.Audit.Source.AddressPermitRequestCalls.joined_success' depends on axioms: [propext]",
+                "level": "info"
+              },
+              {
+                "message": "LidoSRv3/Tests/AddressPermitRequestCalls.lean:89:0: 'LidoSRv3.Audit.Guarantees.PAddress1.actual_steth_permit_batch' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]",
+                "level": "info"
+              },
+              {
+                "message": "LidoSRv3/Tests/AddressPermitRequestCalls.lean:90:0: 'LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_permit_batch' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]",
+                "level": "info"
+              },
+              {
+                "message": "LidoSRv3/Tests/AddressPermitRequestCalls.lean:91:0: 'LidoSRv3.Audit.Guarantees.PAddress1.actual_steth_permit_failure_restores' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]",
+                "level": "info"
+              },
+              {
+                "message": "LidoSRv3/Tests/AddressPermitRequestCalls.lean:92:0: 'LidoSRv3.Audit.Guarantees.PAddress1.actual_wrapped_permit_failure_restores' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]",
+                "level": "info"
+              },
+              {
+                "message": "LidoSRv3/Tests/AddressPermitRequestCalls.lean:93:0: 'LidoSRv3.Tests.AddressPermitRequestCalls.public_empty_success' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]",
+                "level": "info"
+              },
+              {
+                "message": "LidoSRv3/Tests/AddressPermitRequestCalls.lean:94:0: 'LidoSRv3.Tests.AddressPermitRequestCalls.public_paused_rollback' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]",
+                "level": "info"
+              }
+            ],
+            "inputs": [
+              [
+                "LidoSRv3.Tests.AddressPermitRequestCalls:deps",
+                [
+                  [
+                    "deps",
+                    [
+                      [
+                        "\u00ablido-srv3-proof-closure\u00bb/LidoSRv3Test:extraDep",
+                        [
+                          [
+                            "@\u00ablido-srv3-proof-closure\u00bb:extraDep",
+                            "00000000000006bb"
+                          ]
+                        ]
+                      ],
+                      [
+                        "imports",
+                        [
+                          [
+                            "LidoSRv3.Audit.Guarantees.PAddress1PermitRequestCalls transitive imports (legacy)",
+                            "82dcb784546c439e"
+                          ],
+                          [
+                            "LidoSRv3.Audit.Guarantees.PAddress1PermitRequestCalls:importAllArts",
+                            "924e9475b2e490ac"
+                          ]
+                        ]
+                      ]
+                    ]
+                  ],
+                  [
+                    "libs",
+                    [
+                      [
+                        "import dynlibs",
+                        "00000000000006bb"
+                      ],
+                      [
+                        "package external libraries",
+                        "00000000000006bb"
+                      ],
+                      [
+                        "module dynlibs",
+                        "00000000000006bb"
+                      ],
+                      [
+                        "module plugins",
+                        "00000000000006bb"
+                      ]
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "Lean 4.31.0, commit 68218e876d2a38b1985b8590fff244a83c321783",
+                "fc45ac412f28501c"
+              ],
+              [
+                "/private/tmp/lido-address-permit-batches/LidoSRv3/Tests/AddressPermitRequestCalls.lean",
+                "fd70811bde9345f7"
+              ],
+              [
+                "options",
+                "00000000000006bb"
+              ],
+              [
+                "isModule: false",
+                "feefd2a0d3a1847e"
+              ],
+              [
+                "Module.name: LidoSRv3.Tests.AddressPermitRequestCalls",
+                "8def6120c7117b05"
+              ],
+              [
+                "Package.id?: (some lido-srv3-proof-closure)",
+                "1792847f4a06c449"
+              ],
+              [
+                "Module.leanArgs: #[]",
+                "00000000000006bb"
+              ]
+            ],
+            "depHash": "3363d7cb7abbae17"
+          }
+        }
+      }
+    }
+  ]
+}

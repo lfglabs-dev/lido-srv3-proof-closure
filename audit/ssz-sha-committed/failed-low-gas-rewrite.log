@@ -1,0 +1,107 @@
+⚠ [1071/1135] Replayed Conform.Wheels
+warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: Conform/Wheels.lean:106:70: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1073/1135] Replayed EvmYul.Pretty
+warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: EvmYul/Pretty.lean:36:32: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1114/1135] Replayed EvmYul.Semantics
+warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1115/1135] Replayed EvmYul.EVM.Semantics
+warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+ℹ [1133/1135] Replayed LidoSRv3.Audit.Source.SszWitnessAbi
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:326:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.run_success_input_binding' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:327:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.pubkey_environment' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:328:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.pair_environment' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:329:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.merkle_environment' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:330:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.call_environment' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:331:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.fields_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:332:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.run_success_origin' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:334:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.read64_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:335:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.readBool_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszWitnessAbi.lean:336:0: 'LidoSRv3.Audit.Source.SszWitnessAbi.tail_success_length' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1134/1135] Replayed LidoSRv3.Audit.Source.SszShaCommitted
+info: LidoSRv3/Audit/Source/SszShaCommitted.lean:337:0: 'LidoSRv3.Audit.Source.SszShaCommitted.run_success_computed_merkle' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/SszShaCommitted.lean:338:0: 'LidoSRv3.Audit.Source.SszShaCommitted.pubkey_success_words' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszShaCommitted.lean:339:0: 'LidoSRv3.Audit.Source.SszShaCommitted.merkle_success_digest' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszShaCommitted.lean:340:0: 'LidoSRv3.Audit.Source.SszShaCommitted.call_words' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszShaCommitted.lean:341:0: 'LidoSRv3.Audit.Source.SszShaCommitted.pair_success_words' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszShaCommitted.lean:342:0: 'LidoSRv3.Audit.Source.SszShaCommitted.pair_success_digest' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszShaCommitted.lean:343:0: 'LidoSRv3.Audit.Source.SszShaCommitted.call_success_output' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszShaCommitted.lean:344:0: 'LidoSRv3.Audit.Source.SszShaCommitted.pair_success_output' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszShaCommitted.lean:345:0: 'LidoSRv3.Audit.Source.SszShaCommitted.call_success_gas' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszShaCommitted.lean:346:0: 'LidoSRv3.Audit.Source.SszShaCommitted.call_success_depth' depends on axioms: [propext, Classical.choice, Quot.sound]
+✖ [1135/1135] Building LidoSRv3.Tests.SszShaCommittedMutants (1.2s)
+trace: .> LEAN_PATH=/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Cli/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/batteries/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Qq/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/aesop/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/proofwidgets/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/importGraph/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/plausible/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/mathlib/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/evmyul/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/verity/.lake/build/lib/lean:/private/tmp/lido-ssz-sha-committed/.lake/build/lib/lean /Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean /private/tmp/lido-ssz-sha-committed/LidoSRv3/Tests/SszShaCommittedMutants.lean -o /private/tmp/lido-ssz-sha-committed/.lake/build/lib/lean/LidoSRv3/Tests/SszShaCommittedMutants.olean -i /private/tmp/lido-ssz-sha-committed/.lake/build/lib/lean/LidoSRv3/Tests/SszShaCommittedMutants.ilean -c /private/tmp/lido-ssz-sha-committed/.lake/build/ir/LidoSRv3/Tests/SszShaCommittedMutants.c --setup /private/tmp/lido-ssz-sha-committed/.lake/build/ir/LidoSRv3/Tests/SszShaCommittedMutants.setup.json --json
+error: LidoSRv3/Tests/SszShaCommittedMutants.lean:56:2: Tactic `rfl` failed: The left-hand side
+  tag
+    (finish
+      (SszShaCallMemory.callSha (0 + 2)
+        (Ccall SszShaCallMemory.shaAddress SszShaCallMemory.shaAddress (UInt256.ofNat 0)
+          (preparePair lowGas (UInt256.ofNat 7) (UInt256.ofNat 9)).gasAvailable
+          (preparePair lowGas (UInt256.ofNat 7) (UInt256.ofNat 9)).accountMap
+          (preparePair lowGas (UInt256.ofNat 7) (UInt256.ofNat 9)).toMachineState
+          (preparePair lowGas (UInt256.ofNat 7) (UInt256.ofNat 9)).substate)
+        (UInt256.ofNat ↑(preparePair lowGas (UInt256.ofNat 7) (UInt256.ofNat 9)).executionEnv.codeOwner)
+        (preparePair lowGas (UInt256.ofNat 7) (UInt256.ofNat 9)).gasAvailable
+        (preparePair lowGas (UInt256.ofNat 7) (UInt256.ofNat 9))))
+is not definitionally equal to the right-hand side
+  some Error.sha256PrecompileFailed
+
+⊢ tag
+      (finish
+        (SszShaCallMemory.callSha (0 + 2)
+          (Ccall SszShaCallMemory.shaAddress SszShaCallMemory.shaAddress (UInt256.ofNat 0)
+            (preparePair lowGas (UInt256.ofNat 7) (UInt256.ofNat 9)).gasAvailable
+            (preparePair lowGas (UInt256.ofNat 7) (UInt256.ofNat 9)).accountMap
+            (preparePair lowGas (UInt256.ofNat 7) (UInt256.ofNat 9)).toMachineState
+            (preparePair lowGas (UInt256.ofNat 7) (UInt256.ofNat 9)).substate)
+          (UInt256.ofNat ↑(preparePair lowGas (UInt256.ofNat 7) (UInt256.ofNat 9)).executionEnv.codeOwner)
+          (preparePair lowGas (UInt256.ofNat 7) (UInt256.ofNat 9)).gasAvailable
+          (preparePair lowGas (UInt256.ofNat 7) (UInt256.ofNat 9)))) =
+    some Error.sha256PrecompileFailed
+warning: LidoSRv3/Tests/SszShaCommittedMutants.lean:55:13: This simp argument is unused:
+  prepared_read
+
+Hint: Omit it from the simp argument list.
+  simp only ̵[̵p̵r̵e̵p̵a̵r̵e̵d̵_̵r̵e̵a̵d̵]̵
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+info: LidoSRv3/Tests/SszShaCommittedMutants.lean:59:0: 'LidoSRv3.Tests.SszShaCommittedMutants.successful_guard_keeps_wrap' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/SszShaCommittedMutants.lean:60:0: 'LidoSRv3.Audit.Source.SszShaCommitted.merkle_success_digest' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/SszShaCommittedMutants.lean:61:0: 'LidoSRv3.Audit.Source.SszShaCommitted.run_success_computed_merkle' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+error: Lean exited with code 1
+Some required targets logged failures:
+- LidoSRv3.Tests.SszShaCommittedMutants
+error: build failed

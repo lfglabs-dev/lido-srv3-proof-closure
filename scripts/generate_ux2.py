@@ -24,8 +24,9 @@ from typing import NoReturn
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from main_guarantees import main_record, load_main
+from main_guarantees import main_record, main_display, load_main
 import audit_metadata  # noqa: E402  (sibling module, located above)
+from source_spans import span_rows
 import check_proof_escapes  # noqa: E402  (sibling module, located above)
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -876,15 +877,6 @@ def assumption_rows(index: dict[str, dict], ids: list[str]) -> list[dict]:
     return rows
 
 
-def span_rows(source_map: dict, identifier: str) -> list[dict]:
-    targets = [t for t in source_map["targets"] if t["id"] == identifier]
-    if len(targets) != 1:
-        fail(f"{identifier}: expected one source-map target, found {len(targets)}")
-    return [{key: span[key] for key in
-             ("path", "function", "start_line", "end_line", "source_sha", "permalink")}
-            for span in targets[0]["spans"]]
-
-
 def kill_line_modules(command: str) -> list[str]:
     return [word for word in command.split() if word.startswith("LidoSRv3.Tests.")]
 
@@ -898,6 +890,7 @@ def build_record(row: dict, position: int, context: dict) -> dict:
         "summary": row["summary"],
         "classification": row["classification"],
         "next_gate": row["next_gate"],
+        **main_display(row, context["main_results"].get(row["id"], {})),
         "roadmap_priority": row["roadmap_priority"],
         "theorems": [theorem_record(context["declarations"], plane, row[plane])
                      for plane in ("abstract", "verity")],
@@ -907,7 +900,7 @@ def build_record(row: dict, position: int, context: dict) -> dict:
         "fidelity": {"covered": row["fidelity"]["covered"],
                      "missing": row["fidelity"]["missing"],
                      "open_gap_count": len(row["fidelity"]["missing"])},
-        "source_spans": span_rows(context["source_map"], row["id"]),
+        "source_spans": span_rows(context["source_map"], row["id"], fail),
         "boundary": {"model_not_deployment": context["boundary"],
                      "not_covered": row["fidelity"]["missing"]},
     }

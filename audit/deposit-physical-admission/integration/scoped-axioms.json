@@ -1,0 +1,30 @@
+{
+  "LidoSRv3.Audit.Guarantees.PDeposit1.actual_registered_module_call_metadata_suffix": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Guarantees.PDeposit1.actual_registered_module_failure_restores": [
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.DepositPhysicalAdmission.selectedOctets_head": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Source.DepositPhysicalAdmission.selected_fields": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.DepositPhysicalAdmission.public_positive": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.DepositPhysicalAdmission.public_rejection_restores": [
+    "Quot.sound",
+    "propext"
+  ]
+}

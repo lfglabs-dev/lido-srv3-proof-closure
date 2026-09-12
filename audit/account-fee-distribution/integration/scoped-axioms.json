@@ -1,0 +1,125 @@
+{
+  "axioms": {
+    "AccountAddress.FeeDistribution.PaymentChain.append": [
+      "propext"
+    ],
+    "AccountAddress.FeeDistribution.PaymentChain.ledger": [
+      "Quot.sound",
+      "propext"
+    ],
+    "AccountAddress.FeeDistribution.PaymentChain.storage": [
+      "propext"
+    ],
+    "AccountAddress.FeeDistribution.execute_success": [
+      "Quot.sound",
+      "propext"
+    ],
+    "AccountAddress.FeeDistribution.modules_success": [
+      "Quot.sound",
+      "propext"
+    ],
+    "AccountAddress.FeeDistribution.positivePayments_paid": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "AccountAddress.FeeDistribution.success_chain": [
+      "propext"
+    ],
+    "AccountAddress.FeeDistribution.success_paid": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "AccountAddress.FeeDistribution.success_storage": [
+      "propext"
+    ],
+    "AccountAddress.FeeDistribution.transfer_ledger": [
+      "Quot.sound",
+      "propext"
+    ],
+    "AccountAddress.FeeDistribution.transfer_success": [
+      "Quot.sound",
+      "propext"
+    ],
+    "AccountAddress.ReportFeeDistribution.execute_success": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "AccountAddress.ReportFeeDistribution.execute_success_ledger": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "AccountAddress.ReportFeeDistribution.failure_restores": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "AccountAddress.ReportFeeDistribution.minted_budget": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "AccountAddress.ReportFeeDistribution.minted_shares": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "AccountFeeDistributionRegression.actual_distribution": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "AccountFeeDistributionRegression.actual_public_consumer": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "AccountFeeDistributionRegression.conversion_reject_restores_debit": [
+      "propext"
+    ],
+    "AccountFeeDistributionRegression.guard_order_from_zero_before_stopped": [
+      "propext"
+    ],
+    "AccountFeeDistributionRegression.late_overflow_rolls_back_prior_mint_and_transfer": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "AccountFeeDistributionRegression.self_and_duplicate_recipients": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "AccountFeeDistributionRegression.wrapped_share_rate_after_transfer": [
+      "propext"
+    ],
+    "AccountFeeDistributionRegression.zero_mint_skips_bad_treasury": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "AccountFeeDistributionRegression.zero_treasury_skips_read": [
+      "propext"
+    ],
+    "LidoSRv3.Audit.Guarantees.PAccount1.actual_report_fee_distribution_failure_restores": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "LidoSRv3.Audit.Guarantees.PAccount1.actual_report_fee_mint_distribution": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ]
+  },
+  "registered_olean_sha256": {
+    "FeeDistribution": "d7da9cedf418b35fb4d4f5eeef66bf65a7bf4dc0dd12c6107bed0957b06e77fe",
+    "ReportFeeDistribution": "b2049ecced02f4e052402671ca8779d9bea40e253ebe219ba204c90643fb17c8",
+    "LidoSRv3.Audit.Guarantees.PAccount1FeeDistribution": "a526a28fe07293464813aead809634cb61c918d6ad8c5f4536ddc05276b17846",
+    "Tests.Verity.ReportFeeDistributionTest": "2294dbab99798761e2a338a626949d3c1a5c0d321670faee24d63a33afad7c7a"
+  },
+  "scope": "Fresh actual normal-Lake registered environment; all27 newly named theorems (18 production,9 regression). Candidate manual olean identity is not asserted."
+}

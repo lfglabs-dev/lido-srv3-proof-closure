@@ -1,0 +1,82 @@
+{
+  "Lido": {
+    "compiler": {
+      "version": "0.4.24+commit.e67f0147"
+    },
+    "settings": {
+      "remappings": [
+        "@aragon/os/=src/@aragon/os/",
+        "openzeppelin-solidity/=src/openzeppelin-solidity/"
+      ],
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "compilationTarget": {
+        "src/contracts/0.4.24/Lido.sol": "Lido"
+      },
+      "evmVersion": "byzantium",
+      "libraries": {}
+    },
+    "sources": 37,
+    "artifact_sha256": "5e322826827db4f4709535b88f4514baebbc40230dcfb8af7c458505170480f3",
+    "object_sha256": "b3f3bc26682a0365d5c6d045482cdd1248961241d916c26a792563364f453f9a"
+  },
+  "QuoteHarness": {
+    "compiler": {
+      "version": "0.4.24+commit.e67f0147"
+    },
+    "settings": {
+      "remappings": [
+        "@aragon/os/=src/@aragon/os/",
+        "openzeppelin-solidity/=src/openzeppelin-solidity/"
+      ],
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "compilationTarget": {
+        "src/QuoteHarness.sol": "QuoteHarness"
+      },
+      "evmVersion": "byzantium",
+      "libraries": {}
+    },
+    "sources": 38,
+    "artifact_sha256": "8e03c9c263b5fe63e3f2c2eb9a2e8ea573c71174fc5bd5cb63a3937945a8aed7",
+    "object_sha256": "0d38d7d65af27789d46680f495e92ddf65752aafb8738b14bd7152f09706635e"
+  },
+  "BatchHarness": {
+    "compiler": {
+      "version": "0.8.9+commit.e5eed63a"
+    },
+    "settings": {
+      "remappings": [
+        "@openzeppelin/=src/@openzeppelin/"
+      ],
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "metadata": {
+        "bytecodeHash": "ipfs"
+      },
+      "compilationTarget": {
+        "src/BatchHarness.sol": "BatchHarness"
+      },
+      "evmVersion": "london",
+      "libraries": {}
+    },
+    "sources": 18,
+    "artifact_sha256": "67cdd722fa1f4f8d2fe620011e1adbdcfbb3d72fc948a1f1b5ab72d23b60a09d",
+    "object_sha256": "17b07cae0e23376e665c320380c8b8a2718ac4001d5ad19134ae122a5ca24123"
+  },
+  "reused": {
+    "parent": "6e87eb6e7d6465936d3fab76c3fc7fab5ec51194",
+    "WstETH_artifact_sha256": "dcb0b2a66eac8c7e763bcf431dee815672c03a99223bd172ad71e8f0c12b2eff",
+    "queue_sources": 18
+  },
+  "tools": {
+    "forge": "forge Version: 1.5.0-v1.5.0\nCommit SHA: 1c57854462289b2e71ee7654cd6666217ed86ffd\nBuild Timestamp: 2025-11-24T06:07:42.598695000Z (1763964462)\nBuild Profile: maxperf",
+    "cast": "cast Version: 1.5.0-v1.5.0\nCommit SHA: 1c57854462289b2e71ee7654cd6666217ed86ffd\nBuild Timestamp: 2025-11-24T06:07:42.598695000Z (1763964462)\nBuild Profile: maxperf"
+  }
+}

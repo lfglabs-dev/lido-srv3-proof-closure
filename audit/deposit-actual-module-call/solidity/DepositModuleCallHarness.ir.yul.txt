@@ -1,0 +1,1058 @@
+
+/// @use-src 5:"audit/deposit-actual-module-call/solidity/DepositModuleCall.t.sol"
+object "DepositModuleCallHarness_1542" {
+    code {
+        /// @src 5:340:1785  "contract DepositModuleCallHarness {..."
+        mstore(64, memoryguard(128))
+        if callvalue() { revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb() }
+
+        constructor_DepositModuleCallHarness_1542()
+
+        let _1 := allocate_unbounded()
+        codecopy(_1, dataoffset("DepositModuleCallHarness_1542_deployed"), datasize("DepositModuleCallHarness_1542_deployed"))
+
+        return(_1, datasize("DepositModuleCallHarness_1542_deployed"))
+
+        function allocate_unbounded() -> memPtr {
+            memPtr := mload(64)
+        }
+
+        function revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb() {
+            revert(0, 0)
+        }
+
+        /// @src 5:340:1785  "contract DepositModuleCallHarness {..."
+        function constructor_DepositModuleCallHarness_1542() {
+
+            /// @src 5:340:1785  "contract DepositModuleCallHarness {..."
+
+        }
+        /// @src 5:340:1785  "contract DepositModuleCallHarness {..."
+
+    }
+    /// @use-src 0:"/private/tmp/lido-ssz-proof-committed/lido-core/contracts/0.8.25/sr/SRStorage.sol", 5:"audit/deposit-actual-module-call/solidity/DepositModuleCall.t.sol"
+    object "DepositModuleCallHarness_1542_deployed" {
+        code {
+            /// @src 5:340:1785  "contract DepositModuleCallHarness {..."
+            mstore(64, memoryguard(128))
+
+            if iszero(lt(calldatasize(), 4))
+            {
+                let selector := shift_right_224_unsigned(calldataload(0))
+                switch selector
+
+                case 0x92137c18
+                {
+                    // invoke(uint256,uint256,uint256,bytes)
+
+                    external_fun_invoke_1519()
+                }
+
+                case 0xb9027a6c
+                {
+                    // decodeCall(address,uint256,bytes)
+
+                    external_fun_decodeCall_1541()
+                }
+
+                default {}
+            }
+
+            revert_error_42b3090547df1d2001c96683413b8cf91c1b902ef5e3cb8d9f6f304cf7446f74()
+
+            function shift_right_224_unsigned(value) -> newValue {
+                newValue :=
+
+                shr(224, value)
+
+            }
+
+            function allocate_unbounded() -> memPtr {
+                memPtr := mload(64)
+            }
+
+            function revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb() {
+                revert(0, 0)
+            }
+
+            function revert_error_dbdddcbe895c83990c08b3492a0e83918d802a52331272ac6fdb6a7c4aea3b1b() {
+                revert(0, 0)
+            }
+
+            function revert_error_c1322bf8034eace5e0b5c7295db60986aa89aae5e0ea0873e4689e076861a5db() {
+                revert(0, 0)
+            }
+
+            function cleanup_t_uint256(value) -> cleaned {
+                cleaned := value
+            }
+
+            function validator_revert_t_uint256(value) {
+                if iszero(eq(value, cleanup_t_uint256(value))) { revert(0, 0) }
+            }
+
+            function abi_decode_t_uint256(offset, end) -> value {
+                value := calldataload(offset)
+                validator_revert_t_uint256(value)
+            }
+
+            function revert_error_1b9f4a0a5773e33b91aa01db23bf8c55fce1411167c872835e7fa00a4f17d46d() {
+                revert(0, 0)
+            }
+
+            function revert_error_15abf5612cd996bc235ba1e55a4a30ac60e6bb601ff7ba4ad3f179b6be8d0490() {
+                revert(0, 0)
+            }
+
+            function revert_error_81385d8c0b31fffe14be1da910c8bd3a80be4cfa248e04f42ec0faea3132a8ef() {
+                revert(0, 0)
+            }
+
+            // bytes
+            function abi_decode_t_bytes_calldata_ptr(offset, end) -> arrayPos, length {
+                if iszero(slt(add(offset, 0x1f), end)) { revert_error_1b9f4a0a5773e33b91aa01db23bf8c55fce1411167c872835e7fa00a4f17d46d() }
+                length := calldataload(offset)
+                if gt(length, 0xffffffffffffffff) { revert_error_15abf5612cd996bc235ba1e55a4a30ac60e6bb601ff7ba4ad3f179b6be8d0490() }
+                arrayPos := add(offset, 0x20)
+                if gt(add(arrayPos, mul(length, 0x01)), end) { revert_error_81385d8c0b31fffe14be1da910c8bd3a80be4cfa248e04f42ec0faea3132a8ef() }
+            }
+
+            function abi_decode_tuple_t_uint256t_uint256t_uint256t_bytes_calldata_ptr(headStart, dataEnd) -> value0, value1, value2, value3, value4 {
+                if slt(sub(dataEnd, headStart), 128) { revert_error_dbdddcbe895c83990c08b3492a0e83918d802a52331272ac6fdb6a7c4aea3b1b() }
+
+                {
+
+                    let offset := 0
+
+                    value0 := abi_decode_t_uint256(add(headStart, offset), dataEnd)
+                }
+
+                {
+
+                    let offset := 32
+
+                    value1 := abi_decode_t_uint256(add(headStart, offset), dataEnd)
+                }
+
+                {
+
+                    let offset := 64
+
+                    value2 := abi_decode_t_uint256(add(headStart, offset), dataEnd)
+                }
+
+                {
+
+                    let offset := calldataload(add(headStart, 96))
+                    if gt(offset, 0xffffffffffffffff) { revert_error_c1322bf8034eace5e0b5c7295db60986aa89aae5e0ea0873e4689e076861a5db() }
+
+                    value3, value4 := abi_decode_t_bytes_calldata_ptr(add(headStart, offset), dataEnd)
+                }
+
+            }
+
+            function array_length_t_bytes_memory_ptr(value) -> length {
+
+                length := mload(value)
+
+            }
+
+            function array_storeLengthForEncoding_t_bytes_memory_ptr_fromStack(pos, length) -> updated_pos {
+                mstore(pos, length)
+                updated_pos := add(pos, 0x20)
+            }
+
+            function copy_memory_to_memory_with_cleanup(src, dst, length) {
+
+                mcopy(dst, src, length)
+                mstore(add(dst, length), 0)
+
+            }
+
+            function round_up_to_mul_of_32(value) -> result {
+                result := and(add(value, 31), not(31))
+            }
+
+            function abi_encode_t_bytes_memory_ptr_to_t_bytes_memory_ptr_fromStack(value, pos) -> end {
+                let length := array_length_t_bytes_memory_ptr(value)
+                pos := array_storeLengthForEncoding_t_bytes_memory_ptr_fromStack(pos, length)
+                copy_memory_to_memory_with_cleanup(add(value, 0x20), pos, length)
+                end := add(pos, round_up_to_mul_of_32(length))
+            }
+
+            function abi_encode_tuple_t_bytes_memory_ptr_t_bytes_memory_ptr__to_t_bytes_memory_ptr_t_bytes_memory_ptr__fromStack(headStart , value0, value1) -> tail {
+                tail := add(headStart, 64)
+
+                mstore(add(headStart, 0), sub(tail, headStart))
+                tail := abi_encode_t_bytes_memory_ptr_to_t_bytes_memory_ptr_fromStack(value0,  tail)
+
+                mstore(add(headStart, 32), sub(tail, headStart))
+                tail := abi_encode_t_bytes_memory_ptr_to_t_bytes_memory_ptr_fromStack(value1,  tail)
+
+            }
+
+            function external_fun_invoke_1519() {
+
+                if callvalue() { revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb() }
+                let param_0, param_1, param_2, param_3, param_4 :=  abi_decode_tuple_t_uint256t_uint256t_uint256t_bytes_calldata_ptr(4, calldatasize())
+                let ret_0, ret_1 :=  fun_invoke_1519(param_0, param_1, param_2, param_3, param_4)
+                let memPos := allocate_unbounded()
+                let memEnd := abi_encode_tuple_t_bytes_memory_ptr_t_bytes_memory_ptr__to_t_bytes_memory_ptr_t_bytes_memory_ptr__fromStack(memPos , ret_0, ret_1)
+                return(memPos, sub(memEnd, memPos))
+
+            }
+
+            function cleanup_t_uint160(value) -> cleaned {
+                cleaned := and(value, 0xffffffffffffffffffffffffffffffffffffffff)
+            }
+
+            function cleanup_t_address(value) -> cleaned {
+                cleaned := cleanup_t_uint160(value)
+            }
+
+            function validator_revert_t_address(value) {
+                if iszero(eq(value, cleanup_t_address(value))) { revert(0, 0) }
+            }
+
+            function abi_decode_t_address(offset, end) -> value {
+                value := calldataload(offset)
+                validator_revert_t_address(value)
+            }
+
+            function abi_decode_tuple_t_addresst_uint256t_bytes_calldata_ptr(headStart, dataEnd) -> value0, value1, value2, value3 {
+                if slt(sub(dataEnd, headStart), 96) { revert_error_dbdddcbe895c83990c08b3492a0e83918d802a52331272ac6fdb6a7c4aea3b1b() }
+
+                {
+
+                    let offset := 0
+
+                    value0 := abi_decode_t_address(add(headStart, offset), dataEnd)
+                }
+
+                {
+
+                    let offset := 32
+
+                    value1 := abi_decode_t_uint256(add(headStart, offset), dataEnd)
+                }
+
+                {
+
+                    let offset := calldataload(add(headStart, 64))
+                    if gt(offset, 0xffffffffffffffff) { revert_error_c1322bf8034eace5e0b5c7295db60986aa89aae5e0ea0873e4689e076861a5db() }
+
+                    value2, value3 := abi_decode_t_bytes_calldata_ptr(add(headStart, offset), dataEnd)
+                }
+
+            }
+
+            function external_fun_decodeCall_1541() {
+
+                if callvalue() { revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb() }
+                let param_0, param_1, param_2, param_3 :=  abi_decode_tuple_t_addresst_uint256t_bytes_calldata_ptr(4, calldatasize())
+                let ret_0, ret_1 :=  fun_decodeCall_1541(param_0, param_1, param_2, param_3)
+                let memPos := allocate_unbounded()
+                let memEnd := abi_encode_tuple_t_bytes_memory_ptr_t_bytes_memory_ptr__to_t_bytes_memory_ptr_t_bytes_memory_ptr__fromStack(memPos , ret_0, ret_1)
+                return(memPos, sub(memEnd, memPos))
+
+            }
+
+            function revert_error_42b3090547df1d2001c96683413b8cf91c1b902ef5e3cb8d9f6f304cf7446f74() {
+                revert(0, 0)
+            }
+
+            function zero_value_for_split_t_bytes_memory_ptr() -> ret {
+                ret := 96
+            }
+
+            function shift_right_0_unsigned(value) -> newValue {
+                newValue :=
+
+                shr(0, value)
+
+            }
+
+            function cleanup_from_storage_t_address(value) -> cleaned {
+                cleaned := and(value, 0xffffffffffffffffffffffffffffffffffffffff)
+            }
+
+            function extract_from_storage_value_offset_0t_address(slot_value) -> value {
+                value := cleanup_from_storage_t_address(shift_right_0_unsigned(slot_value))
+            }
+
+            function read_from_storage_split_offset_0_t_address(slot) -> value {
+                value := extract_from_storage_value_offset_0t_address(sload(slot))
+
+            }
+
+            function shift_right_128_unsigned(value) -> newValue {
+                newValue :=
+
+                shr(128, value)
+
+            }
+
+            function cleanup_from_storage_t_uint64(value) -> cleaned {
+                cleaned := and(value, 0xffffffffffffffff)
+            }
+
+            function extract_from_storage_value_offset_16t_uint64(slot_value) -> value {
+                value := cleanup_from_storage_t_uint64(shift_right_128_unsigned(slot_value))
+            }
+
+            function read_from_storage_split_offset_16_t_uint64(slot) -> value {
+                value := extract_from_storage_value_offset_16t_uint64(sload(slot))
+
+            }
+
+            function cleanup_t_uint64(value) -> cleaned {
+                cleaned := and(value, 0xffffffffffffffff)
+            }
+
+            function identity(value) -> ret {
+                ret := value
+            }
+
+            function convert_t_uint64_to_t_uint256(value) -> converted {
+                converted := cleanup_t_uint256(identity(cleanup_t_uint64(value)))
+            }
+
+            function panic_error_0x12() {
+                mstore(0, 35408467139433450592217433187231851964531694900788300625387963629091585785856)
+                mstore(4, 0x12)
+                revert(0, 0x24)
+            }
+
+            function panic_error_0x11() {
+                mstore(0, 35408467139433450592217433187231851964531694900788300625387963629091585785856)
+                mstore(4, 0x11)
+                revert(0, 0x24)
+            }
+
+            function checked_div_t_uint256(x, y) -> r {
+                x := cleanup_t_uint256(x)
+                y := cleanup_t_uint256(y)
+                if iszero(y) { panic_error_0x12() }
+
+                r := div(x, y)
+            }
+
+            function cleanup_t_rational_0_by_1(value) -> cleaned {
+                cleaned := value
+            }
+
+            function convert_t_rational_0_by_1_to_t_uint256(value) -> converted {
+                converted := cleanup_t_uint256(identity(cleanup_t_rational_0_by_1(value)))
+            }
+
+            function abi_encode_tuple__to__fromStack(headStart ) -> tail {
+                tail := add(headStart, 0)
+
+            }
+
+            function convert_t_uint160_to_t_uint160(value) -> converted {
+                converted := cleanup_t_uint160(identity(cleanup_t_uint160(value)))
+            }
+
+            function convert_t_uint160_to_t_contract$_IStakingModule_$726(value) -> converted {
+                converted := convert_t_uint160_to_t_uint160(value)
+            }
+
+            function convert_t_address_to_t_contract$_IStakingModule_$726(value) -> converted {
+                converted := convert_t_uint160_to_t_contract$_IStakingModule_$726(value)
+            }
+
+            function convert_t_uint160_to_t_address(value) -> converted {
+                converted := convert_t_uint160_to_t_uint160(value)
+            }
+
+            function convert_t_contract$_IStakingModule_$726_to_t_address(value) -> converted {
+                converted := convert_t_uint160_to_t_address(value)
+            }
+
+            function revert_error_0cc013b6b3b6beabea4e3a74a6d380f0df81852ca99887912475e1f66b2a2c20() {
+                revert(0, 0)
+            }
+
+            function panic_error_0x41() {
+                mstore(0, 35408467139433450592217433187231851964531694900788300625387963629091585785856)
+                mstore(4, 0x41)
+                revert(0, 0x24)
+            }
+
+            function finalize_allocation(memPtr, size) {
+                let newFreePtr := add(memPtr, round_up_to_mul_of_32(size))
+                // protect against overflow
+                if or(gt(newFreePtr, 0xffffffffffffffff), lt(newFreePtr, memPtr)) { panic_error_0x41() }
+                mstore(64, newFreePtr)
+            }
+
+            function shift_left_224(value) -> newValue {
+                newValue :=
+
+                shl(224, value)
+
+            }
+
+            function revert_error_987264b3b1d58a9c7f8255e93e81c77d86d6299019c33110a076957a3e06e2ae() {
+                revert(0, 0)
+            }
+
+            function allocate_memory(size) -> memPtr {
+                memPtr := allocate_unbounded()
+                finalize_allocation(memPtr, size)
+            }
+
+            function array_allocation_size_t_bytes_memory_ptr(length) -> size {
+                // Make sure we can allocate memory without overflow
+                if gt(length, 0xffffffffffffffff) { panic_error_0x41() }
+
+                size := round_up_to_mul_of_32(length)
+
+                // add length slot
+                size := add(size, 0x20)
+
+            }
+
+            function abi_decode_available_length_t_bytes_memory_ptr_fromMemory(src, length, end) -> array {
+                array := allocate_memory(array_allocation_size_t_bytes_memory_ptr(length))
+                mstore(array, length)
+                let dst := add(array, 0x20)
+                if gt(add(src, length), end) { revert_error_987264b3b1d58a9c7f8255e93e81c77d86d6299019c33110a076957a3e06e2ae() }
+                copy_memory_to_memory_with_cleanup(src, dst, length)
+            }
+
+            // bytes
+            function abi_decode_t_bytes_memory_ptr_fromMemory(offset, end) -> array {
+                if iszero(slt(add(offset, 0x1f), end)) { revert_error_1b9f4a0a5773e33b91aa01db23bf8c55fce1411167c872835e7fa00a4f17d46d() }
+                let length := mload(offset)
+                array := abi_decode_available_length_t_bytes_memory_ptr_fromMemory(add(offset, 0x20), length, end)
+            }
+
+            function abi_decode_tuple_t_bytes_memory_ptrt_bytes_memory_ptr_fromMemory(headStart, dataEnd) -> value0, value1 {
+                if slt(sub(dataEnd, headStart), 64) { revert_error_dbdddcbe895c83990c08b3492a0e83918d802a52331272ac6fdb6a7c4aea3b1b() }
+
+                {
+
+                    let offset := mload(add(headStart, 0))
+                    if gt(offset, 0xffffffffffffffff) { revert_error_c1322bf8034eace5e0b5c7295db60986aa89aae5e0ea0873e4689e076861a5db() }
+
+                    value0 := abi_decode_t_bytes_memory_ptr_fromMemory(add(headStart, offset), dataEnd)
+                }
+
+                {
+
+                    let offset := mload(add(headStart, 32))
+                    if gt(offset, 0xffffffffffffffff) { revert_error_c1322bf8034eace5e0b5c7295db60986aa89aae5e0ea0873e4689e076861a5db() }
+
+                    value1 := abi_decode_t_bytes_memory_ptr_fromMemory(add(headStart, offset), dataEnd)
+                }
+
+            }
+
+            function abi_encode_t_uint256_to_t_uint256_fromStack(value, pos) {
+                mstore(pos, cleanup_t_uint256(value))
+            }
+
+            function copy_calldata_to_memory_with_cleanup(src, dst, length) {
+
+                calldatacopy(dst, src, length)
+                mstore(add(dst, length), 0)
+
+            }
+
+            // bytes -> bytes
+            function abi_encode_t_bytes_calldata_ptr_to_t_bytes_memory_ptr_fromStack(start, length, pos) -> end {
+                pos := array_storeLengthForEncoding_t_bytes_memory_ptr_fromStack(pos, length)
+
+                copy_calldata_to_memory_with_cleanup(start, pos, length)
+                end := add(pos, round_up_to_mul_of_32(length))
+            }
+
+            function abi_encode_tuple_t_uint256_t_bytes_calldata_ptr__to_t_uint256_t_bytes_memory_ptr__fromStack(headStart , value0, value1, value2) -> tail {
+                tail := add(headStart, 64)
+
+                abi_encode_t_uint256_to_t_uint256_fromStack(value0,  add(headStart, 0))
+
+                mstore(add(headStart, 32), sub(tail, headStart))
+                tail := abi_encode_t_bytes_calldata_ptr_to_t_bytes_memory_ptr_fromStack(value1, value2,  tail)
+
+            }
+
+            function revert_forward_1() {
+                let pos := allocate_unbounded()
+                returndatacopy(pos, 0, returndatasize())
+                revert(pos, returndatasize())
+            }
+
+            function cleanup_t_rational_48_by_1(value) -> cleaned {
+                cleaned := value
+            }
+
+            function convert_t_rational_48_by_1_to_t_uint256(value) -> converted {
+                converted := cleanup_t_uint256(identity(cleanup_t_rational_48_by_1(value)))
+            }
+
+            function mod_t_uint256(x, y) -> r {
+                x := cleanup_t_uint256(x)
+                y := cleanup_t_uint256(y)
+                if iszero(y) { panic_error_0x12() }
+                r := mod(x, y)
+            }
+
+            function checked_mul_t_uint256(x, y) -> product {
+                x := cleanup_t_uint256(x)
+                y := cleanup_t_uint256(y)
+                let product_raw := mul(x, y)
+                product := cleanup_t_uint256(product_raw)
+
+                // overflow, if x != 0 and y != product/x
+                if iszero(
+                    or(
+                        iszero(x),
+                        eq(y, div(product, x))
+                    )
+                ) { panic_error_0x11() }
+
+            }
+
+            function convert_t_uint256_to_t_uint64(value) -> converted {
+                converted := cleanup_t_uint64(identity(cleanup_t_uint256(value)))
+            }
+
+            function shift_left_0(value) -> newValue {
+                newValue :=
+
+                shl(0, value)
+
+            }
+
+            function update_byte_slice_8_shift_0(value, toInsert) -> result {
+                let mask := 0xffffffffffffffff
+                toInsert := shift_left_0(toInsert)
+                value := and(value, not(mask))
+                result := or(value, and(toInsert, mask))
+            }
+
+            function convert_t_uint64_to_t_uint64(value) -> converted {
+                converted := cleanup_t_uint64(identity(cleanup_t_uint64(value)))
+            }
+
+            function prepare_store_t_uint64(value) -> ret {
+                ret := value
+            }
+
+            function update_storage_value_offset_0t_uint64_to_t_uint64(slot, value_0) {
+                let convertedValue_0 := convert_t_uint64_to_t_uint64(value_0)
+                sstore(slot, update_byte_slice_8_shift_0(sload(slot), prepare_store_t_uint64(convertedValue_0)))
+            }
+
+            function shift_left_64(value) -> newValue {
+                newValue :=
+
+                shl(64, value)
+
+            }
+
+            function update_byte_slice_8_shift_8(value, toInsert) -> result {
+                let mask := 0xffffffffffffffff0000000000000000
+                toInsert := shift_left_64(toInsert)
+                value := and(value, not(mask))
+                result := or(value, and(toInsert, mask))
+            }
+
+            function update_storage_value_offset_8t_uint64_to_t_uint64(slot, value_0) {
+                let convertedValue_0 := convert_t_uint64_to_t_uint64(value_0)
+                sstore(slot, update_byte_slice_8_shift_8(sload(slot), prepare_store_t_uint64(convertedValue_0)))
+            }
+
+            function convert_t_uint256_to_t_uint256(value) -> converted {
+                converted := cleanup_t_uint256(identity(cleanup_t_uint256(value)))
+            }
+
+            function abi_encode_tuple_t_uint256__to_t_uint256__fromStack(headStart , value0) -> tail {
+                tail := add(headStart, 32)
+
+                abi_encode_t_uint256_to_t_uint256_fromStack(value0,  add(headStart, 0))
+
+            }
+
+            /// @ast-id 1519
+            /// @src 5:561:1518  "function invoke(uint256 id, uint256 selected, uint256 maxEB, bytes calldata data)..."
+            function fun_invoke_1519(var_id_1391, var_selected_1393, var_maxEB_1395, var_data_1397_offset, var_data_1397_length) -> var_keys_1400_mpos, var_sigs_1402_mpos {
+                /// @src 5:668:685  "bytes memory keys"
+                let zero_t_bytes_memory_ptr_1_mpos := zero_value_for_split_t_bytes_memory_ptr()
+                var_keys_1400_mpos := zero_t_bytes_memory_ptr_1_mpos
+                /// @src 5:687:704  "bytes memory sigs"
+                let zero_t_bytes_memory_ptr_2_mpos := zero_value_for_split_t_bytes_memory_ptr()
+                var_sigs_1402_mpos := zero_t_bytes_memory_ptr_2_mpos
+
+                /// @src 5:744:753  "SRStorage"
+                let expr_1406_address := linkersymbol("/private/tmp/lido-ssz-proof-committed/lido-core/contracts/0.8.25/sr/SRStorage.sol:SRStorage")
+                /// @src 5:769:771  "id"
+                let _3 := var_id_1391
+                let expr_1408 := _3
+                /// @src 5:744:772  "SRStorage.getModuleState(id)"
+                let expr_1409_slot := fun_getModuleState_75(expr_1408)
+                /// @src 5:744:779  "SRStorage.getModuleState(id).config"
+                let _4 := add(expr_1409_slot, 0)
+                let _5_slot := _4
+                let expr_1410_slot := _5_slot
+                /// @src 5:744:793  "SRStorage.getModuleState(id).config.moduleAddress"
+                let _6 := add(expr_1410_slot, 0)
+                let _7 := read_from_storage_split_offset_0_t_address(_6)
+                let expr_1411 := _7
+                /// @src 5:720:793  "address moduleAddress = SRStorage.getModuleState(id).config.moduleAddress"
+                let var_moduleAddress_1405 := expr_1411
+                /// @src 5:817:826  "SRStorage"
+                let expr_1415_address := linkersymbol("/private/tmp/lido-ssz-proof-committed/lido-core/contracts/0.8.25/sr/SRStorage.sol:SRStorage")
+                /// @src 5:842:844  "id"
+                let _8 := var_id_1391
+                let expr_1417 := _8
+                /// @src 5:817:845  "SRStorage.getModuleState(id)"
+                let expr_1418_slot := fun_getModuleState_75(expr_1417)
+                /// @src 5:817:854  "SRStorage.getModuleState(id).deposits"
+                let _9 := add(expr_1418_slot, 1)
+                let _10_slot := _9
+                let expr_1419_slot := _10_slot
+                /// @src 5:817:874  "SRStorage.getModuleState(id).deposits.maxDepositsPerBlock"
+                let _11 := add(expr_1419_slot, 0)
+                let _12 := read_from_storage_split_offset_16_t_uint64(_11)
+                let expr_1420 := _12
+                /// @src 5:803:874  "uint256 cap = SRStorage.getModuleState(id).deposits.maxDepositsPerBlock"
+                let var_cap_1414 := convert_t_uint64_to_t_uint256(expr_1420)
+                /// @src 5:901:909  "selected"
+                let _13 := var_selected_1393
+                let expr_1424 := _13
+                /// @src 5:912:917  "maxEB"
+                let _14 := var_maxEB_1395
+                let expr_1425 := _14
+                /// @src 5:901:917  "selected / maxEB"
+                let expr_1426 := checked_div_t_uint256(expr_1424, expr_1425)
+
+                /// @src 5:884:917  "uint256 target = selected / maxEB"
+                let var_target_1423 := expr_1426
+                /// @src 5:930:933  "cap"
+                let _15 := var_cap_1414
+                let expr_1428 := _15
+                /// @src 5:936:942  "target"
+                let _16 := var_target_1423
+                let expr_1429 := _16
+                /// @src 5:930:942  "cap < target"
+                let expr_1430 := lt(cleanup_t_uint256(expr_1428), cleanup_t_uint256(expr_1429))
+                /// @src 5:927:954  "if(cap < target) target=cap"
+                if expr_1430 {
+                    /// @src 5:951:954  "cap"
+                    let _17 := var_cap_1414
+                    let expr_1432 := _17
+                    /// @src 5:944:954  "target=cap"
+                    var_target_1423 := expr_1432
+                    let expr_1433 := expr_1432
+                    /// @src 5:927:954  "if(cap < target) target=cap"
+                }
+                /// @src 5:967:973  "target"
+                let _18 := var_target_1423
+                let expr_1436 := _18
+                /// @src 5:975:976  "0"
+                let expr_1437 := 0x00
+                /// @src 5:967:976  "target==0"
+                let expr_1438 := eq(cleanup_t_uint256(expr_1436), convert_t_rational_0_by_1_to_t_uint256(expr_1437))
+                /// @src 5:964:999  "if(target==0) revert ZeroDeposits()"
+                if expr_1438 {
+                    /// @src 5:985:999  "ZeroDeposits()"
+                    {
+                        let _19 := allocate_unbounded()
+                        mstore(_19, 76586096797923479990829474034314011096486620583021977708822283839985846059008)
+                        let _20 := abi_encode_tuple__to__fromStack(add(_19, 4) )
+                        revert(_19, sub(_20, _19))
+                    }/// @src 5:964:999  "if(target==0) revert ZeroDeposits()"
+                }
+                /// @src 5:1036:1049  "moduleAddress"
+                let _21 := var_moduleAddress_1405
+                let expr_1447 := _21
+                /// @src 5:1021:1050  "IStakingModule(moduleAddress)"
+                let expr_1448_address := convert_t_address_to_t_contract$_IStakingModule_$726(expr_1447)
+                /// @src 5:1021:1068  "IStakingModule(moduleAddress).obtainDepositData"
+                let expr_1449_address := convert_t_contract$_IStakingModule_$726_to_t_address(expr_1448_address)
+                let expr_1449_functionSelector := 0xbee41b58
+                /// @src 5:1069:1075  "target"
+                let _22 := var_target_1423
+                let expr_1450 := _22
+                /// @src 5:1076:1080  "data"
+                let _23_offset := var_data_1397_offset
+                let _23_length := var_data_1397_length
+                let expr_1451_offset := _23_offset
+                let expr_1451_length := _23_length
+                /// @src 5:1021:1081  "IStakingModule(moduleAddress).obtainDepositData(target,data)"
+
+                // storage for arguments and returned data
+                let _24 := allocate_unbounded()
+                mstore(_24, shift_left_224(expr_1449_functionSelector))
+                let _25 := abi_encode_tuple_t_uint256_t_bytes_calldata_ptr__to_t_uint256_t_bytes_memory_ptr__fromStack(add(_24, 4) , expr_1450, expr_1451_offset, expr_1451_length)
+
+                let _26 := call(gas(), expr_1449_address,  0,  _24, sub(_25, _24), _24, 0)
+
+                if iszero(_26) { revert_forward_1() }
+
+                let expr_1452_component_1_mpos, expr_1452_component_2_mpos
+                if _26 {
+
+                    let _27 := returndatasize()
+                    returndatacopy(_24, 0, _27)
+
+                    // update freeMemoryPointer according to dynamic return size
+                    finalize_allocation(_24, _27)
+
+                    // decode return parameters from external try-call into retVars
+                    expr_1452_component_1_mpos, expr_1452_component_2_mpos :=  abi_decode_tuple_t_bytes_memory_ptrt_bytes_memory_ptr_fromMemory(_24, add(_24, _27))
+                }
+                /// @src 5:1009:1081  "(keys,sigs)=IStakingModule(moduleAddress).obtainDepositData(target,data)"
+                var_sigs_1402_mpos := expr_1452_component_2_mpos
+                var_keys_1400_mpos := expr_1452_component_1_mpos
+                /// @src 5:1094:1098  "keys"
+                let _28_mpos := var_keys_1400_mpos
+                let expr_1455_mpos := _28_mpos
+                /// @src 5:1094:1105  "keys.length"
+                let expr_1456 := array_length_t_bytes_memory_ptr(expr_1455_mpos)
+                /// @src 5:1106:1108  "48"
+                let expr_1457 := 0x30
+                /// @src 5:1094:1108  "keys.length%48"
+                let expr_1458 := mod_t_uint256(expr_1456, convert_t_rational_48_by_1_to_t_uint256(expr_1457))
+
+                /// @src 5:1110:1111  "0"
+                let expr_1459 := 0x00
+                /// @src 5:1094:1111  "keys.length%48!=0"
+                let expr_1460 := iszero(eq(cleanup_t_uint256(expr_1458), convert_t_rational_0_by_1_to_t_uint256(expr_1459)))
+                /// @src 5:1091:1139  "if(keys.length%48!=0) revert WrongPubkeyLength()"
+                if expr_1460 {
+                    /// @src 5:1120:1139  "WrongPubkeyLength()"
+                    {
+                        let _29 := allocate_unbounded()
+                        mstore(_29, 36194784718320099553558262602641978695507290164216338118051978880125654532096)
+                        let _30 := abi_encode_tuple__to__fromStack(add(_29, 4) )
+                        revert(_29, sub(_30, _29))
+                    }/// @src 5:1091:1139  "if(keys.length%48!=0) revert WrongPubkeyLength()"
+                }
+                /// @src 5:1164:1168  "keys"
+                let _31_mpos := var_keys_1400_mpos
+                let expr_1467_mpos := _31_mpos
+                /// @src 5:1164:1175  "keys.length"
+                let expr_1468 := array_length_t_bytes_memory_ptr(expr_1467_mpos)
+                /// @src 5:1176:1178  "48"
+                let expr_1469 := 0x30
+                /// @src 5:1164:1178  "keys.length/48"
+                let expr_1470 := checked_div_t_uint256(expr_1468, convert_t_rational_48_by_1_to_t_uint256(expr_1469))
+
+                /// @src 5:1149:1178  "uint256 actual=keys.length/48"
+                let var_actual_1466 := expr_1470
+                /// @src 5:1191:1197  "actual"
+                let _32 := var_actual_1466
+                let expr_1472 := _32
+                /// @src 5:1198:1204  "target"
+                let _33 := var_target_1423
+                let expr_1473 := _33
+                /// @src 5:1191:1204  "actual>target"
+                let expr_1474 := gt(cleanup_t_uint256(expr_1472), cleanup_t_uint256(expr_1473))
+                /// @src 5:1188:1239  "if(actual>target) revert ModuleReturnExceedTarget()"
+                if expr_1474 {
+                    /// @src 5:1213:1239  "ModuleReturnExceedTarget()"
+                    {
+                        let _34 := allocate_unbounded()
+                        mstore(_34, 35480109854668016690792426241115735842612682081085293801725508816481206403072)
+                        let _35 := abi_encode_tuple__to__fromStack(add(_34, 4) )
+                        revert(_34, sub(_35, _34))
+                    }/// @src 5:1188:1239  "if(actual>target) revert ModuleReturnExceedTarget()"
+                }
+                /// @src 5:1271:1277  "actual"
+                let _36 := var_actual_1466
+                let expr_1481 := _36
+                /// @src 5:1278:1283  "maxEB"
+                let _37 := var_maxEB_1395
+                let expr_1482 := _37
+                /// @src 5:1271:1283  "actual*maxEB"
+                let expr_1483 := checked_mul_t_uint256(expr_1481, expr_1482)
+
+                /// @src 5:1249:1283  "uint256 depositsValue=actual*maxEB"
+                let var_depositsValue_1480 := expr_1483
+                /// @src 5:1352:1367  "block.timestamp"
+                let expr_1495 := timestamp()
+                /// @src 5:1345:1368  "uint64(block.timestamp)"
+                let expr_1496 := convert_t_uint256_to_t_uint64(expr_1495)
+                /// @src 5:1293:1302  "SRStorage"
+                let expr_1485_address := linkersymbol("/private/tmp/lido-ssz-proof-committed/lido-core/contracts/0.8.25/sr/SRStorage.sol:SRStorage")
+                /// @src 5:1318:1320  "id"
+                let _38 := var_id_1391
+                let expr_1488 := _38
+                /// @src 5:1293:1321  "SRStorage.getModuleState(id)"
+                let expr_1489_slot := fun_getModuleState_75(expr_1488)
+                /// @src 5:1293:1330  "SRStorage.getModuleState(id).deposits"
+                let _39 := add(expr_1489_slot, 1)
+                let _40_slot := _39
+                let expr_1490_slot := _40_slot
+                /// @src 5:1293:1344  "SRStorage.getModuleState(id).deposits.lastDepositAt"
+                let _41 := add(expr_1490_slot, 0)
+                /// @src 5:1293:1368  "SRStorage.getModuleState(id).deposits.lastDepositAt=uint64(block.timestamp)"
+                update_storage_value_offset_0t_uint64_to_t_uint64(_41, expr_1496)
+                let expr_1497 := expr_1496
+                /// @src 5:1440:1452  "block.number"
+                let expr_1509 := number()
+                /// @src 5:1433:1453  "uint64(block.number)"
+                let expr_1510 := convert_t_uint256_to_t_uint64(expr_1509)
+                /// @src 5:1378:1387  "SRStorage"
+                let expr_1499_address := linkersymbol("/private/tmp/lido-ssz-proof-committed/lido-core/contracts/0.8.25/sr/SRStorage.sol:SRStorage")
+                /// @src 5:1403:1405  "id"
+                let _42 := var_id_1391
+                let expr_1502 := _42
+                /// @src 5:1378:1406  "SRStorage.getModuleState(id)"
+                let expr_1503_slot := fun_getModuleState_75(expr_1502)
+                /// @src 5:1378:1415  "SRStorage.getModuleState(id).deposits"
+                let _43 := add(expr_1503_slot, 1)
+                let _44_slot := _43
+                let expr_1504_slot := _44_slot
+                /// @src 5:1378:1432  "SRStorage.getModuleState(id).deposits.lastDepositBlock"
+                let _45 := add(expr_1504_slot, 0)
+                /// @src 5:1378:1453  "SRStorage.getModuleState(id).deposits.lastDepositBlock=uint64(block.number)"
+                update_storage_value_offset_8t_uint64_to_t_uint64(_45, expr_1510)
+                let expr_1511 := expr_1510
+                /// @src 5:1494:1496  "id"
+                let _46 := var_id_1391
+                let expr_1514 := _46
+                /// @src 5:1497:1510  "depositsValue"
+                let _47 := var_depositsValue_1480
+                let expr_1515 := _47
+                /// @src 5:1468:1511  "StakingRouterETHDeposited(id,depositsValue)"
+                let _48 := 0x9151b7f88aca05d432bb395647ef52b2ffc454e3c6afb69c95345af6b5a778c0
+                let _49 := convert_t_uint256_to_t_uint256(expr_1514)
+                {
+                    let _50 := allocate_unbounded()
+                    let _51 := abi_encode_tuple_t_uint256__to_t_uint256__fromStack(_50 , expr_1515)
+                    log2(_50, sub(_51, _50) , _48, _49)
+                }
+            }
+            /// @src 5:340:1785  "contract DepositModuleCallHarness {..."
+
+            /// @ast-id 1541
+            /// @src 5:1591:1783  "function decodeCall(address target, uint256 count, bytes calldata data)..."
+            function fun_decodeCall_1541(var_target_1521, var_count_1523, var_data_1525_offset, var_data_1525_length) -> var__1528_mpos, var__1530_mpos {
+                /// @src 5:1688:1700  "bytes memory"
+                let zero_t_bytes_memory_ptr_52_mpos := zero_value_for_split_t_bytes_memory_ptr()
+                var__1528_mpos := zero_t_bytes_memory_ptr_52_mpos
+                /// @src 5:1701:1713  "bytes memory"
+                let zero_t_bytes_memory_ptr_53_mpos := zero_value_for_split_t_bytes_memory_ptr()
+                var__1530_mpos := zero_t_bytes_memory_ptr_53_mpos
+
+                /// @src 5:1743:1749  "target"
+                let _54 := var_target_1521
+                let expr_1533 := _54
+                /// @src 5:1728:1750  "IStakingModule(target)"
+                let expr_1534_address := convert_t_address_to_t_contract$_IStakingModule_$726(expr_1533)
+                /// @src 5:1728:1768  "IStakingModule(target).obtainDepositData"
+                let expr_1535_address := convert_t_contract$_IStakingModule_$726_to_t_address(expr_1534_address)
+                let expr_1535_functionSelector := 0xbee41b58
+                /// @src 5:1769:1774  "count"
+                let _55 := var_count_1523
+                let expr_1536 := _55
+                /// @src 5:1775:1779  "data"
+                let _56_offset := var_data_1525_offset
+                let _56_length := var_data_1525_length
+                let expr_1537_offset := _56_offset
+                let expr_1537_length := _56_length
+                /// @src 5:1728:1780  "IStakingModule(target).obtainDepositData(count,data)"
+
+                // storage for arguments and returned data
+                let _57 := allocate_unbounded()
+                mstore(_57, shift_left_224(expr_1535_functionSelector))
+                let _58 := abi_encode_tuple_t_uint256_t_bytes_calldata_ptr__to_t_uint256_t_bytes_memory_ptr__fromStack(add(_57, 4) , expr_1536, expr_1537_offset, expr_1537_length)
+
+                let _59 := call(gas(), expr_1535_address,  0,  _57, sub(_58, _57), _57, 0)
+
+                if iszero(_59) { revert_forward_1() }
+
+                let expr_1538_component_1_mpos, expr_1538_component_2_mpos
+                if _59 {
+
+                    let _60 := returndatasize()
+                    returndatacopy(_57, 0, _60)
+
+                    // update freeMemoryPointer according to dynamic return size
+                    finalize_allocation(_57, _60)
+
+                    // decode return parameters from external try-call into retVars
+                    expr_1538_component_1_mpos, expr_1538_component_2_mpos :=  abi_decode_tuple_t_bytes_memory_ptrt_bytes_memory_ptr_fromMemory(_57, add(_57, _60))
+                }
+                /// @src 5:1721:1780  "return IStakingModule(target).obtainDepositData(count,data)"
+                var__1528_mpos := expr_1538_component_1_mpos
+                var__1530_mpos := expr_1538_component_2_mpos
+                leave
+
+            }
+            /// @src 5:340:1785  "contract DepositModuleCallHarness {..."
+
+            function mapping_index_access_t_mapping$_t_uint256_$_t_struct$_ModuleState_$419_storage_$_of_t_uint256(slot , key) -> dataSlot {
+                mstore(0, convert_t_uint256_to_t_uint256(key))
+                mstore(0x20, slot)
+                dataSlot := keccak256(0, 0x40)
+            }
+
+            function convert_t_struct$_ModuleState_$419_storage_to_t_struct$_ModuleState_$419_storage_ptr(value) -> converted {
+                converted := value
+            }
+
+            /// @ast-id 75
+            /// @src 0:1032:1183  "function getModuleState(uint256 _moduleId) internal view returns (ModuleState storage) {..."
+            function fun_getModuleState_75(var__moduleId_62) -> var__66_slot {
+
+                /// @src 0:1136:1152  "getRouterState()"
+                let expr_69_slot := fun_getRouterState_59()
+                /// @src 0:1136:1165  "getRouterState().moduleStates"
+                let _61 := add(expr_69_slot, 0)
+                let _62_slot := _61
+                let expr_70_slot := _62_slot
+                /// @src 0:1166:1175  "_moduleId"
+                let _63 := var__moduleId_62
+                let expr_71 := _63
+                /// @src 0:1136:1176  "getRouterState().moduleStates[_moduleId]"
+                let _64 := mapping_index_access_t_mapping$_t_uint256_$_t_struct$_ModuleState_$419_storage_$_of_t_uint256(expr_70_slot,expr_71)
+                let _65_slot := _64
+                let expr_72_slot := _65_slot
+                /// @src 0:1129:1176  "return getRouterState().moduleStates[_moduleId]"
+                var__66_slot := convert_t_struct$_ModuleState_$419_storage_to_t_struct$_ModuleState_$419_storage_ptr(expr_72_slot)
+                leave
+
+            }
+            /// @src 5:340:1785  "contract DepositModuleCallHarness {..."
+
+            function array_storeLengthForEncoding_t_string_memory_ptr_nonPadded_inplace_fromStack(pos, length) -> updated_pos {
+                updated_pos := pos
+            }
+
+            function store_literal_in_memory_831834a4d2b419c7674f211476c6a71027102c039859cc132e24117525fe36ad(memPtr) {
+
+                mstore(add(memPtr, 0), "lido.StakingRouter.routerStorage")
+
+            }
+
+            function abi_encode_t_stringliteral_831834a4d2b419c7674f211476c6a71027102c039859cc132e24117525fe36ad_to_t_string_memory_ptr_nonPadded_inplace_fromStack(pos) -> end {
+                pos := array_storeLengthForEncoding_t_string_memory_ptr_nonPadded_inplace_fromStack(pos, 32)
+                store_literal_in_memory_831834a4d2b419c7674f211476c6a71027102c039859cc132e24117525fe36ad(pos)
+                end := add(pos, 32)
+            }
+
+            function abi_encode_tuple_packed_t_stringliteral_831834a4d2b419c7674f211476c6a71027102c039859cc132e24117525fe36ad__to_t_string_memory_ptr__nonPadded_inplace_fromStack(pos ) -> end {
+
+                pos := abi_encode_t_stringliteral_831834a4d2b419c7674f211476c6a71027102c039859cc132e24117525fe36ad_to_t_string_memory_ptr_nonPadded_inplace_fromStack( pos)
+
+                end := pos
+            }
+
+            function array_dataslot_t_bytes_memory_ptr(ptr) -> data {
+                data := ptr
+
+                data := add(ptr, 0x20)
+
+            }
+
+            function convert_t_bytes32_to_t_uint256(value) -> converted {
+                converted := convert_t_uint256_to_t_uint256(shift_right_0_unsigned(value))
+            }
+
+            function cleanup_t_rational_1_by_1(value) -> cleaned {
+                cleaned := value
+            }
+
+            function convert_t_rational_1_by_1_to_t_uint256(value) -> converted {
+                converted := cleanup_t_uint256(identity(cleanup_t_rational_1_by_1(value)))
+            }
+
+            function checked_sub_t_uint256(x, y) -> diff {
+                x := cleanup_t_uint256(x)
+                y := cleanup_t_uint256(y)
+                diff := sub(x, y)
+
+                if gt(diff, x) { panic_error_0x11() }
+
+            }
+
+            function cleanup_t_rational_255_by_1(value) -> cleaned {
+                cleaned := value
+            }
+
+            function convert_t_rational_255_by_1_to_t_uint256(value) -> converted {
+                converted := cleanup_t_uint256(identity(cleanup_t_rational_255_by_1(value)))
+            }
+
+            function cleanup_t_bytes32(value) -> cleaned {
+                cleaned := value
+            }
+
+            function convert_t_uint256_to_t_bytes32(value) -> converted {
+                converted := cleanup_t_bytes32(shift_left_0(cleanup_t_uint256(value)))
+            }
+
+            /// @src 0:527:718  "bytes32 internal constant ROUTER_STORAGE_POSITION = keccak256(..."
+            function constant_ROUTER_STORAGE_POSITION_46() -> ret {
+                /// @src 0:627:679  "abi.encodePacked(\"lido.StakingRouter.routerStorage\")"
+
+                let expr_30_mpos := allocate_unbounded()
+                let _66 := add(expr_30_mpos, 0x20)
+
+                let _67 := abi_encode_tuple_packed_t_stringliteral_831834a4d2b419c7674f211476c6a71027102c039859cc132e24117525fe36ad__to_t_string_memory_ptr__nonPadded_inplace_fromStack(_66)
+                mstore(expr_30_mpos, sub(_67, add(expr_30_mpos, 0x20)))
+                finalize_allocation(expr_30_mpos, sub(_67, expr_30_mpos))
+                /// @src 0:617:680  "keccak256(abi.encodePacked(\"lido.StakingRouter.routerStorage\"))"
+                let expr_31 := keccak256(array_dataslot_t_bytes_memory_ptr(expr_30_mpos), array_length_t_bytes_memory_ptr(expr_30_mpos))
+                /// @src 0:609:681  "uint256(keccak256(abi.encodePacked(\"lido.StakingRouter.routerStorage\")))"
+                let expr_32 := convert_t_bytes32_to_t_uint256(expr_31)
+                /// @src 0:684:685  "1"
+                let expr_33 := 0x01
+                /// @src 0:609:685  "uint256(keccak256(abi.encodePacked(\"lido.StakingRouter.routerStorage\"))) - 1"
+                let expr_34 := checked_sub_t_uint256(expr_32, convert_t_rational_1_by_1_to_t_uint256(expr_33))
+
+                /// @src 0:598:686  "abi.encode(uint256(keccak256(abi.encodePacked(\"lido.StakingRouter.routerStorage\"))) - 1)"
+
+                let expr_35_mpos := allocate_unbounded()
+                let _68 := add(expr_35_mpos, 0x20)
+
+                let _69 := abi_encode_tuple_t_uint256__to_t_uint256__fromStack(_68, expr_34)
+                mstore(expr_35_mpos, sub(_69, add(expr_35_mpos, 0x20)))
+                finalize_allocation(expr_35_mpos, sub(_69, expr_35_mpos))
+                /// @src 0:579:692  "keccak256(..."
+                let expr_36 := keccak256(array_dataslot_t_bytes_memory_ptr(expr_35_mpos), array_length_t_bytes_memory_ptr(expr_35_mpos))
+                /// @src 0:712:716  "0xff"
+                let expr_41 := 0xff
+                /// @src 0:704:717  "uint256(0xff)"
+                let expr_42 := convert_t_rational_255_by_1_to_t_uint256(expr_41)
+                /// @src 0:696:718  "bytes32(uint256(0xff))"
+                let expr_43 := convert_t_uint256_to_t_bytes32(expr_42)
+                /// @src 0:695:718  "~bytes32(uint256(0xff))"
+                let expr_44 := cleanup_t_bytes32(not(expr_43))
+                /// @src 0:579:718  "keccak256(..."
+                let expr_45 := and(expr_36, expr_44)
+
+                let _70 := expr_45
+
+                ret := _70
+            }
+
+            /// @ast-id 59
+            /// @src 0:772:981  "function getRouterState() internal pure returns (RouterState storage $) {..."
+            function fun_getRouterState_59() -> var_$_51_slot {
+
+                /// @src 0:874:897  "ROUTER_STORAGE_POSITION"
+                let expr_55 := constant_ROUTER_STORAGE_POSITION_46()
+                /// @src 0:854:897  "bytes32 _position = ROUTER_STORAGE_POSITION"
+                let var__position_54 := expr_55
+                /// @src 0:907:975  "assembly (\"memory-safe\") {..."
+                {
+                    var_$_51_slot := var__position_54
+                }
+
+            }
+            /// @src 5:340:1785  "contract DepositModuleCallHarness {..."
+
+        }
+
+        data ".metadata" hex"a2646970667358221220f11e597decc03d6d9a67d2f0310a6635dd45858db2da6c1a49cd248d469d7c2364736f6c63430008190033"
+    }
+
+}

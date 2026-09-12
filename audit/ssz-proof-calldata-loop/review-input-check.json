@@ -1,0 +1,13 @@
+{
+  "candidate": "a9f097c81db661dbd413dae298c7162ede248572",
+  "command": [
+    "python3",
+    "audit/ssz-proof-calldata-loop/check_receipt.py"
+  ],
+  "result": {
+    "scope": "Recorded file/package-pin comparison only; no fresh proof or EVM execution",
+    "checks": 1195,
+    "errors": []
+  },
+  "fresh_execution": "file and package-pin comparison only; no Lean or Forge rebuild"
+}

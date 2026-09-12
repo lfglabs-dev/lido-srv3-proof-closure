@@ -1,0 +1,991 @@
+⚠ [12/615] Replayed LidoSRv3.Audit.Source.TrioAlloc2.Selection
+warning: LidoSRv3/Audit/Source/TrioAlloc2/Selection.lean:53:10: This simp argument is unused:
+  levelsEq
+
+Hint: Omit it from the simp argument list.
+  simp [l̵e̵v̵e̵l̵s̵E̵q̵,̵ ̵Spec.minimum, countEq]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TrioAlloc2/Selection.lean:70:10: This simp argument is unused:
+  levelsEq
+
+Hint: Omit it from the simp argument list.
+  simp [l̵e̵v̵e̵l̵s̵E̵q̵,̵ ̵Spec.minimum, nonzero, minimumEq]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [21/615] Replayed LidoSRv3.Audit.Source.TrioAlloc2.StepCorrespondence
+warning: LidoSRv3/Audit/Source/TrioAlloc2/StepCorrespondence.lean:16:71: This simp argument is unused:
+  eq
+
+Hint: Omit it from the simp argument list.
+  simp [decodedRows, List.getElem?_zipWith, List.getElem?_set_ne eq,̵ ̵e̵q̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+ℹ [24/615] Replayed LidoSRv3.Audit.Source.TrioAlloc2.Composition
+info: LidoSRv3/Audit/Source/TrioAlloc2/Composition.lean:53:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_success_establishes_consumer_premises' depends on axioms: [propext,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/Composition.lean:54:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_then_consumer_succeeds' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/Composition.lean:71:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_then_consumer_distributes' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [25/615] Replayed LidoSRv3.Audit.Source.TrioComposition.Parent
+info: LidoSRv3/Audit/Source/TrioComposition/Parent.lean:252:0: 'LidoSRv3.Audit.Source.TrioComposition.getDepositAllocations_total_bound' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/Parent.lean:253:0: 'LidoSRv3.Audit.Source.TrioComposition.convertPositive_refines' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/Parent.lean:254:0: 'LidoSRv3.Audit.Source.TrioComposition.convertZero_refines' depends on axioms: [propext, Classical.choice, Quot.sound]
+⚠ [28/615] Replayed LidoSRv3.Audit.Source.TrioAlloc2.RowBounds
+warning: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:171:20: This simp argument is unused:
+  ↓reduceDIte
+
+Hint: Omit it from the simp argument list.
+  simp only [bound,̵ ̵↓̵r̵e̵d̵u̵c̵e̵D̵I̵t̵e̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+info: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:174:0: 'LidoSRv3.Audit.Source.TrioAlloc2.step_row_bounds' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:175:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocateLoop_row_bounds' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:176:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocate_row_bounds' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/RowBounds.lean:177:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocate_delta_success' depends on axioms: [propext, Quot.sound]
+ℹ [29/615] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentComposition
+info: LidoSRv3/Audit/Source/TrioComposition/ParentComposition.lean:65:0: 'LidoSRv3.Audit.Source.TrioComposition.producer_consumer_conversion_refines' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ParentComposition.lean:66:0: 'LidoSRv3.Audit.Source.TrioComposition.producer_zero_conversion_refines' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioComposition/ParentComposition.lean:67:0: 'LidoSRv3.Audit.Source.TrioComposition.producer_consumer_parent_subtraction' depends on axioms: [propext, Quot.sound]
+ℹ [32/615] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentRelational
+info: LidoSRv3/Audit/Source/TrioComposition/ParentRelational.lean:185:0: 'LidoSRv3.Audit.Source.TrioComposition.ParentSpec.public_all_outcomes' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [34/615] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentDeterminism
+info: LidoSRv3/Audit/Source/TrioComposition/ParentDeterminism.lean:155:0: 'LidoSRv3.Audit.Source.TrioComposition.ParentSpec.public_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [35/615] Replayed LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI
+info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:169:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.decodeArray_encoded' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:170:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.decodeArguments_encoded' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:171:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.decodeReturn_encoded' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:172:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.run_encoded' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/TrioAlloc2/LibraryABI.lean:173:0: 'LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.run_short' depends on axioms: [propext, Quot.sound]
+ℹ [36/615] Replayed LidoSRv3.Audit.Source.TrioAlloc2.ABIComposition
+info: LidoSRv3/Audit/Source/TrioAlloc2/ABIComposition.lean:46:0: 'LidoSRv3.Audit.Source.TrioAlloc2.producer_then_abi_distributes' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [37/615] Replayed LidoSRv3.Audit.Source.TrioComposition.ParentABI
+info: LidoSRv3/Audit/Source/TrioComposition/ParentABI.lean:110:0: 'LidoSRv3.Audit.Source.TrioComposition.public_abi_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [474/615] Replayed audit.trio.deposit.Deposit
+info: audit/trio/deposit/Deposit.lean:313:0: 'audit.trio.deposit.abi_success_composes_deposit_values' depends on axioms: [propext, Quot.sound]
+info: audit/trio/deposit/Deposit.lean:367:0: 'audit.trio.deposit.prepareDepositABI_composes_beacon_values' depends on axioms: [propext, Quot.sound]
+⚠ [485/615] Replayed Verity.Core
+warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1041:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+ℹ [487/615] Replayed audit.trio.deposit.RouterDeposit
+info: audit/trio/deposit/RouterDeposit.lean:250:0: 'audit.trio.deposit.RouterDeposit.every_failure_rolls_back' depends on axioms: [propext, Quot.sound]
+info: audit/trio/deposit/RouterDeposit.lean:281:0: 'audit.trio.deposit.RouterDeposit.beaconLoop_ok_conservation' depends on axioms: [propext, Quot.sound]
+info: audit/trio/deposit/RouterDeposit.lean:397:0: 'audit.trio.deposit.RouterDeposit.executeRaw_ok_conservation' depends on axioms: [propext, Quot.sound]
+info: audit/trio/deposit/RouterDeposit.lean:417:0: 'audit.trio.deposit.RouterDeposit.execute_ok_conservation' depends on axioms: [propext, Quot.sound]
+info: audit/trio/deposit/RouterDeposit.lean:447:0: 'audit.trio.deposit.RouterDeposit.execute_ok_conservation_of_linkssource' depends on axioms: [propext, Quot.sound]
+info: audit/trio/deposit/RouterDeposit.lean:466:0: 'audit.trio.deposit.RouterDeposit.executePrepared_ok_conservation_of_linkssource' depends on axioms: [propext,
+ Quot.sound]
+info: audit/trio/deposit/RouterDeposit.lean:485:0: 'audit.trio.deposit.RouterDeposit.linksSource_of_prepareDepositABI' depends on axioms: [propext, Quot.sound]
+info: audit/trio/deposit/RouterDeposit.lean:509:0: 'audit.trio.deposit.RouterDeposit.execute_ok_conservation_derived' depends on axioms: [propext, Quot.sound]
+⚠ [1169/1213] Replayed Conform.Wheels
+warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: Conform/Wheels.lean:106:70: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1170/1213] Replayed EvmYul.Pretty
+warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: EvmYul/Pretty.lean:36:32: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1218/1378] Replayed EvmYul.Semantics
+warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1219/1378] Replayed EvmYul.EVM.Semantics
+warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1257/1378] Replayed LidoSRv3.Audit.Verity.TopupTx
+warning: LidoSRv3/Audit/Verity/TopupTx.lean:293:8: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: LidoSRv3/Audit/Verity/TopupTx.lean:872:13: This simp argument is unused:
+  uint256Modulus
+
+Hint: Omit it from the simp argument list.
+  simp [pushEntry, scheduledDeposit, linkedCallEntryTo, linkedCallEntry, e̵v̵m̵W̵o̵r̵d̵,̵ ̵u̵i̵n̵t̵2̵5̵6̵M̵o̵d̵u̵l̵u̵s̵]̵e̲v̲m̲W̲o̲r̲d̲]̲
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/TopupTx.lean:965:19: This simp argument is unused:
+  Nat.mod_eq_of_lt hNoWrap
+
+Hint: Omit it from the simp argument list.
+  simp [evmWord,̵ ̵N̵a̵t̵.̵m̵o̵d̵_̵e̵q̵_̵o̵f̵_̵l̵t̵ ̵h̵N̵o̵W̵r̵a̵p̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/TopupTx.lean:1279:5: Variable name `hwcLen` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+ℹ [1310/1378] Replayed audit.trio.deposit.LiveBeacon
+info: audit/trio/deposit/LiveBeacon.lean:176:0: 'audit.trio.deposit.LiveBeacon.failure_restores' depends on axioms: [propext, Quot.sound]
+info: audit/trio/deposit/LiveBeacon.lean:613:0: 'audit.trio.deposit.LiveBeacon.positive_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: audit/trio/deposit/LiveBeacon.lean:614:0: 'audit.trio.deposit.LiveBeacon.keyInputs_admissible' depends on axioms: [propext, Quot.sound]
+ℹ [1314/1378] Replayed audit.trio.deposit.WithdrawalLedger
+info: audit/trio/deposit/WithdrawalLedger.lean:263:0: 'audit.trio.deposit.WithdrawalLedger.pipeline_withdrawal_success_ledger' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+⚠ [1317/1378] Replayed LidoSRv3.Audit.Source.TopupBeaconCommitted
+warning: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:39:32: This simp argument is unused:
+  decide_true
+
+Hint: Omit it from the simp argument list.
+  simp only [̵d̵e̵c̵i̵d̵e̵_̵t̵r̵u̵e̵,̵d̵e̵c̵i̵d̵e̵_̵f̵a̵l̵s̵e̵,̵i̵f̵_̵t̵r̵u̵e̵,̵i̵f̵_̵f̵a̵l̵s̵e̵,̵R̵e̵s̵u̵l̵t̵.̵m̵k̵.̵i̵n̵j̵E̵q̵,̵B̵o̵o̵l̵.̵f̵a̵l̵s̵e̵_̵e̵q̵_̵t̵r̵u̵e̵,̵r̵e̵d̵u̵c̵e̵C̵t̵o̵r̵E̵q̵,̵f̵a̵l̵s̵e̵_̵a̵n̵d̵,̵L̵i̵s̵t̵.̵n̵i̵l̵_̵a̵p̵p̵e̵n̵d̵,̵T̵o̵p̵u̵p̵B̵e̵a̵c̵o̵n̵B̵a̵t̵c̵h̵.̵l̵o̵o̵p̵,̵f̵a̵i̵l̵]̵[̲d̲e̲c̲i̲d̲e̲_̲f̲a̲l̲s̲e̲,̲ ̲i̲f̲_̲t̲r̲u̲e̲,̲ ̲i̲f̲_̲f̲a̲l̲s̲e̲,̲ ̲R̲e̲s̲u̲l̲t̲.̲m̲k̲.̲i̲n̲j̲E̲q̲,̲
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲B̲o̲o̲l̲.̲f̲a̲l̲s̲e̲_̲e̲q̲_̲t̲r̲u̲e̲,̲ ̲r̲e̲d̲u̲c̲e̲C̲t̲o̲r̲E̲q̲,̲ ̲f̲a̲l̲s̲e̲_̲a̲n̲d̲,̲ ̲L̲i̲s̲t̲.̲n̲i̲l̲_̲a̲p̲p̲e̲n̲d̲,̲ ̲T̲o̲p̲u̲p̲B̲e̲a̲c̲o̲n̲B̲a̲t̲c̲h̲.̲l̲o̲o̲p̲,̲
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲f̲a̲i̲l̲]̲ at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:39:44: This simp argument is unused:
+  decide_false
+
+Hint: Omit it from the simp argument list.
+  simp only [decide_true,d̵e̵c̵ ̲id̵e̵_̵fa̵l̵s̵e̵,̵i̵f̵_true, ̲if_false, ̲Result.mk.injEq, ̲Bool.false_eq_true,
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲reduceCtorEq, ̲false_and, ̲List.nil_append, ̲TopupBeaconBatch.loop, ̲fail] at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:39:57: This simp argument is unused:
+  if_true
+
+Hint: Omit it from the simp argument list.
+  simp only [decide_true, ̲decide_false, ̲if_t̵r̵u̵e̵,̵i̵f_̵f̵alse, ̲Result.mk.injEq,
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲Bool.false_eq_true, ̲reduceCtorEq, ̲false_and, ̲List.nil_append, ̲TopupBeaconBatch.loop,
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲fail] at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:39:65: This simp argument is unused:
+  if_false
+
+Hint: Omit it from the simp argument list.
+  simp only [decide_true, ̲decide_false, ̲if_true,i̵f̵_̵f̵a̵l̵s̵e̵,̵ ̲Result.mk.injEq,
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲Bool.false_eq_true, ̲reduceCtorEq, ̲false_and, ̲List.nil_append, ̲TopupBeaconBatch.loop,
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲fail] at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:39:90: This simp argument is unused:
+  Bool.false_eq_true
+
+Hint: Omit it from the simp argument list.
+  simp only [̵d̵e̵c̵i̵d̵e̵_̵t̵r̵u̵e̵,̵d̵e̵c̵i̵d̵e̵_̵f̵a̵l̵s̵e̵,̵i̵f̵_̵t̵r̵u̵e̵,̵i̵f̵_̵f̵a̵l̵s̵e̵,̵R̵e̵s̵u̵l̵t̵.̵m̵k̵.̵i̵n̵j̵E̵q̵,̵B̵o̵o̵l̵.̵f̵a̵l̵s̵e̵_̵e̵q̵_̵t̵r̵u̵e̵,̵r̵e̵d̵u̵c̵e̵C̵t̵o̵r̵E̵q̵,̵f̵a̵l̵s̵e̵_̵a̵n̵d̵,̵L̵i̵s̵t̵.̵n̵i̵l̵_̵a̵p̵p̵e̵n̵d̵,̵T̵o̵p̵u̵p̵B̵e̵a̵c̵o̵n̵B̵a̵t̵c̵h̵.̵l̵o̵o̵p̵,̵f̵a̵i̵l̵]̵[̲d̲e̲c̲i̲d̲e̲_̲t̲r̲u̲e̲,̲ ̲d̲e̲c̲i̲d̲e̲_̲f̲a̲l̲s̲e̲,̲ ̲i̲f̲_̲t̲r̲u̲e̲,̲ ̲i̲f̲_̲f̲a̲l̲s̲e̲,̲ ̲R̲e̲s̲u̲l̲t̲.̲m̲k̲.̲i̲n̲j̲E̲q̲,̲
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲r̲e̲d̲u̲c̲e̲C̲t̲o̲r̲E̲q̲,̲ ̲f̲a̲l̲s̲e̲_̲a̲n̲d̲,̲ ̲L̲i̲s̲t̲.̲n̲i̲l̲_̲a̲p̲p̲e̲n̲d̲,̲ ̲T̲o̲p̲u̲p̲B̲e̲a̲c̲o̲n̲B̲a̲t̲c̲h̲.̲l̲o̲o̲p̲,̲ ̲f̲a̲i̲l̲]̲ at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:39:132: This simp argument is unused:
+  List.nil_append
+
+Hint: Omit it from the simp argument list.
+  simp only [decide_true, ̲decide_false, ̲if_true, ̲if_false, ̲Result.mk.injEq,
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲Bool.false_eq_true, ̲reduceCtorEq, ̲false_and,L̵i̵s̵t̵.̵n̵i̵l̵_̵a̵p̵p̵e̵n̵d̵,̵ ̲TopupBeaconBatch.loop, ̲fail] at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:43:24: This simp argument is unused:
+  decide_true
+
+Hint: Omit it from the simp argument list.
+  simp only [decide_t̵r̵u̵e̵,̵d̵e̵c̵i̵d̵e̵_̵false, ̲if_true, ̲if_false, ̲Result.mk.injEq, ̲Bool.false_eq_true,
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲reduceCtorEq, ̲false_and, ̲List.nil_append, ̲TopupBeaconBatch.loop, ̲fail] at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:43:36: This simp argument is unused:
+  decide_false
+
+Hint: Omit it from the simp argument list.
+  simp only [decide_true,d̵e̵c̵ ̲id̵e̵_̵fa̵l̵s̵e̵,̵i̵f̵_true, ̲if_false, ̲Result.mk.injEq, ̲Bool.false_eq_true,
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲reduceCtorEq, ̲false_and, ̲List.nil_append, ̲TopupBeaconBatch.loop, ̲fail] at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:43:49: This simp argument is unused:
+  if_true
+
+Hint: Omit it from the simp argument list.
+  simp only [decide_true, ̲decide_false, ̲if_t̵r̵u̵e̵,̵i̵f_̵f̵alse, ̲Result.mk.injEq, ̲Bool.false_eq_true,
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲reduceCtorEq, ̲false_and, ̲List.nil_append, ̲TopupBeaconBatch.loop, ̲fail] at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:43:57: This simp argument is unused:
+  if_false
+
+Hint: Omit it from the simp argument list.
+  simp only [decide_true, ̲decide_false, ̲if_true,i̵f̵_̵f̵a̵l̵s̵e̵,̵ ̲Result.mk.injEq, ̲Bool.false_eq_true,
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲reduceCtorEq, ̲false_and, ̲List.nil_append, ̲TopupBeaconBatch.loop, ̲fail] at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:43:82: This simp argument is unused:
+  Bool.false_eq_true
+
+Hint: Omit it from the simp argument list.
+  simp only [̵d̵e̵c̵i̵d̵e̵_̵t̵r̵u̵e̵,̵d̵e̵c̵i̵d̵e̵_̵f̵a̵l̵s̵e̵,̵i̵f̵_̵t̵r̵u̵e̵,̵i̵f̵_̵f̵a̵l̵s̵e̵,̵R̵e̵s̵u̵l̵t̵.̵m̵k̵.̵i̵n̵j̵E̵q̵,̵B̵o̵o̵l̵.̵f̵a̵l̵s̵e̵_̵e̵q̵_̵t̵r̵u̵e̵,̵r̵e̵d̵u̵c̵e̵C̵t̵o̵r̵E̵q̵,̵f̵a̵l̵s̵e̵_̵a̵n̵d̵,̵L̵i̵s̵t̵.̵n̵i̵l̵_̵a̵p̵p̵e̵n̵d̵,̵T̵o̵p̵u̵p̵B̵e̵a̵c̵o̵n̵B̵a̵t̵c̵h̵.̵l̵o̵o̵p̵,̵f̵a̵i̵l̵]̵[̲d̲e̲c̲i̲d̲e̲_̲t̲r̲u̲e̲,̲ ̲d̲e̲c̲i̲d̲e̲_̲f̲a̲l̲s̲e̲,̲ ̲i̲f̲_̲t̲r̲u̲e̲,̲ ̲i̲f̲_̲f̲a̲l̲s̲e̲,̲ ̲R̲e̲s̲u̲l̲t̲.̲m̲k̲.̲i̲n̲j̲E̲q̲,̲ ̲r̲e̲d̲u̲c̲e̲C̲t̲o̲r̲E̲q̲,̲
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲f̲a̲l̲s̲e̲_̲a̲n̲d̲,̲ ̲L̲i̲s̲t̲.̲n̲i̲l̲_̲a̲p̲p̲e̲n̲d̲,̲ ̲T̲o̲p̲u̲p̲B̲e̲a̲c̲o̲n̲B̲a̲t̲c̲h̲.̲l̲o̲o̲p̲,̲ ̲f̲a̲i̲l̲]̲ at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:43:124: This simp argument is unused:
+  List.nil_append
+
+Hint: Omit it from the simp argument list.
+  simp only [decide_true, ̲decide_false, ̲if_true, ̲if_false, ̲Result.mk.injEq,
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲Bool.false_eq_true, ̲reduceCtorEq, ̲false_and,L̵i̵s̵t̵.̵n̵i̵l̵_̵a̵p̵p̵e̵n̵d̵,̵ ̲TopupBeaconBatch.loop, ̲fail] at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:59:41: This simp argument is unused:
+  decide_false
+
+Hint: Omit it from the simp argument list.
+  simp only [̵d̵e̵c̵i̵d̵e̵_̵t̵r̵u̵e̵,̵d̵e̵c̵i̵d̵e̵_̵f̵a̵l̵s̵e̵,̵i̵f̵_̵t̵r̵u̵e̵,̵i̵f̵_̵f̵a̵l̵s̵e̵,̵R̵e̵s̵u̵l̵t̵.̵m̵k̵.̵i̵n̵j̵E̵q̵,̵B̵o̵o̵l̵.̵f̵a̵l̵s̵e̵_̵e̵q̵_̵t̵r̵u̵e̵,̵r̵e̵d̵u̵c̵e̵C̵t̵o̵r̵E̵q̵,̵f̵a̵l̵s̵e̵_̵a̵n̵d̵,̵L̵i̵s̵t̵.̵n̵i̵l̵_̵a̵p̵p̵e̵n̵d̵,̵T̵o̵p̵u̵p̵B̵e̵a̵c̵o̵n̵B̵a̵t̵c̵h̵.̵l̵o̵o̵p̵,̵h̵p̵k̵,̵h̵z̵,̵h̵m̵i̵n̵,̵h̵m̵a̵x̵,̵r̵e̵q̵u̵i̵r̵e̵,̵b̵i̵n̵d̵,̵b̵i̵n̵d̵E̵x̵e̵c̵,̵p̵u̵r̵e̵,̵p̵u̵r̵e̵E̵x̵e̵c̵,̵h̵p̵]̵[̲d̲e̲c̲i̲d̲e̲_̲t̲r̲u̲e̲,̲ ̲i̲f̲_̲t̲r̲u̲e̲,̲ ̲i̲f̲_̲f̲a̲l̲s̲e̲,̲ ̲R̲e̲s̲u̲l̲t̲.̲m̲k̲.̲i̲n̲j̲E̲q̲,̲ ̲B̲o̲o̲l̲.̲f̲a̲l̲s̲e̲_̲e̲q̲_̲t̲r̲u̲e̲,̲
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲r̲e̲d̲u̲c̲e̲C̲t̲o̲r̲E̲q̲,̲ ̲f̲a̲l̲s̲e̲_̲a̲n̲d̲,̲ ̲L̲i̲s̲t̲.̲n̲i̲l̲_̲a̲p̲p̲e̲n̲d̲,̲ ̲T̲o̲p̲u̲p̲B̲e̲a̲c̲o̲n̲B̲a̲t̲c̲h̲.̲l̲o̲o̲p̲,̲ ̲h̲p̲k̲,̲ ̲h̲z̲,̲ ̲h̲m̲i̲n̲,̲
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲h̲m̲a̲x̲,̲ ̲r̲e̲q̲u̲i̲r̲e̲,̲ ̲b̲i̲n̲d̲,̲ ̲b̲i̲n̲d̲E̲x̲e̲c̲,̲ ̲p̲u̲r̲e̲,̲ ̲p̲u̲r̲e̲E̲x̲e̲c̲,̲ ̲h̲p̲]̲ at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:59:87: This simp argument is unused:
+  Bool.false_eq_true
+
+Hint: Omit it from the simp argument list.
+  simp only [̵d̵e̵c̵i̵d̵e̵_̵t̵r̵u̵e̵,̵d̵e̵c̵i̵d̵e̵_̵f̵a̵l̵s̵e̵,̵i̵f̵_̵t̵r̵u̵e̵,̵i̵f̵_̵f̵a̵l̵s̵e̵,̵R̵e̵s̵u̵l̵t̵.̵m̵k̵.̵i̵n̵j̵E̵q̵,̵B̵o̵o̵l̵.̵f̵a̵l̵s̵e̵_̵e̵q̵_̵t̵r̵u̵e̵,̵r̵e̵d̵u̵c̵e̵C̵t̵o̵r̵E̵q̵,̵f̵a̵l̵s̵e̵_̵a̵n̵d̵,̵L̵i̵s̵t̵.̵n̵i̵l̵_̵a̵p̵p̵e̵n̵d̵,̵T̵o̵p̵u̵p̵B̵e̵a̵c̵o̵n̵B̵a̵t̵c̵h̵.̵l̵o̵o̵p̵,̵h̵p̵k̵,̵h̵z̵,̵h̵m̵i̵n̵,̵h̵m̵a̵x̵,̵r̵e̵q̵u̵i̵r̵e̵,̵b̵i̵n̵d̵,̵b̵i̵n̵d̵E̵x̵e̵c̵,̵p̵u̵r̵e̵,̵p̵u̵r̵e̵E̵x̵e̵c̵,̵h̵p̵]̵[̲d̲e̲c̲i̲d̲e̲_̲t̲r̲u̲e̲,̲ ̲d̲e̲c̲i̲d̲e̲_̲f̲a̲l̲s̲e̲,̲ ̲i̲f̲_̲t̲r̲u̲e̲,̲ ̲i̲f̲_̲f̲a̲l̲s̲e̲,̲ ̲R̲e̲s̲u̲l̲t̲.̲m̲k̲.̲i̲n̲j̲E̲q̲,̲
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲r̲e̲d̲u̲c̲e̲C̲t̲o̲r̲E̲q̲,̲ ̲f̲a̲l̲s̲e̲_̲a̲n̲d̲,̲ ̲L̲i̲s̲t̲.̲n̲i̲l̲_̲a̲p̲p̲e̲n̲d̲,̲ ̲T̲o̲p̲u̲p̲B̲e̲a̲c̲o̲n̲B̲a̲t̲c̲h̲.̲l̲o̲o̲p̲,̲ ̲h̲p̲k̲,̲ ̲h̲z̲,̲ ̲h̲m̲i̲n̲,̲
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲h̲m̲a̲x̲,̲ ̲r̲e̲q̲u̲i̲r̲e̲,̲ ̲b̲i̲n̲d̲,̲ ̲b̲i̲n̲d̲E̲x̲e̲c̲,̲ ̲p̲u̲r̲e̲,̲ ̲p̲u̲r̲e̲E̲x̲e̲c̲,̲ ̲h̲p̲]̲ at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:68:45: This simp argument is unused:
+  decide_false
+
+Hint: Omit it from the simp argument list.
+  simp only [̵d̵e̵c̵i̵d̵e̵_̵t̵r̵u̵e̵,̵d̵e̵c̵i̵d̵e̵_̵f̵a̵l̵s̵e̵,̵i̵f̵_̵t̵r̵u̵e̵,̵i̵f̵_̵f̵a̵l̵s̵e̵,̵R̵e̵s̵u̵l̵t̵.̵m̵k̵.̵i̵n̵j̵E̵q̵,̵B̵o̵o̵l̵.̵f̵a̵l̵s̵e̵_̵e̵q̵_̵t̵r̵u̵e̵,̵r̵e̵d̵u̵c̵e̵C̵t̵o̵r̵E̵q̵,̵f̵a̵l̵s̵e̵_̵a̵n̵d̵,̵L̵i̵s̵t̵.̵n̵i̵l̵_̵a̵p̵p̵e̵n̵d̵,̵T̵o̵p̵u̵p̵B̵e̵a̵c̵o̵n̵B̵a̵t̵c̵h̵.̵l̵o̵o̵p̵,̵h̵p̵k̵,̵h̵z̵,̵h̵m̵i̵n̵,̵h̵m̵a̵x̵,̵r̵e̵q̵u̵i̵r̵e̵,̵b̵i̵n̵d̵,̵b̵i̵n̵d̵E̵x̵e̵c̵,̵p̵u̵r̵e̵,̵p̵u̵r̵e̵E̵x̵e̵c̵,̵h̵p̵,̵h̵t̵]̵[̲d̲e̲c̲i̲d̲e̲_̲t̲r̲u̲e̲,̲ ̲i̲f̲_̲t̲r̲u̲e̲,̲ ̲i̲f̲_̲f̲a̲l̲s̲e̲,̲ ̲R̲e̲s̲u̲l̲t̲.̲m̲k̲.̲i̲n̲j̲E̲q̲,̲
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲B̲o̲o̲l̲.̲f̲a̲l̲s̲e̲_̲e̲q̲_̲t̲r̲u̲e̲,̲ ̲r̲e̲d̲u̲c̲e̲C̲t̲o̲r̲E̲q̲,̲ ̲f̲a̲l̲s̲e̲_̲a̲n̲d̲,̲ ̲L̲i̲s̲t̲.̲n̲i̲l̲_̲a̲p̲p̲e̲n̲d̲,̲
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲T̲o̲p̲u̲p̲B̲e̲a̲c̲o̲n̲B̲a̲t̲c̲h̲.̲l̲o̲o̲p̲,̲ ̲h̲p̲k̲,̲ ̲h̲z̲,̲ ̲h̲m̲i̲n̲,̲ ̲h̲m̲a̲x̲,̲ ̲r̲e̲q̲u̲i̲r̲e̲,̲ ̲b̲i̲n̲d̲,̲ ̲b̲i̲n̲d̲E̲x̲e̲c̲,̲ ̲p̲u̲r̲e̲,̲
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲p̲u̲r̲e̲E̲x̲e̲c̲,̲ ̲h̲p̲,̲ ̲h̲t̲]̲ at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:68:91: This simp argument is unused:
+  Bool.false_eq_true
+
+Hint: Omit it from the simp argument list.
+  simp only [̵d̵e̵c̵i̵d̵e̵_̵t̵r̵u̵e̵,̵d̵e̵c̵i̵d̵e̵_̵f̵a̵l̵s̵e̵,̵i̵f̵_̵t̵r̵u̵e̵,̵i̵f̵_̵f̵a̵l̵s̵e̵,̵R̵e̵s̵u̵l̵t̵.̵m̵k̵.̵i̵n̵j̵E̵q̵,̵B̵o̵o̵l̵.̵f̵a̵l̵s̵e̵_̵e̵q̵_̵t̵r̵u̵e̵,̵r̵e̵d̵u̵c̵e̵C̵t̵o̵r̵E̵q̵,̵f̵a̵l̵s̵e̵_̵a̵n̵d̵,̵L̵i̵s̵t̵.̵n̵i̵l̵_̵a̵p̵p̵e̵n̵d̵,̵T̵o̵p̵u̵p̵B̵e̵a̵c̵o̵n̵B̵a̵t̵c̵h̵.̵l̵o̵o̵p̵,̵h̵p̵k̵,̵h̵z̵,̵h̵m̵i̵n̵,̵h̵m̵a̵x̵,̵r̵e̵q̵u̵i̵r̵e̵,̵b̵i̵n̵d̵,̵b̵i̵n̵d̵E̵x̵e̵c̵,̵p̵u̵r̵e̵,̵p̵u̵r̵e̵E̵x̵e̵c̵,̵h̵p̵,̵h̵t̵]̵[̲d̲e̲c̲i̲d̲e̲_̲t̲r̲u̲e̲,̲ ̲d̲e̲c̲i̲d̲e̲_̲f̲a̲l̲s̲e̲,̲ ̲i̲f̲_̲t̲r̲u̲e̲,̲ ̲i̲f̲_̲f̲a̲l̲s̲e̲,̲ ̲R̲e̲s̲u̲l̲t̲.̲m̲k̲.̲i̲n̲j̲E̲q̲,̲
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲r̲e̲d̲u̲c̲e̲C̲t̲o̲r̲E̲q̲,̲ ̲f̲a̲l̲s̲e̲_̲a̲n̲d̲,̲ ̲L̲i̲s̲t̲.̲n̲i̲l̲_̲a̲p̲p̲e̲n̲d̲,̲ ̲T̲o̲p̲u̲p̲B̲e̲a̲c̲o̲n̲B̲a̲t̲c̲h̲.̲l̲o̲o̲p̲,̲ ̲h̲p̲k̲,̲ ̲h̲z̲,̲
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲h̲m̲i̲n̲,̲ ̲h̲m̲a̲x̲,̲ ̲r̲e̲q̲u̲i̲r̲e̲,̲ ̲b̲i̲n̲d̲,̲ ̲b̲i̲n̲d̲E̲x̲e̲c̲,̲ ̲p̲u̲r̲e̲,̲ ̲p̲u̲r̲e̲E̲x̲e̲c̲,̲ ̲h̲p̲,̲ ̲h̲t̲]̲ at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:83:19: This simp argument is unused:
+  decide_true
+
+Hint: Omit it from the simp argument list.
+  simp only [̵d̵e̵c̵i̵d̵e̵_̵t̵r̵u̵e̵,̵d̵e̵c̵i̵d̵e̵_̵f̵a̵l̵s̵e̵,̵i̵f̵_̵t̵r̵u̵e̵,̵i̵f̵_̵f̵a̵l̵s̵e̵,̵R̵e̵s̵u̵l̵t̵.̵m̵k̵.̵i̵n̵j̵E̵q̵,̵B̵o̵o̵l̵.̵f̵a̵l̵s̵e̵_̵e̵q̵_̵t̵r̵u̵e̵,̵r̵e̵d̵u̵c̵e̵C̵t̵o̵r̵E̵q̵,̵f̵a̵l̵s̵e̵_̵a̵n̵d̵,̵L̵i̵s̵t̵.̵n̵i̵l̵_̵a̵p̵p̵e̵n̵d̵,̵T̵o̵p̵u̵p̵B̵e̵a̵c̵o̵n̵B̵a̵t̵c̵h̵.̵l̵o̵o̵p̵,̵h̵p̵k̵,̵r̵e̵q̵u̵i̵r̵e̵,̵b̵i̵n̵d̵,̵b̵i̵n̵d̵E̵x̵e̵c̵,̵f̵a̵i̵l̵]̵[̲d̲e̲c̲i̲d̲e̲_̲f̲a̲l̲s̲e̲,̲ ̲i̲f̲_̲t̲r̲u̲e̲,̲ ̲i̲f̲_̲f̲a̲l̲s̲e̲,̲ ̲R̲e̲s̲u̲l̲t̲.̲m̲k̲.̲i̲n̲j̲E̲q̲,̲ ̲B̲o̲o̲l̲.̲f̲a̲l̲s̲e̲_̲e̲q̲_̲t̲r̲u̲e̲,̲
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲r̲e̲d̲u̲c̲e̲C̲t̲o̲r̲E̲q̲,̲ ̲f̲a̲l̲s̲e̲_̲a̲n̲d̲,̲ ̲L̲i̲s̲t̲.̲n̲i̲l̲_̲a̲p̲p̲e̲n̲d̲,̲ ̲T̲o̲p̲u̲p̲B̲e̲a̲c̲o̲n̲B̲a̲t̲c̲h̲.̲l̲o̲o̲p̲,̲ ̲h̲p̲k̲,̲ ̲r̲e̲q̲u̲i̲r̲e̲,̲ ̲b̲i̲n̲d̲,̲
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲b̲i̲n̲d̲E̲x̲e̲c̲,̲ ̲f̲a̲i̲l̲]̲ at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:83:44: This simp argument is unused:
+  if_true
+
+Hint: Omit it from the simp argument list.
+  simp only [decide_true, ̲decide_false, ̲if_t̵r̵u̵e̵,̵i̵f_̵f̵alse, ̲Result.mk.injEq, ̲Bool.false_eq_true,
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲reduceCtorEq, ̲false_and, ̲List.nil_append, ̲TopupBeaconBatch.loop, ̲hpk, ̲require, ̲bind,
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲bindExec, ̲fail] at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:83:119: This simp argument is unused:
+  List.nil_append
+
+Hint: Omit it from the simp argument list.
+  simp only [̵d̵e̵c̵i̵d̵e̵_̵t̵r̵u̵e̵,̵d̵e̵c̵i̵d̵e̵_̵f̵a̵l̵s̵e̵,̵i̵f̵_̵t̵r̵u̵e̵,̵i̵f̵_̵f̵a̵l̵s̵e̵,̵R̵e̵s̵u̵l̵t̵.̵m̵k̵.̵i̵n̵j̵E̵q̵,̵B̵o̵o̵l̵.̵f̵a̵l̵s̵e̵_̵e̵q̵_̵t̵r̵u̵e̵,̵r̵e̵d̵u̵c̵e̵C̵t̵o̵r̵E̵q̵,̵f̵a̵l̵s̵e̵_̵a̵n̵d̵,̵L̵i̵s̵t̵.̵n̵i̵l̵_̵a̵p̵p̵e̵n̵d̵,̵T̵o̵p̵u̵p̵B̵e̵a̵c̵o̵n̵B̵a̵t̵c̵h̵.̵l̵o̵o̵p̵,̵h̵p̵k̵,̵r̵e̵q̵u̵i̵r̵e̵,̵b̵i̵n̵d̵,̵b̵i̵n̵d̵E̵x̵e̵c̵,̵f̵a̵i̵l̵]̵[̲d̲e̲c̲i̲d̲e̲_̲t̲r̲u̲e̲,̲ ̲d̲e̲c̲i̲d̲e̲_̲f̲a̲l̲s̲e̲,̲ ̲i̲f̲_̲t̲r̲u̲e̲,̲ ̲i̲f̲_̲f̲a̲l̲s̲e̲,̲ ̲R̲e̲s̲u̲l̲t̲.̲m̲k̲.̲i̲n̲j̲E̲q̲,̲
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲B̲o̲o̲l̲.̲f̲a̲l̲s̲e̲_̲e̲q̲_̲t̲r̲u̲e̲,̲ ̲r̲e̲d̲u̲c̲e̲C̲t̲o̲r̲E̲q̲,̲ ̲f̲a̲l̲s̲e̲_̲a̲n̲d̲,̲ ̲T̲o̲p̲u̲p̲B̲e̲a̲c̲o̲n̲B̲a̲t̲c̲h̲.̲l̲o̲o̲p̲,̲ ̲h̲p̲k̲,̲ ̲r̲e̲q̲u̲i̲r̲e̲,̲ ̲b̲i̲n̲d̲,̲
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲b̲i̲n̲d̲E̲x̲e̲c̲,̲ ̲f̲a̲i̲l̲]̲ at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:178:32: This simp argument is unused:
+  decide_true
+
+Hint: Omit it from the simp argument list.
+  simp only [̵d̵e̵c̵i̵d̵e̵_̵t̵r̵u̵e̵,̵d̵e̵c̵i̵d̵e̵_̵f̵a̵l̵s̵e̵,̵i̵f̵_̵t̵r̵u̵e̵,̵i̵f̵_̵f̵a̵l̵s̵e̵,̵R̵e̵s̵u̵l̵t̵.̵m̵k̵.̵i̵n̵j̵E̵q̵,̵B̵o̵o̵l̵.̵f̵a̵l̵s̵e̵_̵e̵q̵_̵t̵r̵u̵e̵,̵r̵e̵d̵u̵c̵e̵C̵t̵o̵r̵E̵q̵,̵f̵a̵l̵s̵e̵_̵a̵n̵d̵,̵L̵i̵s̵t̵.̵n̵i̵l̵_̵a̵p̵p̵e̵n̵d̵,̵T̵o̵p̵u̵p̵B̵e̵a̵c̵o̵n̵B̵a̵t̵c̵h̵.̵l̵o̵o̵p̵,̵f̵a̵i̵l̵]̵[̲d̲e̲c̲i̲d̲e̲_̲f̲a̲l̲s̲e̲,̲ ̲i̲f̲_̲t̲r̲u̲e̲,̲ ̲i̲f̲_̲f̲a̲l̲s̲e̲,̲ ̲R̲e̲s̲u̲l̲t̲.̲m̲k̲.̲i̲n̲j̲E̲q̲,̲
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲B̲o̲o̲l̲.̲f̲a̲l̲s̲e̲_̲e̲q̲_̲t̲r̲u̲e̲,̲ ̲r̲e̲d̲u̲c̲e̲C̲t̲o̲r̲E̲q̲,̲ ̲f̲a̲l̲s̲e̲_̲a̲n̲d̲,̲ ̲L̲i̲s̲t̲.̲n̲i̲l̲_̲a̲p̲p̲e̲n̲d̲,̲ ̲T̲o̲p̲u̲p̲B̲e̲a̲c̲o̲n̲B̲a̲t̲c̲h̲.̲l̲o̲o̲p̲,̲
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲f̲a̲i̲l̲]̲ at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:178:44: This simp argument is unused:
+  decide_false
+
+Hint: Omit it from the simp argument list.
+  simp only [decide_true,d̵e̵c̵ ̲id̵e̵_̵fa̵l̵s̵e̵,̵i̵f̵_true, ̲if_false, ̲Result.mk.injEq, ̲Bool.false_eq_true,
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲reduceCtorEq, ̲false_and, ̲List.nil_append, ̲TopupBeaconBatch.loop, ̲fail] at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:178:57: This simp argument is unused:
+  if_true
+
+Hint: Omit it from the simp argument list.
+  simp only [decide_true, ̲decide_false, ̲if_t̵r̵u̵e̵,̵i̵f_̵f̵alse, ̲Result.mk.injEq,
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲Bool.false_eq_true, ̲reduceCtorEq, ̲false_and, ̲List.nil_append, ̲TopupBeaconBatch.loop,
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲fail] at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:178:65: This simp argument is unused:
+  if_false
+
+Hint: Omit it from the simp argument list.
+  simp only [decide_true, ̲decide_false, ̲if_true,i̵f̵_̵f̵a̵l̵s̵e̵,̵ ̲Result.mk.injEq,
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲Bool.false_eq_true, ̲reduceCtorEq, ̲false_and, ̲List.nil_append, ̲TopupBeaconBatch.loop,
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲fail] at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:178:90: This simp argument is unused:
+  Bool.false_eq_true
+
+Hint: Omit it from the simp argument list.
+  simp only [̵d̵e̵c̵i̵d̵e̵_̵t̵r̵u̵e̵,̵d̵e̵c̵i̵d̵e̵_̵f̵a̵l̵s̵e̵,̵i̵f̵_̵t̵r̵u̵e̵,̵i̵f̵_̵f̵a̵l̵s̵e̵,̵R̵e̵s̵u̵l̵t̵.̵m̵k̵.̵i̵n̵j̵E̵q̵,̵B̵o̵o̵l̵.̵f̵a̵l̵s̵e̵_̵e̵q̵_̵t̵r̵u̵e̵,̵r̵e̵d̵u̵c̵e̵C̵t̵o̵r̵E̵q̵,̵f̵a̵l̵s̵e̵_̵a̵n̵d̵,̵L̵i̵s̵t̵.̵n̵i̵l̵_̵a̵p̵p̵e̵n̵d̵,̵T̵o̵p̵u̵p̵B̵e̵a̵c̵o̵n̵B̵a̵t̵c̵h̵.̵l̵o̵o̵p̵,̵f̵a̵i̵l̵]̵[̲d̲e̲c̲i̲d̲e̲_̲t̲r̲u̲e̲,̲ ̲d̲e̲c̲i̲d̲e̲_̲f̲a̲l̲s̲e̲,̲ ̲i̲f̲_̲t̲r̲u̲e̲,̲ ̲i̲f̲_̲f̲a̲l̲s̲e̲,̲ ̲R̲e̲s̲u̲l̲t̲.̲m̲k̲.̲i̲n̲j̲E̲q̲,̲
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲r̲e̲d̲u̲c̲e̲C̲t̲o̲r̲E̲q̲,̲ ̲f̲a̲l̲s̲e̲_̲a̲n̲d̲,̲ ̲L̲i̲s̲t̲.̲n̲i̲l̲_̲a̲p̲p̲e̲n̲d̲,̲ ̲T̲o̲p̲u̲p̲B̲e̲a̲c̲o̲n̲B̲a̲t̲c̲h̲.̲l̲o̲o̲p̲,̲ ̲f̲a̲i̲l̲]̲ at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:178:132: This simp argument is unused:
+  List.nil_append
+
+Hint: Omit it from the simp argument list.
+  simp only [decide_true, ̲decide_false, ̲if_true, ̲if_false, ̲Result.mk.injEq,
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲Bool.false_eq_true, ̲reduceCtorEq, ̲false_and,L̵i̵s̵t̵.̵n̵i̵l̵_̵a̵p̵p̵e̵n̵d̵,̵ ̲TopupBeaconBatch.loop, ̲fail] at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:182:24: This simp argument is unused:
+  decide_true
+
+Hint: Omit it from the simp argument list.
+  simp only [decide_t̵r̵u̵e̵,̵d̵e̵c̵i̵d̵e̵_̵false, ̲if_true, ̲if_false, ̲Result.mk.injEq, ̲Bool.false_eq_true,
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲reduceCtorEq, ̲false_and, ̲List.nil_append, ̲TopupBeaconBatch.loop, ̲fail] at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:182:36: This simp argument is unused:
+  decide_false
+
+Hint: Omit it from the simp argument list.
+  simp only [decide_true,d̵e̵c̵ ̲id̵e̵_̵fa̵l̵s̵e̵,̵i̵f̵_true, ̲if_false, ̲Result.mk.injEq, ̲Bool.false_eq_true,
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲reduceCtorEq, ̲false_and, ̲List.nil_append, ̲TopupBeaconBatch.loop, ̲fail] at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:182:49: This simp argument is unused:
+  if_true
+
+Hint: Omit it from the simp argument list.
+  simp only [decide_true, ̲decide_false, ̲if_t̵r̵u̵e̵,̵i̵f_̵f̵alse, ̲Result.mk.injEq, ̲Bool.false_eq_true,
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲reduceCtorEq, ̲false_and, ̲List.nil_append, ̲TopupBeaconBatch.loop, ̲fail] at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:182:57: This simp argument is unused:
+  if_false
+
+Hint: Omit it from the simp argument list.
+  simp only [decide_true, ̲decide_false, ̲if_true,i̵f̵_̵f̵a̵l̵s̵e̵,̵ ̲Result.mk.injEq, ̲Bool.false_eq_true,
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲reduceCtorEq, ̲false_and, ̲List.nil_append, ̲TopupBeaconBatch.loop, ̲fail] at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:182:82: This simp argument is unused:
+  Bool.false_eq_true
+
+Hint: Omit it from the simp argument list.
+  simp only [̵d̵e̵c̵i̵d̵e̵_̵t̵r̵u̵e̵,̵d̵e̵c̵i̵d̵e̵_̵f̵a̵l̵s̵e̵,̵i̵f̵_̵t̵r̵u̵e̵,̵i̵f̵_̵f̵a̵l̵s̵e̵,̵R̵e̵s̵u̵l̵t̵.̵m̵k̵.̵i̵n̵j̵E̵q̵,̵B̵o̵o̵l̵.̵f̵a̵l̵s̵e̵_̵e̵q̵_̵t̵r̵u̵e̵,̵r̵e̵d̵u̵c̵e̵C̵t̵o̵r̵E̵q̵,̵f̵a̵l̵s̵e̵_̵a̵n̵d̵,̵L̵i̵s̵t̵.̵n̵i̵l̵_̵a̵p̵p̵e̵n̵d̵,̵T̵o̵p̵u̵p̵B̵e̵a̵c̵o̵n̵B̵a̵t̵c̵h̵.̵l̵o̵o̵p̵,̵f̵a̵i̵l̵]̵[̲d̲e̲c̲i̲d̲e̲_̲t̲r̲u̲e̲,̲ ̲d̲e̲c̲i̲d̲e̲_̲f̲a̲l̲s̲e̲,̲ ̲i̲f̲_̲t̲r̲u̲e̲,̲ ̲i̲f̲_̲f̲a̲l̲s̲e̲,̲ ̲R̲e̲s̲u̲l̲t̲.̲m̲k̲.̲i̲n̲j̲E̲q̲,̲ ̲r̲e̲d̲u̲c̲e̲C̲t̲o̲r̲E̲q̲,̲
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲f̲a̲l̲s̲e̲_̲a̲n̲d̲,̲ ̲L̲i̲s̲t̲.̲n̲i̲l̲_̲a̲p̲p̲e̲n̲d̲,̲ ̲T̲o̲p̲u̲p̲B̲e̲a̲c̲o̲n̲B̲a̲t̲c̲h̲.̲l̲o̲o̲p̲,̲ ̲f̲a̲i̲l̲]̲ at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:182:124: This simp argument is unused:
+  List.nil_append
+
+Hint: Omit it from the simp argument list.
+  simp only [decide_true, ̲decide_false, ̲if_true, ̲if_false, ̲Result.mk.injEq,
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲Bool.false_eq_true, ̲reduceCtorEq, ̲false_and,L̵i̵s̵t̵.̵n̵i̵l̵_̵a̵p̵p̵e̵n̵d̵,̵ ̲TopupBeaconBatch.loop, ̲fail] at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:197:41: This simp argument is unused:
+  decide_false
+
+Hint: Omit it from the simp argument list.
+  simp only [̵d̵e̵c̵i̵d̵e̵_̵t̵r̵u̵e̵,̵d̵e̵c̵i̵d̵e̵_̵f̵a̵l̵s̵e̵,̵i̵f̵_̵t̵r̵u̵e̵,̵i̵f̵_̵f̵a̵l̵s̵e̵,̵R̵e̵s̵u̵l̵t̵.̵m̵k̵.̵i̵n̵j̵E̵q̵,̵B̵o̵o̵l̵.̵f̵a̵l̵s̵e̵_̵e̵q̵_̵t̵r̵u̵e̵,̵r̵e̵d̵u̵c̵e̵C̵t̵o̵r̵E̵q̵,̵f̵a̵l̵s̵e̵_̵a̵n̵d̵,̵L̵i̵s̵t̵.̵n̵i̵l̵_̵a̵p̵p̵e̵n̵d̵,̵T̵o̵p̵u̵p̵B̵e̵a̵c̵o̵n̵B̵a̵t̵c̵h̵.̵l̵o̵o̵p̵,̵h̵p̵k̵,̵h̵z̵,̵h̵m̵i̵n̵,̵h̵m̵a̵x̵,̵r̵e̵q̵u̵i̵r̵e̵,̵b̵i̵n̵d̵,̵b̵i̵n̵d̵E̵x̵e̵c̵,̵p̵u̵r̵e̵,̵p̵u̵r̵e̵E̵x̵e̵c̵,̵h̵p̵]̵[̲d̲e̲c̲i̲d̲e̲_̲t̲r̲u̲e̲,̲ ̲i̲f̲_̲t̲r̲u̲e̲,̲ ̲i̲f̲_̲f̲a̲l̲s̲e̲,̲ ̲R̲e̲s̲u̲l̲t̲.̲m̲k̲.̲i̲n̲j̲E̲q̲,̲ ̲B̲o̲o̲l̲.̲f̲a̲l̲s̲e̲_̲e̲q̲_̲t̲r̲u̲e̲,̲
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲r̲e̲d̲u̲c̲e̲C̲t̲o̲r̲E̲q̲,̲ ̲f̲a̲l̲s̲e̲_̲a̲n̲d̲,̲ ̲L̲i̲s̲t̲.̲n̲i̲l̲_̲a̲p̲p̲e̲n̲d̲,̲ ̲T̲o̲p̲u̲p̲B̲e̲a̲c̲o̲n̲B̲a̲t̲c̲h̲.̲l̲o̲o̲p̲,̲ ̲h̲p̲k̲,̲ ̲h̲z̲,̲ ̲h̲m̲i̲n̲,̲
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲h̲m̲a̲x̲,̲ ̲r̲e̲q̲u̲i̲r̲e̲,̲ ̲b̲i̲n̲d̲,̲ ̲b̲i̲n̲d̲E̲x̲e̲c̲,̲ ̲p̲u̲r̲e̲,̲ ̲p̲u̲r̲e̲E̲x̲e̲c̲,̲ ̲h̲p̲]̲ at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:197:87: This simp argument is unused:
+  Bool.false_eq_true
+
+Hint: Omit it from the simp argument list.
+  simp only [̵d̵e̵c̵i̵d̵e̵_̵t̵r̵u̵e̵,̵d̵e̵c̵i̵d̵e̵_̵f̵a̵l̵s̵e̵,̵i̵f̵_̵t̵r̵u̵e̵,̵i̵f̵_̵f̵a̵l̵s̵e̵,̵R̵e̵s̵u̵l̵t̵.̵m̵k̵.̵i̵n̵j̵E̵q̵,̵B̵o̵o̵l̵.̵f̵a̵l̵s̵e̵_̵e̵q̵_̵t̵r̵u̵e̵,̵r̵e̵d̵u̵c̵e̵C̵t̵o̵r̵E̵q̵,̵f̵a̵l̵s̵e̵_̵a̵n̵d̵,̵L̵i̵s̵t̵.̵n̵i̵l̵_̵a̵p̵p̵e̵n̵d̵,̵T̵o̵p̵u̵p̵B̵e̵a̵c̵o̵n̵B̵a̵t̵c̵h̵.̵l̵o̵o̵p̵,̵h̵p̵k̵,̵h̵z̵,̵h̵m̵i̵n̵,̵h̵m̵a̵x̵,̵r̵e̵q̵u̵i̵r̵e̵,̵b̵i̵n̵d̵,̵b̵i̵n̵d̵E̵x̵e̵c̵,̵p̵u̵r̵e̵,̵p̵u̵r̵e̵E̵x̵e̵c̵,̵h̵p̵]̵[̲d̲e̲c̲i̲d̲e̲_̲t̲r̲u̲e̲,̲ ̲d̲e̲c̲i̲d̲e̲_̲f̲a̲l̲s̲e̲,̲ ̲i̲f̲_̲t̲r̲u̲e̲,̲ ̲i̲f̲_̲f̲a̲l̲s̲e̲,̲ ̲R̲e̲s̲u̲l̲t̲.̲m̲k̲.̲i̲n̲j̲E̲q̲,̲
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲r̲e̲d̲u̲c̲e̲C̲t̲o̲r̲E̲q̲,̲ ̲f̲a̲l̲s̲e̲_̲a̲n̲d̲,̲ ̲L̲i̲s̲t̲.̲n̲i̲l̲_̲a̲p̲p̲e̲n̲d̲,̲ ̲T̲o̲p̲u̲p̲B̲e̲a̲c̲o̲n̲B̲a̲t̲c̲h̲.̲l̲o̲o̲p̲,̲ ̲h̲p̲k̲,̲ ̲h̲z̲,̲ ̲h̲m̲i̲n̲,̲
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲h̲m̲a̲x̲,̲ ̲r̲e̲q̲u̲i̲r̲e̲,̲ ̲b̲i̲n̲d̲,̲ ̲b̲i̲n̲d̲E̲x̲e̲c̲,̲ ̲p̲u̲r̲e̲,̲ ̲p̲u̲r̲e̲E̲x̲e̲c̲,̲ ̲h̲p̲]̲ at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:205:45: This simp argument is unused:
+  decide_false
+
+Hint: Omit it from the simp argument list.
+  simp only [̵d̵e̵c̵i̵d̵e̵_̵t̵r̵u̵e̵,̵d̵e̵c̵i̵d̵e̵_̵f̵a̵l̵s̵e̵,̵i̵f̵_̵t̵r̵u̵e̵,̵i̵f̵_̵f̵a̵l̵s̵e̵,̵R̵e̵s̵u̵l̵t̵.̵m̵k̵.̵i̵n̵j̵E̵q̵,̵B̵o̵o̵l̵.̵f̵a̵l̵s̵e̵_̵e̵q̵_̵t̵r̵u̵e̵,̵r̵e̵d̵u̵c̵e̵C̵t̵o̵r̵E̵q̵,̵f̵a̵l̵s̵e̵_̵a̵n̵d̵,̵L̵i̵s̵t̵.̵n̵i̵l̵_̵a̵p̵p̵e̵n̵d̵,̵T̵o̵p̵u̵p̵B̵e̵a̵c̵o̵n̵B̵a̵t̵c̵h̵.̵l̵o̵o̵p̵,̵h̵p̵k̵,̵h̵z̵,̵h̵m̵i̵n̵,̵h̵m̵a̵x̵,̵r̵e̵q̵u̵i̵r̵e̵,̵b̵i̵n̵d̵,̵b̵i̵n̵d̵E̵x̵e̵c̵,̵p̵u̵r̵e̵,̵p̵u̵r̵e̵E̵x̵e̵c̵,̵h̵p̵,̵h̵t̵]̵[̲d̲e̲c̲i̲d̲e̲_̲t̲r̲u̲e̲,̲ ̲i̲f̲_̲t̲r̲u̲e̲,̲ ̲i̲f̲_̲f̲a̲l̲s̲e̲,̲ ̲R̲e̲s̲u̲l̲t̲.̲m̲k̲.̲i̲n̲j̲E̲q̲,̲
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲B̲o̲o̲l̲.̲f̲a̲l̲s̲e̲_̲e̲q̲_̲t̲r̲u̲e̲,̲ ̲r̲e̲d̲u̲c̲e̲C̲t̲o̲r̲E̲q̲,̲ ̲f̲a̲l̲s̲e̲_̲a̲n̲d̲,̲ ̲L̲i̲s̲t̲.̲n̲i̲l̲_̲a̲p̲p̲e̲n̲d̲,̲
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲T̲o̲p̲u̲p̲B̲e̲a̲c̲o̲n̲B̲a̲t̲c̲h̲.̲l̲o̲o̲p̲,̲ ̲h̲p̲k̲,̲ ̲h̲z̲,̲ ̲h̲m̲i̲n̲,̲ ̲h̲m̲a̲x̲,̲ ̲r̲e̲q̲u̲i̲r̲e̲,̲ ̲b̲i̲n̲d̲,̲ ̲b̲i̲n̲d̲E̲x̲e̲c̲,̲ ̲p̲u̲r̲e̲,̲
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲p̲u̲r̲e̲E̲x̲e̲c̲,̲ ̲h̲p̲,̲ ̲h̲t̲]̲ at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:205:91: This simp argument is unused:
+  Bool.false_eq_true
+
+Hint: Omit it from the simp argument list.
+  simp only [̵d̵e̵c̵i̵d̵e̵_̵t̵r̵u̵e̵,̵d̵e̵c̵i̵d̵e̵_̵f̵a̵l̵s̵e̵,̵i̵f̵_̵t̵r̵u̵e̵,̵i̵f̵_̵f̵a̵l̵s̵e̵,̵R̵e̵s̵u̵l̵t̵.̵m̵k̵.̵i̵n̵j̵E̵q̵,̵B̵o̵o̵l̵.̵f̵a̵l̵s̵e̵_̵e̵q̵_̵t̵r̵u̵e̵,̵r̵e̵d̵u̵c̵e̵C̵t̵o̵r̵E̵q̵,̵f̵a̵l̵s̵e̵_̵a̵n̵d̵,̵L̵i̵s̵t̵.̵n̵i̵l̵_̵a̵p̵p̵e̵n̵d̵,̵T̵o̵p̵u̵p̵B̵e̵a̵c̵o̵n̵B̵a̵t̵c̵h̵.̵l̵o̵o̵p̵,̵h̵p̵k̵,̵h̵z̵,̵h̵m̵i̵n̵,̵h̵m̵a̵x̵,̵r̵e̵q̵u̵i̵r̵e̵,̵b̵i̵n̵d̵,̵b̵i̵n̵d̵E̵x̵e̵c̵,̵p̵u̵r̵e̵,̵p̵u̵r̵e̵E̵x̵e̵c̵,̵h̵p̵,̵h̵t̵]̵[̲d̲e̲c̲i̲d̲e̲_̲t̲r̲u̲e̲,̲ ̲d̲e̲c̲i̲d̲e̲_̲f̲a̲l̲s̲e̲,̲ ̲i̲f̲_̲t̲r̲u̲e̲,̲ ̲i̲f̲_̲f̲a̲l̲s̲e̲,̲ ̲R̲e̲s̲u̲l̲t̲.̲m̲k̲.̲i̲n̲j̲E̲q̲,̲
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲r̲e̲d̲u̲c̲e̲C̲t̲o̲r̲E̲q̲,̲ ̲f̲a̲l̲s̲e̲_̲a̲n̲d̲,̲ ̲L̲i̲s̲t̲.̲n̲i̲l̲_̲a̲p̲p̲e̲n̲d̲,̲ ̲T̲o̲p̲u̲p̲B̲e̲a̲c̲o̲n̲B̲a̲t̲c̲h̲.̲l̲o̲o̲p̲,̲ ̲h̲p̲k̲,̲ ̲h̲z̲,̲
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲h̲m̲i̲n̲,̲ ̲h̲m̲a̲x̲,̲ ̲r̲e̲q̲u̲i̲r̲e̲,̲ ̲b̲i̲n̲d̲,̲ ̲b̲i̲n̲d̲E̲x̲e̲c̲,̲ ̲p̲u̲r̲e̲,̲ ̲p̲u̲r̲e̲E̲x̲e̲c̲,̲ ̲h̲p̲,̲ ̲h̲t̲]̲ at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:224:19: This simp argument is unused:
+  decide_true
+
+Hint: Omit it from the simp argument list.
+  simp only [̵d̵e̵c̵i̵d̵e̵_̵t̵r̵u̵e̵,̵d̵e̵c̵i̵d̵e̵_̵f̵a̵l̵s̵e̵,̵i̵f̵_̵t̵r̵u̵e̵,̵i̵f̵_̵f̵a̵l̵s̵e̵,̵R̵e̵s̵u̵l̵t̵.̵m̵k̵.̵i̵n̵j̵E̵q̵,̵B̵o̵o̵l̵.̵f̵a̵l̵s̵e̵_̵e̵q̵_̵t̵r̵u̵e̵,̵r̵e̵d̵u̵c̵e̵C̵t̵o̵r̵E̵q̵,̵f̵a̵l̵s̵e̵_̵a̵n̵d̵,̵L̵i̵s̵t̵.̵n̵i̵l̵_̵a̵p̵p̵e̵n̵d̵,̵T̵o̵p̵u̵p̵B̵e̵a̵c̵o̵n̵B̵a̵t̵c̵h̵.̵l̵o̵o̵p̵,̵h̵p̵k̵,̵r̵e̵q̵u̵i̵r̵e̵,̵b̵i̵n̵d̵,̵b̵i̵n̵d̵E̵x̵e̵c̵,̵f̵a̵i̵l̵]̵[̲d̲e̲c̲i̲d̲e̲_̲f̲a̲l̲s̲e̲,̲ ̲i̲f̲_̲t̲r̲u̲e̲,̲ ̲i̲f̲_̲f̲a̲l̲s̲e̲,̲ ̲R̲e̲s̲u̲l̲t̲.̲m̲k̲.̲i̲n̲j̲E̲q̲,̲ ̲B̲o̲o̲l̲.̲f̲a̲l̲s̲e̲_̲e̲q̲_̲t̲r̲u̲e̲,̲
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲r̲e̲d̲u̲c̲e̲C̲t̲o̲r̲E̲q̲,̲ ̲f̲a̲l̲s̲e̲_̲a̲n̲d̲,̲ ̲L̲i̲s̲t̲.̲n̲i̲l̲_̲a̲p̲p̲e̲n̲d̲,̲ ̲T̲o̲p̲u̲p̲B̲e̲a̲c̲o̲n̲B̲a̲t̲c̲h̲.̲l̲o̲o̲p̲,̲ ̲h̲p̲k̲,̲ ̲r̲e̲q̲u̲i̲r̲e̲,̲ ̲b̲i̲n̲d̲,̲
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲b̲i̲n̲d̲E̲x̲e̲c̲,̲ ̲f̲a̲i̲l̲]̲ at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:224:44: This simp argument is unused:
+  if_true
+
+Hint: Omit it from the simp argument list.
+  simp only [decide_true, ̲decide_false, ̲if_t̵r̵u̵e̵,̵i̵f_̵f̵alse, ̲Result.mk.injEq, ̲Bool.false_eq_true,
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲reduceCtorEq, ̲false_and, ̲List.nil_append, ̲TopupBeaconBatch.loop, ̲hpk, ̲require, ̲bind,
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲bindExec, ̲fail] at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:224:119: This simp argument is unused:
+  List.nil_append
+
+Hint: Omit it from the simp argument list.
+  simp only [̵d̵e̵c̵i̵d̵e̵_̵t̵r̵u̵e̵,̵d̵e̵c̵i̵d̵e̵_̵f̵a̵l̵s̵e̵,̵i̵f̵_̵t̵r̵u̵e̵,̵i̵f̵_̵f̵a̵l̵s̵e̵,̵R̵e̵s̵u̵l̵t̵.̵m̵k̵.̵i̵n̵j̵E̵q̵,̵B̵o̵o̵l̵.̵f̵a̵l̵s̵e̵_̵e̵q̵_̵t̵r̵u̵e̵,̵r̵e̵d̵u̵c̵e̵C̵t̵o̵r̵E̵q̵,̵f̵a̵l̵s̵e̵_̵a̵n̵d̵,̵L̵i̵s̵t̵.̵n̵i̵l̵_̵a̵p̵p̵e̵n̵d̵,̵T̵o̵p̵u̵p̵B̵e̵a̵c̵o̵n̵B̵a̵t̵c̵h̵.̵l̵o̵o̵p̵,̵h̵p̵k̵,̵r̵e̵q̵u̵i̵r̵e̵,̵b̵i̵n̵d̵,̵b̵i̵n̵d̵E̵x̵e̵c̵,̵f̵a̵i̵l̵]̵[̲d̲e̲c̲i̲d̲e̲_̲t̲r̲u̲e̲,̲ ̲d̲e̲c̲i̲d̲e̲_̲f̲a̲l̲s̲e̲,̲ ̲i̲f̲_̲t̲r̲u̲e̲,̲ ̲i̲f̲_̲f̲a̲l̲s̲e̲,̲ ̲R̲e̲s̲u̲l̲t̲.̲m̲k̲.̲i̲n̲j̲E̲q̲,̲
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲B̲o̲o̲l̲.̲f̲a̲l̲s̲e̲_̲e̲q̲_̲t̲r̲u̲e̲,̲ ̲r̲e̲d̲u̲c̲e̲C̲t̲o̲r̲E̲q̲,̲ ̲f̲a̲l̲s̲e̲_̲a̲n̲d̲,̲ ̲T̲o̲p̲u̲p̲B̲e̲a̲c̲o̲n̲B̲a̲t̲c̲h̲.̲l̲o̲o̲p̲,̲ ̲h̲p̲k̲,̲ ̲r̲e̲q̲u̲i̲r̲e̲,̲ ̲b̲i̲n̲d̲,̲
+  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲b̲i̲n̲d̲E̲x̲e̲c̲,̲ ̲f̲a̲i̲l̲]̲ at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+info: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:299:0: 'LidoSRv3.Audit.Source.TopupBeaconCommitted.helper_success_count' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:300:0: 'LidoSRv3.Audit.Source.TopupBeaconCommitted.loop_success_count' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:301:0: 'LidoSRv3.Audit.Source.TopupBeaconCommitted.deposit_success_count' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:302:0: 'LidoSRv3.Audit.Source.TopupBeaconCommitted.push_success_count' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:303:0: 'LidoSRv3.Audit.Source.TopupBeaconCommitted.guarded_amount_fits' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:304:0: 'LidoSRv3.Audit.Source.TopupBeaconCommitted.loop_success_balances' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:305:0: 'LidoSRv3.Audit.Source.TopupBeaconCommitted.run_success_balances' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:306:0: 'LidoSRv3.Audit.Source.TopupBeaconCommitted.helper_success_balances' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TopupBeaconCommitted.lean:307:0: 'LidoSRv3.Audit.Source.TopupBeaconCommitted.committed_funding' depends on axioms: [propext, Quot.sound]
+⚠ [1318/1378] Replayed audit.trio.deposit.LiveBeaconCommitted
+warning: audit/trio/deposit/LiveBeaconCommitted.lean:81:9: Local variable 'unit' resembles constructor 'PUnit.unit' - write '.unit' (with a dot) or 'PUnit.unit' to use the constructor.
+
+Note: This linter can be disabled with `set_option linter.constructorNameAsVariable false`
+warning: audit/trio/deposit/LiveBeaconCommitted.lean:103:9: Local variable 'unit' resembles constructor 'PUnit.unit' - write '.unit' (with a dot) or 'PUnit.unit' to use the constructor.
+
+Note: This linter can be disabled with `set_option linter.constructorNameAsVariable false`
+warning: audit/trio/deposit/LiveBeaconCommitted.lean:107:11: Local variable 'unit' resembles constructor 'PUnit.unit' - write '.unit' (with a dot) or 'PUnit.unit' to use the constructor.
+
+Note: This linter can be disabled with `set_option linter.constructorNameAsVariable false`
+warning: audit/trio/deposit/LiveBeaconCommitted.lean:116:15: Local variable 'unit' resembles constructor 'PUnit.unit' - write '.unit' (with a dot) or 'PUnit.unit' to use the constructor.
+
+Note: This linter can be disabled with `set_option linter.constructorNameAsVariable false`
+warning: audit/trio/deposit/LiveBeaconCommitted.lean:120:44: This simp argument is unused:
+  List.append_nil
+
+Hint: Omit it from the simp argument list.
+  simp only [Live.bindExec, lengthGuard, Live.pureExec, beaconLoop, hwithdrawal, hlengths,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲h̵l̵o̵o̵p̵,̵ ̵L̵i̵s̵t̵.̵a̵p̵p̵e̵n̵d̵_̵n̵i̵l̵]̵h̲l̲o̲o̲p̲]̲ at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: audit/trio/deposit/LiveBeaconCommitted.lean:124:25: This simp argument is unused:
+  Live.pureExec
+
+Hint: Omit it from the simp argument list.
+  simp only [Live.p̵u̵r̵e̵E̵x̵e̵c̵,̵ ̵L̵i̵v̵e̵.̵Result.mk.injEq, true_and, List.nil_append, List.append_nil] at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: audit/trio/deposit/LiveBeaconCommitted.lean:327:39: This simp argument is unused:
+  if_neg
+
+Hint: Omit it from the simp argument list.
+  simp only [hl, hr, hbcn, if_pos,̵ ̵i̵f̵_̵n̵e̵g̵] at hw hb ⊢
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+info: audit/trio/deposit/LiveBeaconCommitted.lean:329:0: 'audit.trio.deposit.LiveBeaconCommitted.execute_pipeline_success_conservation' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: audit/trio/deposit/LiveBeaconCommitted.lean:331:0: 'audit.trio.deposit.LiveBeaconCommitted.execute_ok_derives_preparation' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: audit/trio/deposit/LiveBeaconCommitted.lean:332:0: 'audit.trio.deposit.LiveBeaconCommitted.execute_ok_derives_actual_effects' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [1319/1378] Replayed audit.trio.deposit.PhysicalMetadata
+info: audit/trio/deposit/PhysicalMetadata.lean:196:0: 'audit.trio.deposit.PhysicalMetadata.packed_fields' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: audit/trio/deposit/PhysicalMetadata.lean:197:0: 'audit.trio.deposit.PhysicalMetadata.success_effects' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: audit/trio/deposit/PhysicalMetadata.lean:198:0: 'audit.trio.deposit.PhysicalMetadata.failure_restores' depends on axioms: [propext, Quot.sound]
+⚠ [1321/1378] Replayed LidoSRv3.Audit.Source.TopupModuleCall
+warning: LidoSRv3/Audit/Source/TopupModuleCall.lean:145:6: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: LidoSRv3/Audit/Source/TopupModuleCall.lean:147:6: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: LidoSRv3/Audit/Source/TopupModuleCall.lean:158:4: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: LidoSRv3/Audit/Source/TopupModuleCall.lean:160:4: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: LidoSRv3/Audit/Source/TopupModuleCall.lean:172:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: LidoSRv3/Audit/Source/TopupModuleCall.lean:262:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+info: LidoSRv3/Audit/Source/TopupModuleCall.lean:273:0: 'LidoSRv3.Audit.Source.TopupModuleCall.execute_success_has_code' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TopupModuleCall.lean:275:0: 'LidoSRv3.Audit.Source.TopupModuleCall.call_success_origin' depends on axioms: [propext]
+info: LidoSRv3/Audit/Source/TopupModuleCall.lean:276:0: 'LidoSRv3.Audit.Source.TopupModuleCall.decoded_call_has_code' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/TopupModuleCall.lean:277:0: 'LidoSRv3.Audit.Source.TopupModuleCall.execute_no_code' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1322/1378] Replayed audit.trio.deposit.ModuleCall
+info: audit/trio/deposit/ModuleCall.lean:301:0: 'audit.trio.deposit.ModuleCall.call_success_origin' depends on axioms: [propext]
+info: audit/trio/deposit/ModuleCall.lean:302:0: 'audit.trio.deposit.ModuleCall.decoded_call_origin' depends on axioms: [propext, Quot.sound]
+info: audit/trio/deposit/ModuleCall.lean:303:0: 'audit.trio.deposit.ModuleCall.prepare_values' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: audit/trio/deposit/ModuleCall.lean:304:0: 'audit.trio.deposit.ModuleCall.return_size_bounds' depends on axioms: [propext, Quot.sound]
+info: audit/trio/deposit/ModuleCall.lean:305:0: 'audit.trio.deposit.ModuleCall.decodeReturn_size_bounds' depends on axioms: [propext, Quot.sound]
+ℹ [1336/1378] Replayed LidoSRv3.Audit.Source.SszRootCall
+info: LidoSRv3/Audit/Source/SszRootCall.lean:206:0: 'LidoSRv3.Audit.Source.SszRootCall.run_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszRootCall.lean:207:0: 'LidoSRv3.Audit.Source.SszRootCall.slot_failure_no_call' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/SszRootCall.lean:208:0: 'LidoSRv3.Audit.Source.SszRootCall.run_world' depends on axioms: [propext, Quot.sound]
+ℹ [1337/1378] Replayed LidoSRv3.Audit.Source.SszActualLeafTree
+info: LidoSRv3/Audit/Source/SszActualLeafTree.lean:86:0: 'LidoSRv3.Audit.Source.SszActualLeafTree.leaf_success_tree' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/SszActualLeafTree.lean:87:0: 'LidoSRv3.Audit.Source.SszActualLeafTree.branch_output_tree' does not depend on any axioms
+ℹ [1338/1378] Replayed LidoSRv3.Audit.Source.TopupGatewayRootCalls
+info: LidoSRv3/Audit/Source/TopupGatewayRootCalls.lean:155:0: 'LidoSRv3.Audit.Source.TopupGatewayRootCalls.authenticated' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/TopupGatewayRootCalls.lean:156:0: 'LidoSRv3.Audit.Source.TopupGatewayRootCalls.row_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/TopupGatewayRootCalls.lean:157:0: 'LidoSRv3.Audit.Source.TopupGatewayRootCalls.loop_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1339/1378] Replayed LidoSRv3.Audit.Source.TopupRouterCommitted
+info: LidoSRv3/Audit/Source/TopupRouterCommitted.lean:153:0: 'LidoSRv3.Audit.Source.TopupRouterCommitted.continuation_success' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TopupRouterCommitted.lean:154:0: 'LidoSRv3.Audit.Source.TopupRouterCommitted.execute_success_program' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TopupRouterCommitted.lean:155:0: 'LidoSRv3.Audit.Source.TopupRouterCommitted.module_execute_success' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [1340/1378] Replayed LidoSRv3.Audit.Source.TopupBatchConsumer
+info: LidoSRv3/Audit/Source/TopupBatchConsumer.lean:173:0: 'LidoSRv3.Audit.Source.TopupBatchConsumer.blockCap_packed' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TopupBatchConsumer.lean:174:0: 'LidoSRv3.Audit.Source.TopupBatchConsumer.target_bound' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TopupBatchConsumer.lean:175:0: 'LidoSRv3.Audit.Source.TopupBatchConsumer.continuation_input' depends on axioms: [propext]
+info: LidoSRv3/Audit/Source/TopupBatchConsumer.lean:176:0: 'LidoSRv3.Audit.Source.TopupBatchConsumer.run_success_exact_effects' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TopupBatchConsumer.lean:177:0: 'LidoSRv3.Audit.Source.TopupBatchConsumer.run_success_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1341/1378] Replayed LidoSRv3.Audit.Source.TopupBatchRootCalls
+info: LidoSRv3/Audit/Source/TopupBatchRootCalls.lean:149:0: 'LidoSRv3.Audit.Source.TopupBatchRootCalls.run_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/TopupBatchRootCalls.lean:150:0: 'LidoSRv3.Audit.Source.TopupBatchRootCalls.failure_restores' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1342/1378] Replayed LidoSRv3.Audit.Source.TopupRootCallEffects
+info: LidoSRv3/Audit/Source/TopupRootCallEffects.lean:73:0: 'LidoSRv3.Audit.Source.TopupRootCallEffects.run_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1343/1378] Replayed LidoSRv3.Audit.Source.TopupModuleMemory
+info: LidoSRv3/Audit/Source/TopupModuleMemory.lean:172:0: 'LidoSRv3.Audit.Source.TopupModuleMemory.raw_bounds' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TopupModuleMemory.lean:173:0: 'LidoSRv3.Audit.Source.TopupModuleMemory.decode_success' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TopupModuleMemory.lean:174:0: 'LidoSRv3.Audit.Source.TopupModuleMemory.program_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/TopupModuleMemory.lean:175:0: 'LidoSRv3.Audit.Source.TopupModuleMemory.execute_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1344/1378] Replayed LidoSRv3.Audit.Source.TopupBatchMemory
+info: LidoSRv3/Audit/Source/TopupBatchMemory.lean:81:0: 'LidoSRv3.Audit.Source.TopupBatchMemory.run_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/TopupBatchMemory.lean:82:0: 'LidoSRv3.Audit.Source.TopupBatchMemory.failure_restores' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1345/1378] Replayed LidoSRv3.Audit.Guarantees.PTopupMemoryCalls
+info: LidoSRv3/Audit/Guarantees/PTopupMemoryCalls.lean:51:0: 'LidoSRv3.Audit.Guarantees.PTopupMemoryCalls.actual_root_module_memory_effects' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Guarantees/PTopupMemoryCalls.lean:52:0: 'LidoSRv3.Audit.Guarantees.PTopupMemoryCalls.actual_root_module_memory_failure_restores' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [1346/1378] Replayed LidoSRv3.Audit.Source.TopupCredentialCall
+info: LidoSRv3/Audit/Source/TopupCredentialCall.lean:217:0: 'LidoSRv3.Audit.Source.TopupCredentialCall.copied_signed_guard' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TopupCredentialCall.lean:218:0: 'LidoSRv3.Audit.Source.TopupCredentialCall.decode_fields' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TopupCredentialCall.lean:219:0: 'LidoSRv3.Audit.Source.TopupCredentialCall.lookup_origin' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TopupCredentialCall.lean:220:0: 'LidoSRv3.Audit.Source.TopupCredentialCall.run_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/TopupCredentialCall.lean:221:0: 'LidoSRv3.Audit.Source.TopupCredentialCall.failure_restores' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1347/1378] Replayed LidoSRv3.Audit.Guarantees.PTopupCredentialCalls
+info: LidoSRv3/Audit/Guarantees/PTopupCredentialCalls.lean:55:0: 'LidoSRv3.Audit.Guarantees.PTopupCredentialCalls.actual_credential_root_module_memory_effects' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Guarantees/PTopupCredentialCalls.lean:56:0: 'LidoSRv3.Audit.Guarantees.PTopupCredentialCalls.actual_credential_root_module_failure_restores' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [1348/1378] Replayed audit.trio.deposit.ModulePhysicalMetadata
+info: audit/trio/deposit/ModulePhysicalMetadata.lean:218:0: 'audit.trio.deposit.ModulePhysicalMetadata.failure_restores' depends on axioms: [propext, Quot.sound]
+info: audit/trio/deposit/ModulePhysicalMetadata.lean:219:0: 'audit.trio.deposit.ModulePhysicalMetadata.success_commitment' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: audit/trio/deposit/ModulePhysicalMetadata.lean:220:0: 'audit.trio.deposit.ModulePhysicalMetadata.success_effects' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1349/1378] Replayed LidoSRv3.Audit.Guarantees.PDeposit1ModuleCalls
+info: LidoSRv3/Audit/Guarantees/PDeposit1ModuleCalls.lean:58:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.actual_module_call_metadata_suffix' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Guarantees/PDeposit1ModuleCalls.lean:59:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.actual_module_call_failure_restores' depends on axioms: [propext, Quot.sound]
+ℹ [1351/1378] Replayed LidoSRv3.Audit.Source.TopupPhysicalCredentialGetter
+info: LidoSRv3/Audit/Source/TopupPhysicalCredentialGetter.lean:105:0: 'LidoSRv3.Audit.Source.TopupPhysicalCredentialGetter.selected_fields' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TopupPhysicalCredentialGetter.lean:106:0: 'LidoSRv3.Audit.Source.TopupPhysicalCredentialGetter.dispatch_request' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TopupPhysicalCredentialGetter.lean:107:0: 'LidoSRv3.Audit.Source.TopupPhysicalCredentialGetter.body_success' depends on axioms: [propext]
+info: LidoSRv3/Audit/Source/TopupPhysicalCredentialGetter.lean:108:0: 'LidoSRv3.Audit.Source.TopupPhysicalCredentialGetter.response_fields' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [1352/1378] Replayed LidoSRv3.Audit.Guarantees.PTopupPhysicalCredentialGetter
+info: LidoSRv3/Audit/Guarantees/PTopupPhysicalCredentialGetter.lean:68:0: 'LidoSRv3.Audit.Guarantees.PTopupPhysicalCredentialGetter.actual_physical_credential_root_module_memory_effects' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Guarantees/PTopupPhysicalCredentialGetter.lean:69:0: 'LidoSRv3.Audit.Guarantees.PTopupPhysicalCredentialGetter.actual_physical_credential_root_module_failure_restores' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [1353/1378] Replayed LidoSRv3.Audit.Source.TopupTimingHistory
+info: LidoSRv3/Audit/Source/TopupTimingHistory.lean:233:0: 'LidoSRv3.Audit.Source.TopupTimingHistory.execute_produced' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/TopupTimingHistory.lean:234:0: 'LidoSRv3.Audit.Source.TopupTimingHistory.run_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/TopupTimingHistory.lean:235:0: 'LidoSRv3.Audit.Source.TopupTimingHistory.failure_restores' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/TopupTimingHistory.lean:237:0: 'LidoSRv3.Audit.Source.TopupTimingHistory.gates_admitted' depends on axioms: [propext]
+info: LidoSRv3/Audit/Source/TopupTimingHistory.lean:238:0: 'LidoSRv3.Audit.Source.TopupTimingHistory.packed_fields' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/TopupTimingHistory.lean:239:0: 'LidoSRv3.Audit.Source.TopupTimingHistory.update_word' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/TopupTimingHistory.lean:240:0: 'LidoSRv3.Audit.Source.TopupTimingHistory.execute_projection' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1354/1378] Replayed LidoSRv3.Audit.Guarantees.PTopupTimingHistory
+info: LidoSRv3/Audit/Guarantees/PTopupTimingHistory.lean:117:0: 'LidoSRv3.Audit.Guarantees.PTopupTimingHistory.history_effects' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Guarantees/PTopupTimingHistory.lean:118:0: 'LidoSRv3.Audit.Guarantees.PTopupTimingHistory.actual_timing_credential_root_module_memory_history' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Guarantees/PTopupTimingHistory.lean:119:0: 'LidoSRv3.Audit.Guarantees.PTopupTimingHistory.actual_timing_credential_root_module_failure_restores' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+⚠ [1355/1378] Replayed LidoSRv3.Audit.Source.TopupRouterLocatorCall
+warning: LidoSRv3/Audit/Source/TopupRouterLocatorCall.lean:40:19: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+info: LidoSRv3/Audit/Source/TopupRouterLocatorCall.lean:195:0: 'LidoSRv3.Audit.Source.TopupRouterLocatorCall.decode_fields' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TopupRouterLocatorCall.lean:196:0: 'LidoSRv3.Audit.Source.TopupRouterLocatorCall.lookup_origin' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TopupRouterLocatorCall.lean:197:0: 'LidoSRv3.Audit.Source.TopupRouterLocatorCall.run_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/TopupRouterLocatorCall.lean:198:0: 'LidoSRv3.Audit.Source.TopupRouterLocatorCall.failure_restores' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [1356/1378] Replayed LidoSRv3.Audit.Guarantees.PTopupRouterLocatorCall
+info: LidoSRv3/Audit/Guarantees/PTopupRouterLocatorCall.lean:74:0: 'LidoSRv3.Audit.Guarantees.PTopupRouterLocatorCall.actual_locator_timing_credential_root_module_memory_history' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Guarantees/PTopupRouterLocatorCall.lean:75:0: 'LidoSRv3.Audit.Guarantees.PTopupRouterLocatorCall.actual_locator_timing_credential_root_module_failure_restores' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [1357/1378] Replayed LidoSRv3.Audit.Source.TopupEntryAdmission
+info: LidoSRv3/Audit/Source/TopupEntryAdmission.lean:107:0: 'LidoSRv3.Audit.Source.TopupEntryAdmission.roleSlot_bytes' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/TopupEntryAdmission.lean:108:0: 'LidoSRv3.Audit.Source.TopupEntryAdmission.gates_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/TopupEntryAdmission.lean:109:0: 'LidoSRv3.Audit.Source.TopupEntryAdmission.run_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/TopupEntryAdmission.lean:110:0: 'LidoSRv3.Audit.Source.TopupEntryAdmission.failure_restores' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1358/1378] Replayed LidoSRv3.Audit.Guarantees.PTopupEntryAdmission
+info: LidoSRv3/Audit/Guarantees/PTopupEntryAdmission.lean:45:0: 'LidoSRv3.Audit.Guarantees.PTopupEntryAdmission.actual_physical_entry_locator_timing_credential_root_module_memory_history' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Guarantees/PTopupEntryAdmission.lean:46:0: 'LidoSRv3.Audit.Guarantees.PTopupEntryAdmission.actual_physical_entry_failure_restores' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+⚠ [1359/1378] Replayed LidoSRv3.Audit.Source.TopupRouterAdmissionCallGates
+warning: LidoSRv3/Audit/Source/TopupRouterAdmissionCallGates.lean:97:17: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+info: LidoSRv3/Audit/Source/TopupRouterAdmissionCallGates.lean:257:0: 'LidoSRv3.Audit.Source.TopupRouterAdmissionCallGates.auth_origin' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TopupRouterAdmissionCallGates.lean:258:0: 'LidoSRv3.Audit.Source.TopupRouterAdmissionCallGates.canDeposit_origin' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TopupRouterAdmissionCallGates.lean:259:0: 'LidoSRv3.Audit.Source.TopupRouterAdmissionCallGates.admitted_calls' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TopupRouterAdmissionCallGates.lean:261:0: 'LidoSRv3.Audit.Source.TopupRouterAdmissionCallGates.decodeBool_fields' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Source/TopupRouterAdmissionCallGates.lean:262:0: 'LidoSRv3.Audit.Source.TopupRouterAdmissionCallGates.physical_success' depends on axioms: [propext]
+info: LidoSRv3/Audit/Source/TopupRouterAdmissionCallGates.lean:263:0: 'LidoSRv3.Audit.Source.TopupRouterAdmissionCallGates.run_admitted' depends on axioms: [propext, Quot.sound]
+ℹ [1360/1378] Replayed LidoSRv3.Audit.Guarantees.PTopup1RootCalls
+info: LidoSRv3/Audit/Guarantees/PTopup1RootCalls.lean:19:0: 'LidoSRv3.Audit.Guarantees.PTopup1.actual_root_module_batch_effects' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [1363/1378] Replayed LidoSRv3.Audit.Guarantees.PTopup2ActualBatch
+info: LidoSRv3/Audit/Guarantees/PTopup2ActualBatch.lean:40:0: 'LidoSRv3.Audit.Guarantees.PTopup2.actual_module_batch_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1364/1378] Replayed LidoSRv3.Audit.Guarantees.PTopup2RootCalls
+info: LidoSRv3/Audit/Guarantees/PTopup2RootCalls.lean:20:0: 'LidoSRv3.Audit.Guarantees.PTopup2.actual_root_module_batch_bound' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+⚠ [1365/1378] Replayed LidoSRv3.Audit.Guarantees.PTopup2ModuleFailure
+warning: LidoSRv3/Audit/Guarantees/PTopup2ModuleFailure.lean:39:27: This simp argument is unused:
+  hl
+
+Hint: Omit it from the simp argument list.
+  simp ̵[̵h̵l̵]̵
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Guarantees/PTopup2ModuleFailure.lean:42:15: This simp argument is unused:
+  hl
+
+Hint: Omit it from the simp argument list.
+  simp only ̵[̵h̵l̵]̵
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+info: LidoSRv3/Audit/Guarantees/PTopup2ModuleFailure.lean:51:0: 'LidoSRv3.Audit.Guarantees.PTopup2.actual_module_no_code_failure' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Guarantees/PTopup2ModuleFailure.lean:52:0: 'LidoSRv3.Audit.Guarantees.PTopup2.actual_root_batch_no_code_failure' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [1366/1378] Replayed LidoSRv3.Tests.TopupBatchConsumerRegression
+info: LidoSRv3/Tests/TopupBatchConsumerRegression.lean:64:0: 'LidoSRv3.Tests.TopupBatchConsumerRegression.packed_cap' depends on axioms: [propext]
+info: LidoSRv3/Tests/TopupBatchConsumerRegression.lean:65:0: 'LidoSRv3.Tests.TopupBatchConsumerRegression.zero_batch_consumes_actual_module' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TopupBatchConsumerRegression.lean:66:0: 'LidoSRv3.Tests.TopupBatchConsumerRegression.above_cap_restores_module_effects' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [1367/1378] Replayed LidoSRv3.Tests.TopupBatchRootCallsRegression
+info: LidoSRv3/Tests/TopupBatchRootCallsRegression.lean:142:0: 'LidoSRv3.Tests.TopupBatchRootCallsRegression.no_module_actual_call_then_decoder_failure' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TopupBatchRootCallsRegression.lean:143:0: 'LidoSRv3.Tests.TopupBatchRootCallsRegression.no_module_entire_entry_world_restored' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TopupBatchRootCallsRegression.lean:145:0: 'LidoSRv3.Tests.TopupBatchRootCallsRegression.two_rows_consume_ordered_limits' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TopupBatchRootCallsRegression.lean:146:0: 'LidoSRv3.Tests.TopupBatchRootCallsRegression.forbidden_root_skips_module' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TopupBatchRootCallsRegression.lean:148:0: 'LidoSRv3.Tests.TopupBatchRootCallsRegression.actual_batch_succeeds' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TopupBatchRootCallsRegression.lean:149:0: 'LidoSRv3.Tests.TopupBatchRootCallsRegression.actual_batch_has_joint_guarantee' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TopupBatchRootCallsRegression.lean:150:0: 'LidoSRv3.Tests.TopupBatchRootCallsRegression.actual_requests_and_effects' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TopupBatchRootCallsRegression.lean:151:0: 'LidoSRv3.Tests.TopupBatchRootCallsRegression.above_cap_rolls_back_keeps_both_attempts' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TopupBatchRootCallsRegression.lean:152:0: 'LidoSRv3.Tests.TopupBatchRootCallsRegression.duplicate_retains_first_root' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/TopupBatchRootCallsRegression.lean:153:0: 'LidoSRv3.Tests.TopupBatchRootCallsRegression.short_slot_proof_makes_no_root_attempt' depends on axioms: [propext,
+ Quot.sound]
+info: LidoSRv3/Tests/TopupBatchRootCallsRegression.lean:154:0: 'LidoSRv3.Tests.TopupBatchRootCallsRegression.activation_precedes_root' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/TopupBatchRootCallsRegression.lean:155:0: 'LidoSRv3.Tests.TopupBatchRootCallsRegression.rejected_root_retains_attempt' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/TopupBatchRootCallsRegression.lean:156:0: 'LidoSRv3.Tests.TopupBatchRootCallsRegression.wrong_caller_rejected' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/TopupBatchRootCallsRegression.lean:157:0: 'LidoSRv3.Tests.TopupBatchRootCallsRegression.pending_overflow_retains_verified_root' depends on axioms: [propext,
+ Quot.sound]
+ℹ [1368/1378] Replayed LidoSRv3.Tests.TopupRouterContinuationMutants
+info: LidoSRv3/Tests/TopupRouterContinuationMutants.lean:247:0: 'LidoSRv3.Audit.Source.TopupRouterCredentials.typeOf_packed' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/TopupRouterContinuationMutants.lean:248:0: 'LidoSRv3.Audit.Source.TopupRouterContinuation.guardSum_spec' depends on axioms: [propext]
+info: LidoSRv3/Tests/TopupRouterContinuationMutants.lean:249:0: 'LidoSRv3.Audit.Source.TopupRouterContinuation.checked_fields' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/TopupRouterContinuationMutants.lean:250:0: 'LidoSRv3.Audit.Source.TopupRouterContinuation.inputs_admissible' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TopupRouterContinuationMutants.lean:251:0: 'LidoSRv3.Audit.Source.TopupRouterContinuation.positive_success' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TopupRouterContinuationMutants.lean:252:0: 'LidoSRv3.Audit.Source.TopupRouterContinuation.postcondition_bounded' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TopupRouterContinuationMutants.lean:253:0: 'LidoSRv3.Audit.Source.TopupRouterContinuation.failure_restores' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TopupRouterContinuationMutants.lean:255:0: 'LidoSRv3.Tests.TopupRouterContinuationMutants.late_execution' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TopupRouterContinuationMutants.lean:256:0: 'LidoSRv3.Tests.TopupRouterContinuationMutants.current_words_execute' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [1369/1378] Replayed LidoSRv3.Tests.TopupModuleCallMutants
+info: LidoSRv3/Tests/TopupModuleCallMutants.lean:105:0: 'LidoSRv3.Audit.Source.TopupModuleCall.address_packed' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/TopupModuleCallMutants.lean:106:0: 'LidoSRv3.Audit.Source.TopupModuleCall.call_success_origin' depends on axioms: [propext]
+info: LidoSRv3/Tests/TopupModuleCallMutants.lean:107:0: 'LidoSRv3.Audit.Source.TopupModuleCall.decodeReturn_encoded' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/TopupModuleCallMutants.lean:108:0: 'LidoSRv3.Audit.Source.TopupModuleCall.program_success_origin' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TopupModuleCallMutants.lean:109:0: 'LidoSRv3.Audit.Source.TopupModuleCall.program_encoded' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/TopupModuleCallMutants.lean:110:0: 'LidoSRv3.Audit.Source.TopupModuleCall.failure_restores' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/TopupModuleCallMutants.lean:111:0: 'LidoSRv3.Tests.TopupModuleCallMutants.positive_execution' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1370/1378] Replayed LidoSRv3.Tests.TopupRootCallEffectsRegression
+info: LidoSRv3/Tests/TopupRootCallEffectsRegression.lean:188:0: 'LidoSRv3.Tests.TopupRootCallEffectsRegression.module_program_matches_physical_fixture' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TopupRootCallEffectsRegression.lean:189:0: 'LidoSRv3.Tests.TopupRootCallEffectsRegression.positive_world_matches_physical_fixture' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TopupRootCallEffectsRegression.lean:190:0: 'LidoSRv3.Tests.TopupRootCallEffectsRegression.positive_physical_balances_and_count' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TopupRootCallEffectsRegression.lean:191:0: 'LidoSRv3.Tests.TopupRootCallEffectsRegression.actual_reply_above_cap_rejected' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TopupRootCallEffectsRegression.lean:192:0: 'LidoSRv3.Tests.TopupRootCallEffectsRegression.actual_reply_above_cap_restores' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TopupRootCallEffectsRegression.lean:194:0: 'LidoSRv3.Tests.TopupRootCallEffectsRegression.zero_keeps_actual_module_effects' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TopupRootCallEffectsRegression.lean:195:0: 'LidoSRv3.Tests.TopupRootCallEffectsRegression.prefix_computes_expected' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Tests/TopupRootCallEffectsRegression.lean:196:0: 'LidoSRv3.Tests.TopupRootCallEffectsRegression.actual_input_is_expected' depends on axioms: [propext]
+info: LidoSRv3/Tests/TopupRootCallEffectsRegression.lean:197:0: 'LidoSRv3.Tests.TopupRootCallEffectsRegression.zero_batch_effects' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TopupRootCallEffectsRegression.lean:198:0: 'LidoSRv3.Tests.TopupRootCallEffectsRegression.positive_program_projection' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TopupRootCallEffectsRegression.lean:199:0: 'LidoSRv3.Tests.TopupRootCallEffectsRegression.positive_batch_succeeds' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TopupRootCallEffectsRegression.lean:200:0: 'LidoSRv3.Tests.TopupRootCallEffectsRegression.positive_batch_joint_consumer' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [1371/1378] Replayed LidoSRv3.Tests.TopupModuleMemoryRegression
+info: LidoSRv3/Tests/TopupModuleMemoryRegression.lean:69:0: 'LidoSRv3.Tests.TopupModuleMemoryRegression.canonical_array' depends on axioms: [propext]
+info: LidoSRv3/Tests/TopupModuleMemoryRegression.lean:70:0: 'LidoSRv3.Tests.TopupModuleMemoryRegression.raw_allocation_first' depends on axioms: [propext]
+info: LidoSRv3/Tests/TopupModuleMemoryRegression.lean:71:0: 'LidoSRv3.Tests.TopupModuleMemoryRegression.empty_head' depends on axioms: [propext]
+info: LidoSRv3/Tests/TopupModuleMemoryRegression.lean:72:0: 'LidoSRv3.Tests.TopupModuleMemoryRegression.array_allocation_before_extent' depends on axioms: [propext]
+info: LidoSRv3/Tests/TopupModuleMemoryRegression.lean:73:0: 'LidoSRv3.Tests.TopupModuleMemoryRegression.short_payload' depends on axioms: [propext]
+info: LidoSRv3/Tests/TopupModuleMemoryRegression.lean:74:0: 'LidoSRv3.Tests.TopupModuleMemoryRegression.count_panics' depends on axioms: [propext]
+info: LidoSRv3/Tests/TopupModuleMemoryRegression.lean:75:0: 'LidoSRv3.Tests.TopupModuleMemoryRegression.unaligned_empty' depends on axioms: [propext]
+info: LidoSRv3/Tests/TopupModuleMemoryRegression.lean:76:0: 'LidoSRv3.Tests.TopupModuleMemoryRegression.full_batch_success' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TopupModuleMemoryRegression.lean:77:0: 'LidoSRv3.Tests.TopupModuleMemoryRegression.full_batch_same_world_attempts' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TopupModuleMemoryRegression.lean:78:0: 'LidoSRv3.Tests.TopupModuleMemoryRegression.full_batch_memory_failure' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TopupModuleMemoryRegression.lean:79:0: 'LidoSRv3.Tests.TopupModuleMemoryRegression.public_consumer' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/TopupModuleMemoryRegression.lean:80:0: 'LidoSRv3.Tests.TopupModuleMemoryRegression.positive_preserves_physical_execution' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TopupModuleMemoryRegression.lean:81:0: 'LidoSRv3.Tests.TopupModuleMemoryRegression.positive_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1372/1378] Replayed LidoSRv3.Tests.TopupCredentialCall
+info: LidoSRv3/Tests/TopupCredentialCall.lean:86:0: 'LidoSRv3.Tests.TopupCredentialCall.full_batch_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/TopupCredentialCall.lean:87:0: 'LidoSRv3.Tests.TopupCredentialCall.late_failure_keeps_calls_restores' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TopupCredentialCall.lean:88:0: 'LidoSRv3.Tests.TopupCredentialCall.public_consumer' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1373/1378] Replayed LidoSRv3.Tests.TopupPhysicalCredentialGetter
+info: LidoSRv3/Tests/TopupPhysicalCredentialGetter.lean:102:0: 'LidoSRv3.Tests.TopupPhysicalCredentialGetter.full_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/TopupPhysicalCredentialGetter.lean:103:0: 'LidoSRv3.Tests.TopupPhysicalCredentialGetter.late_failure' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/TopupPhysicalCredentialGetter.lean:104:0: 'LidoSRv3.Tests.TopupPhysicalCredentialGetter.public_consumer' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [1374/1378] Replayed LidoSRv3.Tests.TopupTimingHistory
+info: LidoSRv3/Tests/TopupTimingHistory.lean:111:0: 'LidoSRv3.Tests.TopupTimingHistory.full_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/TopupTimingHistory.lean:112:0: 'LidoSRv3.Tests.TopupTimingHistory.public_consumer' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/TopupTimingHistory.lean:113:0: 'LidoSRv3.Tests.TopupTimingHistory.public_rollback' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1375/1378] Replayed LidoSRv3.Tests.TopupRouterLocatorCall
+info: LidoSRv3/Tests/TopupRouterLocatorCall.lean:126:0: 'LidoSRv3.Tests.TopupRouterLocatorCall.public_consumer' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Tests/TopupRouterLocatorCall.lean:127:0: 'LidoSRv3.Tests.TopupRouterLocatorCall.public_rollback' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1376/1378] Built LidoSRv3.Audit.Source.TopupRouterAdmissionCall (1.9s)
+info: LidoSRv3/Audit/Source/TopupRouterAdmissionCall.lean:194:0: 'LidoSRv3.Audit.Source.TopupRouterAdmissionCall.failure_restores' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TopupRouterAdmissionCall.lean:196:0: 'LidoSRv3.Audit.Source.TopupRouterAdmissionCall.walk_relation' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Source/TopupRouterAdmissionCall.lean:197:0: 'LidoSRv3.Audit.Source.TopupRouterAdmissionCall.walk_prior' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Source/TopupRouterAdmissionCall.lean:198:0: 'LidoSRv3.Audit.Source.TopupRouterAdmissionCall.run_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+✖ [1377/1378] Building LidoSRv3.Audit.Guarantees.PTopupRouterAdmissionCall (1.5s)
+trace: .> LEAN_PATH=/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Cli/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/batteries/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Qq/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/aesop/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/proofwidgets/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/importGraph/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/plausible/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/mathlib/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/evmyul/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/verity/.lake/build/lib/lean:/private/tmp/lido-topup-router-admission-call/.lake/build/lib/lean /Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean /private/tmp/lido-topup-router-admission-call/LidoSRv3/Audit/Guarantees/PTopupRouterAdmissionCall.lean -o /private/tmp/lido-topup-router-admission-call/.lake/build/lib/lean/LidoSRv3/Audit/Guarantees/PTopupRouterAdmissionCall.olean -i /private/tmp/lido-topup-router-admission-call/.lake/build/lib/lean/LidoSRv3/Audit/Guarantees/PTopupRouterAdmissionCall.ilean -c /private/tmp/lido-topup-router-admission-call/.lake/build/ir/LidoSRv3/Audit/Guarantees/PTopupRouterAdmissionCall.c --setup /private/tmp/lido-topup-router-admission-call/.lake/build/ir/LidoSRv3/Audit/Guarantees/PTopupRouterAdmissionCall.setup.json --json
+error: LidoSRv3/Audit/Guarantees/PTopupRouterAdmissionCall.lean:44:106: unexpected token '/--'; expected term
+error: LidoSRv3/Audit/Guarantees/PTopupRouterAdmissionCall.lean:59:2: Type mismatch
+  PTopupEntryAdmission.actual_physical_entry_locator_timing_credential_root_module_memory_history i.caller i.locatorCall
+    i.locator i.cursor i.returnBuffer i.hash i.moduleCall i.withdrawalCall i.gateway i.ctx i.deposit i.moduleId i.keys
+    i.operators i.rows i.allocation hp
+has type
+  TopupEntryAdmission.Admitted i.gateway.gateway i.caller i.gateway.before ∧
+    TopupEntryAdmission.run i.caller i.locatorCall i.locator i.cursor i.returnBuffer i.hash i.moduleCall
+          i.withdrawalCall i.gateway i.ctx i.deposit i.moduleId i.keys i.operators i.rows i.allocation =
+        TopupEntryAdmission.ofPrior
+          (TopupRouterLocatorCall.run i.locatorCall i.locator i.cursor i.returnBuffer i.hash i.moduleCall
+            i.withdrawalCall i.gateway i.ctx i.deposit i.moduleId i.keys i.operators i.rows i.allocation) ∧
+      ∃ router next raw,
+        (i.gateway.before.core.codeSize i.locator.val).val ≠ 0 ∧
+          i.locatorCall (TopupRouterLocatorCall.request i.gateway.gateway i.locator) i.gateway.before =
+              StaticCall.Reply.success raw ∧
+            TopupRouterLocatorCall.decodeRouter i.cursor raw = Except.ok (router, next) ∧
+              32 ≤ (word (List.length raw)).val ∧
+                router.val = (word (decode (List.take 32 raw))).val ∧
+                  router.val < 2 ^ 160 ∧
+                    audit.trio.deposit.ModuleCall.finalizeAllocation i.cursor 32 = Except.ok next ∧
+                      i.cursor.val + 32 = next.val ∧
+                        next.val < 2 ^ 64 ∧
+                          have selected := TopupRouterLocatorCall.resolved i.ctx router;
+                          selected.self = i.ctx.self ∧
+                            selected.sender = router ∧
+                              have prior :=
+                                TopupTimingHistory.run next i.returnBuffer i.hash i.moduleCall i.withdrawalCall
+                                  i.gateway selected i.deposit i.moduleId i.keys i.operators i.rows i.allocation;
+                              have result :=
+                                TopupRouterLocatorCall.run i.locatorCall i.locator i.cursor i.returnBuffer i.hash
+                                  i.moduleCall i.withdrawalCall i.gateway i.ctx i.deposit i.moduleId i.keys i.operators
+                                  i.rows i.allocation;
+                              result =
+                                  TopupRouterLocatorCall.ofTiming
+                                    [{ request := TopupRouterLocatorCall.request i.gateway.gateway i.locator,
+                                        isStatic := true, accepted := true, returned := raw }]
+                                    prior ∧
+                                result.world = prior.world ∧
+                                  result.suffix = some prior ∧
+                                    result.observations =
+                                        [Sum.inl
+                                                { request := TopupRouterLocatorCall.request i.gateway.gateway i.locator,
+                                                  isStatic := true, accepted := true, returned := raw }] ++
+                                            List.map Sum.inl (prior.credentialAttempts ++ prior.rootAttempts) ++
+                                          List.map Sum.inr prior.moduleAttempts ∧
+                                      TimingEffects next i.returnBuffer i.hash i.moduleCall i.withdrawalCall i.gateway
+                                        selected i.deposit i.moduleId i.keys i.operators i.rows i.allocation
+but is expected to have type
+  PriorEffects i
+info: LidoSRv3/Audit/Guarantees/PTopupRouterAdmissionCall.lean:67:0: 'LidoSRv3.Audit.Guarantees.PTopupRouterAdmissionCall.actual_router_admission_complete_prior' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Guarantees/PTopupRouterAdmissionCall.lean:68:0: 'LidoSRv3.Audit.Guarantees.PTopupRouterAdmissionCall.actual_gateway_entry_failure_restores' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+error: Lean exited with code 1
+Some required targets logged failures:
+- LidoSRv3.Audit.Guarantees.PTopupRouterAdmissionCall
+error: build failed

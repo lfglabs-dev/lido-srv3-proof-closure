@@ -1,0 +1,30 @@
+{
+  "source": "958617bb6faed5f3de12563f028c2dbd41378b01",
+  "main_base": "61ce7060ccfa96d94a36e1112674fbba15d9ef94",
+  "merge_union": "efb37f8ce55ac0a32875bf7e3089028c3526006a",
+  "source_unchanged": true,
+  "facade": "Direct PTopup2RootCalls import; Trust imports new regressions and queries publicjointconsumer,rollback,jointfixture,orderedtwo-rowfixture",
+  "AllTrust": {
+    "jobs": 1679,
+    "exit": 0
+  },
+  "exact_trust": {
+    "axioms": 29,
+    "exit": 0,
+    "environment_dependencies_recomputed": true,
+    "native_claims_reevaluated": true
+  },
+  "reused": {
+    "source_identities": 1282,
+    "package_pins": 11,
+    "packet_hashes": 14,
+    "scope": "Original18 scopedaxiomsets/11kernel+publicinstantiation and45Solidityidentitychecks retain original unchanged source scope; no freshSolidityexecution credited."
+  },
+  "source_review": "CLEAN9586 full source/Solidity report retained",
+  "integration_review": "Pending exact frozen final review; source not self-approved",
+  "sha256": {
+    "audit/topup-root-call-batch/integration-build.log": "146a1705f7f99012927fa8add533c4dc5f7b606619e9054d86d5cacadc3b184c",
+    "audit/topup-root-call-batch/integration-trust.log": "7bbc30d43354184f55ebc2604bfc99a4eb9a1ef38d03119723965bf74425c439",
+    "audit/topup-root-call-batch/independent-source-review-9586.md": "ee94195f40f20908bdbfef7b6f38b0fd2dde495ca85bb70021715a268f7397d1"
+  }
+}

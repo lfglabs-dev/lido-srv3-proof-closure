@@ -5,6 +5,7 @@ namespace LidoSRv3.Tests.TrioConsolidation.Spec
 open audit.trio.consolidation
 
 private def key (id length : Nat := 48) : Pubkey := ⟨id, length⟩
+private def wrapKey (id : Nat) : Pubkey := ⟨id + pubkeyModulus, 48⟩
 
 example : validateBusAdd 4 2
     [⟨[key 11, key 12], key 21⟩, ⟨[key 13], key 22⟩] = .ok 3 := by
@@ -59,5 +60,34 @@ example : validateVaultAdd (word 3) (word 5) [key 11 47] [key 21] =
 example : validateVaultAdd (word 3) (word 3) [key 11 47] [key 21] =
     .error (.invalidSourceLength 0 47) := by
   rfl
+
+/-- Unrestricted integer encoding wraps at `2^384`. -/
+example : integerBE pubkeyLength 1 =
+    integerBE pubkeyLength (1 + pubkeyModulus) := integerBE48_collides_unbounded
+
+/-- Actual 48-byte representation refuses the wrapping identity, so distinct
+identities do not encode to the same 48 bytes. -/
+example : pubkeyOctets (key 1) = some (integerBE pubkeyLength 1) := by
+  native_decide
+
+example : pubkeyOctets (wrapKey 1) = none := by
+  native_decide
+
+example : pubkeyOctets (key 1) ≠ pubkeyOctets (wrapKey 1) := by
+  native_decide
+
+example : pubkeyOctets (key 1) ≠ pubkeyOctets (key 2) := by
+  native_decide
+
+example : encodePackedRequest (key 11) (key 21) =
+    some (integerBE 48 11 ++ integerBE 48 21) := by
+  native_decide
+
+example : (encodePackedRequest (key 11) (key 21)).map List.length = some 96 := by
+  native_decide
+
+/-- Length-47 keys have no 48-byte representation, even with a small identity. -/
+example : pubkeyOctets (key 11 47) = none := by
+  native_decide
 
 end LidoSRv3.Tests.TrioConsolidation.Spec

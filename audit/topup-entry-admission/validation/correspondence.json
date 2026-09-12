@@ -1,0 +1,12 @@
+{
+  "compiler_ir_sha256": "4170a026329677bca075096ede2b500f76d0ec7a481d793086d3793fa88358b0",
+  "core": "17005714f151e5502c559932319a3f2f74ac2436",
+  "full_prior_conclusion": true,
+  "mapping_vectors": 4,
+  "source_mapping": {
+    "AccessControlUpgradeable hasRole/_checkRole": "actual namespace role mapping, msg.sender, lowbyte not entireword or canonical1",
+    "PausableUntil / fullIR1864-1876": "timestamp < full256-bit resume word; equality resumes; exact4-byte14378398; before arraylengths/lookup",
+    "TopUpGateway160 / fullIR337-370": "typed outer head precedes role; two64-byte Keccaks role/base then caller/inner; SLOAD lowbyte admission; full68-byte error",
+    "public consumer": "entire prior338 conclusion plus executed physical gates and same actual suffix result/world"
+  }
+}

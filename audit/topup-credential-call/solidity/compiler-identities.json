@@ -1,0 +1,136 @@
+{
+  "binary_sha256": "cc3f94a70ac681b0304084acc1980aabe2a1bb3240d44ce76a8df0e1e77a2110",
+  "methods": {
+    "BEACON_ROOTS()": "56d7e8fd",
+    "DEFAULT_ADMIN_ROLE()": "a217fddf",
+    "GI_FIRST_VALIDATOR_CURR()": "3a5e31fe",
+    "GI_FIRST_VALIDATOR_PREV()": "562d7d67",
+    "GI_STATE_ROOT()": "2f8d5149",
+    "MANAGE_LIMITS_ROLE()": "c674b598",
+    "PAUSE_INFINITELY()": "a302ee38",
+    "PAUSE_ROLE()": "389ed267",
+    "PIVOT_SLOT()": "8f60eab9",
+    "RESUME_ROLE()": "2de03aa1",
+    "SLOTS_PER_EPOCH()": "da30e279",
+    "TOP_UP_ROLE()": "6fce8ab2",
+    "getLastTopUpTimestamp()": "7ac22a89",
+    "getMaxRootAge()": "3fdaf2bd",
+    "getMaxValidatorsPerTopUp()": "0de205eb",
+    "getMinBlockDistance()": "9274c2ea",
+    "getMinTopUpGwei()": "224499ee",
+    "getResumeSinceTimestamp()": "589ff76c",
+    "getRoleAdmin(bytes32)": "248a9ca3",
+    "getRoleMember(bytes32,uint256)": "9010d07c",
+    "getRoleMemberCount(bytes32)": "ca15c873",
+    "getRoleMembers(bytes32)": "a3246ad3",
+    "getTargetBalanceGwei()": "d696d9e5",
+    "grantRole(bytes32,address)": "2f2ff15d",
+    "hasRole(bytes32,address)": "91d14854",
+    "initialize(address,uint256,uint256,uint256,uint256,uint256)": "45ff4c80",
+    "isBlockDistancePassed()": "bc4d461a",
+    "isPaused()": "b187bd26",
+    "pauseFor(uint256)": "f3f449c7",
+    "pauseUntil(uint256)": "abe9cfc8",
+    "renounceRole(bytes32,address)": "36568abe",
+    "resume()": "046f7da2",
+    "revokeRole(bytes32,address)": "d547741f",
+    "setMaxRootAge(uint256)": "67cf3726",
+    "setMaxValidatorsPerTopUp(uint256)": "6ba62f6a",
+    "setMinBlockDistance(uint256)": "ae2bfefa",
+    "setTopUpBalanceLimits(uint256,uint256)": "3a5da28f",
+    "supportsInterface(bytes4)": "01ffc9a7",
+    "topUp((uint256,uint256[],uint256[],uint256[],(uint64,uint64,uint64),(bytes32[],bytes,uint64,uint64,uint64,uint64,uint64,bool)[],uint256[]))": "1141aa5a"
+  },
+  "solc": "/Users/thomas/.svm/0.8.25/solc-0.8.25",
+  "sources": {
+    "@openzeppelin/contracts-v5.2/access/IAccessControl.sol": {
+      "origin": "accepted-deposit-dsm-vendored",
+      "sha256": "c112f5c86fdc4e862f88d4f5694530342320923ebd5b5e7d9d8493550d337c2d"
+    },
+    "@openzeppelin/contracts-v5.2/access/extensions/IAccessControlEnumerable.sol": {
+      "origin": "accepted-deposit-dsm-vendored",
+      "sha256": "f91dc4b5750c1bac7a6a11a6057f14f01121847e6a6284e1200d8a87a4c4ff1e"
+    },
+    "@openzeppelin/contracts-v5.2/utils/introspection/IERC165.sol": {
+      "origin": "accepted-deposit-dsm-vendored",
+      "sha256": "7c5c3f98ab876991e7dd34b84d41137e836306eb9f36f6386a631f5be3f5d6d4"
+    },
+    "@openzeppelin/contracts-v5.2/utils/structs/EnumerableSet.sol": {
+      "origin": "accepted-deposit-dsm-vendored",
+      "sha256": "ed0804f9dcff9d2dceba8cc83f31669a84491dfcfe510050c9371aa7c48db09c"
+    },
+    "audit/topup-gateway-witness-batch/solidity/TopupGatewayWitnessBatch.t.sol": {
+      "origin": "accepted-proof-base",
+      "sha256": "feddd9ebdd11e9dc1d0eb0fdf4f3da59e5e059ad7c41aa022b9875af0a20dee5"
+    },
+    "contracts/0.8.25/CLValidatorVerifier.sol": {
+      "origin": "core:17005714f151e5502c559932319a3f2f74ac2436",
+      "sha256": "d6e89f6975e4fa02f758bf461a98ac2d689296b5c92d03ffd4e43a22d0b3d7ed"
+    },
+    "contracts/0.8.25/TopUpGateway.sol": {
+      "origin": "core:17005714f151e5502c559932319a3f2f74ac2436",
+      "sha256": "a7ffb654fb4d8d83ba14a6d9452663f786e9a21434be3ce9b7205c546526b7b4"
+    },
+    "contracts/common/interfaces/IPausableUntil.sol": {
+      "origin": "core:17005714f151e5502c559932319a3f2f74ac2436",
+      "sha256": "0377e3ac9ff2d6be41f4b8f40eee7cfd452ce6de760f9b9145fdb38b94902de3"
+    },
+    "contracts/common/interfaces/TopUpWitness.sol": {
+      "origin": "core:17005714f151e5502c559932319a3f2f74ac2436",
+      "sha256": "34135d561e4d8c3f1585cdbc15d20f568e36bb37db6c8d4444a8d0cd48cef44d"
+    },
+    "contracts/common/interfaces/ValidatorWitness.sol": {
+      "origin": "core:17005714f151e5502c559932319a3f2f74ac2436",
+      "sha256": "8fd24cfab7402233029756e52e59198b0d9cbf0a42e5c07d9fa2338ed731a5f7"
+    },
+    "contracts/common/lib/BLS.sol": {
+      "origin": "core:17005714f151e5502c559932319a3f2f74ac2436",
+      "sha256": "0187cc6a6b1aaa833317695d88795db431fa237452213e8c3872a0f444dceb7c"
+    },
+    "contracts/common/lib/BeaconTypes.sol": {
+      "origin": "core:17005714f151e5502c559932319a3f2f74ac2436",
+      "sha256": "9591e9af1a4fd398db86267f3589e763f9eb2016bf29e26cfa50988cf73a10c3"
+    },
+    "contracts/common/lib/GIndex.sol": {
+      "origin": "core:17005714f151e5502c559932319a3f2f74ac2436",
+      "sha256": "2653bd4ba89c349f3db36f21a8afc6a24e0e233816d9b608f46d048feb601d1f"
+    },
+    "contracts/common/lib/SSZ.sol": {
+      "origin": "core:17005714f151e5502c559932319a3f2f74ac2436",
+      "sha256": "91ef497b972bbee0fe89043034e6bd62fa0c1059f22874d4826bc6164a22009b"
+    },
+    "contracts/common/lib/UnstructuredStorage.sol": {
+      "origin": "core:17005714f151e5502c559932319a3f2f74ac2436",
+      "sha256": "ca4ad93eedff40de12fdd50a88ef608650139a5543fd160dab61cad4d3c03160"
+    },
+    "contracts/common/lib/WithdrawalCredentials.sol": {
+      "origin": "core:17005714f151e5502c559932319a3f2f74ac2436",
+      "sha256": "cf5e77be0c5d522d853d19a4c5284e53fa0fb149a9902f77648a8f6d5584636c"
+    },
+    "contracts/common/utils/PausableUntil.sol": {
+      "origin": "core:17005714f151e5502c559932319a3f2f74ac2436",
+      "sha256": "f27405a7f52a15f7e1b10a73ae57ed69fe6514aaba821415e5584458546cf255"
+    },
+    "contracts/openzeppelin/5.2/upgradeable/access/AccessControlUpgradeable.sol": {
+      "origin": "core:17005714f151e5502c559932319a3f2f74ac2436",
+      "sha256": "d32578f73ad0a24f65d8208033226cc5567a9df2a57fabadf644f6e4e7f172a4"
+    },
+    "contracts/openzeppelin/5.2/upgradeable/access/extensions/AccessControlEnumerableUpgradeable.sol": {
+      "origin": "core:17005714f151e5502c559932319a3f2f74ac2436",
+      "sha256": "b6b854fdb69cfe58d7494f6cfc1920a68b504c32e97f6028b6d62a844bc17426"
+    },
+    "contracts/openzeppelin/5.2/upgradeable/proxy/utils/Initializable.sol": {
+      "origin": "core:17005714f151e5502c559932319a3f2f74ac2436",
+      "sha256": "a8b7eafa0fdc7cb5a644c8c61a8e4c51e031d5e1e6f268f72dbe18b768ead56e"
+    },
+    "contracts/openzeppelin/5.2/upgradeable/utils/ContextUpgradeable.sol": {
+      "origin": "core:17005714f151e5502c559932319a3f2f74ac2436",
+      "sha256": "a08e16324da33a9d666dc07a22ae58031c242a3869f6808e55b4b82fc70cb209"
+    },
+    "contracts/openzeppelin/5.2/upgradeable/utils/introspection/ERC165Upgradeable.sol": {
+      "origin": "core:17005714f151e5502c559932319a3f2f74ac2436",
+      "sha256": "76f4b4b6f5d8de71b0b29d90f2b277b88b2c45898340b20b278b9e9ed5074f77"
+    }
+  },
+  "version": "solc, the solidity compiler commandline interface\nVersion: 0.8.25+commit.b61c2a91.Darwin.appleclang\n"
+}

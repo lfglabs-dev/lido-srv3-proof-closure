@@ -311,4 +311,58 @@ theorem abi_success_composes_deposit_values
                         exact lt_of_le_of_lt (Nat.le_mul_of_pos_right _ maxPositive) withinTarget
 
 #print axioms abi_success_composes_deposit_values
+
+/-- A successful `prepareDepositABI` prefix composes beacon charges from the
+literal `depositSize` argument (`composeValues`), not from ALLOC. Instantiating
+`depositSize` with pinned `DEPOSIT_SIZE` yields `perKey = DEPOSIT_SIZE` and
+`total = actualKeys * DEPOSIT_SIZE`. The returned-key count is the aligned
+public-key batch length, and the Lido pull is the checked product with the
+configured `maxEBType1`, which the executed division guard keeps nonzero. -/
+theorem prepareDepositABI_composes_beacon_values
+    (layout : TrioAlloc1.Layout) (storage : TrioAlloc1.Storage)
+    (oracle : TrioAlloc1.StaticOracle) (config : TrioAlloc1.Config)
+    (amount : Word) (before after : TrioAlloc1.Transcript)
+    (moduleId : Word) (limits : DepositLimits)
+    (obtainDepositData : ObtainDepositData) (depositSize : Nat)
+    (prepared : PreparedDeposit)
+    (executed : prepareDepositABI layout storage oracle config amount before moduleId
+      limits obtainDepositData depositSize = (.ok prepared, after)) :
+    prepared.values.beaconPerKeyWei = depositSize ∧
+      prepared.values.beaconTotalWei = prepared.values.actualKeys * depositSize ∧
+      prepared.moduleData.publicKeysBatch.length =
+        prepared.values.actualKeys * pubkeyLength ∧
+      prepared.values.lidoPullWei = prepared.values.actualKeys * config.maxEBType1.val ∧
+      prepared.values.lidoPullWei < 2 ^ 256 ∧
+      prepared.maxEBType1 = config.maxEBType1 ∧
+      prepared.moduleId = moduleId ∧
+      0 < config.maxEBType1.val := by
+  unfold prepareDepositABI at executed
+  split at executed <;> try simp_all
+  next allocation allocAfter allocEq =>
+    split at executed <;> try simp_all
+    next moduleIndex indexEq =>
+      split at executed <;> try simp_all
+      next selected selectedEq =>
+        unfold maxDepositsCount at executed
+        split at executed <;> try simp_all
+        next nonzero =>
+          split at executed <;> try simp_all
+          next target targetEq =>
+            split at executed <;> try simp_all
+            next nonzeroTarget =>
+              split at executed <;> try simp_all
+              next moduleData moduleEq =>
+                split at executed <;> try simp_all
+                next aligned =>
+                  split at executed <;> try simp_all
+                  next withinTarget =>
+                    obtain ⟨rfl, rfl⟩ := executed
+                    have maxPositive : 0 < config.maxEBType1.val := by
+                      by_cases h : config.maxEBType1 = 0
+                      · simp [h] at nonzero
+                      · exact Nat.pos_of_ne_zero (fun hz => h (Fin.ext hz))
+                    refine ⟨rfl, rfl, ?_, rfl, withinTarget, rfl, rfl, maxPositive⟩
+                    exact (Nat.div_mul_cancel (Nat.dvd_of_mod_eq_zero moduleEq)).symm
+
+#print axioms prepareDepositABI_composes_beacon_values
 end audit.trio.deposit

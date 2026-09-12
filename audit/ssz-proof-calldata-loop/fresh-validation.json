@@ -1,0 +1,72 @@
+{
+  "created_utc": "2026-09-09T19:48:19.644642+00:00",
+  "scope": "Fresh direct checks of both source files and the test module with imported caches and temporary outputs; targeted Lake graph replay separately reuses caches. Not a full dependency rebuild.",
+  "head": "28a1187169182494be04601a660a66d628694249",
+  "before": {
+    "LidoSRv3/Audit/Source/SszProofLoopResources.lean": "064e7bca29c544035ec802ff920472a5ab29d6f96650b51af07f36da59821eb2",
+    "LidoSRv3/Audit/Source/SszProofCalldataLoop.lean": "ebc58764fcfc3b72f0c1bfd4a2ce3339b2d316344a47755e7819d9ad627f7d87",
+    "LidoSRv3/Tests/SszProofCalldataLoopMutants.lean": "67d9e112d11eb69b9f4dbbdfd8d37c7f74c486f7ba9161438a7638f6a3c3bd7b",
+    "lakefile.lean": "8ea3781110b3234bdfcf2b2c87c5c064fa7d2aee018da57bcab100f8baf1ab87",
+    "lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
+    "lean-toolchain": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee",
+    "foundry.toml": "adb4990ab31a2bb53f5eeb370e4f55d962f7bc1026bce01708497a56b262356c"
+  },
+  "after": {
+    "LidoSRv3/Audit/Source/SszProofLoopResources.lean": "064e7bca29c544035ec802ff920472a5ab29d6f96650b51af07f36da59821eb2",
+    "LidoSRv3/Audit/Source/SszProofCalldataLoop.lean": "ebc58764fcfc3b72f0c1bfd4a2ce3339b2d316344a47755e7819d9ad627f7d87",
+    "LidoSRv3/Tests/SszProofCalldataLoopMutants.lean": "67d9e112d11eb69b9f4dbbdfd8d37c7f74c486f7ba9161438a7638f6a3c3bd7b",
+    "lakefile.lean": "8ea3781110b3234bdfcf2b2c87c5c064fa7d2aee018da57bcab100f8baf1ab87",
+    "lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
+    "lean-toolchain": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee",
+    "foundry.toml": "adb4990ab31a2bb53f5eeb370e4f55d962f7bc1026bce01708497a56b262356c"
+  },
+  "unchanged": true,
+  "runs": [
+    {
+      "command": [
+        "lake",
+        "env",
+        "lean",
+        "LidoSRv3/Audit/Source/SszProofLoopResources.lean",
+        "-o",
+        "/tmp/lido-ssz-step-validated-wordbytes.olean"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 2.68
+    },
+    {
+      "command": [
+        "lake",
+        "env",
+        "lean",
+        "LidoSRv3/Audit/Source/SszProofCalldataLoop.lean",
+        "-o",
+        "/tmp/lido-ssz-step-validated-calldata.olean"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.968
+    },
+    {
+      "command": [
+        "lake",
+        "env",
+        "lean",
+        "LidoSRv3/Tests/SszProofCalldataLoopMutants.lean",
+        "-o",
+        "/tmp/lido-ssz-loop-validated-tests.olean"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.729
+    },
+    {
+      "command": [
+        "lake",
+        "build",
+        "LidoSRv3.Tests.SszProofCalldataLoopMutants"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.958
+    }
+  ],
+  "passed": true
+}

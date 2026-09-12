@@ -1,5 +1,60 @@
 {
   "schema": "lido-srv3-ux2-guarantee-v1",
+  "main_result": {
+    "description": "A successful deposit CALL in the source interpreter binds the submitted root to the ordered SHA preimages of its actually decoded public key, credentials, signature and msg.value in gwei. The guards derive exact field widths, uint64 amount range and gwei divisibility. The separate CL verifier ABI-frame composition remains open. A separate initialized compiled-harness consumer carries the actual memory allocations, field stores and SHA loads into the proof loop, deriving its typed validator leaf and bounded memory extent from initialization.",
+    "model": "Source deposit CALL/ABI interpreter with forward opaque SHA evaluation; historical synthetic encoding and Nat.pair results are separate",
+    "theorems": [
+      {
+        "plane": "source",
+        "role": "registered main source-model result (audit/trio/main-guarantees.json)",
+        "status": "CHECKED",
+        "name": "LidoSRv3.Audit.Guarantees.PSsz1.actual_deposit_call_binds_root",
+        "module": "LidoSRv3.Audit.Guarantees.PSsz1ActualDeposit",
+        "file": "LidoSRv3/Audit/Guarantees/PSsz1ActualDeposit.lean",
+        "start_line": 13,
+        "end_line": 23,
+        "doc": "/-- A successful actual deposit CALL determines its helper input from decoded\npayload fields and msg.value. The root matches the ordered SHA preimage chain\nfor precisely that input, with widths and uint64 gwei range derived from guards. -/",
+        "statement": "theorem actual_deposit_call_binds_root (ctx : Context) (target : Address)\n    (payload : Live.Bytes) (amount : Word) (before after : World) (data : Live.Bytes)\n    (trace : List Attempt)\n    (h : TopupBeaconEffects.push DepositDataRootCorrespondence.sha256\n      ctx target payload amount before = ⟨.ok data, after, trace⟩) :\n    ∃ f, decodePayload payload = some f ∧\n      f.pubkey.length = 48 ∧ f.credentials.length = 32 ∧ f.signature.length = 96 ∧\n      (consumedInput f amount).amountGwei < 2^64 ∧ amount.val % 10^9 = 0 ∧\n      f.suppliedRoot = LidoSRv3.Audit.Verity.TopupTx.abiWordOfBytes\n        (DepositDataRootCorrespondence.computeDepositDataRootWithAmount\n          (consumedInput f amount)).bytes"
+      },
+      {
+        "plane": "source",
+        "role": "registered main source-model result (audit/trio/main-guarantees.json)",
+        "status": "CHECKED",
+        "name": "LidoSRv3.Audit.Guarantees.PSsz1.actual_memory_validator_branch",
+        "module": "LidoSRv3.Audit.Guarantees.PSsz1ActualMemory",
+        "file": "LidoSRv3/Audit/Guarantees/PSsz1ActualMemory.lean",
+        "start_line": 11,
+        "end_line": 27,
+        "doc": "",
+        "statement": "theorem actual_memory_validator_branch (fuel : Nat) (context afterState : EVM.State)\n    (h : SszCompiledConsumer.run fuel context = .ok afterState)\n    (hffi : SszProofCommitted.ShaWidth) :\n    ∃ head keySlice f branch,\n      SszWitnessAbi.header context = .ok head ∧\n      SszWitnessAbi.tail context head (UInt256.ofNat 36) 1 = .ok keySlice ∧\n      keySlice.length = 48 ∧ SszWitnessAbi.FieldsMatch context head f ∧\n      SszWitnessAbi.tail context head (UInt256.ofNat 4) 32 = .ok branch ∧\n      branch.length ≤ 2^64-1 ∧\n      let words := SszProofCommitted.proofWords branch.length context.executionEnv.calldata\n        branch.offset (SszProofCommitted.endOffset branch.offset branch.length)\n      words ≠ [] ∧\n      SszProofFold.Branch SszProofCalldataStep.ffiPair\n        (SszProofCalldataStep.decodeIndex (context.calldataload (UInt256.ofNat 100))).toNat\n        (SszProofCommitted.validatorLeaf context keySlice.offset f) words\n        (context.calldataload (UInt256.ofNat 68)) ∧\n      afterState.executionEnv = context.executionEnv ∧ afterState.activeWords.toNat ≤ 20"
+      }
+    ],
+    "covered": [
+      "The actual CALL dispatcher decodes the same payload and consumes the same transferred value; no independent helper input is supplied.",
+      "The source guard sequence derives 48/32/96-byte widths and an exactly divisible uint64 gwei amount.",
+      "The independently transcribed callee hash chain agrees forward with the depositor helper on those consumed fields, including signature splits, zero padding and little-endian amount.",
+      "The initialized harness consumer derives memory extent at most 20 words, the key length and field values, and connects all seven Merkle SHA calls and their physical loads/stores to the actual consumed proof branch. No initial-memory bound or successful intermediate-stage premise is supplied."
+    ],
+    "missing": [
+      "The complete CLValidatorVerifier entry (root/slot/proposer/generalized-index prefix) must consume the initialized compiled-harness result, and the actual consumed proof words must be related to the full ABI-declared list. The new memory consumer does not establish these connections.",
+      "General malformed deposit-ABI acceptance and exact revert/event byte encodings are not established by the existing source callee interpreter."
+    ],
+    "conditions": [
+      "The existing concrete CALL/ABI source interpreter and physical-world semantics apply; general compiler and declared Verity semantics remain accepted boundaries.",
+      "SHA is the existing opaque function returning exactly 32 bounded bytes. Only forward evaluation is used; no cryptographic injectivity or relation to a separate validator-proof transaction is assumed.",
+      "The compiled-harness consumer uses the inherited SHA output-width condition and its actual successful execution; the initialized memory bound is derived. General opcode dispatch/gas remains within the accepted semantics scope; no new calldata-size or allocation premise is added."
+    ],
+    "assumptions": [
+      "A-SOURCE-SHAPED",
+      "A-VERITY-SCAFFOLD",
+      "A-SOLC-TRUSTED",
+      "A-SHA256-FFI"
+    ],
+    "outside": [
+      "General SHA/precompile correctness, compiler correctness, gas and consensus.",
+      "The full TOPUP or DEPOSIT entry state machine belongs to the respective guarantee; this result binds one successful deposit call."
+    ]
+  },
   "id": "P-SSZ-1",
   "position": 11,
   "summary": "Bidirectional structural deposit-root equivalence is registered as deposit_root_iff: the named Spec SszWitness.Correspondence on well-formed deposits (pinned 48/32/96-byte widths). Construction binds sourceWitness src to sourceNode src at .clValidatorVerifier; determination recovers witness = sourceWitness src from depositVerified witness root with root = sourceNode src. Deposit uniqueness is the named PerfectDepositEncoding (A-PERFECT-HASH) child deposit_unique_of_perfect, not a parent conjunct. sourceNode_mutant_kill_line_refutes_parent is the parent-shaped kill-line (encode mutated to sourceNode + 1; wellFormedDeposit retained). This complements composed_ssz_encoding, which still registers the single traversal conjunct composedEncodingOk on ComposedSszInput (the mutant-exercised deposit-data-root reconstruction under sourceCombine). swapped_combine_kill_line_refutes_parent remains the traversal-child kill-line; inconsistent_witness_kill_line and inconsistent_operation_index_kill_line remain bindOperation-level negatives. SHA-256 functional correctness stays A-SHA256-FFI; the imported Yul fragment stays OPEN under A-YUL-INTERFACE.",

@@ -1,0 +1,11 @@
+Compiling 23 files with Solc 0.8.25
+Solc 0.8.25 finished in 10.78s
+Compiler run successful!
+
+Ran 3 tests for audit/topup-history-domain/solidity/TopupHistoryDomain.t.sol:TopupHistoryDomainTest
+[PASS] test_history_firstTruncatingBlockAdmitsRepeat() (gas: 493040)
+[PASS] test_history_lastRepresentableBlockRejectsRepeat() (gas: 424417)
+[PASS] test_history_nonzeroTruncatedBlockAlsoAdmitsRepeat() (gas: 490806)
+Suite result: ok. 3 passed; 0 failed; 0 skipped; finished in 6.86ms (4.70ms CPU time)
+
+Ran 1 test suite in 139.12ms (6.86ms CPU time): 3 tests passed, 0 failed, 0 skipped (3 total tests)

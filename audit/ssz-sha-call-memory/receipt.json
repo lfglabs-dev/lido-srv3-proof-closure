@@ -1,0 +1,126 @@
+{
+  "schema": "lido-ssz-sha-call-memory-v1",
+  "created_utc": "2026-09-09T15:36:27.408685+00:00",
+  "checkout_head_at_validation": "8236977681bf6c701cba77162a95031e458e411a",
+  "branch": "codex/local-lido-gateway-sha-20260909",
+  "source_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "package_pins": {
+    ".lake/packages/verity": "e977aaad6e1a9e92e0132d41b3d33a14135a4d46",
+    ".lake/packages/evmyul": "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9"
+  },
+  "main_result": "Existing scratch -> actual EVM.call -> Theta -> Xi_SHA256 opaque FFI -> derived output32 copy/readback/frame and bounded mload. Actual gas cap width and64-byte fee84 derived; no read/copy/success-result premises. BLS consumer uses codeOwner, gas(), Ccall fee, and explicit fee admission.",
+  "lean": {
+    "executed_command": "lake build LidoSRv3.Audit.Source.SszShaCallBytes LidoSRv3.Audit.Source.SszShaCallMemory LidoSRv3.Tests.SszShaCallMemoryMutants",
+    "exit": 0,
+    "jobs": 1126,
+    "public_source_theorems": 14,
+    "regression_examples": 10,
+    "axiom_queries": 9,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "new_file_warnings": 0,
+    "replayed_existing_warnings": [
+      "Conform.Wheels deprecation",
+      "EvmYul.Pretty deprecation",
+      "EvmYul.Semantics/EVM.Semantics Mathlib.Data.Array.Defs deprecation"
+    ],
+    "validation_scope": "Final exact source/test build; dependencies reused by Lake where unchanged; no full repository rebuild",
+    "scan": {
+      "LidoSRv3/Audit/Source/SszShaCallBytes.lean": {
+        "sorry_or_admit": false,
+        "native_decide_or_bv_decide": false,
+        "axiom_declaration": false
+      },
+      "LidoSRv3/Audit/Source/SszShaCallMemory.lean": {
+        "sorry_or_admit": false,
+        "native_decide_or_bv_decide": false,
+        "axiom_declaration": false
+      },
+      "LidoSRv3/Tests/SszShaCallMemoryMutants.lean": {
+        "sorry_or_admit": false,
+        "native_decide_or_bv_decide": false,
+        "axiom_declaration": false
+      }
+    }
+  },
+  "solidity": {
+    "receipt": "solidity/receipt.json",
+    "executed_by": "root",
+    "rerun_by_worker": false,
+    "tests": 4,
+    "fuzz_tests": 2,
+    "runs_each": 1024,
+    "scope": "Real SHA examples; actual identity4 output copy/frame; explicit hypothetical address2 fault-injection against unmodified BLS/SSZ guards. Not standard-SHA short replies, FFI correctness, or runtime exploit."
+  },
+  "dependency_closure": {
+    "manifest": "dependency-inputs.json",
+    "package_source_count": 1109,
+    "local_lido_count": 9,
+    "scope": "Package Lean source closure identified by actual final Lake setup importArts; core toolchain is pinned separately, selected core byte/array/USize files additionally hashed. This is not a full toolchain-source closure or rebuild of every dependency."
+  },
+  "pinned_solidity_sources": [
+    "contracts/common/lib/BLS.sol",
+    "contracts/common/lib/SSZ.sol",
+    "contracts/common/lib/MemUtils.sol",
+    "contracts/0.8.25/CLValidatorVerifier.sol"
+  ],
+  "validated_inputs": {
+    ".lake/packages/evmyul/EvmYul/EVM/Gas.lean": "9f06caccf5cc8f27f7822392cd1963c8353eb816052f4596321a12c2da707436",
+    ".lake/packages/evmyul/EvmYul/EVM/PrecompiledContracts.lean": "cb69358e1f534c46e7054e4ef60eb8f78f7c78502b9d6e7e3ecf375c60206012",
+    ".lake/packages/evmyul/EvmYul/EVM/Semantics.lean": "2b742023b451daa6e52e768803469625ac2c1e0c561f7cd963f5cbf1032a9af9",
+    ".lake/packages/evmyul/EvmYul/EVM/State.lean": "7e672e4d693016149f5cb657a0f0ce2ba1eeec403c19f12a78f5af77b24ff78e",
+    ".lake/packages/evmyul/EvmYul/FFI/ffi.lean": "c0b6b455399a476fd3c5be3fd3e1df5788a112dd92b520397512d073b6317562",
+    ".lake/packages/evmyul/EvmYul/MachineState.lean": "0acd50c32ca8ac6a547c727fb86d72ed96ab12e04b60bd7cf7c5b19817caffa1",
+    ".lake/packages/evmyul/EvmYul/MachineStateOps.lean": "a0f4d2b7d78aef73ff7a417be25b585e4962b8d2bb866b3d6a081a1403631def",
+    ".lake/packages/evmyul/EvmYul/Maps/AccountMap.lean": "8ce51e59b0d2be13b7bb749225a28bb532c8cc07574f798617c03a7392b08b54",
+    ".lake/packages/evmyul/EvmYul/SharedState.lean": "1e435e76749627661374a969876f172bcfa9e7d09ef93380fd46c76780d39001",
+    ".lake/packages/evmyul/EvmYul/SharedStateOps.lean": "99d0566564c01fece85c84972d8fe8853bf593a4c04b3b4da496db2774d3d7c6",
+    ".lake/packages/evmyul/EvmYul/State.lean": "a4775255b761de39b7c14df0062c9274826aea85669672465632ceb86de8ab4e",
+    ".lake/packages/evmyul/EvmYul/State/ExecutionEnv.lean": "07c13875da163c40b1fde5046c711a18502c54c3b574443c6c296fa4566dfbd7",
+    ".lake/packages/evmyul/EvmYul/StateOps.lean": "ed24f52c490c1f9a56f4df5a3883533dad884ca2276f58d05cbf9ed3cd386e21",
+    ".lake/packages/evmyul/EvmYul/UInt256.lean": "87f93f2edfc0dd3c4cc36b4a79ed4812c2ca7a4ff08ecb3987638df68a8593e6",
+    ".lake/packages/evmyul/EvmYul/Wheels.lean": "fd7a8a200e201ba6707ab7f0972211191aae872564e715fe4f5d706af87dd5db",
+    "LidoSRv3/Audit/Source/SszLittleEndianCorrespondence.lean": "354768f3a855422699513646e7ec7b06809f7be545fba623ad9659c331e4fdb8",
+    "LidoSRv3/Audit/Source/SszProofFold.lean": "2e0c24c00c0fbae5cfe8dec50a459996b64988e839087bec1880034d65859b6d",
+    "LidoSRv3/Audit/Source/SszScratchByteArray.lean": "ed6249a91046db3165beb3d38f5c3f1ee5b9db0c4a6ff559a3b0877d5757218b",
+    "LidoSRv3/Audit/Source/SszScratchEvmMemory.lean": "44489c5cd5688a6747b5d1eea1672015c709db91695faedd66b27e44e9053edd",
+    "LidoSRv3/Audit/Source/SszShaCallBytes.lean": "f91d8f08c5e0dbc7eb97dce0a405fd0b072b73f1b6738f1eafc752989e30db9f",
+    "LidoSRv3/Audit/Source/SszShaCallMemory.lean": "acd7b15153918e28c3881e073f6f0f5f165c01cf959863b272e2f9ffa7305020",
+    "LidoSRv3/Audit/Source/SszValidatorLeaf.lean": "a2b5fa2b0f8b5955e0d4d27a5052e0d19bb08058b5e734dd48d55cc121d3170f",
+    "LidoSRv3/Audit/Source/SszWrapperIndex.lean": "57833ae3afc8731c7b6a80862666194c1fa561db316952b3e5b4073013a6b045",
+    "LidoSRv3/Tests/SszShaCallMemoryMutants.lean": "179755221f491a266498fdcf498cdd2fd581d59b7e63706c014cf5c0f9db89b1",
+    "audit/ssz-sha-call-memory/README.md": "ad653fe97e6aca5d67187e20506a784225207613c03e4db4344667e4c7b9d35c",
+    "audit/ssz-sha-call-memory/check_receipt.py": "8ea32530c4af184823cca3c2f275c7aeb04152108fe3fac586438cfa77a3f5b4",
+    "audit/ssz-sha-call-memory/solidity/README.md": "777898e886dc4c54315063ca3ba560fb2322422f23ad722f89e71d23abab6222",
+    "audit/ssz-sha-call-memory/solidity/SszShaCallMemory.t.sol": "31f45929c6deae55cb49997f3a236af3735f439d4428da66d20924e2129e2658",
+    "audit/ssz-sha-call-memory/solidity/receipt.json": "51c573d8af05e9a7937cc1a38ead4f85c6b07297537b970e969f6c9d90349d99",
+    "audit/ssz-sha-call-memory/solidity/validation.log": "e34f3cd75381c94d3af1c096ad588f1a5ecd5e2b44f0fc24e7efe36f33d2deba",
+    "foundry.toml": "adb4990ab31a2bb53f5eeb370e4f55d962f7bc1026bce01708497a56b262356c",
+    "lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
+    "lakefile.lean": "8ea3781110b3234bdfcf2b2c87c5c064fa7d2aee018da57bcab100f8baf1ab87",
+    "lean-toolchain": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee",
+    "lido-core/contracts/0.8.25/CLValidatorVerifier.sol": "d6e89f6975e4fa02f758bf461a98ac2d689296b5c92d03ffd4e43a22d0b3d7ed",
+    "lido-core/contracts/common/lib/BLS.sol": "0187cc6a6b1aaa833317695d88795db431fa237452213e8c3872a0f444dceb7c",
+    "lido-core/contracts/common/lib/MemUtils.sol": "dc4f389cfd1ae1b4dd5fe908432159103544ece1ca9f694093f64def5db7acca",
+    "lido-core/contracts/common/lib/SSZ.sol": "91ef497b972bbee0fe89043034e6bd62fa0c1059f22874d4826bc6164a22009b"
+  },
+  "evidence_hashes": {
+    "audit/ssz-sha-call-memory/validation.log": "fc55673b8803e7b6667c639d30121ea3c9883f7e70279e7a2e25a821985416fd",
+    "audit/ssz-sha-call-memory/axioms.log": "575d3748a4aee579fd7d901189776e2452538ae9cf6dc944c8efd5daca40e8d5",
+    "audit/ssz-sha-call-memory/dependency-inputs.json": "7b555b2f7dfa82329ad6ae73ffeb35bfa24d7a51eb8435f6eaa767e15a5d3978",
+    "audit/ssz-sha-call-memory/source-check.json": "d9beed9e21705f2f87f226d8370574e2dc6ac5ba2289fbb90963d157c6ffa785",
+    "audit/ssz-sha-call-memory/validated-inputs.sha256": "5b6997366f03532d37457e989cd3b5c18d3c63f37c7530b7e575780327b72273"
+  },
+  "remaining_boundaries": [
+    "Opaque ffi.sha256 output size32 is explicit; no cryptographic correctness, universal FFI length or typed ShaReply refinement",
+    "Raw calldata extent/layout explicit; no Solidity ABI decoding, compiler or deployed-runtime refinement",
+    "Direct CALL helper, not public step or gas-charged EVM.X/stack/revert ABI proof; generic gasCost arbitrary and BLS consumer has explicit fee admission",
+    "Byte-copy theorem unrestricted activeWords; mload needs initial activeWords<2^251; actual wrapped-extent counterexample exposed, no reachability claim",
+    "No whole-world frame: existing Theta precompile branch resets createdAccounts",
+    "Sibling SSZ/fold scratch, fls, calldata loads, root lookup and address provenance unchanged"
+  ],
+  "independent_review": "Pending root commit and independent exact-candidate review"
+}

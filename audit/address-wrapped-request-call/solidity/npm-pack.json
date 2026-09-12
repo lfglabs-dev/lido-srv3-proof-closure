@@ -1,0 +1,1351 @@
+[
+  {
+    "id": "@openzeppelin/contracts@4.4.1",
+    "name": "@openzeppelin/contracts",
+    "version": "4.4.1",
+    "size": 182320,
+    "unpackedSize": 1414176,
+    "shasum": "3382db2cd83ab565ed9626765e7da92944b45de8",
+    "integrity": "sha512-o+pHCf/yMLSlV5MkDQEzEQL402i6SoRnktru+0rdSxVEFZcTzzGhZCAtZjUFyKGazMSv1TilzMg+RbED1N8XHQ==",
+    "filename": "openzeppelin-contracts-4.4.1.tgz",
+    "files": [
+      {
+        "path": "README.md",
+        "size": 5873,
+        "mode": 420
+      },
+      {
+        "path": "access/AccessControl.sol",
+        "size": 7417,
+        "mode": 420
+      },
+      {
+        "path": "access/AccessControlEnumerable.sol",
+        "size": 2376,
+        "mode": 420
+      },
+      {
+        "path": "access/IAccessControl.sol",
+        "size": 2920,
+        "mode": 420
+      },
+      {
+        "path": "access/IAccessControlEnumerable.sol",
+        "size": 1228,
+        "mode": 420
+      },
+      {
+        "path": "access/Ownable.sol",
+        "size": 2460,
+        "mode": 420
+      },
+      {
+        "path": "access/README.adoc",
+        "size": 743,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/AccessControl.json",
+        "size": 4510,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/AccessControlEnumerable.json",
+        "size": 5398,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/Address.json",
+        "size": 684,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/Arrays.json",
+        "size": 682,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/BeaconProxy.json",
+        "size": 8193,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/BitMaps.json",
+        "size": 692,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/Clones.json",
+        "size": 682,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/ConditionalEscrow.json",
+        "size": 3427,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/Context.json",
+        "size": 230,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/Counters.json",
+        "size": 686,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/Create2.json",
+        "size": 684,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/ECDSA.json",
+        "size": 693,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/EIP712.json",
+        "size": 247,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/EnumerableMap.json",
+        "size": 704,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/EnumerableSet.json",
+        "size": 704,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/ERC20.json",
+        "size": 16337,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/ERC20Burnable.json",
+        "size": 6411,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/ERC20Capped.json",
+        "size": 6015,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/ERC20FlashMint.json",
+        "size": 7367,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/ERC20Pausable.json",
+        "size": 6526,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/ERC20Permit.json",
+        "size": 7331,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/ERC20PresetFixedSupply.json",
+        "size": 20388,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/ERC20PresetMinterPauser.json",
+        "size": 42423,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/ERC20Snapshot.json",
+        "size": 6898,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/ERC20Votes.json",
+        "size": 12350,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/ERC20VotesComp.json",
+        "size": 13231,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/ERC20Wrapper.json",
+        "size": 7010,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/ERC165.json",
+        "size": 622,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/ERC165Checker.json",
+        "size": 710,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/ERC165Storage.json",
+        "size": 636,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/ERC721.json",
+        "size": 27443,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/ERC721Burnable.json",
+        "size": 7335,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/ERC721Enumerable.json",
+        "size": 8203,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/ERC721Holder.json",
+        "size": 2713,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/ERC721Pausable.json",
+        "size": 7828,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/ERC721PresetMinterPauserAutoId.json",
+        "size": 57184,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/ERC721URIStorage.json",
+        "size": 7078,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/ERC777.json",
+        "size": 39456,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/ERC777PresetFixedSupply.json",
+        "size": 42277,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/ERC1155.json",
+        "size": 29068,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/ERC1155Burnable.json",
+        "size": 7858,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/ERC1155Holder.json",
+        "size": 6135,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/ERC1155Pausable.json",
+        "size": 7629,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/ERC1155PresetMinterPauser.json",
+        "size": 60846,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/ERC1155Receiver.json",
+        "size": 2315,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/ERC1155Supply.json",
+        "size": 7602,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/ERC1820Implementer.json",
+        "size": 1945,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/ERC1967Proxy.json",
+        "size": 6851,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/ERC1967Upgrade.json",
+        "size": 1186,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/ERC2771Context.json",
+        "size": 626,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/Escrow.json",
+        "size": 8855,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/Governor.json",
+        "size": 11907,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/GovernorCompatibilityBravo.json",
+        "size": 18758,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/GovernorCountingSimple.json",
+        "size": 12575,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/GovernorProposalThreshold.json",
+        "size": 11952,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/GovernorSettings.json",
+        "size": 14060,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/GovernorTimelockCompound.json",
+        "size": 14579,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/GovernorTimelockControl.json",
+        "size": 14429,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/GovernorVotes.json",
+        "size": 12189,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/GovernorVotesComp.json",
+        "size": 12201,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/GovernorVotesQuorumFraction.json",
+        "size": 13461,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/IAccessControl.json",
+        "size": 3872,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/IAccessControlEnumerable.json",
+        "size": 4760,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/IBeacon.json",
+        "size": 497,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/ICompoundTimelock.json",
+        "size": 5293,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/IERC20.json",
+        "size": 4000,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/IERC20Metadata.json",
+        "size": 4769,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/IERC20Permit.json",
+        "size": 1822,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/IERC165.json",
+        "size": 624,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/IERC721.json",
+        "size": 6204,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/IERC721Enumerable.json",
+        "size": 7367,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/IERC721Metadata.json",
+        "size": 7096,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/IERC721Receiver.json",
+        "size": 976,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/IERC777.json",
+        "size": 8500,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/IERC777Recipient.json",
+        "size": 1093,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/IERC777Sender.json",
+        "size": 1085,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/IERC1155.json",
+        "size": 6491,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/IERC1155MetadataURI.json",
+        "size": 6885,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/IERC1155Receiver.json",
+        "size": 2311,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/IERC1271.json",
+        "size": 738,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/IERC1363.json",
+        "size": 7873,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/IERC1363Receiver.json",
+        "size": 976,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/IERC1363Spender.json",
+        "size": 859,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/IERC1820Implementer.json",
+        "size": 787,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/IERC1820Registry.json",
+        "size": 4807,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/IERC2612.json",
+        "size": 1802,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/IERC2981.json",
+        "size": 1239,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/IERC3156FlashBorrower.json",
+        "size": 1095,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/IERC3156FlashLender.json",
+        "size": 1854,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/IGovernor.json",
+        "size": 11357,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/IGovernorCompatibilityBravo.json",
+        "size": 16415,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/IGovernorTimelock.json",
+        "size": 13167,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/Initializable.json",
+        "size": 248,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/Math.json",
+        "size": 683,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/MerkleProof.json",
+        "size": 705,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/MinimalForwarder.json",
+        "size": 15943,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/Multicall.json",
+        "size": 620,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/Ownable.json",
+        "size": 1326,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/Pausable.json",
+        "size": 991,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/PaymentSplitter.json",
+        "size": 20505,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/Proxy.json",
+        "size": 375,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/ProxyAdmin.json",
+        "size": 11036,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/PullPayment.json",
+        "size": 892,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/ReentrancyGuard.json",
+        "size": 249,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/RefundEscrow.json",
+        "size": 16503,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/SafeCast.json",
+        "size": 691,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/SafeERC20.json",
+        "size": 700,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/SafeMath.json",
+        "size": 691,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/SignatureChecker.json",
+        "size": 715,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/SignedSafeMath.json",
+        "size": 703,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/StorageSlot.json",
+        "size": 692,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/Strings.json",
+        "size": 684,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/TimelockController.json",
+        "size": 44629,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/Timers.json",
+        "size": 682,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/TokenTimelock.json",
+        "size": 8876,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/TransparentUpgradeableProxy.json",
+        "size": 15442,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/UpgradeableBeacon.json",
+        "size": 6759,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/UUPSUpgradeable.json",
+        "size": 1850,
+        "mode": 420
+      },
+      {
+        "path": "build/contracts/VestingWallet.json",
+        "size": 16131,
+        "mode": 420
+      },
+      {
+        "path": "finance/PaymentSplitter.sol",
+        "size": 7485,
+        "mode": 420
+      },
+      {
+        "path": "finance/README.adoc",
+        "size": 778,
+        "mode": 420
+      },
+      {
+        "path": "finance/VestingWallet.sol",
+        "size": 4648,
+        "mode": 420
+      },
+      {
+        "path": "governance/compatibility/GovernorCompatibilityBravo.sol",
+        "size": 9849,
+        "mode": 420
+      },
+      {
+        "path": "governance/compatibility/IGovernorCompatibilityBravo.sol",
+        "size": 3333,
+        "mode": 420
+      },
+      {
+        "path": "governance/extensions/GovernorCountingSimple.sol",
+        "size": 3286,
+        "mode": 420
+      },
+      {
+        "path": "governance/extensions/GovernorProposalThreshold.sol",
+        "size": 680,
+        "mode": 420
+      },
+      {
+        "path": "governance/extensions/GovernorSettings.sol",
+        "size": 3575,
+        "mode": 420
+      },
+      {
+        "path": "governance/extensions/GovernorTimelockCompound.sol",
+        "size": 8509,
+        "mode": 420
+      },
+      {
+        "path": "governance/extensions/GovernorTimelockControl.sol",
+        "size": 5633,
+        "mode": 420
+      },
+      {
+        "path": "governance/extensions/GovernorVotes.sol",
+        "size": 836,
+        "mode": 420
+      },
+      {
+        "path": "governance/extensions/GovernorVotesComp.sol",
+        "size": 800,
+        "mode": 420
+      },
+      {
+        "path": "governance/extensions/GovernorVotesQuorumFraction.sol",
+        "size": 1668,
+        "mode": 420
+      },
+      {
+        "path": "governance/extensions/IGovernorTimelock.sol",
+        "size": 739,
+        "mode": 420
+      },
+      {
+        "path": "governance/Governor.sol",
+        "size": 12220,
+        "mode": 420
+      },
+      {
+        "path": "governance/IGovernor.sol",
+        "size": 7476,
+        "mode": 420
+      },
+      {
+        "path": "governance/README.adoc",
+        "size": 11314,
+        "mode": 420
+      },
+      {
+        "path": "governance/TimelockController.sol",
+        "size": 11577,
+        "mode": 420
+      },
+      {
+        "path": "interfaces/draft-IERC2612.sol",
+        "size": 221,
+        "mode": 420
+      },
+      {
+        "path": "interfaces/IERC20.sol",
+        "size": 151,
+        "mode": 420
+      },
+      {
+        "path": "interfaces/IERC20Metadata.sol",
+        "size": 178,
+        "mode": 420
+      },
+      {
+        "path": "interfaces/IERC165.sol",
+        "size": 161,
+        "mode": 420
+      },
+      {
+        "path": "interfaces/IERC721.sol",
+        "size": 154,
+        "mode": 420
+      },
+      {
+        "path": "interfaces/IERC721Enumerable.sol",
+        "size": 185,
+        "mode": 420
+      },
+      {
+        "path": "interfaces/IERC721Metadata.sol",
+        "size": 181,
+        "mode": 420
+      },
+      {
+        "path": "interfaces/IERC721Receiver.sol",
+        "size": 170,
+        "mode": 420
+      },
+      {
+        "path": "interfaces/IERC777.sol",
+        "size": 154,
+        "mode": 420
+      },
+      {
+        "path": "interfaces/IERC777Recipient.sol",
+        "size": 172,
+        "mode": 420
+      },
+      {
+        "path": "interfaces/IERC777Sender.sol",
+        "size": 166,
+        "mode": 420
+      },
+      {
+        "path": "interfaces/IERC1155.sol",
+        "size": 157,
+        "mode": 420
+      },
+      {
+        "path": "interfaces/IERC1155MetadataURI.sol",
+        "size": 190,
+        "mode": 420
+      },
+      {
+        "path": "interfaces/IERC1155Receiver.sol",
+        "size": 173,
+        "mode": 420
+      },
+      {
+        "path": "interfaces/IERC1271.sol",
+        "size": 666,
+        "mode": 420
+      },
+      {
+        "path": "interfaces/IERC1363.sol",
+        "size": 3766,
+        "mode": 420
+      },
+      {
+        "path": "interfaces/IERC1363Receiver.sol",
+        "size": 1335,
+        "mode": 420
+      },
+      {
+        "path": "interfaces/IERC1363Spender.sol",
+        "size": 1172,
+        "mode": 420
+      },
+      {
+        "path": "interfaces/IERC1820Implementer.sol",
+        "size": 185,
+        "mode": 420
+      },
+      {
+        "path": "interfaces/IERC1820Registry.sol",
+        "size": 179,
+        "mode": 420
+      },
+      {
+        "path": "interfaces/IERC2981.sol",
+        "size": 788,
+        "mode": 420
+      },
+      {
+        "path": "interfaces/IERC3156.sol",
+        "size": 191,
+        "mode": 420
+      },
+      {
+        "path": "interfaces/IERC3156FlashBorrower.sol",
+        "size": 913,
+        "mode": 420
+      },
+      {
+        "path": "interfaces/IERC3156FlashLender.sol",
+        "size": 1437,
+        "mode": 420
+      },
+      {
+        "path": "interfaces/README.adoc",
+        "size": 922,
+        "mode": 420
+      },
+      {
+        "path": "metatx/ERC2771Context.sol",
+        "size": 1189,
+        "mode": 420
+      },
+      {
+        "path": "metatx/MinimalForwarder.sol",
+        "size": 1970,
+        "mode": 420
+      },
+      {
+        "path": "metatx/README.adoc",
+        "size": 190,
+        "mode": 420
+      },
+      {
+        "path": "package.json",
+        "size": 804,
+        "mode": 420
+      },
+      {
+        "path": "proxy/beacon/BeaconProxy.sol",
+        "size": 2171,
+        "mode": 420
+      },
+      {
+        "path": "proxy/beacon/IBeacon.sol",
+        "size": 450,
+        "mode": 420
+      },
+      {
+        "path": "proxy/beacon/UpgradeableBeacon.sol",
+        "size": 2040,
+        "mode": 420
+      },
+      {
+        "path": "proxy/Clones.sol",
+        "size": 3558,
+        "mode": 420
+      },
+      {
+        "path": "proxy/ERC1967/ERC1967Proxy.sol",
+        "size": 1383,
+        "mode": 420
+      },
+      {
+        "path": "proxy/ERC1967/ERC1967Upgrade.sol",
+        "size": 6733,
+        "mode": 420
+      },
+      {
+        "path": "proxy/Proxy.sol",
+        "size": 3232,
+        "mode": 420
+      },
+      {
+        "path": "proxy/README.adoc",
+        "size": 5088,
+        "mode": 420
+      },
+      {
+        "path": "proxy/transparent/ProxyAdmin.sol",
+        "size": 2840,
+        "mode": 420
+      },
+      {
+        "path": "proxy/transparent/TransparentUpgradeableProxy.sol",
+        "size": 5191,
+        "mode": 420
+      },
+      {
+        "path": "proxy/utils/Initializable.sol",
+        "size": 3119,
+        "mode": 420
+      },
+      {
+        "path": "proxy/utils/UUPSUpgradeable.sol",
+        "size": 3078,
+        "mode": 420
+      },
+      {
+        "path": "security/Pausable.sol",
+        "size": 2230,
+        "mode": 420
+      },
+      {
+        "path": "security/PullPayment.sol",
+        "size": 2701,
+        "mode": 420
+      },
+      {
+        "path": "security/README.adoc",
+        "size": 699,
+        "mode": 420
+      },
+      {
+        "path": "security/ReentrancyGuard.sol",
+        "size": 2660,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC20/ERC20.sol",
+        "size": 11805,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC20/extensions/draft-ERC20Permit.sol",
+        "size": 2956,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC20/extensions/draft-IERC20Permit.sol",
+        "size": 2252,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC20/extensions/ERC20Burnable.sol",
+        "size": 1322,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC20/extensions/ERC20Capped.sol",
+        "size": 976,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC20/extensions/ERC20FlashMint.sol",
+        "size": 3309,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC20/extensions/ERC20Pausable.sol",
+        "size": 932,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC20/extensions/ERC20Snapshot.sol",
+        "size": 8786,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC20/extensions/ERC20Votes.sol",
+        "size": 9727,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC20/extensions/ERC20VotesComp.sol",
+        "size": 2200,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC20/extensions/ERC20Wrapper.sol",
+        "size": 1898,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC20/extensions/IERC20Metadata.sol",
+        "size": 683,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC20/IERC20.sol",
+        "size": 2784,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC20/presets/ERC20PresetFixedSupply.sol",
+        "size": 927,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC20/presets/ERC20PresetMinterPauser.sol",
+        "size": 2921,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC20/README.adoc",
+        "size": 3618,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC20/utils/SafeERC20.sol",
+        "size": 3916,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC20/utils/TokenTimelock.sol",
+        "size": 1922,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC721/ERC721.sol",
+        "size": 13620,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC721/extensions/ERC721Burnable.sol",
+        "size": 773,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC721/extensions/ERC721Enumerable.sol",
+        "size": 7002,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC721/extensions/ERC721Pausable.sol",
+        "size": 942,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC721/extensions/ERC721URIStorage.sol",
+        "size": 1911,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC721/extensions/IERC721Enumerable.sol",
+        "size": 1017,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC721/extensions/IERC721Metadata.sol",
+        "size": 761,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC721/IERC721.sol",
+        "size": 4736,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC721/IERC721Receiver.sol",
+        "size": 964,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC721/presets/ERC721PresetMinterPauserAutoId.sol",
+        "size": 4254,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC721/README.adoc",
+        "size": 2291,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC721/utils/ERC721Holder.sol",
+        "size": 791,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC777/ERC777.sol",
+        "size": 18325,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC777/IERC777.sol",
+        "size": 6197,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC777/IERC777Recipient.sol",
+        "size": 1250,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC777/IERC777Sender.sol",
+        "size": 1259,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC777/presets/ERC777PresetFixedSupply.sol",
+        "size": 806,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC777/README.adoc",
+        "size": 878,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC1155/ERC1155.sol",
+        "size": 15276,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC1155/extensions/ERC1155Burnable.sol",
+        "size": 1054,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC1155/extensions/ERC1155Pausable.sol",
+        "size": 1093,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC1155/extensions/ERC1155Supply.sol",
+        "size": 1713,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC1155/extensions/IERC1155MetadataURI.sol",
+        "size": 675,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC1155/IERC1155.sol",
+        "size": 4062,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC1155/IERC1155Receiver.sol",
+        "size": 2460,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC1155/presets/ERC1155PresetMinterPauser.sol",
+        "size": 3816,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC1155/README.adoc",
+        "size": 1697,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC1155/utils/ERC1155Holder.sol",
+        "size": 727,
+        "mode": 420
+      },
+      {
+        "path": "token/ERC1155/utils/ERC1155Receiver.sol",
+        "size": 611,
+        "mode": 420
+      },
+      {
+        "path": "utils/Address.sol",
+        "size": 7909,
+        "mode": 420
+      },
+      {
+        "path": "utils/Arrays.sol",
+        "size": 1529,
+        "mode": 420
+      },
+      {
+        "path": "utils/Context.sol",
+        "size": 844,
+        "mode": 420
+      },
+      {
+        "path": "utils/Counters.sol",
+        "size": 1396,
+        "mode": 420
+      },
+      {
+        "path": "utils/Create2.sol",
+        "size": 2483,
+        "mode": 420
+      },
+      {
+        "path": "utils/cryptography/draft-EIP712.sol",
+        "size": 4507,
+        "mode": 420
+      },
+      {
+        "path": "utils/cryptography/ECDSA.sol",
+        "size": 9322,
+        "mode": 420
+      },
+      {
+        "path": "utils/cryptography/MerkleProof.sol",
+        "size": 2074,
+        "mode": 420
+      },
+      {
+        "path": "utils/cryptography/SignatureChecker.sol",
+        "size": 1427,
+        "mode": 420
+      },
+      {
+        "path": "utils/escrow/ConditionalEscrow.sol",
+        "size": 872,
+        "mode": 420
+      },
+      {
+        "path": "utils/escrow/Escrow.sol",
+        "size": 2157,
+        "mode": 420
+      },
+      {
+        "path": "utils/escrow/RefundEscrow.sol",
+        "size": 3190,
+        "mode": 420
+      },
+      {
+        "path": "utils/introspection/ERC165.sol",
+        "size": 987,
+        "mode": 420
+      },
+      {
+        "path": "utils/introspection/ERC165Checker.sol",
+        "size": 4620,
+        "mode": 420
+      },
+      {
+        "path": "utils/introspection/ERC165Storage.sol",
+        "size": 1379,
+        "mode": 420
+      },
+      {
+        "path": "utils/introspection/ERC1820Implementer.sol",
+        "size": 1476,
+        "mode": 420
+      },
+      {
+        "path": "utils/introspection/IERC165.sol",
+        "size": 853,
+        "mode": 420
+      },
+      {
+        "path": "utils/introspection/IERC1820Implementer.sol",
+        "size": 759,
+        "mode": 420
+      },
+      {
+        "path": "utils/introspection/IERC1820Registry.sol",
+        "size": 4853,
+        "mode": 420
+      },
+      {
+        "path": "utils/math/Math.sol",
+        "size": 1212,
+        "mode": 420
+      },
+      {
+        "path": "utils/math/SafeCast.sol",
+        "size": 7818,
+        "mode": 420
+      },
+      {
+        "path": "utils/math/SafeMath.sol",
+        "size": 6769,
+        "mode": 420
+      },
+      {
+        "path": "utils/math/SignedSafeMath.sol",
+        "size": 1716,
+        "mode": 420
+      },
+      {
+        "path": "utils/Multicall.sol",
+        "size": 695,
+        "mode": 420
+      },
+      {
+        "path": "utils/README.adoc",
+        "size": 3813,
+        "mode": 420
+      },
+      {
+        "path": "utils/StorageSlot.sol",
+        "size": 2484,
+        "mode": 420
+      },
+      {
+        "path": "utils/Strings.sol",
+        "size": 2032,
+        "mode": 420
+      },
+      {
+        "path": "utils/structs/BitMaps.sol",
+        "size": 1576,
+        "mode": 420
+      },
+      {
+        "path": "utils/structs/EnumerableMap.sol",
+        "size": 7640,
+        "mode": 420
+      },
+      {
+        "path": "utils/structs/EnumerableSet.sol",
+        "size": 12181,
+        "mode": 420
+      },
+      {
+        "path": "utils/Timers.sol",
+        "size": 2042,
+        "mode": 420
+      }
+    ],
+    "entryCount": 267,
+    "bundled": []
+  }
+]

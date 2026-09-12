@@ -1,0 +1,36 @@
+# TOPUP router admission calls
+
+Source-only addition on accepted main344 `d353e85438b3456604a76ee417f9359627751240` (tree `d4b640dafad39f2b4293d0be5782aeab8d612dfd`). Solidity pin: `17005714f151e5502c559932319a3f2f74ac2436`.
+
+The actual gateway role/pause, length/timing, router-locator, physical credential and root stages execute once. At their post-root/pre-module seam, the new continuation executes router → independent router locator `topUpGateway()` STATICCALL, decodes its canonical address and checks the actual gateway caller. It validates the actual produced module input, reads physical registry membership and packed status/type, and—only when the inherited computed rounded target is zero—executes router → supplied Lido `canDeposit()` STATICCALL and decodes a canonical boolean. Only then does it invoke the original module and withdrawal continuation and history completion.
+
+`PTopupRouterAdmissionCall.actual_router_admission_complete_prior` has only whole-run success as its premise. Its `PriorEffects` contains the entire TOPUP342 public conjunction verbatim. It additionally proves exact final World equality, the retained complete old result, the actual internally produced seam value, physical admission and both real request/decoder origins. In particular, arbitrary module and withdrawal replies retain their actual returned World and journals. No old externally stateful stage is replayed by the new runner. `walk_prior` and `walk_relation` are proof-time relations, not runtime calls to `prior`.
+
+The gateway output supplies the pubkeys and computed limits passed to the newly executed input validator and the unchanged module encoder. Keys/operators remain the actual entry arrays. No aligned-array, pubkey-width, authorization equality, stage-success, memory-fit or frame premise is added. Registration checks the full nonzero EnumerableSet position; status reads bits 224–231 and rejects values ≥ 3 with Panic(0x21), then nonzero active status, then type bits 232–239 unequal to 2. Both call transports retain rejection bytes, empty/malformed reply failure and ordinary no-code empty-reply behavior. New custom errors and enum panic use exact raw bytes; the inherited allocator's Panic(0x41) keeps its existing symbolic Fault representation.
+
+The router locator is independent of the gateway locator. The Lido target is `ctx.self`; `ctx.sender` is replaced by the actual gateway locator's decoded router. No locator equality is assumed. A successful STATICCALL has no mutable reply World in the existing transport semantics; this does not assert read-only behavior for arbitrary mutable CALLs. Static state-change attempts fail.
+
+## Deliberate boundaries
+
+This is a bounded consumed admission increment, not a full router prefix or a whole gateway-to-router transport proof. The original router allocation-view phase is still omitted: `LIDO.getDepositableEther()` and the linked `SRLib._getModuleDepositAllocation` invocation (compiled DELEGATECALL) are represented by the inherited arbitrary `allocation` value boundary. The actual inherited cap read/minimum/gwei rounding computes the target consumed by `canDeposit` and the module. No equality is asserted between an arbitrary stateful library reply and this World.
+
+The outer gateway → router `topUp(...)` CALL, its outgoing ABI/memory/copy/return handling, the router's arbitrary raw entry-calldata decoding and nonpayable guard, immutable deployment/proxy identity, deployed locator getter implementation, actual Lido getter implementation, gas/OOG and full memory provenance remain outside this increment. Auth and boolean decoder cursors are phase inputs, not claimed to be the full caller allocator trajectory. Existing precompile, SHA/root, withdrawal, beacon and log-encoding boundaries remain exactly those of TOPUP342. The test fixtures are not deployed production contracts.
+
+## Evidence
+
+- Normal Lake source/public/regression builds; final target `LidoSRv3.Tests.TopupRouterAdmissionCallRegression` succeeds with 1378 dependency jobs. All four new modules have ordinary normal setup options `{}`, no plugins, nonsynthetic traces and no skip-kernel setting. `validation/build-identities.json` pins current source/olean/setup/trace providers; builds during development and final regression refresh are distinguished in the retained logs.
+- `validation/validate.py` checks 1361 actual source providers (old local bytes at the exact base and package bytes at 11 Git pins), 39 ordinary environment axiom scopes, the literal full TOPUP342 conclusion, and complete compiler/fixture identities. All 39 scopes use only `propext`, `Classical.choice`, `Quot.sound` (some empty). It uses the unchanged trust checker's isolated `Lean.collectAxioms` probe, importing only Lean syntactically and loading the candidate as data. New sources contain no macro, axiom, native decision, unsafe implementation or custom elaborator.
+- Kernel regressions include nonempty successful public instantiation, actual positive-target skip, zero-target denial after the root before the module, actual module effects/journal projection, and public late-failure rollback; plus scalar decoder and source error-order cases.
+- Fresh offline Solidity 0.8.25, optimizer200, viaIR, Cancun execution: 17 tests pass, including 256 status-byte fuzz cases. The inherited full pinned `BatchRouter` overrides no router execution function. Raw endpoints check caller/selector and test writable fallback rejection, precise malformed address/bool responses, exact failure order, positive-target skip, successful zero-target module execution and late module rollback. Full source bodies and metadata of five artifacts are checked.
+- Cached standard input/output is retained from the accepted no-code packet with 28 exact source identities. Fresh Forge materializes those bodies plus the new test, 29 sources total. `StakingRouter.ir` is the complete fresh 5046-line production router IR; `BatchRouter.ir` is the complete executed inherited fixture IR. The cached production IR is separately named `StakingRouter.cached.ir`; cached/fresh bytecode or immutable-id equality is not claimed. The old `router-ir.txt` is already newline-terminated; the initial validator's extra-EOF comparison failed and was corrected without weakening the byte comparison.
+
+`development-*.log` files record failed and successful intermediate attempts; none is proof of the final source. `build.log`, current normal identities, ordinary scope records, Solidity receipt and validator summary are the final evidence. No existing source, aggregate import, Trust query, lakefile, site or roadmap file is changed. Root integration and independent review remain separate.
+
+Recheck without recompiling contracts or rebuilding Lean:
+
+```sh
+python3 audit/topup-router-admission-call/validation/validate.py
+python3 audit/topup-router-admission-call/seal.py
+```
+
+`validate.py --write` records evidence; default compares it. `solidity/run.py` explicitly reruns the isolated Forge suite and writes new artifacts and receipt; it is not part of the comparison-only validator. `seal.py --write` records the dossier/source digest table; default only compares it. Read scripts before execution when auditing a frozen candidate.

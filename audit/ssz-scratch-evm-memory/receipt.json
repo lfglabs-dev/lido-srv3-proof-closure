@@ -1,0 +1,119 @@
+{
+  "schema": "lido-ssz-scratch-evm-memory-v1",
+  "created_utc": "2026-09-09T14:48:40.580155+00:00",
+  "checkout_head_at_validation": "4286b2de7c5359d7550a2d4b63674e9c8ea94735",
+  "branch": "codex/local-lido-router-memory-20260909",
+  "source_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "package_pins": {
+    ".lake/packages/verity": "e977aaad6e1a9e92e0132d41b3d33a14135a4d46",
+    ".lake/packages/evmyul": "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9"
+  },
+  "main_result": "Existing EvmYul mstore32zero then calldatacopy0offset48: full arbitrary dirty-memory normal form, exact real padded read64=raw48++zero16, outside-scratch byte frame, max64old allocation, raw prefix/key48/suffix-to-typed pubkeyBlock consumer. No result/copy/read premises.",
+  "lean": {
+    "executed_command": "lake build LidoSRv3.Audit.Source.SszScratchByteArray LidoSRv3.Audit.Source.SszScratchEvmMemory LidoSRv3.Tests.SszScratchEvmMemoryMutants",
+    "exit": 0,
+    "jobs": 1097,
+    "public_source_theorems": 18,
+    "private_source_lemmas": 1,
+    "regression_examples": 25,
+    "fixture_lemmas": 1,
+    "axiom_queries": 8,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "new_file_warnings": 0,
+    "replayed_existing_warnings": [
+      "Conform.Wheels deprecation",
+      "EvmYul.Pretty deprecation"
+    ],
+    "validation_scope": "Final exact source/test build; dependencies reused by Lake where unchanged; no full repository rebuild",
+    "scan": {
+      "LidoSRv3/Audit/Source/SszScratchByteArray.lean": {
+        "sorry_or_admit": false,
+        "native_decide_or_bv_decide": false,
+        "axiom_declaration": false
+      },
+      "LidoSRv3/Audit/Source/SszScratchEvmMemory.lean": {
+        "sorry_or_admit": false,
+        "native_decide_or_bv_decide": false,
+        "axiom_declaration": false
+      },
+      "LidoSRv3/Tests/SszScratchEvmMemoryMutants.lean": {
+        "sorry_or_admit": false,
+        "native_decide_or_bv_decide": false,
+        "axiom_declaration": false
+      }
+    }
+  },
+  "solidity": {
+    "receipt": "solidity/receipt.json",
+    "executed_by": "root",
+    "rerun_by_worker": false,
+    "tests": 4,
+    "fuzz_tests": 2,
+    "runs_each": 1024,
+    "key_positions": 48,
+    "mutation_classes": 6,
+    "scope": "Unmodified pinned BLS helper and separately duplicated two-operation observation block; finite execution evidence, not full EVM refinement"
+  },
+  "dependency_closure": {
+    "manifest": "dependency-inputs.json",
+    "package_source_count": 1080,
+    "local_lido_count": 7,
+    "scope": "Package Lean source closure identified by actual final Lake setup importArts; core toolchain is pinned separately, selected core byte/array/USize files additionally hashed. This is not a full toolchain-source closure or rebuild of every dependency."
+  },
+  "pinned_solidity_sources": [
+    "contracts/common/lib/BLS.sol",
+    "contracts/common/lib/SSZ.sol",
+    "contracts/common/lib/MemUtils.sol",
+    "contracts/0.8.25/CLValidatorVerifier.sol"
+  ],
+  "validated_inputs": {
+    ".lake/packages/evmyul/EvmYul/FFI/ffi.lean": "c0b6b455399a476fd3c5be3fd3e1df5788a112dd92b520397512d073b6317562",
+    ".lake/packages/evmyul/EvmYul/MachineState.lean": "0acd50c32ca8ac6a547c727fb86d72ed96ab12e04b60bd7cf7c5b19817caffa1",
+    ".lake/packages/evmyul/EvmYul/MachineStateOps.lean": "a0f4d2b7d78aef73ff7a417be25b585e4962b8d2bb866b3d6a081a1403631def",
+    ".lake/packages/evmyul/EvmYul/SharedState.lean": "1e435e76749627661374a969876f172bcfa9e7d09ef93380fd46c76780d39001",
+    ".lake/packages/evmyul/EvmYul/SharedStateOps.lean": "99d0566564c01fece85c84972d8fe8853bf593a4c04b3b4da496db2774d3d7c6",
+    ".lake/packages/evmyul/EvmYul/State.lean": "a4775255b761de39b7c14df0062c9274826aea85669672465632ceb86de8ab4e",
+    ".lake/packages/evmyul/EvmYul/StateOps.lean": "ed24f52c490c1f9a56f4df5a3883533dad884ca2276f58d05cbf9ed3cd386e21",
+    ".lake/packages/evmyul/EvmYul/UInt256.lean": "87f93f2edfc0dd3c4cc36b4a79ed4812c2ca7a4ff08ecb3987638df68a8593e6",
+    ".lake/packages/evmyul/EvmYul/Wheels.lean": "fd7a8a200e201ba6707ab7f0972211191aae872564e715fe4f5d706af87dd5db",
+    "LidoSRv3/Audit/Source/SszLittleEndianCorrespondence.lean": "354768f3a855422699513646e7ec7b06809f7be545fba623ad9659c331e4fdb8",
+    "LidoSRv3/Audit/Source/SszProofFold.lean": "2e0c24c00c0fbae5cfe8dec50a459996b64988e839087bec1880034d65859b6d",
+    "LidoSRv3/Audit/Source/SszScratchByteArray.lean": "ed6249a91046db3165beb3d38f5c3f1ee5b9db0c4a6ff559a3b0877d5757218b",
+    "LidoSRv3/Audit/Source/SszScratchEvmMemory.lean": "44489c5cd5688a6747b5d1eea1672015c709db91695faedd66b27e44e9053edd",
+    "LidoSRv3/Audit/Source/SszValidatorLeaf.lean": "a2b5fa2b0f8b5955e0d4d27a5052e0d19bb08058b5e734dd48d55cc121d3170f",
+    "LidoSRv3/Audit/Source/SszWrapperIndex.lean": "57833ae3afc8731c7b6a80862666194c1fa561db316952b3e5b4073013a6b045",
+    "LidoSRv3/Tests/SszScratchEvmMemoryMutants.lean": "8efc984682424d5f856acecd9c88425f9d6a997ae4b596f88f4bfa346b496e15",
+    "audit/ssz-scratch-evm-memory/README.md": "ea654864ade12d3461c8095018818eea96021360b07b00c1545b980b42c7be55",
+    "audit/ssz-scratch-evm-memory/check_receipt.py": "8ea32530c4af184823cca3c2f275c7aeb04152108fe3fac586438cfa77a3f5b4",
+    "audit/ssz-scratch-evm-memory/solidity/README.md": "cc7eaafb874dffc7fc6c331f7a331d348260fcd7a579ee8568792360b032e4da",
+    "audit/ssz-scratch-evm-memory/solidity/SszScratchEvmMemory.t.sol": "fd2093afce9a21c87188adb5f5f126d9d35fb2c324ff609b77e7111315fe1500",
+    "audit/ssz-scratch-evm-memory/solidity/receipt.json": "b9df9edf9b6e6af56f4738c0b2957cc617049928b622d998300329d3b7fe0831",
+    "audit/ssz-scratch-evm-memory/solidity/validation.log": "b1b23a0f059a94139097ac69134a201da959733f3d7921f02f439cdb1a34bb65",
+    "foundry.toml": "adb4990ab31a2bb53f5eeb370e4f55d962f7bc1026bce01708497a56b262356c",
+    "lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
+    "lakefile.lean": "8ea3781110b3234bdfcf2b2c87c5c064fa7d2aee018da57bcab100f8baf1ab87",
+    "lean-toolchain": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee",
+    "lido-core/contracts/0.8.25/CLValidatorVerifier.sol": "d6e89f6975e4fa02f758bf461a98ac2d689296b5c92d03ffd4e43a22d0b3d7ed",
+    "lido-core/contracts/common/lib/BLS.sol": "0187cc6a6b1aaa833317695d88795db431fa237452213e8c3872a0f444dceb7c",
+    "lido-core/contracts/common/lib/MemUtils.sol": "dc4f389cfd1ae1b4dd5fe908432159103544ece1ca9f694093f64def5db7acca",
+    "lido-core/contracts/common/lib/SSZ.sol": "91ef497b972bbee0fe89043034e6bd62fa0c1059f22874d4826bc6164a22009b"
+  },
+  "evidence_hashes": {
+    "audit/ssz-scratch-evm-memory/validation.log": "144208a09f39a97c1025f17de90a54416c51f526d94ecf2718229d756808a944",
+    "audit/ssz-scratch-evm-memory/axioms.log": "4cb6300c7d1f683c15c433984a1b622e88475821a1dc758986c4913a1b47a338",
+    "audit/ssz-scratch-evm-memory/dependency-inputs.json": "13199b42709bccbac00765de3aa97e5b4e547180bd56db187f5608ea1d86ef27",
+    "audit/ssz-scratch-evm-memory/source-check.json": "813d51b405cbdf6ed02a15a0996012bd859e378885e1f8118f5dafc8ece9e62f",
+    "audit/ssz-scratch-evm-memory/validated-inputs.sha256": "2cf0a3dceb2f33ed9cbe85d0b834f0f68ef91a0f6c290188fdaa1f85f2adfa88"
+  },
+  "remaining_boundaries": [
+    "ABI decoding and malformed/out-of-bounds calldata; input extent/layout explicit",
+    "No public opcode-dispatch, compiler, gas-charged EVM.X, stack, host-resource or deployed-runtime refinement",
+    "SHA call/input transport/success/failure/returndata copy/final mload not proved; typed ShaReply.output remains subsequent boundary",
+    "Separate SSZ memory helper, sibling calldata loads/fold scratch, fls/generalized-index decode, root lookup and provenance unchanged"
+  ],
+  "independent_review": "Pending root commit and independent exact-candidate review"
+}

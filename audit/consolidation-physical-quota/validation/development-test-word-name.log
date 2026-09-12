@@ -1,0 +1,436 @@
+⚠ [11/631] Replayed Verity.Core
+warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1041:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+⚠ [1129/1233] Replayed Conform.Wheels
+warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: Conform/Wheels.lean:106:70: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1130/1233] Replayed EvmYul.Pretty
+warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: EvmYul/Pretty.lean:36:32: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1177/1233] Replayed EvmYul.Semantics
+warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1178/1233] Replayed EvmYul.EVM.Semantics
+warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1216/1233] Replayed LidoSRv3.Audit.Verity.TopupTx
+warning: LidoSRv3/Audit/Verity/TopupTx.lean:293:8: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: LidoSRv3/Audit/Verity/TopupTx.lean:872:13: This simp argument is unused:
+  uint256Modulus
+
+Hint: Omit it from the simp argument list.
+  simp [pushEntry, scheduledDeposit, linkedCallEntryTo, linkedCallEntry, e̵v̵m̵W̵o̵r̵d̵,̵ ̵u̵i̵n̵t̵2̵5̵6̵M̵o̵d̵u̵l̵u̵s̵]̵e̲v̲m̲W̲o̲r̲d̲]̲
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/TopupTx.lean:965:19: This simp argument is unused:
+  Nat.mod_eq_of_lt hNoWrap
+
+Hint: Omit it from the simp argument list.
+  simp [evmWord,̵ ̵N̵a̵t̵.̵m̵o̵d̵_̵e̵q̵_̵o̵f̵_̵l̵t̵ ̵h̵N̵o̵W̵r̵a̵p̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/TopupTx.lean:1279:5: Variable name `hwcLen` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+⚠ [1260/1269] Replayed audit.trio.consolidation.GatewayCall
+warning: audit/trio/consolidation/GatewayCall.lean:187:79: This simp argument is unused:
+  pureExec
+
+Hint: Omit it from the simp argument list.
+  simp only [addConsolidationRequestsLoop, validatePublicKey, pubkeyLength, ̲h̲s̲'̲,̲
+                      hs̵'̵,̵ ̵h̵t', decide_true, Live.require, bind, bindExec, pure, ̵p̵u̵r̵e̵E̵x̵e̵c̵,̵
+                      callAddConsolidationRequest, hc, List.nil_append]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: audit/trio/consolidation/GatewayCall.lean:188:49: This simp argument is unused:
+  hc
+
+Hint: Omit it from the simp argument list.
+  simp only [addConsolidationRequestsLoop, validatePublicKey, pubkeyLength,
+  ̵  ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵hs',
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ht', decide_true, Live.require, bind, bindExec, pure, pureExec,
+                      callAddConsolidationRequest, h̵c̵,̵ ̵List.nil_append]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: audit/trio/consolidation/GatewayCall.lean:188:53: This simp argument is unused:
+  List.nil_append
+
+Hint: Omit it from the simp argument list.
+  simp only [addConsolidationRequestsLoop, validatePublicKey, pubkeyLength, hs',
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ht', decide_true, Live.require, bind, bindExec, pure, pureExec,
+                      callAddConsolidationRequest, h̵c̵,̵ ̵L̵i̵s̵t̵.̵n̵i̵l̵_̵a̵p̵p̵e̵n̵d̵]̵h̲c̲]̲
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: audit/trio/consolidation/GatewayCall.lean:259:54: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+info: audit/trio/consolidation/GatewayCall.lean:366:0: 'audit.trio.consolidation.GatewayCall.execute_success_requests' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: audit/trio/consolidation/GatewayCall.lean:367:0: 'audit.trio.consolidation.GatewayCall.invoke_failure_restores' depends on axioms: [propext]
+ℹ [1261/1269] Replayed audit.trio.consolidation.GatewaySettlement
+info: audit/trio/consolidation/GatewaySettlement.lean:399:0: 'audit.trio.consolidation.GatewaySettlement.countGroups_success' depends on axioms: [propext, Quot.sound]
+info: audit/trio/consolidation/GatewaySettlement.lean:400:0: 'audit.trio.consolidation.GatewaySettlement.quote_success' depends on axioms: [propext, Quot.sound]
+info: audit/trio/consolidation/GatewaySettlement.lean:401:0: 'audit.trio.consolidation.GatewaySettlement.settle_success' depends on axioms: [propext]
+info: audit/trio/consolidation/GatewaySettlement.lean:402:0: 'audit.trio.consolidation.GatewaySettlement.afterQuote_success' depends on axioms: [propext, Quot.sound]
+info: audit/trio/consolidation/GatewaySettlement.lean:403:0: 'audit.trio.consolidation.GatewaySettlement.body_success' depends on axioms: [propext, Quot.sound]
+info: audit/trio/consolidation/GatewaySettlement.lean:404:0: 'audit.trio.consolidation.GatewaySettlement.execute_success' depends on axioms: [propext, Quot.sound]
+info: audit/trio/consolidation/GatewaySettlement.lean:405:0: 'audit.trio.consolidation.GatewaySettlement.failure_restores' depends on axioms: [propext]
+ℹ [1262/1269] Replayed LidoSRv3.Audit.Guarantees.PConsolidationEth1ActualSettlement
+info: LidoSRv3/Audit/Guarantees/PConsolidationEth1ActualSettlement.lean:40:0: 'LidoSRv3.Audit.Guarantees.PConsolidationEth1.actual_settlement_success' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Guarantees/PConsolidationEth1ActualSettlement.lean:41:0: 'LidoSRv3.Audit.Guarantees.PConsolidationEth1.actual_settlement_failure_restores' depends on axioms: [propext]
+ℹ [1263/1269] Replayed audit.trio.consolidation.SettlementRequests
+info: audit/trio/consolidation/SettlementRequests.lean:87:0: 'audit.trio.consolidation.SettlementRequests.execute_success' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [1264/1269] Replayed LidoSRv3.Audit.Guarantees.PConsolidationEth1Requests
+info: LidoSRv3/Audit/Guarantees/PConsolidationEth1Requests.lean:22:0: 'LidoSRv3.Audit.Guarantees.PConsolidationEth1.actual_settlement_requests' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [1265/1269] Replayed LidoSRv3.Tests.ConsolidationSettlementRegression
+info: LidoSRv3/Tests/ConsolidationSettlementRegression.lean:120:0: 'LidoSRv3.Tests.ConsolidationSettlementRegression.accepted_refund_balance_change_rejected' depends on axioms: [propext]
+info: LidoSRv3/Tests/ConsolidationSettlementRegression.lean:121:0: 'LidoSRv3.Tests.ConsolidationSettlementRegression.code_less_vault_typed_decode_failure' depends on axioms: [propext]
+info: LidoSRv3/Tests/ConsolidationSettlementRegression.lean:122:0: 'LidoSRv3.Tests.ConsolidationSettlementRegression.same_world_success' depends on axioms: [propext]
+info: LidoSRv3/Tests/ConsolidationSettlementRegression.lean:123:0: 'LidoSRv3.Tests.ConsolidationSettlementRegression.nested_quote_vault_refund_order' depends on axioms: [propext]
+info: LidoSRv3/Tests/ConsolidationSettlementRegression.lean:124:0: 'LidoSRv3.Tests.ConsolidationSettlementRegression.refund_reject_rolls_back_prior_vault_storage_and_value' depends on axioms: [propext]
+info: LidoSRv3/Tests/ConsolidationSettlementRegression.lean:125:0: 'LidoSRv3.Tests.ConsolidationSettlementRegression.zero_refund_skips_rejecting_recipient' depends on axioms: [propext]
+info: LidoSRv3/Tests/ConsolidationSettlementRegression.lean:126:0: 'LidoSRv3.Tests.ConsolidationSettlementRegression.zero_recipient_uses_code_less_sender' depends on axioms: [propext]
+info: LidoSRv3/Tests/ConsolidationSettlementRegression.lean:127:0: 'LidoSRv3.Tests.ConsolidationSettlementRegression.fee_requoted_in_vault_world' depends on axioms: [propext]
+info: LidoSRv3/Tests/ConsolidationSettlementRegression.lean:128:0: 'LidoSRv3.Tests.ConsolidationSettlementRegression.fee_product_overflow_before_vault' depends on axioms: [propext]
+info: LidoSRv3/Tests/ConsolidationSettlementRegression.lean:129:0: 'LidoSRv3.Tests.ConsolidationSettlementRegression.short_inner_fee_reply_rejected' depends on axioms: [propext]
+info: LidoSRv3/Tests/ConsolidationSettlementRegression.lean:130:0: 'LidoSRv3.Tests.ConsolidationSettlementRegression.checked_count_overflow' depends on axioms: [propext]
+ℹ [1266/1269] Replayed LidoSRv3.Tests.ConsolidationSettlementRequestsRegression
+info: LidoSRv3/Tests/ConsolidationSettlementRequestsRegression.lean:70:0: 'LidoSRv3.Tests.ConsolidationSettlementRequestsRegression.actual_two_requests_joint_consumer' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/ConsolidationSettlementRequestsRegression.lean:71:0: 'LidoSRv3.Tests.ConsolidationSettlementRequestsRegression.actual_bytes_decode' depends on axioms: [propext]
+info: LidoSRv3/Tests/ConsolidationSettlementRequestsRegression.lean:72:0: 'LidoSRv3.Tests.ConsolidationSettlementRequestsRegression.decoded_loop_and_refund_effects' depends on axioms: [propext]
+info: LidoSRv3/Tests/ConsolidationSettlementRequestsRegression.lean:73:0: 'LidoSRv3.Tests.ConsolidationSettlementRequestsRegression.zero_refund_joint_consumer' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/ConsolidationSettlementRequestsRegression.lean:74:0: 'LidoSRv3.Tests.ConsolidationSettlementRequestsRegression.distinct_fee_read_worlds' depends on axioms: [propext]
+info: LidoSRv3/Tests/ConsolidationSettlementRequestsRegression.lean:75:0: 'LidoSRv3.Tests.ConsolidationSettlementRequestsRegression.changed_inner_fee_rejects_and_restores' depends on axioms: [propext]
+info: LidoSRv3/Tests/ConsolidationSettlementRequestsRegression.lean:76:0: 'LidoSRv3.Tests.ConsolidationSettlementRequestsRegression.rejected_refund_restores_inbox_effects' depends on axioms: [propext]
+ℹ [1267/1269] Built audit.trio.consolidation.PhysicalQuotaSettlement (1.7s)
+info: audit/trio/consolidation/PhysicalQuotaSettlement.lean:292:0: 'audit.trio.consolidation.PhysicalQuotaSettlement.field_bound' depends on axioms: [propext]
+info: audit/trio/consolidation/PhysicalQuotaSettlement.lean:293:0: 'audit.trio.consolidation.PhysicalQuotaSettlement.current_bound' depends on axioms: [propext]
+info: audit/trio/consolidation/PhysicalQuotaSettlement.lean:294:0: 'audit.trio.consolidation.PhysicalQuotaSettlement.updatedTime_success' depends on axioms: [propext, Quot.sound]
+info: audit/trio/consolidation/PhysicalQuotaSettlement.lean:295:0: 'audit.trio.consolidation.PhysicalQuotaSettlement.transition_success' depends on axioms: [propext, Quot.sound]
+info: audit/trio/consolidation/PhysicalQuotaSettlement.lean:296:0: 'audit.trio.consolidation.PhysicalQuotaSettlement.transition_none' depends on axioms: [propext]
+info: audit/trio/consolidation/PhysicalQuotaSettlement.lean:297:0: 'audit.trio.consolidation.PhysicalQuotaSettlement.prepare_success' depends on axioms: [propext, Quot.sound]
+info: audit/trio/consolidation/PhysicalQuotaSettlement.lean:298:0: 'audit.trio.consolidation.PhysicalQuotaSettlement.quota_effects' depends on axioms: [propext, Quot.sound]
+info: audit/trio/consolidation/PhysicalQuotaSettlement.lean:299:0: 'audit.trio.consolidation.PhysicalQuotaSettlement.execute_success' depends on axioms: [propext]
+info: audit/trio/consolidation/PhysicalQuotaSettlement.lean:300:0: 'audit.trio.consolidation.PhysicalQuotaSettlement.failure_restores' depends on axioms: [propext]
+ℹ [1268/1269] Built LidoSRv3.Audit.Guarantees.PConsolidationEth1PhysicalQuota (1.4s)
+info: LidoSRv3/Audit/Guarantees/PConsolidationEth1PhysicalQuota.lean:46:0: 'LidoSRv3.Audit.Guarantees.PConsolidationEth1.actual_physical_quota_settlement_requests' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Audit/Guarantees/PConsolidationEth1PhysicalQuota.lean:47:0: 'LidoSRv3.Audit.Guarantees.PConsolidationEth1.actual_physical_quota_failure_restores' depends on axioms: [propext]
+✖ [1269/1269] Building LidoSRv3.Tests.TrioConsolidation.PhysicalQuotaSettlement (1.6s)
+trace: .> LEAN_PATH=/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Cli/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/batteries/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/Qq/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/aesop/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/proofwidgets/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/importGraph/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/plausible/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/mathlib/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/evmyul/.lake/build/lib/lean:/Users/thomas/work/lido/local-lido-proofs/.lake/packages/verity/.lake/build/lib/lean:/private/tmp/lido-consolidation-physical-quota/.lake/build/lib/lean /Users/thomas/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean /private/tmp/lido-consolidation-physical-quota/LidoSRv3/Tests/TrioConsolidation/PhysicalQuotaSettlement.lean -o /private/tmp/lido-consolidation-physical-quota/.lake/build/lib/lean/LidoSRv3/Tests/TrioConsolidation/PhysicalQuotaSettlement.olean -i /private/tmp/lido-consolidation-physical-quota/.lake/build/lib/lean/LidoSRv3/Tests/TrioConsolidation/PhysicalQuotaSettlement.ilean -c /private/tmp/lido-consolidation-physical-quota/.lake/build/ir/LidoSRv3/Tests/TrioConsolidation/PhysicalQuotaSettlement.c --setup /private/tmp/lido-consolidation-physical-quota/.lake/build/ir/LidoSRv3/Tests/TrioConsolidation/PhysicalQuotaSettlement.setup.json --json
+error: LidoSRv3/Tests/TrioConsolidation/PhysicalQuotaSettlement.lean:12:2: Ambiguous term
+  word
+Possible interpretations:
+  audit.trio.consolidation.word
+    (maximum + previous * 2 ^ 32 + timestamp * 2 ^ 64 + duration * 2 ^ 96 + items * 2 ^ 128 +
+      2 ^ 255) : audit.trio.consolidation.Word
+  
+  Live.word
+    (maximum + previous * 2 ^ 32 + timestamp * 2 ^ 64 + duration * 2 ^ 96 + items * 2 ^ 128 + 2 ^ 255) : Live.Word
+error: LidoSRv3/Tests/TrioConsolidation/PhysicalQuotaSettlement.lean:15:113: Tactic `decide` failed for proposition
+  PhysicalQuotaSettlement.transition (raw 0 99 100 0 10) 0 (2 ^ 256 - 1) = Except.ok none
+because its `Decidable` instance
+  instDecidableEqExcept_batteries (PhysicalQuotaSettlement.transition (raw 0 99 100 0 10) 0 (2 ^ 256 - 1))
+    (Except.ok none)
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match PhysicalQuotaSettlement.transition (raw 0 99 100 0 10) 0 (2 ^ 256 - 1), Except.ok none with
+  | Except.error a, Except.error b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+  | Except.error a, Except.ok a_1 => isFalse ⋯
+  | Except.ok a, Except.error a_1 => isFalse ⋯
+  | Except.ok a, Except.ok b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+error: LidoSRv3/Tests/TrioConsolidation/PhysicalQuotaSettlement.lean:17:164: Tactic `decide` failed for proposition
+  PhysicalQuotaSettlement.transition (raw 10 6 100 10 0) 99 2 = Except.error PhysicalQuotaSettlement.arithmetic
+because its `Decidable` instance
+  instDecidableEqExcept_batteries (PhysicalQuotaSettlement.transition (raw 10 6 100 10 0) 99 2)
+    (Except.error PhysicalQuotaSettlement.arithmetic)
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match PhysicalQuotaSettlement.transition (raw 10 6 100 10 0) 99 2,
+    Except.error PhysicalQuotaSettlement.arithmetic with
+  | Except.error a, Except.error b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+  | Except.error a, Except.ok a_1 => isFalse ⋯
+  | Except.ok a, Except.error a_1 => isFalse ⋯
+  | Except.ok a, Except.ok b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+error: LidoSRv3/Tests/TrioConsolidation/PhysicalQuotaSettlement.lean:19:160: Tactic `decide` failed for proposition
+  PhysicalQuotaSettlement.transition (raw 10 6 0 0 1) 100 2 = Except.error PhysicalQuotaSettlement.division
+because its `Decidable` instance
+  instDecidableEqExcept_batteries (PhysicalQuotaSettlement.transition (raw 10 6 0 0 1) 100 2)
+    (Except.error PhysicalQuotaSettlement.division)
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match PhysicalQuotaSettlement.transition (raw 10 6 0 0 1) 100 2, Except.error PhysicalQuotaSettlement.division with
+  | Except.error a, Except.error b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+  | Except.error a, Except.ok a_1 => isFalse ⋯
+  | Except.ok a, Except.error a_1 => isFalse ⋯
+  | Except.ok a, Except.ok b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+error: LidoSRv3/Tests/TrioConsolidation/PhysicalQuotaSettlement.lean:21:160: Tactic `decide` failed for proposition
+  PhysicalQuotaSettlement.transition (raw 10 6 0 0 0) 100 2 = Except.error PhysicalQuotaSettlement.division
+because its `Decidable` instance
+  instDecidableEqExcept_batteries (PhysicalQuotaSettlement.transition (raw 10 6 0 0 0) 100 2)
+    (Except.error PhysicalQuotaSettlement.division)
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match PhysicalQuotaSettlement.transition (raw 10 6 0 0 0) 100 2, Except.error PhysicalQuotaSettlement.division with
+  | Except.error a, Except.error b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+  | Except.error a, Except.ok a_1 => isFalse ⋯
+  | Except.ok a, Except.error a_1 => isFalse ⋯
+  | Except.ok a, Except.ok b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+error: LidoSRv3/Tests/TrioConsolidation/PhysicalQuotaSettlement.lean:24:66: Tactic `decide` failed for proposition
+  PhysicalQuotaSettlement.transition (raw 10 6 0 0 0) 100 7 =
+    Except.error (Fault.bubbled (GatewayCall.error2 3504717813 7 6))
+because its `Decidable` instance
+  instDecidableEqExcept_batteries (PhysicalQuotaSettlement.transition (raw 10 6 0 0 0) 100 7)
+    (Except.error (Fault.bubbled (GatewayCall.error2 3504717813 7 6)))
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match PhysicalQuotaSettlement.transition (raw 10 6 0 0 0) 100 7,
+    Except.error (Fault.bubbled (GatewayCall.error2 3504717813 7 6)) with
+  | Except.error a, Except.error b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+  | Except.error a, Except.ok a_1 => isFalse ⋯
+  | Except.ok a, Except.error a_1 => isFalse ⋯
+  | Except.ok a, Except.ok b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+error: LidoSRv3/Tests/TrioConsolidation/PhysicalQuotaSettlement.lean:26:133: Tactic `decide` failed for proposition
+  PhysicalQuotaSettlement.transition (raw 3 10 0 1 0) 1 2 = Except.error (Fault.bubbled (encode 4 845268882))
+because its `Decidable` instance
+  instDecidableEqExcept_batteries (PhysicalQuotaSettlement.transition (raw 3 10 0 1 0) 1 2)
+    (Except.error (Fault.bubbled (encode 4 845268882)))
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match PhysicalQuotaSettlement.transition (raw 3 10 0 1 0) 1 2, Except.error (Fault.bubbled (encode 4 845268882)) with
+  | Except.error a, Except.error b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+  | Except.error a, Except.ok a_1 => isFalse ⋯
+  | Except.ok a, Except.error a_1 => isFalse ⋯
+  | Except.ok a, Except.ok b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+error: LidoSRv3/Tests/TrioConsolidation/PhysicalQuotaSettlement.lean:28:168: Tactic `decide` failed for proposition
+  PhysicalQuotaSettlement.transition (raw 10 1 0 1 2) (2 ^ 256 - 1) 1 = Except.error PhysicalQuotaSettlement.arithmetic
+because its `Decidable` instance
+  instDecidableEqExcept_batteries (PhysicalQuotaSettlement.transition (raw 10 1 0 1 2) (2 ^ 256 - 1) 1)
+    (Except.error PhysicalQuotaSettlement.arithmetic)
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match PhysicalQuotaSettlement.transition (raw 10 1 0 1 2) (2 ^ 256 - 1) 1,
+    Except.error PhysicalQuotaSettlement.arithmetic with
+  | Except.error a, Except.error b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+  | Except.error a, Except.ok a_1 => isFalse ⋯
+  | Except.ok a, Except.error a_1 => isFalse ⋯
+  | Except.ok a, Except.ok b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+error: LidoSRv3/Tests/TrioConsolidation/PhysicalQuotaSettlement.lean:30:168: Tactic `decide` failed for proposition
+  PhysicalQuotaSettlement.transition (raw 10 1 0 1 1) (2 ^ 256 - 1) 1 = Except.error PhysicalQuotaSettlement.arithmetic
+because its `Decidable` instance
+  instDecidableEqExcept_batteries (PhysicalQuotaSettlement.transition (raw 10 1 0 1 1) (2 ^ 256 - 1) 1)
+    (Except.error PhysicalQuotaSettlement.arithmetic)
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match PhysicalQuotaSettlement.transition (raw 10 1 0 1 1) (2 ^ 256 - 1) 1,
+    Except.error PhysicalQuotaSettlement.arithmetic with
+  | Except.error a, Except.error b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+  | Except.error a, Except.ok a_1 => isFalse ⋯
+  | Except.ok a, Except.error a_1 => isFalse ⋯
+  | Except.ok a, Except.ok b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+error: LidoSRv3/Tests/TrioConsolidation/PhysicalQuotaSettlement.lean:32:167: Tactic `decide` failed for proposition
+  PhysicalQuotaSettlement.transition (raw 10 6 0 3 0) (2 ^ 32 + 2) 2 = Except.error PhysicalQuotaSettlement.arithmetic
+because its `Decidable` instance
+  instDecidableEqExcept_batteries (PhysicalQuotaSettlement.transition (raw 10 6 0 3 0) (2 ^ 32 + 2) 2)
+    (Except.error PhysicalQuotaSettlement.arithmetic)
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match PhysicalQuotaSettlement.transition (raw 10 6 0 3 0) (2 ^ 32 + 2) 2,
+    Except.error PhysicalQuotaSettlement.arithmetic with
+  | Except.error a, Except.error b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+  | Except.error a, Except.ok a_1 => isFalse ⋯
+  | Except.ok a, Except.error a_1 => isFalse ⋯
+  | Except.ok a, Except.ok b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+error: LidoSRv3/Tests/TrioConsolidation/PhysicalQuotaSettlement.lean:34:167: Tactic `decide` failed for proposition
+  PhysicalQuotaSettlement.transition (raw 10 6 2 3 0) (2 ^ 32 + 1) 2 = Except.error PhysicalQuotaSettlement.arithmetic
+because its `Decidable` instance
+  instDecidableEqExcept_batteries (PhysicalQuotaSettlement.transition (raw 10 6 2 3 0) (2 ^ 32 + 1) 2)
+    (Except.error PhysicalQuotaSettlement.arithmetic)
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match PhysicalQuotaSettlement.transition (raw 10 6 2 3 0) (2 ^ 32 + 1) 2,
+    Except.error PhysicalQuotaSettlement.arithmetic with
+  | Except.error a, Except.error b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+  | Except.error a, Except.ok a_1 => isFalse ⋯
+  | Except.ok a, Except.error a_1 => isFalse ⋯
+  | Except.ok a, Except.ok b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+error: LidoSRv3/Tests/TrioConsolidation/PhysicalQuotaSettlement.lean:37:46: Tactic `decide` failed for proposition
+  PhysicalQuotaSettlement.transition (raw 10 6 0 1 0) (2 ^ 32 + 5) 2 =
+    Except.ok (some { available := 6, remaining := 4, timestamp := 5, raw := raw 10 4 5 1 0 })
+because its `Decidable` instance
+  instDecidableEqExcept_batteries (PhysicalQuotaSettlement.transition (raw 10 6 0 1 0) (2 ^ 32 + 5) 2)
+    (Except.ok (some { available := 6, remaining := 4, timestamp := 5, raw := raw 10 4 5 1 0 }))
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match PhysicalQuotaSettlement.transition (raw 10 6 0 1 0) (2 ^ 32 + 5) 2,
+    Except.ok (some { available := 6, remaining := 4, timestamp := 5, raw := raw 10 4 5 1 0 }) with
+  | Except.error a, Except.error b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+  | Except.error a, Except.ok a_1 => isFalse ⋯
+  | Except.ok a, Except.error a_1 => isFalse ⋯
+  | Except.ok a, Except.ok b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+error: LidoSRv3/Tests/TrioConsolidation/PhysicalQuotaSettlement.lean:40:54: Tactic `decide` failed for proposition
+  PhysicalQuotaSettlement.transition (raw 10 6 90 10 100) 109 2 =
+    Except.ok (some { available := 10, remaining := 8, timestamp := 100, raw := raw 10 8 100 10 100 })
+because its `Decidable` instance
+  instDecidableEqExcept_batteries (PhysicalQuotaSettlement.transition (raw 10 6 90 10 100) 109 2)
+    (Except.ok (some { available := 10, remaining := 8, timestamp := 100, raw := raw 10 8 100 10 100 }))
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match PhysicalQuotaSettlement.transition (raw 10 6 90 10 100) 109 2,
+    Except.ok (some { available := 10, remaining := 8, timestamp := 100, raw := raw 10 8 100 10 100 }) with
+  | Except.error a, Except.error b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+  | Except.error a, Except.ok a_1 => isFalse ⋯
+  | Except.ok a, Except.error a_1 => isFalse ⋯
+  | Except.ok a, Except.ok b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+error: LidoSRv3/Tests/TrioConsolidation/PhysicalQuotaSettlement.lean:43:137: Ambiguous term
+  word
+Possible interpretations:
+  audit.trio.consolidation.word 100 : audit.trio.consolidation.Word
+  
+  Live.word 100 : Live.Word
+error: LidoSRv3/Tests/TrioConsolidation/PhysicalQuotaSettlement.lean:50:47: Ambiguous term
+  word
+Possible interpretations:
+  audit.trio.consolidation.word 6 : audit.trio.consolidation.Word
+  
+  Live.word 6 : Live.Word
+error: LidoSRv3/Tests/TrioConsolidation/PhysicalQuotaSettlement.lean:57:76: Tactic `decide` failed for proposition
+  ((run quotaRefund).outcome, (run quotaRefund).world.core.readContractSlot 100 PhysicalQuotaSettlement.position,
+      ((run quotaRefund).world.core.readContractSlot 300 777).val,
+      ((run quotaRefund).world.core.readContractSlot 400 888).val, (run quotaRefund).trace.length) =
+    (Except.ok (), expectedQuota, 2, 42, 7)
+because its `Decidable` instance
+  instDecidableEqProd
+    ((run quotaRefund).outcome, (run quotaRefund).world.core.readContractSlot 100 PhysicalQuotaSettlement.position,
+      ((run quotaRefund).world.core.readContractSlot 300 777).val,
+      ((run quotaRefund).world.core.readContractSlot 400 888).val, (run quotaRefund).trace.length)
+    (Except.ok (), expectedQuota, 2, 42, 7)
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match (run quotaRefund).outcome, Except.ok () with
+  | Except.error a, Except.error b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+  | Except.error a, Except.ok a_1 => isFalse ⋯
+  | Except.ok a, Except.error a_1 => isFalse ⋯
+  | Except.ok a, Except.ok b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+error: LidoSRv3/Tests/TrioConsolidation/PhysicalQuotaSettlement.lean:63:53: Ambiguous term
+  word
+Possible interpretations:
+  audit.trio.consolidation.word 6 : audit.trio.consolidation.Word
+  
+  Live.word 6 : Live.Word
+error: LidoSRv3/Tests/TrioConsolidation/PhysicalQuotaSettlement.lean:65:53: Ambiguous term
+  word
+Possible interpretations:
+  audit.trio.consolidation.word 6 : audit.trio.consolidation.Word
+  
+  Live.word 6 : Live.Word
+error: LidoSRv3/Tests/TrioConsolidation/PhysicalQuotaSettlement.lean:74:70: Tactic `decide` failed for proposition
+  ((run refundReject).outcome, (run refundReject).world.core.readContractSlot 100 PhysicalQuotaSettlement.position,
+      ((run refundReject).world.core.readContractSlot 300 777).val, (run refundReject).trace.length) =
+    (Except.error (Fault.reason "FeeRefundFailed"), raw 10 6 90 10 1, 0, 7)
+because its `Decidable` instance
+  instDecidableEqProd
+    ((run refundReject).outcome, (run refundReject).world.core.readContractSlot 100 PhysicalQuotaSettlement.position,
+      ((run refundReject).world.core.readContractSlot 300 777).val, (run refundReject).trace.length)
+    (Except.error (Fault.reason "FeeRefundFailed"), raw 10 6 90 10 1, 0, 7)
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match (run refundReject).outcome, Except.error (Fault.reason "FeeRefundFailed") with
+  | Except.error a, Except.error b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+  | Except.error a, Except.ok a_1 => isFalse ⋯
+  | Except.ok a, Except.error a_1 => isFalse ⋯
+  | Except.ok a, Except.ok b => if h : a = b then h ▸ isTrue ⋯ else isFalse ⋯
+warning: LidoSRv3/Tests/TrioConsolidation/PhysicalQuotaSettlement.lean:76:8: declaration uses `sorry`
+error: LidoSRv3/Tests/TrioConsolidation/PhysicalQuotaSettlement.lean:84:147: Ambiguous term
+  word
+Possible interpretations:
+  audit.trio.consolidation.word 123 : audit.trio.consolidation.Word
+  
+  Live.word 123 : Live.Word
+error: LidoSRv3/Tests/TrioConsolidation/PhysicalQuotaSettlement.lean:82:2: Missing cases:
+(Reply.successWithTrace _ (World.mk (Verity.ContractState.mk _ _ (Verity.Core.Address.mk _ _) (Verity.Core.Address.mk _ _) (Verity.Core.Address.mk _ _) (Verity.Core.Uint256.mk _ _) (Verity.Core.Uint256.mk _ _) (Verity.Core.Uint256.mk _ _) (Verity.Core.Uint256.mk _ _) (Verity.Core.Uint256.mk _ _) (Verity.Core.Uint256.mk _ _) (Verity.Core.Uint256.mk _ _) _ _ _ _ _ _) _ _) _)
+(Reply.rejectedWithTrace _ _)
+error: LidoSRv3/Tests/TrioConsolidation/PhysicalQuotaSettlement.lean:87:7: Invalid dotted identifier notation: The expected type of `.ok` could not be determined
+
+Hint: Using one of these would be unambiguous:
+  [apply] `Except.ok`
+  [apply] `EST.Out.ok`
+  [apply] `EStateM.Result.ok`
+  [apply] `Lean.Meta.DefEqArgsFirstPassResult.ok`
+  [apply] `Std.Http.Response.ok`
+  [apply] `Std.Http.Status.ok`
+  [apply] `Lean.Meta.Grind.CheckCoverageResult.ok`
+error: LidoSRv3/Tests/TrioConsolidation/PhysicalQuotaSettlement.lean:87:14: Ambiguous term
+  word
+Possible interpretations:
+  audit.trio.consolidation.word 123 : audit.trio.consolidation.Word
+  
+  Live.word 123 : Live.Word
+info: LidoSRv3/Tests/TrioConsolidation/PhysicalQuotaSettlement.lean:89:0: 'LidoSRv3.Tests.TrioConsolidation.PhysicalQuotaSettlement.public_nonempty' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+info: LidoSRv3/Tests/TrioConsolidation/PhysicalQuotaSettlement.lean:90:0: 'LidoSRv3.Tests.TrioConsolidation.PhysicalQuotaSettlement.public_original_rollback' depends on axioms: [propext,
+ sorryAx]
+info: LidoSRv3/Tests/TrioConsolidation/PhysicalQuotaSettlement.lean:91:0: 'LidoSRv3.Tests.TrioConsolidation.PhysicalQuotaSettlement.nonempty_actual_success' depends on axioms: [propext, sorryAx]
+info: LidoSRv3/Tests/TrioConsolidation/PhysicalQuotaSettlement.lean:92:0: 'LidoSRv3.Tests.TrioConsolidation.PhysicalQuotaSettlement.accepted_callback_changes_quota' depends on axioms: [propext,
+ sorryAx]
+error: Lean exited with code 1
+Some required targets logged failures:
+- LidoSRv3.Tests.TrioConsolidation.PhysicalQuotaSettlement
+error: build failed

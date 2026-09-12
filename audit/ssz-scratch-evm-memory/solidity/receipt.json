@@ -1,0 +1,25 @@
+{
+  "scope": "unmodified BLS helper plus separately duplicated pre-SHA two-operation block and intentional mutations; finite source execution evidence",
+  "source_pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "solc": "0.8.25",
+  "forge": "forge Version: 1.5.0-v1.5.0\nCommit SHA: 1c57854462289b2e71ee7654cd6666217ed86ffd\nBuild Timestamp: 2025-11-24T06:07:42.598695000Z (1763964462)\nBuild Profile: maxperf",
+  "command": "FOUNDRY_SRC=audit/ssz-scratch-evm-memory/solidity FOUNDRY_TEST=audit/ssz-scratch-evm-memory/solidity forge test --remappings contracts/=lido-core/contracts/ --match-contract SszScratchEvmMemoryTest --fuzz-runs 1024 --fuzz-seed 0x20260909 --out /tmp/lido-ssz-scratch-solidity-out --cache-path /tmp/lido-ssz-scratch-solidity-cache -vv",
+  "exit_code": 0,
+  "tests": 4,
+  "fuzz_tests": 2,
+  "runs_each": 1024,
+  "key_positions": 48,
+  "mutations": 6,
+  "files_sha256": {
+    "README.md": "cc7eaafb874dffc7fc6c331f7a331d348260fcd7a579ee8568792360b032e4da",
+    "SszScratchEvmMemory.t.sol": "fd2093afce9a21c87188adb5f5f126d9d35fb2c324ff609b77e7111315fe1500",
+    "validation.log": "b1b23a0f059a94139097ac69134a201da959733f3d7921f02f439cdb1a34bb65"
+  },
+  "sources_sha256": {
+    "foundry.toml": "adb4990ab31a2bb53f5eeb370e4f55d962f7bc1026bce01708497a56b262356c",
+    "lido-core/contracts/common/lib/BLS.sol": "0187cc6a6b1aaa833317695d88795db431fa237452213e8c3872a0f444dceb7c",
+    "lido-core/contracts/common/lib/SSZ.sol": "91ef497b972bbee0fe89043034e6bd62fa0c1059f22874d4826bc6164a22009b",
+    "lido-core/contracts/common/lib/MemUtils.sol": "dc4f389cfd1ae1b4dd5fe908432159103544ece1ca9f694093f64def5db7acca",
+    "lido-core/contracts/0.8.25/CLValidatorVerifier.sol": "d6e89f6975e4fa02f758bf461a98ac2d689296b5c92d03ffd4e43a22d0b3d7ed"
+  }
+}

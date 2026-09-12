@@ -39,6 +39,15 @@ example : (setClaimedStorage unclaimedPhysicalWord).val =
     13 * two248 + 19 * two208 + two200 + 23 * two160 + 3 := by
   decide
 
+/-- Full-byte claimed: input byte=2 (bit 201 set) is replaced by exactly byte=1.
+Bits below 200 and >=208 are preserved (counterexample for "just set bit 200" models). -/
+def claimedByte2PhysicalWord : StorageWord :=
+  ⟨13 * two248 + 19 * two208 + 2 * two200 + 23 * two160 + 3, by decide⟩
+
+example : (setClaimedStorage claimedByte2PhysicalWord).val =
+    13 * two248 + 19 * two208 + two200 + 23 * two160 + 3 := by
+  decide
+
 /-- Model-only boundaries for the checked enqueue increment. -/
 def requestInput : RequestInput :=
   { caller := 3, owner := 0, amount := 100, shares := 100,

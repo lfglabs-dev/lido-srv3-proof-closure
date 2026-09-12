@@ -1,0 +1,18 @@
+Diagnostic account of tool-level failures (not proof/compiler failures):
+
+1. Initial fixture creation/execution tool call selected
+   /tmp/lido-address-permit-batches/audit/address-permit-request-calls/solidity
+   before creating it. The shell did not run. Tool returned:
+   exec_command failed: CreateProcess { message: "Rejected(\"Failed to create unified exec process: No such file or directory (os error 2)\")" }
+   Resolution: create/copy fixture from the existing repository working directory,
+   then execute forge from the now-existing fixture directory. The actual first
+   executed Forge compilation/tests pass; no failed Solidity execution is hidden.
+
+2. Initial exploratory Python artifact key comparison iterated old keys and
+   indexed new artifact without accounting for optional assembly field:
+   KeyError: 'assembly'
+   Resolution: inspect key intersections and bytecode nested fields. Old JSON has
+   additional assembly field; metadata and bytecode objects agree; sourceMap fields
+   differ. Fresh full assembly inspection also matches prior bytes exactly.
+   check-correspondence.py asserts these precise identities and records actual
+   artifact hashes, not whole-JSON equality.

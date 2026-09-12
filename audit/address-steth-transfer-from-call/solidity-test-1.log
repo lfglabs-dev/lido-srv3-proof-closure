@@ -1,0 +1,20 @@
+Compiling 19 files with Solc 0.8.9
+Solc 0.8.9 finished in 1.04s
+Compiler run successful!
+
+Ran 12 tests for test/TransferFrom.t.sol:TransferFromTest
+[PASS] testActualDirectRequestBatch() (gas: 10516252)
+[PASS] testActualInfiniteAllowanceSkipsApprove() (gas: 5064257)
+[PASS] testActualPermitThenDirectBatch() (gas: 10572061)
+[PASS] testAliasFreshRecipientAndZeroFiniteApproval() (gas: 5074047)
+[PASS] testFiniteAllowanceFirstAndExactTrueEvents() (gas: 5064823)
+[PASS] testFiniteMaximumMinusOneNotInfinite() (gas: 5037801)
+[PASS] testFuzzAllowanceTokenUnitsAndAlias(uint64,uint64,bool,bool) (runs: 1024, μ: 5055268, ~: 5055236)
+[PASS] testLateAllowanceFailureRestoresRealPermitAndFirstItem() (gas: 10487079)
+[PASS] testLatePauseAndOverflowRestoreAllowance() (gas: 5068145)
+[PASS] testNestedMappingNotSharesSlotOrReversedKeys() (gas: 5039373)
+[PASS] testSpendGuardPriorityBeforeConversion() (gas: 5060314)
+[PASS] testSpenderOwnerStillUsesAllowance() (gas: 5037145)
+Suite result: ok. 12 passed; 0 failed; 0 skipped; finished in 987.97ms (1.07s CPU time)
+
+Ran 1 test suite in 992.88ms (987.97ms CPU time): 12 tests passed, 0 failed, 0 skipped (12 total tests)

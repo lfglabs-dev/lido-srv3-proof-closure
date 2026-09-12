@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/private/tmp/lido-address-request-batches/audit/address-request-batches/check-correspondence.py", line 41, in <module>
+    asm=(O/'BatchHarness.asm').read_text();assert slot in asm
+AssertionError

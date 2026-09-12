@@ -1,0 +1,55 @@
+{
+  "AccountAddress.AccountingCall.call_getter": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "AccountAddress.AccountingCall.call_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "AccountAddress.AccountingCall.decode_getter": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "AccountAddress.ReportFeeAccountingCall.execute_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "AccountAddress.ReportFeeAccountingCall.finish_success_replay": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "AccountAddress.ReportFeeAccountingCall.mint_replay": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "AccountAddress.ReportFeeAccountingCall.prepare_success": [
+    "propext"
+  ],
+  "LidoSRv3.Audit.Guarantees.PAccount1.actual_report_accounting_call": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Audit.Guarantees.PAccount1.actual_report_accounting_call_failure_restores": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.AccountAccountingCall.public_failure": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "LidoSRv3.Tests.AccountAccountingCall.public_success": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ]
+}

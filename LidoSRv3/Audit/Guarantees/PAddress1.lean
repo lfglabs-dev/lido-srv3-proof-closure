@@ -2,7 +2,7 @@ import LidoSRv3.Audit.Guarantees.Registry
 import LidoSRv3.Audit.AddressEquivariance
 import LidoSRv3.Audit.Verity.AddressTransferTx
 import LidoSRv3.Audit.Verity.AddressTx
-import LidoSRv3.Audit.Verity.AddressClaimBatchTx
+import LidoSRv3.Audit.Verity.AddressRecipientCallBridge
 
 namespace LidoSRv3.Audit.Guarantees.PAddress1
 
@@ -13,8 +13,10 @@ open LidoSRv3.Audit.SolidityAddress
 
 abbrev Address := Nat
 
-/-- P-ADDRESS-1 is closed by the universal source-shaped address transition and
-its executable Verity transaction composition. -/
+/-- P-ADDRESS-1 remains OPEN: the source-shaped transition and its executable
+Verity composition are checked, while full live-receipt renaming
+has not been established.  In particular, no source-level
+renaming theorem is presented as consuming the live CALL/world receipt. -/
 def guarantee : Guarantee := ⟨.pAddress1, [.model, .source, .verityTx]⟩
 
 /-!
@@ -250,6 +252,8 @@ below needs only `a₁, a₂ ≠ 0`), and `singletonActorEntryPoint` is provably
 content while reading as a real exclusion. Carrying either as an unused
 binder would hide that they are premise-free rather than making the claim
 more honest. -/
+/- Source-level universal writer equivariance.  This theorem does not consume
+the live `claimWithdrawalsTo` receipt; full live-receipt renaming remains a separate unproved ambition. -/
 theorem universal_address_writer_equivariance
     (a₁ a₂ : Verity.Address) (h₁ : a₁ ≠ 0) (h₂ : a₂ ≠ 0)
     (inp : LidoSRv3.Audit.SolidityAddress.Input) :
@@ -291,29 +295,6 @@ theorem abstract_source_verity_tx_address_equivariance :
     LidoSRv3.Audit.Verity.AddressTx.composed_verity_tx_address_equivariance.2.2.2.2.1,
     LidoSRv3.Audit.Verity.AddressTx.composed_verity_tx_address_equivariance.2.2.2.2.2.2.2⟩
 
-/-- Bounded live `claimWithdrawalsTo` transaction evidence, kept separate from
-the universal four-projection parent above. The two-item executable receipt
-reads current/previous packed request words and checkpoint words, marks both
-packed claimed bytes, decrements locked ETH, and derives two ordered
-value-bearing payout CALL journal entries. Every failed batch run restores its
-entry snapshot. This is not compiler extraction or keccak-level correspondence. -/
-theorem bounded_live_claim_batch_storage_call_surface :
-    LidoSRv3.Audit.Verity.AddressClaimBatchTx.observe [1, 2]
-        ((LidoSRv3.Audit.Verity.AddressClaimBatchTx.executeClaimWithdrawalsTo
-          [1, 2] [1, 1] (2 : Verity.Address)).run
-            LidoSRv3.Audit.Verity.AddressClaimBatchTx.twoClaimState) =
-      ⟨.committed, [true, true], 0,
-        [LidoSRv3.Audit.Verity.AddressClaimBatchTx.payoutEntry (2 : Verity.Address) 30,
-          LidoSRv3.Audit.Verity.AddressClaimBatchTx.payoutEntry
-            (2 : Verity.Address) 40]⟩ ∧
-    (∀ (requestIds hints : List Nat) (recipient : Verity.Address)
-      (state rollback : Verity.ContractState) (reason : String),
-      (LidoSRv3.Audit.Verity.AddressClaimBatchTx.executeClaimWithdrawalsTo
-        requestIds hints recipient).run state = .revert reason rollback →
-      rollback = state) := by
-  exact ⟨LidoSRv3.Audit.Verity.AddressClaimBatchTx.two_claim_batch_observe,
-    LidoSRv3.Audit.Verity.AddressClaimBatchTx.every_revert_restores_snapshot⟩
-
 /-- Bounded horizontal slice only: MODEL→SOURCE→official-Denote composition
 for the owner-operated WithdrawalQueue ERC-721 ownership handoff. This retained
 regression theorem is subordinate to the universal parent composition above. -/
@@ -328,7 +309,49 @@ theorem bounded_transfer_model_source_tx :
       (renameState12 { owner := 1, approved := 9 }).approved) =
       (true, swap12 3, swap12 0) ∧
     swap12 3 != 4 ∧ swap12 9 != 8 ∧
-    observe (run 9 1 3 1 9) = (false, 1, 9) :=
-  model_source_tx_address_equivariance_slice
+    observe (run 9 1 3 1 9) = (false, 1, 9) := by
+  exact model_source_tx_address_equivariance_slice
+
+/-! Actual physical-claim recipient-CALL consumers. These are useful necessary
+execution results, separate from the abstract four-entry renaming model. -/
+open LidoSRv3.Audit.Verity.AddressRecipientCallBridge in
+/-- Successful root execution derives physical owner/finalization checks,
+the checked payout and locked subtraction, the actual empty-calldata CALL,
+its returned world and the two final events. Arbitrary callbacks may change
+state; recipient net credit and final claimed-bit preservation are not claimed. -/
+theorem actual_claim_recipient_effect (callee : External) (ctx : Context)
+    (requestId hint : Nat) (recipient : Verity.Address) (before : World)
+    (h : (runClaimTo callee ctx requestId hint recipient before).outcome = .ok ()) :
+    ClaimEffect callee ctx requestId hint recipient before
+      (runClaimTo callee ctx requestId hint recipient before).world
+      (runClaimTo callee ctx requestId hint recipient before).attempts :=
+  runClaimTo_success callee ctx requestId hint recipient before h
+
+open LidoSRv3.Audit.Verity.AddressRecipientCallBridge in
+/-- Actual claimWithdrawalsTo success derives the entry guards and an ordered
+chain of physical claim/CALL/event steps on the callback-returned worlds.
+There are no supplied stage-success or callee-frame hypotheses. -/
+theorem actual_claim_withdrawals_to_chain (callee : External) (ctx : Context)
+    (requestIds hints : List Nat) (recipient : Verity.Address) (before : World)
+    (h : (runClaimWithdrawalsTo callee ctx requestIds hints recipient before).outcome = .ok ()) :
+    recipient ≠ Verity.zeroAddress ∧ requestIds.length = hints.length ∧
+      ClaimChain callee ctx recipient requestIds hints before
+        (runClaimWithdrawalsTo callee ctx requestIds hints recipient before).world
+        (runClaimWithdrawalsTo callee ctx requestIds hints recipient before).attempts :=
+  runClaimWithdrawalsTo_success callee ctx requestIds hints recipient before h
+
+open LidoSRv3.Audit.Verity.AddressRecipientCallBridge in
+/-- Any failed root batch restores the complete modeled entry world, including
+callback writes and events from earlier successful iterations. -/
+theorem actual_claim_withdrawals_failure_restores (callee : External) (ctx : Context)
+    (requestIds hints : List Nat) (recipient : Verity.Address) (before : World)
+    (fault : LidoSRv3.Audit.Source.TrioReserve1.Live.Fault)
+    (h : (runClaimWithdrawalsTo callee ctx requestIds hints recipient before).outcome = .error fault) :
+    (runClaimWithdrawalsTo callee ctx requestIds hints recipient before).world = before :=
+  claim_withdrawals_to_revert_restores_caller_and_callee_world callee ctx requestIds hints recipient before fault h
+
+#print axioms actual_claim_recipient_effect
+#print axioms actual_claim_withdrawals_to_chain
+#print axioms actual_claim_withdrawals_failure_restores
 
 end LidoSRv3.Audit.Guarantees.PAddress1

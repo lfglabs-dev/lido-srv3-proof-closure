@@ -1,0 +1,30 @@
+Compiling 30 files with Solc 0.4.24
+Compiling 2 files with Solc 0.8.9
+Solc 0.4.24 finished in 143.59ms
+Solc 0.8.9 finished in 272.53ms
+Compiler run successful with warnings:
+Warning: Functions in interfaces should be declared external.
+vendor/@aragon/os/contracts/acl/IACL.sol:13:5: Warning: Functions in interfaces should be declared external.
+    function hasPermission(address who, address where, bytes32 what, bytes how) public view returns (bool);
+    ^-----------------------------------------------------------------------------------------------------^
+Warning: Functions in interfaces should be declared external.
+vendor/@aragon/os/contracts/evmscript/IEVMScriptRegistry.sol:24:5: Warning: Functions in interfaces should be declared external.
+    function getScriptExecutor(bytes script) public view returns (IEVMScriptExecutor);
+    ^--------------------------------------------------------------------------------^
+Warning: Unused function parameter. Remove or comment out the variable name to silence this warning.
+vendor/@aragon/os/contracts/common/VaultRecoverable.sol:49:34: Warning: Unused function parameter. Remove or comment out the variable name to silence this warning.
+    function allowRecoverability(address token) public view returns (bool) {
+                                 ^-----------^
+
+Ran 8 tests for test/Distribution.t.sol:DistributionTest
+[PASS] testActualOrderAmountsAndEvents() (gas: 186433)
+[PASS] testConversionRevertRestoresDebit() (gas: 59228)
+[PASS] testFromZeroPrecedesPaused() (gas: 18446744073709549958)
+[PASS] testLateOverflowRollsBackMintAndPriorTransfer() (gas: 106201)
+[PASS] testRawMultiplicationWraps() (gas: 56105)
+[PASS] testSelfAndDuplicateRecipients() (gas: 110831)
+[PASS] testZeroMintSkipsDistribution() (gas: 29020)
+[PASS] testZeroTreasurySkipsResolver() (gas: 83837)
+Suite result: ok. 8 passed; 0 failed; 0 skipped; finished in 4.90ms (4.03ms CPU time)
+
+Ran 1 test suite in 144.87ms (4.90ms CPU time): 8 tests passed, 0 failed, 0 skipped (8 total tests)

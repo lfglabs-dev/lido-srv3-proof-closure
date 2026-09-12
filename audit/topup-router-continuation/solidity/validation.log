@@ -1,0 +1,12 @@
+Compiling 7 files with Solc 0.8.25
+Solc 0.8.25 finished in 663.05ms
+Compiler run successful!
+
+Ran 4 tests for audit/topup-router-continuation/solidity/TopupRouterCredentials.t.sol:TopupRouterCredentialsTest
+[PASS] testFuzz_readsActualNamespacedWords(uint256,bytes32,bytes32) (runs: 1024, μ: 8150, ~: 8150)
+[PASS] testFuzz_typeAssignmentPreservesAllOtherBits(uint256,bytes32,uint8) (runs: 1024, μ: 7839, ~: 7839)
+[PASS] test_currentWordsAreReadAgain() (gas: 13571)
+[PASS] test_rootAndAllTypeValues() (gas: 925384)
+Suite result: ok. 4 passed; 0 failed; 0 skipped; finished in 22.74ms (45.65ms CPU time)
+
+Ran 1 test suite in 151.13ms (22.74ms CPU time): 4 tests passed, 0 failed, 0 skipped (4 total tests)

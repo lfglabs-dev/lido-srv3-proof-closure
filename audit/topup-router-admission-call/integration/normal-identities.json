@@ -1,0 +1,57 @@
+{
+  "source_commit": "ed043832023c75e04adf76ea05c3ac96f3353897",
+  "accepted_configuration": "6e59055f72a4da135915844f6f504b02f10c6fcb",
+  "sources": 1361,
+  "pins": 11,
+  "artifact_hashes": 42,
+  "scoped_axioms": 39,
+  "normal": [
+    {
+      "olean_sha256": "58c05ec60074f57f92f839b081e2900fb3194b104a39bac93b848c26e7dc7b63",
+      "setup_sha256": "c6479fefdc969db1b4af59a4abf1b62ec31328a47d15536ccfe9e6306623ae60",
+      "sha256": "fb06c16fba7c153518cde030ba630354dba4b4ef7c4f0b799fade912e6773466",
+      "source": "LidoSRv3/Audit/Source/TopupRouterAdmissionCallGates.lean",
+      "trace_sha256": "975dc0965cf63178716e6b8b8a12c533c8daf5e170745bff8c64da1524f4c36c"
+    },
+    {
+      "olean_sha256": "f4967b3e80cae816af4ddaddf8fc88f9666facab638eb063ddb76c46644a5758",
+      "setup_sha256": "0a71cd66dbf9fc34420d3622dc34077b7a6aa6e1ad4548c04d399256b3a5829c",
+      "sha256": "276c9365b71531520271c5fb721278f6478b76b9d546868e4f8a631e600ec6a4",
+      "source": "LidoSRv3/Audit/Source/TopupRouterAdmissionCall.lean",
+      "trace_sha256": "d4974aacc10eb3f69d39415d4dede8c36f960b3fdcb49d551aff98b540bcd63d"
+    },
+    {
+      "olean_sha256": "51bc7617965133eee63735290efca8430cebdbeb8b91e30c72d2fafe58ba7283",
+      "setup_sha256": "6af78c5d8d3732cb9e9c7a5e04eea18bf03eb47b1f0137c8b2632443dbec5b55",
+      "sha256": "66d6407af6f481bac9b89f4a5ae55d5819b50bcdddbba2f0a3836eefd4bb7a9e",
+      "source": "LidoSRv3/Audit/Guarantees/PTopupRouterAdmissionCall.lean",
+      "trace_sha256": "2fabbd500840d4c46cb864bcde9576a72e7fb7e1c8523b9125cd94118b185aca"
+    },
+    {
+      "olean_sha256": "e12d7dd831c4237ee3b8e9f684ff8d1cf81f64ec78d006a52d4027fc7178dd33",
+      "setup_sha256": "235b99cbe31dd79400fa28ec0e48d765cfe901984197de74b82a6f9def8348bc",
+      "sha256": "4fe6631f5d61b451c9f47a3cd9a40fd0535e7ad1763219849149ff884f73f976",
+      "source": "LidoSRv3/Tests/TopupRouterAdmissionCallRegression.lean",
+      "trace_sha256": "555d978a19a60e8d0567e0ba40c041cc39d689d5774b3cc9736d399e466e41af"
+    },
+    {
+      "source": "LidoSRv3/Audit/AllGuarantees.lean",
+      "source_sha256": "1b17d9160f0218f54cf974e41f23f0388ba10d901703efd3b7ddd1a47c5a4180",
+      "setup_sha256": "94f6e30a1b31f77a97e09d39a2fed18964e70a52957f44668c442637dd409ca7",
+      "trace_sha256": "f18304084dbb165e14a319fe1c51c6a9e7a1b3addb63d9bf9cef1db5e8fc6683",
+      "olean_sha256": "1f454e5037d3c132d84583cf29e293eacea858a17ef766c701393ed6d077f27a"
+    },
+    {
+      "source": "LidoSRv3/Audit/Trust.lean",
+      "source_sha256": "c0da4ac46b4981f5bffd087dee9bc672e86f5429a8161a56e7f8aed93c2b71f0",
+      "setup_sha256": "d9735983141047ea8406dedad44283f3330ef1bd54ed659eeacaea23f5af8395",
+      "trace_sha256": "8c844b34381c89ed032b6682123e380214f16d4eccfa33d473f2b352d8d19684",
+      "olean_sha256": "de0b74532e46425aff59ede5202074d58e37081ee12a22ae865bbe65a951db68"
+    }
+  ],
+  "configuration_sha256": {
+    "lakefile.lean": "68a2eeea808e5fe3ada64e9a89f7da8698c67893a021bdde219043fc99110411",
+    "lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
+    "lean-toolchain": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee"
+  }
+}

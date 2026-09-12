@@ -1,0 +1,15 @@
+{
+  "source": "965835661f8db5caba9263b0d62e94106b1f07cf",
+  "source_hashes": {
+    "LidoSRv3/Audit/Guarantees/PAccount1.lean": "67c88010fdc868ee990f41e0775da5d829f01d34b72946886e60f22629195d0c",
+    "LidoSRv3/Audit/Verity/HandleOracleReportTx.lean": "d41736060fc56b9d89f2c2fec1859dda053357c3895cb3fd109972033d5aae4d",
+    "LidoSRv3/Audit/Source/ReportFeeProductsCorrespondence.lean": "471edd6b2b855844679dd5ef23409523caea2b221482991a51bc028a06135936",
+    "audit/trio/account-address/ReportFeeMint.lean": "0876f53edde2fbb6742fa4ac1e49b01071d14ccf54896165299264be9fca05c0",
+    "audit/trio/account-address/StETHMintShares.lean": "f4fc5b04455acb9c5993779e4171ccc5a288fe5adf701ee68b0a16d47b031f1b",
+    "audit/trio/account-address/Tests/Verity/ReportFeeMintTest.lean": "980481aa1936fc32f2a1d315cb97114ba1b68257f660b1e14a32b5162ff5a995",
+    "audit/trio/account-address/Tests/Verity/StETHMintSharesTest.lean": "6371f34d781ed3ddf6c63413c952f3fb3b5715ff23a400cf3d3b6e33f43f830c"
+  },
+  "all_seven_unchanged": true,
+  "manifest_identical_to_main": "64f73f101187992db5b9b446852c3063a5a6d5b7",
+  "external_pins": 11
+}
