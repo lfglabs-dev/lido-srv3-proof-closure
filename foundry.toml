@@ -16,3 +16,14 @@ src = "solidity/minfirst/src"
 test = "solidity/minfirst/test"
 out = "solidity/out/minfirst"
 cache_path = "solidity/cache/minfirst"
+
+# Pinned StakingRouter.deposit against DepositNFrameTx via FFI.
+[profile.deposit_source]
+src = "solidity/deposit/src"
+test = "solidity/deposit/test"
+out = "solidity/out/deposit"
+cache_path = "solidity/cache/deposit"
+remappings = [
+  "contracts/=lido-core/contracts/",
+  "@openzeppelin/contracts-v5.2/=audit/deposit-dsm-call/solidity/src/@openzeppelin/contracts-v5.2/"
+]
