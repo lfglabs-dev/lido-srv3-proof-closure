@@ -22,7 +22,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 | [`P-ALLOC-2`](#p-alloc-2) | CHECKED | CHECKED | 4 open | **IMPLEMENTATION_PENDING** |
 | [`P-DEPOSIT-1`](#p-deposit-1) | CHECKED | CHECKED | 3 open | **IMPLEMENTATION_PENDING** |
 | [`P-TOPUP-1`](#p-topup-1) | CHECKED | CHECKED | 1 open | **IMPLEMENTATION_PENDING** |
-| [`P-ACCOUNT-1`](#p-account-1) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
+| [`P-ACCOUNT-1`](#p-account-1) | CHECKED | CHECKED | 5 open | **IMPLEMENTATION_PENDING** |
 | [`P-RESERVE-1`](#p-reserve-1) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
 | [`P-CONSOLIDATION-ETH-1`](#p-consolidation-eth-1) | CHECKED | CHECKED | 11 open | **IMPLEMENTATION_PENDING** |
 | [`P-ADDRESS-1`](#p-address-1) | CHECKED | CHECKED | 7 open | **IMPLEMENTATION_PENDING** |
@@ -157,12 +157,11 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
 
-**Limitations — 6 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+**Limitations — 5 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
 - SRStorage membership and unique uint24 module ids
 - accountingOracle caller and REPORT_EXITED_VALIDATORS_ROLE
 - submitReportData / _handleConsensusReportData
-- packed uint64 accounting words
 - re-read of the written router snapshot for rewards
 - full live-report success is still not modeled; the demoted child now states only local accepted constructor order through sourceTraceRetired
 
@@ -740,6 +739,11 @@ LidoSRv3.Tests.PackCSszMutants.engine_mutant_disagrees_with_sha256engine._native
 LidoSRv3.Tests.PackFConsolidationObserveMutants.swapped_map_reread_kill_line_refutes_observe._native.native_decide.ax_1_1
 LidoSRv3.Tests.PackGTopupProvenanceMutants.dead_beacon_model_kill_line_disagrees_with_pin._native.native_decide.ax_1_1
 LidoSRv3.Tests.PackJTopupEthJournalMutants.beacon_as_consolidation_kill_line_refutes_dest_restriction._native.native_decide.ax_1_1
+LidoSRv3.Tests.AccountPackedWordsMutants.sample_observe_total._native.native_decide.ax_1_1
+LidoSRv3.Tests.AccountPackedWordsMutants.sample_persist_is_packed_zero._native.native_decide.ax_1_1
+LidoSRv3.Tests.AccountPackedWordsMutants.sample_getter_recovers._native.native_decide.ax_1_1
+LidoSRv3.Tests.AccountPackedWordsMutants.sample_width32_kill_line._native.native_decide.ax_1_1
+LidoSRv3.Tests.AccountPackedWordsMutants.sample_offset64_kill_line._native.native_decide.ax_1_1
 LidoSRv3.Tests.TopupReturnBufferMutants.decode_at_credentials_next_128._native.native_decide.ax_1_1
 LidoSRv3.Tests.TopupReturnBufferMutants.decode_at_credentials_next_160._native.native_decide.ax_1_1
 ```

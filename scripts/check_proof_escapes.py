@@ -26,8 +26,8 @@ LIBRARY_ROOTS = ("LidoSRv3.lean",)
 # Corrected295 consolidation tests add85 sites and move existing test lines.
 # Exact delta: audit/consolidation-gateway-call/native-inventory.json.
 # This records native-backed regressions; it does not grant kernel-proof credit.
-NATIVE_DECIDE_COUNT = 414
-NATIVE_DECIDE_SHA256 = "9bcec76d5cf2facd99b2308f21388515eb8cdb5ce5b145ac6638670a596240a0"
+NATIVE_DECIDE_COUNT = 421
+NATIVE_DECIDE_SHA256 = "aa918b5424287ce4c6893ebf24983b0a2c013b3d549a226a9bdafad369c84c18"
 ESCAPES = (
     ("sorry", re.compile(r"\bsorry\b")),
     ("admit", re.compile(r"\badmit\b")),
