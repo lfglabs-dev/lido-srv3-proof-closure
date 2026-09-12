@@ -328,6 +328,135 @@ theorem router_source_cap_within_block_cap
   -- from the definition at TopupCorrespondence.lean:337-339.
   exact Nat.le_trans hAggr hCap
 
+/-! ## Chantier 4bis (Thomas 2026-09-12): P-TOPUP-2 exact-sum bound under gateway-shape premise
+
+The `router_source_cap_within_block_cap` above is honest at the router
+level ALONE, but the wrap it disclosed is UNREACHABLE in the pinned
+deployment because the pinned `TopUpGateway` constructs its
+`topUpLimits[i]` as `_evaluateTopUpLimit(...) * 1 gwei`
+(`TopUpGateway.sol:226`); the evaluator's output is bounded by
+`targetBalanceGwei : uint64`, so every limit is at most
+`(2^64 - 1) * 10^9 < 2^73`. The number of keys is bounded by
+`maxValidatorsPerTopUp : uint64`, so at most `2^64 - 1`. And
+`StakingRouter.topUp` at line 686 (`_checkAppAuth(_getTopUpGateway())`)
+only admits the top-up gateway as caller — no other caller can supply
+non-gateway-shaped limits.
+
+Composing these gives:
+- Each admitted allocation ≤ its `topUpLimits[i]` (source line 728) ≤
+  `(2^64 - 1) * 10^9`.
+- Sum over ≤ `2^64 - 1` keys of values < `2^73` is < `2^64 * 2^73 =
+  2^137 << 2^256`.
+- Therefore `allocSum inp.allocations < uint256Modulus`, so
+  `allocSumUnchecked inp.allocations = allocSum inp.allocations`
+  (no wrap; `allocSumUnchecked_eq_allocSum`).
+- Combined with `hAggr`, the EXACT sum ≤ `maxTopUpPerBlockGwei * gwei`.
+
+The registered signal narrowing therefore becomes: **exact under
+gateway-shape premise, wrapped otherwise**. The premise is named in
+the theorem's statement and captured by `GatewayShapedInput`; the
+residual is what the premise assumes about the caller's construction
+of `topUpLimits` and about the router's admission chain.
+
+The `router_source_cap_within_block_cap` above is retained as an
+unregistered lemma used inside this composition; the composition
+below is the new registered abstract parent (per the general rule
+from Thomas 2026-09-12 — a weakened claim must be composed with a
+real-form premise before being registered). -/
+
+/-- `2^64 - 1`, the Solidity uint64 upper bound. -/
+def uint64Max : Nat := 2 ^ 64 - 1
+
+/-- Gateway-shape premise: the pinned `TopUpGateway.sol:226`
+constructs `topUpLimits[i] = _evaluateTopUpLimit(...) * 1 gwei` where
+the evaluator's output is bounded by `targetBalanceGwei : uint64`,
+and the number of keys is bounded by `maxValidatorsPerTopUp : uint64`.
+This premise DOES NOT claim that any specific caller supplied the
+limits; it only asserts that the limits and length have the shape a
+gateway-constructed call would have. Under `StakingRouter.topUp:686`,
+the top-up gateway is currently the only admitted caller (a
+consequence of the pinned SR access-control chain, disclosed as the
+premise residual). -/
+structure GatewayShapedInput (inp : SolidityTopup.SourceTopupInput) : Prop where
+  lengthBound : inp.allocations.length ≤ uint64Max
+  perElementBound : ∀ a ∈ inp.allocations, a ≤ uint64Max * GWEI
+
+private theorem list_sum_le_length_mul_bound (xs : List Nat) (bound : Nat)
+    (hAll : ∀ a ∈ xs, a ≤ bound) :
+    xs.sum ≤ xs.length * bound := by
+  induction xs with
+  | nil => simp
+  | cons x rest ih =>
+      simp only [List.sum_cons, List.length_cons]
+      have hx : x ≤ bound := hAll x List.mem_cons_self
+      have htail : rest.sum ≤ rest.length * bound :=
+        ih (fun a ha => hAll a (List.mem_cons_of_mem _ ha))
+      calc x + rest.sum ≤ bound + rest.length * bound := Nat.add_le_add hx htail
+        _ = (rest.length + 1) * bound := by
+              rw [Nat.add_mul, Nat.one_mul, Nat.add_comm]
+
+private theorem gateway_sum_lt_uint256Modulus
+    {inp : SolidityTopup.SourceTopupInput}
+    (hShape : GatewayShapedInput inp) :
+    SolidityTopup.allocSum inp.allocations < SolidityTopup.uint256Modulus := by
+  -- Chain: allocSum ≤ len * (uint64Max * GWEI) ≤ uint64Max * (uint64Max * GWEI)
+  --                                             < 2^64 * 2^64 * 10^9 = 2^128 * 10^9
+  --                                             < 2^128 * 2^30 = 2^158 < 2^256.
+  have hlist : List.sum inp.allocations ≤
+      inp.allocations.length * (uint64Max * GWEI) :=
+    list_sum_le_length_mul_bound _ _ hShape.perElementBound
+  have hlist' : SolidityTopup.allocSum inp.allocations ≤
+      inp.allocations.length * (uint64Max * GWEI) := by
+    have hEq : SolidityTopup.allocSum inp.allocations = List.sum inp.allocations := by
+      induction inp.allocations with
+      | nil => rfl
+      | cons a rest ih => simp [SolidityTopup.allocSum, List.sum_cons, ih]
+    rw [hEq]; exact hlist
+  have hlen : inp.allocations.length * (uint64Max * GWEI) ≤
+      uint64Max * (uint64Max * GWEI) := Nat.mul_le_mul_right _ hShape.lengthBound
+  have hStrict : uint64Max * (uint64Max * GWEI) < SolidityTopup.uint256Modulus := by
+    unfold uint64Max GWEI SolidityTopup.uint256Modulus
+    decide
+  exact Nat.lt_of_le_of_lt (Nat.le_trans hlist' hlen) hStrict
+
+/-- **P-TOPUP-2, abstract plane (chantier 4bis, Thomas 2026-09-12):
+new registered abstract parent under the gateway-shape premise.**
+
+Under the pinned gateway construction of `topUpLimits[i]` (bounded by
+uint64 * gwei) and key-count bound (bounded by uint64), the sum is
+under `2^256`, so no wrap occurs. Combined with the router's aggregate
+guard at line 737, the EXACT sum is bounded by
+`maxTopUpPerBlockGwei * gwei`.
+
+Residual named in `fidelity.missing`: the premise assumes the caller
+constructs its `topUpLimits` as the pinned `TopUpGateway.sol:226`
+does; under `StakingRouter.topUp:686` (`_checkAppAuth(_getTopUpGateway())`)
+this is the only admitted caller today. Under any non-gateway caller
+the `router_source_cap_within_block_cap` (retained as lemma) bounds
+only the WRAPPED sum. -/
+theorem router_exact_sum_bounded_under_gateway_shape
+    {cfg : SolidityTopup.SourceTopupConfig} {inp : SolidityTopup.SourceTopupInput}
+    (hShape : GatewayShapedInput inp)
+    (hAggr : SolidityTopup.accumulated inp ≤
+      SolidityTopup.smDepositableEthAmountRounded cfg inp) :
+    SolidityTopup.allocSum inp.allocations ≤ inp.maxTopUpPerBlockGwei * cfg.gwei := by
+  -- Under the gateway-shape premise, wrap is unreachable.
+  have hNoWrap : SolidityTopup.allocSum inp.allocations <
+      SolidityTopup.uint256Modulus :=
+    gateway_sum_lt_uint256Modulus hShape
+  -- Under no-wrap: allocSum = allocSumUnchecked = accumulated.
+  have hEq : SolidityTopup.allocSumUnchecked inp.allocations =
+      SolidityTopup.allocSum inp.allocations :=
+    SolidityTopup.allocSumUnchecked_eq_allocSum hNoWrap
+  have hAccu : SolidityTopup.accumulated inp =
+      SolidityTopup.allocSum inp.allocations := by
+    unfold SolidityTopup.accumulated
+    exact hEq
+  -- Compose with router_source_cap_within_block_cap to lift to block cap.
+  have hCap := router_source_cap_within_block_cap hAggr
+  rw [hAccu] at hCap
+  exact hCap
+
 /-- P-TOPUP-2 is closed on the abstract Nat cap and on a composed faithful
 `Contract.run` transaction that computes allocation/share observables.
 The composed Verity theorem lives in this namespace via
