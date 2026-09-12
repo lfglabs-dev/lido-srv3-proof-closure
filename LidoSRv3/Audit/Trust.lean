@@ -143,6 +143,8 @@ import LidoSRv3.Audit.Source.ReserveUnfinalizedCall
 import LidoSRv3.Audit.Source.AccountFeeShares
 import LidoSRv3.Audit.Source.AccountPackedWords
 import LidoSRv3.Tests.AccountPackedWordsMutants
+import LidoSRv3.Audit.Verity.TopupUnboundedCount
+import LidoSRv3.Audit.Verity.TopupMultiCallBlockCap
 import LidoSRv3.Audit.Source.DepositLinksSource
 import LidoSRv3.Tests.PackGTopupProvenanceMutants
 import LidoSRv3.Audit.Provenance.ConsolidationRequest
@@ -1740,6 +1742,21 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.AccountPackedWordsMutants.sample_getter_recovers
 #print axioms LidoSRv3.Tests.AccountPackedWordsMutants.sample_width32_kill_line
 #print axioms LidoSRv3.Tests.AccountPackedWordsMutants.sample_offset64_kill_line
+
+-- P-TOPUP-2 unbounded count + same-block accumulation bound (grok
+-- #409 / see `audit/topup2-unbounded/README.md`). The leftover walk
+-- is proved for every key-list length (unbounded induction);
+-- registered parent stays at the 32 instance. Same-block accumulation
+-- across calls is bounded under `minBlockDistance ≥ 1` and
+-- `blockNumber ≠ 0`; a no-lock mutant exceeds the cap, the public
+-- entry refuses that second call. Closes the "same-block accumulation
+-- across calls is excluded from the single-call parent" half of the
+-- corresponding P-TOPUP-2 fidelity.missing entry.
+#print axioms LidoSRv3.Audit.Verity.TopupUnboundedCount.leftover_walk_sum_le_budget
+#print axioms LidoSRv3.Audit.Verity.TopupMultiCallBlockCap.same_block_sum_le_cap
+#print axioms LidoSRv3.Audit.Verity.TopupMultiCallBlockCap.setter_refuses_zero
+#print axioms LidoSRv3.Audit.Verity.TopupMultiCallBlockCap.no_lock_two_call_exceeds_cap
+#print axioms LidoSRv3.Audit.Verity.TopupMultiCallBlockCap.router_only_two_call_exceeds_cap
 
 -- P-DEPOSIT-1 LinksSource firstAmount / publicKeysBatchLength derived
 -- from pinned router shape (grok #405 / see `audit/deposit-linkssource/

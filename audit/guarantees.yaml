@@ -425,10 +425,11 @@
           "per-key bound per_key_bounded_by_candidate: every transition allocation is paired with and no greater than its requested/evaluated candidate",
           "executor sourceRun plus separately copied sourceRunIndependent/sourceLimitsIndependent/sourceCandidatesIndependent/sourceConsumeIndependent equations with proved equality bridges; an explicit decoded gwei-normalized topUpLimits array is checked against gateway evaluation and caps each request; observe reads persisted allocations and budget slots",
           "Contract.run rollback after intermediate writes",
-          "maxValidatorsPerTopUp guard enforced as checked revert on count>32; the no-check mutant is guard-necessity evidence outside the registered Verity parent's count <= 32 premise"
+          "maxValidatorsPerTopUp guard enforced as checked revert on count>32; the no-check mutant is guard-necessity evidence outside the registered Verity parent's count <= 32 premise",
+          "unbounded count and same-block accumulation bounds (grok #409): TopupUnboundedCount.leftover_walk_sum_le_budget proves the leftover walk is bounded for every key-list length (unbounded induction); registered parent stays the count=32 instance. TopupMultiCallBlockCap.same_block_sum_le_cap: under minBlockDistance \u2265 1 and blockNumber \u2260 0, the sum across sequential same-block calls is bounded by maxTopUpPerBlockGwei. Kill-lines no_lock_two_call_exceeds_cap and router_only_two_call_exceeds_cap refute the cap without the lock. Axioms only propext / Quot.sound. Discharged via LidoSRv3/Audit/Verity/TopupUnboundedCount.lean and LidoSRv3/Audit/Verity/TopupMultiCallBlockCap.lean."
         ],
         "missing": [
-          "_verifyValidator / 0x02 module WC / block-distance / RootPrecedesLastTopUp; same-block accumulation across calls is excluded from the single-call parent",
+          "_verifyValidator / 0x02 module WC / block-distance / RootPrecedesLastTopUp (the same-block accumulation half is closed by grok #409 \u2014 see covered).",
           "live wei conversion and the module-selected allocateDeposits return/policy",
           "Lido withdrawDepositableEther and beacon makeBeaconChainTopUp",
           "gwei versus wei units and 48-byte pubkeys",
