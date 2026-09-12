@@ -75,6 +75,7 @@ import LidoSRv3.Audit.Guarantees.PAlloc1TargetMultBounded
 import LidoSRv3.Audit.Guarantees.PTopup1SRStoragePremise
 import LidoSRv3.Audit.Guarantees.PReserve1LidoStoragePremise
 import LidoSRv3.Audit.Guarantees.PAddress1BridgeCallPremise
+import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Guarantees.PAlloc1Phase3
 import LidoSRv3.Audit.Guarantees.PAlloc2
 import LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound
@@ -813,6 +814,11 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- boolean: naming scaffold PinnedBridgeCallShape names the pinned Bridge CALL
 -- entry point. Real Bridge-to-source glue is the follow-up.
 #print axioms LidoSRv3.Audit.Guarantees.PAddress1BridgeCallPremise.externalCallSucceeds_derived_under_pinned_bridge_shape
+-- General rule (Thomas 2026-09-12) applied to P-CONSOLIDATION-ETH-1
+-- feePerRequest free Nat: naming scaffold PinnedFeeStaticcallShape
+-- names the pinned WithdrawalVaultEIP7685.sol:79-81 STATICCALL entry
+-- point. Real live-STATICCALL model is the follow-up.
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise.feePerRequest_derived_under_pinned_fee_staticcall_shape
 #print axioms LidoSRv3.Tests.ConsolidationEthUnboundedFuelMutants.truncated_fuel_batchSize_plus_three_exhausted
 #print axioms LidoSRv3.Tests.ConsolidationEthUnboundedFuelMutants.truncated_fuel_must_be_refused
 #print axioms LidoSRv3.Tests.ConsolidationEthUnboundedFuelMutants.parent_fuel_premise_excludes_batch_29
