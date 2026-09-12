@@ -26,14 +26,14 @@ from source_spans import span_identity
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
 SOURCE_FIDELITY = AUDIT / "SOURCE-FIDELITY.md"
-R1_REVIEW_BASE = "4f325975c60eee4d81d524d68f7b22a64b430c6d"
+R1_REVIEW_BASE = "8cc189f01d47968d05cb8c2ee1087c3cf9ec0aae"
 # Bind the report inputs to the recorded Git object and exact bytes.
 # Changed inputs must never inherit an earlier source review.
 # This exact family is every structured input used to render the R1 review
 # report.  A normal regeneration may never pair changed family content with a
 # stale certified basis.
 R1_REPORT_INPUT_SHA256 = {
-    "audit/guarantees.yaml": "dbd14ec29636c7dff80100cdbd7e91d629f65629da003330feb8f0a790d65a7a",
+    "audit/guarantees.yaml": "72e3a065b2c34597285e3bc10177e0faa7cb58f3de4358322737377de94ddbe2",
     "audit/source-map.yaml": "33040d89e1b1b93dd5cd5b7e855d45eee0883caec1629ee64fe6199a143619fb",
     "audit/trust-native-decide-allowlist.txt": "4676e3021844b17f62e9fcb11069c5a09fcede77977b5af2242c455bfa7d38c6",
 }
