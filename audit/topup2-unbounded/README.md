@@ -11,7 +11,7 @@
 - **Lean toolchain:** `leanprover/lean4:v4.31.0` (`lean-toolchain`)
 - **Verity pin:** `e977aaad6e1a9e92e0132d41b3d33a14135a4d46` (`lakefile.lean`)
 - **Claimed by:** grok cloud agent, 2026-09-12
-- **Status:** CLAIM — additive lot; Spark raccord is a later agent
+- **Status:** ready — both bounds lifted; Spark raccord is a later agent
 
 This lot does **not** claim the already-merged TOPUP pointer-origin / keccak
 lanes and does **not** claim Spark `A-ABSTRACT-TX`. No `spark/*` branch or PR
@@ -128,6 +128,9 @@ imports of those tests. `lakefile.lean` is not edited (Spark raccord may add
 
 ## Controls
 
+Verified at `/workspace`, toolchain `leanprover/lean4:v4.31.0`, Solidity pin
+`17005714f151e5502c559932319a3f2f74ac2436`.
+
 ```
 lake build LidoSRv3.Tests.TopupUnboundedCountMutants
 lake build LidoSRv3.Tests.TopupUnboundedMultiCallMutants
@@ -135,4 +138,13 @@ lake build LidoSRv3Test
 ```
 
 `#print axioms` on every export: only `propext` / `Classical.choice` /
-`Quot.sound`. No `sorry`, no stub, no renamed premise.
+`Quot.sound` (or none). No `sorry`, no stub, no renamed premise.
+
+## Commits
+
+| SHA | Lot | Proved under | Open |
+| --- | --- | --- | --- |
+| `43903ef1` | claim | — | both bounds |
+| `e642630a` | prove | leftover walk ∀ keys; `minBlockDistance ≥ 1`; `blockNumber ≠ 0` | Spark raccord |
+| `2688fcdd` | test | 33-key lockstep; honest n=2 sum = cap; no-lock sum = 2×cap | — |
+| `182b2220` | fix | same; no `sorryAx` | Spark raccord / live wei / SSZ |
