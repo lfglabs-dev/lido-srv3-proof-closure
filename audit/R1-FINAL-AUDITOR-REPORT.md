@@ -4,7 +4,7 @@
 
 ## Decision
 
-Review basis: structured inputs including the accepted TOPUP constructor provenance disclosure (theorem registrations and statuses unchanged; prior PR250 basis `ffd6ae4d5be0a5e1e7d1be335700e58ca90771f5` and exact input delta retained in `audit/metadata-reconcile/report-basis.json`; this revision is not a new independent certification; trio composition scoped separately) `09d3adde34bde6d79b598bd9bc1a1a5cd092a2df`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
+Review basis: structured inputs including the accepted TOPUP constructor provenance disclosure (theorem registrations and statuses unchanged; prior PR250 basis `ffd6ae4d5be0a5e1e7d1be335700e58ca90771f5` and exact input delta retained in `audit/metadata-reconcile/report-basis.json`; this revision is not a new independent certification; trio composition scoped separately) `e7b11d6c8686ef074175a728e380fe456496271d`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
 
 ## Architecture and evidence boundary
 
@@ -657,7 +657,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Limitations — 5 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
-- SHA-256 functional correctness remains an out-of-scope scope-boundary disclosure (retained at registry level per audit schema; see LidoSRv3/Audit/Provenance/SszSha256Isolation.lean for the isolation showing no registered SSZ theorem kernel-depends on sha256_correct). combine is abstract; the produced-digest-equals-FIPS-SHA-256 claim is never asserted.
+- A-SHA256-FFI on the opaque Compiler.Sha256.Engine.sha256 definition: SszSha256Isolation.lean shows no registered SSZ theorem's #print axioms mentions sha256_correct, but the opaque symbol is consumed by the registered parents and by combine, so the assumption is embedded in the definitional shape of the model. RECLASSED in PR #400, REINSTATED per mandate 2026-09-12. combine is abstract; the produced-digest-equals-FIPS-SHA-256 claim is never asserted.
 - the constructor pin is an in-repo literal, not a live-deployment identity
 - the BEACON_ROOTS model is not a deployed-address or codehash identity
 - .verityTx CHECKED is the modeled list lookup (executeRead = rfl), not Contract.run at the EIP-4788 precompile address; history cells are caller-supplied
