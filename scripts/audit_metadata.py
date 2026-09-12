@@ -33,7 +33,7 @@ R1_REVIEW_BASE = "ca785a6193df436c1e5bb72f9eeec51d04f64ff9"
 # report.  A normal regeneration may never pair changed family content with a
 # stale certified basis.
 R1_REPORT_INPUT_SHA256 = {
-    "audit/guarantees.yaml": "40e071cc0832ff90e8c296bf931bf6d3bb2a9fbaa7e751816742e8674024d8f5",
+    "audit/guarantees.yaml": "aa940a7b9526290eafc51976b98666f3cf4fdb8cb045a8a3c7868b629bf49e91",
     "audit/source-map.yaml": "0711e13088159cc092c4a4cfdf2111eedefa39b744d02dbe1957db31da30cd2e",
     "audit/trust-native-decide-allowlist.txt": "4676e3021844b17f62e9fcb11069c5a09fcede77977b5af2242c455bfa7d38c6",
 }
@@ -97,7 +97,7 @@ EXPECTED_CANONICAL_DETAIL_SHA256 = {
     "P-ACCOUNT-1": "a4fb7f20ffd6fd9910506d6a8b23804fafd0e3c568aa29bf97f3bf26b0d4ac56",
     "P-RESERVE-1": "eb6a0affec058fe8f7e735966799ec574614f818c957f8b7904a92003dd60848",
     "P-CONSOLIDATION-ETH-1": "9cede371d5e3cc68ae0efe9bbf1c3955d1636e80ec628de774ab994bee0c0f66",
-    "P-ADDRESS-1": "54a38a10487c59c28752e5a5b99cdc3ba9cb22f42296682a5a02330c40c1cbbf",
+    "P-ADDRESS-1": "2fb30dbf3e2a965a3f4c032c473cc44502dac8ee5842aa35ce628599b41ebb1a",
     "P-TOPUP-2": "98c99bfd923efa066f17b56c38e709fb2d395a180cc761543457780c6452db3e",
     "P-CONSOLIDATION-1": "0e3269248687436cbf782bebd7e0fea1d528f09e1a358cd3e2156c273619d2c1",
     "P-SSZ-1": "1331d1bf0caa59fd10b0cf9e8befd8ada3c07c6344a3b5c6f25cd0edbb4fa443",
