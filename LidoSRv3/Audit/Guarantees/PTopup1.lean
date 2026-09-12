@@ -806,21 +806,47 @@ def SourceTopupCallCorresponds (cfg : SourceTopupConfig) (inp : SourceTopupInput
   call.moduleReturndata = inp.allocations ∧
   (call.withdrawalCredentialsType = 2 ↔ inp.wcTypeIsType2 = true)
 
-/-- **P-TOPUP-1, registered Verity parent.** Every possible untrusted module
-return is guarded. On its admitted branch the actual registered transaction is
-definitionally exposed by theorem (not hidden by an observable projection) as
-the source-derived call path using router-derived WC, `_pubkeys`, zero dummy
-signature, and source SSZ roots. The legacy allocation-only theorems above are
-retained as arithmetic/rollback lemmas but are not this registered executor. -/
+/-- **P-TOPUP-1, registered Verity parent (chantier 2, mandate 2026-09-12).**
+
+Four conjuncts, each an explicit conjunct in the theorem's statement (not
+hidden by an observable projection):
+
+1. `SourceTopupCallCorresponds cfg inp call` — the concrete `TopupCall` retains
+   the byte-shape of the pinned abstract source input.
+2. `VerityGuardedReturndataSimulation cfg call state` — every possible
+   untrusted module return is guarded; on the admitted branch the registered
+   transaction is exactly the source-derived call path using router-derived
+   WC, `_pubkeys`, zero dummy signature, and source SSZ roots.
+3. `NonzeroWrapRevertsAndRestores state` — the universal nonzero-wrap close
+   on the legacy allocation-only plane (`Verity.TopupTx.execute`): every
+   word-bounded allocation list whose exact sum reaches the modulus while its
+   unchecked total is nonzero reverts without moving value and restores the
+   entry snapshot. This is the "wrap close" the theorem's name promises.
+4. `hLen → hAmt → hCommit → VerityCommittingSimulation cfg inp state` — the
+   `pulled = pushed` correspondence on the legacy allocation-only plane
+   (`Verity.TopupTx.execute`) under a committing branch (`hCommit`), plus the
+   observation equality with `sourceObservables` and the rollback-restores
+   invariant on the same plane. Conjuncts (3) and (4) are stated on the
+   legacy plane; the guarded plane's own `pulled = pushed` and observation
+   equality remain open and are disclosed in `fidelity.missing`.
+
+The prior formulation of this theorem lacked conjuncts (3) and (4) despite
+its name; per mandate 2026-09-12 that omission is now closed by changing the
+ENUNCE of the registered parent rather than by a wrapper. -/
 theorem verity_tx_simulates_source_with_nonzero_wrap_close
     (cfg : SourceTopupConfig) (inp : SourceTopupInput)
     (call : Verity.TopupTx.TopupCall)
     (state : Verity.ContractState)
     (hCall : SourceTopupCallCorresponds cfg inp call) :
     SourceTopupCallCorresponds cfg inp call ∧
-      VerityGuardedReturndataSimulation cfg call state := by
-  refine ⟨hCall, ?_⟩
-  exact
+      VerityGuardedReturndataSimulation cfg call state ∧
+      NonzeroWrapRevertsAndRestores state ∧
+      (inp.allocations.length ≤ uint256Modulus →
+        (∀ a ∈ inp.allocations, a < uint256Modulus) →
+        (run cfg inp).reverts = false →
+          VerityCommittingSimulation cfg inp state) := by
+  refine ⟨hCall, ?_, ?_, ?_⟩
+  · exact
       ⟨fun failure =>
           Verity.TopupTx.executeGuarded_binds_returndata cfg call failure _,
         fun o failure hLoop =>
@@ -833,5 +859,9 @@ theorem verity_tx_simulates_source_with_nonzero_wrap_close
         fun failure hLoop hTarget hSource =>
           Verity.TopupTx.executeGuarded_apply_of_guards_pass cfg call failure _ hLoop hTarget
             hSource⟩
+  · intro allocations hWrap hNz hAmt
+    exact verity_nonzero_wrap_reverts_and_restores allocations state hWrap hNz hAmt
+  · intro hLen hAmt hCommit
+    exact verity_tx_simulates_source cfg inp state hLen hAmt hCommit
 
 end LidoSRv3.Audit.Guarantees.PTopup1
