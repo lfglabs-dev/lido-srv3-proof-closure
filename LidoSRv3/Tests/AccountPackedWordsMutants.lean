@@ -108,11 +108,9 @@ theorem parent_ofNat_clobbers_exited
       decide)
     simpa [word, hunp] using hw
   · have hdiv : b / two64 = 0 := Nat.div_eq_of_lt hb
-    have hbmod : b < Verity.Core.Uint256.modulus := by
-      rw [← two256_eq_mod]
-      exact Nat.lt_trans hb two64_lt_two256
+    rw [hparent]
     simp only [unpackModule]
-    rw [hparent, hdiv]
+    rw [hdiv]
     exact Nat.zero_mod two64
 
 /-- Skipping the `uint64` cast (`SRLib.sol:884`) and writing the raw parent
