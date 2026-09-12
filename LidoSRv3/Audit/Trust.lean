@@ -71,6 +71,7 @@ import LidoSRv3.Audit.StrategyProofs
 import LidoSRv3.Audit.Common.Atomicity
 import LidoSRv3.Audit.Common.Bounded
 import LidoSRv3.Audit.Guarantees.PAlloc1
+import LidoSRv3.Audit.Guarantees.PAlloc1TargetMultBounded
 import LidoSRv3.Audit.Guarantees.PAlloc1Phase3
 import LidoSRv3.Audit.Guarantees.PAlloc2
 import LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound
@@ -786,6 +787,11 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- fuelBudget = 32 model artifact; the mainnet Bus ceiling is 200,
 -- so batches up to 200 fit at derived fuel batchSize + 4.
 #print axioms LidoSRv3.Audit.Verity.ConsolidationEthUnboundedFuel.verity_tx_success_at_derived_fuel_under_bus_ceiling
+-- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
+-- target_multiplication conjunct: derives shareLimit * totalValidators ≤
+-- MAX_UINT256 from pinned StakingModule.shareLimit:uint16 + totalValidators:
+-- uint64 type bounds (65535 * 2^64 << 2^256).
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc1TargetMultBounded.target_multiplication_under_pinned_type_bounds
 #print axioms LidoSRv3.Tests.ConsolidationEthUnboundedFuelMutants.truncated_fuel_batchSize_plus_three_exhausted
 #print axioms LidoSRv3.Tests.ConsolidationEthUnboundedFuelMutants.truncated_fuel_must_be_refused
 #print axioms LidoSRv3.Tests.ConsolidationEthUnboundedFuelMutants.parent_fuel_premise_excludes_batch_29

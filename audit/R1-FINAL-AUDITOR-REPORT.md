@@ -4,7 +4,7 @@
 
 ## Decision
 
-Review basis: structured inputs including the accepted TOPUP constructor provenance disclosure (theorem registrations and statuses unchanged; prior PR250 basis `ffd6ae4d5be0a5e1e7d1be335700e58ca90771f5` and exact input delta retained in `audit/metadata-reconcile/report-basis.json`; this revision is not a new independent certification; trio composition scoped separately) `db274e4a8aac71720308de04778cff7fb0a64093`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
+Review basis: structured inputs including the accepted TOPUP constructor provenance disclosure (theorem registrations and statuses unchanged; prior PR250 basis `ffd6ae4d5be0a5e1e7d1be335700e58ca90771f5` and exact input delta retained in `audit/metadata-reconcile/report-basis.json`; this revision is not a new independent certification; trio composition scoped separately) `be8268fee6657e6503902cc5c732acf3c6fddabb`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
 
 ## Architecture and evidence boundary
 
@@ -69,7 +69,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 - unique moduleAddress on addModule
 - getDepositAllocations / MinFirst fill (see P-ALLOC-2)
-- reachable-router CheckedBounds
+- reachable-router CheckedBounds (partially addressed by general rule 2026-09-12: `target_multiplication` conjunct derived from pinned uint16/uint64 type bounds via PAlloc1TargetMultBounded; three other conjuncts remain follow-ups)
 - Contract.run rollback after intermediate writes for AllocationTx.allocate; the cited revert_restores_snapshot theorem does not cover allocateLiveFromStorage
 **Trio source composition.** The new source path reads physical count/configuration, executes each response-dependent module call and checked arithmetic in source order, then performs the capacity pass. Count is derived for modeled initialization/ACL/public-writer histories; the raw-state theorem takes count <=32. It does not cap an arbitrary corrupt count. The stored producer derives output arrays from executed per-row writes.
 
