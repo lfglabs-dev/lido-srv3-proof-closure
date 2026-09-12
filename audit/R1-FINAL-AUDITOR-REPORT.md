@@ -23,10 +23,10 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 | [`P-DEPOSIT-1`](#p-deposit-1) | CHECKED | CHECKED | 8 open | **IMPLEMENTATION_PENDING** |
 | [`P-TOPUP-1`](#p-topup-1) | CHECKED | CHECKED | 4 open | **IMPLEMENTATION_PENDING** |
 | [`P-ACCOUNT-1`](#p-account-1) | CHECKED | CHECKED | 5 open | **IMPLEMENTATION_PENDING** |
-| [`P-RESERVE-1`](#p-reserve-1) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
+| [`P-RESERVE-1`](#p-reserve-1) | CHECKED | CHECKED | 12 open | **IMPLEMENTATION_PENDING** |
 | [`P-CONSOLIDATION-ETH-1`](#p-consolidation-eth-1) | CHECKED | CHECKED | 11 open | **IMPLEMENTATION_PENDING** |
 | [`P-ADDRESS-1`](#p-address-1) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
-| [`P-TOPUP-2`](#p-topup-2) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
+| [`P-TOPUP-2`](#p-topup-2) | CHECKED | CHECKED | 11 open | **IMPLEMENTATION_PENDING** |
 | [`P-CONSOLIDATION-1`](#p-consolidation-1) | CHECKED | CHECKED | 7 open | **IMPLEMENTATION_PENDING** |
 | [`P-SSZ-1`](#p-ssz-1) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
 | [`P-SSZ-1.deposit-data-root`](#p-ssz-1deposit-data-root) | CHECKED | PARTIAL | 1 open | **IMPLEMENTATION_PENDING** |
@@ -187,7 +187,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
 
-**Limitations — 6 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+**Limitations — 12 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
 - canDeposit / bunker / router authorization (now proved as scopedWithdrawGuards on any committed call, but the two booleans are still free inputs, not live bunker/pause/msg.sender checks)
 - packed uint128 buffered ether and ETH transfer
@@ -195,6 +195,12 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 - _seedDepositsCount
 - buffer is a declared oracle word, not the contract balance
 - reserve-target writer surface setDepositsReserveTarget and its report-time rebalance interaction
+- Verity `modelWithdrawDepositableEther` updates reserve words only; the pinned `Lido.sol:885` calls `stakingRouter.receiveDepositableEther.value(_amount)()`. The payable CALL (target, value, selector, order after the spend writes) is not journaled at the Verity plane. Grok differential #419 flags this as D-TRANSFER-1.
+- Verity storage is model-local slots 0-4 (`buffered` / `storedDepositsReserve` / `unfinalizedStETH` / `depositedPostReport` / `depositedNextReportAdjusted`); the pin uses keccak unstructured positions (`BUFFERED_ETHER_AND_DEPOSITED_POST_REPORT_POSITION`, `DEPOSITS_RESERVE_POSITION`, ...) and a packed uint128 pair for buffer + post-report. Storage identity between the model observation cells and the deployed layout is not claimed. Grok differential #419 flags this as D-SLOT-1.
+- Verity SafeMath overflow on `depositedPostReport +=` uses a model string `DEPOSITED_POST_REPORT_OVERFLOW`; the pinned 0.4.24 `SafeMath.add` reverts without a specific string. The four live wrapper strings (`CAN_NOT_DEPOSIT`, `APP_AUTH_FAILED`, `ZERO_AMOUNT`, `NOT_ENOUGH_ETHER`) match. Grok differential #419 flags this as D-OVERFLOW-STRING-1.
+- Verity does not model the packed uint128 pair `buffered`/`depositedPostReport` (Lido.sol:131-132). A seeded `depositedPostReport = uint128.max + 1 ether` still fits uint256 SafeMath in the model; the pin's 0.4.24 `<< 128` wraps the high half. The registered parent cannot see the pack wrap. Grok differential #419 flags this as D-PACK-1.
+- Verity omits `_seedDepositsCount` bookkeeping (Lido.sol:877-882) and the `Unbuffered` / `DepositedPostReportUpdated` events. Grok differential #419 flags this as D-SEED-1 / D-EVENT-1.
+- Verity allocation helper uses `safeSub` and returns `ALLOCATION_ARITHMETIC` on overflow; the pinned 0.4.24 helper does raw `remaining -=` (unchecked wrap). The `min` bounds make that branch unreachable on the grok harness vectors. Grok differential #419 flags this as D-WRAP-1.
 **Trio source composition.** Independent ordered status, authorization/locator, live queue/frame calls, ABI decoding, partition arithmetic, spending and receiver-tail relations cover every withdrawal outcome and root rollback. Physical protection is separately proved for the concrete bound queue/consensus/receiver pipeline, including final physical accounting and the next live queue demand. Generic arbitrary successful callbacks are not promised reserve protection.
 
 **Composition validation.** SOURCE COMPOSITION CANDIDATE; final independent review and official exact-source gates pending. Legacy primary guarantee registrations remain unchanged.
@@ -269,7 +275,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
 
-**Limitations — 6 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+**Limitations — 11 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
 - _verifyValidator / 0x02 module WC / block-distance / RootPrecedesLastTopUp (the same-block accumulation half is closed by grok #409 — see covered).
 - live wei conversion and the module-selected allocateDeposits return/policy
@@ -277,6 +283,11 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 - gwei versus wei units and 48-byte pubkeys
 - keccak memory-array oracle
 - pendingBalanceGwei is trusted operator calldata
+- Verity `sourceRun` applies a leftover-budget walk (`sourceConsume`) that the pinned `TopUpGateway.sol:226-232` does not execute; the pin writes `topUpLimits[i] = _evaluateTopUpLimit(...) * 1 gwei` independently per index. For two keys each eligible for 20 gwei with `remainingCap = 20`, source limits are `[20, 20]` but `sourceRun` produces `[20, 0]`. Grok differential #417 flags this as D-CONSUME-1.
+- Verity `evaluateTopUpLimit` does not take slash / exit as inputs; pinned `_evaluateTopUpLimit` (TopUpGateway.sol:403-405) returns 0 when `exitEpoch != FAR_FUTURE_EPOCH` or `slashed`. A slashed validator with a supplied `topUpLimits = [0]` (the pin) fails `evaluatedLimits != topUpLimits` and returns `none`. Grok differential #417 flags this as D-SLASH-1.
+- Verity `sourceRun` sees numeric arrays only; the pinned `:160-223` prefix guards `onlyRole(TOP_UP_ROLE)` (D-AUTH-1), strictly increasing indices (D-SORT-1), type-0x02 WC (D-WC-1), 48-byte pubkeys (D-PUBKEY-1), and `maxValidatorsPerTopUp` (D-MAX-1) are not exercised at the Verity plane. Grok differential #417.
+- Verity `sourceRun` stays in gwei; the pinned line 226 multiplies by `1 gwei` before the router call. Comparing `used` to on-chain `topUpLimits[i]` is a 10^9 disagreement unless the harness converts. Grok differential #417 flags this as D-UNITS-1.
+- Verity `used` is the leftover-consumed total; the pinned `totalLimits +=` sits in `unchecked` and gates `_setLastTopUpData` (D-TOTAL-1). Grok differential #417.
 
 **Classification.** **IMPLEMENTATION_PENDING** — Keep the checked block-cap parent, its pointwise per-key child, explicit gwei-normalized per-key limit input, and the mutant-budget kill-line. Next model the wei conversion and module-selected allocateDeposits result. Keep the 32-guard witness labeled as premise/guard necessity; do not compose with P-TOPUP-1.
 
