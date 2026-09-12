@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Source.AddressCorrespondence
+import LidoSRv3.Audit.Source.BridgeCallResultSource
 
 /-! # P-ADDRESS-1 externalCallSucceeds naming scaffold
 
@@ -75,5 +76,34 @@ theorem externalCallSucceeds_derived_under_pinned_bridge_shape
     (hPinned : PinnedBridgeCallShape inp) :
     inp.externalCallSucceeds = true :=
   hPinned.externalCallSucceedsBecausePinned
+
+/-! ## Real-derivation composition (2026-09-13, first step)
+
+Real derivation past the naming scaffold: `externalCallSucceeds`
+routes through the source-defined function
+`externalCallSucceedsFromBridge` on a named `BridgeCallOutcome`. -/
+
+/-- Linkage premise: the `Input.externalCallSucceeds` field is
+functionally determined by a source-level Bridge outcome via
+`externalCallSucceedsFromBridge`. -/
+structure ExternalCallFromBridge
+    (inp : Input)
+    (outcome : LidoSRv3.Audit.Source.BridgeCallResultSource.BridgeCallOutcome) : Prop where
+  externalCallMatchesBridge :
+    inp.externalCallSucceeds =
+      LidoSRv3.Audit.Source.BridgeCallResultSource.externalCallSucceedsFromBridge outcome
+
+/-- Real-derivation composition: under the Bridge outcome premise
+(callee succeeded) AND the linkage premise, the input's
+`externalCallSucceeds` is `true` — derived via the source-defined
+function, not caller-supplied. -/
+theorem externalCallSucceeds_derived_from_bridge_outcome
+    {inp : Input}
+    {outcome : LidoSRv3.Audit.Source.BridgeCallResultSource.BridgeCallOutcome}
+    (hLink : ExternalCallFromBridge inp outcome)
+    (hSucceeded : outcome.succeeded = true) :
+    inp.externalCallSucceeds = true := by
+  rw [hLink.externalCallMatchesBridge]
+  exact LidoSRv3.Audit.Source.BridgeCallResultSource.externalCallSucceeds_true_of_bridge_succeeded hSucceeded
 
 end LidoSRv3.Audit.Guarantees.PAddress1BridgeCallPremise
