@@ -26,14 +26,14 @@ from source_spans import span_identity
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
 SOURCE_FIDELITY = AUDIT / "SOURCE-FIDELITY.md"
-R1_REVIEW_BASE = "67075346102c9bf3c8c0e442c441565766185373"
+R1_REVIEW_BASE = "2bf7e6ffe026cd1a32606822cb2d2f86420d9751"
 # Bind the report inputs to the recorded Git object and exact bytes.
 # Changed inputs must never inherit an earlier source review.
 # This exact family is every structured input used to render the R1 review
 # report.  A normal regeneration may never pair changed family content with a
 # stale certified basis.
 R1_REPORT_INPUT_SHA256 = {
-    "audit/guarantees.yaml": "b795f0c731973ef5a43d70552400392eb51671be10a3df97afe791d53097a973",
+    "audit/guarantees.yaml": "aa940a7b9526290eafc51976b98666f3cf4fdb8cb045a8a3c7868b629bf49e91",
     "audit/source-map.yaml": "0711e13088159cc092c4a4cfdf2111eedefa39b744d02dbe1957db31da30cd2e",
     "audit/trust-native-decide-allowlist.txt": "4676e3021844b17f62e9fcb11069c5a09fcede77977b5af2242c455bfa7d38c6",
 }
@@ -52,6 +52,7 @@ SUBORDINATE_IDS = [
     "P-SSZ-1.encoding-simulation",
     "P-TOPUP-2.leftover-budget-walk",
     "P-TOPUP-2.router-inversion",
+    "P-ADDRESS-1.recipient-call-bridge",
     "P-ADDRESS-1.denote-admission",
     "P-RESERVE-RELATIONAL",
     "P-ALLOC-EXEC-1", "P-ETH-JOURNAL-1", "P-VAULT-ETH-1", "P-ORACLE-SUPPLY-1",
@@ -96,7 +97,7 @@ EXPECTED_CANONICAL_DETAIL_SHA256 = {
     "P-ACCOUNT-1": "a4fb7f20ffd6fd9910506d6a8b23804fafd0e3c568aa29bf97f3bf26b0d4ac56",
     "P-RESERVE-1": "eb6a0affec058fe8f7e735966799ec574614f818c957f8b7904a92003dd60848",
     "P-CONSOLIDATION-ETH-1": "9cede371d5e3cc68ae0efe9bbf1c3955d1636e80ec628de774ab994bee0c0f66",
-    "P-ADDRESS-1": "08a266711ae5f4551b03ddaf2ff1193d958d7e8a0da2727fedc76241c9c30206",
+    "P-ADDRESS-1": "2fb30dbf3e2a965a3f4c032c473cc44502dac8ee5842aa35ce628599b41ebb1a",
     "P-TOPUP-2": "98c99bfd923efa066f17b56c38e709fb2d395a180cc761543457780c6452db3e",
     "P-CONSOLIDATION-1": "0e3269248687436cbf782bebd7e0fea1d528f09e1a358cd3e2156c273619d2c1",
     "P-SSZ-1": "1331d1bf0caa59fd10b0cf9e8befd8ada3c07c6344a3b5c6f25cd0edbb4fa443",
