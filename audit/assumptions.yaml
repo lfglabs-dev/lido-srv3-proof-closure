@@ -37,16 +37,6 @@
       "removal_path": "Derive positivity of the vault\u2019s forwarded value from a justified fee condition and a composed calling path, or separately revise the theorem\u2019s positive-fee claim."
     },
     {
-      "id": "A-HANDWRITTEN-MINFIRST",
-      "accepted": true,
-      "risk": "The handwritten MinFirst model lacks established Solidity and EVM equivalence.",
-      "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
-      "severity": "MEDIUM",
-      "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
-      "validation": "Validated by the linked source spans, executable mutants, or explicit reproduction command where available.",
-      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
-    },
-    {
       "id": "A-VERITY-SCAFFOLD",
       "accepted": true,
       "risk": "The Verity 4.31 scaffold is non-certified.",
