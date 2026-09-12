@@ -224,8 +224,11 @@ theorem executeConsolidation_committed_forwards_msgValue
           · cases hacc : gatewayAccepts
             · simp [executeConsolidation, hp, ht, hearly, hacc] at h
             · simp [executeConsolidation, hp, ht, hearly, hacc] at h
-              -- On the committed arm the produced call carries the input msgValue.
-              simp [h]
+              -- On the committed arm the produced call is
+              -- `⟨groups, caller, msgValue⟩`; injection gives
+              -- `call = ⟨groups, caller, msgValue⟩`, so `call.value = msgValue`.
+              obtain ⟨_, hcall, _⟩ := h
+              subst hcall
               rfl
 
 end audit.trio.consolidation
