@@ -53,6 +53,9 @@ structure GatewayDistanceState where
 def minBlockDistanceAdmitted (n : Nat) : Prop :=
   n ≠ 0 ∧ n ≤ 2 ^ 16 - 1
 
+instance (n : Nat) : Decidable (minBlockDistanceAdmitted n) :=
+  inferInstanceAs (Decidable (_ ∧ _))
+
 theorem setter_refuses_zero : ¬ minBlockDistanceAdmitted 0 := by
   intro h
   exact h.1 rfl
@@ -83,8 +86,7 @@ def totalLimits (b : TopupBatch) (cfg : TopupConfig) : Nat :=
 
 theorem zipWith_min_sum_le_rights :
     ∀ (req lim : List Nat), (List.zipWith min req lim).sum ≤ lim.sum
-  | [], _ => by
-      cases lim <;> simp
+  | [], lim => by cases lim <;> simp
   | _ :: _, [] => by simp
   | r :: rs, l :: ls => by
       simp only [List.zipWith_cons_cons, List.sum_cons]
@@ -97,9 +99,9 @@ theorem totalLimits_zero_implies_transition_zero
   have hcand : (candidates b cfg).sum ≤ (evaluatedLimits b cfg).sum :=
     zipWith_min_sum_le_rights b.requestedGwei (evaluatedLimits b cfg)
   have hz : (candidates b cfg).sum = 0 :=
-    Nat.eq_zero_of_le_zero (hcand.trans (Nat.le_of_eq h))
+    Nat.eq_zero_of_le_zero (Nat.le_trans hcand (Nat.le_of_eq h))
   have hwalk := leftover_walk_sum_le_keys (transitionBudget b cfg) (candidates b cfg)
-  exact Nat.eq_zero_of_le_zero (hwalk.trans (Nat.le_of_eq hz))
+  exact Nat.eq_zero_of_le_zero (Nat.le_trans hwalk (Nat.le_of_eq hz))
 
 inductive CallOutcome
   | reverted
@@ -155,13 +157,12 @@ theorem distance_fails_after_set
     (hDist : 0 < s.minBlockDistance) :
     ¬ BlockDistancePassed (setLastTopUpData s blockNumber timestamp) blockNumber := by
   intro h
-  have hlast : (setLastTopUpData s blockNumber timestamp).lastTopUpBlock = blockNumber := rfl
-  have hmin : (setLastTopUpData s blockNumber timestamp).minBlockDistance =
-      s.minBlockDistance := rfl
-  rcases h with h0 | ⟨_, hge⟩
-  · exact hBlock (by simpa [hlast] using h0)
-  · have : s.minBlockDistance ≤ 0 := by
-      simpa [hmin, Nat.sub_self] using hge
+  rcases h with h0 | hrest
+  · exact hBlock (by simpa [setLastTopUpData] using h0)
+  · have hge : s.minBlockDistance ≤ blockNumber - blockNumber := by
+      simpa [setLastTopUpData] using hrest.2
+    have : s.minBlockDistance ≤ 0 := by
+      simpa [Nat.sub_self] using hge
     exact Nat.not_lt.mpr this hDist
 
 theorem runMany_all_zero_of_blocked
@@ -174,8 +175,8 @@ theorem runMany_all_zero_of_blocked
   | nil => simp [runMany]
   | cons b bs ih =>
       have hr := runOne_blocked cfg blockNumber timestamp b s h
-      simp [runMany, hr, usedOf] at ih ⊢
-      exact ih h
+      simp [runMany, hr, usedOf]
+      exact ih s h
 
 theorem minBlockDistance_preserved_set (s : GatewayDistanceState)
     (blockNumber timestamp : Nat) :
@@ -232,14 +233,14 @@ theorem same_block_sum_le_cap
             Nat.eq_zero_of_le_zero (Nat.not_lt.mp hlim)
           have hused : (transition b cfg).sum = 0 :=
             totalLimits_zero_implies_transition_zero b cfg hzero
-          simp only [hs', usedOf, hused]
+          simp only [hs', usedOf, hused, List.sum_cons, Nat.zero_add]
           exact ih s hDist hMono
       · have hr := runOne_blocked cfg blockNumber timestamp b s hp
-        simp [hr, usedOf]
+        simp [hr, usedOf, List.sum_cons, Nat.zero_add]
         exact ih s hDist hMono
 
 /-- Mutant: skip `_setLastTopUpData`.  Distance never locks. -/
-def runOneNoLock (cfg : TopupConfig) (blockNumber timestamp : Nat)
+def runOneNoLock (cfg : TopupConfig) (blockNumber _timestamp : Nat)
     (b : TopupBatch) (s : GatewayDistanceState) :
     CallOutcome × GatewayDistanceState :=
   if BlockDistancePassed s blockNumber then
