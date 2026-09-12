@@ -135,6 +135,7 @@ import LidoSRv3.Tests.PackGDepositProvenanceMutants
 import LidoSRv3.Audit.Provenance.TopupBeacon
 import LidoSRv3.Audit.Provenance.TopupNoWrapOrphaned
 import LidoSRv3.Audit.Provenance.SszPerfectHashOrphaned
+import LidoSRv3.Audit.Provenance.SszSha256Isolation
 import LidoSRv3.Audit.Provenance.HandwrittenMinFirstOrphaned
 import LidoSRv3.Tests.PackGTopupProvenanceMutants
 import LidoSRv3.Audit.Provenance.ConsolidationRequest
@@ -1609,6 +1610,26 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Provenance.SszPerfectHashOrphaned.abstract_parent_ignores_perfect_deposit_encoding
 #print axioms LidoSRv3.Audit.Provenance.SszPerfectHashOrphaned.abstract_parent_applies_universally
 #print axioms LidoSRv3.Audit.Provenance.SszPerfectHashOrphaned.verity_parent_ignores_perfect_deposit_encoding
+
+-- A-SHA256-FFI scope isolation (see
+-- `audit/findings/A-SHA256-FFI-isolated.md` and
+-- `LidoSRv3/Audit/Provenance/SszSha256Isolation.lean`): every
+-- registered SSZ theorem is structural or compositional around the
+-- SHA-256 boundary and does not itself consume `sha256_correct` at
+-- the kernel level. The SHA-256-independent part of the audit is
+-- unconditional; the SHA-256-dependent part ("produced digests equal
+-- the FIPS SHA-256 of their preimages") is not claimed by any
+-- registered theorem. A-SHA256-FFI is retired from every consumer's
+-- `assumptions` list (P-SSZ-1, P-SSZ-1.deposit-data-root,
+-- P-SSZ-1.abstract-digest, P-SSZ-1.tx-execution-simulation,
+-- P-SSZ-LIVE-1); the registry entry is retained as a mandatory
+-- scope-boundary disclosure per `scripts/audit_metadata.py`.
+#print axioms LidoSRv3.Audit.Provenance.SszSha256Isolation.ssz1_abstract_parent_ignores_sha256_correctness
+#print axioms LidoSRv3.Audit.Provenance.SszSha256Isolation.ssz1_abstract_parent_applies_universally
+#print axioms LidoSRv3.Audit.Provenance.SszSha256Isolation.ssz1_verity_parent_ignores_sha256_correctness
+#print axioms LidoSRv3.Audit.Provenance.SszSha256Isolation.deposit_data_root_parent_ignores_sha256_correctness
+#print axioms LidoSRv3.Audit.Provenance.SszSha256Isolation.abstract_digest_parent_ignores_sha256_correctness
+#print axioms LidoSRv3.Audit.Provenance.SszSha256Isolation.tx_execution_simulation_parent_ignores_sha256_correctness
 
 -- A-HANDWRITTEN-MINFIRST orphelinat (see
 -- `audit/findings/A-HANDWRITTEN-MINFIRST-orphaned.md` and

@@ -57,16 +57,6 @@
       "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
     },
     {
-      "id": "A-SHA256-FFI",
-      "accepted": true,
-      "risk": "SHA-256 precompile behavior relies on opaque native FFI and host-library behavior; differential vectors do not close this crypto risk.",
-      "justification": "The project proves SSZ preimage shape but does not re-prove SHA-256/precompile functional correctness.",
-      "severity": "HIGH",
-      "violation_impact": "Digest-value and proof-verification claims fail if SHA-256 behavior differs.",
-      "validation": "Pin the FFI/precompile interface and run known-answer vectors; do not promote vectors to a cryptographic proof.",
-      "removal_path": "Prove or import a separately certified SHA-256/precompile refinement theorem."
-    },
-    {
       "id": "A-RUNTIME-PROVENANCE",
       "accepted": true,
       "risk": "Canonical runtime, codehash, fork configuration, and address provenance are unavailable; Mock-derived evidence is non-production evidence.",
@@ -97,6 +87,16 @@
       "violation_impact": "Only a foundational inconsistency in Lean's classical axioms would invalidate the affected theorems; no project-specific claim rests on it.",
       "validation": "LidoSRv3.Audit.Trust prints the axiom dependencies of every registered theorem, so any dependency outside {propext, Classical.choice, Quot.sound} is visible in the build log.",
       "removal_path": "Re-prove the affected theorems constructively; not required, since classical reasoning is in scope for this development."
+    },
+    {
+      "id": "A-SHA256-FFI",
+      "accepted": true,
+      "risk": "SHA-256 precompile behavior relies on opaque native FFI and host-library behavior; the audit does not prove SHA-256/precompile functional correctness. All registered SSZ theorems are structural or compositional around the SHA-256 boundary and do not themselves depend on this assumption -- see LidoSRv3/Audit/Provenance/SszSha256Isolation.lean for the isolation. The assumption is retained as a mandatory scope-boundary disclosure per audit_metadata.py.",
+      "justification": "The project proves SSZ preimage shape, digest chain composition, memory copies, address-2 call sequences, and revert restoration, but does not re-prove SHA-256/precompile functional correctness. Every registered SSZ theorem's #print axioms output contains only subsets of {propext, Classical.choice, Quot.sound}, with no sha256_correct axiom.",
+      "severity": "HIGH",
+      "violation_impact": "Digest-value and proof-verification claims fail if SHA-256 behavior differs. But no registered SSZ theorem in this audit claims digest values or proof verification (they claim structural composition around the digest), so the impact is scoped to the guarantee-level fidelity gaps that name SHA-256 functional correctness as an out-of-scope item.",
+      "validation": "Pin the FFI/precompile interface and run known-answer vectors; do not promote vectors to a cryptographic proof. LidoSRv3/Audit/Provenance/SszSha256Isolation.lean records that the current registered SSZ theorem chain does not need any sha256_correct hypothesis.",
+      "removal_path": "The mandatory scope-boundary check in scripts/audit_metadata.py requires this assumption in the registry regardless. Consumer-list retirements from every guarantee's assumptions field are performed via the isolation proof above."
     }
   ]
 }
