@@ -278,6 +278,10 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Spec.AllocationCorrespondence.alloc2_spec_step_amount_correspondence
 #print axioms LidoSRv3.Audit.Spec.AllocationCorrespondence.topup2_per_key_remains_gwei
 #print axioms LidoSRv3.Audit.Guarantees.PTopup2.verity_tx_simulates_topup2_spec
+-- Chantier 4 (mandate 2026-09-12): registered abstract parent on the real
+-- router mechanism at StakingRouter.sol:696/700/706/737 (via SolidityTopup.run).
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2.router_source_cap_within_block_cap
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2.source_smDepRounded_le_maxTopUpPerBlockWei
 -- PTopup2 aggregate arithmetic bounds used by the multi-batch cap
 -- discipline: per-key `consumeBudget` upper bound, and three
 -- aggregate-vs-individual / module-limit / block-cap monotone bounds.
