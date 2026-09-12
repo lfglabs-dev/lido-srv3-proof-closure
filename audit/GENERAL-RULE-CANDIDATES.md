@@ -351,3 +351,61 @@ point.
 Every scaffold above is honestly labeled "Status: naming scaffold,
 not a full composition" so future readers can identify each as
 scaffolding-in-progress rather than closed composition.
+
+## Update 2026-09-13: real-derivation first steps
+
+Each of the four naming scaffolds from PRs #441/#442/#443/#444/#445
+now has a real-derivation first-step landed. Each first-step:
+
+- Adds a new source-level module (`LidoSRv3/Audit/Source/*.lean`)
+  defining a `SomeStorageState : Type` and a source-level function
+  matching the pinned Solidity definition.
+- Adds a composition theorem that derives the free field/boolean
+  through the source function from a named `SomethingFromSource`
+  linkage premise — a real derivation, not a projection.
+
+Merged real-derivation first-step PRs:
+
+- **PR #447** — P-RESERVE-1 canDeposit via `LidoStakingStateStorage`
+  (isStakingPaused + isBunkerActive as named source booleans).
+- **PR #448** — P-TOPUP-1 three booleans via `SRStorageSourceModel`
+  (three named SR context reads: gateway, moduleExists, wcType).
+- **PR #449** — P-ADDRESS-1 externalCallSucceeds via
+  `BridgeCallResultSource` (named BridgeCallOutcome success bit).
+- **PR #450** — P-CONSOLIDATION-ETH-1 fee STATICCALL via
+  `ConsolidationFeeStaticcallSource` (named PredeployStaticcallResult
+  ABI-decoded fee).
+- **PR #451** — P-ALLOC-1 registry MAX_STAKING_MODULES_COUNT = 32
+  via `StakingModuleRegistrySource` (named StakingModuleRegistryState
+  moduleCount bound).
+
+Each first-step routes the composition through a NAMED source-level
+function on a NAMED source state, definitionally equal to the pinned
+Solidity guard — a real derivation, not a straight-line projection.
+The named source states are still input propositions; the follow-up
+work is per-candidate live-keyed-storage / live-STATICCALL /
+per-writer-glue derivations that consume the source state from actual
+storage / execution reads.
+
+## Follow-ups after 2026-09-13 first-steps
+
+Each candidate still has open live-derivation follow-ups:
+
+- **RESERVE-1** — packed StakeLimitStruct decoder for
+  `isStakingPaused`; live bunker-slot storage-read for
+  `isBunkerActive`; Aragon-ACL role-check for `authorizedRouter`.
+- **TOPUP-1** — packed SRStorage decoder for `moduleId != 0`;
+  WithdrawalCredentials.isType2 byte-decode; Aragon-ACL top-up-gateway
+  registry read.
+- **ADDRESS-1** — per-writer Bridge-to-source glue for the four
+  writers (requestWithdrawals, unwrap, claimWithdrawalsTo,
+  transferFrom).
+- **CONSOLIDATION-ETH-1 fee** — live-STATICCALL executable model +
+  32-byte ABI decoder + EIP-7251-schedule model.
+- **ALLOC-1 remaining CheckedBounds** — per-module uint64
+  field-bound source model; SRStorage
+  `addValidators`/`_updateExitedCounters` monotonicity invariants.
+
+Each remaining follow-up is estimated at ~200-400 Lean lines
+(smaller than the initial estimates because the naming scaffolds
+and first-step source modules landed cleanly).
