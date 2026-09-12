@@ -148,3 +148,4 @@ lake build LidoSRv3Test
 | `e642630a` | prove | leftover walk ∀ keys; `minBlockDistance ≥ 1`; `blockNumber ≠ 0` | Spark raccord |
 | `2688fcdd` | test | 33-key lockstep; honest n=2 sum = cap; no-lock sum = 2×cap | — |
 | `182b2220` | fix | same; no `sorryAx` | Spark raccord / live wei / SSZ |
+| `15d9c592` | docs | `lake build` of both mutant targets and `LidoSRv3Test` green | Spark raccord / live wei / SSZ |
