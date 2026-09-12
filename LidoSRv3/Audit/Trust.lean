@@ -81,6 +81,7 @@ import LidoSRv3.Audit.Source.BridgeCallResultSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
+import LidoSRv3.Audit.Source.StakingModuleRegistrySource
 import LidoSRv3.Audit.Guarantees.PAlloc1Phase3
 import LidoSRv3.Audit.Guarantees.PAlloc2
 import LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound
@@ -854,6 +855,11 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold.active_subtraction_under_pinned_sr_shape
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold.total_addition_under_pinned_sr_shape
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold.available_arithmetic_under_pinned_sr_shape
+-- Real-derivation first step for P-ALLOC-1 remaining CheckedBounds
+-- conjuncts (2026-09-13): source-level StakingModuleRegistryState names
+-- the pinned SRLib.sol Module-struct type bounds + MAX_STAKING_MODULES_COUNT
+-- = 32 registry invariant.
+#print axioms LidoSRv3.Audit.Source.StakingModuleRegistrySource.moduleCount_bounded_of_registry_state
 #print axioms LidoSRv3.Tests.ConsolidationEthUnboundedFuelMutants.truncated_fuel_batchSize_plus_three_exhausted
 #print axioms LidoSRv3.Tests.ConsolidationEthUnboundedFuelMutants.truncated_fuel_must_be_refused
 #print axioms LidoSRv3.Tests.ConsolidationEthUnboundedFuelMutants.parent_fuel_premise_excludes_batch_29
