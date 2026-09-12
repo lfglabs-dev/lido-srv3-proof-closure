@@ -4,7 +4,7 @@
 
 ## Decision
 
-Review basis: structured inputs including the accepted TOPUP constructor provenance disclosure (theorem registrations and statuses unchanged; prior PR250 basis `ffd6ae4d5be0a5e1e7d1be335700e58ca90771f5` and exact input delta retained in `audit/metadata-reconcile/report-basis.json`; this revision is not a new independent certification; trio composition scoped separately) `f90745c46801a1ffc33acd01fcae4bbb7a793b7a`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
+Review basis: structured inputs including the accepted TOPUP constructor provenance disclosure (theorem registrations and statuses unchanged; prior PR250 basis `ffd6ae4d5be0a5e1e7d1be335700e58ca90771f5` and exact input delta retained in `audit/metadata-reconcile/report-basis.json`; this revision is not a new independent certification; trio composition scoped separately) `2d5ca8f5c196cd4f8819be0e3b978f23ad507f99`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
 
 ## Architecture and evidence boundary
 
@@ -21,7 +21,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 | [`P-ALLOC-1`](#p-alloc-1) | CHECKED | CHECKED | 4 open | **IMPLEMENTATION_PENDING** |
 | [`P-ALLOC-2`](#p-alloc-2) | CHECKED | CHECKED | 4 open | **IMPLEMENTATION_PENDING** |
 | [`P-DEPOSIT-1`](#p-deposit-1) | CHECKED | CHECKED | 3 open | **IMPLEMENTATION_PENDING** |
-| [`P-TOPUP-1`](#p-topup-1) | CHECKED | CHECKED | 1 open | **IMPLEMENTATION_PENDING** |
+| [`P-TOPUP-1`](#p-topup-1) | CHECKED | CHECKED | 4 open | **IMPLEMENTATION_PENDING** |
 | [`P-ACCOUNT-1`](#p-account-1) | CHECKED | CHECKED | 5 open | **IMPLEMENTATION_PENDING** |
 | [`P-RESERVE-1`](#p-reserve-1) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
 | [`P-CONSOLIDATION-ETH-1`](#p-consolidation-eth-1) | CHECKED | CHECKED | 11 open | **IMPLEMENTATION_PENDING** |
@@ -139,11 +139,14 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
 
-**Limitations — 1 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+**Limitations — 4 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
 - abstract-TX rollback plane conjunct RevertRestoresSnapshot is definitional in TxObservation (A-ABSTRACT-TX): a Verity.Contract.run executable-plane rollback equivalent is not yet folded into this registered parent, so a modelling mismatch in the abstract observation type would silently mis-classify a reverting run.
+- Verity plane covers only the allocation-and-spend suffix (StakingRouter.sol:722-756): `executeGuarded` starts at `allocateDeposits` (line 717). The source-line 686-716 prefix guards `NotAuthorized()` (caller ≠ top-up gateway), `EmptyKeysList()` (keyIndices.length = 0), and `WrongWithdrawalCredentialsType()` (WC bit not type 2) are proved on the Source plane by `source_module_guard_required` / `source_wc_type2_guard_required` conjuncts of `source_topup_conserves_and_rolls_back` but not exercised on the Verity executable plane. Grok differential #414 flags this via D-AUTH-1, D-WC-1, D-EMPTY-1.
+- Verity plane journal starts after the `allocateDeposits` call, so the `allocateDeposits`-then-`withdrawDepositableEther`-then-per-key-`deposit` journal shape is not fully compared to the pinned `topUp` at StakingRouter.sol:686-756. Grok differential #414 flags this via D-CALL-1.
+- Model Lido/beacon addresses in `TopupTx` are pins (`0xF00D` model-local Lido; canonical deposit contract for beacon); the differential harness deploys mocks at freshly-generated addresses. Target address equality between the model literal and any specific deployed contract is not claimed by this parent. Grok differential #414 flags this via D-ADDR-1.
 
-**Classification.** **IMPLEMENTATION_PENDING** — Fold a Verity.Contract.run executable-plane rollback conjunct into the registered parent that matches RevertRestoresSnapshot, so the abstract TxObservation shape stops being the only witness to rollback. Keep the checked universal nonzero-wrap revert and wrap-to-zero empty-commit partition.
+**Classification.** **IMPLEMENTATION_PENDING** — Fold a Verity.Contract.run executable-plane rollback conjunct into the registered parent that matches RevertRestoresSnapshot; and extend the Verity CLI parent from `executeGuarded` (suffix 722-756) to include the prefix guards (auth / EmptyKeys / WC) at lines 686-716. Keep the checked universal nonzero-wrap revert and wrap-to-zero empty-commit partition.
 
 **Next gate.** Universal word-bounded nonzero-wrap Verity revert/non-commit/rollback is CHECKED; wrap-to-zero remains an empty commit. A-TOPUP-BEACON-ADDRESS is discharged from deployment artifacts (see LidoSRv3/Audit/Provenance/BeaconDepositAddress.lean and audit/artifacts.lock.json). Do not derive a top-up LinksSource from ALLOC.
 
