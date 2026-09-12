@@ -269,10 +269,10 @@
           "source-shaped spending and checked arithmetic under well-formed storage",
           "Contract.run rollback after intermediate writes",
           "guard-checking wrapper premise: canDeposit/authorizedRouter are proved to hold on any committed call, not merely assumed; the guard-liveness conjunct is kill-line-backed by guard_drop_kill_line_refutes_parent, which refutes the parent predicate shape (freshness retained) on mutantWithdrawNoCanDeposit, a guard-for-guard copy with only the canDeposit check dropped",
-          "effective, min-capped, live queue-facing reserve is invariant under a fresh WQ-style value, not just the restated storedDepositsReserve field; the parent kill-line partition_spend_mutant_kill_line_refutes_parent refutes the parent predicate shape (freshness retained) on a mutated spend transition, and the stale-cache theorems separately witness that the freshQueueCache hypothesis cannot be dropped"
+          "effective, min-capped, live queue-facing reserve is invariant under a fresh WQ-style value, not just the restated storedDepositsReserve field; the parent kill-line partition_spend_mutant_kill_line_refutes_parent refutes the parent predicate shape (freshness retained) on a mutated spend transition, and the stale-cache theorems separately witness that the freshQueueCache hypothesis cannot be dropped",
+          "live WithdrawalQueue.unfinalizedStETH call (grok #404): derives freshQueueCache from a live STATICCALL observation (selector 0xd0fb84e8, value 0, 32-byte ABI decode); fails closed on failure / wrong selector / nonzero value / short returndata. The physical queue subtraction stays in TrioReserve1.Queue. Discharged via LidoSRv3/Audit/Source/ReserveUnfinalizedCall.lean; kill-lines in LidoSRv3/Tests/ReserveUnfinalizedCallMutants.lean. Axioms only propext / Quot.sound."
         ],
         "missing": [
-          "live WithdrawalQueue.unfinalizedStETH call (freshness is now an explicit freshQueueCache hypothesis with a stale-cache kill-line, not an implicit assumption)",
           "canDeposit / bunker / router authorization (now proved as scopedWithdrawGuards on any committed call, but the two booleans are still free inputs, not live bunker/pause/msg.sender checks)",
           "packed uint128 buffered ether and ETH transfer",
           "frame-nonce reset and report-time rebalance",

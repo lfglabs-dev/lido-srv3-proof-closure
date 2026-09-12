@@ -23,7 +23,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 | [`P-DEPOSIT-1`](#p-deposit-1) | CHECKED | CHECKED | 4 open | **IMPLEMENTATION_PENDING** |
 | [`P-TOPUP-1`](#p-topup-1) | CHECKED | CHECKED | 1 open | **IMPLEMENTATION_PENDING** |
 | [`P-ACCOUNT-1`](#p-account-1) | CHECKED | CHECKED | 7 open | **IMPLEMENTATION_PENDING** |
-| [`P-RESERVE-1`](#p-reserve-1) | CHECKED | CHECKED | 7 open | **IMPLEMENTATION_PENDING** |
+| [`P-RESERVE-1`](#p-reserve-1) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
 | [`P-CONSOLIDATION-ETH-1`](#p-consolidation-eth-1) | CHECKED | CHECKED | 11 open | **IMPLEMENTATION_PENDING** |
 | [`P-ADDRESS-1`](#p-address-1) | CHECKED | CHECKED | 7 open | **IMPLEMENTATION_PENDING** |
 | [`P-TOPUP-2`](#p-topup-2) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
@@ -182,9 +182,8 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
 
-**Limitations — 7 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+**Limitations — 6 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
-- live WithdrawalQueue.unfinalizedStETH call (freshness is now an explicit freshQueueCache hypothesis with a stale-cache kill-line, not an implicit assumption)
 - canDeposit / bunker / router authorization (now proved as scopedWithdrawGuards on any committed call, but the two booleans are still free inputs, not live bunker/pause/msg.sender checks)
 - packed uint128 buffered ether and ETH transfer
 - frame-nonce reset and report-time rebalance
