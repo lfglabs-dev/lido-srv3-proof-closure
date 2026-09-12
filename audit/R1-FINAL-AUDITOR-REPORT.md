@@ -4,7 +4,7 @@
 
 ## Decision
 
-Review basis: structured inputs including the accepted TOPUP constructor provenance disclosure (theorem registrations and statuses unchanged; prior PR250 basis `ffd6ae4d5be0a5e1e7d1be335700e58ca90771f5` and exact input delta retained in `audit/metadata-reconcile/report-basis.json`; this revision is not a new independent certification; trio composition scoped separately) `4f325975c60eee4d81d524d68f7b22a64b430c6d`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
+Review basis: structured inputs including the accepted TOPUP constructor provenance disclosure (theorem registrations and statuses unchanged; prior PR250 basis `ffd6ae4d5be0a5e1e7d1be335700e58ca90771f5` and exact input delta retained in `audit/metadata-reconcile/report-basis.json`; this revision is not a new independent certification; trio composition scoped separately) `8cc189f01d47968d05cb8c2ee1087c3cf9ec0aae`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
 
 ## Architecture and evidence boundary
 
@@ -25,7 +25,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 | [`P-ACCOUNT-1`](#p-account-1) | CHECKED | CHECKED | 5 open | **IMPLEMENTATION_PENDING** |
 | [`P-RESERVE-1`](#p-reserve-1) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
 | [`P-CONSOLIDATION-ETH-1`](#p-consolidation-eth-1) | CHECKED | CHECKED | 11 open | **IMPLEMENTATION_PENDING** |
-| [`P-ADDRESS-1`](#p-address-1) | CHECKED | CHECKED | 7 open | **IMPLEMENTATION_PENDING** |
+| [`P-ADDRESS-1`](#p-address-1) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
 | [`P-TOPUP-2`](#p-topup-2) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
 | [`P-CONSOLIDATION-1`](#p-consolidation-1) | CHECKED | CHECKED | 7 open | **IMPLEMENTATION_PENDING** |
 | [`P-SSZ-1`](#p-ssz-1) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
@@ -238,9 +238,8 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
 
-**Limitations — 7 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+**Limitations — 6 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
-- unbounded source-to-Verity correspondence and caller-swap equivariance theorem for the live claimWithdrawalsTo batch; the checked observe receipt is two-item
 - keccak-level physical mapping-slot derivation for queue/checkpoint struct words; ContractState mapUint channels model keyed POSITION/POSITION+1 words
 - EnumerableSet owner-request removal, Transfer/WithdrawalClaimed events, adversarial recipient code, and machine-level CALL semantics
 - packed WithdrawalQueue ERC-721 transfer and WstETH/ERC-20 storage, approvals, balances, and allowances outside the bounded claim request words

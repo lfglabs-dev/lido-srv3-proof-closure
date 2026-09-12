@@ -26,14 +26,14 @@ from source_spans import span_identity
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
 SOURCE_FIDELITY = AUDIT / "SOURCE-FIDELITY.md"
-R1_REVIEW_BASE = "4f325975c60eee4d81d524d68f7b22a64b430c6d"
+R1_REVIEW_BASE = "8cc189f01d47968d05cb8c2ee1087c3cf9ec0aae"
 # Bind the report inputs to the recorded Git object and exact bytes.
 # Changed inputs must never inherit an earlier source review.
 # This exact family is every structured input used to render the R1 review
 # report.  A normal regeneration may never pair changed family content with a
 # stale certified basis.
 R1_REPORT_INPUT_SHA256 = {
-    "audit/guarantees.yaml": "dbd14ec29636c7dff80100cdbd7e91d629f65629da003330feb8f0a790d65a7a",
+    "audit/guarantees.yaml": "72e3a065b2c34597285e3bc10177e0faa7cb58f3de4358322737377de94ddbe2",
     "audit/source-map.yaml": "33040d89e1b1b93dd5cd5b7e855d45eee0883caec1629ee64fe6199a143619fb",
     "audit/trust-native-decide-allowlist.txt": "4676e3021844b17f62e9fcb11069c5a09fcede77977b5af2242c455bfa7d38c6",
 }
@@ -87,13 +87,13 @@ EXPECTED_CANONICAL_CLAIMS = {
 }
 EXPECTED_CANONICAL_DETAIL_SHA256 = {
     "P-ALLOC-1": "9ad778510fac55548ab9b51cb802743fa33eabcc2908ffdbaae38bb59065a5f3",
-    "P-ALLOC-2": "e5955a7a287a477ee8e21da15dabed644676f247d242035be35cf8db5f39f70e",
+    "P-ALLOC-2": "605ae32bda595b9d0847ceccd826c9a7d76e1a99e3d617b7d1dc140ee940855b",
     "P-DEPOSIT-1": "9903eccd7b9770b92bf7cd80a609f83c6dd6fe0830dd68bb171c19295cc3ab17",
     "P-TOPUP-1": "56ee5bd9d6a311d24196211874603f6ceb3d3e64d0ef2485460c765fbb528fb0",
     "P-ACCOUNT-1": "f5cf8880625596432793e62d6e5636e08ca2fd3d31376da5ee66c8f431c6d58d",
     "P-RESERVE-1": "e2d004760969a98b2c52ec7ad0375f9758188763ba6045449470f924a3e4ff6b",
     "P-CONSOLIDATION-ETH-1": "3a1646e5cfde353954a5ede1aef086dd74f844929e1b1fdca1d46a8f43fec858",
-    "P-ADDRESS-1": "3d2b469aa2a2e621f8951f8937a9e3d468fd910857da34fa2cadeee3785fcb81",
+    "P-ADDRESS-1": "08a266711ae5f4551b03ddaf2ff1193d958d7e8a0da2727fedc76241c9c30206",
     "P-TOPUP-2": "ea871b8f92659f4f6bd846a7b4c0751ec8485c02c343735cda9553d28bf7423d",
     "P-CONSOLIDATION-1": "a1aefd3811f57dd50b145d6fd0e476094202ebff7cdaa78a99299694ad9c7287",
     "P-SSZ-1": "34b6ab0e40f56dd44ffb44c1b37a090ffeb3880339d403022e172534a16cbb8a",
