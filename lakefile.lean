@@ -49,6 +49,7 @@ lean_lib «LidoSRv3» where
     .submodules `LidoSRv3.Audit.Verity.TrioConsolidation,
     .one `LidoSRv3.Audit.Verity.DepositLedgerTx,
     .one `LidoSRv3.Audit.Verity.DepositNFrameTx,
+    .one `LidoSRv3.Audit.Verity.DepositSourceEntry,
     .one `LidoSRv3.Audit.Verity.DepositParentTx,
     .one `LidoSRv3.Audit.Verity.DepositRollback,
     .one `LidoSRv3.Audit.Verity.DepositTx,
