@@ -16,6 +16,10 @@ ROOT = Path(__file__).resolve().parents[1]
 # explicit: the root module is compiled production code, not a fixture.
 SOURCE_ROOT = "LidoSRv3"
 LIBRARY_ROOTS = ("LidoSRv3.lean",)
+# Chantier 7 (mandate 2026-09-12): also scan the trio composition tree,
+# which carries registered evidence (e.g., audit/trio/consolidation/Bus.lean)
+# and was previously outside the check's scope.
+EXTRA_SOURCE_ROOTS = ("audit/trio",)
 # This is an inventory, rather than a permission to introduce the tactic: any
 # addition, deletion, or move of a project `native_decide` use must be reviewed
 # by deliberately updating this guard.  The existing uses are separately
@@ -26,8 +30,8 @@ LIBRARY_ROOTS = ("LidoSRv3.lean",)
 # Corrected295 consolidation tests add85 sites and move existing test lines.
 # Exact delta: audit/consolidation-gateway-call/native-inventory.json.
 # This records native-backed regressions; it does not grant kernel-proof credit.
-NATIVE_DECIDE_COUNT = 421
-NATIVE_DECIDE_SHA256 = "aa918b5424287ce4c6893ebf24983b0a2c013b3d549a226a9bdafad369c84c18"
+NATIVE_DECIDE_COUNT = 437
+NATIVE_DECIDE_SHA256 = "28faccb0936fbc01016c5e80d42b76855faa3263631fff119e72f58783a464e7"
 ESCAPES = (
     ("sorry", re.compile(r"\bsorry\b")),
     ("admit", re.compile(r"\badmit\b")),
@@ -36,7 +40,17 @@ ESCAPES = (
     ("constant", re.compile(r"\bconstant\b")),
     ("unsafe", re.compile(r"\bunsafe\b")),
     ("Lean.ofReduceBool", re.compile(r"\bLean\.ofReduceBool\b")),
+    # Chantier 7 (mandate 2026-09-12): `opaque` declarations embed
+    # assumptions into definitions that `#print axioms` cannot see.
+    # Any new `opaque` must be reviewed by updating the allowlist below.
+    ("opaque", re.compile(r"^[ \t]*opaque[ \t]+\w", re.MULTILINE)),
 )
+# Chantier 7 (mandate 2026-09-12): explicitly enumerated allowlist for
+# `opaque` declarations. Each entry is (relative_path, opaque_name).
+# Adding or moving an opaque symbol requires updating this list.
+OPAQUE_ALLOWLIST = frozenset({
+    ("LidoSRv3/Audit/Source/DepositDataRootCorrespondence.lean", "sha256"),
+})
 CHAR_LITERAL = re.compile(r"(?<![\w'])'(?:\\.|[^\\'\n])'(?!\w)")
 
 
@@ -120,8 +134,14 @@ def fail(message: str) -> None:
 
 def project_sources(root: Path) -> list[Path]:
     source_root = root / SOURCE_ROOT
+    extra_files: list[Path] = []
+    for extra in EXTRA_SOURCE_ROOTS:
+        extra_dir = root / extra
+        if extra_dir.is_dir():
+            extra_files.extend(extra_dir.rglob("*.lean"))
     files = sorted([*source_root.rglob("*.lean"),
-                    *(root / relative for relative in LIBRARY_ROOTS)])
+                    *(root / relative for relative in LIBRARY_ROOTS),
+                    *extra_files])
     missing_roots = [path.relative_to(root).as_posix() for path in files if not path.is_file()]
     if missing_roots:
         fail(f"missing production Lean source(s): {', '.join(missing_roots)}")
@@ -166,12 +186,25 @@ def main() -> None:
     files = project_sources(root)
     for path in files:
         source = path.read_text(encoding="utf-8")
-        if not any(token in source for token in ("sorry", "admit", "axiom", "constant", "unsafe", "Lean.ofReduceBool")):
+        if not any(token in source for token in ("sorry", "admit", "axiom", "constant", "unsafe", "Lean.ofReduceBool", "opaque")):
             continue
         clean = strip_comments_and_strings(source, mask_escaped_identifiers=True)
         newlines = [index for index, char in enumerate(clean) if char == "\n"]
         relative = path.relative_to(root).as_posix()
         for name, pattern in ESCAPES:
+            if name == "opaque":
+                # Chantier 7 (mandate 2026-09-12): enumerate every opaque
+                # declaration; each must be on the OPAQUE_ALLOWLIST.
+                for match in pattern.finditer(clean):
+                    line = bisect.bisect_right(newlines, match.start()) + 1
+                    # Extract the declared name from the source line to key
+                    # the allowlist.
+                    text = source.splitlines()[line - 1]
+                    name_match = re.match(r"\s*opaque\s+(\w+)", text)
+                    opaque_name = name_match.group(1) if name_match else "<unknown>"
+                    if (relative, opaque_name) not in OPAQUE_ALLOWLIST:
+                        fail(f"{relative}:{line}: forbidden opaque `{opaque_name}` (add to OPAQUE_ALLOWLIST if intended)")
+                continue
             match = pattern.search(clean)
             if match:
                 line = bisect.bisect_right(newlines, match.start()) + 1

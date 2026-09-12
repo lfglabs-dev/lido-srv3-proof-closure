@@ -69,6 +69,15 @@ test:
 	@lake build LidoSRv3Test
 	@lake build AccountAddressChecks
 	@printf '%s\n' 'LidoSRv3Test: mutants, vectors, nested Verity tests, and regressions compiled'
+	@# Chantier 7 (mandate 2026-09-12): fixture SHA-256 + immutable-payload
+	@# verification for the three deployed-bytecode fixtures cited by the
+	@# A-TOPUP-BEACON-ADDRESS, A-DEPOSIT-CONTRACT, A-DEPOSIT-32-ETHER, and
+	@# A-CANONICAL-REQUEST-ADDRESS discharges. Each script re-hashes the
+	@# pinned fixture bytes, checks the artifact SHA-256 matches, and
+	@# re-extracts every named immutable at its recorded byte offset.
+	@python3 scripts/verify_beacon_deposit_immutable.py
+	@python3 scripts/verify_consolidation_request_immutable.py
+	@python3 scripts/verify_deposit_thirty_two_ether.py
 	@test -s fixtures/solidity-reference/stakingRouter.getDepositAllocations.test.ts
 	@test -s fixtures/solidity-reference/stakingRouter.rewards.test.ts
 	@test -s fixtures/solidity-reference/stakingRouter.status-control.test.ts
