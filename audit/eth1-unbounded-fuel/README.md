@@ -6,6 +6,7 @@
 - **fidelity.missing entry:** `the dispatch-fuel arm quantifies over the model's own dispatcher bound (fuelBudget=32 under A-ABSTRACT-TX); it is a frame-count artifact of the abstract transaction model and carries no deployed gas-metering meaning`
 - **Branch:** `grok/lido-eth1-unbounded-fuel-20260912`
 - **Base:** `origin/main` @ `1a40db36df3990da9287ac7b03b7e9a1e9bcffe4`
+- **Head:** `a7dbc01462bd32d9f026a01ec5a3c9382edc2331`
 - **Pinned Solidity:** `17005714f151e5502c559932319a3f2f74ac2436`
 - **Claimed by:** grok cloud agent, 2026-09-12
 - **Status:** closed on this derived consumer — Spark raccord pending
@@ -121,6 +122,8 @@ quantifies every funded non-wrapping batch at derived fuel.
   Vault 199–208, EIP7685 56–73, Bus 383–406).
 - `lake env lean LidoSRv3/Audit/Verity/ConsolidationEthUnboundedFuel.lean`: passed.
 - `lake env lean LidoSRv3/Tests/ConsolidationEthUnboundedFuelMutants.lean`: passed.
+- `lake build LidoSRv3Test`: passed (1948 jobs); mutant module built at job
+  1916 with the same axiom surface.
 - `#print axioms` of every Verity export: `propext` / `Classical.choice` /
   `Quot.sound` (or a subset). `parent_fuel_premise_excludes_batch_29` uses none.
   No `sorryAx`.
