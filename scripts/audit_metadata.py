@@ -26,14 +26,14 @@ from source_spans import span_identity
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
 SOURCE_FIDELITY = AUDIT / "SOURCE-FIDELITY.md"
-R1_REVIEW_BASE = "8e92393f02c48739132c2e49a030da5e21b74d6f"
+R1_REVIEW_BASE = "38a28a2afb209da54da59b5cd8d3a037a3db197a"
 # Bind the report inputs to the recorded Git object and exact bytes.
 # Changed inputs must never inherit an earlier source review.
 # This exact family is every structured input used to render the R1 review
 # report.  A normal regeneration may never pair changed family content with a
 # stale certified basis.
 R1_REPORT_INPUT_SHA256 = {
-    "audit/guarantees.yaml": "3c62774cff0816d15c601a52d415e64a13847531a470870b74b5630008db403e",
+    "audit/guarantees.yaml": "3d9b48241f722ea7d6280c1ca647b4c86beddb1881b6cdb4fbcc2292a99c7236",
     "audit/source-map.yaml": "0711e13088159cc092c4a4cfdf2111eedefa39b744d02dbe1957db31da30cd2e",
     "audit/trust-native-decide-allowlist.txt": "4676e3021844b17f62e9fcb11069c5a09fcede77977b5af2242c455bfa7d38c6",
 }
@@ -90,7 +90,7 @@ EXPECTED_CANONICAL_CLAIMS = {
     "P-SSZ-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.deposit_root_iff", "CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.actual_compiled_cl_entry_complete_declared_branch", "IMPLEMENTATION_PENDING", ("A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT", "A-SOLC-TRUSTED", "A-RUNTIME-PROVENANCE")),
 }
 EXPECTED_CANONICAL_DETAIL_SHA256 = {
-    "P-ALLOC-1": "03e52f5e9f21cc4b9a6a22e408f4f115d79cea197e0f46f68bba67d43d461bf4",
+    "P-ALLOC-1": "ed0320e45dcdc483b5fd299514bfe79a6a28da2aaa184ab7c02761fff75583a2",
     "P-ALLOC-2": "605ae32bda595b9d0847ceccd826c9a7d76e1a99e3d617b7d1dc140ee940855b",
     "P-DEPOSIT-1": "6f8c1c10e295a4decfcce7030d15ae7126a0e167d71db52b3a0318ca8fd1637c",
     "P-TOPUP-1": "5f40ee538e6d5a3b236e88ca35ef5932936b87582ea2d42d4b26b625880d58e5",
