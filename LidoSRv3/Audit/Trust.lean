@@ -284,6 +284,12 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- router mechanism at StakingRouter.sol:696/700/706/737 (via SolidityTopup.run).
 #print axioms LidoSRv3.Audit.Guarantees.PTopup2.router_source_cap_within_block_cap
 #print axioms LidoSRv3.Audit.Guarantees.PTopup2.source_smDepRounded_le_maxTopUpPerBlockWei
+-- Chantier 4bis (Thomas 2026-09-12): P-TOPUP-2 exact-sum composition under
+-- the gateway-shape premise (topUpLimits from TopUpGateway.sol:226; keys
+-- bounded by maxValidatorsPerTopUp:uint64; router-only-admits-gateway at
+-- StakingRouter.sol:686). Under this premise, wrap is unreachable and the
+-- EXACT sum is bounded by maxTopUpPerBlockGwei * gwei.
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2.router_exact_sum_bounded_under_gateway_shape
 -- PTopup2 aggregate arithmetic bounds used by the multi-batch cap
 -- discipline: per-key `consumeBudget` upper bound, and three
 -- aggregate-vs-individual / module-limit / block-cap monotone bounds.
