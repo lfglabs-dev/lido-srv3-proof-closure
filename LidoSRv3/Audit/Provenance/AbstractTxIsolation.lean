@@ -102,7 +102,14 @@ theorem topup_source_parent_applies_universally
 /-- The registered P-TOPUP-1 Verity parent
 `PTopup1.verity_tx_simulates_source_with_nonzero_wrap_close` applies
 universally without consuming any caller-supplied `AbstractTxFaithful`
-premise. -/
+premise. Chantier 2 (mandate 2026-09-12): the parent's ENUNCE now has
+four conjuncts (adds `NonzeroWrapRevertsAndRestores` and a curried
+committing-simulation on the legacy plane); this isolation projects the
+first two to match the historical isolation shape and is retained as
+unregistered structural evidence only. Per mandate: A-ABSTRACT-TX is
+reinstated on P-TOPUP-1 because `TxObservation.reverted ↦ before` is
+definitional — a hypothesis embedded in a definition remains a
+hypothesis even when `#print axioms` does not surface it. -/
 theorem topup_verity_parent_ignores_abstract_tx
     (AbstractTxFaithful : Prop) (_hAbstractTxFaithful : AbstractTxFaithful)
     (cfg : _root_.LidoSRv3.Audit.SolidityTopup.SourceTopupConfig)
@@ -112,8 +119,10 @@ theorem topup_verity_parent_ignores_abstract_tx
     (hCall : PTopup1.SourceTopupCallCorresponds cfg inp call) :
     PTopup1.SourceTopupCallCorresponds cfg inp call ∧
       PTopup1.VerityGuardedReturndataSimulation cfg call state :=
-  PTopup1.verity_tx_simulates_source_with_nonzero_wrap_close
-    cfg inp call state hCall
+  let ⟨h1, h2, _, _⟩ :=
+    PTopup1.verity_tx_simulates_source_with_nonzero_wrap_close
+      cfg inp call state hCall
+  ⟨h1, h2⟩
 
 /-- The registered P-CONSOLIDATION-ETH-1 abstract parent applies
 universally without consuming any caller-supplied `AbstractTxFaithful`

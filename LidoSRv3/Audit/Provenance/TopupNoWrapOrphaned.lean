@@ -74,9 +74,12 @@ theorem source_parent_applies_universally
       RunFollowsAllocationLoop cfg inp :=
   PTopup1.source_topup_conserves_and_rolls_back cfg inp before after attempts trace
 
-/-- The registered Verity-side parent's conclusion holds on **any** input as
-well: the `hCall : SourceTopupCallCorresponds cfg inp call` premise is the
-call-shape correspondence, not a `NoUncheckedWrap` premise. -/
+/-- The registered Verity-side parent's first two conjuncts hold on **any**
+input: the `hCall : SourceTopupCallCorresponds cfg inp call` premise is the
+call-shape correspondence, not a `NoUncheckedWrap` premise. Chantier 2
+(mandate 2026-09-12): the parent's ENUNCE now has four conjuncts; this
+orphelinat projects the first two to match the historical no-wrap-orphan
+shape and is retained as unregistered structural evidence only. -/
 theorem verity_parent_ignores_no_unchecked_wrap
     (cfg : SourceTopupConfig) (inp : SourceTopupInput)
     (call : Verity.TopupTx.TopupCall)
@@ -85,6 +88,8 @@ theorem verity_parent_ignores_no_unchecked_wrap
     (_hWrap : ¬ NoUncheckedWrap inp) :
     SourceTopupCallCorresponds cfg inp call ∧
       VerityGuardedReturndataSimulation cfg call state :=
-  PTopup1.verity_tx_simulates_source_with_nonzero_wrap_close cfg inp call state hCall
+  let ⟨h1, h2, _, _⟩ :=
+    PTopup1.verity_tx_simulates_source_with_nonzero_wrap_close cfg inp call state hCall
+  ⟨h1, h2⟩
 
 end LidoSRv3.Audit.Provenance.TopupNoWrapOrphaned
