@@ -499,7 +499,6 @@
     {
       "id": "P-SSZ-1",
       "assumptions": [
-        "A-SHA256-FFI",
         "A-MULTI-NODE-TRANSPORT",
         "A-SOLC-TRUSTED",
         "A-RUNTIME-PROVENANCE"
@@ -565,7 +564,6 @@
       "parent_id": "P-SSZ-1",
       "source_plane_scope": "deposit-data-root only",
       "assumptions": [
-        "A-SHA256-FFI",
         "A-MULTI-NODE-TRANSPORT"
       ],
       "reproduction": {
@@ -647,7 +645,6 @@
       ],
       "no_new_forbidden_lean_tokens": true,
       "assumptions": [
-        "A-SHA256-FFI",
         "A-MULTI-NODE-TRANSPORT"
       ],
       "reproduction": {
@@ -866,8 +863,7 @@
       "parent_id": "P-SSZ-1",
       "source_plane_scope": "SSZ transaction execution simulation only",
       "assumptions": [
-        "A-VERITY-SCAFFOLD",
-        "A-SHA256-FFI"
+        "A-VERITY-SCAFFOLD"
       ],
       "no_new_forbidden_lean_tokens": true,
       "reproduction": {
@@ -1192,7 +1188,6 @@
     {
       "id": "P-SSZ-LIVE-1",
       "assumptions": [
-        "A-SHA256-FFI",
         "A-SOURCE-SHAPED",
         "A-CLASSICAL-CHOICE",
         "A-SOLC-TRUSTED",
