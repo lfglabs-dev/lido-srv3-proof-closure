@@ -224,13 +224,13 @@
           "handleOracleReport-shaped validity/overflow guards; observe reads writeArray balances",
           "Contract.run rollback after intermediate writes",
           "child source_report_before_reward: constructor ordering of an accepted positive-fee report on the source if-tree",
-          "sharesToMintAsFees derived from pinned fee products (grok #402): handleOracleReportDerived obtains sharesToMintAsFees from pinned _calculateProtocolFees products (Accounting.sol:317,323,325,331 via ReportFeeProductsCorrespondence) rather than a free Nat. Product panic is fail-closed; mint-after-read is cited from the unchanged parent. Discharged via LidoSRv3/Audit/Source/AccountFeeShares.lean; kill-lines in LidoSRv3/Tests/AccountFeeSharesMutants.lean. Axioms only propext / Quot.sound. totalFee / precisionPoints remain getter outputs (StakingRouter.getStakingRewardsDistribution 808-873); the live written-snapshot re-read stays a separate missing entry."
+          "sharesToMintAsFees derived from pinned fee products (grok #402): handleOracleReportDerived obtains sharesToMintAsFees from pinned _calculateProtocolFees products (Accounting.sol:317,323,325,331 via ReportFeeProductsCorrespondence) rather than a free Nat. Product panic is fail-closed; mint-after-read is cited from the unchanged parent. Discharged via LidoSRv3/Audit/Source/AccountFeeShares.lean; kill-lines in LidoSRv3/Tests/AccountFeeSharesMutants.lean. Axioms only propext / Quot.sound. totalFee / precisionPoints remain getter outputs (StakingRouter.getStakingRewardsDistribution 808-873); the live written-snapshot re-read stays a separate missing entry.",
+          "packed uint64 accounting words derived from pinned SRTypes.sol packing (grok #399): exact pack/unpack of ModuleStateAccounting (SRTypes.sol:157-164) and RouterStateAccounting (SRTypes.sol:166-172); on the committed admission domain (balances \u2264 MAX_VALUE_GWEI < 2^64), persistBalances writes pack \u27e8b, 0, 0\u27e9 (HandleOracleReportTx 162-164 / SRLib.sol:886), writeSlot totalBalanceSlot writes packRouter \u27e8total, 0\u27e9 (line 252 / SRLib.sol:891), observe unpacks those words (lines 284-285), and getStakingModuleStateAccounting recovers each balance (StakingRouter.sol:396-403). Source field write writeLow64 preserves bits 64+ (SRLib.sol:886). Width (uint32) and offset (bits 64..127) mutants disagree with the parent write. Discharged via LidoSRv3/Audit/Source/AccountPackedWords.lean; kill-lines in LidoSRv3/Tests/AccountPackedWordsMutants.lean. Axioms only propext / Quot.sound / Classical.choice (5 sample witnesses use native_decide, allow-listed)."
         ],
         "missing": [
           "SRStorage membership and unique uint24 module ids",
           "accountingOracle caller and REPORT_EXITED_VALIDATORS_ROLE",
           "submitReportData / _handleConsensusReportData",
-          "packed uint64 accounting words",
           "re-read of the written router snapshot for rewards",
           "full live-report success is still not modeled; the demoted child now states only local accepted constructor order through sourceTraceRetired"
         ]

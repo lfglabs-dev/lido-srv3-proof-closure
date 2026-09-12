@@ -141,6 +141,8 @@ import LidoSRv3.Audit.Provenance.AbstractTxIsolation
 import LidoSRv3.Audit.Source.AddressSingleton
 import LidoSRv3.Audit.Source.ReserveUnfinalizedCall
 import LidoSRv3.Audit.Source.AccountFeeShares
+import LidoSRv3.Audit.Source.AccountPackedWords
+import LidoSRv3.Tests.AccountPackedWordsMutants
 import LidoSRv3.Audit.Source.DepositLinksSource
 import LidoSRv3.Tests.PackGTopupProvenanceMutants
 import LidoSRv3.Audit.Provenance.ConsolidationRequest
@@ -1713,6 +1715,31 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.AccountFeeShares.product_panic_reverts
 #print axioms LidoSRv3.Audit.Source.AccountFeeShares.free_argument_mints_when_source_is_zero
 #print axioms LidoSRv3.Audit.Source.AccountFeeShares.getter_outputs_feed_products
+
+-- P-ACCOUNT-1 packed uint64 accounting words (grok #399 / see
+-- `audit/account-packed-words/README.md`). Exact pack/unpack of
+-- `ModuleStateAccounting` (SRTypes.sol:157-164) and
+-- `RouterStateAccounting` (SRTypes.sol:166-172). On the committed
+-- admission domain, persistBalances writes pack ⟨b, 0, 0⟩;
+-- writeSlot totalBalanceSlot writes packRouter ⟨total, 0⟩;
+-- observe unpacks; getStakingModuleStateAccounting recovers each
+-- balance; writeLow64 preserves bits 64+. Width (uint32) and offset
+-- (bits 64..127) mutants disagree with the parent write.
+-- Closes P-ACCOUNT-1's fidelity.missing entry "packed uint64
+-- accounting words".
+#print axioms LidoSRv3.Audit.Source.AccountPackedWords.persistBalances_writes_packed_zero
+#print axioms LidoSRv3.Audit.Source.AccountPackedWords.writeSlot_total_is_packed_router
+#print axioms LidoSRv3.Audit.Source.AccountPackedWords.persistBalances_getter_recovers
+#print axioms LidoSRv3.Audit.Source.AccountPackedWords.observe_balances_eq_unpacked_module_words
+#print axioms LidoSRv3.Audit.Source.AccountPackedWords.observe_total_eq_unpacked_router_word
+#print axioms LidoSRv3.Audit.Source.AccountPackedWords.parent_observe_eq_sourceView
+#print axioms LidoSRv3.Tests.AccountPackedWordsMutants.width32_misses_parent_balance
+#print axioms LidoSRv3.Tests.AccountPackedWordsMutants.offset64_disagrees_parent_ofNat
+#print axioms LidoSRv3.Tests.AccountPackedWordsMutants.sample_router_getter
+#print axioms LidoSRv3.Tests.AccountPackedWordsMutants.sample_persist_is_packed_zero
+#print axioms LidoSRv3.Tests.AccountPackedWordsMutants.sample_getter_recovers
+#print axioms LidoSRv3.Tests.AccountPackedWordsMutants.sample_width32_kill_line
+#print axioms LidoSRv3.Tests.AccountPackedWordsMutants.sample_offset64_kill_line
 
 -- P-DEPOSIT-1 LinksSource firstAmount / publicKeysBatchLength derived
 -- from pinned router shape (grok #405 / see `audit/deposit-linkssource/
