@@ -4,7 +4,7 @@
 
 ## Decision
 
-Review basis: structured inputs including the accepted TOPUP constructor provenance disclosure (theorem registrations and statuses unchanged; prior PR250 basis `ffd6ae4d5be0a5e1e7d1be335700e58ca90771f5` and exact input delta retained in `audit/metadata-reconcile/report-basis.json`; this revision is not a new independent certification; trio composition scoped separately) `67075346102c9bf3c8c0e442c441565766185373`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
+Review basis: structured inputs including the accepted TOPUP constructor provenance disclosure (theorem registrations and statuses unchanged; prior PR250 basis `ffd6ae4d5be0a5e1e7d1be335700e58ca90771f5` and exact input delta retained in `audit/metadata-reconcile/report-basis.json`; this revision is not a new independent certification; trio composition scoped separately) `ca785a6193df436c1e5bb72f9eeec51d04f64ff9`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
 
 ## Architecture and evidence boundary
 
@@ -25,7 +25,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 | [`P-ACCOUNT-1`](#p-account-1) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
 | [`P-RESERVE-1`](#p-reserve-1) | CHECKED | CHECKED | 13 open | **IMPLEMENTATION_PENDING** |
 | [`P-CONSOLIDATION-ETH-1`](#p-consolidation-eth-1) | CHECKED | CHECKED | 18 open | **IMPLEMENTATION_PENDING** |
-| [`P-ADDRESS-1`](#p-address-1) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
+| [`P-ADDRESS-1`](#p-address-1) | CHECKED | CHECKED | 11 open | **IMPLEMENTATION_PENDING** |
 | [`P-TOPUP-2`](#p-topup-2) | CHECKED | CHECKED | 14 open | **IMPLEMENTATION_PENDING** |
 | [`P-CONSOLIDATION-1`](#p-consolidation-1) | CHECKED | CHECKED | 8 open | **IMPLEMENTATION_PENDING** |
 | [`P-SSZ-1`](#p-ssz-1) | CHECKED | CHECKED | 9 open | **IMPLEMENTATION_PENDING** |
@@ -41,6 +41,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 | [`P-SSZ-1.encoding-simulation`](#p-ssz-1encoding-simulation) | CHECKED | CHECKED | 1 open | **IMPLEMENTATION_PENDING** |
 | [`P-TOPUP-2.leftover-budget-walk`](#p-topup-2leftover-budget-walk) | CHECKED | PARTIAL | 1 open | **IMPLEMENTATION_PENDING** |
 | [`P-TOPUP-2.router-inversion`](#p-topup-2router-inversion) | OPEN | OPEN | 1 open | **IMPLEMENTATION_PENDING** |
+| [`P-ADDRESS-1.recipient-call-bridge`](#p-address-1recipient-call-bridge) | CHECKED | CHECKED | 1 open | **IMPLEMENTATION_PENDING** |
 | [`P-ADDRESS-1.denote-admission`](#p-address-1denote-admission) | OPEN | CHECKED | 3 open | **IMPLEMENTATION_PENDING** |
 | [`P-RESERVE-RELATIONAL`](#p-reserve-relational) | CHECKED | CHECKED | 0 open | **NONE** |
 | [`P-ALLOC-EXEC-1`](#p-alloc-exec-1) | CHECKED | PARTIAL | 2 open | **IMPLEMENTATION_PENDING** |
@@ -266,7 +267,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
 
-**Limitations — 6 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+**Limitations — 11 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
 - keccak-level physical mapping-slot derivation for queue/checkpoint struct words; ContractState mapUint channels model keyed POSITION/POSITION+1 words
 - EnumerableSet owner-request removal, Transfer/WithdrawalClaimed events, adversarial recipient code, and machine-level CALL semantics
@@ -274,10 +275,15 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 - transferFrom is a wrapper-level single-item projection rather than a proved implementation-body correspondence
 - external-call success and most environment checks are caller-supplied Booleans
 - pinned implementation-body extraction and machine-level storage/execution correspondence
+- chantier 6 guard-order inversion #1 (mandate 2026-09-12): the Verity `AddressTx` model of `WithdrawalQueue.transferFrom` (`LidoSRv3/Audit/Verity/AddressTx.lean:82-88`) checks `balance >= amount` (line 84, `InsufficientBalance`) BEFORE `allowance >= amount` (line 86, `InsufficientAllowance`). The pinned Solidity source at `contracts/0.4.24/StETH.sol` for the analogous StETH `transferFrom` inverts this: allowance is decremented (via `_spendAllowance`) BEFORE the balance-debit `_transfer` in the ERC-20 flow. Two failure modes with the same account state therefore surface with different revert reasons on the two planes (Verity model reports `InsufficientBalance` where pinned StETH would report `InsufficientAllowance`). The registered parent's success/rollback conjuncts are ADDRESS-EQUIVARIANT over the model's own admission function and are not sensitive to which revert reason fires; the guard-order divergence is therefore invisible to the parent but a real fidelity gap of the modelled `transferFrom` correspondence.
+- chantier 6 guard-order inversion #2 (mandate 2026-09-12): the Verity `AddressTx` and `AddressClaimBatchTx` model of `WithdrawalQueue._claim` checks the request-owner gate (`ownerWord == addressToWord sender`, `NotRequestOwner`) at `AddressTx.lean:111` BEFORE the hint-bounds check on the supplied checkpoint hint. The pinned Solidity source at `contracts/0.8.9/WithdrawalQueueBase.sol` `_claim` (lines ~460-500) inverts this: `_checkHint(_requestId, _hint, _lastCheckpointIndex)` (hint bounds) is performed BEFORE the packed-word owner-decode check. A malformed hint on a not-yet-owned request therefore reverts `InvalidHint` on chain but `NotRequestOwner` on the Verity plane. The registered parent's address-equivariance is not sensitive to the revert-reason ordering, but the `AddressClaimBatchTx` per-request receipt shape is; this remains a fidelity gap of the modelled `_claim` correspondence.
+- chantier 6 parent shape disclosure (mandate 2026-09-12): the registered abstract parent `universal_address_writer_equivariance` is a BOOLEAN-PROJECTION theorem on `SolidityAddress.admitted` / `run` with a caller-relative renaming, and does NOT track any state indexed by address (the `AddressState` record models a scoped subset of the pinned storage; the parent's `run` produces a committed post-state that is renamed by `renameInput`/`renameOutput` but not indexed by address in the sense of an address→word mapping keyed by callers). Address-indexed storage — balances, allowances, per-address request lists — remains a separate model plane (`AddressClaimBatchTx` uses `mapUint` channels for the claim-loop, but the parent's success shape is projection-level, not physical-mapping-level).
+- chantier 6 (mandate 2026-09-12): the `LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean` module carries the real CALL evidence for the four permissionless writers — the executable `externalCallBindTo`-based call frames for `claimWithdrawalsTo` (`claim_withdrawals_to_revert_restores_caller_and_callee_world`), `unwrap` (`unwrap_bridge_receipt`, `unwrap_revert_restores_caller_and_callee_world`), `transferFrom` (`transfer_revert_restores_world`), and `requestWithdrawals` (`request_revert_restores_caller_and_callee_world`), plus the caller-and-callee-world rollback (`revert_restores_caller_and_callee_world`) and the EOA-recipient empty-value receipt (`eoa_empty_value_call_receipt`). These bridge theorems are NOT folded into the registered Verity parent `abstract_source_verity_tx_address_equivariance`; the parent still consumes address-writer observables via the projection plane and does not compose with the bridge's caller-and-callee-world rollback. Registered as subordinate `P-ADDRESS-1.recipient-call-bridge`.
+- chantier 6 report correction (mandate 2026-09-12): `report/P-ADDRESS-1.md` previously cited `PAddress1.bounded_live_claim_batch_storage_call_surface`, a theorem that does not exist in `LidoSRv3/`. Corrected to name the actual live-batch evidence: `LidoSRv3.Audit.Model.AddressClaimJournalLegacy.two_claim_batch_observe` (two-item receipt) and `LidoSRv3.Audit.Verity.AddressClaimBatchTx.every_revert_restores_snapshot` (universal failed-run rollback).
 
-**Classification.** **IMPLEMENTATION_PENDING** — Keep the checked four-projection parent, its admission-side and write-side kill-lines, and the Verity composition. Do not call all four writers permissionless or widen to singleton-actor entrypoints.
+**Classification.** **IMPLEMENTATION_PENDING** — Keep the checked four-projection parent, its admission-side and write-side kill-lines, and the Verity composition. Do not call all four writers permissionless or widen to singleton-actor entrypoints. Next steps (chantier 6 disclosures): fold the AddressRecipientCallBridge caller-and-callee-world rollback into the registered Verity parent, invert the balance/allowance and _claim owner/hint guard orders in the Verity model to match the pinned Solidity, and lift the parent from projection-level to physical-mapping-level for address-indexed storage.
 
-**Next gate.** OPEN: the checked parent remains a four-projection model. The separate claim batch now iterates arbitrary request/hint lists and materially reads packed request/checkpoint channels, updates locked ETH, and journals payout CALLs, with a checked two-item observe receipt. Still open: unbounded source/equivariance correspondence for that live batch, keccak physical mapping derivation, EnumerableSet/events/adversarial callee semantics, and unrelated packed ERC-721/WstETH storage. Do not add singleton-actor functions or call all four writers permissionless.
+**Next gate.** Chantier 6 (mandate 2026-09-12): two guard-order inversions disclosed in fidelity.missing (StETH balance-vs-allowance in the modelled transferFrom; WithdrawalQueue._claim owner-vs-hint). Parent shape disclosed as boolean-projection without address-indexed state. AddressRecipientCallBridge theorems registered as subordinate P-ADDRESS-1.recipient-call-bridge; not yet folded into the registered Verity parent. report/P-ADDRESS-1.md corrected: bounded_live_claim_batch_storage_call_surface (nonexistent) replaced by AddressClaimJournalLegacy.two_claim_batch_observe + AddressClaimBatchTx.every_revert_restores_snapshot. OPEN: unbounded source/equivariance correspondence for the live batch, keccak physical mapping derivation, EnumerableSet/events/adversarial callee semantics, and unrelated packed ERC-721/WstETH storage. Do not add singleton-actor functions or call all four writers permissionless.
 
 ### `P-TOPUP-2`
 
@@ -575,6 +581,24 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 **Classification.** **IMPLEMENTATION_PENDING** — Add committing_implies_router_guards_pass in TopupCorrespondence.lean, mirroring committedNoTopUp_implies_zero_total's run_inversion pattern, and compose it into router_source_cap_within_block_cap so the registered parent takes only (run cfg inp).reverts = false.
 
 **Next gate.** Preserve this open child; it tracks the open derivation of the aggregate hypothesis of the registered P-TOPUP-2 abstract parent.
+
+### `P-ADDRESS-1.recipient-call-bridge`
+
+**Accepted theorem planes.** Abstract `CHECKED`: `LidoSRv3.Audit.Verity.AddressRecipientCallBridge.revert_restores_caller_and_callee_world`. Verity `CHECKED`: `LidoSRv3.Audit.Verity.AddressRecipientCallBridge.eoa_empty_value_call_receipt`.
+
+**Proof shape / exact domain statement.** Chantier 6 (mandate 2026-09-12): registered as the P-ADDRESS-1 CALL-evidence subordinate. LidoSRv3/Audit/Verity/AddressRecipientCallBridge.lean carries the real executable external-call frames for the four permissionless writers: claimWithdrawalsTo (claim_withdrawals_to_revert_restores_caller_and_callee_world), unwrap (unwrap_bridge_receipt / unwrap_revert_restores_caller_and_callee_world), transferFrom (transfer_revert_restores_world), and requestWithdrawals (request_revert_restores_caller_and_callee_world), plus the caller-and-callee-world rollback lemma (revert_restores_caller_and_callee_world) and the EOA-recipient empty-value receipt (eoa_empty_value_call_receipt). These are not yet folded into the registered Verity parent abstract_source_verity_tx_address_equivariance; the parent still consumes address-writer observables at the projection plane and does not compose with the bridge's world-rollback shape.
+
+**Source/artifact provenance.** No independent source-map target; supplemental evidence only. A source-map entry is source provenance, not deployed-artifact provenance.
+
+**Assumptions.** `A-VERITY-SCAFFOLD`
+
+**Limitations — 1 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+
+- not yet folded into the registered Verity parent abstract_source_verity_tx_address_equivariance; the parent's success/rollback shape remains projection-level
+
+**Classification.** **IMPLEMENTATION_PENDING** — Fold the caller-and-callee-world rollback into the registered Verity parent so the parent shape is CALL-frame-level, not projection-level.
+
+**Next gate.** Preserve as child; folding the Bridge caller-and-callee-world rollback into the registered Verity parent of P-ADDRESS-1 is the next widening.
 
 ### `P-ADDRESS-1.denote-admission`
 
