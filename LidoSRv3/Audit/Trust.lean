@@ -78,6 +78,7 @@ import LidoSRv3.Audit.Guarantees.PReserve1LidoStoragePremise
 import LidoSRv3.Audit.Source.LidoStakingStateStorage
 import LidoSRv3.Audit.Guarantees.PAddress1BridgeCallPremise
 import LidoSRv3.Audit.Source.BridgeCallResultSource
+import LidoSRv3.Audit.Source.BridgePerWriterGlue
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -837,6 +838,10 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- from a named BridgeCallOutcome, not caller constant.
 #print axioms LidoSRv3.Audit.Source.BridgeCallResultSource.externalCallSucceeds_true_of_bridge_succeeded
 #print axioms LidoSRv3.Audit.Guarantees.PAddress1BridgeCallPremise.externalCallSucceeds_derived_from_bridge_outcome
+-- Per-writer Bridge-to-source glue (2026-09-13, second real-derivation step
+-- for P-ADDRESS-1 externalCallSucceeds): four per-writer constructors identify
+-- the pinned Solidity callee for each of the four address-bearing writers.
+#print axioms LidoSRv3.Audit.Source.BridgePerWriterGlue.bridgeOutcomeForWriter_succeeded
 -- General rule (Thomas 2026-09-12) applied to P-CONSOLIDATION-ETH-1
 -- feePerRequest free Nat: naming scaffold PinnedFeeStaticcallShape
 -- names the pinned WithdrawalVaultEIP7685.sol:79-81 STATICCALL entry
