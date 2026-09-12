@@ -155,7 +155,7 @@ theorem decode_abiWord_small (n : Nat) (hn : n < 256) :
   have hbe : beWord (abiWord n) = n := by
     simp only [abiWord]
     rw [beWord_zeros_snoc]
-    simp [Nat.mod_mod, Nat.mod_eq_of_lt hn]
+    simp [Nat.mod_eq_of_lt hn]
   simp [decodeWord32, abiWord_length, hbe]
 
 #print axioms live_requires_selector
