@@ -281,7 +281,8 @@
           "Contract.run rollback after intermediate writes",
           "guard-checking wrapper premise: canDeposit/authorizedRouter are proved to hold on any committed call, not merely assumed; the guard-liveness conjunct is kill-line-backed by guard_drop_kill_line_refutes_parent, which refutes the parent predicate shape (freshness retained) on mutantWithdrawNoCanDeposit, a guard-for-guard copy with only the canDeposit check dropped",
           "effective, min-capped, live queue-facing reserve is invariant under a fresh WQ-style value, not just the restated storedDepositsReserve field; the parent kill-line partition_spend_mutant_kill_line_refutes_parent refutes the parent predicate shape (freshness retained) on a mutated spend transition, and the stale-cache theorems separately witness that the freshQueueCache hypothesis cannot be dropped",
-          "live WithdrawalQueue.unfinalizedStETH call (grok #404): derives freshQueueCache from a live STATICCALL observation (selector 0xd0fb84e8, value 0, 32-byte ABI decode); fails closed on failure / wrong selector / nonzero value / short returndata. The physical queue subtraction stays in TrioReserve1.Queue. Discharged via LidoSRv3/Audit/Source/ReserveUnfinalizedCall.lean; kill-lines in LidoSRv3/Tests/ReserveUnfinalizedCallMutants.lean. Axioms only propext / Quot.sound."
+          "live WithdrawalQueue.unfinalizedStETH call (grok #404): derives freshQueueCache from a live STATICCALL observation (selector 0xd0fb84e8, value 0, 32-byte ABI decode); fails closed on failure / wrong selector / nonzero value / short returndata. The physical queue subtraction stays in TrioReserve1.Queue. Discharged via LidoSRv3/Audit/Source/ReserveUnfinalizedCall.lean; kill-lines in LidoSRv3/Tests/ReserveUnfinalizedCallMutants.lean. Axioms only propext / Quot.sound.",
+          "RESERVE-1 Verity plane divergence disclosures acknowledged (grok differential #419): six model divergences (D-TRANSFER-1, D-SLOT-1, D-OVERFLOW-STRING-1, D-PACK-1, D-SEED-1/D-EVENT-1, D-WRAP-1) honestly stated in fidelity.missing rather than occulted. D-WQ-FIELD-1 is closed by grok #404 (already merged as PR #408 via ReserveUnfinalizedCall.lean)."
         ],
         "missing": [
           "canDeposit / bunker / router authorization (now proved as scopedWithdrawGuards on any committed call, but the two booleans are still free inputs, not live bunker/pause/msg.sender checks)",
@@ -289,7 +290,13 @@
           "frame-nonce reset and report-time rebalance",
           "_seedDepositsCount",
           "buffer is a declared oracle word, not the contract balance",
-          "reserve-target writer surface setDepositsReserveTarget and its report-time rebalance interaction"
+          "reserve-target writer surface setDepositsReserveTarget and its report-time rebalance interaction",
+          "Verity `modelWithdrawDepositableEther` updates reserve words only; the pinned `Lido.sol:885` calls `stakingRouter.receiveDepositableEther.value(_amount)()`. The payable CALL (target, value, selector, order after the spend writes) is not journaled at the Verity plane. Grok differential #419 flags this as D-TRANSFER-1.",
+          "Verity storage is model-local slots 0-4 (`buffered` / `storedDepositsReserve` / `unfinalizedStETH` / `depositedPostReport` / `depositedNextReportAdjusted`); the pin uses keccak unstructured positions (`BUFFERED_ETHER_AND_DEPOSITED_POST_REPORT_POSITION`, `DEPOSITS_RESERVE_POSITION`, ...) and a packed uint128 pair for buffer + post-report. Storage identity between the model observation cells and the deployed layout is not claimed. Grok differential #419 flags this as D-SLOT-1.",
+          "Verity SafeMath overflow on `depositedPostReport +=` uses a model string `DEPOSITED_POST_REPORT_OVERFLOW`; the pinned 0.4.24 `SafeMath.add` reverts without a specific string. The four live wrapper strings (`CAN_NOT_DEPOSIT`, `APP_AUTH_FAILED`, `ZERO_AMOUNT`, `NOT_ENOUGH_ETHER`) match. Grok differential #419 flags this as D-OVERFLOW-STRING-1.",
+          "Verity does not model the packed uint128 pair `buffered`/`depositedPostReport` (Lido.sol:131-132). A seeded `depositedPostReport = uint128.max + 1 ether` still fits uint256 SafeMath in the model; the pin's 0.4.24 `<< 128` wraps the high half. The registered parent cannot see the pack wrap. Grok differential #419 flags this as D-PACK-1.",
+          "Verity omits `_seedDepositsCount` bookkeeping (Lido.sol:877-882) and the `Unbuffered` / `DepositedPostReportUpdated` events. Grok differential #419 flags this as D-SEED-1 / D-EVENT-1.",
+          "Verity allocation helper uses `safeSub` and returns `ALLOCATION_ARITHMETIC` on overflow; the pinned 0.4.24 helper does raw `remaining -=` (unchecked wrap). The `min` bounds make that branch unreachable on the grok harness vectors. Grok differential #419 flags this as D-WRAP-1."
         ]
       },
       "classification": {
@@ -437,7 +444,8 @@
           "executor sourceRun plus separately copied sourceRunIndependent/sourceLimitsIndependent/sourceCandidatesIndependent/sourceConsumeIndependent equations with proved equality bridges; an explicit decoded gwei-normalized topUpLimits array is checked against gateway evaluation and caps each request; observe reads persisted allocations and budget slots",
           "Contract.run rollback after intermediate writes",
           "maxValidatorsPerTopUp guard enforced as checked revert on count>32; the no-check mutant is guard-necessity evidence outside the registered Verity parent's count <= 32 premise",
-          "unbounded count and same-block accumulation bounds (grok #409): TopupUnboundedCount.leftover_walk_sum_le_budget proves the leftover walk is bounded for every key-list length (unbounded induction); registered parent stays the count=32 instance. TopupMultiCallBlockCap.same_block_sum_le_cap: under minBlockDistance \u2265 1 and blockNumber \u2260 0, the sum across sequential same-block calls is bounded by maxTopUpPerBlockGwei. Kill-lines no_lock_two_call_exceeds_cap and router_only_two_call_exceeds_cap refute the cap without the lock. Axioms only propext / Quot.sound. Discharged via LidoSRv3/Audit/Verity/TopupUnboundedCount.lean and LidoSRv3/Audit/Verity/TopupMultiCallBlockCap.lean."
+          "unbounded count and same-block accumulation bounds (grok #409): TopupUnboundedCount.leftover_walk_sum_le_budget proves the leftover walk is bounded for every key-list length (unbounded induction); registered parent stays the count=32 instance. TopupMultiCallBlockCap.same_block_sum_le_cap: under minBlockDistance \u2265 1 and blockNumber \u2260 0, the sum across sequential same-block calls is bounded by maxTopUpPerBlockGwei. Kill-lines no_lock_two_call_exceeds_cap and router_only_two_call_exceeds_cap refute the cap without the lock. Axioms only propext / Quot.sound. Discharged via LidoSRv3/Audit/Verity/TopupUnboundedCount.lean and LidoSRv3/Audit/Verity/TopupMultiCallBlockCap.lean.",
+          "TOPUP-2 Verity plane divergence disclosures acknowledged (grok differential #417): five model divergences (D-CONSUME-1, D-SLASH-1, D-AUTH-1/D-SORT-1/D-WC-1/D-PUBKEY-1/D-MAX-1 bundle, D-UNITS-1, D-TOTAL-1) honestly stated in fidelity.missing rather than occulted."
         ],
         "missing": [
           "_verifyValidator / 0x02 module WC / block-distance / RootPrecedesLastTopUp (the same-block accumulation half is closed by grok #409 \u2014 see covered).",
@@ -445,7 +453,12 @@
           "Lido withdrawDepositableEther and beacon makeBeaconChainTopUp",
           "gwei versus wei units and 48-byte pubkeys",
           "keccak memory-array oracle",
-          "pendingBalanceGwei is trusted operator calldata"
+          "pendingBalanceGwei is trusted operator calldata",
+          "Verity `sourceRun` applies a leftover-budget walk (`sourceConsume`) that the pinned `TopUpGateway.sol:226-232` does not execute; the pin writes `topUpLimits[i] = _evaluateTopUpLimit(...) * 1 gwei` independently per index. For two keys each eligible for 20 gwei with `remainingCap = 20`, source limits are `[20, 20]` but `sourceRun` produces `[20, 0]`. Grok differential #417 flags this as D-CONSUME-1.",
+          "Verity `evaluateTopUpLimit` does not take slash / exit as inputs; pinned `_evaluateTopUpLimit` (TopUpGateway.sol:403-405) returns 0 when `exitEpoch != FAR_FUTURE_EPOCH` or `slashed`. A slashed validator with a supplied `topUpLimits = [0]` (the pin) fails `evaluatedLimits != topUpLimits` and returns `none`. Grok differential #417 flags this as D-SLASH-1.",
+          "Verity `sourceRun` sees numeric arrays only; the pinned `:160-223` prefix guards `onlyRole(TOP_UP_ROLE)` (D-AUTH-1), strictly increasing indices (D-SORT-1), type-0x02 WC (D-WC-1), 48-byte pubkeys (D-PUBKEY-1), and `maxValidatorsPerTopUp` (D-MAX-1) are not exercised at the Verity plane. Grok differential #417.",
+          "Verity `sourceRun` stays in gwei; the pinned line 226 multiplies by `1 gwei` before the router call. Comparing `used` to on-chain `topUpLimits[i]` is a 10^9 disagreement unless the harness converts. Grok differential #417 flags this as D-UNITS-1.",
+          "Verity `used` is the leftover-consumed total; the pinned `totalLimits +=` sits in `unchecked` and gates `_setLastTopUpData` (D-TOTAL-1). Grok differential #417."
         ]
       },
       "classification": {
