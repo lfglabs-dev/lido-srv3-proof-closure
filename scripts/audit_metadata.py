@@ -90,7 +90,7 @@ EXPECTED_CANONICAL_CLAIMS = {
     "P-SSZ-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.deposit_root_iff", "CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.actual_compiled_cl_entry_complete_declared_branch", "IMPLEMENTATION_PENDING", ("A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT", "A-SOLC-TRUSTED", "A-RUNTIME-PROVENANCE")),
 }
 EXPECTED_CANONICAL_DETAIL_SHA256 = {
-    "P-ALLOC-1": "03e52f5e9f21cc4b9a6a22e408f4f115d79cea197e0f46f68bba67d43d461bf4",
+    "P-ALLOC-1": "ed0320e45dcdc483b5fd299514bfe79a6a28da2aaa184ab7c02761fff75583a2",
     "P-ALLOC-2": "605ae32bda595b9d0847ceccd826c9a7d76e1a99e3d617b7d1dc140ee940855b",
     "P-DEPOSIT-1": "6f8c1c10e295a4decfcce7030d15ae7126a0e167d71db52b3a0318ca8fd1637c",
     "P-TOPUP-1": "5f40ee538e6d5a3b236e88ca35ef5932936b87582ea2d42d4b26b625880d58e5",
