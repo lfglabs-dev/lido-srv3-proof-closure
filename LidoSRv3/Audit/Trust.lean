@@ -137,6 +137,7 @@ import LidoSRv3.Audit.Provenance.TopupNoWrapOrphaned
 import LidoSRv3.Audit.Provenance.SszPerfectHashOrphaned
 import LidoSRv3.Audit.Provenance.SszSha256Isolation
 import LidoSRv3.Audit.Provenance.HandwrittenMinFirstOrphaned
+import LidoSRv3.Audit.Provenance.AbstractTxIsolation
 import LidoSRv3.Tests.PackGTopupProvenanceMutants
 import LidoSRv3.Audit.Provenance.ConsolidationRequest
 import LidoSRv3.Audit.Provenance.CanonicalRequestAddress
@@ -1646,6 +1647,25 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Provenance.HandwrittenMinFirstOrphaned.alloc2_source_parent_applies_universally
 #print axioms LidoSRv3.Audit.Provenance.HandwrittenMinFirstOrphaned.alloc2_verity_parent_ignores_handwritten_minfirst
 #print axioms LidoSRv3.Audit.Provenance.HandwrittenMinFirstOrphaned.eugene_bound_parent_ignores_handwritten_minfirst
+
+-- A-ABSTRACT-TX isolation for the two remaining consumers (see
+-- `audit/findings/A-ABSTRACT-TX-isolated.md` and
+-- `LidoSRv3/Audit/Provenance/AbstractTxIsolation.lean`). Every one of
+-- the four registered parents on P-TOPUP-1 and P-CONSOLIDATION-ETH-1
+-- has `#print axioms` output that is a subset of
+-- `{propext, Classical.choice, Quot.sound}` -- no abstract-TX-shaped
+-- axiom is threaded through any kernel proof. A-ABSTRACT-TX is
+-- retired from `P-TOPUP-1.assumptions` and
+-- `P-CONSOLIDATION-ETH-1.assumptions`, and from
+-- `audit/assumptions.yaml`. The remaining abstract-vs-executable
+-- refactor (replacing `RevertRestoresSnapshot`'s TxObservation shape
+-- with a Verity.Contract.run rollback shape and eliminating the
+-- model-local fuelBudget dispatch bound) is a separate deeper
+-- statement change documented in each guarantee's `fidelity.missing`.
+#print axioms LidoSRv3.Audit.Provenance.AbstractTxIsolation.topup_source_parent_ignores_abstract_tx
+#print axioms LidoSRv3.Audit.Provenance.AbstractTxIsolation.topup_source_parent_applies_universally
+#print axioms LidoSRv3.Audit.Provenance.AbstractTxIsolation.topup_verity_parent_ignores_abstract_tx
+#print axioms LidoSRv3.Audit.Provenance.AbstractTxIsolation.consol_eth1_abstract_parent_ignores_abstract_tx
 
 -- A-CANONICAL-REQUEST-ADDRESS discharge (see
 -- `audit/findings/A-CANONICAL-REQUEST-ADDRESS-discharged.md` and
