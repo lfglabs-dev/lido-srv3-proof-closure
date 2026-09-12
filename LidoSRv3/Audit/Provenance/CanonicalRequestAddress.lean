@@ -25,21 +25,28 @@ Lido `WithdrawalVault` implementation bytecode.
   `0000bbddc7ce488642fb579f8b00f3a590007251`, i.e. the canonical
   EIP-7251 consolidation-request predeploy.
 
-`scripts/check_deployed_code.py` re-verifies that the deployed
-implementation runtime bytecode still matches the fixture (its
-byte-for-byte identity is anchored under the accepted assumption
-`A-RUNTIME-PROVENANCE`, which is a *global* assumption every guarantee
-already carries).
+`scripts/verify_consolidation_request_immutable.py` (chantier 7
+correction, mandate 2026-09-12: this file previously named
+`scripts/check_deployed_code.py`, which does NOT read the fixture —
+it compares deployed source metadata across repos) re-hashes the
+pinned fixture bytes, checks the artifact SHA-256 matches
+`audit/artifacts.lock.json`, and re-extracts the 20 bytes at offset
+730 to confirm they equal
+`0000bbddc7ce488642fb579f8b00f3a590007251`. The
+`A-RUNTIME-PROVENANCE` accepted assumption (a *global* assumption
+every guarantee already carries) still anchors the fixture-to-
+mainnet-implementation byte-for-byte identity.
 
 The Lean fact below extracts the 20 immutable bytes from the fixture
 and shows they equal the model literal. The fixture bytes at the
 extraction offset are hardcoded here as a `List UInt8` — that list is
 the exact byte substring `fixture[730:750]` of the pinned fixture
-file, which the reproduction script `scripts/verify_consolidation_
-request_immutable.py` re-derives (see the finding for details).
+file, which `scripts/verify_consolidation_request_immutable.py`
+re-derives at build time via `make test`.
 
 Together with the fixture-hash pin in `audit/artifacts.lock.json` and
-the `check_deployed_code.py` gate, this closes
+the `verify_consolidation_request_immutable.py` gate wired into
+`make test` (chantier 7, mandate 2026-09-12), this closes
 `A-CANONICAL-REQUEST-ADDRESS` down to `A-RUNTIME-PROVENANCE`.
 -/
 

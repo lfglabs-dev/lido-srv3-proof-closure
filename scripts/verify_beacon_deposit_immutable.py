@@ -68,14 +68,20 @@ def main() -> None:
         die(f"fixture length mismatch: got {len(fixture_bytes)}, expected {entry['fixture_size_bytes']}")
 
     for extraction in entry["immutable_extractions"]:
-        offset = extraction["byte_offset"]
+        # Chantier 7 fix (mandate 2026-09-12): some entries carry a single
+        # `byte_offset`, others (extraction_kind = push32_payload_enumeration)
+        # carry a `byte_offsets` list. Support both.
         width = extraction["width_bytes"]
         expected_hex = extraction["expected_value_hex"].lower()
-        extracted = fixture_bytes[offset:offset + width].hex().lower()
-        status = "OK" if extracted == expected_hex else "MISMATCH"
-        print(f"{extraction['immutable_name']} @ offset {offset} width {width}: {extracted} ({status})")
-        if extracted != expected_hex:
-            die(f"{extraction['immutable_name']} extraction mismatch")
+        offsets = extraction.get("byte_offsets")
+        if offsets is None:
+            offsets = [extraction["byte_offset"]]
+        for offset in offsets:
+            extracted = fixture_bytes[offset:offset + width].hex().lower()
+            status = "OK" if extracted == expected_hex else "MISMATCH"
+            print(f"{extraction['immutable_name']} @ offset {offset} width {width}: {extracted} ({status})")
+            if extracted != expected_hex:
+                die(f"{extraction['immutable_name']} extraction mismatch at offset {offset}")
 
     rpc_url = os.environ.get("ETH_RPC_URL")
     if rpc_url:
