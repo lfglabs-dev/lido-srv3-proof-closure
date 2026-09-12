@@ -91,6 +91,8 @@ import LidoSRv3.Audit.Verity.PConsolidationEth1RequestTx
 import LidoSRv3.Tests.PConsolidationEth1RefundTxMutants
 import LidoSRv3.Tests.PConsolidationEth1RequestTxMutants
 import LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants
+import LidoSRv3.Audit.Verity.ConsolidationEthUnboundedFuel
+import LidoSRv3.Tests.ConsolidationEthUnboundedFuelMutants
 import LidoSRv3.Audit.Guarantees.PSsz1
 import LidoSRv3.Audit.Verity.SszEncodingTx
 import LidoSRv3.Tests.SszEncodingTxMutants
@@ -760,6 +762,14 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1.verity_tx_universal_zero_remainder_boundary
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1.verity_tx_success_and_revert_partition
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1.verity_tx_composes_value_flow_and_rollback
+-- Chantier 5 (mandate 2026-09-12): additive derived consumer integrating grok #410,
+-- lifting the P-CONSOLIDATION-ETH-1 success arm to derived fuel batchSize+4.
+#print axioms LidoSRv3.Audit.Verity.ConsolidationEthUnboundedFuel.verity_tx_success_shape_unbounded
+#print axioms LidoSRv3.Audit.Verity.ConsolidationEthUnboundedFuel.registered_parent_is_instance_at_32
+#print axioms LidoSRv3.Audit.Verity.ConsolidationEthUnboundedFuel.registered_parent_recovered_at_32
+#print axioms LidoSRv3.Tests.ConsolidationEthUnboundedFuelMutants.truncated_fuel_batchSize_plus_three_exhausted
+#print axioms LidoSRv3.Tests.ConsolidationEthUnboundedFuelMutants.truncated_fuel_must_be_refused
+#print axioms LidoSRv3.Tests.ConsolidationEthUnboundedFuelMutants.parent_fuel_premise_excludes_batch_29
 #print axioms LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants.rejects_dropped_refund_leg
 #print axioms LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants.rejects_misrouted_vault_leg
 #print axioms LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants.rejects_corrupted_refund_amount
