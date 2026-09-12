@@ -4,7 +4,7 @@
 
 ## Decision
 
-Review basis: structured inputs including the accepted TOPUP constructor provenance disclosure (theorem registrations and statuses unchanged; prior PR250 basis `ffd6ae4d5be0a5e1e7d1be335700e58ca90771f5` and exact input delta retained in `audit/metadata-reconcile/report-basis.json`; this revision is not a new independent certification; trio composition scoped separately) `b92f13645595881a93f61d3ab4afaa065af2764a`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
+Review basis: structured inputs including the accepted TOPUP constructor provenance disclosure (theorem registrations and statuses unchanged; prior PR250 basis `ffd6ae4d5be0a5e1e7d1be335700e58ca90771f5` and exact input delta retained in `audit/metadata-reconcile/report-basis.json`; this revision is not a new independent certification; trio composition scoped separately) `8e92393f02c48739132c2e49a030da5e21b74d6f`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
 
 ## Architecture and evidence boundary
 
@@ -24,7 +24,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 | [`P-TOPUP-1`](#p-topup-1) | CHECKED | CHECKED | 7 open | **IMPLEMENTATION_PENDING** |
 | [`P-ACCOUNT-1`](#p-account-1) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
 | [`P-RESERVE-1`](#p-reserve-1) | CHECKED | CHECKED | 14 open | **IMPLEMENTATION_PENDING** |
-| [`P-CONSOLIDATION-ETH-1`](#p-consolidation-eth-1) | CHECKED | CHECKED | 18 open | **IMPLEMENTATION_PENDING** |
+| [`P-CONSOLIDATION-ETH-1`](#p-consolidation-eth-1) | CHECKED | CHECKED | 19 open | **IMPLEMENTATION_PENDING** |
 | [`P-ADDRESS-1`](#p-address-1) | CHECKED | CHECKED | 12 open | **IMPLEMENTATION_PENDING** |
 | [`P-TOPUP-2`](#p-topup-2) | CHECKED | CHECKED | 15 open | **IMPLEMENTATION_PENDING** |
 | [`P-CONSOLIDATION-1`](#p-consolidation-1) | CHECKED | CHECKED | 8 open | **IMPLEMENTATION_PENDING** |
@@ -235,7 +235,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Assumptions.** `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
 
-**Limitations — 18 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+**Limitations — 19 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
 - VaultHub / Dashboard / TriggerableWithdrawalsGateway / StakingVault withdraw sites (named out of scope)
 - Bus/Gateway/Vault intermediate hops and live executeConsolidation ABI
@@ -255,6 +255,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 - chantier 5 CL proof guard (mandate 2026-09-12): the consensus-layer validator-status proof required by the gateway before forwarding source/target pubkey pairs to the vault is not modeled; a batch with unverifiable/invalid CL proof must revert before the modeled arms.
 - chantier 5 fee STATICCALL (mandate 2026-09-12): the vault's `_getConsolidationRequestFee` (WithdrawalVaultEIP7685.sol:79-81 → `_getFeeFromContract(CONSOLIDATION_REQUEST)`) reads the live fee via STATICCALL on the CONSOLIDATION_REQUEST address; the registered Verity parent treats fee as a caller-supplied word, not as the live STATICCALL result. A live-STATICCALL binding is required before the vault-side fee equation can be claimed against the deployed EIP-7251 predeploy.
 - chantier 5 source-map correction (mandate 2026-09-12): the P-CONSOLIDATION-ETH-1 first span in `audit/source-map.yaml` previously pointed at `contracts/0.8.25/vaults/ValidatorConsolidationRequests.sol` line 24-25 (a nonexistent file), which was the wrong contract. Corrected to `contracts/0.8.9/vaults/WithdrawalVaultEIP7685.sol` lines 17-73 (CONSOLIDATION_REQUEST immutable declaration + constructor initialization + `_addConsolidationRequests` function that consumes it). The concrete `WithdrawalVault.sol` extends this abstract base.
+- general-rule residual (Thomas 2026-09-12): the P-CONSOLIDATION-ETH-1 `PinnedFeeStaticcallShape` scaffold (see covered) names the pinned STATICCALL entry point but does NOT yet execute it against the live EIP-7251 predeploy. A real derivation requires a live-STATICCALL executable model on the pinned CONSOLIDATION_REQUEST address, an ABI decoder for the 32-byte fee return word, and an EIP-7251-schedule model to describe the predeploy's per-block fee output. None are tree-resident yet. Until they are added, the `feePerRequest` remains a free Nat even under the scaffold — the scaffold's value is naming the composition entry point.
 
 **Classification.** **IMPLEMENTATION_PENDING** — Keep the universal success-arm parent, the now-universal four-arm revert partition with its numeral witnesses, the zero-remainder boundary corner, the wiring/premise kill-lines, and the chantier-5 grok-#410 derived-fuel consumer. Keep A-CANONICAL-REQUEST-ADDRESS discharged. Do not restore vault→Lido/WQ as a child or compose with P-CONSOLIDATION-1 until an ABI/interpreter bridge exists. Next steps (chantier 5 disclosures): model the ADD_CONSOLIDATION_REQUESTS_ROLE gate, the whenResumed pause, the quota check, the CL proof, and bind the live fee STATICCALL to the deployed EIP-7251 predeploy.
 
