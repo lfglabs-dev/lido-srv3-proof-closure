@@ -51,7 +51,6 @@
     {
       "id": "P-ALLOC-2",
       "assumptions": [
-        "A-HANDWRITTEN-MINFIRST",
         "A-VERITY-SCAFFOLD",
         "A-SOLC-TRUSTED",
         "A-RUNTIME-PROVENANCE"
@@ -735,8 +734,7 @@
       "parent_id": "P-ALLOC-1",
       "source_plane_scope": "operator bond bound only",
       "assumptions": [
-        "A-SOURCE-SHAPED",
-        "A-HANDWRITTEN-MINFIRST"
+        "A-SOURCE-SHAPED"
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound LidoSRv3.Tests.PAlloc1EugeneBoundVectors",
