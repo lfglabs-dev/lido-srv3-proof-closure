@@ -341,7 +341,9 @@ contract Topup2DifferentialTest {
         (bool ok,) = callTopUp(OPERATOR, _data(_one(1), vws, _one(0)));
         require(!ok, "router revert");
         require(gateway.getLastTopUpTimestamp() == 0, "no last write after fail");
-        require(log.count() == 1, "call happened then reverted");
+        // The evaluate loop finished in memory, then stakingRouter.topUp reverted.
+        // The CallLog push and LastTopUpChanged both roll back with the frame.
+        require(log.count() == 0, "journal rolled back");
     }
 
     function testMutantDroppedGuardDetected() public {
