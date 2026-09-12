@@ -264,7 +264,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Limitations — 6 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
-- _verifyValidator / 0x02 module WC / block-distance / RootPrecedesLastTopUp; same-block accumulation across calls is excluded from the single-call parent
+- _verifyValidator / 0x02 module WC / block-distance / RootPrecedesLastTopUp (the same-block accumulation half is closed by grok #409 — see covered).
 - live wei conversion and the module-selected allocateDeposits return/policy
 - Lido withdrawDepositableEther and beacon makeBeaconChainTopUp
 - gwei versus wei units and 48-byte pubkeys
