@@ -139,6 +139,7 @@ import LidoSRv3.Audit.Provenance.SszSha256Isolation
 import LidoSRv3.Audit.Provenance.HandwrittenMinFirstOrphaned
 import LidoSRv3.Audit.Provenance.AbstractTxIsolation
 import LidoSRv3.Audit.Source.AddressSingleton
+import LidoSRv3.Audit.Source.ReserveUnfinalizedCall
 import LidoSRv3.Tests.PackGTopupProvenanceMutants
 import LidoSRv3.Audit.Provenance.ConsolidationRequest
 import LidoSRv3.Audit.Provenance.CanonicalRequestAddress
@@ -1681,6 +1682,21 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.AddressSingleton.no_fixed_actor_of_admitted
 #print axioms LidoSRv3.Audit.Source.AddressSingleton.fixed_owner_mutant_requires_actor
 #print axioms LidoSRv3.Audit.Source.AddressSingleton.parent_omission_is_definitional
+
+-- P-RESERVE-1 live unfinalizedStETH STATICCALL (grok #404 / see
+-- `audit/reserve-unfinalized/README.md`): derives `freshQueueCache`
+-- from a live STATICCALL to `unfinalizedStETH()` (selector 0xd0fb84e8,
+-- zero value, 32-byte ABI decode). The registered parent still takes
+-- `freshQueueCache before live`; this consumer derives `live` from
+-- the STATICCALL observation and fails closed on failure / wrong
+-- selector / nonzero value / short returndata. Closes P-RESERVE-1's
+-- fidelity.missing entry "live WithdrawalQueue.unfinalizedStETH
+-- call (freshness is now an explicit freshQueueCache hypothesis with
+-- a stale-cache kill-line, not an implicit assumption)".
+#print axioms LidoSRv3.Audit.Source.ReserveUnfinalizedCall.success_fresh_iff
+#print axioms LidoSRv3.Audit.Source.ReserveUnfinalizedCall.failed_call_not_fresh
+#print axioms LidoSRv3.Audit.Source.ReserveUnfinalizedCall.spend_preserves_from_live_call
+#print axioms LidoSRv3.Audit.Source.ReserveUnfinalizedCall.decode_abiWord_small
 
 -- A-CANONICAL-REQUEST-ADDRESS discharge (see
 -- `audit/findings/A-CANONICAL-REQUEST-ADDRESS-discharged.md` and
