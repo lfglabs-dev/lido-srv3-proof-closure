@@ -63,6 +63,8 @@ Axioms of every export (`#print axioms`): `propext` / `Quot.sound` /
 
 - **cwd:** `/workspace`
 - **base SHA:** `1a40db36df3990da9287ac7b03b7e9a1e9bcffe4` (`origin/main`)
+- **lot SHAs:** `ee143402ce383b4687187e6ab67ee71c25c1c2af`,
+  `cc43ebd7ac456e1e78e8af42c1e8c4c6927c7296`
 - **toolchain:** `leanprover/lean4:v4.31.0` (`68218e876d2a38b1985b8590fff244a83c321783`)
 - **targets:** `lake build LidoSRv3.Audit.Verity.AddressClaimBatchUnbounded`
   `LidoSRv3.Audit.Spec.AllocLoopTermination`, both mutant modules, and
