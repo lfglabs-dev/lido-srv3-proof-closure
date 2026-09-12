@@ -38,7 +38,7 @@ namespace LidoSRv3.Audit.Verity.TopupUnboundedCount
 
 open _root_.Verity
 open LidoSRv3.Audit.Guarantees.PTopup2
-open LidoSRv3.Audit.Source.Topup2
+open LidoSRv3.Audit.Source.Topup2 hiding Word
 open LidoSRv3.Audit.Verity.Topup2DistributionTx
 
 /-! ## Induction on the key list
@@ -91,32 +91,21 @@ theorem parent_block_cap_instance_eq
 are already quantified over every list.  Restate them here as the derived
 consumer so the unbounded lot names its own induction. -/
 
-theorem sourceConsume_any_count :
-    ∀ remaining candidates,
-      sourceConsume remaining candidates = sourceConsumeIndependent remaining candidates
-  | _, [] => rfl
-  | remaining, cand :: rest => by
-      simp [sourceConsume, sourceConsumeIndependent, sourceConsume_any_count]
+theorem sourceConsume_any_count (remaining : Word) (candidates : List Word) :
+    sourceConsume remaining candidates =
+      sourceConsumeIndependent remaining candidates :=
+  (sourceConsumeIndependent_eq_sourceConsume remaining candidates).symm
 
-theorem sourceLimits_any_count :
-    ∀ effective pending target minTopUp,
-      sourceLimits effective pending target minTopUp =
-        sourceLimitsIndependent effective pending target minTopUp
-  | [], [], _, _ => rfl
-  | e :: es, p :: ps, target, minTopUp => by
-      simp [sourceLimits, sourceLimitsIndependent, sourceLimits_any_count]
-  | [], _ :: _, _, _ => rfl
-  | _ :: _, [], _, _ => rfl
+theorem sourceLimits_any_count (effective pending : List Word)
+    (target minTopUp : Word) :
+    sourceLimits effective pending target minTopUp =
+      sourceLimitsIndependent effective pending target minTopUp :=
+  (sourceLimitsIndependent_eq_sourceLimits effective pending target minTopUp).symm
 
-theorem sourceCandidates_any_count :
-    ∀ requested topUpLimits,
-      sourceCandidates requested topUpLimits =
-        sourceCandidatesIndependent requested topUpLimits
-  | [], [] => rfl
-  | r :: rs, limit :: limits => by
-      simp [sourceCandidates, sourceCandidatesIndependent, sourceCandidates_any_count]
-  | [], _ :: _ => rfl
-  | _ :: _, [] => rfl
+theorem sourceCandidates_any_count (requested topUpLimits : List Word) :
+    sourceCandidates requested topUpLimits =
+      sourceCandidatesIndependent requested topUpLimits :=
+  (sourceCandidatesIndependent_eq_sourceCandidates requested topUpLimits).symm
 
 theorem sourceRun_any_count
     (effective pending requested topUpLimits : List Word)
@@ -124,10 +113,9 @@ theorem sourceRun_any_count
     sourceRun effective pending requested topUpLimits target minTopUp remainingCap
         moduleLimit valueGwei =
       sourceRunIndependent effective pending requested topUpLimits target minTopUp
-        remainingCap moduleLimit valueGwei := by
-  unfold sourceRun sourceRunIndependent
-  simp only [sourceLimits_any_count, sourceCandidates_any_count, sourceConsume_any_count]
-  rfl
+        remainingCap moduleLimit valueGwei :=
+  (sourceRunIndependent_eq_sourceRun effective pending requested topUpLimits
+    target minTopUp remainingCap moduleLimit valueGwei).symm
 
 /-! ## `allocate` without the frozen-32 guard
 
@@ -165,11 +153,9 @@ theorem allocate_eq_any_of_le
         failAfterWrites := by
   funext snapshot
   unfold allocate allocateAnyCount
-  by_cases hz : count = 0
-  · simp [hz]
-  · have hbeq : (count == 0) = false := by simp [hz]
-    have hNotOver : ¬ maxValidatorsPerTopUp < count := Nat.not_lt.mpr h
-    simp [hbeq, hNotOver]
+  have hNotOver : ¬ maxValidatorsPerTopUp < count := Nat.not_lt.mpr h
+  simp [hNotOver]
+  rfl
 
 /-- Lockstep of the unbounded transaction against the independent source
 view, for **every** decoded count.  No `count ≤ 32` premise. -/
@@ -201,12 +187,12 @@ theorem verity_tx_simulates_pinned_source_any_count
   by_cases hZero : requested.length = 0
   · have hEffZ : effective.length = 0 := hER.trans hZero
     unfold Contract.run allocateAnyCount sourceView
-    simp [hZero, hEffZ, observe, sourceRunIndependent]
+    simp [hZero, observe, sourceRunIndependent, hEffZ]
   · have hZ : (requested.length == 0) = false := by simp [hZero]
     unfold Contract.run allocateAnyCount sourceView
     simp only [hZ, Bool.false_eq_true, ↓reduceIte, hEff', hPend', hReq, hLimits']
-    rw [sourceRun_any_count]
-    cases hRun : sourceRunIndependent effective pending requested topUpLimits target minTopUp
+    rw [sourceRunIndependent_eq_sourceRun]
+    cases hRun : sourceRun effective pending requested topUpLimits target minTopUp
         remainingCap moduleLimit valueGwei with
     | none =>
         simp [observe]
