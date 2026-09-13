@@ -843,6 +843,24 @@ theorem writePayloads_events (start : Nat) (payloads : List (List Word))
       intro start state
       simp only [writePayloads, writeMapUint_events, ih]
 
+/-- **Chantier 2 (Thomas 2026-09-13) writePayloads invariance.**
+`writePayloads` writes only to the fabricated `sourceMapSlot` /
+`targetMapSlot` mappings; `observeFromJournal` reads none of those,
+so `writePayloads` is transparent to it. Corollary: dropping the
+`writePayloads` call site would leave `observeFromJournal`'s output
+unchanged. This is the "write side" complement to the "read side"
+slot-invariance theorem (`observeFromJournal_success_slot_invariant`
+from PR #594): together, `observeFromJournal` is provably
+insensitive to whether the fabricated writes happen or not, and
+insensitive to the values they store. -/
+theorem observeFromJournal_writePayloads_invariant
+    (before : ContractState) (r : Result) (start : Nat)
+    (payloads : List (List Word)) (state : ContractState) :
+    observeFromJournal before (.success r (writePayloads start payloads state)) =
+      observeFromJournal before (.success r state) := by
+  simp only [observeFromJournal, writePayloads_calls, writePayloads_events,
+    writePayloads_readSlot]
+
 theorem persist_calls (start : Nat) (obs : Observables) (state : ContractState) :
     (persist start obs state).calls = state.calls ++ obs.calls.map toJournal := by
   unfold persist
