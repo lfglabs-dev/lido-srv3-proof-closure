@@ -150,6 +150,7 @@ import LidoSRv3.Audit.Source.ConsolidationMsgValueSource
 import LidoSRv3.Audit.Source.StETHGuardOrderSource
 import LidoSRv3.Audit.Source.ClaimGuardOrderSource
 import LidoSRv3.Audit.Source.ConsolidationFeeMsgValueComposition
+import LidoSRv3.Audit.Source.ConsolidationCompositeGateSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -1175,6 +1176,8 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.ConsolidationFeeMsgValueComposition.vaultMsgValue_pos_of_gates_pass_and_fee_pos
 #print axioms LidoSRv3.Audit.Source.ConsolidationFeeMsgValueComposition.vaultMsgValue_zero_of_fee_zero
 #print axioms LidoSRv3.Audit.Source.ConsolidationFeeMsgValueComposition.batchSize_gate_fails_of_gt
+-- Seventieth-step (2026-09-13): P-CONSOLIDATION-ETH-1 composite entry-gate.
+#print axioms LidoSRv3.Audit.Source.ConsolidationCompositeGateSource.entryGatePasses_true_of_all_premises
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape
