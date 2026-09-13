@@ -18,9 +18,26 @@ parent covers ALL four writers in the ETH-reserve balance partition
 
 **Honest reading:** the registered parent
 `LidoSRv3.Audit.Guarantees.PReserve1.source_spend_preserves_withdrawal_reserve`
-covers ONE writer — the top-up spend path. The three other writers
-in the partition are not composed into the parent; each is either an
-open sub-obligation or a subordinate row.
+covers ONE writer — the top-up spend path (`Lido.withdrawDepositableEther`
+at `Lido.sol:869-886`).  The three other writers in the ETH-reserve
+partition are NOT composed into the parent and each remains an open
+sub-obligation:
+
+1. **`setDepositsReserveTarget`** — the reserve-target update surface
+   (Lido admin call).  Currently absent from the model.
+2. **Report-time rebalance** via `_updateBufferedEtherAllocation`
+   (invoked from Lido's oracle report handler).  Not modeled.
+3. **Withdrawal-queue finalization** (`WithdrawalQueue.finalize`
+   updating `unfinalizedStETH`) — the source of the `freshQueueCache`
+   hypothesis; the WQ writer itself is outside the P-RESERVE-1
+   parent's scope.
+
+Chantier 2 mandate: "modélise les trois autres écrivains de la
+partition (setDepositsReserveTarget, rééquilibrage au rapport
+`_updateBufferedEtherAllocation`, finalisation WQ) ou, si hors portée,
+rétrécis honnêtement la carte et note-le dans SITE-CORRECTIONS.md".
+This card is the honest-narrowing option: the parent covers exactly
+the top-up spend writer; the other three remain open follow-ups.
 
 Additional signal chantier 1 (mandate 2026-09-12) reinstated as
 `fidelity.missing`:
@@ -32,29 +49,33 @@ Additional signal chantier 1 (mandate 2026-09-12) reinstated as
 > RECLASSED not discharged (PR #408 was a rename, not a change to
 > the parent's ENUNCE).
 
-Additional signal chantier 2 Piste A (2026-09-13, PR #559):
+Additional signal chantier 2 Piste A (2026-09-13, PR #559 + PR #589):
 
-> **`WithdrawInputs.canDeposit` free Bool eliminated at the parent's
+> **Both free Booleans on `WithdrawInputs` eliminated at the parent's
 > ENUNCE level.**  `WithdrawInputs` no longer carries `canDeposit :
-> Bool` as a free caller field.  It carries `lidoState :
-> LidoStakingState { isStakingPaused, isBunkerActive }` (shared with
-> TOPUP-1) and `canDeposit` is a `@[reducible, simp] def` computing
-> `canDepositFromStorage inputs.lidoState` per `Lido.sol:815-816`.
-> Callers can no longer instantiate the boolean independently of a
-> named pinned Lido storage state.  Residual: `authorizedRouter :
-> Bool` remains a free field on `WithdrawInputs` (Aragon-ACL
-> derivation left as a follow-up; `PReserve1LidoStoragePremise`
-> already contains the `canDeposit_derived_from_lido_state` and
-> `authorizedRouter_derived_from_acl` compositions that a future PR
-> can wire in); the two `LidoStakingState` component booleans still
-> stand in for live pause / bunker storage reads.
+> Bool` nor `authorizedRouter : Bool` as free caller fields.  It
+> carries `lidoState : LidoStakingState { isStakingPaused,
+> isBunkerActive }` (shared with TOPUP-1) and `acl :
+> AragonACLSource.ACLState { stakingRouterRole, topUpGatewayApp :
+> Bool }` (a two-boolean source-model of the Aragon ACL registry
+> restricted to the two role queries the audit uses).
+> `WithdrawInputs.canDeposit` is a `@[reducible, simp] def` computing
+> `canDepositFromStorage inputs.lidoState` per `Lido.sol:815-816`;
+> `WithdrawInputs.authorizedRouter` is a `@[reducible, simp] def`
+> computing `isAuthorizedRouter inputs.acl` = `inputs.acl.stakingRouterRole`
+> per `Lido.sol:872`.  Callers can no longer instantiate either
+> boolean independently of a named pinned storage/ACL state.
+> Residual: the four `LidoStakingState` + `ACLState` component
+> booleans still stand in for live pause / bunker / ACL-role storage
+> reads.
 
 **Site fix:** narrow the RESERVE-1 card to name exactly the one
-writer covered, list the other three as open, and reference
-`audit/guarantees.yaml` P-RESERVE-1 `fidelity.missing` for the
-13 disclosed gaps (was 12 before chantier 1's reinstatement).  Also
-reflect that `canDeposit` on `WithdrawInputs` is no longer a free
-boolean; `authorizedRouter` remains.
+writer covered, list the other three as open (setDepositsReserveTarget,
+report-time rebalance, WQ finalization — see the four-writer
+enumeration above), and reference `audit/guarantees.yaml`
+P-RESERVE-1 `fidelity.missing` for the disclosed gaps.  Also
+reflect that BOTH `canDeposit` and `authorizedRouter` on
+`WithdrawInputs` are now derived from pinned source states.
 
 ## TOPUP-1 — Verity plane ENUNCE promises match the code (chantier 2)
 
@@ -94,16 +115,36 @@ that actually delivers what the name promises:
   plane.
 - Conjuncts 3–4 are proved on the legacy `execute` plane, not on
   `executeGuarded`; the guarded-plane analogue is open.
-- **`lidoCanDeposit` free Bool eliminated at the parent's ENUNCE
-  level** (Piste-A chantier 1, PR #562, 2026-09-13): `SourceTopupInput`
-  no longer carries `lidoCanDeposit : Bool` as a free caller field.
-  It carries `lidoState : LidoStakingState { isStakingPaused,
-  isBunkerActive }` and `lidoCanDeposit` is a `@[reducible, simp] def`
-  computing `canDepositFromStorage inp.lidoState` per
-  `Lido.sol:815-816`.  Residual: the other three `SourceTopupInput`
-  booleans (`callerIsTopUpGateway`, `moduleExists`, `wcTypeIsType2`)
-  remain free at the structure level; the pinned SR-context source
-  model `SRTopupCallerContext` exists but is not yet wired.
+- **All four `SourceTopupInput` free Bools eliminated at the parent's
+  ENUNCE level** (Piste-A chantier 1, PR #562 + PR #583, 2026-09-13):
+  `SourceTopupInput` no longer carries `lidoCanDeposit`,
+  `callerIsTopUpGateway`, `moduleExists`, or `wcTypeIsType2` as free
+  caller fields.  It carries `lidoState : LidoStakingState
+  { isStakingPaused, isBunkerActive }` (PR #562) and `srCtx :
+  SRTopupCallerContext { callerIsGatewayFromRead,
+  moduleExistsFromRead, wcTypeIsType2FromRead }` (PR #583).  Each of
+  the four booleans becomes a `@[reducible, simp] def` accessor over
+  one of the two embedded source states: `lidoCanDeposit` reduces
+  to `canDepositFromStorage inp.lidoState` per `Lido.sol:815-816`;
+  the three SR-context booleans reduce to the corresponding source
+  functions in `SRStorageSourceModel` per StakingRouter.sol:686
+  (`_checkAppAuth(_getTopUpGateway())`), SRUtils.sol:46
+  (`SRStorage.isModuleExists`), and SRUtils.sol:42
+  (`WithdrawalCredentials.isType2`).  30 construction sites migrated
+  in Piste-A test/verity files.  Callers of `SourceTopupInput` can
+  no longer instantiate any of the four booleans independently of
+  named pinned source states.
+- **D-ADDR-1 fully discharged (both halves)** (Piste-A chantier 1,
+  PR #604, 2026-09-13): `Verity.TopupTx.lidoAddress` is no longer
+  the `0xF00D` placeholder — it is anchored to the deployed
+  `StakingRouter` runtime `LIDO` immutable inlined at seven
+  `push20_payload_enumeration` byte offsets (6332, 9021, 9656, 9739,
+  10386, 12237, 15321, each width 20) via new provenance module
+  `LidoSRv3/Audit/Provenance/LidoAddress.lean`.  Value:
+  `0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84`, the canonical Lido
+  proxy mainnet address.  The beacon-address half of D-ADDR-1 was
+  already covered by `BeaconDepositAddress.lean` (PR #391); both
+  halves now discharged down to `A-RUNTIME-PROVENANCE`.
 - **Executable Contract.run rollback theorems registered in the
   P-TOPUP-1 namespace** (Piste-A chantier 1, PR #576, 2026-09-13):
   `verity_tx_guarded_revert_restores_snapshot` (for
@@ -121,12 +162,16 @@ that actually delivers what the name promises:
 **Site fix:** update the TOPUP-1 card to describe the four-conjunct
 Verity parent honestly, disclose the D-CALL-1 residual
 (prefix-then-suffix half of the executable-plane extension), reflect
-that `lidoCanDeposit` is now derived from a pinned `LidoStakingState`
-while the three SR-context booleans remain caller premises, and
-mention the two new executable Contract.run rollback theorems
-`verity_tx_guarded_revert_restores_snapshot` /
-`verity_tx_legacy_revert_restores_snapshot` while noting the abstract
-A-ABSTRACT-TX conjunct is still in the registered parent.
+that **all four** SourceTopupInput booleans (`lidoCanDeposit`,
+`callerIsTopUpGateway`, `moduleExists`, `wcTypeIsType2`) are now
+derived from pinned source states (`LidoStakingState` +
+`SRTopupCallerContext`), mention the two new executable Contract.run
+rollback theorems `verity_tx_guarded_revert_restores_snapshot` /
+`verity_tx_legacy_revert_restores_snapshot` (noting the abstract
+A-ABSTRACT-TX conjunct is still in the registered parent), and
+reflect that **both halves of D-ADDR-1** (beacon and Lido addresses)
+are anchored to the deployed StakingRouter runtime bytecode via
+`BeaconDepositAddress.lean` and `LidoAddress.lean`.
 
 ## TOPUP-2 — narrowing signal is 'exact under gateway-shape premise, wrapped otherwise' (chantier 4bis)
 
