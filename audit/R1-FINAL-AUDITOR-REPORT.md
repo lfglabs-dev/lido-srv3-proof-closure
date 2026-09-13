@@ -4,7 +4,7 @@
 
 ## Decision
 
-Review basis: structured inputs including the accepted TOPUP constructor provenance disclosure (theorem registrations and statuses unchanged; prior PR250 basis `ffd6ae4d5be0a5e1e7d1be335700e58ca90771f5` and exact input delta retained in `audit/metadata-reconcile/report-basis.json`; this revision is not a new independent certification; trio composition scoped separately) `bfb93ad2c2125dda6d2eb6b6b40a0cd3a0a6e0bd`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
+Review basis: structured inputs including the accepted TOPUP constructor provenance disclosure (theorem registrations and statuses unchanged; prior PR250 basis `ffd6ae4d5be0a5e1e7d1be335700e58ca90771f5` and exact input delta retained in `audit/metadata-reconcile/report-basis.json`; this revision is not a new independent certification; trio composition scoped separately) `73884a73df1481d9a61b27a278fd48df3de41dee`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
 
 ## Architecture and evidence boundary
 
@@ -18,7 +18,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 | Claim | Abstract | Verity | Fidelity gaps | Classification |
 | --- | --- | --- | --- | --- |
-| [`P-ALLOC-1`](#p-alloc-1) | CHECKED | CHECKED | 4 open | **IMPLEMENTATION_PENDING** |
+| [`P-ALLOC-1`](#p-alloc-1) | CHECKED | CHECKED | 3 open | **IMPLEMENTATION_PENDING** |
 | [`P-ALLOC-2`](#p-alloc-2) | CHECKED | CHECKED | 4 open | **IMPLEMENTATION_PENDING** |
 | [`P-DEPOSIT-1`](#p-deposit-1) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
 | [`P-TOPUP-1`](#p-topup-1) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
@@ -65,12 +65,11 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
 
-**Limitations — 4 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+**Limitations — 3 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
 - unique moduleAddress on addModule
 - getDepositAllocations / MinFirst fill (see P-ALLOC-2)
 - reachable-router CheckedBounds (partially addressed: `target_multiplication` conjunct derived from pinned uint16/uint64 type bounds via PAlloc1TargetMultBounded, PR #439; three remaining conjuncts wrapped in naming scaffold `PinnedSRAllocationBoundsShape`; the bridge parent `checked_execute_under_pinned_shape` composes both into the P-ALLOC-1 conclusion under pinned shape premises rather than raw `CheckedBounds`, chantier 3 2026-09-13. Residual: `active_subtraction` / `total_addition` / `available_arithmetic` are still pass-through invariants, not derived from live SRStorage reads.)
-- Contract.run rollback after intermediate writes for AllocationTx.allocate; the cited revert_restores_snapshot theorem does not cover allocateLiveFromStorage
 **Trio source composition.** The new source path reads physical count/configuration, executes each response-dependent module call and checked arithmetic in source order, then performs the capacity pass. Count is derived for modeled initialization/ACL/public-writer histories; the raw-state theorem takes count <=32. It does not cap an arbitrary corrupt count. The stored producer derives output arrays from executed per-row writes.
 
 **Composition validation.** SOURCE COMPOSITION CANDIDATE; final independent review and official exact-source gates pending. Legacy primary guarantee registrations remain unchanged.
