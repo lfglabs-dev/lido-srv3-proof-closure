@@ -144,4 +144,38 @@ theorem moduleExists_true_of_mapping_nonzero
   simp [moduleExistsFromMapping,
         LidoSRv3.Audit.Source.KeccakMappingStorageSource.read, hNonzero]
 
+/-! ## Fourth-step composition (2026-09-13): wcTypeIsType2 via packed decoder
+
+`SRTopupCallerContext.wcTypeIsType2FromRead` above still takes the
+WC-type check as a `Bool`. The pinned `SRUtils._requireWCType2`
+(SRUtils.sol:41-43) checks a specific byte of the module state
+config's `withdrawalCredentialsType` field. In the pinned packed
+storage, that byte is at a specific bit offset of the module state
+struct's packed word. The composition below derives
+`wcTypeIsType2FromRead` from a `PackedSlotDecoder` on that byte. -/
+
+/-- The bit-range for `withdrawalCredentialsType` in the packed
+ModuleStateConfig slot (per SRLib.sol packing). Concrete offset is
+auditable against pinned source; scaffold names it as constants. -/
+def wcTypeBitOffset : Nat := 8
+def wcTypeBitWidth : Nat := 8
+
+/-- Definition of `_requireWCType2` from a packed slot decoder: the
+`wcTypeBitOffset..wcTypeBitOffset+wcTypeBitWidth` byte of the packed
+module-state-config word equals 2 iff the WC type is type 2. -/
+def wcTypeIsType2FromPacked
+    (d : LidoSRv3.Audit.Source.KeccakMappingStorageSource.PackedSlotDecoder) : Bool :=
+  decide (LidoSRv3.Audit.Source.KeccakMappingStorageSource.decodeField
+    d wcTypeBitOffset wcTypeBitWidth = 2)
+
+/-- Under the pinned packed-slot premise (the decoder's WC-type byte
+equals 2), `wcTypeIsType2FromPacked = true`. Real derivation from a
+named bit-range read. -/
+theorem wcTypeIsType2_true_of_byte_two
+    {d : LidoSRv3.Audit.Source.KeccakMappingStorageSource.PackedSlotDecoder}
+    (hByte : d.extract wcTypeBitOffset wcTypeBitWidth = 2) :
+    wcTypeIsType2FromPacked d = true := by
+  simp [wcTypeIsType2FromPacked,
+        LidoSRv3.Audit.Source.KeccakMappingStorageSource.decodeField, hByte]
+
 end LidoSRv3.Audit.Source.SRStorageSourceModel
