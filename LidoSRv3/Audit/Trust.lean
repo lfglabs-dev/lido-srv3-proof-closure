@@ -128,6 +128,7 @@ import LidoSRv3.Audit.Source.WQRequestPackedDecoderSource
 import LidoSRv3.Audit.Source.WQCheckpointPackedDecoderSource
 import LidoSRv3.Audit.Source.PermitDecodeSource
 import LidoSRv3.Audit.Source.SolidityAddressTypeSource
+import LidoSRv3.Audit.Source.SolidityUint256WrapSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -1068,6 +1069,11 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.SolidityAddressTypeSource.toAddress_lt_modulus
 #print axioms LidoSRv3.Audit.Source.SolidityAddressTypeSource.toAddress_idem
 #print axioms LidoSRv3.Audit.Source.SolidityAddressTypeSource.toAddress_id_of_bounded
+-- Forty-eighth-step (2026-09-13): Solidity uint256 wrap source model.
+#print axioms LidoSRv3.Audit.Source.SolidityUint256WrapSource.toUint256_lt_modulus
+#print axioms LidoSRv3.Audit.Source.SolidityUint256WrapSource.toUint256_idem
+#print axioms LidoSRv3.Audit.Source.SolidityUint256WrapSource.checkedAddOverflow_false_of_bounded
+#print axioms LidoSRv3.Audit.Source.SolidityUint256WrapSource.checkedAddOverflow_true_of_wrap
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape
