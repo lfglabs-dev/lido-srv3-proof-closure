@@ -100,6 +100,7 @@ import LidoSRv3.Audit.Source.ERC20AllowanceKeyViaOracleSource
 import LidoSRv3.Audit.Source.ACLPermissionKeyViaOracleSource
 import LidoSRv3.Audit.Source.ConsolidationPauseSlotViaOracleSource
 import LidoSRv3.Audit.Source.ConsolidationQuotaSlotViaOracleSource
+import LidoSRv3.Audit.Source.ACLRoleMappingViaOracleSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -956,6 +957,8 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.ConsolidationPauseSlotViaOracleSource.whenResumedGuardFromOracle_passes_of_slot_zero
 -- Nineteenth-step (2026-09-13): quota-guard MappingStorage via KeccakOracle.
 #print axioms LidoSRv3.Audit.Source.ConsolidationQuotaSlotViaOracleSource.quotaCheckFromOracle_passes_of_bound
+-- Twentieth-step (2026-09-13): ACL role-mapping MappingStorage via KeccakOracle.
+#print axioms LidoSRv3.Audit.Source.ACLRoleMappingViaOracleSource.hasRoleFromOracle_true_of_nonzero
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape
