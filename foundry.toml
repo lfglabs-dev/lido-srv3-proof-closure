@@ -38,3 +38,20 @@ remappings = [
   "contracts/=lido-core/contracts/",
   "@openzeppelin/contracts-v5.2/=audit/deposit-dsm-call/solidity/src/@openzeppelin/contracts-v5.2/"
 ]
+
+# Pinned Lido.withdrawDepositableEther vs modelWithdrawDepositableEther via FFI (grok #419).
+# The 0.4.24 Lido pin is compiled by scripts/compile_reserve_pin.sh (Foundry
+# 1.8 does not resolve solc 0.4.24 natively); the test deploys the pre-compiled
+# bytecode via cheatcode `vm.deployCode`.
+[profile.reserve_source]
+src = "solidity/reserve/src"
+test = "solidity/reserve/test"
+out = "solidity/out/reserve"
+cache_path = "solidity/cache/reserve"
+solc_version = "0.8.25"
+via_ir = false
+evm_version = "cancun"
+fs_permissions = [{ access = "read", path = "./" }]
+remappings = [
+  "contracts/=lido-core/contracts/"
+]
