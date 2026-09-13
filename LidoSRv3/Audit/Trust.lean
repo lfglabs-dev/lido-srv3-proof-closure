@@ -1862,13 +1862,17 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- `canonical_request_literal` pins the EIP-7251 canonical literal
 -- as a text-level constant; `rewrite_preserves_other` documents that
 -- the ensemble rewrite preserves other fields;
--- `canonical_request_assumption_remains_open` explicitly records the
--- residual assumption A-CANONICAL-REQUEST-ADDRESS as open.
+-- `canonical_request_assumption_status` (chantier 4 rename, Thomas
+-- 2026-09-13) records that A-CANONICAL-REQUEST-ADDRESS deployed-target
+-- identity is DISCHARGED (fixture-anchored `verify_*` +
+-- `Provenance/CanonicalRequestAddress.lean`); the residual OPEN gap is
+-- the separate Verity-plane fold (`MultiContract.requestAddr = 5` not
+-- folded to the discharged canonical literal).
 #print axioms LidoSRv3.Audit.Provenance.ConsolidationRequest.ensemble_request_is_verity_requestAddr
 #print axioms LidoSRv3.Audit.Provenance.ConsolidationRequest.verity_requestAddr_remains_ensemble
 #print axioms LidoSRv3.Audit.Provenance.ConsolidationRequest.canonical_request_literal
 #print axioms LidoSRv3.Audit.Provenance.ConsolidationRequest.rewrite_preserves_other
-#print axioms LidoSRv3.Audit.Provenance.ConsolidationRequest.canonical_request_assumption_remains_open
+#print axioms LidoSRv3.Audit.Provenance.ConsolidationRequest.canonical_request_assumption_status
 
 -- Provenance.Deposit: 3 audit-only claims documenting the open
 -- deployment-facts boundary. `deposit_contract_assumption_remains_open`
