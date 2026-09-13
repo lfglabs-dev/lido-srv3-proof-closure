@@ -176,13 +176,15 @@ private def stateBal (inputs : Inputs) (bal : Nat) : Verity.ContractState :=
 /-! ## Value-plane kill-lines: CALLs must move exactly msg.value
 
 Three model mutants of the same executed transaction (see
-`ConsolidationTx.lean`): `addRequestsValueBlind` keeps the payable credit
-and the journaled CALL frames but debits nothing (the pre-lift stub
-behavior), `addRequestsDoubleDebit` debits twice the journaled value per
-CALL, and `addRequestsJournalValueBlind` debits honestly but journals each
-frame with value `0`. Each witness satisfies the same memory-decode
-hypotheses as the registered parent `verity_tx_simulates_consolidation`,
-so the refutations are about the value plane, not decode plumbing. -/
+`ConsolidationTx.lean`): `addRequestsValueBlindSlotFree` keeps the
+payable credit and the journaled CALL frames but debits nothing
+(value-blind stub), `addRequestsDoubleDebitSlotFree` debits twice the
+journaled value per CALL, and `addRequestsJournalValueBlindSlotFree`
+debits honestly but journals each frame with value `0`. Each witness
+satisfies the same memory-decode hypotheses as the registered parents
+`verity_tx_journal_forwards_msg_value` and `verity_tx_preserves_eth_balance`
+(both on `addRequestsSlotFree` after chantier 2 PR #646), so the
+refutations are about the value plane, not decode plumbing. -/
 
 private def valObs : Observables :=
   commitObservables (word consolidationRequestAddress) (word 3) (word 3)
