@@ -104,13 +104,29 @@ that actually delivers what the name promises:
   booleans (`callerIsTopUpGateway`, `moduleExists`, `wcTypeIsType2`)
   remain free at the structure level; the pinned SR-context source
   model `SRTopupCallerContext` exists but is not yet wired.
+- **Executable Contract.run rollback theorems registered in the
+  P-TOPUP-1 namespace** (Piste-A chantier 1, PR #576, 2026-09-13):
+  `verity_tx_guarded_revert_restores_snapshot` (for
+  `Verity.TopupTx.executeGuarded cfg call failure`) and
+  `verity_tx_legacy_revert_restores_snapshot` (for
+  `Verity.TopupTx.execute allocations failure`), each proving
+  `state = rollback` on any revert.  Underlying proofs unfold
+  `Contract.run` and case-split on the wrapper's success/revert
+  branches.  Registered as executable-plane companions of the
+  A-ABSTRACT-TX-backed `RevertRestoresSnapshot` conjunct in
+  `source_topup_conserves_and_rolls_back`.  Retiring A-ABSTRACT-TX
+  from the parent's ENUNCE (rewriting the 5-conjunct signature) is
+  still open.
 
 **Site fix:** update the TOPUP-1 card to describe the four-conjunct
 Verity parent honestly, disclose the D-CALL-1 residual
-(prefix-then-suffix half of the executable-plane extension), and
-reflect that `lidoCanDeposit` is now derived from a pinned
-`LidoStakingState` while the three SR-context booleans remain caller
-premises.
+(prefix-then-suffix half of the executable-plane extension), reflect
+that `lidoCanDeposit` is now derived from a pinned `LidoStakingState`
+while the three SR-context booleans remain caller premises, and
+mention the two new executable Contract.run rollback theorems
+`verity_tx_guarded_revert_restores_snapshot` /
+`verity_tx_legacy_revert_restores_snapshot` while noting the abstract
+A-ABSTRACT-TX conjunct is still in the registered parent.
 
 ## TOPUP-2 — narrowing signal is 'exact under gateway-shape premise, wrapped otherwise' (chantier 4bis)
 
@@ -205,6 +221,54 @@ distinct named-open items (verifyProof on production gindices,
 `_validatorHashTreeRoot` layout distinct from calldata offsets,
 EIP-4788, SHA-256), and DO NOT describe the dummy-validator model as
 the registered parent.
+
+## ALLOC-1 — Chantier 3 progress (Piste A, 2026-09-13)
+
+**No misleading site claim was flagged for ALLOC-1.**  This section
+records the honest posture of P-ALLOC-1 after three Piste-A chantier-3
+PRs.
+
+- **`checked_execute_under_pinned_shape`** (PR #557):  new bridge
+  parent in `LidoSRv3.Audit.Guarantees.PAlloc1` composes
+  `PinnedStakingModuleTypeBounds` (real Nat.mul_le_mul + decide
+  derivation of the `target_multiplication` conjunct from pinned
+  uint16 `shareLimit` + uint64 `totalValidators`) with
+  `PinnedSRAllocationBoundsShape` (naming scaffold for
+  `active_subtraction`/`total_addition`/`available_arithmetic`), and
+  applies `checked_execute` to the composed `CheckedBounds`.  Real
+  derivation for one out of five conjuncts; the other three remain
+  pass-through invariants (residual open until live-SRStorage source
+  models land).
+- **`verity_tx_live_revert_restores_snapshot`** (PR #571):  new
+  registered theorem in `PAlloc1` re-exports
+  `Verity.AllocationTx.live_revert_restores_snapshot` — every revert
+  of `allocateLiveFromStorage` (the actual live-summary entry wired
+  into the P-ALLOC-1 Verity parent) restores the pre-call snapshot.
+  Includes the injected late-failure path
+  `live_injected_after_writes_rolls_back` (revert reason
+  `INJECTED_AFTER_WRITES` fired after every summary/stake staticcall +
+  all observation writes).  The prior `fidelity.missing` entry that
+  flagged rollback coverage for `allocate` only is retired.
+- **Hoisting + flat-slot disclosures** (PR #574): two new
+  `fidelity.missing` entries in P-ALLOC-1: (a) `bindLiveAll` hoists
+  all `_getStakingModuleSummary` / `getTotalModuleStake` staticcalls
+  out of the pinned `SRLib.sol:508-533` interleaved allocation loop,
+  so no equivalence is claimed for full outcomes or call traces; (b)
+  the Verity model uses flat `Nat` slot indices
+  (`modulesCountSlot = 29`, `moduleIdSlot = 30`, `moduleConfigSlot = 31`)
+  whereas pinned `SRStorage.sol` uses ERC-7201-style keccak-derived
+  namespaced slots.
+
+**Site fix:** if the ALLOC-1 card presents `CheckedBounds` as fully
+derived, narrow it to "target_multiplication derived from pinned
+type bounds; other three CheckedBounds conjuncts remain pinned-shape
+premises".  If the ALLOC-1 card presents storage identity between the
+Verity model and the deployed layout, narrow it to "model plane
+pattern/order, no byte-level identity claimed".  If the ALLOC-1 card
+presents `Contract.run` rollback as unconditional across all entry
+points, note that both `allocate` (legacy planted maps) and
+`allocateLiveFromStorage` (live-summary entry) are covered by
+namespace-registered theorems.
 
 ## Global signals
 
