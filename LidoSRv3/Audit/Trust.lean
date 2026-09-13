@@ -109,6 +109,7 @@ import LidoSRv3.Audit.Source.DepositPerKeyCallSource
 import LidoSRv3.Audit.Source.DepositCustomErrorsSource
 import LidoSRv3.Audit.Source.ERC7201StorageSlotSource
 import LidoSRv3.Audit.Source.DepositDistinctModulesSource
+import LidoSRv3.Audit.Source.TopupPrefixGuardsSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -990,6 +991,11 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.DepositDistinctModulesSource.distinctModules_true_of_singleton
 #print axioms LidoSRv3.Audit.Source.DepositDistinctModulesSource.distinctModules_true_of_empty
 #print axioms LidoSRv3.Audit.Source.DepositDistinctModulesSource.distinctModules_cons
+-- Twenty-ninth-step (2026-09-13): TOPUP-1 prefix-guards source model for #414.
+#print axioms LidoSRv3.Audit.Source.TopupPrefixGuardsSource.callerIsTopupGateway_true_of_eq
+#print axioms LidoSRv3.Audit.Source.TopupPrefixGuardsSource.keysListNonEmpty_true_of_ne
+#print axioms LidoSRv3.Audit.Source.TopupPrefixGuardsSource.wcTypeIsType2_true_of_eq_two
+#print axioms LidoSRv3.Audit.Source.TopupPrefixGuardsSource.allPrefixGuardsPass_true_of_premises
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape
