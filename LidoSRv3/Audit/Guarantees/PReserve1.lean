@@ -6,6 +6,7 @@ import LidoSRv3.Audit.Source.ReserveSeedBookkeepingSource
 import LidoSRv3.Audit.Source.ERC7201StorageSlotSource
 import LidoSRv3.Audit.Source.SolidityUint128WrapSource
 import LidoSRv3.Audit.Source.ReserveSetTargetSource
+import LidoSRv3.Audit.Source.WithdrawalQueueFinalizeSource
 import LidoSRv3.Audit.Guarantees.Registry
 
 namespace LidoSRv3.Audit.Guarantees.PReserve1
@@ -539,5 +540,20 @@ theorem reserve_set_target_noop_of_unauth
     LidoSRv3.Audit.Source.ReserveSetTargetSource.setDepositsReserveTarget
       state newTarget false = state :=
   LidoSRv3.Audit.Source.ReserveSetTargetSource.setDepositsReserveTarget_of_unauth state newTarget
+
+/-- Source-shaped WithdrawalQueue finalization writer facts (PR #675). -/
+theorem reserve_wq_finalize_drops_unfinalized
+    (wqs : LidoSRv3.Audit.Source.WithdrawalQueueMappingSource.WithdrawalQueueStorage)
+    (finalizedAmount : Nat) :
+    (LidoSRv3.Audit.Source.WithdrawalQueueFinalizeSource.finalize
+        wqs finalizedAmount).unfinalizedStETH = wqs.unfinalizedStETH - finalizedAmount :=
+  LidoSRv3.Audit.Source.WithdrawalQueueFinalizeSource.finalize_unfinalizedStETH wqs finalizedAmount
+
+theorem reserve_wq_finalize_monotone
+    (wqs : LidoSRv3.Audit.Source.WithdrawalQueueMappingSource.WithdrawalQueueStorage)
+    (finalizedAmount : Nat) :
+    (LidoSRv3.Audit.Source.WithdrawalQueueFinalizeSource.finalize
+        wqs finalizedAmount).unfinalizedStETH ≤ wqs.unfinalizedStETH :=
+  LidoSRv3.Audit.Source.WithdrawalQueueFinalizeSource.finalize_monotone wqs finalizedAmount
 
 end LidoSRv3.Audit.Guarantees.PReserve1
