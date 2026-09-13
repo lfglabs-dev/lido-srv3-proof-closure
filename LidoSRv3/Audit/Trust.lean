@@ -155,6 +155,7 @@ import LidoSRv3.Audit.Source.Topup1CompositeGateSource
 import LidoSRv3.Audit.Source.Reserve1CompositeGateSource
 import LidoSRv3.Audit.Source.Address1CompositeGuardSource
 import LidoSRv3.Audit.Source.Deposit1CompositeGateSource
+import LidoSRv3.Audit.Source.Topup2CompositeGuardSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -1191,6 +1192,10 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- Seventy-fourth-step (2026-09-13): P-DEPOSIT-1 composite entry-gate.
 #print axioms LidoSRv3.Audit.Source.Deposit1CompositeGateSource.entryGatePasses_true_of_premises
 #print axioms LidoSRv3.Audit.Source.Deposit1CompositeGateSource.journal_length_eq_deposit_count
+-- Seventy-fifth-step (2026-09-13): P-TOPUP-2 chantier-4bis composite guard.
+#print axioms LidoSRv3.Audit.Source.Topup2CompositeGuardSource.compositeGuardPasses_true_of_premises
+#print axioms LidoSRv3.Audit.Source.Topup2CompositeGuardSource.rounded_allocation_preserves_cap
+#print axioms LidoSRv3.Audit.Source.Topup2CompositeGuardSource.minClamp_allocation_preserves_cap
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape
