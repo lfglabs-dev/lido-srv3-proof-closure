@@ -26,7 +26,13 @@ retained.
 ## Non-goals
 
 - No bus, no consensus-layer verify.
-- Gateway nonzero stays a premise.
+- Gateway nonzero (formerly A-CONSOLIDATION-GATEWAY-NONZERO) is RETIRED
+  from P-CONSOLIDATION-VALUE-1's assumption list via PR #712's
+  registered-parent statement swap to `..._from_gateway`. The
+  `hGatewayAdmittedNonzero` implication is DERIVED from
+  `PredeployStaticcallResult`-shaped pinned-source premises via
+  `gatewayTotalFee_ne_zero_of_fee_ne_zero`. Residual `hFeeNonzero`
+  on the STATICCALL structure remains caller-supplied.
 - Official denotation success is not claimed.
 
 ## Build
