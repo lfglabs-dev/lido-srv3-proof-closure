@@ -1481,7 +1481,6 @@
       "assumptions": [
         "A-SOURCE-SHAPED",
         "A-VERITY-SCAFFOLD",
-        "A-CONSOLIDATION-GATEWAY-NONZERO",
         "A-CLASSICAL-CHOICE",
         "A-SOLC-TRUSTED",
         "A-RUNTIME-PROVENANCE"
@@ -1490,14 +1489,14 @@
         "command": "lake build LidoSRv3.Audit.Guarantees.PConsolidationValue1 LidoSRv3.Tests.PackN6ConsolValueMutants LidoSRv3.Tests.PackP6OfficialSuccessMutants",
         "expected": "official_denote_succeeds_and_justified_forwards_msg_value builds; official_denote_mutant_still_reverts_refutes_parent, zero_value_link_mutant_refutes_value_bearing_conjunct, official_denote_success_kill_line_refutes_parent, and zero_value_calls_refute_exact_forwarding keep premises"
       },
-      "summary": "Supplemental parent: the official upstream widened-call denotation (DenoteFunctionCalls.denoteFunctionWithCalls at the pinned Verity head) succeeds on the registered bind entrypoint for every oracle, accepting predeploy model, transaction, and world satisfying the source guards, journaling one fresh value-bearing CALL frame, forwarding exactly msg.value, re-establishing preservesEthBalance, and producing only request frames; independently the justified interpreter forwards exactly msg.value with noConsensusLayerVerify. A-CONSOLIDATION-GATEWAY-NONZERO stays a premise. No bus. The base denoteFunction fragment still reverts on the bind entrypoint (kept named in ConsolidationBridgeGap).",
+      "summary": "official_denote_succeeds_and_justified_forwards_msg_value_from_gateway (chantier 2 Thomas 2026-09-13 item a, follows PR #699 pattern): the registered supplemental parent takes `result : PredeployStaticcallResult` (naming the pinned EIP-7251 CONSOLIDATION_REQUEST STATICCALL return from WithdrawalVaultEIP7685.sol:79-93) plus `hFeeNonzero : result.abiDecodedFee ≠ 0` at the outer level, and per-conjunct pinned-source premises replacing the caller-supplied `hGatewayAdmittedNonzero` implication: (first conjunct) `hFeeFromStaticcall : fee = result.abiDecodedFee` binds the free fee to the STATICCALL return, and (second conjunct) `hMsgValueSource : inputs.msgValue.val = gatewayVaultBoundary result inputs.sources.length .msgValue` bridges the vault input to the gateway-forwarded scalar (ConsolidationGateway.sol:212-220), plus `hCountPos : 0 < inputs.sources.length`. Under this shape both `→ msgValue ≠ 0` premises are DERIVED via `Nat.one_mul` / `gatewayTotalFee_ne_zero_of_fee_ne_zero`, and A-CONSOLIDATION-GATEWAY-NONZERO is RETIRED from this guarantee's assumption list. The original `official_denote_succeeds_and_justified_forwards_msg_value` (kept in-file for downstream compat) proves: the official upstream widened-call denotation (DenoteFunctionCalls.denoteFunctionWithCalls at the pinned Verity head) succeeds on the registered bind entrypoint for every oracle, accepting predeploy model, transaction, and world satisfying the source guards, journaling one fresh value-bearing CALL frame, forwarding exactly msg.value, re-establishing preservesEthBalance, and producing only request frames; independently the justified interpreter forwards exactly msg.value with noConsensusLayerVerify. No bus. The base denoteFunction fragment still reverts on the bind entrypoint (kept named in ConsolidationBridgeGap).",
       "abstract": {
         "status": "CHECKED",
-        "theorem": "LidoSRv3.Audit.Guarantees.PConsolidationValue1.official_denote_succeeds_and_justified_forwards_msg_value"
+        "theorem": "LidoSRv3.Audit.Guarantees.PConsolidationValue1.official_denote_succeeds_and_justified_forwards_msg_value_from_gateway"
       },
       "verity": {
         "status": "CHECKED",
-        "theorem": "LidoSRv3.Audit.Guarantees.PConsolidationValue1.official_denote_succeeds_and_justified_forwards_msg_value"
+        "theorem": "LidoSRv3.Audit.Guarantees.PConsolidationValue1.official_denote_succeeds_and_justified_forwards_msg_value_from_gateway"
       },
       "fidelity": {
         "covered": [
