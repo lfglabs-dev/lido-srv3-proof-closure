@@ -203,6 +203,21 @@ that actually delivers what the name promises:
   `source_topup_conserves_and_rolls_back`.  Retiring A-ABSTRACT-TX
   from the parent's ENUNCE (rewriting the 5-conjunct signature) is
   still open.
+- **D-EMPTY-1 / D-AUTH-1 / D-WC-1 prefix-guards naming bridge**
+  (Piste-A chantier 1, PR #627, 2026-09-13):  new bridge parent
+  `source_topup_conserves_and_rolls_back_under_prefix_guards_shape`
+  in `PTopup1` names the three pinned StakingRouter.topUp:686-716
+  prefix guards at the parent's ENUNCE via
+  `TopupPrefixGuardsSource`: `callerIsTopupGateway = decide (caller
+  = topupGateway)` (D-AUTH-1, line 686 `NotAuthorized`);
+  `keysListNonEmpty = decide (keyIndices.length ≠ 0)` (D-EMPTY-1,
+  line 695 `EmptyKeysList`); `wcTypeIsType2 = decide (wcTypeByte =
+  2)` (D-WC-1, line 702 `WrongWithdrawalCredentialsType`).  The
+  Verity `executeGuarded` interpreter starts at line 717 and does
+  NOT exercise these prefix guards; the bridge NAMES them at the
+  parent's ENUNCE.  **NAMING composition** — executable-plane
+  extension to include 686-716 remains the follow-up (analog of
+  D-CALL-1 prefix-then-suffix half, still open).
 
 **Site fix:** update the TOPUP-1 card to describe the four-conjunct
 Verity parent honestly, disclose the D-CALL-1 residual
@@ -213,10 +228,14 @@ derived from pinned source states (`LidoStakingState` +
 `SRTopupCallerContext`), mention the two new executable Contract.run
 rollback theorems `verity_tx_guarded_revert_restores_snapshot` /
 `verity_tx_legacy_revert_restores_snapshot` (noting the abstract
-A-ABSTRACT-TX conjunct is still in the registered parent), and
-reflect that **both halves of D-ADDR-1** (beacon and Lido addresses)
-are anchored to the deployed StakingRouter runtime bytecode via
-`BeaconDepositAddress.lean` and `LidoAddress.lean`.
+A-ABSTRACT-TX conjunct is still in the registered parent), reflect
+that **both halves of D-ADDR-1** (beacon and Lido addresses) are
+anchored to the deployed StakingRouter runtime bytecode via
+`BeaconDepositAddress.lean` and `LidoAddress.lean`, and mention the
+D-EMPTY-1 / D-AUTH-1 / D-WC-1 prefix-guards naming bridge
+`source_topup_conserves_and_rolls_back_under_prefix_guards_shape`
+(noting the executable-plane extension past line 717 remains the
+follow-up).
 
 ## TOPUP-2 — narrowing signal is 'exact under gateway-shape premise, wrapped otherwise' (chantier 4bis)
 
@@ -348,6 +367,14 @@ PRs.
   (`modulesCountSlot = 29`, `moduleIdSlot = 30`, `moduleConfigSlot = 31`)
   whereas pinned `SRStorage.sol` uses ERC-7201-style keccak-derived
   namespaced slots.
+- **`checked_execute_under_pinned_shape_and_constants`** (PR #629):
+  extends the pinned-shape bridge with a composite premise NAMING
+  the pinned SRLib allocation constants (`MAX_STAKING_MODULES_COUNT =
+  32`, `stakeShareLimitMaxBp = 10000`) via
+  `Alloc1CompositeBoundsSource.PinnedAllocConstantsPremise`.  The
+  composite premise is inhabited by construction (each constant
+  reduces to `rfl`).  Downstream P-ALLOC-1 consumers can enforce the
+  pinned SR constants uniformly at the ENUNCE.
 
 **Site fix:** if the ALLOC-1 card presents `CheckedBounds` as fully
 derived, narrow it to "target_multiplication derived from pinned
