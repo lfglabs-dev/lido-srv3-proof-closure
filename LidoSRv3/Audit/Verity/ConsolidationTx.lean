@@ -1807,6 +1807,20 @@ theorem observeFromJournal_simulates_pinned_source_slotFree
   exact observeFromJournal_simulates_pinned_source inputs state hCountBound hEntry
     hSources hTargets hSourceLens hTargetLens
 
+/-- **Chantier 2 (Thomas 2026-09-13) substitution-preserves-observation
+corollary.** Any `View`-predicate holding on the `observeFromJournal`
+view of `addRequests` under `Contract.run` also holds on the
+`observeFromJournal` view of `addRequestsSlotFree`, and vice versa.
+Immediate from the bundled `observeFromJournal_run_addRequests_eq_...`
+equality (PR #622). Consumers verifying observational properties of
+the registered `addRequests` can drop-in-substitute
+`addRequestsSlotFree` without proof-obligation change. -/
+theorem addRequestsSlotFree_preserves_observeFromJournal_predicate
+    (inputs : Inputs) (state : ContractState) (F : View → Prop) :
+    F (observeFromJournal state ((addRequests inputs).run state)) ↔
+    F (observeFromJournal state ((addRequestsSlotFree inputs).run state)) := by
+  rw [observeFromJournal_run_addRequests_eq_observeFromJournal_run_addRequestsSlotFree]
+
 /-! ## Value-bearing CALLs: exact forwarding and preservesEthBalance -/
 
 private theorem foldl_sub_values (cs : List CallObs) (w : Word) :
