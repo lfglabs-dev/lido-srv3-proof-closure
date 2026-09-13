@@ -40,9 +40,16 @@ bind entrypoint `spec.functions[1]`:
 4. produces only request frames to the linked predeploy — no
    consensus-layer verification frame (`onlyRequestFrames`).
 
-`A-CONSOLIDATION-GATEWAY-NONZERO` stays a named caller premise
-(`hGatewayAdmittedNonzero`).  This module does not start the Bus, does not
-add delay/quota logic, and does not discharge the gateway premise.
+`hGatewayAdmittedNonzero` remains a named caller premise on this
+lower-level theorem for downstream compat. `A-CONSOLIDATION-GATEWAY-NONZERO`
+itself is RETIRED from both consumer guarantees' assumption lists
+(PR #699 for P-CONSOLIDATION-1, PR #712 for P-CONSOLIDATION-VALUE-1) —
+the registered `..._from_gateway` variants in `PConsolidation1.lean`
+and `PConsolidationValue1.lean` DERIVE `hGatewayAdmittedNonzero` from
+`PredeployStaticcallResult`-shaped pinned-source premises via
+`gatewayTotalFee_ne_zero_of_fee_ne_zero`. This module does not start
+the Bus, does not add delay/quota logic, and does not itself perform
+the derivation — the retirement lives at the guarantee layer.
 -/
 
 namespace LidoSRv3.Audit.Verity.ConsolidationOfficialDenoteSuccess
