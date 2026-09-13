@@ -24,8 +24,16 @@ outside its arms and still reverts
 (`ConsolidationBridgeGap.official_external_call_reverts` stays named); no
 compiled-artifact behaviour is claimed.
 
-The gateway nonzero premise remains an explicit caller-supplied premise
-(`A-CONSOLIDATION-GATEWAY-NONZERO`).  This parent neither starts the Bus nor
+The gateway nonzero premise was formerly caller-supplied via
+`A-CONSOLIDATION-GATEWAY-NONZERO`; it is now DERIVED under the
+`PredeployStaticcallResult`-shaped pinned-source premises of the
+registered `..._from_gateway` variant (chantier 2 Thomas 2026-09-13
+item a, PR #712 — same pattern as PR #699 on P-CONSOLIDATION-1),
+and `A-CONSOLIDATION-GATEWAY-NONZERO` is retired from this
+guarantee's assumption list. The residual `hFeeNonzero :
+result.abiDecodedFee ≠ 0` on the outer STATICCALL structure remains
+caller-supplied pending a live-STATICCALL executable model on the
+pinned EIP-7251 predeploy. This parent neither starts the Bus nor
 performs consensus-layer verification: `noConsensusLayerVerify` is an
 explicit conjunct of the justified half, and `onlyRequestFrames` is its
 denotation-plane counterpart in the official half.
@@ -45,7 +53,9 @@ open LidoSRv3.Audit.Spec.ConsolidationValueCorrespondence
 
 /-- Supplemental parent: official widened-call denotation succeeds on
 value-bearing request CALLs, justified interpreter forwards `msg.value`.
-`A-CONSOLIDATION-GATEWAY-NONZERO` stays a premise. -/
+Registered on the gateway-bridge variant `..._from_gateway` (PR #712);
+`A-CONSOLIDATION-GATEWAY-NONZERO` is retired from this guarantee's
+assumption list. -/
 def guarantee : Guarantee := ⟨.pConsolidationValue1, [.model, .source, .verityTx]⟩
 
 /-- Every successful justified execution retains all registered consolidation
@@ -124,7 +134,10 @@ the vault to its pre-credit balance, and produces only request frames
 Second conjunct: every successful justified execution forwards exactly
 `msg.value` and carries `noConsensusLayerVerify` as an explicit conjunct.
 
-`A-CONSOLIDATION-GATEWAY-NONZERO` stays a premise in both halves.  The base
+This original theorem takes `A-CONSOLIDATION-GATEWAY-NONZERO` as a
+caller-supplied premise in both halves; the `..._from_gateway` variant
+below (PR #712) DERIVES it under `PredeployStaticcallResult`-shaped
+pinned-source premises and is the new registered form.  The base
 fragment `denoteFunction` still reverts on the bind entrypoint
 (`official_external_call_reverts`, kept named in `ConsolidationBridgeGap`);
 no compiled-artifact behaviour is claimed.  No bus, no delay, no quota. -/
