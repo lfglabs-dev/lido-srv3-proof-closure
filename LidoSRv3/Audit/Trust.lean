@@ -94,6 +94,7 @@ import LidoSRv3.Audit.Source.BridgePerWriterExecutablePlane
 import LidoSRv3.Audit.Source.KeccakConcreteCommitmentSource
 import LidoSRv3.Audit.Source.AragonACLRoleKeyViaOracleSource
 import LidoSRv3.Audit.Source.BridgeSelectorViaOracleSource
+import LidoSRv3.Audit.Source.MappingSlotViaOracleSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -936,6 +937,9 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.AragonACLRoleKeyViaOracleSource.realRoleKey_deterministic
 -- Thirteenth-step (2026-09-13): Bridge ABI selector via KeccakOracle real derivation.
 #print axioms LidoSRv3.Audit.Source.BridgeSelectorViaOracleSource.realSelectorFor_deterministic
+-- Fourteenth-step (2026-09-13): Solidity mapping-slot derivation via KeccakOracle.
+#print axioms LidoSRv3.Audit.Source.MappingSlotViaOracleSource.realMappingStorage_slotAt_eq
+#print axioms LidoSRv3.Audit.Source.MappingSlotViaOracleSource.realSlotDerivation_deterministic
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape
