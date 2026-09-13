@@ -102,11 +102,17 @@ def processBatch (inputs : Inputs) (batch : Batch) : Contract Unit :=
 /-- `StakingRouter.sol:983 LIDO.withdrawDepositableEther(depositsValue, actualDepositsCount)`
 with `Lido.sol:869-886` and `Lido.sol:839-859` inlined; same shape as
 `DepositParentTx.pullFromLido` (see its docstring for the untranscribed Lido
-lines), restated here over the list total. -/
-def pullFromLido (inputs : Inputs) (total : Word) : Contract Unit := do
+lines), restated here over the list total.
+
+Grok #412 D-CALL-1 (partial discharge, 2026-09-13): the journal frame now
+carries two argument words `[total, count]` — the pinned Solidity call is
+`LIDO.withdrawDepositableEther(depositsValue, actualDepositsCount)`, so the
+journal shape matches the pinned two-argument ABI encoding rather than a
+single-word `[total]`. -/
+def pullFromLido (inputs : Inputs) (total count : Word) : Contract Unit := do
   -- StakingRouter.sol:983  LIDO.withdrawDepositableEther(depositsValue, actualDepositsCount);
   externalCallBindTo inputs.lido 0 [] (DepositParentTx.callName inputs.lidoCallOk
-    "withdrawDepositableEther") [total]
+    "withdrawDepositableEther") [total, count]
   let state ← DepositParentTx.getState
   -- Lido.sol:842  require(_depositAmount <= depositableEther, "NOT_ENOUGH_ETHER");
   require (total ≤ state.readSlot lidoDepositableSlot) "NOT_ENOUGH_ETHER"
@@ -145,7 +151,7 @@ so the line-996 balance assert fires with `Panic(0x01)`. -/
 def executePullPushAssertTail (inputs : Inputs) (pullTotal entryBalance : Word) :
     Contract Unit := do
   -- StakingRouter.sol:983  LIDO.withdrawDepositableEther(depositsValue, actualDepositsCount);
-  pullFromLido inputs pullTotal
+  pullFromLido inputs pullTotal (wordKeys inputs.batches)
   -- StakingRouter.sol:985-991  BeaconChainDepositor.makeBeaconChainDeposits32ETH(...)  (one frame per batch)
   let _ ← inputs.batches.mapM (pushBatch inputs)
   -- StakingRouter.sol:993  uint256 etherBalanceAfterDeposits = address(this).balance;
@@ -239,7 +245,8 @@ def moduleEntry (inputs : Inputs) (batch : Batch) : ExternalCall :=
   linkedCallEntryTo "obtainDepositData" inputs.module 0 [batch.moduleId, batch.keys]
 
 def pullEntry (inputs : Inputs) : ExternalCall :=
-  linkedCallEntryTo "withdrawDepositableEther" inputs.lido 0 [wordTotal inputs.batches]
+  linkedCallEntryTo "withdrawDepositableEther" inputs.lido 0
+    [wordTotal inputs.batches, wordKeys inputs.batches]
 
 def pushEntry (inputs : Inputs) (batch : Batch) : ExternalCall :=
   linkedCallEntryTo "depositToBeacon" inputs.beacon batch.amount
@@ -349,9 +356,9 @@ def afterBatches (inputs : Inputs) : List Batch → ContractState → ContractSt
 abbrev afterCall (value : Word) (entry : ExternalCall) (state : ContractState) : ContractState :=
   DepositParentTx.afterCall value entry state
 
-def afterPull (inputs : Inputs) (total : Word) (state : ContractState) : ContractState :=
+def afterPull (inputs : Inputs) (total count : Word) (state : ContractState) : ContractState :=
   let s1 := afterCall 0
-    (linkedCallEntryTo "withdrawDepositableEther" inputs.lido 0 [total]) state
+    (linkedCallEntryTo "withdrawDepositableEther" inputs.lido 0 [total, count]) state
   let s2 := s1.writeSlot lidoDepositableSlot (s1.readSlot lidoDepositableSlot - total)
   { s2 with selfBalance := s2.selfBalance + total }
 
@@ -369,7 +376,7 @@ def committedProcessedState (inputs : Inputs) (state : ContractState) : Contract
 def committedState (inputs : Inputs) (state : ContractState) : ContractState :=
   if shouldPull inputs then
     afterPushes inputs inputs.batches
-      (afterPull inputs (wordTotal inputs.batches)
+      (afterPull inputs (wordTotal inputs.batches) (wordKeys inputs.batches)
         (committedProcessedState inputs state))
   else
     committedProcessedState inputs state
@@ -416,15 +423,15 @@ theorem processBatches_apply (inputs : Inputs) (batches : List Batch) (state : C
   change List.mapM.loop (processBatch inputs) batches [] state = _
   simpa using processBatches_loop inputs batches [] state h
 
-theorem pullFromLido_apply (inputs : Inputs) (total : Word) (state : ContractState)
+theorem pullFromLido_apply (inputs : Inputs) (total count : Word) (state : ContractState)
     (hCall : inputs.lidoCallOk = true)
     (hFunded : total ≤ state.readSlot lidoDepositableSlot) :
-    pullFromLido inputs total state = .success () (afterPull inputs total state) := by
+    pullFromLido inputs total count state = .success () (afterPull inputs total count state) := by
   have hFrame := DepositParentTx.bindTo_apply inputs.lido 0 "withdrawDepositableEther"
-    [total] state (by decide) (DepositParentTx.zero_le _)
+    [total, count] state (by decide) (DepositParentTx.zero_le _)
   have hGuard : decide (total ≤
       (DepositParentTx.afterCall 0
-        (linkedCallEntryTo "withdrawDepositableEther" inputs.lido 0 [total])
+        (linkedCallEntryTo "withdrawDepositableEther" inputs.lido 0 [total, count])
         state).readSlot lidoDepositableSlot) = true :=
     decide_eq_true hFunded
   simp only [pullFromLido, Bind.bind, _root_.Verity.bind, DepositParentTx.callName,
@@ -474,15 +481,16 @@ theorem calls_afterBatches (inputs : Inputs) (batches : List Batch)
       rw [afterBatches, ih, calls_afterBatch]
       simp [List.append_assoc]
 
-@[simp] theorem selfBalance_afterPull (inputs : Inputs) (total : Word)
+@[simp] theorem selfBalance_afterPull (inputs : Inputs) (total count : Word)
     (state : ContractState) :
-    (afterPull inputs total state).selfBalance = state.selfBalance + total := by
+    (afterPull inputs total count state).selfBalance = state.selfBalance + total := by
   show state.selfBalance - 0 + total = _
   rw [_root_.Verity.Core.Uint256.sub_zero]
 
-@[simp] theorem calls_afterPull (inputs : Inputs) (total : Word) (state : ContractState) :
-    (afterPull inputs total state).calls =
-      state.calls ++ [linkedCallEntryTo "withdrawDepositableEther" inputs.lido 0 [total]] := rfl
+@[simp] theorem calls_afterPull (inputs : Inputs) (total count : Word) (state : ContractState) :
+    (afterPull inputs total count state).calls =
+      state.calls ++ [linkedCallEntryTo "withdrawDepositableEther" inputs.lido 0
+        [total, count]] := rfl
 
 @[simp] theorem calls_afterPush (inputs : Inputs) (batch : Batch) (state : ContractState) :
     (afterPush inputs batch state).calls = state.calls ++ [pushEntry inputs batch] := rfl
@@ -571,7 +579,7 @@ theorem execute_apply (inputs : Inputs) (state : ContractState)
     execute inputs state = .success () (committedState inputs state) := by
   let entry := state.writeSlot counterSlot (state.readSlot counterSlot + 1)
   let processed := afterBatches inputs inputs.batches entry
-  let pulled := afterPull inputs (wordTotal inputs.batches) processed
+  let pulled := afterPull inputs (wordTotal inputs.batches) (wordKeys inputs.batches) processed
   have hNoWrap :
       exactTotal inputs.batches < _root_.Verity.Core.Uint256.modulus :=
     by simpa using foldStable_bound h.foldStable
@@ -593,7 +601,7 @@ theorem execute_apply (inputs : Inputs) (state : ContractState)
       selfBalance_afterBatches]
     exact h.entryBalance
   have hPulledBalance : pulled.selfBalance = wordTotal inputs.batches := by
-    rw [show pulled = afterPull inputs (wordTotal inputs.batches) processed from rfl,
+    rw [show pulled = afterPull inputs (wordTotal inputs.batches) (wordKeys inputs.batches) processed from rfl,
       selfBalance_afterPull, hProcessedBalance, _root_.Verity.Core.Uint256.zero_add]
   have hTotalVal := wordTotal_val inputs.batches h.foldStable
   have hPushFunds : exactTotal inputs.batches ≤ pulled.selfBalance.val := by
@@ -633,7 +641,8 @@ theorem execute_apply (inputs : Inputs) (state : ContractState)
   · -- Nonempty branch: pull, push per batch, and assert.
     simp only [hPull, if_true, executePullPushAssertTail, Bind.bind, _root_.Verity.bind,
       hPullTotal]
-    rw [pullFromLido_apply inputs (wordTotal inputs.batches) processed h.lidoCallOk hFunded]
+    rw [pullFromLido_apply inputs (wordTotal inputs.batches) (wordKeys inputs.batches)
+      processed h.lidoCallOk hFunded]
     simp only [Bind.bind, _root_.Verity.bind]
     rw [pushBatches_apply inputs inputs.batches pulled h.healthy hPushFunds]
     simp only [Bind.bind, _root_.Verity.bind, DepositParentTx.getState, hClose,
@@ -671,13 +680,13 @@ theorem committed_balance (inputs : Inputs) (state : ContractState)
       rw [selfBalance_afterBatches]
       exact h.entryBalance
     have hAfterPull :
-        (afterPull inputs (wordTotal inputs.batches)
+        (afterPull inputs (wordTotal inputs.batches) (wordKeys inputs.batches)
           (afterBatches inputs inputs.batches
             (state.writeSlot counterSlot (state.readSlot counterSlot + 1)))).selfBalance =
           wordTotal inputs.batches := by
       rw [selfBalance_afterPull, hBefore, _root_.Verity.Core.Uint256.zero_add]
     have hFunds : exactTotal inputs.batches ≤
-        (afterPull inputs (wordTotal inputs.batches)
+        (afterPull inputs (wordTotal inputs.batches) (wordKeys inputs.batches)
           (afterBatches inputs inputs.batches
             (state.writeSlot counterSlot (state.readSlot counterSlot + 1)))).selfBalance.val := by
       rw [hAfterPull, wordTotal_val inputs.batches h.foldStable]
@@ -737,13 +746,27 @@ def ofTwoBatches (inputs : DepositParentTx.Inputs) : Inputs :=
     lido := inputs.lido, module := inputs.module,
     beacon := inputs.beacon, batches := [inputs.first, inputs.second] }
 
-theorem two_batch_expectedCalls_eq (inputs : DepositParentTx.Inputs)
+/-- After grok #412 D-CALL-1 (2026-09-13) the two-batch specialization no longer
+matches `DepositParentTx.expectedCalls` verbatim: the `DepositNFrameTx.pullEntry`
+now carries a two-argument `[wordTotal, wordKeys]` payload (matching pinned
+`LIDO.withdrawDepositableEther(depositsValue, actualDepositsCount)` at
+`StakingRouter.sol:983`), while the legacy `DepositParentTx.pullEntry` still
+records only the amount.  This lemma records the module- and push-leg equality
+that survives the shift; the pull leg intentionally diverges. -/
+theorem two_batch_expectedCalls_module_push_eq (inputs : DepositParentTx.Inputs)
     (hShouldPull : shouldPull (ofTwoBatches inputs) = true) :
-    expectedCalls (ofTwoBatches inputs) = DepositParentTx.expectedCalls inputs := by
-  simp only [expectedCalls, tailCalls, hShouldPull, if_true]
-  simp [ofTwoBatches, moduleEntry, pullEntry, pushEntry, wordTotal,
-    DepositParentTx.expectedCalls, DepositParentTx.moduleEntry,
-    DepositParentTx.pullEntry, DepositParentTx.pushEntry, DepositParentTx.totalAmount]
+    (inputs.first, inputs.second) = (inputs.first, inputs.second) ∧
+      (expectedCalls (ofTwoBatches inputs)).take 2 =
+        (DepositParentTx.expectedCalls inputs).take 2 ∧
+      (expectedCalls (ofTwoBatches inputs)).drop 3 =
+        (DepositParentTx.expectedCalls inputs).drop 3 := by
+  refine ⟨rfl, ?_, ?_⟩
+  · simp only [expectedCalls, tailCalls, hShouldPull, if_true]
+    simp [ofTwoBatches, moduleEntry, DepositParentTx.expectedCalls,
+      DepositParentTx.moduleEntry]
+  · simp only [expectedCalls, tailCalls, hShouldPull, if_true]
+    simp [ofTwoBatches, pushEntry, DepositParentTx.expectedCalls,
+      DepositParentTx.pushEntry]
 
 theorem two_batch_is_n_eq_two (inputs : DepositParentTx.Inputs) :
     (ofTwoBatches inputs).batches.length = 2 ∧
