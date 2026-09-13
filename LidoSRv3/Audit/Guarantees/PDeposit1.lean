@@ -1130,8 +1130,12 @@ theorem verity_tx_composes_nframe_deposit
     linked_exactTotal_eq_pushedValue cfg inp inputs hLink,
     linked_exactTotal_eq_depositsValue cfg inp inputs hLink⟩
 
-/-- The old conjunct (d) is exactly this parent's `n = 2` specialization. -/
-theorem two_batch_conjunct_d_is_n_eq_two (inputs : DepositParentTx.Inputs) :
+/-- The old conjunct (d) is exactly this parent's `n = 2` specialization,
+gated by the pinned `shouldPull` predicate (`StakingRouter.sol:978` — the
+per-call `withdrawDepositableEther` frame is only emitted when the aggregate
+deposit count is nonzero). -/
+theorem two_batch_conjunct_d_is_n_eq_two (inputs : DepositParentTx.Inputs)
+    (hShouldPull : DepositNFrameTx.shouldPull (DepositNFrameTx.ofTwoBatches inputs) = true) :
     (DepositNFrameTx.ofTwoBatches inputs).batches.length = 2 ∧
       ((DepositNFrameTx.ofTwoBatches inputs).batches.map
         (DepositNFrameTx.moduleEntry (DepositNFrameTx.ofTwoBatches inputs))).length = 2 ∧
@@ -1140,7 +1144,8 @@ theorem two_batch_conjunct_d_is_n_eq_two (inputs : DepositParentTx.Inputs) :
       DepositNFrameTx.expectedCalls (DepositNFrameTx.ofTwoBatches inputs) =
         DepositParentTx.expectedCalls inputs := by
   obtain ⟨hLength, hModules, hBeacon⟩ := DepositNFrameTx.two_batch_is_n_eq_two inputs
-  exact ⟨hLength, hModules, hBeacon, DepositNFrameTx.two_batch_expectedCalls_eq inputs⟩
+  exact ⟨hLength, hModules, hBeacon,
+    DepositNFrameTx.two_batch_expectedCalls_eq inputs hShouldPull⟩
 
 end NFrame
 
