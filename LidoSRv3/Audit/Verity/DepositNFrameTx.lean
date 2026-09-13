@@ -32,7 +32,16 @@ structure Inputs where
   moduleActive : Bool
   allocationValid : Bool
   lidoCallOk : Bool
+  /-- `BeaconChainDepositor.DEPOSIT_SIZE` — the constant per-key wei the beacon
+  leg sends (`BeaconChainDepositor.sol:24`, always 32 ether). -/
   depositSize : Word
+  /-- `StakingRouter.MAX_EFFECTIVE_BALANCE_WC_TYPE_01` — the constructor-time
+  immutable used at `StakingRouter.sol:972` for the pull quantity
+  `depositsValue = actualDepositsCount * MAX_EFFECTIVE_BALANCE_WC_TYPE_01`.
+  On a conserving deployment `maxEBType1 = depositSize`; on a skewed
+  deployment they differ and the line-996 balance assert (`Panic(0x01)`)
+  fires because pull ≠ push (grok #412 D-SKEW-1). -/
+  maxEBType1 : Word
   lido : Address
   module : Address
   beacon : Address
@@ -45,7 +54,9 @@ def zeroBatch : Batch :=
     moduleCallOk := true, beaconCallOk := true }
 
 /-- View the shared fields through the old helper API.  The distinguished
-fields are never consulted by `processBatch` or `pushBatch`. -/
+fields are never consulted by `processBatch` or `pushBatch`.  The legacy
+plane conflates `depositSize` and `maxEBType1`; the split is honoured only in
+this module's `execute` pull-amount computation. -/
 def legacyInputs (inputs : Inputs) : DepositParentTx.Inputs :=
   { authorized := inputs.authorized
     moduleActive := inputs.moduleActive
@@ -126,11 +137,15 @@ theorem shouldPull_false_of_exactKeys_eq_zero {inputs : Inputs}
 
 /-- The pull+push+assert tail (StakingRouter.sol:983-996) — everything past the
 line-978 early return.  Extracted so `execute` can gate it behind the pinned
-early-return predicate `shouldPull`. -/
-def executePullPushAssertTail (inputs : Inputs) (entryBalance : Word) : Contract Unit := do
-  let total := wordTotal inputs.batches
+early-return predicate `shouldPull`.  `pullTotal` is
+`wordKeys inputs.batches * inputs.maxEBType1` per StakingRouter.sol:972; the
+per-batch push tail sums to `wordTotal inputs.batches` per BeaconChainDepositor.
+On a skewed deployment (`maxEBType1 ≠ depositSize`) `pullTotal ≠ wordTotal`,
+so the line-996 balance assert fires with `Panic(0x01)`. -/
+def executePullPushAssertTail (inputs : Inputs) (pullTotal entryBalance : Word) :
+    Contract Unit := do
   -- StakingRouter.sol:983  LIDO.withdrawDepositableEther(depositsValue, actualDepositsCount);
-  pullFromLido inputs total
+  pullFromLido inputs pullTotal
   -- StakingRouter.sol:985-991  BeaconChainDepositor.makeBeaconChainDeposits32ETH(...)  (one frame per batch)
   let _ ← inputs.batches.mapM (pushBatch inputs)
   -- StakingRouter.sol:993  uint256 etherBalanceAfterDeposits = address(this).balance;
@@ -191,19 +206,23 @@ def execute (inputs : Inputs) : Contract Unit := do
   setStorage ⟨counterSlot⟩ (state.readSlot counterSlot + 1)
   -- StakingRouter.sol:952-976  per module leg (generalised to a list)
   let _ ← inputs.batches.mapM (processBatch inputs)
-  -- StakingRouter.sol:972  uint256 depositsValue = actualDepositsCount * MAX_EFFECTIVE_BALANCE_WC_TYPE_01;  (checked as a guard)
-  let total := wordTotal inputs.batches
-  -- Model-added consistency guard on the composed list.  In the pin, the split
-  -- `MAX_EFFECTIVE_BALANCE_WC_TYPE_01` (line 972) vs `DEPOSIT_SIZE` (BCD line 57)
-  -- surfaces this at the line-996 assert as `Panic(0x01)`; the model reports it
-  -- earlier under the same selector.
-  require (total == wordKeys inputs.batches * inputs.depositSize)
+  -- StakingRouter.sol:972  uint256 depositsValue = actualDepositsCount * MAX_EFFECTIVE_BALANCE_WC_TYPE_01;
+  -- Model split from `DEPOSIT_SIZE`: the pull quantity uses the constructor-time
+  -- immutable `maxEBType1`, while the per-batch push aggregate carries
+  -- `batch.amount = batch.keys * depositSize` (pinned `DEPOSIT_SIZE`).  On a
+  -- conserving deployment the two match and the line-996 assert passes; on a
+  -- skewed deployment they differ and the assert fires with `Panic(0x01)`.
+  let pullTotal := wordKeys inputs.batches * inputs.maxEBType1
+  -- Model-added consistency guard on the composed list's push aggregate.
+  -- Pinned per-batch push amounts are `batch.keys * DEPOSIT_SIZE`
+  -- (`BeaconChainDepositor.sol:57`); the check ties `wordTotal` to that shape.
+  require (wordTotal inputs.batches == wordKeys inputs.batches * inputs.depositSize)
     "Panic(0x01)"
   -- StakingRouter.sol:978  if (actualDepositsCount == 0) return;
   -- The pull, per-key push, and line-996 assert live in `executePullPushAssertTail`
   -- and only fire when the pinned `shouldPull` predicate holds.
   if shouldPull inputs then
-    executePullPushAssertTail inputs state.selfBalance
+    executePullPushAssertTail inputs pullTotal state.selfBalance
   else
     (Pure.pure () : Contract Unit)
 
@@ -250,6 +269,11 @@ structure Preconditions (inputs : Inputs) (state : ContractState) : Prop where
   healthy : ∀ batch ∈ inputs.batches, Healthy batch
   distinctModules : (inputs.batches.map fun batch => batch.moduleId).Nodup
   valueMatches : wordTotal inputs.batches = wordKeys inputs.batches * inputs.depositSize
+  /-- Conserving deployment (`MAX_EFFECTIVE_BALANCE_WC_TYPE_01 = DEPOSIT_SIZE`
+  at construction, i.e. 32 ether = 32 ether at the pinned deployment).  On a
+  skewed deployment the line-996 balance assert fires with `Panic(0x01)` (see
+  `skewed_deployment_reverts_at_line_996_balance_assert`; grok #412 D-SKEW-1). -/
+  conserving : inputs.maxEBType1 = inputs.depositSize
   entryBalance : state.selfBalance = 0
   funded : wordTotal inputs.batches ≤ state.readSlot lidoDepositableSlot
   foldStable : FoldStable 0 inputs.batches
@@ -570,6 +594,13 @@ theorem execute_apply (inputs : Inputs) (state : ContractState)
       (afterBatches inputs inputs.batches entry).selfBalance = state.selfBalance := by
     rw [selfBalance_afterBatches]
     simp [entry, h.entryBalance]
+  -- Under `Preconditions.conserving` the pinned pull quantity
+  -- `wordKeys inputs.batches * inputs.maxEBType1` collapses back to `wordTotal`
+  -- via `Preconditions.valueMatches`; the split becomes observable only on the
+  -- skewed-deployment kill-line (see `skewed_deployment_reverts_at_line_996`).
+  have hPullTotal :
+      wordKeys inputs.batches * inputs.maxEBType1 = wordTotal inputs.batches := by
+    rw [h.conserving, ← h.valueMatches]
   simp only [execute, Bind.bind, _root_.Verity.bind, _root_.Verity.require,
     h.authorized, h.moduleActive, h.allocationValid, hNoWrapGuard, if_true,
     DepositParentTx.getState, setStorage]
@@ -578,7 +609,8 @@ theorem execute_apply (inputs : Inputs) (state : ContractState)
   -- Case split on the pinned StakingRouter.sol:978 `shouldPull` predicate.
   by_cases hPull : shouldPull inputs
   · -- Nonempty branch: pull, push per batch, and assert.
-    simp only [hPull, if_true, executePullPushAssertTail, Bind.bind, _root_.Verity.bind]
+    simp only [hPull, if_true, executePullPushAssertTail, Bind.bind, _root_.Verity.bind,
+      hPullTotal]
     rw [pullFromLido_apply inputs (wordTotal inputs.batches) processed h.lidoCallOk hFunded]
     simp only [Bind.bind, _root_.Verity.bind]
     rw [pushBatches_apply inputs inputs.batches pulled h.healthy hPushFunds]
@@ -679,7 +711,8 @@ theorem wrapping_fold_reverts_without_journal (inputs : Inputs) (state : Contrac
 def ofTwoBatches (inputs : DepositParentTx.Inputs) : Inputs :=
   { authorized := inputs.authorized, moduleActive := inputs.moduleActive,
     allocationValid := inputs.allocationValid, lidoCallOk := inputs.lidoCallOk,
-    depositSize := inputs.depositSize, lido := inputs.lido, module := inputs.module,
+    depositSize := inputs.depositSize, maxEBType1 := inputs.depositSize,
+    lido := inputs.lido, module := inputs.module,
     beacon := inputs.beacon, batches := [inputs.first, inputs.second] }
 
 theorem two_batch_expectedCalls_eq (inputs : DepositParentTx.Inputs)

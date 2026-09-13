@@ -16,7 +16,8 @@ def batchC : DepositNFrameTx.Batch :=
 
 def threeBatchInputs : DepositNFrameTx.Inputs :=
   { authorized := true, moduleActive := true, allocationValid := true,
-    lidoCallOk := true, depositSize := 32, lido := 101, module := 202, beacon := 303,
+    lidoCallOk := true, depositSize := 32, maxEBType1 := 32,
+    lido := 101, module := 202, beacon := 303,
     batches := [batchA, batchB, batchC] }
 
 def threeBatchState : ContractState :=
@@ -36,6 +37,7 @@ theorem three_batch_preconditions :
     rcases hCases with rfl | rfl | rfl <;> exact ⟨rfl, rfl, rfl, rfl⟩
   distinctModules := by decide
   valueMatches := by decide
+  conserving := rfl
   entryBalance := by decide
   funded := by decide
   foldStable :=
@@ -61,6 +63,7 @@ theorem two_batch_preconditions :
     rcases hCases with rfl | rfl <;> exact ⟨rfl, rfl, rfl, rfl⟩
   distinctModules := by decide
   valueMatches := by decide
+  conserving := rfl
   entryBalance := by decide
   funded := by decide
   foldStable := .cons (by decide) (.cons (by decide) (.nil (by decide)))
