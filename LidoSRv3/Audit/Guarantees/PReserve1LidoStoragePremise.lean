@@ -1,5 +1,6 @@
 import LidoSRv3.Audit.Source.ReserveCorrespondence
 import LidoSRv3.Audit.Source.LidoStakingStateStorage
+import LidoSRv3.Audit.Source.AragonACLSource
 
 /-! # P-RESERVE-1 canDeposit/authorizedRouter naming scaffold
 
@@ -110,5 +111,36 @@ theorem canDeposit_derived_from_lido_state
   rw [hLink.canDepositMatchesSource]
   exact LidoSRv3.Audit.Source.LidoStakingStateStorage.canDeposit_true_of_pinned_storage
     hStakingNotPaused hBunkerNotActive
+
+/-! ## Second-step composition (2026-09-13): authorizedRouter via Aragon ACL
+
+`PinnedLidoReserveCallShape.authorizedRouterBecausePinned` above
+takes the router-authorization check as an input. Under the pinned
+`Lido.sol:872` `_auth(address(stakingRouter))` chain, this delegates
+to Aragon's ACL registry (see `AragonACLSource`). The composition
+below derives `inputs.authorizedRouter` from a live ACL state via
+the shared `AragonACLSource.isAuthorizedRouter` function. -/
+
+/-- Linkage premise: `inputs.authorizedRouter` is functionally
+determined by the Aragon-ACL state via `isAuthorizedRouter`. -/
+structure AuthorizedRouterFromACL
+    (inputs : WithdrawInputs)
+    (acl : LidoSRv3.Audit.Source.AragonACLSource.ACLState) : Prop where
+  authorizedRouterMatchesACL :
+    inputs.authorizedRouter =
+      LidoSRv3.Audit.Source.AragonACLSource.isAuthorizedRouter acl
+
+/-- Second-step composition: under the ACL premise
+(`STAKING_ROUTER_ROLE` granted) AND the linkage,
+`inputs.authorizedRouter = true` — derived via the shared Aragon
+ACL source model, not caller-supplied. -/
+theorem authorizedRouter_derived_from_acl
+    {inputs : WithdrawInputs}
+    {acl : LidoSRv3.Audit.Source.AragonACLSource.ACLState}
+    (hLink : AuthorizedRouterFromACL inputs acl)
+    (hRole : acl.hasRole "STAKING_ROUTER_ROLE" = true) :
+    inputs.authorizedRouter = true := by
+  rw [hLink.authorizedRouterMatchesACL]
+  exact LidoSRv3.Audit.Source.AragonACLSource.isAuthorizedRouter_true_of_role_granted hRole
 
 end LidoSRv3.Audit.Guarantees.PReserve1LidoStoragePremise
