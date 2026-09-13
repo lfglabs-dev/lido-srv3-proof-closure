@@ -119,7 +119,7 @@ theorem topup_verity_parent_ignores_abstract_tx
     (hCall : PTopup1.SourceTopupCallCorresponds cfg inp call) :
     PTopup1.SourceTopupCallCorresponds cfg inp call ∧
       PTopup1.VerityGuardedReturndataSimulation cfg call state :=
-  let ⟨h1, h2, _, _⟩ :=
+  let ⟨h1, h2, _, _, _⟩ :=
     PTopup1.verity_tx_simulates_source_with_nonzero_wrap_close
       cfg inp call state hCall
   ⟨h1, h2⟩
