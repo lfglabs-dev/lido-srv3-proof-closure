@@ -1561,6 +1561,21 @@ theorem revert_restores_snapshot
   unfold Contract.run at h
   split at h <;> simp_all
 
+/-- **Chantier 2 (Thomas 2026-09-13) slot-free companion rollback-by-
+construction.** The slot-free companion `addRequestsSlotFree` inherits
+the same `Contract.run` rollback semantics as `addRequests` — every
+`.revert` outcome carries the pre-call snapshot, not the dirtied
+intermediate state. Discharged directly by unfolding `Contract.run`
+(which universally maps `.revert _ _` to `.revert _ state` regardless
+of the underlying `Contract`'s persistence choice). -/
+theorem revert_restores_snapshot_slotFree
+    (inputs : Inputs) (inject : Bool) (state rollback : ContractState)
+    (reason : String)
+    (h : (addRequestsSlotFree inputs inject).run state = .revert reason rollback) :
+    rollback = state := by
+  unfold Contract.run at h
+  split at h <;> simp_all
+
 /-- **Chantier 2 (Thomas 2026-09-13) `Contract.run`-level slot-free
 observation equivalence.** Lifts
 `observeFromJournal_addRequests_eq_observeFromJournal_addRequestsSlotFree`
