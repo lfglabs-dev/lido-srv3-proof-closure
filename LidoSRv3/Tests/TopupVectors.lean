@@ -178,7 +178,7 @@ example :
    The module call at lines 717--718 is still made when Lido is live, precisely
    so the module queue cursor can advance. -/
 example :
-    run cfg { inp with moduleAllocationEth := 0, lidoCanDeposit := false, allocations := [] }
+    run cfg { inp with moduleAllocationEth := 0, lidoState := { isStakingPaused := true, isBunkerActive := false }, allocations := [] }
       = .revertLidoDepositsPaused := by decide
 
 example :
@@ -188,7 +188,7 @@ example :
 /- With a nonzero rounded amount the same paused flag produces a *different*
    revert: `CAN_NOT_DEPOSIT` at `Lido.sol` line 870, reached through line 744.
    Collapsing the two into one guard is the plausible mistake. -/
-example : run cfg { inp with lidoCanDeposit := false } = .revertLidoCannotDeposit := by decide
+example : run cfg { inp with lidoState := { isStakingPaused := true, isBunkerActive := false } } = .revertLidoCannotDeposit := by decide
 
 /-! ## The allocation loop, source lines 722--734 -/
 
@@ -266,7 +266,7 @@ example :
 
 /- The observation model classifies a reverting branch as `.reverted`. -/
 example :
-    (observation (0 : Nat) 1 [] ⟨[], [], []⟩ (run cfg { inp with lidoCanDeposit := false })).result
+    (observation (0 : Nat) 1 [] ⟨[], [], []⟩ (run cfg { inp with lidoState := { isStakingPaused := true, isBunkerActive := false } })).result
       = .reverted := by rfl
 
 /-! ## The push loop, `BeaconChainDepositor.sol` lines 66--108 -/
