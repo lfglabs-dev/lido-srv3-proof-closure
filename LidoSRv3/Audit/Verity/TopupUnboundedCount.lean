@@ -148,7 +148,8 @@ theorem allocate_eq_any_of_le
     (count : Nat) (target minTopUp remainingCap moduleLimit valueGwei : Word)
     (failAfterWrites : Bool)
     (h : count ≤ maxValidatorsPerTopUp) :
-    allocate count target minTopUp remainingCap moduleLimit valueGwei failAfterWrites =
+    allocate count maxValidatorsPerTopUp
+        target minTopUp remainingCap moduleLimit valueGwei failAfterWrites =
       allocateAnyCount count target minTopUp remainingCap moduleLimit valueGwei
         failAfterWrites := by
   funext snapshot
@@ -218,8 +219,8 @@ theorem parent_verity_is_unbounded_instance
       requested.length = topUpLimits.length)
     (hMax : requested.length ≤ maxValidatorsPerTopUp) :
     observe (List.replicate requested.length 0) remainingCap
-        ((allocate requested.length target minTopUp remainingCap moduleLimit valueGwei).run
-          state) =
+        ((allocate requested.length maxValidatorsPerTopUp
+            target minTopUp remainingCap moduleLimit valueGwei).run state) =
       sourceView effective pending requested topUpLimits target minTopUp remainingCap
         moduleLimit valueGwei := by
   have heq := allocate_eq_any_of_le requested.length target minTopUp remainingCap
@@ -243,8 +244,8 @@ theorem parent_verity_instance_matches_registered
       requested.length = topUpLimits.length)
     (hMax : requested.length ≤ maxValidatorsPerTopUp) :
     observe (List.replicate requested.length 0) remainingCap
-        ((allocate requested.length target minTopUp remainingCap moduleLimit valueGwei).run
-          state) =
+        ((allocate requested.length maxValidatorsPerTopUp
+            target minTopUp remainingCap moduleLimit valueGwei).run state) =
       sourceView effective pending requested topUpLimits target minTopUp remainingCap
         moduleLimit valueGwei :=
   parent_verity_is_unbounded_instance

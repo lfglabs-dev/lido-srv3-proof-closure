@@ -17,8 +17,8 @@ private def runView (effective pending requested topUpLimits : List Word)
     (target minTopUp remainingCap moduleLimit valueGwei : Word) : View :=
   let before := stateFor effective pending requested topUpLimits defaultState
   observe (List.replicate requested.length 0) remainingCap
-    ((allocate requested.length target minTopUp remainingCap moduleLimit valueGwei).run
-      before)
+    ((allocate requested.length maxValidatorsPerTopUp
+        target minTopUp remainingCap moduleLimit valueGwei).run before)
 
 /-- Happy path: two validators share a 10-gwei block/share budget left to
 right.  The first takes its 6-gwei request; the second is capped at 4. -/
@@ -94,7 +94,8 @@ example :
 `Contract.run`, not merely hidden by the observation. -/
 example :
     let before := stateFor (words [32]) (words [0]) (words [4]) (words [32]) defaultState
-    (allocate 1 (word 64) (word 1) (word 10) (word 100) (word 100) true).run before =
+    (allocate 1 maxValidatorsPerTopUp
+        (word 64) (word 1) (word 10) (word 100) (word 100) true).run before =
       .revert "INJECTED_AFTER_WRITES" before := by rfl
 
 
@@ -224,7 +225,8 @@ private def overLimitState : ContractState :=
 
 example : overLimitCount > maxValidatorsPerTopUp := by decide
 
-example : (allocate overLimitCount (word 64) (word 1) (word 100) (word 100) (word 100)).run
+example : (allocate overLimitCount maxValidatorsPerTopUp
+    (word 64) (word 1) (word 100) (word 100) (word 100)).run
     overLimitState = .revert "MaxValidatorsPerTopUpExceeded" overLimitState := by
   rfl
 
@@ -254,7 +256,8 @@ theorem max_validators_guard_kill_line_refutes_no_check :
     ∃ (effective pending requested : List Word)
       (target minTopUp remainingCap moduleLimit valueGwei : Word)
       (state : ContractState),
-      (allocate requested.length target minTopUp remainingCap moduleLimit valueGwei).run state =
+      (allocate requested.length maxValidatorsPerTopUp
+          target minTopUp remainingCap moduleLimit valueGwei).run state =
         .revert "MaxValidatorsPerTopUpExceeded" state ∧
       (allocateNoMaxCheck requested.length target minTopUp remainingCap moduleLimit valueGwei).run state =
         .success ⟨List.replicate requested.length (word 1), word 67, word 33⟩

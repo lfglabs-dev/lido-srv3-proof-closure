@@ -25,8 +25,8 @@ private def runFrozen (effective pending requested topUpLimits : List Word)
     (target minTopUp remainingCap moduleLimit valueGwei : Word) : View :=
   let before := stateFor effective pending requested topUpLimits defaultState
   observe (List.replicate requested.length 0) remainingCap
-    ((allocate requested.length target minTopUp remainingCap moduleLimit
-      valueGwei).run before)
+    ((allocate requested.length maxValidatorsPerTopUp
+        target minTopUp remainingCap moduleLimit valueGwei).run before)
 
 /-- Leftover walk on a 40-key list (above the frozen 32) still respects the
 budget.  StakingRouter / IStakingModuleV2 have no `count ≤ 32`. -/
@@ -84,7 +84,8 @@ example :
 the leftover walk / StakingRouter.  The contract guard is the stored
 `uint64`, not this 32. -/
 theorem frozen_32_is_model_not_router :
-    (allocate over33 (word 64) (word 1) (word 100) (word 100) (word 100)).run
+    (allocate over33 maxValidatorsPerTopUp
+        (word 64) (word 1) (word 100) (word 100) (word 100)).run
         (stateFor overEff overPend overReq overLim defaultState) =
       .revert "MaxValidatorsPerTopUpExceeded"
         (stateFor overEff overPend overReq overLim defaultState) ∧

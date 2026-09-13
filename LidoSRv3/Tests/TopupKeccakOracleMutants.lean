@@ -88,12 +88,13 @@ theorem sample_keccak_disagrees :
 /-- The registered parent fires on this witness (observe = sourceView). -/
 theorem sample_parent_holds :
     observe (List.replicate sampleRequested.length 0) sampleRemaining
-        ((allocate sampleRequested.length sampleTarget sampleMinTopUp
+        ((allocate sampleRequested.length maxValidatorsPerTopUp sampleTarget sampleMinTopUp
           sampleRemaining sampleModuleLimit sampleValue).run sampleState) =
       sourceView sampleEffective samplePending sampleRequested sampleLimits
         sampleTarget sampleMinTopUp sampleRemaining sampleModuleLimit sampleValue :=
   LidoSRv3.Audit.Guarantees.PTopup2.verity_tx_simulates_topup2_spec
     sampleEffective samplePending sampleRequested sampleLimits
+    maxValidatorsPerTopUp
     sampleTarget sampleMinTopUp sampleRemaining sampleModuleLimit sampleValue
     sampleState sample_readArray_effective sample_readArray_pending
     sample_readArray_requested sample_readArray_limits
@@ -103,12 +104,13 @@ theorem sample_parent_holds :
 nonzero keccak stub. -/
 theorem sample_parent_any_oracle_nonzero :
     observe (List.replicate sampleRequested.length 0) sampleRemaining
-        ((allocate sampleRequested.length sampleTarget sampleMinTopUp
+        ((allocate sampleRequested.length maxValidatorsPerTopUp sampleTarget sampleMinTopUp
           sampleRemaining sampleModuleLimit sampleValue).run sampleState) =
       sourceView sampleEffective samplePending sampleRequested sampleLimits
         sampleTarget sampleMinTopUp sampleRemaining sampleModuleLimit sampleValue :=
   verity_tx_simulates_topup2_spec_any_oracle nonzeroKeccakOracle
     sampleEffective samplePending sampleRequested sampleLimits
+    maxValidatorsPerTopUp
     sampleTarget sampleMinTopUp sampleRemaining sampleModuleLimit sampleValue
     sampleState
     (by simpa [readArray_eq_readArrayWith nonzeroKeccakOracle] using
