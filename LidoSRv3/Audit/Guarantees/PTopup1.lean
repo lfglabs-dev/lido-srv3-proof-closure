@@ -2,6 +2,7 @@ import LidoSRv3.Audit.Allocation
 import LidoSRv3.Audit.Trace
 import LidoSRv3.Audit.Source.TopupCorrespondence
 import LidoSRv3.Audit.Source.TopupParentCorrespondence
+import LidoSRv3.Audit.Source.TopupPrefixGuardsSource
 import LidoSRv3.Audit.Verity.TopupTx
 import LidoSRv3.Audit.Guarantees.Registry
 
@@ -459,6 +460,63 @@ theorem source_topup_conserves_and_rolls_back {State : Type}
         hActive hWc hGwei hPaused hLoop,
       fun hLoop hOver => source_over_target_guard_required cfg inp hAuth hKeys hLens hPub hMod
         hActive hWc hGwei hPaused hLoop hOver⟩⟩
+
+/-- **Chantier 1 (Piste A, Thomas 2026-09-13) D-EMPTY-1 / D-AUTH-1 /
+D-WC-1 prefix-guards naming bridge.**
+
+Restates `source_topup_conserves_and_rolls_back` with added
+`_hPrefixGuards` premises NAMING the pinned StakingRouter.topUp
+prefix guards (source lines 686-716) via
+`TopupPrefixGuardsSource`.  The Verity plane's
+`Verity.TopupTx.executeGuarded` interpreter starts at
+`allocateDeposits` (line 717), so the three prefix guards are NOT
+exercised on the executable plane.
+
+This bridge names each pinned prefix guard as a source-level
+function of the pinned inputs at the parent's ENUNCE level:
+
+- `callerIsTopupGateway caller topupGateway` (D-AUTH-1, source
+  line 686 `msg.sender != TOPUP_GATEWAY → revert NotAuthorized()`).
+- `keysListNonEmpty keyIndices` (D-EMPTY-1, source line 695
+  `keyIndices.length == 0 → revert EmptyKeysList()`).
+- `wcTypeIsType2 wcTypeByte` (D-WC-1, source line 702
+  `wc[0] != WC_TYPE_2 → revert WrongWithdrawalCredentialsType()`).
+
+**NAMING composition, not full closure of D-EMPTY-1 / D-AUTH-1 /
+D-WC-1.**  The Verity `executeGuarded` interpreter still starts
+past line 717; extending it to include the prefix-guard branches at
+686-716 is the executable-plane extension follow-up (analog of the
+D-CALL-1 prefix-then-suffix half already flagged in
+`fidelity.missing`).  The registered `source_topup_conserves_and_rolls_back`
+is retained for existing consumers. -/
+theorem source_topup_conserves_and_rolls_back_under_prefix_guards_shape
+    {State : Type}
+    (cfg : SourceTopupConfig) (inp : SourceTopupInput)
+    (before after : State) (attempts : List CallAttempt) (trace : CommitTrace)
+    (caller topupGatewayAddr wcTypeByte : Nat)
+    (_hPrefixGuards :
+      -- The three prefix guards as source-level functions of pinned
+      -- inputs; each named after the pinned Solidity revert.
+      (LidoSRv3.Audit.Source.TopupPrefixGuardsSource.callerIsTopupGateway
+          caller topupGatewayAddr = decide (caller = topupGatewayAddr)) ∧
+      (∀ keyIndices : List Nat,
+        LidoSRv3.Audit.Source.TopupPrefixGuardsSource.keysListNonEmpty
+          keyIndices = decide (keyIndices.length ≠ 0)) ∧
+      (LidoSRv3.Audit.Source.TopupPrefixGuardsSource.wcTypeIsType2 wcTypeByte =
+        decide (wcTypeByte = LidoSRv3.Audit.Source.TopupPrefixGuardsSource.wcType2Byte))) :
+    ConservesAndRollsBack cfg inp before after attempts trace ∧
+    UnregisteredModuleReverts cfg inp ∧
+    WrapMovesNoValue cfg inp ∧
+    WrongWcTypeReverts cfg inp ∧
+    RunFollowsAllocationLoop cfg inp :=
+  -- The prefix-guards premise names the three pinned prefix guards
+  -- at 686/695/702 as source-level functions; the proof delegates
+  -- to the registered parent since the source-plane guards
+  -- (which are exercised in the parent's second and fourth
+  -- conjuncts) are unchanged.  The ENUNCE now records the pinned
+  -- prefix-guard shapes that the Verity executable plane omits
+  -- past line 717 (D-EMPTY-1 / D-AUTH-1 / D-WC-1 disclosure).
+  source_topup_conserves_and_rolls_back cfg inp before after attempts trace
 
 /--
 The `assert(etherBalanceBeforeTopUp == etherBalanceAfterTopUp)` at
