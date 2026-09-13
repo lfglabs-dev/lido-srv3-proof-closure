@@ -106,6 +106,7 @@ import LidoSRv3.Audit.Source.WQStorageViaOracleSource
 import LidoSRv3.Audit.Source.SRModuleMappingViaOracleSource
 import LidoSRv3.Audit.Source.DepositEmptyBatchEarlyReturnSource
 import LidoSRv3.Audit.Source.DepositPerKeyCallSource
+import LidoSRv3.Audit.Source.DepositCustomErrorsSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -979,6 +980,8 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.DepositPerKeyCallSource.perKeyDepositFrames_length
 #print axioms LidoSRv3.Audit.Source.DepositPerKeyCallSource.perKeyDepositFrames_value
 #print axioms LidoSRv3.Audit.Source.DepositPerKeyCallSource.realWithdrawArgs_depositsValue_eq
+-- Twenty-sixth-step (2026-09-13): D-REVERT-1 custom-error source model.
+#print axioms LidoSRv3.Audit.Source.DepositCustomErrorsSource.realErrorSelector_deterministic
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape
