@@ -81,6 +81,7 @@ import LidoSRv3.Audit.Source.BridgeCallResultSource
 import LidoSRv3.Audit.Source.BridgePerWriterGlue
 import LidoSRv3.Audit.Source.AragonACLSource
 import LidoSRv3.Audit.Source.KeccakMappingStorageSource
+import LidoSRv3.Audit.Source.WithdrawalQueueMappingSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -887,6 +888,9 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise.feePerRequest_derived_from_staticcall_result
 -- Second-step (2026-09-13): P-CONSOLIDATION-ETH-1 fee EIP-7251 schedule.
 #print axioms LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.abiDecodedFee_matches_schedule
+-- Shared WithdrawalQueue source model (2026-09-13): request/checkpoint mappings
+-- + unfinalizedStETH accumulator for P-RESERVE-1 and P-ADDRESS-1.
+#print axioms LidoSRv3.Audit.Source.WithdrawalQueueMappingSource.unfinalizedStETHFromStorage_eq
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape
