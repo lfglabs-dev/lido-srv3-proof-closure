@@ -4,6 +4,7 @@ import LidoSRv3.Audit.Source.ReservePackedBufferSource
 import LidoSRv3.Audit.Source.ReservePayableCallSource
 import LidoSRv3.Audit.Source.ReserveSeedBookkeepingSource
 import LidoSRv3.Audit.Source.ERC7201StorageSlotSource
+import LidoSRv3.Audit.Source.SolidityUint128WrapSource
 import LidoSRv3.Audit.Guarantees.Registry
 
 namespace LidoSRv3.Audit.Guarantees.PReserve1
@@ -328,6 +329,59 @@ theorem source_spend_preserves_withdrawal_reserve_under_erc7201_slot_shape
   -- since the model's local slot indexing is unchanged — the ENUNCE
   -- records the pinned slot-derivation shape the model's flat slots
   -- 0-4 stand in for (D-SLOT-1 disclosure).
+  source_spend_preserves_withdrawal_reserve inputs before after amount live hfresh h
+
+/-- **Chantier 2 (Piste A, Thomas 2026-09-13) D-WRAP-1 uint128 wrap
+naming bridge.**
+
+Restates `source_spend_preserves_withdrawal_reserve` with added
+`_hWrapShape` premises NAMING the pinned Solidity uint128 wrap
+semantics via `SolidityUint128WrapSource.toUint128` and
+`wrappedAdd`.  The Verity model's allocation helper uses `safeSub`
+and returns `ALLOCATION_ARITHMETIC` on overflow; the pinned 0.4.24
+helper does raw `remaining -=` (unchecked wrap).  On the packed
+uint128 pair `buffered` / `depositedPostReport` at Lido.sol:131-132,
+each half wraps mod 2^128 — the model treats them as unbounded
+`Nat` accumulators.
+
+This bridge NAMES the pinned uint128 wrap semantics at the parent's
+ENUNCE via three `SolidityUint128WrapSource` equations:
+- `toUint128 x = x % 2^128` (truncation to uint128).
+- `wrappedAdd a b = (a + b) % 2^128` (modular addition).
+- `toUint128_lt_modulus`: the truncated value is strictly less than
+  `2^128`.
+
+**NAMING composition, not full closure of D-WRAP-1.**  The Verity
+model still uses `safeSub` in the allocation helper; extending to
+model the unchecked wrap is the follow-up.  The min-bound
+premises make the divergence unreachable on the grok #419 harness
+witness vectors, but the ENUNCE now names the pinned wrap semantics
+explicitly. -/
+theorem source_spend_preserves_withdrawal_reserve_under_uint128_wrap_shape
+    (inputs : WithdrawInputs) (before after : ReserveState) (amount live : Word)
+    (x : Nat)
+    (_hWrapShape :
+      -- The pinned uint128 wrap semantics: truncation, modular
+      -- addition, and boundedness of the truncated value.
+      LidoSRv3.Audit.Source.SolidityUint128WrapSource.toUint128 x =
+        x % LidoSRv3.Audit.Source.SolidityUint128WrapSource.uint128Modulus ∧
+      (∀ a b, LidoSRv3.Audit.Source.SolidityUint128WrapSource.wrappedAdd a b =
+        (a + b) % LidoSRv3.Audit.Source.SolidityUint128WrapSource.uint128Modulus) ∧
+      LidoSRv3.Audit.Source.SolidityUint128WrapSource.toUint128 x <
+        LidoSRv3.Audit.Source.SolidityUint128WrapSource.uint128Modulus)
+    (hfresh : freshQueueCache before live)
+    (h : modelWithdrawDepositableEther inputs before amount = .committed after) :
+    scopedWithdrawGuards inputs ∧
+      amount ≠ 0 ∧
+      withdrawalPartitionSpendInvariant before after amount ∧
+      liveEffectiveWithdrawalsReserve after live = liveEffectiveWithdrawalsReserve before live :=
+  -- The wrap-shape premise names the pinned Solidity uint128 wrap
+  -- semantics (truncation, modular addition, boundedness) that the
+  -- Verity model's `safeSub` / unbounded-Nat arithmetic replaces
+  -- with checked bounds.  The proof delegates to the registered
+  -- parent since the model's arithmetic transition is unchanged —
+  -- the ENUNCE records the pinned wrap semantics the model treats
+  -- as unbounded Nat (D-WRAP-1 disclosure).
   source_spend_preserves_withdrawal_reserve inputs before after amount live hfresh h
 
 /--
