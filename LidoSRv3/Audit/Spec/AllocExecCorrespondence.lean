@@ -8,7 +8,10 @@ import LidoSRv3.Audit.Verity.DepositParentTx
 wei an allocation stands for is `amount * depositSize`, where `depositSize`
 is the existing per-key configuration field
 (`SourceDepositConfig.depositSize` / `Inputs.depositSize`), not a claimed
-32-ether deployment fact -- `A-DEPOSIT-32-ETHER` stays OPEN.
+32-ether deployment fact. `A-DEPOSIT-32-ETHER` is DISCHARGED at the
+provenance layer via `scripts/verify_deposit_thirty_two_ether.py`
+(chantier 4, Thomas 2026-09-13); this Spec correspondence is stated
+over the free `depositSize` and does not consume the pin.
 
 `ExecutesAllocation` is the caller-side bridge from two Spec allocations to
 the executable transaction's two batch legs.  It carries exactly two facts

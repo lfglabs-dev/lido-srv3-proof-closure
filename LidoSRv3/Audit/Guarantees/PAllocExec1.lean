@@ -12,8 +12,11 @@ equality
 
 where `depositSize` is the existing configuration field
 (`SourceDepositConfig.depositSize` / `Inputs.depositSize`), not a claimed
-32-ether deployment fact -- `A-DEPOSIT-32-ETHER` stays OPEN, and no pin is
-invented to discharge it.
+32-ether deployment fact. `A-DEPOSIT-32-ETHER` is DISCHARGED at the
+provenance layer via `scripts/verify_deposit_thirty_two_ether.py`
+(chantier 4, Thomas 2026-09-13) but is not consumed by this parent —
+`ExecutesAllocation` is stated over the free `depositSize`, not over
+the 32-ether pin.
 
 The registered parent is now the two-batch router construction
 `routerDepositInputs`: it produces the two legs whose keys are the
@@ -21,7 +24,9 @@ allocation amounts and whose wei is `amount * depositSize`, so
 `ExecutesAllocation` and `LinksSource` are theorems of the router, not
 caller hypotheses.  The multiply-only composition
 `allocated_amount_times_deposit_size` stays as a lemma.
-`A-DEPOSIT-32-ETHER` stays OPEN.  This is not an n-frame lift.
+`A-DEPOSIT-32-ETHER` is discharged at the provenance layer (chantier 4)
+but this parent statement does not consume it — it is stated over the
+free configuration field `depositSize`. This is not an n-frame lift.
 
 Registered as supplemental `P-ALLOC-EXEC-1`; not in the immutable
 minimal-11 facade.
