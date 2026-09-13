@@ -868,8 +868,23 @@ theorem verity_tx_simulates_source_with_nonzero_wrap_close
       -- `executeSourceShapeWithAuth_reverts_on_unauth`.
       (∀ (allocations : List Nat) (failure : Verity.TopupTx.FailurePoint),
         (Verity.TopupTx.executeSourceShapeWithAuth allocations false failure).run state =
-          Verity.ContractResult.revert "NotAuthorized" state) := by
-  refine ⟨hCall, ?_, ?_, ?_, ?_, ?_⟩
+          Verity.ContractResult.revert "NotAuthorized" state) ∧
+      -- Chantier 1 (Piste A, Thomas 2026-09-13, Grok differential #414
+      -- D-WC-1 executable closure).
+      -- `Verity.TopupTx.executeSourceShapeWithAllPrefixGuards` reverts closed
+      -- on `wcTypeIsType2 = false`, matching the pinned
+      -- `StakingRouter.sol:702 wc[0] != WC_TYPE_2 →
+      -- WrongWithdrawalCredentialsType()` guard.  Real ENUNCE extension
+      -- consuming `executeSourceShapeWithAllPrefixGuards_reverts_on_wrong_wc`.
+      -- The three prefix guards 686/695/702 are now all exercised on the CLI
+      -- plane (D-AUTH-1 / D-EMPTY-1 / D-WC-1 all closed at the parent's
+      -- ENUNCE level).
+      (∀ (allocations : List Nat) (callerIsTopUpGateway : Bool)
+          (failure : Verity.TopupTx.FailurePoint),
+        (Verity.TopupTx.executeSourceShapeWithAllPrefixGuards
+            allocations callerIsTopUpGateway false failure).run state =
+          Verity.ContractResult.revert "WrongWithdrawalCredentialsType" state) := by
+  refine ⟨hCall, ?_, ?_, ?_, ?_, ?_, ?_⟩
   · exact
       ⟨fun failure =>
           Verity.TopupTx.executeGuarded_binds_returndata cfg call failure _,
@@ -891,6 +906,9 @@ theorem verity_tx_simulates_source_with_nonzero_wrap_close
     exact Verity.TopupTx.executeSourceShape_reverts_on_empty failure state
   · intro allocations failure
     exact Verity.TopupTx.executeSourceShapeWithAuth_reverts_on_unauth allocations failure state
+  · intro allocations callerIsTopUpGateway failure
+    exact Verity.TopupTx.executeSourceShapeWithAllPrefixGuards_reverts_on_wrong_wc
+      allocations callerIsTopUpGateway failure state
 
 /-- **Chantier 1 (Piste A, Thomas 2026-09-13): executable Contract.run
 rollback for the guarded Verity plane.**
