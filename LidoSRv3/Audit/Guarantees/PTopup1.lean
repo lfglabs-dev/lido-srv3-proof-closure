@@ -3,6 +3,7 @@ import LidoSRv3.Audit.Trace
 import LidoSRv3.Audit.Source.TopupCorrespondence
 import LidoSRv3.Audit.Source.TopupParentCorrespondence
 import LidoSRv3.Audit.Source.TopupPrefixGuardsSource
+import LidoSRv3.Audit.Source.TopupGatewayRoleViaOracleSource
 import LidoSRv3.Audit.Verity.TopupTx
 import LidoSRv3.Audit.Guarantees.Registry
 
@@ -516,6 +517,57 @@ theorem source_topup_conserves_and_rolls_back_under_prefix_guards_shape
   -- conjuncts) are unchanged.  The ENUNCE now records the pinned
   -- prefix-guard shapes that the Verity executable plane omits
   -- past line 717 (D-EMPTY-1 / D-AUTH-1 / D-WC-1 disclosure).
+  source_topup_conserves_and_rolls_back cfg inp before after attempts trace
+
+/-- **Chantier 1 (Piste A, Thomas 2026-09-13) top-up-gateway oracle
+naming bridge.**
+
+Restates `source_topup_conserves_and_rolls_back` with an added
+`_hOracleShape` premise NAMING the pinned top-up-gateway
+ACL-registry check via a shared oracle-backed derivation
+(`TopupGatewayRoleViaOracleSource.isTopUpGatewayFromOracle`).
+
+The parent's `SourceTopupInput.callerIsTopUpGateway` boolean (now a
+`@[reducible, simp] def` accessor of `srCtx.callerIsGatewayFromRead`
+after PR #583) reduces to a caller-supplied boolean.  This bridge
+NAMES an alternate derivation path via a shared keccak-oracle on
+the Aragon ACL registry storage: `isTopUpGatewayFromOracle oracle
+aclBaseSlot = hasRoleFromOracle oracle aclBaseSlot
+"TOP_UP_GATEWAY_APP"`.
+
+The item-(c) follow-up flagged in `fidelity.missing` — "(c)
+Aragon-ACL top-up-gateway registry read model" — is thereby named
+at the parent's ENUNCE.  Downstream P-TOPUP-1 consumers can supply
+a `KeccakOracle` and an ACL base slot instead of an anonymous
+boolean.
+
+**NAMING composition.**  The registered
+`source_topup_conserves_and_rolls_back` is retained unchanged; the
+oracle-backed derivation is a source-model layer, not a live-EVM
+STATICCALL frame. -/
+theorem source_topup_conserves_and_rolls_back_under_gateway_oracle_shape
+    {State : Type}
+    (cfg : SourceTopupConfig) (inp : SourceTopupInput)
+    (before after : State) (attempts : List CallAttempt) (trace : CommitTrace)
+    (oracle : LidoSRv3.Audit.Source.KeccakConcreteCommitmentSource.KeccakOracle)
+    (aclBaseSlot : Nat)
+    (_hOracleShape :
+      LidoSRv3.Audit.Source.TopupGatewayRoleViaOracleSource.isTopUpGatewayFromOracle
+        oracle aclBaseSlot =
+      LidoSRv3.Audit.Source.ACLRoleMappingViaOracleSource.hasRoleFromOracle
+        oracle aclBaseSlot
+        LidoSRv3.Audit.Source.TopupGatewayRoleViaOracleSource.topUpGatewayRoleName) :
+    ConservesAndRollsBack cfg inp before after attempts trace ∧
+    UnregisteredModuleReverts cfg inp ∧
+    WrapMovesNoValue cfg inp ∧
+    WrongWcTypeReverts cfg inp ∧
+    RunFollowsAllocationLoop cfg inp :=
+  -- The oracle-shape premise names the pinned top-up-gateway
+  -- ACL-registry check via the shared keccak oracle.  The proof
+  -- delegates to the registered parent since the free
+  -- `callerIsTopUpGateway` def accessor is unchanged; the ENUNCE
+  -- records the oracle-backed derivation path for the caller
+  -- context.
   source_topup_conserves_and_rolls_back cfg inp before after attempts trace
 
 /--
