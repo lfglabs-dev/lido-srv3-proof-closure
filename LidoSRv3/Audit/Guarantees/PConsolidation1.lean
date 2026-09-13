@@ -307,12 +307,18 @@ identity `_requireExactFee` (`WithdrawalVaultEIP7685.sol:123-127`,
 `IncorrectFee` branch is unreachable and the vault commits on the
 count / bound / per-key-validation guards alone.
 
-A-CONSOLIDATION-GATEWAY-NONZERO disclosure remains explicit on the
-STATICCALL fee itself: `gatewayTotalFee_ne_zero_of_fee_ne_zero`
-derives `result.abiDecodedFee ≠ 0 → totalFee ≠ 0`, and
-`gatewayTotalFee_zero_at_fee_zero` documents the `fee = 0` on-chain
-case (`totalFee = 0`; the vault admits `msg.value = 0` under
-`_requireExactFee(0)`).
+A-CONSOLIDATION-GATEWAY-NONZERO status: RETIRED from this guarantee's
+assumption list via PR #699 (registered-parent statement swap to
+`source_consolidation_preserves_eligibility_value_atomicity_from_gateway`).
+The vault-side `hGatewayAdmittedNonzero` is DERIVED under the pinned-
+source premise shape via `gatewayTotalFee_ne_zero_of_fee_ne_zero`
+(`result.abiDecodedFee ≠ 0 → totalFee ≠ 0` arithmetic bridge).
+`gatewayTotalFee_zero_at_fee_zero` documents the complementary `fee = 0`
+on-chain case (`totalFee = 0`; the vault admits `msg.value = 0` under
+`_requireExactFee(0)`). The remaining residual is the caller-supplied
+`hFeeNonzero : result.abiDecodedFee ≠ 0` on the outer STATICCALL
+structure, pending a live-STATICCALL executable model on the pinned
+EIP-7251 predeploy.
 
 The full `Contract.run` chain from the gateway's Verity contract
 through an ABI encoder to the vault's `Contract.run` remains OPEN
