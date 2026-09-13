@@ -109,14 +109,51 @@ def pullFromLido (inputs : Inputs) (total : Word) : Contract Unit := do
 def pushBatch (inputs : Inputs) (batch : Batch) : Contract Unit :=
   DepositParentTx.pushBatch (legacyInputs inputs) batch
 
+/-- Source-derived early-return predicate on the aggregated per-call deposit
+count.  Mirrors the pinned `StakingRouter.sol:978`
+`if (actualDepositsCount == 0) return;` semantics: on the model's list-lift the
+per-call `actualDepositsCount` is the aggregate `exactKeys inputs.batches`. -/
+def shouldPull (inputs : Inputs) : Bool :=
+  decide (exactKeys inputs.batches ≠ 0)
+
+theorem shouldPull_true_of_exactKeys_ne_zero {inputs : Inputs}
+    (h : exactKeys inputs.batches ≠ 0) : shouldPull inputs = true := by
+  simp [shouldPull, h]
+
+theorem shouldPull_false_of_exactKeys_eq_zero {inputs : Inputs}
+    (h : exactKeys inputs.batches = 0) : shouldPull inputs = false := by
+  simp [shouldPull, h]
+
+/-- The pull+push+assert tail (StakingRouter.sol:983-996) — everything past the
+line-978 early return.  Extracted so `execute` can gate it behind the pinned
+early-return predicate `shouldPull`. -/
+def executePullPushAssertTail (inputs : Inputs) (entryBalance : Word) : Contract Unit := do
+  let total := wordTotal inputs.batches
+  -- StakingRouter.sol:983  LIDO.withdrawDepositableEther(depositsValue, actualDepositsCount);
+  pullFromLido inputs total
+  -- StakingRouter.sol:985-991  BeaconChainDepositor.makeBeaconChainDeposits32ETH(...)  (one frame per batch)
+  let _ ← inputs.batches.mapM (pushBatch inputs)
+  -- StakingRouter.sol:993  uint256 etherBalanceAfterDeposits = address(this).balance;
+  let after ← DepositParentTx.getState
+  -- StakingRouter.sol:996  assert(etherBalanceBeforeDeposits == etherBalanceAfterDeposits);
+  require (after.selfBalance == entryBalance) "ASSERT_BALANCE_UNCHANGED"
+
 /-- `StakingRouter.sol:942-997 deposit(uint256 _stakingModuleId, bytes calldata _depositCalldata)`,
 generalised to a list of batches: the pinned function deposits for one module
 per call; this transaction runs `processBatch` over every batch, one aggregate
 Lido pull, then `pushBatch` over every batch. The guard chain is the one of
 `SolidityDeposit.run`; the list shape is the model's.
 
+Consumes the source model `DepositEmptyBatchEarlyReturnSource.shouldPull` at
+`StakingRouter.sol:978`: when the aggregate per-call `actualDepositsCount` is
+zero, `execute` commits after the counter update and per-batch module reads,
+without emitting the `withdrawDepositableEther` frame, the per-batch beacon
+frames, or the line-996 balance assert — mirroring the pinned early return.
+Grok differential #412 D-EMPTY-PULL vector goes from divergence (model always
+emitted a zero-argument Lido pull) to equality on the empty-batch witness.
+
 Not transcribed: as for `DepositParentTx.execute` (`StakingRouter.sol:948-949,
-954-969, 978, 980, 993`).
+954-969, 980, 993`).
 
 Added by the model: `Batch.dataValid`/`rootValid` (no counterpart in the span),
 the `"BATCH_TOTAL_OVERFLOW"` guard (the exact bound is checked before either
@@ -143,14 +180,13 @@ def execute (inputs : Inputs) : Contract Unit := do
   let total := wordTotal inputs.batches
   require (total == wordKeys inputs.batches * inputs.depositSize)
     "ALLOCATION_VALUE_MISMATCH"
-  -- StakingRouter.sol:983  LIDO.withdrawDepositableEther(depositsValue, actualDepositsCount);
-  pullFromLido inputs total
-  -- StakingRouter.sol:985-991  BeaconChainDepositor.makeBeaconChainDeposits32ETH(...)  (one frame per batch)
-  let _ ← inputs.batches.mapM (pushBatch inputs)
-  -- StakingRouter.sol:993  uint256 etherBalanceAfterDeposits = address(this).balance;
-  let after ← DepositParentTx.getState
-  -- StakingRouter.sol:996  assert(etherBalanceBeforeDeposits == etherBalanceAfterDeposits);
-  require (after.selfBalance == state.selfBalance) "ASSERT_BALANCE_UNCHANGED"
+  -- StakingRouter.sol:978  if (actualDepositsCount == 0) return;
+  -- The pull, per-key push, and line-996 assert live in `executePullPushAssertTail`
+  -- and only fire when the pinned `shouldPull` predicate holds.
+  if shouldPull inputs then
+    executePullPushAssertTail inputs state.selfBalance
+  else
+    (Pure.pure () : Contract Unit)
 
 def moduleEntry (inputs : Inputs) (batch : Batch) : ExternalCall :=
   linkedCallEntryTo "obtainDepositData" inputs.module 0 [batch.moduleId, batch.keys]
@@ -162,9 +198,16 @@ def pushEntry (inputs : Inputs) (batch : Batch) : ExternalCall :=
   linkedCallEntryTo "depositToBeacon" inputs.beacon batch.amount
     [batch.moduleId, batch.keys, batch.dynamicDataCommitment, batch.depositDataRoot]
 
+/-- Pull + per-batch push calls, only emitted when the pinned early-return
+predicate `shouldPull` holds. -/
+def tailCalls (inputs : Inputs) : List ExternalCall :=
+  if shouldPull inputs then
+    [pullEntry inputs] ++ inputs.batches.map (pushEntry inputs)
+  else
+    []
+
 def expectedCalls (inputs : Inputs) : List ExternalCall :=
-  inputs.batches.map (moduleEntry inputs) ++ [pullEntry inputs] ++
-    inputs.batches.map (pushEntry inputs)
+  inputs.batches.map (moduleEntry inputs) ++ tailCalls inputs
 
 @[ext] structure Observables where
   committed : Bool
@@ -257,11 +300,17 @@ def afterPushes (inputs : Inputs) : List Batch → ContractState → ContractSta
   | [], state => state
   | batch :: batches, state => afterPushes inputs batches (afterPush inputs batch state)
 
+def committedProcessedState (inputs : Inputs) (state : ContractState) : ContractState :=
+  afterBatches inputs inputs.batches
+    (state.writeSlot counterSlot (state.readSlot counterSlot + 1))
+
 def committedState (inputs : Inputs) (state : ContractState) : ContractState :=
-  afterPushes inputs inputs.batches
-    (afterPull inputs (wordTotal inputs.batches)
-      (afterBatches inputs inputs.batches
-        (state.writeSlot counterSlot (state.readSlot counterSlot + 1))))
+  if shouldPull inputs then
+    afterPushes inputs inputs.batches
+      (afterPull inputs (wordTotal inputs.batches)
+        (committedProcessedState inputs state))
+  else
+    committedProcessedState inputs state
 
 theorem processBatch_apply (inputs : Inputs) (batch : Batch) (state : ContractState)
     (h : Healthy batch) :
@@ -498,16 +547,29 @@ theorem execute_apply (inputs : Inputs) (state : ContractState)
   have hValueGuard :
       (wordTotal inputs.batches == wordKeys inputs.batches * inputs.depositSize) = true := by
     simp [h.valueMatches]
+  have hProcessedSelf :
+      (afterBatches inputs inputs.batches entry).selfBalance = state.selfBalance := by
+    rw [selfBalance_afterBatches]
+    simp [entry, h.entryBalance]
   simp only [execute, Bind.bind, _root_.Verity.bind, _root_.Verity.require,
     h.authorized, h.moduleActive, h.allocationValid, hNoWrapGuard, if_true,
     DepositParentTx.getState, setStorage]
   rw [processBatches_apply inputs inputs.batches entry h.healthy]
   simp only [Bind.bind, _root_.Verity.bind, hValueGuard, _root_.Verity.require, if_true]
-  rw [pullFromLido_apply inputs (wordTotal inputs.batches) processed h.lidoCallOk hFunded]
-  simp only [Bind.bind, _root_.Verity.bind]
-  rw [pushBatches_apply inputs inputs.batches pulled h.healthy hPushFunds]
-  simp only [Bind.bind, _root_.Verity.bind, DepositParentTx.getState, hClose,
-    beq_self_eq_true, _root_.Verity.require, if_true, committedState, entry, processed, pulled]
+  -- Case split on the pinned StakingRouter.sol:978 `shouldPull` predicate.
+  by_cases hPull : shouldPull inputs
+  · -- Nonempty branch: pull, push per batch, and assert.
+    simp only [hPull, if_true, executePullPushAssertTail, Bind.bind, _root_.Verity.bind]
+    rw [pullFromLido_apply inputs (wordTotal inputs.batches) processed h.lidoCallOk hFunded]
+    simp only [Bind.bind, _root_.Verity.bind]
+    rw [pushBatches_apply inputs inputs.batches pulled h.healthy hPushFunds]
+    simp only [Bind.bind, _root_.Verity.bind, DepositParentTx.getState, hClose,
+      beq_self_eq_true, _root_.Verity.require, if_true,
+      committedState, committedProcessedState, entry, processed, pulled,
+      hPull]
+  · -- Empty-batch branch (line-978 early return): no pull, no push, no assert.
+    simp only [hPull, Bool.false_eq_true, if_false, Pure.pure, _root_.Verity.pure,
+      committedState, committedProcessedState, entry, processed, pulled]
 
 theorem execute_run (inputs : Inputs) (state : ContractState)
     (h : Preconditions inputs state) :
@@ -516,33 +578,43 @@ theorem execute_run (inputs : Inputs) (state : ContractState)
 
 theorem committed_calls (inputs : Inputs) (state : ContractState) :
     (committedState inputs state).calls = state.calls ++ expectedCalls inputs := by
-  simp only [committedState, calls_afterPushes, calls_afterPull, calls_afterBatches,
-    ContractState.calls_writeSlot, expectedCalls, pullEntry]
-  simp [List.append_assoc]
+  by_cases hPull : shouldPull inputs
+  · simp only [committedState, hPull, if_true, calls_afterPushes, calls_afterPull,
+      committedProcessedState, calls_afterBatches, ContractState.calls_writeSlot,
+      expectedCalls, tailCalls, pullEntry]
+    simp [List.append_assoc]
+  · simp only [committedState, hPull, Bool.false_eq_true, if_false,
+      committedProcessedState, calls_afterBatches, ContractState.calls_writeSlot,
+      expectedCalls, tailCalls, if_neg hPull]
+    simp [List.append_assoc]
 
 theorem committed_balance (inputs : Inputs) (state : ContractState)
     (h : Preconditions inputs state) :
     (committedState inputs state).selfBalance = state.selfBalance := by
-  have hBefore :
-      (afterBatches inputs inputs.batches
-        (state.writeSlot counterSlot (state.readSlot counterSlot + 1))).selfBalance = 0 := by
-    rw [selfBalance_afterBatches]
-    exact h.entryBalance
-  have hAfterPull :
-      (afterPull inputs (wordTotal inputs.batches)
+  by_cases hPull : shouldPull inputs
+  · have hBefore :
         (afterBatches inputs inputs.batches
-          (state.writeSlot counterSlot (state.readSlot counterSlot + 1)))).selfBalance =
-        wordTotal inputs.batches := by
-    rw [selfBalance_afterPull, hBefore, _root_.Verity.Core.Uint256.zero_add]
-  have hFunds : exactTotal inputs.batches ≤
-      (afterPull inputs (wordTotal inputs.batches)
-        (afterBatches inputs inputs.batches
-          (state.writeSlot counterSlot (state.readSlot counterSlot + 1)))).selfBalance.val := by
-    rw [hAfterPull, wordTotal_val inputs.batches h.foldStable]
-  apply _root_.Verity.Core.Uint256.ext
-  rw [committedState, selfBalance_afterPushes inputs inputs.batches _ hFunds, hAfterPull,
-    wordTotal_val inputs.batches h.foldStable]
-  simp [h.entryBalance]
+          (state.writeSlot counterSlot (state.readSlot counterSlot + 1))).selfBalance = 0 := by
+      rw [selfBalance_afterBatches]
+      exact h.entryBalance
+    have hAfterPull :
+        (afterPull inputs (wordTotal inputs.batches)
+          (afterBatches inputs inputs.batches
+            (state.writeSlot counterSlot (state.readSlot counterSlot + 1)))).selfBalance =
+          wordTotal inputs.batches := by
+      rw [selfBalance_afterPull, hBefore, _root_.Verity.Core.Uint256.zero_add]
+    have hFunds : exactTotal inputs.batches ≤
+        (afterPull inputs (wordTotal inputs.batches)
+          (afterBatches inputs inputs.batches
+            (state.writeSlot counterSlot (state.readSlot counterSlot + 1)))).selfBalance.val := by
+      rw [hAfterPull, wordTotal_val inputs.batches h.foldStable]
+    apply _root_.Verity.Core.Uint256.ext
+    rw [committedState, if_pos hPull, committedProcessedState,
+      selfBalance_afterPushes inputs inputs.batches _ hFunds, hAfterPull,
+      wordTotal_val inputs.batches h.foldStable]
+    simp [h.entryBalance]
+  · rw [committedState, if_neg hPull, committedProcessedState, selfBalance_afterBatches]
+    simp [h.entryBalance]
 
 theorem execute_observes_source (inputs : Inputs) (state : ContractState)
     (h : Preconditions inputs state) :
@@ -579,9 +651,11 @@ theorem wrapping_fold_reverts_without_journal (inputs : Inputs) (state : Contrac
       decide (exactTotal inputs.batches < _root_.Verity.Core.Uint256.modulus) = false :=
     decide_eq_false (Nat.not_lt.mpr hWrap)
   have hRaw : execute inputs state = .revert "BATCH_TOTAL_OVERFLOW" state := by
-    simp only [execute, Bind.bind, _root_.Verity.bind, _root_.Verity.require,
-      hAuthorized, hActive, hAllocation, hGuard, Bool.false_eq_true, if_true, if_false]
-  simp [Contract.run, hRaw, observe]
+    simp [execute, Bind.bind, _root_.Verity.bind, _root_.Verity.require,
+      hAuthorized, hActive, hAllocation, hGuard]
+  refine ⟨?_, ?_⟩
+  · simp [Contract.run, hRaw]
+  · simp [Contract.run, hRaw, observe]
 
 def ofTwoBatches (inputs : DepositParentTx.Inputs) : Inputs :=
   { authorized := inputs.authorized, moduleActive := inputs.moduleActive,
@@ -589,11 +663,13 @@ def ofTwoBatches (inputs : DepositParentTx.Inputs) : Inputs :=
     depositSize := inputs.depositSize, lido := inputs.lido, module := inputs.module,
     beacon := inputs.beacon, batches := [inputs.first, inputs.second] }
 
-theorem two_batch_expectedCalls_eq (inputs : DepositParentTx.Inputs) :
+theorem two_batch_expectedCalls_eq (inputs : DepositParentTx.Inputs)
+    (hShouldPull : shouldPull (ofTwoBatches inputs) = true) :
     expectedCalls (ofTwoBatches inputs) = DepositParentTx.expectedCalls inputs := by
-  simp [expectedCalls, ofTwoBatches, moduleEntry, pullEntry, pushEntry, wordTotal,
-    DepositParentTx.expectedCalls, DepositParentTx.moduleEntry, DepositParentTx.pullEntry,
-    DepositParentTx.pushEntry, DepositParentTx.totalAmount]
+  simp only [expectedCalls, tailCalls, hShouldPull, if_true]
+  simp [ofTwoBatches, moduleEntry, pullEntry, pushEntry, wordTotal,
+    DepositParentTx.expectedCalls, DepositParentTx.moduleEntry,
+    DepositParentTx.pullEntry, DepositParentTx.pushEntry, DepositParentTx.totalAmount]
 
 theorem two_batch_is_n_eq_two (inputs : DepositParentTx.Inputs) :
     (ofTwoBatches inputs).batches.length = 2 ∧
