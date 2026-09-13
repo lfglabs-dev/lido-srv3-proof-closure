@@ -4,6 +4,7 @@ import LidoSRv3.Audit.Source.Alloc1CompositeBoundsSource
 import LidoSRv3.Audit.Guarantees.Registry
 import LidoSRv3.Audit.Guarantees.PAlloc1TargetMultBounded
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
+import LidoSRv3.Audit.Guarantees.PAlloc1TotalAdditionBounded
 import LidoSRv3.Audit.Verity.AllocCapacityPhase3
 import LidoSRv3.Audit.Verity.AllocationTx
 
@@ -203,6 +204,53 @@ theorem checked_execute_under_pinned_shape_and_constants
   -- constants at the ENUNCE for downstream consumers.
   checked_execute_under_pinned_shape cfg modules depositsToAllocate isTopUp
     hMaxEB hTypes hShape
+
+/-- **Chantier 3 (Piste A, Thomas 2026-09-13) `total_addition` real
+derivation.**
+
+Analog of `checked_execute_under_pinned_shape` where the
+`total_addition` conjunct of `CheckedBounds` is DERIVED from real
+arithmetic on `PinnedAllocationEntryBounds` (MAX_STAKING_MODULES_COUNT
+= 32, uint64 `depositsToAllocate`, uint64 per-module
+`allocationEntry`), not passed through from `PinnedSRAllocation-
+BoundsShape.totalAdditionInvariant`.  Via `PAlloc1TotalAdditionBounded.
+total_addition_under_pinned_bounds`: `deposits + Σ entries ≤ (32 + 1)
+* (2^64 - 1) ≈ 6·10^20 << MAX_UINT256 = 2^256 - 1`.
+
+Two of the four `CheckedBounds` conjuncts are now derived from real
+bounds (target_multiplication via `PAlloc1TargetMultBounded`;
+total_addition via `PAlloc1TotalAdditionBounded`).  `active_subtraction`
+and `available_arithmetic` remain caller-supplied premises for now
+(see `fidelity.missing`; live SRStorage monotonicity + per-module uint64
+caps derivation is the follow-up). -/
+theorem checked_execute_under_type_and_allocation_bounds
+    (cfg : Config) (modules : List Module) (depositsToAllocate : Verity.Uint256)
+    (isTopUp : Bool)
+    (hMaxEB : cfg.maxEBType1 ≠ 0)
+    (hTypes : PAlloc1TargetMultBounded.PinnedStakingModuleTypeBounds
+      cfg modules depositsToAllocate)
+    (hAlloc : PAlloc1TotalAdditionBounded.PinnedAllocationEntryBounds
+      cfg modules depositsToAllocate)
+    (hActiveSubtr : ∀ m ∈ modules,
+      (wordMax m.summaryExitedCount m.accountingExitedCount : Nat)
+        ≤ (m.depositedCount : Nat))
+    (hAvailArith : ∀ m ∈ modules, m.isActive = true →
+      (if isTopUp && m.isType2 then
+        MathView.activeCount m * (cfg.maxEBType2 : Nat) ≤ Verity.Core.MAX_UINT256
+      else
+        MathView.allocationEntry cfg m + (m.depositableCount : Nat) ≤
+          Verity.Core.MAX_UINT256)) :
+    ∃ rows, SolidityAllocCapacity.execute cfg modules depositsToAllocate isTopUp = some rows ∧
+      rows.map (fun row => (row.capacity : Nat)) =
+        MathView.capacities cfg modules depositsToAllocate isTopUp :=
+  checked_execute cfg modules depositsToAllocate isTopUp
+    { maxEBType1_nonzero := hMaxEB
+      active_subtraction := hActiveSubtr
+      total_addition :=
+        PAlloc1TotalAdditionBounded.total_addition_under_pinned_bounds hAlloc
+      available_arithmetic := hAvailArith
+      target_multiplication :=
+        PAlloc1TargetMultBounded.target_multiplication_under_pinned_type_bounds hTypes }
 
 /-- Successful execution retains router index order. -/
 theorem router_order_preserved {cfg : Config} {modules : List Module}
