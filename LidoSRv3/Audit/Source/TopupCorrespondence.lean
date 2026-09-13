@@ -1,5 +1,6 @@
 import LidoSRv3.Audit.Trace
 import LidoSRv3.Audit.Source.LidoStakingStateStorage
+import LidoSRv3.Audit.Source.SRStorageSourceModel
 
 /-!
 Pinned source correspondence for the SRv3 beacon-chain *top-up* push at
@@ -203,10 +204,19 @@ Per-call data the pinned top-up path reads.  Each field names the exact source
 expression it stands for.
 -/
 structure SourceTopupInput where
-  /-- Whether `_msgSender()` is the top-up gateway, as `_checkAppAuth` reads it
-  at source line 1178 for the argument computed at source line 686.  It runs
-  before any other statement of `topUp`. -/
-  callerIsTopUpGateway : Bool
+  /-- 2026-09-13 chantier 1 Piste A: the three SR/ACL/WC-byte read booleans
+  (`callerIsTopUpGateway`, `moduleExists`, `wcTypeIsType2`) are no longer
+  free `Bool` fields on `SourceTopupInput`.  They are now `@[reducible, simp]
+  def` accessors over the embedded
+  `SRStorageSourceModel.SRTopupCallerContext { callerIsGatewayFromRead,
+   moduleExistsFromRead, wcTypeIsType2FromRead }`, each naming the specific
+  pinned Solidity read (StakingRouter.sol:686 `_checkAppAuth(_getTopUpGateway())`
+  for the gateway boolean; SRUtils.sol:46 `SRStorage.isModuleExists(_moduleId)`
+  for module existence; SRUtils.sol:42
+  `WithdrawalCredentials.isType2(stateConfig.withdrawalCredentialsType)` for
+  the WC-type byte).  Callers construct an `SRTopupCallerContext`; the three
+  booleans are derived. -/
+  srCtx : LidoSRv3.Audit.Source.SRStorageSourceModel.SRTopupCallerContext
   /-- `n = _keyIndices.length`, source line 767. -/
   keyIndicesLength : Nat
   /-- `_operatorIds.length`, compared at source line 773. -/
@@ -218,14 +228,8 @@ structure SourceTopupInput where
   `_pubkeys[i].length` is checked at source line 778 and again at
   `BeaconChainDepositor.sol` line 82. -/
   pubkeyLengths : List Nat
-  /-- `SRStorage.isModuleExists(_moduleId)`, `SRUtils.sol` line 46, reached from
-  source line 689. -/
-  moduleExists : Bool
   /-- `stateConfig.status == StakingModuleStatus.Active`, source line 691. -/
   moduleActive : Bool
-  /-- `WithdrawalCredentials.isType2(stateConfig.withdrawalCredentialsType)`,
-  `SRUtils.sol` line 42, reached from source line 694. -/
-  wcTypeIsType2 : Bool
   /-- `SRStorage.getRouterState().maxTopUpPerBlockGwei`, source line 696. -/
   maxTopUpPerBlockGwei : Nat
   /-- `_getModuleDepositAllocation(_stakingModuleId, depositableEther, true)`,
@@ -251,6 +255,32 @@ structure SourceTopupInput where
   `Lido.sol` line 842. -/
   lidoDepositableEther : Nat
   deriving Repr, DecidableEq
+
+/-- 2026-09-13 chantier 1 Piste A: `SourceTopupInput.callerIsTopUpGateway` is
+now a `@[reducible, simp] def` accessor over the embedded
+`SRTopupCallerContext`, corresponding to `StakingRouter.sol:686`
+`_checkAppAuth(_getTopUpGateway())`.  Downstream code that reads
+`inp.callerIsTopUpGateway` continues to work under the same dot-notation
+syntax and returns the same boolean value, but callers can no longer
+instantiate the boolean independently of a named pinned SR-context. -/
+@[reducible, simp] def SourceTopupInput.callerIsTopUpGateway
+    (inp : SourceTopupInput) : Bool :=
+  LidoSRv3.Audit.Source.SRStorageSourceModel.isTopUpGatewayCall inp.srCtx
+
+/-- 2026-09-13 chantier 1 Piste A: `SourceTopupInput.moduleExists` is now a
+`@[reducible, simp] def` accessor over the embedded `SRTopupCallerContext`,
+corresponding to `SRUtils.sol:46` `SRStorage.isModuleExists(_moduleId)`. -/
+@[reducible, simp] def SourceTopupInput.moduleExists
+    (inp : SourceTopupInput) : Bool :=
+  LidoSRv3.Audit.Source.SRStorageSourceModel.moduleExists inp.srCtx
+
+/-- 2026-09-13 chantier 1 Piste A: `SourceTopupInput.wcTypeIsType2` is now
+a `@[reducible, simp] def` accessor over the embedded `SRTopupCallerContext`,
+corresponding to `SRUtils.sol:42`
+`WithdrawalCredentials.isType2(stateConfig.withdrawalCredentialsType)`. -/
+@[reducible, simp] def SourceTopupInput.wcTypeIsType2
+    (inp : SourceTopupInput) : Bool :=
+  LidoSRv3.Audit.Source.SRStorageSourceModel.wcIsType2 inp.srCtx
 
 /-- 2026-09-13 chantier 1 Piste A: `SourceTopupInput.lidoCanDeposit` is
 now a `@[reducible, simp] def` accessor of the pinned

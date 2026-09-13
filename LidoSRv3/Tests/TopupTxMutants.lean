@@ -213,10 +213,11 @@ private def killCfg : SourceTopupConfig := ⟨48, 48, 1, 1, uint256Modulus⟩
 accumulator at source line 732 wraps.  Every limit, balance and cap is set
 above the exact sum, so no OTHER guard fires at this witness. -/
 private def wrapInput : SourceTopupInput :=
-  { callerIsTopUpGateway := true, keyIndicesLength := 2, operatorIdsLength := 2,
+  { srCtx := { callerIsGatewayFromRead := true, moduleExistsFromRead := true, wcTypeIsType2FromRead := true },
+    keyIndicesLength := 2, operatorIdsLength := 2,
     topUpLimits := [uint256Modulus + 1, uint256Modulus + 1],
-    pubkeyLengths := [48, 48], moduleExists := true, moduleActive := true,
-    wcTypeIsType2 := true, maxTopUpPerBlockGwei := uint256Modulus + 1,
+    pubkeyLengths := [48, 48], moduleActive := true,
+    maxTopUpPerBlockGwei := uint256Modulus + 1,
     moduleAllocationEth := uint256Modulus + 1, lidoState := { isStakingPaused := false, isBunkerActive := false },
     allocations := [uint256Modulus - 1, 2], routerBalanceBefore := uint256Modulus,
     lidoDepositableEther := uint256Modulus + 1 }
@@ -224,9 +225,10 @@ private def wrapInput : SourceTopupInput :=
 /-- An unregistered-module input that passes every guard before source line
 689 and commits once the tail is reached. -/
 private def moduleMissingInput : SourceTopupInput :=
-  { callerIsTopUpGateway := true, keyIndicesLength := 1, operatorIdsLength := 1,
-    topUpLimits := [10], pubkeyLengths := [48], moduleExists := false,
-    moduleActive := true, wcTypeIsType2 := true, maxTopUpPerBlockGwei := 100,
+  { srCtx := { callerIsGatewayFromRead := true, moduleExistsFromRead := false, wcTypeIsType2FromRead := true },
+    keyIndicesLength := 1, operatorIdsLength := 1,
+    topUpLimits := [10], pubkeyLengths := [48],
+    moduleActive := true, maxTopUpPerBlockGwei := 100,
     moduleAllocationEth := 100, lidoState := { isStakingPaused := false, isBunkerActive := false },
     allocations := [5], routerBalanceBefore := 100,
     lidoDepositableEther := 100 }
@@ -234,9 +236,10 @@ private def moduleMissingInput : SourceTopupInput :=
 /-- A non-type-2 withdrawal-credentials input that passes every guard before
 source line 694 and commits once the tail is reached. -/
 private def wcType1Input : SourceTopupInput :=
-  { callerIsTopUpGateway := true, keyIndicesLength := 1, operatorIdsLength := 1,
-    topUpLimits := [10], pubkeyLengths := [48], moduleExists := true,
-    moduleActive := true, wcTypeIsType2 := false, maxTopUpPerBlockGwei := 100,
+  { srCtx := { callerIsGatewayFromRead := true, moduleExistsFromRead := true, wcTypeIsType2FromRead := false },
+    keyIndicesLength := 1, operatorIdsLength := 1,
+    topUpLimits := [10], pubkeyLengths := [48],
+    moduleActive := true, maxTopUpPerBlockGwei := 100,
     moduleAllocationEth := 100, lidoState := { isStakingPaused := false, isBunkerActive := false },
     allocations := [5], routerBalanceBefore := 100,
     lidoDepositableEther := 100 }
@@ -703,9 +706,10 @@ private def guardCfg : SourceTopupConfig := ⟨48, 48, 1000000000, 1, uint256Mod
 /-- Module returndata whose single entry is one wei off a gwei boundary, so the
 alignment test at source line 724 fires.  Every other guard passes. -/
 private def misalignedInput : SourceTopupInput :=
-  { callerIsTopUpGateway := true, keyIndicesLength := 1, operatorIdsLength := 1,
-    topUpLimits := [2000000000], pubkeyLengths := [48], moduleExists := true,
-    moduleActive := true, wcTypeIsType2 := true, maxTopUpPerBlockGwei := 3,
+  { srCtx := { callerIsGatewayFromRead := true, moduleExistsFromRead := true, wcTypeIsType2FromRead := true },
+    keyIndicesLength := 1, operatorIdsLength := 1,
+    topUpLimits := [2000000000], pubkeyLengths := [48],
+    moduleActive := true, maxTopUpPerBlockGwei := 3,
     moduleAllocationEth := 3000000000, lidoState := { isStakingPaused := false, isBunkerActive := false },
     allocations := [1000000001], routerBalanceBefore := 0,
     lidoDepositableEther := 3000000000 }

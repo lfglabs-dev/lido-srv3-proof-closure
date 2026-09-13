@@ -14,14 +14,12 @@ private def cfg : SourceTopupConfig :=
     uint64Max := uint256Modulus + 1 }
 
 private def base : SourceTopupInput :=
-  { callerIsTopUpGateway := false
+  { srCtx := { callerIsGatewayFromRead := false, moduleExistsFromRead := true, wcTypeIsType2FromRead := true }
     keyIndicesLength := 2
     operatorIdsLength := 2
     topUpLimits := [uint256Modulus + 1, uint256Modulus + 1]
     pubkeyLengths := [48, 48]
-    moduleExists := true
     moduleActive := true
-    wcTypeIsType2 := true
     maxTopUpPerBlockGwei := uint256Modulus + 1
     moduleAllocationEth := uint256Modulus + 1
     lidoState := { isStakingPaused := false, isBunkerActive := false }
