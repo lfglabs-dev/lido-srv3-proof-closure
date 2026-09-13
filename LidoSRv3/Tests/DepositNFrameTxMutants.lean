@@ -29,7 +29,7 @@ theorem three_batch_preconditions :
   authorized := rfl
   moduleActive := rfl
   allocationValid := rfl
-  lidoCallOk := rfl
+  lidoCallOk := fun _ => rfl
   healthy := by
     intro batch hBatch
     have hCases : batch = batchA ∨ batch = batchB ∨ batch = batchC := by
@@ -55,7 +55,7 @@ theorem two_batch_preconditions :
   authorized := rfl
   moduleActive := rfl
   allocationValid := rfl
-  lidoCallOk := rfl
+  lidoCallOk := fun _ => rfl
   healthy := by
     intro batch hBatch
     have hCases : batch = batchA ∨ batch = batchB := by
