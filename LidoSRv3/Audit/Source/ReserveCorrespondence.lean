@@ -1,5 +1,6 @@
 import LidoSRv3.Audit.Arithmetic
 import LidoSRv3.Audit.Source.LidoStakingStateStorage
+import LidoSRv3.Audit.Source.AragonACLSource
 import Verity.Core
 import Verity.EVM.Uint256
 import Verity.Macro
@@ -204,7 +205,14 @@ structure WithdrawInputs where
   and `canDeposit` is a `def` accessor.  The free-Bool version of
   this field has been eliminated. -/
   lidoState : LidoSRv3.Audit.Source.LidoStakingStateStorage.LidoStakingState
-  authorizedRouter : Bool
+  /-- Pinned Aragon ACL registry state (chantier 2 Piste A v3, 2026-09-13):
+  `_auth(address(stakingRouter))` at `Lido.sol:872` delegates to
+  `ACL.hasPermission(msg.sender, address(this), STAKING_ROUTER_ROLE)`.
+  `WithdrawInputs` carries a source-model `ACLState` with two named
+  role booleans (`stakingRouterRole`, `topUpGatewayApp`).  The free
+  `authorizedRouter : Bool` field is eliminated; `WithdrawInputs.authorizedRouter`
+  is a `@[reducible, simp] def` accessor of `acl.stakingRouterRole`. -/
+  acl : LidoSRv3.Audit.Source.AragonACLSource.ACLState
   deriving DecidableEq, Repr
 
 /-- Definition of `Lido.canDeposit()` at `Lido.sol:815-816` as a
@@ -212,16 +220,23 @@ function of the pinned `LidoStakingState` fields carried on
 `WithdrawInputs`.  Since 2026-09-13 chantier 2, `WithdrawInputs`
 no longer carries a free `canDeposit : Bool`; callers supply a
 `LidoStakingState`, and this accessor reads the boolean by
-definition.  Downstream code that reads `inputs.canDeposit`
-continues to work unchanged (same dot-notation syntax, same
-boolean value), but callers can no longer instantiate the boolean
-independently of a named pinned storage state.  Marked
-`@[reducible]` so proofs that previously closed guard-revert
-branches by `rfl` on `⟨canDeposit, authorizedRouter⟩` continue to
-close after destructuring the pinned two-boolean storage state. -/
+definition. -/
 @[reducible, simp] def WithdrawInputs.canDeposit (inputs : WithdrawInputs) : Bool :=
   LidoSRv3.Audit.Source.LidoStakingStateStorage.canDepositFromStorage
     inputs.lidoState
+
+/-- Definition of `_auth(address(stakingRouter))` at `Lido.sol:872`
+as a function of the pinned `ACLState` carried on `WithdrawInputs`.
+Since 2026-09-13 chantier 2 v3, `WithdrawInputs` no longer carries
+a free `authorizedRouter : Bool`; callers supply an `ACLState` and
+this accessor reads the boolean directly from the named
+`stakingRouterRole` field via `AragonACLSource.isAuthorizedRouter`
+(which reduces to `state.stakingRouterRole` under `@[reducible,
+simp]`).  Downstream `simp` / `rfl` calls unfold the def chain
+transparently. -/
+@[reducible, simp] def WithdrawInputs.authorizedRouter
+    (inputs : WithdrawInputs) : Bool :=
+  LidoSRv3.Audit.Source.AragonACLSource.isAuthorizedRouter inputs.acl
 
 /-! ## Lido._getBufferedEtherAllocation (Lido.sol:605-616) -/
 
@@ -420,12 +435,21 @@ theorem verity_execution_simulates_spec (state : ContractState) (amount : Word) 
   -- ⟨.reverted, decode state, decode state⟩` once the `canDeposit` def is
   -- unfolded, so `simp` closes them; only the `(false, false, true)` pass
   -- branch falls through to the deep proof below.
-  rintro ⟨⟨isStakingPaused, isBunkerActive⟩, authorizedRouter⟩
-  cases isStakingPaused <;> cases isBunkerActive <;> cases authorizedRouter <;>
+  -- 2026-09-13 chantier 2 Piste A v3: both `canDeposit` and `authorizedRouter`
+  -- are now `@[reducible, simp] def` accessors of the pinned two-boolean
+  -- `LidoStakingState` and the named `ACLState.stakingRouterRole` field.
+  -- Destructure `WithdrawInputs` into its three underlying booleans
+  -- (isStakingPaused, isBunkerActive, stakingRouterRole) — note that
+  -- topUpGatewayApp is a separate ACL field ignored by RESERVE-1 — and
+  -- case-split on all three.  Only the (F, F, T) pass branch survives the
+  -- shared `simp` stanza.
+  rintro ⟨⟨isStakingPaused, isBunkerActive⟩, ⟨stakingRouterRole, topUpGatewayApp⟩⟩
+  cases isStakingPaused <;> cases isBunkerActive <;> cases stakingRouterRole <;>
     try (simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
       observeVerity, specTx, modelWithdrawDepositableEther, sourceWithdrawDepositableEther,
-      WithdrawInputs.canDeposit,
+      WithdrawInputs.canDeposit, WithdrawInputs.authorizedRouter,
       LidoSRv3.Audit.Source.LidoStakingStateStorage.canDepositFromStorage,
+      LidoSRv3.Audit.Source.AragonACLSource.isAuthorizedRouter,
       Verity.require, Verity.bind, Bind.bind, Pure.pure, Contract.run]; done)
   by_cases hzero : amount = 0
   · subst amount
