@@ -281,7 +281,19 @@ structure Preconditions (inputs : Inputs) (state : ContractState) : Prop where
   authorized : inputs.authorized = true
   moduleActive : inputs.moduleActive = true
   allocationValid : inputs.allocationValid = true
-  lidoCallOk : inputs.lidoCallOk = true
+  /-- Genuine relaxation of the previous unconditional
+  `lidoCallOk : inputs.lidoCallOk = true` (grok #412 Preconditions retirement
+  follow-up, 2026-09-13, third in sequence after entryBalance and funded):
+  Lido's per-call receiver-selection boolean is required only when the
+  pinned `shouldPull` predicate fires and `pullFromLido` actually invokes
+  the receiver.  On the empty-batch branch (exactKeys = 0 → shouldPull =
+  false) `pullFromLido` is not executed, so no lidoCallOk constraint is
+  needed.  The old premise was strictly stronger.  Wider admissible input
+  set: deployments where a caller supplied `lidoCallOk = false` (a failing
+  Lido callee) can still compose the registered parent whenever the caller
+  also supplied an empty-batch input, because the pinned StakingRouter.sol:978
+  early return skips the Lido pull entirely. -/
+  lidoCallOk : shouldPull inputs = true → inputs.lidoCallOk = true
   healthy : ∀ batch ∈ inputs.batches, Healthy batch
   /-- Grok #412 D-NFRAME-1 (discharged 2026-09-13): pinned `StakingRouter.deposit`
   admits one `stakingModuleId` per call; the model list-lifts across `batches`
@@ -675,7 +687,7 @@ theorem execute_apply (inputs : Inputs) (state : ContractState)
     simp only [hPull, if_true, executePullPushAssertTail, Bind.bind, _root_.Verity.bind,
       hPullTotal]
     rw [pullFromLido_apply inputs (wordTotal inputs.batches) (wordKeys inputs.batches)
-      processed h.lidoCallOk (hFunded hPull)]
+      processed (h.lidoCallOk hPull) (hFunded hPull)]
     simp only [Bind.bind, _root_.Verity.bind]
     rw [pushBatches_apply inputs inputs.batches pulled h.healthy hPushFunds]
     simp only [Bind.bind, _root_.Verity.bind, DepositParentTx.getState, hClose,
