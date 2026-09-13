@@ -218,12 +218,17 @@ Not transcribed:
 Added by the model: `zipRequests` (parallel arrays to pairs), the
 `SourceOutcome` / `Observables` record, and the revert reason strings.
 
-Ordering note: `_validatePublicKey` runs inside the loop (lines 69-70),
-after `_requireExactFee` (line 66); the model hoists the whole-batch key
-validation before the fee guard. Both guards are pure and the first failing
-one reverts the frame either way, so the committed arm is unchanged; only
-the revert reason of a batch that fails both guards differs
-(`InvalidPublicKeyLength` here, `IncorrectFee` in Solidity).
+Chantier 2 fix (Thomas 2026-09-13): the guard order now matches
+`WithdrawalVaultEIP7685._addConsolidationRequests` exactly. The
+Solidity sequence is (1) checked multiplication `requestsCount * fee`
+(Panic on overflow) → (2) `_requireExactFee` (`IncorrectFee` revert if
+`msg.value != requiredFee`) → (3) loop `_validatePublicKey`
+(`InvalidPublicKeyLength` revert on the first non-48-byte key). The
+prior model hoisted the whole-batch key validation before the fee
+guard; both guards are pure so the committed arm is unchanged either
+way, but on a batch that fails both guards the revert reason now
+matches Solidity (`IncorrectFee`) instead of the hoisted-key one
+(`InvalidPublicKeyLength`).
 
 Independent pinned-source interpreter. It does not call the Verity
 transaction or any shared execution helper besides the constructors above. -/
@@ -239,18 +244,18 @@ def sourceRun (inputs : Inputs) : SourceOutcome :=
           inputs.sourceLens inputs.targetLens with
       | none => .reverted "ArraysLengthMismatch"
       | some requests =>
-          -- WithdrawalVaultEIP7685.sol:98  if (pubkey.length != PUBLIC_KEY_LENGTH) revert InvalidPublicKeyLength(pubkey);  [_validatePublicKey, loop 69-70; hoisted before the fee guard]
-          if requests.all validRequest then
-            -- WithdrawalVaultEIP7685.sol:66  _requireExactFee(requestsCount * fee);  (Solidity 0.8 checked multiply, Panic 0x11)
-            if (requests.length * inputs.fee.val ≤ Verity.Core.MAX_UINT256 : Bool) then
-              -- WithdrawalVaultEIP7685.sol:124  if (requiredFee != msg.value) revert IncorrectFee(requiredFee, msg.value);  [_requireExactFee]
-              if inputs.msgValue.val == requests.length * inputs.fee.val then
+          -- WithdrawalVaultEIP7685.sol:66  _requireExactFee(requestsCount * fee);  (Solidity 0.8 checked multiply, Panic 0x11)
+          if (requests.length * inputs.fee.val ≤ Verity.Core.MAX_UINT256 : Bool) then
+            -- WithdrawalVaultEIP7685.sol:124  if (requiredFee != msg.value) revert IncorrectFee(requiredFee, msg.value);  [_requireExactFee]
+            if inputs.msgValue.val == requests.length * inputs.fee.val then
+              -- WithdrawalVaultEIP7685.sol:69-70  _validatePublicKey(sourcePubkeys[i]); _validatePublicKey(targetPubkeys[i]);  (loop 68-72; InvalidPublicKeyLength inside the loop, after _requireExactFee)
+              if requests.all validRequest then
                 -- WithdrawalVaultEIP7685.sol:71  _callAddConsolidationRequest(sourcePubkeys[i], targetPubkeys[i], fee);  (loop 68-72; CALL 115 + emit 120 per pair)
                 .committed (commitObservables inputs.requestTarget inputs.fee
                   inputs.msgValue requests)
-              else .reverted "IncorrectFee"
-            else .reverted "Panic(0x11): checked multiplication overflow"
-          else .reverted "InvalidPublicKeyLength"
+              else .reverted "InvalidPublicKeyLength"
+            else .reverted "IncorrectFee"
+          else .reverted "Panic(0x11): checked multiplication overflow"
   -- WithdrawalVault.sol:204  revert NotConsolidationGateway();
   else .reverted "NotConsolidationGateway"
 
@@ -322,24 +327,26 @@ theorem source_consolidation_preserves_eligibility_value_atomicity
             split at hobs
             · cases hobs
             · next requests hZip =>
+                -- Chantier 2 (Thomas 2026-09-13): guard order now matches
+                -- Solidity — bound → exact fee → per-key validation.
                 split at hobs
-                · next hValid =>
+                · next hBoundB =>
+                    have hBound :
+                        requests.length * inputs.fee.val ≤
+                          Verity.Core.MAX_UINT256 :=
+                      of_decide_eq_true hBoundB
                     split at hobs
-                    · next hBoundB =>
-                        have hBound :
-                            requests.length * inputs.fee.val ≤
-                              Verity.Core.MAX_UINT256 :=
-                          of_decide_eq_true hBoundB
+                    · next hFeeB =>
+                        have hFee : inputs.msgValue.val =
+                            requests.length * inputs.fee.val :=
+                          beq_iff_eq.mp hFeeB
+                        have hLenPos : requests.length ≠ 0 :=
+                          zipRequests_some_length hZip ▸ hPos
+                        have hFeeNonzero : inputs.fee.val ≠ 0 := by
+                          intro hZeroFee
+                          exact hMsgNonzero (by simp [hFee, hZeroFee])
                         split at hobs
-                        · next hFeeB =>
-                            have hFee : inputs.msgValue.val =
-                                requests.length * inputs.fee.val :=
-                              beq_iff_eq.mp hFeeB
-                            have hLenPos : requests.length ≠ 0 :=
-                              zipRequests_some_length hZip ▸ hPos
-                            have hFeeNonzero : inputs.fee.val ≠ 0 := by
-                              intro hZeroFee
-                              exact hMsgNonzero (by simp [hFee, hZeroFee])
+                        · next hValid =>
                             injection hobs with hobs
                             exact ⟨requests, hZip, hEq, hPos, hValid,
                               hBound, hFee, hFeeNonzero, hobs.symm⟩
