@@ -1178,6 +1178,51 @@ theorem addRequests_isSuccess_eq_addRequestsSlotFree_isSuccess
     · simp only [if_neg hFail]; rfl
   · simp only [if_neg hCredit]
 
+/-- **Chantier 2 (Thomas 2026-09-13) full `observeFromJournal`-level
+equivalence.** Discharges the bundled observation-plane equality:
+`observeFromJournal snapshot (addRequests inputs f snapshot)` equals
+`observeFromJournal snapshot (addRequestsSlotFree inputs f snapshot)`
+on every input. Proof composes:
+- `addRequests_isSuccess_eq_addRequestsSlotFree_isSuccess` (outcome tag),
+- `addRequests_snd_calls_eq_addRequestsSlotFree_snd_calls` (calls),
+- `addRequests_snd_events_eq_addRequestsSlotFree_snd_events` (events),
+- `addRequests_snd_readSlot_eq_addRequestsSlotFree_snd_readSlot` (count/fee),
+so on the shared success arm the two `View` records have identical
+fields; on the shared revert arm both reduce to the constant
+`⟨.reverted, [], [], [], snapshot.readSlot countSlot, 0⟩`. -/
+theorem observeFromJournal_addRequests_eq_observeFromJournal_addRequestsSlotFree
+    (inputs : Inputs) (failAfterWrites : Bool) (snapshot : ContractState) :
+    observeFromJournal snapshot (addRequests inputs failAfterWrites snapshot) =
+    observeFromJournal snapshot (addRequestsSlotFree inputs failAfterWrites snapshot) := by
+  have hSucc := addRequests_isSuccess_eq_addRequestsSlotFree_isSuccess
+    inputs failAfterWrites snapshot
+  have hCalls := addRequests_snd_calls_eq_addRequestsSlotFree_snd_calls
+    inputs failAfterWrites snapshot
+  have hEvents := addRequests_snd_events_eq_addRequestsSlotFree_snd_events
+    inputs failAfterWrites snapshot
+  have hReadSlot := fun slot =>
+    addRequests_snd_readSlot_eq_addRequestsSlotFree_snd_readSlot
+      inputs failAfterWrites snapshot slot
+  rcases hL : addRequests inputs failAfterWrites snapshot with ⟨rL, stateL⟩ | ⟨reasonL, stateL⟩
+  · rcases hR : addRequestsSlotFree inputs failAfterWrites snapshot
+      with ⟨rR, stateR⟩ | ⟨reasonR, stateR⟩
+    · rw [hL, hR] at hCalls hEvents hReadSlot
+      simp only [ContractResult.snd_success] at hCalls hEvents hReadSlot
+      have hCount := hReadSlot countSlot
+      have hFee := hReadSlot feePaidSlot
+      simp only [observeFromJournal]
+      congr 1
+      · rw [hCalls]
+      · rw [hEvents]
+      · rw [hCalls]
+    · rw [hL, hR] at hSucc
+      simp [ContractResult.isSuccess] at hSucc
+  · rcases hR : addRequestsSlotFree inputs failAfterWrites snapshot
+      with ⟨rR, stateR⟩ | ⟨reasonR, stateR⟩
+    · rw [hL, hR] at hSucc
+      simp [ContractResult.isSuccess] at hSucc
+    · rfl
+
 /-- **Chantier 2 (Thomas 2026-09-13) return-value equivalence.**
 Both defs return `.success` with the exact same value
 (`ofObservables obs`) when they commit — the return value is a pure
