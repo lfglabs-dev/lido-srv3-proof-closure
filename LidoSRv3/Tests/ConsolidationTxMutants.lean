@@ -40,7 +40,8 @@ private def stateOf (inputs : Inputs) : Verity.ContractState :=
     defaultState
 
 private def runView (inputs : Inputs) : View :=
-  observe (stateOf inputs) ((addRequests inputs).run (stateOf inputs))
+  observeFromJournal (stateOf inputs)
+    ((addRequestsSlotFree inputs).run (stateOf inputs))
 
 private def expectedCall (source target : Nat) : CallObs :=
   { target := word consolidationRequestAddress
@@ -107,7 +108,7 @@ example :
 example :
     let first := runView (pair 11 21)
     let secondState :=
-      match (addRequests (pair 11 21)).run (stateOf (pair 11 21)) with
+      match (addRequestsSlotFree (pair 11 21)).run (stateOf (pair 11 21)) with
       | .success _ after =>
           stateFor [word 12] [word 22] [key48] [key48] after
       | .revert _ s => s
@@ -115,7 +116,8 @@ example :
       { pair 12 22 with }
     first = ⟨.committed, [expectedCall 11 21], [expectedEvent 11 21],
         [[word 11, word 21]], word 1, word 3⟩ ∧
-      observe secondState ((addRequests secondInputs).run secondState) =
+      observeFromJournal secondState
+          ((addRequestsSlotFree secondInputs).run secondState) =
         ⟨.committed, [expectedCall 12 22], [expectedEvent 12 22],
           [[word 12, word 22]], word 2, word 3⟩ := by native_decide
 
@@ -123,26 +125,28 @@ example :
 appending is rejected. -/
 example :
     let secondState :=
-      match (addRequests (pair 11 21)).run (stateOf (pair 11 21)) with
+      match (addRequestsSlotFree (pair 11 21)).run (stateOf (pair 11 21)) with
       | .success _ after =>
           stateFor [word 12] [word 22] [key48] [key48] after
       | .revert _ s => s
-    observe secondState ((addRequests (pair 12 22)).run secondState) ≠
+    observeFromJournal secondState
+        ((addRequestsSlotFree (pair 12 22)).run secondState) ≠
       ⟨.committed, [expectedCall 12 22], [expectedEvent 12 22],
         [[word 12, word 22]], word 1, word 3⟩ := by native_decide
 
-/-- Failure after call/event/memory writes is observed as a revert. The
-snapshot law `revert_restores_snapshot` then restores the pre-call state. -/
+/-- Failure after call/event journal writes is observed as a revert. The
+snapshot law `revert_restores_snapshot_slotFree` then restores the pre-call
+state. -/
 example :
-    observe (stateOf (pair 11 21)) ((addRequests (pair 11 21) true).run
-      (stateOf (pair 11 21))) =
+    observeFromJournal (stateOf (pair 11 21))
+        ((addRequestsSlotFree (pair 11 21) true).run (stateOf (pair 11 21))) =
       ⟨.reverted, [], [], [], 0, 0⟩ := by native_decide
 
 example (reason : String) (rollback : Verity.ContractState)
-    (h : (addRequests (pair 11 21) true).run (stateOf (pair 11 21)) =
+    (h : (addRequestsSlotFree (pair 11 21) true).run (stateOf (pair 11 21)) =
       .revert reason rollback) :
     rollback = stateOf (pair 11 21) :=
-  revert_restores_snapshot _ _ _ _ _ h
+  revert_restores_snapshot_slotFree _ _ _ _ _ h
 
 /-- Empty-key length is rejected before a CALL is formed. -/
 example :
@@ -290,32 +294,34 @@ exercise the executable path at both boundaries of the wrap point. -/
 wrap the entry credit to `1 < fee = 3`; the batch is rejected at entry and
 the pre-call snapshot is restored. -/
 example :
-    (addRequests (pair 11 21)).run (stateBal (pair 11 21) (2^256 - 2)) =
+    (addRequestsSlotFree (pair 11 21)).run (stateBal (pair 11 21) (2^256 - 2)) =
       .revert "ENTRY_CREDIT_OVERFLOW" (stateBal (pair 11 21) (2^256 - 2)) :=
-  entry_credit_overflow_reverts _ _ _ (by native_decide)
+  entry_credit_overflow_reverts_slotFree _ _ _ (by native_decide)
 
 /-- The overflow reject is observed, not committed: no CALL, event,
 payload, or fee survives an entry that cannot be credited. -/
 example :
-    observe (stateBal (pair 11 21) (2^256 - 2))
-        ((addRequests (pair 11 21)).run (stateBal (pair 11 21) (2^256 - 2))) =
+    observeFromJournal (stateBal (pair 11 21) (2^256 - 2))
+        ((addRequestsSlotFree (pair 11 21)).run
+          (stateBal (pair 11 21) (2^256 - 2))) =
       ⟨.reverted, [], [], [], 0, 0⟩ := by native_decide
 
 /-- Boundary commit: the largest admissible credit
 `2^256 - 4 + 3 = MAX_UINT256` does not wrap, so the batch commits the full
 honest observables. -/
 example :
-    observe (stateBal (pair 11 21) (2^256 - 4))
-        ((addRequests (pair 11 21)).run (stateBal (pair 11 21) (2^256 - 4))) =
+    observeFromJournal (stateBal (pair 11 21) (2^256 - 4))
+        ((addRequestsSlotFree (pair 11 21)).run
+          (stateBal (pair 11 21) (2^256 - 4))) =
       ⟨.committed, [expectedCall 11 21], [expectedEvent 11 21],
         [[word 11, word 21]], word 1, word 3⟩ := by native_decide
 
 /-- Boundary reject: one wei further, `2^256 - 3 + 3 = 2^256`, wraps and is
 rejected at entry. -/
 example :
-    (addRequests (pair 11 21)).run (stateBal (pair 11 21) (2^256 - 3)) =
+    (addRequestsSlotFree (pair 11 21)).run (stateBal (pair 11 21) (2^256 - 3)) =
       .revert "ENTRY_CREDIT_OVERFLOW" (stateBal (pair 11 21) (2^256 - 3)) :=
-  entry_credit_overflow_reverts _ _ _ (by native_decide)
+  entry_credit_overflow_reverts_slotFree _ _ _ (by native_decide)
 
 /-- **Cheap mutant: swapped concat.** Journal calldata = source then target
 (96 bytes). A swapped target then source concat fails observe: the
