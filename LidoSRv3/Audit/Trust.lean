@@ -740,16 +740,13 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- on any successful sourceRun outcome. Specialization of the commit-level
 -- retirement bridge for Verity-plane consumers.
 #print axioms LidoSRv3.Audit.SolidityConsolidation.sourceRun_committed_payloads_eq_call_inputs
--- Chantier 2 (Thomas 2026-09-13): generic observation-substitution
--- lemma. If `observe = v` and `v.payloads = v.calls.map (·.input)`,
--- then `observeFromJournal = v` as well. Usable bridge for any
--- downstream context to substitute observeFromJournal for observe.
-#print axioms LidoSRv3.Audit.Verity.ConsolidationTx.observeFromJournal_eq_of_observe_and_payload_matches_calls
--- Chantier 2 (Thomas 2026-09-13): sourceView payload-shape and the
--- slot-independent simulation corollary of verity_tx_simulates_pinned_source.
--- Closes the retirement substitution chain across both planes.
-#print axioms LidoSRv3.Audit.Verity.ConsolidationTx.sourceView_payloads_eq_calls_input
-#print axioms LidoSRv3.Audit.Verity.ConsolidationTx.observeFromJournal_simulates_pinned_source
+-- Chantier 2 (Thomas 2026-09-13, item c continuation): the pre-retirement
+-- helpers observeFromJournal_eq_of_observe_and_payload_matches_calls,
+-- verity_tx_simulates_pinned_source, sourceView_payloads_eq_calls_input,
+-- and observeFromJournal_simulates_pinned_source were retired here — they
+-- served as intermediate composers for the parent proof chain now
+-- bypassed by observeFromJournal_simulates_pinned_source_slotFree's
+-- direct-proof rewrite in PR #648.
 -- Chantier 2 (Thomas 2026-09-13): the registered parent
 -- verity_tx_simulates_consolidation now directly consumes
 -- addRequestsSlotFree + observeFromJournal (fabricated slots retired

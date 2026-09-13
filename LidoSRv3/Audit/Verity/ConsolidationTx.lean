@@ -551,42 +551,6 @@ theorem observeFromJournal_success_slot_invariant
       observeFromJournal before (.success r2 state2) := by
   simp [observeFromJournal, hCalls, hEvents, hCount, hFee]
 
-/-- **Chantier 2 (Thomas 2026-09-13) observation-vs-observation bridge.**
-Generic substitution lemma: if `observe before result` returns a
-view `v` whose `payloads` field happens to equal `v.calls.map (·.input)`,
-then `observeFromJournal before result = v` as well. This is the
-usable form of the retirement-substitution: any downstream context
-that has both `observe = v` and the payload-equals-calls-inputs
-fact for `v` can substitute `observeFromJournal` for `observe`
-directly.
-
-Proof: on the revert arm both observations return the reverted
-View definitionally; on the success arm the two agree on all
-non-payload fields (from `observeFromJournal_success_non_payload_eq_observe`)
-and the payloads agree by `hPay`. -/
-theorem observeFromJournal_eq_of_observe_and_payload_matches_calls
-    (before : ContractState) (result : ContractResult Result) (v : View)
-    (hObs : observe before result = v)
-    (hPay : v.payloads = v.calls.map (·.input)) :
-    observeFromJournal before result = v := by
-  cases result with
-  | success r state =>
-    -- Read off the field equalities from hObs by unfolding both sides.
-    cases v with | mk vStatus vCalls vEvents vPayloads vRequestCount vFeePaid =>
-    simp only [observe, View.mk.injEq] at hObs
-    obtain ⟨hStatus, hCalls, hEvents, hPayloadsObs, hCount, hFee⟩ := hObs
-    -- observeFromJournal on this success has all non-payload fields matching observe.
-    simp only [observeFromJournal, View.mk.injEq]
-    refine ⟨hStatus, hCalls, hEvents, ?_, hCount, hFee⟩
-    -- Payloads: on the observeFromJournal side, it's
-    -- `(state.calls.drop before.calls.length).map ofJournal .map (·.input)`
-    -- Which equals `vCalls.map (·.input)` (from hCalls), which equals vPayloads
-    -- (from hPay symm).
-    rw [hCalls, ← hPay]
-  | revert reason rollback =>
-    rw [observeFromJournal_revert_eq_observe]
-    exact hObs
-
 private theorem readMapUint_writeMapUint_other_slot (s : ContractState)
     {slot slot' : Nat} (hslot : slot' ≠ slot) (key key' value : Word) :
     (s.writeMapUint slot key value).readMapUint slot' key' =
@@ -1339,117 +1303,6 @@ private theorem addRequests_run_cases
   · next obs hC =>
       exact Or.inr ⟨obs, hC, h.symm⟩
 
-/-- Composed faithful-plane theorem: the real memory-array transaction has the
-same outcome observables as the independently stated pinned-source run.
-The entry no-wrap premise is the executed-plane funding condition: without
-it the frame-entry payable credit would wrap and the transaction rejects
-(`entry_credit_overflow_reverts`), so the pinned-source commit is not the
-outcome of a wrapping entry. -/
-theorem verity_tx_simulates_pinned_source
-    (inputs : Inputs) (state : ContractState)
-    (hCountBound : (state.readSlot countSlot).val + inputs.sources.length <
-      Verity.Core.Uint256.modulus)
-    (hEntry : state.selfBalance.val + inputs.msgValue.val <
-      Verity.Core.Uint256.modulus)
-    (hSources : readArray state "sources" sourcesBase inputs.sources.length =
-      some inputs.sources)
-    (hTargets : readArray state "targets" targetsBase inputs.targets.length =
-      some inputs.targets)
-    (hSourceLens : readArray state "sourceLens" sourceLensBase
-      inputs.sourceLens.length = some inputs.sourceLens)
-    (hTargetLens : readArray state "targetLens" targetLensBase
-      inputs.targetLens.length = some inputs.targetLens) :
-    observe state ((addRequests inputs).run state) =
-      sourceView inputs (state.readSlot countSlot).val := by
-  rcases addRequests_run_cases inputs state hEntry hSources hTargets
-      hSourceLens hTargetLens _ rfl with
-    ⟨reason, hRun, hr⟩ | ⟨obs, hRun, hr⟩
-  · rw [hr]
-    simp [sourceView, observe, ofNat_val, hRun]
-  · rw [hr]
-    have hCalls := persist_calls (state.readSlot countSlot).val obs
-      (credited state inputs)
-    have hEvents := persist_events (state.readSlot countSlot).val obs
-      (credited state inputs)
-    obtain ⟨hCount, hCallsLen, hPayloadLength, hNormalized, _, _, _⟩ :=
-      sourceRun_committed_payload_shape inputs obs hRun
-    have hBound : (state.readSlot countSlot).val + obs.payloads.length ≤
-        Verity.Core.Uint256.modulus := by
-      rw [hPayloadLength]
-      exact Nat.le_of_lt hCountBound
-    have hPayloads := persist_read_payloads
-      (state.readSlot countSlot).val obs (credited state inputs) hCount
-      hNormalized hBound
-    have hCountVal :
-        (Verity.Core.Uint256.ofNat
-          ((state.readSlot countSlot).val + obs.requestCount)).val =
-          (state.readSlot countSlot).val + obs.requestCount := by
-      rw [Verity.Core.Uint256.val_ofNat, Nat.mod_eq_of_lt]
-      · rw [hCount, hPayloadLength]; exact hCountBound
-    simp only [sourceView, hRun, observe, persist_calls, credited_calls,
-      persist_events, credited_events, persist_read_count, persist_read_fee,
-      drop_map_ofJournal, drop_map_ofEvent]
-    rw [hCallsLen, hPayloads]
-
-/-- **Chantier 2 (Thomas 2026-09-13) sourceView payload-shape lemma.**
-`sourceView.payloads = sourceView.calls.map (·.input)` unconditionally:
-on the reverted arm both are `[]`; on the committed arm it follows
-from `sourceRun_committed_payloads_eq_call_inputs` (the sourceRun-level
-retirement bridge from PR #596). Used as the hypothesis of
-`observeFromJournal_eq_of_observe_and_payload_matches_calls` (PR #599)
-to derive that `observeFromJournal` also simulates `sourceView`. -/
-theorem sourceView_payloads_eq_calls_input (inputs : Inputs) (beforeCount : Nat) :
-    (sourceView inputs beforeCount).payloads =
-      (sourceView inputs beforeCount).calls.map (·.input) := by
-  unfold sourceView
-  cases hRun : sourceRun inputs with
-  | reverted _ => simp
-  | committed obs =>
-    -- obs.payloads = obs.calls.map (·.input) from the sourceRun-level bridge.
-    simpa using
-      LidoSRv3.Audit.SolidityConsolidation.sourceRun_committed_payloads_eq_call_inputs
-        inputs obs hRun
-
-/-- **Chantier 2 (Thomas 2026-09-13) slot-independent simulation.**
-Corollary of `verity_tx_simulates_pinned_source` (PR #596-era) via
-the generic substitution lemma
-`observeFromJournal_eq_of_observe_and_payload_matches_calls`
-(PR #599) and the payload-shape lemma `sourceView_payloads_eq_calls_input`
-above: `observeFromJournal` also equals `sourceView` on every
-executed `addRequests` run.
-
-The slot-independent observation function is therefore a sound
-substitute for the registered `observe` against the `sourceView`
-correspondence — no reads of the fabricated `sourceMapSlot` /
-`targetMapSlot` needed anywhere on this path. This is the
-executable-plane counterpart of the source-plane retirement
-bridges from PRs #584 and #585, closing the substitution chain
-across both planes.
-
-Same premises as `verity_tx_simulates_pinned_source`. -/
-theorem observeFromJournal_simulates_pinned_source
-    (inputs : Inputs) (state : ContractState)
-    (hCountBound : (state.readSlot countSlot).val + inputs.sources.length <
-      Verity.Core.Uint256.modulus)
-    (hEntry : state.selfBalance.val + inputs.msgValue.val <
-      Verity.Core.Uint256.modulus)
-    (hSources : readArray state "sources" sourcesBase inputs.sources.length =
-      some inputs.sources)
-    (hTargets : readArray state "targets" targetsBase inputs.targets.length =
-      some inputs.targets)
-    (hSourceLens : readArray state "sourceLens" sourceLensBase
-      inputs.sourceLens.length = some inputs.sourceLens)
-    (hTargetLens : readArray state "targetLens" targetLensBase
-      inputs.targetLens.length = some inputs.targetLens) :
-    observeFromJournal state ((addRequests inputs).run state) =
-      sourceView inputs (state.readSlot countSlot).val :=
-  observeFromJournal_eq_of_observe_and_payload_matches_calls
-    state ((addRequests inputs).run state)
-    (sourceView inputs (state.readSlot countSlot).val)
-    (verity_tx_simulates_pinned_source inputs state hCountBound hEntry
-      hSources hTargets hSourceLens hTargetLens)
-    (sourceView_payloads_eq_calls_input inputs (state.readSlot countSlot).val)
-
 theorem revert_restores_snapshot
     (inputs : Inputs) (inject : Bool) (state rollback : ContractState)
     (reason : String)
@@ -1789,7 +1642,6 @@ stated on `addRequestsSlotFree` for the P-CONSOLIDATION-1 value-plane
 parents' retirement port. Structurally identical to the originals; the
 proofs use `persistSlotFree_calls` / `persistSlotFree_selfBalance` in
 place of the `persist_*` closed forms. -/
-
 
 private theorem addRequestsSlotFree_success_inversion
     (inputs : Inputs) (state : ContractState)
