@@ -16,3 +16,14 @@ src = "solidity/minfirst/src"
 test = "solidity/minfirst/test"
 out = "solidity/out/minfirst"
 cache_path = "solidity/cache/minfirst"
+
+# Pinned StakingRouter.topUp against TopupTx.execute via FFI.
+[profile.topup_source]
+src = "solidity/topup/src"
+test = "solidity/topup/test"
+out = "solidity/out/topup"
+cache_path = "solidity/cache/topup"
+remappings = [
+  "contracts/=lido-core/contracts/",
+  "@openzeppelin/contracts-v5.2/=audit/deposit-dsm-call/solidity/src/@openzeppelin/contracts-v5.2/"
+]

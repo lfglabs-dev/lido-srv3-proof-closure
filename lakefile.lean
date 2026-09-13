@@ -76,6 +76,7 @@ lean_lib «LidoSRv3» where
     .one `LidoSRv3.Audit.Verity.TopupParent,
     .one `LidoSRv3.Audit.Verity.TopupRollback,
     .one `LidoSRv3.Audit.Verity.TopupTx,
+    .one `LidoSRv3.Audit.Verity.TopupSourceEntry,
     .one `LidoSRv3.Audit.Verity.VaultEthTx
   ]
 
