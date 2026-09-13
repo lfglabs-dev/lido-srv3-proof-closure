@@ -69,13 +69,58 @@ Additional signal chantier 2 Piste A (2026-09-13, PR #559 + PR #589):
 > booleans still stand in for live pause / bunker / ACL-role storage
 > reads.
 
+Additional signal chantier 2 Piste A (2026-09-13, PR #611 / #613 /
+#615 / #618 / #620): **Five #419 D-* naming bridge parents
+registered in the P-RESERVE-1 namespace.**
+
+The Verity plane's `withdrawWithGuards` interpreter still writes
+only the reserve words and omits the pinned Solidity payable CALL /
+packed uint128 wrap / seed-count bookkeeping / event journal /
+ERC-7201-derived storage positions.  The following bridge parents
+NAME each of the five pinned shapes at the parent's ENUNCE level,
+so downstream consumers must supply the pinned shape witness — the
+Verity model's omission is disclosed rather than hidden:
+
+1. `source_spend_preserves_withdrawal_reserve_under_pinned_wq_shape`
+   (PR #611) — freshQueueCache re-anchored to
+   `WithdrawalQueueStorage.unfinalizedStETH` via
+   `ReserveFreshCacheFromWQ.liveFromWQStorage`.
+2. `source_spend_preserves_withdrawal_reserve_under_packed_buffer_shape`
+   (PR #613, D-PACK-1 naming) — `before.buffered` re-anchored to the
+   low 128 bits of the packed uint256 at Lido.sol:131-132 via
+   `ReservePackedBufferSource.unpackBuffered`.
+3. `source_spend_preserves_withdrawal_reserve_under_payable_call_shape`
+   (PR #615, D-TRANSFER-1 naming) — names the pinned Lido.sol:885
+   payable CALL frame
+   `stakingRouter.receiveDepositableEther.value(_amount)()` as a
+   `ReservePayableCallSource.PayableCallFrame`.
+4. `source_spend_preserves_withdrawal_reserve_under_seed_bookkeeping_shape`
+   (PR #618, D-SEED-1 / D-EVENT-1 naming) — names the pinned
+   Lido.sol:877-882 `_seedDepositsCount` bookkeeping + paired
+   Unbuffered / DepositedPostReportUpdated events as a
+   `ReserveSeedBookkeepingSource.SeedDepositsCountResult`.
+5. `source_spend_preserves_withdrawal_reserve_under_erc7201_slot_shape`
+   (PR #620, D-SLOT-1 naming) — names the pinned Lido ERC-7201-style
+   keccak-derived storage-position derivation via
+   `ERC7201StorageSlotSource.realERC7201BaseSlot`.
+
+**All five bridges are NAMING compositions, not full closures.**
+The registered `source_spend_preserves_withdrawal_reserve` is
+retained for existing consumers; extending the actual Verity
+`withdrawWithGuards` interpreter to journal the CALL / observe the
+uint128 wrap / write the seed-count fields / emit the events /
+observe keccak-derived positions is the follow-up in each case.
+Only D-WRAP-1 remains without a naming bridge as of 2026-09-13.
+
 **Site fix:** narrow the RESERVE-1 card to name exactly the one
 writer covered, list the other three as open (setDepositsReserveTarget,
 report-time rebalance, WQ finalization — see the four-writer
 enumeration above), and reference `audit/guarantees.yaml`
-P-RESERVE-1 `fidelity.missing` for the disclosed gaps.  Also
-reflect that BOTH `canDeposit` and `authorizedRouter` on
-`WithdrawInputs` are now derived from pinned source states.
+P-RESERVE-1 `fidelity.missing` for the disclosed gaps.  Reflect that
+BOTH `canDeposit` and `authorizedRouter` on `WithdrawInputs` are now
+derived from pinned source states.  Also mention the five #419 D-*
+naming bridges (freshQueueCache/WQ, D-PACK-1, D-TRANSFER-1,
+D-SEED-1/D-EVENT-1, D-SLOT-1) exposed at the parent's ENUNCE.
 
 ## TOPUP-1 — Verity plane ENUNCE promises match the code (chantier 2)
 
