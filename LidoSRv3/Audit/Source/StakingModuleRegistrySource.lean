@@ -89,4 +89,30 @@ theorem moduleFields_bounded_by_uint64
   ⟨bounds.depositedBounded, bounds.depositableBounded,
    bounds.summaryExitedBounded, bounds.accountingExitedBounded⟩
 
+/-! ## Third-step composition (2026-09-13): SRStorage monotonicity invariant
+
+`PinnedSRAllocationBoundsShape.activeSubtractionInvariant` above
+needs the exited ≤ deposited invariant. In the pinned StakingRouter,
+this holds by construction: `addValidators` only grows deposited,
+`_updateExitedCounters` only grows exited, and exit-then-deposit
+paths enforce exited ≤ deposited via early revert. Below defines a
+source-level monotonicity invariant. -/
+
+/-- SR monotonicity invariant: for each module in the registry, the
+`max(summaryExited, accountingExited)` is bounded by `deposited`.
+The pinned Solidity ensures this by construction through
+`_updateExitedCounters` guards and `addValidators` monotonicity. -/
+def SRMonotonicityInvariant (bounds : ModuleFieldBounds) : Prop :=
+  max bounds.summaryExitedCount bounds.accountingExitedCount
+    ≤ bounds.depositedCount
+
+/-- Under the pinned SR monotonicity premise, exit counts ≤
+deposited count. Definitionally, from the named invariant. -/
+theorem active_subtraction_bound_of_sr_monotonicity
+    {bounds : ModuleFieldBounds}
+    (hMono : SRMonotonicityInvariant bounds) :
+    max bounds.summaryExitedCount bounds.accountingExitedCount
+      ≤ bounds.depositedCount :=
+  hMono
+
 end LidoSRv3.Audit.Source.StakingModuleRegistrySource
