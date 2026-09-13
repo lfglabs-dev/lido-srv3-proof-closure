@@ -135,6 +135,7 @@ import LidoSRv3.Audit.Source.SolidityPrimitiveUintSource
 import LidoSRv3.Audit.Source.SolidityCheckedSubSource
 import LidoSRv3.Audit.Source.SolidityCheckedAddSource
 import LidoSRv3.Audit.Source.SolidityCheckedMulSource
+import LidoSRv3.Audit.Source.SolidityMinSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -1104,6 +1105,11 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- Fifty-fourth-step (2026-09-13): Solidity SafeMath.mul / checked-mul source model.
 #print axioms LidoSRv3.Audit.Source.SolidityCheckedMulSource.checkedMulU256_some_of_bounded
 #print axioms LidoSRv3.Audit.Source.SolidityCheckedMulSource.checkedMulU256_none_of_wrap
+-- Fifty-fifth-step (2026-09-13): Solidity min/max primitive source model.
+#print axioms LidoSRv3.Audit.Source.SolidityMinSource.minU_le_left
+#print axioms LidoSRv3.Audit.Source.SolidityMinSource.minU_le_right
+#print axioms LidoSRv3.Audit.Source.SolidityMinSource.left_le_maxU
+#print axioms LidoSRv3.Audit.Source.SolidityMinSource.right_le_maxU
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape
