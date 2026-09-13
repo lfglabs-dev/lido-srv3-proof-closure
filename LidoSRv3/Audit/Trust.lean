@@ -144,6 +144,7 @@ import LidoSRv3.Audit.Source.Topup2NKeyNoWrapSource
 import LidoSRv3.Audit.Source.Topup2ExactCapSource
 import LidoSRv3.Audit.Source.Topup2PerAllocGuardSource
 import LidoSRv3.Audit.Source.ModuleReturnGuardSource
+import LidoSRv3.Audit.Source.Topup2RoundingSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -1145,6 +1146,10 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.ModuleReturnGuardSource.moduleReturnWithinTarget_true_of_le
 #print axioms LidoSRv3.Audit.Source.ModuleReturnGuardSource.moduleReturnWithinTarget_false_of_gt
 #print axioms LidoSRv3.Audit.Source.ModuleReturnGuardSource.moduleReturnWithinTarget_true_of_zero
+-- Sixty-fourth-step (2026-09-13): StakingRouter.topUp:706 gwei-rounding source model.
+#print axioms LidoSRv3.Audit.Source.Topup2RoundingSource.roundDownToGwei_mod_zero
+#print axioms LidoSRv3.Audit.Source.Topup2RoundingSource.roundDownToGwei_le
+#print axioms LidoSRv3.Audit.Source.Topup2RoundingSource.roundDownToGwei_of_mod_zero
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape
