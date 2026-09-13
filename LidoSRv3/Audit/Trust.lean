@@ -725,6 +725,11 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- retirement.
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.observeFromJournal_revert_eq_observe
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.observeFromJournal_success_non_payload_eq_observe
+-- Status invariants + payload definition for the slot-independent
+-- observation function (definitional, no axioms beyond propext).
+#print axioms LidoSRv3.Audit.Verity.ConsolidationTx.observeFromJournal_status_success
+#print axioms LidoSRv3.Audit.Verity.ConsolidationTx.observeFromJournal_status_revert
+#print axioms LidoSRv3.Audit.Verity.ConsolidationTx.observeFromJournal_success_payloads_eq_calls_input
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.function_spec_bridge_constructors
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.committed_journal_forwards_msg_value
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.committed_preserves_eth_balance

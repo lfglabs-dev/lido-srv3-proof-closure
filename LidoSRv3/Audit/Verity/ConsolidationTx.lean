@@ -432,6 +432,34 @@ theorem observeFromJournal_success_non_payload_eq_observe
       (observe before (.success r state)).feePaid := by
   simp [observeFromJournal, observe]
 
+/-- **Chantier 2 (Thomas 2026-09-13) status invariant.** The
+slot-independent alternative preserves the `status` invariant: a
+successful executable transition always yields `.committed` status,
+a reverting transition always yields `.reverted` status. This is
+a definitional invariant of the new observation function; useful
+for downstream consumers that pattern-match on status without
+needing to touch the payload representation. -/
+theorem observeFromJournal_status_success
+    (before state : ContractState) (r : Result) :
+    (observeFromJournal before (.success r state)).status = .committed := rfl
+
+theorem observeFromJournal_status_revert
+    (before rollback : ContractState) (reason : String) :
+    (observeFromJournal before (.revert reason rollback)).status = .reverted := rfl
+
+/-- **Chantier 2 (Thomas 2026-09-13) payload definition.** On a
+successful executable transition, `observeFromJournal.payloads` is
+definitionally `calls.map (·.input)` — the CALL journal's `input`
+carrier. This is the field that would previously have read
+`readPayloads state beforeCount calls.length` in `observe`; the
+new observation reads it directly from the CALL journal delta
+between `before` and `state` (`state.calls.drop before.calls.length`
+mapped through `ofJournal`). -/
+theorem observeFromJournal_success_payloads_eq_calls_input
+    (before state : ContractState) (r : Result) :
+    (observeFromJournal before (.success r state)).payloads =
+      (observeFromJournal before (.success r state)).calls.map (·.input) := rfl
+
 private theorem readMapUint_writeMapUint_other_slot (s : ContractState)
     {slot slot' : Nat} (hslot : slot' ≠ slot) (key key' value : Word) :
     (s.writeMapUint slot key value).readMapUint slot' key' =
