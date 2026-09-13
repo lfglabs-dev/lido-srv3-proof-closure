@@ -113,6 +113,7 @@ import LidoSRv3.Audit.Source.Topup1CompositeGateSource
 import LidoSRv3.Audit.Source.Reserve1CompositeGateSource
 import LidoSRv3.Audit.Source.Alloc1CompositeBoundsSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
+import LidoSRv3.Audit.Guarantees.PConsolidationEth1CLProofPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
 import LidoSRv3.Audit.Source.StakingModuleRegistrySource
@@ -1000,6 +1001,13 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- names the pinned WithdrawalVaultEIP7685.sol:79-81 STATICCALL entry
 -- point. Real live-STATICCALL model is the follow-up.
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise.feePerRequest_derived_under_pinned_fee_staticcall_shape
+-- Chantier 2 (Thomas 2026-09-13) item (d.CL): CL-proof composition
+-- premise. Under PinnedCLProofShape, derives the SSZ.verifyProof-fold
+-- iff and the EIP-4788 anchor targeting, load-bearing on
+-- real_validator_correspondence from P-SSZ-1. Names the pinned
+-- _validatePubKeyWCProof composition entry point; full Verity
+-- composition into PhysicalEntrySettlement remains OPEN.
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1CLProofPremise.cl_proof_derived_under_pinned_cl_proof_shape
 -- Real-derivation step for P-CONSOLIDATION-ETH-1 fee STATICCALL (2026-09-13):
 -- source-level consolidationFeeFromStaticcall derives feePerRequest from a
 -- named PredeployStaticcallResult, not caller Nat.
