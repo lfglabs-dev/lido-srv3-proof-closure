@@ -147,6 +147,7 @@ import LidoSRv3.Audit.Source.ModuleReturnGuardSource
 import LidoSRv3.Audit.Source.Topup2RoundingSource
 import LidoSRv3.Audit.Source.Topup2MinClampSource
 import LidoSRv3.Audit.Source.ConsolidationMsgValueSource
+import LidoSRv3.Audit.Source.StETHGuardOrderSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -1160,6 +1161,10 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.ConsolidationMsgValueSource.msgValueForBatch_pos_of_nonzero
 #print axioms LidoSRv3.Audit.Source.ConsolidationMsgValueSource.msgValueForBatch_zero_of_fee_zero
 #print axioms LidoSRv3.Audit.Source.ConsolidationMsgValueSource.msgValueForBatch_zero_of_empty_batch
+-- Sixty-seventh-step (2026-09-13): P-ADDRESS-1 chantier-6 StETH guard order.
+#print axioms LidoSRv3.Audit.Source.StETHGuardOrderSource.both_orders_agree_on_success
+#print axioms LidoSRv3.Audit.Source.StETHGuardOrderSource.orders_disagree_on_balance_only_failure
+#print axioms LidoSRv3.Audit.Source.StETHGuardOrderSource.orders_disagree_on_allowance_only_failure
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape
