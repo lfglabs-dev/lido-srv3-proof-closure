@@ -59,7 +59,9 @@ theorem source_parent_ignores_no_unchecked_wrap
       WrapMovesNoValue cfg inp ∧
       WrongWcTypeReverts cfg inp ∧
       RunFollowsAllocationLoop cfg inp :=
-  PTopup1.source_topup_conserves_and_rolls_back cfg inp before after attempts trace
+  let ⟨h1, h2, h3, h4, h5, _⟩ :=
+    PTopup1.source_topup_conserves_and_rolls_back cfg inp before after attempts trace
+  ⟨h1, h2, h3, h4, h5⟩
 
 /-- Same statement without the ignored `hWrap` hypothesis: the parent applies
 to every input, wrapping or not. -/
@@ -72,7 +74,9 @@ theorem source_parent_applies_universally
       WrapMovesNoValue cfg inp ∧
       WrongWcTypeReverts cfg inp ∧
       RunFollowsAllocationLoop cfg inp :=
-  PTopup1.source_topup_conserves_and_rolls_back cfg inp before after attempts trace
+  let ⟨h1, h2, h3, h4, h5, _⟩ :=
+    PTopup1.source_topup_conserves_and_rolls_back cfg inp before after attempts trace
+  ⟨h1, h2, h3, h4, h5⟩
 
 /-- The registered Verity-side parent's first two conjuncts hold on **any**
 input: the `hCall : SourceTopupCallCorresponds cfg inp call` premise is the
