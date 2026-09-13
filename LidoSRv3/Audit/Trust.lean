@@ -760,12 +760,15 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- side of the slot-independence claim (complement to
 -- observeFromJournal_success_slot_invariant on the read side).
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.observeFromJournal_writePayloads_invariant
--- persist vs persistSlotFree observation equality: the slot-free variant
--- produces the same calls/events as persist (fabricated slot writes are
--- dead to observation). Prep for the eventual physical retirement of
--- writePayloads from persist.
-#print axioms LidoSRv3.Audit.Verity.ConsolidationTx.persist_calls_eq_persistSlotFree_calls
-#print axioms LidoSRv3.Audit.Verity.ConsolidationTx.persist_events_eq_persistSlotFree_events
+-- Chantier 2 (Thomas 2026-09-13, item c continuation): the persist vs
+-- persistSlotFree field-level observation-equality lemmas
+-- (persist_calls_eq_persistSlotFree_calls, persist_events_eq_persistSlotFree_events,
+-- persist_readSlot_eq_persistSlotFree_readSlot, addRequests_snd_calls/events/readSlot_eq_...,
+-- addRequests_isSuccess_eq_...) were retired here — they served as
+-- intermediate composers for observeFromJournal_(run_)addRequests_eq_...
+-- (retired in PR #661), which in turn composed observeFromJournal_simulates_pinned_source_slotFree
+-- (rewritten directly in PR #648). None are on the registered parent
+-- proof chain anymore.
 -- Slot-free executable transaction: addRequestsSlotFree is a definitional
 -- companion to addRequests that uses persistSlotFree. Downstream
 -- consumers wanting a slot-free tx have this available today.
