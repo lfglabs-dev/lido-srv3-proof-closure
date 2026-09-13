@@ -219,6 +219,34 @@ theorem verity_tx_simulates_consolidation (inputs : Inputs)
   verity_tx_simulates_pinned_source inputs state hCountBound hEntry
     hSources hTargets hSourceLens hTargetLens
 
+/-- **Chantier 2 (Thomas 2026-09-13) slot-independent consumer.**
+Slot-independent version of the registered
+`verity_tx_simulates_consolidation`: `observeFromJournal` also
+equals `sourceView` on every executed run, without reading the
+fabricated `sourceMapSlot` / `targetMapSlot`. Direct alias of
+`observeFromJournal_simulates_pinned_source` (PR #600); named here
+under the P-CONSOLIDATION-1 guarantee namespace so downstream
+consumers can adopt the slot-independent observation without
+reaching into `Verity.ConsolidationTx`. -/
+theorem verity_tx_simulates_consolidation_from_journal (inputs : Inputs)
+    (state : Verity.ContractState)
+    (hCountBound : (state.readSlot countSlot).val + inputs.sources.length <
+      Verity.Core.Uint256.modulus)
+    (hEntry : state.selfBalance.val + inputs.msgValue.val <
+      Verity.Core.Uint256.modulus)
+    (hSources : readArray state "sources" sourcesBase inputs.sources.length =
+      some inputs.sources)
+    (hTargets : readArray state "targets" targetsBase inputs.targets.length =
+      some inputs.targets)
+    (hSourceLens : readArray state "sourceLens" sourceLensBase
+      inputs.sourceLens.length = some inputs.sourceLens)
+    (hTargetLens : readArray state "targetLens" targetLensBase
+      inputs.targetLens.length = some inputs.targetLens) :
+    observeFromJournal state ((addRequests inputs).run state) =
+      sourceView inputs (state.readSlot countSlot).val :=
+  observeFromJournal_simulates_pinned_source inputs state hCountBound hEntry
+    hSources hTargets hSourceLens hTargetLens
+
 /-- Every revert of the consolidation transaction, including failure after
 intermediate call/event/memory writes, restores the pre-call snapshot. -/
 theorem verity_tx_revert_restores_snapshot
