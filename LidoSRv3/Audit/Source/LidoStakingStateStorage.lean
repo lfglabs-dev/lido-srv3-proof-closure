@@ -38,11 +38,16 @@ for `isStakingPaused`; a separate bunker slot for `isBunkerActive`). -/
 structure LidoStakingState : Type where
   isStakingPaused : Bool
   isBunkerActive : Bool
+  deriving DecidableEq, Repr
 
 /-- Definition of `Lido.canDeposit()` at Lido.sol:815-816 as a
 function of the two named pinned booleans. Definition, not
-caller-supplied constant. -/
-def canDepositFromStorage (state : LidoStakingState) : Bool :=
+caller-supplied constant.  Marked `@[simp]` so downstream `simp`
+calls that previously reduced a free `inputs.canDeposit : Bool`
+constructor argument continue to close after `WithdrawInputs`'s
+2026-09-13 chantier 2 refactor (`canDeposit` def → pinned
+`LidoStakingState` accessor). -/
+@[simp] def canDepositFromStorage (state : LidoStakingState) : Bool :=
   !state.isStakingPaused && !state.isBunkerActive
 
 /-- `canDepositFromStorage` iff its two-conjunct definition. -/
