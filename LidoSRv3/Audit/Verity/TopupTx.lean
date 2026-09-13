@@ -115,11 +115,18 @@ def allocationStage (allocations : List Nat) : Contract Unit := fun state =>
   .success () ((allocationPass allocations 0 0 state).writeSlot pulledTotalSlot 0)
 
 /-- Real external-call frame: the zero-value Lido pull at `StakingRouter.sol:744`.
-`externalCallBindTo` journals the destination and argument word itself. -/
+`externalCallBindTo` journals the destination and both argument words themselves:
+the two-argument shape of `withdrawDepositableEther(amount, 0)` at the pinned
+Solidity call site is reflected in the executable journal as
+`[(total : Uint256), (0 : Uint256)]`.  The trailing zero word matches the
+hard-coded second `uint256` parameter passed by the router at source line 744;
+before this correction the frame journalled only the leading `amount` word and
+the source's second argument silently escaped the executable journal, which is
+the differential Grok #414 flagged as D-CALL-1 (journal-shape half). -/
 def lidoPull (total : Nat) : Contract Unit :=
   -- StakingRouter.sol:744  LIDO.withdrawDepositableEther(amount, 0);
   externalCallBindTo lidoAddress 0 [] "withdrawDepositableEther"
-    ([(total : Uint256)] : List Uint256)
+    ([(total : Uint256), (0 : Uint256)] : List Uint256)
 
 /-- The wei `withdrawDepositableEther` hands back.  `externalCallBindTo` is a
 caller-side frame: it debits, journals, and binds, but callee-originated
@@ -454,7 +461,10 @@ def sourceObservables (allocations : List Nat) : OutcomeObservables :=
       lidoAddress.toNat :: pushes.map (fun _ => beaconAddress.toNat),
     if wrapped = 0 then [] else 0 :: pushes.map (fun p => evmWord p.2),
     if wrapped = 0 then [] else
-      [evmWord wrapped] :: pushes.map (fun p => [evmWord p.1, 0, 0, evmWord p.2])⟩
+      -- The pull frame carries both `withdrawDepositableEther(amount, 0)` argument
+      -- words at `StakingRouter.sol:744`; the trailing zero mirrors the hard-coded
+      -- second parameter (Grok #414 D-CALL-1 journal-shape half).
+      [evmWord wrapped, evmWord 0] :: pushes.map (fun p => [evmWord p.1, 0, 0, evmWord p.2])⟩
 
 /-! ## The journal execution has to produce
 
@@ -472,7 +482,9 @@ def beaconJournal (allocations : List Nat) (index : Nat) : List ExternalCall :=
   (sourcePushes allocations index).map pushEntry
 
 def pullEntry (total : Nat) : ExternalCall :=
-  linkedCallEntryTo "withdrawDepositableEther" lidoAddress 0 [(total : Uint256)]
+  -- StakingRouter.sol:744  LIDO.withdrawDepositableEther(amount, 0);  -- the trailing 0 mirrors the hard-coded second argument at the pinned call site (fixes Grok #414 D-CALL-1 journal-shape half).
+  linkedCallEntryTo "withdrawDepositableEther" lidoAddress 0
+    [(total : Uint256), (0 : Uint256)]
 
 def expectedCalls (allocations : List Nat) : List ExternalCall :=
   if allocSumUnchecked allocations = 0 then []
@@ -886,7 +898,8 @@ theorem pullEntry_name (total : Nat) :
     (pullEntry total).name = "withdrawDepositableEther" := rfl
 theorem pullEntry_target (total : Nat) : (pullEntry total).target = lidoAddress.toNat := rfl
 theorem pullEntry_value (total : Nat) : (pullEntry total).value = 0 := rfl
-theorem pullEntry_calldata (total : Nat) : (pullEntry total).calldata = [evmWord total] := rfl
+theorem pullEntry_calldata (total : Nat) :
+    (pullEntry total).calldata = [evmWord total, evmWord 0] := rfl
 
 theorem callValueOf_beaconJournal :
     ∀ (l : List Nat) (index : Nat), (∀ a ∈ l, a < uint256Modulus) →
