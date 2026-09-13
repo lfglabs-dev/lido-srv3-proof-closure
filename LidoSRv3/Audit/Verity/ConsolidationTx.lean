@@ -1987,6 +1987,50 @@ def addRequestsDoubleDebit (inputs : Inputs) : Contract Result :=
 def addRequestsJournalValueBlind (inputs : Inputs) : Contract Result :=
   addRequestsWith persistJournalValueBlind inputs
 
+/-! Chantier 2 (Thomas 2026-09-13, item c continuation) slot-free
+mutant variants. These match the `addRequestsSlotFree` companion
+(dropping `writePayloads` — hence no fabricated `sourceMapSlot` /
+`targetMapSlot` writes) and mutate exactly one aspect of the value
+plane, so their kill-lines refute the slot-free registered parents. -/
+
+def persistPlainSlotFree (start : Nat) (obs : Observables)
+    (state : ContractState) : ContractState :=
+  let dirty := (state.writeSlot countSlot
+      (Verity.Core.Uint256.ofNat (start + obs.requestCount)))
+    |>.writeSlot feePaidSlot obs.feePaid
+  { dirty with
+    events := dirty.events ++ obs.events.map toEvent
+    calls := dirty.calls ++ obs.calls.map toJournal }
+
+def persistDoubleDebitSlotFree (start : Nat) (obs : Observables)
+    (state : ContractState) : ContractState :=
+  let dirty := (state.writeSlot countSlot
+      (Verity.Core.Uint256.ofNat (start + obs.requestCount)))
+    |>.writeSlot feePaidSlot obs.feePaid
+  let dirty := forwardCallsDouble dirty obs.calls
+  { dirty with
+    events := dirty.events ++ obs.events.map toEvent
+    calls := dirty.calls ++ obs.calls.map toJournal }
+
+def persistJournalValueBlindSlotFree (start : Nat) (obs : Observables)
+    (state : ContractState) : ContractState :=
+  let dirty := (state.writeSlot countSlot
+      (Verity.Core.Uint256.ofNat (start + obs.requestCount)))
+    |>.writeSlot feePaidSlot obs.feePaid
+  let dirty := forwardCalls dirty obs.calls
+  { dirty with
+    events := dirty.events ++ obs.events.map toEvent
+    calls := dirty.calls ++ obs.calls.map toJournalValueBlind }
+
+def addRequestsValueBlindSlotFree (inputs : Inputs) : Contract Result :=
+  addRequestsWith persistPlainSlotFree inputs
+
+def addRequestsDoubleDebitSlotFree (inputs : Inputs) : Contract Result :=
+  addRequestsWith persistDoubleDebitSlotFree inputs
+
+def addRequestsJournalValueBlindSlotFree (inputs : Inputs) : Contract Result :=
+  addRequestsWith persistJournalValueBlindSlotFree inputs
+
 /-! ## FunctionSpec call/event/memory fragment (not a transcription)
 
 `requestOne` is a single-pair bridge spec exercising the three constructors,
