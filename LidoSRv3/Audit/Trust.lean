@@ -85,6 +85,7 @@ import LidoSRv3.Audit.Source.WithdrawalQueueMappingSource
 import LidoSRv3.Audit.Source.ReserveFreshCacheFromWQ
 import LidoSRv3.Audit.Source.ERC20StorageSource
 import LidoSRv3.Audit.Source.AddressStETHGuardsSource
+import LidoSRv3.Audit.Source.ConsolidationRoleGuardSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -904,6 +905,8 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- Fifth-step (2026-09-13): P-ADDRESS-1 stETH balance/allowance guards via ERC-20.
 #print axioms LidoSRv3.Audit.Source.AddressStETHGuardsSource.callerBalanceSufficient_true_of_bound
 #print axioms LidoSRv3.Audit.Source.AddressStETHGuardsSource.callerAllowanceSufficient_true_of_bound
+-- Fifth-step (2026-09-13): P-CONSOLIDATION-ETH-1 ADD_CONSOLIDATION_REQUESTS_ROLE via ACL.
+#print axioms LidoSRv3.Audit.Source.ConsolidationRoleGuardSource.role_granted_of_acl
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape
