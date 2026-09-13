@@ -317,6 +317,37 @@ def sourceRun (inputs : Inputs) : SourceOutcome :=
 
 /-- Solidity-facing name, `WithdrawalVault.sol:199`. -/
 abbrev addConsolidationRequests := sourceRun
+
+/-- **Chantier 2 (Thomas 2026-09-13) sourceRun-level retirement
+bridge.** Specialization of `commit_payloads_equal_call_inputs` to
+the `sourceRun` outcome: any observation produced by a successful
+`sourceRun` satisfies `obs.payloads = obs.calls.map (·.input)`.
+Downstream Verity-plane consumers of `sourceRun`-committed
+observations can substitute the CALL-journal input carrier for
+the fabricated `sourceMapSlot` / `targetMapSlot` reread without
+threading through `commitObservables`'s internal structure. -/
+theorem sourceRun_committed_payloads_eq_call_inputs
+    (inputs : Inputs) (obs : Observables)
+    (hRun : sourceRun inputs = .committed obs) :
+    obs.payloads = obs.calls.map (·.input) := by
+  unfold sourceRun at hRun
+  split at hRun
+  · split at hRun
+    · simp at hRun
+    · split at hRun
+      · simp at hRun
+      · next requests hZip =>
+          split at hRun
+          · split at hRun
+            · split at hRun
+              · injection hRun with hObs
+                subst obs
+                exact commit_payloads_equal_call_inputs
+                  inputs.requestTarget inputs.fee inputs.msgValue requests
+              · simp at hRun
+            · simp at hRun
+          · simp at hRun
+  · simp at hRun
 /-- A committed source run binds one CALL and one event per pair, pays exactly
 `msg.value`, and records `source ‖ target` as the memory payload. A revert
 exposes no prefix of those effects.

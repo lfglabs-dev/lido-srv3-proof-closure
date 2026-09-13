@@ -733,6 +733,10 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- Slot-invariance: observeFromJournal doesn't read sourceMapSlot / targetMapSlot,
 -- so its output is unchanged by arbitrary rewrites of those slots.
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.observeFromJournal_success_slot_invariant
+-- sourceRun-level retirement bridge: obs.payloads = obs.calls.map (·.input)
+-- on any successful sourceRun outcome. Specialization of the commit-level
+-- retirement bridge for Verity-plane consumers.
+#print axioms LidoSRv3.Audit.SolidityConsolidation.sourceRun_committed_payloads_eq_call_inputs
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.function_spec_bridge_constructors
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.committed_journal_forwards_msg_value
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.committed_preserves_eth_balance
