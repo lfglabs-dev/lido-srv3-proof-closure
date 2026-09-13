@@ -194,15 +194,6 @@ private def valObs : Observables :=
 private def valState : Verity.ContractState :=
   stateBal (pair 11 21) 5
 
-private def valAfterPlain : Verity.ContractState :=
-  persistPlain 0 valObs (credited valState (pair 11 21))
-
-private def valAfterDouble : Verity.ContractState :=
-  persistDoubleDebit 0 valObs (credited valState (pair 11 21))
-
-private def valAfterJournalBlind : Verity.ContractState :=
-  persistJournalValueBlind 0 valObs (credited valState (pair 11 21))
-
 /-! Chantier 2 (Thomas 2026-09-13, item c continuation) slot-free
 mutant witnesses. Same input, same source-plane commit, but the
 persistence variant is the slot-free companion (no `writePayloads`
@@ -217,77 +208,6 @@ private def valAfterDoubleSlotFree : Verity.ContractState :=
 
 private def valAfterJournalBlindSlotFree : Verity.ContractState :=
   persistJournalValueBlindSlotFree 0 valObs (credited valState (pair 11 21))
-
-/-- **Kill-line: value-blind debit refutes `committed_preserves_eth_balance`
-on a mutant of its own model.** The pre-lift stub behavior — journaled
-CALLs that move no wei — leaves the credited `msg.value` stuck on the
-vault: the post-run `selfBalance` is pre-call + 3, not the pre-call 5.
-`sourceRun` commits the same batch, so the mutant reaches the success arm
-the registered theorem talks about. -/
-theorem value_blind_debit_kill_line_refutes_preserves_eth_balance :
-    ∃ (inputs : Inputs) (state : Verity.ContractState)
-      (result : Result) (after : Verity.ContractState),
-      readArray state "sources" sourcesBase inputs.sources.length =
-        some inputs.sources ∧
-      readArray state "targets" targetsBase inputs.targets.length =
-        some inputs.targets ∧
-      readArray state "sourceLens" sourceLensBase
-        inputs.sourceLens.length = some inputs.sourceLens ∧
-      readArray state "targetLens" targetLensBase
-        inputs.targetLens.length = some inputs.targetLens ∧
-      observe state ((addRequestsValueBlind inputs).run state) =
-        observe state (.success result after) ∧
-      after.selfBalance ≠ state.selfBalance :=
-  ⟨pair 11 21, valState, ofObservables valObs, valAfterPlain,
-    by native_decide, by native_decide, by native_decide,
-    by native_decide, by native_decide, by native_decide⟩
-
-/-- **Kill-line: double debit refutes `committed_preserves_eth_balance`
-on a mutant of its own model.** Debiting twice the journaled value per CALL
-drains the vault: post-run `selfBalance` is pre-call + 3 − 6 = 2, not 5. -/
-theorem double_debit_kill_line_refutes_preserves_eth_balance :
-    ∃ (inputs : Inputs) (state : Verity.ContractState)
-      (result : Result) (after : Verity.ContractState),
-      readArray state "sources" sourcesBase inputs.sources.length =
-        some inputs.sources ∧
-      readArray state "targets" targetsBase inputs.targets.length =
-        some inputs.targets ∧
-      readArray state "sourceLens" sourceLensBase
-        inputs.sourceLens.length = some inputs.sourceLens ∧
-      readArray state "targetLens" targetLensBase
-        inputs.targetLens.length = some inputs.targetLens ∧
-      observe state ((addRequestsDoubleDebit inputs).run state) =
-        observe state (.success result after) ∧
-      after.selfBalance ≠ state.selfBalance :=
-  ⟨pair 11 21, valState, ofObservables valObs, valAfterDouble,
-    by native_decide, by native_decide, by native_decide,
-    by native_decide, by native_decide, by native_decide⟩
-
-/-- **Kill-line: journaled value 0 refutes
-`committed_journal_forwards_msg_value` on a mutant of its own model.**
-Honest debits with zero-valued journal frames leave the balance correct
-(the mutant passes the balance assertion) but the journal claims no value
-moved: the frame-values sum is 0, not `msg.value = 3`. -/
-theorem journal_value_blind_kill_line_refutes_exact_forwarding :
-    ∃ (inputs : Inputs) (state : Verity.ContractState)
-      (result : Result) (after : Verity.ContractState),
-      readArray state "sources" sourcesBase inputs.sources.length =
-        some inputs.sources ∧
-      readArray state "targets" targetsBase inputs.targets.length =
-        some inputs.targets ∧
-      readArray state "sourceLens" sourceLensBase
-        inputs.sourceLens.length = some inputs.sourceLens ∧
-      readArray state "targetLens" targetLensBase
-        inputs.targetLens.length = some inputs.targetLens ∧
-      observe state ((addRequestsJournalValueBlind inputs).run state) =
-        observe state (.success result after) ∧
-      after.selfBalance = state.selfBalance ∧
-      ((after.calls.drop state.calls.length).map (·.value)).sum ≠
-        inputs.msgValue.val :=
-  ⟨pair 11 21, valState, ofObservables valObs, valAfterJournalBlind,
-    by native_decide, by native_decide, by native_decide,
-    by native_decide, by native_decide, by native_decide,
-    by native_decide⟩
 
 /-! Chantier 2 (Thomas 2026-09-13, item c continuation) slot-free
 kill-lines. Mirror the three pre-retirement kill-lines but for the

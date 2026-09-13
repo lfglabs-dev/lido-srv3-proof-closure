@@ -774,12 +774,17 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.committed_journal_forwards_msg_value
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.committed_preserves_eth_balance
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.entry_credit_overflow_reverts
+-- Chantier 2 (Thomas 2026-09-13, item c continuation): value-plane
+-- kill-lines retargeted to the slot-free companion mutants (PR #658).
+-- Pre-retirement variants were physically retired since the registered
+-- parents verity_tx_journal_forwards_msg_value and
+-- verity_tx_preserves_eth_balance (PR #646) are on addRequestsSlotFree.
 #print axioms
-  LidoSRv3.Tests.ConsolidationTxMutants.value_blind_debit_kill_line_refutes_preserves_eth_balance
+  LidoSRv3.Tests.ConsolidationTxMutants.value_blind_debit_kill_line_refutes_preserves_eth_balance_slotFree
 #print axioms
-  LidoSRv3.Tests.ConsolidationTxMutants.double_debit_kill_line_refutes_preserves_eth_balance
+  LidoSRv3.Tests.ConsolidationTxMutants.double_debit_kill_line_refutes_preserves_eth_balance_slotFree
 #print axioms
-  LidoSRv3.Tests.ConsolidationTxMutants.journal_value_blind_kill_line_refutes_exact_forwarding
+  LidoSRv3.Tests.ConsolidationTxMutants.journal_value_blind_kill_line_refutes_exact_forwarding_slotFree
 #print axioms LidoSRv3.Audit.Guarantees.PAddress1.bounded_transfer_model_source_tx
 #print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_claim_withdrawals_to_chain
 #print axioms LidoSRv3.Audit.Guarantees.PAddress1.actual_claim_recipient_effect
