@@ -17,8 +17,8 @@
       "name": "LidoSRv3.Audit.Guarantees.PAccount1.mint_after_read_discipline",
       "module": "LidoSRv3.Audit.Guarantees.PAccount1",
       "file": "LidoSRv3/Audit/Guarantees/PAccount1.lean",
-      "start_line": 105,
-      "end_line": 105,
+      "start_line": 106,
+      "end_line": 106,
       "doc": "/-- **P-ACCOUNT-1, abstract plane.**  On every committed execution of the\nmodeled `handleOracleReport`, the `rewardsRead` step is written strictly before\nany nonzero `rewardsMinted` step, read directly from the transaction step\nclock: whenever `0 < tick(mint)`, then `tick(read) < tick(mint)`.\n\nRegistered P-ACCOUNT-1 parent. Independent tx-storage-flag order\ndiscipline: on every committed execution of the real `handleOracleReport`,\nthe `rewardsReadSlot` tick is written strictly before any nonzero\n`rewardsMintedSlot` tick. This reads the two raw ticks directly and does not\ngo through `storedSteps`; exact expected ticks make the same reordering visible\nat the `View` boundary, but this theorem states the order predicate directly\nrather than obtaining it through source-view equality. `Result.steps` (and the\n`View.steps` it feeds) is built from these same tx storage flags and never\ncalls `AccountingCorrespondence.successfulSteps`; the two planes share no\nstep-list bridge. Unlike the demoted `source_report_before_reward` child,\nthis parent is directly refuted by the `mint_order_kill_line` mutant below,\nso the registered claim has an adversarial witness rather than being true by\nconstruction. The ticks are not call-site constants: every step write goes\nthrough `stampStep`, which reads the transaction-local step clock in\n`sequenceSlot` and stores `clock + 1`, so the number a slot ends up holding is\nthe position at which that write actually ran. Moving a `stampStep` call\ntherefore changes the tick it records, which is what makes this an ordering\nclaim rather than a fact about which numeral a line of program text\ncontains. -/",
       "statement": "theorem mint_after_read_discipline : mintAfterReadDiscipline"
     },
@@ -29,8 +29,8 @@
       "name": "LidoSRv3.Audit.Guarantees.PAccount1.verity_tx_simulates_oracle_report",
       "module": "LidoSRv3.Audit.Guarantees.PAccount1",
       "file": "LidoSRv3/Audit/Guarantees/PAccount1.lean",
-      "start_line": 65,
-      "end_line": 68,
+      "start_line": 66,
+      "end_line": 69,
       "doc": "/-- **P-ACCOUNT-1, Verity plane.**  `observe` of `handleOracleReport` equals\n`sourceView`.\n\nVerity child. `observe` of `handleOracleReport` (balance array + total/flag\nslots) equals the independently stated `sourceView`. Not `submitReportData`;\n`sharesToMintAsFees` is an argument, not a computed fee. -/",
       "statement": "theorem verity_tx_simulates_oracle_report\n    (i : ReportInput) (sharesToMintAsFees : Nat) (state : Verity.ContractState) :\n    observe i ((handleOracleReport i sharesToMintAsFees).run state) =\n      sourceView i sharesToMintAsFees"
     }
@@ -90,18 +90,19 @@
       "independent tx storage-flag ticks for Result.steps/View.steps with no successfulSteps bridge",
       "handleOracleReport-shaped validity/overflow guards; observe reads writeArray balances",
       "Contract.run rollback after intermediate writes",
-      "child source_report_before_reward: constructor ordering of an accepted positive-fee report on the source if-tree"
+      "child source_report_before_reward: constructor ordering of an accepted positive-fee report on the source if-tree",
+      "sharesToMintAsFees derived from pinned fee products (grok #402): handleOracleReportDerived obtains sharesToMintAsFees from pinned _calculateProtocolFees products (Accounting.sol:317,323,325,331 via ReportFeeProductsCorrespondence) rather than a free Nat. Product panic is fail-closed; mint-after-read is cited from the unchanged parent. Discharged via LidoSRv3/Audit/Source/AccountFeeShares.lean; kill-lines in LidoSRv3/Tests/AccountFeeSharesMutants.lean. Axioms only propext / Quot.sound. totalFee / precisionPoints remain getter outputs (StakingRouter.getStakingRewardsDistribution 808-873); the live written-snapshot re-read stays a separate missing entry.",
+      "RECLASSED (mandate 2026-09-12): grok #399 (PR #418) added LidoSRv3/Audit/Source/AccountPackedWords.lean which proves the pack/unpack round-trip for the degenerate case `pack ⟨b, 0, 0⟩` (zero exit / zero pending). The general packed layout with nonzero exit/pending fields is not linked to the parent write. The corresponding fidelity.missing entry is REINSTATED below."
     ],
     "missing": [
       "SRStorage membership and unique uint24 module ids",
       "accountingOracle caller and REPORT_EXITED_VALIDATORS_ROLE",
       "submitReportData / _handleConsensusReportData",
-      "fee computation (sharesToMintAsFees is an argument)",
-      "packed uint64 accounting words",
       "re-read of the written router snapshot for rewards",
-      "full live-report success is still not modeled; the demoted child now states only local accepted constructor order through sourceTraceRetired"
+      "full live-report success is still not modeled; the demoted child now states only local accepted constructor order through sourceTraceRetired",
+      "packed uint64 accounting words. RECLASSED in PR #418, REINSTATED here per mandate 2026-09-12: only the degenerate `pack ⟨b, 0, 0⟩` case is linked to the parent write; the full uint64|uint64|uint128 packing with nonzero exited/pending fields is not established for the registered `mint_after_read_discipline` / `verity_tx_simulates_oracle_report` theorems."
     ],
-    "open_gap_count": 7
+    "open_gap_count": 6
   },
   "source_spans": [
     {
@@ -223,16 +224,15 @@
       "The subject is a Lean model of Staking Router v3, written against pinned source lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436.",
       "No theorem here binds to deployed bytecode, a runtime codehash, a constructor, or a chain address. The SRv3 contracts are deployed on mainnet with lidofinance/core v4.0.0 (2026-07-24; StakingRouter proxy 0xFdDf38947aFB03C621C71b06C9C70bce73f12999, TopUpGateway proxy 0x3FC2C71579D80790Aaa3fc7Be8B66ac39dC57374); the theorems still speak about the model, not about that deployment.",
       "CHECKED means *the named Lean theorem builds*. It does not mean audited, verified on chain, or closed.",
-      "Every row below still has open fidelity gaps — 68 in total. The last column counts them per row; audit/guarantees.yaml names each one."
+      "Every row below still has open fidelity gaps — 107 in total. The last column counts them per row; audit/guarantees.yaml names each one."
     ],
     "not_covered": [
       "SRStorage membership and unique uint24 module ids",
       "accountingOracle caller and REPORT_EXITED_VALIDATORS_ROLE",
       "submitReportData / _handleConsensusReportData",
-      "fee computation (sharesToMintAsFees is an argument)",
-      "packed uint64 accounting words",
       "re-read of the written router snapshot for rewards",
-      "full live-report success is still not modeled; the demoted child now states only local accepted constructor order through sourceTraceRetired"
+      "full live-report success is still not modeled; the demoted child now states only local accepted constructor order through sourceTraceRetired",
+      "packed uint64 accounting words. RECLASSED in PR #418, REINSTATED here per mandate 2026-09-12: only the degenerate `pack ⟨b, 0, 0⟩` case is linked to the parent write; the full uint64|uint64|uint128 packing with nonzero exited/pending fields is not established for the registered `mint_after_read_discipline` / `verity_tx_simulates_oracle_report` theorems."
     ]
   }
 }

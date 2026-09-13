@@ -83,42 +83,22 @@ import LidoSRv3.Audit.Source.AragonACLSource
 import LidoSRv3.Audit.Source.KeccakMappingStorageSource
 import LidoSRv3.Audit.Source.WithdrawalQueueMappingSource
 import LidoSRv3.Audit.Source.ReserveFreshCacheFromWQ
-import LidoSRv3.Audit.Source.ERC20StorageSource
-import LidoSRv3.Audit.Source.AddressStETHGuardsSource
-import LidoSRv3.Audit.Source.ConsolidationRoleGuardSource
-import LidoSRv3.Audit.Source.ConsolidationPauseGuardSource
-import LidoSRv3.Audit.Source.ConsolidationQuotaGuardSource
-import LidoSRv3.Audit.Source.ConsolidationClProofSource
-import LidoSRv3.Audit.Source.ConsolidationFeeLiveStaticcallSource
-import LidoSRv3.Audit.Source.BridgePerWriterExecutablePlane
 import LidoSRv3.Audit.Source.KeccakConcreteCommitmentSource
 import LidoSRv3.Audit.Source.AragonACLRoleKeyViaOracleSource
-import LidoSRv3.Audit.Source.BridgeSelectorViaOracleSource
 import LidoSRv3.Audit.Source.MappingSlotViaOracleSource
 import LidoSRv3.Audit.Source.NestedMappingSlotViaOracleSource
-import LidoSRv3.Audit.Source.ERC20AllowanceKeyViaOracleSource
 import LidoSRv3.Audit.Source.ACLPermissionKeyViaOracleSource
-import LidoSRv3.Audit.Source.ConsolidationPauseSlotViaOracleSource
-import LidoSRv3.Audit.Source.ConsolidationQuotaSlotViaOracleSource
 import LidoSRv3.Audit.Source.ACLRoleMappingViaOracleSource
-import LidoSRv3.Audit.Source.ERC20StateViaOracleSource
 import LidoSRv3.Audit.Source.WQStorageViaOracleSource
 import LidoSRv3.Audit.Source.SRModuleMappingViaOracleSource
-import LidoSRv3.Audit.Source.DepositEmptyBatchEarlyReturnSource
-import LidoSRv3.Audit.Source.DepositPerKeyCallSource
-import LidoSRv3.Audit.Source.DepositCustomErrorsSource
 import LidoSRv3.Audit.Source.ERC7201StorageSlotSource
-import LidoSRv3.Audit.Source.DepositDistinctModulesSource
 import LidoSRv3.Audit.Source.TopupPrefixGuardsSource
 import LidoSRv3.Audit.Source.TopupLidoAddressSource
 import LidoSRv3.Audit.Source.TopupWithdrawTwoArgSource
 import LidoSRv3.Audit.Source.ReservePayableCallSource
 import LidoSRv3.Audit.Source.ReservePackedBufferSource
 import LidoSRv3.Audit.Source.ReserveSeedBookkeepingSource
-import LidoSRv3.Audit.Source.Topup2PrefixGuardsSource
-import LidoSRv3.Audit.Source.Topup2ConsumeAndUnitsSource
 import LidoSRv3.Audit.Source.LidoBunkerViaOracleSource
-import LidoSRv3.Audit.Source.ConsolidationRoleViaOracleSource
 import LidoSRv3.Audit.Source.AuthorizedRouterViaOracleSource
 import LidoSRv3.Audit.Source.TopupGatewayRoleViaOracleSource
 import LidoSRv3.Audit.Source.WCType2ByteDecodeSource
@@ -126,43 +106,12 @@ import LidoSRv3.Audit.Source.SRModulePackedDecoderSource
 import LidoSRv3.Audit.Source.StakeLimitStructDecoderSource
 import LidoSRv3.Audit.Source.WQRequestPackedDecoderSource
 import LidoSRv3.Audit.Source.WQCheckpointPackedDecoderSource
-import LidoSRv3.Audit.Source.PermitDecodeSource
-import LidoSRv3.Audit.Source.SolidityAddressTypeSource
-import LidoSRv3.Audit.Source.SolidityUint256WrapSource
 import LidoSRv3.Audit.Source.SolidityUint128WrapSource
-import LidoSRv3.Audit.Source.SolidityUint40Source
 import LidoSRv3.Audit.Source.SolidityPrimitiveUintSource
-import LidoSRv3.Audit.Source.SolidityCheckedSubSource
-import LidoSRv3.Audit.Source.SolidityCheckedAddSource
-import LidoSRv3.Audit.Source.SolidityCheckedMulSource
-import LidoSRv3.Audit.Source.SolidityMinSource
 import LidoSRv3.Audit.Source.SRAllocationConstantsSource
-import LidoSRv3.Audit.Source.ConsolidationBatchSizeSource
-import LidoSRv3.Audit.Source.Topup2Uint64BoundsSource
-import LidoSRv3.Audit.Source.Topup2SumNoWrapSource
-import LidoSRv3.Audit.Source.Topup2NKeyNoWrapSource
-import LidoSRv3.Audit.Source.Topup2ExactCapSource
-import LidoSRv3.Audit.Source.Topup2PerAllocGuardSource
-import LidoSRv3.Audit.Source.ModuleReturnGuardSource
-import LidoSRv3.Audit.Source.Topup2RoundingSource
-import LidoSRv3.Audit.Source.Topup2MinClampSource
-import LidoSRv3.Audit.Source.ConsolidationMsgValueSource
-import LidoSRv3.Audit.Source.StETHGuardOrderSource
-import LidoSRv3.Audit.Source.ClaimGuardOrderSource
-import LidoSRv3.Audit.Source.ConsolidationFeeMsgValueComposition
-import LidoSRv3.Audit.Source.ConsolidationCompositeGateSource
 import LidoSRv3.Audit.Source.Topup1CompositeGateSource
 import LidoSRv3.Audit.Source.Reserve1CompositeGateSource
-import LidoSRv3.Audit.Source.Address1CompositeGuardSource
-import LidoSRv3.Audit.Source.Deposit1CompositeGateSource
-import LidoSRv3.Audit.Source.Topup2CompositeGuardSource
 import LidoSRv3.Audit.Source.Alloc1CompositeBoundsSource
-import LidoSRv3.Audit.Source.Sha256OpacitySource
-import LidoSRv3.Audit.Source.BeaconRootsEip4788Source
-import LidoSRv3.Audit.Source.SszGindexSource
-import LidoSRv3.Audit.Source.SszVerifyProofSource
-import LidoSRv3.Audit.Source.SszValidatorHashTreeRootSource
-import LidoSRv3.Audit.Source.SszListRootSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -1389,6 +1338,15 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PReserveRelational.verity_reserve_slot_is_not_read
 #print axioms LidoSRv3.Audit.Guarantees.PReserveRelational.verity_reserve_does_not_change_finalization
 #print axioms LidoSRv3.Audit.Guarantees.PReserveRelational.verity_revert_restores_snapshot
+-- Chantier 1 (Thomas 2026-09-13): the registered ABSTRACT parent for
+-- P-SSZ-1 is now `real_validator_correspondence`, whose statement names
+-- the pinned 8-leaf Validator layout, the fork-aware gindex choice, the
+-- verifyProof / foldPath equivalence, and the EIP-4788 anchor identity.
+-- The previous `deposit_root_iff` Nat.pair gadget stays as an
+-- unregistered child (still #print axioms'd for kernel evidence).
+#print axioms LidoSRv3.Audit.Guarantees.PSsz1.real_validator_correspondence
+#print axioms LidoSRv3.Audit.Guarantees.PSsz1.real_validator_correspondence_witness
+#print axioms LidoSRv3.Audit.Guarantees.PSsz1.real_validator_correspondence_mutant_target_refutes_parent
 #print axioms LidoSRv3.Audit.Guarantees.PSsz1.deposit_root_iff
 #print axioms LidoSRv3.Audit.Guarantees.PSsz1.deposit_unique_of_perfect
 #print axioms LidoSRv3.Audit.Guarantees.PSsz1.sourceNode_mutant_kill_line_refutes_parent
