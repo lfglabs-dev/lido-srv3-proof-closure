@@ -1,6 +1,7 @@
 import LidoSRv3.Audit.Source.ReserveCorrespondence
 import LidoSRv3.Audit.Source.ReserveFreshCacheFromWQ
 import LidoSRv3.Audit.Source.ReservePackedBufferSource
+import LidoSRv3.Audit.Source.ReservePayableCallSource
 import LidoSRv3.Audit.Guarantees.Registry
 
 namespace LidoSRv3.Audit.Guarantees.PReserve1
@@ -162,6 +163,60 @@ theorem source_spend_preserves_withdrawal_reserve_under_packed_buffer_shape
   -- value at the ENUNCE level is unchanged — the ENUNCE now records
   -- WHERE this value comes from (the low half of a packed uint256),
   -- which is the D-PACK-1 disclosure.
+  source_spend_preserves_withdrawal_reserve inputs before after amount live hfresh h
+
+/-- **Chantier 2 (Piste A, Thomas 2026-09-13) D-TRANSFER-1 payable-CALL
+naming bridge.**
+
+Restates `source_spend_preserves_withdrawal_reserve` with an added
+premise naming the pinned Lido.sol:885 payable-CALL frame
+`stakingRouter.receiveDepositableEther.value(_amount)()`.  Callers
+must supply a `stakingRouterAddr : Nat` and a
+`selectorPrefix : Nat` (bytes4(keccak256("receiveDepositableEther()")))
+plus the `amount : Word` already consumed by the parent, and the
+bridge names the expected payable-CALL frame at the pinned call site
+as
+`ReservePayableCallSource.receiveDepositableEtherFrame stakingRouterAddr amount.toNat selectorPrefix`.
+
+Discloses the Grok #419 D-TRANSFER-1 divergence at the parent's
+ENUNCE level: `modelWithdrawDepositableEther` updates reserve words
+only; the Verity plane's journal does NOT contain the payable CALL
+that pinned Solidity emits after the spend writes at line 885.  The
+bridge NAMES the pinned CALL frame (target = StakingRouter proxy,
+value = _amount, selector = 4-byte
+`bytes4(keccak256("receiveDepositableEther()"))`, empty calldata
+tail) as a source-level `PayableCallFrame`; downstream consumers of
+the Verity Reserve journal can compare their frame against the
+named pinned shape.
+
+**This is a NAMING composition, not a full closure of D-TRANSFER-1.**
+The Verity model's actual `withdrawWithGuards` journal still omits
+the payable CALL; disclosing the pinned frame's shape via the ENUNCE
+records what the executable-plane extension will have to journal
+when the model is extended.  The `withdrawalPartitionSpendInvariant`
++ `liveEffectiveWithdrawalsReserve` conclusions of the registered
+parent are unchanged. -/
+theorem source_spend_preserves_withdrawal_reserve_under_payable_call_shape
+    (inputs : WithdrawInputs) (before after : ReserveState) (amount live : Word)
+    (stakingRouterAddr selectorPrefix : Nat)
+    (_hPinnedFrame :
+      (LidoSRv3.Audit.Source.ReservePayableCallSource.receiveDepositableEtherFrame
+        stakingRouterAddr (amount : Nat) selectorPrefix).target = stakingRouterAddr ∧
+      (LidoSRv3.Audit.Source.ReservePayableCallSource.receiveDepositableEtherFrame
+        stakingRouterAddr (amount : Nat) selectorPrefix).value = (amount : Nat) ∧
+      (LidoSRv3.Audit.Source.ReservePayableCallSource.receiveDepositableEtherFrame
+        stakingRouterAddr (amount : Nat) selectorPrefix).calldata = [])
+    (hfresh : freshQueueCache before live)
+    (h : modelWithdrawDepositableEther inputs before amount = .committed after) :
+    scopedWithdrawGuards inputs ∧
+      amount ≠ 0 ∧
+      withdrawalPartitionSpendInvariant before after amount ∧
+      liveEffectiveWithdrawalsReserve after live = liveEffectiveWithdrawalsReserve before live :=
+  -- The pinned-frame premise names the pinned Solidity payable-CALL
+  -- frame at `Lido.sol:885`; the proof delegates to the registered
+  -- parent since the model's spend-word transition is unchanged —
+  -- the ENUNCE now records the pinned CALL shape the model omits
+  -- (D-TRANSFER-1 disclosure).
   source_spend_preserves_withdrawal_reserve inputs before after amount live hfresh h
 
 /--
