@@ -1558,14 +1558,17 @@ theorem committed_preserves_eth_balance_slotFree
 
 /-! ## Kill-line mutants (not source)
 
-Model mutants for the value-plane kill-lines. `addRequestsValueBlind` keeps the frame-entry payable credit and the
-journaled CALL frames but drops the per-CALL debit — exactly the pre-lift
-stub behavior ("success stubs move no wei"). `addRequestsDoubleDebit`
-debits twice the journaled value per CALL. `addRequestsJournalValueBlind`
-debits honestly but journals each frame with value `0`. None of these is
-the model of record; they exist so the kill-lines in
-`Tests/ConsolidationTxMutants.lean` can refute `preservesEthBalance` and
-exact forwarding on mutants of this model. -/
+Model mutants for the value-plane kill-lines, targeting the slot-free
+registered parents (`verity_tx_journal_forwards_msg_value` and
+`verity_tx_preserves_eth_balance` on `addRequestsSlotFree`, after
+chantier 2 PR #646). `addRequestsValueBlindSlotFree` keeps the
+frame-entry payable credit and the journaled CALL frames but drops
+the per-CALL debit. `addRequestsDoubleDebitSlotFree` debits twice the
+journaled value per CALL. `addRequestsJournalValueBlindSlotFree`
+debits honestly but journals each frame with value `0`. None of
+these is the model of record; they exist so the kill-lines in
+`Tests/ConsolidationTxMutants.lean` can refute `preserves_eth_balance`
+and exact forwarding on mutants of this model. -/
 
 def forwardCallsDouble (state : ContractState) : List CallObs → ContractState
   | [] => state
@@ -1575,38 +1578,6 @@ def forwardCallsDouble (state : ContractState) : List CallObs → ContractState
 
 def toJournalValueBlind (c : CallObs) : ExternalCall :=
   { toJournal c with value := 0 }
-
-def persistPlain (start : Nat) (obs : Observables) (state : ContractState) :
-    ContractState :=
-  let dirty := writePayloads start obs.payloads state
-  let dirty := (dirty.writeSlot countSlot
-      (Verity.Core.Uint256.ofNat (start + obs.requestCount)))
-    |>.writeSlot feePaidSlot obs.feePaid
-  { dirty with
-    events := dirty.events ++ obs.events.map toEvent
-    calls := dirty.calls ++ obs.calls.map toJournal }
-
-def persistDoubleDebit (start : Nat) (obs : Observables)
-    (state : ContractState) : ContractState :=
-  let dirty := writePayloads start obs.payloads state
-  let dirty := (dirty.writeSlot countSlot
-      (Verity.Core.Uint256.ofNat (start + obs.requestCount)))
-    |>.writeSlot feePaidSlot obs.feePaid
-  let dirty := forwardCallsDouble dirty obs.calls
-  { dirty with
-    events := dirty.events ++ obs.events.map toEvent
-    calls := dirty.calls ++ obs.calls.map toJournal }
-
-def persistJournalValueBlind (start : Nat) (obs : Observables)
-    (state : ContractState) : ContractState :=
-  let dirty := writePayloads start obs.payloads state
-  let dirty := (dirty.writeSlot countSlot
-      (Verity.Core.Uint256.ofNat (start + obs.requestCount)))
-    |>.writeSlot feePaidSlot obs.feePaid
-  let dirty := forwardCalls dirty obs.calls
-  { dirty with
-    events := dirty.events ++ obs.events.map toEvent
-    calls := dirty.calls ++ obs.calls.map toJournalValueBlind }
 
 /-- Common skeleton of the value-plane mutants: same decode, same
 `sourceRun` decision tree, same entry credit; only `persistFn` differs. -/
@@ -1633,15 +1604,6 @@ def addRequestsWith
             (persistFn (snapshot.readSlot countSlot).val obs
               (credited snapshot inputs))
   | _, _, _, _ => .revert "MEMORY_ARRAY_DECODE" snapshot
-
-def addRequestsValueBlind (inputs : Inputs) : Contract Result :=
-  addRequestsWith persistPlain inputs
-
-def addRequestsDoubleDebit (inputs : Inputs) : Contract Result :=
-  addRequestsWith persistDoubleDebit inputs
-
-def addRequestsJournalValueBlind (inputs : Inputs) : Contract Result :=
-  addRequestsWith persistJournalValueBlind inputs
 
 /-! Chantier 2 (Thomas 2026-09-13, item c continuation) slot-free
 mutant variants. These match the `addRequestsSlotFree` companion
