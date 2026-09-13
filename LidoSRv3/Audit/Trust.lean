@@ -751,6 +751,10 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- consumer alias, exposing observeFromJournal_simulates_pinned_source
 -- under the guarantee namespace.
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidation1.verity_tx_simulates_consolidation_from_journal
+-- Chantier 2 (Thomas 2026-09-13): writePayloads invariance — the write
+-- side of the slot-independence claim (complement to
+-- observeFromJournal_success_slot_invariant on the read side).
+#print axioms LidoSRv3.Audit.Verity.ConsolidationTx.observeFromJournal_writePayloads_invariant
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.function_spec_bridge_constructors
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.committed_journal_forwards_msg_value
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.committed_preserves_eth_balance
