@@ -848,6 +848,9 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- names ACL role-check as a source function of ACLState.
 #print axioms LidoSRv3.Audit.Source.AragonACLSource.isAuthorizedRouter_true_of_role_granted
 #print axioms LidoSRv3.Audit.Source.AragonACLSource.isTopUpGatewayCaller_true_of_app_registered
+-- Second-step composition (2026-09-13): P-TOPUP-1 callerIsGatewayFromRead
+-- derived via the shared Aragon ACL source model.
+#print axioms LidoSRv3.Audit.Source.SRStorageSourceModel.callerIsGateway_derived_from_acl
 -- General rule (Thomas 2026-09-12) applied to P-CONSOLIDATION-ETH-1
 -- feePerRequest free Nat: naming scaffold PinnedFeeStaticcallShape
 -- names the pinned WithdrawalVaultEIP7685.sol:79-81 STATICCALL entry
