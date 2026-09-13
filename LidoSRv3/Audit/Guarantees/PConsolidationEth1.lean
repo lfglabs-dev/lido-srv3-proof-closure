@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Guarantees.Registry
+import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx
 import LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTxUniversal
 import LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTxUniversalRevert
@@ -496,23 +497,40 @@ Registry-facing Verity close: the universal funded success shape conjoined
 with executable rollback shapes at all four modeled non-success boundaries
 (zero value, wrapped product, underfunding, and dispatch-fuel exhaustion), both
 as the four exact numeral witnesses and — since Wave 6 — at full
-`∀`-quantifier strength via `UniversalRevertPartition`. -/
-theorem verity_tx_success_and_revert_partition (msgValue batchSize feePerRequest : Nat)
+`∀`-quantifier strength via `UniversalRevertPartition`.
+
+**Chantier 2 (Thomas 2026-09-13, item a) fee-STATICCALL wiring: statement
+change.** The per-request fee is no longer a free `Nat` input; the parent
+now consumes an `LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
+.PredeployStaticcallResult` and uses `result.abiDecodedFee` as the
+per-request fee. This wires the pinned Solidity fee source
+(`WithdrawalVaultEIP7685.sol:79-93`,
+`_getFeeFromContract(CONSOLIDATION_REQUEST)`) into the registered Verity
+parent's statement directly: a caller composing the parent must supply a
+`PredeployStaticcallResult` naming the EIP-7251 predeploy STATICCALL
+return, not an arbitrary Nat. The proof is unchanged — `result.abiDecodedFee`
+is still a `Nat`, so the underlying frame-by-frame chaining through
+`Verity.PConsolidationEth1CompositionTxUniversal.run_success_shape` and
+`Verity.PConsolidationEth1CompositionTxUniversalRevert` carries. -/
+theorem verity_tx_success_and_revert_partition
+    (msgValue batchSize : Nat)
+    (result : _root_.LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.PredeployStaticcallResult)
     (hpos : 0 < msgValue)
     (hmv : msgValue < _root_.Verity.Core.Uint256.modulus)
     (hnM : batchSize < _root_.Verity.Core.Uint256.modulus)
-    (hfee : feePerRequest < _root_.Verity.Core.Uint256.modulus)
-    (hnf : batchSize * feePerRequest < _root_.Verity.Core.Uint256.modulus)
-    (hle : batchSize * feePerRequest ≤ msgValue)
+    (hfee : result.abiDecodedFee < _root_.Verity.Core.Uint256.modulus)
+    (hnf : batchSize * result.abiDecodedFee <
+      _root_.Verity.Core.Uint256.modulus)
+    (hle : batchSize * result.abiDecodedFee ≤ msgValue)
     (hfuel : batchSize + 4 ≤ fuelBudget) :
-    UniversalSuccessShape msgValue batchSize feePerRequest ∧
+    UniversalSuccessShape msgValue batchSize result.abiDecodedFee ∧
       RevertsOnZeroValue ∧
       RevertsOnWrappedFee ∧
       RevertsOnUnderfunding ∧
       ExhaustsFuelAndRollsBack ∧
       UniversalRevertPartition := by
-  refine ⟨verity_tx_universal_success_shape msgValue batchSize feePerRequest
-    hpos hmv hnM hfee hnf hle hfuel, ?_⟩
+  refine ⟨verity_tx_universal_success_shape msgValue batchSize
+    result.abiDecodedFee hpos hmv hnM hfee hnf hle hfuel, ?_⟩
   obtain ⟨h1, h2, h3, h4⟩ := honest_revert_partition
   exact ⟨h1, h2, h3, h4, verity_tx_universal_revert_partition⟩
 
