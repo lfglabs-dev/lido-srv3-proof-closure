@@ -860,6 +860,9 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- WithdrawalQueue mapping decoders.
 #print axioms LidoSRv3.Audit.Source.KeccakMappingStorageSource.read_eq
 #print axioms LidoSRv3.Audit.Source.KeccakMappingStorageSource.decodeField_eq
+-- Third-step composition (2026-09-13): P-RESERVE-1 isStakingPaused via
+-- packed StakeLimitStruct decoder consuming the shared PackedSlotDecoder.
+#print axioms LidoSRv3.Audit.Source.LidoStakingStateStorage.isStakingPaused_false_of_bit_zero
 -- General rule (Thomas 2026-09-12) applied to P-CONSOLIDATION-ETH-1
 -- feePerRequest free Nat: naming scaffold PinnedFeeStaticcallShape
 -- names the pinned WithdrawalVaultEIP7685.sol:79-81 STATICCALL entry

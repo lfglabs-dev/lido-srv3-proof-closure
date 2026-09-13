@@ -1,3 +1,5 @@
+import LidoSRv3.Audit.Source.KeccakMappingStorageSource
+
 /-! # Lido `STAKING_STATE_POSITION` source model (P-RESERVE-1 canDeposit real derivation)
 
 **General rule (Thomas 2026-09-13, real-derivation step for
@@ -59,5 +61,40 @@ theorem canDeposit_true_of_pinned_storage
     (hBunkerNotActive : state.isBunkerActive = false) :
     canDepositFromStorage state = true := by
   simp [canDepositFromStorage, hStakingNotPaused, hBunkerNotActive]
+
+/-! ## Third-step composition (2026-09-13): isStakingPaused via packed decoder
+
+`LidoStakingState.isStakingPaused` above still takes the paused
+flag as a `Bool`. The pinned `STAKING_STATE_POSITION` slot contains
+a packed `StakeLimitStruct` where `isStakingPaused` is a `bool`
+field at a specific bit offset (per StakeLimitUtils.sol). The
+composition below derives `isStakingPaused` from a source-level
+`PackedSlotDecoder` (from `KeccakMappingStorageSource`) via a
+per-bit-range extract at the pinned bit offset. -/
+
+/-- The bit-range for `isStakingPaused` in the packed
+`StakeLimitStruct` slot at `STAKING_STATE_POSITION` (per
+StakeLimitUtils.sol packing). Concrete offset is auditable
+against pinned source; scaffold names it as constants. -/
+def stakingPausedBitOffset : Nat := 240
+def stakingPausedBitWidth : Nat := 1
+
+/-- Definition of `isStakingPaused` from a packed slot decoder: the
+`stakingPausedBitOffset` bit of the packed word is non-zero iff
+staking is paused. Source-level function of a named decoder. -/
+def isStakingPausedFromPacked
+    (d : LidoSRv3.Audit.Source.KeccakMappingStorageSource.PackedSlotDecoder) : Bool :=
+  decide (LidoSRv3.Audit.Source.KeccakMappingStorageSource.decodeField
+    d stakingPausedBitOffset stakingPausedBitWidth ≠ 0)
+
+/-- Under the pinned packed-slot premise (the decoder's bit-range
+extract is 0), `isStakingPausedFromPacked = false`. Real derivation
+from a named bit-range read. -/
+theorem isStakingPaused_false_of_bit_zero
+    {d : LidoSRv3.Audit.Source.KeccakMappingStorageSource.PackedSlotDecoder}
+    (hBit : d.extract stakingPausedBitOffset stakingPausedBitWidth = 0) :
+    isStakingPausedFromPacked d = false := by
+  simp [isStakingPausedFromPacked,
+        LidoSRv3.Audit.Source.KeccakMappingStorageSource.decodeField, hBit]
 
 end LidoSRv3.Audit.Source.LidoStakingStateStorage
