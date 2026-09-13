@@ -762,6 +762,10 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- writePayloads from persist.
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.persist_calls_eq_persistSlotFree_calls
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.persist_events_eq_persistSlotFree_events
+-- Slot-free executable transaction: addRequestsSlotFree is a definitional
+-- companion to addRequests that uses persistSlotFree. Downstream
+-- consumers wanting a slot-free tx have this available today.
+#check LidoSRv3.Audit.Verity.ConsolidationTx.addRequestsSlotFree
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.function_spec_bridge_constructors
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.committed_journal_forwards_msg_value
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.committed_preserves_eth_balance
