@@ -230,10 +230,10 @@
         "command": "lake build LidoSRv3.Audit.Guarantees.PAccount1 LidoSRv3.Audit.Verity.HandleOracleReportTx LidoSRv3.Tests.HandleOracleReportTxMutants",
         "expected": "mint-after-read discipline over clock-stamped balance-write/read/mint ticks, with its pure call-site reordering kill-line on a valid nonempty report, plus the handleOracleReport-shaped Contract.run transaction and mutants"
       },
-      "summary": "mint_after_read_discipline: on every committed modeled handleOracleReport, rewardsReadSlot is stamped before any nonzero rewardsMintedSlot. mint_order_kill_line refutes the same predicate on a pure call-site-reordering mutant. The demoted source_report_before_reward child now uses premise-free sourceTraceRetired; legacy fullReportSucceeds APIs remain compatibility adapters and carry no registered load-bearing premise. Not submitReportData; sharesToMintAsFees is an argument.",
+      "summary": "Chantier 3 (mandate 2026-09-13) upgrades the registered ABSTRACT parent from mint_after_read_discipline (read→mint ordering only) to router_accounting_order_discipline, the conjunction of write-router-before-read and read-before-mint over the same handleOracleReport transaction. On every committed modeled handleOracleReport: (1) the AccountingOracle.submitReportData validator-balances push through StakingRouter.reportValidatorBalancesByStakingModule (AccountingOracle.sol:513-517) is stamped strictly before Accounting.handleOracleReport's _stakingRouter.getStakingRewardsDistribution() read (Accounting.sol:277) — the write-router-before-read conjunct is the deployed risk Thomas 2026-09-13 flagged as the real ordering, not just read→mint; (2) the rewardsReadSlot tick is stamped strictly before any nonzero rewardsMintedSlot tick — mint_after_read_discipline is kept as an unregistered sub-theorem of the combined parent. Both are refuted by pure call-site reordering mutants: write_router_before_read_kill_line (handleOracleReportReadBeforeWrite moves stampStep balancesWrittenSlot below stampStep rewardsReadSlot) and mint_order_kill_line (handleOracleReportMintBeforeRead moves stampStep rewardsMintedSlot above stampStep rewardsReadSlot). The demoted source_report_before_reward child now uses premise-free sourceTraceRetired; legacy fullReportSucceeds APIs remain compatibility adapters and carry no registered load-bearing premise. Not submitReportData; sharesToMintAsFees is an argument.",
       "abstract": {
         "status": "CHECKED",
-        "theorem": "LidoSRv3.Audit.Guarantees.PAccount1.mint_after_read_discipline"
+        "theorem": "LidoSRv3.Audit.Guarantees.PAccount1.router_accounting_order_discipline"
       },
       "verity": {
         "status": "CHECKED",
@@ -241,7 +241,8 @@
       },
       "fidelity": {
         "covered": [
-          "mint-after-read order discipline over the two raw tx-storage ticks, which are stamped from a transaction-local step clock rather than written as call-site constants, refuted on the registered parent itself by a pure call-site reordering kill-line mutant that edits no literal and rebinds no slot",
+          "chantier 3 (mandate 2026-09-13): registered abstract parent router_accounting_order_discipline conjoins two orderings on the same handleOracleReport transaction — (a) write_router_before_read_discipline (balancesWrittenSlot tick < rewardsReadSlot tick when read is nonzero; AccountingOracle.sol:513-517 → Accounting.sol:277 ordering), and (b) mint_after_read_discipline (rewardsReadSlot tick < rewardsMintedSlot tick when mint is nonzero). The write-before-read conjunct is Thomas 2026-09-13's real-risk ordering (getStakingRewardsDistribution must read the just-written router snapshot, not stale weights); mint-after-read is retained as unregistered sub-theorem. Two pure call-site reordering kill-lines refute each conjunct on mutant handleOracleReports whose only change is the position of one stampStep call: write_router_before_read_kill_line (handleOracleReportReadBeforeWrite) and mint_order_kill_line (handleOracleReportMintBeforeRead).",
+          "mint-after-read order discipline over the two raw tx-storage ticks, which are stamped from a transaction-local step clock rather than written as call-site constants, refuted on the sub-theorem itself by a pure call-site reordering kill-line mutant that edits no literal and rebinds no slot",
           "balance-write, accounting, rewards-read, and rewards-minted steps are clock-stamped; storedSteps requires the balance-write tick instead of hard-coding balancesWritten",
           "the reordering mutant's flags remain present but their exact ticks expose the reversed mint/read order",
           "independent tx storage-flag ticks for Result.steps/View.steps with no successfulSteps bridge",
@@ -262,9 +263,9 @@
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Keep the checked mint-after-read discipline theorem and its call-site-reordering kill-line as the registered parent, and keep the step ticks sourced from the sequenceSlot clock rather than from call-site constants; keep source_report_before_reward as the demoted source-plane child. Do not widen to submitReportData."
+        "work": "Keep the checked router_accounting_order_discipline theorem (write-router-before-read AND mint-after-read conjunction) and its two call-site-reordering kill-lines as the registered abstract parent, and keep the step ticks sourced from the sequenceSlot clock rather than from call-site constants; keep source_report_before_reward as the demoted source-plane child. Do not widen to submitReportData."
       },
-      "next_gate": "fullReportSucceeds is retired from the demoted child; OPEN: model later full-report failure surfaces only if widening is explicitly authorized. Keep mint-after-read parent; do not widen to submitReportData.",
+      "next_gate": "Chantier 3 (Thomas 2026-09-13) upgrades the registered abstract parent to router_accounting_order_discipline (write-router-before-read AND read-before-mint), naming the real deployed risk AccountingOracle.sol:513-517 → Accounting.sol:277. Both conjuncts are refuted by pure call-site reordering kill-lines. fullReportSucceeds is retired from the demoted child; OPEN: model later full-report failure surfaces only if widening is explicitly authorized. Do not widen to submitReportData.",
       "roadmap_priority": "DONE"
     },
     {
