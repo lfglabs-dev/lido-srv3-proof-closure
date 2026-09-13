@@ -116,6 +116,7 @@ import LidoSRv3.Audit.Source.ReservePayableCallSource
 import LidoSRv3.Audit.Source.ReservePackedBufferSource
 import LidoSRv3.Audit.Source.ReserveSeedBookkeepingSource
 import LidoSRv3.Audit.Source.Topup2PrefixGuardsSource
+import LidoSRv3.Audit.Source.Topup2ConsumeAndUnitsSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -1023,6 +1024,12 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.Topup2PrefixGuardsSource.wcIsType2_true_of_eq
 #print axioms LidoSRv3.Audit.Source.Topup2PrefixGuardsSource.pubkeyLengthOk_true_of_empty
 #print axioms LidoSRv3.Audit.Source.Topup2PrefixGuardsSource.validatorCountAtMost_true_of_le
+-- Thirty-sixth-step (2026-09-13): TOPUP-2 D-CONSUME-1/D-UNITS-1/D-TOTAL-1/D-SLASH-1 source models.
+#print axioms LidoSRv3.Audit.Source.Topup2ConsumeAndUnitsSource.evaluateTopUpLimit_eq
+#print axioms LidoSRv3.Audit.Source.Topup2ConsumeAndUnitsSource.gweiToWei_eq
+#print axioms LidoSRv3.Audit.Source.Topup2ConsumeAndUnitsSource.totalLimitsAccum_nil
+#print axioms LidoSRv3.Audit.Source.Topup2ConsumeAndUnitsSource.slashOrExitToZero_zero_of_flag
+#print axioms LidoSRv3.Audit.Source.Topup2ConsumeAndUnitsSource.slashOrExitToZero_preserves_of_not_flag
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape
