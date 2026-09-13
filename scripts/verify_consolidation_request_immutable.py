@@ -33,6 +33,14 @@ ROOT = Path(__file__).resolve().parent.parent
 FIXTURE = ROOT / "fixtures/deployed/WithdrawalVault-impl-runtime.bin"
 ARTIFACTS = ROOT / "audit/artifacts.lock.json"
 
+# Pure-Python keccak256 shared with scripts/check_deployed_code.py: EIP-1052
+# EXTCODEHASH uses Keccak-256, not SHA3-256 (padding differs). Track-C
+# chantier-4 provenance addition (Thomas 2026-09-13) records the on-chain
+# codehash alongside the fixture SHA-256 so a caller can reproduce the
+# EXTCODEHASH check via any Ethereum RPC.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from check_deployed_code import keccak256  # noqa: E402
+
 
 def die(msg: str) -> "None":
     print(f"verify_consolidation_request_immutable: {msg}", file=sys.stderr)
@@ -92,6 +100,22 @@ def main() -> None:
             f"fixture length mismatch: got {len(fixture_bytes)}, expected {entry['fixture_size_bytes']}"
         )
 
+    # Chantier 4 (Thomas 2026-09-13) codehash provenance check: recompute
+    # keccak256(fixture) and compare to the recorded EIP-1052 EXTCODEHASH.
+    expected_codehash = entry.get("fixture_codehash_keccak256")
+    if not expected_codehash:
+        die("audit/artifacts.lock.json entry missing fixture_codehash_keccak256")
+    actual_codehash = keccak256(fixture_bytes).hex()
+    if actual_codehash != expected_codehash:
+        die(
+            f"fixture keccak256 mismatch: got {actual_codehash}, "
+            f"expected {expected_codehash}"
+        )
+    print(
+        f"fixture codehash keccak256 = {actual_codehash} "
+        "(EIP-1052 EXTCODEHASH of the deployed runtime bytecode)"
+    )
+
     # Extract every recorded immutable and print / verify.
     for extraction in entry["immutable_extractions"]:
         offset = extraction["byte_offset"]
@@ -119,7 +143,13 @@ def main() -> None:
                 f"live deployed bytecode SHA-256 diverged from fixture: "
                 f"got {live_sha}, fixture {expected_sha}"
             )
-        print(f"live re-verification (via {rpc_url}): OK")
+        live_codehash = keccak256(live).hex()
+        if live_codehash != expected_codehash:
+            die(
+                f"live EIP-1052 codehash diverged from fixture: "
+                f"got {live_codehash}, fixture {expected_codehash}"
+            )
+        print(f"live re-verification (via {rpc_url}): OK (codehash {live_codehash})")
     else:
         print("live re-verification skipped (set ETH_RPC_URL to enable)")
 

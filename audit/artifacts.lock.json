@@ -57,6 +57,8 @@
       "fixture_path": "fixtures/deployed/WithdrawalVault-impl-runtime.bin",
       "fixture_size_bytes": 5088,
       "fixture_sha256": "a3e9e582928d58cdfe87a6405ad1a7967f720cafa97f98ae8d619e36b961aa7f",
+      "fixture_codehash_keccak256": "d1e0d1b48e4f5abd04bdfd14805366f0cf7946b7bb41b7a5ad8652361f3e3d36",
+      "codehash_note": "keccak256 of the fixture runtime bytecode; this is the EIP-1052 EXTCODEHASH value that Ethereum RPC eth_getCode against the implementation address produces at any block where the code has not been upgraded. Verified by scripts/verify_consolidation_request_immutable.py.",
       "immutable_extractions": [
         {
           "immutable_name": "CONSOLIDATION_REQUEST",
@@ -76,6 +78,8 @@
       "fixture_path": "fixtures/deployed/StakingRouter-impl-runtime.bin",
       "fixture_size_bytes": 21087,
       "fixture_sha256": "c30ed4e63cb0a57dca577484afff0765fcaa9840d75b440067fd55c7d4fc7013",
+      "fixture_codehash_keccak256": "9cd5d45ddde5f74d3867aa22c98fd79a85df89d202145bc588173d92e00600ec",
+      "codehash_note": "keccak256 of the fixture runtime bytecode; this is the EIP-1052 EXTCODEHASH value that Ethereum RPC eth_getCode against the implementation address produces at any block where the code has not been upgraded. Verified by scripts/verify_beacon_deposit_immutable.py and scripts/verify_deposit_thirty_two_ether.py.",
       "immutable_extractions": [
         {
           "immutable_name": "DEPOSIT_CONTRACT (aka top-up beacon deposit target)",
