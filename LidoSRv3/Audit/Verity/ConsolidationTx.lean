@@ -1141,51 +1141,6 @@ theorem addRequests_isSuccess_eq_addRequestsSlotFree_isSuccess
     · simp only [if_neg hFail]; rfl
   · simp only [if_neg hCredit]
 
-/-- **Chantier 2 (Thomas 2026-09-13) full `observeFromJournal`-level
-equivalence.** Discharges the bundled observation-plane equality:
-`observeFromJournal snapshot (addRequests inputs f snapshot)` equals
-`observeFromJournal snapshot (addRequestsSlotFree inputs f snapshot)`
-on every input. Proof composes:
-- `addRequests_isSuccess_eq_addRequestsSlotFree_isSuccess` (outcome tag),
-- `addRequests_snd_calls_eq_addRequestsSlotFree_snd_calls` (calls),
-- `addRequests_snd_events_eq_addRequestsSlotFree_snd_events` (events),
-- `addRequests_snd_readSlot_eq_addRequestsSlotFree_snd_readSlot` (count/fee),
-so on the shared success arm the two `View` records have identical
-fields; on the shared revert arm both reduce to the constant
-`⟨.reverted, [], [], [], snapshot.readSlot countSlot, 0⟩`. -/
-theorem observeFromJournal_addRequests_eq_observeFromJournal_addRequestsSlotFree
-    (inputs : Inputs) (failAfterWrites : Bool) (snapshot : ContractState) :
-    observeFromJournal snapshot (addRequests inputs failAfterWrites snapshot) =
-    observeFromJournal snapshot (addRequestsSlotFree inputs failAfterWrites snapshot) := by
-  have hSucc := addRequests_isSuccess_eq_addRequestsSlotFree_isSuccess
-    inputs failAfterWrites snapshot
-  have hCalls := addRequests_snd_calls_eq_addRequestsSlotFree_snd_calls
-    inputs failAfterWrites snapshot
-  have hEvents := addRequests_snd_events_eq_addRequestsSlotFree_snd_events
-    inputs failAfterWrites snapshot
-  have hReadSlot := fun slot =>
-    addRequests_snd_readSlot_eq_addRequestsSlotFree_snd_readSlot
-      inputs failAfterWrites snapshot slot
-  rcases hL : addRequests inputs failAfterWrites snapshot with ⟨rL, stateL⟩ | ⟨reasonL, stateL⟩
-  · rcases hR : addRequestsSlotFree inputs failAfterWrites snapshot
-      with ⟨rR, stateR⟩ | ⟨reasonR, stateR⟩
-    · rw [hL, hR] at hCalls hEvents hReadSlot
-      simp only [ContractResult.snd_success] at hCalls hEvents hReadSlot
-      have hCount := hReadSlot countSlot
-      have hFee := hReadSlot feePaidSlot
-      simp only [observeFromJournal]
-      congr 1
-      · rw [hCalls]
-      · rw [hEvents]
-      · rw [hCalls]
-    · rw [hL, hR] at hSucc
-      simp [ContractResult.isSuccess] at hSucc
-  · rcases hR : addRequestsSlotFree inputs failAfterWrites snapshot
-      with ⟨rR, stateR⟩ | ⟨reasonR, stateR⟩
-    · rw [hL, hR] at hSucc
-      simp [ContractResult.isSuccess] at hSucc
-    · rfl
-
 theorem persist_calls (start : Nat) (obs : Observables) (state : ContractState) :
     (persist start obs state).calls = state.calls ++ obs.calls.map toJournal := by
   unfold persist
@@ -1518,37 +1473,6 @@ theorem revert_restores_snapshot_slotFree
   unfold Contract.run at h
   split at h <;> simp_all
 
-/-- **Chantier 2 (Thomas 2026-09-13) `Contract.run`-level slot-free
-observation equivalence.** Lifts
-`observeFromJournal_addRequests_eq_observeFromJournal_addRequestsSlotFree`
-through `Contract.run`'s revert-rollback semantics. On the success arm
-`Contract.run c s = c s` verbatim; on the revert arm `Contract.run c s`
-substitutes `s` for the reverted-state field, but `observeFromJournal`
-on `.revert _ _` returns the constant `⟨.reverted, [], [], [], s.readSlot
-countSlot, 0⟩` regardless of the carried state — so the revert-side
-rewriting is invisible to `observeFromJournal`. Both cases follow from
-the raw-application equivalence. -/
-theorem observeFromJournal_run_addRequests_eq_observeFromJournal_run_addRequestsSlotFree
-    (inputs : Inputs) (state : ContractState) :
-    observeFromJournal state ((addRequests inputs).run state) =
-    observeFromJournal state ((addRequestsSlotFree inputs).run state) := by
-  unfold Contract.run
-  have hRaw := observeFromJournal_addRequests_eq_observeFromJournal_addRequestsSlotFree
-    inputs false state
-  have hSucc := addRequests_isSuccess_eq_addRequestsSlotFree_isSuccess
-    inputs false state
-  rcases hL : addRequests inputs false state with ⟨rL, stateL⟩ | ⟨reasonL, stateL⟩
-  · rcases hR : addRequestsSlotFree inputs false state with ⟨rR, stateR⟩ | ⟨reasonR, stateR⟩
-    · simp only []
-      rw [hL, hR] at hRaw
-      exact hRaw
-    · rw [hL, hR] at hSucc
-      simp [ContractResult.isSuccess] at hSucc
-  · rcases hR : addRequestsSlotFree inputs false state with ⟨rR, stateR⟩ | ⟨reasonR, stateR⟩
-    · rw [hL, hR] at hSucc
-      simp [ContractResult.isSuccess] at hSucc
-    · rfl
-
 private theorem addRequestsSlotFree_run_eq
     (inputs : Inputs) (state : ContractState)
     (hEntry : state.selfBalance.val + inputs.msgValue.val <
@@ -1641,14 +1565,17 @@ theorem persistSlotFree_read_fee (start : Nat) (obs : Observables)
   exact ContractState.readSlot_writeSlot_same _ feePaidSlot _
 
 /-- **Chantier 2 (Thomas 2026-09-13) slot-free simulation of the
-pinned source.** The slot-free companion transaction
-`addRequestsSlotFree` still simulates the pinned source at the
-`observeFromJournal` view — proved by chaining
-`observeFromJournal_run_addRequests_eq_observeFromJournal_run_addRequestsSlotFree`
-with the registered `observeFromJournal_simulates_pinned_source`.
-This is the retirement-completeness statement: the slot-free
-executable transaction produces the same slot-free observation as
-the pinned Solidity source under the same premises. -/
+pinned source — direct proof.** `addRequestsSlotFree` simulates the
+pinned source at the `observeFromJournal` view under the same premises
+as the pre-retirement `verity_tx_simulates_pinned_source`, proved
+**directly** via `addRequestsSlotFree_run_cases` + `persistSlotFree_calls` /
+`persistSlotFree_events` / `persistSlotFree_read_count` /
+`persistSlotFree_read_fee` + `sourceRun_committed_payloads_eq_call_inputs`
+(source-plane bridge), without routing through the pre-retirement
+`observe` / `addRequests` / `persist` / `writePayloads` / `readPayloads`
+scaffolding. This is the retirement-completeness statement: the
+slot-free executable transaction produces the same slot-free
+observation as the pinned Solidity source under the same premises. -/
 theorem observeFromJournal_simulates_pinned_source_slotFree
     (inputs : Inputs) (state : ContractState)
     (hCountBound : (state.readSlot countSlot).val + inputs.sources.length <
