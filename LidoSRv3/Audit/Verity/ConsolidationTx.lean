@@ -960,6 +960,48 @@ where
   writeSlot_events : ∀ (s : ContractState) (slot : Nat) (v : Word),
       (s.writeSlot slot v).events = s.events := fun _ _ _ => rfl
 
+/-- **Chantier 2 (Thomas 2026-09-13) `readSlot` agreement.** For any
+top-level `slot`, `(persist ...).readSlot slot = (persistSlotFree ...).readSlot slot`.
+`persist` differs from `persistSlotFree` only via `writePayloads`, which
+uses `writeMapUint` under nested map-storage. `writePayloads_readSlot`
+proves the top-level `readSlot` is invariant across `writePayloads`,
+so both variants produce the same top-level slot reads unconditionally.
+This is what makes `observeFromJournal`'s `countSlot`/`feePaidSlot`
+reads slot-free-safe. -/
+theorem persist_readSlot_eq_persistSlotFree_readSlot (start : Nat)
+    (obs : Observables) (state : ContractState) (slot : Nat) :
+    (persist start obs state).readSlot slot =
+    (persistSlotFree start obs state).readSlot slot := by
+  simp only [persist, persistSlotFree, readSlot_set_log,
+    forwardCalls_readSlot]
+  by_cases hFee : slot = feePaidSlot
+  · rw [hFee, ContractState.readSlot_writeSlot_same, ContractState.readSlot_writeSlot_same]
+  · rw [ContractState.readSlot_writeSlot_other _ (Ne.symm (fun h => hFee h.symm)),
+        ContractState.readSlot_writeSlot_other _ (Ne.symm (fun h => hFee h.symm))]
+    by_cases hCount : slot = countSlot
+    · rw [hCount, ContractState.readSlot_writeSlot_same, ContractState.readSlot_writeSlot_same]
+    · rw [ContractState.readSlot_writeSlot_other _ (Ne.symm (fun h => hCount h.symm)),
+          ContractState.readSlot_writeSlot_other _ (Ne.symm (fun h => hCount h.symm))]
+      exact writePayloads_readSlot _ _ _ _
+
+/-- **Chantier 2 (Thomas 2026-09-13) `selfBalance` agreement.**
+`persist_selfBalance` already gives the closed-form `foldl (- .value)`
+for `persist`. The proof for `persistSlotFree` is the same modulo the
+missing `writePayloads_selfBalance` step, which is trivially applicable
+either way — hence full equality. -/
+theorem persist_selfBalance_eq_persistSlotFree_selfBalance (start : Nat)
+    (obs : Observables) (state : ContractState) :
+    (persist start obs state).selfBalance =
+    (persistSlotFree start obs state).selfBalance := by
+  simp only [persist, persistSlotFree, forwardCalls_selfBalance,
+    writeSlot_selfBalance, writePayloads_selfBalance,
+    setLog_selfBalance]
+where
+  setLog_selfBalance : ∀ (s : ContractState) (evs : List Event)
+      (cs : List ExternalCall),
+      ({ s with events := evs, calls := cs }).selfBalance = s.selfBalance :=
+    fun _ _ _ => rfl
+
 /-- **Chantier 2 (Thomas 2026-09-13) `.snd.calls` equivalence between
 `addRequests` and `addRequestsSlotFree`.** Both transactions share the
 same guard structure (entry-credit bound, memory decode, `sourceRun`
@@ -1031,6 +1073,75 @@ theorem addRequests_snd_events_eq_addRequestsSlotFree_snd_events
       exact persist_events_eq_persistSlotFree_events _ _ _
     · simp only [if_neg hFail, ContractResult.snd_success]
       exact persist_events_eq_persistSlotFree_events _ _ _
+  · simp only [if_neg hCredit]
+
+/-- **Chantier 2 (Thomas 2026-09-13) transaction-level slot-agreement.**
+For every slot, the final `.snd.readSlot` of `addRequests` matches
+`addRequestsSlotFree`. On non-committed arms, both return
+`.revert reason snapshot` — same state. On the committed arm, both
+carry the persist(SlotFree) state whose `readSlot`s agree by
+`persist_readSlot_eq_persistSlotFree_readSlot`. -/
+theorem addRequests_snd_readSlot_eq_addRequestsSlotFree_snd_readSlot
+    (inputs : Inputs) (failAfterWrites : Bool) (snapshot : ContractState)
+    (slot : Nat) :
+    (addRequests inputs failAfterWrites snapshot).snd.readSlot slot =
+    (addRequestsSlotFree inputs failAfterWrites snapshot).snd.readSlot slot := by
+  unfold addRequests addRequestsSlotFree
+  by_cases hCredit : snapshot.selfBalance.val + inputs.msgValue.val < Verity.Core.Uint256.modulus
+  · simp only [if_pos hCredit]
+    rcases hA : readArray (credited snapshot inputs) "sources" sourcesBase inputs.sources.length
+      with _ | sources
+    · rfl
+    rcases hB : readArray (credited snapshot inputs) "targets" targetsBase inputs.targets.length
+      with _ | targets
+    · rfl
+    rcases hC : readArray (credited snapshot inputs) "sourceLens" sourceLensBase inputs.sourceLens.length
+      with _ | sourceLens
+    · rfl
+    rcases hD : readArray (credited snapshot inputs) "targetLens" targetLensBase inputs.targetLens.length
+      with _ | targetLens
+    · rfl
+    simp only []
+    rcases hSR : sourceRun _ with reason | obs
+    · rfl
+    by_cases hFail : failAfterWrites
+    · simp only [if_pos hFail, ContractResult.snd_revert]
+      exact persist_readSlot_eq_persistSlotFree_readSlot _ _ _ _
+    · simp only [if_neg hFail, ContractResult.snd_success]
+      exact persist_readSlot_eq_persistSlotFree_readSlot _ _ _ _
+  · simp only [if_neg hCredit]
+
+/-- **Chantier 2 (Thomas 2026-09-13) transaction-level `selfBalance`
+agreement.** Same structure as the `readSlot` variant, discharged by
+`persist_selfBalance_eq_persistSlotFree_selfBalance` on the committed
+arm. -/
+theorem addRequests_snd_selfBalance_eq_addRequestsSlotFree_snd_selfBalance
+    (inputs : Inputs) (failAfterWrites : Bool) (snapshot : ContractState) :
+    (addRequests inputs failAfterWrites snapshot).snd.selfBalance =
+    (addRequestsSlotFree inputs failAfterWrites snapshot).snd.selfBalance := by
+  unfold addRequests addRequestsSlotFree
+  by_cases hCredit : snapshot.selfBalance.val + inputs.msgValue.val < Verity.Core.Uint256.modulus
+  · simp only [if_pos hCredit]
+    rcases hA : readArray (credited snapshot inputs) "sources" sourcesBase inputs.sources.length
+      with _ | sources
+    · rfl
+    rcases hB : readArray (credited snapshot inputs) "targets" targetsBase inputs.targets.length
+      with _ | targets
+    · rfl
+    rcases hC : readArray (credited snapshot inputs) "sourceLens" sourceLensBase inputs.sourceLens.length
+      with _ | sourceLens
+    · rfl
+    rcases hD : readArray (credited snapshot inputs) "targetLens" targetLensBase inputs.targetLens.length
+      with _ | targetLens
+    · rfl
+    simp only []
+    rcases hSR : sourceRun _ with reason | obs
+    · rfl
+    by_cases hFail : failAfterWrites
+    · simp only [if_pos hFail, ContractResult.snd_revert]
+      exact persist_selfBalance_eq_persistSlotFree_selfBalance _ _ _
+    · simp only [if_neg hFail, ContractResult.snd_success]
+      exact persist_selfBalance_eq_persistSlotFree_selfBalance _ _ _
   · simp only [if_neg hCredit]
 
 theorem persist_calls (start : Nat) (obs : Observables) (state : ContractState) :
