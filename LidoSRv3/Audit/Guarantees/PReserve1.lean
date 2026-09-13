@@ -7,6 +7,7 @@ import LidoSRv3.Audit.Source.ERC7201StorageSlotSource
 import LidoSRv3.Audit.Source.SolidityUint128WrapSource
 import LidoSRv3.Audit.Source.ReserveSetTargetSource
 import LidoSRv3.Audit.Source.WithdrawalQueueFinalizeSource
+import LidoSRv3.Audit.Source.ReserveUpdateBufferedAllocationSource
 import LidoSRv3.Audit.Guarantees.Registry
 
 namespace LidoSRv3.Audit.Guarantees.PReserve1
@@ -555,5 +556,37 @@ theorem reserve_wq_finalize_monotone
     (LidoSRv3.Audit.Source.WithdrawalQueueFinalizeSource.finalize
         wqs finalizedAmount).unfinalizedStETH ≤ wqs.unfinalizedStETH :=
   LidoSRv3.Audit.Source.WithdrawalQueueFinalizeSource.finalize_monotone wqs finalizedAmount
+
+/-- Source-shaped report-time allocation-writer facts (PR #676). -/
+theorem reserve_update_buffered_allocation_preserves_reserve_fields
+    (state : ReserveState) (newBuffered newDepositedPostReport : Word) :
+    (LidoSRv3.Audit.Source.ReserveUpdateBufferedAllocationSource.updateBufferedEtherAllocation
+        state newBuffered newDepositedPostReport).storedDepositsReserve =
+      state.storedDepositsReserve ∧
+    (LidoSRv3.Audit.Source.ReserveUpdateBufferedAllocationSource.updateBufferedEtherAllocation
+        state newBuffered newDepositedPostReport).unfinalizedStETH = state.unfinalizedStETH :=
+  LidoSRv3.Audit.Source.ReserveUpdateBufferedAllocationSource.updateBufferedEtherAllocation_preserves_other_fields
+    state newBuffered newDepositedPostReport
+
+theorem reserve_update_buffered_allocation_writes_buffered
+    (state : ReserveState) (newBuffered newDepositedPostReport : Word) :
+    (LidoSRv3.Audit.Source.ReserveUpdateBufferedAllocationSource.updateBufferedEtherAllocation
+        state newBuffered newDepositedPostReport).buffered = newBuffered :=
+  LidoSRv3.Audit.Source.ReserveUpdateBufferedAllocationSource.updateBufferedEtherAllocation_buffered
+    state newBuffered newDepositedPostReport
+
+theorem reserve_update_buffered_allocation_writes_deposited_post_report
+    (state : ReserveState) (newBuffered newDepositedPostReport : Word) :
+    (LidoSRv3.Audit.Source.ReserveUpdateBufferedAllocationSource.updateBufferedEtherAllocation
+        state newBuffered newDepositedPostReport).depositedPostReport = newDepositedPostReport :=
+  LidoSRv3.Audit.Source.ReserveUpdateBufferedAllocationSource.updateBufferedEtherAllocation_depositedPostReport
+    state newBuffered newDepositedPostReport
+
+theorem reserve_update_buffered_allocation_clears_next_report
+    (state : ReserveState) (newBuffered newDepositedPostReport : Word) :
+    (LidoSRv3.Audit.Source.ReserveUpdateBufferedAllocationSource.updateBufferedEtherAllocation
+        state newBuffered newDepositedPostReport).depositedNextReportAdjusted = (0 : Word) :=
+  LidoSRv3.Audit.Source.ReserveUpdateBufferedAllocationSource.updateBufferedEtherAllocation_next_report
+    state newBuffered newDepositedPostReport
 
 end LidoSRv3.Audit.Guarantees.PReserve1
