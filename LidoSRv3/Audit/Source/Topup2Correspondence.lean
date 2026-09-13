@@ -87,30 +87,37 @@ def minWord (a b : Word) : Word := if a ≤ b then a else b
 
 /-- `TopUpGateway.sol:396-415 _evaluateTopUpLimit(ValidatorWitness calldata _validator, uint256 _pendingBalanceGwei) returns (uint256)`.
 
-Not transcribed: 403-405
+Transcribed: 403-405
 `if (_validator.exitEpoch != FAR_FUTURE_EPOCH || _validator.slashed) { return 0; }`
-(the exit / slash filter; exited or slashed validators are upstream of this
-numeric slice and must be filtered by the caller); 407 `Storage storage $ = _gatewayStorage();`
+via the caller-supplied `slashedOrExited : Bool` gate (chantier 2 2026-09-13
+D-SLASH-1 discharge — was: not transcribed / filtered upstream).
+Not transcribed: 407 `Storage storage $ = _gatewayStorage();`
 (`target` / `minTopUp` are explicit inputs).
 Added by the model: the `none` branch of the checked addition (Solidity 0.8
 panics).
 
-Pinned `_evaluateTopUpLimit` after activation/exit/slash
-filters.  Locals follow the source: `currentTotal`, then `topUpLimit`.
-The addition is checked; overflow is `none`. Slash/exit/activation arrays
-are upstream of this numeric slice. -/
-def evaluateTopUpLimit (effective pending target minTopUp : Word) : Option Word := do
-  -- TopUpGateway.sol:408  uint256 currentTotal = _validator.effectiveBalance + _pendingBalanceGwei;
-  let currentTotal ← safeAdd effective pending
-  -- TopUpGateway.sol:409  if (currentTotal >= $.targetBalanceGwei) return 0;
-  if target ≤ currentTotal then some 0
-  else
-    -- TopUpGateway.sol:411  uint256 topUpLimit = $.targetBalanceGwei - currentTotal;
-    -- (`safeSub` cannot fail here: the branch has `currentTotal < target`)
-    let topUpLimit ← safeSub target currentTotal
-    -- TopUpGateway.sol:412  if (topUpLimit < $.minTopUpGwei) return 0;
-    -- TopUpGateway.sol:414  return topUpLimit;
-    if topUpLimit < minTopUp then some 0 else some topUpLimit
+`slashedOrExited` collapses the pinned two-Bool disjunction
+`exitEpoch != FAR_FUTURE_EPOCH || slashed` into a single caller-supplied
+flag; both source clauses map to a `return 0` on the same edge, so the
+observable output is a pure function of their disjunction.
+
+Locals follow the source: `currentTotal`, then `topUpLimit`.
+The addition is checked; overflow is `none`. -/
+def evaluateTopUpLimit (effective pending target minTopUp : Word)
+    (slashedOrExited : Bool := false) : Option Word :=
+  -- TopUpGateway.sol:403-405  if (exitEpoch != FAR_FUTURE_EPOCH || slashed) return 0;
+  if slashedOrExited then some 0 else do
+    -- TopUpGateway.sol:408  uint256 currentTotal = _validator.effectiveBalance + _pendingBalanceGwei;
+    let currentTotal ← safeAdd effective pending
+    -- TopUpGateway.sol:409  if (currentTotal >= $.targetBalanceGwei) return 0;
+    if target ≤ currentTotal then some 0
+    else
+      -- TopUpGateway.sol:411  uint256 topUpLimit = $.targetBalanceGwei - currentTotal;
+      -- (`safeSub` cannot fail here: the branch has `currentTotal < target`)
+      let topUpLimit ← safeSub target currentTotal
+      -- TopUpGateway.sol:412  if (topUpLimit < $.minTopUpGwei) return 0;
+      -- TopUpGateway.sol:414  return topUpLimit;
+      if topUpLimit < minTopUp then some 0 else some topUpLimit
 
 /-- Solidity-facing name, TopUpGateway.sol:396. -/
 abbrev _evaluateTopUpLimit := evaluateTopUpLimit
@@ -133,19 +140,25 @@ This pass keeps only line 226
 `topUpLimits[i] = _evaluateTopUpLimit(vw, _topUps.pendingBalanceGwei[i]) * 1 gwei;`
 without the `* 1 gwei` (see the unit note in the module header); the
 `totalLimits +=` of 227 is not accumulated here (it reappears as `used` in
-`sourceRun`).  Length mismatch between `effective` and `pending` is `none`
-(Solidity: 168-172 `WrongArrayLength`).
+`sourceRun`).  Length mismatch between `effective` and `pending` (or between
+either and the per-validator `slashedOrExited` list) is `none` (Solidity:
+168-172 `WrongArrayLength`).
 
 Per-key limits produced by the gateway evaluation loop.  Keeping this list
 explicit is important: it is the live array passed to the module allocation
-boundary, rather than an implicit constant hidden in the allocator. -/
-def sourceLimits : List Word → List Word → Word → Word → Option (List Word)
-  | [], [], _, _ => some []
-  | e :: es, p :: ps, target, minTopUp => do
-      let limit ← evaluateTopUpLimit e p target minTopUp
-      let rest ← sourceLimits es ps target minTopUp
+boundary, rather than an implicit constant hidden in the allocator.
+
+`slashedOrExited : List Bool` is the caller-supplied per-validator gate for
+the pinned line 403-405 `if (exitEpoch != FAR_FUTURE_EPOCH || slashed)
+return 0;` filter (chantier 2 2026-09-13 D-SLASH-1 discharge). -/
+def sourceLimits : List Word → List Word → List Bool → Word → Word →
+    Option (List Word)
+  | [], [], [], _, _ => some []
+  | e :: es, p :: ps, se :: ses, target, minTopUp => do
+      let limit ← evaluateTopUpLimit e p target minTopUp se
+      let rest ← sourceLimits es ps ses target minTopUp
       some (limit :: rest)
-  | _, _, _, _ => none
+  | _, _, _, _, _ => none
 
 /-- Second pass: module requests are independently capped by the explicit
 per-key limits.  This is the StakingRouter side (`StakingRouter.topUp`
@@ -189,15 +202,21 @@ the model receives it and re-evaluates); the tuple result
 
 Pinned-source batch: evaluate and bind the explicit per-key limit array,
 take the share/value/block budget, then consume it left to right.  Empty,
-misaligned, or inconsistent arrays revert. -/
+misaligned, or inconsistent arrays revert.
+
+`slashedOrExited : List Bool` is the caller-supplied per-validator slash/
+exit filter (chantier 2 2026-09-13 D-SLASH-1 discharge). Length mismatch
+against `effective` returns `none` at `sourceLimits`. -/
 def sourceRun (effective pending requested topUpLimits : List Word)
+    (slashedOrExited : List Bool)
     (target minTopUp remainingCap moduleLimit valueGwei : Word) :
     Option (List Word × Word × Word) :=
   -- TopUpGateway.sol:163-164  uint256 validatorsCount = _topUps.validatorIndices.length; if (validatorsCount == 0) revert WrongArrayLength();
   if effective.length == 0 then none
   else
     -- TopUpGateway.sol:226  topUpLimits[i] = _evaluateTopUpLimit(vw, _topUps.pendingBalanceGwei[i]) * 1 gwei;   (gwei here)
-    match sourceLimits effective pending target minTopUp with
+    -- The 403-405 slash/exit gate is applied inside sourceLimits per-index.
+    match sourceLimits effective pending slashedOrExited target minTopUp with
     | none => none
     | some evaluatedLimits =>
         -- added by the model: the supplied array must be the evaluated one
@@ -220,11 +239,12 @@ def sourceRun (effective pending requested topUpLimits : List Word)
                       | some remaining => some (allocs, remaining, used)
 
 /-- Overflow of the pinned checked addition is a source revert, not a total
-Nat wrap. -/
+Nat wrap. Only applies when the caller does not gate at the earlier slash/
+exit filter (which unconditionally returns `some 0`). -/
 theorem evaluateTopUpLimit_overflow
     (effective pending target minTopUp : Word)
     (h : MAX_UINT256 < effective.val + pending.val) :
-    evaluateTopUpLimit effective pending target minTopUp = none := by
+    evaluateTopUpLimit effective pending target minTopUp false = none := by
   unfold evaluateTopUpLimit
   simp [safeAdd, Bind.bind, h]
 
