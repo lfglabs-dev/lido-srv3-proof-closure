@@ -49,17 +49,32 @@ follow-ups in the two guarantees' `fidelity.missing`:
     - `observeFromJournal_status_success` / `_revert` (PR #592)
     - `observeFromJournal_success_payloads_eq_calls_input` (PR #592)
     - `observeFromJournal_success_slot_invariant` (PR #594)
+    - `observeFromJournal_eq_of_observe_and_payload_matches_calls`
+      (PR #599) — generic substitution API
+    - `sourceView_payloads_eq_calls_input` + `observeFromJournal_simulates_pinned_source`
+      (PR #600) — slot-independent Verity theorem
+    - `observeFromJournal_writePayloads_invariant` (PR #605) —
+      write-side slot invariance
+    - `persistSlotFree` companion + `persist_calls_eq_persistSlotFree_calls`
+      + `persist_events_eq_persistSlotFree_events` (PR #609)
+    - `addRequestsSlotFree` companion executable transaction (PR #610)
+  - **Guarantee namespace**, `LidoSRv3/Audit/Guarantees/PConsolidation1.lean`:
+    - `verity_tx_simulates_consolidation_from_journal` (PR #602)
+      — slot-independent P-CONSOLIDATION-1 consumer alias
 
-  The physical retirement itself (removing the slot definitions
-  and rewriting `observe`, `readPayloads`, `writePayloads`, and
-  the ~30 downstream theorems that reference them) is the
-  remaining refactor. All proof obligations for the substitution
-  are already discharged.
+  The physical retirement itself (switching `addRequests` to use
+  `persistSlotFree`, then removing the slot definitions, and
+  rewriting `observe`, `readPayloads`, `writePayloads`, and the
+  ~30 downstream theorems that reference them) is the remaining
+  refactor. All proof obligations for the substitution are
+  already discharged: `addRequestsSlotFree` is a drop-in
+  slot-free transaction usable today.
 
 ## PR ledger (chantier-2)
 
 PRs #560, #563, #565, #567, #570, #573, #577, #579, #582, #584,
-#585, #586 (next_gate refresh), #588, #592, #594, #596 — 16 landed.
+#585, #586, #588, #592, #594, #596, #598, #599, #600, #602,
+#605, #606, #609, #610 — 24 landed.
 
 ## Assumptions status
 
