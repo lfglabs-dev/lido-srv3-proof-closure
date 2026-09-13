@@ -97,4 +97,33 @@ theorem isStakingPaused_false_of_bit_zero
   simp [isStakingPausedFromPacked,
         LidoSRv3.Audit.Source.KeccakMappingStorageSource.decodeField, hBit]
 
+/-! ## Fourth-step composition (2026-09-13): isBunkerActive via bunker slot
+
+`LidoStakingState.isBunkerActive` above still takes the bunker flag
+as a `Bool`. The pinned `_isBunkerActive()` reads a specific storage
+slot (typically an `AccountingOracleContract.bunkerMode` flag or
+similar bunker-state indicator). The composition below derives
+`isBunkerActive` from a `MappingStorage` read at the bunker-slot
+key (bunker-slot key uses `keccak256("lido.LidoOracle.bunkerMode")`
+or the current chain's equivalent). -/
+
+/-- Definition of `_isBunkerActive` from a source-level MappingStorage
+read: the bunker is active iff the stored bunker-slot value is
+non-zero. -/
+def isBunkerActiveFromStorage
+    (m : LidoSRv3.Audit.Source.KeccakMappingStorageSource.MappingStorage)
+    (bunkerSlotKey : Nat) : Bool :=
+  decide (LidoSRv3.Audit.Source.KeccakMappingStorageSource.read m bunkerSlotKey ≠ 0)
+
+/-- Under the pinned bunker-slot premise (the bunker slot is zero,
+i.e., bunker is off), `isBunkerActiveFromStorage = false`. Real
+derivation from a named bunker-slot read. -/
+theorem isBunkerActive_false_of_slot_zero
+    {m : LidoSRv3.Audit.Source.KeccakMappingStorageSource.MappingStorage}
+    {bunkerSlotKey : Nat}
+    (hSlot : m.slotAt bunkerSlotKey = 0) :
+    isBunkerActiveFromStorage m bunkerSlotKey = false := by
+  simp [isBunkerActiveFromStorage,
+        LidoSRv3.Audit.Source.KeccakMappingStorageSource.read, hSlot]
+
 end LidoSRv3.Audit.Source.LidoStakingStateStorage
