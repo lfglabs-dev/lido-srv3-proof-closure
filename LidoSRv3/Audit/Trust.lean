@@ -125,6 +125,7 @@ import LidoSRv3.Audit.Source.WCType2ByteDecodeSource
 import LidoSRv3.Audit.Source.SRModulePackedDecoderSource
 import LidoSRv3.Audit.Source.StakeLimitStructDecoderSource
 import LidoSRv3.Audit.Source.WQRequestPackedDecoderSource
+import LidoSRv3.Audit.Source.WQCheckpointPackedDecoderSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -1055,6 +1056,9 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- Forty-fourth-step (2026-09-13): WithdrawalQueue WithdrawalRequest packed decoder.
 #print axioms LidoSRv3.Audit.Source.WQRequestPackedDecoderSource.claimedFromPacked_true_of_nonzero
 #print axioms LidoSRv3.Audit.Source.WQRequestPackedDecoderSource.claimedFromPacked_false_of_zero
+-- Forty-fifth-step (2026-09-13): WithdrawalQueue Checkpoint packed decoder.
+#print axioms LidoSRv3.Audit.Source.WQCheckpointPackedDecoderSource.fromRequestIdFromPacked_eq
+#print axioms LidoSRv3.Audit.Source.WQCheckpointPackedDecoderSource.maxShareRateFromPacked_eq
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape
