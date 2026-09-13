@@ -708,6 +708,15 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- fidelity.missing).
 #print axioms
   LidoSRv3.Audit.SolidityConsolidation.commit_payloads_equal_call_inputs
+-- Second/third retirement-bridge theorems: the same payload is also
+-- carried by the event log (WithdrawalVaultEIP7685.sol:120), and the
+-- CALL journal and event log agree on the payload for every committed
+-- request. Together with `commit_payloads_equal_call_inputs` these give
+-- two independent slot-substitution proofs.
+#print axioms
+  LidoSRv3.Audit.SolidityConsolidation.commit_payloads_equal_event_payloads
+#print axioms
+  LidoSRv3.Audit.SolidityConsolidation.commit_call_inputs_equal_event_payloads
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.function_spec_bridge_constructors
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.committed_journal_forwards_msg_value
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.committed_preserves_eth_balance
