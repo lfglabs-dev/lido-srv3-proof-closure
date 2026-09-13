@@ -203,6 +203,21 @@ private def valAfterDouble : Verity.ContractState :=
 private def valAfterJournalBlind : Verity.ContractState :=
   persistJournalValueBlind 0 valObs (credited valState (pair 11 21))
 
+/-! Chantier 2 (Thomas 2026-09-13, item c continuation) slot-free
+mutant witnesses. Same input, same source-plane commit, but the
+persistence variant is the slot-free companion (no `writePayloads`
+to the fabricated `sourceMapSlot`/`targetMapSlot`). Value-plane
+mutations are otherwise identical to their pre-retirement siblings. -/
+
+private def valAfterPlainSlotFree : Verity.ContractState :=
+  persistPlainSlotFree 0 valObs (credited valState (pair 11 21))
+
+private def valAfterDoubleSlotFree : Verity.ContractState :=
+  persistDoubleDebitSlotFree 0 valObs (credited valState (pair 11 21))
+
+private def valAfterJournalBlindSlotFree : Verity.ContractState :=
+  persistJournalValueBlindSlotFree 0 valObs (credited valState (pair 11 21))
+
 /-- **Kill-line: value-blind debit refutes `committed_preserves_eth_balance`
 on a mutant of its own model.** The pre-lift stub behavior — journaled
 CALLs that move no wei — leaves the credited `msg.value` stuck on the
@@ -270,6 +285,71 @@ theorem journal_value_blind_kill_line_refutes_exact_forwarding :
       ((after.calls.drop state.calls.length).map (·.value)).sum ≠
         inputs.msgValue.val :=
   ⟨pair 11 21, valState, ofObservables valObs, valAfterJournalBlind,
+    by native_decide, by native_decide, by native_decide,
+    by native_decide, by native_decide, by native_decide,
+    by native_decide⟩
+
+/-! Chantier 2 (Thomas 2026-09-13, item c continuation) slot-free
+kill-lines. Mirror the three pre-retirement kill-lines but for the
+slot-free mutants (based on `addRequestsSlotFree` companion). Same
+concrete witness (`pair 11 21` / `valState` / `valObs`) — the value-plane
+mutations are identical modulo the fabricated slot writes, which
+`persistSlotFree` skips. -/
+
+theorem value_blind_debit_kill_line_refutes_preserves_eth_balance_slotFree :
+    ∃ (inputs : Inputs) (state : Verity.ContractState)
+      (result : Result) (after : Verity.ContractState),
+      readArray state "sources" sourcesBase inputs.sources.length =
+        some inputs.sources ∧
+      readArray state "targets" targetsBase inputs.targets.length =
+        some inputs.targets ∧
+      readArray state "sourceLens" sourceLensBase
+        inputs.sourceLens.length = some inputs.sourceLens ∧
+      readArray state "targetLens" targetLensBase
+        inputs.targetLens.length = some inputs.targetLens ∧
+      observeFromJournal state ((addRequestsValueBlindSlotFree inputs).run state) =
+        observeFromJournal state (.success result after) ∧
+      after.selfBalance ≠ state.selfBalance :=
+  ⟨pair 11 21, valState, ofObservables valObs, valAfterPlainSlotFree,
+    by native_decide, by native_decide, by native_decide,
+    by native_decide, by native_decide, by native_decide⟩
+
+theorem double_debit_kill_line_refutes_preserves_eth_balance_slotFree :
+    ∃ (inputs : Inputs) (state : Verity.ContractState)
+      (result : Result) (after : Verity.ContractState),
+      readArray state "sources" sourcesBase inputs.sources.length =
+        some inputs.sources ∧
+      readArray state "targets" targetsBase inputs.targets.length =
+        some inputs.targets ∧
+      readArray state "sourceLens" sourceLensBase
+        inputs.sourceLens.length = some inputs.sourceLens ∧
+      readArray state "targetLens" targetLensBase
+        inputs.targetLens.length = some inputs.targetLens ∧
+      observeFromJournal state ((addRequestsDoubleDebitSlotFree inputs).run state) =
+        observeFromJournal state (.success result after) ∧
+      after.selfBalance ≠ state.selfBalance :=
+  ⟨pair 11 21, valState, ofObservables valObs, valAfterDoubleSlotFree,
+    by native_decide, by native_decide, by native_decide,
+    by native_decide, by native_decide, by native_decide⟩
+
+theorem journal_value_blind_kill_line_refutes_exact_forwarding_slotFree :
+    ∃ (inputs : Inputs) (state : Verity.ContractState)
+      (result : Result) (after : Verity.ContractState),
+      readArray state "sources" sourcesBase inputs.sources.length =
+        some inputs.sources ∧
+      readArray state "targets" targetsBase inputs.targets.length =
+        some inputs.targets ∧
+      readArray state "sourceLens" sourceLensBase
+        inputs.sourceLens.length = some inputs.sourceLens ∧
+      readArray state "targetLens" targetLensBase
+        inputs.targetLens.length = some inputs.targetLens ∧
+      observeFromJournal state
+          ((addRequestsJournalValueBlindSlotFree inputs).run state) =
+        observeFromJournal state (.success result after) ∧
+      after.selfBalance = state.selfBalance ∧
+      ((after.calls.drop state.calls.length).map (·.value)).sum ≠
+        inputs.msgValue.val :=
+  ⟨pair 11 21, valState, ofObservables valObs, valAfterJournalBlindSlotFree,
     by native_decide, by native_decide, by native_decide,
     by native_decide, by native_decide, by native_decide,
     by native_decide⟩
