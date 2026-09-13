@@ -300,7 +300,19 @@ structure Preconditions (inputs : Inputs) (state : ContractState) : Prop where
   differ, so the line-996 balance assert would fire with `Panic(0x01)` — the
   assert is now genuinely load-bearing (grok #412 D-SKEW-1). -/
   conserving : inputs.maxEBType1 = inputs.depositSize
-  entryBalance : state.selfBalance = 0
+  /-- Genuine relaxation of the previous `entryBalance : state.selfBalance = 0`
+  (grok #412 Preconditions retirement follow-up, 2026-09-13): the parent now
+  admits any entry `selfBalance` whose sum with the batches' exact total fits
+  one word.  The old `state.selfBalance = 0` premise strictly implied this
+  (0 + exactTotal = exactTotal < 2^256 via `foldStable_bound`), so no
+  previously-admitted input is excluded; deployments whose router already
+  holds some ether from an independent path (e.g. a partial
+  `receiveDepositableEther` refund the pinned router allows) now compose
+  under this parent as well.  The registered parent
+  `verity_tx_composes_nframe_deposit_under_router_shape`'s admissible input
+  set is genuinely wider. -/
+  entryBalanceNoWrap :
+    state.selfBalance.val + exactTotal inputs.batches < _root_.Verity.Core.Uint256.modulus
   funded : wordTotal inputs.batches ≤ state.readSlot lidoDepositableSlot
   foldStable : FoldStable 0 inputs.batches
 
@@ -596,21 +608,29 @@ theorem execute_apply (inputs : Inputs) (state : ContractState)
   have hFunded : wordTotal inputs.batches ≤ processed.readSlot lidoDepositableSlot := by
     rw [hLido]
     exact h.funded
-  have hProcessedBalance : processed.selfBalance = 0 := by
+  have hTotalVal := wordTotal_val inputs.batches h.foldStable
+  have hProcessedBalance : processed.selfBalance = state.selfBalance := by
     rw [show processed = afterBatches inputs inputs.batches entry from rfl,
       selfBalance_afterBatches]
-    exact h.entryBalance
-  have hPulledBalance : pulled.selfBalance = wordTotal inputs.batches := by
-    rw [show pulled = afterPull inputs (wordTotal inputs.batches) (wordKeys inputs.batches) processed from rfl,
-      selfBalance_afterPull, hProcessedBalance, _root_.Verity.Core.Uint256.zero_add]
-  have hTotalVal := wordTotal_val inputs.batches h.foldStable
+    -- entry writes counterSlot; selfBalance is unaffected.
+    rfl
+  -- Under `entryBalanceNoWrap`, `state.selfBalance + wordTotal` doesn't wrap.
+  have hAddNoWrap : state.selfBalance.val + (wordTotal inputs.batches).val
+      < _root_.Verity.Core.Uint256.modulus := by
+    rw [hTotalVal]; exact h.entryBalanceNoWrap
+  have hPulledBalanceVal : pulled.selfBalance.val
+      = state.selfBalance.val + (wordTotal inputs.batches).val := by
+    show (afterPull inputs (wordTotal inputs.batches) (wordKeys inputs.batches)
+      processed).selfBalance.val = _
+    rw [selfBalance_afterPull, hProcessedBalance]
+    exact _root_.Verity.Core.Uint256.add_eq_of_lt hAddNoWrap
   have hPushFunds : exactTotal inputs.batches ≤ pulled.selfBalance.val := by
-    rw [hPulledBalance, hTotalVal]
+    rw [hPulledBalanceVal, hTotalVal]; omega
   have hCloseVal :
       (afterPushes inputs inputs.batches pulled).selfBalance.val = state.selfBalance.val := by
-    rw [selfBalance_afterPushes inputs inputs.batches pulled hPushFunds, hPulledBalance,
+    rw [selfBalance_afterPushes inputs inputs.batches pulled hPushFunds, hPulledBalanceVal,
       hTotalVal]
-    simp [h.entryBalance]
+    omega
   have hClose :
       (afterPushes inputs inputs.batches pulled).selfBalance = state.selfBalance :=
     _root_.Verity.Core.Uint256.ext hCloseVal
@@ -620,7 +640,7 @@ theorem execute_apply (inputs : Inputs) (state : ContractState)
   have hProcessedSelf :
       (afterBatches inputs inputs.batches entry).selfBalance = state.selfBalance := by
     rw [selfBalance_afterBatches]
-    simp [entry, h.entryBalance]
+    rfl
   -- Under `Preconditions.conserving` the pinned pull quantity
   -- `wordKeys inputs.batches * inputs.maxEBType1` collapses back to `wordTotal`
   -- via `Preconditions.valueMatches`; the split becomes observable only on a
@@ -673,30 +693,34 @@ theorem committed_calls (inputs : Inputs) (state : ContractState) :
 theorem committed_balance (inputs : Inputs) (state : ContractState)
     (h : Preconditions inputs state) :
     (committedState inputs state).selfBalance = state.selfBalance := by
+  have hTotalVal := wordTotal_val inputs.batches h.foldStable
   by_cases hPull : shouldPull inputs
   · have hBefore :
         (afterBatches inputs inputs.batches
-          (state.writeSlot counterSlot (state.readSlot counterSlot + 1))).selfBalance = 0 := by
-      rw [selfBalance_afterBatches]
-      exact h.entryBalance
-    have hAfterPull :
+          (state.writeSlot counterSlot (state.readSlot counterSlot + 1))).selfBalance =
+          state.selfBalance := by
+      rw [selfBalance_afterBatches]; rfl
+    have hAddNoWrap : state.selfBalance.val + (wordTotal inputs.batches).val
+        < _root_.Verity.Core.Uint256.modulus := by
+      rw [hTotalVal]; exact h.entryBalanceNoWrap
+    have hAfterPullVal :
         (afterPull inputs (wordTotal inputs.batches) (wordKeys inputs.batches)
           (afterBatches inputs inputs.batches
-            (state.writeSlot counterSlot (state.readSlot counterSlot + 1)))).selfBalance =
-          wordTotal inputs.batches := by
-      rw [selfBalance_afterPull, hBefore, _root_.Verity.Core.Uint256.zero_add]
+            (state.writeSlot counterSlot (state.readSlot counterSlot + 1)))).selfBalance.val =
+          state.selfBalance.val + (wordTotal inputs.batches).val := by
+      rw [selfBalance_afterPull, hBefore]
+      exact _root_.Verity.Core.Uint256.add_eq_of_lt hAddNoWrap
     have hFunds : exactTotal inputs.batches ≤
         (afterPull inputs (wordTotal inputs.batches) (wordKeys inputs.batches)
           (afterBatches inputs inputs.batches
             (state.writeSlot counterSlot (state.readSlot counterSlot + 1)))).selfBalance.val := by
-      rw [hAfterPull, wordTotal_val inputs.batches h.foldStable]
+      rw [hAfterPullVal, hTotalVal]; omega
     apply _root_.Verity.Core.Uint256.ext
     rw [committedState, if_pos hPull, committedProcessedState,
-      selfBalance_afterPushes inputs inputs.batches _ hFunds, hAfterPull,
-      wordTotal_val inputs.batches h.foldStable]
-    simp [h.entryBalance]
+      selfBalance_afterPushes inputs inputs.batches _ hFunds, hAfterPullVal, hTotalVal]
+    omega
   · rw [committedState, if_neg hPull, committedProcessedState, selfBalance_afterBatches]
-    simp [h.entryBalance]
+    rfl
 
 theorem execute_observes_source (inputs : Inputs) (state : ContractState)
     (h : Preconditions inputs state) :
