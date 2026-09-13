@@ -32,10 +32,29 @@ Additional signal chantier 1 (mandate 2026-09-12) reinstated as
 > RECLASSED not discharged (PR #408 was a rename, not a change to
 > the parent's ENUNCE).
 
+Additional signal chantier 2 Piste A (2026-09-13, PR #559):
+
+> **`WithdrawInputs.canDeposit` free Bool eliminated at the parent's
+> ENUNCE level.**  `WithdrawInputs` no longer carries `canDeposit :
+> Bool` as a free caller field.  It carries `lidoState :
+> LidoStakingState { isStakingPaused, isBunkerActive }` (shared with
+> TOPUP-1) and `canDeposit` is a `@[reducible, simp] def` computing
+> `canDepositFromStorage inputs.lidoState` per `Lido.sol:815-816`.
+> Callers can no longer instantiate the boolean independently of a
+> named pinned Lido storage state.  Residual: `authorizedRouter :
+> Bool` remains a free field on `WithdrawInputs` (Aragon-ACL
+> derivation left as a follow-up; `PReserve1LidoStoragePremise`
+> already contains the `canDeposit_derived_from_lido_state` and
+> `authorizedRouter_derived_from_acl` compositions that a future PR
+> can wire in); the two `LidoStakingState` component booleans still
+> stand in for live pause / bunker storage reads.
+
 **Site fix:** narrow the RESERVE-1 card to name exactly the one
 writer covered, list the other three as open, and reference
 `audit/guarantees.yaml` P-RESERVE-1 `fidelity.missing` for the
-13 disclosed gaps (was 12 before chantier 1's reinstatement).
+13 disclosed gaps (was 12 before chantier 1's reinstatement).  Also
+reflect that `canDeposit` on `WithdrawInputs` is no longer a free
+boolean; `authorizedRouter` remains.
 
 ## TOPUP-1 — Verity plane ENUNCE promises match the code (chantier 2)
 
@@ -61,18 +80,37 @@ that actually delivers what the name promises:
 
 **Also disclosed (chantier 2 `fidelity.missing`):**
 
-- `lidoPull` at `LidoSRv3/Audit/Verity/TopupTx.lean:119-122` journals
-  a single-word argument `[total]` via `externalCallBindTo lidoAddress
-  0 [] "withdrawDepositableEther" [(total : Uint256)]`; the pinned
-  source at `StakingRouter.sol:744` calls
-  `LIDO.withdrawDepositableEther(amount, 0)` with two arguments. The
-  executable frame is single-argument.
+- `lidoPull` **now** journals both arguments `[(total : Uint256),
+  (0 : Uint256)]` of the pinned `LIDO.withdrawDepositableEther(amount,
+  0)` at `StakingRouter.sol:744`.  The journal-shape half of Grok
+  differential #414 D-CALL-1 was discharged in Piste-A chantier 1
+  (PR #554, 2026-09-13); `pullEntry` + `pullEntry_calldata` + the
+  source-observable `sourceObservables` all carry the two-word
+  calldata.  What remains open is the prefix-then-suffix half of
+  D-CALL-1: `Verity.TopupTx.executeGuarded` still starts at
+  `allocateDeposits` (line 717); the full-journal comparison over
+  the 686-756 span (`allocateDeposits`-then-`withdrawDepositableEther`
+  -then-per-key-`deposit`) is not yet exercised on the executable
+  plane.
 - Conjuncts 3–4 are proved on the legacy `execute` plane, not on
   `executeGuarded`; the guarded-plane analogue is open.
+- **`lidoCanDeposit` free Bool eliminated at the parent's ENUNCE
+  level** (Piste-A chantier 1, PR #562, 2026-09-13): `SourceTopupInput`
+  no longer carries `lidoCanDeposit : Bool` as a free caller field.
+  It carries `lidoState : LidoStakingState { isStakingPaused,
+  isBunkerActive }` and `lidoCanDeposit` is a `@[reducible, simp] def`
+  computing `canDepositFromStorage inp.lidoState` per
+  `Lido.sol:815-816`.  Residual: the other three `SourceTopupInput`
+  booleans (`callerIsTopUpGateway`, `moduleExists`, `wcTypeIsType2`)
+  remain free at the structure level; the pinned SR-context source
+  model `SRTopupCallerContext` exists but is not yet wired.
 
 **Site fix:** update the TOPUP-1 card to describe the four-conjunct
-Verity parent honestly, and disclose the two-argument `lidoPull`
-divergence + the legacy-plane-vs-guarded-plane scope narrowing.
+Verity parent honestly, disclose the D-CALL-1 residual
+(prefix-then-suffix half of the executable-plane extension), and
+reflect that `lidoCanDeposit` is now derived from a pinned
+`LidoStakingState` while the three SR-context booleans remain caller
+premises.
 
 ## TOPUP-2 — narrowing signal is 'exact under gateway-shape premise, wrapped otherwise' (chantier 4bis)
 
