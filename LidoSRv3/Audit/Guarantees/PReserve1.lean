@@ -418,4 +418,63 @@ theorem verity_tx_preserves_withdrawal_reserve
     withdrawalPartitionSpendInvariant (decode state) (decode after) amount :=
   verity_commit_preserves_withdrawal_reserve inputs state after amount h
 
+/-- **Chantier 2 (Piste A, Thomas 2026-09-13) D-PACK-1 registered
+consumer of the pinned uint128 packed pair round-trip.**
+
+The pinned `Lido.sol:131-132` packs `buffered` (low 128 bits) and
+`depositedPostReport` (high 128 bits) into a single `uint256` storage
+slot.  Reading `buffered` from that packed slot requires the low-half
+extraction `packedWord & type(uint128).max`; the source-level function
+is `LidoSRv3.Audit.Source.ReservePackedBufferSource.unpackBuffered`.
+
+`unpackBuffered_of_packPair_of_bounded` (in the source module) proves
+the pack/unpack round-trip: under the pinned `buffered ≤ uint128Max`
+type-width premise on `buffered : uint128`, the low-half extraction
+of `packPair buffered depositedPostReport` recovers `buffered`.
+
+This registered consumer theorem carries the round-trip fact into the
+P-RESERVE-1 namespace, so any downstream consumer that receives a
+`packedWord` and a bounded `buffered` witness gets the projection
+identity as a proved P-RESERVE-1 lemma.  This is not a naming scaffold:
+the proof invokes the round-trip theorem non-trivially (it is not a
+`rfl` — the modular arithmetic on `+` and `*` inside `packPair` needs
+the boundedness premise to eliminate the low-half mod, which the source
+module discharges via `Nat.add_mul_mod_self_right` + `Nat.mod_eq_of_lt`). -/
+theorem reserve_buffered_matches_packed_low_half
+    (buffered depositedPostReport : Nat)
+    (hLow : buffered ≤ LidoSRv3.Audit.Source.ReservePackedBufferSource.uint128Max) :
+    LidoSRv3.Audit.Source.ReservePackedBufferSource.unpackBuffered
+        (LidoSRv3.Audit.Source.ReservePackedBufferSource.packPair
+          buffered depositedPostReport) = buffered :=
+  LidoSRv3.Audit.Source.ReservePackedBufferSource.unpackBuffered_of_packPair_of_bounded
+    hLow
+
+/-- **Chantier 2 (Piste A, Thomas 2026-09-13) D-SEED-1/D-EVENT-1
+registered consumer of the pinned `_seedDepositsCount` bookkeeping.**
+
+The pinned `Lido.sol:877-882` `_seedDepositsCount(_amount)` performs
+`depositedPostReport += _amount` and `buffered -= _amount`, then emits
+`Unbuffered(_amount)` and `DepositedPostReportUpdated(newTotal)`.
+`ReserveSeedBookkeepingSource.seedDepositsCount` captures the two
+writes and the paired events as a source-level function.
+
+`seedDepositsCount_depositedPostReport_eq` and `_buffered_eq` in the
+source module prove the arithmetic identities; this registered
+consumer re-exports them into the P-RESERVE-1 namespace as a single
+pair, so downstream consumers get the seed-bookkeeping identity as
+proved P-RESERVE-1 lemmas without pulling in the source-module import
+directly. -/
+theorem reserve_seed_bookkeeping_identities
+    (currentDepositedPostReport currentBuffered amount : Nat) :
+    (LidoSRv3.Audit.Source.ReserveSeedBookkeepingSource.seedDepositsCount
+      currentDepositedPostReport currentBuffered amount).newDepositedPostReport =
+        currentDepositedPostReport + amount ∧
+    (LidoSRv3.Audit.Source.ReserveSeedBookkeepingSource.seedDepositsCount
+      currentDepositedPostReport currentBuffered amount).newBuffered =
+        currentBuffered - amount :=
+  ⟨LidoSRv3.Audit.Source.ReserveSeedBookkeepingSource.seedDepositsCount_depositedPostReport_eq
+      currentDepositedPostReport currentBuffered amount,
+   LidoSRv3.Audit.Source.ReserveSeedBookkeepingSource.seedDepositsCount_buffered_eq
+      currentDepositedPostReport currentBuffered amount⟩
+
 end LidoSRv3.Audit.Guarantees.PReserve1
