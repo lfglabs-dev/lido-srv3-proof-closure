@@ -4,14 +4,25 @@
 
 SRv3 believes facts about consensus-layer validators only through SSZ Merkle proofs. A caller hands a gateway a witness; the verifier folds the branch and compares it to a trusted root; the deposit path recomputes a deposit-data root from pubkey, withdrawal credentials, amount, and signature.
 
-P-SSZ-1 registers bidirectional reconstruction as the frozen Spec `SszWitness.Correspondence` on a model where `Node = Nat` and the combiner is `Nat.pair` rather than SHA-256:
+**Chantier 1 (Thomas 2026-09-13)** replaces the registered abstract parent. Previously P-SSZ-1's abstract parent was `deposit_root_iff`, a bidirectional `Spec.SszWitness.Correspondence` on the `depositSszWitness` gadget: a dummy validator at generalized index 2 with `Nat.pair` combine — an object `CLValidatorVerifier._verifyValidator` (`0.8.25/CLValidatorVerifier.sol:44-85`) never checks. The new registered parent `real_validator_correspondence` names the real deployed objects the compiled entry consumes:
 
-- construction: a well-formed deposit $src$ binds `sourceWitness src` to `sourceNode src` at `.clValidatorVerifier`
+1. the 8-leaf `Validator` container from `_validatorHashTreeRoot` (`CLValidatorVerifier.sol:60-85`), consumed via `SszValidatorHashTreeRootSource.validatorHashTreeRoot`;
+2. the fork-aware generalized-index choice `concat(GI_STATE_ROOT, GI_FIRST_VALIDATOR_{PREV|CURR}.shr(i))` (`CLValidatorVerifier.sol:54, 97-100`), whose PREV/CURR branch is named by `chosenFirstValidatorGI` under the `provenSlot < pivotSlot` pivot;
+3. the `SSZ.verifyProof` Merkle fold (`common/lib/SSZ.sol:179`) reduced to a `foldPath` equality on the `SszVerifyProofSource` oracle model;
+4. the EIP-4788 `BEACON_ROOTS` read (`CLValidatorVerifier.sol:27, 103-107`), anchored to `BeaconRootsEip4788Source.canonicalCall` at the pinned predeploy `0x000F3df6D732807Ef1319fB7B8bB8522d0Beac02`.
+
+The five previously-orphan source models (`Sha256OpacitySource`, `SszGindexSource`, `SszVerifyProofSource`, `SszValidatorHashTreeRootSource`, `BeaconRootsEip4788Source`) are consumed by the new parent statement in the same PR. The parent-shaped kill-line `real_validator_correspondence_mutant_target_refutes_parent` refutes the mutant-substituted parent when the EIP-4788 target is replaced with a non-canonical address. Non-vacuity is witnessed by `real_validator_correspondence_witness`.
+
+The downgraded child `deposit_root_iff` remains in the module as unregistered subordinate evidence:
+
+- construction: a well-formed deposit `src` binds `sourceWitness src` to `sourceNode src` at `.clValidatorVerifier`
 - determination: any verified witness at that root equals `sourceWitness src`
 
-Deposit uniqueness is the named `PerfectDepositEncoding` (`A-PERFECT-HASH`) child `deposit_unique_of_perfect`, not a parent conjunct. `sourceNode_mutant_kill_line_refutes_parent` increments `encode` and keeps `wellFormedDeposit`. The one-object traversal child `composed_ssz_encoding` remains; `swapped_combine_kill_line_refutes_parent` is that child's kill-line. TX persists those observables, rereads them from storage, and restores the snapshot on failure.
+Deposit uniqueness is the named `PerfectDepositEncoding` (`A-PERFECT-HASH`) child `deposit_unique_of_perfect`. `sourceNode_mutant_kill_line_refutes_parent` increments `encode` and keeps `wellFormedDeposit`. The one-object traversal child `composed_ssz_encoding` remains; `swapped_combine_kill_line_refutes_parent` is that child's kill-line. TX persists those observables, rereads them from storage, and restores the snapshot on failure.
 
-We do not prove `SSZ.verifyProof` on production gindices, SHA-256 (`A-SHA256-FFI`), or the imported-to-deployed Yul fragment (OPEN).
+**Under `A-SHA256-FFI`** the parent's `verifyProof`/`foldPath` equivalence conjunct (3) is oracle-parametric: it holds for every `Sha256Oracle`, whether or not that oracle coincides with FIPS SHA-256. Conjunct (1) is likewise oracle-parametric — it names the pinned 8-leaf pairwise schedule but does not claim its outputs are the FIPS SHA-256 of the concatenated byte inputs. What `A-SHA256-FFI` still gates is the collision-freedom identification that would let a caller conclude "the verified branch uniquely determined the deposited validator container"; the abstract parent does not make that claim and is silent on it.
+
+We still do not prove `SSZ.verifyProof` on production gindices, SHA-256 correctness (`A-SHA256-FFI`), or the imported-to-deployed Yul fragment (OPEN). The abstract-plane anchors (`parentBlockRoot`, fork version, claimed root) remain independently supplied at this layer; the compiled entry `actual_compiled_cl_entry_complete_declared_branch` binds them to executed calldata / STATICCALL replies, so the abstract and Verity planes now share the same real-object vocabulary.
 
 ## Proof limitations and recommendations
 
@@ -21,17 +32,27 @@ CHECKED does not mean a Merkle proof was verified, that generalized indices are 
 
 Ranked next work: preserve the checked `txInputFromComposed` one-object TX theorem; decide separately whether to restrict the general `EncodingInput` API. Keep SHA obligations split and Yul visibly OPEN.
 
-Theorems: `PSsz1.deposit_root_iff` (registered parent; named Spec `SszWitness.Correspondence`), `PSsz1.sourceNode_mutant_kill_line_refutes_parent` (parent-shaped kill-line), `PSsz1.deposit_unique_of_perfect` (unregistered uniqueness child under `PerfectDepositEncoding`), `PSsz1.composed_ssz_encoding` (traversal child; concludes `composedEncodingOk`), `PSsz1.swapped_combine_kill_line_refutes_parent` (traversal-child kill-line), `PSsz1.composedEncodingOkFull_not_trivial_crossed_witness`, `PSsz1.composed_ssz_encoding_full` (unregistered demoted bundle), `PSsz1.verity_tx_simulates_ssz_encoding`.
+Theorems: `PSsz1.real_validator_correspondence` (registered abstract parent, chantier 1 2026-09-13; names the pinned 8-leaf Validator schedule, the fork-aware gindex choice, the `verifyProof`/`foldPath` equivalence, and the EIP-4788 canonical-target identity), `PSsz1.real_validator_correspondence_mutant_target_refutes_parent` (parent-shaped kill-line on the EIP-4788 target), `PSsz1.real_validator_correspondence_witness` (non-vacuity witness), `PSsz1.deposit_root_iff` (downgraded unregistered child; named Spec `SszWitness.Correspondence` on the Nat.pair gadget), `PSsz1.sourceNode_mutant_kill_line_refutes_parent` (downgraded parent-shaped kill-line for `deposit_root_iff`), `PSsz1.deposit_unique_of_perfect` (unregistered uniqueness child under `PerfectDepositEncoding`), `PSsz1.composed_ssz_encoding` (traversal child; concludes `composedEncodingOk`), `PSsz1.swapped_combine_kill_line_refutes_parent` (traversal-child kill-line), `PSsz1.composedEncodingOkFull_not_trivial_crossed_witness`, `PSsz1.composed_ssz_encoding_full` (unregistered demoted bundle), `PSsz1.verity_tx_simulates_ssz_encoding`.
 Assumptions: `A-SHA256-FFI`, `A-PERFECT-HASH`, `A-MULTI-NODE-TRANSPORT`, `A-SOLC-TRUSTED`, `A-YUL-INTERFACE`.
+
+## Chantier 1 update (Thomas 2026-09-13)
+
+Registered abstract parent is now `real_validator_correspondence`.
+`deposit_root_iff` is downgraded to unregistered child.
+`real_validator_correspondence_mutant_target_refutes_parent` replaces
+`sourceNode_mutant_kill_line_refutes_parent` as the registered parent-shaped
+kill-line (both are retained in the module). See the head of this document
+for the four conjuncts of the new parent statement.
 
 ## Wave 0 (2026-08-22)
 
-Registered parent is now `deposit_root_iff` as `Spec.SszWitness.Correspondence`.
+Registered parent was `deposit_root_iff` as `Spec.SszWitness.Correspondence`.
 The uniqueness conjunct that restated `PerfectDepositEncoding` is demoted to
 `deposit_unique_of_perfect`. The parent-shaped kill-line
 `sourceNode_mutant_kill_line_refutes_parent` mutates `encode` to
 `sourceNode + 1` and retains `wellFormedDeposit`. `composed_ssz_encoding`
-stays the traversal child; its kill-line is unchanged.
+stays the traversal child; its kill-line is unchanged. (Chantier 1 2026-09-13
+downgrades this parent to unregistered child; see head of document.)
 
 ## Wave 6 changes (2026-08-19)
 
