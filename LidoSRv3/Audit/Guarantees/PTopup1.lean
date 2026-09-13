@@ -1021,4 +1021,67 @@ theorem verity_tx_legacy_revert_restores_snapshot
     rollback = state :=
   Verity.TopupTx.revert_restores_snapshot allocations failure state rollback reason h
 
+/-- **Chantier 1 (Piste A, Thomas 2026-09-13) D-CALL-1 prefix-then-suffix
+half: registered closure at the guarded plane.**
+
+The pinned `StakingRouter.topUp` at lines 686-716 has three prefix guards
+(auth 686 / empty keys 695 / wc type 702) BEFORE the module frame at
+line 717.  `Verity.TopupTx.executeGuarded` already journals the module
+frame (`allocateDeposits` at line 1608 of `TopupTx.lean`) and the
+suffix (`guardedSourceStage` covers 722-756).
+
+The new `Verity.TopupTx.executeGuardedWithAllPrefixGuards` inserts the
+three prefix guards in pinned line order before delegating to
+`executeGuarded`, so the guarded plane now covers the FULL pinned journal
+from line 686 through line 756.  Three registered closures:
+
+- `guarded_reverts_on_unauth` — matches pinned line 686
+  `NotAuthorized()`.
+- `guarded_reverts_on_empty_keys` — matches pinned line 695
+  `EmptyKeysList()`.
+- `guarded_reverts_on_wrong_wc` — matches pinned line 702
+  `WrongWithdrawalCredentialsType()`.
+
+Each is a Contract.run rollback: revert with the pinned Solidity's
+error selector and restore the entry snapshot.  Real ENUNCE additions
+consuming the three new theorems in `Verity.TopupTx`; the executable
+plane's D-CALL-1 prefix-then-suffix half is closed at the P-TOPUP-1
+namespace level. -/
+theorem verity_tx_guarded_reverts_on_unauth
+    (cfg : SourceTopupConfig)
+    (call : Verity.TopupTx.TopupCall)
+    (wcTypeIsType2 : Bool)
+    (failure : Verity.TopupTx.FailurePoint)
+    (state : Verity.ContractState) :
+    (Verity.TopupTx.executeGuardedWithAllPrefixGuards
+        cfg call false wcTypeIsType2 failure).run state =
+      Verity.ContractResult.revert "NotAuthorized" state :=
+  Verity.TopupTx.executeGuardedWithAllPrefixGuards_reverts_on_unauth
+    cfg call wcTypeIsType2 failure state
+
+theorem verity_tx_guarded_reverts_on_empty_keys
+    (cfg : SourceTopupConfig)
+    (call : Verity.TopupTx.TopupCall)
+    (wcTypeIsType2 : Bool)
+    (failure : Verity.TopupTx.FailurePoint)
+    (state : Verity.ContractState)
+    (hEmpty : call.keyIndices.length = 0) :
+    (Verity.TopupTx.executeGuardedWithAllPrefixGuards
+        cfg call true wcTypeIsType2 failure).run state =
+      Verity.ContractResult.revert "EmptyKeysList" state :=
+  Verity.TopupTx.executeGuardedWithAllPrefixGuards_reverts_on_empty_keys
+    cfg call wcTypeIsType2 failure state hEmpty
+
+theorem verity_tx_guarded_reverts_on_wrong_wc
+    (cfg : SourceTopupConfig)
+    (call : Verity.TopupTx.TopupCall)
+    (failure : Verity.TopupTx.FailurePoint)
+    (state : Verity.ContractState)
+    (hNonempty : call.keyIndices.length ≠ 0) :
+    (Verity.TopupTx.executeGuardedWithAllPrefixGuards
+        cfg call true false failure).run state =
+      Verity.ContractResult.revert "WrongWithdrawalCredentialsType" state :=
+  Verity.TopupTx.executeGuardedWithAllPrefixGuards_reverts_on_wrong_wc
+    cfg call failure state hNonempty
+
 end LidoSRv3.Audit.Guarantees.PTopup1

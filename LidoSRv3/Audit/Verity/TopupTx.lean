@@ -1608,6 +1608,74 @@ def executeGuarded (cfg : SourceTopupConfig) (call : TopupCall) (failure : Failu
   let returned ← allocateDeposits call
   guardedSourceStage cfg call returned failure
 
+/-- **Chantier 1 (Piste A, Thomas 2026-09-13) D-CALL-1 prefix-then-suffix
+half: guarded plane with all three source-line 686-716 prefix guards.**
+
+The pinned `StakingRouter.topUp` at lines 686-716 has three prefix guards
+BEFORE the module frame at line 717 (which `executeGuarded` already
+journals via `allocateDeposits call`):
+- Line 686 `if (msg.sender != TOPUP_GATEWAY) revert NotAuthorized()`.
+- Line 695 `if (keyIndices.length == 0) revert EmptyKeysList()`.
+- Line 702 `if (wc[0] != WC_TYPE_2) revert WrongWithdrawalCredentialsType()`.
+
+`executeGuardedWithAllPrefixGuards` inserts these three guards in pinned
+line order BEFORE `executeGuarded`, so the guarded plane now covers the
+FULL pinned journal comparison from line 686 through line 756.  Real
+model extension consuming three new registered theorems (one per guard).
+
+Ordering in pinned line order: auth (686) → empty (695) → wc (702) →
+module frame (717 in `allocateGuarded`) → spend (722-756 in
+`guardedSourceStage`). -/
+def executeGuardedWithAllPrefixGuards
+    (cfg : SourceTopupConfig) (call : TopupCall)
+    (callerIsTopUpGateway wcTypeIsType2 : Bool)
+    (failure : FailurePoint) : Contract Unit := do
+  -- StakingRouter.sol:686  if (msg.sender != TOPUP_GATEWAY) revert NotAuthorized();
+  require (decide (callerIsTopUpGateway = true)) "NotAuthorized"
+  -- StakingRouter.sol:695  if (keyIndices.length == 0) revert EmptyKeysList();
+  require (decide (call.keyIndices.length ≠ 0)) "EmptyKeysList"
+  -- StakingRouter.sol:702  if (wc[0] != WC_TYPE_2) revert WrongWithdrawalCredentialsType();
+  require (decide (wcTypeIsType2 = true)) "WrongWithdrawalCredentialsType"
+  executeGuarded cfg call failure
+
+/-- The guarded-plane D-AUTH-1 closure: reverts closed on unauth. -/
+theorem executeGuardedWithAllPrefixGuards_reverts_on_unauth
+    (cfg : SourceTopupConfig) (call : TopupCall) (wcTypeIsType2 : Bool)
+    (failure : FailurePoint) (state : ContractState) :
+    (executeGuardedWithAllPrefixGuards cfg call false wcTypeIsType2 failure).run state =
+      ContractResult.revert "NotAuthorized" state := by
+  simp [executeGuardedWithAllPrefixGuards, Contract.run, Bind.bind,
+    _root_.Verity.bind, _root_.Verity.require]
+
+/-- The guarded-plane D-EMPTY-1 closure: reverts closed on empty keyIndices. -/
+theorem executeGuardedWithAllPrefixGuards_reverts_on_empty_keys
+    (cfg : SourceTopupConfig) (call : TopupCall)
+    (wcTypeIsType2 : Bool) (failure : FailurePoint) (state : ContractState)
+    (hEmpty : call.keyIndices.length = 0) :
+    (executeGuardedWithAllPrefixGuards cfg call true wcTypeIsType2 failure).run state =
+      ContractResult.revert "EmptyKeysList" state := by
+  simp [executeGuardedWithAllPrefixGuards, Contract.run, Bind.bind,
+    _root_.Verity.bind, _root_.Verity.require, hEmpty]
+
+/-- The guarded-plane D-WC-1 closure: reverts closed on non-type-2 wc. -/
+theorem executeGuardedWithAllPrefixGuards_reverts_on_wrong_wc
+    (cfg : SourceTopupConfig) (call : TopupCall) (failure : FailurePoint)
+    (state : ContractState) (hNonempty : call.keyIndices.length ≠ 0) :
+    (executeGuardedWithAllPrefixGuards cfg call true false failure).run state =
+      ContractResult.revert "WrongWithdrawalCredentialsType" state := by
+  simp [executeGuardedWithAllPrefixGuards, Contract.run, Bind.bind,
+    _root_.Verity.bind, _root_.Verity.require, hNonempty]
+
+/-- On the all-guards-pass path, `executeGuardedWithAllPrefixGuards` reduces
+to `executeGuarded`; the full guarded plane covers lines 686-756. -/
+theorem executeGuardedWithAllPrefixGuards_of_all_pass
+    (cfg : SourceTopupConfig) (call : TopupCall) (failure : FailurePoint)
+    (state : ContractState) (hNonempty : call.keyIndices.length ≠ 0) :
+    (executeGuardedWithAllPrefixGuards cfg call true true failure).run state =
+      (executeGuarded cfg call failure).run state := by
+  simp [executeGuardedWithAllPrefixGuards, Contract.run, Bind.bind,
+    _root_.Verity.bind, _root_.Verity.require, hNonempty]
+
 /-- The binding statement.  `executeGuarded` journals the module frame and then
 runs the guard-and-spend stage on *that frame's returndata*; the allocation
 array is not a free argument of the guarded transaction. -/
