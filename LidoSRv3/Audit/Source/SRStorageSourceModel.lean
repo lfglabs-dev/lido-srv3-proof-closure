@@ -48,20 +48,28 @@ structure SRTopupCallerContext : Type where
   callerIsGatewayFromRead : Bool
   moduleExistsFromRead : Bool
   wcTypeIsType2FromRead : Bool
+  deriving DecidableEq, Repr
 
 /-- Definition of `_checkAppAuth(_getTopUpGateway())` at
-StakingRouter.sol:686 as a function of the SR context. -/
-def isTopUpGatewayCall (ctx : SRTopupCallerContext) : Bool :=
+StakingRouter.sol:686 as a function of the SR context.  Marked
+`@[reducible, simp]` (2026-09-13 chantier 1 Piste A) so downstream
+proofs that previously closed `SourceTopupInput.callerIsTopUpGateway`
+guard branches by `rfl` / `simp` continue to close after the free
+Bool is replaced by a def accessor over an embedded
+`SRTopupCallerContext`. -/
+@[reducible, simp] def isTopUpGatewayCall (ctx : SRTopupCallerContext) : Bool :=
   ctx.callerIsGatewayFromRead
 
 /-- Definition of `SRUtils._requireModuleIdExists` at
-SRUtils.sol:45-47 as a function of the SR context. -/
-def moduleExists (ctx : SRTopupCallerContext) : Bool :=
+SRUtils.sol:45-47 as a function of the SR context.  Same
+`@[reducible, simp]` treatment as `isTopUpGatewayCall`. -/
+@[reducible, simp] def moduleExists (ctx : SRTopupCallerContext) : Bool :=
   ctx.moduleExistsFromRead
 
 /-- Definition of `SRUtils._requireWCType2` at SRUtils.sol:41-43
-as a function of the SR context. -/
-def wcIsType2 (ctx : SRTopupCallerContext) : Bool :=
+as a function of the SR context.  Same `@[reducible, simp]`
+treatment. -/
+@[reducible, simp] def wcIsType2 (ctx : SRTopupCallerContext) : Bool :=
   ctx.wcTypeIsType2FromRead
 
 /-- Under the pinned SR-context premise (all three named reads are

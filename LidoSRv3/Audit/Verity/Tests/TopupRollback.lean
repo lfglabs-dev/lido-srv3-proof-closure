@@ -7,14 +7,12 @@ open LidoSRv3.Audit.SolidityTopup
 open LidoSRv3.Audit.Verity.TopupRollback
 
 def nominal : SourceTopupInput :=
-  { callerIsTopUpGateway := true
+  { srCtx := { callerIsGatewayFromRead := true, moduleExistsFromRead := true, wcTypeIsType2FromRead := true }
     keyIndicesLength := 2
     operatorIdsLength := 2
     topUpLimits := [2 * pinnedConfig.minDeposit, 2 * pinnedConfig.minDeposit]
     pubkeyLengths := [48, 48]
-    moduleExists := true
     moduleActive := true
-    wcTypeIsType2 := true
     maxTopUpPerBlockGwei := 4 * pinnedConfig.minDeposit / pinnedConfig.gwei
     moduleAllocationEth := 4 * pinnedConfig.minDeposit
     lidoState := { isStakingPaused := false, isBunkerActive := false }
@@ -27,7 +25,7 @@ def nominal : SourceTopupInput :=
 #guard (Compiler.CompilationModel.compile spec [topUpSelector]).isOk
 
 def rollbackVector : Bool :=
-  let unauthorized := { nominal with callerIsTopUpGateway := false }
+  let unauthorized := { nominal with srCtx := { nominal.srCtx with callerIsGatewayFromRead := false } }
   let tx := transactionObservation (topupProgram pinnedConfig unauthorized (17 : Nat)) 999 []
     { calls := [], ethMoves := [{ sender := 1, recipient := 2, amount := ⟨3⟩ }], logs := [] }
   decide (tx.committedState = 17 ∧ tx.committedTrace.ethMoves = [] ∧ tx.committedTrace.logs = [])

@@ -32,8 +32,18 @@ private def cfg : SourceTopupConfig := ⟨48, 48, 10, 100, 1000⟩
 /- The gateway caller, three well-formed keys, an ample block cap and ample Lido
    liquidity.  The module returns 100 + 200 + 150 = 450 wei of allocations. -/
 private def inp : SourceTopupInput :=
-  ⟨true, 3, 3, [200, 200, 200], [48, 48, 48], true, true, true, 100, 900, true,
-    [100, 200, 150], 5000, 5000⟩
+  { srCtx := { callerIsGatewayFromRead := true, moduleExistsFromRead := true, wcTypeIsType2FromRead := true }
+    keyIndicesLength := 3
+    operatorIdsLength := 3
+    topUpLimits := [200, 200, 200]
+    pubkeyLengths := [48, 48, 48]
+    moduleActive := true
+    maxTopUpPerBlockGwei := 100
+    moduleAllocationEth := 900
+    lidoState := { isStakingPaused := false, isBunkerActive := false }
+    allocations := [100, 200, 150]
+    routerBalanceBefore := 5000
+    lidoDepositableEther := 5000 }
 
 /-! ## The committing push -/
 
@@ -90,16 +100,16 @@ example :
    687 and before the module lookup at line 689, so it must win over every later
    guard.  Modelling it after input validation -- or omitting it, which
    classifies an unauthorized call as a commit -- is the plausible mistake. -/
-example : run cfg { inp with callerIsTopUpGateway := false } = .revertNotAuthorized := by decide
+example : run cfg { inp with srCtx := { inp.srCtx with callerIsGatewayFromRead := false } } = .revertNotAuthorized := by decide
 
 example :
-    run cfg { inp with callerIsTopUpGateway := false, keyIndicesLength := 0,
+    run cfg { inp with srCtx := { inp.srCtx with callerIsGatewayFromRead := false }, keyIndicesLength := 0,
                        moduleActive := false } = .revertNotAuthorized := by decide
 
 /- An unauthorized call with an empty allocation set must not slip into the line
    741 commit. -/
 example :
-    run cfg { inp with callerIsTopUpGateway := false, allocations := [] }
+    run cfg { inp with srCtx := { inp.srCtx with callerIsGatewayFromRead := false }, allocations := [] }
       ≠ .committedNoTopUp := by decide
 
 /-! ## Input validation, `_validateTopUpInputs`, source lines 761--782 -/
@@ -127,12 +137,13 @@ example : run cfg { inp with pubkeyLengths := [48, 47, 48] } = .revertWrongPubke
    lookup at line 689 and the status check at line 691.  Reordering them is a
    plausible mistake and is rejected here. -/
 example :
-    run cfg { inp with pubkeyLengths := [48, 47, 48], moduleExists := false,
+    run cfg { inp with pubkeyLengths := [48, 47, 48],
+                       srCtx := { inp.srCtx with moduleExistsFromRead := false },
                        moduleActive := false } = .revertWrongPubkeyLength := by decide
 
 /-! ## Module state, source lines 689--694 -/
 
-example : run cfg { inp with moduleExists := false } = .revertStakingModuleUnregistered := by
+example : run cfg { inp with srCtx := { inp.srCtx with moduleExistsFromRead := false } } = .revertStakingModuleUnregistered := by
   decide
 
 example : run cfg { inp with moduleActive := false } = .revertStakingModuleNotActive := by decide
@@ -140,12 +151,13 @@ example : run cfg { inp with moduleActive := false } = .revertStakingModuleNotAc
 /- `SRUtils._requireWCType2`, line 694: top-up is only supported for 0x02
    withdrawal credentials. -/
 example :
-    run cfg { inp with wcTypeIsType2 := false } = .revertWrongWithdrawalCredentialsType := by
+    run cfg { inp with srCtx := { inp.srCtx with wcTypeIsType2FromRead := false } } = .revertWrongWithdrawalCredentialsType := by
   decide
 
 /- The status check at line 691 precedes the credentials check at line 694. -/
 example :
-    run cfg { inp with moduleActive := false, wcTypeIsType2 := false }
+    run cfg { inp with moduleActive := false,
+                       srCtx := { inp.srCtx with wcTypeIsType2FromRead := false } }
       = .revertStakingModuleNotActive := by decide
 
 /-! ## The cap and the gwei rounding, source lines 696--706 -/
@@ -311,9 +323,18 @@ example : run { cfg with publicKeyLength := 32 } inp = .revertInvalidPublicKeyLe
    `type(uint64).max` as deployed.  The block cap is 10 ETH and the module is
    allocated 5 ETH. -/
 private def inpPinned : SourceTopupInput :=
-  ⟨true, 2, 2, [2000000000000000000, 2000000000000000000], [48, 48], true, true, true,
-    10000000000, 5000000000000000000, true,
-    [1000000000000000000, 1000000000000000000], 0, 10000000000000000000⟩
+  { srCtx := { callerIsGatewayFromRead := true, moduleExistsFromRead := true, wcTypeIsType2FromRead := true }
+    keyIndicesLength := 2
+    operatorIdsLength := 2
+    topUpLimits := [2000000000000000000, 2000000000000000000]
+    pubkeyLengths := [48, 48]
+    moduleActive := true
+    maxTopUpPerBlockGwei := 10000000000
+    moduleAllocationEth := 5000000000000000000
+    lidoState := { isStakingPaused := false, isBunkerActive := false }
+    allocations := [1000000000000000000, 1000000000000000000]
+    routerBalanceBefore := 0
+    lidoDepositableEther := 10000000000000000000 }
 
 example :
     run pinnedConfig inpPinned

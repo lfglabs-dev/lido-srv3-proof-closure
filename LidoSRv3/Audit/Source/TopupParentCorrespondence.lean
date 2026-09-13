@@ -217,7 +217,7 @@ returndata) for the three external calls at `:717-718`, `:744` and `:750`. -/
 def sourceExecute (cfg : SourceTopupConfig) (base : SourceTopupInput)
     (gateway caller : Address) (iface : CalleeInterface) : ParentExecution :=
   -- StakingRouter.sol:1177-1179  _checkAppAuth: if (_msgSender() != _appAuth) revert NotAuthorized();
-  let authenticated := { base with callerIsTopUpGateway := caller == gateway }
+  let authenticated := { base with srCtx := { base.srCtx with callerIsGatewayFromRead := caller == gateway } }
   -- StakingRouter.sol:686-715  guards before the module call
   match preAllocation cfg authenticated with
   | some outcome => sourceRevert [] outcome

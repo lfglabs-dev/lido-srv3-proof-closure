@@ -57,10 +57,11 @@ private def killCfg : SourceTopupConfig := ⟨48, 48, 1, 1, uint256Modulus⟩
 on-chain `unchecked` accumulator wraps to `1`; every limit, balance and cap
 sits above the exact sum, so no other guard fires. -/
 private def wrapInput : SourceTopupInput :=
-  { callerIsTopUpGateway := true, keyIndicesLength := 2, operatorIdsLength := 2,
+  { srCtx := { callerIsGatewayFromRead := true, moduleExistsFromRead := true, wcTypeIsType2FromRead := true },
+    keyIndicesLength := 2, operatorIdsLength := 2,
     topUpLimits := [uint256Modulus + 1, uint256Modulus + 1],
-    pubkeyLengths := [48, 48], moduleExists := true, moduleActive := true,
-    wcTypeIsType2 := true, maxTopUpPerBlockGwei := uint256Modulus + 1,
+    pubkeyLengths := [48, 48], moduleActive := true,
+    maxTopUpPerBlockGwei := uint256Modulus + 1,
     moduleAllocationEth := uint256Modulus + 1, lidoState := { isStakingPaused := false, isBunkerActive := false },
     allocations := [uint256Modulus - 1, 2], routerBalanceBefore := uint256Modulus,
     lidoDepositableEther := uint256Modulus + 1 }
