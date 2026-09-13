@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Source.ReserveCorrespondence
+import LidoSRv3.Audit.Source.ReserveFreshCacheFromWQ
 import LidoSRv3.Audit.Guarantees.Registry
 
 namespace LidoSRv3.Audit.Guarantees.PReserve1
@@ -82,6 +83,41 @@ theorem source_spend_preserves_withdrawal_reserve
         · simpa using hcan
         · simpa using hauth
         · exact hAmt
+
+/-- **Chantier 2 (Piste A, Thomas 2026-09-13) freshQueueCache bridge.**
+
+Restates `source_spend_preserves_withdrawal_reserve` with the free
+`live : Word` premise re-anchored to a source-level
+`WithdrawalQueueStorage` read: `live = liveFromWQStorage wqs =
+wqs.unfinalizedStETH`.  The caller can no longer supply an arbitrary
+`live` word for the freshness hypothesis; they must construct a
+`WithdrawalQueueStorage` and the freshness invariant is expressed
+against the storage-derived value.
+
+The registered `source_spend_preserves_withdrawal_reserve` above is
+retained unchanged for existing consumers.  This bridge exposes the
+Chantier 2 fidelity-composition value at the P-RESERVE-1 namespace:
+consumers can now supply a WQ storage state instead of a free `live`
+word.  Residual: `WithdrawalQueueStorage` is still a source model
+(the `unfinalizedStETH` field is a named `Nat` accumulator, not yet a
+STATICCALL-observed return-word); the executable-plane STATICCALL
+frame is the next follow-up (see `fidelity.missing`). -/
+theorem source_spend_preserves_withdrawal_reserve_under_pinned_wq_shape
+    (inputs : WithdrawInputs) (before after : ReserveState) (amount : Word)
+    (wqs : LidoSRv3.Audit.Source.WithdrawalQueueMappingSource.WithdrawalQueueStorage)
+    (hfresh : freshQueueCache before
+      ((LidoSRv3.Audit.Source.ReserveFreshCacheFromWQ.liveFromWQStorage wqs : Nat) : Word))
+    (h : modelWithdrawDepositableEther inputs before amount = .committed after) :
+    scopedWithdrawGuards inputs ∧
+      amount ≠ 0 ∧
+      withdrawalPartitionSpendInvariant before after amount ∧
+      liveEffectiveWithdrawalsReserve after
+          ((LidoSRv3.Audit.Source.ReserveFreshCacheFromWQ.liveFromWQStorage wqs : Nat) : Word) =
+        liveEffectiveWithdrawalsReserve before
+          ((LidoSRv3.Audit.Source.ReserveFreshCacheFromWQ.liveFromWQStorage wqs : Nat) : Word) :=
+  source_spend_preserves_withdrawal_reserve inputs before after amount
+    ((LidoSRv3.Audit.Source.ReserveFreshCacheFromWQ.liveFromWQStorage wqs : Nat) : Word)
+    hfresh h
 
 /--
 **P-RESERVE-1, Verity plane.** The executable `withdrawWithGuards` observes the
