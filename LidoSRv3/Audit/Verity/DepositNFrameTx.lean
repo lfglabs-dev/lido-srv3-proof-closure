@@ -200,6 +200,15 @@ def execute (inputs : Inputs) : Contract Unit := do
   -- Added by the model: word-overflow guard on the batch total (Solidity 0.8.25 checked-arithmetic Panic(0x11)).
   require (decide (exactTotal inputs.batches < _root_.Verity.Core.Uint256.modulus))
     "Panic(0x11)"
+  -- Added by the model (grok #412 D-NFRAME-1): the pinned `StakingRouter.deposit`
+  -- takes ONE `stakingModuleId` per call; the model list-lifts across `batches`,
+  -- one per module.  Duplicate `moduleId` within one composed transaction would
+  -- collide on the counter/observation slot and does not correspond to any pinned
+  -- semantics.  The check moves from a free `Preconditions.distinctModules` premise
+  -- to an executable in-body guard so mis-shaped inputs revert here instead of
+  -- silently breaking the parent premise.
+  require (decide ((inputs.batches.map fun batch => batch.moduleId).Nodup))
+    "DuplicateModuleId"
   -- StakingRouter.sol:980  uint256 etherBalanceBeforeDeposits = address(this).balance;
   let state ← DepositParentTx.getState
   -- StakingRouter.sol:976  _updateModuleLastDepositState(_stakingModuleId, depositsValue);
@@ -267,6 +276,14 @@ structure Preconditions (inputs : Inputs) (state : ContractState) : Prop where
   allocationValid : inputs.allocationValid = true
   lidoCallOk : inputs.lidoCallOk = true
   healthy : ∀ batch ∈ inputs.batches, Healthy batch
+  /-- Grok #412 D-NFRAME-1 (discharged 2026-09-13): pinned `StakingRouter.deposit`
+  admits one `stakingModuleId` per call; the model list-lifts across `batches`
+  one per module.  Distinct `moduleId`s across the composed list is still required
+  for a successful commit — but this is now ALSO an in-body executable guard in
+  `execute` (a `DuplicateModuleId` revert), so callers who supply a duplicating
+  input no longer silently break the parent premise: the executor observes them
+  and reverts.  The Preconditions field remains so `execute_apply` proves the
+  successful path without threading an extra `decide (Nodup ...) = true` step. -/
   distinctModules : (inputs.batches.map fun batch => batch.moduleId).Nodup
   valueMatches : wordTotal inputs.batches = wordKeys inputs.batches * inputs.depositSize
   /-- Conserving deployment (`MAX_EFFECTIVE_BALANCE_WC_TYPE_01 = DEPOSIT_SIZE`
@@ -603,8 +620,11 @@ theorem execute_apply (inputs : Inputs) (state : ContractState)
   have hPullTotal :
       wordKeys inputs.batches * inputs.maxEBType1 = wordTotal inputs.batches := by
     rw [h.conserving, ← h.valueMatches]
+  have hDistinctGuard :
+      decide ((inputs.batches.map fun batch => batch.moduleId).Nodup) = true :=
+    decide_eq_true h.distinctModules
   simp only [execute, Bind.bind, _root_.Verity.bind, _root_.Verity.require,
-    h.authorized, h.moduleActive, h.allocationValid, hNoWrapGuard, if_true,
+    h.authorized, h.moduleActive, h.allocationValid, hNoWrapGuard, hDistinctGuard, if_true,
     DepositParentTx.getState, setStorage]
   rw [processBatches_apply inputs inputs.batches entry h.healthy]
   simp only [Bind.bind, _root_.Verity.bind, hValueGuard, _root_.Verity.require, if_true]

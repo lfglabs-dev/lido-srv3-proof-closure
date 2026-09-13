@@ -113,4 +113,32 @@ theorem wrapping_witness_moves_no_journal :
     wrappingInputs threeBatchState rfl rfl rfl hWrap
   exact ⟨hRun, congrArg Observables.journal hObs⟩
 
+/-! ## D-NFRAME-1 in-body distinctModules guard kill-line -/
+
+/-- Two batches with the same `moduleId` — pinned `StakingRouter.deposit` admits
+one module per call, so this is not a pinned scenario; the model rejects at the
+new in-body guard rather than silently breaking the parent premise. -/
+def duplicateModuleInputs : DepositNFrameTx.Inputs :=
+  { threeBatchInputs with
+    batches := [batchA, { batchB with moduleId := batchA.moduleId }] }
+
+theorem duplicate_module_input_reverts_at_in_body_guard :
+    (DepositNFrameTx.execute duplicateModuleInputs).run threeBatchState =
+      .revert "DuplicateModuleId" threeBatchState := by
+  -- After the auth/active/allocation and word-overflow guards pass, the new
+  -- `Nodup` check on `batches.map moduleId` fires because both batches carry
+  -- moduleId = batchA.moduleId.
+  have hAuthorized : duplicateModuleInputs.authorized = true := rfl
+  have hActive : duplicateModuleInputs.moduleActive = true := rfl
+  have hAllocation : duplicateModuleInputs.allocationValid = true := rfl
+  have hNoWrapGuard :
+      decide (exactTotal duplicateModuleInputs.batches <
+        _root_.Verity.Core.Uint256.modulus) = true := by decide
+  have hDistinctGuard :
+      decide ((duplicateModuleInputs.batches.map fun batch => batch.moduleId).Nodup) =
+        false := by decide
+  simp [Contract.run, DepositNFrameTx.execute, Bind.bind, _root_.Verity.bind,
+    _root_.Verity.require, hAuthorized, hActive, hAllocation, hNoWrapGuard,
+    hDistinctGuard]
+
 end LidoSRv3.Tests.DepositNFrameTxMutants
