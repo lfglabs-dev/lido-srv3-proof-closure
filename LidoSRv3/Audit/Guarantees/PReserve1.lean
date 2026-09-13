@@ -418,4 +418,54 @@ theorem verity_tx_preserves_withdrawal_reserve
     withdrawalPartitionSpendInvariant (decode state) (decode after) amount :=
   verity_commit_preserves_withdrawal_reserve inputs state after amount h
 
+/-- **Chantier 2 (Piste A, Thomas 2026-09-13) registered consumer of the
+`authorizedRouter` def-accessor identity.**
+
+The four ETH-reserve free booleans previously carried on
+`WithdrawInputs` were eliminated across chantier 2 (PRs #559, #589):
+`canDeposit` became a `def` accessor over `lidoState`, and
+`authorizedRouter` became a `def` accessor over the pinned Aragon ACL
+state.
+
+This registered consumer records the exact def-accessor identity at
+the P-RESERVE-1 namespace: `inputs.authorizedRouter =
+isAuthorizedRouter inputs.acl = inputs.acl.stakingRouterRole`.  The
+`@[reducible, simp]` marker on both `WithdrawInputs.authorizedRouter`
+and `AragonACLSource.isAuthorizedRouter` means downstream `simp` /
+`rfl` calls unfold the def chain transparently — which is exactly what
+`verity_execution_simulates_spec` (in `ReserveCorrespondence.lean`)
+relies on to close its deep proof.
+
+Non-scaffold: this identity is load-bearing.  Replacing the def
+accessor with an opaque `authorizedRouter : Bool` field would break
+`verity_execution_simulates_spec` (the deep-proof `simp` chain would
+no longer unfold through the accessor).  The registered consumer
+captures the identity explicitly at the P-RESERVE-1 namespace so
+downstream consumers can rely on it. -/
+theorem reserve_authorized_router_def_accessor
+    (inputs : WithdrawInputs) :
+    inputs.authorizedRouter =
+      LidoSRv3.Audit.Source.AragonACLSource.isAuthorizedRouter inputs.acl :=
+  rfl
+
+/-- The `isAuthorizedRouter` predicate is itself the projection to
+`stakingRouterRole` — a `rfl` identity registered at the P-RESERVE-1
+namespace so downstream consumers get both hops of the def chain. -/
+theorem reserve_is_authorized_router_projects_staking_router_role
+    (acl : LidoSRv3.Audit.Source.AragonACLSource.ACLState) :
+    LidoSRv3.Audit.Source.AragonACLSource.isAuthorizedRouter acl =
+      acl.stakingRouterRole :=
+  rfl
+
+/-- The composed def chain: `inputs.authorizedRouter =
+inputs.acl.stakingRouterRole`.  The single identity ties the
+`WithdrawInputs` def accessor directly to the pinned ACL storage
+field, closing the "authorizedRouter refactor" item at the P-RESERVE-1
+namespace.  A regression that made `authorizedRouter` an opaque field
+(rather than a def accessor) would fail this `rfl`. -/
+theorem reserve_authorized_router_composed_chain
+    (inputs : WithdrawInputs) :
+    inputs.authorizedRouter = inputs.acl.stakingRouterRole :=
+  rfl
+
 end LidoSRv3.Audit.Guarantees.PReserve1
