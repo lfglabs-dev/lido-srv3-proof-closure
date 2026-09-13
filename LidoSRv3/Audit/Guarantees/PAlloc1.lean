@@ -1,6 +1,7 @@
 import LidoSRv3.Audit.Model.AllocCapacity
 import LidoSRv3.Audit.Source.AllocCapacityCorrespondence
 import LidoSRv3.Audit.Source.Alloc1CompositeBoundsSource
+import LidoSRv3.Audit.Source.SRStorageExitedMonotonicity
 import LidoSRv3.Audit.Guarantees.Registry
 import LidoSRv3.Audit.Guarantees.PAlloc1TargetMultBounded
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -203,6 +204,61 @@ theorem checked_execute_under_pinned_shape_and_constants
   -- constants at the ENUNCE for downstream consumers.
   checked_execute_under_pinned_shape cfg modules depositsToAllocate isTopUp
     hMaxEB hTypes hShape
+
+/-- **Chantier 3 (Piste A, Thomas 2026-09-13) `active_subtraction` real
+derivation via SRStorage write-history.**
+
+The `active_subtraction` conjunct of `CheckedBounds` is derived from a
+per-module write-history premise via
+`LidoSRv3.Audit.Source.SRStorageExitedMonotonicity.reachable_state_is_monotone`.
+Each module in the list is required to expose its `_updateExitedCounters` /
+`addValidators` write history from genesis; the write-discipline model
+enforces the invariant `wordMax exited ≤ deposited` as a state-machine
+reachability property (real derivation, not a caller premise).
+
+`SRStorageExitedMonotonicity.ExitedMonotone` is the invariant;
+`SRStorageExitedMonotonicity.reachable_state_is_monotone` proves the
+invariant is preserved by every successful `Operation` starting from
+`genesis`.  The bridge below projects the invariant back to the
+`Module`'s counter fields via `ofModule_monotone_iff`.
+
+Residual: this is a SOURCE-MODEL derivation.  Connecting the write history
+to LIVE EVM SRStorage writes (via `addValidators` / `_updateExitedCounters`
+STATICCALL frames) remains a follow-up.  With `target_multiplication`
+(via `PAlloc1TargetMultBounded`) and this new `active_subtraction`
+derivation, TWO of the four CheckedBounds conjuncts are derived from real
+source-plane reasoning rather than caller-supplied invariants. -/
+theorem checked_execute_under_type_and_write_history_bounds
+    (cfg : Config) (modules : List Module) (depositsToAllocate : Verity.Uint256)
+    (isTopUp : Bool)
+    (hMaxEB : cfg.maxEBType1 ≠ 0)
+    (hTypes : PAlloc1TargetMultBounded.PinnedStakingModuleTypeBounds
+      cfg modules depositsToAllocate)
+    (hHistories : ∀ m ∈ modules,
+      ∃ ops : List LidoSRv3.Audit.Source.SRStorageExitedMonotonicity.Operation,
+        LidoSRv3.Audit.Source.SRStorageExitedMonotonicity.applyOperations
+          LidoSRv3.Audit.Source.SRStorageExitedMonotonicity.genesis ops =
+        some (LidoSRv3.Audit.Source.SRStorageExitedMonotonicity.ofModule m))
+    (hShape : PAlloc1RemainingBoundsScaffold.PinnedSRAllocationBoundsShape
+      cfg modules depositsToAllocate isTopUp) :
+    ∃ rows, SolidityAllocCapacity.execute cfg modules depositsToAllocate isTopUp = some rows ∧
+      rows.map (fun row => (row.capacity : Nat)) =
+        MathView.capacities cfg modules depositsToAllocate isTopUp :=
+  checked_execute cfg modules depositsToAllocate isTopUp
+    { maxEBType1_nonzero := hMaxEB
+      active_subtraction := by
+        intro m hMem
+        rcases hHistories m hMem with ⟨ops, hOps⟩
+        have hMono :=
+          LidoSRv3.Audit.Source.SRStorageExitedMonotonicity.reachable_state_is_monotone
+            ops (LidoSRv3.Audit.Source.SRStorageExitedMonotonicity.ofModule m) hOps
+        exact
+          (LidoSRv3.Audit.Source.SRStorageExitedMonotonicity.ofModule_monotone_iff m).mp
+            hMono
+      total_addition := hShape.totalAdditionInvariant
+      available_arithmetic := hShape.availableArithmeticInvariant
+      target_multiplication :=
+        PAlloc1TargetMultBounded.target_multiplication_under_pinned_type_bounds hTypes }
 
 /-- Successful execution retains router index order. -/
 theorem router_order_preserved {cfg : Config} {modules : List Module}
