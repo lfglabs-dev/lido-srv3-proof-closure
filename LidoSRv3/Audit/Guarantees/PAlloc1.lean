@@ -234,4 +234,40 @@ theorem verity_tx_revert_restores_snapshot
   _root_.LidoSRv3.Audit.Verity.AllocationTx.revert_restores_snapshot
     count cfg depositsToAllocate isTopUp inject state rollback reason h
 
+open LidoSRv3.Audit.Verity.AllocationTx in
+/-- **Chantier 3 (Piste A, 2026-09-13): Contract.run rollback for the
+live-summary entry point.**  Every revert of
+`allocateLiveFromStorage` — the actual entry point wired into the
+registered Verity parent `verity_tx_simulates_allocation_count_from_storage`
+— restores the pre-call snapshot.  Includes the injected late-
+failure path exercised by `live_injected_after_writes_rolls_back`,
+which fires after every summary/stake staticcall has bound its row
+and after the allocation / capacity / address / total observation
+writes have been requested; `Contract.run` still returns
+`state = rollback` in that case.
+
+This closes the P-ALLOC-1 fidelity.missing entry "Contract.run
+rollback after intermediate writes for AllocationTx.allocate; the
+cited revert_restores_snapshot theorem does not cover
+allocateLiveFromStorage" — the registered parent now cites a
+Contract.run rollback theorem that DOES cover
+`allocateLiveFromStorage`, alongside the pre-existing coverage for
+the legacy `allocate` planted-map entry point.
+
+Underlying proof is `AllocationTx.live_revert_restores_snapshot`; this
+theorem re-exports it under the P-ALLOC-1 namespace so downstream
+consumers of the P-ALLOC-1 rollback obligation can name a live-plane
+theorem without reaching into `Verity.AllocationTx`. -/
+theorem verity_tx_live_revert_restores_snapshot
+    (adversary :
+      Compiler.CompilationModel.DenoteExternalCalls.AdversaryModel)
+    (cfg : Config) (depositsToAllocate : Verity.Uint256)
+    (isTopUp inject : Bool) (state rollback : Verity.ContractState)
+    (reason : String)
+    (h : (allocateLiveFromStorage adversary cfg depositsToAllocate isTopUp inject).run state =
+      Verity.ContractResult.revert reason rollback) :
+    rollback = state :=
+  live_revert_restores_snapshot
+    adversary cfg depositsToAllocate isTopUp inject state rollback reason h
+
 end LidoSRv3.Audit.Guarantees.PAlloc1
