@@ -154,6 +154,7 @@ import LidoSRv3.Audit.Source.ConsolidationCompositeGateSource
 import LidoSRv3.Audit.Source.Topup1CompositeGateSource
 import LidoSRv3.Audit.Source.Reserve1CompositeGateSource
 import LidoSRv3.Audit.Source.Address1CompositeGuardSource
+import LidoSRv3.Audit.Source.Deposit1CompositeGateSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -1187,6 +1188,9 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.Reserve1CompositeGateSource.canDepositFromOracleAndPacked_true_of_all_premises
 -- Seventy-third-step (2026-09-13): P-ADDRESS-1 composite balance/allowance guard.
 #print axioms LidoSRv3.Audit.Source.Address1CompositeGuardSource.bothGuardsPassFromOracle_true_of_bounds
+-- Seventy-fourth-step (2026-09-13): P-DEPOSIT-1 composite entry-gate.
+#print axioms LidoSRv3.Audit.Source.Deposit1CompositeGateSource.entryGatePasses_true_of_premises
+#print axioms LidoSRv3.Audit.Source.Deposit1CompositeGateSource.journal_length_eq_deposit_count
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape
