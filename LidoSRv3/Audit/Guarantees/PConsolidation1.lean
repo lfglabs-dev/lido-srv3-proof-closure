@@ -310,6 +310,38 @@ theorem verity_tx_simulates_consolidation_from_gateway
     exact LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayTotalFee_eq
       result inputs.sources.length
 
+/-- **Chantier 2 (Thomas 2026-09-13) A-CONSOLIDATION-GATEWAY-NONZERO
+gateway-bridged derivation.** Under the bridge premise
+`inputs.msgValue.val = gatewayVaultBoundary result inputs.sources.length`,
+a positive request count `inputs.sources.length ≠ 0`, and a nonzero
+STATICCALL fee `result.abiDecodedFee ≠ 0`, we DERIVE
+`inputs.msgValue.val ≠ 0` — the vault-side A-CONSOLIDATION-GATEWAY-NONZERO
+premise — without external assumption. This is the mandate's
+"fee ≠ 0 → totalFee ≠ 0" derivation, load-bearing on the three named
+premises: dropping any of them leaves `inputs.msgValue.val` arbitrary
+(zero fee, empty batch, or unrelated msgValue) and the conclusion
+false. The complementary `fee = 0` case is documented by
+`gatewayTotalFee_zero_at_fee_zero` (source plane): the on-chain
+`fee = 0` path forwards `totalFee = 0`, and the vault admits
+`msg.value = 0` under `_requireExactFee(0)`. Consumers composing at
+the gateway plane with a positive fee no longer need to supply
+A-CONSOLIDATION-GATEWAY-NONZERO as a caller premise — this theorem
+discharges it. -/
+theorem verity_tx_gateway_bridge_derives_nonzero_msg_value
+    (result : LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.PredeployStaticcallResult)
+    (inputs : Inputs)
+    (hMsgValue : inputs.msgValue.val =
+      (LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayVaultBoundary
+        result inputs.sources.length).msgValue)
+    (hCountPos : 0 < inputs.sources.length)
+    (hFeeNonzero : result.abiDecodedFee ≠ 0) :
+    inputs.msgValue.val ≠ 0 := by
+  rw [hMsgValue]
+  unfold LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayVaultBoundary
+  simp only
+  exact LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayTotalFee_ne_zero_of_fee_ne_zero
+    result inputs.sources.length hCountPos hFeeNonzero
+
 /-- **Kill-line: packing order.** If source ≠ target, a swapped
 target then source concat produces a different observation than the
 canonical source then target. One pair suffices. -/
