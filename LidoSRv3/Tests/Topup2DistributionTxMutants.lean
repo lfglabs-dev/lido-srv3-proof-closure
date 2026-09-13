@@ -17,8 +17,9 @@ private def runView (effective pending requested topUpLimits : List Word)
     (target minTopUp remainingCap moduleLimit valueGwei : Word) : View :=
   let before := stateFor effective pending requested topUpLimits defaultState
   observe (List.replicate requested.length 0) remainingCap
-    ((allocate requested.length target minTopUp remainingCap moduleLimit valueGwei).run
-      before)
+    ((allocate requested.length maxValidatorsPerTopUp
+        (List.replicate requested.length false)
+        target minTopUp remainingCap moduleLimit valueGwei).run before)
 
 /-- Happy path: two validators share a 10-gwei block/share budget left to
 right.  The first takes its 6-gwei request; the second is capped at 4. -/
@@ -94,7 +95,8 @@ example :
 `Contract.run`, not merely hidden by the observation. -/
 example :
     let before := stateFor (words [32]) (words [0]) (words [4]) (words [32]) defaultState
-    (allocate 1 (word 64) (word 1) (word 10) (word 100) (word 100) true).run before =
+    (allocate 1 maxValidatorsPerTopUp [false]
+        (word 64) (word 1) (word 10) (word 100) (word 100) true).run before =
       .revert "INJECTED_AFTER_WRITES" before := by rfl
 
 
@@ -194,7 +196,8 @@ Lean analogue of a gateway that dropped the `MaxValidatorsPerTopUpExceeded`
 require. The honest transaction reverts an over-limit batch that the mutant
 commits, so the guard is load-bearing rather than vacuous. -/
 
-def allocateNoMaxCheck (count : Nat) (target minTopUp remainingCap moduleLimit valueGwei : Word)
+def allocateNoMaxCheck (count : Nat) (slashedOrExited : List Bool)
+    (target minTopUp remainingCap moduleLimit valueGwei : Word)
     (failAfterWrites : Bool := false) : Contract Result := fun snapshot =>
   if count == 0 then .revert "WrongArrayLength" snapshot else
   match readArray snapshot "effective" effectiveBase count,
@@ -203,7 +206,7 @@ def allocateNoMaxCheck (count : Nat) (target minTopUp remainingCap moduleLimit v
       readArray snapshot "topUpLimits" limitsBase count with
   | some effective, some pending, some requested, some topUpLimits =>
       match LidoSRv3.Audit.Source.Topup2.sourceRun effective pending requested topUpLimits
-          target minTopUp remainingCap moduleLimit valueGwei with
+          slashedOrExited target minTopUp remainingCap moduleLimit valueGwei with
       | none => .revert "TOPUP_ARITHMETIC" snapshot
       | some (allocs, remaining, used) =>
           let dirty := persistAllocs allocs snapshot
@@ -224,11 +227,14 @@ private def overLimitState : ContractState :=
 
 example : overLimitCount > maxValidatorsPerTopUp := by decide
 
-example : (allocate overLimitCount (word 64) (word 1) (word 100) (word 100) (word 100)).run
+example : (allocate overLimitCount maxValidatorsPerTopUp
+    (List.replicate overLimitCount false)
+    (word 64) (word 1) (word 100) (word 100) (word 100)).run
     overLimitState = .revert "MaxValidatorsPerTopUpExceeded" overLimitState := by
   rfl
 
-example : (allocateNoMaxCheck overLimitCount (word 64) (word 1) (word 100) (word 100) (word 100)).run
+example : (allocateNoMaxCheck overLimitCount (List.replicate overLimitCount false)
+    (word 64) (word 1) (word 100) (word 100) (word 100)).run
     overLimitState = .success ⟨List.replicate overLimitCount (word 1), word 67, word 33⟩
       ((persistAllocs (List.replicate overLimitCount (word 1)) overLimitState).writeSlot remainingSlot (word 67) |>.writeSlot allocatedSlot (word 33)) := by
   rfl
@@ -237,8 +243,8 @@ private def runViewNoMax (effective pending requested topUpLimits : List Word)
     (target minTopUp remainingCap moduleLimit valueGwei : Word) : View :=
   let before := stateFor effective pending requested topUpLimits defaultState
   observe (List.replicate requested.length 0) remainingCap
-    ((allocateNoMaxCheck requested.length target minTopUp remainingCap moduleLimit valueGwei).run
-      before)
+    ((allocateNoMaxCheck requested.length (List.replicate requested.length false)
+        target minTopUp remainingCap moduleLimit valueGwei).run before)
 
 example : runView overLimitEffective overLimitPending overLimitRequested overLimitTopUpLimits
     (word 64) (word 1) (word 100) (word 100) (word 100) =
@@ -251,15 +257,18 @@ example : runViewNoMax overLimitEffective overLimitPending overLimitRequested ov
   decide
 
 theorem max_validators_guard_kill_line_refutes_no_check :
-    ∃ (effective pending requested : List Word)
+    ∃ (effective pending requested : List Word) (slashedOrExited : List Bool)
       (target minTopUp remainingCap moduleLimit valueGwei : Word)
       (state : ContractState),
-      (allocate requested.length target minTopUp remainingCap moduleLimit valueGwei).run state =
+      (allocate requested.length maxValidatorsPerTopUp slashedOrExited
+          target minTopUp remainingCap moduleLimit valueGwei).run state =
         .revert "MaxValidatorsPerTopUpExceeded" state ∧
-      (allocateNoMaxCheck requested.length target minTopUp remainingCap moduleLimit valueGwei).run state =
+      (allocateNoMaxCheck requested.length slashedOrExited
+          target minTopUp remainingCap moduleLimit valueGwei).run state =
         .success ⟨List.replicate requested.length (word 1), word 67, word 33⟩
           ((persistAllocs (List.replicate requested.length (word 1)) state).writeSlot remainingSlot (word 67) |>.writeSlot allocatedSlot (word 33)) := by
   exact ⟨overLimitEffective, overLimitPending, overLimitRequested,
+    List.replicate overLimitCount false,
     word 64, word 1, word 100, word 100, word 100, overLimitState, rfl, rfl⟩
 
 end LidoSRv3.Tests.Topup2DistributionTxMutants

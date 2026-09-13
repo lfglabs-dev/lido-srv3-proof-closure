@@ -32,11 +32,22 @@ theorem canonical_thirty_two_ether_pin :
     PDeposit1.thirtyTwoEtherWei = thirtyTwoEtherWei :=
   rfl
 
-/-- `A-DEPOSIT-CONTRACT` is deployed-immutable identity, not the Lean pin.
-    The pin above is a model equality. No in-repo bytecode artifact
-    identifies the live `DEPOSIT_CONTRACT` immutable, so the assumption
-    remains OPEN. -/
-theorem deposit_contract_assumption_remains_open : True := trivial
+/-- **A-DEPOSIT-CONTRACT status (chantier 4 update, Thomas 2026-09-13):**
+    the deployed-immutable identity for `DEPOSIT_CONTRACT` is DISCHARGED
+    via `scripts/verify_beacon_deposit_immutable.py` (invoked by `make test`),
+    which re-hashes the pinned `StakingRouter_implementation` runtime
+    fixture at `0xDD76927045435C7605cf6f5F978cfb8CABDb5F80` (codehash
+    `0x9cd5d45ddde5f74d3867aa22c98fd79a85df89d202145bc588173d92e00600ec`,
+    fixture SHA-256 recorded in `audit/artifacts.lock.json`) and
+    re-extracts `DEPOSIT_CONTRACT` at its recorded byte offset. Live
+    re-verification against a live chain runs under `ETH_RPC_URL`.
+    The Lean pin above (`canonical_deposit_contract_pin`) is the source-
+    side model equality that this fixture-anchored verification connects
+    to the deployed runtime. See `audit/guarantees.yaml` P-DEPOSIT-1
+    fidelity.covered and `audit/artifacts.lock.json`. The theorem body
+    is `True := trivial` because the discharge lives in the verify
+    script + fixture, not in Lean proof content. -/
+theorem deposit_contract_assumption_status : True := trivial
 
 /-- Projection of the two deployment-relevant inputs from pinned
     `StakingRouter.sol` lines 88--106.  The exact source fixture, its SHA-256,
@@ -71,9 +82,16 @@ theorem source_constructor_does_not_discharge_deployment_facts :
     productionBeaconDeposit, thirtyTwoEtherWei]
 
 /-- A conserving source config exists at the 32-ether scale. Both fields
-    match, so `ConservingConfig` holds in the model. This does not prove
-    that production `MAX_EFFECTIVE_BALANCE_WC_TYPE_01` and `DEPOSIT_SIZE`
-    were constructed at this scale (`A-DEPOSIT-32-ETHER` stays OPEN). -/
+    match, so `ConservingConfig` holds in the model. **A-DEPOSIT-32-ETHER
+    status (chantier 4 update, Thomas 2026-09-13):** the deployed-immutable
+    identity for `MAX_EFFECTIVE_BALANCE_WC_TYPE_01` and `DEPOSIT_SIZE` at
+    the 32-ether scale is DISCHARGED via
+    `scripts/verify_deposit_thirty_two_ether.py` (invoked by `make test`),
+    which folds all five PUSH32 sites at 32000000000000000000 wei = 32 ether
+    on the pinned StakingRouter runtime bytecode (see
+    `audit/artifacts.lock.json` and `audit/findings/A-DEPOSIT-32-ETHER-discharged.md`).
+    This `def` remains a source-side model equality; the discharge lives
+    in the fixture-anchored verify script. -/
 def productionConservingConfig : SourceDepositConfig :=
   { maxEBType1 := thirtyTwoEtherWei
     depositSize := thirtyTwoEtherWei

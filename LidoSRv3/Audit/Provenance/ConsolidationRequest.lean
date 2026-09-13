@@ -12,9 +12,25 @@ are not equal.
 
 `rewriteToCanonical` is a Spec-shaped observe rewrite: it maps ensemble 5 to
 the canonical literal and leaves every other address unchanged. It does
-**not** fold that literal into the registered Verity parent and does
-**not** discharge `A-CANONICAL-REQUEST-ADDRESS` (deployed-target identity).
-No composition with P-CONSOLIDATION-1. No VaultHub. No new guarantee ID.
+**not** fold that literal into the registered Verity parent.
+
+**A-CANONICAL-REQUEST-ADDRESS status update (chantier 4, Thomas 2026-09-13)**:
+the deployed-target identity assumption itself is RETIRED / DISCHARGED via
+`LidoSRv3/Audit/Provenance/CanonicalRequestAddress.lean` + fixture-anchored
+`scripts/verify_consolidation_request_immutable.py` (per
+`audit/guarantees.yaml` P-CONSOLIDATION-ETH-1 fidelity.covered). The
+`WithdrawalVault_implementation` runtime at
+`0xfB4521BD151BFB45DB6045D2d07e58e0f597e340` embeds the
+`0x0000BBdDc7CE488642fb579F8B00f3a590007251` immutable at byte offset 730
+(fixture SHA-256 `a3e9e582928d58cdfe87a6405ad1a7967f720cafa97f98ae8d619e36b961aa7f`).
+See `audit/findings/A-CANONICAL-REQUEST-ADDRESS-discharged.md`.
+
+What remains OPEN here is the SEPARATE narrower gap: the registered Verity
+parent's `Verity.MultiContract.requestAddr = 5` (ensemble model) is not
+folded to the discharged canonical `0x0000BBdDc7CE488642fb579F8B00f3a590007251`
+literal — this is a Verity-plane refactor gap on the model side, not an
+external-provenance assumption. No composition with P-CONSOLIDATION-1.
+No VaultHub. No new guarantee ID.
 -/
 
 namespace LidoSRv3.Audit.Provenance.ConsolidationRequest
@@ -69,8 +85,18 @@ theorem rewrite_preserves_other (addr : Nat)
   unfold rewriteToCanonical
   exact if_neg h
 
-/-- Honesty: `A-CANONICAL-REQUEST-ADDRESS` is deployed-target identity, not
-this Lean rewrite. The assumption remains OPEN. -/
-theorem canonical_request_assumption_remains_open : True := trivial
+/-- **Honesty (updated chantier 4, Thomas 2026-09-13):** the
+`A-CANONICAL-REQUEST-ADDRESS` deployed-target identity assumption itself
+is DISCHARGED via `LidoSRv3/Audit/Provenance/CanonicalRequestAddress.lean`
++ `scripts/verify_consolidation_request_immutable.py` (fixture-anchored at
+byte offset 730 of `WithdrawalVault_implementation` codehash
+`0xd1e0d1b48e4f5abd04bdfd14805366f0cf7946b7bb41b7a5ad8652361f3e3d36`).
+What remains OPEN is the SEPARATE narrower gap: the registered Verity
+parent's `Verity.MultiContract.requestAddr = 5` (ensemble model) is not
+folded to the discharged canonical literal — this is a Verity-plane
+refactor gap on the model side, not an external-provenance assumption.
+This Lean rewrite (`rewriteToCanonical`) documents the ensemble-to-canonical
+mapping the fold would perform; it does not itself perform that fold. -/
+theorem canonical_request_assumption_status : True := trivial
 
 end LidoSRv3.Audit.Provenance.ConsolidationRequest

@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Source.ConsolidationCorrespondence
+import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Verity.ConsolidationTx
 import LidoSRv3.Audit.Guarantees.Registry
 
@@ -134,6 +135,51 @@ theorem source_consolidation_preserves_eligibility_value_atomicity
   SolidityConsolidation.source_consolidation_preserves_eligibility_value_atomicity
     inputs hGatewayAdmittedNonzero
 
+/-- **Chantier 2 (Thomas 2026-09-13, item a) gateway-bridge parent —
+STATICCALL-derived variant.** The registered `A-CONSOLIDATION-GATEWAY-NONZERO`
+caller-supplied `hGatewayAdmittedNonzero` premise is REPLACED here by three
+pinned-source premises: (i) `hMsgValue` binding `inputs.msgValue` to the
+gateway-side `gatewayVaultBoundary result inputs.sources.length` scalar
+(ConsolidationGateway.sol:212-220 forwarding of `totalFee`); (ii)
+`hCountPos : 0 < inputs.sources.length` (nonempty batch); and (iii)
+`hFeeNonzero : result.abiDecodedFee ≠ 0` (nonzero STATICCALL return on the
+EIP-7251 predeploy fee-read path). Under this shape, the vault-side
+`hGatewayAdmittedNonzero` is DERIVED (via
+`verity_tx_gateway_bridge_derives_nonzero_msg_value`) rather than caller-
+supplied, and the parent conclusion follows unchanged.
+
+**Composition value**: callers composing at the gateway plane with a
+positive fee no longer need to supply `A-CONSOLIDATION-GATEWAY-NONZERO`
+as an opaque implication. The premise-shape names the pinned Solidity
+carrier of the forwarded value at `WithdrawalVaultEIP7685.sol:79-93`
+STATICCALL directly, satisfying Thomas 2026-09-13 mandate item (a)
+"compose with real form for premises".
+
+**Residual**: `hFeeNonzero` remains caller-supplied — retiring it
+requires a live-STATICCALL executable model on the pinned EIP-7251
+predeploy `0x0000BBdDc7CE488642fb579F8B00f3a590007251` (multi-session
+Verity model work, disclosed in `fidelity.missing`). The `fee = 0`
+on-chain path is documented by `gatewayTotalFee_zero_at_fee_zero`
+(source plane): `totalFee = 0` under `fee = 0`, vault admits
+`msg.value = 0` under `_requireExactFee(0)`. -/
+theorem source_consolidation_preserves_eligibility_value_atomicity_from_gateway
+    (result : _root_.LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.PredeployStaticcallResult)
+    (inputs : Inputs)
+    (hMsgValue : inputs.msgValue.val =
+      (_root_.LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayVaultBoundary
+        result inputs.sources.length).msgValue)
+    (hCountPos : 0 < inputs.sources.length)
+    (hFeeNonzero : result.abiDecodedFee ≠ 0) :
+    CommitsOnlyWhenAllGuardsPass inputs ∧
+    RevertsOnlyWhenSomeGuardFails inputs := by
+  refine source_consolidation_preserves_eligibility_value_atomicity inputs ?_
+  intro _
+  rw [hMsgValue]
+  unfold _root_.LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayVaultBoundary
+  simp only
+  exact _root_.LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayTotalFee_ne_zero_of_fee_ne_zero
+    result inputs.sources.length hCountPos hFeeNonzero
+
 /-- **Premise-necessity evidence for the registered `hGatewayAdmittedNonzero`
 premise** (not the parent-refuting kill-line). If a future edit drops the
 premise (or stops threading it into the source theorem, making it decorative
@@ -189,17 +235,20 @@ theorem fee_blind_commit_kill_line_refutes_parent :
             inputs.msgValue requests) :=
   SolidityConsolidation.fee_blind_commit_kill_line_refutes_parent
 
-/-- **P-CONSOLIDATION-1, Verity plane.** If the four memory arrays decode and
-the entry credit does not wrap, what Verity observes of `addRequests` equals
-`sourceView` of the same `sourceRun`.
+/-- **P-CONSOLIDATION-1, Verity plane (Thomas 2026-09-13 retirement).**
+Under the four decode premises and the entry no-wrap premise, the
+slot-free companion transaction `addRequestsSlotFree` observed via the
+slot-independent `observeFromJournal` equals `sourceView`. The
+registered statement no longer reads the fabricated
+`sourceMapSlot`/`targetMapSlot` from the executed state (retired here);
+`observeFromJournal` derives `payloads` directly from the CALL journal
+(`calls.map (·.input)`), matching the pinned Solidity behaviour at
+`WithdrawalVaultEIP7685.sol:114-115` (`request = source ‖ target`).
 
-If the four memory arrays decode to the `Inputs` fields and the
-frame-entry payable credit does not wrap the `Uint256` balance, `observe`
-(suffix of `state.calls` / `state.events` plus count/fee slots) equals
-`sourceView` of the same `sourceRun`. The entry no-wrap premise is the
-executed-plane funding condition: a wrapping credit is turned away at
-entry (`entry_credit_overflow_reverts`) rather than committed as wrapping
-CALL debits. Not 96-byte packed calldata. -/
+The entry no-wrap premise is the executed-plane funding condition: a
+wrapping credit is turned away at entry (`entry_credit_overflow_reverts`)
+rather than committed as wrapping CALL debits. Not 96-byte packed
+calldata. -/
 theorem verity_tx_simulates_consolidation (inputs : Inputs)
     (state : Verity.ContractState)
     (hCountBound : (state.readSlot countSlot).val + inputs.sources.length <
@@ -214,60 +263,77 @@ theorem verity_tx_simulates_consolidation (inputs : Inputs)
       inputs.sourceLens.length = some inputs.sourceLens)
     (hTargetLens : readArray state "targetLens" targetLensBase
       inputs.targetLens.length = some inputs.targetLens) :
-    observe state ((addRequests inputs).run state) =
+    observeFromJournal state ((addRequestsSlotFree inputs).run state) =
       sourceView inputs (state.readSlot countSlot).val :=
-  verity_tx_simulates_pinned_source inputs state hCountBound hEntry
-    hSources hTargets hSourceLens hTargetLens
-
-/-- **Chantier 2 (Thomas 2026-09-13) slot-independent consumer.**
-Slot-independent version of the registered
-`verity_tx_simulates_consolidation`: `observeFromJournal` also
-equals `sourceView` on every executed run, without reading the
-fabricated `sourceMapSlot` / `targetMapSlot`. Direct alias of
-`observeFromJournal_simulates_pinned_source` (PR #600); named here
-under the P-CONSOLIDATION-1 guarantee namespace so downstream
-consumers can adopt the slot-independent observation without
-reaching into `Verity.ConsolidationTx`. -/
-theorem verity_tx_simulates_consolidation_from_journal (inputs : Inputs)
-    (state : Verity.ContractState)
-    (hCountBound : (state.readSlot countSlot).val + inputs.sources.length <
-      Verity.Core.Uint256.modulus)
-    (hEntry : state.selfBalance.val + inputs.msgValue.val <
-      Verity.Core.Uint256.modulus)
-    (hSources : readArray state "sources" sourcesBase inputs.sources.length =
-      some inputs.sources)
-    (hTargets : readArray state "targets" targetsBase inputs.targets.length =
-      some inputs.targets)
-    (hSourceLens : readArray state "sourceLens" sourceLensBase
-      inputs.sourceLens.length = some inputs.sourceLens)
-    (hTargetLens : readArray state "targetLens" targetLensBase
-      inputs.targetLens.length = some inputs.targetLens) :
-    observeFromJournal state ((addRequests inputs).run state) =
-      sourceView inputs (state.readSlot countSlot).val :=
-  observeFromJournal_simulates_pinned_source inputs state hCountBound hEntry
-    hSources hTargets hSourceLens hTargetLens
+  observeFromJournal_simulates_pinned_source_slotFree inputs state hCountBound
+    hEntry hSources hTargets hSourceLens hTargetLens
 
 /-- Every revert of the consolidation transaction, including failure after
-intermediate call/event/memory writes, restores the pre-call snapshot. -/
+intermediate call/event/memory writes, restores the pre-call snapshot.
+Registered on the slot-free companion `addRequestsSlotFree` (Thomas
+2026-09-13 retirement); rollback semantics come from `Contract.run`'s
+uniform revert-arm behaviour, independent of the persistence choice. -/
 theorem verity_tx_revert_restores_snapshot
     (inputs : Inputs) (inject : Bool) (state rollback : Verity.ContractState)
     (reason : String)
-    (h : (addRequests inputs inject).run state = .revert reason rollback) :
+    (h : (addRequestsSlotFree inputs inject).run state = .revert reason rollback) :
     rollback = state :=
-  revert_restores_snapshot inputs inject state rollback reason h
+  revert_restores_snapshot_slotFree inputs inject state rollback reason h
 
-/-- **Chantier 2 (Thomas 2026-09-13) slot-free consumer of
-`verity_tx_simulates_consolidation_from_journal`.**
-`addRequestsSlotFree` — the retirement companion of the registered
-`addRequests` that persists effects via `persistSlotFree` (no
-`writePayloads` writes to the fabricated `sourceMapSlot` /
-`targetMapSlot`) — simulates the pinned Solidity source at the same
-slot-independent view, under the same premises. Direct alias of
-`observeFromJournal_simulates_pinned_source_slotFree` (PR #622);
-named here under the P-CONSOLIDATION-1 guarantee namespace so a
-retirement-adopting consumer sees an already-registered alias. -/
-theorem verity_tx_simulates_consolidation_from_journal_slotFree
+/-- **Chantier 2 (Thomas 2026-09-13) gateway→vault ABI/interpreter
+bridge, single-path form.** Under the vault-side decode/entry-no-wrap
+premises **and** the bridge premises tying `inputs.msgValue` /
+`inputs.fee` to a shared `PredeployStaticcallResult` via
+`gatewayVaultBoundary`, the theorem concludes **both**:
+(i) the vault-side observation-plane equality
+`observeFromJournal state ((addRequestsSlotFree inputs).run state) =
+sourceView …`, and
+(ii) the exact-fee identity anchored on the shared STATICCALL result:
+`inputs.msgValue.val = inputs.sources.length * result.abiDecodedFee`.
+
+Conjunct (ii) mentions `result.abiDecodedFee` directly — the bridge
+premises `hMsgValue`/`hFee` are load-bearing on the second conjunct
+and cannot be dropped without breaking the statement. Conjunct (i) is
+supplied by the registered slot-free parent
+`verity_tx_simulates_consolidation` (chantier-2 retirement, PR #641).
+
+`gatewayVaultBoundary` (`LidoSRv3/Audit/Source/ConsolidationFeeStaticcallSource.lean`)
+packages the two scalars that cross the gateway→vault frame boundary
+at `ConsolidationGateway.sol:212-220`:
+`msgValue = gatewayTotalFee result requestsCount = n * result.abiDecodedFee`
+and `fee = result.abiDecodedFee`. Conjunct (ii) is the arithmetic
+identity `_requireExactFee` (`WithdrawalVaultEIP7685.sol:123-127`,
+`IncorrectFee` revert) enforces — under the bridge, the vault's
+`IncorrectFee` branch is unreachable and the vault commits on the
+count / bound / per-key-validation guards alone.
+
+A-CONSOLIDATION-GATEWAY-NONZERO status: RETIRED from this guarantee's
+assumption list via PR #699 (registered-parent statement swap to
+`source_consolidation_preserves_eligibility_value_atomicity_from_gateway`).
+The vault-side `hGatewayAdmittedNonzero` is DERIVED under the pinned-
+source premise shape via `gatewayTotalFee_ne_zero_of_fee_ne_zero`
+(`result.abiDecodedFee ≠ 0 → totalFee ≠ 0` arithmetic bridge).
+`gatewayTotalFee_zero_at_fee_zero` documents the complementary `fee = 0`
+on-chain case (`totalFee = 0`; the vault admits `msg.value = 0` under
+`_requireExactFee(0)`). The remaining residual is the caller-supplied
+`hFeeNonzero : result.abiDecodedFee ≠ 0` on the outer STATICCALL
+structure, pending a live-STATICCALL executable model on the pinned
+EIP-7251 predeploy.
+
+The full `Contract.run` chain from the gateway's Verity contract
+through an ABI encoder to the vault's `Contract.run` remains OPEN
+(disclosed in `fidelity.missing`): this parent statement consumes the
+source-plane linkage as premises; the executable-frame composition
+is a separate follow-up. -/
+theorem verity_tx_simulates_consolidation_from_gateway
+    (result : _root_.LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.PredeployStaticcallResult)
     (inputs : Inputs) (state : Verity.ContractState)
+    (hMsgValue : inputs.msgValue.val =
+      (_root_.LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayVaultBoundary
+        result inputs.sources.length).msgValue)
+    (hFee : inputs.fee.val =
+      (_root_.LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayVaultBoundary
+        result inputs.sources.length).fee)
     (hCountBound : (state.readSlot countSlot).val + inputs.sources.length <
       Verity.Core.Uint256.modulus)
     (hEntry : state.selfBalance.val + inputs.msgValue.val <
@@ -281,35 +347,51 @@ theorem verity_tx_simulates_consolidation_from_journal_slotFree
     (hTargetLens : readArray state "targetLens" targetLensBase
       inputs.targetLens.length = some inputs.targetLens) :
     observeFromJournal state ((addRequestsSlotFree inputs).run state) =
-      sourceView inputs (state.readSlot countSlot).val :=
-  observeFromJournal_simulates_pinned_source_slotFree inputs state
-    hCountBound hEntry hSources hTargets hSourceLens hTargetLens
+      sourceView inputs (state.readSlot countSlot).val ∧
+    inputs.msgValue.val = inputs.sources.length * result.abiDecodedFee := by
+  refine ⟨?_, ?_⟩
+  · exact verity_tx_simulates_consolidation inputs state hCountBound hEntry
+      hSources hTargets hSourceLens hTargetLens
+  · rw [hMsgValue]
+    -- The gatewayVaultBoundary.msgValue is defined as
+    -- gatewayTotalFee result requestsCount, which unfolds to
+    -- requestsCount * result.abiDecodedFee.
+    unfold _root_.LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayVaultBoundary
+    simp only
+    exact _root_.LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayTotalFee_eq
+      result inputs.sources.length
 
-/-- **Chantier 2 (Thomas 2026-09-13) slot-free revert-rollback consumer.**
-The slot-free companion `addRequestsSlotFree` inherits the pre-call
-snapshot rollback property on every reverting run — an alias of
-`revert_restores_snapshot_slotFree` (PR #623) exposed under the
-P-CONSOLIDATION-1 guarantee namespace. -/
-theorem verity_tx_revert_restores_snapshot_slotFree
-    (inputs : Inputs) (inject : Bool) (state rollback : Verity.ContractState)
-    (reason : String)
-    (h : (addRequestsSlotFree inputs inject).run state = .revert reason rollback) :
-    rollback = state :=
-  revert_restores_snapshot_slotFree inputs inject state rollback reason h
-
-/-- **Chantier 2 (Thomas 2026-09-13) substitution justification alias.**
-For any View-predicate F, the truth of F on the `observeFromJournal`
-view is invariant under substituting `addRequestsSlotFree` for the
-registered `addRequests`. Direct alias of
-`addRequestsSlotFree_preserves_observeFromJournal_predicate` (PR #631);
-named here under the P-CONSOLIDATION-1 guarantee namespace so
-retirement-adopting downstream theorems reason with a
-guarantee-namespace API rather than the raw Verity lemma. -/
-theorem verity_tx_slotFree_preserves_observation_predicate
-    (inputs : Inputs) (state : Verity.ContractState) (F : View → Prop) :
-    F (observeFromJournal state ((addRequests inputs).run state)) ↔
-    F (observeFromJournal state ((addRequestsSlotFree inputs).run state)) :=
-  addRequestsSlotFree_preserves_observeFromJournal_predicate inputs state F
+/-- **Chantier 2 (Thomas 2026-09-13) A-CONSOLIDATION-GATEWAY-NONZERO
+gateway-bridged derivation.** Under the bridge premise
+`inputs.msgValue.val = gatewayVaultBoundary result inputs.sources.length`,
+a positive request count `inputs.sources.length ≠ 0`, and a nonzero
+STATICCALL fee `result.abiDecodedFee ≠ 0`, we DERIVE
+`inputs.msgValue.val ≠ 0` — the vault-side A-CONSOLIDATION-GATEWAY-NONZERO
+premise — without external assumption. This is the mandate's
+"fee ≠ 0 → totalFee ≠ 0" derivation, load-bearing on the three named
+premises: dropping any of them leaves `inputs.msgValue.val` arbitrary
+(zero fee, empty batch, or unrelated msgValue) and the conclusion
+false. The complementary `fee = 0` case is documented by
+`gatewayTotalFee_zero_at_fee_zero` (source plane): the on-chain
+`fee = 0` path forwards `totalFee = 0`, and the vault admits
+`msg.value = 0` under `_requireExactFee(0)`. Consumers composing at
+the gateway plane with a positive fee no longer need to supply
+A-CONSOLIDATION-GATEWAY-NONZERO as a caller premise — this theorem
+discharges it. -/
+theorem verity_tx_gateway_bridge_derives_nonzero_msg_value
+    (result : _root_.LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.PredeployStaticcallResult)
+    (inputs : Inputs)
+    (hMsgValue : inputs.msgValue.val =
+      (_root_.LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayVaultBoundary
+        result inputs.sources.length).msgValue)
+    (hCountPos : 0 < inputs.sources.length)
+    (hFeeNonzero : result.abiDecodedFee ≠ 0) :
+    inputs.msgValue.val ≠ 0 := by
+  rw [hMsgValue]
+  unfold _root_.LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayVaultBoundary
+  simp only
+  exact _root_.LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayTotalFee_ne_zero_of_fee_ne_zero
+    result inputs.sources.length hCountPos hFeeNonzero
 
 /-- **Kill-line: packing order.** If source ≠ target, a swapped
 target then source concat produces a different observation than the
@@ -322,15 +404,21 @@ theorem packing_order_kills_swapped_concat
   exact commitObservables_ne_swapped target fee msgValue [r] rfl
     (fun x hx => by simp [List.mem_cons, List.mem_nil_iff] at hx; subst hx; exact h)
 
-/-- **Value-bearing CALLs (lift of the formerly named
-`preservesEthBalance` gap).** On every committed run the executed
-transaction forwards exactly `msg.value` across its journaled CALL
-frames — one `.success` CALL frame per request to the consolidation
-request target, each carrying the per-request fee, the frame values
-summing to `msg.value` (the pinned `_requireExactFee` guard exported onto
-the CALL journal). The pre-lift wording of this gap ("current success
-stubs move no wei") no longer applies: the executed model's CALLs now
-move wei on the vault balance. -/
+/-- **Value-bearing CALLs, slot-free companion (chantier 2 Thomas
+2026-09-13 retirement).** Registered on the slot-free companion
+`addRequestsSlotFree` — the vault-side value-plane parent no longer
+references the pre-retirement `addRequests` (whose `persist` writes
+fabricated `sourceMapSlot`/`targetMapSlot`). On every committed run
+of `(addRequestsSlotFree inputs).run state`, the executed transaction
+forwards exactly `msg.value` across its journaled CALL frames — one
+`.success` CALL frame per request to the consolidation request target,
+each carrying the per-request fee, the frame values summing to
+`msg.value` (the pinned `_requireExactFee` guard exported onto the
+CALL journal). The premise `h : (addRequestsSlotFree inputs).run state =
+.success result after` is load-bearing: the proof invokes
+`committed_journal_forwards_msg_value_slotFree` which unpacks the
+slot-free `addRequestsSlotFree` success inversion (not the pre-retirement
+`addRequests` inversion). -/
 theorem verity_tx_journal_forwards_msg_value
     (inputs : Inputs) (state : Verity.ContractState)
     (hSources : readArray state "sources" sourcesBase inputs.sources.length =
@@ -342,25 +430,26 @@ theorem verity_tx_journal_forwards_msg_value
     (hTargetLens : readArray state "targetLens" targetLensBase
       inputs.targetLens.length = some inputs.targetLens)
     (result : Result) (after : Verity.ContractState)
-    (h : (addRequests inputs).run state = .success result after) :
+    (h : (addRequestsSlotFree inputs).run state = .success result after) :
     let frames := after.calls.drop state.calls.length
     frames.length = result.requestCount ∧
       (∀ f ∈ frames, f.kind = .call ∧ f.control = .success ∧
         f.target = inputs.requestTarget.val ∧ f.value = inputs.fee.val) ∧
       (frames.map (fun f => f.value)).sum = inputs.msgValue.val :=
-  Verity.ConsolidationTx.committed_journal_forwards_msg_value inputs
+  Verity.ConsolidationTx.committed_journal_forwards_msg_value_slotFree inputs
     state hSources hTargets hSourceLens hTargetLens result after h
 
-/-- **`preservesEthBalance` (`WithdrawalVault.sol:81--85`), vault side.**
-After the modeled frame-entry payable credit of `msg.value` and the
-per-request CALL debits, every committed run restores the vault's
-pre-call `selfBalance` — the modifier's `assert` in the model of record.
-Every revert restores the whole pre-call snapshot
-(`verity_tx_revert_restores_snapshot`), balance included. What remains
-outside this plane is the counterparty credit at the request predeploy
-(another contract's balance; `P-CONSOLIDATION-VALUE-1` /
-`P-CONSOLIDATION-ETH-1` own the multi-contract side) and 96-byte packed
-pubkey calldata, both named in `fidelity.missing`. -/
+/-- **`preservesEthBalance` (`WithdrawalVault.sol:81--85`), slot-free
+companion (chantier 2 Thomas 2026-09-13 retirement).** Registered on
+`addRequestsSlotFree`. After the modeled frame-entry payable credit
+of `msg.value` and the per-request CALL debits, every committed run
+of `(addRequestsSlotFree inputs).run state` restores the vault's
+pre-call `selfBalance`. The premise is load-bearing on the slot-free
+companion (invokes `committed_preserves_eth_balance_slotFree` which
+uses `persistSlotFree_selfBalance` — the slot-free closed form).
+What remains outside is the counterparty credit at the request predeploy
+(`P-CONSOLIDATION-VALUE-1` / `P-CONSOLIDATION-ETH-1`) and 96-byte
+packed pubkey calldata, both named in `fidelity.missing`. -/
 theorem verity_tx_preserves_eth_balance
     (inputs : Inputs) (state : Verity.ContractState)
     (hSources : readArray state "sources" sourcesBase inputs.sources.length =
@@ -372,9 +461,9 @@ theorem verity_tx_preserves_eth_balance
     (hTargetLens : readArray state "targetLens" targetLensBase
       inputs.targetLens.length = some inputs.targetLens)
     (result : Result) (after : Verity.ContractState)
-    (h : (addRequests inputs).run state = .success result after) :
+    (h : (addRequestsSlotFree inputs).run state = .success result after) :
     after.selfBalance = state.selfBalance :=
-  Verity.ConsolidationTx.committed_preserves_eth_balance inputs state
+  Verity.ConsolidationTx.committed_preserves_eth_balance_slotFree inputs state
     hSources hTargets hSourceLens hTargetLens result after h
 
 end LidoSRv3.Audit.Guarantees.PConsolidation1

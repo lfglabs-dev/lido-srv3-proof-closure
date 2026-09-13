@@ -138,6 +138,8 @@ unconstrained. -/
 theorem verity_tx_simulates_topup2_spec_any_oracle
     (oracle : DenoteOracle)
     (effective pending requested topUpLimits : List Word)
+    (slashedOrExited : List Bool)
+    (maxValidators : Nat)
     (target minTopUp remainingCap moduleLimit valueGwei : Word)
     (state : ContractState)
     (hEff : readArrayWith oracle state "effective" effectiveBase effective.length =
@@ -150,14 +152,15 @@ theorem verity_tx_simulates_topup2_spec_any_oracle
       some topUpLimits)
     (hLen : effective.length = pending.length ∧ pending.length = requested.length ∧
       requested.length = topUpLimits.length)
-    (hMax : requested.length ≤ maxValidatorsPerTopUp) :
+    (hMax : requested.length ≤ maxValidators) :
     observe (List.replicate requested.length 0) remainingCap
-        ((allocate requested.length target minTopUp remainingCap moduleLimit valueGwei).run
-          state) =
-      sourceView effective pending requested topUpLimits
+        ((allocate requested.length maxValidators slashedOrExited
+            target minTopUp remainingCap moduleLimit valueGwei).run state) =
+      sourceView effective pending requested topUpLimits slashedOrExited
         target minTopUp remainingCap moduleLimit valueGwei := by
   refine LidoSRv3.Audit.Guarantees.PTopup2.verity_tx_simulates_topup2_spec
-    effective pending requested topUpLimits target minTopUp remainingCap moduleLimit
+    effective pending requested topUpLimits slashedOrExited maxValidators
+    target minTopUp remainingCap moduleLimit
     valueGwei state ?_ ?_ ?_ ?_ hLen hMax
   · simpa [readArray_eq_readArrayWith oracle] using hEff
   · simpa [readArray_eq_readArrayWith oracle] using hPend

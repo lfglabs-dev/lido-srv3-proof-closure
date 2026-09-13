@@ -23,9 +23,9 @@ Because the tick is read from state rather than written as a call-site constant,
 
 The parent is an unbounded $\forall$ over every report, fee, and state. Invalid, overflowing, and zero-fee commits discharge vacuously. The demoted source child now uses premise-free `sourceTraceRetired`; the legacy `fullReportSucceeds` API remains only as a compatibility adapter. `storedSteps` compares exact ticks, so the reordering is also visible at the View boundary.
 
-The kill-line now uses the valid nonempty report `⟨[1], [1], [1]⟩`. The balance write has its own clock stamp, so `storedSteps` no longer invents `.balancesWritten` unconditionally. `.rewardsRead` still has no counterpart in the pinned call sequence (the deployed order is write, compute fees, mint, `reportRewardsMinted`). Fee computation and `submitReportData` stay in `fidelity.missing`.
+The kill-line now uses the valid nonempty report `⟨[1], [1], [1]⟩`. The balance write has its own clock stamp, so `storedSteps` no longer invents `.balancesWritten` unconditionally. Chantier 3 (Thomas 2026-09-13) upgrades the registered parent so that BOTH ordering conjuncts are on the modeled call sequence: `balancesWrittenSlot < rewardsReadSlot` (write-router-before-read, `AccountingOracle.sol:513-517` → `Accounting.sol:277`) is checked alongside `rewardsReadSlot < rewardsMintedSlot` (read-before-mint). Fee computation and `submitReportData` stay in `fidelity.missing`.
 
-CHECKED does not mean the pinned path mints after reading fresh balances, that the caller is authorized, or that the minted amount is the protocol fee.
+CHECKED means the modeled ordering discipline holds — fees are derived from a router state written strictly before the read, and the mint records strictly after the read. CHECKED does NOT mean the caller is authorized, that the minted amount is the protocol fee, or that the full `submitReportData` surface is modeled.
 
 Ranked next work: keep the retired source child premise-free and the mint-after-read parent/kill-line intact; model later full-report failures only if widening to that surface is explicitly authorized.
 

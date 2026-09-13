@@ -97,10 +97,11 @@ theorem sourceConsume_any_count (remaining : Word) (candidates : List Word) :
   (sourceConsumeIndependent_eq_sourceConsume remaining candidates).symm
 
 theorem sourceLimits_any_count (effective pending : List Word)
-    (target minTopUp : Word) :
-    sourceLimits effective pending target minTopUp =
-      sourceLimitsIndependent effective pending target minTopUp :=
-  (sourceLimitsIndependent_eq_sourceLimits effective pending target minTopUp).symm
+    (slashedOrExited : List Bool) (target minTopUp : Word) :
+    sourceLimits effective pending slashedOrExited target minTopUp =
+      sourceLimitsIndependent effective pending slashedOrExited target minTopUp :=
+  (sourceLimitsIndependent_eq_sourceLimits effective pending slashedOrExited
+    target minTopUp).symm
 
 theorem sourceCandidates_any_count (requested topUpLimits : List Word) :
     sourceCandidates requested topUpLimits =
@@ -109,13 +110,14 @@ theorem sourceCandidates_any_count (requested topUpLimits : List Word) :
 
 theorem sourceRun_any_count
     (effective pending requested topUpLimits : List Word)
+    (slashedOrExited : List Bool)
     (target minTopUp remainingCap moduleLimit valueGwei : Word) :
-    sourceRun effective pending requested topUpLimits target minTopUp remainingCap
-        moduleLimit valueGwei =
-      sourceRunIndependent effective pending requested topUpLimits target minTopUp
-        remainingCap moduleLimit valueGwei :=
+    sourceRun effective pending requested topUpLimits slashedOrExited
+        target minTopUp remainingCap moduleLimit valueGwei =
+      sourceRunIndependent effective pending requested topUpLimits slashedOrExited
+        target minTopUp remainingCap moduleLimit valueGwei :=
   (sourceRunIndependent_eq_sourceRun effective pending requested topUpLimits
-    target minTopUp remainingCap moduleLimit valueGwei).symm
+    slashedOrExited target minTopUp remainingCap moduleLimit valueGwei).symm
 
 /-! ## `allocate` without the frozen-32 guard
 
@@ -124,7 +126,7 @@ Identical to `Topup2DistributionTx.allocate` except the
 IStakingModuleV2 have no such guard.  TopUpGateway's guard is the stored
 word, not this literal. -/
 
-def allocateAnyCount (count : Nat)
+def allocateAnyCount (count : Nat) (slashedOrExited : List Bool)
     (target minTopUp remainingCap moduleLimit valueGwei : Word)
     (failAfterWrites : Bool := false) : Contract Result := fun snapshot =>
   -- TopUpGateway.sol:164  if (validatorsCount == 0) revert WrongArrayLength();
@@ -134,8 +136,8 @@ def allocateAnyCount (count : Nat)
       readArray snapshot "requested" requestedBase count,
       readArray snapshot "topUpLimits" limitsBase count with
   | some effective, some pending, some requested, some topUpLimits =>
-      match sourceRun effective pending requested topUpLimits target minTopUp remainingCap
-          moduleLimit valueGwei with
+      match sourceRun effective pending requested topUpLimits slashedOrExited
+          target minTopUp remainingCap moduleLimit valueGwei with
       | none => .revert "TOPUP_ARITHMETIC" snapshot
       | some (allocs, remaining, used) =>
           let dirty := persistAllocs allocs snapshot
@@ -145,12 +147,14 @@ def allocateAnyCount (count : Nat)
   | _, _, _, _ => .revert "MEMORY_ARRAY_DECODE" snapshot
 
 theorem allocate_eq_any_of_le
-    (count : Nat) (target minTopUp remainingCap moduleLimit valueGwei : Word)
+    (count : Nat) (slashedOrExited : List Bool)
+    (target minTopUp remainingCap moduleLimit valueGwei : Word)
     (failAfterWrites : Bool)
     (h : count ≤ maxValidatorsPerTopUp) :
-    allocate count target minTopUp remainingCap moduleLimit valueGwei failAfterWrites =
-      allocateAnyCount count target minTopUp remainingCap moduleLimit valueGwei
-        failAfterWrites := by
+    allocate count maxValidatorsPerTopUp slashedOrExited
+        target minTopUp remainingCap moduleLimit valueGwei failAfterWrites =
+      allocateAnyCount count slashedOrExited
+        target minTopUp remainingCap moduleLimit valueGwei failAfterWrites := by
   funext snapshot
   unfold allocate allocateAnyCount
   have hNotOver : ¬ maxValidatorsPerTopUp < count := Nat.not_lt.mpr h
@@ -161,6 +165,7 @@ theorem allocate_eq_any_of_le
 view, for **every** decoded count.  No `count ≤ 32` premise. -/
 theorem verity_tx_simulates_pinned_source_any_count
     (effective pending requested topUpLimits : List Word)
+    (slashedOrExited : List Bool)
     (target minTopUp remainingCap moduleLimit valueGwei : Word)
     (state : ContractState)
     (hEff : readArray state "effective" effectiveBase effective.length = some effective)
@@ -170,10 +175,10 @@ theorem verity_tx_simulates_pinned_source_any_count
     (hLen : effective.length = pending.length ∧ pending.length = requested.length ∧
       requested.length = topUpLimits.length) :
     observe (List.replicate requested.length 0) remainingCap
-        ((allocateAnyCount requested.length target minTopUp remainingCap moduleLimit
-          valueGwei).run state) =
-      sourceView effective pending requested topUpLimits target minTopUp remainingCap
-        moduleLimit valueGwei := by
+        ((allocateAnyCount requested.length slashedOrExited
+          target minTopUp remainingCap moduleLimit valueGwei).run state) =
+      sourceView effective pending requested topUpLimits slashedOrExited
+        target minTopUp remainingCap moduleLimit valueGwei := by
   have hER : effective.length = requested.length := hLen.1.trans hLen.2.1
   have hPR : pending.length = requested.length := hLen.2.1
   have hLR : topUpLimits.length = requested.length := hLen.2.2.symm
@@ -192,8 +197,8 @@ theorem verity_tx_simulates_pinned_source_any_count
     unfold Contract.run allocateAnyCount sourceView
     simp only [hZ, Bool.false_eq_true, ↓reduceIte, hEff', hPend', hReq, hLimits']
     rw [sourceRunIndependent_eq_sourceRun]
-    cases hRun : sourceRun effective pending requested topUpLimits target minTopUp
-        remainingCap moduleLimit valueGwei with
+    cases hRun : sourceRun effective pending requested topUpLimits slashedOrExited
+        target minTopUp remainingCap moduleLimit valueGwei with
     | none =>
         simp [observe]
     | some trip =>
@@ -208,6 +213,7 @@ theorem verity_tx_simulates_pinned_source_any_count
 `count ≤ 32`, where `allocate` and `allocateAnyCount` agree. -/
 theorem parent_verity_is_unbounded_instance
     (effective pending requested topUpLimits : List Word)
+    (slashedOrExited : List Bool)
     (target minTopUp remainingCap moduleLimit valueGwei : Word)
     (state : ContractState)
     (hEff : readArray state "effective" effectiveBase effective.length = some effective)
@@ -218,21 +224,23 @@ theorem parent_verity_is_unbounded_instance
       requested.length = topUpLimits.length)
     (hMax : requested.length ≤ maxValidatorsPerTopUp) :
     observe (List.replicate requested.length 0) remainingCap
-        ((allocate requested.length target minTopUp remainingCap moduleLimit valueGwei).run
-          state) =
-      sourceView effective pending requested topUpLimits target minTopUp remainingCap
-        moduleLimit valueGwei := by
-  have heq := allocate_eq_any_of_le requested.length target minTopUp remainingCap
-    moduleLimit valueGwei false hMax
+        ((allocate requested.length maxValidatorsPerTopUp slashedOrExited
+            target minTopUp remainingCap moduleLimit valueGwei).run state) =
+      sourceView effective pending requested topUpLimits slashedOrExited
+        target minTopUp remainingCap moduleLimit valueGwei := by
+  have heq := allocate_eq_any_of_le requested.length slashedOrExited
+    target minTopUp remainingCap moduleLimit valueGwei false hMax
   rw [heq]
   exact verity_tx_simulates_pinned_source_any_count
-    effective pending requested topUpLimits target minTopUp remainingCap moduleLimit
+    effective pending requested topUpLimits slashedOrExited
+    target minTopUp remainingCap moduleLimit
     valueGwei state hEff hPend hReq hLimits hLen
 
 /-- Same statement as `verity_tx_simulates_topup2_spec`, derived from the
 unbounded consumer plus `allocate_eq_any_of_le`. -/
 theorem parent_verity_instance_matches_registered
     (effective pending requested topUpLimits : List Word)
+    (slashedOrExited : List Bool)
     (target minTopUp remainingCap moduleLimit valueGwei : Word)
     (state : ContractState)
     (hEff : readArray state "effective" effectiveBase effective.length = some effective)
@@ -243,12 +251,13 @@ theorem parent_verity_instance_matches_registered
       requested.length = topUpLimits.length)
     (hMax : requested.length ≤ maxValidatorsPerTopUp) :
     observe (List.replicate requested.length 0) remainingCap
-        ((allocate requested.length target minTopUp remainingCap moduleLimit valueGwei).run
-          state) =
-      sourceView effective pending requested topUpLimits target minTopUp remainingCap
-        moduleLimit valueGwei :=
+        ((allocate requested.length maxValidatorsPerTopUp slashedOrExited
+            target minTopUp remainingCap moduleLimit valueGwei).run state) =
+      sourceView effective pending requested topUpLimits slashedOrExited
+        target minTopUp remainingCap moduleLimit valueGwei :=
   parent_verity_is_unbounded_instance
-    effective pending requested topUpLimits target minTopUp remainingCap moduleLimit
+    effective pending requested topUpLimits slashedOrExited
+    target minTopUp remainingCap moduleLimit
     valueGwei state hEff hPend hReq hLimits hLen hMax
 
 #print axioms leftover_walk_sum_le_budget

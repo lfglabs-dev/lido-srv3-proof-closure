@@ -9,11 +9,14 @@ import Compiler.CompilationModel
 This transaction models `WithdrawalVault.addConsolidationRequests` from
 `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`. Source and target
 public keys and their lengths are read through the compilation-model
-denotation of memory-backed `uint256[]` values. Successful pairs persist
-`source ‖ target` through `writeMapUint`, the request count and fee through
-`writeSlot`, one journaled CALL, and one `ConsolidationRequestAdded` event.
-The frame-entry payable credit of `msg.value` (`credited`) and the
-per-request CALL debit (`forwardCalls`, the `call{value: fee}` of
+denotation of memory-backed `uint256[]` values. Successful runs persist
+the request count and `msg.value`-derived fee through `writeSlot`, emit
+one journaled CALL per request, and one `ConsolidationRequestAdded` event
+per request. Source and target public keys are exposed on the CALL journal
+only (each committed CALL frame carries `abi.encodePacked(source, target)`
+as its `input`) — there is no per-request storage-slot write. The
+frame-entry payable credit of `msg.value` (`credited`) and the per-request
+CALL debit (`forwardCalls`, the `call{value: fee}` of
 `WithdrawalVaultEIP7685._callAddConsolidationRequest` lines 113--121) move
 wei on the vault's balance, so committed runs forward exactly `msg.value`
 across the journaled CALLs and restore the pre-call `selfBalance` — the
@@ -25,6 +28,18 @@ not be funded), so such entries are rejected before decode
 (`ENTRY_CREDIT_OVERFLOW`) instead of committing wrapped debits. The
 counterparty credit at the request predeploy is a separate contract's
 balance and is not modeled on this single-contract plane.
+
+**Chantier 2 retirement (Thomas 2026-09-13, item c).** Two fabricated
+observation slots — `sourceMapSlot` and `targetMapSlot`, previously
+populated by `writePayloads` and read back by `readPayloads` — had no
+Solidity storage counterpart. They have been physically removed together
+with all the machinery that depended on them (`writePayloads`, `persist`,
+`readPayloads`, `observe`, `addRequests`, and the associated support
+lemmas). The registered observation is now `observeFromJournal`, which
+derives per-request payloads from the CALL journal only; the registered
+executable transaction is `addRequestsSlotFree`, whose persistence
+(`persistSlotFree`) writes only the two real observation slots
+`countSlot` / `feePaidSlot` and the journaled CALL/event effects.
 -/
 
 namespace LidoSRv3.Audit.Verity.ConsolidationTx
@@ -58,27 +73,6 @@ def targetLensBase : Nat := 0x4000
 def countSlot : Nat := 30
 /-- Observation slot, no Solidity storage counterpart: `msg.value` of the last commit. -/
 def feePaidSlot : Nat := 31
-/-- **Fabricated observation slot** (chantier 2 disclosure, Thomas
-2026-09-13): `sourcePubkey` word per request index. **No Solidity
-storage counterpart** — `WithdrawalVaultEIP7685._addConsolidationRequests`
-(`lido-core/contracts/0.8.9/WithdrawalVaultEIP7685.sol:56-73`)
-never writes any per-request source-pubkey slot; it iterates and
-calls the request predeploy directly. This slot is model-only
-instrumentation used to demonstrate that the model persists the
-payload pair and rereads it (`readPayloads` / `writePayloads` in
-this file). Retirement is a planned refactor: replace the slot
-read with an observation directly from the CALL journal (each
-committed CALL frame already carries `source ‖ target` as
-`input`), eliminating the fabricated slot and its 30+ downstream
-uses. Tracked as an open follow-up for the registered
-`P-CONSOLIDATION-1` parent's `fidelity.missing`. -/
-def sourceMapSlot : Nat := 32
-/-- **Fabricated observation slot** (chantier 2 disclosure, Thomas
-2026-09-13): `targetPubkey` word per request index. Same
-disclosure as `sourceMapSlot` above — no Solidity storage
-counterpart; retirement plan is to replace slot reads with CALL-
-journal reads on committed frames. -/
-def targetMapSlot : Nat := 33
 
 private def oracle : DenoteOracle where
   mappingSlot := fun _ _ => 0
@@ -195,17 +189,6 @@ private theorem map_ofNat_val (ws : List Word) :
   simp [ofJournal, toJournal, ofNat_val]
   exact map_ofNat_val _
 
-/-- Added by the model: records each `source ‖ target` pair in the two
-observation mapping slots (`sourceMapSlot`, `targetMapSlot`). No Solidity
-storage write corresponds to this. -/
-def writePayloads : Nat → List (List Word) → ContractState → ContractState
-  | _, [], state => state
-  | index, payload :: rest, state =>
-      writePayloads (index + 1) rest
-        ((state.writeMapUint sourceMapSlot (Verity.Core.Uint256.ofNat index)
-            (payload.getD 0 0)).writeMapUint targetMapSlot
-          (Verity.Core.Uint256.ofNat index) (payload.getD 1 0))
-
 /-- One journaled CALL moves its value out of the vault: the pinned
 `CONSOLIDATION_REQUEST.call{value: fee}` of
 `WithdrawalVaultEIP7685._callAddConsolidationRequest` (lines 113--121)
@@ -219,39 +202,11 @@ def forwardCalls (state : ContractState) : List CallObs → ContractState
 
 /-- Effects of a committed loop `WithdrawalVaultEIP7685.sol:68-72` on the
 vault state: the per-CALL value debits (`forwardCalls`, line 115), the CALL
-journal (line 115) and the events (line 120). The observation-slot writes
-(`writePayloads`, `countSlot`, `feePaidSlot`) are added by the model.
-
-**Chantier 2 retirement note (Thomas 2026-09-13):** the `writePayloads`
-call on line 226 writes only to the fabricated `sourceMapSlot` /
-`targetMapSlot` mappings — no Solidity storage counterpart. The
-retirement scaffolding proves those writes are transparent to
-`observeFromJournal` (see `observeFromJournal_writePayloads_invariant`)
-and their reads are equivalent to the CALL journal projection (see
-`commit_payloads_equal_call_inputs`, `sourceRun_committed_payloads_eq_call_inputs`).
-A future PR can drop the `writePayloads` call from `persist` and
-the fabricated slots from state altogether; `observeFromJournal`
-and `verity_tx_simulates_consolidation_from_journal` continue to
-hold unchanged. -/
-def persist (start : Nat) (obs : Observables) (state : ContractState) :
-    ContractState :=
-  let dirty := writePayloads start obs.payloads state
-  let dirty := (dirty.writeSlot countSlot
-      (Verity.Core.Uint256.ofNat (start + obs.requestCount)))
-    |>.writeSlot feePaidSlot obs.feePaid
-  let dirty := forwardCalls dirty obs.calls
-  { dirty with
-    events := dirty.events ++ obs.events.map toEvent
-    calls := dirty.calls ++ obs.calls.map toJournal }
-
-/-- **Chantier 2 (Thomas 2026-09-13) slot-free variant.** Companion
-to `persist` that skips the `writePayloads` call. The retirement
-scaffolding proves this variant produces the same
-`observeFromJournal` output as `persist` (see
-`persist_slot_free_eq_persist_observeFromJournal` below), so
-`observeFromJournal` cannot distinguish the two — the fabricated
-slot writes are literally unobservable to the slot-independent
-observation. -/
+journal (line 115), the events (line 120), and the two observation slots
+`countSlot` / `feePaidSlot` written by the model. Source/target payloads
+are exposed only on the CALL journal (each frame carries
+`abi.encodePacked(source, target)` as its `input`); no per-request storage
+slot is written. -/
 def persistSlotFree (start : Nat) (obs : Observables) (state : ContractState) :
     ContractState :=
   let dirty := (state.writeSlot countSlot
@@ -276,68 +231,29 @@ def ofObservables (obs : Observables) : Result :=
 /-! ## WithdrawalVault.addConsolidationRequests (WithdrawalVault.sol:199-208), executed plane -/
 
 /-- `WithdrawalVault.sol:199-208 addConsolidationRequests(bytes[] calldata sourcePubkeys, bytes[] calldata targetPubkeys)`,
-executed transaction. Guards and the loop are delegated to the pinned
-`SolidityConsolidation.sourceRun` (see its header for the line map); this
-def adds the frame entry, the memory decode of the two arrays, and the
-state effects.
+executed transaction (slot-free). Guards and the loop are delegated to the
+pinned `SolidityConsolidation.sourceRun` (see its header for the line map);
+this def adds the frame entry, the memory decode of the two arrays, and
+the state effects.
 
 Not transcribed: `preservesEthBalance` (`WithdrawalVault.sol:81-85`) as a
-statement; it is proved instead (`committed_preserves_eth_balance`). The
-STATICCALL fee read and the CALL failure arm follow `sourceRun`.
+statement; it is proved instead (`committed_preserves_eth_balance_slotFree`).
+The STATICCALL fee read and the CALL failure arm follow `sourceRun`.
 
 Added by the model: the payable frame-entry credit `credited` with its
 `ENTRY_CREDIT_OVERFLOW` admissibility guard, the `MEMORY_ARRAY_DECODE`
-revert, the `failAfterWrites` injection hook (`INJECTED_AFTER_WRITES`), and
-the observation slots written by `persist`.
+revert, the `failAfterWrites` injection hook (`INJECTED_AFTER_WRITES`),
+and the two observation slots (`countSlot` / `feePaidSlot`) written by
+`persistSlotFree`. Source and target payloads are exposed only on the
+CALL journal (`toJournal` records each frame's
+`abi.encodePacked(source, target)` as `input`); no per-request storage
+slot is written.
 
 The entry state is the payable credit of `msg.value` (`credited`); a frame
 entry whose credit would wrap the vault's `Uint256` balance is rejected
 before decode (`ENTRY_CREDIT_OVERFLOW`); on admissible entries, length
 mismatch, fee failure, or the injected failure after intermediate writes
 reverts to the un-credited pre-call snapshot. -/
-def addRequests (inputs : Inputs) (failAfterWrites : Bool := false) :
-    Contract Result := fun snapshot =>
-  if snapshot.selfBalance.val + inputs.msgValue.val <
-      Verity.Core.Uint256.modulus then
-    match readArray (credited snapshot inputs) "sources" sourcesBase
-        inputs.sources.length,
-        readArray (credited snapshot inputs) "targets" targetsBase
-        inputs.targets.length,
-        readArray (credited snapshot inputs) "sourceLens" sourceLensBase
-        inputs.sourceLens.length,
-        readArray (credited snapshot inputs) "targetLens" targetLensBase
-        inputs.targetLens.length with
-    | some sources, some targets, some sourceLens, some targetLens =>
-        let decoded : Inputs :=
-          { inputs with
-            sources := sources, targets := targets,
-            sourceLens := sourceLens, targetLens := targetLens }
-        match sourceRun decoded with
-        | .reverted reason => .revert reason snapshot
-        | .committed obs =>
-            let start := (snapshot.readSlot countSlot).val
-            let dirty := persist start obs (credited snapshot inputs)
-            if failAfterWrites then .revert "INJECTED_AFTER_WRITES" dirty
-            else .success (ofObservables obs) dirty
-    | _, _, _, _ => .revert "MEMORY_ARRAY_DECODE" snapshot
-  else .revert "ENTRY_CREDIT_OVERFLOW" snapshot
-
-/-- Solidity-facing name, `WithdrawalVault.sol:199`. -/
-abbrev addConsolidationRequests := addRequests
-
-/-- **Chantier 2 (Thomas 2026-09-13) slot-free executable transaction.**
-Companion to `addRequests` that persists effects via `persistSlotFree`
-(no `writePayloads` call, no fabricated `sourceMapSlot` /
-`targetMapSlot` writes). The rest of the frame-entry logic —
-credit, memory decode, `sourceRun` guards, `failAfterWrites` hook —
-is identical to `addRequests`. The retirement scaffolding proves
-`observeFromJournal` cannot distinguish `addRequestsSlotFree`
-from `addRequests` on either arm (`persist_calls_eq_persistSlotFree_calls`,
-`persist_events_eq_persistSlotFree_events`, and
-`observeFromJournal_writePayloads_invariant`). So a caller wanting
-a slot-free executable transaction can use `addRequestsSlotFree`
-today; downstream `observeFromJournal`-based observations
-transfer without change. -/
 def addRequestsSlotFree (inputs : Inputs) (failAfterWrites : Bool := false) :
     Contract Result := fun snapshot =>
   if snapshot.selfBalance.val + inputs.msgValue.val <
@@ -375,13 +291,13 @@ wrapped back and the transaction still committed; the committed path now
 certifies a non-wrapping entry credit, so the checked debit guard
 `call.value ≤ state.selfBalance` of the repository's CALL interpreter is
 never violated on a success arm. -/
-theorem entry_credit_overflow_reverts (inputs : Inputs) (inject : Bool)
+theorem entry_credit_overflow_reverts_slotFree (inputs : Inputs) (inject : Bool)
     (state : ContractState)
     (hOverflow : Verity.Core.Uint256.modulus ≤
       state.selfBalance.val + inputs.msgValue.val) :
-    (addRequests inputs inject).run state =
+    (addRequestsSlotFree inputs inject).run state =
       .revert "ENTRY_CREDIT_OVERFLOW" state := by
-  unfold Contract.run addRequests
+  unfold Contract.run addRequestsSlotFree
   rw [if_neg (by omega)]
 
 inductive Status where | committed | reverted deriving DecidableEq, Repr
@@ -395,31 +311,6 @@ structure View where
   feePaid : Word
   deriving DecidableEq, Repr
 
-/-- Reread the persisted source/target payload pair for each request index. -/
-def readPayloads (state : ContractState) : Nat → Nat → List (List Word)
-  | _, 0 => []
-  | index, count + 1 =>
-      [state.readMapUint sourceMapSlot (Verity.Core.Uint256.ofNat index),
-       state.readMapUint targetMapSlot (Verity.Core.Uint256.ofNat index)] ::
-        readPayloads state (index + 1) count
-
-/-- Success reads the journal the body appended to `state.calls` / `state.events`,
-not the `Result` payload. Payloads are independently reread from the two
-persisted mapping slots for the new request indices
-`[beforeCount, beforeCount + calls.length)`. Using `calls.length` (not a
-Uint256 slot delta) keeps the reread count on `Nat` and avoids modulus
-round-trips through the count slot. -/
-def observe (before : ContractState) : ContractResult Result → View
-  | .success _ state =>
-      let calls := (state.calls.drop before.calls.length).map ofJournal
-      let events := (state.events.drop before.events.length).map ofEvent
-      let beforeCount := (before.readSlot countSlot).val
-      ⟨.committed, calls, events,
-        readPayloads state beforeCount calls.length,
-        state.readSlot countSlot, state.readSlot feePaidSlot⟩
-  | .revert _ _ =>
-      ⟨.reverted, [], [], [], before.readSlot countSlot, 0⟩
-
 def sourceView (inputs : Inputs) (beforeCount : Nat) : View :=
   match sourceRun inputs with
   | .reverted _ =>
@@ -428,39 +319,19 @@ def sourceView (inputs : Inputs) (beforeCount : Nat) : View :=
       ⟨.committed, obs.calls, obs.events, obs.payloads,
         Verity.Core.Uint256.ofNat (beforeCount + obs.requestCount), obs.feePaid⟩
 
-/-! ## Chantier 2 (Thomas 2026-09-13) slot-independent alternative
+/-! ## Slot-independent registered observation
 
-The registered `observe` above reads the fabricated `sourceMapSlot`
-/ `targetMapSlot` via `readPayloads` to reconstruct the per-request
-payload. The source-plane retirement-bridge theorems in
-`ConsolidationCorrespondence.lean` (`commit_payloads_equal_call_inputs`,
-`commit_payloads_equal_event_payloads`) prove that on every
-committed observation the fabricated `obs.payloads` equals both
-the CALL-journal input carrier and the event-log payload carrier.
+The registered observation derives per-request `payloads` from the CALL
+journal's `input` field, which mirrors real Solidity behavior at
+`WithdrawalVaultEIP7685.sol:114-115` — each committed CALL frame carries
+`abi.encodePacked(sourcePubkey, targetPubkey)` as its `input`. No
+per-request storage slot is read (there is none: the previously
+fabricated `sourceMapSlot` / `targetMapSlot` were physically retired in
+chantier 2 item (c), Thomas 2026-09-13). -/
 
-The alternative observation function below is the slot-independent
-version: it derives `payloads` from the CALL journal's `input`
-field directly (which corresponds to real Solidity behavior at
-`WithdrawalVaultEIP7685.sol:114-115` — each committed CALL frame
-carries `abi.encodePacked(sourcePubkey, targetPubkey)` as its
-input). No fabricated storage slot is read.
-
-This is a concrete first step of the physical retirement: with
-this function available, a downstream consumer of `observe.payloads`
-can migrate to `observeFromJournal.payloads` without touching the
-current registered `observe`. The equivalence theorem
-`observeFromJournal_committed_payloads_via_calls` below proves
-the substitution is sound on committed runs; a caller's downstream
-code that used `observe.payloads` can be reproved with
-`observeFromJournal.payloads`. -/
-
-/-- Slot-independent alternative to `observe`: `payloads` is
-computed directly from `calls.map (·.input)`, without reading the
-fabricated `sourceMapSlot` / `targetMapSlot` storage slots. Matches
-`observe` on all non-payload fields; matches on `payloads` on
-committed runs whose CALL frames' `input` records the same bytes
-the fabricated slots were populated with (`writePayloads` in the
-same file). -/
+/-- Registered slot-free observation: `payloads` is
+computed directly from `calls.map (·.input)` — the CALL journal's `input`
+carrier records `abi.encodePacked(source, target)` for each request. -/
 def observeFromJournal (before : ContractState) : ContractResult Result → View
   | .success _ state =>
       let calls := (state.calls.drop before.calls.length).map ofJournal
@@ -470,37 +341,6 @@ def observeFromJournal (before : ContractState) : ContractResult Result → View
         state.readSlot countSlot, state.readSlot feePaidSlot⟩
   | .revert _ _ =>
       ⟨.reverted, [], [], [], before.readSlot countSlot, 0⟩
-
-/-- **Chantier 2 (Thomas 2026-09-13) slot-independence.** On every
-reverting run of the executable transaction, `observeFromJournal`
-equals `observe` — neither reads any per-request payload data on a
-revert, so the two are definitionally identical on the revert arm. -/
-theorem observeFromJournal_revert_eq_observe
-    (before : ContractState) (reason : String) (rollback : ContractState) :
-    observeFromJournal before (.revert reason rollback) =
-      observe before (.revert reason rollback) := by
-  rfl
-
-/-- **Chantier 2 (Thomas 2026-09-13) slot-independence — non-payload
-fields.** On every successful run, `observeFromJournal` agrees with
-`observe` on the status, calls, events, and count/fee fields — the
-`payloads` field is the only place they can diverge (and the source
-plane's retirement-bridge theorems prove they agree there too when
-the fabricated slots and CALL inputs carry the same bytes, which is
-guaranteed by `writePayloads`). -/
-theorem observeFromJournal_success_non_payload_eq_observe
-    (before state : ContractState) (r : Result) :
-    (observeFromJournal before (.success r state)).status =
-      (observe before (.success r state)).status ∧
-    (observeFromJournal before (.success r state)).calls =
-      (observe before (.success r state)).calls ∧
-    (observeFromJournal before (.success r state)).events =
-      (observe before (.success r state)).events ∧
-    (observeFromJournal before (.success r state)).requestCount =
-      (observe before (.success r state)).requestCount ∧
-    (observeFromJournal before (.success r state)).feePaid =
-      (observe before (.success r state)).feePaid := by
-  simp [observeFromJournal, observe]
 
 /-- **Chantier 2 (Thomas 2026-09-13) status invariant.** The
 slot-independent alternative preserves the `status` invariant: a
@@ -520,27 +360,23 @@ theorem observeFromJournal_status_revert
 /-- **Chantier 2 (Thomas 2026-09-13) payload definition.** On a
 successful executable transition, `observeFromJournal.payloads` is
 definitionally `calls.map (·.input)` — the CALL journal's `input`
-carrier. This is the field that would previously have read
-`readPayloads state beforeCount calls.length` in `observe`; the
-new observation reads it directly from the CALL journal delta
-between `before` and `state` (`state.calls.drop before.calls.length`
-mapped through `ofJournal`). -/
+carrier. Each committed CALL frame's `input` is
+`abi.encodePacked(source, target)` (`toJournal` records the observable
+`CallObs.input` verbatim), so the payload sequence is read directly
+from the CALL journal delta between `before` and `state`
+(`state.calls.drop before.calls.length` mapped through `ofJournal`). -/
 theorem observeFromJournal_success_payloads_eq_calls_input
     (before state : ContractState) (r : Result) :
     (observeFromJournal before (.success r state)).payloads =
       (observeFromJournal before (.success r state)).calls.map (·.input) := rfl
 
 /-- **Chantier 2 (Thomas 2026-09-13) slot invariance.**
-`observeFromJournal` doesn't read `sourceMapSlot` or `targetMapSlot`
-on the success arm — its `payloads` field is derived from
-`calls.map (·.input)`, and its `count`/`fee` reads target `countSlot`
-/ `feePaidSlot`. So arbitrary rewriting of the fabricated slots
-leaves `observeFromJournal`'s output unchanged, at the point where
-`observe` would have `readPayloads`-read those slots. Formal
-statement: for any two states that agree on `state.calls`,
-`state.events`, `countSlot`, and `feePaidSlot`, but differ
-arbitrarily on `sourceMapSlot`/`targetMapSlot`,
-`observeFromJournal` produces the same `View`. -/
+`observeFromJournal`'s success arm reads only `state.calls`,
+`state.events`, `countSlot`, and `feePaidSlot` — its `payloads` field
+is derived from `calls.map (·.input)`. So for any two states that
+agree on `state.calls`, `state.events`, `countSlot`, and
+`feePaidSlot`, `observeFromJournal` produces the same `View`,
+regardless of any other storage differences between them. -/
 theorem observeFromJournal_success_slot_invariant
     (before state1 state2 : ContractState) (r1 r2 : Result)
     (hCalls : state1.calls = state2.calls)
@@ -550,42 +386,6 @@ theorem observeFromJournal_success_slot_invariant
     observeFromJournal before (.success r1 state1) =
       observeFromJournal before (.success r2 state2) := by
   simp [observeFromJournal, hCalls, hEvents, hCount, hFee]
-
-/-- **Chantier 2 (Thomas 2026-09-13) observation-vs-observation bridge.**
-Generic substitution lemma: if `observe before result` returns a
-view `v` whose `payloads` field happens to equal `v.calls.map (·.input)`,
-then `observeFromJournal before result = v` as well. This is the
-usable form of the retirement-substitution: any downstream context
-that has both `observe = v` and the payload-equals-calls-inputs
-fact for `v` can substitute `observeFromJournal` for `observe`
-directly.
-
-Proof: on the revert arm both observations return the reverted
-View definitionally; on the success arm the two agree on all
-non-payload fields (from `observeFromJournal_success_non_payload_eq_observe`)
-and the payloads agree by `hPay`. -/
-theorem observeFromJournal_eq_of_observe_and_payload_matches_calls
-    (before : ContractState) (result : ContractResult Result) (v : View)
-    (hObs : observe before result = v)
-    (hPay : v.payloads = v.calls.map (·.input)) :
-    observeFromJournal before result = v := by
-  cases result with
-  | success r state =>
-    -- Read off the field equalities from hObs by unfolding both sides.
-    cases v with | mk vStatus vCalls vEvents vPayloads vRequestCount vFeePaid =>
-    simp only [observe, View.mk.injEq] at hObs
-    obtain ⟨hStatus, hCalls, hEvents, hPayloadsObs, hCount, hFee⟩ := hObs
-    -- observeFromJournal on this success has all non-payload fields matching observe.
-    simp only [observeFromJournal, View.mk.injEq]
-    refine ⟨hStatus, hCalls, hEvents, ?_, hCount, hFee⟩
-    -- Payloads: on the observeFromJournal side, it's
-    -- `(state.calls.drop before.calls.length).map ofJournal .map (·.input)`
-    -- Which equals `vCalls.map (·.input)` (from hCalls), which equals vPayloads
-    -- (from hPay symm).
-    rw [hCalls, ← hPay]
-  | revert reason rollback =>
-    rw [observeFromJournal_revert_eq_observe]
-    exact hObs
 
 private theorem readMapUint_writeMapUint_other_slot (s : ContractState)
     {slot slot' : Nat} (hslot : slot' ≠ slot) (key key' value : Word) :
@@ -631,15 +431,6 @@ theorem forwardCalls_readMapUint (state : ContractState)
   | nil => rfl
   | cons c rest ih => simp only [forwardCalls, ih, forwardCall_readMapUint]
 
-theorem forwardCalls_readPayloads (state : ContractState)
-    (calls : List CallObs) (start count : Nat) :
-    readPayloads (forwardCalls state calls) start count =
-      readPayloads state start count := by
-  induction count generalizing start state with
-  | zero => rfl
-  | succ count ih =>
-      simp only [readPayloads, forwardCalls_readMapUint, ih]
-
 theorem forwardCalls_readSlot (state : ContractState) (calls : List CallObs)
     (slot : Nat) :
     (forwardCalls state calls).readSlot slot = state.readSlot slot := by
@@ -663,16 +454,6 @@ private theorem writeMapUint_selfBalance (s : ContractState) (slot : Nat)
     (key value : Word) :
     (s.writeMapUint slot key value).selfBalance = s.selfBalance := rfl
 
-theorem writePayloads_selfBalance (start : Nat) (payloads : List (List Word))
-    (state : ContractState) :
-    (writePayloads start payloads state).selfBalance = state.selfBalance := by
-  revert start state
-  induction payloads with
-  | nil => intro start state; rfl
-  | cons payload rest ih =>
-      intro start state
-      simp only [writePayloads, ih, writeMapUint_selfBalance]
-
 theorem forwardCalls_selfBalance (state : ContractState)
     (calls : List CallObs) :
     (forwardCalls state calls).selfBalance =
@@ -686,780 +467,33 @@ theorem writeSlot_selfBalance (state : ContractState) (slot : Nat)
     (value : Word) :
     (state.writeSlot slot value).selfBalance = state.selfBalance := rfl
 
-theorem persist_selfBalance (start : Nat) (obs : Observables)
+/-- **Chantier 2 (Thomas 2026-09-13) slot-free selfBalance closed form.**
+Load-bearing support lemma for the value-plane parents on
+`addRequestsSlotFree`. -/
+theorem persistSlotFree_selfBalance (start : Nat) (obs : Observables)
     (state : ContractState) :
-    (persist start obs state).selfBalance =
+    (persistSlotFree start obs state).selfBalance =
       obs.calls.foldl (fun bal c => bal - c.value) state.selfBalance := by
-  unfold persist
-  simp only [forwardCalls_selfBalance, writeSlot_selfBalance,
-    writePayloads_selfBalance]
-
-private theorem writePayloads_preserves_prior (payloads : List (List Word)) :
-    ∀ (start : Nat) (state : ContractState) (key : Nat),
-      key < start →
-      start + payloads.length ≤ Verity.Core.Uint256.modulus →
-      (writePayloads start payloads state).readMapUint sourceMapSlot
-          (Verity.Core.Uint256.ofNat key) =
-        state.readMapUint sourceMapSlot (Verity.Core.Uint256.ofNat key) ∧
-      (writePayloads start payloads state).readMapUint targetMapSlot
-          (Verity.Core.Uint256.ofNat key) =
-        state.readMapUint targetMapSlot (Verity.Core.Uint256.ofNat key) := by
-  intro start state key hKey hBound
-  induction payloads generalizing start state with
-  | nil => exact ⟨rfl, rfl⟩
-  | cons payload rest ih =>
-      rw [writePayloads]
-      have hStart : start < Verity.Core.Uint256.modulus := by
-        simp only [List.length_cons] at hBound
-        omega
-      have hKeyBound : key < Verity.Core.Uint256.modulus := Nat.lt_trans hKey hStart
-      have hWordNe :
-          Verity.Core.Uint256.ofNat key ≠ Verity.Core.Uint256.ofNat start := by
-        intro h
-        have hv := congrArg Verity.Core.Uint256.val h
-        simp [Verity.Core.Uint256.val_ofNat, Nat.mod_eq_of_lt hKeyBound,
-          Nat.mod_eq_of_lt hStart] at hv
-        omega
-      have hTail := ih (start + 1)
-        ((state.writeMapUint sourceMapSlot (Verity.Core.Uint256.ofNat start)
-          (payload.getD 0 0)).writeMapUint targetMapSlot
-          (Verity.Core.Uint256.ofNat start) (payload.getD 1 0))
-        (by omega) (by simp only [List.length_cons] at hBound ⊢; omega)
-      constructor
-      · rw [hTail.1]
-        rw [readMapUint_writeMapUint_other_slot _ (by decide)]
-        exact readMapUint_writeMapUint_other_key _ _ hWordNe _
-      · rw [hTail.2]
-        rw [readMapUint_writeMapUint_other_key _ _ hWordNe]
-        exact readMapUint_writeMapUint_other_slot _ (by decide) _ _ _
-
-theorem writePayloads_read_written (payloads : List (List Word)) :
-    ∀ (start : Nat) (state : ContractState) (i : Nat),
-      start + payloads.length ≤ Verity.Core.Uint256.modulus →
-      i < payloads.length →
-      (writePayloads start payloads state).readMapUint sourceMapSlot
-          (Verity.Core.Uint256.ofNat (start + i)) = (payloads.getD i []).getD 0 0 ∧
-        (writePayloads start payloads state).readMapUint targetMapSlot
-          (Verity.Core.Uint256.ofNat (start + i)) = (payloads.getD i []).getD 1 0 := by
-  intro start state i hBound hi
-  induction payloads generalizing start state i with
-  | nil => simp at hi
-  | cons payload rest ih =>
-      cases i with
-      | zero =>
-          simp only [Nat.add_zero]
-          rw [writePayloads]
-          have hPrior := writePayloads_preserves_prior rest (start + 1)
-            ((state.writeMapUint sourceMapSlot (Verity.Core.Uint256.ofNat start)
-              (payload.getD 0 0)).writeMapUint targetMapSlot
-              (Verity.Core.Uint256.ofNat start) (payload.getD 1 0))
-            start (by omega)
-            (by simp only [List.length_cons] at hBound ⊢; omega)
-          constructor
-          · rw [hPrior.1, readMapUint_writeMapUint_other_slot _ (by decide)]
-            exact ContractState.readMapUint_writeMapUint_same _ _ _ _
-          · rw [hPrior.2, ContractState.readMapUint_writeMapUint_same]
-            rfl
-      | succ i =>
-          simp only [writePayloads]
-          have hTailBound : start + 1 + rest.length ≤ Verity.Core.Uint256.modulus := by
-            simp only [List.length_cons] at hBound
-            omega
-          have hTailI : i < rest.length := by
-            simp only [List.length_cons, Nat.succ_lt_succ_iff] at hi
-            exact hi
-          simpa [Nat.add_assoc, List.getD_cons_succ] using
-            ih (start + 1)
-              ((state.writeMapUint sourceMapSlot (Verity.Core.Uint256.ofNat start)
-                (payload.getD 0 0)).writeMapUint targetMapSlot
-                (Verity.Core.Uint256.ofNat start) (payload.getD 1 0))
-              i hTailBound hTailI
+  unfold persistSlotFree
+  simp only [forwardCalls_selfBalance, writeSlot_selfBalance]
 
 def normalizedPayload (payload : List Word) : List Word :=
   [payload.getD 0 0, payload.getD 1 0]
-
-theorem writePayloads_readPayloads (start : Nat) (payloads : List (List Word))
-    (state : ContractState)
-    (hBound : start + payloads.length ≤ Verity.Core.Uint256.modulus) :
-    readPayloads (writePayloads start payloads state) start payloads.length =
-      payloads.map normalizedPayload := by
-  induction payloads generalizing start state with
-  | nil => rfl
-  | cons payload rest ih =>
-      have hHead := writePayloads_read_written (payload :: rest) start state 0
-        hBound (by simp)
-      have hTailBound : start + 1 + rest.length ≤ Verity.Core.Uint256.modulus := by
-        simp only [List.length_cons] at hBound
-        omega
-      simp only [writePayloads, List.length_cons, readPayloads, List.map_cons]
-      have hs : (writePayloads (start + 1) rest
-            ((state.writeMapUint sourceMapSlot (Verity.Core.Uint256.ofNat start)
-              (payload.getD 0 0)).writeMapUint targetMapSlot
-              (Verity.Core.Uint256.ofNat start) (payload.getD 1 0))).readMapUint
-              sourceMapSlot (Verity.Core.Uint256.ofNat start) =
-          payload.getD 0 0 := by
-        simpa [Nat.add_zero, writePayloads] using hHead.1
-      have ht : (writePayloads (start + 1) rest
-            ((state.writeMapUint sourceMapSlot (Verity.Core.Uint256.ofNat start)
-              (payload.getD 0 0)).writeMapUint targetMapSlot
-              (Verity.Core.Uint256.ofNat start) (payload.getD 1 0))).readMapUint
-              targetMapSlot (Verity.Core.Uint256.ofNat start) =
-          payload.getD 1 0 := by
-        simpa [Nat.add_zero, writePayloads] using hHead.2
-      rw [hs, ht, ih (start + 1)
-        ((state.writeMapUint sourceMapSlot (Verity.Core.Uint256.ofNat start)
-          (payload.getD 0 0)).writeMapUint targetMapSlot
-          (Verity.Core.Uint256.ofNat start) (payload.getD 1 0)) hTailBound]
-      rfl
-
-theorem readPayloads_writeSlot (state : ContractState) (slot : Nat) (value : Word)
-    (start count : Nat) :
-    readPayloads (state.writeSlot slot value) start count =
-      readPayloads state start count := by
-  induction count generalizing start with
-  | zero => rfl
-  | succ count ih =>
-      simp only [readPayloads]
-      simp [ContractState.readMapUint, ih]
-
-@[simp] theorem readPayloads_set_log (state : ContractState)
-    (events : List Event) (calls : List ExternalCall) (start count : Nat) :
-    readPayloads { state with events := events, calls := calls } start count =
-      readPayloads state start count := by
-  induction count generalizing start with
-  | zero => rfl
-  | succ count ih =>
-      simp only [readPayloads]
-      change _ :: _ = _ :: _
-      rw [show ({ state with events := events, calls := calls } : ContractState).readMapUint
-          sourceMapSlot (Verity.Core.Uint256.ofNat start) =
-          state.readMapUint sourceMapSlot (Verity.Core.Uint256.ofNat start) by rfl]
-      rw [show ({ state with events := events, calls := calls } : ContractState).readMapUint
-          targetMapSlot (Verity.Core.Uint256.ofNat start) =
-          state.readMapUint targetMapSlot (Verity.Core.Uint256.ofNat start) by rfl]
-      rw [ih]
-
-theorem persist_read_payloads (start : Nat) (obs : Observables)
-    (state : ContractState) (hCount : obs.requestCount = obs.payloads.length)
-    (hNormalized : obs.payloads.map normalizedPayload = obs.payloads)
-    (hBound : start + obs.payloads.length ≤ Verity.Core.Uint256.modulus) :
-    readPayloads (persist start obs state) start obs.requestCount = obs.payloads := by
-  unfold persist
-  rw [readPayloads_set_log, forwardCalls_readPayloads, readPayloads_writeSlot,
-    readPayloads_writeSlot, hCount]
-  rw [writePayloads_readPayloads start obs.payloads state hBound, hNormalized]
-
-theorem writePayloads_readSlot (start : Nat) (payloads : List (List Word))
-    (state : ContractState) (slot : Nat) :
-    (writePayloads start payloads state).readSlot slot = state.readSlot slot := by
-  revert start state
-  induction payloads with
-  | nil =>
-      intro start state
-      rfl
-  | cons payload rest ih =>
-      intro start state
-      simp only [writePayloads]
-      rw [ih]
-      simp [ContractState.readSlot, ContractState.storage_writeMapUint]
 
 @[simp] theorem readSlot_set_log (s : ContractState) (events : List Event)
     (calls : List ExternalCall) (slot : Nat) :
     ({ s with events := events, calls := calls }).readSlot slot = s.readSlot slot :=
   rfl
 
-theorem persist_read_count (start : Nat) (obs : Observables)
+/-- **Chantier 2 (Thomas 2026-09-13) slot-free `.calls` closed form.**
+Load-bearing support lemma for the value-plane parents on
+`addRequestsSlotFree`. -/
+theorem persistSlotFree_calls (start : Nat) (obs : Observables)
     (state : ContractState) :
-    (persist start obs state).readSlot countSlot =
-      Verity.Core.Uint256.ofNat (start + obs.requestCount) := by
-  unfold persist
-  rw [readSlot_set_log, forwardCalls_readSlot]
-  rw [ContractState.readSlot_writeSlot_other (slot := feePaidSlot) (slot' := countSlot)]
-  · exact ContractState.readSlot_writeSlot_same _ countSlot _
-  · decide
-
-theorem persist_read_fee (start : Nat) (obs : Observables)
-    (state : ContractState) :
-    (persist start obs state).readSlot feePaidSlot = obs.feePaid := by
-  unfold persist
-  rw [readSlot_set_log, forwardCalls_readSlot]
-  exact ContractState.readSlot_writeSlot_same _ feePaidSlot _
-
-private theorem writeMapUint_calls (s : ContractState) (slot : Nat)
-    (key value : Word) : (s.writeMapUint slot key value).calls = s.calls :=
-  rfl
-
-private theorem writeMapUint_events (s : ContractState) (slot : Nat)
-    (key value : Word) : (s.writeMapUint slot key value).events = s.events :=
-  rfl
-
-theorem writePayloads_calls (start : Nat) (payloads : List (List Word))
-    (state : ContractState) :
-    (writePayloads start payloads state).calls = state.calls := by
-  revert start state
-  induction payloads with
-  | nil => intro start state; rfl
-  | cons _ rest ih =>
-      intro start state
-      simp only [writePayloads, writeMapUint_calls, ih]
-
-theorem writePayloads_events (start : Nat) (payloads : List (List Word))
-    (state : ContractState) :
-    (writePayloads start payloads state).events = state.events := by
-  revert start state
-  induction payloads with
-  | nil => intro start state; rfl
-  | cons _ rest ih =>
-      intro start state
-      simp only [writePayloads, writeMapUint_events, ih]
-
-/-- **Chantier 2 (Thomas 2026-09-13) writePayloads invariance.**
-`writePayloads` writes only to the fabricated `sourceMapSlot` /
-`targetMapSlot` mappings; `observeFromJournal` reads none of those,
-so `writePayloads` is transparent to it. Corollary: dropping the
-`writePayloads` call site would leave `observeFromJournal`'s output
-unchanged. This is the "write side" complement to the "read side"
-slot-invariance theorem (`observeFromJournal_success_slot_invariant`
-from PR #594): together, `observeFromJournal` is provably
-insensitive to whether the fabricated writes happen or not, and
-insensitive to the values they store. -/
-theorem observeFromJournal_writePayloads_invariant
-    (before : ContractState) (r : Result) (start : Nat)
-    (payloads : List (List Word)) (state : ContractState) :
-    observeFromJournal before (.success r (writePayloads start payloads state)) =
-      observeFromJournal before (.success r state) := by
-  simp only [observeFromJournal, writePayloads_calls, writePayloads_events,
-    writePayloads_readSlot]
-
-/-- **Chantier 2 (Thomas 2026-09-13) `persist` vs `persistSlotFree`
-observation equality.** `persist` writes the fabricated slots
-before doing everything else; `persistSlotFree` skips that write.
-Both produce the same state on all fields `observeFromJournal`
-reads (`.calls`, `.events`, `countSlot`, `feePaidSlot`, `selfBalance`),
-so `observeFromJournal` cannot distinguish them.
-
-Concretely: `persist = writePayloads ... ∘ persistSlotFree ...`,
-and every `observeFromJournal`-visible field is preserved through
-`writePayloads` (`writePayloads_calls`, `writePayloads_events`,
-`writePayloads_readSlot`). -/
-theorem persist_calls_eq_persistSlotFree_calls (start : Nat)
-    (obs : Observables) (state : ContractState) :
-    (persist start obs state).calls = (persistSlotFree start obs state).calls := by
-  simp only [persist, persistSlotFree, forwardCalls_calls,
-    writeSlot_calls, writePayloads_calls]
-where
-  writeSlot_calls : ∀ (s : ContractState) (slot : Nat) (v : Word),
-      (s.writeSlot slot v).calls = s.calls := fun _ _ _ => rfl
-
-theorem persist_events_eq_persistSlotFree_events (start : Nat)
-    (obs : Observables) (state : ContractState) :
-    (persist start obs state).events = (persistSlotFree start obs state).events := by
-  simp only [persist, persistSlotFree, forwardCalls_events,
-    writeSlot_events, writePayloads_events]
-where
-  writeSlot_events : ∀ (s : ContractState) (slot : Nat) (v : Word),
-      (s.writeSlot slot v).events = s.events := fun _ _ _ => rfl
-
-/-- **Chantier 2 (Thomas 2026-09-13) `readSlot` agreement.** For any
-top-level `slot`, `(persist ...).readSlot slot = (persistSlotFree ...).readSlot slot`.
-`persist` differs from `persistSlotFree` only via `writePayloads`, which
-uses `writeMapUint` under nested map-storage. `writePayloads_readSlot`
-proves the top-level `readSlot` is invariant across `writePayloads`,
-so both variants produce the same top-level slot reads unconditionally.
-This is what makes `observeFromJournal`'s `countSlot`/`feePaidSlot`
-reads slot-free-safe. -/
-theorem persist_readSlot_eq_persistSlotFree_readSlot (start : Nat)
-    (obs : Observables) (state : ContractState) (slot : Nat) :
-    (persist start obs state).readSlot slot =
-    (persistSlotFree start obs state).readSlot slot := by
-  simp only [persist, persistSlotFree, readSlot_set_log,
-    forwardCalls_readSlot]
-  by_cases hFee : slot = feePaidSlot
-  · rw [hFee, ContractState.readSlot_writeSlot_same, ContractState.readSlot_writeSlot_same]
-  · rw [ContractState.readSlot_writeSlot_other _ (Ne.symm (fun h => hFee h.symm)),
-        ContractState.readSlot_writeSlot_other _ (Ne.symm (fun h => hFee h.symm))]
-    by_cases hCount : slot = countSlot
-    · rw [hCount, ContractState.readSlot_writeSlot_same, ContractState.readSlot_writeSlot_same]
-    · rw [ContractState.readSlot_writeSlot_other _ (Ne.symm (fun h => hCount h.symm)),
-          ContractState.readSlot_writeSlot_other _ (Ne.symm (fun h => hCount h.symm))]
-      exact writePayloads_readSlot _ _ _ _
-
-/-- **Chantier 2 (Thomas 2026-09-13) `selfBalance` agreement.**
-`persist_selfBalance` already gives the closed-form `foldl (- .value)`
-for `persist`. The proof for `persistSlotFree` is the same modulo the
-missing `writePayloads_selfBalance` step, which is trivially applicable
-either way — hence full equality. -/
-theorem persist_selfBalance_eq_persistSlotFree_selfBalance (start : Nat)
-    (obs : Observables) (state : ContractState) :
-    (persist start obs state).selfBalance =
-    (persistSlotFree start obs state).selfBalance := by
-  simp only [persist, persistSlotFree, forwardCalls_selfBalance,
-    writeSlot_selfBalance, writePayloads_selfBalance,
-    setLog_selfBalance]
-where
-  setLog_selfBalance : ∀ (s : ContractState) (evs : List Event)
-      (cs : List ExternalCall),
-      ({ s with events := evs, calls := cs }).selfBalance = s.selfBalance :=
-    fun _ _ _ => rfl
-
-/-- **Chantier 2 (Thomas 2026-09-13) frame-scalar preservation.**
-Both `persist` and `persistSlotFree` preserve `state.msgValue` (neither
-`forwardCall`, `writeSlot`, `writePayloads`, nor the `{ with events, calls }`
-update touches it). This closes another storage-adjacent surface for
-the slot-free retirement: no msg.value drift under substitution. -/
-theorem persist_msgValue_eq_persistSlotFree_msgValue (start : Nat)
-    (obs : Observables) (state : ContractState) :
-    (persist start obs state).msgValue = (persistSlotFree start obs state).msgValue := by
-  simp only [persist, persistSlotFree, forwardCalls_msgValue,
-    writeSlot_msgValue, writePayloads_msgValue, setLog_msgValue]
-where
-  forwardCalls_msgValue : ∀ (s : ContractState) (cs : List CallObs),
-      (forwardCalls s cs).msgValue = s.msgValue := by
-    intro s cs; revert s; induction cs with
-    | nil => intro s; rfl
-    | cons c rest ih => intro s; simp only [forwardCalls]; rw [ih]; rfl
-  writeSlot_msgValue : ∀ (s : ContractState) (slot : Nat) (v : Word),
-      (s.writeSlot slot v).msgValue = s.msgValue := fun _ _ _ => rfl
-  writePayloads_msgValue : ∀ (start : Nat) (payloads : List (List Word))
-      (s : ContractState),
-      (writePayloads start payloads s).msgValue = s.msgValue := by
-    intro start payloads
-    revert start
-    induction payloads with
-    | nil => intro start s; rfl
-    | cons p rest ih => intro start s; simp only [writePayloads]; rw [ih]; rfl
-  setLog_msgValue : ∀ (s : ContractState) (evs : List Event)
-      (cs : List ExternalCall),
-      ({ s with events := evs, calls := cs }).msgValue = s.msgValue :=
-    fun _ _ _ => rfl
-
-/-- **Chantier 2 (Thomas 2026-09-13) frame-scalar preservation, batch.**
-`persist` and `persistSlotFree` preserve every non-storage frame scalar
-`forwardCall` / `writeSlot` / `writePayloads` never touch: `sender`,
-`thisAddress`, `txOrigin`, `blockTimestamp`, `blockNumber`, `chainId`,
-`blobBaseFee`, `calldataSize`. -/
-theorem persist_sender_eq_persistSlotFree_sender (start : Nat)
-    (obs : Observables) (state : ContractState) :
-    (persist start obs state).sender = (persistSlotFree start obs state).sender := by
-  simp only [persist, persistSlotFree, fc, ws, wp]
-where
-  fc : ∀ (s : ContractState) (cs : List CallObs),
-      (forwardCalls s cs).sender = s.sender := by
-    intro s cs; revert s
-    induction cs with
-    | nil => intro s; rfl
-    | cons c rest ih => intro s; simp only [forwardCalls, forwardCall]; exact ih _
-  ws : ∀ (s : ContractState) (slot : Nat) (v : Word),
-      (s.writeSlot slot v).sender = s.sender := fun _ _ _ => rfl
-  wp : ∀ (start : Nat) (payloads : List (List Word)) (s : ContractState),
-      (writePayloads start payloads s).sender = s.sender := by
-    intro start payloads; revert start
-    induction payloads with
-    | nil => intros; rfl
-    | cons p rest ih => intro start s; simp only [writePayloads]; exact ih _ _
-
-theorem persist_thisAddress_eq_persistSlotFree_thisAddress (start : Nat)
-    (obs : Observables) (state : ContractState) :
-    (persist start obs state).thisAddress = (persistSlotFree start obs state).thisAddress := by
-  simp only [persist, persistSlotFree, fc, ws, wp]
-where
-  fc : ∀ (s : ContractState) (cs : List CallObs),
-      (forwardCalls s cs).thisAddress = s.thisAddress := by
-    intro s cs; revert s
-    induction cs with
-    | nil => intro s; rfl
-    | cons c rest ih => intro s; simp only [forwardCalls, forwardCall]; exact ih _
-  ws : ∀ (s : ContractState) (slot : Nat) (v : Word),
-      (s.writeSlot slot v).thisAddress = s.thisAddress := fun _ _ _ => rfl
-  wp : ∀ (start : Nat) (payloads : List (List Word)) (s : ContractState),
-      (writePayloads start payloads s).thisAddress = s.thisAddress := by
-    intro start payloads; revert start
-    induction payloads with
-    | nil => intros; rfl
-    | cons p rest ih => intro start s; simp only [writePayloads]; exact ih _ _
-
-theorem persist_blockTimestamp_eq_persistSlotFree_blockTimestamp (start : Nat)
-    (obs : Observables) (state : ContractState) :
-    (persist start obs state).blockTimestamp = (persistSlotFree start obs state).blockTimestamp := by
-  simp only [persist, persistSlotFree, fc, ws, wp]
-where
-  fc : ∀ (s : ContractState) (cs : List CallObs),
-      (forwardCalls s cs).blockTimestamp = s.blockTimestamp := by
-    intro s cs; revert s
-    induction cs with
-    | nil => intro s; rfl
-    | cons c rest ih => intro s; simp only [forwardCalls, forwardCall]; exact ih _
-  ws : ∀ (s : ContractState) (slot : Nat) (v : Word),
-      (s.writeSlot slot v).blockTimestamp = s.blockTimestamp := fun _ _ _ => rfl
-  wp : ∀ (start : Nat) (payloads : List (List Word)) (s : ContractState),
-      (writePayloads start payloads s).blockTimestamp = s.blockTimestamp := by
-    intro start payloads; revert start
-    induction payloads with
-    | nil => intros; rfl
-    | cons p rest ih => intro start s; simp only [writePayloads]; exact ih _ _
-
-theorem persist_txOrigin_eq_persistSlotFree_txOrigin (start : Nat)
-    (obs : Observables) (state : ContractState) :
-    (persist start obs state).txOrigin = (persistSlotFree start obs state).txOrigin := by
-  simp only [persist, persistSlotFree, fc, ws, wp]
-where
-  fc : ∀ (s : ContractState) (cs : List CallObs),
-      (forwardCalls s cs).txOrigin = s.txOrigin := by
-    intro s cs; revert s
-    induction cs with
-    | nil => intro s; rfl
-    | cons c rest ih => intro s; simp only [forwardCalls, forwardCall]; exact ih _
-  ws : ∀ (s : ContractState) (slot : Nat) (v : Word),
-      (s.writeSlot slot v).txOrigin = s.txOrigin := fun _ _ _ => rfl
-  wp : ∀ (start : Nat) (payloads : List (List Word)) (s : ContractState),
-      (writePayloads start payloads s).txOrigin = s.txOrigin := by
-    intro start payloads; revert start
-    induction payloads with
-    | nil => intros; rfl
-    | cons p rest ih => intro start s; simp only [writePayloads]; exact ih _ _
-
-theorem persist_blockNumber_eq_persistSlotFree_blockNumber (start : Nat)
-    (obs : Observables) (state : ContractState) :
-    (persist start obs state).blockNumber = (persistSlotFree start obs state).blockNumber := by
-  simp only [persist, persistSlotFree, fc, ws, wp]
-where
-  fc : ∀ (s : ContractState) (cs : List CallObs),
-      (forwardCalls s cs).blockNumber = s.blockNumber := by
-    intro s cs; revert s
-    induction cs with
-    | nil => intro s; rfl
-    | cons c rest ih => intro s; simp only [forwardCalls, forwardCall]; exact ih _
-  ws : ∀ (s : ContractState) (slot : Nat) (v : Word),
-      (s.writeSlot slot v).blockNumber = s.blockNumber := fun _ _ _ => rfl
-  wp : ∀ (start : Nat) (payloads : List (List Word)) (s : ContractState),
-      (writePayloads start payloads s).blockNumber = s.blockNumber := by
-    intro start payloads; revert start
-    induction payloads with
-    | nil => intros; rfl
-    | cons p rest ih => intro start s; simp only [writePayloads]; exact ih _ _
-
-theorem persist_chainId_eq_persistSlotFree_chainId (start : Nat)
-    (obs : Observables) (state : ContractState) :
-    (persist start obs state).chainId = (persistSlotFree start obs state).chainId := by
-  simp only [persist, persistSlotFree, fc, ws, wp]
-where
-  fc : ∀ (s : ContractState) (cs : List CallObs),
-      (forwardCalls s cs).chainId = s.chainId := by
-    intro s cs; revert s
-    induction cs with
-    | nil => intro s; rfl
-    | cons c rest ih => intro s; simp only [forwardCalls, forwardCall]; exact ih _
-  ws : ∀ (s : ContractState) (slot : Nat) (v : Word),
-      (s.writeSlot slot v).chainId = s.chainId := fun _ _ _ => rfl
-  wp : ∀ (start : Nat) (payloads : List (List Word)) (s : ContractState),
-      (writePayloads start payloads s).chainId = s.chainId := by
-    intro start payloads; revert start
-    induction payloads with
-    | nil => intros; rfl
-    | cons p rest ih => intro start s; simp only [writePayloads]; exact ih _ _
-
-theorem persist_blobBaseFee_eq_persistSlotFree_blobBaseFee (start : Nat)
-    (obs : Observables) (state : ContractState) :
-    (persist start obs state).blobBaseFee = (persistSlotFree start obs state).blobBaseFee := by
-  simp only [persist, persistSlotFree, fc, ws, wp]
-where
-  fc : ∀ (s : ContractState) (cs : List CallObs),
-      (forwardCalls s cs).blobBaseFee = s.blobBaseFee := by
-    intro s cs; revert s
-    induction cs with
-    | nil => intro s; rfl
-    | cons c rest ih => intro s; simp only [forwardCalls, forwardCall]; exact ih _
-  ws : ∀ (s : ContractState) (slot : Nat) (v : Word),
-      (s.writeSlot slot v).blobBaseFee = s.blobBaseFee := fun _ _ _ => rfl
-  wp : ∀ (start : Nat) (payloads : List (List Word)) (s : ContractState),
-      (writePayloads start payloads s).blobBaseFee = s.blobBaseFee := by
-    intro start payloads; revert start
-    induction payloads with
-    | nil => intros; rfl
-    | cons p rest ih => intro start s; simp only [writePayloads]; exact ih _ _
-
-theorem persist_calldataSize_eq_persistSlotFree_calldataSize (start : Nat)
-    (obs : Observables) (state : ContractState) :
-    (persist start obs state).calldataSize = (persistSlotFree start obs state).calldataSize := by
-  simp only [persist, persistSlotFree, fc, ws, wp]
-where
-  fc : ∀ (s : ContractState) (cs : List CallObs),
-      (forwardCalls s cs).calldataSize = s.calldataSize := by
-    intro s cs; revert s
-    induction cs with
-    | nil => intro s; rfl
-    | cons c rest ih => intro s; simp only [forwardCalls, forwardCall]; exact ih _
-  ws : ∀ (s : ContractState) (slot : Nat) (v : Word),
-      (s.writeSlot slot v).calldataSize = s.calldataSize := fun _ _ _ => rfl
-  wp : ∀ (start : Nat) (payloads : List (List Word)) (s : ContractState),
-      (writePayloads start payloads s).calldataSize = s.calldataSize := by
-    intro start payloads; revert start
-    induction payloads with
-    | nil => intros; rfl
-    | cons p rest ih => intro start s; simp only [writePayloads]; exact ih _ _
-
-/-- **Chantier 2 (Thomas 2026-09-13) `.snd.calls` equivalence between
-`addRequests` and `addRequestsSlotFree`.** Both transactions share the
-same guard structure (entry-credit bound, memory decode, `sourceRun`
-guards, `failAfterWrites` hook) and differ only in the committed arm:
-`addRequests` persists via `persist` (which writes the fabricated
-`sourceMapSlot` / `targetMapSlot`), while `addRequestsSlotFree`
-persists via `persistSlotFree` (which skips those writes). Since
-`persist_calls_eq_persistSlotFree_calls` proves those two states have
-identical `.calls`, the committed arm's `.snd.calls` matches; every
-other arm returns `.revert reason snapshot` on both sides. So a
-downstream observer keying off `.snd.calls` cannot distinguish
-`addRequestsSlotFree` from `addRequests` — retirement of the slot
-definitions is `.calls`-safe. -/
-theorem addRequests_snd_calls_eq_addRequestsSlotFree_snd_calls
-    (inputs : Inputs) (failAfterWrites : Bool) (snapshot : ContractState) :
-    (addRequests inputs failAfterWrites snapshot).snd.calls =
-    (addRequestsSlotFree inputs failAfterWrites snapshot).snd.calls := by
-  unfold addRequests addRequestsSlotFree
-  by_cases hCredit : snapshot.selfBalance.val + inputs.msgValue.val < Verity.Core.Uint256.modulus
-  · simp only [if_pos hCredit]
-    rcases hA : readArray (credited snapshot inputs) "sources" sourcesBase inputs.sources.length
-      with _ | sources
-    · rfl
-    rcases hB : readArray (credited snapshot inputs) "targets" targetsBase inputs.targets.length
-      with _ | targets
-    · rfl
-    rcases hC : readArray (credited snapshot inputs) "sourceLens" sourceLensBase inputs.sourceLens.length
-      with _ | sourceLens
-    · rfl
-    rcases hD : readArray (credited snapshot inputs) "targetLens" targetLensBase inputs.targetLens.length
-      with _ | targetLens
-    · rfl
-    simp only []
-    rcases hSR : sourceRun _ with reason | obs
-    · rfl
-    by_cases hFail : failAfterWrites
-    · simp only [if_pos hFail, ContractResult.snd_revert]
-      exact persist_calls_eq_persistSlotFree_calls _ _ _
-    · simp only [if_neg hFail, ContractResult.snd_success]
-      exact persist_calls_eq_persistSlotFree_calls _ _ _
-  · simp only [if_neg hCredit]
-
-/-- Companion `.snd.events` equivalence, discharged from
-`persist_events_eq_persistSlotFree_events` by the same case split. -/
-theorem addRequests_snd_events_eq_addRequestsSlotFree_snd_events
-    (inputs : Inputs) (failAfterWrites : Bool) (snapshot : ContractState) :
-    (addRequests inputs failAfterWrites snapshot).snd.events =
-    (addRequestsSlotFree inputs failAfterWrites snapshot).snd.events := by
-  unfold addRequests addRequestsSlotFree
-  by_cases hCredit : snapshot.selfBalance.val + inputs.msgValue.val < Verity.Core.Uint256.modulus
-  · simp only [if_pos hCredit]
-    rcases hA : readArray (credited snapshot inputs) "sources" sourcesBase inputs.sources.length
-      with _ | sources
-    · rfl
-    rcases hB : readArray (credited snapshot inputs) "targets" targetsBase inputs.targets.length
-      with _ | targets
-    · rfl
-    rcases hC : readArray (credited snapshot inputs) "sourceLens" sourceLensBase inputs.sourceLens.length
-      with _ | sourceLens
-    · rfl
-    rcases hD : readArray (credited snapshot inputs) "targetLens" targetLensBase inputs.targetLens.length
-      with _ | targetLens
-    · rfl
-    simp only []
-    rcases hSR : sourceRun _ with reason | obs
-    · rfl
-    by_cases hFail : failAfterWrites
-    · simp only [if_pos hFail, ContractResult.snd_revert]
-      exact persist_events_eq_persistSlotFree_events _ _ _
-    · simp only [if_neg hFail, ContractResult.snd_success]
-      exact persist_events_eq_persistSlotFree_events _ _ _
-  · simp only [if_neg hCredit]
-
-/-- **Chantier 2 (Thomas 2026-09-13) transaction-level slot-agreement.**
-For every slot, the final `.snd.readSlot` of `addRequests` matches
-`addRequestsSlotFree`. On non-committed arms, both return
-`.revert reason snapshot` — same state. On the committed arm, both
-carry the persist(SlotFree) state whose `readSlot`s agree by
-`persist_readSlot_eq_persistSlotFree_readSlot`. -/
-theorem addRequests_snd_readSlot_eq_addRequestsSlotFree_snd_readSlot
-    (inputs : Inputs) (failAfterWrites : Bool) (snapshot : ContractState)
-    (slot : Nat) :
-    (addRequests inputs failAfterWrites snapshot).snd.readSlot slot =
-    (addRequestsSlotFree inputs failAfterWrites snapshot).snd.readSlot slot := by
-  unfold addRequests addRequestsSlotFree
-  by_cases hCredit : snapshot.selfBalance.val + inputs.msgValue.val < Verity.Core.Uint256.modulus
-  · simp only [if_pos hCredit]
-    rcases hA : readArray (credited snapshot inputs) "sources" sourcesBase inputs.sources.length
-      with _ | sources
-    · rfl
-    rcases hB : readArray (credited snapshot inputs) "targets" targetsBase inputs.targets.length
-      with _ | targets
-    · rfl
-    rcases hC : readArray (credited snapshot inputs) "sourceLens" sourceLensBase inputs.sourceLens.length
-      with _ | sourceLens
-    · rfl
-    rcases hD : readArray (credited snapshot inputs) "targetLens" targetLensBase inputs.targetLens.length
-      with _ | targetLens
-    · rfl
-    simp only []
-    rcases hSR : sourceRun _ with reason | obs
-    · rfl
-    by_cases hFail : failAfterWrites
-    · simp only [if_pos hFail, ContractResult.snd_revert]
-      exact persist_readSlot_eq_persistSlotFree_readSlot _ _ _ _
-    · simp only [if_neg hFail, ContractResult.snd_success]
-      exact persist_readSlot_eq_persistSlotFree_readSlot _ _ _ _
-  · simp only [if_neg hCredit]
-
-/-- **Chantier 2 (Thomas 2026-09-13) transaction-level `selfBalance`
-agreement.** Same structure as the `readSlot` variant, discharged by
-`persist_selfBalance_eq_persistSlotFree_selfBalance` on the committed
-arm. -/
-theorem addRequests_snd_selfBalance_eq_addRequestsSlotFree_snd_selfBalance
-    (inputs : Inputs) (failAfterWrites : Bool) (snapshot : ContractState) :
-    (addRequests inputs failAfterWrites snapshot).snd.selfBalance =
-    (addRequestsSlotFree inputs failAfterWrites snapshot).snd.selfBalance := by
-  unfold addRequests addRequestsSlotFree
-  by_cases hCredit : snapshot.selfBalance.val + inputs.msgValue.val < Verity.Core.Uint256.modulus
-  · simp only [if_pos hCredit]
-    rcases hA : readArray (credited snapshot inputs) "sources" sourcesBase inputs.sources.length
-      with _ | sources
-    · rfl
-    rcases hB : readArray (credited snapshot inputs) "targets" targetsBase inputs.targets.length
-      with _ | targets
-    · rfl
-    rcases hC : readArray (credited snapshot inputs) "sourceLens" sourceLensBase inputs.sourceLens.length
-      with _ | sourceLens
-    · rfl
-    rcases hD : readArray (credited snapshot inputs) "targetLens" targetLensBase inputs.targetLens.length
-      with _ | targetLens
-    · rfl
-    simp only []
-    rcases hSR : sourceRun _ with reason | obs
-    · rfl
-    by_cases hFail : failAfterWrites
-    · simp only [if_pos hFail, ContractResult.snd_revert]
-      exact persist_selfBalance_eq_persistSlotFree_selfBalance _ _ _
-    · simp only [if_neg hFail, ContractResult.snd_success]
-      exact persist_selfBalance_eq_persistSlotFree_selfBalance _ _ _
-  · simp only [if_neg hCredit]
-
-/-- **Chantier 2 (Thomas 2026-09-13) outcome-tag equivalence.**
-`addRequests` and `addRequestsSlotFree` follow the exact same guard
-structure — they classify every input into the same outcome tag
-(`.success` vs `.revert`). This is proved by the same case split as
-the `.snd` observation theorems: every branch that produces `.revert`
-on one side produces `.revert` on the other; every branch that
-produces `.success` on one side does so on the other. -/
-theorem addRequests_isSuccess_eq_addRequestsSlotFree_isSuccess
-    (inputs : Inputs) (failAfterWrites : Bool) (snapshot : ContractState) :
-    (addRequests inputs failAfterWrites snapshot).isSuccess =
-    (addRequestsSlotFree inputs failAfterWrites snapshot).isSuccess := by
-  unfold addRequests addRequestsSlotFree
-  by_cases hCredit : snapshot.selfBalance.val + inputs.msgValue.val < Verity.Core.Uint256.modulus
-  · simp only [if_pos hCredit]
-    rcases hA : readArray (credited snapshot inputs) "sources" sourcesBase inputs.sources.length
-      with _ | sources
-    · rfl
-    rcases hB : readArray (credited snapshot inputs) "targets" targetsBase inputs.targets.length
-      with _ | targets
-    · rfl
-    rcases hC : readArray (credited snapshot inputs) "sourceLens" sourceLensBase inputs.sourceLens.length
-      with _ | sourceLens
-    · rfl
-    rcases hD : readArray (credited snapshot inputs) "targetLens" targetLensBase inputs.targetLens.length
-      with _ | targetLens
-    · rfl
-    simp only []
-    rcases hSR : sourceRun _ with reason | obs
-    · rfl
-    by_cases hFail : failAfterWrites
-    · simp only [if_pos hFail]; rfl
-    · simp only [if_neg hFail]; rfl
-  · simp only [if_neg hCredit]
-
-/-- **Chantier 2 (Thomas 2026-09-13) full `observeFromJournal`-level
-equivalence.** Discharges the bundled observation-plane equality:
-`observeFromJournal snapshot (addRequests inputs f snapshot)` equals
-`observeFromJournal snapshot (addRequestsSlotFree inputs f snapshot)`
-on every input. Proof composes:
-- `addRequests_isSuccess_eq_addRequestsSlotFree_isSuccess` (outcome tag),
-- `addRequests_snd_calls_eq_addRequestsSlotFree_snd_calls` (calls),
-- `addRequests_snd_events_eq_addRequestsSlotFree_snd_events` (events),
-- `addRequests_snd_readSlot_eq_addRequestsSlotFree_snd_readSlot` (count/fee),
-so on the shared success arm the two `View` records have identical
-fields; on the shared revert arm both reduce to the constant
-`⟨.reverted, [], [], [], snapshot.readSlot countSlot, 0⟩`. -/
-theorem observeFromJournal_addRequests_eq_observeFromJournal_addRequestsSlotFree
-    (inputs : Inputs) (failAfterWrites : Bool) (snapshot : ContractState) :
-    observeFromJournal snapshot (addRequests inputs failAfterWrites snapshot) =
-    observeFromJournal snapshot (addRequestsSlotFree inputs failAfterWrites snapshot) := by
-  have hSucc := addRequests_isSuccess_eq_addRequestsSlotFree_isSuccess
-    inputs failAfterWrites snapshot
-  have hCalls := addRequests_snd_calls_eq_addRequestsSlotFree_snd_calls
-    inputs failAfterWrites snapshot
-  have hEvents := addRequests_snd_events_eq_addRequestsSlotFree_snd_events
-    inputs failAfterWrites snapshot
-  have hReadSlot := fun slot =>
-    addRequests_snd_readSlot_eq_addRequestsSlotFree_snd_readSlot
-      inputs failAfterWrites snapshot slot
-  rcases hL : addRequests inputs failAfterWrites snapshot with ⟨rL, stateL⟩ | ⟨reasonL, stateL⟩
-  · rcases hR : addRequestsSlotFree inputs failAfterWrites snapshot
-      with ⟨rR, stateR⟩ | ⟨reasonR, stateR⟩
-    · rw [hL, hR] at hCalls hEvents hReadSlot
-      simp only [ContractResult.snd_success] at hCalls hEvents hReadSlot
-      have hCount := hReadSlot countSlot
-      have hFee := hReadSlot feePaidSlot
-      simp only [observeFromJournal]
-      congr 1
-      · rw [hCalls]
-      · rw [hEvents]
-      · rw [hCalls]
-    · rw [hL, hR] at hSucc
-      simp [ContractResult.isSuccess] at hSucc
-  · rcases hR : addRequestsSlotFree inputs failAfterWrites snapshot
-      with ⟨rR, stateR⟩ | ⟨reasonR, stateR⟩
-    · rw [hL, hR] at hSucc
-      simp [ContractResult.isSuccess] at hSucc
-    · rfl
-
-/-- **Chantier 2 (Thomas 2026-09-13) return-value equivalence.**
-Both defs return `.success` with the exact same value
-(`ofObservables obs`) when they commit — the return value is a pure
-function of the source-plane observables, not of the persistence
-choice. `getValue?` therefore agrees on every input. -/
-theorem addRequests_getValue?_eq_addRequestsSlotFree_getValue?
-    (inputs : Inputs) (failAfterWrites : Bool) (snapshot : ContractState) :
-    (addRequests inputs failAfterWrites snapshot).getValue? =
-    (addRequestsSlotFree inputs failAfterWrites snapshot).getValue? := by
-  unfold addRequests addRequestsSlotFree
-  by_cases hCredit : snapshot.selfBalance.val + inputs.msgValue.val < Verity.Core.Uint256.modulus
-  · simp only [if_pos hCredit]
-    rcases hA : readArray (credited snapshot inputs) "sources" sourcesBase inputs.sources.length
-      with _ | sources
-    · rfl
-    rcases hB : readArray (credited snapshot inputs) "targets" targetsBase inputs.targets.length
-      with _ | targets
-    · rfl
-    rcases hC : readArray (credited snapshot inputs) "sourceLens" sourceLensBase inputs.sourceLens.length
-      with _ | sourceLens
-    · rfl
-    rcases hD : readArray (credited snapshot inputs) "targetLens" targetLensBase inputs.targetLens.length
-      with _ | targetLens
-    · rfl
-    simp only []
-    rcases hSR : sourceRun _ with reason | obs
-    · rfl
-    by_cases hFail : failAfterWrites
-    · simp only [if_pos hFail]; rfl
-    · simp only [if_neg hFail]; rfl
-  · simp only [if_neg hCredit]
-
-theorem persist_calls (start : Nat) (obs : Observables) (state : ContractState) :
-    (persist start obs state).calls = state.calls ++ obs.calls.map toJournal := by
-  unfold persist
-  simp [writePayloads_calls, forwardCalls_calls]
-
-theorem persist_events (start : Nat) (obs : Observables) (state : ContractState) :
-    (persist start obs state).events = state.events ++ obs.events.map toEvent := by
-  unfold persist
-  simp [writePayloads_events, forwardCalls_events]
+    (persistSlotFree start obs state).calls =
+      state.calls ++ obs.calls.map toJournal := by
+  unfold persistSlotFree
+  simp [forwardCalls_calls]
 
 private theorem map_ofJournal_toJournal (cs : List CallObs) :
     cs.map (ofJournal ∘ toJournal) = cs := by
@@ -1563,13 +597,19 @@ private theorem sourceRun_committed_payload_shape
               · simp at hRun
   · simp at hRun
 
-/-- Under the entry no-wrap premise and the four decode equations the
-executed transaction is exactly the outcome of the pinned-source
-interpreter: revert passes the pre-call snapshot through, commit persists
-on the frame-entry credited state. The two sides differ only by structure
-eta on the decoded `Inputs` literal and the ground `if false` injection
-flag. -/
-private theorem addRequests_run_eq
+/-- Rollback-by-construction. Every `.revert` outcome of the executable
+transaction carries the pre-call snapshot, not any dirtied intermediate
+state. Discharged directly by unfolding `Contract.run` (which universally
+maps `.revert _ _` to `.revert _ state`). -/
+theorem revert_restores_snapshot_slotFree
+    (inputs : Inputs) (inject : Bool) (state rollback : ContractState)
+    (reason : String)
+    (h : (addRequestsSlotFree inputs inject).run state = .revert reason rollback) :
+    rollback = state := by
+  unfold Contract.run at h
+  split at h <;> simp_all
+
+private theorem addRequestsSlotFree_run_eq
     (inputs : Inputs) (state : ContractState)
     (hEntry : state.selfBalance.val + inputs.msgValue.val <
       Verity.Core.Uint256.modulus)
@@ -1581,22 +621,22 @@ private theorem addRequests_run_eq
       inputs.sourceLens.length = some inputs.sourceLens)
     (hTargetLens : readArray state "targetLens" targetLensBase
       inputs.targetLens.length = some inputs.targetLens) :
-    (addRequests inputs).run state =
+    (addRequestsSlotFree inputs).run state =
       match sourceRun inputs with
       | .reverted reason => .revert reason state
       | .committed obs =>
           .success (ofObservables obs)
-            (persist (state.readSlot countSlot).val obs
+            (persistSlotFree (state.readSlot countSlot).val obs
               (credited state inputs)) := by
   unfold Contract.run
-  have hap : (addRequests inputs) state =
+  have hap : (addRequestsSlotFree inputs) state =
       match sourceRun inputs with
       | .reverted reason => .revert reason state
       | .committed obs =>
           .success (ofObservables obs)
-            (persist (state.readSlot countSlot).val obs
+            (persistSlotFree (state.readSlot countSlot).val obs
               (credited state inputs)) := by
-    unfold addRequests
+    unfold addRequestsSlotFree
     rw [if_pos hEntry]
     simp only [readArray_credited, hSources, hTargets, hSourceLens,
       hTargetLens]
@@ -1606,11 +646,7 @@ private theorem addRequests_run_eq
   | reverted reason => rfl
   | committed obs => rfl
 
-/-- Outcome inversion for the executed transaction under the entry no-wrap
-premise and the four decode equations: the run is exactly the
-`.revert`-pass-through or the `.success` persistence of the pinned-source
-interpreter's own outcome. -/
-private theorem addRequests_run_cases
+private theorem addRequestsSlotFree_run_cases
     (inputs : Inputs) (state : ContractState)
     (hEntry : state.selfBalance.val + inputs.msgValue.val <
       Verity.Core.Uint256.modulus)
@@ -1623,366 +659,59 @@ private theorem addRequests_run_cases
     (hTargetLens : readArray state "targetLens" targetLensBase
       inputs.targetLens.length = some inputs.targetLens)
     (r : ContractResult Result)
-    (h : (addRequests inputs).run state = r) :
+    (h : (addRequestsSlotFree inputs).run state = r) :
     (∃ reason, sourceRun inputs = .reverted reason ∧
         r = .revert reason state) ∨
     (∃ obs, sourceRun inputs = .committed obs ∧
         r = .success (ofObservables obs)
-          (persist (state.readSlot countSlot).val obs
+          (persistSlotFree (state.readSlot countSlot).val obs
             (credited state inputs))) := by
-  rw [addRequests_run_eq inputs state hEntry hSources hTargets hSourceLens
-    hTargetLens] at h
+  rw [addRequestsSlotFree_run_eq inputs state hEntry hSources hTargets
+    hSourceLens hTargetLens] at h
   split at h
   · next reason hR =>
       exact Or.inl ⟨reason, hR, h.symm⟩
   · next obs hC =>
       exact Or.inr ⟨obs, hC, h.symm⟩
+/-- **Chantier 2 slot-free `.events` closed form.** -/
+theorem persistSlotFree_events (start : Nat) (obs : Observables)
+    (state : ContractState) :
+    (persistSlotFree start obs state).events =
+      state.events ++ obs.events.map toEvent := by
+  unfold persistSlotFree
+  simp [forwardCalls_events]
 
-/-- Composed faithful-plane theorem: the real memory-array transaction has the
-same outcome observables as the independently stated pinned-source run.
-The entry no-wrap premise is the executed-plane funding condition: without
-it the frame-entry payable credit would wrap and the transaction rejects
-(`entry_credit_overflow_reverts`), so the pinned-source commit is not the
-outcome of a wrapping entry. -/
-theorem verity_tx_simulates_pinned_source
-    (inputs : Inputs) (state : ContractState)
-    (hCountBound : (state.readSlot countSlot).val + inputs.sources.length <
-      Verity.Core.Uint256.modulus)
-    (hEntry : state.selfBalance.val + inputs.msgValue.val <
-      Verity.Core.Uint256.modulus)
-    (hSources : readArray state "sources" sourcesBase inputs.sources.length =
-      some inputs.sources)
-    (hTargets : readArray state "targets" targetsBase inputs.targets.length =
-      some inputs.targets)
-    (hSourceLens : readArray state "sourceLens" sourceLensBase
-      inputs.sourceLens.length = some inputs.sourceLens)
-    (hTargetLens : readArray state "targetLens" targetLensBase
-      inputs.targetLens.length = some inputs.targetLens) :
-    observe state ((addRequests inputs).run state) =
-      sourceView inputs (state.readSlot countSlot).val := by
-  rcases addRequests_run_cases inputs state hEntry hSources hTargets
-      hSourceLens hTargetLens _ rfl with
-    ⟨reason, hRun, hr⟩ | ⟨obs, hRun, hr⟩
-  · rw [hr]
-    simp [sourceView, observe, ofNat_val, hRun]
-  · rw [hr]
-    have hCalls := persist_calls (state.readSlot countSlot).val obs
-      (credited state inputs)
-    have hEvents := persist_events (state.readSlot countSlot).val obs
-      (credited state inputs)
-    obtain ⟨hCount, hCallsLen, hPayloadLength, hNormalized, _, _, _⟩ :=
-      sourceRun_committed_payload_shape inputs obs hRun
-    have hBound : (state.readSlot countSlot).val + obs.payloads.length ≤
-        Verity.Core.Uint256.modulus := by
-      rw [hPayloadLength]
-      exact Nat.le_of_lt hCountBound
-    have hPayloads := persist_read_payloads
-      (state.readSlot countSlot).val obs (credited state inputs) hCount
-      hNormalized hBound
-    have hCountVal :
-        (Verity.Core.Uint256.ofNat
-          ((state.readSlot countSlot).val + obs.requestCount)).val =
-          (state.readSlot countSlot).val + obs.requestCount := by
-      rw [Verity.Core.Uint256.val_ofNat, Nat.mod_eq_of_lt]
-      · rw [hCount, hPayloadLength]; exact hCountBound
-    simp only [sourceView, hRun, observe, persist_calls, credited_calls,
-      persist_events, credited_events, persist_read_count, persist_read_fee,
-      drop_map_ofJournal, drop_map_ofEvent]
-    rw [hCallsLen, hPayloads]
+/-- **Chantier 2 slot-free `countSlot` closed form.** -/
+theorem persistSlotFree_read_count (start : Nat) (obs : Observables)
+    (state : ContractState) :
+    (persistSlotFree start obs state).readSlot countSlot =
+      Verity.Core.Uint256.ofNat (start + obs.requestCount) := by
+  unfold persistSlotFree
+  rw [readSlot_set_log, forwardCalls_readSlot]
+  rw [ContractState.readSlot_writeSlot_other (slot := feePaidSlot) (slot' := countSlot)]
+  · exact ContractState.readSlot_writeSlot_same _ countSlot _
+  · decide
 
-/-- **Chantier 2 (Thomas 2026-09-13) sourceView payload-shape lemma.**
-`sourceView.payloads = sourceView.calls.map (·.input)` unconditionally:
-on the reverted arm both are `[]`; on the committed arm it follows
-from `sourceRun_committed_payloads_eq_call_inputs` (the sourceRun-level
-retirement bridge from PR #596). Used as the hypothesis of
-`observeFromJournal_eq_of_observe_and_payload_matches_calls` (PR #599)
-to derive that `observeFromJournal` also simulates `sourceView`. -/
-theorem sourceView_payloads_eq_calls_input (inputs : Inputs) (beforeCount : Nat) :
-    (sourceView inputs beforeCount).payloads =
-      (sourceView inputs beforeCount).calls.map (·.input) := by
-  unfold sourceView
-  cases hRun : sourceRun inputs with
-  | reverted _ => simp
-  | committed obs =>
-    -- obs.payloads = obs.calls.map (·.input) from the sourceRun-level bridge.
-    simpa using
-      LidoSRv3.Audit.SolidityConsolidation.sourceRun_committed_payloads_eq_call_inputs
-        inputs obs hRun
-
-/-- **Chantier 2 (Thomas 2026-09-13) slot-independent simulation.**
-Corollary of `verity_tx_simulates_pinned_source` (PR #596-era) via
-the generic substitution lemma
-`observeFromJournal_eq_of_observe_and_payload_matches_calls`
-(PR #599) and the payload-shape lemma `sourceView_payloads_eq_calls_input`
-above: `observeFromJournal` also equals `sourceView` on every
-executed `addRequests` run.
-
-The slot-independent observation function is therefore a sound
-substitute for the registered `observe` against the `sourceView`
-correspondence — no reads of the fabricated `sourceMapSlot` /
-`targetMapSlot` needed anywhere on this path. This is the
-executable-plane counterpart of the source-plane retirement
-bridges from PRs #584 and #585, closing the substitution chain
-across both planes.
-
-Same premises as `verity_tx_simulates_pinned_source`. -/
-theorem observeFromJournal_simulates_pinned_source
-    (inputs : Inputs) (state : ContractState)
-    (hCountBound : (state.readSlot countSlot).val + inputs.sources.length <
-      Verity.Core.Uint256.modulus)
-    (hEntry : state.selfBalance.val + inputs.msgValue.val <
-      Verity.Core.Uint256.modulus)
-    (hSources : readArray state "sources" sourcesBase inputs.sources.length =
-      some inputs.sources)
-    (hTargets : readArray state "targets" targetsBase inputs.targets.length =
-      some inputs.targets)
-    (hSourceLens : readArray state "sourceLens" sourceLensBase
-      inputs.sourceLens.length = some inputs.sourceLens)
-    (hTargetLens : readArray state "targetLens" targetLensBase
-      inputs.targetLens.length = some inputs.targetLens) :
-    observeFromJournal state ((addRequests inputs).run state) =
-      sourceView inputs (state.readSlot countSlot).val :=
-  observeFromJournal_eq_of_observe_and_payload_matches_calls
-    state ((addRequests inputs).run state)
-    (sourceView inputs (state.readSlot countSlot).val)
-    (verity_tx_simulates_pinned_source inputs state hCountBound hEntry
-      hSources hTargets hSourceLens hTargetLens)
-    (sourceView_payloads_eq_calls_input inputs (state.readSlot countSlot).val)
-
-theorem revert_restores_snapshot
-    (inputs : Inputs) (inject : Bool) (state rollback : ContractState)
-    (reason : String)
-    (h : (addRequests inputs inject).run state = .revert reason rollback) :
-    rollback = state := by
-  unfold Contract.run at h
-  split at h <;> simp_all
-
-/-- **Chantier 2 (Thomas 2026-09-13) slot-free companion rollback-by-
-construction.** The slot-free companion `addRequestsSlotFree` inherits
-the same `Contract.run` rollback semantics as `addRequests` — every
-`.revert` outcome carries the pre-call snapshot, not the dirtied
-intermediate state. Discharged directly by unfolding `Contract.run`
-(which universally maps `.revert _ _` to `.revert _ state` regardless
-of the underlying `Contract`'s persistence choice). -/
-theorem revert_restores_snapshot_slotFree
-    (inputs : Inputs) (inject : Bool) (state rollback : ContractState)
-    (reason : String)
-    (h : (addRequestsSlotFree inputs inject).run state = .revert reason rollback) :
-    rollback = state := by
-  unfold Contract.run at h
-  split at h <;> simp_all
-
-/-- **Chantier 2 (Thomas 2026-09-13) `Contract.run`-lifted `.snd.calls`
-agreement.** For every `Inputs`, `inject`, and `state`, the `.snd.calls`
-of the two variants under `Contract.run` agree. On `.success`,
-`Contract.run c s = c s` verbatim and the raw application equality
-(PR #614) transfers. On `.revert`, `Contract.run` maps both sides to
-`.revert _ state`, so `.snd = state` on both — equal by `rfl`. Mixed
-outcome tags are contradicted by
-`addRequests_isSuccess_eq_addRequestsSlotFree_isSuccess` (PR #617). -/
-theorem run_addRequests_snd_calls_eq_run_addRequestsSlotFree_snd_calls
-    (inputs : Inputs) (inject : Bool) (state : ContractState) :
-    ((addRequests inputs inject).run state).snd.calls =
-    ((addRequestsSlotFree inputs inject).run state).snd.calls := by
-  unfold Contract.run
-  have hRaw := addRequests_snd_calls_eq_addRequestsSlotFree_snd_calls
-    inputs inject state
-  have hSucc := addRequests_isSuccess_eq_addRequestsSlotFree_isSuccess
-    inputs inject state
-  rcases hL : addRequests inputs inject state with ⟨rL, stateL⟩ | ⟨reasonL, stateL⟩
-  · rcases hR : addRequestsSlotFree inputs inject state
-      with ⟨rR, stateR⟩ | ⟨reasonR, stateR⟩
-    · simp only []
-      rw [hL, hR] at hRaw
-      simp only [ContractResult.snd_success] at hRaw
-      exact hRaw
-    · rw [hL, hR] at hSucc
-      simp [ContractResult.isSuccess] at hSucc
-  · rcases hR : addRequestsSlotFree inputs inject state
-      with ⟨rR, stateR⟩ | ⟨reasonR, stateR⟩
-    · rw [hL, hR] at hSucc
-      simp [ContractResult.isSuccess] at hSucc
-    · rfl
-
-/-- **Chantier 2 (Thomas 2026-09-13) `Contract.run`-lifted `.snd.events`
-agreement.** Same structure as the `.snd.calls` lift, discharged via
-`addRequests_snd_events_eq_addRequestsSlotFree_snd_events` (PR #614). -/
-theorem run_addRequests_snd_events_eq_run_addRequestsSlotFree_snd_events
-    (inputs : Inputs) (inject : Bool) (state : ContractState) :
-    ((addRequests inputs inject).run state).snd.events =
-    ((addRequestsSlotFree inputs inject).run state).snd.events := by
-  unfold Contract.run
-  have hRaw := addRequests_snd_events_eq_addRequestsSlotFree_snd_events
-    inputs inject state
-  have hSucc := addRequests_isSuccess_eq_addRequestsSlotFree_isSuccess
-    inputs inject state
-  rcases hL : addRequests inputs inject state with ⟨rL, stateL⟩ | ⟨reasonL, stateL⟩
-  · rcases hR : addRequestsSlotFree inputs inject state
-      with ⟨rR, stateR⟩ | ⟨reasonR, stateR⟩
-    · simp only []
-      rw [hL, hR] at hRaw
-      simp only [ContractResult.snd_success] at hRaw
-      exact hRaw
-    · rw [hL, hR] at hSucc
-      simp [ContractResult.isSuccess] at hSucc
-  · rcases hR : addRequestsSlotFree inputs inject state
-      with ⟨rR, stateR⟩ | ⟨reasonR, stateR⟩
-    · rw [hL, hR] at hSucc
-      simp [ContractResult.isSuccess] at hSucc
-    · rfl
-
-/-- **Chantier 2 (Thomas 2026-09-13) `Contract.run`-lifted `.snd.readSlot`
-agreement.** For any slot and every input, the readSlot of the final
-state produced by `Contract.run` agrees between the registered
-`addRequests` and the slot-free companion `addRequestsSlotFree`. On
-success arms the raw agreement (PR #616) transfers; on revert arms
-both sides carry the pre-call snapshot, so the reads are equal by
-`rfl`. -/
-theorem run_addRequests_snd_readSlot_eq_run_addRequestsSlotFree_snd_readSlot
-    (inputs : Inputs) (inject : Bool) (state : ContractState) (slot : Nat) :
-    ((addRequests inputs inject).run state).snd.readSlot slot =
-    ((addRequestsSlotFree inputs inject).run state).snd.readSlot slot := by
-  unfold Contract.run
-  have hRaw := addRequests_snd_readSlot_eq_addRequestsSlotFree_snd_readSlot
-    inputs inject state slot
-  have hSucc := addRequests_isSuccess_eq_addRequestsSlotFree_isSuccess
-    inputs inject state
-  rcases hL : addRequests inputs inject state with ⟨rL, stateL⟩ | ⟨reasonL, stateL⟩
-  · rcases hR : addRequestsSlotFree inputs inject state
-      with ⟨rR, stateR⟩ | ⟨reasonR, stateR⟩
-    · simp only []
-      rw [hL, hR] at hRaw
-      simp only [ContractResult.snd_success] at hRaw
-      exact hRaw
-    · rw [hL, hR] at hSucc
-      simp [ContractResult.isSuccess] at hSucc
-  · rcases hR : addRequestsSlotFree inputs inject state
-      with ⟨rR, stateR⟩ | ⟨reasonR, stateR⟩
-    · rw [hL, hR] at hSucc
-      simp [ContractResult.isSuccess] at hSucc
-    · rfl
-
-/-- **Chantier 2 (Thomas 2026-09-13) `Contract.run`-lifted `.snd.selfBalance`
-agreement.** Same structure, discharged via
-`addRequests_snd_selfBalance_eq_addRequestsSlotFree_snd_selfBalance`
-(PR #616). -/
-theorem run_addRequests_snd_selfBalance_eq_run_addRequestsSlotFree_snd_selfBalance
-    (inputs : Inputs) (inject : Bool) (state : ContractState) :
-    ((addRequests inputs inject).run state).snd.selfBalance =
-    ((addRequestsSlotFree inputs inject).run state).snd.selfBalance := by
-  unfold Contract.run
-  have hRaw := addRequests_snd_selfBalance_eq_addRequestsSlotFree_snd_selfBalance
-    inputs inject state
-  have hSucc := addRequests_isSuccess_eq_addRequestsSlotFree_isSuccess
-    inputs inject state
-  rcases hL : addRequests inputs inject state with ⟨rL, stateL⟩ | ⟨reasonL, stateL⟩
-  · rcases hR : addRequestsSlotFree inputs inject state
-      with ⟨rR, stateR⟩ | ⟨reasonR, stateR⟩
-    · simp only []
-      rw [hL, hR] at hRaw
-      simp only [ContractResult.snd_success] at hRaw
-      exact hRaw
-    · rw [hL, hR] at hSucc
-      simp [ContractResult.isSuccess] at hSucc
-  · rcases hR : addRequestsSlotFree inputs inject state
-      with ⟨rR, stateR⟩ | ⟨reasonR, stateR⟩
-    · rw [hL, hR] at hSucc
-      simp [ContractResult.isSuccess] at hSucc
-    · rfl
-
-/-- **Chantier 2 (Thomas 2026-09-13) `Contract.run`-lifted `.isSuccess`
-agreement.** On success `Contract.run c s` retains the underlying
-`.success` constructor; on revert both sides emit `.revert _ state`.
-Both cases preserve the raw application's `.isSuccess` value. So
-`addRequests_isSuccess_eq_addRequestsSlotFree_isSuccess` (PR #617)
-transfers directly. -/
-theorem run_addRequests_isSuccess_eq_run_addRequestsSlotFree_isSuccess
-    (inputs : Inputs) (inject : Bool) (state : ContractState) :
-    ((addRequests inputs inject).run state).isSuccess =
-    ((addRequestsSlotFree inputs inject).run state).isSuccess := by
-  unfold Contract.run
-  have hSucc := addRequests_isSuccess_eq_addRequestsSlotFree_isSuccess
-    inputs inject state
-  rcases hL : addRequests inputs inject state with ⟨rL, stateL⟩ | ⟨reasonL, stateL⟩
-  · rcases hR : addRequestsSlotFree inputs inject state
-      with ⟨rR, stateR⟩ | ⟨reasonR, stateR⟩
-    · rfl
-    · rw [hL, hR] at hSucc
-      simp [ContractResult.isSuccess] at hSucc
-  · rcases hR : addRequestsSlotFree inputs inject state
-      with ⟨rR, stateR⟩ | ⟨reasonR, stateR⟩
-    · rw [hL, hR] at hSucc
-      simp [ContractResult.isSuccess] at hSucc
-    · rfl
-
-/-- **Chantier 2 (Thomas 2026-09-13) `Contract.run`-lifted `.getValue?`
-agreement.** Same pattern; on success both sides return `some
-(ofObservables obs)` with the same obs; on revert both return `none`.
-Discharge via `addRequests_getValue?_eq_addRequestsSlotFree_getValue?`
-(PR #617). -/
-theorem run_addRequests_getValue?_eq_run_addRequestsSlotFree_getValue?
-    (inputs : Inputs) (inject : Bool) (state : ContractState) :
-    ((addRequests inputs inject).run state).getValue? =
-    ((addRequestsSlotFree inputs inject).run state).getValue? := by
-  unfold Contract.run
-  have hRaw := addRequests_getValue?_eq_addRequestsSlotFree_getValue?
-    inputs inject state
-  have hSucc := addRequests_isSuccess_eq_addRequestsSlotFree_isSuccess
-    inputs inject state
-  rcases hL : addRequests inputs inject state with ⟨rL, stateL⟩ | ⟨reasonL, stateL⟩
-  · rcases hR : addRequestsSlotFree inputs inject state
-      with ⟨rR, stateR⟩ | ⟨reasonR, stateR⟩
-    · simp only []
-      rw [hL, hR] at hRaw
-      exact hRaw
-    · rw [hL, hR] at hSucc
-      simp [ContractResult.isSuccess] at hSucc
-  · rcases hR : addRequestsSlotFree inputs inject state
-      with ⟨rR, stateR⟩ | ⟨reasonR, stateR⟩
-    · rw [hL, hR] at hSucc
-      simp [ContractResult.isSuccess] at hSucc
-    · rfl
-
-/-- **Chantier 2 (Thomas 2026-09-13) `Contract.run`-level slot-free
-observation equivalence.** Lifts
-`observeFromJournal_addRequests_eq_observeFromJournal_addRequestsSlotFree`
-through `Contract.run`'s revert-rollback semantics. On the success arm
-`Contract.run c s = c s` verbatim; on the revert arm `Contract.run c s`
-substitutes `s` for the reverted-state field, but `observeFromJournal`
-on `.revert _ _` returns the constant `⟨.reverted, [], [], [], s.readSlot
-countSlot, 0⟩` regardless of the carried state — so the revert-side
-rewriting is invisible to `observeFromJournal`. Both cases follow from
-the raw-application equivalence. -/
-theorem observeFromJournal_run_addRequests_eq_observeFromJournal_run_addRequestsSlotFree
-    (inputs : Inputs) (state : ContractState) :
-    observeFromJournal state ((addRequests inputs).run state) =
-    observeFromJournal state ((addRequestsSlotFree inputs).run state) := by
-  unfold Contract.run
-  have hRaw := observeFromJournal_addRequests_eq_observeFromJournal_addRequestsSlotFree
-    inputs false state
-  have hSucc := addRequests_isSuccess_eq_addRequestsSlotFree_isSuccess
-    inputs false state
-  rcases hL : addRequests inputs false state with ⟨rL, stateL⟩ | ⟨reasonL, stateL⟩
-  · rcases hR : addRequestsSlotFree inputs false state with ⟨rR, stateR⟩ | ⟨reasonR, stateR⟩
-    · simp only []
-      rw [hL, hR] at hRaw
-      exact hRaw
-    · rw [hL, hR] at hSucc
-      simp [ContractResult.isSuccess] at hSucc
-  · rcases hR : addRequestsSlotFree inputs false state with ⟨rR, stateR⟩ | ⟨reasonR, stateR⟩
-    · rw [hL, hR] at hSucc
-      simp [ContractResult.isSuccess] at hSucc
-    · rfl
+/-- **Chantier 2 slot-free `feePaidSlot` closed form.** -/
+theorem persistSlotFree_read_fee (start : Nat) (obs : Observables)
+    (state : ContractState) :
+    (persistSlotFree start obs state).readSlot feePaidSlot = obs.feePaid := by
+  unfold persistSlotFree
+  rw [readSlot_set_log, forwardCalls_readSlot]
+  exact ContractState.readSlot_writeSlot_same _ feePaidSlot _
 
 /-- **Chantier 2 (Thomas 2026-09-13) slot-free simulation of the
-pinned source.** The slot-free companion transaction
-`addRequestsSlotFree` still simulates the pinned source at the
-`observeFromJournal` view — proved by chaining
-`observeFromJournal_run_addRequests_eq_observeFromJournal_run_addRequestsSlotFree`
-with the registered `observeFromJournal_simulates_pinned_source`.
-This is the retirement-completeness statement: the slot-free
-executable transaction produces the same slot-free observation as
-the pinned Solidity source under the same premises. -/
+pinned source — direct proof.** `addRequestsSlotFree` simulates the
+pinned source at the `observeFromJournal` view under the same premises
+as the pre-retirement `verity_tx_simulates_pinned_source`, proved
+**directly** via `addRequestsSlotFree_run_cases` + `persistSlotFree_calls` /
+`persistSlotFree_events` / `persistSlotFree_read_count` /
+`persistSlotFree_read_fee` + `sourceRun_committed_payloads_eq_call_inputs`
+(source-plane bridge), without routing through the pre-retirement
+`observe` / `addRequests` / `persist` / `writePayloads` / `readPayloads`
+scaffolding. This is the retirement-completeness statement: the
+slot-free executable transaction produces the same slot-free
+observation as the pinned Solidity source under the same premises. -/
 theorem observeFromJournal_simulates_pinned_source_slotFree
     (inputs : Inputs) (state : ContractState)
     (hCountBound : (state.readSlot countSlot).val + inputs.sources.length <
@@ -1999,23 +728,20 @@ theorem observeFromJournal_simulates_pinned_source_slotFree
       inputs.targetLens.length = some inputs.targetLens) :
     observeFromJournal state ((addRequestsSlotFree inputs).run state) =
       sourceView inputs (state.readSlot countSlot).val := by
-  rw [← observeFromJournal_run_addRequests_eq_observeFromJournal_run_addRequestsSlotFree]
-  exact observeFromJournal_simulates_pinned_source inputs state hCountBound hEntry
-    hSources hTargets hSourceLens hTargetLens
-
-/-- **Chantier 2 (Thomas 2026-09-13) substitution-preserves-observation
-corollary.** Any `View`-predicate holding on the `observeFromJournal`
-view of `addRequests` under `Contract.run` also holds on the
-`observeFromJournal` view of `addRequestsSlotFree`, and vice versa.
-Immediate from the bundled `observeFromJournal_run_addRequests_eq_...`
-equality (PR #622). Consumers verifying observational properties of
-the registered `addRequests` can drop-in-substitute
-`addRequestsSlotFree` without proof-obligation change. -/
-theorem addRequestsSlotFree_preserves_observeFromJournal_predicate
-    (inputs : Inputs) (state : ContractState) (F : View → Prop) :
-    F (observeFromJournal state ((addRequests inputs).run state)) ↔
-    F (observeFromJournal state ((addRequestsSlotFree inputs).run state)) := by
-  rw [observeFromJournal_run_addRequests_eq_observeFromJournal_run_addRequestsSlotFree]
+  rcases addRequestsSlotFree_run_cases inputs state hEntry hSources hTargets
+      hSourceLens hTargetLens _ rfl with
+    ⟨reason, hRun, hr⟩ | ⟨obs, hRun, hr⟩
+  · rw [hr]
+    simp [sourceView, observeFromJournal, ofNat_val, hRun]
+  · rw [hr]
+    have hPayEq : obs.payloads = obs.calls.map (·.input) :=
+      SolidityConsolidation.sourceRun_committed_payloads_eq_call_inputs
+        inputs obs hRun
+    simp only [sourceView, hRun, observeFromJournal, persistSlotFree_calls,
+      credited_calls, persistSlotFree_events, credited_events,
+      persistSlotFree_read_count, persistSlotFree_read_fee,
+      drop_map_ofJournal, drop_map_ofEvent]
+    rw [hPayEq]
 
 /-! ## Value-bearing CALLs: exact forwarding and preservesEthBalance -/
 
@@ -2069,13 +795,13 @@ theorem sub_foldl_replicate (B fee : Word) (n : Nat) (msgValue : Word)
       simp only [List.replicate_succ, List.foldl_cons, hEq]
       exact ih _ hmVal
 
-/-- Success inversion for the executed transaction: under the four decode
-equations, a `.success` outcome implies `sourceRun inputs` committed some
-`obs`, the result is that observables record, and the post-state is exactly
-`persist` applied to the frame-entry credited state. A `.success` outcome
-additionally certifies the entry credit did not wrap — a wrapping entry is
-turned away before decode, so the success hypothesis is false there. -/
-private theorem addRequests_success_inversion
+/-! ## Slot-free value-plane theorems
+
+Value-plane guarantees stated on `addRequestsSlotFree` — the CALL-journal
+forwarding and `preservesEthBalance` (vault side, `WithdrawalVault.sol:81-85`)
+consumed by the P-CONSOLIDATION-1 registered parents. -/
+
+private theorem addRequestsSlotFree_success_inversion
     (inputs : Inputs) (state : ContractState)
     (hSources : readArray state "sources" sourcesBase inputs.sources.length =
       some inputs.sources)
@@ -2086,33 +812,32 @@ private theorem addRequests_success_inversion
     (hTargetLens : readArray state "targetLens" targetLensBase
       inputs.targetLens.length = some inputs.targetLens)
     (result : Result) (after : ContractState)
-    (h : (addRequests inputs).run state = .success result after) :
+    (h : (addRequestsSlotFree inputs).run state = .success result after) :
     ∃ obs, sourceRun inputs = .committed obs ∧
       ofObservables obs = result ∧
-      persist (state.readSlot countSlot).val obs (credited state inputs) =
+      persistSlotFree (state.readSlot countSlot).val obs (credited state inputs) =
         after := by
   by_cases hEntry : state.selfBalance.val + inputs.msgValue.val <
       Verity.Core.Uint256.modulus
-  · rcases addRequests_run_cases inputs state hEntry hSources hTargets
+  · rcases addRequestsSlotFree_run_cases inputs state hEntry hSources hTargets
         hSourceLens hTargetLens _ h with ⟨reason, _, hr⟩ | ⟨obs, hsr, hr⟩
     · simp at hr
     · injection hr with hRes hAfter
       exact ⟨obs, hsr, hRes.symm, hAfter.symm⟩
-  · have hRevert : (addRequests inputs).run state =
+  · have hRevert : (addRequestsSlotFree inputs).run state =
         .revert "ENTRY_CREDIT_OVERFLOW" state := by
-      unfold Contract.run addRequests
+      unfold Contract.run addRequestsSlotFree
       rw [if_neg hEntry]
     rw [hRevert] at h
     simp at h
 
-/-- On a committed batch the executed transaction forwards exactly
-`msg.value`: the journal suffix is one `.call` frame per request, every
-frame is a `.success` frame to the consolidation-request target carrying
-the per-request fee as its value, and the frame values sum to `msg.value`
-— the pinned `_requireExactFee` guard exported onto the CALL journal.
-Hypotheses are the four memory-array decode equations, as in
-`verity_tx_simulates_pinned_source`. -/
-theorem committed_journal_forwards_msg_value
+/-- Slot-free companion of `committed_journal_forwards_msg_value`
+(Thomas 2026-09-13 retirement). The journal suffix has the same
+shape: one `.success` CALL frame per request to the request target,
+frame values summing to `msg.value`. Proof structure mirrors the
+original but uses `addRequestsSlotFree_success_inversion` and
+`persistSlotFree_calls`. -/
+theorem committed_journal_forwards_msg_value_slotFree
     (inputs : Inputs) (state : ContractState)
     (hSources : readArray state "sources" sourcesBase inputs.sources.length =
       some inputs.sources)
@@ -2123,20 +848,20 @@ theorem committed_journal_forwards_msg_value
     (hTargetLens : readArray state "targetLens" targetLensBase
       inputs.targetLens.length = some inputs.targetLens)
     (result : Result) (after : ContractState)
-    (h : (addRequests inputs).run state = .success result after) :
+    (h : (addRequestsSlotFree inputs).run state = .success result after) :
     let frames := after.calls.drop state.calls.length
     frames.length = result.requestCount ∧
       (∀ f ∈ frames, f.kind = .call ∧ f.control = .success ∧
         f.target = inputs.requestTarget.val ∧ f.value = inputs.fee.val) ∧
       (frames.map (fun f => f.value)).sum = inputs.msgValue.val := by
   obtain ⟨obs, hRun, hRes, hAfter⟩ :=
-    addRequests_success_inversion inputs state hSources hTargets hSourceLens
-      hTargetLens result after h
+    addRequestsSlotFree_success_inversion inputs state hSources hTargets
+      hSourceLens hTargetLens result after h
   obtain ⟨hCount, hCallsLen, _, _, hValues, hTargets', hFeeEq⟩ :=
     sourceRun_committed_payload_shape inputs obs hRun
   subst result
   subst after
-  simp only [ofObservables, persist_calls, credited_calls, List.drop_left,
+  simp only [ofObservables, persistSlotFree_calls, credited_calls, List.drop_left,
     List.length_map]
   refine ⟨hCallsLen, ?_, ?_⟩
   · intro f hf
@@ -2158,17 +883,11 @@ theorem committed_journal_forwards_msg_value
         simp [List.map_map, toJournal]
     rw [hmap, hValues, map_replicate_val, sum_replicate_nat, hFeeEq]
 
-/-- `preservesEthBalance` (`WithdrawalVault.sol:81--85`), vault side: after
-the modeled frame-entry payable credit of `msg.value` and the per-request
-CALL debits, every committed run restores the vault's pre-call
-`selfBalance` — the modifier's `assert`. A committed run certifies the
-entry credit did not wrap (a wrapping `selfBalance + msg.value` is turned
-away before decode, `entry_credit_overflow_reverts`), so the debits it
-folds over are funded rather than wrapping. Every revert restores the whole
-pre-call snapshot (`revert_restores_snapshot`), balance included. The
-counterparty credit at the request predeploy is another contract's balance
-and stays on the multi-contract plane. -/
-theorem committed_preserves_eth_balance
+/-- Slot-free companion of `committed_preserves_eth_balance` (Thomas
+2026-09-13 retirement). Same conclusion: `after.selfBalance =
+state.selfBalance` on every committed run. Uses
+`persistSlotFree_selfBalance` for the closed form. -/
+theorem committed_preserves_eth_balance_slotFree
     (inputs : Inputs) (state : ContractState)
     (hSources : readArray state "sources" sourcesBase inputs.sources.length =
       some inputs.sources)
@@ -2179,28 +898,31 @@ theorem committed_preserves_eth_balance
     (hTargetLens : readArray state "targetLens" targetLensBase
       inputs.targetLens.length = some inputs.targetLens)
     (result : Result) (after : ContractState)
-    (h : (addRequests inputs).run state = .success result after) :
+    (h : (addRequestsSlotFree inputs).run state = .success result after) :
     after.selfBalance = state.selfBalance := by
   obtain ⟨obs, hRun, _, hAfter⟩ :=
-    addRequests_success_inversion inputs state hSources hTargets hSourceLens
-      hTargetLens result after h
+    addRequestsSlotFree_success_inversion inputs state hSources hTargets
+      hSourceLens hTargetLens result after h
   obtain ⟨_, hCallsLen, _, _, hValues, _, hFeeEq⟩ :=
     sourceRun_committed_payload_shape inputs obs hRun
   subst after
-  rw [persist_selfBalance, selfBalance_credited, foldl_sub_values, hValues]
+  rw [persistSlotFree_selfBalance, selfBalance_credited, foldl_sub_values, hValues]
   exact sub_foldl_replicate state.selfBalance inputs.fee obs.calls.length
     inputs.msgValue hFeeEq
 
 /-! ## Kill-line mutants (not source)
 
-Model mutants for the value-plane kill-lines. `addRequestsValueBlind` keeps the frame-entry payable credit and the
-journaled CALL frames but drops the per-CALL debit — exactly the pre-lift
-stub behavior ("success stubs move no wei"). `addRequestsDoubleDebit`
-debits twice the journaled value per CALL. `addRequestsJournalValueBlind`
-debits honestly but journals each frame with value `0`. None of these is
-the model of record; they exist so the kill-lines in
-`Tests/ConsolidationTxMutants.lean` can refute `preservesEthBalance` and
-exact forwarding on mutants of this model. -/
+Model mutants for the value-plane kill-lines, targeting the slot-free
+registered parents (`verity_tx_journal_forwards_msg_value` and
+`verity_tx_preserves_eth_balance` on `addRequestsSlotFree`, after
+chantier 2 PR #646). `addRequestsValueBlindSlotFree` keeps the
+frame-entry payable credit and the journaled CALL frames but drops
+the per-CALL debit. `addRequestsDoubleDebitSlotFree` debits twice the
+journaled value per CALL. `addRequestsJournalValueBlindSlotFree`
+debits honestly but journals each frame with value `0`. None of
+these is the model of record; they exist so the kill-lines in
+`Tests/ConsolidationTxMutants.lean` can refute `preserves_eth_balance`
+and exact forwarding on mutants of this model. -/
 
 def forwardCallsDouble (state : ContractState) : List CallObs → ContractState
   | [] => state
@@ -2210,38 +932,6 @@ def forwardCallsDouble (state : ContractState) : List CallObs → ContractState
 
 def toJournalValueBlind (c : CallObs) : ExternalCall :=
   { toJournal c with value := 0 }
-
-def persistPlain (start : Nat) (obs : Observables) (state : ContractState) :
-    ContractState :=
-  let dirty := writePayloads start obs.payloads state
-  let dirty := (dirty.writeSlot countSlot
-      (Verity.Core.Uint256.ofNat (start + obs.requestCount)))
-    |>.writeSlot feePaidSlot obs.feePaid
-  { dirty with
-    events := dirty.events ++ obs.events.map toEvent
-    calls := dirty.calls ++ obs.calls.map toJournal }
-
-def persistDoubleDebit (start : Nat) (obs : Observables)
-    (state : ContractState) : ContractState :=
-  let dirty := writePayloads start obs.payloads state
-  let dirty := (dirty.writeSlot countSlot
-      (Verity.Core.Uint256.ofNat (start + obs.requestCount)))
-    |>.writeSlot feePaidSlot obs.feePaid
-  let dirty := forwardCallsDouble dirty obs.calls
-  { dirty with
-    events := dirty.events ++ obs.events.map toEvent
-    calls := dirty.calls ++ obs.calls.map toJournal }
-
-def persistJournalValueBlind (start : Nat) (obs : Observables)
-    (state : ContractState) : ContractState :=
-  let dirty := writePayloads start obs.payloads state
-  let dirty := (dirty.writeSlot countSlot
-      (Verity.Core.Uint256.ofNat (start + obs.requestCount)))
-    |>.writeSlot feePaidSlot obs.feePaid
-  let dirty := forwardCalls dirty obs.calls
-  { dirty with
-    events := dirty.events ++ obs.events.map toEvent
-    calls := dirty.calls ++ obs.calls.map toJournalValueBlind }
 
 /-- Common skeleton of the value-plane mutants: same decode, same
 `sourceRun` decision tree, same entry credit; only `persistFn` differs. -/
@@ -2269,14 +959,49 @@ def addRequestsWith
               (credited snapshot inputs))
   | _, _, _, _ => .revert "MEMORY_ARRAY_DECODE" snapshot
 
-def addRequestsValueBlind (inputs : Inputs) : Contract Result :=
-  addRequestsWith persistPlain inputs
+/-! Chantier 2 (Thomas 2026-09-13, item c continuation) slot-free
+mutant variants. These match the `addRequestsSlotFree` companion
+(dropping `writePayloads` — hence no fabricated `sourceMapSlot` /
+`targetMapSlot` writes) and mutate exactly one aspect of the value
+plane, so their kill-lines refute the slot-free registered parents. -/
 
-def addRequestsDoubleDebit (inputs : Inputs) : Contract Result :=
-  addRequestsWith persistDoubleDebit inputs
+def persistPlainSlotFree (start : Nat) (obs : Observables)
+    (state : ContractState) : ContractState :=
+  let dirty := (state.writeSlot countSlot
+      (Verity.Core.Uint256.ofNat (start + obs.requestCount)))
+    |>.writeSlot feePaidSlot obs.feePaid
+  { dirty with
+    events := dirty.events ++ obs.events.map toEvent
+    calls := dirty.calls ++ obs.calls.map toJournal }
 
-def addRequestsJournalValueBlind (inputs : Inputs) : Contract Result :=
-  addRequestsWith persistJournalValueBlind inputs
+def persistDoubleDebitSlotFree (start : Nat) (obs : Observables)
+    (state : ContractState) : ContractState :=
+  let dirty := (state.writeSlot countSlot
+      (Verity.Core.Uint256.ofNat (start + obs.requestCount)))
+    |>.writeSlot feePaidSlot obs.feePaid
+  let dirty := forwardCallsDouble dirty obs.calls
+  { dirty with
+    events := dirty.events ++ obs.events.map toEvent
+    calls := dirty.calls ++ obs.calls.map toJournal }
+
+def persistJournalValueBlindSlotFree (start : Nat) (obs : Observables)
+    (state : ContractState) : ContractState :=
+  let dirty := (state.writeSlot countSlot
+      (Verity.Core.Uint256.ofNat (start + obs.requestCount)))
+    |>.writeSlot feePaidSlot obs.feePaid
+  let dirty := forwardCalls dirty obs.calls
+  { dirty with
+    events := dirty.events ++ obs.events.map toEvent
+    calls := dirty.calls ++ obs.calls.map toJournalValueBlind }
+
+def addRequestsValueBlindSlotFree (inputs : Inputs) : Contract Result :=
+  addRequestsWith persistPlainSlotFree inputs
+
+def addRequestsDoubleDebitSlotFree (inputs : Inputs) : Contract Result :=
+  addRequestsWith persistDoubleDebitSlotFree inputs
+
+def addRequestsJournalValueBlindSlotFree (inputs : Inputs) : Contract Result :=
+  addRequestsWith persistJournalValueBlindSlotFree inputs
 
 /-! ## FunctionSpec call/event/memory fragment (not a transcription)
 

@@ -40,7 +40,8 @@ private def stateOf (inputs : Inputs) : Verity.ContractState :=
     defaultState
 
 private def runView (inputs : Inputs) : View :=
-  observe (stateOf inputs) ((addRequests inputs).run (stateOf inputs))
+  observeFromJournal (stateOf inputs)
+    ((addRequestsSlotFree inputs).run (stateOf inputs))
 
 private def expectedCall (source target : Nat) : CallObs :=
   { target := word consolidationRequestAddress
@@ -107,7 +108,7 @@ example :
 example :
     let first := runView (pair 11 21)
     let secondState :=
-      match (addRequests (pair 11 21)).run (stateOf (pair 11 21)) with
+      match (addRequestsSlotFree (pair 11 21)).run (stateOf (pair 11 21)) with
       | .success _ after =>
           stateFor [word 12] [word 22] [key48] [key48] after
       | .revert _ s => s
@@ -115,7 +116,8 @@ example :
       { pair 12 22 with }
     first = ⟨.committed, [expectedCall 11 21], [expectedEvent 11 21],
         [[word 11, word 21]], word 1, word 3⟩ ∧
-      observe secondState ((addRequests secondInputs).run secondState) =
+      observeFromJournal secondState
+          ((addRequestsSlotFree secondInputs).run secondState) =
         ⟨.committed, [expectedCall 12 22], [expectedEvent 12 22],
           [[word 12, word 22]], word 2, word 3⟩ := by native_decide
 
@@ -123,26 +125,28 @@ example :
 appending is rejected. -/
 example :
     let secondState :=
-      match (addRequests (pair 11 21)).run (stateOf (pair 11 21)) with
+      match (addRequestsSlotFree (pair 11 21)).run (stateOf (pair 11 21)) with
       | .success _ after =>
           stateFor [word 12] [word 22] [key48] [key48] after
       | .revert _ s => s
-    observe secondState ((addRequests (pair 12 22)).run secondState) ≠
+    observeFromJournal secondState
+        ((addRequestsSlotFree (pair 12 22)).run secondState) ≠
       ⟨.committed, [expectedCall 12 22], [expectedEvent 12 22],
         [[word 12, word 22]], word 1, word 3⟩ := by native_decide
 
-/-- Failure after call/event/memory writes is observed as a revert. The
-snapshot law `revert_restores_snapshot` then restores the pre-call state. -/
+/-- Failure after call/event journal writes is observed as a revert. The
+snapshot law `revert_restores_snapshot_slotFree` then restores the pre-call
+state. -/
 example :
-    observe (stateOf (pair 11 21)) ((addRequests (pair 11 21) true).run
-      (stateOf (pair 11 21))) =
+    observeFromJournal (stateOf (pair 11 21))
+        ((addRequestsSlotFree (pair 11 21) true).run (stateOf (pair 11 21))) =
       ⟨.reverted, [], [], [], 0, 0⟩ := by native_decide
 
 example (reason : String) (rollback : Verity.ContractState)
-    (h : (addRequests (pair 11 21) true).run (stateOf (pair 11 21)) =
+    (h : (addRequestsSlotFree (pair 11 21) true).run (stateOf (pair 11 21)) =
       .revert reason rollback) :
     rollback = stateOf (pair 11 21) :=
-  revert_restores_snapshot _ _ _ _ _ h
+  revert_restores_snapshot_slotFree _ _ _ _ _ h
 
 /-- Empty-key length is rejected before a CALL is formed. -/
 example :
@@ -176,13 +180,15 @@ private def stateBal (inputs : Inputs) (bal : Nat) : Verity.ContractState :=
 /-! ## Value-plane kill-lines: CALLs must move exactly msg.value
 
 Three model mutants of the same executed transaction (see
-`ConsolidationTx.lean`): `addRequestsValueBlind` keeps the payable credit
-and the journaled CALL frames but debits nothing (the pre-lift stub
-behavior), `addRequestsDoubleDebit` debits twice the journaled value per
-CALL, and `addRequestsJournalValueBlind` debits honestly but journals each
-frame with value `0`. Each witness satisfies the same memory-decode
-hypotheses as the registered parent `verity_tx_simulates_consolidation`,
-so the refutations are about the value plane, not decode plumbing. -/
+`ConsolidationTx.lean`): `addRequestsValueBlindSlotFree` keeps the
+payable credit and the journaled CALL frames but debits nothing
+(value-blind stub), `addRequestsDoubleDebitSlotFree` debits twice the
+journaled value per CALL, and `addRequestsJournalValueBlindSlotFree`
+debits honestly but journals each frame with value `0`. Each witness
+satisfies the same memory-decode hypotheses as the registered parents
+`verity_tx_journal_forwards_msg_value` and `verity_tx_preserves_eth_balance`
+(both on `addRequestsSlotFree` after chantier 2 PR #646), so the
+refutations are about the value plane, not decode plumbing. -/
 
 private def valObs : Observables :=
   commitObservables (word consolidationRequestAddress) (word 3) (word 3)
@@ -194,22 +200,29 @@ private def valObs : Observables :=
 private def valState : Verity.ContractState :=
   stateBal (pair 11 21) 5
 
-private def valAfterPlain : Verity.ContractState :=
-  persistPlain 0 valObs (credited valState (pair 11 21))
+/-! Chantier 2 (Thomas 2026-09-13, item c continuation) slot-free
+mutant witnesses. Same input, same source-plane commit, but the
+persistence variant is the slot-free companion (no `writePayloads`
+to the fabricated `sourceMapSlot`/`targetMapSlot`). Value-plane
+mutations are otherwise identical to their pre-retirement siblings. -/
 
-private def valAfterDouble : Verity.ContractState :=
-  persistDoubleDebit 0 valObs (credited valState (pair 11 21))
+private def valAfterPlainSlotFree : Verity.ContractState :=
+  persistPlainSlotFree 0 valObs (credited valState (pair 11 21))
 
-private def valAfterJournalBlind : Verity.ContractState :=
-  persistJournalValueBlind 0 valObs (credited valState (pair 11 21))
+private def valAfterDoubleSlotFree : Verity.ContractState :=
+  persistDoubleDebitSlotFree 0 valObs (credited valState (pair 11 21))
 
-/-- **Kill-line: value-blind debit refutes `committed_preserves_eth_balance`
-on a mutant of its own model.** The pre-lift stub behavior — journaled
-CALLs that move no wei — leaves the credited `msg.value` stuck on the
-vault: the post-run `selfBalance` is pre-call + 3, not the pre-call 5.
-`sourceRun` commits the same batch, so the mutant reaches the success arm
-the registered theorem talks about. -/
-theorem value_blind_debit_kill_line_refutes_preserves_eth_balance :
+private def valAfterJournalBlindSlotFree : Verity.ContractState :=
+  persistJournalValueBlindSlotFree 0 valObs (credited valState (pair 11 21))
+
+/-! Chantier 2 (Thomas 2026-09-13, item c continuation) slot-free
+kill-lines. Mirror the three pre-retirement kill-lines but for the
+slot-free mutants (based on `addRequestsSlotFree` companion). Same
+concrete witness (`pair 11 21` / `valState` / `valObs`) — the value-plane
+mutations are identical modulo the fabricated slot writes, which
+`persistSlotFree` skips. -/
+
+theorem value_blind_debit_kill_line_refutes_preserves_eth_balance_slotFree :
     ∃ (inputs : Inputs) (state : Verity.ContractState)
       (result : Result) (after : Verity.ContractState),
       readArray state "sources" sourcesBase inputs.sources.length =
@@ -220,17 +233,14 @@ theorem value_blind_debit_kill_line_refutes_preserves_eth_balance :
         inputs.sourceLens.length = some inputs.sourceLens ∧
       readArray state "targetLens" targetLensBase
         inputs.targetLens.length = some inputs.targetLens ∧
-      observe state ((addRequestsValueBlind inputs).run state) =
-        observe state (.success result after) ∧
+      observeFromJournal state ((addRequestsValueBlindSlotFree inputs).run state) =
+        observeFromJournal state (.success result after) ∧
       after.selfBalance ≠ state.selfBalance :=
-  ⟨pair 11 21, valState, ofObservables valObs, valAfterPlain,
+  ⟨pair 11 21, valState, ofObservables valObs, valAfterPlainSlotFree,
     by native_decide, by native_decide, by native_decide,
     by native_decide, by native_decide, by native_decide⟩
 
-/-- **Kill-line: double debit refutes `committed_preserves_eth_balance`
-on a mutant of its own model.** Debiting twice the journaled value per CALL
-drains the vault: post-run `selfBalance` is pre-call + 3 − 6 = 2, not 5. -/
-theorem double_debit_kill_line_refutes_preserves_eth_balance :
+theorem double_debit_kill_line_refutes_preserves_eth_balance_slotFree :
     ∃ (inputs : Inputs) (state : Verity.ContractState)
       (result : Result) (after : Verity.ContractState),
       readArray state "sources" sourcesBase inputs.sources.length =
@@ -241,19 +251,14 @@ theorem double_debit_kill_line_refutes_preserves_eth_balance :
         inputs.sourceLens.length = some inputs.sourceLens ∧
       readArray state "targetLens" targetLensBase
         inputs.targetLens.length = some inputs.targetLens ∧
-      observe state ((addRequestsDoubleDebit inputs).run state) =
-        observe state (.success result after) ∧
+      observeFromJournal state ((addRequestsDoubleDebitSlotFree inputs).run state) =
+        observeFromJournal state (.success result after) ∧
       after.selfBalance ≠ state.selfBalance :=
-  ⟨pair 11 21, valState, ofObservables valObs, valAfterDouble,
+  ⟨pair 11 21, valState, ofObservables valObs, valAfterDoubleSlotFree,
     by native_decide, by native_decide, by native_decide,
     by native_decide, by native_decide, by native_decide⟩
 
-/-- **Kill-line: journaled value 0 refutes
-`committed_journal_forwards_msg_value` on a mutant of its own model.**
-Honest debits with zero-valued journal frames leave the balance correct
-(the mutant passes the balance assertion) but the journal claims no value
-moved: the frame-values sum is 0, not `msg.value = 3`. -/
-theorem journal_value_blind_kill_line_refutes_exact_forwarding :
+theorem journal_value_blind_kill_line_refutes_exact_forwarding_slotFree :
     ∃ (inputs : Inputs) (state : Verity.ContractState)
       (result : Result) (after : Verity.ContractState),
       readArray state "sources" sourcesBase inputs.sources.length =
@@ -264,12 +269,13 @@ theorem journal_value_blind_kill_line_refutes_exact_forwarding :
         inputs.sourceLens.length = some inputs.sourceLens ∧
       readArray state "targetLens" targetLensBase
         inputs.targetLens.length = some inputs.targetLens ∧
-      observe state ((addRequestsJournalValueBlind inputs).run state) =
-        observe state (.success result after) ∧
+      observeFromJournal state
+          ((addRequestsJournalValueBlindSlotFree inputs).run state) =
+        observeFromJournal state (.success result after) ∧
       after.selfBalance = state.selfBalance ∧
       ((after.calls.drop state.calls.length).map (·.value)).sum ≠
         inputs.msgValue.val :=
-  ⟨pair 11 21, valState, ofObservables valObs, valAfterJournalBlind,
+  ⟨pair 11 21, valState, ofObservables valObs, valAfterJournalBlindSlotFree,
     by native_decide, by native_decide, by native_decide,
     by native_decide, by native_decide, by native_decide,
     by native_decide⟩
@@ -288,32 +294,34 @@ exercise the executable path at both boundaries of the wrap point. -/
 wrap the entry credit to `1 < fee = 3`; the batch is rejected at entry and
 the pre-call snapshot is restored. -/
 example :
-    (addRequests (pair 11 21)).run (stateBal (pair 11 21) (2^256 - 2)) =
+    (addRequestsSlotFree (pair 11 21)).run (stateBal (pair 11 21) (2^256 - 2)) =
       .revert "ENTRY_CREDIT_OVERFLOW" (stateBal (pair 11 21) (2^256 - 2)) :=
-  entry_credit_overflow_reverts _ _ _ (by native_decide)
+  entry_credit_overflow_reverts_slotFree _ _ _ (by native_decide)
 
 /-- The overflow reject is observed, not committed: no CALL, event,
 payload, or fee survives an entry that cannot be credited. -/
 example :
-    observe (stateBal (pair 11 21) (2^256 - 2))
-        ((addRequests (pair 11 21)).run (stateBal (pair 11 21) (2^256 - 2))) =
+    observeFromJournal (stateBal (pair 11 21) (2^256 - 2))
+        ((addRequestsSlotFree (pair 11 21)).run
+          (stateBal (pair 11 21) (2^256 - 2))) =
       ⟨.reverted, [], [], [], 0, 0⟩ := by native_decide
 
 /-- Boundary commit: the largest admissible credit
 `2^256 - 4 + 3 = MAX_UINT256` does not wrap, so the batch commits the full
 honest observables. -/
 example :
-    observe (stateBal (pair 11 21) (2^256 - 4))
-        ((addRequests (pair 11 21)).run (stateBal (pair 11 21) (2^256 - 4))) =
+    observeFromJournal (stateBal (pair 11 21) (2^256 - 4))
+        ((addRequestsSlotFree (pair 11 21)).run
+          (stateBal (pair 11 21) (2^256 - 4))) =
       ⟨.committed, [expectedCall 11 21], [expectedEvent 11 21],
         [[word 11, word 21]], word 1, word 3⟩ := by native_decide
 
 /-- Boundary reject: one wei further, `2^256 - 3 + 3 = 2^256`, wraps and is
 rejected at entry. -/
 example :
-    (addRequests (pair 11 21)).run (stateBal (pair 11 21) (2^256 - 3)) =
+    (addRequestsSlotFree (pair 11 21)).run (stateBal (pair 11 21) (2^256 - 3)) =
       .revert "ENTRY_CREDIT_OVERFLOW" (stateBal (pair 11 21) (2^256 - 3)) :=
-  entry_credit_overflow_reverts _ _ _ (by native_decide)
+  entry_credit_overflow_reverts_slotFree _ _ _ (by native_decide)
 
 /-- **Cheap mutant: swapped concat.** Journal calldata = source then target
 (96 bytes). A swapped target then source concat fails observe: the
