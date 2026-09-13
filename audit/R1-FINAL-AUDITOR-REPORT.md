@@ -4,7 +4,7 @@
 
 ## Decision
 
-Review basis: structured inputs including the accepted TOPUP constructor provenance disclosure (theorem registrations and statuses unchanged; prior PR250 basis `ffd6ae4d5be0a5e1e7d1be335700e58ca90771f5` and exact input delta retained in `audit/metadata-reconcile/report-basis.json`; this revision is not a new independent certification; trio composition scoped separately) `db8670fdf3e37cad8ea438f98c1495688b043017`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
+Review basis: structured inputs including the accepted TOPUP constructor provenance disclosure (theorem registrations and statuses unchanged; prior PR250 basis `ffd6ae4d5be0a5e1e7d1be335700e58ca90771f5` and exact input delta retained in `audit/metadata-reconcile/report-basis.json`; this revision is not a new independent certification; trio composition scoped separately) `b8195c1da781cffad1d7422d563b0e7598fa7120`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
 
 ## Architecture and evidence boundary
 
@@ -27,7 +27,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 | [`P-CONSOLIDATION-ETH-1`](#p-consolidation-eth-1) | CHECKED | CHECKED | 19 open | **IMPLEMENTATION_PENDING** |
 | [`P-ADDRESS-1`](#p-address-1) | CHECKED | CHECKED | 12 open | **IMPLEMENTATION_PENDING** |
 | [`P-TOPUP-2`](#p-topup-2) | CHECKED | CHECKED | 15 open | **IMPLEMENTATION_PENDING** |
-| [`P-CONSOLIDATION-1`](#p-consolidation-1) | CHECKED | CHECKED | 10 open | **IMPLEMENTATION_PENDING** |
+| [`P-CONSOLIDATION-1`](#p-consolidation-1) | CHECKED | CHECKED | 11 open | **IMPLEMENTATION_PENDING** |
 | [`P-SSZ-1`](#p-ssz-1) | CHECKED | CHECKED | 9 open | **IMPLEMENTATION_PENDING** |
 | [`P-SSZ-1.deposit-data-root`](#p-ssz-1deposit-data-root) | CHECKED | PARTIAL | 1 open | **IMPLEMENTATION_PENDING** |
 | [`P-SSZ-1.gindex-concat`](#p-ssz-1gindex-concat) | CHECKED | PARTIAL | 1 open | **IMPLEMENTATION_PENDING** |
@@ -329,7 +329,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-CONSOLIDATION-GATEWAY-NONZERO`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
 
-**Limitations — 10 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+**Limitations — 11 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
 - beacon eligibility, quota, witness, and gateway grouping
 - 96-byte packed pubkey calldata and real request-contract calls
@@ -341,6 +341,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 - A-CONSOLIDATION-GATEWAY-NONZERO is a caller-supplied premise on the vault input: an authorized call carries nonzero forwarded msg.value. Positive outer gateway payment alone does not derive it. RECLASSED in PR #411, REINSTATED in this commit per mandate 2026-09-12.
 - chantier 2 (Thomas 2026-09-13) disclosure: `RequestAdditionFailed` revert branch (`WithdrawalVaultEIP7685.sol:116-118`) is now source-modeled by `sourceRunWithCallOutcomes` (see `fidelity.covered`), which extends `sourceRun` with per-request CALL success flags. The registered `sourceRun` remains the happy-path projection (all-success reduction proved). Residual: `callOutcomes : List Bool` is caller-supplied — deriving the flags from a live callee-plane STATICCALL model on the pinned predeploy `0x0000BBdDc7CE488642fb579F8B00f3a590007251` and a per-key rollback semantics remain OPEN.
 - chantier 2 (Thomas 2026-09-13) disclosure: the `_getConsolidationRequestFee` STATICCALL (`WithdrawalVaultEIP7685.sol:79-93`; `_getFeeFromContract` 83-95) is not modeled as a callable frame. `Inputs.fee` is a scalar input rather than the ABI-decoded return of a STATICCALL to `CONSOLIDATION_REQUEST`; the `FeeReadFailed` (line 87) and `FeeInvalidData` (line 91) revert branches on the read path are not part of `sourceRun`. Recovering them requires a live STATICCALL executable model on the pinned predeploy 0x0000BBdDc7CE488642fb579F8B00f3a590007251 plus an ABI decoder for the 32-byte return.
+- chantier 2 (Thomas 2026-09-13) disclosure: fabricated observation slots `sourceMapSlot = 32` and `targetMapSlot = 33` in `LidoSRv3/Audit/Verity/ConsolidationTx.lean` have no Solidity storage counterpart — `WithdrawalVaultEIP7685._addConsolidationRequests` (`lido-core/contracts/0.8.9/WithdrawalVaultEIP7685.sol:56-73`) never writes any per-request source-pubkey / target-pubkey storage slot; it iterates and calls the request predeploy directly. These slots are model-only instrumentation used by `readPayloads` / `writePayloads` to demonstrate persistence and reread of the pair. Retirement plan (documented in the module docstring at ConsolidationTx.lean:61-77): replace the slot reads with observations directly off the committed CALL journal (each committed CALL frame already carries `source ‖ target` as `input`), eliminating the fabricated slots and their 30+ downstream uses. Full retirement is a Verity refactor with cascading updates in `ConsolidationValueTx`, `Tests/PackFConsolidationObserveMutants`, and the observation-equality lemmas around lines 455-565; remains OPEN.
 
 **Classification.** **IMPLEMENTATION_PENDING** — Keep the checked vault-loop and value-bearing CALL theorems. Derive hGatewayAdmittedNonzero for the vault input from a justified positive forwarded total fee and a composed gateway path, or revise the positive-fee claim. A positive outer payment alone is insufficient. Keep the checked entry-credit overflow guard and its boundary regressions.
 

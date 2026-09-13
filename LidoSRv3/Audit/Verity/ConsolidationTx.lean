@@ -58,9 +58,26 @@ def targetLensBase : Nat := 0x4000
 def countSlot : Nat := 30
 /-- Observation slot, no Solidity storage counterpart: `msg.value` of the last commit. -/
 def feePaidSlot : Nat := 31
-/-- Observation slot, no Solidity storage counterpart: `sourcePubkey` word per request index. -/
+/-- **Fabricated observation slot** (chantier 2 disclosure, Thomas
+2026-09-13): `sourcePubkey` word per request index. **No Solidity
+storage counterpart** — `WithdrawalVaultEIP7685._addConsolidationRequests`
+(`lido-core/contracts/0.8.9/WithdrawalVaultEIP7685.sol:56-73`)
+never writes any per-request source-pubkey slot; it iterates and
+calls the request predeploy directly. This slot is model-only
+instrumentation used to demonstrate that the model persists the
+payload pair and rereads it (`readPayloads` / `writePayloads` in
+this file). Retirement is a planned refactor: replace the slot
+read with an observation directly from the CALL journal (each
+committed CALL frame already carries `source ‖ target` as
+`input`), eliminating the fabricated slot and its 30+ downstream
+uses. Tracked as an open follow-up for the registered
+`P-CONSOLIDATION-1` parent's `fidelity.missing`. -/
 def sourceMapSlot : Nat := 32
-/-- Observation slot, no Solidity storage counterpart: `targetPubkey` word per request index. -/
+/-- **Fabricated observation slot** (chantier 2 disclosure, Thomas
+2026-09-13): `targetPubkey` word per request index. Same
+disclosure as `sourceMapSlot` above — no Solidity storage
+counterpart; retirement plan is to replace slot reads with CALL-
+journal reads on committed frames. -/
 def targetMapSlot : Nat := 33
 
 private def oracle : DenoteOracle where
