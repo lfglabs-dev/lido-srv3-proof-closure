@@ -137,6 +137,7 @@ import LidoSRv3.Audit.Source.SolidityCheckedAddSource
 import LidoSRv3.Audit.Source.SolidityCheckedMulSource
 import LidoSRv3.Audit.Source.SolidityMinSource
 import LidoSRv3.Audit.Source.SRAllocationConstantsSource
+import LidoSRv3.Audit.Source.ConsolidationBatchSizeSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -1115,6 +1116,10 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.SRAllocationConstantsSource.stakeShareLimitMaxBp_le_uint16Max
 #print axioms LidoSRv3.Audit.Source.SRAllocationConstantsSource.stakeShareLimit_le_max_of_validated
 #print axioms LidoSRv3.Audit.Source.SRAllocationConstantsSource.stakeShareLimit_le_uint16Max_of_bounded
+-- Fifty-seventh-step (2026-09-13): CONSOLIDATION-ETH-1 batchSize gate source model.
+#print axioms LidoSRv3.Audit.Source.ConsolidationBatchSizeSource.batchSizeWithinLimit_true_of_le
+#print axioms LidoSRv3.Audit.Source.ConsolidationBatchSizeSource.batchSizeWithinLimit_false_of_gt
+#print axioms LidoSRv3.Audit.Source.ConsolidationBatchSizeSource.batchSizeWithinLimit_true_of_empty
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape
