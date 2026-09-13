@@ -1635,6 +1635,65 @@ theorem run_addRequests_snd_events_eq_run_addRequestsSlotFree_snd_events
       simp [ContractResult.isSuccess] at hSucc
     · rfl
 
+/-- **Chantier 2 (Thomas 2026-09-13) `Contract.run`-lifted `.snd.readSlot`
+agreement.** For any slot and every input, the readSlot of the final
+state produced by `Contract.run` agrees between the registered
+`addRequests` and the slot-free companion `addRequestsSlotFree`. On
+success arms the raw agreement (PR #616) transfers; on revert arms
+both sides carry the pre-call snapshot, so the reads are equal by
+`rfl`. -/
+theorem run_addRequests_snd_readSlot_eq_run_addRequestsSlotFree_snd_readSlot
+    (inputs : Inputs) (inject : Bool) (state : ContractState) (slot : Nat) :
+    ((addRequests inputs inject).run state).snd.readSlot slot =
+    ((addRequestsSlotFree inputs inject).run state).snd.readSlot slot := by
+  unfold Contract.run
+  have hRaw := addRequests_snd_readSlot_eq_addRequestsSlotFree_snd_readSlot
+    inputs inject state slot
+  have hSucc := addRequests_isSuccess_eq_addRequestsSlotFree_isSuccess
+    inputs inject state
+  rcases hL : addRequests inputs inject state with ⟨rL, stateL⟩ | ⟨reasonL, stateL⟩
+  · rcases hR : addRequestsSlotFree inputs inject state
+      with ⟨rR, stateR⟩ | ⟨reasonR, stateR⟩
+    · simp only []
+      rw [hL, hR] at hRaw
+      simp only [ContractResult.snd_success] at hRaw
+      exact hRaw
+    · rw [hL, hR] at hSucc
+      simp [ContractResult.isSuccess] at hSucc
+  · rcases hR : addRequestsSlotFree inputs inject state
+      with ⟨rR, stateR⟩ | ⟨reasonR, stateR⟩
+    · rw [hL, hR] at hSucc
+      simp [ContractResult.isSuccess] at hSucc
+    · rfl
+
+/-- **Chantier 2 (Thomas 2026-09-13) `Contract.run`-lifted `.snd.selfBalance`
+agreement.** Same structure, discharged via
+`addRequests_snd_selfBalance_eq_addRequestsSlotFree_snd_selfBalance`
+(PR #616). -/
+theorem run_addRequests_snd_selfBalance_eq_run_addRequestsSlotFree_snd_selfBalance
+    (inputs : Inputs) (inject : Bool) (state : ContractState) :
+    ((addRequests inputs inject).run state).snd.selfBalance =
+    ((addRequestsSlotFree inputs inject).run state).snd.selfBalance := by
+  unfold Contract.run
+  have hRaw := addRequests_snd_selfBalance_eq_addRequestsSlotFree_snd_selfBalance
+    inputs inject state
+  have hSucc := addRequests_isSuccess_eq_addRequestsSlotFree_isSuccess
+    inputs inject state
+  rcases hL : addRequests inputs inject state with ⟨rL, stateL⟩ | ⟨reasonL, stateL⟩
+  · rcases hR : addRequestsSlotFree inputs inject state
+      with ⟨rR, stateR⟩ | ⟨reasonR, stateR⟩
+    · simp only []
+      rw [hL, hR] at hRaw
+      simp only [ContractResult.snd_success] at hRaw
+      exact hRaw
+    · rw [hL, hR] at hSucc
+      simp [ContractResult.isSuccess] at hSucc
+  · rcases hR : addRequestsSlotFree inputs inject state
+      with ⟨rR, stateR⟩ | ⟨reasonR, stateR⟩
+    · rw [hL, hR] at hSucc
+      simp [ContractResult.isSuccess] at hSucc
+    · rfl
+
 /-- **Chantier 2 (Thomas 2026-09-13) `Contract.run`-level slot-free
 observation equivalence.** Lifts
 `observeFromJournal_addRequests_eq_observeFromJournal_addRequestsSlotFree`
