@@ -422,6 +422,121 @@ theorem payload_ne_swapped (request : Request) (h : request.source ≠ request.t
   injection heq with h1 _
   exact h h1
 
+/-! ## Chantier 2 (Thomas 2026-09-13): RequestAdditionFailed branch model
+
+The pinned `_callAddConsolidationRequest`
+(`WithdrawalVaultEIP7685.sol:113-121`) issues
+`CONSOLIDATION_REQUEST.call{value: fee}(request)` per request and
+reverts `RequestAdditionFailed(request)` on `!success` (lines
+116-118). The registered `sourceRun` above treats every journaled
+CALL as `.success` — it never reaches the failing branch. The
+model below explicitly captures that revert branch on a per-request
+success flag list, and relates it to `sourceRun` on the all-success
+case. Not a change to the registered `sourceRun`'s decision tree;
+`sourceRun` remains the model of record. -/
+
+/-- `sourceRun` extended with per-request CALL success flags: after
+the same gate stack (caller, nonempty, aligned keys, product bound,
+exact fee, valid keys), if any request's CALL flag is `false`
+(the pinned `(bool success,) = CONSOLIDATION_REQUEST.call{value:
+fee}(request)` failing on that iteration), revert
+`RequestAdditionFailed`. When every CALL flag is `true` and the
+list length matches the request count, this reduces to `sourceRun`.
+
+`callOutcomes` is a per-request `Bool` sourced from the pinned CALL
+site; it is not a source-plane input to the guard stack but a
+caller-facing summary of the executable plane's success flags. The
+model does not derive `callOutcomes` (a live callee model on the
+pinned predeploy address remains OPEN); it only names the branch
+so that `sourceRunWithCallOutcomes ≠ sourceRun` on any failing
+outcome is a documented model fact rather than an implicit
+assumption. -/
+def sourceRunWithCallOutcomes
+    (inputs : Inputs) (callOutcomes : List Bool) : SourceOutcome :=
+  if inputs.caller == inputs.gateway then
+    if inputs.sources.length == 0 then
+      .reverted "ZeroArgument(sourcePubkeys)"
+    else
+      match zipRequests inputs.sources inputs.targets
+          inputs.sourceLens inputs.targetLens with
+      | none => .reverted "ArraysLengthMismatch"
+      | some requests =>
+          if (requests.length * inputs.fee.val ≤ Verity.Core.MAX_UINT256 : Bool) then
+            if inputs.msgValue.val == requests.length * inputs.fee.val then
+              if requests.all validRequest then
+                -- WithdrawalVaultEIP7685.sol:115-118  (bool success,) = CONSOLIDATION_REQUEST.call{value: fee}(request);
+                -- if (!success) { revert RequestAdditionFailed(request); }
+                if callOutcomes.length = requests.length ∧
+                    callOutcomes.all id then
+                  .committed (commitObservables inputs.requestTarget inputs.fee
+                    inputs.msgValue requests)
+                else .reverted "RequestAdditionFailed"
+              else .reverted "InvalidPublicKeyLength"
+            else .reverted "IncorrectFee"
+          else .reverted "Panic(0x11): checked multiplication overflow"
+  else .reverted "NotConsolidationGateway"
+
+/-- **All-success case reduces to `sourceRun`.** When every CALL
+succeeds — i.e., `callOutcomes` is a `List.replicate` of `true` of
+the correct request-count length — `sourceRunWithCallOutcomes`
+returns exactly what `sourceRun` returns. This is the reduction
+that justifies `sourceRun` as the "happy path" projection of the
+model with the CALL branch. -/
+theorem sourceRunWithCallOutcomes_all_success_eq_sourceRun
+    (inputs : Inputs) :
+    ∀ requests, zipRequests inputs.sources inputs.targets
+        inputs.sourceLens inputs.targetLens = some requests →
+      sourceRunWithCallOutcomes inputs (List.replicate requests.length true) =
+        sourceRun inputs := by
+  intro requests hZip
+  unfold sourceRunWithCallOutcomes sourceRun
+  by_cases hCaller : inputs.caller == inputs.gateway
+  · simp only [hCaller, if_true]
+    by_cases hLen : inputs.sources.length == 0
+    · simp [hLen]
+    · simp only [hLen, if_false]
+      rw [hZip]
+      by_cases hBound : (requests.length * inputs.fee.val ≤ Verity.Core.MAX_UINT256 : Bool)
+      · simp only [hBound, if_true]
+        by_cases hFee : inputs.msgValue.val == requests.length * inputs.fee.val
+        · simp only [hFee, if_true]
+          by_cases hValid : requests.all validRequest
+          · simp only [hValid, if_true]
+            have hLenEq : (List.replicate requests.length true).length = requests.length :=
+              List.length_replicate
+            have hAll : (List.replicate requests.length true).all id = true := by
+              simp
+            simp [hLenEq, hAll]
+          · simp [hValid]
+        · simp [hFee]
+      · simp [hBound]
+  · simp [hCaller]
+
+/-- **`RequestAdditionFailed` branch is inhabited** (non-vacuity
+witness). A gateway-authorized, nonempty, 48-byte-aligned batch
+with a valid exact fee but a single failing CALL yields
+`.reverted "RequestAdditionFailed"`. This shows the new branch is
+not trivially unreachable, and documents the executable-plane
+revert path the registered `sourceRun` currently abstracts away. -/
+theorem sourceRunWithCallOutcomes_request_addition_failed_witness :
+    ∃ (inputs : Inputs) (callOutcomes : List Bool),
+      sourceRunWithCallOutcomes inputs callOutcomes = .reverted "RequestAdditionFailed" := by
+  refine ⟨?_, [false], ?_⟩
+  -- One valid 48-byte pair, matching lengths, exact fee = msg.value = 0,
+  -- fee = 0 (so the product bound and exact-fee guards both pass), but
+  -- the single CALL flag is `false`.
+  · exact
+      { caller := Verity.Core.Uint256.ofNat 1
+        gateway := Verity.Core.Uint256.ofNat 1
+        requestTarget := Verity.Core.Uint256.ofNat 42
+        fee := Verity.Core.Uint256.ofNat 0
+        msgValue := Verity.Core.Uint256.ofNat 0
+        sources := [Verity.Core.Uint256.ofNat 0]
+        targets := [Verity.Core.Uint256.ofNat 0]
+        sourceLens := [Verity.Core.Uint256.ofNat 48]
+        targetLens := [Verity.Core.Uint256.ofNat 48] }
+  · decide
+
 def swappedRequestCall (target fee : Word) (request : Request) : CallObs :=
   { target := target, value := fee, input := swappedPayload request }
 
