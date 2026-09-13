@@ -135,6 +135,51 @@ theorem source_consolidation_preserves_eligibility_value_atomicity
   SolidityConsolidation.source_consolidation_preserves_eligibility_value_atomicity
     inputs hGatewayAdmittedNonzero
 
+/-- **Chantier 2 (Thomas 2026-09-13, item a) gateway-bridge parent —
+STATICCALL-derived variant.** The registered `A-CONSOLIDATION-GATEWAY-NONZERO`
+caller-supplied `hGatewayAdmittedNonzero` premise is REPLACED here by three
+pinned-source premises: (i) `hMsgValue` binding `inputs.msgValue` to the
+gateway-side `gatewayVaultBoundary result inputs.sources.length` scalar
+(ConsolidationGateway.sol:212-220 forwarding of `totalFee`); (ii)
+`hCountPos : 0 < inputs.sources.length` (nonempty batch); and (iii)
+`hFeeNonzero : result.abiDecodedFee ≠ 0` (nonzero STATICCALL return on the
+EIP-7251 predeploy fee-read path). Under this shape, the vault-side
+`hGatewayAdmittedNonzero` is DERIVED (via
+`verity_tx_gateway_bridge_derives_nonzero_msg_value`) rather than caller-
+supplied, and the parent conclusion follows unchanged.
+
+**Composition value**: callers composing at the gateway plane with a
+positive fee no longer need to supply `A-CONSOLIDATION-GATEWAY-NONZERO`
+as an opaque implication. The premise-shape names the pinned Solidity
+carrier of the forwarded value at `WithdrawalVaultEIP7685.sol:79-93`
+STATICCALL directly, satisfying Thomas 2026-09-13 mandate item (a)
+"compose with real form for premises".
+
+**Residual**: `hFeeNonzero` remains caller-supplied — retiring it
+requires a live-STATICCALL executable model on the pinned EIP-7251
+predeploy `0x0000BBdDc7CE488642fb579F8B00f3a590007251` (multi-session
+Verity model work, disclosed in `fidelity.missing`). The `fee = 0`
+on-chain path is documented by `gatewayTotalFee_zero_at_fee_zero`
+(source plane): `totalFee = 0` under `fee = 0`, vault admits
+`msg.value = 0` under `_requireExactFee(0)`. -/
+theorem source_consolidation_preserves_eligibility_value_atomicity_from_gateway
+    (result : _root_.LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.PredeployStaticcallResult)
+    (inputs : Inputs)
+    (hMsgValue : inputs.msgValue.val =
+      (_root_.LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayVaultBoundary
+        result inputs.sources.length).msgValue)
+    (hCountPos : 0 < inputs.sources.length)
+    (hFeeNonzero : result.abiDecodedFee ≠ 0) :
+    CommitsOnlyWhenAllGuardsPass inputs ∧
+    RevertsOnlyWhenSomeGuardFails inputs := by
+  refine source_consolidation_preserves_eligibility_value_atomicity inputs ?_
+  intro _
+  rw [hMsgValue]
+  unfold _root_.LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayVaultBoundary
+  simp only
+  exact _root_.LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayTotalFee_ne_zero_of_fee_ne_zero
+    result inputs.sources.length hCountPos hFeeNonzero
+
 /-- **Premise-necessity evidence for the registered `hGatewayAdmittedNonzero`
 premise** (not the parent-refuting kill-line). If a future edit drops the
 premise (or stops threading it into the source theorem, making it decorative
@@ -275,13 +320,13 @@ through an ABI encoder to the vault's `Contract.run` remains OPEN
 source-plane linkage as premises; the executable-frame composition
 is a separate follow-up. -/
 theorem verity_tx_simulates_consolidation_from_gateway
-    (result : LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.PredeployStaticcallResult)
+    (result : _root_.LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.PredeployStaticcallResult)
     (inputs : Inputs) (state : Verity.ContractState)
     (hMsgValue : inputs.msgValue.val =
-      (LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayVaultBoundary
+      (_root_.LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayVaultBoundary
         result inputs.sources.length).msgValue)
     (hFee : inputs.fee.val =
-      (LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayVaultBoundary
+      (_root_.LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayVaultBoundary
         result inputs.sources.length).fee)
     (hCountBound : (state.readSlot countSlot).val + inputs.sources.length <
       Verity.Core.Uint256.modulus)
@@ -305,9 +350,9 @@ theorem verity_tx_simulates_consolidation_from_gateway
     -- The gatewayVaultBoundary.msgValue is defined as
     -- gatewayTotalFee result requestsCount, which unfolds to
     -- requestsCount * result.abiDecodedFee.
-    unfold LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayVaultBoundary
+    unfold _root_.LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayVaultBoundary
     simp only
-    exact LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayTotalFee_eq
+    exact _root_.LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayTotalFee_eq
       result inputs.sources.length
 
 /-- **Chantier 2 (Thomas 2026-09-13) A-CONSOLIDATION-GATEWAY-NONZERO
@@ -328,18 +373,18 @@ the gateway plane with a positive fee no longer need to supply
 A-CONSOLIDATION-GATEWAY-NONZERO as a caller premise — this theorem
 discharges it. -/
 theorem verity_tx_gateway_bridge_derives_nonzero_msg_value
-    (result : LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.PredeployStaticcallResult)
+    (result : _root_.LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.PredeployStaticcallResult)
     (inputs : Inputs)
     (hMsgValue : inputs.msgValue.val =
-      (LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayVaultBoundary
+      (_root_.LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayVaultBoundary
         result inputs.sources.length).msgValue)
     (hCountPos : 0 < inputs.sources.length)
     (hFeeNonzero : result.abiDecodedFee ≠ 0) :
     inputs.msgValue.val ≠ 0 := by
   rw [hMsgValue]
-  unfold LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayVaultBoundary
+  unfold _root_.LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayVaultBoundary
   simp only
-  exact LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayTotalFee_ne_zero_of_fee_ne_zero
+  exact _root_.LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayTotalFee_ne_zero_of_fee_ne_zero
     result inputs.sources.length hCountPos hFeeNonzero
 
 /-- **Kill-line: packing order.** If source ≠ target, a swapped

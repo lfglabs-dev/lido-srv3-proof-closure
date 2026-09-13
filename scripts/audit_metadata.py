@@ -86,7 +86,7 @@ EXPECTED_CANONICAL_CLAIMS = {
     "P-CONSOLIDATION-ETH-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PConsolidationEth1.eth_flow_parent_at_canonical", "CHECKED", "LidoSRv3.Audit.Guarantees.PConsolidationEth1.verity_tx_success_and_revert_partition", "IMPLEMENTATION_PENDING", ("A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-SOLC-TRUSTED", "A-RUNTIME-PROVENANCE")),
     "P-ADDRESS-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAddress1.universal_address_writer_equivariance", "CHECKED", "LidoSRv3.Audit.Guarantees.PAddress1.abstract_source_verity_tx_address_equivariance", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-SOLC-TRUSTED", "A-RUNTIME-PROVENANCE")),
     "P-TOPUP-2": ("CHECKED", "LidoSRv3.Audit.Guarantees.PTopup2.router_exact_sum_bounded_under_gateway_shape", "CHECKED", "LidoSRv3.Audit.Guarantees.PTopup2.verity_tx_simulates_topup2_spec", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-SOLC-TRUSTED", "A-RUNTIME-PROVENANCE")),
-    "P-CONSOLIDATION-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity", "CHECKED", "LidoSRv3.Audit.Guarantees.PConsolidation1.verity_tx_simulates_consolidation", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-CONSOLIDATION-GATEWAY-NONZERO", "A-SOLC-TRUSTED", "A-RUNTIME-PROVENANCE")),
+    "P-CONSOLIDATION-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity_from_gateway", "CHECKED", "LidoSRv3.Audit.Guarantees.PConsolidation1.verity_tx_simulates_consolidation", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-SOLC-TRUSTED", "A-RUNTIME-PROVENANCE")),
     "P-SSZ-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.real_validator_correspondence", "CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.actual_compiled_cl_entry_complete_declared_branch", "IMPLEMENTATION_PENDING", ("A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT", "A-SOLC-TRUSTED", "A-RUNTIME-PROVENANCE")),
 }
 EXPECTED_CANONICAL_DETAIL_SHA256 = {
@@ -99,7 +99,7 @@ EXPECTED_CANONICAL_DETAIL_SHA256 = {
     "P-CONSOLIDATION-ETH-1": "5f182e386487d0e8509b3d7d1ffb178705fa62a78602feb43442836ced4b8b9a",
     "P-ADDRESS-1": "f92b9cd14691bde29d53d75990625059d51fbe043e94e991a3b446d9e8b6ba37",
     "P-TOPUP-2": "aa114745909c7e21be3ec147f2b5678d55b4cfc435998df0d13275d4f9c8f9d9",
-    "P-CONSOLIDATION-1": "a672748d71900e0c850b7d71c222f6aaf773d01fb7eb588d71d562f311531321",
+    "P-CONSOLIDATION-1": "826f7c4629af1ccfad3c5b0dbe464d74c9321c82c2fd0faba308daac28303d52",
     "P-SSZ-1": "02a17f6aad36762480eb7d89ae929af7499931fded1d9084a37e7776bb444b73",
 }
 EXPECTED_PRIORITIES = {
