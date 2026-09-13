@@ -49,23 +49,53 @@ moduleStatesDepositsSlot batch.moduleId ...` per-batch, and emit a
 
 ### Retire free booleans from Preconditions (Thomas 2026-09-13)
 
-`Preconditions.authorized` / `.moduleActive` / `.allocationValid` /
-`.lidoCallOk` / `.entryBalance = 0` are currently free premises on
-`inputs.<field> = true`. Retiring them requires composing with:
+**Partial progress (Piste B session 2026-09-13, five PRs merged):**
 
-- DSM caller admission (source model exists at `LidoSRv3/Audit/Source/
-  DepositDsmCall.lean` but is complex; needs a leaner premise API).
-- Router-side pinned admission chain (`_checkAppAuth` at line 943 and the
-  ModuleState config gate at :946).
-- Lido callsite success under pinned Lido shape (no source model exists;
-  needs a new `LidoWithdrawableCallSuccess` premise anchored to the
-  deployed Lido address at 17005714).
-- Router entry-balance invariant (`state.selfBalance = 0` reflects the
-  pinned line-996 assert's precondition; needs a router invariant premise).
+- **`Preconditions.entryBalance = 0` retired** (PR #587): relaxed to
+  `entryBalanceNoWrap : state.selfBalance.val + exactTotal inputs.batches
+  < Uint256.modulus`. Old premise strictly stronger; nonzero-selfBalance
+  router states now compose.
+- **`Preconditions.funded` retired** (PR #590): unconditional Lido funding
+  bound relaxed to conditional `shouldPull inputs = true → wordTotal ≤ ...`.
+  Underfunded-Lido empty-batch inputs now compose.
+- **`Preconditions.lidoCallOk` retired** (PR #591): unconditional
+  `inputs.lidoCallOk = true` relaxed to conditional
+  `shouldPull inputs = true → inputs.lidoCallOk = true`. Failing-Lido
+  empty-batch inputs now compose.
+- **`Preconditions.conserving` retired** (PR #595): unconditional conserving
+  premise relaxed to conditional `shouldPull inputs = true → maxEBType1 =
+  depositSize`. Skewed-deployment empty-batch inputs now compose.
+- **`Preconditions.entryBalanceNoWrap` further relaxed** (PR #597): the
+  non-wrap premise from #587 further relaxed to conditional-on-shouldPull.
+  Arbitrary router selfBalance (up to Uint256.modulus - 1) admits an
+  empty-batch call.
 
-Each is a genuine parent-statement change (from free `Bool` to composed
-pinned-source premise); none is a rename per Thomas's 2026-09-13
-`~/work/goals/lido-common.md` rule 2.
+**Remaining unconditional Preconditions (require full DSM+router
+composition, not conditional-on-shouldPull relaxation because the pinned
+guards fire BEFORE the shouldPull early return):**
+
+- `Preconditions.authorized : inputs.authorized = true` — pinned
+  `StakingRouter.sol:943` `_checkAppAuth(_getDepositSecurityModule())`
+  fires before line-978 early return. Conditional-on-shouldPull relaxation
+  would diverge from pin (accept unauthorized empty calls). Requires the
+  DSM caller admission composition (source model exists at
+  `LidoSRv3/Audit/Source/DepositDsmCall.lean` but is complex; needs a
+  leaner premise API).
+- `Preconditions.moduleActive : inputs.moduleActive = true` — pinned
+  `:946` ModuleState config gate fires before line-978. Requires router-
+  side pinned admission chain composition.
+- `Preconditions.allocationValid : inputs.allocationValid = true` — pinned
+  `:954-969` maxDepositsCount / ZeroDeposits / WrongPubkeyLength /
+  ModuleReturnExceedTarget guards fire before line-978. Requires
+  composition with the pinned allocation-validity premises.
+
+**Structurally unconditional (relaxation would be unsound):**
+
+- `Preconditions.distinctModules`, `.foldStable`, `.valueMatches` gate
+  model-added requires on per-batch content (moduleIds, amounts) that are
+  independent of the `shouldPull` aggregate. Relaxing them to
+  conditional-on-shouldPull would allow inputs with e.g. duplicate
+  moduleIds but exactKeys = 0 to fail the executor guard — unsound.
 
 ### Grok #412 harness integration into `make test`
 
@@ -165,15 +195,42 @@ receiver code. `report/P-ADDRESS-1.md` must be updated accordingly.
 
 ## Session tally (this branch, 2026-09-13)
 
-Chantier 1 DEPOSIT-1 PRs merged during this session:
+Chantier 1 DEPOSIT-1 PRs merged during this Piste B session:
 
-| PR | Item | Merge SHA |
-|----|------|-----------|
-| #553 | D-EMPTY-PULL | 805ab538 |
-| #561 | D-REVERT-1 | 32ceb74a |
-| #564 | D-SKEW-1 | e40ea125 |
-| #566 | D-NFRAME-1 | d15144a1 |
-| #568 | D-CALL-1 two-arg-pull half | bfc6ad53 |
-| #572 | Task 8 revert_restores_snapshot on N-frame executor | (merge of PR #572) |
+### Grok #412 D-* discharges (six)
 
-One TOPUP-2 D-UNITS-1 attempt was BLOCKED and abandoned before merge (fresh-context review correctly flagged it as an isolated source-model addition).
+| PR | Item |
+|----|------|
+| #553 | D-EMPTY-PULL |
+| #561 | D-REVERT-1 |
+| #564 | D-SKEW-1 |
+| #566 | D-NFRAME-1 |
+| #568 | D-CALL-1 two-arg-pull half |
+| #572 | Task 8: revert_restores_snapshot on N-frame executor |
+
+### Preconditions retirements (five)
+
+| PR | Retirement |
+|----|-----------|
+| #587 | `entryBalance = 0` → `entryBalanceNoWrap` (arithmetic relaxation) |
+| #590 | `funded` → conditional-on-shouldPull |
+| #591 | `lidoCallOk` → conditional-on-shouldPull |
+| #595 | `conserving` → conditional-on-shouldPull |
+| #597 | `entryBalanceNoWrap` → further conditional-on-shouldPull |
+
+### Documentation / track-hand-off (four)
+
+| PR | Item |
+|----|------|
+| #575 | `audit/TRACK-B-REQUESTS.md` initial track-hand-off document |
+| #580 | `report/P-DEPOSIT-1.md` six-discharge preamble update |
+| #581 | `audit/SITE-CORRECTIONS.md` DEPOSIT-1 Piste B progress section |
+| #593 | `audit/SITE-CORRECTIONS.md` Preconditions relaxations subsection |
+
+**Total: 15 merged PRs.**
+
+One TOPUP-2 D-UNITS-1 attempt was BLOCKED and abandoned before merge
+(fresh-context review correctly flagged it as an isolated source-model
+addition per Thomas's 2026-09-13 rule). Two TOPUP-2 D-SLASH-1 attempts
+abandoned mid-session due to 14-reference cascade in
+`Topup2Correspondence.lean`.
