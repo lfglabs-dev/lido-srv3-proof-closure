@@ -95,13 +95,14 @@ def sourceConsumeIndependent : Word → List Word → Option (List Word × Word)
       let (tail, leftover) ← sourceConsumeIndependent next rest
       some (allocated :: tail, leftover)
 
-def sourceLimitsIndependent : List Word → List Word → Word → Word → Option (List Word)
-  | [], [], _, _ => some []
-  | e :: es, p :: ps, target, minTopUp => do
-      let limit ← evaluateTopUpLimit e p target minTopUp
-      let rest ← sourceLimitsIndependent es ps target minTopUp
+def sourceLimitsIndependent : List Word → List Word → List Bool → Word → Word →
+    Option (List Word)
+  | [], [], [], _, _ => some []
+  | e :: es, p :: ps, se :: ses, target, minTopUp => do
+      let limit ← evaluateTopUpLimit e p target minTopUp se
+      let rest ← sourceLimitsIndependent es ps ses target minTopUp
       some (limit :: rest)
-  | _, _, _, _ => none
+  | _, _, _, _, _ => none
 
 def sourceCandidatesIndependent : List Word → List Word → Option (List Word)
   | [], [] => some []
@@ -113,11 +114,12 @@ def sourceCandidatesIndependent : List Word → List Word → Option (List Word)
 /-- Independent copy of `Source.Topup2.sourceRun` (`TopUpGateway.sol:160-237
 topUp`); see that docstring for the line map. -/
 def sourceRunIndependent (effective pending requested topUpLimits : List Word)
+    (slashedOrExited : List Bool)
     (target minTopUp remainingCap moduleLimit valueGwei : Word) :
     Option (List Word × Word × Word) :=
   if effective.length == 0 then none
   else
-    match sourceLimitsIndependent effective pending target minTopUp with
+    match sourceLimitsIndependent effective pending slashedOrExited target minTopUp with
     | none => none
     | some evaluatedLimits =>
         if evaluatedLimits != topUpLimits then none
@@ -145,15 +147,19 @@ theorem sourceConsumeIndependent_eq_sourceConsume :
         sourceConsumeIndependent_eq_sourceConsume]
 
 theorem sourceLimitsIndependent_eq_sourceLimits :
-    ∀ effective pending target minTopUp,
-      sourceLimitsIndependent effective pending target minTopUp =
-        sourceLimits effective pending target minTopUp
-  | [], [], _, _ => rfl
-  | e :: es, p :: ps, target, minTopUp => by
+    ∀ effective pending slashedOrExited target minTopUp,
+      sourceLimitsIndependent effective pending slashedOrExited target minTopUp =
+        sourceLimits effective pending slashedOrExited target minTopUp
+  | [], [], [], _, _ => rfl
+  | e :: es, p :: ps, se :: ses, target, minTopUp => by
       simp [sourceLimitsIndependent, sourceLimits,
         sourceLimitsIndependent_eq_sourceLimits]
-  | [], _ :: _, _, _ => rfl
-  | _ :: _, [], _, _ => rfl
+  | [], [], _ :: _, _, _ => rfl
+  | [], _ :: _, [], _, _ => rfl
+  | [], _ :: _, _ :: _, _, _ => rfl
+  | _ :: _, [], [], _, _ => rfl
+  | _ :: _, [], _ :: _, _, _ => rfl
+  | _ :: _, _ :: _, [], _, _ => rfl
 
 theorem sourceCandidatesIndependent_eq_sourceCandidates :
     ∀ requested topUpLimits,
@@ -168,11 +174,12 @@ theorem sourceCandidatesIndependent_eq_sourceCandidates :
 
 theorem sourceRunIndependent_eq_sourceRun
     (effective pending requested topUpLimits : List Word)
+    (slashedOrExited : List Bool)
     (target minTopUp remainingCap moduleLimit valueGwei : Word) :
-    sourceRunIndependent effective pending requested topUpLimits target minTopUp remainingCap
-        moduleLimit valueGwei =
-      sourceRun effective pending requested topUpLimits target minTopUp remainingCap
-        moduleLimit valueGwei := by
+    sourceRunIndependent effective pending requested topUpLimits slashedOrExited
+        target minTopUp remainingCap moduleLimit valueGwei =
+      sourceRun effective pending requested topUpLimits slashedOrExited
+        target minTopUp remainingCap moduleLimit valueGwei := by
   unfold sourceRunIndependent sourceRun
   simp only [sourceLimitsIndependent_eq_sourceLimits,
     sourceCandidatesIndependent_eq_sourceCandidates,
@@ -195,6 +202,7 @@ to the pre-call snapshot.  `failAfterWrites` is a test hook placed after the
 allocation and budget writes; it proves rollback even after intermediate
 effects. -/
 def allocate (count : Nat) (maxValidators : Nat)
+    (slashedOrExited : List Bool)
     (target minTopUp remainingCap moduleLimit valueGwei : Word)
     (failAfterWrites : Bool := false) : Contract Result := fun snapshot =>
   -- TopUpGateway.sol:164  if (validatorsCount == 0) revert WrongArrayLength();
@@ -208,8 +216,11 @@ def allocate (count : Nat) (maxValidators : Nat)
       readArray snapshot "requested" requestedBase count,
       readArray snapshot "topUpLimits" limitsBase count with
   | some effective, some pending, some requested, some topUpLimits =>
-      match sourceRun effective pending requested topUpLimits target minTopUp remainingCap
-          moduleLimit valueGwei with
+      -- `slashedOrExited` is the caller-supplied per-validator slash/exit
+      -- filter (`TopUpGateway.sol:403-405`, chantier 2 2026-09-13 D-SLASH-1
+      -- discharge). Sourced upstream from the pinned SSZ validator proof.
+      match sourceRun effective pending requested topUpLimits slashedOrExited
+          target minTopUp remainingCap moduleLimit valueGwei with
       | none => .revert "TOPUP_ARITHMETIC" snapshot
       | some (allocs, remaining, used) =>
           let dirty := persistAllocs allocs snapshot
@@ -237,9 +248,10 @@ def observe (beforeAllocs : List Word) (beforeRemaining : Word) :
   | .revert _ _ => ⟨.reverted, beforeAllocs, beforeRemaining, 0⟩
 
 def sourceView (effective pending requested topUpLimits : List Word)
+    (slashedOrExited : List Bool)
     (target minTopUp remainingCap moduleLimit valueGwei : Word) : View :=
-  match sourceRunIndependent effective pending requested topUpLimits target minTopUp remainingCap
-      moduleLimit valueGwei with
+  match sourceRunIndependent effective pending requested topUpLimits slashedOrExited
+      target minTopUp remainingCap moduleLimit valueGwei with
   | none => ⟨.reverted, List.replicate requested.length 0, remainingCap, 0⟩
   | some (allocs, remaining, used) => ⟨.committed, allocs, remaining, used⟩
 
@@ -248,6 +260,7 @@ has the same allocation/share observables as the independently stated
 pinned-source batch. -/
 theorem verity_tx_simulates_pinned_source
     (effective pending requested topUpLimits : List Word)
+    (slashedOrExited : List Bool)
     (maxValidators : Nat)
     (target minTopUp remainingCap moduleLimit valueGwei : Word)
     (state : ContractState)
@@ -259,10 +272,10 @@ theorem verity_tx_simulates_pinned_source
       requested.length = topUpLimits.length)
     (hMax : requested.length ≤ maxValidators) :
     observe (List.replicate requested.length 0) remainingCap
-        ((allocate requested.length maxValidators
+        ((allocate requested.length maxValidators slashedOrExited
             target minTopUp remainingCap moduleLimit valueGwei).run state) =
-      sourceView effective pending requested topUpLimits target minTopUp remainingCap
-        moduleLimit valueGwei := by
+      sourceView effective pending requested topUpLimits slashedOrExited
+        target minTopUp remainingCap moduleLimit valueGwei := by
   have hER : effective.length = requested.length := hLen.1.trans hLen.2.1
   have hPR : pending.length = requested.length := hLen.2.1
   have hLR : topUpLimits.length = requested.length := hLen.2.2.symm
@@ -284,8 +297,8 @@ theorem verity_tx_simulates_pinned_source
     simp only [hZ, hNotOver, Bool.false_eq_true, ↓reduceIte, hEff', hPend', hReq,
       hLimits']
     rw [sourceRunIndependent_eq_sourceRun]
-    cases hRun : sourceRun effective pending requested topUpLimits target minTopUp
-        remainingCap moduleLimit valueGwei with
+    cases hRun : sourceRun effective pending requested topUpLimits slashedOrExited
+        target minTopUp remainingCap moduleLimit valueGwei with
     | none =>
         simp [observe]
     | some trip =>
@@ -300,9 +313,10 @@ theorem verity_tx_simulates_pinned_source
 returns the exact pre-transaction snapshot. -/
 theorem revert_restores_snapshot
     (count maxValidators : Nat)
+    (slashedOrExited : List Bool)
     (target minTopUp remainingCap moduleLimit valueGwei : Word)
     (inject : Bool) (state rollback : ContractState) (reason : String)
-    (h : (allocate count maxValidators
+    (h : (allocate count maxValidators slashedOrExited
         target minTopUp remainingCap moduleLimit valueGwei inject).run
       state = .revert reason rollback) : rollback = state := by
   unfold Contract.run at h
