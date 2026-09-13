@@ -37,7 +37,7 @@ theorem three_batch_preconditions :
     rcases hCases with rfl | rfl | rfl <;> exact ⟨rfl, rfl, rfl, rfl⟩
   distinctModules := by decide
   valueMatches := by decide
-  conserving := rfl
+  conserving := fun _ => rfl
   entryBalanceNoWrap := by decide
   funded := fun _ => by decide
   foldStable :=
@@ -63,7 +63,7 @@ theorem two_batch_preconditions :
     rcases hCases with rfl | rfl <;> exact ⟨rfl, rfl, rfl, rfl⟩
   distinctModules := by decide
   valueMatches := by decide
-  conserving := rfl
+  conserving := fun _ => rfl
   entryBalanceNoWrap := by decide
   funded := fun _ => by decide
   foldStable := .cons (by decide) (.cons (by decide) (.nil (by decide)))
