@@ -1144,6 +1144,72 @@ theorem addRequests_snd_selfBalance_eq_addRequestsSlotFree_snd_selfBalance
       exact persist_selfBalance_eq_persistSlotFree_selfBalance _ _ _
   · simp only [if_neg hCredit]
 
+/-- **Chantier 2 (Thomas 2026-09-13) outcome-tag equivalence.**
+`addRequests` and `addRequestsSlotFree` follow the exact same guard
+structure — they classify every input into the same outcome tag
+(`.success` vs `.revert`). This is proved by the same case split as
+the `.snd` observation theorems: every branch that produces `.revert`
+on one side produces `.revert` on the other; every branch that
+produces `.success` on one side does so on the other. -/
+theorem addRequests_isSuccess_eq_addRequestsSlotFree_isSuccess
+    (inputs : Inputs) (failAfterWrites : Bool) (snapshot : ContractState) :
+    (addRequests inputs failAfterWrites snapshot).isSuccess =
+    (addRequestsSlotFree inputs failAfterWrites snapshot).isSuccess := by
+  unfold addRequests addRequestsSlotFree
+  by_cases hCredit : snapshot.selfBalance.val + inputs.msgValue.val < Verity.Core.Uint256.modulus
+  · simp only [if_pos hCredit]
+    rcases hA : readArray (credited snapshot inputs) "sources" sourcesBase inputs.sources.length
+      with _ | sources
+    · rfl
+    rcases hB : readArray (credited snapshot inputs) "targets" targetsBase inputs.targets.length
+      with _ | targets
+    · rfl
+    rcases hC : readArray (credited snapshot inputs) "sourceLens" sourceLensBase inputs.sourceLens.length
+      with _ | sourceLens
+    · rfl
+    rcases hD : readArray (credited snapshot inputs) "targetLens" targetLensBase inputs.targetLens.length
+      with _ | targetLens
+    · rfl
+    simp only []
+    rcases hSR : sourceRun _ with reason | obs
+    · rfl
+    by_cases hFail : failAfterWrites
+    · simp only [if_pos hFail]; rfl
+    · simp only [if_neg hFail]; rfl
+  · simp only [if_neg hCredit]
+
+/-- **Chantier 2 (Thomas 2026-09-13) return-value equivalence.**
+Both defs return `.success` with the exact same value
+(`ofObservables obs`) when they commit — the return value is a pure
+function of the source-plane observables, not of the persistence
+choice. `getValue?` therefore agrees on every input. -/
+theorem addRequests_getValue?_eq_addRequestsSlotFree_getValue?
+    (inputs : Inputs) (failAfterWrites : Bool) (snapshot : ContractState) :
+    (addRequests inputs failAfterWrites snapshot).getValue? =
+    (addRequestsSlotFree inputs failAfterWrites snapshot).getValue? := by
+  unfold addRequests addRequestsSlotFree
+  by_cases hCredit : snapshot.selfBalance.val + inputs.msgValue.val < Verity.Core.Uint256.modulus
+  · simp only [if_pos hCredit]
+    rcases hA : readArray (credited snapshot inputs) "sources" sourcesBase inputs.sources.length
+      with _ | sources
+    · rfl
+    rcases hB : readArray (credited snapshot inputs) "targets" targetsBase inputs.targets.length
+      with _ | targets
+    · rfl
+    rcases hC : readArray (credited snapshot inputs) "sourceLens" sourceLensBase inputs.sourceLens.length
+      with _ | sourceLens
+    · rfl
+    rcases hD : readArray (credited snapshot inputs) "targetLens" targetLensBase inputs.targetLens.length
+      with _ | targetLens
+    · rfl
+    simp only []
+    rcases hSR : sourceRun _ with reason | obs
+    · rfl
+    by_cases hFail : failAfterWrites
+    · simp only [if_pos hFail]; rfl
+    · simp only [if_neg hFail]; rfl
+  · simp only [if_neg hCredit]
+
 theorem persist_calls (start : Nat) (obs : Observables) (state : ContractState) :
     (persist start obs state).calls = state.calls ++ obs.calls.map toJournal := by
   unfold persist
