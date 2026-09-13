@@ -325,6 +325,46 @@ def addRequests (inputs : Inputs) (failAfterWrites : Bool := false) :
 /-- Solidity-facing name, `WithdrawalVault.sol:199`. -/
 abbrev addConsolidationRequests := addRequests
 
+/-- **Chantier 2 (Thomas 2026-09-13) slot-free executable transaction.**
+Companion to `addRequests` that persists effects via `persistSlotFree`
+(no `writePayloads` call, no fabricated `sourceMapSlot` /
+`targetMapSlot` writes). The rest of the frame-entry logic —
+credit, memory decode, `sourceRun` guards, `failAfterWrites` hook —
+is identical to `addRequests`. The retirement scaffolding proves
+`observeFromJournal` cannot distinguish `addRequestsSlotFree`
+from `addRequests` on either arm (`persist_calls_eq_persistSlotFree_calls`,
+`persist_events_eq_persistSlotFree_events`, and
+`observeFromJournal_writePayloads_invariant`). So a caller wanting
+a slot-free executable transaction can use `addRequestsSlotFree`
+today; downstream `observeFromJournal`-based observations
+transfer without change. -/
+def addRequestsSlotFree (inputs : Inputs) (failAfterWrites : Bool := false) :
+    Contract Result := fun snapshot =>
+  if snapshot.selfBalance.val + inputs.msgValue.val <
+      Verity.Core.Uint256.modulus then
+    match readArray (credited snapshot inputs) "sources" sourcesBase
+        inputs.sources.length,
+        readArray (credited snapshot inputs) "targets" targetsBase
+        inputs.targets.length,
+        readArray (credited snapshot inputs) "sourceLens" sourceLensBase
+        inputs.sourceLens.length,
+        readArray (credited snapshot inputs) "targetLens" targetLensBase
+        inputs.targetLens.length with
+    | some sources, some targets, some sourceLens, some targetLens =>
+        let decoded : Inputs :=
+          { inputs with
+            sources := sources, targets := targets,
+            sourceLens := sourceLens, targetLens := targetLens }
+        match sourceRun decoded with
+        | .reverted reason => .revert reason snapshot
+        | .committed obs =>
+            let start := (snapshot.readSlot countSlot).val
+            let dirty := persistSlotFree start obs (credited snapshot inputs)
+            if failAfterWrites then .revert "INJECTED_AFTER_WRITES" dirty
+            else .success (ofObservables obs) dirty
+    | _, _, _, _ => .revert "MEMORY_ARRAY_DECODE" snapshot
+  else .revert "ENTRY_CREDIT_OVERFLOW" snapshot
+
 /-- Entry-credit overflow rejects the transaction before any decode, guard,
 or write: when `selfBalance + msg.value` would wrap the `Uint256` balance,
 the payable credit could not land and the per-CALL debits could not be
