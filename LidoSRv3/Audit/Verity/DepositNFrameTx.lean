@@ -270,9 +270,11 @@ structure Preconditions (inputs : Inputs) (state : ContractState) : Prop where
   distinctModules : (inputs.batches.map fun batch => batch.moduleId).Nodup
   valueMatches : wordTotal inputs.batches = wordKeys inputs.batches * inputs.depositSize
   /-- Conserving deployment (`MAX_EFFECTIVE_BALANCE_WC_TYPE_01 = DEPOSIT_SIZE`
-  at construction, i.e. 32 ether = 32 ether at the pinned deployment).  On a
-  skewed deployment the line-996 balance assert fires with `Panic(0x01)` (see
-  `skewed_deployment_reverts_at_line_996_balance_assert`; grok #412 D-SKEW-1). -/
+  at construction, i.e. 32 ether = 32 ether at the pinned deployment).  Without
+  this premise the pinned pull `wordKeys * maxEBType1` and the per-batch push
+  aggregate `wordTotal = wordKeys * depositSize` (per `valueMatches`) would
+  differ, so the line-996 balance assert would fire with `Panic(0x01)` — the
+  assert is now genuinely load-bearing (grok #412 D-SKEW-1). -/
   conserving : inputs.maxEBType1 = inputs.depositSize
   entryBalance : state.selfBalance = 0
   funded : wordTotal inputs.batches ≤ state.readSlot lidoDepositableSlot
@@ -596,8 +598,8 @@ theorem execute_apply (inputs : Inputs) (state : ContractState)
     simp [entry, h.entryBalance]
   -- Under `Preconditions.conserving` the pinned pull quantity
   -- `wordKeys inputs.batches * inputs.maxEBType1` collapses back to `wordTotal`
-  -- via `Preconditions.valueMatches`; the split becomes observable only on the
-  -- skewed-deployment kill-line (see `skewed_deployment_reverts_at_line_996`).
+  -- via `Preconditions.valueMatches`; the split becomes observable only on a
+  -- skewed deployment, where the line-996 balance assert would fire.
   have hPullTotal :
       wordKeys inputs.batches * inputs.maxEBType1 = wordTotal inputs.batches := by
     rw [h.conserving, ← h.valueMatches]
