@@ -115,6 +115,7 @@ import LidoSRv3.Audit.Source.TopupWithdrawTwoArgSource
 import LidoSRv3.Audit.Source.ReservePayableCallSource
 import LidoSRv3.Audit.Source.ReservePackedBufferSource
 import LidoSRv3.Audit.Source.ReserveSeedBookkeepingSource
+import LidoSRv3.Audit.Source.Topup2PrefixGuardsSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -1016,6 +1017,12 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- Thirty-fourth-step (2026-09-13): RESERVE-1 D-SEED-1/D-EVENT-1 bookkeeping source model.
 #print axioms LidoSRv3.Audit.Source.ReserveSeedBookkeepingSource.seedDepositsCount_depositedPostReport_eq
 #print axioms LidoSRv3.Audit.Source.ReserveSeedBookkeepingSource.seedDepositsCount_buffered_eq
+-- Thirty-fifth-step (2026-09-13): TOPUP-2 D-AUTH-1/D-SORT-1/D-WC-1/D-PUBKEY-1/D-MAX-1 prefix guards.
+#print axioms LidoSRv3.Audit.Source.Topup2PrefixGuardsSource.callerHasTopUpRole_true_of_eq
+#print axioms LidoSRv3.Audit.Source.Topup2PrefixGuardsSource.indicesSorted_true_of_singleton
+#print axioms LidoSRv3.Audit.Source.Topup2PrefixGuardsSource.wcIsType2_true_of_eq
+#print axioms LidoSRv3.Audit.Source.Topup2PrefixGuardsSource.pubkeyLengthOk_true_of_empty
+#print axioms LidoSRv3.Audit.Source.Topup2PrefixGuardsSource.validatorCountAtMost_true_of_le
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape
