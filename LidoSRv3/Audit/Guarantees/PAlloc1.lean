@@ -1,6 +1,8 @@
 import LidoSRv3.Audit.Model.AllocCapacity
 import LidoSRv3.Audit.Source.AllocCapacityCorrespondence
 import LidoSRv3.Audit.Guarantees.Registry
+import LidoSRv3.Audit.Guarantees.PAlloc1TargetMultBounded
+import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
 import LidoSRv3.Audit.Verity.AllocCapacityPhase3
 import LidoSRv3.Audit.Verity.AllocationTx
 
@@ -107,6 +109,52 @@ theorem checked_execute
       rows.map (fun row => (row.capacity : Nat)) =
         MathView.capacities cfg modules depositsToAllocate isTopUp :=
   source_capacities_match_canonical cfg modules depositsToAllocate isTopUp hBounds
+
+/-- **Chantier 3 composition (Piste A, Thomas 2026-09-13).**
+
+`CheckedBounds` is derivable from the pinned SRLib/StakingModule shape
+premises named in `PAlloc1TargetMultBounded.PinnedStakingModuleTypeBounds`
+and `PAlloc1RemainingBoundsScaffold.PinnedSRAllocationBoundsShape` (+ the
+config's `maxEBType1 ≠ 0` pinned constant). This composition is the
+"CheckedBounds atteignable" step Thomas asked for on 2026-09-13: it
+strips the parent's caller-side `CheckedBounds` premise and replaces it
+with the two pinned-shape premises that name where each conjunct is
+supposed to come from in the pinned Solidity (SRLib.sol type widths and
+SRStorage invariants). Callers who supply the pinned shapes get the
+executor/MathView correspondence for free.
+
+Residuals — recorded in `fidelity.missing` — are: (a) the two shape
+structures still name their invariants as caller premises rather than
+proving them from live SRStorage reads, so this is a NAMING composition
+of pinned invariants, not a live-storage derivation; (b) `PinnedSR-
+AllocationBoundsShape` bundles `active_subtraction`, `total_addition`,
+and `available_arithmetic` as premises whose real derivations require
+SRStorage monotonicity + `MAX_STAKING_MODULES_COUNT = 32` + per-module
+uint64 caps.
+
+The `target_multiplication` conjunct's derivation is not renamed here:
+it is reduced to `PinnedStakingModuleTypeBounds` via the already-
+registered `PAlloc1TargetMultBounded.target_multiplication_under_pinned
+_type_bounds`, which is a REAL derivation (`uint16Max * uint64Max <
+MAX_UINT256` closed by `decide`). -/
+theorem checked_execute_under_pinned_shape
+    (cfg : Config) (modules : List Module) (depositsToAllocate : Verity.Uint256)
+    (isTopUp : Bool)
+    (hMaxEB : cfg.maxEBType1 ≠ 0)
+    (hTypes : PAlloc1TargetMultBounded.PinnedStakingModuleTypeBounds
+      cfg modules depositsToAllocate)
+    (hShape : PAlloc1RemainingBoundsScaffold.PinnedSRAllocationBoundsShape
+      cfg modules depositsToAllocate isTopUp) :
+    ∃ rows, SolidityAllocCapacity.execute cfg modules depositsToAllocate isTopUp = some rows ∧
+      rows.map (fun row => (row.capacity : Nat)) =
+        MathView.capacities cfg modules depositsToAllocate isTopUp :=
+  checked_execute cfg modules depositsToAllocate isTopUp
+    { maxEBType1_nonzero := hMaxEB
+      active_subtraction := hShape.activeSubtractionInvariant
+      total_addition := hShape.totalAdditionInvariant
+      available_arithmetic := hShape.availableArithmeticInvariant
+      target_multiplication :=
+        PAlloc1TargetMultBounded.target_multiplication_under_pinned_type_bounds hTypes }
 
 /-- Successful execution retains router index order. -/
 theorem router_order_preserved {cfg : Config} {modules : List Module}
