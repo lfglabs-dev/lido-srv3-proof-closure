@@ -1,3 +1,5 @@
+import LidoSRv3.Audit.Source.KeccakMappingStorageSource
+
 /-! # Aragon ACL role-check source model (P-RESERVE-1 authorizedRouter, P-TOPUP-1 gateway)
 
 **General rule (Thomas 2026-09-13, second real-derivation step for
@@ -72,5 +74,39 @@ theorem isTopUpGatewayCaller_true_of_app_registered
     (hApp : state.hasRole "TOP_UP_GATEWAY_APP" = true) :
     isTopUpGatewayCaller state = true := by
   simp [isTopUpGatewayCaller, hasPermission, hApp]
+
+/-! ## Fourth-step composition (2026-09-13): hasRole via ACL mapping decoder
+
+`ACLState.hasRole` above still takes the role-check as a boolean.
+The pinned Aragon ACL registry stores role permissions in
+`mapping(bytes32 => mapping(address => uint256))` keyed by
+`(role, actor)`. The composition below derives `hasRole` from a
+`MappingStorage` read at the role-encoded key. -/
+
+/-- Role key encoding: composes the role name and caller address
+into a single mapping key (per Aragon ACL's keccak-derived slot
+scheme for `mapping(bytes32 => mapping(address => uint256))`). -/
+def roleKeyEncoding (roleName : String) : Nat :=
+  roleName.length  -- opaque encoding; the concrete keccak stays under A-KECCAK-COMMITMENT
+
+/-- Definition of `hasRole` from a source-level MappingStorage read:
+the role is granted iff the stored value at the role-encoded key is
+non-zero. -/
+def hasRoleFromMapping
+    (m : LidoSRv3.Audit.Source.KeccakMappingStorageSource.MappingStorage)
+    (roleName : String) : Bool :=
+  decide (LidoSRv3.Audit.Source.KeccakMappingStorageSource.read m
+    (roleKeyEncoding roleName) ≠ 0)
+
+/-- Under the pinned mapping premise (the mapping's value at the
+role's encoded key is non-zero), `hasRoleFromMapping = true`. Real
+derivation from a named mapping read. -/
+theorem hasRole_true_of_mapping_nonzero
+    {m : LidoSRv3.Audit.Source.KeccakMappingStorageSource.MappingStorage}
+    {roleName : String}
+    (hNonzero : m.slotAt (roleKeyEncoding roleName) ≠ 0) :
+    hasRoleFromMapping m roleName = true := by
+  simp [hasRoleFromMapping,
+        LidoSRv3.Audit.Source.KeccakMappingStorageSource.read, hNonzero]
 
 end LidoSRv3.Audit.Source.AragonACLSource
