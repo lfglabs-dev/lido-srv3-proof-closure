@@ -131,6 +131,7 @@ import LidoSRv3.Audit.Source.SolidityAddressTypeSource
 import LidoSRv3.Audit.Source.SolidityUint256WrapSource
 import LidoSRv3.Audit.Source.SolidityUint128WrapSource
 import LidoSRv3.Audit.Source.SolidityUint40Source
+import LidoSRv3.Audit.Source.SolidityPrimitiveUintSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -1084,6 +1085,9 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- Fiftieth-step (2026-09-13): Solidity uint40 truncation source model.
 #print axioms LidoSRv3.Audit.Source.SolidityUint40Source.toUint40_lt_modulus
 #print axioms LidoSRv3.Audit.Source.SolidityUint40Source.toUint40_idem
+-- Fifty-first-step (2026-09-13): Solidity primitive-uint truncation source model.
+#print axioms LidoSRv3.Audit.Source.SolidityPrimitiveUintSource.toUintN_lt_modulus
+#print axioms LidoSRv3.Audit.Source.SolidityPrimitiveUintSource.toUintN_idem
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape
