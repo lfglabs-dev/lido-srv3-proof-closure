@@ -1033,6 +1033,71 @@ where
       ({ s with events := evs, calls := cs }).msgValue = s.msgValue :=
     fun _ _ _ => rfl
 
+/-- **Chantier 2 (Thomas 2026-09-13) frame-scalar preservation, batch.**
+`persist` and `persistSlotFree` preserve every non-storage frame scalar
+`forwardCall` / `writeSlot` / `writePayloads` never touch: `sender`,
+`thisAddress`, `txOrigin`, `blockTimestamp`, `blockNumber`, `chainId`,
+`blobBaseFee`, `calldataSize`. -/
+theorem persist_sender_eq_persistSlotFree_sender (start : Nat)
+    (obs : Observables) (state : ContractState) :
+    (persist start obs state).sender = (persistSlotFree start obs state).sender := by
+  simp only [persist, persistSlotFree, fc, ws, wp]
+where
+  fc : ∀ (s : ContractState) (cs : List CallObs),
+      (forwardCalls s cs).sender = s.sender := by
+    intro s cs; revert s
+    induction cs with
+    | nil => intro s; rfl
+    | cons c rest ih => intro s; simp only [forwardCalls, forwardCall]; exact ih _
+  ws : ∀ (s : ContractState) (slot : Nat) (v : Word),
+      (s.writeSlot slot v).sender = s.sender := fun _ _ _ => rfl
+  wp : ∀ (start : Nat) (payloads : List (List Word)) (s : ContractState),
+      (writePayloads start payloads s).sender = s.sender := by
+    intro start payloads; revert start
+    induction payloads with
+    | nil => intros; rfl
+    | cons p rest ih => intro start s; simp only [writePayloads]; exact ih _ _
+
+theorem persist_thisAddress_eq_persistSlotFree_thisAddress (start : Nat)
+    (obs : Observables) (state : ContractState) :
+    (persist start obs state).thisAddress = (persistSlotFree start obs state).thisAddress := by
+  simp only [persist, persistSlotFree, fc, ws, wp]
+where
+  fc : ∀ (s : ContractState) (cs : List CallObs),
+      (forwardCalls s cs).thisAddress = s.thisAddress := by
+    intro s cs; revert s
+    induction cs with
+    | nil => intro s; rfl
+    | cons c rest ih => intro s; simp only [forwardCalls, forwardCall]; exact ih _
+  ws : ∀ (s : ContractState) (slot : Nat) (v : Word),
+      (s.writeSlot slot v).thisAddress = s.thisAddress := fun _ _ _ => rfl
+  wp : ∀ (start : Nat) (payloads : List (List Word)) (s : ContractState),
+      (writePayloads start payloads s).thisAddress = s.thisAddress := by
+    intro start payloads; revert start
+    induction payloads with
+    | nil => intros; rfl
+    | cons p rest ih => intro start s; simp only [writePayloads]; exact ih _ _
+
+theorem persist_blockTimestamp_eq_persistSlotFree_blockTimestamp (start : Nat)
+    (obs : Observables) (state : ContractState) :
+    (persist start obs state).blockTimestamp = (persistSlotFree start obs state).blockTimestamp := by
+  simp only [persist, persistSlotFree, fc, ws, wp]
+where
+  fc : ∀ (s : ContractState) (cs : List CallObs),
+      (forwardCalls s cs).blockTimestamp = s.blockTimestamp := by
+    intro s cs; revert s
+    induction cs with
+    | nil => intro s; rfl
+    | cons c rest ih => intro s; simp only [forwardCalls, forwardCall]; exact ih _
+  ws : ∀ (s : ContractState) (slot : Nat) (v : Word),
+      (s.writeSlot slot v).blockTimestamp = s.blockTimestamp := fun _ _ _ => rfl
+  wp : ∀ (start : Nat) (payloads : List (List Word)) (s : ContractState),
+      (writePayloads start payloads s).blockTimestamp = s.blockTimestamp := by
+    intro start payloads; revert start
+    induction payloads with
+    | nil => intros; rfl
+    | cons p rest ih => intro start s; simp only [writePayloads]; exact ih _ _
+
 /-- **Chantier 2 (Thomas 2026-09-13) `.snd.calls` equivalence between
 `addRequests` and `addRequestsSlotFree`.** Both transactions share the
 same guard structure (entry-credit bound, memory decode, `sourceRun`
