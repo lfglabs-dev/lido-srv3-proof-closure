@@ -142,6 +142,7 @@ import LidoSRv3.Audit.Source.Topup2Uint64BoundsSource
 import LidoSRv3.Audit.Source.Topup2SumNoWrapSource
 import LidoSRv3.Audit.Source.Topup2NKeyNoWrapSource
 import LidoSRv3.Audit.Source.Topup2ExactCapSource
+import LidoSRv3.Audit.Source.Topup2PerAllocGuardSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -1135,6 +1136,10 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- Sixty-first-step (2026-09-13): P-TOPUP-2 chantier-4bis exact-cap conclusion.
 #print axioms LidoSRv3.Audit.Source.Topup2ExactCapSource.allocationExceedsLimitGuard_true_of_le
 #print axioms LidoSRv3.Audit.Source.Topup2ExactCapSource.nkey_sum_le_maxTopUpCap_of_guard
+-- Sixty-second-step (2026-09-13): P-TOPUP-2 pinned per-allocation guard (line 729).
+#print axioms LidoSRv3.Audit.Source.Topup2PerAllocGuardSource.perAllocationWithinCap_true_of_le
+#print axioms LidoSRv3.Audit.Source.Topup2PerAllocGuardSource.perAllocationWithinCap_false_of_gt
+#print axioms LidoSRv3.Audit.Source.Topup2PerAllocGuardSource.perAllocationWithinCap_implies_le_allocationCap
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape
