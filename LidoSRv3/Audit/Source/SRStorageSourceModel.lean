@@ -1,3 +1,5 @@
+import LidoSRv3.Audit.Source.AragonACLSource
+
 /-! # StakingRouter SRStorage source model (P-TOPUP-1 booleans real derivation)
 
 **General rule (Thomas 2026-09-13, real-derivation step for
@@ -76,5 +78,38 @@ theorem all_guards_pass_of_pinned_sr_reads
   · simpa [isTopUpGatewayCall] using hGateway
   · simpa [moduleExists] using hModule
   · simpa [wcIsType2] using hWc
+
+/-! ## Second-step composition (2026-09-13): callerIsTopUpGateway via Aragon ACL
+
+The `SRTopupCallerContext.callerIsGatewayFromRead` field above still
+takes the gateway check as an input `Bool`. Under the pinned
+`StakingRouter.sol:1177-1179` `_checkAppAuth(_getTopUpGateway())`
+chain, the gateway check delegates through Aragon's app-manager
+lookup to the ACL registry (see `AragonACLSource`). The composition
+below derives `callerIsGatewayFromRead` from a live ACL state via
+the shared `AragonACLSource.isTopUpGatewayCaller` function. -/
+
+/-- Linkage premise: `SRTopupCallerContext.callerIsGatewayFromRead`
+is functionally determined by the Aragon-ACL state via
+`isTopUpGatewayCaller`. -/
+structure CallerIsGatewayFromACL
+    (ctx : SRTopupCallerContext)
+    (acl : LidoSRv3.Audit.Source.AragonACLSource.ACLState) : Prop where
+  gatewayReadMatchesACL :
+    ctx.callerIsGatewayFromRead =
+      LidoSRv3.Audit.Source.AragonACLSource.isTopUpGatewayCaller acl
+
+/-- Second-step composition: under the ACL premise
+(`TOP_UP_GATEWAY_APP` registered) AND the linkage,
+`ctx.callerIsGatewayFromRead = true` — derived via the shared
+Aragon ACL source model, not caller-supplied. -/
+theorem callerIsGateway_derived_from_acl
+    {ctx : SRTopupCallerContext}
+    {acl : LidoSRv3.Audit.Source.AragonACLSource.ACLState}
+    (hLink : CallerIsGatewayFromACL ctx acl)
+    (hApp : acl.hasRole "TOP_UP_GATEWAY_APP" = true) :
+    ctx.callerIsGatewayFromRead = true := by
+  rw [hLink.gatewayReadMatchesACL]
+  exact LidoSRv3.Audit.Source.AragonACLSource.isTopUpGatewayCaller_true_of_app_registered hApp
 
 end LidoSRv3.Audit.Source.SRStorageSourceModel
