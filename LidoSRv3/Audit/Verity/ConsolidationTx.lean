@@ -960,6 +960,79 @@ where
   writeSlot_events : ∀ (s : ContractState) (slot : Nat) (v : Word),
       (s.writeSlot slot v).events = s.events := fun _ _ _ => rfl
 
+/-- **Chantier 2 (Thomas 2026-09-13) `.snd.calls` equivalence between
+`addRequests` and `addRequestsSlotFree`.** Both transactions share the
+same guard structure (entry-credit bound, memory decode, `sourceRun`
+guards, `failAfterWrites` hook) and differ only in the committed arm:
+`addRequests` persists via `persist` (which writes the fabricated
+`sourceMapSlot` / `targetMapSlot`), while `addRequestsSlotFree`
+persists via `persistSlotFree` (which skips those writes). Since
+`persist_calls_eq_persistSlotFree_calls` proves those two states have
+identical `.calls`, the committed arm's `.snd.calls` matches; every
+other arm returns `.revert reason snapshot` on both sides. So a
+downstream observer keying off `.snd.calls` cannot distinguish
+`addRequestsSlotFree` from `addRequests` — retirement of the slot
+definitions is `.calls`-safe. -/
+theorem addRequests_snd_calls_eq_addRequestsSlotFree_snd_calls
+    (inputs : Inputs) (failAfterWrites : Bool) (snapshot : ContractState) :
+    (addRequests inputs failAfterWrites snapshot).snd.calls =
+    (addRequestsSlotFree inputs failAfterWrites snapshot).snd.calls := by
+  unfold addRequests addRequestsSlotFree
+  by_cases hCredit : snapshot.selfBalance.val + inputs.msgValue.val < Verity.Core.Uint256.modulus
+  · simp only [if_pos hCredit]
+    rcases hA : readArray (credited snapshot inputs) "sources" sourcesBase inputs.sources.length
+      with _ | sources
+    · rfl
+    rcases hB : readArray (credited snapshot inputs) "targets" targetsBase inputs.targets.length
+      with _ | targets
+    · rfl
+    rcases hC : readArray (credited snapshot inputs) "sourceLens" sourceLensBase inputs.sourceLens.length
+      with _ | sourceLens
+    · rfl
+    rcases hD : readArray (credited snapshot inputs) "targetLens" targetLensBase inputs.targetLens.length
+      with _ | targetLens
+    · rfl
+    simp only []
+    rcases hSR : sourceRun _ with reason | obs
+    · rfl
+    by_cases hFail : failAfterWrites
+    · simp only [if_pos hFail, ContractResult.snd_revert]
+      exact persist_calls_eq_persistSlotFree_calls _ _ _
+    · simp only [if_neg hFail, ContractResult.snd_success]
+      exact persist_calls_eq_persistSlotFree_calls _ _ _
+  · simp only [if_neg hCredit]
+
+/-- Companion `.snd.events` equivalence, discharged from
+`persist_events_eq_persistSlotFree_events` by the same case split. -/
+theorem addRequests_snd_events_eq_addRequestsSlotFree_snd_events
+    (inputs : Inputs) (failAfterWrites : Bool) (snapshot : ContractState) :
+    (addRequests inputs failAfterWrites snapshot).snd.events =
+    (addRequestsSlotFree inputs failAfterWrites snapshot).snd.events := by
+  unfold addRequests addRequestsSlotFree
+  by_cases hCredit : snapshot.selfBalance.val + inputs.msgValue.val < Verity.Core.Uint256.modulus
+  · simp only [if_pos hCredit]
+    rcases hA : readArray (credited snapshot inputs) "sources" sourcesBase inputs.sources.length
+      with _ | sources
+    · rfl
+    rcases hB : readArray (credited snapshot inputs) "targets" targetsBase inputs.targets.length
+      with _ | targets
+    · rfl
+    rcases hC : readArray (credited snapshot inputs) "sourceLens" sourceLensBase inputs.sourceLens.length
+      with _ | sourceLens
+    · rfl
+    rcases hD : readArray (credited snapshot inputs) "targetLens" targetLensBase inputs.targetLens.length
+      with _ | targetLens
+    · rfl
+    simp only []
+    rcases hSR : sourceRun _ with reason | obs
+    · rfl
+    by_cases hFail : failAfterWrites
+    · simp only [if_pos hFail, ContractResult.snd_revert]
+      exact persist_events_eq_persistSlotFree_events _ _ _
+    · simp only [if_neg hFail, ContractResult.snd_success]
+      exact persist_events_eq_persistSlotFree_events _ _ _
+  · simp only [if_neg hCredit]
+
 theorem persist_calls (start : Nat) (obs : Observables) (state : ContractState) :
     (persist start obs state).calls = state.calls ++ obs.calls.map toJournal := by
   unfold persist
