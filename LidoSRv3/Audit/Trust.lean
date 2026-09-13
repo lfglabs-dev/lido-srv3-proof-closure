@@ -851,6 +851,9 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- Second-step composition (2026-09-13): P-TOPUP-1 callerIsGatewayFromRead
 -- derived via the shared Aragon ACL source model.
 #print axioms LidoSRv3.Audit.Source.SRStorageSourceModel.callerIsGateway_derived_from_acl
+-- Second-step composition (2026-09-13): P-RESERVE-1 authorizedRouter
+-- derived via the shared Aragon ACL source model.
+#print axioms LidoSRv3.Audit.Guarantees.PReserve1LidoStoragePremise.authorizedRouter_derived_from_acl
 -- General rule (Thomas 2026-09-12) applied to P-CONSOLIDATION-ETH-1
 -- feePerRequest free Nat: naming scaffold PinnedFeeStaticcallShape
 -- names the pinned WithdrawalVaultEIP7685.sol:79-81 STATICCALL entry
