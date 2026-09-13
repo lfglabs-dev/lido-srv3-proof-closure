@@ -234,3 +234,53 @@ One TOPUP-2 D-UNITS-1 attempt was BLOCKED and abandoned before merge
 addition per Thomas's 2026-09-13 rule). Two TOPUP-2 D-SLASH-1 attempts
 abandoned mid-session due to 14-reference cascade in
 `Topup2Correspondence.lean`.
+
+### Chantier 2 TOPUP-2 shipments (later in session)
+
+Two additional TOPUP-2 parent-statement changes landed after the initial
+tally above:
+
+| PR | Item |
+|----|------|
+| #654 | `Topup2DistributionTx.allocate` / `verity_tx_simulates_topup2_spec` reparameterized on caller-supplied `maxValidators : Nat` (sourced from `TopUpGateway.sol:42` packed `uint64 $.maxValidatorsPerTopUp`, packed slot 0 of `TopupPackedStorage`). Legacy callsites pass the constant `maxValidatorsPerTopUp := 32` positionally; the theorem now admits any admissible `uint64` configuration of the pinned gateway. |
+| #660 | D-SLASH-1 discharge: `evaluateTopUpLimit` and `sourceLimits{Independent,}` take caller-supplied per-validator `slashedOrExited : List Bool` gate modeling `TopUpGateway.sol:403-405` `if (exitEpoch != FAR_FUTURE_EPOCH || slashed) return 0;`; parent threads `slashedOrExited` through `allocate → sourceRun → sourceLimits`; a length mismatch against `effective` returns `none` from `sourceLimits` so both sides revert. Sourced upstream from the pinned SSZ validator proof. |
+
+Also #645 (integrating Grok #417 harness into `make test`) landed
+independently.
+
+### Piste B extended-session finding commits (not PRs)
+
+Three documentation-only finding commits pushed on standalone spark
+branches per common-rules rule 7 (each turn ends with a pushed commit or
+finding); not opened as PRs because report/log edits do not change a
+parent statement (rule 1):
+
+| Commit | Branch | Item |
+|--------|--------|------|
+| `29ff1828` | `spark/lido-track-b-status-finding-20260913` | Initial post-session scope estimate of remaining Chantier 2 D-* slices |
+| `9f3b4b39` | `spark/lido-p-address-1-report-real-state-gap-20260913` | `report/P-ADDRESS-1.md` wave-7 note: 12-boolean projection vs address-indexed real state (StETH balances/allowances; WQ owner/claimed/hint; Bridge CALL succeeds), source lines cited |
+| `36ee3667` | `spark/lido-p-topup-2-report-wave3-chantier2-20260913` | `report/P-TOPUP-2.md` wave-3 note: PR #654 / #660 shipments plus enumerated open D-* divergences with source lines and cross-refs to existing report issues 18/21/22/27/29/31 |
+
+### Remaining open Piste B items (as of last commit)
+
+Chantier 1 DEPOSIT-1: D-SLOT-1 (ERC-7201 keyed layout for
+`ModuleState.deposits`, 65+ refs across 5 files); three unconditional
+Preconditions retirements (`authorized` / `moduleActive` /
+`allocationValid`) requiring full DSM + router composition; D-CALL-1
+per-key-push half (`pushBatch` per-batch → per-key `deposit{value: 32
+ether}` frames with per-key `depositDataRoot`); Grok #412 harness
+integration into `make test`.
+
+Chantier 2 TOPUP-2: D-CONSUME-1 (retire `sourceConsume` leftover walk);
+D-UNITS-1 (gwei → wei pipeline unit propagation);
+D-TOTAL-1 (`didSetLastTopUpData` observable gated on `totalLimits > 0`);
+D-AUTH/SORT/WC/PUBKEY prefix as caller-supplied premises. Each remaining
+D-* must be closed by a green vector on the Grok #417 harness (rule 9).
+
+Chantier 3 ADDRESS-1: replace `universal_address_writer_equivariance`
+12-boolean environment projection with address-indexed real state
+(`balances[a]` / `allowances[a][b]` / `owner[reqId]` /
+`claimed[reqId]` / `hint[reqId]` / `externalCallSucceeds` from Bridge
+CALL model); parent registered "à code du destinataire près" per the
+`AddressRecipientCallBridge` premise. `AddressClaimBatchTx` already
+models the storage/CALL surface for the claim path.
