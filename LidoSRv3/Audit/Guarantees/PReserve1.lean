@@ -5,6 +5,7 @@ import LidoSRv3.Audit.Source.ReservePayableCallSource
 import LidoSRv3.Audit.Source.ReserveSeedBookkeepingSource
 import LidoSRv3.Audit.Source.ERC7201StorageSlotSource
 import LidoSRv3.Audit.Source.SolidityUint128WrapSource
+import LidoSRv3.Audit.Source.ReserveUpdateBufferedAllocationSource
 import LidoSRv3.Audit.Guarantees.Registry
 
 namespace LidoSRv3.Audit.Guarantees.PReserve1
@@ -417,5 +418,54 @@ theorem verity_tx_preserves_withdrawal_reserve
     (h : (ReserveContract.withdrawWithGuards inputs amount).run state = .success () after) :
     withdrawalPartitionSpendInvariant (decode state) (decode after) amount :=
   verity_commit_preserves_withdrawal_reserve inputs state after amount h
+
+/-- **Chantier 2 (Piste A, Thomas 2026-09-13) registered `_updateBufferedEtherAllocation`
+partition-writer companion (writer #3 of 4).**
+
+The pinned `Lido._updateBufferedEtherAllocation` (invoked from the
+oracle report handler at report time) rewrites the packed
+`buffered` / `depositedPostReport` pair and clears the next-report
+accumulator.  Modeled by
+`ReserveUpdateBufferedAllocationSource.updateBufferedEtherAllocation`.
+
+Registered consumer that preserves the two non-touched partition
+fields (`storedDepositsReserve`, `unfinalizedStETH`), so composition
+with the top-up spend writer preserves the invariants the spend
+writer depends on.  Non-scaffold: real state-machine derivation. -/
+theorem reserve_update_buffered_allocation_preserves_reserve_fields
+    (state : ReserveState) (newBuffered newDepositedPostReport : Word) :
+    (LidoSRv3.Audit.Source.ReserveUpdateBufferedAllocationSource.updateBufferedEtherAllocation
+        state newBuffered newDepositedPostReport).storedDepositsReserve =
+      state.storedDepositsReserve ∧
+    (LidoSRv3.Audit.Source.ReserveUpdateBufferedAllocationSource.updateBufferedEtherAllocation
+        state newBuffered newDepositedPostReport).unfinalizedStETH =
+      state.unfinalizedStETH :=
+  LidoSRv3.Audit.Source.ReserveUpdateBufferedAllocationSource.updateBufferedEtherAllocation_preserves_other_fields
+    state newBuffered newDepositedPostReport
+
+/-- The rebalance writes exactly the requested new `buffered` value. -/
+theorem reserve_update_buffered_allocation_writes_buffered
+    (state : ReserveState) (newBuffered newDepositedPostReport : Word) :
+    (LidoSRv3.Audit.Source.ReserveUpdateBufferedAllocationSource.updateBufferedEtherAllocation
+        state newBuffered newDepositedPostReport).buffered = newBuffered :=
+  LidoSRv3.Audit.Source.ReserveUpdateBufferedAllocationSource.updateBufferedEtherAllocation_buffered
+    state newBuffered newDepositedPostReport
+
+/-- The rebalance writes exactly the requested new `depositedPostReport`
+value. -/
+theorem reserve_update_buffered_allocation_writes_deposited_post_report
+    (state : ReserveState) (newBuffered newDepositedPostReport : Word) :
+    (LidoSRv3.Audit.Source.ReserveUpdateBufferedAllocationSource.updateBufferedEtherAllocation
+        state newBuffered newDepositedPostReport).depositedPostReport = newDepositedPostReport :=
+  LidoSRv3.Audit.Source.ReserveUpdateBufferedAllocationSource.updateBufferedEtherAllocation_depositedPostReport
+    state newBuffered newDepositedPostReport
+
+/-- The rebalance resets the next-report accumulator to zero. -/
+theorem reserve_update_buffered_allocation_clears_next_report
+    (state : ReserveState) (newBuffered newDepositedPostReport : Word) :
+    (LidoSRv3.Audit.Source.ReserveUpdateBufferedAllocationSource.updateBufferedEtherAllocation
+        state newBuffered newDepositedPostReport).depositedNextReportAdjusted = (0 : Word) :=
+  LidoSRv3.Audit.Source.ReserveUpdateBufferedAllocationSource.updateBufferedEtherAllocation_next_report
+    state newBuffered newDepositedPostReport
 
 end LidoSRv3.Audit.Guarantees.PReserve1
