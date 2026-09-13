@@ -140,6 +140,7 @@ import LidoSRv3.Audit.Source.SRAllocationConstantsSource
 import LidoSRv3.Audit.Source.ConsolidationBatchSizeSource
 import LidoSRv3.Audit.Source.Topup2Uint64BoundsSource
 import LidoSRv3.Audit.Source.Topup2SumNoWrapSource
+import LidoSRv3.Audit.Source.Topup2NKeyNoWrapSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -1126,6 +1127,10 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.Topup2Uint64BoundsSource.allocationLimit_le_cap
 -- Fifty-ninth-step (2026-09-13): P-TOPUP-2 chantier-4bis sum-no-wrap conclusion.
 #print axioms LidoSRv3.Audit.Source.Topup2SumNoWrapSource.aggregateCap_lt_uint256Modulus
+-- Sixtieth-step (2026-09-13): P-TOPUP-2 chantier-4bis N-key final composition.
+#print axioms LidoSRv3.Audit.Source.Topup2NKeyNoWrapSource.sum_le_length_mul
+#print axioms LidoSRv3.Audit.Source.Topup2NKeyNoWrapSource.nkey_sum_le_aggregateCap
+#print axioms LidoSRv3.Audit.Source.Topup2NKeyNoWrapSource.nkey_sum_lt_uint256Modulus
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape
