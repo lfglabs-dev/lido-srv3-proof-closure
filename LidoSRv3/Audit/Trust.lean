@@ -200,6 +200,7 @@ import LidoSRv3.Tests.PackGTopupProvenanceMutants
 import LidoSRv3.Audit.Provenance.ConsolidationRequest
 import LidoSRv3.Audit.Provenance.CanonicalRequestAddress
 import LidoSRv3.Audit.Provenance.BeaconDepositAddress
+import LidoSRv3.Audit.Provenance.LidoAddress
 import LidoSRv3.Audit.Provenance.DepositThirtyTwoEther
 import LidoSRv3.Audit.Provenance.DepositAbstractTxOrphaned
 import LidoSRv3.Tests.PackGEth1ProvenanceMutants
@@ -2246,6 +2247,22 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Provenance.BeaconDepositAddress.deposit_canonical_pin_equals_canonical
 #print axioms LidoSRv3.Audit.Provenance.BeaconDepositAddress.topup_verity_beacon_equals_deployed_immutable
 #print axioms LidoSRv3.Audit.Provenance.BeaconDepositAddress.deposit_canonical_pin_equals_deployed_immutable
+
+-- D-ADDR-1 Lido-address half discharge (chantier 1 Piste A 2026-09-13, see
+-- `LidoSRv3/Audit/Provenance/LidoAddress.lean`): the Verity top-up model
+-- literal `LidoSRv3.Audit.Verity.TopupTx.lidoAddress` equals the `LIDO`
+-- immutable inlined at seven `push20_payload_enumeration` offsets (6332,
+-- 9021, 9656, 9739, 10386, 12237, 15321, each width 20) in the deployed
+-- StakingRouter runtime bytecode (fixture SHA-256
+-- c30ed4e63cb0a57dca577484afff0765fcaa9840d75b440067fd55c7d4fc7013).  The
+-- Grok differential #414 D-ADDR-1 flagged the previous `0xF00D` placeholder;
+-- this discharge anchors the model literal to the canonical Lido proxy
+-- mainnet address `0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84`.  The
+-- beacon-address half of D-ADDR-1 is already covered by
+-- BeaconDepositAddress.lean above.
+#print axioms LidoSRv3.Audit.Provenance.LidoAddress.deployed_lido_immutable_equals_canonical
+#print axioms LidoSRv3.Audit.Provenance.LidoAddress.topup_verity_lido_equals_canonical
+#print axioms LidoSRv3.Audit.Provenance.LidoAddress.topup_verity_lido_equals_deployed_immutable
 
 -- A-DEPOSIT-32-ETHER discharge (see
 -- `audit/findings/A-DEPOSIT-32-ETHER-discharged.md` and
