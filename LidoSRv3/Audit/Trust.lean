@@ -730,6 +730,9 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.observeFromJournal_status_success
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.observeFromJournal_status_revert
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.observeFromJournal_success_payloads_eq_calls_input
+-- Slot-invariance: observeFromJournal doesn't read sourceMapSlot / targetMapSlot,
+-- so its output is unchanged by arbitrary rewrites of those slots.
+#print axioms LidoSRv3.Audit.Verity.ConsolidationTx.observeFromJournal_success_slot_invariant
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.function_spec_bridge_constructors
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.committed_journal_forwards_msg_value
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.committed_preserves_eth_balance

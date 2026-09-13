@@ -460,6 +460,27 @@ theorem observeFromJournal_success_payloads_eq_calls_input
     (observeFromJournal before (.success r state)).payloads =
       (observeFromJournal before (.success r state)).calls.map (·.input) := rfl
 
+/-- **Chantier 2 (Thomas 2026-09-13) slot invariance.**
+`observeFromJournal` doesn't read `sourceMapSlot` or `targetMapSlot`
+on the success arm — its `payloads` field is derived from
+`calls.map (·.input)`, and its `count`/`fee` reads target `countSlot`
+/ `feePaidSlot`. So arbitrary rewriting of the fabricated slots
+leaves `observeFromJournal`'s output unchanged, at the point where
+`observe` would have `readPayloads`-read those slots. Formal
+statement: for any two states that agree on `state.calls`,
+`state.events`, `countSlot`, and `feePaidSlot`, but differ
+arbitrarily on `sourceMapSlot`/`targetMapSlot`,
+`observeFromJournal` produces the same `View`. -/
+theorem observeFromJournal_success_slot_invariant
+    (before state1 state2 : ContractState) (r1 r2 : Result)
+    (hCalls : state1.calls = state2.calls)
+    (hEvents : state1.events = state2.events)
+    (hCount : state1.readSlot countSlot = state2.readSlot countSlot)
+    (hFee : state1.readSlot feePaidSlot = state2.readSlot feePaidSlot) :
+    observeFromJournal before (.success r1 state1) =
+      observeFromJournal before (.success r2 state2) := by
+  simp [observeFromJournal, hCalls, hEvents, hCount, hFee]
+
 private theorem readMapUint_writeMapUint_other_slot (s : ContractState)
     {slot slot' : Nat} (hslot : slot' ≠ slot) (key key' value : Word) :
     (s.writeMapUint slot key value).readMapUint slot' key' =
