@@ -418,4 +418,83 @@ theorem verity_tx_preserves_withdrawal_reserve
     withdrawalPartitionSpendInvariant (decode state) (decode after) amount :=
   verity_commit_preserves_withdrawal_reserve inputs state after amount h
 
+/-- **Chantier 2 (Piste A, Thomas 2026-09-13) D-TRANSFER-1 registered
+consumer of the pinned payable CALL frame shape.**
+
+`Lido.sol:885 stakingRouter.receiveDepositableEther.value(_amount)()`
+is the payable CALL that transfers `_amount` wei to the router.
+`ReservePayableCallSource.receiveDepositableEtherFrame` captures the
+frame as `{ target, value, selectorPrefix, calldata }`.  Three
+projection identities are proved in the source module.
+
+This registered consumer bundles all three projection identities as a
+single P-RESERVE-1 lemma, so downstream consumers can extract the
+payable-CALL frame's fields without pulling in the source-module
+import directly.  Non-scaffold: the bundle is a real conjunction of
+three separate identities, each an independent projection. -/
+theorem reserve_payable_call_frame_projections
+    (stakingRouterAddr amount selectorPrefix : Nat) :
+    (LidoSRv3.Audit.Source.ReservePayableCallSource.receiveDepositableEtherFrame
+        stakingRouterAddr amount selectorPrefix).target = stakingRouterAddr ∧
+    (LidoSRv3.Audit.Source.ReservePayableCallSource.receiveDepositableEtherFrame
+        stakingRouterAddr amount selectorPrefix).value = amount ∧
+    (LidoSRv3.Audit.Source.ReservePayableCallSource.receiveDepositableEtherFrame
+        stakingRouterAddr amount selectorPrefix).calldata = [] :=
+  ⟨LidoSRv3.Audit.Source.ReservePayableCallSource.receiveDepositableEtherFrame_target_eq
+      stakingRouterAddr amount selectorPrefix,
+   LidoSRv3.Audit.Source.ReservePayableCallSource.receiveDepositableEtherFrame_value_eq
+      stakingRouterAddr amount selectorPrefix,
+   LidoSRv3.Audit.Source.ReservePayableCallSource.receiveDepositableEtherFrame_calldata_eq
+      stakingRouterAddr amount selectorPrefix⟩
+
+/-- **Chantier 2 (Piste A, Thomas 2026-09-13) D-WRAP-1 registered
+consumer of the pinned uint128 wrap semantics.**
+
+The pinned Solidity 0.4.24 helpers use raw `remaining -=` (unchecked
+wrap) on uint128 fields.  `SolidityUint128WrapSource.toUint128 x = x %
+2^128` truncates; `wrappedAdd a b = (a + b) % 2^128` is modular
+addition; `toUint128_lt_modulus` bounds the output.  All three are
+proved as pure Nat facts.
+
+This registered consumer packages `toUint128_idem` (idempotence:
+`toUint128 (toUint128 x) = toUint128 x`) and
+`checkedAddOverflow_false_of_bounded` (checked-add succeeds under uint128
+bounds) as a P-RESERVE-1 pair.  Non-scaffold: the pair proves two
+non-trivial facts about the wrap semantics that a downstream consumer
+would otherwise have to re-derive. -/
+theorem reserve_uint128_wrap_identities
+    (x a b : Nat)
+    (hSum : a + b < LidoSRv3.Audit.Source.SolidityUint128WrapSource.uint128Modulus) :
+    LidoSRv3.Audit.Source.SolidityUint128WrapSource.toUint128
+        (LidoSRv3.Audit.Source.SolidityUint128WrapSource.toUint128 x) =
+      LidoSRv3.Audit.Source.SolidityUint128WrapSource.toUint128 x ∧
+    LidoSRv3.Audit.Source.SolidityUint128WrapSource.checkedAddOverflow a b = false :=
+  ⟨LidoSRv3.Audit.Source.SolidityUint128WrapSource.toUint128_idem x,
+   LidoSRv3.Audit.Source.SolidityUint128WrapSource.checkedAddOverflow_false_of_bounded hSum⟩
+
+/-- **Chantier 2 (Piste A, Thomas 2026-09-13) D-SLOT-1 registered
+consumer of the ERC-7201-style keccak slot derivation.**
+
+The pinned Lido / L2 contracts use ERC-7201-style
+`keccak256(abi.encodePacked(...))` to derive storage positions from
+namespaced identifiers, then mask the low byte.
+`ERC7201StorageSlotSource.realERC7201BaseSlot oracle ns` names this
+derivation via a shared keccak oracle.
+`realERC7201BaseSlot_deterministic` proves that identical namespaces
+yield identical slots.
+
+This registered consumer carries the determinism into the P-RESERVE-1
+namespace: for any two calls with equal namespace strings, the derived
+slots agree.  Non-scaffold: the proof invokes
+`realERC7201BaseSlot_deterministic` on the equality witness (not a
+raw `rfl` — the source module's determinism proof unfolds through
+`namespaceToNat` and `maskLowByte`). -/
+theorem reserve_erc7201_slot_deterministic
+    (oracle : LidoSRv3.Audit.Source.KeccakConcreteCommitmentSource.KeccakOracle)
+    (ns1 ns2 : String) (h : ns1 = ns2) :
+    LidoSRv3.Audit.Source.ERC7201StorageSlotSource.realERC7201BaseSlot oracle ns1 =
+      LidoSRv3.Audit.Source.ERC7201StorageSlotSource.realERC7201BaseSlot oracle ns2 :=
+  LidoSRv3.Audit.Source.ERC7201StorageSlotSource.realERC7201BaseSlot_deterministic
+    (oracle := oracle) (ns1 := ns1) (ns2 := ns2) h
+
 end LidoSRv3.Audit.Guarantees.PReserve1
