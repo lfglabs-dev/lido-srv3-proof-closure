@@ -706,6 +706,33 @@ theorem execute_observes_source (inputs : Inputs) (state : ContractState)
     simp [observe, sourceObservables, committed_balance inputs state h, committed_calls,
       List.drop_left]
 
+/-- Executable plane rollback: every reverting `execute` run restores the exact
+entry snapshot.  Hypothesis-free (no Preconditions), so this holds even after
+intermediate storage writes and even for mis-shaped inputs.  Load-bearing on
+the registered N-frame executor (grok #412 D-* Task 8 discharge, 2026-09-13:
+previously the analogous statement lived on the retired `DepositParentTx.execute`
+via `PDeposit1.verity_tx_revert_restores_snapshot`; it now lives on the
+registered executor directly). -/
+theorem revert_restores_snapshot (inputs : Inputs)
+    (state rollback : ContractState) (reason : String)
+    (h : (execute inputs).run state = .revert reason rollback) :
+    rollback = state := by
+  unfold Contract.run at h
+  cases hx : execute inputs state <;> simp [hx] at h
+  exact h.2.symm
+
+/-- Companion observation lemma: a reverting `execute` run observes the idle
+boundary — no committed flag, entry `selfBalance`, empty journal. -/
+theorem revert_observes_idle (inputs : Inputs)
+    (state rollback : ContractState) (reason : String)
+    (h : (execute inputs).run state = .revert reason rollback) :
+    observe state ((execute inputs).run state) =
+      ⟨false, state.selfBalance.val, []⟩ := by
+  have hroll : rollback = state :=
+    revert_restores_snapshot inputs state rollback reason h
+  rw [h, hroll]
+  simp [observe]
+
 /-- Exact public conclusion shared by the production theorem and mutant. -/
 def ParentConclusion (program : Inputs → Contract Unit) (inputs : Inputs)
     (state : ContractState) : Prop :=
