@@ -136,7 +136,8 @@ def executePullPushAssertTail (inputs : Inputs) (entryBalance : Word) : Contract
   -- StakingRouter.sol:993  uint256 etherBalanceAfterDeposits = address(this).balance;
   let after ← DepositParentTx.getState
   -- StakingRouter.sol:996  assert(etherBalanceBeforeDeposits == etherBalanceAfterDeposits);
-  require (after.selfBalance == entryBalance) "ASSERT_BALANCE_UNCHANGED"
+  -- Solidity `assert(...)` compiles to `Panic(0x01)` in Solidity ≥ 0.8.0.
+  require (after.selfBalance == entryBalance) "Panic(0x01)"
 
 /-- `StakingRouter.sol:942-997 deposit(uint256 _stakingModuleId, bytes calldata _depositCalldata)`,
 generalised to a list of batches: the pinned function deposits for one module
@@ -155,21 +156,35 @@ emitted a zero-argument Lido pull) to equality on the empty-batch witness.
 Not transcribed: as for `DepositParentTx.execute` (`StakingRouter.sol:948-949,
 954-969, 980, 993`).
 
-Added by the model: `Batch.dataValid`/`rootValid` (no counterpart in the span),
-the `"BATCH_TOTAL_OVERFLOW"` guard (the exact bound is checked before either
+Added by the model: `Batch.dataValid`/`rootValid` (no counterpart in the span)
+and the `"Panic(0x11)"` guard (the exact bound is checked before either
 pass, so a wrapping list cannot leave a value-moving journal even when callers
-omit `Preconditions`), the `"ALLOCATION_VALUE_MISMATCH"` guard, and all revert
-strings, which are model names rather than the Solidity custom errors. -/
+omit `Preconditions`; this guard is model-added because Solidity 0.8.25's
+checked arithmetic panics with `0x11`, but the model uses a pre-pass so the
+composed executable transaction cannot cross the modulus before the guard).
+
+Revert reasons: since the discharge of grok #412 D-REVERT-1 (2026-09-13) the
+model emits the pinned Solidity source identifiers (`NotAuthorized()`,
+`StakingModuleNotActive()`, `ZeroDeposits()`, `Panic(0x01)` for the line-996
+`assert`) rather than the earlier model strings.  The composed
+`maxDepositsCount / ZeroDeposits / WrongPubkeyLength / ModuleReturnExceedTarget`
+guard block (lines 954-969) is still one abstracted family under the leading
+`ZeroDeposits()` selector-name because `Preconditions.allocationValid` is a
+single boolean; the model-added word-overflow guard reports as the source-level
+`Panic(0x11)` (checked-arithmetic panic selector), and the model-added
+value-consistency guard on the composed list reports as `Panic(0x01)` since the
+pinned split `MAX_EFFECTIVE_BALANCE_WC_TYPE_01` vs `DEPOSIT_SIZE` surfaces at
+the line-996 balance assert. -/
 def execute (inputs : Inputs) : Contract Unit := do
   -- StakingRouter.sol:943  _checkAppAuth(_getDepositSecurityModule());
-  require inputs.authorized "NOT_AUTHORIZED"
+  require inputs.authorized "NotAuthorized()"
   -- StakingRouter.sol:946  if (stateConfig.status != StakingModuleStatus.Active) revert StakingModuleNotActive();
-  require inputs.moduleActive "MODULE_NOT_ACTIVE"
-  -- StakingRouter.sol:954-969  maxDepositsCount / ZeroDeposits / WrongPubkeyLength / ModuleReturnExceedTarget  (abstracted)
-  require inputs.allocationValid "INVALID_ALLOCATION"
-  -- Added by the model: word-overflow guard on the batch total.
+  require inputs.moduleActive "StakingModuleNotActive()"
+  -- StakingRouter.sol:954-969  maxDepositsCount / ZeroDeposits / WrongPubkeyLength / ModuleReturnExceedTarget (abstracted family under leading selector name).
+  require inputs.allocationValid "ZeroDeposits()"
+  -- Added by the model: word-overflow guard on the batch total (Solidity 0.8.25 checked-arithmetic Panic(0x11)).
   require (decide (exactTotal inputs.batches < _root_.Verity.Core.Uint256.modulus))
-    "BATCH_TOTAL_OVERFLOW"
+    "Panic(0x11)"
   -- StakingRouter.sol:980  uint256 etherBalanceBeforeDeposits = address(this).balance;
   let state ← DepositParentTx.getState
   -- StakingRouter.sol:976  _updateModuleLastDepositState(_stakingModuleId, depositsValue);
@@ -178,8 +193,12 @@ def execute (inputs : Inputs) : Contract Unit := do
   let _ ← inputs.batches.mapM (processBatch inputs)
   -- StakingRouter.sol:972  uint256 depositsValue = actualDepositsCount * MAX_EFFECTIVE_BALANCE_WC_TYPE_01;  (checked as a guard)
   let total := wordTotal inputs.batches
+  -- Model-added consistency guard on the composed list.  In the pin, the split
+  -- `MAX_EFFECTIVE_BALANCE_WC_TYPE_01` (line 972) vs `DEPOSIT_SIZE` (BCD line 57)
+  -- surfaces this at the line-996 assert as `Panic(0x01)`; the model reports it
+  -- earlier under the same selector.
   require (total == wordKeys inputs.batches * inputs.depositSize)
-    "ALLOCATION_VALUE_MISMATCH"
+    "Panic(0x01)"
   -- StakingRouter.sol:978  if (actualDepositsCount == 0) return;
   -- The pull, per-key push, and line-996 assert live in `executePullPushAssertTail`
   -- and only fire when the pinned `shouldPull` predicate holds.
@@ -645,12 +664,12 @@ theorem wrapping_fold_reverts_without_journal (inputs : Inputs) (state : Contrac
     (hActive : inputs.moduleActive = true)
     (hAllocation : inputs.allocationValid = true)
     (hWrap : _root_.Verity.Core.Uint256.modulus ≤ exactTotal inputs.batches) :
-    (execute inputs).run state = .revert "BATCH_TOTAL_OVERFLOW" state ∧
+    (execute inputs).run state = .revert "Panic(0x11)" state ∧
       observe state ((execute inputs).run state) = ⟨false, state.selfBalance.val, []⟩ := by
   have hGuard :
       decide (exactTotal inputs.batches < _root_.Verity.Core.Uint256.modulus) = false :=
     decide_eq_false (Nat.not_lt.mpr hWrap)
-  have hRaw : execute inputs state = .revert "BATCH_TOTAL_OVERFLOW" state := by
+  have hRaw : execute inputs state = .revert "Panic(0x11)" state := by
     simp [execute, Bind.bind, _root_.Verity.bind, _root_.Verity.require,
       hAuthorized, hActive, hAllocation, hGuard]
   refine ⟨?_, ?_⟩

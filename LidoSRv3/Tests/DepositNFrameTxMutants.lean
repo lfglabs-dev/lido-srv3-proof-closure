@@ -97,7 +97,7 @@ def wrappingInputs : DepositNFrameTx.Inputs :=
 
 theorem wrapping_witness_moves_no_journal :
     (DepositNFrameTx.execute wrappingInputs).run threeBatchState =
-        .revert "BATCH_TOTAL_OVERFLOW" threeBatchState ∧
+        .revert "Panic(0x11)" threeBatchState ∧
       (observe threeBatchState
         ((DepositNFrameTx.execute wrappingInputs).run threeBatchState)).journal = [] := by
   have hWrap : _root_.Verity.Core.Uint256.modulus ≤
