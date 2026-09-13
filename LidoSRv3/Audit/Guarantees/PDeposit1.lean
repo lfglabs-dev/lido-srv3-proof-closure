@@ -299,11 +299,40 @@ theorem linked_conserving_deployment_pull_is_word_bounded
   rw [depositsValue, hCons]
   exact (linked_deployment_push_is_word_bounded cfg inp inputs hLink hNoWrap).2
 
-/-- Hypothesis-free executable rollback theorem. Unlike the composed parent,
-this statement takes neither `LinksSource` nor success `Preconditions`: every
-actual `execute` revert restores the exact entry snapshot and observes the idle
-boundary. -/
+/-- Hypothesis-free executable rollback theorem on the REGISTERED N-frame
+executor (grok #412 Task 8 discharge, 2026-09-13: the theorem used to reference
+`DepositParentTx.execute` — the retired 2-batch plane — via the open above; it
+now targets `DepositNFrameTx.execute`, the registered executor exposed by
+`verity_tx_composes_nframe_deposit_under_router_shape` and by
+`ExecutesNFrameJournal := ParentConclusion DepositNFrameTx.execute`).
+
+Unlike the composed parent, this statement takes neither `LinksSource` nor
+success `Preconditions`: every actual `execute` revert restores the exact
+entry snapshot and observes the idle boundary (no committed flag, entry
+`selfBalance`, empty journal).  This holds after intermediate storage writes
+and for mis-shaped inputs (e.g. duplicate module ids that fire the
+`DuplicateModuleId` guard after the counter/state update). -/
 theorem verity_tx_revert_restores_snapshot
+    (inputs : LidoSRv3.Audit.Verity.DepositNFrameTx.Inputs)
+    (entry rollback : _root_.Verity.ContractState)
+    (reason : String)
+    (hRevert : (LidoSRv3.Audit.Verity.DepositNFrameTx.execute inputs).run entry =
+      .revert reason rollback) :
+    rollback = entry ∧
+      LidoSRv3.Audit.Verity.DepositNFrameTx.observe entry
+          ((LidoSRv3.Audit.Verity.DepositNFrameTx.execute inputs).run entry) =
+        ⟨false, entry.selfBalance.val, []⟩ :=
+  ⟨LidoSRv3.Audit.Verity.DepositNFrameTx.revert_restores_snapshot
+      inputs entry rollback reason hRevert,
+   LidoSRv3.Audit.Verity.DepositNFrameTx.revert_observes_idle
+      inputs entry rollback reason hRevert⟩
+
+/-- Legacy alignment on the retired `DepositParentTx.execute` two-batch plane.
+Retained for the historical `Trust.lean` printout and to document that the
+composed parent's own rollback invariant is preserved on the retired plane; the
+registered rollback claim is `verity_tx_revert_restores_snapshot` (above) on
+the N-frame executor. -/
+theorem verity_tx_revert_restores_snapshot_legacy_parent
     (inputs : Inputs) (entry rollback : _root_.Verity.ContractState)
     (reason : String)
     (hRevert : (execute inputs).run entry = .revert reason rollback) :
