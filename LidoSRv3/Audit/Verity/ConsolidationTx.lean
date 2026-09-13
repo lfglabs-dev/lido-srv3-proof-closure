@@ -1229,6 +1229,72 @@ theorem persist_frame_scalars_eq_persistSlotFree_frame_scalars_bundle
    persist_blobBaseFee_eq_persistSlotFree_blobBaseFee start obs state,
    persist_calldataSize_eq_persistSlotFree_calldataSize start obs state⟩
 
+/-- **Chantier 2 (Thomas 2026-09-13) transaction-level frame-scalar
+preservation.** Lifts each of the ten `persist_*_eq_persistSlotFree_*`
+scalar equalities to the `.snd` of `addRequests` and
+`addRequestsSlotFree` via the shared guard-structure case split. On
+the reverting arm both sides return `.revert reason snapshot` (same
+snapshot, same field), closed by `rfl`; on the committed arm both
+`persist` and `persistSlotFree` are applied to the same credited
+state with the same observables, so per-field agreement transfers. -/
+theorem addRequests_snd_msgValue_eq_addRequestsSlotFree_snd_msgValue
+    (inputs : Inputs) (failAfterWrites : Bool) (snapshot : ContractState) :
+    (addRequests inputs failAfterWrites snapshot).snd.msgValue =
+    (addRequestsSlotFree inputs failAfterWrites snapshot).snd.msgValue := by
+  unfold addRequests addRequestsSlotFree
+  by_cases hCredit : snapshot.selfBalance.val + inputs.msgValue.val < Verity.Core.Uint256.modulus
+  · simp only [if_pos hCredit]
+    rcases hA : readArray (credited snapshot inputs) "sources" sourcesBase inputs.sources.length
+      with _ | sources
+    · rfl
+    rcases hB : readArray (credited snapshot inputs) "targets" targetsBase inputs.targets.length
+      with _ | targets
+    · rfl
+    rcases hC : readArray (credited snapshot inputs) "sourceLens" sourceLensBase inputs.sourceLens.length
+      with _ | sourceLens
+    · rfl
+    rcases hD : readArray (credited snapshot inputs) "targetLens" targetLensBase inputs.targetLens.length
+      with _ | targetLens
+    · rfl
+    simp only []
+    rcases hSR : sourceRun _ with reason | obs
+    · rfl
+    by_cases hFail : failAfterWrites
+    · simp only [if_pos hFail, ContractResult.snd_revert]
+      exact persist_msgValue_eq_persistSlotFree_msgValue _ _ _
+    · simp only [if_neg hFail, ContractResult.snd_success]
+      exact persist_msgValue_eq_persistSlotFree_msgValue _ _ _
+  · simp only [if_neg hCredit]
+
+theorem addRequests_snd_sender_eq_addRequestsSlotFree_snd_sender
+    (inputs : Inputs) (failAfterWrites : Bool) (snapshot : ContractState) :
+    (addRequests inputs failAfterWrites snapshot).snd.sender =
+    (addRequestsSlotFree inputs failAfterWrites snapshot).snd.sender := by
+  unfold addRequests addRequestsSlotFree
+  by_cases hCredit : snapshot.selfBalance.val + inputs.msgValue.val < Verity.Core.Uint256.modulus
+  · simp only [if_pos hCredit]
+    rcases hA : readArray (credited snapshot inputs) "sources" sourcesBase inputs.sources.length
+      with _ | sources
+    · rfl
+    rcases hB : readArray (credited snapshot inputs) "targets" targetsBase inputs.targets.length
+      with _ | targets
+    · rfl
+    rcases hC : readArray (credited snapshot inputs) "sourceLens" sourceLensBase inputs.sourceLens.length
+      with _ | sourceLens
+    · rfl
+    rcases hD : readArray (credited snapshot inputs) "targetLens" targetLensBase inputs.targetLens.length
+      with _ | targetLens
+    · rfl
+    simp only []
+    rcases hSR : sourceRun _ with reason | obs
+    · rfl
+    by_cases hFail : failAfterWrites
+    · simp only [if_pos hFail, ContractResult.snd_revert]
+      exact persist_sender_eq_persistSlotFree_sender _ _ _
+    · simp only [if_neg hFail, ContractResult.snd_success]
+      exact persist_sender_eq_persistSlotFree_sender _ _ _
+  · simp only [if_neg hCredit]
+
 /-- **Chantier 2 (Thomas 2026-09-13) `.snd.calls` equivalence between
 `addRequests` and `addRequestsSlotFree`.** Both transactions share the
 same guard structure (entry-credit bound, memory decode, `sourceRun`
