@@ -88,6 +88,7 @@ import LidoSRv3.Audit.Source.AddressStETHGuardsSource
 import LidoSRv3.Audit.Source.ConsolidationRoleGuardSource
 import LidoSRv3.Audit.Source.ConsolidationPauseGuardSource
 import LidoSRv3.Audit.Source.ConsolidationQuotaGuardSource
+import LidoSRv3.Audit.Source.ConsolidationClProofSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -914,6 +915,8 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.ConsolidationPauseGuardSource.whenResumed_passes_of_not_paused
 -- Seventh-step (2026-09-13): P-CONSOLIDATION-ETH-1 per-window quota guard derivation.
 #print axioms LidoSRv3.Audit.Source.ConsolidationQuotaGuardSource.quotaCheck_passes_of_bound
+-- Eighth-step (2026-09-13): P-CONSOLIDATION-ETH-1 CL-side EIP-7251 proof derivation.
+#print axioms LidoSRv3.Audit.Source.ConsolidationClProofSource.clProof_valid_of_registry
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape
