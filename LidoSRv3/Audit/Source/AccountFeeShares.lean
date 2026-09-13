@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Source.ReportFeeProductsCorrespondence
+import LidoSRv3.Audit.Source.ReportRewardsMintedCorrespondence
 import LidoSRv3.Audit.Verity.HandleOracleReportTx
 import Verity.Core
 import Verity.Stdlib.Math
@@ -180,6 +181,47 @@ theorem getter_outputs_feed_products
   cases h
   exact ⟨rfl, rfl⟩
 
+/-- **Chantier 3 composition (Thomas 2026-09-13 mandate item):** binds the
+#402 derived consumer to `_calculateFeeDistribution` (Accounting.sol:335-357)
+and the mint (Accounting.sol:403-413), structurally.
+
+Statement: for any non-profitable `FeeInput` (LIP-12 branch at
+Accounting.sol:322, i.e. `execute fee = some none`), there EXISTS a
+`shares : Word` such that `derivedSharesToMintAsFees fee = some shares`
+AND `shares.val = 0` AND calling
+`ReportRewardsMinted.consume moduleIds shares.val snapshot outcomes`
+produces empty events with a fee distribution computed by
+`calculateFeeDistribution` on those derived shares — no `.minted` event,
+matching the pinned Solidity zero-shares skip at Accounting.sol:403-413.
+
+**Load-bearing on `h`**: dropping the non-profitable-fee premise leaves
+`derivedSharesToMintAsFees fee` unconstrained (could be `none` or `some
+nonzero`), so no `shares` witness can be produced and the existential
+fails. **Structurally binds `fee` to `shares`**: the witness's `shares`
+is derived from `fee` via `derived_nonprofitable_zero`, and the consume
+call uses `shares.val` — not a hardcoded literal. Composes all three
+components (derived consumer, `_calculateFeeDistribution`, mint-skipped)
+in a single load-bearing registered statement per the chantier 3
+mandate. Positive-shares branch (mint fires) requires additional
+snapshot-side reasoning about `getStakingRewardsDistribution`'s totalFee
+and remains a separate follow-up. -/
+theorem derivedConsumer_nonprofitable_composes_fee_distribution_no_mint
+    (fee : FeeInput) (moduleIds : List Nat)
+    (snapshot : SolidityAccounting.ReportRewardsMinted.RouterSnapshot)
+    (outcomes : List SolidityAccounting.ReportRewardsMinted.CallbackOutcome)
+    (h : ReportFeeProductsCorrespondence.execute fee = some none) :
+    ∃ shares : Word,
+      derivedSharesToMintAsFees fee = some shares ∧
+      shares.val = 0 ∧
+      SolidityAccounting.ReportRewardsMinted.consume moduleIds shares.val
+          snapshot outcomes =
+        .ok ([], SolidityAccounting.ReportRewardsMinted.calculateFeeDistribution
+          shares.val
+          (SolidityAccounting.ReportRewardsMinted.getStakingRewardsDistribution
+            snapshot)) := by
+  refine ⟨0, derived_nonprofitable_zero fee h, rfl, ?_⟩
+  simp [SolidityAccounting.ReportRewardsMinted.consume]
+
 #print axioms derived_eq_source_products
 #print axioms derived_nonprofitable_zero
 #print axioms derived_profitable_is_l331
@@ -190,5 +232,7 @@ theorem getter_outputs_feed_products
 #print axioms handleOracleReportDerived_mint_after_read
 #print axioms free_argument_mints_when_source_is_zero
 #print axioms getter_outputs_feed_products
+#print axioms derivedConsumer_nonprofitable_composes_fee_distribution_no_mint
 
 end LidoSRv3.Audit.Source.AccountFeeShares
+
