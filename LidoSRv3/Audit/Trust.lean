@@ -1874,13 +1874,16 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Provenance.ConsolidationRequest.rewrite_preserves_other
 #print axioms LidoSRv3.Audit.Provenance.ConsolidationRequest.canonical_request_assumption_status
 
--- Provenance.Deposit: 3 audit-only claims documenting the open
--- deployment-facts boundary. `deposit_contract_assumption_remains_open`
--- keeps A-DEPOSIT-CONTRACT explicit; `source_constructor_does_not_
--- discharge_deployment_facts` refutes source-only derivation;
--- `wrong_deposit_contract_pin_kill_line` refutes an incorrect
--- deposit-contract pin as a kill-line witness.
-#print axioms LidoSRv3.Audit.Provenance.Deposit.deposit_contract_assumption_remains_open
+-- Provenance.Deposit: 3 audit-only claims documenting the deployment-facts
+-- boundary. `deposit_contract_assumption_status` (chantier 4 rename,
+-- Thomas 2026-09-13) records that A-DEPOSIT-CONTRACT deployed-immutable
+-- identity is DISCHARGED via `verify_beacon_deposit_immutable.py` (in
+-- `make test`) against fixture-anchored codehash
+-- `0x9cd5d45ddde5f74d3867aa22c98fd79a85df89d202145bc588173d92e00600ec`.
+-- `source_constructor_does_not_discharge_deployment_facts` refutes
+-- source-only derivation; `wrong_deposit_contract_pin_kill_line` refutes
+-- an incorrect deposit-contract pin as a kill-line witness.
+#print axioms LidoSRv3.Audit.Provenance.Deposit.deposit_contract_assumption_status
 #print axioms LidoSRv3.Audit.Provenance.Deposit.source_constructor_does_not_discharge_deployment_facts
 #print axioms LidoSRv3.Audit.Provenance.Deposit.wrong_deposit_contract_pin_kill_line
 

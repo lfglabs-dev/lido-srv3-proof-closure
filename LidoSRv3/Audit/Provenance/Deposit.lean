@@ -32,11 +32,22 @@ theorem canonical_thirty_two_ether_pin :
     PDeposit1.thirtyTwoEtherWei = thirtyTwoEtherWei :=
   rfl
 
-/-- `A-DEPOSIT-CONTRACT` is deployed-immutable identity, not the Lean pin.
-    The pin above is a model equality. No in-repo bytecode artifact
-    identifies the live `DEPOSIT_CONTRACT` immutable, so the assumption
-    remains OPEN. -/
-theorem deposit_contract_assumption_remains_open : True := trivial
+/-- **A-DEPOSIT-CONTRACT status (chantier 4 update, Thomas 2026-09-13):**
+    the deployed-immutable identity for `DEPOSIT_CONTRACT` is DISCHARGED
+    via `scripts/verify_beacon_deposit_immutable.py` (invoked by `make test`),
+    which re-hashes the pinned `StakingRouter_implementation` runtime
+    fixture at `0xDD76927045435C7605cf6f5F978cfb8CABDb5F80` (codehash
+    `0x9cd5d45ddde5f74d3867aa22c98fd79a85df89d202145bc588173d92e00600ec`,
+    fixture SHA-256 recorded in `audit/artifacts.lock.json`) and
+    re-extracts `DEPOSIT_CONTRACT` at its recorded byte offset. Live
+    re-verification against a live chain runs under `ETH_RPC_URL`.
+    The Lean pin above (`canonical_deposit_contract_pin`) is the source-
+    side model equality that this fixture-anchored verification connects
+    to the deployed runtime. See `audit/guarantees.yaml` P-DEPOSIT-1
+    fidelity.covered and `audit/artifacts.lock.json`. The theorem body
+    is `True := trivial` because the discharge lives in the verify
+    script + fixture, not in Lean proof content. -/
+theorem deposit_contract_assumption_status : True := trivial
 
 /-- Projection of the two deployment-relevant inputs from pinned
     `StakingRouter.sol` lines 88--106.  The exact source fixture, its SHA-256,
