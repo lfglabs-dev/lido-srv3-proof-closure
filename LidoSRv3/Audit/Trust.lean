@@ -112,6 +112,7 @@ import LidoSRv3.Audit.Source.DepositDistinctModulesSource
 import LidoSRv3.Audit.Source.TopupPrefixGuardsSource
 import LidoSRv3.Audit.Source.TopupLidoAddressSource
 import LidoSRv3.Audit.Source.TopupWithdrawTwoArgSource
+import LidoSRv3.Audit.Source.ReservePayableCallSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -1004,6 +1005,10 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.TopupWithdrawTwoArgSource.withdrawArgs_length
 #print axioms LidoSRv3.Audit.Source.TopupWithdrawTwoArgSource.withdrawArgs_first
 #print axioms LidoSRv3.Audit.Source.TopupWithdrawTwoArgSource.withdrawArgs_second
+-- Thirty-second-step (2026-09-13): RESERVE-1 D-TRANSFER-1 payable-CALL source model.
+#print axioms LidoSRv3.Audit.Source.ReservePayableCallSource.receiveDepositableEtherFrame_target_eq
+#print axioms LidoSRv3.Audit.Source.ReservePayableCallSource.receiveDepositableEtherFrame_value_eq
+#print axioms LidoSRv3.Audit.Source.ReservePayableCallSource.receiveDepositableEtherFrame_calldata_eq
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape
