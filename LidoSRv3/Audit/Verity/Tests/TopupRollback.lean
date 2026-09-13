@@ -17,7 +17,7 @@ def nominal : SourceTopupInput :=
     wcTypeIsType2 := true
     maxTopUpPerBlockGwei := 4 * pinnedConfig.minDeposit / pinnedConfig.gwei
     moduleAllocationEth := 4 * pinnedConfig.minDeposit
-    lidoCanDeposit := true
+    lidoState := { isStakingPaused := false, isBunkerActive := false }
     allocations := [pinnedConfig.minDeposit, 2 * pinnedConfig.minDeposit]
     routerBalanceBefore := 7
     lidoDepositableEther := 4 * pinnedConfig.minDeposit }

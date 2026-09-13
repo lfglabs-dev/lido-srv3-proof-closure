@@ -61,7 +61,7 @@ private def wrapInput : SourceTopupInput :=
     topUpLimits := [uint256Modulus + 1, uint256Modulus + 1],
     pubkeyLengths := [48, 48], moduleExists := true, moduleActive := true,
     wcTypeIsType2 := true, maxTopUpPerBlockGwei := uint256Modulus + 1,
-    moduleAllocationEth := uint256Modulus + 1, lidoCanDeposit := true,
+    moduleAllocationEth := uint256Modulus + 1, lidoState := { isStakingPaused := false, isBunkerActive := false },
     allocations := [uint256Modulus - 1, 2], routerBalanceBefore := uint256Modulus,
     lidoDepositableEther := uint256Modulus + 1 }
 

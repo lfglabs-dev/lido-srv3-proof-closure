@@ -217,7 +217,7 @@ private def wrapInput : SourceTopupInput :=
     topUpLimits := [uint256Modulus + 1, uint256Modulus + 1],
     pubkeyLengths := [48, 48], moduleExists := true, moduleActive := true,
     wcTypeIsType2 := true, maxTopUpPerBlockGwei := uint256Modulus + 1,
-    moduleAllocationEth := uint256Modulus + 1, lidoCanDeposit := true,
+    moduleAllocationEth := uint256Modulus + 1, lidoState := { isStakingPaused := false, isBunkerActive := false },
     allocations := [uint256Modulus - 1, 2], routerBalanceBefore := uint256Modulus,
     lidoDepositableEther := uint256Modulus + 1 }
 
@@ -227,7 +227,7 @@ private def moduleMissingInput : SourceTopupInput :=
   { callerIsTopUpGateway := true, keyIndicesLength := 1, operatorIdsLength := 1,
     topUpLimits := [10], pubkeyLengths := [48], moduleExists := false,
     moduleActive := true, wcTypeIsType2 := true, maxTopUpPerBlockGwei := 100,
-    moduleAllocationEth := 100, lidoCanDeposit := true,
+    moduleAllocationEth := 100, lidoState := { isStakingPaused := false, isBunkerActive := false },
     allocations := [5], routerBalanceBefore := 100,
     lidoDepositableEther := 100 }
 
@@ -237,7 +237,7 @@ private def wcType1Input : SourceTopupInput :=
   { callerIsTopUpGateway := true, keyIndicesLength := 1, operatorIdsLength := 1,
     topUpLimits := [10], pubkeyLengths := [48], moduleExists := true,
     moduleActive := true, wcTypeIsType2 := false, maxTopUpPerBlockGwei := 100,
-    moduleAllocationEth := 100, lidoCanDeposit := true,
+    moduleAllocationEth := 100, lidoState := { isStakingPaused := false, isBunkerActive := false },
     allocations := [5], routerBalanceBefore := 100,
     lidoDepositableEther := 100 }
 
@@ -706,7 +706,7 @@ private def misalignedInput : SourceTopupInput :=
   { callerIsTopUpGateway := true, keyIndicesLength := 1, operatorIdsLength := 1,
     topUpLimits := [2000000000], pubkeyLengths := [48], moduleExists := true,
     moduleActive := true, wcTypeIsType2 := true, maxTopUpPerBlockGwei := 3,
-    moduleAllocationEth := 3000000000, lidoCanDeposit := true,
+    moduleAllocationEth := 3000000000, lidoState := { isStakingPaused := false, isBunkerActive := false },
     allocations := [1000000001], routerBalanceBefore := 0,
     lidoDepositableEther := 3000000000 }
 
