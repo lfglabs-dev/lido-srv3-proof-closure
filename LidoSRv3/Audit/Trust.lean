@@ -149,6 +149,7 @@ import LidoSRv3.Audit.Source.Topup2MinClampSource
 import LidoSRv3.Audit.Source.ConsolidationMsgValueSource
 import LidoSRv3.Audit.Source.StETHGuardOrderSource
 import LidoSRv3.Audit.Source.ClaimGuardOrderSource
+import LidoSRv3.Audit.Source.ConsolidationFeeMsgValueComposition
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -1170,6 +1171,10 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.ClaimGuardOrderSource.claim_orders_agree_on_success
 #print axioms LidoSRv3.Audit.Source.ClaimGuardOrderSource.claim_orders_disagree_on_owner_only_failure
 #print axioms LidoSRv3.Audit.Source.ClaimGuardOrderSource.claim_orders_disagree_on_hint_only_failure
+-- Sixty-ninth-step (2026-09-13): Consolidation fee/msgValue/batchSize composition.
+#print axioms LidoSRv3.Audit.Source.ConsolidationFeeMsgValueComposition.vaultMsgValue_pos_of_gates_pass_and_fee_pos
+#print axioms LidoSRv3.Audit.Source.ConsolidationFeeMsgValueComposition.vaultMsgValue_zero_of_fee_zero
+#print axioms LidoSRv3.Audit.Source.ConsolidationFeeMsgValueComposition.batchSize_gate_fails_of_gt
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape
