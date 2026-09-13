@@ -409,3 +409,55 @@ Each candidate still has open live-derivation follow-ups:
 Each remaining follow-up is estimated at ~200-400 Lean lines
 (smaller than the initial estimates because the naming scaffolds
 and first-step source modules landed cleanly).
+
+## Update 2026-09-13 (later): second-through-fourth-step live-storage
+derivations landed
+
+Merged PRs (#453–#465) extend each first-step composition through
+per-candidate live-keyed-storage / bit-decode / mapping-decoder /
+schedule-model layers. Each step consumes named source-level source
+functions on named source states, one layer deeper each time:
+
+- **PR #453** — P-ADDRESS-1 per-writer Bridge glue: four `Writer`
+  constructors identify pinned Solidity callees per writer.
+- **PR #454** — Shared `AragonACLSource` model consumed by both
+  RESERVE-1 and TOPUP-1 downstream.
+- **PR #455** — P-TOPUP-1 callerIsGateway via shared Aragon ACL.
+- **PR #456** — P-RESERVE-1 authorizedRouter via shared Aragon ACL.
+- **PR #457** — Shared `KeccakMappingStorageSource` (abstract
+  MappingStorage + PackedSlotDecoder) consumed by all storage
+  decoders.
+- **PR #458** — P-RESERVE-1 isStakingPaused via packed
+  StakeLimitStruct decoder.
+- **PR #459** — P-TOPUP-1 moduleExists via SR mapping decoder.
+- **PR #460** — P-TOPUP-1 wcTypeIsType2 via packed decoder.
+- **PR #461** — P-RESERVE-1 isBunkerActive via bunker-slot read.
+- **PR #462** — Aragon ACL hasRole via ACL mapping decoder.
+- **PR #463** — P-ALLOC-1 per-module uint64 field bounds.
+- **PR #464** — P-ALLOC-1 SR monotonicity invariant for
+  active_subtraction.
+- **PR #465** — P-CONSOLIDATION-ETH-1 EIP-7251 fee schedule model.
+
+Each step converts a previously-input proposition into a source-level
+function on a named source state one step deeper. The remaining input
+propositions at the deepest layer (concrete keccak commitment,
+per-writer Bridge executable-plane connection, live EIP-7251
+schedule instantiation) stay under existing scope-boundary assumptions
+(A-KECCAK-COMMITMENT / A-VERITY-SCAFFOLD / A-EIP-7251-SCHEDULE) —
+these are the appropriate final resting layers per the mandate's
+scope-boundary rules.
+
+Every layer along the way is now honestly named as a source-level
+function; no anonymous free `Bool` or `Nat` remains directly in a
+registered parent's ENUNCE without a documented derivation chain
+back to a named source read.
+
+Trust envelope remains 36 throughout. Fidelity total continues to
+grow as each disclosure is added honestly.
+
+**Goal never terminates** — but each candidate's derivation chain
+is now maximally deep given the tree's current source-model coverage.
+Future work per Thomas's general rule: extend to differential
+harness integration for divergences #412/#414/#417/#419, and
+add executable-plane connections for Bridge callee, keccak
+derivation, and EIP-7251 schedule.
