@@ -314,7 +314,7 @@ PRs that discharge Grok #412 differential divergences in the registered
   `DepositNFrameTx.revert_restores_snapshot` and
   `.revert_observes_idle` lemmas.
 
-**Additional Piste B progress (2026-09-13, three Preconditions
+**Additional Piste B progress (2026-09-13, five Preconditions
 relaxations widening the registered parent's admissible input set):**
 
 - **`Preconditions.entryBalance = 0` retired** (PR #587): relaxed to
@@ -333,6 +333,19 @@ relaxations widening the registered parent's admissible input set):**
   inputs.lidoCallOk = true`. On empty-batch inputs `pullFromLido` is never
   invoked, so the receiver-selection premise is not needed. Failing-Lido
   empty-batch inputs now compose.
+- **`Preconditions.conserving` retired** (PR #595): unconditional
+  `inputs.maxEBType1 = inputs.depositSize` conserving-deployment premise
+  relaxed to conditional `shouldPull inputs = true → maxEBType1 = depositSize`.
+  On empty-batch inputs `executePullPushAssertTail` is not invoked, so
+  `maxEBType1` never enters the pull quantity. Skewed-deployment
+  (`maxEBType1 ≠ depositSize`) empty-batch inputs now compose.
+- **`Preconditions.entryBalanceNoWrap` further relaxed** (PR #597): the
+  non-wrap premise from #587 further relaxed to conditional
+  `shouldPull inputs = true → state.selfBalance.val + exactTotal <
+  Uint256.modulus`. On empty-batch inputs the executor never touches
+  `selfBalance` through the pull+push+assert tail. Arbitrary router
+  `selfBalance` (up to `Uint256.modulus - 1`) now admits an empty-batch
+  call.
 
 **Site fix:** if the DEPOSIT-1 card presents the executable model as
 mirroring the pinned executor call chain byte-for-byte, add the two
