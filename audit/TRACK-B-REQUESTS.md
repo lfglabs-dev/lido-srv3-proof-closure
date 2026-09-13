@@ -117,12 +117,43 @@ covers all six.
 
 ## 2026-09-13: Chantier 2 TOPUP-2 remaining (grok #417)
 
+**Session shipping notes (2026-09-13, this branch)**: two slices of task #10
+merged into main this session:
+- PR #654 (`aa114745…` initial `98b697a9…`): reparameterized
+  `verity_tx_simulates_topup2_spec` from hardcoded `≤ 32` to caller-supplied
+  `maxValidators : Nat`, sourced from pinned `uint64 $.maxValidatorsPerTopUp`
+  (`TopUpGateway.sol:42`, packed slot 0 of `TopupPackedStorage`). Discharges
+  Thomas's mandate line "count ≤ 32 devient maxValidatorsPerTopUp uint64 de
+  la config".
+- PR #660 (SHA `aa114745…`): **D-SLASH-1 discharge**. Added caller-supplied
+  `slashedOrExited : List Bool` gate at `evaluateTopUpLimit`, threaded
+  through `sourceLimits`, `sourceRun`, `sourceRunIndependent` (+ `_eq_`
+  bridge for all 8 length-mismatch cases), `Topup2DistributionTx.allocate`,
+  `verity_tx_simulates_pinned_source`, `PTopup2.verity_tx_simulates_topup2_spec`,
+  keccak-oracle mirror, and `TopupUnboundedCount` chain
+  (`allocateAnyCount`, `allocate_eq_any_of_le`,
+  `verity_tx_simulates_pinned_source_any_count`,
+  `parent_verity_is_unbounded_instance`,
+  `parent_verity_instance_matches_registered`). D-SLASH-1 moved from
+  `fidelity.missing` to `fidelity.covered`. 1991/1991 modules build clean.
+
+**Remaining D-* on the registered Verity parent**:
+
 - **D-CONSUME-1**: `Verity.sourceRun` still walks `sourceConsume`
   (leftover-budget); pinned `TopUpGateway.sol:226-232` writes
   `topUpLimits[i] = _evaluateTopUpLimit(...) * 1 gwei` independently per
   index. Requires rewriting `sourceRun` to produce independent limits,
   cascading into `verity_tx_simulates_topup2_spec`'s executable-plane
-  correspondence.
+  correspondence. **Scope estimate (post-PR #654/#660)**: 6-8 file touches
+  (`Topup2Correspondence.lean` `sourceConsume`/`sourceRun`,
+  `Topup2DistributionTx.lean` `sourceConsumeIndependent`/`sourceRunIndependent`
+  + `_eq_` bridge, `TopupUnboundedCount.lean` bridge lemmas,
+  `Topup2DistributionTxMutants.lean` + `TopupUnboundedCountMutants.lean` +
+  `TopupKeccakOracleMutants.lean` callsites). Structural: the current
+  `used`/`remaining` observables are computed from `sourceConsume` output;
+  retiring the walk requires reshaping `Result`/`View` to reflect per-key
+  independence and losing the leftover-cap accumulation (or splitting
+  gateway-plane observables from router-plane observables).
 
 - **D-UNITS-1**: `sourceRun` stays in gwei; pinned line 226 multiplies by
   `1 gwei` before the router call. Requires an explicit
@@ -132,27 +163,63 @@ covers all six.
   correctly BLOCKED by fresh-context review as an isolated source-model
   addition (no registered parent consumes it). The real fix must
   restructure the Verity `sourceRun` executable plane.
+  **Scope estimate**: 4-6 file touches, propagates through the budget
+  arithmetic (`budget := minWord valueGwei (minWord moduleLimit remainingCap)` —
+  the caller-supplied `valueGwei` and `moduleLimit` need to become wei so
+  the min is dimensionally consistent, or a unit conversion needs to be
+  documented at the boundary). The `sourceLimitsIndependent` /
+  `sourceCandidatesIndependent` / `sourceConsumeIndependent` copies would
+  each need parallel updates.
 
-- **D-SLASH-1**: `Verity.evaluateTopUpLimit` doesn't take `slash`/`exit`
-  as inputs; pinned `_evaluateTopUpLimit` (TopUpGateway.sol:403-405)
-  returns 0 for slashed or non-`FAR_FUTURE` exitEpoch. Requires input-shape
-  change on the Verity plane.
+- **D-SLASH-1**: ✅ **DISCHARGED (PR #660, 2026-09-13)**. Caller-supplied
+  `slashedOrExited : List Bool` premise now threaded through the registered
+  parent and downstream chain. Moved from `fidelity.missing` to
+  `fidelity.covered`.
 
 - **D-TOTAL-1**: `Verity.used` is the leftover-consumed total; pinned
   `totalLimits +=` sits in `unchecked` and gates `_setLastTopUpData`
   (TopUpGateway.sol:234-236). Requires modeling the unchecked accumulator
-  and its gate.
+  and its gate. **Scope estimate**: 5-7 file touches. Concretely: add
+  `totalLimits : Word` and `didSetLastTopUpData : Bool` to `Result` and
+  `View` in `Topup2DistributionTx.lean`; add a new storage slot
+  (`totalLimitsSlot := 33`, `didSetSlot := 34` or similar); persist inside
+  `allocate` and read inside `observe`; compute `totalLimits =
+  topUpLimits.foldl (·+·) 0` (unchecked `Uint256` addition); derive
+  `didSetLastTopUpData := decide (totalLimits > 0)`. Proof cascade through
+  the `verity_tx_simulates_pinned_source` `simp` set (`storageArray_writeSlot`,
+  `readSlot_writeSlot_same/_other`) and the keccak-oracle mirror. Mutant
+  test callsites (`Topup2DistributionTxMutants.lean`,
+  `TopupKeccakOracleMutants.lean`, `TopupUnboundedCountMutants.lean`) need
+  updated expected `View` values in every `runView` / `runAny` / `runFrozen`
+  witness (~10+ callsites).
 
 - **D-AUTH/SORT/WC/PUBKEY/MAX prefix**: `Verity.sourceRun` sees numeric
   arrays only; pinned `:160-223` prefix guards `onlyRole(TOP_UP_ROLE)`,
   strictly-increasing indices, type-0x02 WC, 48-byte pubkeys, and
   `maxValidatorsPerTopUp` are not exercised at the Verity plane. Requires
-  adding executable guards to the Verity `execute`.
+  adding executable guards to the Verity `execute`. **Scope estimate**:
+  each of the five sub-items is its own slice (Track A's approach is one
+  PR per guard; see PRs #650 `D-EMPTY-1`, #663 `D-AUTH-1`, #665 `D-WC-1`,
+  #668 `D-CALL-1 prefix-then-suffix` on the guarded plane, all merged from
+  Piste A on the TOPUP-1 parent). The Piste B TOPUP-2 mirror should
+  follow the same "add caller-supplied Bool guard, thread through parent
+  premise" pattern established by PR #660 for D-SLASH-1.
 
 The registered abstract parent `router_exact_sum_bounded_under_gateway_shape`
 already takes `GatewayShapedInput` (an explicit gateway-shape premise), so
 its scope is bounded; the Verity parent `verity_tx_simulates_topup2_spec`
-is where each of the above D-* items needs to land.
+is where each of the above D-* items needs to land. **Refactor pattern
+established by PR #654 (`maxValidators : Nat`) and #660
+(`slashedOrExited : List Bool`)**: add caller-supplied parameter,
+thread through 5-8 files, update mutant callsites, refresh guarantees.yaml
+summary + `EXPECTED_CANONICAL_DETAIL_SHA256["P-TOPUP-2"]`.
+
+**Pre-existing gate failures on main (out of Piste B scope, not
+introduced by any Piste B PR)**: `P-ALLOC-1: canonical assurance detail
+differs` and `P-TOPUP-1: canonical assurance detail differs` in
+`scripts/audit_metadata.py check`. Both are Track A / Piste A territory
+per Thomas's forbidden-files list (`PAlloc1*`, `PTopup1*`). Fresh sessions
+should not attempt to fix these from Piste B.
 
 ### Grok #407 (P-TOPUP-2 live wei conversion + allocateDeposits)
 
