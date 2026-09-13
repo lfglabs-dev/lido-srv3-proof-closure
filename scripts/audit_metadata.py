@@ -26,14 +26,14 @@ from source_spans import span_identity
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
 SOURCE_FIDELITY = AUDIT / "SOURCE-FIDELITY.md"
-R1_REVIEW_BASE = "b14bcb392103d90538440cfe125330231e5a15ff"
+R1_REVIEW_BASE = "b1ef06b061fc790dda65410d87a9fb6f0d431785"
 # Bind the report inputs to the recorded Git object and exact bytes.
 # Changed inputs must never inherit an earlier source review.
 # This exact family is every structured input used to render the R1 review
 # report.  A normal regeneration may never pair changed family content with a
 # stale certified basis.
 R1_REPORT_INPUT_SHA256 = {
-    "audit/guarantees.yaml": "df6658750908c1e2ab8c8799c5a1a089707e3bb2f3414dc4dfb6ff6a6c059711",
+    "audit/guarantees.yaml": "3570d8c27dc0b92f92ee0e82c4b1d8d12a14873dfb15767e7c5fcca18237bef5",
     "audit/source-map.yaml": "0711e13088159cc092c4a4cfdf2111eedefa39b744d02dbe1957db31da30cd2e",
     "audit/trust-native-decide-allowlist.txt": "4676e3021844b17f62e9fcb11069c5a09fcede77977b5af2242c455bfa7d38c6",
 }
@@ -92,8 +92,8 @@ EXPECTED_CANONICAL_CLAIMS = {
 EXPECTED_CANONICAL_DETAIL_SHA256 = {
     "P-ALLOC-1": "562c5f49495e62e6fe0a1a123d19330242a461b41f7314ccb8595fde45c6d95f",
     "P-ALLOC-2": "605ae32bda595b9d0847ceccd826c9a7d76e1a99e3d617b7d1dc140ee940855b",
-    "P-DEPOSIT-1": "6f8c1c10e295a4decfcce7030d15ae7126a0e167d71db52b3a0318ca8fd1637c",
-    "P-TOPUP-1": "2727a1445b0a31e05e92c2b467363f48e623024f62acbf6ce5c972bb5ab2187d",
+    "P-DEPOSIT-1": "2813dd2661c9086d94839875de9972c69e9ad611550ca02cbc08a050546a1f85",
+    "P-TOPUP-1": "47a0d7154045122b41b12627107c5f006532e17fe7c53fb5f56e75fa676e983f",
     "P-ACCOUNT-1": "a4fb7f20ffd6fd9910506d6a8b23804fafd0e3c568aa29bf97f3bf26b0d4ac56",
     "P-RESERVE-1": "d5669f1181c24afaa41cbb86e15efb1d9d636bf36b61705d620d18f701dfb368",
     "P-CONSOLIDATION-ETH-1": "5f7fb5b5361934c1fc4e0a573e6bd334dec03def240caf40469ea724718ad534",
