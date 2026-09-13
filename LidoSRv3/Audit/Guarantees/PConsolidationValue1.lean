@@ -199,6 +199,130 @@ theorem official_denote_succeeds_and_justified_forwards_msg_value :
       hCaller hGatewayAdmittedNonzero hExactValue hFunded,
     justified_interpreter_forwards_exactly_msg_value⟩
 
+/-- **Chantier 2 (Thomas 2026-09-13, item a) gateway-bridge parent —
+STATICCALL-derived variant of `official_denote_succeeds_and_justified_forwards_msg_value`.**
+Follows the same registered-parent statement-change pattern as PR #699
+(P-CONSOLIDATION-1) applied to the P-CONSOLIDATION-VALUE-1 compound
+theorem: the caller-supplied `hGatewayAdmittedNonzero` premise on each
+of the two conjuncts is REPLACED by pinned-source structured premises
+naming the EIP-7251 CONSOLIDATION_REQUEST STATICCALL return
+(`WithdrawalVaultEIP7685.sol:79-93`).
+
+First conjunct (official denotation): a caller-supplied
+`hFeeFromStaticcall : fee = result.abiDecodedFee` premise ties the free
+`fee : Nat` to the STATICCALL return; combined with `hFeeNonzero` and
+`hExactValue : tx.msgValue = 1 * fee`, the vault-side `tx.sender =
+gateway → tx.msgValue ≠ 0` is DERIVED (`Nat.mul_ne_zero` /
+`Nat.one_mul`), and the original theorem's 8 conclusions follow.
+
+Second conjunct (justified interpreter): a caller-supplied
+`hMsgValueSource` bridge premise ties `inputs.msgValue.val` to
+`gatewayVaultBoundary result inputs.sources.length .msgValue`
+(matching `ConsolidationGateway.sol:212-220` `totalFee` forwarding).
+Combined with `hCountPos` and `hFeeNonzero`, the vault-side
+`inputs.caller = inputs.gateway → inputs.msgValue.val ≠ 0` is DERIVED
+via `gatewayTotalFee_ne_zero_of_fee_ne_zero`.
+
+Under this pinned-source premise shape, `A-CONSOLIDATION-GATEWAY-NONZERO`
+is retired from P-CONSOLIDATION-VALUE-1's assumption list. The
+original `official_denote_succeeds_and_justified_forwards_msg_value`
+is kept in-file (above) as unregistered evidence for downstream
+callers not on the gateway path. Residual: `hFeeNonzero` remains
+caller-supplied on the pinned STATICCALL structure; full derivation
+requires the multi-session live-STATICCALL executable model on the
+pinned EIP-7251 predeploy. -/
+theorem official_denote_succeeds_and_justified_forwards_msg_value_from_gateway
+    (result : _root_.LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.PredeployStaticcallResult)
+    (hFeeNonzero : result.abiDecodedFee ≠ 0) :
+    (∀ (oracle : DenoteOracle)
+        (adversary : Compiler.CompilationModel.DenoteExternalCalls.AdversaryModel)
+        (target fee gateway : Nat)
+        (tx : DenoteTransaction) (world : ContractState)
+        (sourceKey targetKey : Nat),
+      AcceptingPredeploy adversary →
+      tx.args = [sourceKey, targetKey] →
+      sourceKey < Verity.Core.Uint256.modulus →
+      targetKey < Verity.Core.Uint256.modulus →
+      sourceKey ≠ 0 →
+      targetKey ≠ 0 →
+      tx.sender = gateway →
+      fee = result.abiDecodedFee →
+      tx.msgValue = 1 * fee →
+      world.selfBalance.val + fee < Verity.Core.Uint256.modulus →
+      ((officialDenote (officialEnv oracle adversary target fee) tx
+          world).success = true ∧
+        fee ≠ 0 ∧
+        ((freshCalls (Compiler.CompilationModel.DenoteFunctionCalls.withPayableCallContext world tx)
+            (officialExec (officialEnv oracle adversary target fee) tx
+              world).world).map (fun call => call.value)) = [fee] ∧
+        forwardedValue
+            (Compiler.CompilationModel.DenoteFunctionCalls.withPayableCallContext world tx)
+            (officialExec (officialEnv oracle adversary target fee) tx
+              world).world = tx.msgValue ∧
+        preservesEthBalance
+          (Compiler.CompilationModel.DenoteFunctionCalls.withPayableCallContext world tx)
+          (officialExec (officialEnv oracle adversary target fee) tx
+            world).world ∧
+        (officialExec (officialEnv oracle adversary target fee) tx
+              world).world.selfBalance.val + tx.msgValue
+          = (Compiler.CompilationModel.DenoteFunctionCalls.withPayableCallContext
+              world tx).selfBalance.val ∧
+        (officialExec (officialEnv oracle adversary target fee) tx
+            world).world.selfBalance = world.selfBalance ∧
+        onlyRequestFrames target
+          (Compiler.CompilationModel.DenoteFunctionCalls.withPayableCallContext world tx)
+          (officialExec (officialEnv oracle adversary target fee) tx
+            world).world)) ∧
+    (∀ (inputs : Inputs) (before after : ContractState),
+      0 < inputs.sources.length →
+      inputs.msgValue.val =
+        (_root_.LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayVaultBoundary
+          result inputs.sources.length).msgValue →
+      before.msgValue = inputs.msgValue →
+      inputs.msgValue ≤ before.selfBalance →
+      (execute inputs).run before = .success () after →
+      ∃ (obs : Observables) (requests : List Request),
+        sourceRun inputs = .committed obs ∧
+        zipRequests inputs.sources inputs.targets
+          inputs.sourceLens inputs.targetLens = some requests ∧
+        inputs.caller = inputs.gateway ∧
+        inputs.sources.length ≠ 0 ∧
+        requests.all validRequest = true ∧
+        requests.length * inputs.fee.val ≤ Verity.Core.MAX_UINT256 ∧
+        inputs.msgValue.val = requests.length * inputs.fee.val ∧
+        inputs.fee.val ≠ 0 ∧
+        obs = commitObservables inputs.requestTarget inputs.fee
+          inputs.msgValue requests ∧
+        freshCalls before after = obs.calls.map requestEntry ∧
+        forwardedValue before after = inputs.msgValue.val ∧
+        vaultEthDelta inputs before after ∧
+        preservesEthBalance before after ∧
+        noConsensusLayerVerify before after) := by
+  refine ⟨?_, ?_⟩
+  · intro oracle adversary target fee gateway tx world sourceKey targetKey
+      hAccepting hArgs hSourceAligned hTargetAligned hSourceKey hTargetKey
+      hCaller hFeeFromStaticcall hExactValue hFunded
+    have hGatewayAdmittedNonzero : tx.sender = gateway → tx.msgValue ≠ 0 := by
+      intro _
+      rw [hExactValue, hFeeFromStaticcall, Nat.one_mul]
+      exact hFeeNonzero
+    exact official_denote_succeeds_on_value_bearing_request_calls
+      oracle adversary target fee gateway tx world sourceKey targetKey
+      hAccepting hArgs hSourceAligned hTargetAligned hSourceKey hTargetKey
+      hCaller hGatewayAdmittedNonzero hExactValue hFunded
+  · intro inputs before after hCountPos hMsgValueSource hStateMsgValue
+      hFunds hExecute
+    have hGatewayAdmittedNonzero :
+        inputs.caller = inputs.gateway → inputs.msgValue.val ≠ 0 := by
+      intro _
+      rw [hMsgValueSource]
+      unfold _root_.LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayVaultBoundary
+      simp only
+      exact _root_.LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayTotalFee_ne_zero_of_fee_ne_zero
+        result inputs.sources.length hCountPos hFeeNonzero
+    exact justified_interpreter_forwards_exactly_msg_value inputs before after
+      hGatewayAdmittedNonzero hStateMsgValue hFunds hExecute
+
 /-- Direct named projection of the Solidity modifier postcondition. -/
 theorem preservesEthBalance_of_success
     (inputs : Inputs) (before after : ContractState)
