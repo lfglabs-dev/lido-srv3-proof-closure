@@ -756,6 +756,12 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- side of the slot-independence claim (complement to
 -- observeFromJournal_success_slot_invariant on the read side).
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.observeFromJournal_writePayloads_invariant
+-- persist vs persistSlotFree observation equality: the slot-free variant
+-- produces the same calls/events as persist (fabricated slot writes are
+-- dead to observation). Prep for the eventual physical retirement of
+-- writePayloads from persist.
+#print axioms LidoSRv3.Audit.Verity.ConsolidationTx.persist_calls_eq_persistSlotFree_calls
+#print axioms LidoSRv3.Audit.Verity.ConsolidationTx.persist_events_eq_persistSlotFree_events
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.function_spec_bridge_constructors
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.committed_journal_forwards_msg_value
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.committed_preserves_eth_balance
