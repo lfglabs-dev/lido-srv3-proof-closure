@@ -92,4 +92,69 @@ theorem abiDecodedFee_matches_schedule
     consolidationFeeFromStaticcall result = eip7251FeeSchedule ctx := by
   rw [consolidationFeeFromStaticcall_eq, hMatch]
 
+/-! ## Chantier 2 ABI-bridge composition (Thomas 2026-09-13)
+
+The `ConsolidationGateway.addConsolidationRequests` entrypoint
+(`0.8.25/consolidation/ConsolidationGateway.sol:185-223`) reads
+`fee` via the untranscribed `withdrawalVault.getConsolidationRequestFee()`
+STATICCALL at line 211, computes `totalFee = requestsCount * fee`
+at line 212, and forwards it as
+`withdrawalVault.addConsolidationRequests{value: totalFee}(...)`
+at line 220. The composition below names that arithmetic on top of
+`consolidationFeeFromStaticcall`, and derives the Thomas 2026-09-13
+`fee ≠ 0 → totalFee ≠ 0` fact the `A-CONSOLIDATION-GATEWAY-NONZERO`
+assumption body now explicitly cites. -/
+
+/-- Gateway-side `totalFee = requestsCount * fee` computation
+(`ConsolidationGateway.sol:212`), with `fee` sourced from the
+STATICCALL result. -/
+def gatewayTotalFee (result : PredeployStaticcallResult)
+    (requestsCount : Nat) : Nat :=
+  requestsCount * consolidationFeeFromStaticcall result
+
+/-- Definitionally the gateway multiplication expression: `totalFee =
+requestsCount * fee` where `fee` is the STATICCALL return. -/
+theorem gatewayTotalFee_eq
+    (result : PredeployStaticcallResult) (requestsCount : Nat) :
+    gatewayTotalFee result requestsCount =
+      requestsCount * result.abiDecodedFee :=
+  rfl
+
+/-- **Chantier 2 (Thomas 2026-09-13) derivation `fee ≠ 0 → totalFee ≠ 0`.**
+For any positive `requestsCount`, a nonzero STATICCALL-read fee
+yields a nonzero forwarded `totalFee`. Pure arithmetic on the
+gateway's line 212 expression; this is the derivation the
+`A-CONSOLIDATION-GATEWAY-NONZERO` assumption body now points to as
+the preferred bridge from "nonzero fee on the STATICCALL return"
+to "nonzero forwarded value at the vault frame entry". -/
+theorem gatewayTotalFee_ne_zero_of_fee_ne_zero
+    (result : PredeployStaticcallResult)
+    (requestsCount : Nat)
+    (hRequestsPos : 0 < requestsCount)
+    (hFeeNe : result.abiDecodedFee ≠ 0) :
+    gatewayTotalFee result requestsCount ≠ 0 := by
+  rw [gatewayTotalFee_eq]
+  exact Nat.mul_ne_zero (Nat.pos_iff_ne_zero.mp hRequestsPos) hFeeNe
+
+/-- **Chantier 2 (Thomas 2026-09-13) `fee = 0` on-chain path.** The
+premise is violable on-chain when the EIP-7251 predeploy returns
+`fee = 0`: even a batch with a positive `requestsCount` forwards a
+zero `totalFee`, `msg.value = 0` passes `_requireExactFee(0)`, and
+the vault commits a zero-value batch. Documented as an explicit
+witness for the assumption body — the derivation above is the
+positive-fee side; this witness is the negative side. -/
+theorem gatewayTotalFee_zero_at_fee_zero
+    (result : PredeployStaticcallResult)
+    (requestsCount : Nat)
+    (hFeeZero : result.abiDecodedFee = 0) :
+    gatewayTotalFee result requestsCount = 0 := by
+  rw [gatewayTotalFee_eq, hFeeZero, Nat.mul_zero]
+
+/-- Non-vacuity witness: `gatewayTotalFee` produces a nonzero value
+for a positive fee and a nonempty batch, showing the derivation
+above is not vacuously true. -/
+theorem gatewayTotalFee_ne_zero_witness :
+    gatewayTotalFee ⟨7⟩ 3 ≠ 0 :=
+  gatewayTotalFee_ne_zero_of_fee_ne_zero ⟨7⟩ 3 (by decide) (by decide)
+
 end LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
