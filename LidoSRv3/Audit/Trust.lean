@@ -583,6 +583,14 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1.source_report_before_reward
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1.verity_tx_simulates_oracle_report
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1.verity_tx_revert_restores_snapshot
+-- Chantier 3 (Thomas 2026-09-13): the registered abstract parent for
+-- P-ACCOUNT-1 is now `router_accounting_order_discipline`, the conjunction
+-- of write-router-before-read (AccountingOracle.sol:513-517 →
+-- Accounting.sol:277) and mint-after-read. The previous
+-- `mint_after_read_discipline` is retained as an unregistered sub-theorem.
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1.router_accounting_order_discipline
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1.write_router_before_read_discipline
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1.write_router_before_read_kill_line
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1.mint_after_read_discipline
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1.mint_order_kill_line
 -- Committed-mint event consumers: when the fee mint commits with

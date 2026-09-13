@@ -84,27 +84,87 @@ modeled `handleOracleReport`, the `rewardsRead` step is written strictly before
 any nonzero `rewardsMinted` step, read directly from the transaction step
 clock: whenever `0 < tick(mint)`, then `tick(read) < tick(mint)`.
 
-Registered P-ACCOUNT-1 parent. Independent tx-storage-flag order
-discipline: on every committed execution of the real `handleOracleReport`,
-the `rewardsReadSlot` tick is written strictly before any nonzero
-`rewardsMintedSlot` tick. This reads the two raw ticks directly and does not
-go through `storedSteps`; exact expected ticks make the same reordering visible
-at the `View` boundary, but this theorem states the order predicate directly
-rather than obtaining it through source-view equality. `Result.steps` (and the
-`View.steps` it feeds) is built from these same tx storage flags and never
-calls `AccountingCorrespondence.successfulSteps`; the two planes share no
-step-list bridge. Unlike the demoted `source_report_before_reward` child,
-this parent is directly refuted by the `mint_order_kill_line` mutant below,
-so the registered claim has an adversarial witness rather than being true by
-construction. The ticks are not call-site constants: every step write goes
-through `stampStep`, which reads the transaction-local step clock in
-`sequenceSlot` and stores `clock + 1`, so the number a slot ends up holding is
-the position at which that write actually ran. Moving a `stampStep` call
-therefore changes the tick it records, which is what makes this an ordering
-claim rather than a fact about which numeral a line of program text
-contains. -/
+Read-before-mint discipline. Kept as an unregistered sub-theorem after
+chantier 3 (Thomas 2026-09-13) upgraded the registered parent to also cover
+write-before-read: the deployed risk is the router-write before the
+`getStakingRewardsDistribution` read (`AccountingOracle.sol:513-517` →
+`Accounting.sol:277`), not read→mint alone. The combined registered parent
+`router_accounting_order_discipline` below conjoins both orderings on the
+same transaction. -/
 theorem mint_after_read_discipline : mintAfterReadDiscipline :=
   mintAfterReadDiscipline_holds
+
+/-- "The balances write is stamped strictly before any nonzero read step",
+over the two raw ticks: `0 < readTick → balancesTick < readTick`. -/
+abbrev writeRouterBeforeRead :=
+  LidoSRv3.Audit.Verity.HandleOracleReportTx.writeRouterBeforeRead
+
+/-- "On every committed execution of `tx`, the `balancesWrittenSlot` tick is
+`writeRouterBeforeRead` the `rewardsReadSlot` tick". -/
+abbrev writeRouterBeforeReadDisciplineOf :=
+  LidoSRv3.Audit.Verity.HandleOracleReportTx.writeRouterBeforeReadDisciplineOf
+
+/-- Write-router-before-read discipline applied to the real transaction. -/
+abbrev writeRouterBeforeReadDiscipline :=
+  LidoSRv3.Audit.Verity.HandleOracleReportTx.writeRouterBeforeReadDiscipline
+
+/-- "The combined ordering discipline on the deployed AccountingOracle →
+StakingRouter → Accounting → StakingRouter path": both write-before-read
+and read-before-mint on the same transaction. -/
+abbrev routerAccountingOrderDisciplineOf :=
+  LidoSRv3.Audit.Verity.HandleOracleReportTx.routerAccountingOrderDisciplineOf
+
+/-- Combined ordering discipline applied to the real transaction. -/
+abbrev routerAccountingOrderDiscipline :=
+  LidoSRv3.Audit.Verity.HandleOracleReportTx.routerAccountingOrderDiscipline
+
+/-- **P-ACCOUNT-1, abstract plane (chantier 3, Thomas 2026-09-13).**
+
+On every committed execution of the modeled `handleOracleReport`, both
+orderings on the deployed AccountingOracle → StakingRouter → Accounting →
+StakingRouter path hold, read directly from the transaction step clock:
+
+1. **write-router-before-read** — the `AccountingOracle.submitReportData`
+   validator-balances push through
+   `StakingRouter.reportValidatorBalancesByStakingModule`
+   (`AccountingOracle.sol:513-517`) is stamped strictly before
+   `Accounting.handleOracleReport`'s
+   `_stakingRouter.getStakingRewardsDistribution()` read
+   (`Accounting.sol:277`), so fee shares are always derived from the
+   just-written module weights, never from stale balances;
+2. **read-before-mint** — the `rewardsRead` step precedes any nonzero
+   `rewardsMinted` step, so a positive fee is minted only after the read of
+   fresh balances (the previously-registered `mint_after_read_discipline`
+   above, kept as unregistered sub-theorem).
+
+The ticks are `stampStep`'s reads of the transaction-local `sequenceSlot`
+clock (reset at the top of the commit branch), not per-call-site constants,
+so this is an ordering claim about execution and not about which numeral
+appears on which line. Moving either the `stampStep balancesWrittenSlot`
+call below `stampStep rewardsReadSlot`, or `stampStep rewardsReadSlot` below
+`stampStep rewardsMintedSlot`, without touching any literal, changes the
+tick the moved write records and refutes the corresponding conjunct — see
+`write_router_before_read_kill_line` and `mint_order_kill_line` below. -/
+theorem router_accounting_order_discipline : routerAccountingOrderDiscipline :=
+  LidoSRv3.Audit.Verity.HandleOracleReportTx.routerAccountingOrderDiscipline_holds
+
+/-- Sub-theorem: the write-router-before-read conjunct of the registered
+parent, extracted from the conjunction so it is available on its own. -/
+theorem write_router_before_read_discipline : writeRouterBeforeReadDiscipline :=
+  LidoSRv3.Audit.Verity.HandleOracleReportTx.writeRouterBeforeReadDiscipline_holds
+
+/-- Kill-line for the write-router-before-read conjunct.
+`handleOracleReportReadBeforeWrite` is a pure call-site reordering of the
+real transaction: the `stampStep balancesWrittenSlot` call moves *below*
+`stampStep rewardsReadSlot`, and nothing else changes — every slot binding
+is identical and no literal is edited. Because `stampStep` sources its tick
+from the clock rather than from the call site, the balances-write step now
+records a strictly greater tick than the read step, violating
+`writeRouterBeforeReadDisciplineOf` for that mutant — the same predicate
+`write_router_before_read_discipline` proves for the real transaction. -/
+theorem write_router_before_read_kill_line :
+    LidoSRv3.Audit.Verity.HandleOracleReportTx.writeRouterBeforeReadKillLine :=
+  LidoSRv3.Audit.Verity.HandleOracleReportTx.writeRouterBeforeReadKillLine_holds
 
 /-- The registered ACCOUNT consumer for the physical report/write/getter/mint
 path.  Its mint event is produced by the same `StETHMintShares.State` that

@@ -586,4 +586,138 @@ theorem mintOrderKillLine_holds : mintOrderKillLine := by
     balancesWrittenSlot, sequenceSlot] at h
   exact absurd (h (by decide)) (by decide)
 
+/-! ## Write-router-before-read discipline (chantier 3, Thomas 2026-09-13)
+
+The registered `mint_after_read_discipline` above captures step 3 → step 4
+(`rewardsRead` before `rewardsMinted`). Thomas's 2026-09-13 mandate registers
+the ordering that is actually the real risk on the deployed path:
+`AccountingOracle.submitReportData` writes fresh per-module validator balances
+through `StakingRouter.reportValidatorBalancesByStakingModule`
+(`AccountingOracle.sol:513-517`) *before* `Accounting.handleOracleReport`
+reads them via `_stakingRouter.getStakingRewardsDistribution()`
+(`Accounting.sol:277`). Recording the getter read before the router write
+would derive fee shares from stale module weights.
+
+`writeRouterBeforeRead balancesTick rewardsReadTick := 0 < rewardsReadTick →
+balancesTick < rewardsReadTick` is stated over the same two raw ticks; the
+committed transaction's balance-write step (`balancesWrittenSlot`, tick `1`)
+must precede the read step (`rewardsReadSlot`, tick `3`), leaving tick `2`
+free for the `accountingCalled` handshake. -/
+
+/-- Order predicate over the balance-write and read ticks: any run that
+stamps a nonzero read must have stamped the balances write strictly before
+it. -/
+def writeRouterBeforeRead (balancesTick rewardsReadTick : Word) : Prop :=
+  0 < rewardsReadTick.val → balancesTick.val < rewardsReadTick.val
+
+/-- Write-router-before-read discipline, stated over an arbitrary transaction
+of the same shape as `handleOracleReport`. -/
+def writeRouterBeforeReadDisciplineOf (tx : ReportInput → Nat → Contract Result) : Prop :=
+  ∀ (i : ReportInput) (sharesToMintAsFees : Nat) (state : ContractState),
+    match (tx i sharesToMintAsFees).run state with
+    | .success _ dirty =>
+        writeRouterBeforeRead
+          (dirty.readSlot balancesWrittenSlot) (dirty.readSlot rewardsReadSlot)
+    | .revert _ _ => True
+
+/-- Named write-router-before-read discipline for the registered P-ACCOUNT-1
+parent. -/
+def writeRouterBeforeReadDiscipline : Prop :=
+  writeRouterBeforeReadDisciplineOf
+    (fun i sharesToMintAsFees => handleOracleReport i sharesToMintAsFees)
+
+/-- The real transaction satisfies write-router-before-read discipline: the
+balances write is stamped at tick `1`, the read step at tick `3`, for every
+input, fee, and starting state. Both ticks come from `stampStep`'s read of
+the reset clock, so this is the order the two writes executed in on the
+deployed `AccountingOracle.sol:513-517` → `Accounting.sol:277` path. -/
+theorem writeRouterBeforeReadDiscipline_holds : writeRouterBeforeReadDiscipline := by
+  intro i sharesToMintAsFees state
+  unfold handleOracleReport Contract.run writeRouterBeforeRead
+  by_cases hValid : idsAndBalancesValid i = true
+  · simp only [hValid, Bool.false_eq_true, ↓reduceIte]
+    cases checkedTotal256 i.balancesGwei with
+    | none => simp
+    | some total =>
+        by_cases hFees : 0 < sharesToMintAsFees <;>
+          simp [hFees, stampStep, nextTick,
+            ContractState.readSlot_writeSlot_same,
+            ContractState.readSlot_writeSlot_other, balancesWrittenSlot, totalBalanceSlot,
+            accountingCalledSlot, rewardsReadSlot, rewardsMintedSlot,
+            sequenceSlot] <;>
+          decide
+  · simp [hValid]
+
+/-! ## Combined ordering discipline (chantier 3, Thomas 2026-09-13)
+
+Both raw-tick orderings on the deployed AccountingOracle → StakingRouter →
+Accounting → StakingRouter path together. The registered abstract parent is
+the conjunction: on every committed run of the real `handleOracleReport`,
+the balances write precedes any nonzero read, AND the read precedes any
+nonzero mint. -/
+
+/-- Combined disciplines: write-router-before-read AND mint-after-read on
+the same transaction. -/
+def routerAccountingOrderDisciplineOf (tx : ReportInput → Nat → Contract Result) : Prop :=
+  writeRouterBeforeReadDisciplineOf tx ∧ mintAfterReadDisciplineOf tx
+
+/-- Named ordering discipline for the registered P-ACCOUNT-1 parent. -/
+def routerAccountingOrderDiscipline : Prop :=
+  routerAccountingOrderDisciplineOf
+    (fun i sharesToMintAsFees => handleOracleReport i sharesToMintAsFees)
+
+/-- The real transaction satisfies the combined write-router-before-read and
+mint-after-read discipline for every input, fee, and starting state. -/
+theorem routerAccountingOrderDiscipline_holds : routerAccountingOrderDiscipline :=
+  ⟨writeRouterBeforeReadDiscipline_holds, mintAfterReadDiscipline_holds⟩
+
+/-! ## Write-before-read kill-line
+
+A mutant that moves `stampStep balancesWrittenSlot` *below*
+`stampStep rewardsReadSlot` violates `writeRouterBeforeReadDiscipline`: the
+read step now records a tick strictly less than the balances-write tick.
+Same shape as `handleOracleReportMintBeforeRead`, but reordering the
+write-vs-read pair rather than the read-vs-mint pair. -/
+
+/-- Mutant that reorders the balances-write step *after* the read step; the
+mint step still comes last so `mintAfterRead` still holds, but the read now
+records a tick strictly less than the balances write. -/
+def handleOracleReportReadBeforeWrite (i : ReportInput)
+    (sharesToMintAsFees : Nat) : Contract Result := fun snapshot =>
+  if idsAndBalancesValid i then
+    match checkedTotal256 i.balancesGwei with
+    | none =>
+        .revert "OVERFLOW" (writeAll i.reportedModuleIds i.balancesGwei snapshot)
+    | some total =>
+        let dirty := writeAll i.reportedModuleIds i.balancesGwei snapshot
+        let dirty := dirty.writeSlot totalBalanceSlot total
+        let dirty := dirty.writeSlot sequenceSlot 0
+        let dirty := stampStep accountingCalledSlot dirty
+        let dirty := stampStep rewardsReadSlot dirty
+        let dirty := stampStep balancesWrittenSlot dirty
+        let dirty :=
+          if 0 < sharesToMintAsFees then stampStep rewardsMintedSlot dirty
+          else dirty.writeSlot rewardsMintedSlot 0
+        .success ⟨i.balancesGwei, total, storedSteps dirty i.balancesGwei⟩ dirty
+  else .revert "INVALID_REPORT" snapshot
+
+/-- Named kill-line statement for the write-router-before-read parent:
+running the balances-write step after the read step must falsify
+`writeRouterBeforeReadDiscipline`. -/
+def writeRouterBeforeReadKillLine : Prop :=
+  ¬ writeRouterBeforeReadDisciplineOf handleOracleReportReadBeforeWrite
+
+theorem writeRouterBeforeReadKillLine_holds : writeRouterBeforeReadKillLine := by
+  intro hDisc
+  let witness : ReportInput := ⟨[1], [1], [1]⟩
+  have hValid : idsAndBalancesValid witness = true := by decide
+  have hTotal : checkedTotal256 witness.balancesGwei = some 1 := by decide
+  have h := hDisc witness 1 defaultState
+  simp [handleOracleReportReadBeforeWrite, Contract.run, witness, hValid, hTotal,
+    writeRouterBeforeRead, writeAll, persistBalances, stampStep, nextTick,
+    ContractState.readSlot_writeSlot_same, ContractState.readSlot_writeSlot_other,
+    totalBalanceSlot, accountingCalledSlot, rewardsReadSlot, rewardsMintedSlot,
+    balancesWrittenSlot, sequenceSlot] at h
+  exact absurd (h (by decide)) (by decide)
+
 end LidoSRv3.Audit.Verity.HandleOracleReportTx
