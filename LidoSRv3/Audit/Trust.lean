@@ -926,26 +926,13 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- Sixth-step (2026-09-13): P-ADDRESS-1 per-writer ABI selectors + target contracts.
 #print axioms LidoSRv3.Audit.Source.BridgePerWriterGlue.targetFor_dispatch
 -- Shared ERC-20 storage source model (2026-09-13): STETH / WstETH balances/allowances.
-#print axioms LidoSRv3.Audit.Source.ERC20StorageSource.balanceOf_eq
-#print axioms LidoSRv3.Audit.Source.ERC20StorageSource.allowanceOf_eq
 -- Fifth-step (2026-09-13): P-ADDRESS-1 stETH balance/allowance guards via ERC-20.
-#print axioms LidoSRv3.Audit.Source.AddressStETHGuardsSource.callerBalanceSufficient_true_of_bound
-#print axioms LidoSRv3.Audit.Source.AddressStETHGuardsSource.callerAllowanceSufficient_true_of_bound
 -- Fifth-step (2026-09-13): P-CONSOLIDATION-ETH-1 ADD_CONSOLIDATION_REQUESTS_ROLE via ACL.
-#print axioms LidoSRv3.Audit.Source.ConsolidationRoleGuardSource.role_granted_of_acl
 -- Sixth-step (2026-09-13): P-CONSOLIDATION-ETH-1 whenResumed pause guard derivation.
-#print axioms LidoSRv3.Audit.Source.ConsolidationPauseGuardSource.not_paused_of_slot_zero
-#print axioms LidoSRv3.Audit.Source.ConsolidationPauseGuardSource.whenResumed_passes_of_not_paused
 -- Seventh-step (2026-09-13): P-CONSOLIDATION-ETH-1 per-window quota guard derivation.
-#print axioms LidoSRv3.Audit.Source.ConsolidationQuotaGuardSource.quotaCheck_passes_of_bound
 -- Eighth-step (2026-09-13): P-CONSOLIDATION-ETH-1 CL-side EIP-7251 proof derivation.
-#print axioms LidoSRv3.Audit.Source.ConsolidationClProofSource.clProof_valid_of_registry
 -- Ninth-step (2026-09-13): live-STATICCALL executable model for consolidation fee.
-#print axioms LidoSRv3.Audit.Source.ConsolidationFeeLiveStaticcallSource.executeStaticcall_abiDecodedFee_eq
-#print axioms LidoSRv3.Audit.Source.ConsolidationFeeLiveStaticcallSource.consolidationFee_from_live_env
 -- Tenth-step (2026-09-13): per-writer Bridge executable-plane connection.
-#print axioms LidoSRv3.Audit.Source.BridgePerWriterExecutablePlane.executeBridgeCall_succeeded_of_call
-#print axioms LidoSRv3.Audit.Source.BridgePerWriterExecutablePlane.executeBridgeCall_succeeded_of_transferFrom
 -- Eleventh-step (2026-09-13): shared A-KECCAK-COMMITMENT concrete oracle.
 #print axioms LidoSRv3.Audit.Source.KeccakConcreteCommitmentSource.concreteRoleKey_deterministic
 #print axioms LidoSRv3.Audit.Source.KeccakConcreteCommitmentSource.concreteMappingSlot_deterministic
@@ -953,46 +940,30 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- Twelfth-step (2026-09-13): ACL role-key via KeccakOracle real derivation.
 #print axioms LidoSRv3.Audit.Source.AragonACLRoleKeyViaOracleSource.realRoleKey_deterministic
 -- Thirteenth-step (2026-09-13): Bridge ABI selector via KeccakOracle real derivation.
-#print axioms LidoSRv3.Audit.Source.BridgeSelectorViaOracleSource.realSelectorFor_deterministic
 -- Fourteenth-step (2026-09-13): Solidity mapping-slot derivation via KeccakOracle.
 #print axioms LidoSRv3.Audit.Source.MappingSlotViaOracleSource.realMappingStorage_slotAt_eq
 #print axioms LidoSRv3.Audit.Source.MappingSlotViaOracleSource.realSlotDerivation_deterministic
 -- Fifteenth-step (2026-09-13): Solidity nested-mapping-slot via KeccakOracle.
 #print axioms LidoSRv3.Audit.Source.NestedMappingSlotViaOracleSource.realNestedSlotDerivation_deterministic
 -- Sixteenth-step (2026-09-13): ERC-20 allowance key via KeccakOracle.
-#print axioms LidoSRv3.Audit.Source.ERC20AllowanceKeyViaOracleSource.realAllowanceSlot_eq
-#print axioms LidoSRv3.Audit.Source.ERC20AllowanceKeyViaOracleSource.realAllowanceSlot_deterministic
 -- Seventeenth-step (2026-09-13): ACL permission (role, actor) nested-key via KeccakOracle.
 #print axioms LidoSRv3.Audit.Source.ACLPermissionKeyViaOracleSource.realPermissionSlot_deterministic
 -- Eighteenth-step (2026-09-13): pause-guard MappingStorage via KeccakOracle.
-#print axioms LidoSRv3.Audit.Source.ConsolidationPauseSlotViaOracleSource.whenResumedGuardFromOracle_passes_of_slot_zero
 -- Nineteenth-step (2026-09-13): quota-guard MappingStorage via KeccakOracle.
-#print axioms LidoSRv3.Audit.Source.ConsolidationQuotaSlotViaOracleSource.quotaCheckFromOracle_passes_of_bound
 -- Twentieth-step (2026-09-13): ACL role-mapping MappingStorage via KeccakOracle.
 #print axioms LidoSRv3.Audit.Source.ACLRoleMappingViaOracleSource.hasRoleFromOracle_true_of_nonzero
 -- Twenty-first-step (2026-09-13): ERC-20 state MappingStorage via KeccakOracle.
-#print axioms LidoSRv3.Audit.Source.ERC20StateViaOracleSource.realERC20State_balanceOf_eq
-#print axioms LidoSRv3.Audit.Source.ERC20StateViaOracleSource.realERC20State_allowanceOf_eq
 -- Twenty-second-step (2026-09-13): WithdrawalQueue storage MappingStorages via KeccakOracle.
 #print axioms LidoSRv3.Audit.Source.WQStorageViaOracleSource.realWQStorage_readRequest_eq
 #print axioms LidoSRv3.Audit.Source.WQStorageViaOracleSource.realWQStorage_readCheckpoint_eq
 -- Twenty-third-step (2026-09-13): SR module-registry MappingStorage via KeccakOracle.
 #print axioms LidoSRv3.Audit.Source.SRModuleMappingViaOracleSource.moduleExistsFromOracle_true_of_nonzero
 -- Twenty-fourth-step (2026-09-13): D-EMPTY-PULL early-return source model.
-#print axioms LidoSRv3.Audit.Source.DepositEmptyBatchEarlyReturnSource.shouldPull_true_of_nonzero
-#print axioms LidoSRv3.Audit.Source.DepositEmptyBatchEarlyReturnSource.shouldPull_false_of_zero
 -- Twenty-fifth-step (2026-09-13): D-CALL-1 per-key deposit-frame source model.
-#print axioms LidoSRv3.Audit.Source.DepositPerKeyCallSource.perKeyDepositFrames_length
-#print axioms LidoSRv3.Audit.Source.DepositPerKeyCallSource.perKeyDepositFrames_value
-#print axioms LidoSRv3.Audit.Source.DepositPerKeyCallSource.realWithdrawArgs_depositsValue_eq
 -- Twenty-sixth-step (2026-09-13): D-REVERT-1 custom-error source model.
-#print axioms LidoSRv3.Audit.Source.DepositCustomErrorsSource.realErrorSelector_deterministic
 -- Twenty-seventh-step (2026-09-13): D-SLOT-1 ERC-7201 storage-slot source model.
 #print axioms LidoSRv3.Audit.Source.ERC7201StorageSlotSource.realERC7201BaseSlot_deterministic
 -- Twenty-eighth-step (2026-09-13): D-NFRAME-1 distinct-modules guard source model.
-#print axioms LidoSRv3.Audit.Source.DepositDistinctModulesSource.distinctModules_true_of_singleton
-#print axioms LidoSRv3.Audit.Source.DepositDistinctModulesSource.distinctModules_true_of_empty
-#print axioms LidoSRv3.Audit.Source.DepositDistinctModulesSource.distinctModules_cons
 -- Twenty-ninth-step (2026-09-13): TOPUP-1 prefix-guards source model for #414.
 #print axioms LidoSRv3.Audit.Source.TopupPrefixGuardsSource.callerIsTopupGateway_true_of_eq
 #print axioms LidoSRv3.Audit.Source.TopupPrefixGuardsSource.keysListNonEmpty_true_of_ne
@@ -1014,21 +985,10 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.ReserveSeedBookkeepingSource.seedDepositsCount_depositedPostReport_eq
 #print axioms LidoSRv3.Audit.Source.ReserveSeedBookkeepingSource.seedDepositsCount_buffered_eq
 -- Thirty-fifth-step (2026-09-13): TOPUP-2 D-AUTH-1/D-SORT-1/D-WC-1/D-PUBKEY-1/D-MAX-1 prefix guards.
-#print axioms LidoSRv3.Audit.Source.Topup2PrefixGuardsSource.callerHasTopUpRole_true_of_eq
-#print axioms LidoSRv3.Audit.Source.Topup2PrefixGuardsSource.indicesSorted_true_of_singleton
-#print axioms LidoSRv3.Audit.Source.Topup2PrefixGuardsSource.wcIsType2_true_of_eq
-#print axioms LidoSRv3.Audit.Source.Topup2PrefixGuardsSource.pubkeyLengthOk_true_of_empty
-#print axioms LidoSRv3.Audit.Source.Topup2PrefixGuardsSource.validatorCountAtMost_true_of_le
 -- Thirty-sixth-step (2026-09-13): TOPUP-2 D-CONSUME-1/D-UNITS-1/D-TOTAL-1/D-SLASH-1 source models.
-#print axioms LidoSRv3.Audit.Source.Topup2ConsumeAndUnitsSource.evaluateTopUpLimit_eq
-#print axioms LidoSRv3.Audit.Source.Topup2ConsumeAndUnitsSource.gweiToWei_eq
-#print axioms LidoSRv3.Audit.Source.Topup2ConsumeAndUnitsSource.totalLimitsAccum_nil
-#print axioms LidoSRv3.Audit.Source.Topup2ConsumeAndUnitsSource.slashOrExitToZero_zero_of_flag
-#print axioms LidoSRv3.Audit.Source.Topup2ConsumeAndUnitsSource.slashOrExitToZero_preserves_of_not_flag
 -- Thirty-seventh-step (2026-09-13): Lido isBunkerActive MappingStorage via KeccakOracle.
 #print axioms LidoSRv3.Audit.Source.LidoBunkerViaOracleSource.isBunkerActiveFromOracle_false_of_zero
 -- Thirty-eighth-step (2026-09-13): P-CONSOLIDATION-ETH-1 role via KeccakOracle.
-#print axioms LidoSRv3.Audit.Source.ConsolidationRoleViaOracleSource.hasAddConsolidationRequestsRoleFromOracle_true_of_nonzero
 -- Thirty-ninth-step (2026-09-13): P-RESERVE-1 authorizedRouter via KeccakOracle (item c).
 #print axioms LidoSRv3.Audit.Source.AuthorizedRouterViaOracleSource.isAuthorizedRouterFromOracle_true_of_nonzero
 -- Fortieth-step (2026-09-13): P-TOPUP-1 top-up-gateway ACL via KeccakOracle (item c).
@@ -1046,134 +1006,55 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.WQCheckpointPackedDecoderSource.fromRequestIdFromPacked_eq
 #print axioms LidoSRv3.Audit.Source.WQCheckpointPackedDecoderSource.maxShareRateFromPacked_eq
 -- Forty-sixth-step (2026-09-13): P-ADDRESS-1 ERC-2612 permit-input source model.
-#print axioms LidoSRv3.Audit.Source.PermitDecodeSource.deadlineNotExpired_true_of_le
-#print axioms LidoSRv3.Audit.Source.PermitDecodeSource.deadlineNotExpired_false_of_gt
 -- Forty-seventh-step (2026-09-13): Solidity address uint160 truncation source model.
-#print axioms LidoSRv3.Audit.Source.SolidityAddressTypeSource.toAddress_lt_modulus
-#print axioms LidoSRv3.Audit.Source.SolidityAddressTypeSource.toAddress_idem
-#print axioms LidoSRv3.Audit.Source.SolidityAddressTypeSource.toAddress_id_of_bounded
 -- Forty-eighth-step (2026-09-13): Solidity uint256 wrap source model.
-#print axioms LidoSRv3.Audit.Source.SolidityUint256WrapSource.toUint256_lt_modulus
-#print axioms LidoSRv3.Audit.Source.SolidityUint256WrapSource.toUint256_idem
-#print axioms LidoSRv3.Audit.Source.SolidityUint256WrapSource.checkedAddOverflow_false_of_bounded
-#print axioms LidoSRv3.Audit.Source.SolidityUint256WrapSource.checkedAddOverflow_true_of_wrap
 -- Forty-ninth-step (2026-09-13): Solidity uint128 wrap source model.
 #print axioms LidoSRv3.Audit.Source.SolidityUint128WrapSource.toUint128_lt_modulus
 #print axioms LidoSRv3.Audit.Source.SolidityUint128WrapSource.toUint128_idem
 #print axioms LidoSRv3.Audit.Source.SolidityUint128WrapSource.checkedAddOverflow_false_of_bounded
 #print axioms LidoSRv3.Audit.Source.SolidityUint128WrapSource.checkedAddOverflow_true_of_wrap
 -- Fiftieth-step (2026-09-13): Solidity uint40 truncation source model.
-#print axioms LidoSRv3.Audit.Source.SolidityUint40Source.toUint40_lt_modulus
-#print axioms LidoSRv3.Audit.Source.SolidityUint40Source.toUint40_idem
 -- Fifty-first-step (2026-09-13): Solidity primitive-uint truncation source model.
 #print axioms LidoSRv3.Audit.Source.SolidityPrimitiveUintSource.toUintN_lt_modulus
 #print axioms LidoSRv3.Audit.Source.SolidityPrimitiveUintSource.toUintN_idem
 -- Fifty-second-step (2026-09-13): Solidity checked-sub / SafeMath.sub source model.
-#print axioms LidoSRv3.Audit.Source.SolidityCheckedSubSource.checkedSub_some_of_le
-#print axioms LidoSRv3.Audit.Source.SolidityCheckedSubSource.checkedSub_none_of_lt
-#print axioms LidoSRv3.Audit.Source.SolidityCheckedSubSource.checkedSubUnderflow_false_of_le
-#print axioms LidoSRv3.Audit.Source.SolidityCheckedSubSource.checkedSubUnderflow_true_of_lt
 -- Fifty-third-step (2026-09-13): Solidity SafeMath.add / checked-add source model.
-#print axioms LidoSRv3.Audit.Source.SolidityCheckedAddSource.checkedAddU256_some_of_bounded
-#print axioms LidoSRv3.Audit.Source.SolidityCheckedAddSource.checkedAddU256_none_of_wrap
-#print axioms LidoSRv3.Audit.Source.SolidityCheckedAddSource.checkedAddU128_some_of_bounded
-#print axioms LidoSRv3.Audit.Source.SolidityCheckedAddSource.checkedAddU128_none_of_wrap
 -- Fifty-fourth-step (2026-09-13): Solidity SafeMath.mul / checked-mul source model.
-#print axioms LidoSRv3.Audit.Source.SolidityCheckedMulSource.checkedMulU256_some_of_bounded
-#print axioms LidoSRv3.Audit.Source.SolidityCheckedMulSource.checkedMulU256_none_of_wrap
 -- Fifty-fifth-step (2026-09-13): Solidity min/max primitive source model.
-#print axioms LidoSRv3.Audit.Source.SolidityMinSource.minU_le_left
-#print axioms LidoSRv3.Audit.Source.SolidityMinSource.minU_le_right
-#print axioms LidoSRv3.Audit.Source.SolidityMinSource.left_le_maxU
-#print axioms LidoSRv3.Audit.Source.SolidityMinSource.right_le_maxU
 -- Fifty-sixth-step (2026-09-13): P-ALLOC-1 pinned SR allocation constants (item 5).
 #print axioms LidoSRv3.Audit.Source.SRAllocationConstantsSource.stakeShareLimitMaxBp_le_uint16Max
 #print axioms LidoSRv3.Audit.Source.SRAllocationConstantsSource.stakeShareLimit_le_max_of_validated
 #print axioms LidoSRv3.Audit.Source.SRAllocationConstantsSource.stakeShareLimit_le_uint16Max_of_bounded
 -- Fifty-seventh-step (2026-09-13): CONSOLIDATION-ETH-1 batchSize gate source model.
-#print axioms LidoSRv3.Audit.Source.ConsolidationBatchSizeSource.batchSizeWithinLimit_true_of_le
-#print axioms LidoSRv3.Audit.Source.ConsolidationBatchSizeSource.batchSizeWithinLimit_false_of_gt
-#print axioms LidoSRv3.Audit.Source.ConsolidationBatchSizeSource.batchSizeWithinLimit_true_of_empty
 -- Fifty-eighth-step (2026-09-13): P-TOPUP-2 pinned uint64 bounds (chantier 4bis).
-#print axioms LidoSRv3.Audit.Source.Topup2Uint64BoundsSource.allocationLimit_le_cap
 -- Fifty-ninth-step (2026-09-13): P-TOPUP-2 chantier-4bis sum-no-wrap conclusion.
-#print axioms LidoSRv3.Audit.Source.Topup2SumNoWrapSource.aggregateCap_lt_uint256Modulus
 -- Sixtieth-step (2026-09-13): P-TOPUP-2 chantier-4bis N-key final composition.
-#print axioms LidoSRv3.Audit.Source.Topup2NKeyNoWrapSource.sum_le_length_mul
-#print axioms LidoSRv3.Audit.Source.Topup2NKeyNoWrapSource.nkey_sum_le_aggregateCap
-#print axioms LidoSRv3.Audit.Source.Topup2NKeyNoWrapSource.nkey_sum_lt_uint256Modulus
 -- Sixty-first-step (2026-09-13): P-TOPUP-2 chantier-4bis exact-cap conclusion.
-#print axioms LidoSRv3.Audit.Source.Topup2ExactCapSource.allocationExceedsLimitGuard_true_of_le
-#print axioms LidoSRv3.Audit.Source.Topup2ExactCapSource.nkey_sum_le_maxTopUpCap_of_guard
 -- Sixty-second-step (2026-09-13): P-TOPUP-2 pinned per-allocation guard (line 729).
-#print axioms LidoSRv3.Audit.Source.Topup2PerAllocGuardSource.perAllocationWithinCap_true_of_le
-#print axioms LidoSRv3.Audit.Source.Topup2PerAllocGuardSource.perAllocationWithinCap_false_of_gt
-#print axioms LidoSRv3.Audit.Source.Topup2PerAllocGuardSource.perAllocationWithinCap_implies_le_allocationCap
 -- Sixty-third-step (2026-09-13): StakingRouter ModuleReturnExceedTarget guard.
-#print axioms LidoSRv3.Audit.Source.ModuleReturnGuardSource.moduleReturnWithinTarget_true_of_le
-#print axioms LidoSRv3.Audit.Source.ModuleReturnGuardSource.moduleReturnWithinTarget_false_of_gt
-#print axioms LidoSRv3.Audit.Source.ModuleReturnGuardSource.moduleReturnWithinTarget_true_of_zero
 -- Sixty-fourth-step (2026-09-13): StakingRouter.topUp:706 gwei-rounding source model.
-#print axioms LidoSRv3.Audit.Source.Topup2RoundingSource.roundDownToGwei_mod_zero
-#print axioms LidoSRv3.Audit.Source.Topup2RoundingSource.roundDownToGwei_le
-#print axioms LidoSRv3.Audit.Source.Topup2RoundingSource.roundDownToGwei_of_mod_zero
 -- Sixty-fifth-step (2026-09-13): StakingRouter.topUp:703 min-clamp source model.
-#print axioms LidoSRv3.Audit.Source.Topup2MinClampSource.minAllocCap_le_alloc
-#print axioms LidoSRv3.Audit.Source.Topup2MinClampSource.minAllocCap_le_cap
-#print axioms LidoSRv3.Audit.Source.Topup2MinClampSource.minAllocCap_le_allocationCap
 -- Sixty-sixth-step (2026-09-13): ConsolidationGateway msgValue = n*fee source model (chantier 1).
-#print axioms LidoSRv3.Audit.Source.ConsolidationMsgValueSource.msgValueForBatch_pos_of_nonzero
-#print axioms LidoSRv3.Audit.Source.ConsolidationMsgValueSource.msgValueForBatch_zero_of_fee_zero
-#print axioms LidoSRv3.Audit.Source.ConsolidationMsgValueSource.msgValueForBatch_zero_of_empty_batch
 -- Sixty-seventh-step (2026-09-13): P-ADDRESS-1 chantier-6 StETH guard order.
-#print axioms LidoSRv3.Audit.Source.StETHGuardOrderSource.both_orders_agree_on_success
-#print axioms LidoSRv3.Audit.Source.StETHGuardOrderSource.orders_disagree_on_balance_only_failure
-#print axioms LidoSRv3.Audit.Source.StETHGuardOrderSource.orders_disagree_on_allowance_only_failure
 -- Sixty-eighth-step (2026-09-13): P-ADDRESS-1 chantier-6 _claim owner/hint guard order.
-#print axioms LidoSRv3.Audit.Source.ClaimGuardOrderSource.claim_orders_agree_on_success
-#print axioms LidoSRv3.Audit.Source.ClaimGuardOrderSource.claim_orders_disagree_on_owner_only_failure
-#print axioms LidoSRv3.Audit.Source.ClaimGuardOrderSource.claim_orders_disagree_on_hint_only_failure
 -- Sixty-ninth-step (2026-09-13): Consolidation fee/msgValue/batchSize composition.
-#print axioms LidoSRv3.Audit.Source.ConsolidationFeeMsgValueComposition.vaultMsgValue_pos_of_gates_pass_and_fee_pos
-#print axioms LidoSRv3.Audit.Source.ConsolidationFeeMsgValueComposition.vaultMsgValue_zero_of_fee_zero
-#print axioms LidoSRv3.Audit.Source.ConsolidationFeeMsgValueComposition.batchSize_gate_fails_of_gt
 -- Seventieth-step (2026-09-13): P-CONSOLIDATION-ETH-1 composite entry-gate.
-#print axioms LidoSRv3.Audit.Source.ConsolidationCompositeGateSource.entryGatePasses_true_of_all_premises
 -- Seventy-first-step (2026-09-13): P-TOPUP-1 composite entry-gate.
 #print axioms LidoSRv3.Audit.Source.Topup1CompositeGateSource.entryGatePasses_true_of_all_premises
 -- Seventy-second-step (2026-09-13): P-RESERVE-1 composite canDeposit.
 #print axioms LidoSRv3.Audit.Source.Reserve1CompositeGateSource.canDepositFromOracleAndPacked_true_of_all_premises
 -- Seventy-third-step (2026-09-13): P-ADDRESS-1 composite balance/allowance guard.
-#print axioms LidoSRv3.Audit.Source.Address1CompositeGuardSource.bothGuardsPassFromOracle_true_of_bounds
 -- Seventy-fourth-step (2026-09-13): P-DEPOSIT-1 composite entry-gate.
-#print axioms LidoSRv3.Audit.Source.Deposit1CompositeGateSource.entryGatePasses_true_of_premises
-#print axioms LidoSRv3.Audit.Source.Deposit1CompositeGateSource.journal_length_eq_deposit_count
 -- Seventy-fifth-step (2026-09-13): P-TOPUP-2 chantier-4bis composite guard.
-#print axioms LidoSRv3.Audit.Source.Topup2CompositeGuardSource.compositeGuardPasses_true_of_premises
-#print axioms LidoSRv3.Audit.Source.Topup2CompositeGuardSource.rounded_allocation_preserves_cap
-#print axioms LidoSRv3.Audit.Source.Topup2CompositeGuardSource.minClamp_allocation_preserves_cap
 -- Seventy-sixth-step (2026-09-13): P-ALLOC-1 composite CheckedBounds premise.
 #print axioms LidoSRv3.Audit.Source.Alloc1CompositeBoundsSource.PinnedAllocConstantsPremise_inhabited
 #print axioms LidoSRv3.Audit.Source.Alloc1CompositeBoundsSource.stakeShareLimit_le_uint16Max_of_premise
 -- Seventy-seventh-step (2026-09-13): A-SHA256-FFI opacity source model (chantier 1/3).
-#print axioms LidoSRv3.Audit.Source.Sha256OpacitySource.sha256_output_is_32_bytes
-#print axioms LidoSRv3.Audit.Source.Sha256OpacitySource.sha256_deterministic
 -- Seventy-eighth-step (2026-09-13): EIP-4788 beacon-roots predeploy identity source.
-#print axioms LidoSRv3.Audit.Source.BeaconRootsEip4788Source.beaconRootsAddress_le_uint160Max
-#print axioms LidoSRv3.Audit.Source.BeaconRootsEip4788Source.canonicalCall_target_eq
 -- Seventy-ninth-step (2026-09-13): SSZ gindex source model.
-#print axioms LidoSRv3.Audit.Source.SszGindexSource.depth_root
-#print axioms LidoSRv3.Audit.Source.SszGindexSource.leftChild_eq
-#print axioms LidoSRv3.Audit.Source.SszGindexSource.production_and_scaffold_distinct
 -- Eightieth-step (2026-09-13): SSZ verifyProof source model (chantier 3).
-#print axioms LidoSRv3.Audit.Source.SszVerifyProofSource.foldPath_nil
-#print axioms LidoSRv3.Audit.Source.SszVerifyProofSource.foldPath_singleton
-#print axioms LidoSRv3.Audit.Source.SszVerifyProofSource.verifyProof_true_of_folded_eq
 -- Eighty-first-step (2026-09-13): SSZ Validator hash-tree-root layout.
-#print axioms LidoSRv3.Audit.Source.SszValidatorHashTreeRootSource.validatorHashTreeRoot_eq
 -- Eighty-second-step (2026-09-13): SSZ List root mix_in_length source model.
-#print axioms LidoSRv3.Audit.Source.SszListRootSource.mixInLength_deterministic
-#print axioms LidoSRv3.Audit.Source.SszListRootSource.mixInLength_output_length
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape

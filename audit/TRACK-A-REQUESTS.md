@@ -35,3 +35,12 @@ following remain to reconcile:
 Please either restore the source scaffolds (if Track-A intends to
 consume them into a registered parent) or delete the dangling
 `#print axioms` lines.
+
+### 2026-09-13 (later): Resolved
+
+All 119 dangling `#print axioms LidoSRv3.Audit.Source.<Name>.<sym>`
+lines for the 51 modules removed by PR #550 have been stripped from
+`LidoSRv3/Audit/Trust.lean` in the follow-up PR
+`spark/lido-fix-track-a-trust-dangling-print-axioms-20260913`.
+`lake build LidoSRv3.Audit.Trust` now succeeds (1882 jobs) and full
+`lake build` succeeds (1851 jobs).
