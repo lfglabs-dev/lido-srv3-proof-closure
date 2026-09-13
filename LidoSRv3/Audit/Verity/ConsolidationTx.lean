@@ -694,6 +694,20 @@ theorem persist_selfBalance (start : Nat) (obs : Observables)
   simp only [forwardCalls_selfBalance, writeSlot_selfBalance,
     writePayloads_selfBalance]
 
+/-- **Chantier 2 (Thomas 2026-09-13) slot-free selfBalance closed form.**
+Same closed form as `persist_selfBalance`; the retirement companion
+`persistSlotFree` differs from `persist` only by skipping
+`writePayloads` (which is a no-op on `.selfBalance` via
+`writeSlot_selfBalance`/`writePayloads_selfBalance`). Load-bearing
+support lemma for the value-plane parents porting from `addRequests`
+to `addRequestsSlotFree`. -/
+theorem persistSlotFree_selfBalance (start : Nat) (obs : Observables)
+    (state : ContractState) :
+    (persistSlotFree start obs state).selfBalance =
+      obs.calls.foldl (fun bal c => bal - c.value) state.selfBalance := by
+  unfold persistSlotFree
+  simp only [forwardCalls_selfBalance, writeSlot_selfBalance]
+
 private theorem writePayloads_preserves_prior (payloads : List (List Word)) :
     ∀ (start : Nat) (state : ContractState) (key : Nat),
       key < start →
@@ -1181,6 +1195,17 @@ theorem persist_events (start : Nat) (obs : Observables) (state : ContractState)
     (persist start obs state).events = state.events ++ obs.events.map toEvent := by
   unfold persist
   simp [writePayloads_events, forwardCalls_events]
+
+/-- **Chantier 2 (Thomas 2026-09-13) slot-free `.calls` closed form.**
+Same closed form as `persist_calls` (`persistSlotFree` skips
+`writePayloads`, which is a no-op on `.calls`). Load-bearing support
+lemma for the value-plane parents. -/
+theorem persistSlotFree_calls (start : Nat) (obs : Observables)
+    (state : ContractState) :
+    (persistSlotFree start obs state).calls =
+      state.calls ++ obs.calls.map toJournal := by
+  unfold persistSlotFree
+  simp [forwardCalls_calls]
 
 private theorem map_ofJournal_toJournal (cs : List CallObs) :
     cs.map (ofJournal ∘ toJournal) = cs := by
@@ -1724,6 +1749,189 @@ theorem committed_preserves_eth_balance
     sourceRun_committed_payload_shape inputs obs hRun
   subst after
   rw [persist_selfBalance, selfBalance_credited, foldl_sub_values, hValues]
+  exact sub_foldl_replicate state.selfBalance inputs.fee obs.calls.length
+    inputs.msgValue hFeeEq
+
+/-! ## Slot-free value-plane theorems
+
+Chantier 2 (Thomas 2026-09-13): slot-free variants of
+`committed_journal_forwards_msg_value` and `committed_preserves_eth_balance`
+stated on `addRequestsSlotFree` for the P-CONSOLIDATION-1 value-plane
+parents' retirement port. Structurally identical to the originals; the
+proofs use `persistSlotFree_calls` / `persistSlotFree_selfBalance` in
+place of the `persist_*` closed forms. -/
+
+private theorem addRequestsSlotFree_run_eq
+    (inputs : Inputs) (state : ContractState)
+    (hEntry : state.selfBalance.val + inputs.msgValue.val <
+      Verity.Core.Uint256.modulus)
+    (hSources : readArray state "sources" sourcesBase inputs.sources.length =
+      some inputs.sources)
+    (hTargets : readArray state "targets" targetsBase inputs.targets.length =
+      some inputs.targets)
+    (hSourceLens : readArray state "sourceLens" sourceLensBase
+      inputs.sourceLens.length = some inputs.sourceLens)
+    (hTargetLens : readArray state "targetLens" targetLensBase
+      inputs.targetLens.length = some inputs.targetLens) :
+    (addRequestsSlotFree inputs).run state =
+      match sourceRun inputs with
+      | .reverted reason => .revert reason state
+      | .committed obs =>
+          .success (ofObservables obs)
+            (persistSlotFree (state.readSlot countSlot).val obs
+              (credited state inputs)) := by
+  unfold Contract.run
+  have hap : (addRequestsSlotFree inputs) state =
+      match sourceRun inputs with
+      | .reverted reason => .revert reason state
+      | .committed obs =>
+          .success (ofObservables obs)
+            (persistSlotFree (state.readSlot countSlot).val obs
+              (credited state inputs)) := by
+    unfold addRequestsSlotFree
+    rw [if_pos hEntry]
+    simp only [readArray_credited, hSources, hTargets, hSourceLens,
+      hTargetLens]
+    rfl
+  rw [hap]
+  cases sourceRun inputs with
+  | reverted reason => rfl
+  | committed obs => rfl
+
+private theorem addRequestsSlotFree_run_cases
+    (inputs : Inputs) (state : ContractState)
+    (hEntry : state.selfBalance.val + inputs.msgValue.val <
+      Verity.Core.Uint256.modulus)
+    (hSources : readArray state "sources" sourcesBase inputs.sources.length =
+      some inputs.sources)
+    (hTargets : readArray state "targets" targetsBase inputs.targets.length =
+      some inputs.targets)
+    (hSourceLens : readArray state "sourceLens" sourceLensBase
+      inputs.sourceLens.length = some inputs.sourceLens)
+    (hTargetLens : readArray state "targetLens" targetLensBase
+      inputs.targetLens.length = some inputs.targetLens)
+    (r : ContractResult Result)
+    (h : (addRequestsSlotFree inputs).run state = r) :
+    (∃ reason, sourceRun inputs = .reverted reason ∧
+        r = .revert reason state) ∨
+    (∃ obs, sourceRun inputs = .committed obs ∧
+        r = .success (ofObservables obs)
+          (persistSlotFree (state.readSlot countSlot).val obs
+            (credited state inputs))) := by
+  rw [addRequestsSlotFree_run_eq inputs state hEntry hSources hTargets
+    hSourceLens hTargetLens] at h
+  split at h
+  · next reason hR =>
+      exact Or.inl ⟨reason, hR, h.symm⟩
+  · next obs hC =>
+      exact Or.inr ⟨obs, hC, h.symm⟩
+
+private theorem addRequestsSlotFree_success_inversion
+    (inputs : Inputs) (state : ContractState)
+    (hSources : readArray state "sources" sourcesBase inputs.sources.length =
+      some inputs.sources)
+    (hTargets : readArray state "targets" targetsBase inputs.targets.length =
+      some inputs.targets)
+    (hSourceLens : readArray state "sourceLens" sourceLensBase
+      inputs.sourceLens.length = some inputs.sourceLens)
+    (hTargetLens : readArray state "targetLens" targetLensBase
+      inputs.targetLens.length = some inputs.targetLens)
+    (result : Result) (after : ContractState)
+    (h : (addRequestsSlotFree inputs).run state = .success result after) :
+    ∃ obs, sourceRun inputs = .committed obs ∧
+      ofObservables obs = result ∧
+      persistSlotFree (state.readSlot countSlot).val obs (credited state inputs) =
+        after := by
+  by_cases hEntry : state.selfBalance.val + inputs.msgValue.val <
+      Verity.Core.Uint256.modulus
+  · rcases addRequestsSlotFree_run_cases inputs state hEntry hSources hTargets
+        hSourceLens hTargetLens _ h with ⟨reason, _, hr⟩ | ⟨obs, hsr, hr⟩
+    · simp at hr
+    · injection hr with hRes hAfter
+      exact ⟨obs, hsr, hRes.symm, hAfter.symm⟩
+  · have hRevert : (addRequestsSlotFree inputs).run state =
+        .revert "ENTRY_CREDIT_OVERFLOW" state := by
+      unfold Contract.run addRequestsSlotFree
+      rw [if_neg hEntry]
+    rw [hRevert] at h
+    simp at h
+
+/-- Slot-free companion of `committed_journal_forwards_msg_value`
+(Thomas 2026-09-13 retirement). The journal suffix has the same
+shape: one `.success` CALL frame per request to the request target,
+frame values summing to `msg.value`. Proof structure mirrors the
+original but uses `addRequestsSlotFree_success_inversion` and
+`persistSlotFree_calls`. -/
+theorem committed_journal_forwards_msg_value_slotFree
+    (inputs : Inputs) (state : ContractState)
+    (hSources : readArray state "sources" sourcesBase inputs.sources.length =
+      some inputs.sources)
+    (hTargets : readArray state "targets" targetsBase inputs.targets.length =
+      some inputs.targets)
+    (hSourceLens : readArray state "sourceLens" sourceLensBase
+      inputs.sourceLens.length = some inputs.sourceLens)
+    (hTargetLens : readArray state "targetLens" targetLensBase
+      inputs.targetLens.length = some inputs.targetLens)
+    (result : Result) (after : ContractState)
+    (h : (addRequestsSlotFree inputs).run state = .success result after) :
+    let frames := after.calls.drop state.calls.length
+    frames.length = result.requestCount ∧
+      (∀ f ∈ frames, f.kind = .call ∧ f.control = .success ∧
+        f.target = inputs.requestTarget.val ∧ f.value = inputs.fee.val) ∧
+      (frames.map (fun f => f.value)).sum = inputs.msgValue.val := by
+  obtain ⟨obs, hRun, hRes, hAfter⟩ :=
+    addRequestsSlotFree_success_inversion inputs state hSources hTargets
+      hSourceLens hTargetLens result after h
+  obtain ⟨hCount, hCallsLen, _, _, hValues, hTargets', hFeeEq⟩ :=
+    sourceRun_committed_payload_shape inputs obs hRun
+  subst result
+  subst after
+  simp only [ofObservables, persistSlotFree_calls, credited_calls, List.drop_left,
+    List.length_map]
+  refine ⟨hCallsLen, ?_, ?_⟩
+  · intro f hf
+    rw [List.mem_map] at hf
+    obtain ⟨c, hcMem, rfl⟩ := hf
+    have hcValue : c.value = inputs.fee := by
+      have hmem : c.value ∈ obs.calls.map (·.value) :=
+        List.mem_map_of_mem hcMem
+      rw [hValues, List.mem_replicate] at hmem
+      exact hmem.2
+    have hcTarget : c.target = inputs.requestTarget := by
+      have hmem : c.target ∈ obs.calls.map (·.target) :=
+        List.mem_map_of_mem hcMem
+      rw [hTargets', List.mem_replicate] at hmem
+      exact hmem.2
+    simp [toJournal, hcTarget, hcValue]
+  · have hmap : (obs.calls.map toJournal).map (fun f => f.value) =
+        (obs.calls.map (·.value)).map Verity.Core.Uint256.val := by
+        simp [List.map_map, toJournal]
+    rw [hmap, hValues, map_replicate_val, sum_replicate_nat, hFeeEq]
+
+/-- Slot-free companion of `committed_preserves_eth_balance` (Thomas
+2026-09-13 retirement). Same conclusion: `after.selfBalance =
+state.selfBalance` on every committed run. Uses
+`persistSlotFree_selfBalance` for the closed form. -/
+theorem committed_preserves_eth_balance_slotFree
+    (inputs : Inputs) (state : ContractState)
+    (hSources : readArray state "sources" sourcesBase inputs.sources.length =
+      some inputs.sources)
+    (hTargets : readArray state "targets" targetsBase inputs.targets.length =
+      some inputs.targets)
+    (hSourceLens : readArray state "sourceLens" sourceLensBase
+      inputs.sourceLens.length = some inputs.sourceLens)
+    (hTargetLens : readArray state "targetLens" targetLensBase
+      inputs.targetLens.length = some inputs.targetLens)
+    (result : Result) (after : ContractState)
+    (h : (addRequestsSlotFree inputs).run state = .success result after) :
+    after.selfBalance = state.selfBalance := by
+  obtain ⟨obs, hRun, _, hAfter⟩ :=
+    addRequestsSlotFree_success_inversion inputs state hSources hTargets
+      hSourceLens hTargetLens result after h
+  obtain ⟨_, hCallsLen, _, _, hValues, _, hFeeEq⟩ :=
+    sourceRun_committed_payload_shape inputs obs hRun
+  subst after
+  rw [persistSlotFree_selfBalance, selfBalance_credited, foldl_sub_values, hValues]
   exact sub_foldl_replicate state.selfBalance inputs.fee obs.calls.length
     inputs.msgValue hFeeEq
 
