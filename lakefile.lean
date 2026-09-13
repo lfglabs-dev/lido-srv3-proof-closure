@@ -63,6 +63,7 @@ lean_lib «LidoSRv3» where
     .one `LidoSRv3.Audit.Verity.PConsolidationEth1RefundTx,
     .one `LidoSRv3.Audit.Verity.PConsolidationEth1RequestTx,
     .one `LidoSRv3.Audit.Verity.ReserveRelationalTx,
+    .one `LidoSRv3.Audit.Verity.ReserveSourceEntry,
     .one `LidoSRv3.Audit.Verity.SszAbstractDigest,
     .one `LidoSRv3.Audit.Verity.SszEncodingTx,
     .one `LidoSRv3.Audit.Verity.SszTxSimulation,
