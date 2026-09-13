@@ -25,11 +25,19 @@ abbrev targetsBase := LidoSRv3.Audit.Verity.ConsolidationTx.targetsBase
 abbrev sourceLensBase := LidoSRv3.Audit.Verity.ConsolidationTx.sourceLensBase
 abbrev targetLensBase := LidoSRv3.Audit.Verity.ConsolidationTx.targetLensBase
 abbrev countSlot := LidoSRv3.Audit.Verity.ConsolidationTx.countSlot
-abbrev observe := LidoSRv3.Audit.Verity.ConsolidationTx.observe
-abbrev addRequests := LidoSRv3.Audit.Verity.ConsolidationTx.addRequests
+-- Chantier 2 (Thomas 2026-09-13) slot-free retirement: `observe` and
+-- `addRequests` re-exports now target the slot-free companions
+-- (`observeFromJournal` derives payloads from the CALL journal;
+-- `addRequestsSlotFree` uses `persistSlotFree`, dropping the fabricated
+-- `sourceMapSlot`/`targetMapSlot` writes). `verity_tx_simulates_pinned_source`
+-- re-exports the direct slot-free proof landed in PR #648
+-- (`observeFromJournal_simulates_pinned_source_slotFree`), which does not
+-- transitively use `observe`/`addRequests`/`persist`/`writePayloads`.
+abbrev observe := LidoSRv3.Audit.Verity.ConsolidationTx.observeFromJournal
+abbrev addRequests := LidoSRv3.Audit.Verity.ConsolidationTx.addRequestsSlotFree
 abbrev sourceView := LidoSRv3.Audit.Verity.ConsolidationTx.sourceView
 abbrev verity_tx_simulates_pinned_source :=
-  LidoSRv3.Audit.Verity.ConsolidationTx.verity_tx_simulates_pinned_source
+  LidoSRv3.Audit.Verity.ConsolidationTx.observeFromJournal_simulates_pinned_source_slotFree
 end CT
 
 namespace C
