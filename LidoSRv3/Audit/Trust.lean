@@ -871,6 +871,8 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.LidoStakingStateStorage.isBunkerActive_false_of_slot_zero
 -- Fourth-step (2026-09-13): Aragon ACL hasRole via ACL mapping decoder.
 #print axioms LidoSRv3.Audit.Source.AragonACLSource.hasRole_true_of_mapping_nonzero
+-- Second-step (2026-09-13): P-ALLOC-1 per-module uint64 field bounds.
+#print axioms LidoSRv3.Audit.Source.StakingModuleRegistrySource.moduleFields_bounded_by_uint64
 -- General rule (Thomas 2026-09-12) applied to P-CONSOLIDATION-ETH-1
 -- feePerRequest free Nat: naming scaffold PinnedFeeStaticcallShape
 -- names the pinned WithdrawalVaultEIP7685.sol:79-81 STATICCALL entry
