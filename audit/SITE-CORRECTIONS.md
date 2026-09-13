@@ -314,6 +314,26 @@ PRs that discharge Grok #412 differential divergences in the registered
   `DepositNFrameTx.revert_restores_snapshot` and
   `.revert_observes_idle` lemmas.
 
+**Additional Piste B progress (2026-09-13, three Preconditions
+relaxations widening the registered parent's admissible input set):**
+
+- **`Preconditions.entryBalance = 0` retired** (PR #587): relaxed to
+  `entryBalanceNoWrap : state.selfBalance.val + exactTotal inputs.batches
+  < Uint256.modulus`. Deployments with a nonzero router `selfBalance` (e.g.
+  partial `receiveDepositableEther` refund state) now compose under the
+  registered parent. The old premise strictly implied the new one via
+  `foldStable_bound`, so no previously-admitted input is excluded.
+- **`Preconditions.funded` retired** (PR #590): unconditional Lido funding
+  bound `wordTotal ≤ state.readSlot lidoDepositableSlot` relaxed to
+  conditional `shouldPull inputs = true → wordTotal ≤ ...`. On empty-batch
+  inputs the executor never reads `lidoDepositableSlot`, so no funding
+  constraint is needed. Underfunded-Lido empty-batch inputs now compose.
+- **`Preconditions.lidoCallOk` retired** (PR #591): unconditional
+  `inputs.lidoCallOk = true` relaxed to conditional `shouldPull inputs = true →
+  inputs.lidoCallOk = true`. On empty-batch inputs `pullFromLido` is never
+  invoked, so the receiver-selection premise is not needed. Failing-Lido
+  empty-batch inputs now compose.
+
 **Site fix:** if the DEPOSIT-1 card presents the executable model as
 mirroring the pinned executor call chain byte-for-byte, add the two
 remaining residual disclosures: (a) D-CALL-1 per-key-push half
@@ -321,12 +341,13 @@ remaining residual disclosures: (a) D-CALL-1 per-key-push half
 batch rather than `batch.keys.val` per-key `IDepositContract.deposit`
 frames); (b) D-SLOT-1 (model uses model-local slots 0-4 rather than
 the pinned ERC-7201 `ModuleState.deposits` keyed layout indexed by
-`moduleId`, and no `StakingRouterETHDeposited` event is emitted). See
-`audit/TRACK-B-REQUESTS.md` for the full obligations map — the two
-residual halves plus free-boolean `Preconditions` retirement
-(`authorized`/`moduleActive`/`allocationValid`/`lidoCallOk`/
-`entryBalance = 0` composition with DSM + router) and Grok #412
-harness integration into `make test`.
+`moduleId`, and no `StakingRouterETHDeposited` event is emitted).
+Remaining free-boolean `Preconditions` retirements (authorized /
+moduleActive / allocationValid) require full DSM + router composition
+(these three are checked BEFORE the pinned `shouldPull` early return,
+so conditional-on-shouldPull relaxation is unsound); see
+`audit/TRACK-B-REQUESTS.md` for the full obligations map, and the
+Grok #412 harness integration into `make test`.
 
 ## Global signals
 
