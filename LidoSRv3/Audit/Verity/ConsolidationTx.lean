@@ -1198,6 +1198,37 @@ where
     | nil => intros; rfl
     | cons p rest ih => intro start s; simp only [writePayloads]; exact ih _ _
 
+/-- **Chantier 2 (Thomas 2026-09-13) frame-scalar bundle.** All nine
+scalar `ContractState` fields the retirement obligation covers agree
+between `persist` and `persistSlotFree`. Direct conjunction of the
+nine individual scalar equalities landed across PRs #616 (selfBalance),
+#634 (msgValue), #636 (sender / thisAddress / blockTimestamp), and
+#637 (txOrigin / blockNumber / chainId / blobBaseFee / calldataSize).
+Downstream retirement adopters can `import` a single lemma to unlock
+the entire scalar surface. -/
+theorem persist_frame_scalars_eq_persistSlotFree_frame_scalars_bundle
+    (start : Nat) (obs : Observables) (state : ContractState) :
+    (persist start obs state).selfBalance = (persistSlotFree start obs state).selfBalance ∧
+    (persist start obs state).msgValue = (persistSlotFree start obs state).msgValue ∧
+    (persist start obs state).sender = (persistSlotFree start obs state).sender ∧
+    (persist start obs state).thisAddress = (persistSlotFree start obs state).thisAddress ∧
+    (persist start obs state).blockTimestamp = (persistSlotFree start obs state).blockTimestamp ∧
+    (persist start obs state).txOrigin = (persistSlotFree start obs state).txOrigin ∧
+    (persist start obs state).blockNumber = (persistSlotFree start obs state).blockNumber ∧
+    (persist start obs state).chainId = (persistSlotFree start obs state).chainId ∧
+    (persist start obs state).blobBaseFee = (persistSlotFree start obs state).blobBaseFee ∧
+    (persist start obs state).calldataSize = (persistSlotFree start obs state).calldataSize :=
+  ⟨persist_selfBalance_eq_persistSlotFree_selfBalance start obs state,
+   persist_msgValue_eq_persistSlotFree_msgValue start obs state,
+   persist_sender_eq_persistSlotFree_sender start obs state,
+   persist_thisAddress_eq_persistSlotFree_thisAddress start obs state,
+   persist_blockTimestamp_eq_persistSlotFree_blockTimestamp start obs state,
+   persist_txOrigin_eq_persistSlotFree_txOrigin start obs state,
+   persist_blockNumber_eq_persistSlotFree_blockNumber start obs state,
+   persist_chainId_eq_persistSlotFree_chainId start obs state,
+   persist_blobBaseFee_eq_persistSlotFree_blobBaseFee start obs state,
+   persist_calldataSize_eq_persistSlotFree_calldataSize start obs state⟩
+
 /-- **Chantier 2 (Thomas 2026-09-13) `.snd.calls` equivalence between
 `addRequests` and `addRequestsSlotFree`.** Both transactions share the
 same guard structure (entry-credit bound, memory decode, `sourceRun`
