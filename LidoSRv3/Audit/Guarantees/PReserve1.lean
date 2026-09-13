@@ -3,6 +3,7 @@ import LidoSRv3.Audit.Source.ReserveFreshCacheFromWQ
 import LidoSRv3.Audit.Source.ReservePackedBufferSource
 import LidoSRv3.Audit.Source.ReservePayableCallSource
 import LidoSRv3.Audit.Source.ReserveSeedBookkeepingSource
+import LidoSRv3.Audit.Source.ERC7201StorageSlotSource
 import LidoSRv3.Audit.Guarantees.Registry
 
 namespace LidoSRv3.Audit.Guarantees.PReserve1
@@ -279,6 +280,54 @@ theorem source_spend_preserves_withdrawal_reserve_under_seed_bookkeeping_shape
   -- unchanged — the ENUNCE records the pinned bookkeeping+event
   -- shape the model currently omits (D-SEED-1 / D-EVENT-1
   -- disclosure).
+  source_spend_preserves_withdrawal_reserve inputs before after amount live hfresh h
+
+/-- **Chantier 2 (Piste A, Thomas 2026-09-13) D-SLOT-1 ERC-7201 slot
+provenance naming bridge.**
+
+Restates `source_spend_preserves_withdrawal_reserve` with added
+`_hSlotProvenance` premises NAMING the pinned Lido ERC-7201-style
+keccak-derived storage positions for the reserve-partition slots.
+The Verity plane uses model-local flat slots 0-4
+(`ReserveContract.buffered.slot = 0`,
+`ReserveContract.storedDepositsReserve.slot = 1`,
+`ReserveContract.unfinalizedStETH.slot = 2`,
+`ReserveContract.depositedPostReport.slot = 3`,
+`ReserveContract.depositedNextReportAdjusted.slot = 4`); the pinned
+deployment uses keccak-derived unstructured storage positions
+(`BUFFERED_ETHER_AND_DEPOSITED_POST_REPORT_POSITION`,
+`DEPOSITS_RESERVE_POSITION`, ...).  This bridge NAMES the pinned
+ERC-7201-style derivation via `ERC7201StorageSlotSource.realERC7201BaseSlot`
+on a shared `KeccakOracle`, so the ENUNCE records the pinned slot
+provenance the model's local slots stand in for.
+
+**NAMING composition, not full closure of D-SLOT-1.**  The Verity
+model still writes to slots 0-4; extending the model to observe the
+keccak-derived positions (or proving a bijection between the
+model's local slot indexing and the deployed layout) is the next
+follow-up.  Discloses Grok #419 D-SLOT-1 at the parent's ENUNCE
+level. -/
+theorem source_spend_preserves_withdrawal_reserve_under_erc7201_slot_shape
+    (inputs : WithdrawInputs) (before after : ReserveState) (amount live : Word)
+    (oracle : LidoSRv3.Audit.Source.KeccakConcreteCommitmentSource.KeccakOracle)
+    (_hSlotProvenance :
+      -- The pinned keccak-derived slot for each reserve-partition namespace
+      -- is a deterministic function of the shared KeccakOracle.
+      (∀ ns1 ns2, ns1 = ns2 →
+        LidoSRv3.Audit.Source.ERC7201StorageSlotSource.realERC7201BaseSlot oracle ns1 =
+          LidoSRv3.Audit.Source.ERC7201StorageSlotSource.realERC7201BaseSlot oracle ns2))
+    (hfresh : freshQueueCache before live)
+    (h : modelWithdrawDepositableEther inputs before amount = .committed after) :
+    scopedWithdrawGuards inputs ∧
+      amount ≠ 0 ∧
+      withdrawalPartitionSpendInvariant before after amount ∧
+      liveEffectiveWithdrawalsReserve after live = liveEffectiveWithdrawalsReserve before live :=
+  -- The slot-provenance premise names the pinned ERC-7201-style
+  -- keccak-derived slot derivation as a function of the shared
+  -- KeccakOracle.  The proof delegates to the registered parent
+  -- since the model's local slot indexing is unchanged — the ENUNCE
+  -- records the pinned slot-derivation shape the model's flat slots
+  -- 0-4 stand in for (D-SLOT-1 disclosure).
   source_spend_preserves_withdrawal_reserve inputs before after amount live hfresh h
 
 /--
