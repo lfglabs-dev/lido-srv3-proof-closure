@@ -117,6 +117,7 @@ import LidoSRv3.Audit.Source.ReservePackedBufferSource
 import LidoSRv3.Audit.Source.ReserveSeedBookkeepingSource
 import LidoSRv3.Audit.Source.Topup2PrefixGuardsSource
 import LidoSRv3.Audit.Source.Topup2ConsumeAndUnitsSource
+import LidoSRv3.Audit.Source.LidoBunkerViaOracleSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -1030,6 +1031,8 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.Topup2ConsumeAndUnitsSource.totalLimitsAccum_nil
 #print axioms LidoSRv3.Audit.Source.Topup2ConsumeAndUnitsSource.slashOrExitToZero_zero_of_flag
 #print axioms LidoSRv3.Audit.Source.Topup2ConsumeAndUnitsSource.slashOrExitToZero_preserves_of_not_flag
+-- Thirty-seventh-step (2026-09-13): Lido isBunkerActive MappingStorage via KeccakOracle.
+#print axioms LidoSRv3.Audit.Source.LidoBunkerViaOracleSource.isBunkerActiveFromOracle_false_of_zero
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape
