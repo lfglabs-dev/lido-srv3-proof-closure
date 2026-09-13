@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Source.ReportFeeProductsCorrespondence
+import LidoSRv3.Audit.Source.ReportRewardsMintedCorrespondence
 import LidoSRv3.Audit.Verity.HandleOracleReportTx
 import Verity.Core
 import Verity.Stdlib.Math
@@ -180,6 +181,33 @@ theorem getter_outputs_feed_products
   cases h
   exact ⟨rfl, rfl⟩
 
+/-- **Chantier 3 composition (Thomas 2026-09-13 mandate):** the derived
+consumer's zero-shares branch composes with `_calculateFeeDistribution`
+(Accounting.sol:335-357) and the mint. When
+`derivedSharesToMintAsFees fee = some 0` (LIP-12 non-profitable branch,
+Accounting.sol:322), `consume` with `sharesToMint = 0` returns
+`(events, d) = ([], calculateFeeDistribution 0 fees)` — no `.minted`
+event, `d.moduleShares = feeShares 0 totalFee fees` and
+`d.treasuryShares = 0`. Composes: (#402 derived `sharesToMintAsFees`)
+→ (`_calculateFeeDistribution` at Accounting.sol:335-357) → (mint
+skipped per zero-shares gate at Accounting.sol:403-413). Load-bearing
+on `derivedSharesToMintAsFees fee = some 0`; the alternative branch
+(`some shares` with `shares ≠ 0`) is not covered here because
+`consume` on positive shares depends on the snapshot's
+`getStakingRewardsDistribution` totalFee (positive → mints, zero →
+`feeTotalZero` error). This zero-shares composition suffices to
+NAME the three components in a single registered statement per the
+chantier 3 mandate. -/
+theorem derivedConsumer_zero_shares_composes_fee_distribution_and_mint
+    (fee : FeeInput) (moduleIds : List Nat)
+    (snapshot : SolidityAccounting.ReportRewardsMinted.RouterSnapshot)
+    (outcomes : List SolidityAccounting.ReportRewardsMinted.CallbackOutcome)
+    (h : derivedSharesToMintAsFees fee = some 0) :
+    SolidityAccounting.ReportRewardsMinted.consume moduleIds 0 snapshot outcomes =
+      .ok ([], SolidityAccounting.ReportRewardsMinted.calculateFeeDistribution 0
+        (SolidityAccounting.ReportRewardsMinted.getStakingRewardsDistribution snapshot)) := by
+  simp [SolidityAccounting.ReportRewardsMinted.consume]
+
 #print axioms derived_eq_source_products
 #print axioms derived_nonprofitable_zero
 #print axioms derived_profitable_is_l331
@@ -190,5 +218,6 @@ theorem getter_outputs_feed_products
 #print axioms handleOracleReportDerived_mint_after_read
 #print axioms free_argument_mints_when_source_is_zero
 #print axioms getter_outputs_feed_products
+#print axioms derivedConsumer_zero_shares_composes_fee_distribution_and_mint
 
 end LidoSRv3.Audit.Source.AccountFeeShares
