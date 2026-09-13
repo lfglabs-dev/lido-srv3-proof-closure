@@ -99,6 +99,16 @@
           "canonical_source": "32 ether (uint256 wei)",
           "discharges_assumption": "A-DEPOSIT-32-ETHER (P-DEPOSIT-1, P-ALLOC-EXEC-1)",
           "notes": "solc emits every read of the uint256 constant DEPOSIT_SIZE and of the uint256 immutable MAX_EFFECTIVE_BALANCE_WC_TYPE_01 as PUSH32 (opcode 0x7f) followed by the 32-byte value. Enumerating every PUSH32 whose 32-byte payload equals the 32-ether encoding therefore covers every runtime read of these two values; the enumeration yields exactly the five offsets above, and each payload folds big-endian to 32*10^18 wei."
+        },
+        {
+          "immutable_name": "LIDO (StakingRouter.sol:60 constructor immutable, assigned at line 100 from _lido; used at StakingRouter.sol:666, 697, 713, 744, 951, 983 for LIDO.* external calls and _checkAppAuth(address(LIDO)))",
+          "extraction_kind": "push20_payload_enumeration",
+          "byte_offsets": [6332, 9021, 9656, 9739, 10386, 12237, 15321],
+          "width_bytes": 20,
+          "expected_value_hex": "ae7ab96520de3a18e5e111b5eaab095312d7fe84",
+          "canonical_source": "Lido proxy mainnet address 0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",
+          "discharges_assumption": "D-ADDR-1 Lido-address half (P-TOPUP-1); previously flagged in fidelity.missing as a placeholder 0xF00D in Verity.TopupTx.lidoAddress",
+          "notes": "solc inlines the address-typed `LIDO` immutable at every call site via PUSH20 (opcode 0x73) followed by the 20-byte address. Enumerating every 20-byte window whose payload equals the canonical Lido proxy address yields exactly the seven offsets above. Each offset corresponds to a distinct pinned Solidity call site: 666 `_checkAppAuth(address(LIDO))`, 697 `LIDO.getDepositableEther()`, 713 `LIDO.canDeposit()`, 744 `LIDO.withdrawDepositableEther(amount, 0)`, 951 `LIDO.getDepositableEther()` (in the DSM path), 983 `LIDO.withdrawDepositableEther(depositsValue, actualDepositsCount)` (in the DSM path), plus one internal helper reference. The 20-byte payload folds big-endian to the checksummed Lido proxy address on Ethereum mainnet."
         }
       ]
     }

@@ -36,12 +36,20 @@ def allocationSlot : Nat := 7100
 def allocationTotalSlot : Nat := 7101
 def pulledTotalSlot : Nat := 7102
 
-/-- Placeholder address for `LIDO` (`StakingRouter.sol:744`); a model pin, not
-the deployed Lido address. The grok TOPUP-1 differential (#414 D-ADDR-1)
-notes that its harness deploys a fresh mock at a different address; target
-equality between this model literal and any specific deployed Lido contract
-is NOT claimed by this transaction. -/
-def lidoAddress : Address := (0xF00D : Address)
+/-- `LIDO` (`StakingRouter.sol:60`, `LIDO = ILido(_lido)` at line 100,
+used at line 744 for the `LIDO.withdrawDepositableEther` external
+call).  This literal is anchored to the deployed `StakingRouter`
+runtime `LIDO` immutable at seven `push20_payload_enumeration` byte
+offsets (6332, 9021, 9656, 9739, 10386, 12237, 15321 — each 20 bytes
+wide) via `LidoSRv3/Audit/Provenance/LidoAddress.lean`
+(chantier 1 Piste A 2026-09-13 D-ADDR-1 discharge, fixture SHA-256
+`c30ed4e63cb0a57dca577484afff0765fcaa9840d75b440067fd55c7d4fc7013`
+in `audit/artifacts.lock.json`).  Value:
+`0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84`, the canonical mainnet
+Lido proxy address (`ILido(_lido)` at pinned constructor line 100
+receives this address; the immutable is inlined at every `LIDO.*`
+call site by solc's immutable optimization). -/
+def lidoAddress : Address := (0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84 : Address)
 /-- `DEPOSIT_CONTRACT` (`StakingRouter.sol:750`), the canonical beacon deposit
 contract address. This literal is anchored to the deployed `StakingRouter`
 runtime `DEPOSIT_CONTRACT` immutable at byte offset 7525 via
