@@ -5,6 +5,7 @@ import LidoSRv3.Audit.Source.ReservePayableCallSource
 import LidoSRv3.Audit.Source.ReserveSeedBookkeepingSource
 import LidoSRv3.Audit.Source.ERC7201StorageSlotSource
 import LidoSRv3.Audit.Source.SolidityUint128WrapSource
+import LidoSRv3.Audit.Source.ReserveSetTargetSource
 import LidoSRv3.Audit.Guarantees.Registry
 
 namespace LidoSRv3.Audit.Guarantees.PReserve1
@@ -511,5 +512,32 @@ theorem reserve_erc7201_slot_deterministic
       LidoSRv3.Audit.Source.ERC7201StorageSlotSource.realERC7201BaseSlot oracle ns2 :=
   LidoSRv3.Audit.Source.ERC7201StorageSlotSource.realERC7201BaseSlot_deterministic
     (oracle := oracle) (ns1 := ns1) (ns2 := ns2) h
+
+/-- Source-shaped `setDepositsReserveTarget` writer facts (PR #674). -/
+theorem reserve_set_target_preserves_partition_fields
+    (state : ReserveState) (newTarget : Word) (auth : Bool) :
+    (LidoSRv3.Audit.Source.ReserveSetTargetSource.setDepositsReserveTarget
+        state newTarget auth).buffered = state.buffered ∧
+    (LidoSRv3.Audit.Source.ReserveSetTargetSource.setDepositsReserveTarget
+        state newTarget auth).unfinalizedStETH = state.unfinalizedStETH ∧
+    (LidoSRv3.Audit.Source.ReserveSetTargetSource.setDepositsReserveTarget
+        state newTarget auth).depositedPostReport = state.depositedPostReport ∧
+    (LidoSRv3.Audit.Source.ReserveSetTargetSource.setDepositsReserveTarget
+        state newTarget auth).depositedNextReportAdjusted =
+      state.depositedNextReportAdjusted :=
+  LidoSRv3.Audit.Source.ReserveSetTargetSource.setDepositsReserveTarget_preserves_other_fields
+    state newTarget auth
+
+theorem reserve_set_target_writes_target
+    (state : ReserveState) (newTarget : Word) :
+    (LidoSRv3.Audit.Source.ReserveSetTargetSource.setDepositsReserveTarget
+        state newTarget true).storedDepositsReserve = newTarget :=
+  LidoSRv3.Audit.Source.ReserveSetTargetSource.setDepositsReserveTarget_of_auth state newTarget
+
+theorem reserve_set_target_noop_of_unauth
+    (state : ReserveState) (newTarget : Word) :
+    LidoSRv3.Audit.Source.ReserveSetTargetSource.setDepositsReserveTarget
+      state newTarget false = state :=
+  LidoSRv3.Audit.Source.ReserveSetTargetSource.setDepositsReserveTarget_of_unauth state newTarget
 
 end LidoSRv3.Audit.Guarantees.PReserve1
