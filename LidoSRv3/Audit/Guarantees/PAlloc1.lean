@@ -4,6 +4,8 @@ import LidoSRv3.Audit.Source.Alloc1CompositeBoundsSource
 import LidoSRv3.Audit.Guarantees.Registry
 import LidoSRv3.Audit.Guarantees.PAlloc1TargetMultBounded
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
+import LidoSRv3.Audit.Guarantees.PAlloc1AvailableArithmeticBounded
+
 import LidoSRv3.Audit.Verity.AllocCapacityPhase3
 import LidoSRv3.Audit.Verity.AllocationTx
 
@@ -203,6 +205,46 @@ theorem checked_execute_under_pinned_shape_and_constants
   -- constants at the ENUNCE for downstream consumers.
   checked_execute_under_pinned_shape cfg modules depositsToAllocate isTopUp
     hMaxEB hTypes hShape
+
+/-- **Chantier 3 (Piste A, Thomas 2026-09-13) `available_arithmetic` real
+derivation.**
+
+New bridge combining `PinnedStakingModuleTypeBounds` (real derivation of
+`target_multiplication` via `PAlloc1TargetMultBounded`) with the new
+`PinnedAvailableArithmeticBounds` (uint64 bounds on `activeCount`,
+`maxEBType2`, `allocationEntry`, `depositableCount`) that DERIVES the
+`available_arithmetic` conjunct from real arithmetic via
+`PAlloc1AvailableArithmeticBounded.available_arithmetic_under_pinned_bounds`:
+both case-split branches (topup && type2 product ≤ uint64Max^2 ≤
+MAX_UINT256; else branch sum ≤ 2 * uint64Max ≤ MAX_UINT256) are closed
+by `decide`.
+
+Two of the four CheckedBounds conjuncts are now derived from real
+bounds via this bridge (`target_multiplication` +
+`available_arithmetic`); `active_subtraction` and `total_addition`
+remain caller-supplied through `PinnedSRAllocationBoundsShape` — their
+live-SRStorage derivations are the next follow-up. -/
+theorem checked_execute_under_type_and_available_bounds
+    (cfg : Config) (modules : List Module) (depositsToAllocate : Verity.Uint256)
+    (isTopUp : Bool)
+    (hMaxEB : cfg.maxEBType1 ≠ 0)
+    (hTypes : PAlloc1TargetMultBounded.PinnedStakingModuleTypeBounds
+      cfg modules depositsToAllocate)
+    (hAvail : PAlloc1AvailableArithmeticBounded.PinnedAvailableArithmeticBounds
+      cfg modules isTopUp)
+    (hShape : PAlloc1RemainingBoundsScaffold.PinnedSRAllocationBoundsShape
+      cfg modules depositsToAllocate isTopUp) :
+    ∃ rows, SolidityAllocCapacity.execute cfg modules depositsToAllocate isTopUp = some rows ∧
+      rows.map (fun row => (row.capacity : Nat)) =
+        MathView.capacities cfg modules depositsToAllocate isTopUp :=
+  checked_execute cfg modules depositsToAllocate isTopUp
+    { maxEBType1_nonzero := hMaxEB
+      active_subtraction := hShape.activeSubtractionInvariant
+      total_addition := hShape.totalAdditionInvariant
+      available_arithmetic :=
+        PAlloc1AvailableArithmeticBounded.available_arithmetic_under_pinned_bounds hAvail
+      target_multiplication :=
+        PAlloc1TargetMultBounded.target_multiplication_under_pinned_type_bounds hTypes }
 
 /-- Successful execution retains router index order. -/
 theorem router_order_preserved {cfg : Config} {modules : List Module}
