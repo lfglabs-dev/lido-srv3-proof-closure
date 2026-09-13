@@ -885,6 +885,8 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- named PredeployStaticcallResult, not caller Nat.
 #print axioms LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.consolidationFeeFromStaticcall_eq
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise.feePerRequest_derived_from_staticcall_result
+-- Second-step (2026-09-13): P-CONSOLIDATION-ETH-1 fee EIP-7251 schedule.
+#print axioms LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.abiDecodedFee_matches_schedule
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape
