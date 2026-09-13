@@ -687,6 +687,18 @@ list, there are no undisclosed project-level assumptions or proof escapes.
   LidoSRv3.Audit.Guarantees.PConsolidation1.gateway_admitted_nonzero_kill_line
 #print axioms
   LidoSRv3.Audit.Guarantees.PConsolidation1.packing_order_kills_swapped_concat
+-- Chantier 2 (Thomas 2026-09-13): RequestAdditionFailed branch model.
+-- `sourceRunWithCallOutcomes` names the pinned
+-- `_callAddConsolidationRequest` (WithdrawalVaultEIP7685.sol:113-121)
+-- per-request CALL success/failure branch that the registered
+-- `sourceRun` treats as always-success. The all-success reduction
+-- shows `sourceRun` is the happy-path projection of the extended
+-- model; the non-vacuity witness shows the RequestAdditionFailed
+-- branch is reachable.
+#print axioms
+  LidoSRv3.Audit.SolidityConsolidation.sourceRunWithCallOutcomes_all_success_eq_sourceRun
+#print axioms
+  LidoSRv3.Audit.SolidityConsolidation.sourceRunWithCallOutcomes_request_addition_failed_witness
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.function_spec_bridge_constructors
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.committed_journal_forwards_msg_value
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.committed_preserves_eth_balance
