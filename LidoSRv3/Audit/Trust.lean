@@ -179,7 +179,6 @@ import LidoSRv3.Tests.PackEOracleFrameMutants
 import LidoSRv3.Audit.Spec.ConsolidationObserveCorrespondence
 import LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel
 import LidoSRv3.Audit.Verity.ConsolidationFee
-import LidoSRv3.Tests.PackFConsolidationObserveMutants
 import LidoSRv3.Audit.Provenance.Deposit
 import LidoSRv3.Tests.PackGDepositProvenanceMutants
 import LidoSRv3.Audit.Provenance.TopupBeacon
@@ -408,7 +407,11 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- inside the accepted foundations-only boundary.)
 #print axioms LidoSRv3.Audit.Spec.ConsolidationObserveCorrespondence.persist_payloads_reread
 #print axioms LidoSRv3.Audit.Spec.ConsolidationObserveCorrespondence.gateway_nonzero_remains_named_hyp
-#print axioms LidoSRv3.Tests.PackFConsolidationObserveMutants.swapped_map_reread_kill_line_refutes_observe
+-- Chantier 2 (Thomas 2026-09-13, item c continuation): the swapped-map
+-- kill-line for the pre-retirement `observe` (which reread the fabricated
+-- sourceMapSlot/targetMapSlot) was physically retired here — `observe` is
+-- no longer on the parent proof chain (PR #648), so a swapped-map mutant
+-- of it does not refute the registered guarantee.
 #print axioms LidoSRv3.Audit.Provenance.Deposit.canonical_deposit_contract_pin
 #print axioms LidoSRv3.Audit.Provenance.Deposit.canonical_thirty_two_ether_pin
 #print axioms LidoSRv3.Audit.Provenance.Deposit.production_conserving_config_at_thirty_two_ether
