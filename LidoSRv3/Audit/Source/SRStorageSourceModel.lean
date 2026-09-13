@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Source.AragonACLSource
+import LidoSRv3.Audit.Source.KeccakMappingStorageSource
 
 /-! # StakingRouter SRStorage source model (P-TOPUP-1 booleans real derivation)
 
@@ -111,5 +112,36 @@ theorem callerIsGateway_derived_from_acl
     ctx.callerIsGatewayFromRead = true := by
   rw [hLink.gatewayReadMatchesACL]
   exact LidoSRv3.Audit.Source.AragonACLSource.isTopUpGatewayCaller_true_of_app_registered hApp
+
+/-! ## Third-step composition (2026-09-13): moduleExists via SR mapping decoder
+
+`SRTopupCallerContext.moduleExistsFromRead` above still takes the
+module-registry existence as a `Bool`. The pinned
+`SRStorage.getModuleState(moduleId)` reads from the SR modules
+mapping (`mapping(uint256 => ModuleStateConfig)`) at a
+keccak-derived slot; a module exists iff its `moduleId` field in the
+decoded struct is non-zero (per `SRUtils.sol:45-47`
+`_requireModuleIdExists`). The composition below derives
+`moduleExistsFromRead` from a `MappingStorage` read at the module-id
+key. -/
+
+/-- Definition of `moduleExists` from a source-level MappingStorage
+read: the module exists iff the stored `moduleId` field at the
+mapping-key slot is non-zero. -/
+def moduleExistsFromMapping
+    (m : LidoSRv3.Audit.Source.KeccakMappingStorageSource.MappingStorage)
+    (moduleId : Nat) : Bool :=
+  decide (LidoSRv3.Audit.Source.KeccakMappingStorageSource.read m moduleId ≠ 0)
+
+/-- Under the mapping premise (the mapping's value at `moduleId` is
+non-zero), `moduleExistsFromMapping = true`. Real derivation from a
+named mapping read. -/
+theorem moduleExists_true_of_mapping_nonzero
+    {m : LidoSRv3.Audit.Source.KeccakMappingStorageSource.MappingStorage}
+    {moduleId : Nat}
+    (hNonzero : m.slotAt moduleId ≠ 0) :
+    moduleExistsFromMapping m moduleId = true := by
+  simp [moduleExistsFromMapping,
+        LidoSRv3.Audit.Source.KeccakMappingStorageSource.read, hNonzero]
 
 end LidoSRv3.Audit.Source.SRStorageSourceModel
