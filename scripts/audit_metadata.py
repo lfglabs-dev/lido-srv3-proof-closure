@@ -26,14 +26,14 @@ from source_spans import span_identity
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
 SOURCE_FIDELITY = AUDIT / "SOURCE-FIDELITY.md"
-R1_REVIEW_BASE = "75ef5fdcfb4c31e800b3452c043b852ef05b9e2a"
+R1_REVIEW_BASE = "b1f10cd6ac4eb86003a0673369509aaa280d96b5"
 # Bind the report inputs to the recorded Git object and exact bytes.
 # Changed inputs must never inherit an earlier source review.
 # This exact family is every structured input used to render the R1 review
 # report.  A normal regeneration may never pair changed family content with a
 # stale certified basis.
 R1_REPORT_INPUT_SHA256 = {
-    "audit/guarantees.yaml": "78f1443413dfeb57f095816d3b6eea5eaef78236a9d296f9ad03dea9543e69e8",
+    "audit/guarantees.yaml": "a213f1d73dabeb8afa324aa95e1ce35df86439e529922b4c2bc4e60698490bb1",
     "audit/source-map.yaml": "0711e13088159cc092c4a4cfdf2111eedefa39b744d02dbe1957db31da30cd2e",
     "audit/trust-native-decide-allowlist.txt": "4676e3021844b17f62e9fcb11069c5a09fcede77977b5af2242c455bfa7d38c6",
 }
@@ -92,10 +92,10 @@ EXPECTED_CANONICAL_CLAIMS = {
 EXPECTED_CANONICAL_DETAIL_SHA256 = {
     "P-ALLOC-1": "c0d002981ab4afec0193d1daed1005be373be21995c91a2d761dab748e38c4a1",
     "P-ALLOC-2": "605ae32bda595b9d0847ceccd826c9a7d76e1a99e3d617b7d1dc140ee940855b",
-    "P-DEPOSIT-1": "2813dd2661c9086d94839875de9972c69e9ad611550ca02cbc08a050546a1f85",
+    "P-DEPOSIT-1": "ca50648a977555e22bc2aa1b4a056c102f8ad2030d6077c8c89856b305946c10",
     "P-TOPUP-1": "47a0d7154045122b41b12627107c5f006532e17fe7c53fb5f56e75fa676e983f",
     "P-ACCOUNT-1": "384e194ee3c3da6b66f532442104d65f6aea80eed5ef0207a643383a5ce0949a",
-    "P-RESERVE-1": "d5669f1181c24afaa41cbb86e15efb1d9d636bf36b61705d620d18f701dfb368",
+    "P-RESERVE-1": "2c2a78f52e1378ef92985aa9f3b99ca0eda5340d112a96156517d2683d679c63",
     "P-CONSOLIDATION-ETH-1": "5f7fb5b5361934c1fc4e0a573e6bd334dec03def240caf40469ea724718ad534",
     "P-ADDRESS-1": "f92b9cd14691bde29d53d75990625059d51fbe043e94e991a3b446d9e8b6ba37",
     "P-TOPUP-2": "6a9b044fab73910824075574f0b21cde922b30eb39fdc3e6b4ad697b6b5dde61",
