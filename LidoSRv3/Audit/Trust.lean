@@ -80,6 +80,7 @@ import LidoSRv3.Audit.Guarantees.PAddress1BridgeCallPremise
 import LidoSRv3.Audit.Source.BridgeCallResultSource
 import LidoSRv3.Audit.Source.BridgePerWriterGlue
 import LidoSRv3.Audit.Source.AragonACLSource
+import LidoSRv3.Audit.Source.KeccakMappingStorageSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -854,6 +855,11 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- Second-step composition (2026-09-13): P-RESERVE-1 authorizedRouter
 -- derived via the shared Aragon ACL source model.
 #print axioms LidoSRv3.Audit.Guarantees.PReserve1LidoStoragePremise.authorizedRouter_derived_from_acl
+-- Shared keccak mapping-storage source model (2026-09-13): abstract
+-- MappingStorage + PackedSlotDecoder consumed by SRStorage / Aragon-ACL /
+-- WithdrawalQueue mapping decoders.
+#print axioms LidoSRv3.Audit.Source.KeccakMappingStorageSource.read_eq
+#print axioms LidoSRv3.Audit.Source.KeccakMappingStorageSource.decodeField_eq
 -- General rule (Thomas 2026-09-12) applied to P-CONSOLIDATION-ETH-1
 -- feePerRequest free Nat: naming scaffold PinnedFeeStaticcallShape
 -- names the pinned WithdrawalVaultEIP7685.sol:79-81 STATICCALL entry
