@@ -54,4 +54,39 @@ theorem moduleCount_bounded_of_registry_state
     moduleCountFromRegistry state ≤ 32 :=
   state.moduleCountBoundedBy32
 
+/-! ## Second-step composition (2026-09-13): per-module uint64 field bounds
+
+`PinnedSRAllocationBoundsShape.availableArithmeticInvariant` above
+needs per-module uint64 bounds on `activeCount` and
+`depositableCount`. The pinned SRLib.sol Module struct packs these
+as uint64 fields, so each is bounded by `2^64 - 1`. Below defines
+`ModuleFieldBounds` as a source-level structure naming per-module
+type bounds, and derives the boundedness. -/
+
+def uint64Max : Nat := 2 ^ 64 - 1
+
+/-- Per-module uint64 field bounds as an audit-source structure.
+Names the pinned SRLib.sol Module struct's uint64 fields. -/
+structure ModuleFieldBounds : Type where
+  depositedCount : Nat
+  depositableCount : Nat
+  summaryExitedCount : Nat
+  accountingExitedCount : Nat
+  depositedBounded : depositedCount ≤ uint64Max
+  depositableBounded : depositableCount ≤ uint64Max
+  summaryExitedBounded : summaryExitedCount ≤ uint64Max
+  accountingExitedBounded : accountingExitedCount ≤ uint64Max
+
+/-- Under the per-module uint64 field bounds, every field is at
+most `uint64Max = 2^64 - 1`. Definitionally, from the named
+invariants. -/
+theorem moduleFields_bounded_by_uint64
+    (bounds : ModuleFieldBounds) :
+    bounds.depositedCount ≤ uint64Max ∧
+      bounds.depositableCount ≤ uint64Max ∧
+      bounds.summaryExitedCount ≤ uint64Max ∧
+      bounds.accountingExitedCount ≤ uint64Max :=
+  ⟨bounds.depositedBounded, bounds.depositableBounded,
+   bounds.summaryExitedBounded, bounds.accountingExitedBounded⟩
+
 end LidoSRv3.Audit.Source.StakingModuleRegistrySource
