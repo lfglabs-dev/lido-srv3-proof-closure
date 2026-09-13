@@ -281,7 +281,19 @@ structure Preconditions (inputs : Inputs) (state : ContractState) : Prop where
   authorized : inputs.authorized = true
   moduleActive : inputs.moduleActive = true
   allocationValid : inputs.allocationValid = true
-  lidoCallOk : inputs.lidoCallOk = true
+  /-- Genuine relaxation of the previous unconditional
+  `lidoCallOk : inputs.lidoCallOk = true` (grok #412 Preconditions retirement
+  follow-up, 2026-09-13, third in sequence after entryBalance and funded):
+  Lido's per-call receiver-selection boolean is required only when the
+  pinned `shouldPull` predicate fires and `pullFromLido` actually invokes
+  the receiver.  On the empty-batch branch (exactKeys = 0 → shouldPull =
+  false) `pullFromLido` is not executed, so no lidoCallOk constraint is
+  needed.  The old premise was strictly stronger.  Wider admissible input
+  set: deployments where a caller supplied `lidoCallOk = false` (a failing
+  Lido callee) can still compose the registered parent whenever the caller
+  also supplied an empty-batch input, because the pinned StakingRouter.sol:978
+  early return skips the Lido pull entirely. -/
+  lidoCallOk : shouldPull inputs = true → inputs.lidoCallOk = true
   healthy : ∀ batch ∈ inputs.batches, Healthy batch
   /-- Grok #412 D-NFRAME-1 (discharged 2026-09-13): pinned `StakingRouter.deposit`
   admits one `stakingModuleId` per call; the model list-lifts across `batches`
@@ -313,7 +325,19 @@ structure Preconditions (inputs : Inputs) (state : ContractState) : Prop where
   set is genuinely wider. -/
   entryBalanceNoWrap :
     state.selfBalance.val + exactTotal inputs.batches < _root_.Verity.Core.Uint256.modulus
-  funded : wordTotal inputs.batches ≤ state.readSlot lidoDepositableSlot
+  /-- Genuine relaxation of the previous unconditional
+  `funded : wordTotal inputs.batches ≤ state.readSlot lidoDepositableSlot`
+  (grok #412 Preconditions retirement follow-up, 2026-09-13, PR after #587):
+  Lido's depositable-ether bound is required only when the pinned early-return
+  predicate `shouldPull` fires (i.e., the pull frame is actually emitted).  On
+  the empty-batch branch (exactKeys = 0) the executor never reads
+  `lidoDepositableSlot`, so no funding constraint is needed.  The old premise
+  was strictly stronger (required the bound universally, including on
+  vacuously-empty inputs).  This weakens Preconditions to admit empty-batch
+  inputs on an underfunded Lido without breaking `execute_apply` — the empty
+  branch commits without touching Lido. -/
+  funded : shouldPull inputs = true →
+    wordTotal inputs.batches ≤ state.readSlot lidoDepositableSlot
   foldStable : FoldStable 0 inputs.batches
 
 theorem foldStable_bound {acc : Nat} {batches : List Batch}
@@ -605,9 +629,10 @@ theorem execute_apply (inputs : Inputs) (state : ContractState)
     have hne : lidoDepositableSlot ≠ counterSlot := by decide
     simpa [entry] using ContractState.readSlot_writeSlot_other state hne
       (state.readSlot counterSlot + 1)
-  have hFunded : wordTotal inputs.batches ≤ processed.readSlot lidoDepositableSlot := by
-    rw [hLido]
-    exact h.funded
+  -- `funded` is now conditional on `shouldPull = true`; the pull only runs then.
+  have hFunded : shouldPull inputs = true →
+      wordTotal inputs.batches ≤ processed.readSlot lidoDepositableSlot := fun hPull => by
+    rw [hLido]; exact h.funded hPull
   have hTotalVal := wordTotal_val inputs.batches h.foldStable
   have hProcessedBalance : processed.selfBalance = state.selfBalance := by
     rw [show processed = afterBatches inputs inputs.batches entry from rfl,
@@ -662,7 +687,7 @@ theorem execute_apply (inputs : Inputs) (state : ContractState)
     simp only [hPull, if_true, executePullPushAssertTail, Bind.bind, _root_.Verity.bind,
       hPullTotal]
     rw [pullFromLido_apply inputs (wordTotal inputs.batches) (wordKeys inputs.batches)
-      processed h.lidoCallOk hFunded]
+      processed (h.lidoCallOk hPull) (hFunded hPull)]
     simp only [Bind.bind, _root_.Verity.bind]
     rw [pushBatches_apply inputs inputs.batches pulled h.healthy hPushFunds]
     simp only [Bind.bind, _root_.Verity.bind, DepositParentTx.getState, hClose,
