@@ -82,9 +82,16 @@ theorem source_constructor_does_not_discharge_deployment_facts :
     productionBeaconDeposit, thirtyTwoEtherWei]
 
 /-- A conserving source config exists at the 32-ether scale. Both fields
-    match, so `ConservingConfig` holds in the model. This does not prove
-    that production `MAX_EFFECTIVE_BALANCE_WC_TYPE_01` and `DEPOSIT_SIZE`
-    were constructed at this scale (`A-DEPOSIT-32-ETHER` stays OPEN). -/
+    match, so `ConservingConfig` holds in the model. **A-DEPOSIT-32-ETHER
+    status (chantier 4 update, Thomas 2026-09-13):** the deployed-immutable
+    identity for `MAX_EFFECTIVE_BALANCE_WC_TYPE_01` and `DEPOSIT_SIZE` at
+    the 32-ether scale is DISCHARGED via
+    `scripts/verify_deposit_thirty_two_ether.py` (invoked by `make test`),
+    which folds all five PUSH32 sites at 32000000000000000000 wei = 32 ether
+    on the pinned StakingRouter runtime bytecode (see
+    `audit/artifacts.lock.json` and `audit/findings/A-DEPOSIT-32-ETHER-discharged.md`).
+    This `def` remains a source-side model equality; the discharge lives
+    in the fixture-anchored verify script. -/
 def productionConservingConfig : SourceDepositConfig :=
   { maxEBType1 := thirtyTwoEtherWei
     depositSize := thirtyTwoEtherWei
