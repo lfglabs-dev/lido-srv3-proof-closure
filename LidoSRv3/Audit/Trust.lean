@@ -96,6 +96,7 @@ import LidoSRv3.Audit.Source.AragonACLRoleKeyViaOracleSource
 import LidoSRv3.Audit.Source.BridgeSelectorViaOracleSource
 import LidoSRv3.Audit.Source.MappingSlotViaOracleSource
 import LidoSRv3.Audit.Source.NestedMappingSlotViaOracleSource
+import LidoSRv3.Audit.Source.ERC20AllowanceKeyViaOracleSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -943,6 +944,9 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.MappingSlotViaOracleSource.realSlotDerivation_deterministic
 -- Fifteenth-step (2026-09-13): Solidity nested-mapping-slot via KeccakOracle.
 #print axioms LidoSRv3.Audit.Source.NestedMappingSlotViaOracleSource.realNestedSlotDerivation_deterministic
+-- Sixteenth-step (2026-09-13): ERC-20 allowance key via KeccakOracle.
+#print axioms LidoSRv3.Audit.Source.ERC20AllowanceKeyViaOracleSource.realAllowanceSlot_eq
+#print axioms LidoSRv3.Audit.Source.ERC20AllowanceKeyViaOracleSource.realAllowanceSlot_deterministic
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape
