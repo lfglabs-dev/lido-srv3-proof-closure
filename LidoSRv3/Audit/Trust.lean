@@ -146,6 +146,7 @@ import LidoSRv3.Audit.Source.Topup2PerAllocGuardSource
 import LidoSRv3.Audit.Source.ModuleReturnGuardSource
 import LidoSRv3.Audit.Source.Topup2RoundingSource
 import LidoSRv3.Audit.Source.Topup2MinClampSource
+import LidoSRv3.Audit.Source.ConsolidationMsgValueSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -1155,6 +1156,10 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.Topup2MinClampSource.minAllocCap_le_alloc
 #print axioms LidoSRv3.Audit.Source.Topup2MinClampSource.minAllocCap_le_cap
 #print axioms LidoSRv3.Audit.Source.Topup2MinClampSource.minAllocCap_le_allocationCap
+-- Sixty-sixth-step (2026-09-13): ConsolidationGateway msgValue = n*fee source model (chantier 1).
+#print axioms LidoSRv3.Audit.Source.ConsolidationMsgValueSource.msgValueForBatch_pos_of_nonzero
+#print axioms LidoSRv3.Audit.Source.ConsolidationMsgValueSource.msgValueForBatch_zero_of_fee_zero
+#print axioms LidoSRv3.Audit.Source.ConsolidationMsgValueSource.msgValueForBatch_zero_of_empty_batch
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape
