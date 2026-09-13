@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Source.ConsolidationCorrespondence
+import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Verity.ConsolidationTx
 import LidoSRv3.Audit.Guarantees.Registry
 
@@ -233,6 +234,81 @@ theorem verity_tx_revert_restores_snapshot
     (h : (addRequestsSlotFree inputs inject).run state = .revert reason rollback) :
     rollback = state :=
   revert_restores_snapshot_slotFree inputs inject state rollback reason h
+
+/-- **Chantier 2 (Thomas 2026-09-13) gateway→vault ABI/interpreter
+bridge, single-path form.** Under the vault-side decode/entry-no-wrap
+premises **and** the bridge premises tying `inputs.msgValue` /
+`inputs.fee` to a shared `PredeployStaticcallResult` via
+`gatewayVaultBoundary`, the theorem concludes **both**:
+(i) the vault-side observation-plane equality
+`observeFromJournal state ((addRequestsSlotFree inputs).run state) =
+sourceView …`, and
+(ii) the exact-fee identity anchored on the shared STATICCALL result:
+`inputs.msgValue.val = inputs.sources.length * result.abiDecodedFee`.
+
+Conjunct (ii) mentions `result.abiDecodedFee` directly — the bridge
+premises `hMsgValue`/`hFee` are load-bearing on the second conjunct
+and cannot be dropped without breaking the statement. Conjunct (i) is
+supplied by the registered slot-free parent
+`verity_tx_simulates_consolidation` (chantier-2 retirement, PR #641).
+
+`gatewayVaultBoundary` (`LidoSRv3/Audit/Source/ConsolidationFeeStaticcallSource.lean`)
+packages the two scalars that cross the gateway→vault frame boundary
+at `ConsolidationGateway.sol:212-220`:
+`msgValue = gatewayTotalFee result requestsCount = n * result.abiDecodedFee`
+and `fee = result.abiDecodedFee`. Conjunct (ii) is the arithmetic
+identity `_requireExactFee` (`WithdrawalVaultEIP7685.sol:123-127`,
+`IncorrectFee` revert) enforces — under the bridge, the vault's
+`IncorrectFee` branch is unreachable and the vault commits on the
+count / bound / per-key-validation guards alone.
+
+A-CONSOLIDATION-GATEWAY-NONZERO disclosure remains explicit on the
+STATICCALL fee itself: `gatewayTotalFee_ne_zero_of_fee_ne_zero`
+derives `result.abiDecodedFee ≠ 0 → totalFee ≠ 0`, and
+`gatewayTotalFee_zero_at_fee_zero` documents the `fee = 0` on-chain
+case (`totalFee = 0`; the vault admits `msg.value = 0` under
+`_requireExactFee(0)`).
+
+The full `Contract.run` chain from the gateway's Verity contract
+through an ABI encoder to the vault's `Contract.run` remains OPEN
+(disclosed in `fidelity.missing`): this parent statement consumes the
+source-plane linkage as premises; the executable-frame composition
+is a separate follow-up. -/
+theorem verity_tx_simulates_consolidation_from_gateway
+    (result : LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.PredeployStaticcallResult)
+    (inputs : Inputs) (state : Verity.ContractState)
+    (hMsgValue : inputs.msgValue.val =
+      (LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayVaultBoundary
+        result inputs.sources.length).msgValue)
+    (hFee : inputs.fee.val =
+      (LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayVaultBoundary
+        result inputs.sources.length).fee)
+    (hCountBound : (state.readSlot countSlot).val + inputs.sources.length <
+      Verity.Core.Uint256.modulus)
+    (hEntry : state.selfBalance.val + inputs.msgValue.val <
+      Verity.Core.Uint256.modulus)
+    (hSources : readArray state "sources" sourcesBase inputs.sources.length =
+      some inputs.sources)
+    (hTargets : readArray state "targets" targetsBase inputs.targets.length =
+      some inputs.targets)
+    (hSourceLens : readArray state "sourceLens" sourceLensBase
+      inputs.sourceLens.length = some inputs.sourceLens)
+    (hTargetLens : readArray state "targetLens" targetLensBase
+      inputs.targetLens.length = some inputs.targetLens) :
+    observeFromJournal state ((addRequestsSlotFree inputs).run state) =
+      sourceView inputs (state.readSlot countSlot).val ∧
+    inputs.msgValue.val = inputs.sources.length * result.abiDecodedFee := by
+  refine ⟨?_, ?_⟩
+  · exact verity_tx_simulates_consolidation inputs state hCountBound hEntry
+      hSources hTargets hSourceLens hTargetLens
+  · rw [hMsgValue]
+    -- The gatewayVaultBoundary.msgValue is defined as
+    -- gatewayTotalFee result requestsCount, which unfolds to
+    -- requestsCount * result.abiDecodedFee.
+    unfold LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayVaultBoundary
+    simp only
+    exact LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayTotalFee_eq
+      result inputs.sources.length
 
 /-- **Kill-line: packing order.** If source ≠ target, a swapped
 target then source concat produces a different observation than the
