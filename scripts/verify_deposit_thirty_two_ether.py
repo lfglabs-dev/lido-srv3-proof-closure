@@ -25,6 +25,12 @@ ROOT = Path(__file__).resolve().parent.parent
 FIXTURE = ROOT / "fixtures/deployed/StakingRouter-impl-runtime.bin"
 ARTIFACTS = ROOT / "audit/artifacts.lock.json"
 
+# Track-C chantier-4 provenance addition (Thomas 2026-09-13): recompute the
+# EIP-1052 EXTCODEHASH (keccak256 of the runtime bytecode) and match it against
+# the recorded value in audit/artifacts.lock.json.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from check_deployed_code import keccak256  # noqa: E402
+
 THIRTY_TWO_ETHER = 32 * 10 ** 18
 THIRTY_TWO_ETHER_WORD = THIRTY_TWO_ETHER.to_bytes(32, "big")
 EXPECTED_PUSH32_OFFSETS = (5521, 12112, 14036, 15415, 20126)
@@ -92,6 +98,17 @@ def main() -> None:
     if len(fixture_bytes) != entry["fixture_size_bytes"]:
         die(f"fixture length mismatch: got {len(fixture_bytes)}, expected {entry['fixture_size_bytes']}")
 
+    expected_codehash = entry.get("fixture_codehash_keccak256")
+    if not expected_codehash:
+        die("audit/artifacts.lock.json entry missing fixture_codehash_keccak256")
+    actual_codehash = keccak256(fixture_bytes).hex()
+    if actual_codehash != expected_codehash:
+        die(f"fixture keccak256 mismatch: got {actual_codehash}, expected {expected_codehash}")
+    print(
+        f"fixture codehash keccak256 = {actual_codehash} "
+        "(EIP-1052 EXTCODEHASH of the deployed runtime bytecode)"
+    )
+
     # Enumerate every PUSH32 site whose payload equals the 32-ether word.
     push_offsets = enumerate_push32_offsets(fixture_bytes, THIRTY_TWO_ETHER_WORD)
     if tuple(push_offsets) != EXPECTED_PUSH32_OFFSETS:
@@ -117,7 +134,10 @@ def main() -> None:
         live_sha = hashlib.sha256(live).hexdigest()
         if live_sha != entry["fixture_sha256"]:
             die(f"live deployed bytecode SHA diverged: got {live_sha}, fixture {entry['fixture_sha256']}")
-        print(f"live re-verification (implementation bytecode via {rpc_url}): OK")
+        live_codehash = keccak256(live).hex()
+        if live_codehash != expected_codehash:
+            die(f"live EIP-1052 codehash diverged from fixture: got {live_codehash}, fixture {expected_codehash}")
+        print(f"live re-verification (implementation bytecode via {rpc_url}): OK (codehash {live_codehash})")
     else:
         print("live re-verification skipped (set ETH_RPC_URL to enable)")
 
