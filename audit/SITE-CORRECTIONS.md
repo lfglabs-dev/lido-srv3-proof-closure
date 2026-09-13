@@ -203,23 +203,29 @@ that actually delivers what the name promises:
   `source_topup_conserves_and_rolls_back`.  Retiring A-ABSTRACT-TX
   from the parent's ENUNCE (rewriting the 5-conjunct signature) is
   still open.
-- **D-EMPTY-1 / D-AUTH-1 / D-WC-1 prefix-guards naming bridge**
-  (Piste-A chantier 1, PR #627, 2026-09-13):  new bridge parent
+- **D-EMPTY-1 executable-plane closure**
+  (Piste-A chantier 1, 2026-09-13, Thomas correction on scaffolds):
+  new CLI-plane entry point `Verity.TopupTx.executeSourceShape` in
+  `LidoSRv3/Audit/Verity/TopupTx.lean` inserts a `require (decide
+  (allocations.length ≠ 0)) "EmptyKeysList"` prefix guard before
+  delegating to `execute`, mirroring pinned `StakingRouter.sol:695
+  if (keyIndices.length == 0) revert EmptyKeysList()`.
+  `executeSourceShape_reverts_on_empty` proves the empty-input
+  revert; the registered parent
+  `verity_tx_simulates_source_with_nonzero_wrap_close` gains a 5th
+  conjunct consuming this — a real ENUNCE change, not a bridge.
+  The two prior naming bridges
   `source_topup_conserves_and_rolls_back_under_prefix_guards_shape`
-  in `PTopup1` names the three pinned StakingRouter.topUp:686-716
-  prefix guards at the parent's ENUNCE via
-  `TopupPrefixGuardsSource`: `callerIsTopupGateway = decide (caller
-  = topupGateway)` (D-AUTH-1, line 686 `NotAuthorized`);
-  `keysListNonEmpty = decide (keyIndices.length ≠ 0)` (D-EMPTY-1,
-  line 695 `EmptyKeysList`); `wcTypeIsType2 = decide (wcTypeByte =
-  2)` (D-WC-1, line 702 `WrongWithdrawalCredentialsType`).  The
-  Verity `executeGuarded` interpreter starts at line 717 and does
-  NOT exercise these prefix guards; the bridge NAMES them at the
-  parent's ENUNCE.  **NAMING composition** — executable-plane
-  extension to include 686-716 remains the follow-up (analog of
-  D-CALL-1 prefix-then-suffix half, still open).
+  (D-AUTH-1 / D-EMPTY-1 / D-WC-1) and
+  `source_topup_conserves_and_rolls_back_under_gateway_oracle_shape`
+  (Aragon ACL oracle) are DELETED per Thomas 2026-09-13 rule:
+  scaffolds are removed in the PR that closes the divergence.
+  `AbstractTxIsolation.topup_verity_parent_ignores_abstract_tx`
+  destructures the 5 conjuncts instead of 4.  D-AUTH-1 and D-WC-1
+  remain in `fidelity.missing` (still not exercised on the executable
+  plane); D-EMPTY-1 removed.
 
-**Site fix:** update the TOPUP-1 card to describe the four-conjunct
+**Site fix:** update the TOPUP-1 card to describe the five-conjunct
 Verity parent honestly, disclose the D-CALL-1 residual
 (prefix-then-suffix half of the executable-plane extension), reflect
 that **all four** SourceTopupInput booleans (`lidoCanDeposit`,
@@ -232,10 +238,9 @@ A-ABSTRACT-TX conjunct is still in the registered parent), reflect
 that **both halves of D-ADDR-1** (beacon and Lido addresses) are
 anchored to the deployed StakingRouter runtime bytecode via
 `BeaconDepositAddress.lean` and `LidoAddress.lean`, and mention the
-D-EMPTY-1 / D-AUTH-1 / D-WC-1 prefix-guards naming bridge
-`source_topup_conserves_and_rolls_back_under_prefix_guards_shape`
-(noting the executable-plane extension past line 717 remains the
-follow-up).
+**D-EMPTY-1 executable closure** via `executeSourceShape` (with the
+two prior naming bridges deleted).  D-AUTH-1 and D-WC-1 remain open
+on the executable plane.
 
 ## TOPUP-2 — narrowing signal is 'exact under gateway-shape premise, wrapped otherwise' (chantier 4bis)
 

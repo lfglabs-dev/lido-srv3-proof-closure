@@ -1748,4 +1748,44 @@ theorem observe_after_leading_entry (before after : ContractState) (entry : Exte
   simp only [observe, hOuter, hInner, callValueOf, beq_iff_eq, hName, if_false,
     Nat.zero_add, List.map_cons]
 
+/-! ## D-EMPTY-1 CLI-plane closure
+
+Chantier 1 (Piste A, Thomas 2026-09-13, Grok differential #414 D-EMPTY-1
+executable closure). The pinned `StakingRouter.sol:695 if (keyIndices.length
+== 0) revert EmptyKeysList()` guard is now exercised on the executable
+Verity plane by the CLI entry point below.  Under `SourceTopupCallWellFormed`
+the module returndata (= allocations list) has the same length as the
+caller's `keyIndices` (`SourceTopupCallWellFormed.pubkeys.length =
+moduleReturndata.length` and `keyIndices.length = pubkeys.length` by
+`ArraysLengthMismatch()` at pinned line 692-694), so a nonempty allocations
+list on the CLI plane models a nonempty `keyIndices` in the pinned source
+call.  The registered parent `Guarantees.PTopup1.verity_tx_simulates_source_with_nonzero_wrap_close`
+consumes `executeSourceShape_reverts_on_empty` as its fifth conjunct. -/
+
+def executeSourceShape (allocations : List Nat) (failure : FailurePoint) :
+    Contract Unit := do
+  -- StakingRouter.sol:695  if (keyIndices.length == 0) revert EmptyKeysList();
+  require (decide (allocations.length ≠ 0)) "EmptyKeysList"
+  execute allocations failure
+
+/-- The CLI-plane entry reverts closed on empty allocations, restoring the
+entry snapshot (D-EMPTY-1 executable-plane closure). -/
+theorem executeSourceShape_reverts_on_empty (failure : FailurePoint)
+    (state : ContractState) :
+    (executeSourceShape [] failure).run state =
+      ContractResult.revert "EmptyKeysList" state := by
+  simp [executeSourceShape, Contract.run, Bind.bind, _root_.Verity.bind,
+    _root_.Verity.require]
+
+/-- On nonempty allocations, `executeSourceShape` reduces to `execute`; the
+D-EMPTY-1 guard is pass-through, so every downstream theorem about `execute`
+transfers verbatim to the CLI plane via this equation. -/
+theorem executeSourceShape_of_nonempty (allocations : List Nat)
+    (failure : FailurePoint) (state : ContractState)
+    (hNonempty : allocations.length ≠ 0) :
+    (executeSourceShape allocations failure).run state =
+      (execute allocations failure).run state := by
+  simp [executeSourceShape, Contract.run, Bind.bind, _root_.Verity.bind,
+    _root_.Verity.require, hNonempty]
+
 end LidoSRv3.Audit.Verity.TopupTx

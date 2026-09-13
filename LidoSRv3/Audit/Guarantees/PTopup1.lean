@@ -462,114 +462,6 @@ theorem source_topup_conserves_and_rolls_back {State : Type}
       fun hLoop hOver => source_over_target_guard_required cfg inp hAuth hKeys hLens hPub hMod
         hActive hWc hGwei hPaused hLoop hOver⟩⟩
 
-/-- **Chantier 1 (Piste A, Thomas 2026-09-13) D-EMPTY-1 / D-AUTH-1 /
-D-WC-1 prefix-guards naming bridge.**
-
-Restates `source_topup_conserves_and_rolls_back` with added
-`_hPrefixGuards` premises NAMING the pinned StakingRouter.topUp
-prefix guards (source lines 686-716) via
-`TopupPrefixGuardsSource`.  The Verity plane's
-`Verity.TopupTx.executeGuarded` interpreter starts at
-`allocateDeposits` (line 717), so the three prefix guards are NOT
-exercised on the executable plane.
-
-This bridge names each pinned prefix guard as a source-level
-function of the pinned inputs at the parent's ENUNCE level:
-
-- `callerIsTopupGateway caller topupGateway` (D-AUTH-1, source
-  line 686 `msg.sender != TOPUP_GATEWAY → revert NotAuthorized()`).
-- `keysListNonEmpty keyIndices` (D-EMPTY-1, source line 695
-  `keyIndices.length == 0 → revert EmptyKeysList()`).
-- `wcTypeIsType2 wcTypeByte` (D-WC-1, source line 702
-  `wc[0] != WC_TYPE_2 → revert WrongWithdrawalCredentialsType()`).
-
-**NAMING composition, not full closure of D-EMPTY-1 / D-AUTH-1 /
-D-WC-1.**  The Verity `executeGuarded` interpreter still starts
-past line 717; extending it to include the prefix-guard branches at
-686-716 is the executable-plane extension follow-up (analog of the
-D-CALL-1 prefix-then-suffix half already flagged in
-`fidelity.missing`).  The registered `source_topup_conserves_and_rolls_back`
-is retained for existing consumers. -/
-theorem source_topup_conserves_and_rolls_back_under_prefix_guards_shape
-    {State : Type}
-    (cfg : SourceTopupConfig) (inp : SourceTopupInput)
-    (before after : State) (attempts : List CallAttempt) (trace : CommitTrace)
-    (caller topupGatewayAddr wcTypeByte : Nat)
-    (_hPrefixGuards :
-      -- The three prefix guards as source-level functions of pinned
-      -- inputs; each named after the pinned Solidity revert.
-      (LidoSRv3.Audit.Source.TopupPrefixGuardsSource.callerIsTopupGateway
-          caller topupGatewayAddr = decide (caller = topupGatewayAddr)) ∧
-      (∀ keyIndices : List Nat,
-        LidoSRv3.Audit.Source.TopupPrefixGuardsSource.keysListNonEmpty
-          keyIndices = decide (keyIndices.length ≠ 0)) ∧
-      (LidoSRv3.Audit.Source.TopupPrefixGuardsSource.wcTypeIsType2 wcTypeByte =
-        decide (wcTypeByte = LidoSRv3.Audit.Source.TopupPrefixGuardsSource.wcType2Byte))) :
-    ConservesAndRollsBack cfg inp before after attempts trace ∧
-    UnregisteredModuleReverts cfg inp ∧
-    WrapMovesNoValue cfg inp ∧
-    WrongWcTypeReverts cfg inp ∧
-    RunFollowsAllocationLoop cfg inp :=
-  -- The prefix-guards premise names the three pinned prefix guards
-  -- at 686/695/702 as source-level functions; the proof delegates
-  -- to the registered parent since the source-plane guards
-  -- (which are exercised in the parent's second and fourth
-  -- conjuncts) are unchanged.  The ENUNCE now records the pinned
-  -- prefix-guard shapes that the Verity executable plane omits
-  -- past line 717 (D-EMPTY-1 / D-AUTH-1 / D-WC-1 disclosure).
-  source_topup_conserves_and_rolls_back cfg inp before after attempts trace
-
-/-- **Chantier 1 (Piste A, Thomas 2026-09-13) top-up-gateway oracle
-naming bridge.**
-
-Restates `source_topup_conserves_and_rolls_back` with an added
-`_hOracleShape` premise NAMING the pinned top-up-gateway
-ACL-registry check via a shared oracle-backed derivation
-(`TopupGatewayRoleViaOracleSource.isTopUpGatewayFromOracle`).
-
-The parent's `SourceTopupInput.callerIsTopUpGateway` boolean (now a
-`@[reducible, simp] def` accessor of `srCtx.callerIsGatewayFromRead`
-after PR #583) reduces to a caller-supplied boolean.  This bridge
-NAMES an alternate derivation path via a shared keccak-oracle on
-the Aragon ACL registry storage: `isTopUpGatewayFromOracle oracle
-aclBaseSlot = hasRoleFromOracle oracle aclBaseSlot
-"TOP_UP_GATEWAY_APP"`.
-
-The item-(c) follow-up flagged in `fidelity.missing` — "(c)
-Aragon-ACL top-up-gateway registry read model" — is thereby named
-at the parent's ENUNCE.  Downstream P-TOPUP-1 consumers can supply
-a `KeccakOracle` and an ACL base slot instead of an anonymous
-boolean.
-
-**NAMING composition.**  The registered
-`source_topup_conserves_and_rolls_back` is retained unchanged; the
-oracle-backed derivation is a source-model layer, not a live-EVM
-STATICCALL frame. -/
-theorem source_topup_conserves_and_rolls_back_under_gateway_oracle_shape
-    {State : Type}
-    (cfg : SourceTopupConfig) (inp : SourceTopupInput)
-    (before after : State) (attempts : List CallAttempt) (trace : CommitTrace)
-    (oracle : LidoSRv3.Audit.Source.KeccakConcreteCommitmentSource.KeccakOracle)
-    (aclBaseSlot : Nat)
-    (_hOracleShape :
-      LidoSRv3.Audit.Source.TopupGatewayRoleViaOracleSource.isTopUpGatewayFromOracle
-        oracle aclBaseSlot =
-      LidoSRv3.Audit.Source.ACLRoleMappingViaOracleSource.hasRoleFromOracle
-        oracle aclBaseSlot
-        LidoSRv3.Audit.Source.TopupGatewayRoleViaOracleSource.topUpGatewayRoleName) :
-    ConservesAndRollsBack cfg inp before after attempts trace ∧
-    UnregisteredModuleReverts cfg inp ∧
-    WrapMovesNoValue cfg inp ∧
-    WrongWcTypeReverts cfg inp ∧
-    RunFollowsAllocationLoop cfg inp :=
-  -- The oracle-shape premise names the pinned top-up-gateway
-  -- ACL-registry check via the shared keccak oracle.  The proof
-  -- delegates to the registered parent since the free
-  -- `callerIsTopUpGateway` def accessor is unchanged; the ENUNCE
-  -- records the oracle-backed derivation path for the caller
-  -- context.
-  source_topup_conserves_and_rolls_back cfg inp before after attempts trace
-
 /--
 The `assert(etherBalanceBeforeTopUp == etherBalanceAfterTopUp)` at
 `StakingRouter.sol` line 755 holds on the committing push branch: the router
@@ -954,8 +846,21 @@ theorem verity_tx_simulates_source_with_nonzero_wrap_close
       (inp.allocations.length ≤ uint256Modulus →
         (∀ a ∈ inp.allocations, a < uint256Modulus) →
         (run cfg inp).reverts = false →
-          VerityCommittingSimulation cfg inp state) := by
-  refine ⟨hCall, ?_, ?_, ?_⟩
+          VerityCommittingSimulation cfg inp state) ∧
+      -- Chantier 1 (Piste A, Thomas 2026-09-13, Grok differential #414
+      -- D-EMPTY-1 executable closure).  The CLI-plane entry point
+      -- `Verity.TopupTx.executeSourceShape` reverts closed on empty
+      -- allocations, matching the pinned `StakingRouter.sol:695
+      -- if (keyIndices.length == 0) revert EmptyKeysList()` guard.
+      -- `Contract.run` restores the entry snapshot (universal fail-closed
+      -- rollback).  The 5th-conjunct extension is a real executable-plane
+      -- promise, not a naming bridge: `executeSourceShape` adds a genuine
+      -- prefix-guard branch on top of `execute`, and this parent's ENUNCE
+      -- now consumes it.
+      (∀ failure : Verity.TopupTx.FailurePoint,
+        (Verity.TopupTx.executeSourceShape [] failure).run state =
+          Verity.ContractResult.revert "EmptyKeysList" state) := by
+  refine ⟨hCall, ?_, ?_, ?_, ?_⟩
   · exact
       ⟨fun failure =>
           Verity.TopupTx.executeGuarded_binds_returndata cfg call failure _,
@@ -973,6 +878,8 @@ theorem verity_tx_simulates_source_with_nonzero_wrap_close
     exact verity_nonzero_wrap_reverts_and_restores allocations state hWrap hNz hAmt
   · intro hLen hAmt hCommit
     exact verity_tx_simulates_source cfg inp state hLen hAmt hCommit
+  · intro failure
+    exact Verity.TopupTx.executeSourceShape_reverts_on_empty failure state
 
 /-- **Chantier 1 (Piste A, Thomas 2026-09-13): executable Contract.run
 rollback for the guarded Verity plane.**
