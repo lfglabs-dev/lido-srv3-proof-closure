@@ -136,6 +136,7 @@ import LidoSRv3.Audit.Source.SolidityCheckedSubSource
 import LidoSRv3.Audit.Source.SolidityCheckedAddSource
 import LidoSRv3.Audit.Source.SolidityCheckedMulSource
 import LidoSRv3.Audit.Source.SolidityMinSource
+import LidoSRv3.Audit.Source.SRAllocationConstantsSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -1110,6 +1111,10 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.SolidityMinSource.minU_le_right
 #print axioms LidoSRv3.Audit.Source.SolidityMinSource.left_le_maxU
 #print axioms LidoSRv3.Audit.Source.SolidityMinSource.right_le_maxU
+-- Fifty-sixth-step (2026-09-13): P-ALLOC-1 pinned SR allocation constants (item 5).
+#print axioms LidoSRv3.Audit.Source.SRAllocationConstantsSource.stakeShareLimitMaxBp_le_uint16Max
+#print axioms LidoSRv3.Audit.Source.SRAllocationConstantsSource.stakeShareLimit_le_max_of_validated
+#print axioms LidoSRv3.Audit.Source.SRAllocationConstantsSource.stakeShareLimit_le_uint16Max_of_bounded
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape
