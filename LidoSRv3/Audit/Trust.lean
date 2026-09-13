@@ -111,6 +111,7 @@ import LidoSRv3.Audit.Source.ERC7201StorageSlotSource
 import LidoSRv3.Audit.Source.DepositDistinctModulesSource
 import LidoSRv3.Audit.Source.TopupPrefixGuardsSource
 import LidoSRv3.Audit.Source.TopupLidoAddressSource
+import LidoSRv3.Audit.Source.TopupWithdrawTwoArgSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -999,6 +1000,10 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.TopupPrefixGuardsSource.allPrefixGuardsPass_true_of_premises
 -- Thirtieth-step (2026-09-13): TOPUP-1 lidoAddress deployment-identity source model.
 #print axioms LidoSRv3.Audit.Source.TopupLidoAddressSource.lidoAddressMatches_true_of_eq
+-- Thirty-first-step (2026-09-13): TOPUP-1 D-CALL-1 two-argument withdraw shape.
+#print axioms LidoSRv3.Audit.Source.TopupWithdrawTwoArgSource.withdrawArgs_length
+#print axioms LidoSRv3.Audit.Source.TopupWithdrawTwoArgSource.withdrawArgs_first
+#print axioms LidoSRv3.Audit.Source.TopupWithdrawTwoArgSource.withdrawArgs_second
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape
