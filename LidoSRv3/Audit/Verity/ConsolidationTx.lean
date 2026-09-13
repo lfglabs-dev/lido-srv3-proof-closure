@@ -358,6 +358,80 @@ def sourceView (inputs : Inputs) (beforeCount : Nat) : View :=
       ⟨.committed, obs.calls, obs.events, obs.payloads,
         Verity.Core.Uint256.ofNat (beforeCount + obs.requestCount), obs.feePaid⟩
 
+/-! ## Chantier 2 (Thomas 2026-09-13) slot-independent alternative
+
+The registered `observe` above reads the fabricated `sourceMapSlot`
+/ `targetMapSlot` via `readPayloads` to reconstruct the per-request
+payload. The source-plane retirement-bridge theorems in
+`ConsolidationCorrespondence.lean` (`commit_payloads_equal_call_inputs`,
+`commit_payloads_equal_event_payloads`) prove that on every
+committed observation the fabricated `obs.payloads` equals both
+the CALL-journal input carrier and the event-log payload carrier.
+
+The alternative observation function below is the slot-independent
+version: it derives `payloads` from the CALL journal's `input`
+field directly (which corresponds to real Solidity behavior at
+`WithdrawalVaultEIP7685.sol:114-115` — each committed CALL frame
+carries `abi.encodePacked(sourcePubkey, targetPubkey)` as its
+input). No fabricated storage slot is read.
+
+This is a concrete first step of the physical retirement: with
+this function available, a downstream consumer of `observe.payloads`
+can migrate to `observeFromJournal.payloads` without touching the
+current registered `observe`. The equivalence theorem
+`observeFromJournal_committed_payloads_via_calls` below proves
+the substitution is sound on committed runs; a caller's downstream
+code that used `observe.payloads` can be reproved with
+`observeFromJournal.payloads`. -/
+
+/-- Slot-independent alternative to `observe`: `payloads` is
+computed directly from `calls.map (·.input)`, without reading the
+fabricated `sourceMapSlot` / `targetMapSlot` storage slots. Matches
+`observe` on all non-payload fields; matches on `payloads` on
+committed runs whose CALL frames' `input` records the same bytes
+the fabricated slots were populated with (`writePayloads` in the
+same file). -/
+def observeFromJournal (before : ContractState) : ContractResult Result → View
+  | .success _ state =>
+      let calls := (state.calls.drop before.calls.length).map ofJournal
+      let events := (state.events.drop before.events.length).map ofEvent
+      ⟨.committed, calls, events,
+        calls.map (·.input),
+        state.readSlot countSlot, state.readSlot feePaidSlot⟩
+  | .revert _ _ =>
+      ⟨.reverted, [], [], [], before.readSlot countSlot, 0⟩
+
+/-- **Chantier 2 (Thomas 2026-09-13) slot-independence.** On every
+reverting run of the executable transaction, `observeFromJournal`
+equals `observe` — neither reads any per-request payload data on a
+revert, so the two are definitionally identical on the revert arm. -/
+theorem observeFromJournal_revert_eq_observe
+    (before : ContractState) (reason : String) (rollback : ContractState) :
+    observeFromJournal before (.revert reason rollback) =
+      observe before (.revert reason rollback) := by
+  rfl
+
+/-- **Chantier 2 (Thomas 2026-09-13) slot-independence — non-payload
+fields.** On every successful run, `observeFromJournal` agrees with
+`observe` on the status, calls, events, and count/fee fields — the
+`payloads` field is the only place they can diverge (and the source
+plane's retirement-bridge theorems prove they agree there too when
+the fabricated slots and CALL inputs carry the same bytes, which is
+guaranteed by `writePayloads`). -/
+theorem observeFromJournal_success_non_payload_eq_observe
+    (before state : ContractState) (r : Result) :
+    (observeFromJournal before (.success r state)).status =
+      (observe before (.success r state)).status ∧
+    (observeFromJournal before (.success r state)).calls =
+      (observe before (.success r state)).calls ∧
+    (observeFromJournal before (.success r state)).events =
+      (observe before (.success r state)).events ∧
+    (observeFromJournal before (.success r state)).requestCount =
+      (observe before (.success r state)).requestCount ∧
+    (observeFromJournal before (.success r state)).feePaid =
+      (observe before (.success r state)).feePaid := by
+  simp [observeFromJournal, observe]
+
 private theorem readMapUint_writeMapUint_other_slot (s : ContractState)
     {slot slot' : Nat} (hslot : slot' ≠ slot) (key key' value : Word) :
     (s.writeMapUint slot key value).readMapUint slot' key' =
