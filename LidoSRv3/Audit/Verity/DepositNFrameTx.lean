@@ -310,8 +310,16 @@ structure Preconditions (inputs : Inputs) (state : ContractState) : Prop where
   this premise the pinned pull `wordKeys * maxEBType1` and the per-batch push
   aggregate `wordTotal = wordKeys * depositSize` (per `valueMatches`) would
   differ, so the line-996 balance assert would fire with `Panic(0x01)` — the
-  assert is now genuinely load-bearing (grok #412 D-SKEW-1). -/
-  conserving : inputs.maxEBType1 = inputs.depositSize
+  assert is now genuinely load-bearing (grok #412 D-SKEW-1).
+
+  Grok #412 Preconditions retirement follow-up (2026-09-13, fourth relaxation
+  after entryBalance / funded / lidoCallOk): required only when the pinned
+  `shouldPull` predicate fires and the pull+push+assert tail actually runs.
+  On empty-batch inputs (exactKeys = 0 → shouldPull = false) the executor
+  never invokes `executePullPushAssertTail`, so `maxEBType1` never enters
+  the pull quantity — a skewed deployment on an empty-batch call now
+  composes under the registered parent. -/
+  conserving : shouldPull inputs = true → inputs.maxEBType1 = inputs.depositSize
   /-- Genuine relaxation of the previous `entryBalance : state.selfBalance = 0`
   (grok #412 Preconditions retirement follow-up, 2026-09-13): the parent now
   admits any entry `selfBalance` whose sum with the batches' exact total fits
@@ -670,9 +678,11 @@ theorem execute_apply (inputs : Inputs) (state : ContractState)
   -- `wordKeys inputs.batches * inputs.maxEBType1` collapses back to `wordTotal`
   -- via `Preconditions.valueMatches`; the split becomes observable only on a
   -- skewed deployment, where the line-996 balance assert would fire.
-  have hPullTotal :
-      wordKeys inputs.batches * inputs.maxEBType1 = wordTotal inputs.batches := by
-    rw [h.conserving, ← h.valueMatches]
+  -- `conserving` is now conditional on `shouldPull inputs = true`; the
+  -- derivation only fires in the pull-branch of the case split below.
+  have hPullTotal : shouldPull inputs = true →
+      wordKeys inputs.batches * inputs.maxEBType1 = wordTotal inputs.batches := fun hPull => by
+    rw [h.conserving hPull, ← h.valueMatches]
   have hDistinctGuard :
       decide ((inputs.batches.map fun batch => batch.moduleId).Nodup) = true :=
     decide_eq_true h.distinctModules
@@ -685,7 +695,7 @@ theorem execute_apply (inputs : Inputs) (state : ContractState)
   by_cases hPull : shouldPull inputs
   · -- Nonempty branch: pull, push per batch, and assert.
     simp only [hPull, if_true, executePullPushAssertTail, Bind.bind, _root_.Verity.bind,
-      hPullTotal]
+      hPullTotal hPull]
     rw [pullFromLido_apply inputs (wordTotal inputs.batches) (wordKeys inputs.batches)
       processed (h.lidoCallOk hPull) (hFunded hPull)]
     simp only [Bind.bind, _root_.Verity.bind]
