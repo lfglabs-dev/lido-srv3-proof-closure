@@ -256,6 +256,47 @@ theorem verity_tx_revert_restores_snapshot
     rollback = state :=
   revert_restores_snapshot inputs inject state rollback reason h
 
+/-- **Chantier 2 (Thomas 2026-09-13) slot-free consumer of
+`verity_tx_simulates_consolidation_from_journal`.**
+`addRequestsSlotFree` — the retirement companion of the registered
+`addRequests` that persists effects via `persistSlotFree` (no
+`writePayloads` writes to the fabricated `sourceMapSlot` /
+`targetMapSlot`) — simulates the pinned Solidity source at the same
+slot-independent view, under the same premises. Direct alias of
+`observeFromJournal_simulates_pinned_source_slotFree` (PR #622);
+named here under the P-CONSOLIDATION-1 guarantee namespace so a
+retirement-adopting consumer sees an already-registered alias. -/
+theorem verity_tx_simulates_consolidation_from_journal_slotFree
+    (inputs : Inputs) (state : Verity.ContractState)
+    (hCountBound : (state.readSlot countSlot).val + inputs.sources.length <
+      Verity.Core.Uint256.modulus)
+    (hEntry : state.selfBalance.val + inputs.msgValue.val <
+      Verity.Core.Uint256.modulus)
+    (hSources : readArray state "sources" sourcesBase inputs.sources.length =
+      some inputs.sources)
+    (hTargets : readArray state "targets" targetsBase inputs.targets.length =
+      some inputs.targets)
+    (hSourceLens : readArray state "sourceLens" sourceLensBase
+      inputs.sourceLens.length = some inputs.sourceLens)
+    (hTargetLens : readArray state "targetLens" targetLensBase
+      inputs.targetLens.length = some inputs.targetLens) :
+    observeFromJournal state ((addRequestsSlotFree inputs).run state) =
+      sourceView inputs (state.readSlot countSlot).val :=
+  observeFromJournal_simulates_pinned_source_slotFree inputs state
+    hCountBound hEntry hSources hTargets hSourceLens hTargetLens
+
+/-- **Chantier 2 (Thomas 2026-09-13) slot-free revert-rollback consumer.**
+The slot-free companion `addRequestsSlotFree` inherits the pre-call
+snapshot rollback property on every reverting run — an alias of
+`revert_restores_snapshot_slotFree` (PR #623) exposed under the
+P-CONSOLIDATION-1 guarantee namespace. -/
+theorem verity_tx_revert_restores_snapshot_slotFree
+    (inputs : Inputs) (inject : Bool) (state rollback : Verity.ContractState)
+    (reason : String)
+    (h : (addRequestsSlotFree inputs inject).run state = .revert reason rollback) :
+    rollback = state :=
+  revert_restores_snapshot_slotFree inputs inject state rollback reason h
+
 /-- **Kill-line: packing order.** If source ≠ target, a swapped
 target then source concat produces a different observation than the
 canonical source then target. One pair suffices. -/
