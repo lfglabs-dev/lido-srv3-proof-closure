@@ -1338,6 +1338,15 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PReserveRelational.verity_reserve_slot_is_not_read
 #print axioms LidoSRv3.Audit.Guarantees.PReserveRelational.verity_reserve_does_not_change_finalization
 #print axioms LidoSRv3.Audit.Guarantees.PReserveRelational.verity_revert_restores_snapshot
+-- Chantier 1 (Thomas 2026-09-13): the registered ABSTRACT parent for
+-- P-SSZ-1 is now `real_validator_correspondence`, whose statement names
+-- the pinned 8-leaf Validator layout, the fork-aware gindex choice, the
+-- verifyProof / foldPath equivalence, and the EIP-4788 anchor identity.
+-- The previous `deposit_root_iff` Nat.pair gadget stays as an
+-- unregistered child (still #print axioms'd for kernel evidence).
+#print axioms LidoSRv3.Audit.Guarantees.PSsz1.real_validator_correspondence
+#print axioms LidoSRv3.Audit.Guarantees.PSsz1.real_validator_correspondence_witness
+#print axioms LidoSRv3.Audit.Guarantees.PSsz1.real_validator_correspondence_mutant_target_refutes_parent
 #print axioms LidoSRv3.Audit.Guarantees.PSsz1.deposit_root_iff
 #print axioms LidoSRv3.Audit.Guarantees.PSsz1.deposit_unique_of_perfect
 #print axioms LidoSRv3.Audit.Guarantees.PSsz1.sourceNode_mutant_kill_line_refutes_parent

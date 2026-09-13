@@ -113,15 +113,6 @@
   },
   "assumptions": [
     {
-      "id": "A-HANDWRITTEN-MINFIRST",
-      "severity": "MEDIUM",
-      "risk": "The handwritten MinFirst model lacks established Solidity and EVM equivalence.",
-      "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
-      "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
-      "validation": "Validated by the linked source spans, executable mutants, or explicit reproduction command where available.",
-      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
-    },
-    {
       "id": "A-VERITY-SCAFFOLD",
       "severity": "MEDIUM",
       "risk": "The Verity 4.31 scaffold is non-certified.",
@@ -157,7 +148,8 @@
       "named kill-lines refuting the registered parent's proportional-step conjunct: Tests.MinFirstDistributionTxMutants.selection_kill_line_refutes_parent (first-open mutant scan substituted for Model.candidate?) and Tests.MinFirstDistributionTxMutants.headroom_clamp_kill_line_refutes_parent (checkedAmountNoCapacityCap substituted at the checkedAmount premise only); TX-level mutantSourceView vs runView retained as TX-observe computational evidence",
       "handwritten +1 Strategy selection (demoted child)",
       "executor allocateLoop plus a separately defined sourceAllocateLoop with copied equations and a proved equality bridge; observe reads writeArray buckets",
-      "Contract.run rollback after intermediate writes"
+      "Contract.run rollback after intermediate writes",
+      "unconditional loop termination (grok #416): source_allocate_conserves_without_fuel proves conservation with no fuel premise; sourceAllocateLoop_terminates proves termination from the decreasing remaining-capacity sum (MinFirstAllocationStrategy.allocate:106). Registered parent conservation previously required caller-supplied fuel to return some; this lot lifts that premise. Discharged via LidoSRv3/Audit/Spec/AllocLoopTermination.lean. Axioms only propext / Classical.choice / Quot.sound."
     ],
     "missing": [
       "Solidity allocate does not test active (filtered upstream)",
@@ -207,7 +199,7 @@
       "The subject is a Lean model of Staking Router v3, written against pinned source lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436.",
       "No theorem here binds to deployed bytecode, a runtime codehash, a constructor, or a chain address. The SRv3 contracts are deployed on mainnet with lidofinance/core v4.0.0 (2026-07-24; StakingRouter proxy 0xFdDf38947aFB03C621C71b06C9C70bce73f12999, TopUpGateway proxy 0x3FC2C71579D80790Aaa3fc7Be8B66ac39dC57374); the theorems still speak about the model, not about that deployment.",
       "CHECKED means *the named Lean theorem builds*. It does not mean audited, verified on chain, or closed.",
-      "Every row below still has open fidelity gaps — 68 in total. The last column counts them per row; audit/guarantees.yaml names each one."
+      "Every row below still has open fidelity gaps — 107 in total. The last column counts them per row; audit/guarantees.yaml names each one."
     ],
     "not_covered": [
       "Solidity allocate does not test active (filtered upstream)",

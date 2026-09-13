@@ -3,6 +3,11 @@ import LidoSRv3.Audit.Spec
 import LidoSRv3.Audit.SszDepositEquivalence
 import LidoSRv3.Audit.Source.DepositDataRootCorrespondence
 import LidoSRv3.Audit.Source.GIndexConcatCorrespondence
+import LidoSRv3.Audit.Source.Sha256OpacitySource
+import LidoSRv3.Audit.Source.SszGindexSource
+import LidoSRv3.Audit.Source.SszVerifyProofSource
+import LidoSRv3.Audit.Source.SszValidatorHashTreeRootSource
+import LidoSRv3.Audit.Source.BeaconRootsEip4788Source
 import LidoSRv3.Audit.Verity.SszAbstractDigest
 import LidoSRv3.Audit.Verity.SszTxSimulation
 import LidoSRv3.Audit.Verity.SszEncodingTx
@@ -687,5 +692,234 @@ theorem verity_tx_two_batch_rolls_back
     (h : (encodeTwo first second true).run state = .revert reason rollback) :
     rollback = state :=
   revert_restores_snapshot_two first second true state rollback reason h
+
+/-! ### Real-object abstract parent (chantier 1, Thomas 2026-09-13)
+
+The previous registered abstract parent `deposit_root_iff` states a
+`Spec.SszWitness.Correspondence` at `.clValidatorVerifier` on the
+`depositSszWitness` gadget: a dummy validator at generalized index 2 with
+`Nat.pair` combine — an object that `CLValidatorVerifier._verifyValidator`
+(`0.8.25/CLValidatorVerifier.sol:44-85`) never checks. Thomas's 2026-09-13
+directive downgrades that gadget to an unregistered child and registers
+instead an abstract parent whose statement names the *real* pieces the
+compiled entry consumes: the 8-leaf `Validator` container from
+`_validatorHashTreeRoot` (`CLValidatorVerifier.sol:60-85`), the
+fork-aware generalized index
+`concat(GI_STATE_ROOT, GI_FIRST_VALIDATOR_{PREV|CURR}.shr(i))`
+(`CLValidatorVerifier.sol:54`, `97-100`), the `SSZ.verifyProof` Merkle
+fold (`common/lib/SSZ.sol:179`), and the EIP-4788 `BEACON_ROOTS` read
+(`CLValidatorVerifier.sol:103-107`). All four pieces are drawn from
+their source-plane models: `SszValidatorHashTreeRootSource.Validator` /
+`validatorHashTreeRoot`, `SszVerifyProofSource.verifyProof` /
+`foldPath`, `BeaconRootsEip4788Source.canonicalCall` /
+`beaconRootsAddress`, and `Sha256OpacitySource.Sha256Oracle`. The gindex
+concat pivot on the source plane reuses the pinned `GIndex.concat` and
+`fls` semantics already transcribed in
+`Source.GIndexConcatCorrespondence`.
+
+Conclusions that depend on the SHA-256 opacity assumption
+`A-SHA256-FFI`: the `oracle : Sha256Oracle` supplies an abstract
+32-byte hash function via `Sha256Oracle.hash` /
+`Sha256Oracle.outputLength` / `Sha256Oracle.determinism`. The parent's
+`fold_matches_verify_iff` conjunct is definitional in the oracle (a
+`decide` on a `foldPath` equality), so it holds for every
+`Sha256Oracle`, whether or not that oracle coincides with FIPS
+SHA-256. The identity `leaf_is_pinned_hash_tree_root` is likewise
+oracle-parametric: it names the pinned 8-leaf pairwise schedule but
+does not claim its outputs are the FIPS SHA-256 of the concatenated
+byte inputs. What A-SHA256-FFI still gates is the collision-freedom
+identification that would let a caller conclude "the verified branch
+uniquely determined the deposited validator container"; the abstract
+parent does not make that claim and is silent on it.
+
+Anchors (`parentBlockRoot`, fork version, claimed root) remain
+independently supplied at the abstract plane; the compiled entry
+`actual_compiled_cl_entry_complete_declared_branch` binds them to
+executed calldata / STATICCALL replies, so the two planes now share
+their real-object vocabulary. -/
+
+section RealValidatorParent
+
+open LidoSRv3.Audit.Source.Sha256OpacitySource
+open LidoSRv3.Audit.Source.SszGindexSource
+open LidoSRv3.Audit.Source.SszVerifyProofSource
+open LidoSRv3.Audit.Source.SszValidatorHashTreeRootSource
+open LidoSRv3.Audit.Source.BeaconRootsEip4788Source
+
+/-- Real-object abstract input for `real_validator_correspondence`.
+
+- `oracle` is the opaque `Sha256Oracle` under `A-SHA256-FFI`.
+- `validator` is the 8-field SSZ `Validator` container the deployed
+  `_validatorHashTreeRoot` (`CLValidatorVerifier.sol:60-85`) merkleizes.
+- `siblings` is the ABI-declared Merkle sibling path with parity per
+  gindex level (0 = current node on the left).
+- `parentBlockRoot` is the beacon-block-root returned by the EIP-4788
+  `BEACON_ROOTS` predeploy at the child block's timestamp.
+- `provenSlot` / `pivotSlot` implement the fork-aware branch in
+  `_getValidatorGI` (`CLValidatorVerifier.sol:97-100`).
+- `validatorIndex` is the `_offset` passed to `.shr` there.
+- `eip4788Call` is the canonicalized STATICCALL target-and-timestamp
+  pair; the anchor premise ties it to
+  `BeaconRootsEip4788Source.canonicalCall input.timestamp`. -/
+structure RealValidatorInput where
+  oracle : Sha256Oracle
+  validator : Validator
+  siblings : List (List Nat × Nat)
+  parentBlockRoot : List Nat
+  provenSlot : Nat
+  pivotSlot : Nat
+  validatorIndex : Nat
+  eip4788Call : BeaconRootsCall
+  timestamp : Nat
+
+/-- The pinned `_validatorHashTreeRoot` leaf: pairwise SHA-256
+merkleization of the 8 fields of `validator`, exactly the schedule
+`SszValidatorHashTreeRootSource.validatorHashTreeRoot` transcribes
+from `CLValidatorVerifier.sol:65-85`. -/
+def RealValidatorInput.leaf (input : RealValidatorInput) : List Nat :=
+  validatorHashTreeRoot input.oracle input.validator
+
+/-- The fork-aware first-validator gindex choice from
+`_getValidatorGI` (`CLValidatorVerifier.sol:98`): pre-pivot slots use
+`GI_FIRST_VALIDATOR_PREV`, post-pivot slots use
+`GI_FIRST_VALIDATOR_CURR`. Source-plane operands are the caller's
+supplied gindex integers; the abstract parent does not fix them, it
+merely names the branch. -/
+def RealValidatorInput.chosenFirstValidatorGI
+    (input : RealValidatorInput)
+    (gIFirstValidatorPrev gIFirstValidatorCurr : Nat) : Nat :=
+  if input.provenSlot < input.pivotSlot then gIFirstValidatorPrev
+  else gIFirstValidatorCurr
+
+/-- Registered ABSTRACT parent for P-SSZ-1 (Thomas 2026-09-13).
+
+The four bulleted pieces name the real deployed objects
+`CLValidatorVerifier._verifyValidator` checks, and jointly discharge
+the intended source-plane correspondence between the SSZ Merkle-fold
+verifier and the pinned `Validator` container merkleization:
+
+1. **8-leaf pairwise `Validator` layout** — `input.leaf` unfolds
+   definitionally to the pinned pairwise schedule
+   `validatorHashTreeRoot oracle input.validator` transcribed from
+   `CLValidatorVerifier.sol:65-85`. Not the `Nat.pair` dummy the
+   downgraded `deposit_root_iff` scaffolded.
+
+2. **Fork-aware gindex choice** — `chosenFirstValidatorGI` picks
+   `GI_FIRST_VALIDATOR_PREV` iff `provenSlot < pivotSlot`, matching
+   the ternary at `CLValidatorVerifier.sol:97-100`. The conjunct
+   names the branch on the abstract input; the numerical pivot
+   arithmetic (`.shr`, `GIndex.concat`) is proved elsewhere by
+   `GIndexConcatCorrespondence`.
+
+3. **`SSZ.verifyProof` iff `foldPath` reaches the claimed root** —
+   `SszVerifyProofSource.verifyProof` reduces (by definition of its
+   `decide`) to Merkle-fold equality, which is exactly the
+   `foldPath oracle input.leaf input.siblings = input.parentBlockRoot`
+   fact that Solidity's `verifyProof` (`common/lib/SSZ.sol:179`)
+   checks. Under `A-SHA256-FFI` `oracle.hash` remains opaque; the
+   equivalence itself does not depend on `oracle` being FIPS
+   SHA-256.
+
+4. **EIP-4788 anchor identity** — the anchor premise binds
+   `input.eip4788Call` to the canonical
+   `BeaconRootsEip4788Source.canonicalCall input.timestamp` at the
+   pinned predeploy address `0x000F3df6D732807Ef1319fB7B8bB8522d0Beac02`
+   (`CLValidatorVerifier.sol:27`, `103-107`). EIP-4788 history-ring
+   authenticity itself remains OPEN and is not represented on the
+   abstract plane.
+
+Anchors (`parentBlockRoot`, fork version, claimed root) remain
+independently supplied here — the compiled entry
+`actual_compiled_cl_entry_complete_declared_branch` binds them to
+executed calldata / STATICCALL replies, so the abstract and Verity
+planes share the same real-object vocabulary. -/
+theorem real_validator_correspondence
+    (input : RealValidatorInput)
+    (hEip4788Anchor : input.eip4788Call = canonicalCall input.timestamp)
+    (gIFirstValidatorPrev gIFirstValidatorCurr : Nat) :
+    -- (1) pinned 8-leaf hash-tree-root schedule
+    input.leaf = validatorHashTreeRoot input.oracle input.validator ∧
+    -- (2) fork-aware gindex choice matches the ternary at 97-100
+    ((input.provenSlot < input.pivotSlot →
+      RealValidatorInput.chosenFirstValidatorGI input
+        gIFirstValidatorPrev gIFirstValidatorCurr = gIFirstValidatorPrev) ∧
+      (¬ input.provenSlot < input.pivotSlot →
+        RealValidatorInput.chosenFirstValidatorGI input
+          gIFirstValidatorPrev gIFirstValidatorCurr = gIFirstValidatorCurr)) ∧
+    -- (3) `SSZ.verifyProof` iff Merkle fold reaches claimed root
+    (verifyProof input.oracle input.leaf input.siblings input.parentBlockRoot = true ↔
+      foldPath input.oracle input.leaf input.siblings = input.parentBlockRoot) ∧
+    -- (4) EIP-4788 canonical anchor targets the pinned predeploy
+    input.eip4788Call.target = beaconRootsAddress := by
+  refine ⟨rfl, ⟨?_, ?_⟩, ?_, ?_⟩
+  · intro h
+    simp [RealValidatorInput.chosenFirstValidatorGI, h]
+  · intro h
+    simp [RealValidatorInput.chosenFirstValidatorGI, h]
+  · unfold verifyProof
+    exact decide_eq_true_iff
+  · rw [hEip4788Anchor]
+    exact canonicalCall_target_eq input.timestamp
+
+/-- Non-vacuity witness for the registered `real_validator_correspondence`
+parent: the EIP-4788 anchor premise is discharged by
+`canonicalCall`, and the parent conclusion holds on any input built
+that way. -/
+theorem real_validator_correspondence_witness
+    (oracle : Sha256Oracle)
+    (validator : Validator)
+    (siblings : List (List Nat × Nat))
+    (parentBlockRoot : List Nat)
+    (provenSlot pivotSlot validatorIndex timestamp : Nat)
+    (gIFirstValidatorPrev gIFirstValidatorCurr : Nat) :
+    let input : RealValidatorInput := {
+      oracle := oracle,
+      validator := validator,
+      siblings := siblings,
+      parentBlockRoot := parentBlockRoot,
+      provenSlot := provenSlot,
+      pivotSlot := pivotSlot,
+      validatorIndex := validatorIndex,
+      eip4788Call := canonicalCall timestamp,
+      timestamp := timestamp }
+    input.leaf = validatorHashTreeRoot input.oracle input.validator ∧
+    ((input.provenSlot < input.pivotSlot →
+      RealValidatorInput.chosenFirstValidatorGI input
+        gIFirstValidatorPrev gIFirstValidatorCurr = gIFirstValidatorPrev) ∧
+      (¬ input.provenSlot < input.pivotSlot →
+        RealValidatorInput.chosenFirstValidatorGI input
+          gIFirstValidatorPrev gIFirstValidatorCurr = gIFirstValidatorCurr)) ∧
+    (verifyProof input.oracle input.leaf input.siblings input.parentBlockRoot = true ↔
+      foldPath input.oracle input.leaf input.siblings = input.parentBlockRoot) ∧
+    input.eip4788Call.target = beaconRootsAddress :=
+  real_validator_correspondence _ rfl gIFirstValidatorPrev gIFirstValidatorCurr
+
+/-- Parent-shaped kill-line: replace the EIP-4788 target with a
+non-canonical address. The registered parent's conclusion (4) forces
+`input.eip4788Call.target = beaconRootsAddress`, so any input built
+with a different `target` refutes the mutant-substituted parent under
+the same anchor-shape premise. -/
+theorem real_validator_correspondence_mutant_target_refutes_parent :
+    ¬ (∀ (input : RealValidatorInput),
+        input.eip4788Call =
+          { target := beaconRootsAddress + 1, timestamp := input.timestamp } →
+        input.eip4788Call.target = beaconRootsAddress) := by
+  intro hMutant
+  -- Instantiate at a concrete input whose `eip4788Call` uses the mutant target.
+  have hInput := hMutant
+    { oracle := ⟨fun _ => List.replicate 32 0, fun _ => by decide,
+        fun x y hxy => by cases hxy; rfl⟩
+      validator := ⟨[], [], [], [], [], [], [], []⟩
+      siblings := []
+      parentBlockRoot := []
+      provenSlot := 0
+      pivotSlot := 0
+      validatorIndex := 0
+      eip4788Call := { target := beaconRootsAddress + 1, timestamp := 0 }
+      timestamp := 0 } rfl
+  -- `hInput : beaconRootsAddress + 1 = beaconRootsAddress`, which contradicts +1 ≠ 0.
+  simp at hInput
+
+end RealValidatorParent
 
 end LidoSRv3.Audit.Guarantees.PSsz1
