@@ -114,7 +114,8 @@ example : derivedBatchAmount cfg 5 = 160 := by
 /-- NFrame: the same two router-shaped legs yield `NFrame.LinksSource`. -/
 private def nInputs : LidoSRv3.Audit.Verity.DepositNFrameTx.Inputs :=
   { authorized := true, moduleActive := true, allocationValid := true,
-    lidoCallOk := true, depositSize := 32, lido := 101, module := 202, beacon := 303,
+    lidoCallOk := true, depositSize := 32, maxEBType1 := 32,
+    lido := 101, module := 202, beacon := 303,
     batches := [batchA, batchB] }
 
 example : NFrame.LinksSource cfg inp nInputs :=

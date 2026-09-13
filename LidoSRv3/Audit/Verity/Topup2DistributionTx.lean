@@ -34,6 +34,13 @@ def limitsBase : Nat := 0x4000
 def allocSlot : Nat := 30
 def remainingSlot : Nat := 31
 def allocatedSlot : Nat := 32
+-- Default `MAX_VALIDATORS_PER_TOP_UP` used by kill-line mutants and the
+-- pinned deployment initializer. The registered `allocate` transaction now
+-- accepts an arbitrary caller-supplied bound, which downstream compositions
+-- source from the pinned `uint64 $.maxValidatorsPerTopUp` at
+-- `TopUpGateway.sol:42` (packed slot at
+-- `TopupPackedStorage.GATEWAY_STORAGE_POSITION`, offset 0..63). Keeping the
+-- constant lets legacy proofs pass `maxValidatorsPerTopUp` positionally.
 def maxValidatorsPerTopUp : Nat := 32
 
 private def oracle : DenoteOracle where
@@ -187,12 +194,15 @@ Executable transaction.  Length / overflow / empty-batch failures revert
 to the pre-call snapshot.  `failAfterWrites` is a test hook placed after the
 allocation and budget writes; it proves rollback even after intermediate
 effects. -/
-def allocate (count : Nat) (target minTopUp remainingCap moduleLimit valueGwei : Word)
+def allocate (count : Nat) (maxValidators : Nat)
+    (target minTopUp remainingCap moduleLimit valueGwei : Word)
     (failAfterWrites : Bool := false) : Contract Result := fun snapshot =>
   -- TopUpGateway.sol:164  if (validatorsCount == 0) revert WrongArrayLength();
   if count == 0 then .revert "WrongArrayLength" snapshot else
   -- TopUpGateway.sol:174-175  if (validatorsCount > $.maxValidatorsPerTopUp) { revert MaxValidatorsPerTopUpExceeded(); }
-  if count > maxValidatorsPerTopUp then .revert "MaxValidatorsPerTopUpExceeded" snapshot else
+  -- `maxValidators` is caller-supplied, sourced from the pinned uint64
+  -- `$.maxValidatorsPerTopUp` (packed slot 0 of `TopupPackedStorage`).
+  if count > maxValidators then .revert "MaxValidatorsPerTopUpExceeded" snapshot else
   match readArray snapshot "effective" effectiveBase count,
       readArray snapshot "pending" pendingBase count,
       readArray snapshot "requested" requestedBase count,
@@ -238,6 +248,7 @@ has the same allocation/share observables as the independently stated
 pinned-source batch. -/
 theorem verity_tx_simulates_pinned_source
     (effective pending requested topUpLimits : List Word)
+    (maxValidators : Nat)
     (target minTopUp remainingCap moduleLimit valueGwei : Word)
     (state : ContractState)
     (hEff : readArray state "effective" effectiveBase effective.length = some effective)
@@ -246,10 +257,10 @@ theorem verity_tx_simulates_pinned_source
     (hLimits : readArray state "topUpLimits" limitsBase topUpLimits.length = some topUpLimits)
     (hLen : effective.length = pending.length ∧ pending.length = requested.length ∧
       requested.length = topUpLimits.length)
-    (hMax : requested.length ≤ maxValidatorsPerTopUp) :
+    (hMax : requested.length ≤ maxValidators) :
     observe (List.replicate requested.length 0) remainingCap
-        ((allocate requested.length target minTopUp remainingCap moduleLimit valueGwei).run
-          state) =
+        ((allocate requested.length maxValidators
+            target minTopUp remainingCap moduleLimit valueGwei).run state) =
       sourceView effective pending requested topUpLimits target minTopUp remainingCap
         moduleLimit valueGwei := by
   have hER : effective.length = requested.length := hLen.1.trans hLen.2.1
@@ -262,7 +273,7 @@ theorem verity_tx_simulates_pinned_source
   have hLimits' : readArray state "topUpLimits" limitsBase requested.length =
       some topUpLimits := by
     simpa [hLR] using hLimits
-  have hNotOver : ¬ maxValidatorsPerTopUp < requested.length :=
+  have hNotOver : ¬ maxValidators < requested.length :=
     Nat.not_lt.mpr hMax
   by_cases hZero : requested.length = 0
   · have hEffZ : effective.length = 0 := hER.trans hZero
@@ -288,9 +299,11 @@ theorem verity_tx_simulates_pinned_source
 /-- Any failure, including the injected failure after intermediate writes,
 returns the exact pre-transaction snapshot. -/
 theorem revert_restores_snapshot
-    (count : Nat) (target minTopUp remainingCap moduleLimit valueGwei : Word)
+    (count maxValidators : Nat)
+    (target minTopUp remainingCap moduleLimit valueGwei : Word)
     (inject : Bool) (state rollback : ContractState) (reason : String)
-    (h : (allocate count target minTopUp remainingCap moduleLimit valueGwei inject).run
+    (h : (allocate count maxValidators
+        target minTopUp remainingCap moduleLimit valueGwei inject).run
       state = .revert reason rollback) : rollback = state := by
   unfold Contract.run at h
   split at h <;> simp_all
