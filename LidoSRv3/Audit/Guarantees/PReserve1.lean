@@ -5,6 +5,7 @@ import LidoSRv3.Audit.Source.ReservePayableCallSource
 import LidoSRv3.Audit.Source.ReserveSeedBookkeepingSource
 import LidoSRv3.Audit.Source.ERC7201StorageSlotSource
 import LidoSRv3.Audit.Source.SolidityUint128WrapSource
+import LidoSRv3.Audit.Source.ReserveSetTargetSource
 import LidoSRv3.Audit.Guarantees.Registry
 
 namespace LidoSRv3.Audit.Guarantees.PReserve1
@@ -417,5 +418,58 @@ theorem verity_tx_preserves_withdrawal_reserve
     (h : (ReserveContract.withdrawWithGuards inputs amount).run state = .success () after) :
     withdrawalPartitionSpendInvariant (decode state) (decode after) amount :=
   verity_commit_preserves_withdrawal_reserve inputs state after amount h
+
+/-- **Chantier 2 (Piste A, Thomas 2026-09-13) registered `setDepositsReserveTarget`
+partition-writer companion.**
+
+The pinned `Lido.setDepositsReserveTarget(uint256 _newReserveTarget)`
+(one of the four ETH-reserve partition writers named in
+`audit/SITE-CORRECTIONS.md`) is modeled by
+`LidoSRv3.Audit.Source.ReserveSetTargetSource.setDepositsReserveTarget`.
+Under the ACL admission premise (`auth = true`), the setter writes
+`newTarget` to `storedDepositsReserve` and preserves all four other
+partition fields by construction (`buffered`, `unfinalizedStETH`,
+`depositedPostReport`, `depositedNextReportAdjusted`).
+
+This registered consumer re-exports the field-preservation identities
+into the P-RESERVE-1 namespace, so downstream consumers can reason
+about compositions of the top-up spend writer with the
+reserve-target-set writer without pulling in the source-module import
+directly.  Non-scaffold: each identity is proved from the source-level
+state-machine semantics, and preservation of all four fields is real
+content (a mutant that touched `buffered` on set-target would refute
+this theorem). -/
+theorem reserve_set_target_preserves_partition_fields
+    (state : ReserveState) (newTarget : Word) (auth : Bool) :
+    (LidoSRv3.Audit.Source.ReserveSetTargetSource.setDepositsReserveTarget
+        state newTarget auth).buffered = state.buffered ∧
+    (LidoSRv3.Audit.Source.ReserveSetTargetSource.setDepositsReserveTarget
+        state newTarget auth).unfinalizedStETH = state.unfinalizedStETH ∧
+    (LidoSRv3.Audit.Source.ReserveSetTargetSource.setDepositsReserveTarget
+        state newTarget auth).depositedPostReport = state.depositedPostReport ∧
+    (LidoSRv3.Audit.Source.ReserveSetTargetSource.setDepositsReserveTarget
+        state newTarget auth).depositedNextReportAdjusted =
+      state.depositedNextReportAdjusted :=
+  LidoSRv3.Audit.Source.ReserveSetTargetSource.setDepositsReserveTarget_preserves_other_fields
+    state newTarget auth
+
+/-- Under authenticated call, the setter writes exactly the requested
+target. -/
+theorem reserve_set_target_writes_target
+    (state : ReserveState) (newTarget : Word) :
+    (LidoSRv3.Audit.Source.ReserveSetTargetSource.setDepositsReserveTarget
+        state newTarget true).storedDepositsReserve = newTarget :=
+  LidoSRv3.Audit.Source.ReserveSetTargetSource.setDepositsReserveTarget_of_auth
+    state newTarget
+
+/-- Under unauthenticated call, the setter is a no-op — the state is
+untouched (mirrors the pinned Solidity revert branch, projected onto
+the successful `Contract.run` continuation). -/
+theorem reserve_set_target_noop_of_unauth
+    (state : ReserveState) (newTarget : Word) :
+    LidoSRv3.Audit.Source.ReserveSetTargetSource.setDepositsReserveTarget
+      state newTarget false = state :=
+  LidoSRv3.Audit.Source.ReserveSetTargetSource.setDepositsReserveTarget_of_unauth
+    state newTarget
 
 end LidoSRv3.Audit.Guarantees.PReserve1
