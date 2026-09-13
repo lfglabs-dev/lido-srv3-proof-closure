@@ -1130,10 +1130,16 @@ theorem verity_tx_composes_nframe_deposit
     linked_exactTotal_eq_pushedValue cfg inp inputs hLink,
     linked_exactTotal_eq_depositsValue cfg inp inputs hLink⟩
 
-/-- The old conjunct (d) is exactly this parent's `n = 2` specialization,
-gated by the pinned `shouldPull` predicate (`StakingRouter.sol:978` — the
-per-call `withdrawDepositableEther` frame is only emitted when the aggregate
-deposit count is nonzero). -/
+/-- The old conjunct (d) is this parent's `n = 2` specialization, gated by the
+pinned `shouldPull` predicate (`StakingRouter.sol:978` — the per-call
+`withdrawDepositableEther` frame is only emitted when the aggregate deposit
+count is nonzero).  After grok #412 D-CALL-1 (2026-09-13) the two-batch
+specialization no longer matches `DepositParentTx.expectedCalls` verbatim —
+`DepositNFrameTx.pullEntry` now carries a two-argument `[wordTotal, wordKeys]`
+payload matching pinned `LIDO.withdrawDepositableEther(depositsValue,
+actualDepositsCount)` at StakingRouter.sol:983 — so the equality conjunct is
+narrowed to the module and push slices via
+`two_batch_expectedCalls_module_push_eq`. -/
 theorem two_batch_conjunct_d_is_n_eq_two (inputs : DepositParentTx.Inputs)
     (hShouldPull : DepositNFrameTx.shouldPull (DepositNFrameTx.ofTwoBatches inputs) = true) :
     (DepositNFrameTx.ofTwoBatches inputs).batches.length = 2 ∧
@@ -1141,11 +1147,14 @@ theorem two_batch_conjunct_d_is_n_eq_two (inputs : DepositParentTx.Inputs)
         (DepositNFrameTx.moduleEntry (DepositNFrameTx.ofTwoBatches inputs))).length = 2 ∧
       ((DepositNFrameTx.ofTwoBatches inputs).batches.map
         (DepositNFrameTx.pushEntry (DepositNFrameTx.ofTwoBatches inputs))).length = 2 ∧
-      DepositNFrameTx.expectedCalls (DepositNFrameTx.ofTwoBatches inputs) =
-        DepositParentTx.expectedCalls inputs := by
+      (DepositNFrameTx.expectedCalls (DepositNFrameTx.ofTwoBatches inputs)).take 2 =
+        (DepositParentTx.expectedCalls inputs).take 2 ∧
+      (DepositNFrameTx.expectedCalls (DepositNFrameTx.ofTwoBatches inputs)).drop 3 =
+        (DepositParentTx.expectedCalls inputs).drop 3 := by
   obtain ⟨hLength, hModules, hBeacon⟩ := DepositNFrameTx.two_batch_is_n_eq_two inputs
-  exact ⟨hLength, hModules, hBeacon,
-    DepositNFrameTx.two_batch_expectedCalls_eq inputs hShouldPull⟩
+  obtain ⟨_, hHead, hTail⟩ :=
+    DepositNFrameTx.two_batch_expectedCalls_module_push_eq inputs hShouldPull
+  exact ⟨hLength, hModules, hBeacon, hHead, hTail⟩
 
 end NFrame
 
