@@ -27,3 +27,14 @@ remappings = [
   "contracts/=lido-core/contracts/",
   "@openzeppelin/contracts-v5.2/=audit/deposit-dsm-call/solidity/src/@openzeppelin/contracts-v5.2/"
 ]
+
+# Pinned TopUpGateway._evaluateTopUpLimit / topUp vs sourceRun via FFI (grok #417).
+[profile.topup2_source]
+src = "solidity/topup2/src"
+test = "solidity/topup2/test"
+out = "solidity/out/topup2"
+cache_path = "solidity/cache/topup2"
+remappings = [
+  "contracts/=lido-core/contracts/",
+  "@openzeppelin/contracts-v5.2/=audit/deposit-dsm-call/solidity/src/@openzeppelin/contracts-v5.2/"
+]
