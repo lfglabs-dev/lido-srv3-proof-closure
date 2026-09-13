@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Trace
+import LidoSRv3.Audit.Source.LidoStakingStateStorage
 
 /-!
 Pinned source correspondence for the SRv3 beacon-chain *top-up* push at
@@ -231,9 +232,14 @@ structure SourceTopupInput where
   source line 700.  Its value is the P-ALLOC-1/P-ALLOC-2 slice, so it enters here
   as an input rather than being derived. -/
   moduleAllocationEth : Nat
-  /-- `LIDO.canDeposit()`, read at source line 713 and again at `Lido.sol` line
-  870. -/
-  lidoCanDeposit : Bool
+  /-- 2026-09-13 chantier 1 Piste A: `LIDO.canDeposit()` at source line 713
+  and again at `Lido.sol:870` is no longer a free `Bool` field on
+  `SourceTopupInput`.  It is now a `def` accessor over the pinned
+  `LidoStakingState { isStakingPaused, isBunkerActive }` per
+  `Lido.sol:815-816` (`!STAKING_STATE_POSITION.getStorageStakeLimitStruct().isStakingPaused()
+  && !_isBunkerActive()`).  Callers construct a `LidoStakingState`;
+  the boolean is derived. -/
+  lidoState : LidoSRv3.Audit.Source.LidoStakingStateStorage.LidoStakingState
   /-- `allocations`, the per-key wei returned by
   `IStakingModuleV2.allocateDeposits` at source lines 717--718.  This is the one
   array that is both summed at source line 732 and pushed at
@@ -245,6 +251,21 @@ structure SourceTopupInput where
   `Lido.sol` line 842. -/
   lidoDepositableEther : Nat
   deriving Repr, DecidableEq
+
+/-- 2026-09-13 chantier 1 Piste A: `SourceTopupInput.lidoCanDeposit` is
+now a `@[reducible, simp] def` accessor of the pinned
+`LidoStakingState` fields carried on `SourceTopupInput`, mirroring the
+same refactor applied to `WithdrawInputs.canDeposit` in chantier 2
+(P-RESERVE-1).  Downstream code that reads `inp.lidoCanDeposit`
+continues to work under the same dot-notation syntax and returns the
+same boolean value, but callers can no longer instantiate the boolean
+independently of a named pinned Lido storage state.  Marked
+`@[reducible, simp]` so definitional unfolding is transparent to the
+existing proofs. -/
+@[reducible, simp] def SourceTopupInput.lidoCanDeposit
+    (inp : SourceTopupInput) : Bool :=
+  LidoSRv3.Audit.Source.LidoStakingStateStorage.canDepositFromStorage
+    inp.lidoState
 
 /--
 The branch the pinned top-up path takes.  Every `revert*` constructor names the

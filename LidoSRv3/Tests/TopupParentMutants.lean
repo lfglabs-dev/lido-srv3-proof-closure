@@ -24,7 +24,7 @@ private def base : SourceTopupInput :=
     wcTypeIsType2 := true
     maxTopUpPerBlockGwei := uint256Modulus + 1
     moduleAllocationEth := uint256Modulus + 1
-    lidoCanDeposit := true
+    lidoState := { isStakingPaused := false, isBunkerActive := false }
     allocations := []
     routerBalanceBefore := uint256Modulus
     lidoDepositableEther := uint256Modulus + 1 }
