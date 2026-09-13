@@ -1081,6 +1081,66 @@ theorem verity_tx_simulates_pinned_source
       persist_events, credited_events, persist_read_count, persist_read_fee,
       drop_map_ofJournal, drop_map_ofEvent]
     rw [hCallsLen, hPayloads]
+
+/-- **Chantier 2 (Thomas 2026-09-13) sourceView payload-shape lemma.**
+`sourceView.payloads = sourceView.calls.map (·.input)` unconditionally:
+on the reverted arm both are `[]`; on the committed arm it follows
+from `sourceRun_committed_payloads_eq_call_inputs` (the sourceRun-level
+retirement bridge from PR #596). Used as the hypothesis of
+`observeFromJournal_eq_of_observe_and_payload_matches_calls` (PR #599)
+to derive that `observeFromJournal` also simulates `sourceView`. -/
+theorem sourceView_payloads_eq_calls_input (inputs : Inputs) (beforeCount : Nat) :
+    (sourceView inputs beforeCount).payloads =
+      (sourceView inputs beforeCount).calls.map (·.input) := by
+  unfold sourceView
+  cases hRun : sourceRun inputs with
+  | reverted _ => simp
+  | committed obs =>
+    -- obs.payloads = obs.calls.map (·.input) from the sourceRun-level bridge.
+    simpa using
+      LidoSRv3.Audit.SolidityConsolidation.sourceRun_committed_payloads_eq_call_inputs
+        inputs obs hRun
+
+/-- **Chantier 2 (Thomas 2026-09-13) slot-independent simulation.**
+Corollary of `verity_tx_simulates_pinned_source` (PR #596-era) via
+the generic substitution lemma
+`observeFromJournal_eq_of_observe_and_payload_matches_calls`
+(PR #599) and the payload-shape lemma `sourceView_payloads_eq_calls_input`
+above: `observeFromJournal` also equals `sourceView` on every
+executed `addRequests` run.
+
+The slot-independent observation function is therefore a sound
+substitute for the registered `observe` against the `sourceView`
+correspondence — no reads of the fabricated `sourceMapSlot` /
+`targetMapSlot` needed anywhere on this path. This is the
+executable-plane counterpart of the source-plane retirement
+bridges from PRs #584 and #585, closing the substitution chain
+across both planes.
+
+Same premises as `verity_tx_simulates_pinned_source`. -/
+theorem observeFromJournal_simulates_pinned_source
+    (inputs : Inputs) (state : ContractState)
+    (hCountBound : (state.readSlot countSlot).val + inputs.sources.length <
+      Verity.Core.Uint256.modulus)
+    (hEntry : state.selfBalance.val + inputs.msgValue.val <
+      Verity.Core.Uint256.modulus)
+    (hSources : readArray state "sources" sourcesBase inputs.sources.length =
+      some inputs.sources)
+    (hTargets : readArray state "targets" targetsBase inputs.targets.length =
+      some inputs.targets)
+    (hSourceLens : readArray state "sourceLens" sourceLensBase
+      inputs.sourceLens.length = some inputs.sourceLens)
+    (hTargetLens : readArray state "targetLens" targetLensBase
+      inputs.targetLens.length = some inputs.targetLens) :
+    observeFromJournal state ((addRequests inputs).run state) =
+      sourceView inputs (state.readSlot countSlot).val :=
+  observeFromJournal_eq_of_observe_and_payload_matches_calls
+    state ((addRequests inputs).run state)
+    (sourceView inputs (state.readSlot countSlot).val)
+    (verity_tx_simulates_pinned_source inputs state hCountBound hEntry
+      hSources hTargets hSourceLens hTargetLens)
+    (sourceView_payloads_eq_calls_input inputs (state.readSlot countSlot).val)
+
 theorem revert_restores_snapshot
     (inputs : Inputs) (inject : Bool) (state rollback : ContractState)
     (reason : String)
