@@ -321,15 +321,21 @@ theorem packing_order_kills_swapped_concat
   exact commitObservables_ne_swapped target fee msgValue [r] rfl
     (fun x hx => by simp [List.mem_cons, List.mem_nil_iff] at hx; subst hx; exact h)
 
-/-- **Value-bearing CALLs (lift of the formerly named
-`preservesEthBalance` gap).** On every committed run the executed
-transaction forwards exactly `msg.value` across its journaled CALL
-frames — one `.success` CALL frame per request to the consolidation
-request target, each carrying the per-request fee, the frame values
-summing to `msg.value` (the pinned `_requireExactFee` guard exported onto
-the CALL journal). The pre-lift wording of this gap ("current success
-stubs move no wei") no longer applies: the executed model's CALLs now
-move wei on the vault balance. -/
+/-- **Value-bearing CALLs, slot-free companion (chantier 2 Thomas
+2026-09-13 retirement).** Registered on the slot-free companion
+`addRequestsSlotFree` — the vault-side value-plane parent no longer
+references the pre-retirement `addRequests` (whose `persist` writes
+fabricated `sourceMapSlot`/`targetMapSlot`). On every committed run
+of `(addRequestsSlotFree inputs).run state`, the executed transaction
+forwards exactly `msg.value` across its journaled CALL frames — one
+`.success` CALL frame per request to the consolidation request target,
+each carrying the per-request fee, the frame values summing to
+`msg.value` (the pinned `_requireExactFee` guard exported onto the
+CALL journal). The premise `h : (addRequestsSlotFree inputs).run state =
+.success result after` is load-bearing: the proof invokes
+`committed_journal_forwards_msg_value_slotFree` which unpacks the
+slot-free `addRequestsSlotFree` success inversion (not the pre-retirement
+`addRequests` inversion). -/
 theorem verity_tx_journal_forwards_msg_value
     (inputs : Inputs) (state : Verity.ContractState)
     (hSources : readArray state "sources" sourcesBase inputs.sources.length =
@@ -341,25 +347,26 @@ theorem verity_tx_journal_forwards_msg_value
     (hTargetLens : readArray state "targetLens" targetLensBase
       inputs.targetLens.length = some inputs.targetLens)
     (result : Result) (after : Verity.ContractState)
-    (h : (addRequests inputs).run state = .success result after) :
+    (h : (addRequestsSlotFree inputs).run state = .success result after) :
     let frames := after.calls.drop state.calls.length
     frames.length = result.requestCount ∧
       (∀ f ∈ frames, f.kind = .call ∧ f.control = .success ∧
         f.target = inputs.requestTarget.val ∧ f.value = inputs.fee.val) ∧
       (frames.map (fun f => f.value)).sum = inputs.msgValue.val :=
-  Verity.ConsolidationTx.committed_journal_forwards_msg_value inputs
+  Verity.ConsolidationTx.committed_journal_forwards_msg_value_slotFree inputs
     state hSources hTargets hSourceLens hTargetLens result after h
 
-/-- **`preservesEthBalance` (`WithdrawalVault.sol:81--85`), vault side.**
-After the modeled frame-entry payable credit of `msg.value` and the
-per-request CALL debits, every committed run restores the vault's
-pre-call `selfBalance` — the modifier's `assert` in the model of record.
-Every revert restores the whole pre-call snapshot
-(`verity_tx_revert_restores_snapshot`), balance included. What remains
-outside this plane is the counterparty credit at the request predeploy
-(another contract's balance; `P-CONSOLIDATION-VALUE-1` /
-`P-CONSOLIDATION-ETH-1` own the multi-contract side) and 96-byte packed
-pubkey calldata, both named in `fidelity.missing`. -/
+/-- **`preservesEthBalance` (`WithdrawalVault.sol:81--85`), slot-free
+companion (chantier 2 Thomas 2026-09-13 retirement).** Registered on
+`addRequestsSlotFree`. After the modeled frame-entry payable credit
+of `msg.value` and the per-request CALL debits, every committed run
+of `(addRequestsSlotFree inputs).run state` restores the vault's
+pre-call `selfBalance`. The premise is load-bearing on the slot-free
+companion (invokes `committed_preserves_eth_balance_slotFree` which
+uses `persistSlotFree_selfBalance` — the slot-free closed form).
+What remains outside is the counterparty credit at the request predeploy
+(`P-CONSOLIDATION-VALUE-1` / `P-CONSOLIDATION-ETH-1`) and 96-byte
+packed pubkey calldata, both named in `fidelity.missing`. -/
 theorem verity_tx_preserves_eth_balance
     (inputs : Inputs) (state : Verity.ContractState)
     (hSources : readArray state "sources" sourcesBase inputs.sources.length =
@@ -371,9 +378,9 @@ theorem verity_tx_preserves_eth_balance
     (hTargetLens : readArray state "targetLens" targetLensBase
       inputs.targetLens.length = some inputs.targetLens)
     (result : Result) (after : Verity.ContractState)
-    (h : (addRequests inputs).run state = .success result after) :
+    (h : (addRequestsSlotFree inputs).run state = .success result after) :
     after.selfBalance = state.selfBalance :=
-  Verity.ConsolidationTx.committed_preserves_eth_balance inputs state
+  Verity.ConsolidationTx.committed_preserves_eth_balance_slotFree inputs state
     hSources hTargets hSourceLens hTargetLens result after h
 
 end LidoSRv3.Audit.Guarantees.PConsolidation1
