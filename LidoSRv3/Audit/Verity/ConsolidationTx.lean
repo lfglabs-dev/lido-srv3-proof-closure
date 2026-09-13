@@ -1098,6 +1098,106 @@ where
     | nil => intros; rfl
     | cons p rest ih => intro start s; simp only [writePayloads]; exact ih _ _
 
+theorem persist_txOrigin_eq_persistSlotFree_txOrigin (start : Nat)
+    (obs : Observables) (state : ContractState) :
+    (persist start obs state).txOrigin = (persistSlotFree start obs state).txOrigin := by
+  simp only [persist, persistSlotFree, fc, ws, wp]
+where
+  fc : ∀ (s : ContractState) (cs : List CallObs),
+      (forwardCalls s cs).txOrigin = s.txOrigin := by
+    intro s cs; revert s
+    induction cs with
+    | nil => intro s; rfl
+    | cons c rest ih => intro s; simp only [forwardCalls, forwardCall]; exact ih _
+  ws : ∀ (s : ContractState) (slot : Nat) (v : Word),
+      (s.writeSlot slot v).txOrigin = s.txOrigin := fun _ _ _ => rfl
+  wp : ∀ (start : Nat) (payloads : List (List Word)) (s : ContractState),
+      (writePayloads start payloads s).txOrigin = s.txOrigin := by
+    intro start payloads; revert start
+    induction payloads with
+    | nil => intros; rfl
+    | cons p rest ih => intro start s; simp only [writePayloads]; exact ih _ _
+
+theorem persist_blockNumber_eq_persistSlotFree_blockNumber (start : Nat)
+    (obs : Observables) (state : ContractState) :
+    (persist start obs state).blockNumber = (persistSlotFree start obs state).blockNumber := by
+  simp only [persist, persistSlotFree, fc, ws, wp]
+where
+  fc : ∀ (s : ContractState) (cs : List CallObs),
+      (forwardCalls s cs).blockNumber = s.blockNumber := by
+    intro s cs; revert s
+    induction cs with
+    | nil => intro s; rfl
+    | cons c rest ih => intro s; simp only [forwardCalls, forwardCall]; exact ih _
+  ws : ∀ (s : ContractState) (slot : Nat) (v : Word),
+      (s.writeSlot slot v).blockNumber = s.blockNumber := fun _ _ _ => rfl
+  wp : ∀ (start : Nat) (payloads : List (List Word)) (s : ContractState),
+      (writePayloads start payloads s).blockNumber = s.blockNumber := by
+    intro start payloads; revert start
+    induction payloads with
+    | nil => intros; rfl
+    | cons p rest ih => intro start s; simp only [writePayloads]; exact ih _ _
+
+theorem persist_chainId_eq_persistSlotFree_chainId (start : Nat)
+    (obs : Observables) (state : ContractState) :
+    (persist start obs state).chainId = (persistSlotFree start obs state).chainId := by
+  simp only [persist, persistSlotFree, fc, ws, wp]
+where
+  fc : ∀ (s : ContractState) (cs : List CallObs),
+      (forwardCalls s cs).chainId = s.chainId := by
+    intro s cs; revert s
+    induction cs with
+    | nil => intro s; rfl
+    | cons c rest ih => intro s; simp only [forwardCalls, forwardCall]; exact ih _
+  ws : ∀ (s : ContractState) (slot : Nat) (v : Word),
+      (s.writeSlot slot v).chainId = s.chainId := fun _ _ _ => rfl
+  wp : ∀ (start : Nat) (payloads : List (List Word)) (s : ContractState),
+      (writePayloads start payloads s).chainId = s.chainId := by
+    intro start payloads; revert start
+    induction payloads with
+    | nil => intros; rfl
+    | cons p rest ih => intro start s; simp only [writePayloads]; exact ih _ _
+
+theorem persist_blobBaseFee_eq_persistSlotFree_blobBaseFee (start : Nat)
+    (obs : Observables) (state : ContractState) :
+    (persist start obs state).blobBaseFee = (persistSlotFree start obs state).blobBaseFee := by
+  simp only [persist, persistSlotFree, fc, ws, wp]
+where
+  fc : ∀ (s : ContractState) (cs : List CallObs),
+      (forwardCalls s cs).blobBaseFee = s.blobBaseFee := by
+    intro s cs; revert s
+    induction cs with
+    | nil => intro s; rfl
+    | cons c rest ih => intro s; simp only [forwardCalls, forwardCall]; exact ih _
+  ws : ∀ (s : ContractState) (slot : Nat) (v : Word),
+      (s.writeSlot slot v).blobBaseFee = s.blobBaseFee := fun _ _ _ => rfl
+  wp : ∀ (start : Nat) (payloads : List (List Word)) (s : ContractState),
+      (writePayloads start payloads s).blobBaseFee = s.blobBaseFee := by
+    intro start payloads; revert start
+    induction payloads with
+    | nil => intros; rfl
+    | cons p rest ih => intro start s; simp only [writePayloads]; exact ih _ _
+
+theorem persist_calldataSize_eq_persistSlotFree_calldataSize (start : Nat)
+    (obs : Observables) (state : ContractState) :
+    (persist start obs state).calldataSize = (persistSlotFree start obs state).calldataSize := by
+  simp only [persist, persistSlotFree, fc, ws, wp]
+where
+  fc : ∀ (s : ContractState) (cs : List CallObs),
+      (forwardCalls s cs).calldataSize = s.calldataSize := by
+    intro s cs; revert s
+    induction cs with
+    | nil => intro s; rfl
+    | cons c rest ih => intro s; simp only [forwardCalls, forwardCall]; exact ih _
+  ws : ∀ (s : ContractState) (slot : Nat) (v : Word),
+      (s.writeSlot slot v).calldataSize = s.calldataSize := fun _ _ _ => rfl
+  wp : ∀ (start : Nat) (payloads : List (List Word)) (s : ContractState),
+      (writePayloads start payloads s).calldataSize = s.calldataSize := by
+    intro start payloads; revert start
+    induction payloads with
+    | nil => intros; rfl
+    | cons p rest ih => intro start s; simp only [writePayloads]; exact ih _ _
+
 /-- **Chantier 2 (Thomas 2026-09-13) `.snd.calls` equivalence between
 `addRequests` and `addRequestsSlotFree`.** Both transactions share the
 same guard structure (entry-credit bound, memory decode, `sourceRun`
