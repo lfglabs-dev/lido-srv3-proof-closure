@@ -331,7 +331,7 @@ structure Preconditions (inputs : Inputs) (state : ContractState) : Prop where
   under this parent as well.  The registered parent
   `verity_tx_composes_nframe_deposit_under_router_shape`'s admissible input
   set is genuinely wider. -/
-  entryBalanceNoWrap :
+  entryBalanceNoWrap : shouldPull inputs = true →
     state.selfBalance.val + exactTotal inputs.batches < _root_.Verity.Core.Uint256.modulus
   /-- Genuine relaxation of the previous unconditional
   `funded : wordTotal inputs.batches ≤ state.readSlot lidoDepositableSlot`
@@ -647,26 +647,30 @@ theorem execute_apply (inputs : Inputs) (state : ContractState)
       selfBalance_afterBatches]
     -- entry writes counterSlot; selfBalance is unaffected.
     rfl
-  -- Under `entryBalanceNoWrap`, `state.selfBalance + wordTotal` doesn't wrap.
-  have hAddNoWrap : state.selfBalance.val + (wordTotal inputs.batches).val
-      < _root_.Verity.Core.Uint256.modulus := by
-    rw [hTotalVal]; exact h.entryBalanceNoWrap
-  have hPulledBalanceVal : pulled.selfBalance.val
-      = state.selfBalance.val + (wordTotal inputs.batches).val := by
+  -- Under `entryBalanceNoWrap` (now conditional on shouldPull), the closing
+  -- balance derivations only need to happen in the shouldPull=true branch.
+  have hAddNoWrap : shouldPull inputs = true →
+      state.selfBalance.val + (wordTotal inputs.batches).val
+        < _root_.Verity.Core.Uint256.modulus := fun hPull => by
+    rw [hTotalVal]; exact h.entryBalanceNoWrap hPull
+  have hPulledBalanceVal : shouldPull inputs = true → pulled.selfBalance.val
+      = state.selfBalance.val + (wordTotal inputs.batches).val := fun hPull => by
     show (afterPull inputs (wordTotal inputs.batches) (wordKeys inputs.batches)
       processed).selfBalance.val = _
     rw [selfBalance_afterPull, hProcessedBalance]
-    exact _root_.Verity.Core.Uint256.add_eq_of_lt hAddNoWrap
-  have hPushFunds : exactTotal inputs.batches ≤ pulled.selfBalance.val := by
-    rw [hPulledBalanceVal, hTotalVal]; omega
-  have hCloseVal :
-      (afterPushes inputs inputs.batches pulled).selfBalance.val = state.selfBalance.val := by
-    rw [selfBalance_afterPushes inputs inputs.batches pulled hPushFunds, hPulledBalanceVal,
-      hTotalVal]
+    exact _root_.Verity.Core.Uint256.add_eq_of_lt (hAddNoWrap hPull)
+  have hPushFunds : shouldPull inputs = true →
+      exactTotal inputs.batches ≤ pulled.selfBalance.val := fun hPull => by
+    rw [hPulledBalanceVal hPull, hTotalVal]; omega
+  have hCloseVal : shouldPull inputs = true →
+      (afterPushes inputs inputs.batches pulled).selfBalance.val
+        = state.selfBalance.val := fun hPull => by
+    rw [selfBalance_afterPushes inputs inputs.batches pulled (hPushFunds hPull),
+      hPulledBalanceVal hPull, hTotalVal]
     omega
-  have hClose :
-      (afterPushes inputs inputs.batches pulled).selfBalance = state.selfBalance :=
-    _root_.Verity.Core.Uint256.ext hCloseVal
+  have hClose : shouldPull inputs = true →
+      (afterPushes inputs inputs.batches pulled).selfBalance = state.selfBalance := fun hPull =>
+    _root_.Verity.Core.Uint256.ext (hCloseVal hPull)
   have hValueGuard :
       (wordTotal inputs.batches == wordKeys inputs.batches * inputs.depositSize) = true := by
     simp [h.valueMatches]
@@ -699,8 +703,8 @@ theorem execute_apply (inputs : Inputs) (state : ContractState)
     rw [pullFromLido_apply inputs (wordTotal inputs.batches) (wordKeys inputs.batches)
       processed (h.lidoCallOk hPull) (hFunded hPull)]
     simp only [Bind.bind, _root_.Verity.bind]
-    rw [pushBatches_apply inputs inputs.batches pulled h.healthy hPushFunds]
-    simp only [Bind.bind, _root_.Verity.bind, DepositParentTx.getState, hClose,
+    rw [pushBatches_apply inputs inputs.batches pulled h.healthy (hPushFunds hPull)]
+    simp only [Bind.bind, _root_.Verity.bind, DepositParentTx.getState, hClose hPull,
       beq_self_eq_true, _root_.Verity.require, if_true,
       committedState, committedProcessedState, entry, processed, pulled,
       hPull]
@@ -737,7 +741,7 @@ theorem committed_balance (inputs : Inputs) (state : ContractState)
       rw [selfBalance_afterBatches]; rfl
     have hAddNoWrap : state.selfBalance.val + (wordTotal inputs.batches).val
         < _root_.Verity.Core.Uint256.modulus := by
-      rw [hTotalVal]; exact h.entryBalanceNoWrap
+      rw [hTotalVal]; exact h.entryBalanceNoWrap hPull
     have hAfterPullVal :
         (afterPull inputs (wordTotal inputs.batches) (wordKeys inputs.batches)
           (afterBatches inputs inputs.batches
