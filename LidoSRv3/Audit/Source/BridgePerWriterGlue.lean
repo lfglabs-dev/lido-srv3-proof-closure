@@ -90,4 +90,51 @@ theorem bridgeOutcomeForWriter_succeeded (w : Writer) (calleeSucceeded : Bool) :
         | _ => calleeSucceeded) := by
   cases w <;> rfl
 
+/-! ## Third-step composition (2026-09-13): per-writer ABI selectors + targets
+
+For downstream Bridge-to-source glue, each writer's callee is
+identified by (target contract, ABI selector, calldata shape). Below
+names the four pinned selectors and target labels; each is auditable
+against the pinned Solidity. -/
+
+/-- ABI function selector as a `Nat` (source-level abstraction; the
+concrete keccak-4 stays under A-KECCAK-COMMITMENT). Downstream
+consumers refine this to a specific `UInt32` when integrating with
+the executable Bridge plane. -/
+structure ABISelector : Type where
+  selector : Nat
+
+/-- Per-writer target-contract label (source-level). -/
+inductive TargetContract : Type where
+  | stETH        -- STETH.transferFrom / stETH.transfer
+  | recipient    -- direct value CALL to WithdrawalQueue._claim's _recipient
+  | none         -- transferFrom writer: no external call
+  deriving Repr, DecidableEq
+
+/-- Definition: which pinned contract does this writer's callee
+target? -/
+def targetFor (w : Writer) : TargetContract :=
+  match w with
+  | .requestWithdrawals => .stETH
+  | .claimWithdrawals => .recipient
+  | .unwrap => .stETH
+  | .transferFrom => .none
+
+/-- Definition: which pinned ABI selector does this writer invoke?
+Selectors are named opaquely here; concrete `keccak256("transferFrom
+(address,address,uint256)")[:4]` etc. stay under A-KECCAK-COMMITMENT. -/
+def selectorFor (w : Writer) : ABISelector :=
+  match w with
+  | .requestWithdrawals => { selector := 0x23b872dd }  -- transferFrom
+  | .claimWithdrawals => { selector := 0 }               -- value CALL, no calldata selector
+  | .unwrap => { selector := 0xa9059cbb }              -- transfer
+  | .transferFrom => { selector := 0 }                 -- no external call
+
+/-- The target dispatcher is decidable per writer. -/
+theorem targetFor_dispatch (w : Writer) :
+    (targetFor w = .stETH ∧ (w = .requestWithdrawals ∨ w = .unwrap)) ∨
+    (targetFor w = .recipient ∧ w = .claimWithdrawals) ∨
+    (targetFor w = .none ∧ w = .transferFrom) := by
+  cases w <;> simp [targetFor]
+
 end LidoSRv3.Audit.Source.BridgePerWriterGlue
