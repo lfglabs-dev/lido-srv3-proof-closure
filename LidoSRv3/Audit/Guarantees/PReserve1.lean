@@ -1,5 +1,6 @@
 import LidoSRv3.Audit.Source.ReserveCorrespondence
 import LidoSRv3.Audit.Source.ReserveFreshCacheFromWQ
+import LidoSRv3.Audit.Source.ReservePackedBufferSource
 import LidoSRv3.Audit.Guarantees.Registry
 
 namespace LidoSRv3.Audit.Guarantees.PReserve1
@@ -118,6 +119,50 @@ theorem source_spend_preserves_withdrawal_reserve_under_pinned_wq_shape
   source_spend_preserves_withdrawal_reserve inputs before after amount
     ((LidoSRv3.Audit.Source.ReserveFreshCacheFromWQ.liveFromWQStorage wqs : Nat) : Word)
     hfresh h
+
+/-- **Chantier 2 (Piste A, Thomas 2026-09-13) D-PACK-1 packed uint128
+buffered-pair bridge.**
+
+Restates `source_spend_preserves_withdrawal_reserve` with the model's
+`before.buffered` re-anchored to the low 128 bits of a pinned packed
+uint256 storage word from `Lido.sol:131-132`
+(`BUFFERED_ETHER_AND_DEPOSITED_POST_REPORT_POSITION`).  Callers supply
+a `packedWord : Nat`, and the caller-visible `before.buffered` is
+required to equal `ReservePackedBufferSource.unpackBuffered packedWord`
+(the low-half extraction from the packed uint128 pair).
+
+Discloses the Grok #419 D-PACK-1 divergence at the parent's ENUNCE
+level: the Verity model treats `buffered` as an unbounded `Nat`,
+whereas pinned Solidity 0.4.24 stores it as the low uint128 of a
+packed uint256 with `depositedPostReport` in the high half.  A
+seeded `depositedPostReport = uint128.max + 1 ether` therefore wraps
+the high half in the pin but not in the model.  The bridge NAMES the
+packed source; a full closure of D-PACK-1 additionally requires the
+Verity model to observe wrap on the high half, which remains a
+`fidelity.missing` follow-up.
+
+The registered `source_spend_preserves_withdrawal_reserve` above is
+retained unchanged for existing consumers.  Residual (in
+`fidelity.missing` D-PACK-1 entry): the wrap on the high half is
+still unobserved by the Verity model. -/
+theorem source_spend_preserves_withdrawal_reserve_under_packed_buffer_shape
+    (inputs : WithdrawInputs) (before after : ReserveState) (amount live : Word)
+    (packedWord : Nat)
+    (hLowMatch : (before.buffered : Nat) =
+      LidoSRv3.Audit.Source.ReservePackedBufferSource.unpackBuffered packedWord)
+    (hfresh : freshQueueCache before live)
+    (h : modelWithdrawDepositableEther inputs before amount = .committed after) :
+    scopedWithdrawGuards inputs ∧
+      amount ≠ 0 ∧
+      withdrawalPartitionSpendInvariant before after amount ∧
+      liveEffectiveWithdrawalsReserve after live = liveEffectiveWithdrawalsReserve before live :=
+  -- The packed-buffer premise `hLowMatch` names the pinned source of
+  -- `before.buffered` (low uint128 of the packed word); the proof
+  -- delegates to the registered parent since the model's `buffered`
+  -- value at the ENUNCE level is unchanged — the ENUNCE now records
+  -- WHERE this value comes from (the low half of a packed uint256),
+  -- which is the D-PACK-1 disclosure.
+  source_spend_preserves_withdrawal_reserve inputs before after amount live hfresh h
 
 /--
 **P-RESERVE-1, Verity plane.** The executable `withdrawWithGuards` observes the
