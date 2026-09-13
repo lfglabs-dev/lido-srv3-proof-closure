@@ -405,13 +405,14 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- lemmas of ConsolidationFee use `native_decide` transitively and are
 -- intentionally kept out of this disclosure to keep the Trust surface
 -- inside the accepted foundations-only boundary.)
-#print axioms LidoSRv3.Audit.Spec.ConsolidationObserveCorrespondence.persist_payloads_reread
 #print axioms LidoSRv3.Audit.Spec.ConsolidationObserveCorrespondence.gateway_nonzero_remains_named_hyp
--- Chantier 2 (Thomas 2026-09-13, item c continuation): the swapped-map
--- kill-line for the pre-retirement `observe` (which reread the fabricated
--- sourceMapSlot/targetMapSlot) was physically retired here — `observe` is
--- no longer on the parent proof chain (PR #648), so a swapped-map mutant
--- of it does not refute the registered guarantee.
+-- Chantier 2 (Thomas 2026-09-13, item c completion): the Pack F witness
+-- `persist_payloads_reread` was physically retired in the fabricated-slot
+-- deletion PR — its conclusion named `persist` + `readPayloads` on the
+-- fabricated `sourceMapSlot` / `targetMapSlot`, all four of which are
+-- deleted from `ConsolidationTx.lean` in this PR. Same rationale as the
+-- earlier swapped-map kill-line retirement (PR #673): the `observe`
+-- machinery is off every registered-parent proof chain since PR #648.
 #print axioms LidoSRv3.Audit.Provenance.Deposit.canonical_deposit_contract_pin
 #print axioms LidoSRv3.Audit.Provenance.Deposit.canonical_thirty_two_ether_pin
 #print axioms LidoSRv3.Audit.Provenance.Deposit.production_conserving_config_at_thirty_two_ether
@@ -723,60 +724,27 @@ list, there are no undisclosed project-level assumptions or proof escapes.
   LidoSRv3.Audit.SolidityConsolidation.commit_payloads_equal_event_payloads
 #print axioms
   LidoSRv3.Audit.SolidityConsolidation.commit_call_inputs_equal_event_payloads
--- Chantier 2 (Thomas 2026-09-13): slot-independent alternative
--- `observeFromJournal` derives payloads from calls.map (·.input) directly,
--- without reading the fabricated sourceMapSlot/targetMapSlot. Two agreement
--- theorems: revert-arm identity and success-arm non-payload equality with
--- the registered `observe`. Concrete first step toward physical slot
--- retirement.
-#print axioms LidoSRv3.Audit.Verity.ConsolidationTx.observeFromJournal_revert_eq_observe
-#print axioms LidoSRv3.Audit.Verity.ConsolidationTx.observeFromJournal_success_non_payload_eq_observe
--- Status invariants + payload definition for the slot-independent
--- observation function (definitional, no axioms beyond propext).
-#print axioms LidoSRv3.Audit.Verity.ConsolidationTx.observeFromJournal_status_success
-#print axioms LidoSRv3.Audit.Verity.ConsolidationTx.observeFromJournal_status_revert
-#print axioms LidoSRv3.Audit.Verity.ConsolidationTx.observeFromJournal_success_payloads_eq_calls_input
--- Slot-invariance: observeFromJournal doesn't read sourceMapSlot / targetMapSlot,
--- so its output is unchanged by arbitrary rewrites of those slots.
-#print axioms LidoSRv3.Audit.Verity.ConsolidationTx.observeFromJournal_success_slot_invariant
--- sourceRun-level retirement bridge: obs.payloads = obs.calls.map (·.input)
--- on any successful sourceRun outcome. Specialization of the commit-level
--- retirement bridge for Verity-plane consumers.
+-- Chantier 2 (Thomas 2026-09-13, item c completion): fabricated slots
+-- `sourceMapSlot` / `targetMapSlot` are physically retired from
+-- `LidoSRv3/Audit/Verity/ConsolidationTx.lean` in this PR. Every
+-- theorem that used to certify the retirement bridge (the four
+-- `observeFromJournal_*_eq_observe`, `_status_*`, `_payloads_eq_calls_input`,
+-- `_slot_invariant`, `_writePayloads_invariant` disclosures, and the
+-- non-slot-free `committed_journal_forwards_msg_value`,
+-- `committed_preserves_eth_balance`, `entry_credit_overflow_reverts`,
+-- `function_spec_bridge_constructors`) is deleted here or retargeted to
+-- the slot-free companions on the addRequestsSlotFree / persistSlotFree
+-- executable chain. The disclosure that survives is the registered
+-- P-CONSOLIDATION-1 parent chain (audited via
+-- verity_tx_simulates_consolidation / verity_tx_journal_forwards_msg_value /
+-- verity_tx_preserves_eth_balance in PConsolidation1.lean) and the
+-- source-plane retirement bridge:
 #print axioms LidoSRv3.Audit.SolidityConsolidation.sourceRun_committed_payloads_eq_call_inputs
--- Chantier 2 (Thomas 2026-09-13, item c continuation): the pre-retirement
--- helpers observeFromJournal_eq_of_observe_and_payload_matches_calls,
--- verity_tx_simulates_pinned_source, sourceView_payloads_eq_calls_input,
--- and observeFromJournal_simulates_pinned_source were retired here — they
--- served as intermediate composers for the parent proof chain now
--- bypassed by observeFromJournal_simulates_pinned_source_slotFree's
--- direct-proof rewrite in PR #648.
--- Chantier 2 (Thomas 2026-09-13): the registered parent
--- verity_tx_simulates_consolidation now directly consumes
--- addRequestsSlotFree + observeFromJournal (fabricated slots retired
--- from the registered statement). The alias theorem
--- verity_tx_simulates_consolidation_from_journal is retired here since
--- the parent statement now IS the slot-independent one.
--- Chantier 2 (Thomas 2026-09-13): writePayloads invariance — the write
--- side of the slot-independence claim (complement to
--- observeFromJournal_success_slot_invariant on the read side).
-#print axioms LidoSRv3.Audit.Verity.ConsolidationTx.observeFromJournal_writePayloads_invariant
--- Chantier 2 (Thomas 2026-09-13, item c continuation): the persist vs
--- persistSlotFree field-level observation-equality lemmas
--- (persist_calls_eq_persistSlotFree_calls, persist_events_eq_persistSlotFree_events,
--- persist_readSlot_eq_persistSlotFree_readSlot, addRequests_snd_calls/events/readSlot_eq_...,
--- addRequests_isSuccess_eq_...) were retired here — they served as
--- intermediate composers for observeFromJournal_(run_)addRequests_eq_...
--- (retired in PR #661), which in turn composed observeFromJournal_simulates_pinned_source_slotFree
--- (rewritten directly in PR #648). None are on the registered parent
--- proof chain anymore.
--- Slot-free executable transaction: addRequestsSlotFree is a definitional
--- companion to addRequests that uses persistSlotFree. Downstream
--- consumers wanting a slot-free tx have this available today.
+-- Slot-free executable transaction: addRequestsSlotFree is the registered
+-- companion consumed by the P-CONSOLIDATION-1 parent chain.
 #check LidoSRv3.Audit.Verity.ConsolidationTx.addRequestsSlotFree
-#print axioms LidoSRv3.Audit.Verity.ConsolidationTx.function_spec_bridge_constructors
-#print axioms LidoSRv3.Audit.Verity.ConsolidationTx.committed_journal_forwards_msg_value
-#print axioms LidoSRv3.Audit.Verity.ConsolidationTx.committed_preserves_eth_balance
-#print axioms LidoSRv3.Audit.Verity.ConsolidationTx.entry_credit_overflow_reverts
+#print axioms LidoSRv3.Audit.Verity.ConsolidationTx.committed_journal_forwards_msg_value_slotFree
+#print axioms LidoSRv3.Audit.Verity.ConsolidationTx.committed_preserves_eth_balance_slotFree
 -- Chantier 2 (Thomas 2026-09-13, item c continuation): value-plane
 -- kill-lines retargeted to the slot-free companion mutants (PR #658).
 -- Pre-retirement variants were physically retired since the registered

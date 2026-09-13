@@ -6,6 +6,17 @@ import LidoSRv3.Audit.Guarantees.PConsolidation1
 
 Unregistered children. They do not replace the registered P-CONSOLIDATION-1
 parent, do not start a gateway/bus, and do not invent a guarantee ID.
+
+Chantier 2 (Thomas 2026-09-13, item c completion): the two Pack F
+observe/payloads witnesses (`observe_success_payloads_reread_maps` and
+`persist_payloads_reread`) were physically retired in this PR — both
+theorems consumed the pre-retirement `observe` / `persist` / `readPayloads`
+machinery reading the fabricated `sourceMapSlot` / `targetMapSlot`. Since
+PR #648 the registered P-CONSOLIDATION-1 parent consumes only the
+slot-free companions (`observeFromJournal` / `addRequestsSlotFree`), so
+these two Pack F witnesses no longer name any live model surface.
+Only the `A-CONSOLIDATION-GATEWAY-NONZERO` premise-necessity witness
+survives here.
 -/
 
 namespace LidoSRv3.Audit.Spec.ConsolidationObserveCorrespondence
@@ -13,26 +24,6 @@ namespace LidoSRv3.Audit.Spec.ConsolidationObserveCorrespondence
 open LidoSRv3.Audit.Verity.ConsolidationTx
 open LidoSRv3.Audit.Guarantees.PConsolidation1
 open LidoSRv3.Audit.SolidityConsolidation
-
-/-- Unregistered child: success `observe` rereads the source/target maps.
-It does not trust `Result.payloads`. -/
-theorem observe_success_payloads_reread_maps
-    (before : Verity.ContractState) (result : Result) (after : Verity.ContractState) :
-    (observe before (.success result after)).payloads =
-      readPayloads after (before.readSlot countSlot).val
-        (after.calls.drop before.calls.length).length := by
-  simp [observe]
-
-/-- Persist then reread: written maps are the normalized source-then-target
-pairs. Re-export of the existing Verity lemma so Pack F names the
-observe/payloads layer without a live gateway. -/
-theorem persist_payloads_reread
-    (start : Nat) (obs : Observables) (state : Verity.ContractState)
-    (hCount : obs.requestCount = obs.payloads.length)
-    (hNormalized : obs.payloads.map normalizedPayload = obs.payloads)
-    (hBound : start + obs.payloads.length ≤ Verity.Core.Uint256.modulus) :
-    readPayloads (persist start obs state) start obs.requestCount = obs.payloads :=
-  persist_read_payloads start obs state hCount hNormalized hBound
 
 /-- `A-CONSOLIDATION-GATEWAY-NONZERO` stays a named hyp. Dropping it still
 admits a free batch, so Pack F does not discharge it and does not start
