@@ -717,6 +717,14 @@ list, there are no undisclosed project-level assumptions or proof escapes.
   LidoSRv3.Audit.SolidityConsolidation.commit_payloads_equal_event_payloads
 #print axioms
   LidoSRv3.Audit.SolidityConsolidation.commit_call_inputs_equal_event_payloads
+-- Chantier 2 (Thomas 2026-09-13): slot-independent alternative
+-- `observeFromJournal` derives payloads from calls.map (·.input) directly,
+-- without reading the fabricated sourceMapSlot/targetMapSlot. Two agreement
+-- theorems: revert-arm identity and success-arm non-payload equality with
+-- the registered `observe`. Concrete first step toward physical slot
+-- retirement.
+#print axioms LidoSRv3.Audit.Verity.ConsolidationTx.observeFromJournal_revert_eq_observe
+#print axioms LidoSRv3.Audit.Verity.ConsolidationTx.observeFromJournal_success_non_payload_eq_observe
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.function_spec_bridge_constructors
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.committed_journal_forwards_msg_value
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.committed_preserves_eth_balance
