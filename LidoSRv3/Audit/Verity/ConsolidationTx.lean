@@ -481,6 +481,42 @@ theorem observeFromJournal_success_slot_invariant
       observeFromJournal before (.success r2 state2) := by
   simp [observeFromJournal, hCalls, hEvents, hCount, hFee]
 
+/-- **Chantier 2 (Thomas 2026-09-13) observation-vs-observation bridge.**
+Generic substitution lemma: if `observe before result` returns a
+view `v` whose `payloads` field happens to equal `v.calls.map (·.input)`,
+then `observeFromJournal before result = v` as well. This is the
+usable form of the retirement-substitution: any downstream context
+that has both `observe = v` and the payload-equals-calls-inputs
+fact for `v` can substitute `observeFromJournal` for `observe`
+directly.
+
+Proof: on the revert arm both observations return the reverted
+View definitionally; on the success arm the two agree on all
+non-payload fields (from `observeFromJournal_success_non_payload_eq_observe`)
+and the payloads agree by `hPay`. -/
+theorem observeFromJournal_eq_of_observe_and_payload_matches_calls
+    (before : ContractState) (result : ContractResult Result) (v : View)
+    (hObs : observe before result = v)
+    (hPay : v.payloads = v.calls.map (·.input)) :
+    observeFromJournal before result = v := by
+  cases result with
+  | success r state =>
+    -- Read off the field equalities from hObs by unfolding both sides.
+    cases v with | mk vStatus vCalls vEvents vPayloads vRequestCount vFeePaid =>
+    simp only [observe, View.mk.injEq] at hObs
+    obtain ⟨hStatus, hCalls, hEvents, hPayloadsObs, hCount, hFee⟩ := hObs
+    -- observeFromJournal on this success has all non-payload fields matching observe.
+    simp only [observeFromJournal, View.mk.injEq]
+    refine ⟨hStatus, hCalls, hEvents, ?_, hCount, hFee⟩
+    -- Payloads: on the observeFromJournal side, it's
+    -- `(state.calls.drop before.calls.length).map ofJournal .map (·.input)`
+    -- Which equals `vCalls.map (·.input)` (from hCalls), which equals vPayloads
+    -- (from hPay symm).
+    rw [hCalls, ← hPay]
+  | revert reason rollback =>
+    rw [observeFromJournal_revert_eq_observe]
+    exact hObs
+
 private theorem readMapUint_writeMapUint_other_slot (s : ContractState)
     {slot slot' : Nat} (hslot : slot' ≠ slot) (key key' value : Word) :
     (s.writeMapUint slot key value).readMapUint slot' key' =

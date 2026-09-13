@@ -737,6 +737,11 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- on any successful sourceRun outcome. Specialization of the commit-level
 -- retirement bridge for Verity-plane consumers.
 #print axioms LidoSRv3.Audit.SolidityConsolidation.sourceRun_committed_payloads_eq_call_inputs
+-- Chantier 2 (Thomas 2026-09-13): generic observation-substitution
+-- lemma. If `observe = v` and `v.payloads = v.calls.map (·.input)`,
+-- then `observeFromJournal = v` as well. Usable bridge for any
+-- downstream context to substitute observeFromJournal for observe.
+#print axioms LidoSRv3.Audit.Verity.ConsolidationTx.observeFromJournal_eq_of_observe_and_payload_matches_calls
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.function_spec_bridge_constructors
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.committed_journal_forwards_msg_value
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.committed_preserves_eth_balance
