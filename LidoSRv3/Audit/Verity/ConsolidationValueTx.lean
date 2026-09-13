@@ -209,6 +209,8 @@ theorem requestCalls_value_sum (target fee : Word) (requests : List Request) :
 theorem committed_call_value_sum (inputs : Inputs) (obs : Observables)
     (hRun : sourceRun inputs = .committed obs) :
     callValueSum obs.calls = inputs.msgValue.val := by
+  -- Chantier 2 (Thomas 2026-09-13): guard order matches Solidity —
+  -- bound → exact fee → per-key validation.
   unfold sourceRun at hRun
   split at hRun
   · split at hRun
@@ -218,17 +220,17 @@ theorem committed_call_value_sum (inputs : Inputs) (obs : Observables)
       · next requests hZip =>
           split at hRun
           · split at hRun
-            · split at hRun
-              · next hFee =>
-                  have hFeeNat :
-                      inputs.msgValue.val = requests.length * inputs.fee.val :=
-                    beq_iff_eq.mp hFee
-                  injection hRun with hObs
-                  subst obs
-                  rw [show (commitObservables inputs.requestTarget inputs.fee
-                    inputs.msgValue requests).calls =
-                    requests.map (requestCall inputs.requestTarget inputs.fee) by rfl]
-                  rw [requestCalls_value_sum, ← hFeeNat]
+            · next hFee =>
+              split at hRun
+              · have hFeeNat :
+                    inputs.msgValue.val = requests.length * inputs.fee.val :=
+                  beq_iff_eq.mp hFee
+                injection hRun with hObs
+                subst obs
+                rw [show (commitObservables inputs.requestTarget inputs.fee
+                  inputs.msgValue requests).calls =
+                  requests.map (requestCall inputs.requestTarget inputs.fee) by rfl]
+                rw [requestCalls_value_sum, ← hFeeNat]
               · cases hRun
             · cases hRun
           · cases hRun

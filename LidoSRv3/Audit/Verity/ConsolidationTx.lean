@@ -749,12 +749,14 @@ private theorem sourceRun_committed_payload_shape
           split at hRun
           · simp at hRun
           · next requests hZip =>
+              -- Chantier 2 (Thomas 2026-09-13): guard order matches Solidity —
+              -- bound → exact fee → per-key validation.
               split at hRun
-              · next hValid =>
+              · next hProduct =>
                   split at hRun
-                  · next hProduct =>
+                  · next hFee =>
                       split at hRun
-                      · next hFee =>
+                      · next hValid =>
                           injection hRun with hObs
                           subst obs
                           have hLen := zipRequests_some_length hZip
