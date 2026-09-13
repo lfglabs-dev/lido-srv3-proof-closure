@@ -1045,9 +1045,6 @@ theorem verity_tx_simulates_pinned_source
       persist_events, credited_events, persist_read_count, persist_read_fee,
       drop_map_ofJournal, drop_map_ofEvent]
     rw [hCallsLen, hPayloads]
-
-/-- Any failure, including the injected failure after intermediate
-call/event/memory writes, returns the exact pre-transaction snapshot. -/
 theorem revert_restores_snapshot
     (inputs : Inputs) (inject : Bool) (state rollback : ContractState)
     (reason : String)
