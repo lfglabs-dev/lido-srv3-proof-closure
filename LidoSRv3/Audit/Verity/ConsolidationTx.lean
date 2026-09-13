@@ -1002,6 +1002,37 @@ where
       ({ s with events := evs, calls := cs }).selfBalance = s.selfBalance :=
     fun _ _ _ => rfl
 
+/-- **Chantier 2 (Thomas 2026-09-13) frame-scalar preservation.**
+Both `persist` and `persistSlotFree` preserve `state.msgValue` (neither
+`forwardCall`, `writeSlot`, `writePayloads`, nor the `{ with events, calls }`
+update touches it). This closes another storage-adjacent surface for
+the slot-free retirement: no msg.value drift under substitution. -/
+theorem persist_msgValue_eq_persistSlotFree_msgValue (start : Nat)
+    (obs : Observables) (state : ContractState) :
+    (persist start obs state).msgValue = (persistSlotFree start obs state).msgValue := by
+  simp only [persist, persistSlotFree, forwardCalls_msgValue,
+    writeSlot_msgValue, writePayloads_msgValue, setLog_msgValue]
+where
+  forwardCalls_msgValue : ∀ (s : ContractState) (cs : List CallObs),
+      (forwardCalls s cs).msgValue = s.msgValue := by
+    intro s cs; revert s; induction cs with
+    | nil => intro s; rfl
+    | cons c rest ih => intro s; simp only [forwardCalls]; rw [ih]; rfl
+  writeSlot_msgValue : ∀ (s : ContractState) (slot : Nat) (v : Word),
+      (s.writeSlot slot v).msgValue = s.msgValue := fun _ _ _ => rfl
+  writePayloads_msgValue : ∀ (start : Nat) (payloads : List (List Word))
+      (s : ContractState),
+      (writePayloads start payloads s).msgValue = s.msgValue := by
+    intro start payloads
+    revert start
+    induction payloads with
+    | nil => intro start s; rfl
+    | cons p rest ih => intro start s; simp only [writePayloads]; rw [ih]; rfl
+  setLog_msgValue : ∀ (s : ContractState) (evs : List Event)
+      (cs : List ExternalCall),
+      ({ s with events := evs, calls := cs }).msgValue = s.msgValue :=
+    fun _ _ _ => rfl
+
 /-- **Chantier 2 (Thomas 2026-09-13) `.snd.calls` equivalence between
 `addRequests` and `addRequestsSlotFree`.** Both transactions share the
 same guard structure (entry-credit bound, memory decode, `sourceRun`
