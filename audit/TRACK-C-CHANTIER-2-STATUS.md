@@ -72,20 +72,52 @@ follow-ups in the two guarantees' `fidelity.missing`:
 
 ## PR ledger (chantier-2)
 
+Original chantier-2 sweep (24 PRs, up through PR #610):
 PRs #560, #563, #565, #567, #570, #573, #577, #579, #582, #584,
 #585, #586, #588, #592, #594, #596, #598, #599, #600, #602,
-#605, #606, #609, #610 — 24 landed.
+#605, #606, #609, #610.
+
+Consolidation refactor + A-CONSOLIDATION-GATEWAY-NONZERO retirement
+sweep (subsequent PRs): #641 (retire fabricated slots from parent
+statement), #642 (cleanup unconsumed drips), #644 (gateway→vault
+bridge parent), #646 (value-plane parents to slot-free), #647
+(A-CONSOLIDATION-GATEWAY-NONZERO derivation under bridge), #648
+(direct proof `observeFromJournal_simulates_pinned_source_slotFree`),
+#649 (Trio-plane grouped_tx_simulates to slot-free), #651 (item d.CL
+cross-guarantee CL-proof premise), #655 (executable-frame ABI-bridge
+composition premise), #658 (kill-line mutants ported to slot-free),
+#661/#664/#666/#667/#669 (progressive physical-retirement PRs),
+#673 (`PackFConsolidationObserveMutants` kill-line retired), #683
+(culminating physical retirement, ~800 lines), #687 (fee STATICCALL
+wiring into P-CONSOLIDATION-ETH-1 parent statement), #699
+(A-CONSOLIDATION-GATEWAY-NONZERO retired from P-CONSOLIDATION-1 via
+gateway-bridge parent-statement swap), #706 (sync P-CONSOLIDATION-1
+prose), #712 (retire from P-CONSOLIDATION-VALUE-1), #715 (sync
+P-CONSOLIDATION-VALUE-1 prose), #720 (stale-fidelity-bullet
+cleanup), #725 (assumption removal_path update), #730
+(P-CONSOLIDATION-1 stale REINSTATED phrasing), #733 (Lean docstrings
+in PConsolidationValue1.lean).
 
 ## Assumptions status
 
-- `A-CONSOLIDATION-GATEWAY-NONZERO` is now narrowed in
-  `audit/assumptions.yaml` with explicit `fee = 0` on-chain
-  disclosure and the `fee ≠ 0 → totalFee ≠ 0` derivation
-  (PRs #560, #567). Full discharge still needs a live callee
-  model on the pinned EIP-7251 predeploy (documented in
-  `removal_path`).
-- `A-CONSOLIDATION-GATEWAY-NONZERO` remains a caller-supplied
-  premise on the vault-side theorem; the source-plane linkage
-  (PR #582) shows the vault-input scalars satisfy the exact-fee
-  equation the vault checks, so composition with the gateway leg
-  makes the `IncorrectFee` branch of `sourceRun` unreachable.
+- `A-CONSOLIDATION-GATEWAY-NONZERO` was originally caller-supplied
+  on the vault-side theorem. The narrowing PRs (#560, #567) landed
+  the `fee ≠ 0 → totalFee ≠ 0` arithmetic derivation and disclosed
+  the `fee = 0` on-chain case in `audit/assumptions.yaml`.
+  Subsequently RETIRED from BOTH consumer guarantees' assumption
+  lists (PR #699 for P-CONSOLIDATION-1, PR #712 for
+  P-CONSOLIDATION-VALUE-1) via a registered-parent statement swap
+  to `..._from_gateway` variants that consume
+  `PredeployStaticcallResult`-shaped pinned-source premises directly
+  and derive `hGatewayAdmittedNonzero` via
+  `gatewayTotalFee_ne_zero_of_fee_ne_zero`. The residual
+  `hFeeNonzero : result.abiDecodedFee ≠ 0` on the outer STATICCALL
+  structure remains caller-supplied; full discharge still needs a
+  live-STATICCALL executable model on the pinned EIP-7251 predeploy
+  `0x0000BBdDc7CE488642fb579F8B00f3a590007251` (multi-session Verity
+  model work). The complementary `fee = 0` on-chain path is
+  documented by `gatewayTotalFee_zero_at_fee_zero` (source plane).
+  The full retirement propagation across yaml prose (summary,
+  classification.work, next_gate, fidelity.covered, fidelity.missing)
+  and Lean docstrings landed via PRs #706, #715, #720, #725, #730,
+  #733.
