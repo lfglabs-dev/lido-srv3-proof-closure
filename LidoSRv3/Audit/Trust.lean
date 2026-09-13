@@ -926,6 +926,14 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise.feePerRequest_derived_from_staticcall_result
 -- Second-step (2026-09-13): P-CONSOLIDATION-ETH-1 fee EIP-7251 schedule.
 #print axioms LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.abiDecodedFee_matches_schedule
+-- Chantier 2 (Thomas 2026-09-13): gateway totalFee = requestsCount * fee
+-- composition on top of the STATICCALL result. Derives fee ≠ 0 → totalFee ≠ 0
+-- (the preferred bridge for A-CONSOLIDATION-GATEWAY-NONZERO) and documents
+-- the fee = 0 on-chain path where the assumption is violable.
+#print axioms LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayTotalFee_eq
+#print axioms LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayTotalFee_ne_zero_of_fee_ne_zero
+#print axioms LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayTotalFee_zero_at_fee_zero
+#print axioms LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayTotalFee_ne_zero_witness
 -- Shared WithdrawalQueue source model (2026-09-13): request/checkpoint mappings
 -- + unfinalizedStETH accumulator for P-RESERVE-1 and P-ADDRESS-1.
 #print axioms LidoSRv3.Audit.Source.WithdrawalQueueMappingSource.unfinalizedStETHFromStorage_eq
