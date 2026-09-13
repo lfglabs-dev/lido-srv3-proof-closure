@@ -234,3 +234,132 @@ One TOPUP-2 D-UNITS-1 attempt was BLOCKED and abandoned before merge
 addition per Thomas's 2026-09-13 rule). Two TOPUP-2 D-SLASH-1 attempts
 abandoned mid-session due to 14-reference cascade in
 `Topup2Correspondence.lean`.
+
+## Open-item scope catalog (2026-09-13, Piste B extended session)
+
+Consolidated source-line inventory for the seven Piste B open items,
+compiled after the initial tally to give per-item blocker scope. Each
+entry cites the Solidity ground-truth line and the current Lean-side
+site that must change.  Documentation-only finding; no parent statement
+edits, so per common-rules rule 1 this lands as a finding commit not a
+PR.
+
+### Chantier 1 DEPOSIT-1
+
+**D-SLOT-1** (65+ refs across 5 files, cannot land partially).
+Solidity `ModuleState.deposits` on `StakingModule.sol` uses ERC-7201
+namespaced hash `keccak256(abi.encode(uint256(keccak256("lido.storage.StakingModule")) - 1)) & ~bytes32(uint256(0xff))`.
+The Verity model uses positional slots 0-4.  Migration touches
+`Audit/Verity/DepositTx.lean`, `Audit/Verity/DepositParentTx.lean`,
+`Audit/Source/*.lean` slot-index sites, mutants that construct
+`ContractState` literals with explicit slot indices, plus
+`guarantees.yaml` canonical detail SHA rewrite once the parent
+statement changes.  Introduce `ERC7201.slotOf(namespace, field)` helper
+and migrate atomically.
+
+**D-CALL-1 per-key-push half** (task #13).
+Real Solidity path: `for` loop over keys, each
+`depositContract.deposit{value: 32 ether}(pubkey_i, wc, sig_i, root_i)`
+with per-key `depositDataRoot`.  Current model has batched
+`depositToBeacon(batchOfKeys, singleRoot)` frame.  Fix: split
+`pushBatch` into N-step Verity frames, derive per-key `depositDataRoot`
+from per-key `pubkey_i` / `signature_i` via the pinned
+`Audit/Source/SszDepositMessage.lean` hash-tree-root.  Preserve the
+Lido pull two-arg upstream shape `(deposits, depositCalldata)`.  Every
+existing `pushBatch` proof splits into induction on the key list; the
+`source_deposit_conserves_and_rolls_back` snapshot claim becomes N
+per-key rollback units.
+
+**Preconditions boolean retirement** (task #7).
+Four free booleans on the current DepositTx `Preconditions`:
+`authorized` (msg.sender == DSM address premise on outermost frame);
+`moduleActive` (StakingRouter's ERC-7201 `_stakingModules[id].status`
+== `Active` enum 0); `allocationValid`
+(`StakingRouter.getDepositsAllocation` returns non-zero ≤ available);
+`lidoCallOk` (Lido pull frame at `handleOracleReport` /
+`getELRewardsVaultBalance` returns `success=true` with
+`getBufferedEther() ≥ depositAmount`).  `entryBalance = 0` becomes a
+corollary of balance conservation across composed frames.  Cross-track
+dependency: threads five upstream state models (DSM, StakingRouter,
+StakingModule, Lido, DepositContract) into the parent statement.
+
+### Chantier 2 TOPUP-2
+
+**D-UNITS-1** (`Verity/Topup2DistributionTx.lean`).
+Solidity `TopUpGateway.sol:226`
+`topUpLimits[i] = _evaluateTopUpLimit(vw, pendingBalanceGwei[i]) * 1 gwei;`
+lifts the gwei-scale return to wei via the `* 1 gwei` (10^9) multiplier.
+The Lean model calls the parameter `valueGwei : Word` at every site but
+never applies the multiplier, so `valueGwei` misnames its wei-scale
+conclusion.  Rename/rewire sites: `allocateAnyCount` sig 118, use 130;
+`allocate` sig 178, cases 180/182, forward to `allocateAnyCount` 223,
+`.run` 254; `sourceRun` sig 206, `sourceLimitsIndependent` chain;
+`observe`/`sourceView` boundary 252/254, 265, 276, 278, 301, 317, 320.
+Full fix rewrites `verity_tx_simulates_topup2_spec` statement and
+`guarantees.yaml` canonical detail SHA.
+
+**D-TOTAL-1** (`Verity/Topup2DistributionTx.lean`).
+Solidity `TopUpGateway.sol:234-236`
+`if (totalLimits > 0) { _setLastTopUpData(); }` where
+`totalLimits = sum(topUpLimits)` at line 230.  Current model lacks
+`didSetLastTopUpData : Bool` observable on the `View` record.  Fix:
+add fifth field to `View`, compute `totalEvaluated := (evaluatedLimits
+before slashed/exited zero).sum` in `sourceView`, gate observable on
+`> 0`, thread through `allocate → sourceRun → observe`.  Blocker: five
+existing mutant files (`Topup2DistributionTxMutants.lean`,
+`TopupUnboundedCountMutants.lean` and three others) construct explicit
+`View` literals like `⟨.committed, words [6, 4], word 0, word 10⟩` —
+adding a fifth positional field breaks every literal.  Named-field
+record syntax refactor is a prerequisite.
+
+**D-CONSUME-1** (`Verity/Topup2DistributionTx.lean`).
+Solidity `TopUpGateway.sol:226` computes each `topUpLimits[i]`
+**independently** — no cross-index dependency, no running budget.
+Current model uses a `consumeBudget` leftover walk in `sourceConsume`
+threading a decreasing budget across indices.  Fix: delete
+`sourceConsume` / `consumeBudget`; replace `sourceLimits` inner
+recursion with `List.zipWith f effective pending`; retire
+`parent_block_cap_is_unbounded_instance` (already an unbounded
+instance per `TopupUnboundedCountMutants.lean:39-42`); inline
+`allocateAnyCount` at the sole callsite.
+`Audit/Verity/TopupUnboundedCount.lean` already proves the equivalence
+for `count ≤ 32`.
+
+### Chantier 3 ADDRESS-1
+
+**Real state parent** (task #12).
+Current `universal_address_writer_equivariance` projects onto 12
+booleans (`isRecipient`, `isSender`, etc.) with no address-indexed
+state.  Solidity ground-truth sites:
+- **stETH balances / allowances**: `StETH.sol:253` `_balances[account]`
+  mapping; the transfer path at 462-466 writes allowance **before**
+  balance, so the allowance-then-balance ordering is observable.
+- **WQ owner / claimed / hint**: `WithdrawalQueueBase.sol:467-484`
+  writes `_requests[requestId].owner = owner;
+  _requests[requestId].claimed = true;
+  _requestsByOwner[owner].add(requestId); ...; hints[requestId] = hint;`
+  in that exact order.
+- **externalCallSucceeds**: `AddressRecipientCallBridge` premise;
+  `_sendValue` at 525-530 is
+  `(bool success, ) = recipient.call{value: amount}(""); if (!success) revert CantSendValueRecipientMayHaveReverted();`
+
+Fix: replace 12-bool `View` with
+`AddressView { balances, allowances, owners, claimed, hints, externalCallSucceeds }`;
+register equivariance under `AddressPermutation.act` on this state
+quantified over the recipient's code (Bridge premise).
+`AddressClaimBatchTx` already models the claim-path storage/CALL
+surface — reuse.  Full retirement rewrites `PAddress1Verity` parent
+statement, canonical detail SHA, and every mutant projecting the
+12-bool `View`.  Wave-7 note in `report/P-ADDRESS-1.md` (finding
+commit `9f3b4b39` on branch
+`spark/lido-p-address-1-report-real-state-gap-20260913`) already
+records the gap.
+
+### Common gate
+
+Every fix above rewrites a registered parent statement (`verity_tx_...`
+in `Guarantees/*.lean`) and therefore updates the `guarantees.yaml`
+canonical detail SHA256 constant.  Each landed PR must include a
+fresh-context reviewer verdict `CLEAN`.  Per rule 9, each D-* is
+closed only when the corresponding Grok vector passes on the pinned
+harness (`#412` for DEPOSIT-1, `#417` for TOPUP-2).
