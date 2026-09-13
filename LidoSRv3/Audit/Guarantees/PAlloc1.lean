@@ -5,6 +5,7 @@ import LidoSRv3.Audit.Guarantees.Registry
 import LidoSRv3.Audit.Guarantees.PAlloc1TargetMultBounded
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
 import LidoSRv3.Audit.Guarantees.PAlloc1TotalAdditionBounded
+import LidoSRv3.Audit.Guarantees.PAlloc1AvailableArithmeticBounded
 import LidoSRv3.Audit.Verity.AllocCapacityPhase3
 import LidoSRv3.Audit.Verity.AllocationTx
 
@@ -253,6 +254,28 @@ theorem checked_execute_under_type_and_allocation_bounds
         PAlloc1TargetMultBounded.target_multiplication_under_pinned_type_bounds hTypes }
 
 /-- Successful execution retains router index order. -/
+theorem checked_execute_under_type_and_available_bounds
+    (cfg : Config) (modules : List Module) (depositsToAllocate : Verity.Uint256)
+    (isTopUp : Bool)
+    (hMaxEB : cfg.maxEBType1 ≠ 0)
+    (hTypes : PAlloc1TargetMultBounded.PinnedStakingModuleTypeBounds
+      cfg modules depositsToAllocate)
+    (hAvail : PAlloc1AvailableArithmeticBounded.PinnedAvailableArithmeticBounds
+      cfg modules isTopUp)
+    (hShape : PAlloc1RemainingBoundsScaffold.PinnedSRAllocationBoundsShape
+      cfg modules depositsToAllocate isTopUp) :
+    ∃ rows, SolidityAllocCapacity.execute cfg modules depositsToAllocate isTopUp = some rows ∧
+      rows.map (fun row => (row.capacity : Nat)) =
+        MathView.capacities cfg modules depositsToAllocate isTopUp :=
+  checked_execute cfg modules depositsToAllocate isTopUp
+    { maxEBType1_nonzero := hMaxEB
+      active_subtraction := hShape.activeSubtractionInvariant
+      total_addition := hShape.totalAdditionInvariant
+      available_arithmetic :=
+        PAlloc1AvailableArithmeticBounded.available_arithmetic_under_pinned_bounds hAvail
+      target_multiplication :=
+        PAlloc1TargetMultBounded.target_multiplication_under_pinned_type_bounds hTypes }
+
 theorem router_order_preserved {cfg : Config} {modules : List Module}
     {depositsToAllocate : Verity.Uint256} {isTopUp : Bool} {rows : List Row}
     (h : SolidityAllocCapacity.execute cfg modules depositsToAllocate isTopUp = some rows) :
