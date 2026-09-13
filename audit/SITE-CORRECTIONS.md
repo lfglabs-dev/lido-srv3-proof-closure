@@ -270,6 +270,64 @@ points, note that both `allocate` (legacy planted maps) and
 `allocateLiveFromStorage` (live-summary entry) are covered by
 namespace-registered theorems.
 
+## DEPOSIT-1 — Chantier 1 progress (Piste B, 2026-09-13)
+
+**No misleading site claim was flagged for DEPOSIT-1.**  This section
+records the honest posture of P-DEPOSIT-1 after six Piste-B chantier-1
+PRs that discharge Grok #412 differential divergences in the registered
+`DepositNFrameTx.execute` executor.
+
+- **D-EMPTY-PULL** (PR #553): `DepositNFrameTx.execute` now gates the
+  pull + per-batch push + line-996 assert behind an inlined
+  `shouldPull inputs := decide (exactKeys inputs.batches ≠ 0)`
+  predicate mirroring pinned `StakingRouter.sol:978`
+  `if (actualDepositsCount == 0) return;`. On empty batches the model
+  no longer journals a `withdrawDepositableEther` frame.
+- **D-REVERT-1** (PR #561): `execute` and `executePullPushAssertTail`
+  emit the pinned Solidity selector-name / Panic-selector strings
+  (`NotAuthorized()`, `StakingModuleNotActive()`, `ZeroDeposits()`,
+  `Panic(0x11)`, `Panic(0x01)`) instead of the earlier model-name
+  strings.
+- **D-SKEW-1** (PR #564): `Inputs` split into `depositSize` (per-key
+  constant, `BeaconChainDepositor.DEPOSIT_SIZE`) and `maxEBType1`
+  (constructor-time immutable,
+  `StakingRouter.MAX_EFFECTIVE_BALANCE_WC_TYPE_01`); `execute`'s pull
+  uses `wordKeys * maxEBType1` per StakingRouter.sol:972 while the
+  push aggregate stays at `wordTotal = wordKeys * depositSize`; new
+  `Preconditions.conserving : maxEBType1 = depositSize` premise makes
+  the line-996 balance assert genuinely load-bearing on skewed
+  deployments (previously vacuous).
+- **D-NFRAME-1** (PR #566): in-body
+  `require (decide ((batches.map fun batch => batch.moduleId).Nodup))
+  "DuplicateModuleId"` guard added to `execute` after the
+  word-overflow guard; duplicate `moduleId` inputs now revert at the
+  executor rather than silently breaking the parent premise; kill-line
+  `duplicate_module_input_reverts_at_in_body_guard` in
+  `DepositNFrameTxMutants` exercises the guard.
+- **D-CALL-1 two-argument-pull half** (PR #568): `pullFromLido`
+  widened to two arguments `[wordTotal, wordKeys]` matching pinned
+  `LIDO.withdrawDepositableEther(depositsValue, actualDepositsCount)`
+  at StakingRouter.sol:983.
+- **Task 8** (PR #572): `PDeposit1.verity_tx_revert_restores_snapshot`
+  moved from the retired `DepositParentTx.execute` (2-batch legacy
+  plane) to the registered `DepositNFrameTx.execute`, backed by new
+  `DepositNFrameTx.revert_restores_snapshot` and
+  `.revert_observes_idle` lemmas.
+
+**Site fix:** if the DEPOSIT-1 card presents the executable model as
+mirroring the pinned executor call chain byte-for-byte, add the two
+remaining residual disclosures: (a) D-CALL-1 per-key-push half
+(`pushBatch` still emits one aggregate `depositToBeacon` frame per
+batch rather than `batch.keys.val` per-key `IDepositContract.deposit`
+frames); (b) D-SLOT-1 (model uses model-local slots 0-4 rather than
+the pinned ERC-7201 `ModuleState.deposits` keyed layout indexed by
+`moduleId`, and no `StakingRouterETHDeposited` event is emitted). See
+`audit/TRACK-B-REQUESTS.md` for the full obligations map — the two
+residual halves plus free-boolean `Preconditions` retirement
+(`authorized`/`moduleActive`/`allocationValid`/`lidoCallOk`/
+`entryBalance = 0` composition with DSM + router) and Grok #412
+harness integration into `make test`.
+
 ## Global signals
 
 - **Fidelity total:** 102 open (was 78 pre-mandate; each chantier
