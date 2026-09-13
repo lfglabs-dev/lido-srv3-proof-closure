@@ -108,6 +108,7 @@ import LidoSRv3.Audit.Source.DepositEmptyBatchEarlyReturnSource
 import LidoSRv3.Audit.Source.DepositPerKeyCallSource
 import LidoSRv3.Audit.Source.DepositCustomErrorsSource
 import LidoSRv3.Audit.Source.ERC7201StorageSlotSource
+import LidoSRv3.Audit.Source.DepositDistinctModulesSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -985,6 +986,10 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.DepositCustomErrorsSource.realErrorSelector_deterministic
 -- Twenty-seventh-step (2026-09-13): D-SLOT-1 ERC-7201 storage-slot source model.
 #print axioms LidoSRv3.Audit.Source.ERC7201StorageSlotSource.realERC7201BaseSlot_deterministic
+-- Twenty-eighth-step (2026-09-13): D-NFRAME-1 distinct-modules guard source model.
+#print axioms LidoSRv3.Audit.Source.DepositDistinctModulesSource.distinctModules_true_of_singleton
+#print axioms LidoSRv3.Audit.Source.DepositDistinctModulesSource.distinctModules_true_of_empty
+#print axioms LidoSRv3.Audit.Source.DepositDistinctModulesSource.distinctModules_cons
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape
