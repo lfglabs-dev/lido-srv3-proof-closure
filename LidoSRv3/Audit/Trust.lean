@@ -83,6 +83,7 @@ import LidoSRv3.Audit.Source.AragonACLSource
 import LidoSRv3.Audit.Source.KeccakMappingStorageSource
 import LidoSRv3.Audit.Source.WithdrawalQueueMappingSource
 import LidoSRv3.Audit.Source.ReserveFreshCacheFromWQ
+import LidoSRv3.Audit.Source.ERC20StorageSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -896,6 +897,9 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.ReserveFreshCacheFromWQ.liveFromWQStorage_eq
 -- Sixth-step (2026-09-13): P-ADDRESS-1 per-writer ABI selectors + target contracts.
 #print axioms LidoSRv3.Audit.Source.BridgePerWriterGlue.targetFor_dispatch
+-- Shared ERC-20 storage source model (2026-09-13): STETH / WstETH balances/allowances.
+#print axioms LidoSRv3.Audit.Source.ERC20StorageSource.balanceOf_eq
+#print axioms LidoSRv3.Audit.Source.ERC20StorageSource.allowanceOf_eq
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape
