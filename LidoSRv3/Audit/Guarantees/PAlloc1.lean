@@ -1,6 +1,7 @@
 import LidoSRv3.Audit.Model.AllocCapacity
 import LidoSRv3.Audit.Source.AllocCapacityCorrespondence
 import LidoSRv3.Audit.Source.Alloc1CompositeBoundsSource
+import LidoSRv3.Audit.Source.SRStorageExitedMonotonicity
 import LidoSRv3.Audit.Guarantees.Registry
 import LidoSRv3.Audit.Guarantees.PAlloc1TargetMultBounded
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -273,6 +274,37 @@ theorem checked_execute_under_type_and_available_bounds
       total_addition := hShape.totalAdditionInvariant
       available_arithmetic :=
         PAlloc1AvailableArithmeticBounded.available_arithmetic_under_pinned_bounds hAvail
+      target_multiplication :=
+        PAlloc1TargetMultBounded.target_multiplication_under_pinned_type_bounds hTypes }
+
+theorem checked_execute_under_type_and_write_history_bounds
+    (cfg : Config) (modules : List Module) (depositsToAllocate : Verity.Uint256)
+    (isTopUp : Bool)
+    (hMaxEB : cfg.maxEBType1 ≠ 0)
+    (hTypes : PAlloc1TargetMultBounded.PinnedStakingModuleTypeBounds
+      cfg modules depositsToAllocate)
+    (hHistories : ∀ m ∈ modules,
+      ∃ ops : List LidoSRv3.Audit.Source.SRStorageExitedMonotonicity.Operation,
+        LidoSRv3.Audit.Source.SRStorageExitedMonotonicity.applyOperations
+          LidoSRv3.Audit.Source.SRStorageExitedMonotonicity.genesis ops =
+        some (LidoSRv3.Audit.Source.SRStorageExitedMonotonicity.ofModule m))
+    (hShape : PAlloc1RemainingBoundsScaffold.PinnedSRAllocationBoundsShape
+      cfg modules depositsToAllocate isTopUp) :
+    ∃ rows, SolidityAllocCapacity.execute cfg modules depositsToAllocate isTopUp = some rows ∧
+      rows.map (fun row => (row.capacity : Nat)) =
+        MathView.capacities cfg modules depositsToAllocate isTopUp :=
+  checked_execute cfg modules depositsToAllocate isTopUp
+    { maxEBType1_nonzero := hMaxEB
+      active_subtraction := by
+        intro m hMem
+        rcases hHistories m hMem with ⟨ops, hOps⟩
+        have hMono :=
+          LidoSRv3.Audit.Source.SRStorageExitedMonotonicity.reachable_state_is_monotone
+            ops (LidoSRv3.Audit.Source.SRStorageExitedMonotonicity.ofModule m) hOps
+        exact
+          (LidoSRv3.Audit.Source.SRStorageExitedMonotonicity.ofModule_monotone_iff m).mp hMono
+      total_addition := hShape.totalAdditionInvariant
+      available_arithmetic := hShape.availableArithmeticInvariant
       target_multiplication :=
         PAlloc1TargetMultBounded.target_multiplication_under_pinned_type_bounds hTypes }
 
