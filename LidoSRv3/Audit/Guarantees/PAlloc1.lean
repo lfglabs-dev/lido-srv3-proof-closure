@@ -1,5 +1,6 @@
 import LidoSRv3.Audit.Model.AllocCapacity
 import LidoSRv3.Audit.Source.AllocCapacityCorrespondence
+import LidoSRv3.Audit.Source.Alloc1CompositeBoundsSource
 import LidoSRv3.Audit.Guarantees.Registry
 import LidoSRv3.Audit.Guarantees.PAlloc1TargetMultBounded
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -155,6 +156,53 @@ theorem checked_execute_under_pinned_shape
       available_arithmetic := hShape.availableArithmeticInvariant
       target_multiplication :=
         PAlloc1TargetMultBounded.target_multiplication_under_pinned_type_bounds hTypes }
+
+/-- **Chantier 3 (Piste A, Thomas 2026-09-13) SR-allocation-constants
+composite bounds bridge.**
+
+Restates `checked_execute` with an added `_hConstantsPremise` premise
+NAMING the pinned SRLib allocation constants (`MAX_STAKING_MODULES_COUNT =
+32`, `stakeShareLimitMaxBp = 10000`) via
+`Alloc1CompositeBoundsSource.PinnedAllocConstantsPremise`.  This
+composite premise records the pinned SR constants that ground the
+`CheckedBounds` conjuncts alongside the type-width bounds from
+`PinnedStakingModuleTypeBounds`.
+
+The bridge parent `checked_execute_under_pinned_shape` (previous
+theorem in this file) consumes `PinnedStakingModuleTypeBounds +
+PinnedSRAllocationBoundsShape` and derives the `target_multiplication`
+conjunct.  This new bridge adds the SRLib constants as a NAMED
+composite premise (also inhabited by construction via
+`PinnedAllocConstantsPremise_inhabited`), so downstream P-ALLOC-1
+consumers can enforce the pinned constant values uniformly at the
+ENUNCE.
+
+**NAMING composite composition.**  The registered `checked_execute`
+is retained unchanged.  Live-SRStorage derivations of the three
+remaining CheckedBounds conjuncts (active_subtraction /
+total_addition / available_arithmetic) still remain follow-ups. -/
+theorem checked_execute_under_pinned_shape_and_constants
+    (cfg : Config) (modules : List Module) (depositsToAllocate : Verity.Uint256)
+    (isTopUp : Bool)
+    (hMaxEB : cfg.maxEBType1 ≠ 0)
+    (hTypes : PAlloc1TargetMultBounded.PinnedStakingModuleTypeBounds
+      cfg modules depositsToAllocate)
+    (hShape : PAlloc1RemainingBoundsScaffold.PinnedSRAllocationBoundsShape
+      cfg modules depositsToAllocate isTopUp)
+    (_hConstantsPremise :
+      LidoSRv3.Audit.Source.Alloc1CompositeBoundsSource.PinnedAllocConstantsPremise) :
+    ∃ rows, SolidityAllocCapacity.execute cfg modules depositsToAllocate isTopUp = some rows ∧
+      rows.map (fun row => (row.capacity : Nat)) =
+        MathView.capacities cfg modules depositsToAllocate isTopUp :=
+  -- The constants premise names the pinned SRLib allocation
+  -- constants (MAX_STAKING_MODULES_COUNT = 32, stakeShareLimitMaxBp
+  -- = 10000).  The proof delegates to
+  -- `checked_execute_under_pinned_shape` since the type-width /
+  -- SR-shape bounds already discharge the CheckedBounds
+  -- conjuncts; the constants premise records the pinned SR
+  -- constants at the ENUNCE for downstream consumers.
+  checked_execute_under_pinned_shape cfg modules depositsToAllocate isTopUp
+    hMaxEB hTypes hShape
 
 /-- Successful execution retains router index order. -/
 theorem router_order_preserved {cfg : Config} {modules : List Module}
