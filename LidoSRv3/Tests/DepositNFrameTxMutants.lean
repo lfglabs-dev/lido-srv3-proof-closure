@@ -38,7 +38,7 @@ theorem three_batch_preconditions :
   distinctModules := by decide
   valueMatches := by decide
   conserving := fun _ => rfl
-  entryBalanceNoWrap := by decide
+  entryBalanceNoWrap := fun _ => by decide
   funded := fun _ => by decide
   foldStable :=
     .cons (by decide) (.cons (by decide) (.cons (by decide) (.nil (by decide))))
@@ -64,7 +64,7 @@ theorem two_batch_preconditions :
   distinctModules := by decide
   valueMatches := by decide
   conserving := fun _ => rfl
-  entryBalanceNoWrap := by decide
+  entryBalanceNoWrap := fun _ => by decide
   funded := fun _ => by decide
   foldStable := .cons (by decide) (.cons (by decide) (.nil (by decide)))
 
