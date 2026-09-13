@@ -1561,6 +1561,66 @@ theorem revert_restores_snapshot
   unfold Contract.run at h
   split at h <;> simp_all
 
+/-- **Chantier 2 (Thomas 2026-09-13) `Contract.run`-level slot-free
+observation equivalence.** Lifts
+`observeFromJournal_addRequests_eq_observeFromJournal_addRequestsSlotFree`
+through `Contract.run`'s revert-rollback semantics. On the success arm
+`Contract.run c s = c s` verbatim; on the revert arm `Contract.run c s`
+substitutes `s` for the reverted-state field, but `observeFromJournal`
+on `.revert _ _` returns the constant `⟨.reverted, [], [], [], s.readSlot
+countSlot, 0⟩` regardless of the carried state — so the revert-side
+rewriting is invisible to `observeFromJournal`. Both cases follow from
+the raw-application equivalence. -/
+theorem observeFromJournal_run_addRequests_eq_observeFromJournal_run_addRequestsSlotFree
+    (inputs : Inputs) (state : ContractState) :
+    observeFromJournal state ((addRequests inputs).run state) =
+    observeFromJournal state ((addRequestsSlotFree inputs).run state) := by
+  unfold Contract.run
+  have hRaw := observeFromJournal_addRequests_eq_observeFromJournal_addRequestsSlotFree
+    inputs false state
+  have hSucc := addRequests_isSuccess_eq_addRequestsSlotFree_isSuccess
+    inputs false state
+  rcases hL : addRequests inputs false state with ⟨rL, stateL⟩ | ⟨reasonL, stateL⟩
+  · rcases hR : addRequestsSlotFree inputs false state with ⟨rR, stateR⟩ | ⟨reasonR, stateR⟩
+    · simp only []
+      rw [hL, hR] at hRaw
+      exact hRaw
+    · rw [hL, hR] at hSucc
+      simp [ContractResult.isSuccess] at hSucc
+  · rcases hR : addRequestsSlotFree inputs false state with ⟨rR, stateR⟩ | ⟨reasonR, stateR⟩
+    · rw [hL, hR] at hSucc
+      simp [ContractResult.isSuccess] at hSucc
+    · rfl
+
+/-- **Chantier 2 (Thomas 2026-09-13) slot-free simulation of the
+pinned source.** The slot-free companion transaction
+`addRequestsSlotFree` still simulates the pinned source at the
+`observeFromJournal` view — proved by chaining
+`observeFromJournal_run_addRequests_eq_observeFromJournal_run_addRequestsSlotFree`
+with the registered `observeFromJournal_simulates_pinned_source`.
+This is the retirement-completeness statement: the slot-free
+executable transaction produces the same slot-free observation as
+the pinned Solidity source under the same premises. -/
+theorem observeFromJournal_simulates_pinned_source_slotFree
+    (inputs : Inputs) (state : ContractState)
+    (hCountBound : (state.readSlot countSlot).val + inputs.sources.length <
+      Verity.Core.Uint256.modulus)
+    (hEntry : state.selfBalance.val + inputs.msgValue.val <
+      Verity.Core.Uint256.modulus)
+    (hSources : readArray state "sources" sourcesBase inputs.sources.length =
+      some inputs.sources)
+    (hTargets : readArray state "targets" targetsBase inputs.targets.length =
+      some inputs.targets)
+    (hSourceLens : readArray state "sourceLens" sourceLensBase
+      inputs.sourceLens.length = some inputs.sourceLens)
+    (hTargetLens : readArray state "targetLens" targetLensBase
+      inputs.targetLens.length = some inputs.targetLens) :
+    observeFromJournal state ((addRequestsSlotFree inputs).run state) =
+      sourceView inputs (state.readSlot countSlot).val := by
+  rw [← observeFromJournal_run_addRequests_eq_observeFromJournal_run_addRequestsSlotFree]
+  exact observeFromJournal_simulates_pinned_source inputs state hCountBound hEntry
+    hSources hTargets hSourceLens hTargetLens
+
 /-! ## Value-bearing CALLs: exact forwarding and preservesEthBalance -/
 
 private theorem foldl_sub_values (cs : List CallObs) (w : Word) :
