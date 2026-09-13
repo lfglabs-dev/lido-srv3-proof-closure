@@ -119,6 +119,7 @@ import LidoSRv3.Audit.Source.Topup2PrefixGuardsSource
 import LidoSRv3.Audit.Source.Topup2ConsumeAndUnitsSource
 import LidoSRv3.Audit.Source.LidoBunkerViaOracleSource
 import LidoSRv3.Audit.Source.ConsolidationRoleViaOracleSource
+import LidoSRv3.Audit.Source.AuthorizedRouterViaOracleSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -1036,6 +1037,8 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.LidoBunkerViaOracleSource.isBunkerActiveFromOracle_false_of_zero
 -- Thirty-eighth-step (2026-09-13): P-CONSOLIDATION-ETH-1 role via KeccakOracle.
 #print axioms LidoSRv3.Audit.Source.ConsolidationRoleViaOracleSource.hasAddConsolidationRequestsRoleFromOracle_true_of_nonzero
+-- Thirty-ninth-step (2026-09-13): P-RESERVE-1 authorizedRouter via KeccakOracle (item c).
+#print axioms LidoSRv3.Audit.Source.AuthorizedRouterViaOracleSource.isAuthorizedRouterFromOracle_true_of_nonzero
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape
