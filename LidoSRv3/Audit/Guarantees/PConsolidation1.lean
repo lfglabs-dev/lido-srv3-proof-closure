@@ -297,6 +297,20 @@ theorem verity_tx_revert_restores_snapshot_slotFree
     rollback = state :=
   revert_restores_snapshot_slotFree inputs inject state rollback reason h
 
+/-- **Chantier 2 (Thomas 2026-09-13) substitution justification alias.**
+For any View-predicate F, the truth of F on the `observeFromJournal`
+view is invariant under substituting `addRequestsSlotFree` for the
+registered `addRequests`. Direct alias of
+`addRequestsSlotFree_preserves_observeFromJournal_predicate` (PR #631);
+named here under the P-CONSOLIDATION-1 guarantee namespace so
+retirement-adopting downstream theorems reason with a
+guarantee-namespace API rather than the raw Verity lemma. -/
+theorem verity_tx_slotFree_preserves_observation_predicate
+    (inputs : Inputs) (state : Verity.ContractState) (F : View → Prop) :
+    F (observeFromJournal state ((addRequests inputs).run state)) ↔
+    F (observeFromJournal state ((addRequestsSlotFree inputs).run state)) :=
+  addRequestsSlotFree_preserves_observeFromJournal_predicate inputs state F
+
 /-- **Kill-line: packing order.** If source ≠ target, a swapped
 target then source concat produces a different observation than the
 canonical source then target. One pair suffices. -/
