@@ -699,6 +699,15 @@ list, there are no undisclosed project-level assumptions or proof escapes.
   LidoSRv3.Audit.SolidityConsolidation.sourceRunWithCallOutcomes_all_success_eq_sourceRun
 #print axioms
   LidoSRv3.Audit.SolidityConsolidation.sourceRunWithCallOutcomes_request_addition_failed_witness
+-- Chantier 2 (Thomas 2026-09-13): retirement-bridge theorem for the
+-- fabricated `payloads` / `sourceMapSlot` / `targetMapSlot` fields.
+-- On every committed observation, `obs.payloads = obs.calls.map (·.input)`,
+-- so downstream consumers of `obs.payloads` can read the CALL journal
+-- instead. This is the sound substitution that unblocks retirement of
+-- the fabricated slots (a Verity refactor tracked in P-CONSOLIDATION-1
+-- fidelity.missing).
+#print axioms
+  LidoSRv3.Audit.SolidityConsolidation.commit_payloads_equal_call_inputs
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.function_spec_bridge_constructors
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.committed_journal_forwards_msg_value
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.committed_preserves_eth_balance

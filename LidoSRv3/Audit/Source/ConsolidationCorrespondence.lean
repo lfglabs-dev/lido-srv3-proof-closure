@@ -198,6 +198,28 @@ theorem commitObservables_binds (target fee msgValue : Word)
       obs.events.map (·.payload) = requests.map payload := by
   simp [commitObservables, requestCall, requestEvent, payload]
 
+/-- **Chantier 2 (Thomas 2026-09-13) retirement-bridge theorem.**
+On every committed observation, the fabricated `payloads` field
+(populated from the fabricated `sourceMapSlot` / `targetMapSlot`
+reread in `ConsolidationTx.lean`) is definitionally equal to the
+CALL journal's `input` carrier: `obs.payloads = obs.calls.map (·.input)`.
+
+This is the retirement-equivalence: a caller wanting the
+per-request `source ‖ target` bytes on a committed run can read
+them from the CALL journal (`obs.calls[i].input`) instead of from
+the fabricated storage slots. The CALL journal is real
+`WithdrawalVaultEIP7685.sol:114-115` behavior (each committed CALL
+frame carries `abi.encodePacked(sourcePubkey, targetPubkey)` as
+its input); the storage slots have no Solidity counterpart. When
+the retirement of `sourceMapSlot` / `targetMapSlot` lands, this
+theorem is the substitution that keeps downstream consumers of
+`obs.payloads` sound. -/
+theorem commit_payloads_equal_call_inputs (target fee msgValue : Word)
+    (requests : List Request) :
+    let obs := commitObservables target fee msgValue requests
+    obs.payloads = obs.calls.map (·.input) := by
+  simp [commitObservables, requestCall, payload]
+
 /-! ## WithdrawalVault.addConsolidationRequests (WithdrawalVault.sol:199-208) -/
 
 /-- `WithdrawalVault.sol:199-208 addConsolidationRequests(bytes[] calldata sourcePubkeys, bytes[] calldata targetPubkeys)`,
