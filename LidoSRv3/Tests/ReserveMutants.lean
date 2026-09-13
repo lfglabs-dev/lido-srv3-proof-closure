@@ -14,11 +14,14 @@ private def vector : ReserveState :=
     depositedPostReport := word 3
     depositedNextReportAdjusted := word 2 }
 
--- 2026-09-13 chantier 2 Piste A: `WithdrawInputs.canDeposit` is now a `def`
--- accessor of `inputs.lidoState`; construct a `LidoStakingState` witnessing
--- staking-not-paused ∧ bunker-not-active so `canDeposit = true`.
+-- 2026-09-13 chantier 2 Piste A (v3): both `WithdrawInputs.canDeposit` and
+-- `WithdrawInputs.authorizedRouter` are `def` accessors of pinned
+-- `LidoStakingState` / `ACLState`.  Construct a state witnessing
+-- staking-not-paused ∧ bunker-not-active (canDeposit = true) plus
+-- ACL.stakingRouterRole = true (authorizedRouter = true).
 private def allowed : WithdrawInputs :=
-  ⟨{ isStakingPaused := false, isBunkerActive := false }, true⟩
+  ⟨{ isStakingPaused := false, isBunkerActive := false },
+   { stakingRouterRole := true, topUpGatewayApp := false }⟩
 
 /-- Meaningful source mutant: a deposit spend illegally decrements withdrawal
 demand as well as the deposits reserve. -/
@@ -177,9 +180,12 @@ private def mutantWithdrawNoCanDeposit (inputs : WithdrawInputs)
 /-- Witness inputs for the guard-drop kill-line: the dropped `canDeposit`
 guard is false, the retained `authorizedRouter` guard passes.  Constructs
 a `LidoStakingState` with `isStakingPaused = true` so
-`canDepositFromStorage` computes to `false` per Lido.sol:815-816. -/
+`canDepositFromStorage` computes to `false` per Lido.sol:815-816, and
+an `ACLState` with `stakingRouterRole = true` so `authorizedRouter =
+true`. -/
 private def noCanDeposit : WithdrawInputs :=
-  ⟨{ isStakingPaused := true, isBunkerActive := false }, true⟩
+  ⟨{ isStakingPaused := true, isBunkerActive := false },
+   { stakingRouterRole := true, topUpGatewayApp := false }⟩
 
 /-- Post-state the guard-drop mutant commits to on the standard vector: the
 mutation removes a guard, not the transition, so this is exactly the honest

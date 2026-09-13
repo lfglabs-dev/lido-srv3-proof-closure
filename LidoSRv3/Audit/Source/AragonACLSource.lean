@@ -38,26 +38,46 @@ app-manager lookups is the follow-up. -/
 
 namespace LidoSRv3.Audit.Source.AragonACLSource
 
-/-- Aragon ACL registry state. Names the role-permission mapping as
-a boolean lookup on (caller, role) tuples. -/
+/-- Aragon ACL registry state.  Names the role-permission mapping as
+two explicit boolean fields for the two roles queried by the audit's
+registered parents (P-RESERVE-1's `authorizedRouter` and P-TOPUP-1's
+`callerIsTopUpGateway`).  Using named booleans (instead of a function
+`String → Bool` or a general `List String` role set) keeps `ACLState`
+`DecidableEq` and lets downstream `simp` / `rfl` proofs reduce
+`hasPermission` cleanly by structural pattern-match.  2026-09-13
+chantier 2 Piste A v3. -/
 structure ACLState : Type where
-  hasRole : String → Bool
+  stakingRouterRole : Bool
+  topUpGatewayApp : Bool
+  deriving DecidableEq, Repr
+
+/-- Boolean accessor: whether `role` is granted on this ACL state.
+`@[reducible, simp]` so downstream `simp` / `rfl` calls transparently
+unfold the accessor.  Pattern-matches on the string literal for the
+two roles the audit's registered parents query; any other role is
+`false` by the model. -/
+@[reducible, simp] def ACLState.hasRole (state : ACLState) (role : String) : Bool :=
+  match role with
+  | "STAKING_ROUTER_ROLE" => state.stakingRouterRole
+  | "TOP_UP_GATEWAY_APP"  => state.topUpGatewayApp
+  | _ => false
 
 /-- Definition of `ACL.hasPermission(sender, addr, role)` as a
-function of the ACL state and the queried role. -/
-def hasPermission (state : ACLState) (role : String) : Bool :=
+function of the ACL state and the queried role.  `@[reducible, simp]`
+for transparent unfolding. -/
+@[reducible, simp] def hasPermission (state : ACLState) (role : String) : Bool :=
   state.hasRole role
 
 /-- Definition of `Lido.sol:872` `_auth(address(stakingRouter))` as
 a role-check against Aragon's STAKING_ROUTER_ROLE. -/
-def isAuthorizedRouter (state : ACLState) : Bool :=
-  hasPermission state "STAKING_ROUTER_ROLE"
+@[reducible, simp] def isAuthorizedRouter (state : ACLState) : Bool :=
+  state.stakingRouterRole
 
 /-- Definition of `StakingRouter.sol:1177-1179`
 `_checkAppAuth(_getTopUpGateway())` as a role-check against
 Aragon's TOP_UP_GATEWAY app-manager slot. -/
-def isTopUpGatewayCaller (state : ACLState) : Bool :=
-  hasPermission state "TOP_UP_GATEWAY_APP"
+@[reducible, simp] def isTopUpGatewayCaller (state : ACLState) : Bool :=
+  state.topUpGatewayApp
 
 /-- Under the pinned ACL premise (`STAKING_ROUTER_ROLE` granted),
 `isAuthorizedRouter = true`. -/
@@ -65,7 +85,8 @@ theorem isAuthorizedRouter_true_of_role_granted
     {state : ACLState}
     (hRole : state.hasRole "STAKING_ROUTER_ROLE" = true) :
     isAuthorizedRouter state = true := by
-  simp [isAuthorizedRouter, hasPermission, hRole]
+  simp only [isAuthorizedRouter]
+  simpa [ACLState.hasRole] using hRole
 
 /-- Under the pinned app-manager premise (top-up gateway registered),
 `isTopUpGatewayCaller = true`. -/
@@ -73,7 +94,8 @@ theorem isTopUpGatewayCaller_true_of_app_registered
     {state : ACLState}
     (hApp : state.hasRole "TOP_UP_GATEWAY_APP" = true) :
     isTopUpGatewayCaller state = true := by
-  simp [isTopUpGatewayCaller, hasPermission, hApp]
+  simp only [isTopUpGatewayCaller]
+  simpa [ACLState.hasRole] using hApp
 
 /-! ## Fourth-step composition (2026-09-13): hasRole via ACL mapping decoder
 
