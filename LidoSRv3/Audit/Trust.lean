@@ -104,6 +104,7 @@ import LidoSRv3.Audit.Source.ACLRoleMappingViaOracleSource
 import LidoSRv3.Audit.Source.ERC20StateViaOracleSource
 import LidoSRv3.Audit.Source.WQStorageViaOracleSource
 import LidoSRv3.Audit.Source.SRModuleMappingViaOracleSource
+import LidoSRv3.Audit.Source.DepositEmptyBatchEarlyReturnSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -970,6 +971,9 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.WQStorageViaOracleSource.realWQStorage_readCheckpoint_eq
 -- Twenty-third-step (2026-09-13): SR module-registry MappingStorage via KeccakOracle.
 #print axioms LidoSRv3.Audit.Source.SRModuleMappingViaOracleSource.moduleExistsFromOracle_true_of_nonzero
+-- Twenty-fourth-step (2026-09-13): D-EMPTY-PULL early-return source model.
+#print axioms LidoSRv3.Audit.Source.DepositEmptyBatchEarlyReturnSource.shouldPull_true_of_nonzero
+#print axioms LidoSRv3.Audit.Source.DepositEmptyBatchEarlyReturnSource.shouldPull_false_of_zero
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape
