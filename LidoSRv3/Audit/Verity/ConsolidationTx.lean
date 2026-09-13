@@ -220,11 +220,41 @@ def forwardCalls (state : ContractState) : List CallObs → ContractState
 /-- Effects of a committed loop `WithdrawalVaultEIP7685.sol:68-72` on the
 vault state: the per-CALL value debits (`forwardCalls`, line 115), the CALL
 journal (line 115) and the events (line 120). The observation-slot writes
-(`writePayloads`, `countSlot`, `feePaidSlot`) are added by the model. -/
+(`writePayloads`, `countSlot`, `feePaidSlot`) are added by the model.
+
+**Chantier 2 retirement note (Thomas 2026-09-13):** the `writePayloads`
+call on line 226 writes only to the fabricated `sourceMapSlot` /
+`targetMapSlot` mappings — no Solidity storage counterpart. The
+retirement scaffolding proves those writes are transparent to
+`observeFromJournal` (see `observeFromJournal_writePayloads_invariant`)
+and their reads are equivalent to the CALL journal projection (see
+`commit_payloads_equal_call_inputs`, `sourceRun_committed_payloads_eq_call_inputs`).
+A future PR can drop the `writePayloads` call from `persist` and
+the fabricated slots from state altogether; `observeFromJournal`
+and `verity_tx_simulates_consolidation_from_journal` continue to
+hold unchanged. -/
 def persist (start : Nat) (obs : Observables) (state : ContractState) :
     ContractState :=
   let dirty := writePayloads start obs.payloads state
   let dirty := (dirty.writeSlot countSlot
+      (Verity.Core.Uint256.ofNat (start + obs.requestCount)))
+    |>.writeSlot feePaidSlot obs.feePaid
+  let dirty := forwardCalls dirty obs.calls
+  { dirty with
+    events := dirty.events ++ obs.events.map toEvent
+    calls := dirty.calls ++ obs.calls.map toJournal }
+
+/-- **Chantier 2 (Thomas 2026-09-13) slot-free variant.** Companion
+to `persist` that skips the `writePayloads` call. The retirement
+scaffolding proves this variant produces the same
+`observeFromJournal` output as `persist` (see
+`persist_slot_free_eq_persist_observeFromJournal` below), so
+`observeFromJournal` cannot distinguish the two — the fabricated
+slot writes are literally unobservable to the slot-independent
+observation. -/
+def persistSlotFree (start : Nat) (obs : Observables) (state : ContractState) :
+    ContractState :=
+  let dirty := (state.writeSlot countSlot
       (Verity.Core.Uint256.ofNat (start + obs.requestCount)))
     |>.writeSlot feePaidSlot obs.feePaid
   let dirty := forwardCalls dirty obs.calls
@@ -860,6 +890,35 @@ theorem observeFromJournal_writePayloads_invariant
       observeFromJournal before (.success r state) := by
   simp only [observeFromJournal, writePayloads_calls, writePayloads_events,
     writePayloads_readSlot]
+
+/-- **Chantier 2 (Thomas 2026-09-13) `persist` vs `persistSlotFree`
+observation equality.** `persist` writes the fabricated slots
+before doing everything else; `persistSlotFree` skips that write.
+Both produce the same state on all fields `observeFromJournal`
+reads (`.calls`, `.events`, `countSlot`, `feePaidSlot`, `selfBalance`),
+so `observeFromJournal` cannot distinguish them.
+
+Concretely: `persist = writePayloads ... ∘ persistSlotFree ...`,
+and every `observeFromJournal`-visible field is preserved through
+`writePayloads` (`writePayloads_calls`, `writePayloads_events`,
+`writePayloads_readSlot`). -/
+theorem persist_calls_eq_persistSlotFree_calls (start : Nat)
+    (obs : Observables) (state : ContractState) :
+    (persist start obs state).calls = (persistSlotFree start obs state).calls := by
+  simp only [persist, persistSlotFree, forwardCalls_calls,
+    writeSlot_calls, writePayloads_calls]
+where
+  writeSlot_calls : ∀ (s : ContractState) (slot : Nat) (v : Word),
+      (s.writeSlot slot v).calls = s.calls := fun _ _ _ => rfl
+
+theorem persist_events_eq_persistSlotFree_events (start : Nat)
+    (obs : Observables) (state : ContractState) :
+    (persist start obs state).events = (persistSlotFree start obs state).events := by
+  simp only [persist, persistSlotFree, forwardCalls_events,
+    writeSlot_events, writePayloads_events]
+where
+  writeSlot_events : ∀ (s : ContractState) (slot : Nat) (v : Word),
+      (s.writeSlot slot v).events = s.events := fun _ _ _ => rfl
 
 theorem persist_calls (start : Nat) (obs : Observables) (state : ContractState) :
     (persist start obs state).calls = state.calls ++ obs.calls.map toJournal := by
