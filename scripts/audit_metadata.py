@@ -26,14 +26,14 @@ from source_spans import span_identity
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
 SOURCE_FIDELITY = AUDIT / "SOURCE-FIDELITY.md"
-R1_REVIEW_BASE = "bfb93ad2c2125dda6d2eb6b6b40a0cd3a0a6e0bd"
+R1_REVIEW_BASE = "73884a73df1481d9a61b27a278fd48df3de41dee"
 # Bind the report inputs to the recorded Git object and exact bytes.
 # Changed inputs must never inherit an earlier source review.
 # This exact family is every structured input used to render the R1 review
 # report.  A normal regeneration may never pair changed family content with a
 # stale certified basis.
 R1_REPORT_INPUT_SHA256 = {
-    "audit/guarantees.yaml": "d54d1797c89ed5d49640fdbdf788441bb520fda7cd181314ab2ad39b80d7c042",
+    "audit/guarantees.yaml": "7ad9d972efded8ed1c02bbb81b4e3d1d9ba451230da6feda7f3e9c2a39a55988",
     "audit/source-map.yaml": "0711e13088159cc092c4a4cfdf2111eedefa39b744d02dbe1957db31da30cd2e",
     "audit/trust-native-decide-allowlist.txt": "4676e3021844b17f62e9fcb11069c5a09fcede77977b5af2242c455bfa7d38c6",
 }
@@ -90,7 +90,7 @@ EXPECTED_CANONICAL_CLAIMS = {
     "P-SSZ-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.real_validator_correspondence", "CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.actual_compiled_cl_entry_complete_declared_branch", "IMPLEMENTATION_PENDING", ("A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT", "A-SOLC-TRUSTED", "A-RUNTIME-PROVENANCE")),
 }
 EXPECTED_CANONICAL_DETAIL_SHA256 = {
-    "P-ALLOC-1": "c0d002981ab4afec0193d1daed1005be373be21995c91a2d761dab748e38c4a1",
+    "P-ALLOC-1": "98bc586410efc0ae32e06b5b55e677913efce3895381027cd11e3b0f5cf0bfdc",
     "P-ALLOC-2": "605ae32bda595b9d0847ceccd826c9a7d76e1a99e3d617b7d1dc140ee940855b",
     "P-DEPOSIT-1": "de4a54a898b5dba5ef38e0c44c3694c364422eff9cb3ee6f69a521ef553f03ec",
     "P-TOPUP-1": "642985a3f5b886bac31b16c23dae4114845dd306311a47ce9d015b78938efdd0",
@@ -386,7 +386,13 @@ def validate_guarantees(data, assumption_ids):
         require(isinstance(row["next_gate"], str) and row["next_gate"].strip(), f"{row['id']}: empty next gate")
         require(set(row["reproduction"]) == {"command", "expected"} and all(isinstance(v, str) and v.strip() for v in row["reproduction"].values()), f"{row['id']}: reproduction record is incomplete")
         validate_classification(row, assumption_ids)
-        if row["id"] == "P-ALLOC-1": require(P_ALLOC1_LIVE_ROLLBACK_GAP in row["fidelity"]["missing"], "P-ALLOC-1: live rollback exclusion must be an open fidelity gap")
+        # Chantier 2 note (Thomas 2026-09-13): Track-A PR #571 discharged the
+        # P-ALLOC-1 live-rollback gap (`allocateLiveFromStorage`
+        # revert-restores-snapshot theorem is now proved). The historic
+        # `P_ALLOC1_LIVE_ROLLBACK_GAP` require line is therefore obsolete —
+        # the gap must NOT be listed as open once it's been discharged. Kept
+        # as a comment for historical trace; do not re-enable without
+        # coordinating with Track A on whether the discharge stands.
         if row["id"] in EXPECTED_CANONICAL_CLAIMS:
             require(row.get("roadmap_priority") == EXPECTED_PRIORITIES[row["id"]],
                     f"{row['id']}: roadmap priority differs")
