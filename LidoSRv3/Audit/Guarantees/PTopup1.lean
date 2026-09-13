@@ -864,4 +864,51 @@ theorem verity_tx_simulates_source_with_nonzero_wrap_close
   · intro hLen hAmt hCommit
     exact verity_tx_simulates_source cfg inp state hLen hAmt hCommit
 
+/-- **Chantier 1 (Piste A, Thomas 2026-09-13): executable Contract.run
+rollback for the guarded Verity plane.**
+
+Whatever the guarded Verity transaction mutated, `Contract.run` hands
+back the entry snapshot: every revert of
+`Verity.TopupTx.executeGuarded cfg call failure` restores
+`state = rollback`.  This is the executable-plane analogue of the
+`A-ABSTRACT-TX`-backed `RevertRestoresSnapshot` conjunct in
+`source_topup_conserves_and_rolls_back`, but expressed on the actual
+`Verity.TopupTx.executeGuarded` interpreter instead of the abstract
+`TxObservation.reverted ↦ before` mechanism.  The abstract conjunct
+remains in the registered `source_topup_conserves_and_rolls_back`
+parent because retiring `A-ABSTRACT-TX` from the parent's ENUNCE is
+a strictly larger refactor (would rewrite the 5-conjunct signature).
+This theorem gives downstream consumers a REAL Contract.run rollback
+theorem in the P-TOPUP-1 namespace, so the P-ALLOC-1 style pairing
+(abstract-parent + executable rollback theorem) is available.
+
+Underlying proof: `Verity.TopupTx.executeGuarded_revert_restores_snapshot`
+(one-line `unfold Contract.run; split; simp_all`).  A companion
+`verity_tx_legacy_revert_restores_snapshot` re-exports
+`Verity.TopupTx.revert_restores_snapshot` for the legacy
+`execute allocations failure` entry point (used by the parent's
+conjuncts 3–4 on the legacy plane). -/
+theorem verity_tx_guarded_revert_restores_snapshot
+    (cfg : SourceTopupConfig) (call : Verity.TopupTx.TopupCall)
+    (failure : Verity.TopupTx.FailurePoint)
+    (state rollback : Verity.ContractState) (reason : String)
+    (h : (Verity.TopupTx.executeGuarded cfg call failure).run state
+      = Verity.ContractResult.revert reason rollback) :
+    rollback = state :=
+  Verity.TopupTx.executeGuarded_revert_restores_snapshot
+    cfg call failure state rollback reason h
+
+/-- **Chantier 1 companion**: Contract.run rollback for the legacy
+allocation-only Verity plane `Verity.TopupTx.execute`.  Re-exports
+`Verity.TopupTx.revert_restores_snapshot` so both the legacy and
+guarded planes have executable-plane rollback theorems in the
+P-TOPUP-1 namespace. -/
+theorem verity_tx_legacy_revert_restores_snapshot
+    (allocations : List Nat) (failure : Verity.TopupTx.FailurePoint)
+    (state rollback : Verity.ContractState) (reason : String)
+    (h : (Verity.TopupTx.execute allocations failure).run state
+      = Verity.ContractResult.revert reason rollback) :
+    rollback = state :=
+  Verity.TopupTx.revert_restores_snapshot allocations failure state rollback reason h
+
 end LidoSRv3.Audit.Guarantees.PTopup1
