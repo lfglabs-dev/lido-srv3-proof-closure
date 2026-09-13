@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Arithmetic
+import LidoSRv3.Audit.Source.LidoStakingStateStorage
 import Verity.Core
 import Verity.EVM.Uint256
 import Verity.Macro
@@ -195,9 +196,32 @@ deposit counter, event log payloads, or the final router value transfer.
 -/
 
 structure WithdrawInputs where
-  canDeposit : Bool
+  /-- Pinned Lido `STAKING_STATE_POSITION` reads (2026-09-13 chantier 2,
+  Piste A): `Lido.canDeposit()` at `Lido.sol:815-816` is defined as
+  `!STAKING_STATE_POSITION.getStorageStakeLimitStruct().isStakingPaused()
+   && !_isBunkerActive()`.  Instead of a free `canDeposit : Bool`,
+  `WithdrawInputs` now carries the pinned two-boolean storage state,
+  and `canDeposit` is a `def` accessor.  The free-Bool version of
+  this field has been eliminated. -/
+  lidoState : LidoSRv3.Audit.Source.LidoStakingStateStorage.LidoStakingState
   authorizedRouter : Bool
   deriving DecidableEq, Repr
+
+/-- Definition of `Lido.canDeposit()` at `Lido.sol:815-816` as a
+function of the pinned `LidoStakingState` fields carried on
+`WithdrawInputs`.  Since 2026-09-13 chantier 2, `WithdrawInputs`
+no longer carries a free `canDeposit : Bool`; callers supply a
+`LidoStakingState`, and this accessor reads the boolean by
+definition.  Downstream code that reads `inputs.canDeposit`
+continues to work unchanged (same dot-notation syntax, same
+boolean value), but callers can no longer instantiate the boolean
+independently of a named pinned storage state.  Marked
+`@[reducible]` so proofs that previously closed guard-revert
+branches by `rfl` on `⟨canDeposit, authorizedRouter⟩` continue to
+close after destructuring the pinned two-boolean storage state. -/
+@[reducible, simp] def WithdrawInputs.canDeposit (inputs : WithdrawInputs) : Bool :=
+  LidoSRv3.Audit.Source.LidoStakingStateStorage.canDepositFromStorage
+    inputs.lidoState
 
 /-! ## Lido._getBufferedEtherAllocation (Lido.sol:605-616) -/
 
@@ -389,8 +413,20 @@ including the rollback observable on every checked-arithmetic/source revert. -/
 theorem verity_execution_simulates_spec (state : ContractState) (amount : Word) :
     ∀ inputs, observeVerity state ((ReserveContract.withdrawWithGuards inputs amount).run state) =
       specTx inputs (decode state) amount := by
-  rintro ⟨canDeposit, authorizedRouter⟩
-  cases canDeposit <;> cases authorizedRouter <;> try rfl
+  -- 2026-09-13 chantier 2 Piste A: `WithdrawInputs.canDeposit` is now a `def`
+  -- of the pinned two-boolean `lidoState`, so we destructure into three
+  -- booleans (isStakingPaused, isBunkerActive, authorizedRouter).  Every
+  -- guard-failing branch reduces to `⟨.reverted, decode state, decode state⟩ =
+  -- ⟨.reverted, decode state, decode state⟩` once the `canDeposit` def is
+  -- unfolded, so `simp` closes them; only the `(false, false, true)` pass
+  -- branch falls through to the deep proof below.
+  rintro ⟨⟨isStakingPaused, isBunkerActive⟩, authorizedRouter⟩
+  cases isStakingPaused <;> cases isBunkerActive <;> cases authorizedRouter <;>
+    try (simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+      observeVerity, specTx, modelWithdrawDepositableEther, sourceWithdrawDepositableEther,
+      WithdrawInputs.canDeposit,
+      LidoSRv3.Audit.Source.LidoStakingStateStorage.canDepositFromStorage,
+      Verity.require, Verity.bind, Bind.bind, Pure.pure, Contract.run]; done)
   by_cases hzero : amount = 0
   · subst amount
     rfl

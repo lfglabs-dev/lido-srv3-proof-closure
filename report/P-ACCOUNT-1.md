@@ -4,12 +4,16 @@
 
 Once per frame `AccountingOracle.submitReportData` pushes a per-module validator balance vector through `StakingRouter.reportValidatorBalancesByStakingModule`, then `Accounting.handleOracleReport` derives the fee distribution from that fresh router state, mints the fee shares, and records them last through `reportRewardsMinted`. Recording the mint before the fresh read would pay fees against stale module weights.
 
-P-ACCOUNT-1 verifies that ordering as an execution-order discipline:
+P-ACCOUNT-1 verifies that ordering as an execution-order discipline. **Chantier 3 (Thomas 2026-09-13)** upgrades the registered abstract parent to the conjunction of the two on-path orderings, naming the real deployed risk (`AccountingOracle.sol:513-517` → `Accounting.sol:277`) rather than only read→mint:
 
-- registered parent `mint_after_read_discipline`: on every committed run, $0 < \mathrm{mintTick} \Rightarrow \mathrm{readTick} < \mathrm{mintTick}$
+- registered parent `router_accounting_order_discipline`: on every committed run of the modeled `handleOracleReport`, BOTH
+  - **write-router-before-read**: $0 < \mathrm{readTick} \Rightarrow \mathrm{balancesTick} < \mathrm{readTick}$ — the `AccountingOracle.submitReportData` validator-balances push through `StakingRouter.reportValidatorBalancesByStakingModule` (`AccountingOracle.sol:513-517`) is stamped strictly before `Accounting.handleOracleReport`'s `_stakingRouter.getStakingRewardsDistribution()` read (`Accounting.sol:277`); fees are therefore derived from just-written module weights, never from stale balances.
+  - **read-before-mint**: $0 < \mathrm{mintTick} \Rightarrow \mathrm{readTick} < \mathrm{mintTick}$ — the previous registered parent, now demoted to an unregistered sub-theorem `mint_after_read_discipline` still exposed at parent scope for downstream reuse.
 - $\mathrm{tick} = \mathrm{sequenceSlot} + 1$, from a transaction-local clock reset at the top of the commit branch
 - zero fee shares write $\mathrm{rewardsMinted} = 0$, matching the pinned skip, and the implication then holds with nothing to order
 - reverting runs carry no ordering obligation
+
+Two pure call-site reordering kill-lines refute each conjunct: `write_router_before_read_kill_line` uses `handleOracleReportReadBeforeWrite` (the `stampStep balancesWrittenSlot` call moves below `stampStep rewardsReadSlot`, changing no literal), and `mint_order_kill_line` uses `handleOracleReportMintBeforeRead` (unchanged from before).
 
 Because the tick is read from state rather than written as a call-site constant, moving a step write changes the tick it records. That is what makes `mint_order_kill_line` a control-flow fault: the mint stamp moves above the read stamp with no literal edit, mint records $3$ and read $4$ after the stamped balance write, and the same predicate rejects it.
 
@@ -25,7 +29,7 @@ CHECKED does not mean the pinned path mints after reading fresh balances, that t
 
 Ranked next work: keep the retired source child premise-free and the mint-after-read parent/kill-line intact; model later full-report failures only if widening to that surface is explicitly authorized.
 
-Theorems: `PAccount1.mint_after_read_discipline` (registered parent), `PAccount1.mint_order_kill_line` (kill-line, refutes the parent), `PAccount1.verity_tx_simulates_oracle_report` (Verity child), `PAccount1.source_report_before_reward` (child, source-plane correspondence).
+Theorems: `PAccount1.router_accounting_order_discipline` (chantier 3 registered abstract parent — conjunction of write-router-before-read and read-before-mint), `PAccount1.write_router_before_read_discipline` (registered sub-theorem — the deployed AccountingOracle→Accounting risk), `PAccount1.write_router_before_read_kill_line` (kill-line refuting the write-before-read conjunct on `handleOracleReportReadBeforeWrite`), `PAccount1.mint_after_read_discipline` (demoted unregistered sub-theorem — read-before-mint), `PAccount1.mint_order_kill_line` (kill-line refuting the read-before-mint conjunct), `PAccount1.verity_tx_simulates_oracle_report` (Verity child), `PAccount1.source_report_before_reward` (child, source-plane correspondence).
 Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
 
 ## Intent
