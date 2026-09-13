@@ -2,6 +2,7 @@ import LidoSRv3.Audit.Source.ReserveCorrespondence
 import LidoSRv3.Audit.Source.ReserveFreshCacheFromWQ
 import LidoSRv3.Audit.Source.ReservePackedBufferSource
 import LidoSRv3.Audit.Source.ReservePayableCallSource
+import LidoSRv3.Audit.Source.ReserveSeedBookkeepingSource
 import LidoSRv3.Audit.Guarantees.Registry
 
 namespace LidoSRv3.Audit.Guarantees.PReserve1
@@ -217,6 +218,67 @@ theorem source_spend_preserves_withdrawal_reserve_under_payable_call_shape
   -- parent since the model's spend-word transition is unchanged —
   -- the ENUNCE now records the pinned CALL shape the model omits
   -- (D-TRANSFER-1 disclosure).
+  source_spend_preserves_withdrawal_reserve inputs before after amount live hfresh h
+
+/-- **Chantier 2 (Piste A, Thomas 2026-09-13) D-SEED-1 / D-EVENT-1
+`_seedDepositsCount` bookkeeping + events naming bridge.**
+
+Restates `source_spend_preserves_withdrawal_reserve` with an added
+`_hSeedShape` premise NAMING the pinned Lido.sol:877-882
+`_seedDepositsCount` bookkeeping and event-emission shape as a
+source-level `SeedDepositsCountResult` via
+`ReserveSeedBookkeepingSource.seedDepositsCount`.
+
+Discloses the Grok #419 D-SEED-1 / D-EVENT-1 divergences at the
+parent's ENUNCE level: the Verity model omits the
+`_seedDepositsCount` bookkeeping (`depositedPostReport += _amount`
+at Lido.sol:878, `_setBufferedEther(...sub(_amount))` at line 881)
+and the paired `Unbuffered(_amount)` / `DepositedPostReportUpdated(newTotal)`
+events.  The bridge NAMES the pinned bookkeeping+event tuple as a
+`SeedDepositsCountResult` structure with the source-level equations
+`newDepositedPostReport = currentDepositedPostReport + amount`,
+`newBuffered = currentBuffered - amount`, and the two event frames.
+
+**NAMING composition, not full closure of D-SEED-1 / D-EVENT-1.**
+The registered `source_spend_preserves_withdrawal_reserve` is
+retained unchanged; adding the seed-count bookkeeping writes and
+event journal entries to the Verity `withdrawWithGuards` interpreter
+is the follow-up.
+
+Signature-level constraint: the caller supplies pinned current
+values `currentDepositedPostReport, currentBuffered : Nat` and
+receives a witness to the source-level result of applying the seed
+bookkeeping.  The bridge does not require these to match `before` —
+this is a naming disclosure, so the shape is the value proposition. -/
+theorem source_spend_preserves_withdrawal_reserve_under_seed_bookkeeping_shape
+    (inputs : WithdrawInputs) (before after : ReserveState) (amount live : Word)
+    (currentDepositedPostReport currentBuffered : Nat)
+    (_hSeedShape :
+      (LidoSRv3.Audit.Source.ReserveSeedBookkeepingSource.seedDepositsCount
+        currentDepositedPostReport currentBuffered (amount : Nat)).newDepositedPostReport =
+        currentDepositedPostReport + (amount : Nat) ∧
+      (LidoSRv3.Audit.Source.ReserveSeedBookkeepingSource.seedDepositsCount
+        currentDepositedPostReport currentBuffered (amount : Nat)).newBuffered =
+        currentBuffered - (amount : Nat) ∧
+      (LidoSRv3.Audit.Source.ReserveSeedBookkeepingSource.seedDepositsCount
+        currentDepositedPostReport currentBuffered (amount : Nat)).events.1.amount =
+        (amount : Nat) ∧
+      (LidoSRv3.Audit.Source.ReserveSeedBookkeepingSource.seedDepositsCount
+        currentDepositedPostReport currentBuffered (amount : Nat)).events.2.newTotal =
+        currentDepositedPostReport + (amount : Nat))
+    (hfresh : freshQueueCache before live)
+    (h : modelWithdrawDepositableEther inputs before amount = .committed after) :
+    scopedWithdrawGuards inputs ∧
+      amount ≠ 0 ∧
+      withdrawalPartitionSpendInvariant before after amount ∧
+      liveEffectiveWithdrawalsReserve after live = liveEffectiveWithdrawalsReserve before live :=
+  -- The seed-bookkeeping premise names the pinned Lido.sol:877-882
+  -- `_seedDepositsCount` writes and the paired Unbuffered/DepositedPostReportUpdated
+  -- events as a source-level tuple; the proof delegates to the
+  -- registered parent since the model's spend-word transition is
+  -- unchanged — the ENUNCE records the pinned bookkeeping+event
+  -- shape the model currently omits (D-SEED-1 / D-EVENT-1
+  -- disclosure).
   source_spend_preserves_withdrawal_reserve inputs before after amount live hfresh h
 
 /--
