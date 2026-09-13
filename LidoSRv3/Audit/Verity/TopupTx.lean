@@ -1829,4 +1829,50 @@ theorem executeSourceShapeWithAuth_of_gateway (allocations : List Nat)
   simp [executeSourceShapeWithAuth, Contract.run, Bind.bind, _root_.Verity.bind,
     _root_.Verity.require]
 
+/-! ## D-WC-1 CLI-plane closure
+
+Chantier 1 (Piste A, Thomas 2026-09-13, Grok differential #414 D-WC-1
+executable closure).  Extends `executeSourceShapeWithAuth` with a
+wcType prefix guard mirroring pinned `StakingRouter.sol:702 wc[0] !=
+WC_TYPE_2 → revert WrongWithdrawalCredentialsType()`.  The wcType
+boolean is `wcTypeIsType2 : Bool` on the CLI plane; the pinned SR-context
+read `wcIsType2 srCtx.wcTypeIsType2FromRead` on the source plane provides
+the same witness (see `SRStorageSourceModel.SRTopupCallerContext`).
+
+`executeSourceShapeWithAllPrefixGuards` reverts closed on
+`wcTypeIsType2 = false` and delegates to `executeSourceShapeWithAuth`
+otherwise, ordering the guards in the pinned Solidity's line order
+(auth 686, empty 695, wc 702).  Real ENUNCE extension consuming
+`executeSourceShapeWithAllPrefixGuards_reverts_on_wrong_wc`. -/
+
+def executeSourceShapeWithAllPrefixGuards (allocations : List Nat)
+    (callerIsTopUpGateway wcTypeIsType2 : Bool) (failure : FailurePoint) :
+    Contract Unit := do
+  -- StakingRouter.sol:702  if (wc[0] != WC_TYPE_2) revert WrongWithdrawalCredentialsType();
+  require (decide (wcTypeIsType2 = true)) "WrongWithdrawalCredentialsType"
+  executeSourceShapeWithAuth allocations callerIsTopUpGateway failure
+
+/-- Executable-plane closure of D-WC-1: `executeSourceShapeWithAllPrefixGuards`
+reverts closed with `"WrongWithdrawalCredentialsType"` on `wcTypeIsType2 =
+false`, restoring the entry snapshot. -/
+theorem executeSourceShapeWithAllPrefixGuards_reverts_on_wrong_wc
+    (allocations : List Nat) (callerIsTopUpGateway : Bool)
+    (failure : FailurePoint) (state : ContractState) :
+    (executeSourceShapeWithAllPrefixGuards allocations callerIsTopUpGateway false
+        failure).run state =
+      ContractResult.revert "WrongWithdrawalCredentialsType" state := by
+  simp [executeSourceShapeWithAllPrefixGuards, Contract.run, Bind.bind,
+    _root_.Verity.bind, _root_.Verity.require]
+
+/-- On the type-2 WC path, `executeSourceShapeWithAllPrefixGuards` reduces
+to `executeSourceShapeWithAuth`; downstream theorems transfer verbatim. -/
+theorem executeSourceShapeWithAllPrefixGuards_of_type2
+    (allocations : List Nat) (callerIsTopUpGateway : Bool)
+    (failure : FailurePoint) (state : ContractState) :
+    (executeSourceShapeWithAllPrefixGuards allocations callerIsTopUpGateway true
+        failure).run state =
+      (executeSourceShapeWithAuth allocations callerIsTopUpGateway failure).run state := by
+  simp [executeSourceShapeWithAllPrefixGuards, Contract.run, Bind.bind,
+    _root_.Verity.bind, _root_.Verity.require]
+
 end LidoSRv3.Audit.Verity.TopupTx
