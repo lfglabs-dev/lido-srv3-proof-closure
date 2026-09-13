@@ -867,6 +867,8 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.SRStorageSourceModel.moduleExists_true_of_mapping_nonzero
 -- Fourth-step composition (2026-09-13): P-TOPUP-1 wcTypeIsType2 via packed decoder.
 #print axioms LidoSRv3.Audit.Source.SRStorageSourceModel.wcTypeIsType2_true_of_byte_two
+-- Fourth-step composition (2026-09-13): P-RESERVE-1 isBunkerActive via bunker slot.
+#print axioms LidoSRv3.Audit.Source.LidoStakingStateStorage.isBunkerActive_false_of_slot_zero
 -- General rule (Thomas 2026-09-12) applied to P-CONSOLIDATION-ETH-1
 -- feePerRequest free Nat: naming scaffold PinnedFeeStaticcallShape
 -- names the pinned WithdrawalVaultEIP7685.sol:79-81 STATICCALL entry
