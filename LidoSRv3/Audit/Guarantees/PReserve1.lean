@@ -5,6 +5,7 @@ import LidoSRv3.Audit.Source.ReservePayableCallSource
 import LidoSRv3.Audit.Source.ReserveSeedBookkeepingSource
 import LidoSRv3.Audit.Source.ERC7201StorageSlotSource
 import LidoSRv3.Audit.Source.SolidityUint128WrapSource
+import LidoSRv3.Audit.Source.WithdrawalQueueFinalizeSource
 import LidoSRv3.Audit.Guarantees.Registry
 
 namespace LidoSRv3.Audit.Guarantees.PReserve1
@@ -417,5 +418,39 @@ theorem verity_tx_preserves_withdrawal_reserve
     (h : (ReserveContract.withdrawWithGuards inputs amount).run state = .success () after) :
     withdrawalPartitionSpendInvariant (decode state) (decode after) amount :=
   verity_commit_preserves_withdrawal_reserve inputs state after amount h
+
+/-- **Chantier 2 (Piste A, Thomas 2026-09-13) registered `WithdrawalQueue.finalize`
+partition-writer companion.**
+
+The pinned `WithdrawalQueueBase._finalize` transition — the fourth of
+the four ETH-reserve partition writers — reduces the WQ's
+`unfinalizedStETH` accumulator by the finalized amount.  Registered
+consumer of `WithdrawalQueueFinalizeSource.finalize_unfinalizedStETH`
+and `finalize_monotone`; the monotone drop of the live queue accumulator
+under finalization is a P-RESERVE-1 obligation because the reserve's
+cached `ReserveState.unfinalizedStETH` becomes stale when WQ finalizes
+concurrently.  The freshness invariant `freshQueueCache before live`
+in `source_spend_preserves_withdrawal_reserve` names exactly this
+staleness gap. -/
+theorem reserve_wq_finalize_drops_unfinalized
+    (wqs : LidoSRv3.Audit.Source.WithdrawalQueueMappingSource.WithdrawalQueueStorage)
+    (finalizedAmount : Nat) :
+    (LidoSRv3.Audit.Source.WithdrawalQueueFinalizeSource.finalize
+        wqs finalizedAmount).unfinalizedStETH =
+      wqs.unfinalizedStETH - finalizedAmount :=
+  LidoSRv3.Audit.Source.WithdrawalQueueFinalizeSource.finalize_unfinalizedStETH
+    wqs finalizedAmount
+
+/-- WQ finalize is monotone-decreasing on `unfinalizedStETH` — the live
+queue accumulator never grows under finalization.  This monotone-drop
+property is what makes the reserve's cached `ReserveState.unfinalizedStETH`
+potentially STALE (never fake-fresh in the other direction). -/
+theorem reserve_wq_finalize_monotone
+    (wqs : LidoSRv3.Audit.Source.WithdrawalQueueMappingSource.WithdrawalQueueStorage)
+    (finalizedAmount : Nat) :
+    (LidoSRv3.Audit.Source.WithdrawalQueueFinalizeSource.finalize
+        wqs finalizedAmount).unfinalizedStETH ≤ wqs.unfinalizedStETH :=
+  LidoSRv3.Audit.Source.WithdrawalQueueFinalizeSource.finalize_monotone
+    wqs finalizedAmount
 
 end LidoSRv3.Audit.Guarantees.PReserve1
