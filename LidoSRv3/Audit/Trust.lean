@@ -946,6 +946,12 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayTotalFee_ne_zero_of_fee_ne_zero
 #print axioms LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayTotalFee_zero_at_fee_zero
 #print axioms LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayTotalFee_ne_zero_witness
+-- Chantier 2 (Thomas 2026-09-13): gateway→vault ABI-bridge linkage.
+-- `gatewayVaultBoundary` names the two scalars (msgValue, fee) that cross
+-- the gateway→vault frame boundary; `gatewayVaultBoundary_satisfies_exact_fee`
+-- proves the arithmetic identity that the vault's `_requireExactFee` checks.
+#print axioms LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayVaultBoundary_satisfies_exact_fee
+#print axioms LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource.gatewayVaultBoundary_witness
 -- Shared WithdrawalQueue source model (2026-09-13): request/checkpoint mappings
 -- + unfinalizedStETH accumulator for P-RESERVE-1 and P-ADDRESS-1.
 #print axioms LidoSRv3.Audit.Source.WithdrawalQueueMappingSource.unfinalizedStETHFromStorage_eq

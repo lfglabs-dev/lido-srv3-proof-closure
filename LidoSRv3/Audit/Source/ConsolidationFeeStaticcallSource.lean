@@ -157,4 +157,85 @@ theorem gatewayTotalFee_ne_zero_witness :
     gatewayTotalFee ⟨7⟩ 3 ≠ 0 :=
   gatewayTotalFee_ne_zero_of_fee_ne_zero ⟨7⟩ 3 (by decide) (by decide)
 
+/-! ## Chantier 2 gateway→vault ABI-bridge linkage (Thomas 2026-09-13)
+
+The gateway invocation
+
+    ConsolidationGateway.addConsolidationRequests(groups, refundRecipient)
+
+reads `fee = withdrawalVault.getConsolidationRequestFee()` at
+`ConsolidationGateway.sol:211` (a STATICCALL to the pinned
+CONSOLIDATION_REQUEST predeploy via `WithdrawalVaultEIP7685._getConsolidationRequestFee`
+at `WithdrawalVaultEIP7685.sol:79-93`), computes
+`totalFee = requestsCount * fee` at line 212, and forwards it to
+the vault-side call
+
+    withdrawalVault.addConsolidationRequests{value: totalFee}(sourcePubkeys, targetPubkeys)
+
+at `ConsolidationGateway.sol:220`. Downstream that vault-side call
+enters `WithdrawalVaultEIP7685._addConsolidationRequests`
+(`WithdrawalVaultEIP7685.sol:56-73`), where `msg.value` equals the
+forwarded `totalFee` and the loop-internal `fee` argument
+propagates to each `_callAddConsolidationRequest`.
+
+The source-plane linkage below names the two-endpoint equation
+`Inputs.msgValue = gatewayTotalFee result requestsCount` and
+`Inputs.fee = result.abiDecodedFee`, so a caller composing
+`P-CONSOLIDATION-1` (vault leg) with `P-CONSOLIDATION-ETH-1`
+(gateway leg) knows exactly which two scalars must agree at the
+frame boundary. The `_requireExactFee` guard on the vault side
+(`WithdrawalVaultEIP7685.sol:123-127`, `IncorrectFee` revert)
+enforces `Inputs.msgValue = requests.length * Inputs.fee.val`, so
+this linkage plus the gateway's `totalFee = requestsCount * fee`
+identity gives `requests.length = requestsCount` at the vault's
+frame entry — the number of `(source, target)` pairs the vault
+receives equals the flattened pair count `_prepareConsolidationPairs`
+(`ConsolidationGateway.sol:216-219`) produced from `groups`. -/
+
+/-- Source-plane record of the two scalars that cross the
+gateway→vault frame boundary: `msgValue` = `totalFee` forwarded on
+the outer call at `ConsolidationGateway.sol:220`, and `fee` = the
+STATICCALL-return `abiDecodedFee` from line 211. -/
+structure GatewayVaultFeeBoundary : Type where
+  msgValue : Nat
+  fee : Nat
+
+/-- The exact source-plane linkage: given a `PredeployStaticcallResult`
+and a `requestsCount`, the boundary scalars are
+`msgValue = gatewayTotalFee result requestsCount` and
+`fee = result.abiDecodedFee`. -/
+def gatewayVaultBoundary (result : PredeployStaticcallResult)
+    (requestsCount : Nat) : GatewayVaultFeeBoundary :=
+  { msgValue := gatewayTotalFee result requestsCount
+    fee := result.abiDecodedFee }
+
+/-- **Chantier 2 (Thomas 2026-09-13) exact-fee-boundary identity.**
+`gatewayVaultBoundary result n` satisfies the vault's
+`_requireExactFee` equation exactly: `msgValue = n * fee`. This is
+the arithmetic identity that `_requireExactFee` (`WithdrawalVaultEIP7685.sol:123-127`)
+checks on the vault side; a caller composing the two guarantees
+now has an explicit source-plane linkage proving the two scalars
+that cross the frame boundary satisfy this equation.
+
+The composition consumer is: when the vault leg's `Inputs.msgValue`
+and `Inputs.fee` are populated from `gatewayVaultBoundary`,
+`_requireExactFee` passes (i.e., the vault-side `IncorrectFee`
+revert is unreachable), so the vault commits on the count / bound
+/ per-key-validation guards alone. -/
+theorem gatewayVaultBoundary_satisfies_exact_fee
+    (result : PredeployStaticcallResult) (requestsCount : Nat) :
+    (gatewayVaultBoundary result requestsCount).msgValue =
+      requestsCount * (gatewayVaultBoundary result requestsCount).fee := by
+  unfold gatewayVaultBoundary
+  exact gatewayTotalFee_eq result requestsCount
+
+/-- Non-vacuity witness for the exact-fee boundary identity: a
+positive `requestsCount = 3` and a STATICCALL-return `fee = 7`
+yields `msgValue = 21`, exactly the vault's `_requireExactFee(21)`
+expectation. -/
+theorem gatewayVaultBoundary_witness :
+    (gatewayVaultBoundary ⟨7⟩ 3).msgValue = 21 ∧
+    (gatewayVaultBoundary ⟨7⟩ 3).fee = 7 := by
+  refine ⟨?_, ?_⟩ <;> rfl
+
 end LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
