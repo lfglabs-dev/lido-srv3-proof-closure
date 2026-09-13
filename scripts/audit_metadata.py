@@ -26,14 +26,14 @@ from source_spans import span_identity
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
 SOURCE_FIDELITY = AUDIT / "SOURCE-FIDELITY.md"
-R1_REVIEW_BASE = "8de159ae0bfcaf25a23c0c9ee2675688381e393f"
+R1_REVIEW_BASE = "e8a597f742433475c89382e2eaf96b8475baa214"
 # Bind the report inputs to the recorded Git object and exact bytes.
 # Changed inputs must never inherit an earlier source review.
 # This exact family is every structured input used to render the R1 review
 # report.  A normal regeneration may never pair changed family content with a
 # stale certified basis.
 R1_REPORT_INPUT_SHA256 = {
-    "audit/guarantees.yaml": "4ca364b524684d4260fe8defa707fa4e5fb58ba0491a0f276b5967447f5a1c41",
+    "audit/guarantees.yaml": "a6bad257713977026613a3ae238ee440a358b5801fde53dad85cf66b2417c80b",
     "audit/source-map.yaml": "0711e13088159cc092c4a4cfdf2111eedefa39b744d02dbe1957db31da30cd2e",
     "audit/trust-native-decide-allowlist.txt": "4676e3021844b17f62e9fcb11069c5a09fcede77977b5af2242c455bfa7d38c6",
 }
@@ -93,13 +93,13 @@ EXPECTED_CANONICAL_DETAIL_SHA256 = {
     "P-ALLOC-1": "819c94c10ef768a7f121039a13d7f6865257eafd6a5faa56147ea193a29df041",
     "P-ALLOC-2": "605ae32bda595b9d0847ceccd826c9a7d76e1a99e3d617b7d1dc140ee940855b",
     "P-DEPOSIT-1": "320e945499b68a8c23bce8d0ecdee958938a8ba10e63a233327702fa2e6fe6d7",
-    "P-TOPUP-1": "6dd829ed31ab9c320d8e0bbdd856f27139cd1538488d24f1577a85b7404515f5",
+    "P-TOPUP-1": "4615640461047b5e362765403e56e7bd3134d4975f85314826c9b927a23f6f91",
     "P-ACCOUNT-1": "384e194ee3c3da6b66f532442104d65f6aea80eed5ef0207a643383a5ce0949a",
     "P-RESERVE-1": "017d2ba5238fff006cff0e904c5eb405d51c5a54e023b95a1d5e0175df7fd2b7",
     "P-CONSOLIDATION-ETH-1": "c7b48a4472488e3e4a643c6904fbc110206f81f59da1725a39de237c6698d691",
     "P-ADDRESS-1": "f92b9cd14691bde29d53d75990625059d51fbe043e94e991a3b446d9e8b6ba37",
     "P-TOPUP-2": "6a9b044fab73910824075574f0b21cde922b30eb39fdc3e6b4ad697b6b5dde61",
-    "P-CONSOLIDATION-1": "1f24bb55724e547fd5e803cf3a766dca5fb45f31f4d83cefc9ca2adf1fb7a186",
+    "P-CONSOLIDATION-1": "eb60f526acbe169e16ee40f1dcb26785fd0abb874974eb156aa4a91299e9b527",
     "P-SSZ-1": "02a17f6aad36762480eb7d89ae929af7499931fded1d9084a37e7776bb444b73",
 }
 EXPECTED_PRIORITIES = {
