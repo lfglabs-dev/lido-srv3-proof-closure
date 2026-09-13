@@ -78,6 +78,7 @@ test:
 	@# pinned fixture bytes, checks the artifact SHA-256 matches, and
 	@# re-extracts every named immutable at its recorded byte offset.
 	@python3 scripts/verify_beacon_deposit_immutable.py
+	@python3 scripts/verify_lido_immutable.py
 	@python3 scripts/verify_consolidation_request_immutable.py
 	@python3 scripts/verify_deposit_thirty_two_ether.py
 	@test -s fixtures/solidity-reference/stakingRouter.getDepositAllocations.test.ts
