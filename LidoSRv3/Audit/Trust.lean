@@ -158,6 +158,7 @@ import LidoSRv3.Audit.Source.Deposit1CompositeGateSource
 import LidoSRv3.Audit.Source.Topup2CompositeGuardSource
 import LidoSRv3.Audit.Source.Alloc1CompositeBoundsSource
 import LidoSRv3.Audit.Source.Sha256OpacitySource
+import LidoSRv3.Audit.Source.BeaconRootsEip4788Source
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -1204,6 +1205,9 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- Seventy-seventh-step (2026-09-13): A-SHA256-FFI opacity source model (chantier 1/3).
 #print axioms LidoSRv3.Audit.Source.Sha256OpacitySource.sha256_output_is_32_bytes
 #print axioms LidoSRv3.Audit.Source.Sha256OpacitySource.sha256_deterministic
+-- Seventy-eighth-step (2026-09-13): EIP-4788 beacon-roots predeploy identity source.
+#print axioms LidoSRv3.Audit.Source.BeaconRootsEip4788Source.beaconRootsAddress_le_uint160Max
+#print axioms LidoSRv3.Audit.Source.BeaconRootsEip4788Source.canonicalCall_target_eq
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape
