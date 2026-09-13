@@ -160,6 +160,7 @@ import LidoSRv3.Audit.Source.Alloc1CompositeBoundsSource
 import LidoSRv3.Audit.Source.Sha256OpacitySource
 import LidoSRv3.Audit.Source.BeaconRootsEip4788Source
 import LidoSRv3.Audit.Source.SszGindexSource
+import LidoSRv3.Audit.Source.SszVerifyProofSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -1213,6 +1214,10 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.SszGindexSource.depth_root
 #print axioms LidoSRv3.Audit.Source.SszGindexSource.leftChild_eq
 #print axioms LidoSRv3.Audit.Source.SszGindexSource.production_and_scaffold_distinct
+-- Eightieth-step (2026-09-13): SSZ verifyProof source model (chantier 3).
+#print axioms LidoSRv3.Audit.Source.SszVerifyProofSource.foldPath_nil
+#print axioms LidoSRv3.Audit.Source.SszVerifyProofSource.foldPath_singleton
+#print axioms LidoSRv3.Audit.Source.SszVerifyProofSource.verifyProof_true_of_folded_eq
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape
