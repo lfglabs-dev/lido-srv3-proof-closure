@@ -1788,4 +1788,45 @@ theorem executeSourceShape_of_nonempty (allocations : List Nat)
   simp [executeSourceShape, Contract.run, Bind.bind, _root_.Verity.bind,
     _root_.Verity.require, hNonempty]
 
+/-! ## D-AUTH-1 CLI-plane closure
+
+Chantier 1 (Piste A, Thomas 2026-09-13, Grok differential #414 D-AUTH-1
+executable closure).  Extends `executeSourceShape` with a caller-auth
+prefix guard mirroring the pinned `StakingRouter.sol:686 msg.sender !=
+TOPUP_GATEWAY → revert NotAuthorized()`.  The auth boolean is
+`callerIsTopUpGateway : Bool` on the CLI plane; the pinned SR-context
+read `isTopUpGatewayCall srCtx` on the source plane provides the same
+witness (see `SRStorageSourceModel.SRTopupCallerContext`).
+
+`executeSourceShapeWithAuth` reverts closed on `callerIsTopUpGateway =
+false` and delegates to `executeSourceShape` otherwise.  The registered
+parent `verity_tx_simulates_source_with_nonzero_wrap_close` gains a
+6th conjunct that CONSUMES `executeSourceShapeWithAuth_reverts_on_unauth`
+— real ENUNCE change, not a naming bridge. -/
+
+def executeSourceShapeWithAuth (allocations : List Nat)
+    (callerIsTopUpGateway : Bool) (failure : FailurePoint) : Contract Unit := do
+  -- StakingRouter.sol:686  if (msg.sender != TOPUP_GATEWAY) revert NotAuthorized();
+  require (decide (callerIsTopUpGateway = true)) "NotAuthorized"
+  executeSourceShape allocations failure
+
+/-- Executable-plane closure of D-AUTH-1: `executeSourceShapeWithAuth`
+reverts closed with `"NotAuthorized"` on `callerIsTopUpGateway = false`,
+restoring the entry snapshot. -/
+theorem executeSourceShapeWithAuth_reverts_on_unauth (allocations : List Nat)
+    (failure : FailurePoint) (state : ContractState) :
+    (executeSourceShapeWithAuth allocations false failure).run state =
+      ContractResult.revert "NotAuthorized" state := by
+  simp [executeSourceShapeWithAuth, Contract.run, Bind.bind, _root_.Verity.bind,
+    _root_.Verity.require]
+
+/-- On the authenticated call path, `executeSourceShapeWithAuth` reduces
+to `executeSourceShape`; downstream theorems transfer verbatim. -/
+theorem executeSourceShapeWithAuth_of_gateway (allocations : List Nat)
+    (failure : FailurePoint) (state : ContractState) :
+    (executeSourceShapeWithAuth allocations true failure).run state =
+      (executeSourceShape allocations failure).run state := by
+  simp [executeSourceShapeWithAuth, Contract.run, Bind.bind, _root_.Verity.bind,
+    _root_.Verity.require]
+
 end LidoSRv3.Audit.Verity.TopupTx

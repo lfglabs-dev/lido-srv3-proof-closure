@@ -859,8 +859,17 @@ theorem verity_tx_simulates_source_with_nonzero_wrap_close
       -- now consumes it.
       (∀ failure : Verity.TopupTx.FailurePoint,
         (Verity.TopupTx.executeSourceShape [] failure).run state =
-          Verity.ContractResult.revert "EmptyKeysList" state) := by
-  refine ⟨hCall, ?_, ?_, ?_, ?_⟩
+          Verity.ContractResult.revert "EmptyKeysList" state) ∧
+      -- Chantier 1 (Piste A, Thomas 2026-09-13, Grok differential #414
+      -- D-AUTH-1 executable closure).  `Verity.TopupTx.executeSourceShapeWithAuth`
+      -- reverts closed on `callerIsTopUpGateway = false`, matching the
+      -- pinned `StakingRouter.sol:686 msg.sender != TOPUP_GATEWAY →
+      -- NotAuthorized()` guard.  Real ENUNCE extension consuming
+      -- `executeSourceShapeWithAuth_reverts_on_unauth`.
+      (∀ (allocations : List Nat) (failure : Verity.TopupTx.FailurePoint),
+        (Verity.TopupTx.executeSourceShapeWithAuth allocations false failure).run state =
+          Verity.ContractResult.revert "NotAuthorized" state) := by
+  refine ⟨hCall, ?_, ?_, ?_, ?_, ?_⟩
   · exact
       ⟨fun failure =>
           Verity.TopupTx.executeGuarded_binds_returndata cfg call failure _,
@@ -880,6 +889,8 @@ theorem verity_tx_simulates_source_with_nonzero_wrap_close
     exact verity_tx_simulates_source cfg inp state hLen hAmt hCommit
   · intro failure
     exact Verity.TopupTx.executeSourceShape_reverts_on_empty failure state
+  · intro allocations failure
+    exact Verity.TopupTx.executeSourceShapeWithAuth_reverts_on_unauth allocations failure state
 
 /-- **Chantier 1 (Piste A, Thomas 2026-09-13): executable Contract.run
 rollback for the guarded Verity plane.**
