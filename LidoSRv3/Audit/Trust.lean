@@ -134,6 +134,7 @@ import LidoSRv3.Audit.Source.SolidityUint40Source
 import LidoSRv3.Audit.Source.SolidityPrimitiveUintSource
 import LidoSRv3.Audit.Source.SolidityCheckedSubSource
 import LidoSRv3.Audit.Source.SolidityCheckedAddSource
+import LidoSRv3.Audit.Source.SolidityCheckedMulSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -1100,6 +1101,9 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.SolidityCheckedAddSource.checkedAddU256_none_of_wrap
 #print axioms LidoSRv3.Audit.Source.SolidityCheckedAddSource.checkedAddU128_some_of_bounded
 #print axioms LidoSRv3.Audit.Source.SolidityCheckedAddSource.checkedAddU128_none_of_wrap
+-- Fifty-fourth-step (2026-09-13): Solidity SafeMath.mul / checked-mul source model.
+#print axioms LidoSRv3.Audit.Source.SolidityCheckedMulSource.checkedMulU256_some_of_bounded
+#print axioms LidoSRv3.Audit.Source.SolidityCheckedMulSource.checkedMulU256_none_of_wrap
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape
