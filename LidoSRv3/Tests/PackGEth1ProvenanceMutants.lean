@@ -5,8 +5,12 @@ import LidoSRv3.Audit.Guarantees.PConsolidationEth1
 # Pack G-ETH1 fail-closed vectors
 
 A mutant rewrite that maps ensemble 5 to `0xDEAD` is not the canonical
-observe rewrite. `A-CANONICAL-REQUEST-ADDRESS` stays OPEN. The registered
-Verity parent is unchanged and still journals ensemble 5.
+observe rewrite. `A-CANONICAL-REQUEST-ADDRESS` deployed-target identity is
+DISCHARGED via `Provenance/CanonicalRequestAddress.lean` and
+`scripts/verify_consolidation_request_immutable.py` (chantier 4).
+The residual is the SEPARATE Verity-plane fold gap: the registered
+Verity parent is unchanged and still journals ensemble 5, not the
+discharged canonical literal.
 -/
 
 namespace LidoSRv3.Tests.PackGEth1ProvenanceMutants

@@ -32,12 +32,29 @@ not described as deployed.
 
 ## Missing deployment evidence
 
-The repository contains no StakingRouter runtime bytecode, runtime hash,
-deployment address plus reference block, creation transaction, or decoded
-constructor arguments. Accordingly:
+Historical (pre-chantier-4) status: the repository contained no
+StakingRouter runtime bytecode, runtime hash, deployment address, or
+reference block, so:
 
-- `A-DEPOSIT-CONTRACT` remains OPEN.
-- `A-DEPOSIT-32-ETHER` remains OPEN.
+- `A-DEPOSIT-CONTRACT` was OPEN.
+- `A-DEPOSIT-32-ETHER` was OPEN.
+- `PDeposit1.NFrame.LinksSource` remains caller-supplied.
+- No stronger public parent is registered.
+
+**Chantier 4 update (Thomas 2026-09-13):**
+
+- `A-DEPOSIT-CONTRACT` is DISCHARGED via
+  `scripts/verify_beacon_deposit_immutable.py` (invoked by `make test`)
+  against fixture-anchored codehash
+  `0x9cd5d45ddde5f74d3867aa22c98fd79a85df89d202145bc588173d92e00600ec`
+  on `StakingRouter_implementation` at
+  `0xDD76927045435C7605cf6f5F978cfb8CABDb5F80`; see
+  `audit/artifacts.lock.json` and
+  `audit/findings/A-TOPUP-BEACON-ADDRESS-and-A-DEPOSIT-CONTRACT-discharged.md`.
+- `A-DEPOSIT-32-ETHER` is DISCHARGED via
+  `scripts/verify_deposit_thirty_two_ether.py` (folds all five PUSH32
+  sites at 32000000000000000000 wei = 32 ether); see
+  `audit/findings/A-DEPOSIT-32-ETHER-discharged.md`.
 - `PDeposit1.NFrame.LinksSource` remains caller-supplied.
 - No stronger public parent is registered.
 
