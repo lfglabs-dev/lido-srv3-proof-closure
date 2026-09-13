@@ -92,6 +92,7 @@ import LidoSRv3.Audit.Source.ConsolidationClProofSource
 import LidoSRv3.Audit.Source.ConsolidationFeeLiveStaticcallSource
 import LidoSRv3.Audit.Source.BridgePerWriterExecutablePlane
 import LidoSRv3.Audit.Source.KeccakConcreteCommitmentSource
+import LidoSRv3.Audit.Source.AragonACLRoleKeyViaOracleSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -930,6 +931,8 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.KeccakConcreteCommitmentSource.concreteRoleKey_deterministic
 #print axioms LidoSRv3.Audit.Source.KeccakConcreteCommitmentSource.concreteMappingSlot_deterministic
 #print axioms LidoSRv3.Audit.Source.KeccakConcreteCommitmentSource.concreteAbiSelector_deterministic
+-- Twelfth-step (2026-09-13): ACL role-key via KeccakOracle real derivation.
+#print axioms LidoSRv3.Audit.Source.AragonACLRoleKeyViaOracleSource.realRoleKey_deterministic
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape
