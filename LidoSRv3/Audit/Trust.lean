@@ -121,6 +121,7 @@ import LidoSRv3.Audit.Source.LidoBunkerViaOracleSource
 import LidoSRv3.Audit.Source.ConsolidationRoleViaOracleSource
 import LidoSRv3.Audit.Source.AuthorizedRouterViaOracleSource
 import LidoSRv3.Audit.Source.TopupGatewayRoleViaOracleSource
+import LidoSRv3.Audit.Source.WCType2ByteDecodeSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -1042,6 +1043,8 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.AuthorizedRouterViaOracleSource.isAuthorizedRouterFromOracle_true_of_nonzero
 -- Fortieth-step (2026-09-13): P-TOPUP-1 top-up-gateway ACL via KeccakOracle (item c).
 #print axioms LidoSRv3.Audit.Source.TopupGatewayRoleViaOracleSource.isTopUpGatewayFromOracle_true_of_nonzero
+-- Forty-first-step (2026-09-13): P-TOPUP-1 wcIsType2 byte-decode source model (item b).
+#print axioms LidoSRv3.Audit.Source.WCType2ByteDecodeSource.wcIsType2_true_of_first_byte
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape
