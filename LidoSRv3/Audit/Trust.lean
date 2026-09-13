@@ -114,6 +114,7 @@ import LidoSRv3.Audit.Source.Reserve1CompositeGateSource
 import LidoSRv3.Audit.Source.Alloc1CompositeBoundsSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1CLProofPremise
+import LidoSRv3.Audit.Guarantees.PConsolidationEth1AbiBridgePremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
 import LidoSRv3.Audit.Source.StakingModuleRegistrySource
@@ -1008,6 +1009,15 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- _validatePubKeyWCProof composition entry point; full Verity
 -- composition into PhysicalEntrySettlement remains OPEN.
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1CLProofPremise.cl_proof_derived_under_pinned_cl_proof_shape
+-- Chantier 2 (Thomas 2026-09-13) item (a): ABI-bridge composition premise.
+-- Under PinnedAbiBridgeShape (the four vault-side readArray decodes match
+-- the gateway's supplied lists, and the two frame-boundary scalars come
+-- from gatewayVaultBoundary), derives the P-CONSOLIDATION-1 gateway-bridge
+-- parent's conjunctive conclusion (observeFromJournal = sourceView AND
+-- exact-fee identity on result.abiDecodedFee). Load-bearing on
+-- verity_tx_simulates_consolidation_from_gateway (PR #644). Full Verity
+-- abi.encodeCall model of ConsolidationGateway.sol:220 remains OPEN.
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1AbiBridgePremise.eth1_abi_bridge_derived_under_pinned_shape
 -- Real-derivation step for P-CONSOLIDATION-ETH-1 fee STATICCALL (2026-09-13):
 -- source-level consolidationFeeFromStaticcall derives feePerRequest from a
 -- named PredeployStaticcallResult, not caller Nat.
