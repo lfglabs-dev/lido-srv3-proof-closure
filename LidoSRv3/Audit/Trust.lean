@@ -145,6 +145,7 @@ import LidoSRv3.Audit.Source.Topup2ExactCapSource
 import LidoSRv3.Audit.Source.Topup2PerAllocGuardSource
 import LidoSRv3.Audit.Source.ModuleReturnGuardSource
 import LidoSRv3.Audit.Source.Topup2RoundingSource
+import LidoSRv3.Audit.Source.Topup2MinClampSource
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1FeeStaticcallPremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
@@ -1150,6 +1151,10 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.Topup2RoundingSource.roundDownToGwei_mod_zero
 #print axioms LidoSRv3.Audit.Source.Topup2RoundingSource.roundDownToGwei_le
 #print axioms LidoSRv3.Audit.Source.Topup2RoundingSource.roundDownToGwei_of_mod_zero
+-- Sixty-fifth-step (2026-09-13): StakingRouter.topUp:703 min-clamp source model.
+#print axioms LidoSRv3.Audit.Source.Topup2MinClampSource.minAllocCap_le_alloc
+#print axioms LidoSRv3.Audit.Source.Topup2MinClampSource.minAllocCap_le_cap
+#print axioms LidoSRv3.Audit.Source.Topup2MinClampSource.minAllocCap_le_allocationCap
 -- General rule (Thomas 2026-09-12) applied to P-ALLOC-1 CheckedBounds
 -- three remaining conjuncts (active_subtraction, total_addition,
 -- available_arithmetic): naming scaffold PinnedSRAllocationBoundsShape
