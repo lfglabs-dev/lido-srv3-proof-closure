@@ -220,6 +220,40 @@ theorem commit_payloads_equal_call_inputs (target fee msgValue : Word)
     obs.payloads = obs.calls.map (·.input) := by
   simp [commitObservables, requestCall, payload]
 
+/-- **Chantier 2 (Thomas 2026-09-13) event-side retirement-bridge
+theorem.** Second slot-independence proof: on every committed
+observation, the fabricated `payloads` field is also equal to
+`obs.events.map (·.payload)` — the event log carries the same
+`source ‖ target` bytes as the CALL journal. This is the pinned
+`WithdrawalVaultEIP7685.sol:120` behavior `emit
+ConsolidationRequestAdded(request)` where `request =
+abi.encodePacked(sourcePubkey, targetPubkey)`. So a downstream
+consumer wanting the payload on a committed run has TWO real
+Solidity carriers to read from — the CALL journal (line 115
+`CONSOLIDATION_REQUEST.call{value: fee}(request)`) or the event
+log (line 120) — and neither depends on the fabricated
+`sourceMapSlot` / `targetMapSlot`. Combined with
+`commit_payloads_equal_call_inputs` above, the retirement of the
+fabricated slots is now backed by two independent
+slot-substitution proofs. -/
+theorem commit_payloads_equal_event_payloads (target fee msgValue : Word)
+    (requests : List Request) :
+    let obs := commitObservables target fee msgValue requests
+    obs.payloads = obs.events.map (·.payload) := by
+  simp [commitObservables, requestEvent, payload]
+
+/-- **Chantier 2 (Thomas 2026-09-13) call-vs-event bridge.** The
+two real Solidity carriers agree on the payload for every
+committed request: `obs.calls.map (·.input) = obs.events.map (·.payload)`.
+This lets a downstream consumer freely substitute the CALL-journal
+projection for the event-log projection (or vice versa) without
+threading either through the fabricated `payloads` field. -/
+theorem commit_call_inputs_equal_event_payloads (target fee msgValue : Word)
+    (requests : List Request) :
+    let obs := commitObservables target fee msgValue requests
+    obs.calls.map (·.input) = obs.events.map (·.payload) := by
+  simp [commitObservables, requestCall, requestEvent, payload]
+
 /-! ## WithdrawalVault.addConsolidationRequests (WithdrawalVault.sol:199-208) -/
 
 /-- `WithdrawalVault.sol:199-208 addConsolidationRequests(bytes[] calldata sourcePubkeys, bytes[] calldata targetPubkeys)`,
