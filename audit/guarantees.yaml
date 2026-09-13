@@ -1518,9 +1518,9 @@
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Keep A-CONSOLIDATION-GATEWAY-NONZERO named; bus/delay/quota may start only on top of this official-success parent."
+        "work": "A-CONSOLIDATION-GATEWAY-NONZERO is DERIVED under the pinned-source STATICCALL premise shape (PR #712) and retired from this guarantee's assumption list. The residual caller-supplied `hFeeNonzero : result.abiDecodedFee ≠ 0` on the outer `PredeployStaticcallResult` structure remains — retiring it requires a live-STATICCALL executable model on the pinned EIP-7251 predeploy (multi-session Verity model work). Bus/delay/quota may start only on top of this official-success parent."
       },
-      "next_gate": "Keep A-CONSOLIDATION-GATEWAY-NONZERO named; bus/delay/quota only on top of official success."
+      "next_gate": "Chantier 2 (Thomas 2026-09-13, item a): A-CONSOLIDATION-GATEWAY-NONZERO retired from this guarantee's assumption list via registered-parent statement swap to `official_denote_succeeds_and_justified_forwards_msg_value_from_gateway` (PR #712), following the same pattern as PR #699 on P-CONSOLIDATION-1. The two per-conjunct pinned-source premises (`hFeeFromStaticcall`, `hMsgValueSource`) tie fee and msg.value to the shared `PredeployStaticcallResult` structure naming the EIP-7251 CONSOLIDATION_REQUEST STATICCALL return. OPEN: live-STATICCALL executable model on the pinned predeploy `0x0000BBdDc7CE488642fb579F8B00f3a590007251` (multi-session)."
     },
     {
       "id": "P-TOKEN-1",
