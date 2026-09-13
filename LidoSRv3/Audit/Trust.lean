@@ -748,10 +748,12 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- Closes the retirement substitution chain across both planes.
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.sourceView_payloads_eq_calls_input
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.observeFromJournal_simulates_pinned_source
--- Chantier 2 (Thomas 2026-09-13): slot-independent P-CONSOLIDATION-1
--- consumer alias, exposing observeFromJournal_simulates_pinned_source
--- under the guarantee namespace.
-#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1.verity_tx_simulates_consolidation_from_journal
+-- Chantier 2 (Thomas 2026-09-13): the registered parent
+-- verity_tx_simulates_consolidation now directly consumes
+-- addRequestsSlotFree + observeFromJournal (fabricated slots retired
+-- from the registered statement). The alias theorem
+-- verity_tx_simulates_consolidation_from_journal is retired here since
+-- the parent statement now IS the slot-independent one.
 -- Chantier 2 (Thomas 2026-09-13): writePayloads invariance — the write
 -- side of the slot-independence claim (complement to
 -- observeFromJournal_success_slot_invariant on the read side).
