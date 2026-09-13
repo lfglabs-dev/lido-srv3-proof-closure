@@ -450,7 +450,26 @@ theorem source_topup_conserves_and_rolls_back {State : Type}
     UnregisteredModuleReverts cfg inp ∧
     WrapMovesNoValue cfg inp ∧
     WrongWcTypeReverts cfg inp ∧
-    RunFollowsAllocationLoop cfg inp :=
+    RunFollowsAllocationLoop cfg inp ∧
+    -- Chantier 1 (Piste A, Thomas 2026-09-13) A-ABSTRACT-TX ADDITIVE
+    -- executable-plane rollback conjunct.  The abstract-tx `TxObservation`
+    -- rollback of `ConservesAndRollsBack` is definitional
+    -- (`.reverted ↦ before`, `committedTrace = ⟨[], [], []⟩` by DEFINITION).
+    -- This universal conjunct adds an EXECUTABLE `Contract.run` rollback
+    -- fact from `Verity.TopupTx.executeGuarded_revert_restores_snapshot`
+    -- (chantier 1 2026-09-13 PR #576) into the parent's ENUNCE, so
+    -- consumers who care about executable semantics no longer need to
+    -- consume A-ABSTRACT-TX as a separate assumption — the parent
+    -- itself now delivers a real Verity-plane rollback promise.
+    (∀ (verityState verityRollback : _root_.Verity.ContractState)
+        (guardedCfg : SourceTopupConfig)
+        (guardedCall : _root_.LidoSRv3.Audit.Verity.TopupTx.TopupCall)
+        (failure : _root_.LidoSRv3.Audit.Verity.TopupTx.FailurePoint)
+        (reason : String),
+      (_root_.LidoSRv3.Audit.Verity.TopupTx.executeGuarded
+          guardedCfg guardedCall failure).run verityState =
+        _root_.Verity.ContractResult.revert reason verityRollback →
+      verityRollback = verityState) :=
   ⟨⟨run_conserves cfg inp, fun h => reverting_outcome_rolls_back before after attempts trace h⟩,
    fun hMod hAuth hKeys hLens hPub => source_module_guard_required cfg inp hMod hAuth hKeys hLens hPub,
    fun hWrap => source_wrap_precludes_value_moving_commit cfg inp hWrap,
@@ -460,7 +479,10 @@ theorem source_topup_conserves_and_rolls_back {State : Type}
      ⟨fun o hLoop => source_allocation_guards_required cfg inp o hAuth hKeys hLens hPub hMod
         hActive hWc hGwei hPaused hLoop,
       fun hLoop hOver => source_over_target_guard_required cfg inp hAuth hKeys hLens hPub hMod
-        hActive hWc hGwei hPaused hLoop hOver⟩⟩
+        hActive hWc hGwei hPaused hLoop hOver⟩,
+   fun verityState verityRollback guardedCfg guardedCall failure reason h =>
+     _root_.LidoSRv3.Audit.Verity.TopupTx.executeGuarded_revert_restores_snapshot
+       guardedCfg guardedCall failure verityState verityRollback reason h⟩
 
 /-- **Chantier 1 (Piste A, Thomas 2026-09-13) D-EMPTY-1 / D-AUTH-1 /
 D-WC-1 prefix-guards naming bridge.**
@@ -517,7 +539,10 @@ theorem source_topup_conserves_and_rolls_back_under_prefix_guards_shape
   -- conjuncts) are unchanged.  The ENUNCE now records the pinned
   -- prefix-guard shapes that the Verity executable plane omits
   -- past line 717 (D-EMPTY-1 / D-AUTH-1 / D-WC-1 disclosure).
-  source_topup_conserves_and_rolls_back cfg inp before after attempts trace
+  -- Project the parent's 6-tuple down to the bridge's 5-conjunct shape.
+  let ⟨h1, h2, h3, h4, h5, _⟩ :=
+    source_topup_conserves_and_rolls_back cfg inp before after attempts trace
+  ⟨h1, h2, h3, h4, h5⟩
 
 /-- **Chantier 1 (Piste A, Thomas 2026-09-13) top-up-gateway oracle
 naming bridge.**
@@ -567,8 +592,11 @@ theorem source_topup_conserves_and_rolls_back_under_gateway_oracle_shape
   -- delegates to the registered parent since the free
   -- `callerIsTopUpGateway` def accessor is unchanged; the ENUNCE
   -- records the oracle-backed derivation path for the caller
-  -- context.
-  source_topup_conserves_and_rolls_back cfg inp before after attempts trace
+  -- context.  Project the parent's 6-tuple down to the bridge's
+  -- 5-conjunct shape.
+  let ⟨h1, h2, h3, h4, h5, _⟩ :=
+    source_topup_conserves_and_rolls_back cfg inp before after attempts trace
+  ⟨h1, h2, h3, h4, h5⟩
 
 /--
 The `assert(etherBalanceBeforeTopUp == etherBalanceAfterTopUp)` at

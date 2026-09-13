@@ -896,19 +896,19 @@ theorem guard_discharge_at_returndata_witnesses :
       run guardCfg overLongInput = .revertTopUpLimitIndexOutOfBounds ∧
       run guardCfg overTargetInput = .revertModuleReturnExceedTarget :=
   ⟨((LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back
-        (State := Unit) guardCfg misalignedInput () () [] ⟨[], [], []⟩).2.2.2.2
+        (State := Unit) guardCfg misalignedInput () () [] ⟨[], [], []⟩).2.2.2.2.1
       (by decide) (by decide) (by decide) (by decide) (by decide) (by decide) (by decide)
       (by decide) (by decide)).1 _ (by decide),
    ((LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back
-        (State := Unit) guardCfg overLimitInput () () [] ⟨[], [], []⟩).2.2.2.2
+        (State := Unit) guardCfg overLimitInput () () [] ⟨[], [], []⟩).2.2.2.2.1
       (by decide) (by decide) (by decide) (by decide) (by decide) (by decide) (by decide)
       (by decide) (by decide)).1 _ (by decide),
    ((LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back
-        (State := Unit) guardCfg overLongInput () () [] ⟨[], [], []⟩).2.2.2.2
+        (State := Unit) guardCfg overLongInput () () [] ⟨[], [], []⟩).2.2.2.2.1
       (by decide) (by decide) (by decide) (by decide) (by decide) (by decide) (by decide)
       (by decide) (by decide)).1 _ (by decide),
    ((LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back
-        (State := Unit) guardCfg overTargetInput () () [] ⟨[], [], []⟩).2.2.2.2
+        (State := Unit) guardCfg overTargetInput () () [] ⟨[], [], []⟩).2.2.2.2.1
       (by decide) (by decide) (by decide) (by decide) (by decide) (by decide) (by decide)
       (by decide) (by decide)).2 (by decide) (by decide)⟩
 

@@ -82,7 +82,9 @@ theorem topup_source_parent_ignores_abstract_tx
       PTopup1.WrapMovesNoValue cfg inp ∧
       PTopup1.WrongWcTypeReverts cfg inp ∧
       PTopup1.RunFollowsAllocationLoop cfg inp :=
-  PTopup1.source_topup_conserves_and_rolls_back cfg inp before after attempts trace
+  let ⟨h1, h2, h3, h4, h5, _⟩ :=
+    PTopup1.source_topup_conserves_and_rolls_back cfg inp before after attempts trace
+  ⟨h1, h2, h3, h4, h5⟩
 
 /-- Same statement without the ignored premise. -/
 theorem topup_source_parent_applies_universally
@@ -97,7 +99,9 @@ theorem topup_source_parent_applies_universally
       PTopup1.WrapMovesNoValue cfg inp ∧
       PTopup1.WrongWcTypeReverts cfg inp ∧
       PTopup1.RunFollowsAllocationLoop cfg inp :=
-  PTopup1.source_topup_conserves_and_rolls_back cfg inp before after attempts trace
+  let ⟨h1, h2, h3, h4, h5, _⟩ :=
+    PTopup1.source_topup_conserves_and_rolls_back cfg inp before after attempts trace
+  ⟨h1, h2, h3, h4, h5⟩
 
 /-- The registered P-TOPUP-1 Verity parent
 `PTopup1.verity_tx_simulates_source_with_nonzero_wrap_close` applies
