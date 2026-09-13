@@ -477,4 +477,39 @@ theorem reserve_seed_bookkeeping_identities
    LidoSRv3.Audit.Source.ReserveSeedBookkeepingSource.seedDepositsCount_buffered_eq
       currentDepositedPostReport currentBuffered amount⟩
 
+/-- Registered consumers for the payable transfer, uint128 wrapping, and
+ERC-7201 slot-determinism source facts (PR #671). -/
+theorem reserve_payable_call_frame_projections
+    (stakingRouterAddr amount selectorPrefix : Nat) :
+    (LidoSRv3.Audit.Source.ReservePayableCallSource.receiveDepositableEtherFrame
+        stakingRouterAddr amount selectorPrefix).target = stakingRouterAddr ∧
+    (LidoSRv3.Audit.Source.ReservePayableCallSource.receiveDepositableEtherFrame
+        stakingRouterAddr amount selectorPrefix).value = amount ∧
+    (LidoSRv3.Audit.Source.ReservePayableCallSource.receiveDepositableEtherFrame
+        stakingRouterAddr amount selectorPrefix).calldata = [] :=
+  ⟨LidoSRv3.Audit.Source.ReservePayableCallSource.receiveDepositableEtherFrame_target_eq
+      stakingRouterAddr amount selectorPrefix,
+   LidoSRv3.Audit.Source.ReservePayableCallSource.receiveDepositableEtherFrame_value_eq
+      stakingRouterAddr amount selectorPrefix,
+   LidoSRv3.Audit.Source.ReservePayableCallSource.receiveDepositableEtherFrame_calldata_eq
+      stakingRouterAddr amount selectorPrefix⟩
+
+theorem reserve_uint128_wrap_identities
+    (x a b : Nat)
+    (hSum : a + b < LidoSRv3.Audit.Source.SolidityUint128WrapSource.uint128Modulus) :
+    LidoSRv3.Audit.Source.SolidityUint128WrapSource.toUint128
+        (LidoSRv3.Audit.Source.SolidityUint128WrapSource.toUint128 x) =
+      LidoSRv3.Audit.Source.SolidityUint128WrapSource.toUint128 x ∧
+    LidoSRv3.Audit.Source.SolidityUint128WrapSource.checkedAddOverflow a b = false :=
+  ⟨LidoSRv3.Audit.Source.SolidityUint128WrapSource.toUint128_idem x,
+   LidoSRv3.Audit.Source.SolidityUint128WrapSource.checkedAddOverflow_false_of_bounded hSum⟩
+
+theorem reserve_erc7201_slot_deterministic
+    (oracle : LidoSRv3.Audit.Source.KeccakConcreteCommitmentSource.KeccakOracle)
+    (ns1 ns2 : String) (h : ns1 = ns2) :
+    LidoSRv3.Audit.Source.ERC7201StorageSlotSource.realERC7201BaseSlot oracle ns1 =
+      LidoSRv3.Audit.Source.ERC7201StorageSlotSource.realERC7201BaseSlot oracle ns2 :=
+  LidoSRv3.Audit.Source.ERC7201StorageSlotSource.realERC7201BaseSlot_deterministic
+    (oracle := oracle) (ns1 := ns1) (ns2 := ns2) h
+
 end LidoSRv3.Audit.Guarantees.PReserve1
