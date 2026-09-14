@@ -35,23 +35,30 @@ printf '%s  %s\n' "$solc_digest" "$FOUNDRY_SOLC" | sha256sum --check --strict
 chmod u+x "$FOUNDRY_SOLC"
 "$FOUNDRY_SOLC" --version
 if [[ "$test_script" == repository ]]; then
+  mkdir -p .lake/candidate-validation
   combined_status=0
   proof_report_ready=0
-  if make prove; then
+  if make prove 2>&1 | tee .lake/candidate-validation/prove.log; then
     echo 'CANDIDATE_MAKE_PROVE=PASS'
     proof_report_ready=1
   else
     combined_status=1
     echo 'CANDIDATE_MAKE_PROVE=FAIL'
   fi
-  if make test; then echo 'CANDIDATE_MAKE_TEST=PASS'; else
+  if make test 2>&1 | tee .lake/candidate-validation/test.log; then echo 'CANDIDATE_MAKE_TEST=PASS'; else
     combined_status=1
     echo 'CANDIDATE_MAKE_TEST=FAIL'
   fi
-  if lake build LidoSRv3 LidoSRv3Audit; then echo 'CANDIDATE_LIBRARIES=PASS'; else
+  if lake build LidoSRv3 LidoSRv3Audit 2>&1 | tee .lake/candidate-validation/libraries.log; then echo 'CANDIDATE_LIBRARIES=PASS'; else
     combined_status=1
     echo 'CANDIDATE_LIBRARIES=FAIL'
   fi
+  echo 'CANDIDATE_GATE_DIAGNOSTICS_BEGIN'
+  # Retain compiler failures and differential totals at the end of bounded
+  # remote receipt tails, after verbose Trust axiom output.
+  rg -n -A 5 '^error:|Traceback|failed:|AssertionError|Suite result:|^make:.*Error' \
+    .lake/candidate-validation/{prove,test,libraries}.log | tail -160 || true
+  echo 'CANDIDATE_GATE_DIAGNOSTICS_END'
   if [[ "$proof_report_ready" == 1 ]]; then
     echo 'CANDIDATE_PROOF_REPORT_BEGIN'
     cat proofs/logs/proof-report.json

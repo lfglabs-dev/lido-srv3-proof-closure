@@ -1,3 +1,4 @@
+import LidoSRv3.Audit.AllGuarantees
 import LidoSRv3.Tests.SszDeclaredSiblingsRegression
 import LidoSRv3.Tests.TopupRouterAdmissionCallRegression
 import LidoSRv3.Tests.DepositAdmissionErrorsRegression
@@ -371,7 +372,7 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Spec.OracleFrameCorrespondence.account_parent_remains_order_only
 #print axioms LidoSRv3.Audit.Spec.OracleFrameCorrespondence.eugene_bound_cited
 #print axioms LidoSRv3.Tests.PackEOracleFrameMutants.computed_fee_kill_line_refutes_oracle_frame
-#print axioms LidoSRv3.Audit.Spec.ConsolidationObserveCorrespondence.observe_success_payloads_reread_maps
+-- The synthetic-map payload witness was retired with its observation slots.
 #print axioms LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.abstract_flow_refinement
 -- ConsolidationAbstractFlowModel structural family: `forward_compiles`
 -- documents the forward-flow compilation identity; `payload_length`
@@ -2315,3 +2316,11 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Provenance.DepositAbstractTxOrphaned.source_parent_applies_universally
 #print axioms LidoSRv3.Audit.Provenance.DepositAbstractTxOrphaned.verity_parent_ignores_abstract_tx
 #print axioms LidoSRv3.Audit.Provenance.DepositAbstractTxOrphaned.verity_parent_applies_universally
+
+-- Current registered consumers: historical prints above remain scoped to their declarations.
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.actual_deposit_call_slot_success_and_revert
+#print axioms LidoSRv3.Audit.Guarantees.PTopupRouterAdmissionCall.actual_topup_admission_calls_wei_and_revert
+#print axioms LidoSRv3.Audit.Guarantees.PReserve1LiveWriters.actual_reserve_physical_history
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity_from_gateway
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1.gateway_vault_live_success_and_revert
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidationValue1.official_denote_succeeds_and_justified_forwards_msg_value_from_gateway

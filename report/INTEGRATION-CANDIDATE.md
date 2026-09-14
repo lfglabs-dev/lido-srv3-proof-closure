@@ -12,7 +12,7 @@ The integration started from `1a84e37d9a5ab91dc80de37db6da2a6d90bdb365`.
 The untouched handoff manifest and binary patches were inspected before coding:
 ADDRESS base `d56a7c40b7d120ac81f26c979195357a2f3262c6`, patch SHA256
 `37f9f9ed7067515201163f9ecb80bfdff36c32d8fb0419b8c7fd1a4e07f51b43`;
-CONSOLIDATION patch SHA256
+CONSOLIDATION base `962a349bb0258ed7b05ce21aca2d12ca11cae54a`, patch SHA256
 `95b4970efc9131f56feaaa0e29e28a9f1e70f3a7855e5a194f0d28e0ccc114e8`.
 Their useful composition intent was reused against stronger current producers.
 The old ADDRESS journal/metadata-fingerprint edit was inspected, not copied as
@@ -144,9 +144,10 @@ its obsolete function arity and missing flag input were repaired explicitly.
 At `b5dd0ad9a593e9171e6011a22ed6b584299a933a`, job
 `49e7f482-3cdc-40b5-8887-75f3c7984016` passed `make prove` and all five
 Solidity differential suites: MINFIRST 4, DEPOSIT 17, TOPUP 19, TOPUP2 19,
-RESERVE 15 (74 total, no failures or skips). The remaining repository/audit
-stages were still running when this record was prepared; this is not an overall
-repository-pass claim. Final combined results, including any failures, belong
+RESERVE 15 (74 total, no failures or skips). The overall job failed in Trust compilation; it is not a repository-pass
+receipt. Trust still referenced the retired synthetic-map payload witness.
+That reference is removed, current registered parents are explicitly printed,
+and the repaired candidate requires revalidation. Final combined results, including any failures, belong
 to the exact SHA in the PR body and its durable remote receipts. No predecessor success is carried forward
 as if it validated a later SHA.
 

@@ -59,4 +59,3 @@ REMOTE_BUILD_NODE_ID=dgx-spark REMOTE_BUILD_PASSIVE=1 remote-lean-build lake bui
 ```
 
 Lean v4.31.0 and Verity e977aaad6e1a9e92e0132d41b3d33a14135a4d46 are pinned. Earlier phase1 targeted builds passed, but do not validate this new witness or the final combined SHA. Fresh independent audit remains required.
-
