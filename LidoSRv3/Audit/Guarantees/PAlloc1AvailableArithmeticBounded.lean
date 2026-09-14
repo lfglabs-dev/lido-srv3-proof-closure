@@ -2,6 +2,12 @@ import LidoSRv3.Audit.Model.AllocCapacity
 
 /-! # P-ALLOC-1 `available_arithmetic` conjunct derived from pinned type bounds
 
+Scope correction from pinned SRLib.sol:374-378 and 516-532: the module
+summary returns uint256 values, and type-2 stake comes from another external
+getter. The uint64 hypotheses below are additional assumptions, not consequences
+of those ABI return types. These conditional arithmetic lemmas are retained from
+PRs #652/#653; they do not establish reachable-router `CheckedBounds`.
+
 **Chantier 3 (Piste A, Thomas 2026-09-13) real derivation of the
 `available_arithmetic` CheckedBounds conjunct.**
 
