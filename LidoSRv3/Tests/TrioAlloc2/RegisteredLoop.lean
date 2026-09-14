@@ -13,12 +13,14 @@ theorem closed_bucket_does_not_cap_step :
 
 /- Tie sharing and capacity exhaustion must use mutations from prior steps:
 first bucket fills to 2, then only the second remains open for the last 3. -/
-#eval do
+private def checkInterleaved : IO Unit := do
   match allocate [w 0, w 0] [w 2, w 100] (w 5) with
   | .ok out =>
     unless out = ({ amount := w 5, buckets := [w 2, w 3] } : StepOutput) do
       throw (IO.userError s!"incorrect interleaved allocation: {repr out}")
   | .error reason => throw (IO.userError s!"unexpected panic: {repr reason}")
+
+#eval checkInterleaved
 
 /-- This test uses the registered parent, not a detached library helper. -/
 theorem registered_loop_consumed :
