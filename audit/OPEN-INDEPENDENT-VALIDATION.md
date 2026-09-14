@@ -1,3 +1,20 @@
+# Latest independent review: 00c2e31d
+
+The controller reports independent full-suite job 5a11e2aa PASSED at
+3a6d46e18d9a543f0601d21a4aae274dd3062870, including prove/test, 74 differential
+cases, trust recomputation and 2119 jobs. Precompile dispatch and reserve
+compiler-selection repairs are independently confirmed. Verdict remains semantic
+BLOCKED. The result does not cover successors. Infrastructure is not the block.
+
+The new physical final-result continuation is a substantive intermediate
+correspondence; it does not equate the legacy observation executor with the
+physical producer, or discharge ALLOC2 deployment. Those remain open. The four
+remaining documentation thread IDs were requested because all 32 GitHub threads
+are unresolved in GitHub and the reviewer ledger is not mounted here. No source
+acceptance or final closure is inferred.
+
+## Earlier records
+
 # Current independent validation status
 
 Reviewer 01ab3536 reports exact-SHA full validation at

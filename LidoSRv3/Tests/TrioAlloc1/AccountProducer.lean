@@ -1,4 +1,5 @@
 import LidoSRv3.Tests.TrioAlloc1.VerityVectors
+import LidoSRv3.Audit.Source.TrioComposition.VerityParentResult
 
 set_option maxRecDepth 4096
 namespace LidoSRv3.Tests.TrioAlloc1.AccountProducer
@@ -41,6 +42,16 @@ theorem unqualified_projection_misses_module :
 theorem static_world_preserved : result.2.world = initial.world :=
   (VerityProducer.account_producer_correspondence layout input (vmAdversary badSummary)
     initial []).2
+
+/-- The public executor retains the genuine summary counterexample through its
+final result; no ABI library success can erase this earlier failure. -/
+theorem public_result_preserves_summary_failure :
+    let r := LidoSRv3.Audit.Source.TrioComposition.VerityParentResult.execute
+      layout input.config (word input.config.maxEBType1.val) false
+      (vmAdversary badSummary) initial []
+    r.1.1 = .error (.panic (word 0x11)) ∧
+    r.1.2.map (fun item => (item.request.target.val, item.request.payload)) =
+      [(21, summaryPayload)] := by decide +kernel
 
 #print axioms inconsistent_summary_stops_calls
 #print axioms unqualified_projection_misses_module

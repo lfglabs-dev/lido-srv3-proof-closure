@@ -9,6 +9,7 @@ import LidoSRv3.Audit.Guarantees.PAlloc1AvailableArithmeticBounded
 import LidoSRv3.Audit.Verity.AllocCapacityPhase3
 import LidoSRv3.Audit.Verity.AllocationTx
 import LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer
+import LidoSRv3.Audit.Source.TrioComposition.VerityParentResult
 
 namespace LidoSRv3.Audit.Guarantees.PAlloc1
 
@@ -354,13 +355,25 @@ theorem verity_tx_simulates_allocation_count_from_storage
           (LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.sourceOracle adversary state)
           input before ∧
       (LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.executeAccount
-        layout input adversary callState before).2.world = state) := by
+        layout input adversary callState before).2.world = state ∧
+      (∀ amount,
+        (LidoSRv3.Audit.Source.TrioComposition.VerityParentResult.execute
+          layout input.config amount input.isTopUp adversary callState before).1 =
+          LidoSRv3.Audit.Source.TrioComposition.getDepositAllocationsABI layout
+            (LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.accountStorage state)
+            (LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.sourceOracle adversary state)
+            input.config amount input.isTopUp before ∧
+        (LidoSRv3.Audit.Source.TrioComposition.VerityParentResult.execute
+          layout input.config amount input.isTopUp adversary callState before).2.world = state)) := by
   constructor
   · exact verity_tx_simulates_live_summary_from_storage
       adversary cfg modules depositsToAllocate isTopUp state hLength hBind
   · intro layout input gas before
-    exact LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.account_producer_correspondence
+    have h := LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.account_producer_correspondence
       layout input adversary ⟨state, gas, []⟩ before
+    exact ⟨h.1, h.2, fun amount =>
+      LidoSRv3.Audit.Source.TrioComposition.VerityParentResult.execute_correspondence
+        layout input.config amount input.isTopUp adversary ⟨state, gas, []⟩ before⟩
 
 /-- Every revert of the allocation transaction, including the injected
 failure after intermediate map/slot writes, restores the pre-call snapshot. -/
