@@ -1,6 +1,6 @@
 # P-ADDRESS-1
 
-The registered `LidoSRv3.Audit.Guarantees.PAddress1.universal_address_writer_equivariance` preserves the original source-shaped equivariance conclusions and additionally consumes actual claim-batch execution. The candidate's targeted Lean validation is pending.
+The registered `LidoSRv3.Audit.Guarantees.PAddress1.universal_address_writer_equivariance` preserves the original source-shaped equivariance conclusions and additionally consumes actual claim-batch execution. Targeted Lean validation passed at `6f44fcae7738896385a102e56e78e30769d5db04` on registered `dgx-spark`, job `2ccd4fd6-8ec8-4eb3-a9b2-49f27b017cb4` (1276 build jobs), including both parent-shaped and actual-CALL mutants. Combined-candidate validation remains pending.
 
 For arbitrary nonzero callers `a₁`, `a₂` and every `SolidityAddress.Input`, its conclusion is:
 
