@@ -251,7 +251,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Accepted theorem planes.** Abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PAddress1.universal_address_writer_equivariance`. Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PAddress1.abstract_source_verity_tx_address_equivariance`.
 
-**Proof shape / exact domain statement.** The registered universal_address_writer_equivariance preserves universal admission/post-state renaming over four source-shaped writer projections and adds LiveClaimBatchBehavior over arbitrary callee/context/request/hint/recipient/world inputs. Actual root success derives an ordered physical claim/CALL/event chain; root failure restores the entire modeled caller/callee world. The live execution limb has no supplied admission boolean or stage-success premise. Global caller/owner/callee-world renaming is not proved.
+**Proof shape / exact domain statement.** The registered universal_address_writer_equivariance preserves universal admission/post-state renaming over four source-shaped writer projections and adds LiveClaimBatchBehavior over arbitrary callee/context/request/hint/recipient/world inputs. Actual root success derives an ordered physical claim/CALL/event chain; root failure restores the entire modeled caller/callee world. The live execution limb has no supplied admission boolean or stage-success premise. Global caller/owner/callee-world renaming is not proved. Claim storage now enters and commits the executing account frame; its storage-stage effects preserve foreign-account words before the recipient callback.
 
 **Source/artifact provenance.** `MAPPED`; 4 immutable pinned source span(s) in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance.
 
