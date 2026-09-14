@@ -32,9 +32,10 @@ EXTRA_SOURCE_ROOTS = ("audit/trio",)
 # This records native-backed regressions; it does not grant kernel-proof credit.
 # Integration reconciliation: one synthetic-map test removed before this
 # mission; other differences are retained source/test line moves and API updates.
-# Exact records: audit/metadata-reconcile/candidate-native-inventory.json.
-NATIVE_DECIDE_COUNT = 436
-NATIVE_DECIDE_SHA256 = "67bd2e83220ae5cd3d092ad8e32f26395033717c54dbce92676477bbe2f24ed3"
+# Exact records: candidate-native-inventory.json and kernel-witness-removals.json
+# under audit/metadata-reconcile; 21 test sites replaced by kernel decisions.
+NATIVE_DECIDE_COUNT = 415
+NATIVE_DECIDE_SHA256 = "b3f3801c273222fbb1316f6184baa9c9bdc469b5ed5ed928bdede2a48343ca9e"
 ESCAPES = (
     ("sorry", re.compile(r"\bsorry\b")),
     ("admit", re.compile(r"\badmit\b")),

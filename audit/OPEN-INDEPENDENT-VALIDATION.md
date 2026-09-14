@@ -1,3 +1,25 @@
+# Kernel-checked test-witness successor
+
+Registered dgx-spark job 1f682576-7dca-4621-bae5-058b763f1794 passed both
+TopupReturnBufferMutants and ConsolidationTxMutants at the source commit recorded
+in audit/metadata-reconcile/kernel-witness-removals.json (1369 build jobs).
+The five existing theorem statements and concrete witnesses are unchanged.
+Their 21 native_decide sites now use decide +kernel: two return-buffer decoder
+witnesses and three consolidation debit/journal mutant witnesses.
+
+The disclosure removes exactly those 21 native axioms; the source tactic inventory
+shrinks from 436 to 415 with no added native sites. Full successor Trust recomputation
+must confirm the remaining union: three foundations plus three production compiler
+and eight test-native exceptions (14 total). This is a reduction, not foundational-
+only closure. I-TRUST-FOUNDATIONAL-ONLY remains OPEN for the remaining exceptions.
+All test witnesses remain present, and the production/test scope gate remains.
+
+ALLOC1 supported-module reachability, ALLOC2 compiled/deployed refinement and all
+remaining registered obligations are unchanged and OPEN. The genuine arbitrary-
+module counterexample and AccountFrame are preserved. No semantic CLEAN is claimed.
+
+## Historical review and attempt records
+
 # Reviewer 195a578f: axiom scope remains open
 
 The controller reports an independent full-gate pass at
