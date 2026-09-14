@@ -22,3 +22,21 @@ REMOTE_BUILD_NODE_ID=dgx-spark REMOTE_BUILD_PASSIVE=1 remote-lean-build lake bui
 ```
 
 Job `52552f68-a486-4cc6-929a-20fd944061f0` succeeded with exit 0 (1,344 jobs). The registered theorem reports only `propext`, `Classical.choice`, and `Quot.sound`. Tests include actual locator success/rejection/late rollback, physical admission and metadata regressions. This receipt applies to that SHA; combined-candidate validation and fresh independent review remain pending.
+
+## Executed allocation before module calls
+
+The registered parent retains its prior supplied-allocation suffix conclusion and
+adds DepositAllocation.execute. DSM lookup and physical admission precede the
+allocation producer. The producer uses account-qualified count/record reads,
+executes the existing ALLOC1/ALLOC2 source/ABI composition, then checked-subtracts
+one from physical membership and indexes the returned allocation. Its selected
+amount and matching maxEB feed the actual module/metadata/per-key suffix. A failed
+allocation cannot issue obtainDepositData. All suffix failures restore the entry
+world; attempted allocation calls are retained separately.
+
+Remaining boundaries: Lido.getDepositableEther executable return producer, actual
+allocation STATICCALL/DELEGATECALL realization, constructor/config and phase-memory
+cursor provenance, and deployment/runtime/hash correspondence. The generic test
+hash is only a fixture; the registered parent supplies concrete Keccak. The ALLOC
+arbitrary-summary counterexample remains valid and is exercised through DEPOSIT.
+No paired Solidity differential or independent full-gate acceptance is implied.
