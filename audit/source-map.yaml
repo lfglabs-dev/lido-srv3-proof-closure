@@ -723,11 +723,11 @@
         {
           "repository": "lidofinance/core",
           "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
-          "path": "contracts/0.8.9/vaults/WithdrawalVaultEIP7685.sol",
+          "path": "contracts/0.8.9/WithdrawalVaultEIP7685.sol",
           "function": "CONSOLIDATION_REQUEST immutable + _addConsolidationRequests",
           "start_line": 17,
           "end_line": 73,
-          "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.9/vaults/WithdrawalVaultEIP7685.sol#L17-L73"
+          "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.9/WithdrawalVaultEIP7685.sol#L17-L73"
         },
         {
           "repository": "lidofinance/core",

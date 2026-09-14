@@ -1,4 +1,4 @@
-import LidoSRv3.Audit.Guarantees.PDeposit1PhysicalAdmission
+import LidoSRv3.Audit.Source.Effects.PDeposit1PhysicalAdmission
 
 /-! core17005714, StakingRouter.deposit and _getDepositSecurityModule.
 Actual solc0.8.25 return-valued STATICCALL has no code precheck. The immutable

@@ -1,4 +1,4 @@
-import LidoSRv3.Audit.Source.TopupKeccakOracle
+import LidoSRv3.Audit.Guarantees.Composition.TopupKeccakOracle
 import LidoSRv3.Audit.Guarantees.PTopup2Verity
 
 /-! Concrete witnesses and kill-lines for the P-TOPUP-2 keccak oracle

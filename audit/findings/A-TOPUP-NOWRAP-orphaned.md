@@ -22,7 +22,7 @@ require a general no-wrap premise", and its `removal_path` in
 `audit/assumptions.yaml` is "Review each consuming theorem before removing
 this registry identifier."
 
-## Proof (see `LidoSRv3/Audit/Provenance/TopupNoWrapOrphaned.lean`)
+## Proof (see `LidoSRv3/Audit/Guarantees/Composition/TopupNoWrapOrphaned.lean`)
 
 Three theorems exhibit the orphanage:
 

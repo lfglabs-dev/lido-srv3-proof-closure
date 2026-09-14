@@ -1,5 +1,5 @@
 import LidoSRv3.Audit.Guarantees.PReserve1
-import LidoSRv3.Audit.Source.ReserveUnfinalizedCall
+import LidoSRv3.Audit.Guarantees.Composition.ReserveUnfinalizedCall
 
 /-! # P-RESERVE-1 registered STATICCALL consumer
 

@@ -1,4 +1,4 @@
-import LidoSRv3.Audit.Guarantees.PTopupMemoryCalls
+import LidoSRv3.Audit.Source.Effects.PTopupMemoryCalls
 import audit.trio.consolidation.LowLevel
 
 /-! The covered TOPUP phase begins with the existing typed length/config guards,

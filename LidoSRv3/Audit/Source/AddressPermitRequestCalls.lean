@@ -1,4 +1,4 @@
-import LidoSRv3.Audit.Guarantees.PAddress1RequestBatches
+import LidoSRv3.Audit.Source.Effects.PAddress1RequestBatches
 
 /-! WQ permit CALL before the accepted typed batch's physical pause admission.
 The permit body/signature/domain/nonces are explicit external implementations.

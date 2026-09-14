@@ -30,8 +30,11 @@ EXTRA_SOURCE_ROOTS = ("audit/trio",)
 # Corrected295 consolidation tests add85 sites and move existing test lines.
 # Exact delta: audit/consolidation-gateway-call/native-inventory.json.
 # This records native-backed regressions; it does not grant kernel-proof credit.
-NATIVE_DECIDE_COUNT = 437
-NATIVE_DECIDE_SHA256 = "28faccb0936fbc01016c5e80d42b76855faa3263631fff119e72f58783a464e7"
+# Integration reconciliation: one synthetic-map test removed before this
+# mission; other differences are retained source/test line moves and API updates.
+# Exact records: audit/metadata-reconcile/candidate-native-inventory.json.
+NATIVE_DECIDE_COUNT = 436
+NATIVE_DECIDE_SHA256 = "67bd2e83220ae5cd3d092ad8e32f26395033717c54dbce92676477bbe2f24ed3"
 ESCAPES = (
     ("sorry", re.compile(r"\bsorry\b")),
     ("admit", re.compile(r"\badmit\b")),

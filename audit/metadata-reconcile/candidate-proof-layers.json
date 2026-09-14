@@ -1,0 +1,114 @@
+{
+  "consumer_moves": [
+    {
+      "from": "LidoSRv3/Audit/Source/AccountPackedWords.lean",
+      "to": "LidoSRv3/Audit/Guarantees/Composition/AccountPackedWords.lean",
+      "content_sha256_before_import_rewrites": "9df892e3d8c0ec73e25b322726aaf9a31cb28e9a3f2d9ee40a61052d561415b9"
+    },
+    {
+      "from": "LidoSRv3/Audit/Source/DepositLinksSource.lean",
+      "to": "LidoSRv3/Audit/Guarantees/Composition/DepositLinksSource.lean",
+      "content_sha256_before_import_rewrites": "cf7b5302aec36e7a6f815e18817e3150d600cb6dcfb9256335a16e9c30222bb5"
+    },
+    {
+      "from": "LidoSRv3/Audit/Source/ReserveUnfinalizedCall.lean",
+      "to": "LidoSRv3/Audit/Guarantees/Composition/ReserveUnfinalizedCall.lean",
+      "content_sha256_before_import_rewrites": "d312e3cc4eef768dd9690d8398625697d9e2c48bf0911523bdd567ebfe297935"
+    },
+    {
+      "from": "LidoSRv3/Audit/Source/SszCompiledEntryRollback.lean",
+      "to": "LidoSRv3/Audit/Guarantees/Composition/SszCompiledEntryRollback.lean",
+      "content_sha256_before_import_rewrites": "46f39fd88068ddd49f9bf5f70310010dc42fdff0927a388c02dcffcf82e28863"
+    },
+    {
+      "from": "LidoSRv3/Audit/Source/SszDeclaredSiblings.lean",
+      "to": "LidoSRv3/Audit/Guarantees/Composition/SszDeclaredSiblings.lean",
+      "content_sha256_before_import_rewrites": "1f1e820150953685d04f8da38f9c208bc18056b1b5de29bf1dbc2aec96cfb7fe"
+    },
+    {
+      "from": "LidoSRv3/Audit/Source/TopupKeccakOracle.lean",
+      "to": "LidoSRv3/Audit/Guarantees/Composition/TopupKeccakOracle.lean",
+      "content_sha256_before_import_rewrites": "a3272ec353469d31ec872d0aac26ae831f5469add105eb6663f42378d93e7c7b"
+    },
+    {
+      "from": "LidoSRv3/Audit/Source/DepositAdmissionErrors.lean",
+      "to": "LidoSRv3/Audit/Guarantees/Composition/DepositAdmissionErrors.lean",
+      "content_sha256_before_import_rewrites": "da03dfac0afcb72fb0cb532559e0bf6f5e923202b8eccdd9f6c6aa45c1ef3c7e"
+    },
+    {
+      "from": "LidoSRv3/Audit/Verity/TopupUnboundedCount.lean",
+      "to": "LidoSRv3/Audit/Guarantees/Composition/TopupUnboundedCount.lean",
+      "content_sha256_before_import_rewrites": "1323334be390efb194006a7eca6380fbf66b0540b8e4af36f4a79081c8dd7c6e"
+    },
+    {
+      "from": "LidoSRv3/Audit/Verity/ConsolidationEthUnboundedFuel.lean",
+      "to": "LidoSRv3/Audit/Guarantees/Composition/ConsolidationEthUnboundedFuel.lean",
+      "content_sha256_before_import_rewrites": "2bbb7c2ef75576ad22e7926c4e3befaa3cb5a1c81b5f308eb4c5260c474b63df"
+    },
+    {
+      "from": "LidoSRv3/Audit/Verity/TopupMultiCallBlockCap.lean",
+      "to": "LidoSRv3/Audit/Guarantees/Composition/TopupMultiCallBlockCap.lean",
+      "content_sha256_before_import_rewrites": "6ae9d334d2e2bd34dec9791ebafff38d1dd4e8219b1751af6f740b7cce5f9b04"
+    },
+    {
+      "from": "LidoSRv3/Audit/Provenance/HandwrittenMinFirstOrphaned.lean",
+      "to": "LidoSRv3/Audit/Guarantees/Composition/HandwrittenMinFirstOrphaned.lean",
+      "content_sha256_before_import_rewrites": "3a95493634b17783432b3299d3a9f05c0799390eb99762ede0ceddc634af9cbc"
+    },
+    {
+      "from": "LidoSRv3/Audit/Provenance/CanonicalRequestAddress.lean",
+      "to": "LidoSRv3/Audit/Guarantees/Composition/CanonicalRequestAddress.lean",
+      "content_sha256_before_import_rewrites": "88a9adf0e571a93797db28745e970eb7e7a47be9a91d76ba115dc846d579e06c"
+    },
+    {
+      "from": "LidoSRv3/Audit/Provenance/SszPerfectHashOrphaned.lean",
+      "to": "LidoSRv3/Audit/Guarantees/Composition/SszPerfectHashOrphaned.lean",
+      "content_sha256_before_import_rewrites": "faad057733179c551ce6451e2a367c5ebd43dee458dd1e060876309a9c1f7962"
+    },
+    {
+      "from": "LidoSRv3/Audit/Provenance/AbstractTxIsolation.lean",
+      "to": "LidoSRv3/Audit/Guarantees/Composition/AbstractTxIsolation.lean",
+      "content_sha256_before_import_rewrites": "75f95f1a2a761ae469e0894433614bb8447e5aa9de6acd229a529f923a9c65f8"
+    },
+    {
+      "from": "LidoSRv3/Audit/Provenance/BeaconDepositAddress.lean",
+      "to": "LidoSRv3/Audit/Guarantees/Composition/BeaconDepositAddress.lean",
+      "content_sha256_before_import_rewrites": "5314f1f7fe19f3acffca06ae677807717af74e9bfada7812e524bb4821b7248c"
+    },
+    {
+      "from": "LidoSRv3/Audit/Provenance/SszSha256Isolation.lean",
+      "to": "LidoSRv3/Audit/Guarantees/Composition/SszSha256Isolation.lean",
+      "content_sha256_before_import_rewrites": "72f3b8ffe3cc0b20a00da8037f8afe1c1016ebd53d9789b6db6a035d4f9761fe"
+    },
+    {
+      "from": "LidoSRv3/Audit/Provenance/TopupNoWrapOrphaned.lean",
+      "to": "LidoSRv3/Audit/Guarantees/Composition/TopupNoWrapOrphaned.lean",
+      "content_sha256_before_import_rewrites": "518565e449d8f1080055d26d015fe4656b9e3b835f26b36d66533c8c36aeedd6"
+    },
+    {
+      "from": "LidoSRv3/Audit/Provenance/DepositAbstractTxOrphaned.lean",
+      "to": "LidoSRv3/Audit/Guarantees/Composition/DepositAbstractTxOrphaned.lean",
+      "content_sha256_before_import_rewrites": "394c0b961df2d1ffa0f4dfe170f342de178792970511004e4a9de1f80a13a986"
+    }
+  ],
+  "effect_facades": {
+    "LidoSRv3.Audit.Guarantees.PAddress1WrappedTokenCalls": "LidoSRv3.Audit.Source.Effects.PAddress1WrappedTokenCalls",
+    "LidoSRv3.Audit.Guarantees.PAddress1StETHTransferCalls": "LidoSRv3.Audit.Source.Effects.PAddress1StETHTransferCalls",
+    "LidoSRv3.Audit.Guarantees.PTopupTimingHistory": "LidoSRv3.Audit.Source.Effects.PTopupTimingHistory",
+    "LidoSRv3.Audit.Guarantees.PAddress1PermitRequestCalls": "LidoSRv3.Audit.Source.Effects.PAddress1PermitRequestCalls",
+    "LidoSRv3.Audit.Guarantees.PTopupEntryAdmission": "LidoSRv3.Audit.Source.Effects.PTopupEntryAdmission",
+    "LidoSRv3.Audit.Guarantees.PDeposit1PhysicalAdmission": "LidoSRv3.Audit.Source.Effects.PDeposit1PhysicalAdmission",
+    "LidoSRv3.Audit.Guarantees.PAddress1WrappedTransferCalls": "LidoSRv3.Audit.Source.Effects.PAddress1WrappedTransferCalls",
+    "LidoSRv3.Audit.Guarantees.PAddress1StETHConversionCalls": "LidoSRv3.Audit.Source.Effects.PAddress1StETHConversionCalls",
+    "LidoSRv3.Audit.Guarantees.PAddress1RequestCalls": "LidoSRv3.Audit.Source.Effects.PAddress1RequestCalls",
+    "LidoSRv3.Audit.Guarantees.PAddress1WrappedRequestCalls": "LidoSRv3.Audit.Source.Effects.PAddress1WrappedRequestCalls",
+    "LidoSRv3.Audit.Guarantees.PAddress1StETHQuoteCalls": "LidoSRv3.Audit.Source.Effects.PAddress1StETHQuoteCalls",
+    "LidoSRv3.Audit.Guarantees.PAddress1RequestBatches": "LidoSRv3.Audit.Source.Effects.PAddress1RequestBatches",
+    "LidoSRv3.Audit.Guarantees.PTopupPhysicalCredentialGetter": "LidoSRv3.Audit.Source.Effects.PTopupPhysicalCredentialGetter",
+    "LidoSRv3.Audit.Guarantees.PTopupRouterLocatorCall": "LidoSRv3.Audit.Source.Effects.PTopupRouterLocatorCall",
+    "LidoSRv3.Audit.Guarantees.PTopupMemoryCalls": "LidoSRv3.Audit.Source.Effects.PTopupMemoryCalls",
+    "LidoSRv3.Audit.Guarantees.PTopupCredentialCalls": "LidoSRv3.Audit.Source.Effects.PTopupCredentialCalls",
+    "LidoSRv3.Audit.Guarantees.PDeposit1ModuleCalls": "LidoSRv3.Audit.Source.Effects.PDeposit1ModuleCalls"
+  },
+  "policy": "No theorem statement/name change. Consumer-only proofs belong above implementations. Effect modules have no guarantee imports. Frozen baseline and retirements remain unchanged."
+}

@@ -22,10 +22,10 @@ Remaining obligations:
 - Target/rebalance actions are internal writers. The target setter outer ACL, outer ABI/payable frame setup and broader deployment context remain explicit entry boundaries.
 - Unknown callees and general precompile/gas/LOG ABI/bytecode correspondence remain outside this source-shaped claim.
 
-Targeted validation at `7b22e3a3d021e1447b9e6c112d61f4a95ccc078d` failed as job `aa861c37-c635-40ba-8fdb-b814ee682f9c` on dgx-spark:
+Targeted validation passed at `6044da2ba6a3d8547327889bb6b33f780eeed197` in dgx-spark job `05c5bfba-4727-4be4-bc9a-ab470c21e4d6` (1,273 build jobs):
 
 ```sh
-REMOTE_BUILD_NODE_ID=dgx-spark REMOTE_BUILD_PASSIVE=1 remote-lean-build lake build LidoSRv3.Audit.Guarantees.PReserve1LiveWriters LidoSRv3.Tests.TrioReserve1.Differential LidoSRv3.Tests.TrioReserve1.ReportDifferential LidoSRv3.Tests.TrioReserve1.QueueFinalizeDifferential
+lake build LidoSRv3.Audit.Guarantees.PReserve1LiveWriters LidoSRv3.Tests.TrioReserve1.Differential LidoSRv3.Tests.TrioReserve1.ReportDifferential LidoSRv3.Tests.TrioReserve1.QueueFinalizeDifferential
 ```
 
-Lean v4.31.0 and Verity e977aaad6e1a9e92e0132d41b3d33a14135a4d46 are pinned. The earlier e4a50820 job failed on a reserved identifier. The7b22e3a3 job reached the proof and found a reserved constructor name and a missing execute unfolding in the outcome case split; both are corrected in the working candidate. Revalidation remains pending. Building differential entry modules is not execution of their external harness cases. The historical15-case Solidity RESERVE harness pass applies to its earlier SHA/scope. Combined-SHA validation and fresh independent audit remain required.
+Both history theorems printed only foundational axioms. Earlier failed jobs are retained in the mission receipts; their parser/case-split errors are corrected at this SHA. Lean v4.31.0 and Verity e977aaad6e1a9e92e0132d41b3d33a14135a4d46 are pinned. Building differential entry modules is not execution of their external harness cases. The historical 15-case Solidity RESERVE harness pass applies to its earlier SHA/scope. Combined-SHA validation and fresh independent audit remain required.

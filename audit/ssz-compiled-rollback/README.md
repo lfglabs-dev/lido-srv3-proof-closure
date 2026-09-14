@@ -33,7 +33,7 @@ and consensus stay outside.
 
 | File | Role |
 | --- | --- |
-| `LidoSRv3/Audit/Source/SszCompiledEntryRollback.lean` | Additive theorems |
+| `LidoSRv3/Audit/Guarantees/Composition/SszCompiledEntryRollback.lean` | Additive theorems |
 | `LidoSRv3/Tests/SszCompiledEntryRollbackMutants.lean` | Named kill-lines |
 | `audit/ssz-compiled-rollback/README.md` | This note |
 
@@ -109,7 +109,7 @@ independence.
 ```sh
 lake build LidoSRv3.Audit.Source.SszCompiledEntryRollback
 lake build LidoSRv3.Tests.SszCompiledEntryRollbackMutants
-lake env lean LidoSRv3/Audit/Source/SszCompiledEntryRollback.lean
+lake env lean LidoSRv3/Audit/Guarantees/Composition/SszCompiledEntryRollback.lean
 lake env lean LidoSRv3/Tests/SszCompiledEntryRollbackMutants.lean
 ```
 

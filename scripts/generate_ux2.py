@@ -92,7 +92,6 @@ CLOSERS = ")]}⟩"
 # or equation arm.
 SYMBOL_CHARACTERS = frozenset("!#$%&*+-/<=>?@\\^|~:.")
 
-
 def arm_pipe_at(text: str, index: int) -> bool:
     """Whether the `|` at `index` is a standalone arm-delimiter token."""
     before = text[index - 1] if index else " "

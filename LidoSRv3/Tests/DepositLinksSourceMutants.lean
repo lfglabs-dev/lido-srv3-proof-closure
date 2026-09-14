@@ -1,4 +1,4 @@
-import LidoSRv3.Audit.Source.DepositLinksSource
+import LidoSRv3.Audit.Guarantees.Composition.DepositLinksSource
 import LidoSRv3.Audit.Verity.DepositNFrameTx
 
 /-! P-DEPOSIT-1 router-derived `firstAmount` / `publicKeysBatchLength` vectors. -/

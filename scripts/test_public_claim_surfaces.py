@@ -21,6 +21,8 @@ FILES = (
     "LidoSRv3/Audit/AllGuarantees.lean",
     "LidoSRv3/Audit/Guarantees/PDeposit1.lean",
     "LidoSRv3/Audit/Guarantees/PTopup1.lean",
+    "LidoSRv3/Audit/Guarantees/PDeposit1DsmCall.lean",
+    "LidoSRv3/Audit/Guarantees/PTopupRouterAdmissionCall.lean",
 )
 
 
@@ -64,7 +66,7 @@ with tempfile.TemporaryDirectory() as tmp:
     original = readme.read_text(encoding="utf-8")
     readme.write_text(
         original.replace(
-            "| 3 | `P-DEPOSIT-1` | CHECKED | CHECKED — composed finite list-batch executable transaction |",
+            "| 3 | `P-DEPOSIT-1` | CHECKED | CHECKED — actual DSM/module/withdrawal/beacon execution |",
             "| 3 | `P-DEPOSIT-1` | CHECKED | PARTIAL |",
             1,
         ),

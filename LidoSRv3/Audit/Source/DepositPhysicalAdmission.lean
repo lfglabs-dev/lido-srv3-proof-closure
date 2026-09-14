@@ -1,4 +1,4 @@
-import LidoSRv3.Audit.Guarantees.PDeposit1ModuleCalls
+import LidoSRv3.Audit.Source.Effects.PDeposit1ModuleCalls
 
 /-! Additive physical admission adapter for StakingRouter.deposit, core@17005714.
 DSM locator resolution and selected allocation are existing explicit boundaries.

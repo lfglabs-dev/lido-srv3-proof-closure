@@ -1,4 +1,4 @@
-import LidoSRv3.Audit.Verity.ConsolidationEthUnboundedFuel
+import LidoSRv3.Audit.Guarantees.Composition.ConsolidationEthUnboundedFuel
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 
 /-! # P-CONSOLIDATION-ETH-1 fee STATICCALL naming scaffold
@@ -12,7 +12,7 @@ The registered Verity parent of P-CONSOLIDATION-ETH-1
 _fuel_under_bus_ceiling`) takes `feePerRequest : Nat` as a free
 input. The pinned Solidity's fee is read via `STATICCALL` on the
 `CONSOLIDATION_REQUEST` immutable at
-`contracts/0.8.9/vaults/WithdrawalVaultEIP7685.sol:79-81` →
+`contracts/0.8.9/WithdrawalVaultEIP7685.sol:79-81` →
 `_getFeeFromContract(CONSOLIDATION_REQUEST)` (per the pinned
 Solidity 17005714).
 

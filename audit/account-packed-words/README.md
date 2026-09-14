@@ -82,7 +82,7 @@ Mutant kill-lines: `propext` / `Quot.sound` / `Classical.choice`. Sample `native
 lake build LidoSRv3.Audit.Source.AccountPackedWords
 lake build LidoSRv3.Tests.AccountPackedWordsMutants
 lake build LidoSRv3Test
-lake env lean LidoSRv3/Audit/Source/AccountPackedWords.lean
+lake env lean LidoSRv3/Audit/Guarantees/Composition/AccountPackedWords.lean
 lake env lean LidoSRv3/Tests/AccountPackedWordsMutants.lean
 ```
 

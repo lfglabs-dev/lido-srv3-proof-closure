@@ -88,7 +88,7 @@ same as `Topup2DistributionTxMutants`.
 ```
 lake build LidoSRv3.Audit.Source.TopupKeccakOracle
 lake build LidoSRv3.Tests.TopupKeccakOracleMutants
-lake env lean LidoSRv3/Audit/Source/TopupKeccakOracle.lean
+lake env lean LidoSRv3/Audit/Guarantees/Composition/TopupKeccakOracle.lean
 lake env lean LidoSRv3/Tests/TopupKeccakOracleMutants.lean
 ```
 

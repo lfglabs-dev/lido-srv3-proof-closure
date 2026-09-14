@@ -10,30 +10,32 @@ import subprocess
 import tempfile
 from source_span_test_cases import check_invalid_annotations, write, invoke
 from pathlib import Path
+from test_metadata_history import preserve_historical_inputs, restore_candidate_inputs
+
 ROOT = Path(__file__).resolve().parents[1]
 def reject_html_stage_a_families(reject, module):
     """A Stage A heading inside any CommonMark HTML block is invisible."""
-    table_then_type_7 = "| heading |\n| --- |\n| body |\n{}\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n\n"
+    table_then_type_7 = "| heading |\n| --- |\n| body |\n{}\n## Stage A disclosure\n\nAll 84 canonical fidelity-gap entries remain.\n\n"
     nested_table_then_type_7 = (
         "- list item\n\n{}| heading |\n{}| --- |\n{}| body |\n"
         "<span>\n## Stage A disclosure\n\n"
-        "All 68 canonical fidelity-gap entries remain.\n\n"
+        "All 84 canonical fidelity-gap entries remain.\n\n"
     )
-    list_marker_table_then_type_7 = "- | heading |\n  | --- |\n  | body |\n<span>\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n\n"
+    list_marker_table_then_type_7 = "- | heading |\n  | --- |\n  | body |\n<span>\n## Stage A disclosure\n\nAll 84 canonical fidelity-gap entries remain.\n\n"
     table_then_indented_code_then_type_7 = (
         "| heading |\n| --- |\n| body |\n{}code\n"
         "<span>\n## Stage A disclosure\n\n"
-        "All 68 canonical fidelity-gap entries remain.\n\n"
+        "All 84 canonical fidelity-gap entries remain.\n\n"
     )
     bodies = (
-        "<pre>\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n</pre>\n\n",
-        "<?stage-a\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n?>\n\n",
-        "<![CDATA[\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n]]>\n\n",
-        "<!--\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n-->\n\n",
-        "<div>\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n\n",
-        "<stage-a>\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n\n",
-        "Prelude\n=======\n<span>\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n\n",
-        *(table_then_type_7.format(tag) for tag in ("<span>", "</span>", "<stage-a data-gap=\"68\">")),
+        "<pre>\n## Stage A disclosure\n\nAll 84 canonical fidelity-gap entries remain.\n</pre>\n\n",
+        "<?stage-a\n## Stage A disclosure\n\nAll 84 canonical fidelity-gap entries remain.\n?>\n\n",
+        "<![CDATA[\n## Stage A disclosure\n\nAll 84 canonical fidelity-gap entries remain.\n]]>\n\n",
+        "<!--\n## Stage A disclosure\n\nAll 84 canonical fidelity-gap entries remain.\n-->\n\n",
+        "<div>\n## Stage A disclosure\n\nAll 84 canonical fidelity-gap entries remain.\n\n",
+        "<stage-a>\n## Stage A disclosure\n\nAll 84 canonical fidelity-gap entries remain.\n\n",
+        "Prelude\n=======\n<span>\n## Stage A disclosure\n\nAll 84 canonical fidelity-gap entries remain.\n\n",
+        *(table_then_type_7.format(tag) for tag in ("<span>", "</span>", "<stage-a data-gap=\"84\">")),
         *(nested_table_then_type_7.format(" " * indent, " " * indent, " " * indent)
           for indent in (4, 5)),
         list_marker_table_then_type_7,
@@ -58,6 +60,7 @@ def main():
         (fixture / "LidoSRv3/Audit/Provenance").mkdir(parents=True)
         (fixture / "fixtures/solidity-reference").mkdir(parents=True)
         shutil.copy2(ROOT / "scripts/audit_metadata.py", fixture / "scripts/audit_metadata.py")
+        shutil.copy2(ROOT / "scripts/candidate_metadata.py", fixture / "scripts/candidate_metadata.py")
         shutil.copy2(ROOT / "scripts/gfm_table.py", fixture / "scripts/gfm_table.py")
         shutil.copy2(ROOT / "scripts/markdown_text.py", fixture / "scripts/markdown_text.py")
         shutil.copy2(ROOT / "scripts/trio_report.py", fixture / "scripts/trio_report.py")
@@ -76,9 +79,11 @@ def main():
         subprocess.run(["git", "init", "--quiet"], cwd=fixture, check=True)
         subprocess.run(["git", "config", "user.email", "audit-test@example.invalid"], cwd=fixture, check=True)
         subprocess.run(["git", "config", "user.name", "audit metadata test"], cwd=fixture, check=True)
+        current_inputs = preserve_historical_inputs(fixture)
         subprocess.run(["git", "add", "."], cwd=fixture, check=True)
         subprocess.run(["git", "commit", "--quiet", "-m", "R1 review basis"], cwd=fixture, check=True)
         fixture_review_base = subprocess.run(["git", "rev-parse", "HEAD"], cwd=fixture, check=True, text=True, stdout=subprocess.PIPE).stdout.strip()
+        restore_candidate_inputs(fixture, current_inputs)
         audit_script = fixture / "scripts/audit_metadata.py"
         audit_source = audit_script.read_text(encoding="utf-8")
         rebased_source, substitutions = re.subn(
@@ -105,22 +110,19 @@ def main():
         invoke(fixture, True)
         invoke(fixture, True, command="check")
         source_fidelity = fpath.read_text(encoding="utf-8")
-        stale = re.sub(r"all\s+68\s+canonical\s+fidelity-gap\s+entries\s+remain\.", "all 67 canonical fidelity-gap entries remain.", source_fidelity)
+        stale = re.sub(r"all\s+84\s+canonical\s+fidelity-gap\s+entries\s+remain\.", "all 83 canonical fidelity-gap entries remain.", source_fidelity)
         fpath.write_text(stale, encoding="utf-8"); invoke(fixture, False, "SOURCE-FIDELITY: Stage A disclosure lead paragraph must visibly disclose all canonical fidelity gaps")
-        fpath.write_text(stale + "\n## Elsewhere\n\nAll 68 canonical fidelity-gap entries remain.\n", encoding="utf-8"); invoke(fixture, False, "SOURCE-FIDELITY: Stage A disclosure lead paragraph must visibly disclose all canonical fidelity gaps")
-        later_stage_a = stale.replace("and does not satisfy the source-model completion gates for B–F.\n", "and does not satisfy the source-model completion gates for B–F.\n\nA later Stage A paragraph says all 68 canonical fidelity-gap entries remain.\n", 1)
+        fpath.write_text(stale + "\n## Elsewhere\n\nAll 84 canonical fidelity-gap entries remain.\n", encoding="utf-8"); invoke(fixture, False, "SOURCE-FIDELITY: Stage A disclosure lead paragraph must visibly disclose all canonical fidelity gaps")
+        later_stage_a = stale.replace("and does not satisfy the source-model completion gates for B–F.\n", "and does not satisfy the source-model completion gates for B–F.\n\nA later Stage A paragraph says all 84 canonical fidelity-gap entries remain.\n", 1)
         fpath.write_text(later_stage_a, encoding="utf-8"); invoke(fixture, False, "SOURCE-FIDELITY: Stage A disclosure lead paragraph must visibly disclose all canonical fidelity gaps")
-        duplicate_stage_a = source_fidelity.replace("## Stage A disclosure\n", "## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n\n## Stage A disclosure\n", 1)
+        duplicate_stage_a = source_fidelity.replace("## Stage A disclosure\n", "## Stage A disclosure\n\nAll 84 canonical fidelity-gap entries remain.\n\n## Stage A disclosure\n", 1)
         fpath.write_text(duplicate_stage_a, encoding="utf-8"); invoke(fixture, False, "SOURCE-FIDELITY: require exactly one visible Stage A disclosure section")
         def reject_hidden_stage_a(hidden):
             fpath.write_text(hidden + stale, encoding="utf-8")
             invoke(fixture, False, "SOURCE-FIDELITY: Stage A disclosure lead paragraph must visibly disclose all canonical fidelity gaps")
-        reject_hidden_stage_a("```markdown\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n```\n\n")
-        reject_hidden_stage_a("<!--\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n-->\n\n")
-        # A type-7 tag may not interrupt prose, but it does start raw HTML
-        # immediately after a table (including a list-contained table).  Each
-        # of these used to select the invisible heading as Stage A and borrow
-        # the visible sentence after its blank terminator.
+        reject_hidden_stage_a("```markdown\n## Stage A disclosure\n\nAll 84 canonical fidelity-gap entries remain.\n```\n\n")
+        reject_hidden_stage_a("<!--\n## Stage A disclosure\n\nAll 84 canonical fidelity-gap entries remain.\n-->\n\n")
+        # Reject an invisible Stage A heading borrowing later visible text.
         for prefix in (
             "| A | B |\n| --- | --- |\n| 1 | 2 |\n",
             "- item\n\n    | A | B |\n    | --- | --- |\n    | 1 | 2 |\n",
@@ -144,7 +146,7 @@ def main():
         for mutate in cell_families:
             x = copy.deepcopy(guarantees)
             mutate(x["guarantees"][11])
-            report = module.rendered(x["guarantees"], source)["R1-FINAL-AUDITOR-REPORT.md"]
+            report = module.rendered(x["guarantees"], source)["CANDIDATE-ASSURANCE-REPORT.md"]
             escaped_row = next(line for line in report.splitlines() if "left\\|\\|right" in line)
             if len(re.findall(r"(?<!\\)\|", escaped_row)) != 6:
                 raise AssertionError(f"metadata pipe escaped into table structure:\n{escaped_row}")
@@ -160,7 +162,7 @@ def main():
                        set_assumptions, set_missing, set_next_gate):
             x = copy.deepcopy(guarantees)
             mutate(x["guarantees"][11])
-            report = module.rendered(x["guarantees"], source)["R1-FINAL-AUDITOR-REPORT.md"]
+            report = module.rendered(x["guarantees"], source)["CANDIDATE-ASSURANCE-REPORT.md"]
             carriers = [line for line in report.splitlines() if "left||right" in line]
             if not carriers:
                 raise AssertionError("qualifying metadata never reached the expanded report")
@@ -172,12 +174,12 @@ def main():
         x = copy.deepcopy(guarantees)
         x["guarantees"][11]["summary"] += " changed"
         write(gpath, x)
-        invoke(fixture, False, "R1 review basis input family differs for audit/guarantees.yaml")
+        invoke(fixture, False, "candidate input family differs for audit/guarantees.yaml")
         write(gpath, guarantees)
         x = copy.deepcopy(source)
         x["targets"][0]["spans"][0]["function"] += " changed"
         write(spath, x)
-        invoke(fixture, False, "R1 review basis input family differs for audit/source-map.yaml")
+        invoke(fixture, False, "candidate input family differs for audit/source-map.yaml")
         write(spath, source)
         changed_guarantees = copy.deepcopy(guarantees)
         changed_guarantees["guarantees"][11]["summary"] += " synchronized family change"
@@ -185,7 +187,7 @@ def main():
         changed_source["targets"][0]["spans"][0]["function"] += " synchronized family change"
         write(gpath, changed_guarantees)
         write(spath, changed_source)
-        invoke(fixture, False, "R1 review basis input family differs for audit/guarantees.yaml")
+        invoke(fixture, False, "candidate input family differs for audit/guarantees.yaml")
         write(gpath, guarantees)
         write(spath, source)
         # A valid widened Trust allowlist must fail the review-basis binding.
@@ -195,8 +197,8 @@ def main():
             "._native.native_decide.ax_1_1\n"
         )
         tpath.write_text(widened, encoding="utf-8")
-        invoke(fixture, False, "R1 review basis input family differs for audit/trust-native-decide-allowlist.txt")
-        invoke(fixture, False, "R1 review basis input family differs for audit/trust-native-decide-allowlist.txt",
+        invoke(fixture, False, "candidate input family differs for audit/trust-native-decide-allowlist.txt")
+        invoke(fixture, False, "candidate input family differs for audit/trust-native-decide-allowlist.txt",
                command="check")
         tpath.write_text(trust_allowlist, encoding="utf-8")
 
@@ -268,11 +270,11 @@ def main():
         none_row["classification"]["consumer"] = "P-ALLOC-1"; mutants.append((gpath, x, "NONE may not hide extra claims"))
         x = copy.deepcopy(guarantees); x["guarantees"][6]["fidelity"]["missing"] = ["unclosed leg"]; x["guarantees"][6]["classification"] = {"kind":"PROPERTY_FALSE"}; mutants.append((gpath, x, "lacks counterexample"))
         x = copy.deepcopy(guarantees); x["guarantees"][6]["verity"] = {"status":"OPEN", "theorem":None}; x["guarantees"][6]["fidelity"]["missing"] = ["recursive dispatch absent"]; x["guarantees"][6]["classification"] = {"kind":"IMPLEMENTATION_PENDING", "work":"compose the ensemble"}; mutants.append((gpath, x, "canonical assurance claim differs"))
-        x = copy.deepcopy(guarantees); x["guarantees"][3]["assumptions"].remove("A-TOPUP-NOWRAP"); mutants.append((gpath, x, "canonical assurance claim differs"))
+        x = copy.deepcopy(guarantees); x["guarantees"][3]["assumptions"].remove("A-SOURCE-SHAPED"); mutants.append((gpath, x, "canonical assurance claim differs"))
         x = copy.deepcopy(guarantees); x["guarantees"][0]["next_gate"] = "Refine through generated Yul and EVM."; mutants.append((gpath, x, "canonical assurance detail differs"))
-        x = copy.deepcopy(guarantees); live_rollback_gap = module.P_ALLOC1_LIVE_ROLLBACK_GAP
+        x = copy.deepcopy(guarantees); live_rollback_gap = x["guarantees"][0]["fidelity"]["missing"][0]
         x["guarantees"][0]["fidelity"]["missing"].remove(live_rollback_gap); x["guarantees"][0]["fidelity"]["covered"].append(live_rollback_gap)
-        mutants.append((gpath, x, "P-ALLOC-1: live rollback exclusion must be an open fidelity gap"))
+        mutants.append((gpath, x, "P-ALLOC-1: canonical assurance detail differs"))
         x = copy.deepcopy(guarantees); x["guarantees"][0]["special_bindings"] = guarantees["guarantees"][10]["special_bindings"]; mutants.append((gpath, x, "bindings are SSZ-only"))
         x = copy.deepcopy(guarantees); x["guarantees"][10]["special_bindings"]["deployed_yul"]["scope"] = "entire runtime"; mutants.append((gpath, x, "targeted deployed-Yul binding differs"))
         x = copy.deepcopy(guarantees); x["guarantees"][5]["fidelity"]["missing"] = ["hidden gap"]; x["guarantees"][5]["classification"] = {"kind":"NONE"}; mutants.append((gpath, x, "NONE is reserved"))
@@ -304,14 +306,14 @@ def main():
         readme_path = fixture / "README.md"
         readme = readme_path.read_text(encoding="utf-8")
         for mutated, needle in (
-            (readme.replace("| 1 | `P-ALLOC-1` | CHECKED | CHECKED | 4 open |",
+            (readme.replace("| 1 | `P-ALLOC-1` | CHECKED | CHECKED | 6 open |",
                             "| 1 | `P-ALLOC-1` | CHECKED | CHECKED | 0 open |"),
              "P-ALLOC-1 discloses 0 fidelity gaps"),
-            (readme.replace("| 1 | `P-ALLOC-1` | CHECKED | CHECKED | 4 open |",
+            (readme.replace("| 1 | `P-ALLOC-1` | CHECKED | CHECKED | 6 open |",
                             "| 1 | `P-ALLOC-1` | CHECKED | CHECKED |"),
              "P-ALLOC-1 row is missing its `N open` fidelity-gap cell"),
-            (readme.replace("68 in total", "some in total"),
-             "must render the 68 total fidelity gaps as visible text"),
+            (readme.replace("84 in total", "some in total"),
+             "must render the 84 total fidelity gaps as visible text"),
             (readme.replace("not about a deployed contract", "about a deployed contract"),
              "must render the model-vs-deployed boundary as visible text"),
         ):
@@ -363,9 +365,7 @@ def main():
             invoke(fixture, False, f"README: {claim_id} row is missing its `N open`")
             readme_path.write_text(readme, encoding="utf-8")
 
-        # A row the registry does not record as canonical, printed inside the
-        # headline table: the table must disclose the canonical claims and no
-        # more, or it publishes a gap count that stands behind nothing.
+        # Reject a headline row outside the canonical registry.
         foreign = "| 99 | `P-NOT-CANONICAL-1` | CHECKED | CHECKED | 4 open |"
         readme_path.write_text(readme.replace(rows[-1], f"{rows[-1]}\n{foreign}", 1),
                                encoding="utf-8")
@@ -423,8 +423,8 @@ def main():
         block = opening.group("block")
         title = readme.split("\n", 1)[0]
         for sentence, muted, needle in (
-            ("68 in total", "counted below",
-             "headline blockquote must render the 68 total fidelity gaps as visible text"),
+            ("84 in total", "counted below",
+             "headline blockquote must render the 84 total fidelity gaps as visible text"),
             ("not about a deployed contract", "about a Lean model",
              "headline blockquote must render the model-vs-deployed boundary as "
              "visible text"),
@@ -503,7 +503,7 @@ def main():
             # Thread r3909320734: a full or collapsed reference link names its
             # definition in a second bracket group, which renders as nothing.
             # Recognising only the `(` form left the whole sentence standing in
-            # `[details][not about a deployed contract; 68 in total]` as if a
+            # `[details][not about a deployed contract; 84 in total]` as if a
             # reader met it.  The definition is appended so the link really does
             # form and CommonMark really does render only "details".
             readme_path.write_text(
@@ -578,7 +578,7 @@ def main():
             readme.replace(title, "# Renamed Heading", 1),
             readme.replace(block, f"{block}> - An extra headline note.\n", 1),
             f"{readme}\n## Appendix\n\nRestated: these are proofs "
-            "not about a deployed contract, with 68 in total.\n",
+            "not about a deployed contract, with 84 in total.\n",
         ):
             if still_qualified == readme:
                 raise AssertionError("headline-block control changed nothing")
@@ -590,7 +590,7 @@ def main():
         # the gate would reject a headline a reader plainly meets and no edit to
         # the README could satisfy it.  Each sentence is muted in place and
         # restated in a form whose rendered characters still spell it exactly.
-        for sentence, muted in (("68 in total", "counted below"),
+        for sentence, muted in (("84 in total", "counted below"),
                                 ("not about a deployed contract", "about a Lean model")):
             muted_block = block.replace(sentence, muted, 1)
             for restated in (

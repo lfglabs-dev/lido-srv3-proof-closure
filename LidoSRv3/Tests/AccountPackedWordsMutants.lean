@@ -1,4 +1,4 @@
-import LidoSRv3.Audit.Source.AccountPackedWords
+import LidoSRv3.Audit.Guarantees.Composition.AccountPackedWords
 import LidoSRv3.Audit.Verity.HandleOracleReportTx
 
 /-!

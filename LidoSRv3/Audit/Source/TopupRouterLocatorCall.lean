@@ -1,4 +1,4 @@
-import LidoSRv3.Audit.Guarantees.PTopupTimingHistory
+import LidoSRv3.Audit.Source.Effects.PTopupTimingHistory
 
 /-! core17005714 TopUpGateway: typed length and temporal admission precede
 an actual LOCATOR.stakingRouter STATICCALL. Its canonical address is consumed

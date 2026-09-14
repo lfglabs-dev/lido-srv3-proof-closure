@@ -20,7 +20,7 @@ Pinned Solidity (17005714):
 - `_claim` → value CALL to `_recipient` at
   `contracts/0.8.9/WithdrawalQueueBase.sol:472`.
 - `unwrap` → `stETH.transfer(msg.sender, stETHAmount)` at
-  `contracts/0.4.24/WstETH.sol:73`.
+  `contracts/0.6.12/WstETH.sol:73`.
 - `transferFrom` → no external call (Transfer event only) at
   `contracts/0.8.9/WithdrawalQueueERC721.sol:248`.
 

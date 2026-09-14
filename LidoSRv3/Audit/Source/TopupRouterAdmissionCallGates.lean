@@ -1,4 +1,4 @@
-import LidoSRv3.Audit.Guarantees.PTopupEntryAdmission
+import LidoSRv3.Audit.Source.Effects.PTopupEntryAdmission
 import LidoSRv3.Audit.Source.DepositPhysicalAdmission
 
 /-! core17005714 StakingRouter.topUp admission at the post-root/pre-module

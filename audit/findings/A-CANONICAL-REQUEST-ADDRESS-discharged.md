@@ -47,7 +47,7 @@ still matches (this is the exact `A-RUNTIME-PROVENANCE` check for
 this immutable).
 
 The Lean proof lives in
-`LidoSRv3/Audit/Provenance/CanonicalRequestAddress.lean` and is
+`LidoSRv3/Audit/Guarantees/Composition/CanonicalRequestAddress.lean` and is
 composed of three theorems (all depending only on
 `{propext, Classical.choice, Quot.sound}`):
 
@@ -80,7 +80,7 @@ composed of three theorems (all depending only on
 - Extended `audit/artifacts.lock.json` with the
   `deployed_bytecode.WithdrawalVault_implementation` entry (proxy,
   implementation, fixture path/size/SHA-256, immutable extraction).
-- Added `LidoSRv3/Audit/Provenance/CanonicalRequestAddress.lean` with
+- Added `LidoSRv3/Audit/Guarantees/Composition/CanonicalRequestAddress.lean` with
   the three theorems above.
 - Registered the three theorems in `LidoSRv3/Audit/Trust.lean`.
 - Removed `A-CANONICAL-REQUEST-ADDRESS` from `audit/assumptions.yaml`

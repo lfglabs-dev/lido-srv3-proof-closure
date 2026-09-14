@@ -20,7 +20,7 @@ do **not** consume the caller-supplied premise
 registry text already records that `PerfectDepositEncoding` "is used only
 by the unregistered uniqueness child" (`deposit_unique_of_perfect`).
 
-## Proof (see `LidoSRv3/Audit/Provenance/SszPerfectHashOrphaned.lean`)
+## Proof (see `LidoSRv3/Audit/Guarantees/Composition/SszPerfectHashOrphaned.lean`)
 
 Three theorems exhibit the orphanage:
 

@@ -1,0 +1,428 @@
+{
+  "baseline": "8337eab3437dfb6acdfdfc9d39d2ad1fbfd2af56",
+  "baseline_count": 437,
+  "baseline_digest": "28faccb0936fbc01016c5e80d42b76855faa3263631fff119e72f58783a464e7",
+  "current_count": 436,
+  "current_digest": "67bd2e83220ae5cd3d092ad8e32f26395033717c54dbce92676477bbe2f24ed3",
+  "removed_records": [
+    [
+      "LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean",
+      549,
+      "fun _ => by native_decide, by native_decide,"
+    ],
+    [
+      "LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean",
+      553,
+      "by native_decide, by native_decide, by native_decide, by native_decide,"
+    ],
+    [
+      "LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean",
+      554,
+      "by native_decide, rfl\u27e9,"
+    ],
+    [
+      "LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean",
+      555,
+      "by native_decide, ?_\u27e9"
+    ],
+    [
+      "LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean",
+      557,
+      "exact hFeeNe (by native_decide)"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      58,
+      "[[word 11, word 21]], word 1, word 3\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      64,
+      "[[word 11, word 21]], word 1, word 3\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      70,
+      "[[word 11, word 21]], word 1, word 3\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      76,
+      "[], word 1, word 3\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      83,
+      "[[word 11, word 21]], word 1, word 3\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      89,
+      "\u27e8.reverted, [], [], [], 0, 0\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      95,
+      "[[word 11, word 21]], word 1, word 3\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      104,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      120,
+      "[[word 12, word 22]], word 2, word 3\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      132,
+      "[[word 12, word 22]], word 1, word 3\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      139,
+      "\u27e8.reverted, [], [], [], 0, 0\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      150,
+      "\u27e8.reverted, [], [], [], 0, 0\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      155,
+      "\u27e8.reverted, [], [], [], 0, 0\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      166,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      227,
+      "by native_decide, by native_decide, by native_decide,"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      228,
+      "by native_decide, by native_decide, by native_decide\u27e9"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      248,
+      "by native_decide, by native_decide, by native_decide,"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      249,
+      "by native_decide, by native_decide, by native_decide\u27e9"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      273,
+      "by native_decide, by native_decide, by native_decide,"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      274,
+      "by native_decide, by native_decide, by native_decide,"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      275,
+      "by native_decide\u27e9"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      293,
+      "entry_credit_overflow_reverts _ _ _ (by native_decide)"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      300,
+      "\u27e8.reverted, [], [], [], 0, 0\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      309,
+      "[[word 11, word 21]], word 1, word 3\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      316,
+      "entry_credit_overflow_reverts _ _ _ (by native_decide)"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      325,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/PackFConsolidationObserveMutants.lean",
+      67,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/Topup2DistributionTxMutants.lean",
+      29,
+      "\u27e8.committed, words [6, 4], word 0, word 10\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/Topup2DistributionTxMutants.lean",
+      37,
+      "\u27e8.committed, words [6, 5], word 0, word 11\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/Topup2DistributionTxMutants.lean",
+      44,
+      "\u27e8.committed, words [32], word 68, word 32\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/Topup2DistributionTxMutants.lean",
+      51,
+      "\u27e8.reverted, words [0], word 100, word 0\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/Topup2DistributionTxMutants.lean",
+      63,
+      "\u27e8.committed, words [0, 0], word 0, word 0\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/Topup2DistributionTxMutants.lean",
+      75,
+      "\u27e8.committed, words [6], word 0, word 6\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/Topup2DistributionTxMutants.lean",
+      83,
+      "\u27e8.reverted, [word 0], word 100, word 0\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/Topup2DistributionTxMutants.lean",
+      91,
+      "\u27e8.committed, [word 0], word 100, word 0\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TopupKeccakOracleMutants.lean",
+      100,
+      "(by native_decide) (by native_decide)"
+    ],
+    [
+      "LidoSRv3/Tests/TopupKeccakOracleMutants.lean",
+      122,
+      "(by native_decide) (by native_decide)"
+    ]
+  ],
+  "added_records": [
+    [
+      "LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean",
+      758,
+      "fun _ => by native_decide, by native_decide,"
+    ],
+    [
+      "LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean",
+      762,
+      "by native_decide, by native_decide, by native_decide, by native_decide,"
+    ],
+    [
+      "LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean",
+      763,
+      "by native_decide, rfl\u27e9,"
+    ],
+    [
+      "LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean",
+      764,
+      "by native_decide, ?_\u27e9"
+    ],
+    [
+      "LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean",
+      766,
+      "exact hFeeNe (by native_decide)"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      59,
+      "[[word 11, word 21]], word 1, word 3\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      65,
+      "[[word 11, word 21]], word 1, word 3\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      71,
+      "[[word 11, word 21]], word 1, word 3\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      77,
+      "[], word 1, word 3\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      84,
+      "[[word 11, word 21]], word 1, word 3\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      90,
+      "\u27e8.reverted, [], [], [], 0, 0\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      96,
+      "[[word 11, word 21]], word 1, word 3\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      105,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      122,
+      "[[word 12, word 22]], word 2, word 3\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      135,
+      "[[word 12, word 22]], word 1, word 3\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      143,
+      "\u27e8.reverted, [], [], [], 0, 0\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      154,
+      "\u27e8.reverted, [], [], [], 0, 0\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      159,
+      "\u27e8.reverted, [], [], [], 0, 0\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      170,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      240,
+      "by native_decide, by native_decide, by native_decide,"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      241,
+      "by native_decide, by native_decide, by native_decide\u27e9"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      258,
+      "by native_decide, by native_decide, by native_decide,"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      259,
+      "by native_decide, by native_decide, by native_decide\u27e9"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      279,
+      "by native_decide, by native_decide, by native_decide,"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      280,
+      "by native_decide, by native_decide, by native_decide,"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      281,
+      "by native_decide\u27e9"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      299,
+      "entry_credit_overflow_reverts_slotFree _ _ _ (by native_decide)"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      307,
+      "\u27e8.reverted, [], [], [], 0, 0\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      317,
+      "[[word 11, word 21]], word 1, word 3\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      324,
+      "entry_credit_overflow_reverts_slotFree _ _ _ (by native_decide)"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      333,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/Topup2DistributionTxMutants.lean",
+      30,
+      "\u27e8.committed, words [6, 4], word 0, word 10\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/Topup2DistributionTxMutants.lean",
+      38,
+      "\u27e8.committed, words [6, 5], word 0, word 11\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/Topup2DistributionTxMutants.lean",
+      45,
+      "\u27e8.committed, words [32], word 68, word 32\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/Topup2DistributionTxMutants.lean",
+      52,
+      "\u27e8.reverted, words [0], word 100, word 0\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/Topup2DistributionTxMutants.lean",
+      64,
+      "\u27e8.committed, words [0, 0], word 0, word 0\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/Topup2DistributionTxMutants.lean",
+      76,
+      "\u27e8.committed, words [6], word 0, word 6\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/Topup2DistributionTxMutants.lean",
+      84,
+      "\u27e8.reverted, [word 0], word 100, word 0\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/Topup2DistributionTxMutants.lean",
+      92,
+      "\u27e8.committed, [word 0], word 100, word 0\u27e9 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TopupKeccakOracleMutants.lean",
+      107,
+      "(by native_decide) (by native_decide)"
+    ],
+    [
+      "LidoSRv3/Tests/TopupKeccakOracleMutants.lean",
+      132,
+      "(by native_decide) (by native_decide)"
+    ]
+  ],
+  "classification": "Inventory synchronization only. No new native sites or kernel proof credit. Current inventory equals inherited integration 1a84e37d9a5ab91dc80de37db6da2a6d90bdb365.",
+  "removed_test": "PackFConsolidationObserveMutants used synthetic count/fee/source/target observation storage removed by the inherited slot-removal work; it cannot apply to the slot-free runner."
+}

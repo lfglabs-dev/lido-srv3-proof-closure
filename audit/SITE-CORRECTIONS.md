@@ -43,7 +43,7 @@ Additional signal chantier 1 (mandate 2026-09-12) reinstated as
 `fidelity.missing`:
 
 > live `WithdrawalQueue.unfinalizedStETH()` STATICCALL —
-> `LidoSRv3/Audit/Source/ReserveUnfinalizedCall.lean` is a consumer
+> `LidoSRv3/Audit/Guarantees/Composition/ReserveUnfinalizedCall.lean` is a consumer
 > that derives `freshQueueCache` from a live STATICCALL, but the
 > registered parent still takes `freshQueueCache` as a hypothesis.
 > RECLASSED not discharged (PR #408 was a rename, not a change to

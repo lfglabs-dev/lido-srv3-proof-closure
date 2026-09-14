@@ -257,7 +257,7 @@ existed)
    Residual: pinned `StakingRouter.topUp` caller-shape.
 2. **CONSOLIDATION-ETH-1 batchSize** — PR #438.
    New consumer `verity_tx_success_at_derived_fuel_under_bus_ceiling`
-   in `LidoSRv3/Audit/Verity/ConsolidationEthUnboundedFuel.lean`.
+   in `LidoSRv3/Audit/Guarantees/Composition/ConsolidationEthUnboundedFuel.lean`.
    Names `mainnetBusBatchCeiling = 200`. Consumes grok #410
    `verity_tx_success_shape_unbounded`. Residual: live-Bus binding.
 3. **ALLOC-1 CheckedBounds `target_multiplication` conjunct** —
