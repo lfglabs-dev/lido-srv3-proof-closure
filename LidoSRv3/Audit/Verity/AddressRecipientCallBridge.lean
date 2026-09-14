@@ -621,11 +621,11 @@ def ClaimEffect (callee : External) (ctx : Context) (requestId hint : Nat)
       .success payout removed ∧ payout ≤ (removed.readSlot lockedEtherAmountPosition).val ∧
       dirty = removed.writeSlot lockedEtherAmountPosition
         (.ofNat ((removed.readSlot lockedEtherAmountPosition).val - payout))) ∧
-    (∀ slot, (AccountFrame.commit ctx.self before.core dirty).readContractSlot ctx.self.val slot =
-      dirty.readSlot slot) ∧
-    (∀ other slot, other ≠ ctx.self.val →
-      (AccountFrame.commit ctx.self before.core dirty).readContractSlot other slot =
-        before.core.readContractSlot other slot) ∧
+    (∀ (wordIndex : Nat), (AccountFrame.commit ctx.self before.core dirty).readContractSlot ctx.self.val wordIndex =
+      dirty.readSlot wordIndex) ∧
+    (∀ (other wordIndex : Nat), other ≠ ctx.self.val →
+      (AccountFrame.commit ctx.self before.core dirty).readContractSlot other wordIndex =
+        before.core.readContractSlot other wordIndex) ∧
     PayoutEffect callee ctx recipient payout {before with core := AccountFrame.commit ctx.self before.core dirty} called attempts ∧
     after = claimEvents ctx requestId recipient payout called
 
