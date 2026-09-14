@@ -50,10 +50,10 @@ theorem claim_rejects_unqualified_finalization :
 /-- The structural frame law includes account zero, rather than requiring all
 participants to be nonzero or reducing the world to one actor. -/
 theorem foreign_account_preserved (ctx : Live.Context) (before localState : ContractState)
-    (other slot : Nat) (different : other ≠ ctx.self.val) :
-    (AccountFrame.commit ctx.self before localState).readContractSlot other slot =
-      before.readContractSlot other slot :=
-  AccountFrame.commit_other_account ctx.self before localState other slot different
+    (other wordIndex : Nat) (different : other ≠ ctx.self.val) :
+    (AccountFrame.commit ctx.self before localState).readContractSlot other wordIndex =
+      before.readContractSlot other wordIndex :=
+  AccountFrame.commit_other_account ctx.self before localState other wordIndex different
 
 #print axioms finalization_write_reaches_claim_frame
 #print axioms locked_write_reaches_claim_frame
