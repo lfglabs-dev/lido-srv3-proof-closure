@@ -1,5 +1,44 @@
 # P-SSZ-1
 
+The current registered executable parent is
+`LidoSRv3.Audit.Guarantees.PSsz1.actual_compiled_cl_entry_complete_declared_branch`
+in `PSsz1DeclaredSiblings.lean`. The registered abstract parent remains
+`real_validator_correspondence`. No SSZ theorem was changed by this integration.
+
+The executable parent consumes `SszCompiledClEntry.run`: actual calldata fields,
+the slot-proof hash traversal, the BEACON_ROOTS STATICCALL request and returned
+root word, validator-container encoding, source-selected fork/index arithmetic,
+and every ABI-declared sibling. Whole-run success yields the independent full
+branch relation; failure restores the entry snapshot. The SHA output-width
+premise is retained explicitly. There is no supplied final-root equality or
+successful-root-call premise.
+
+The pinned source is `CLValidatorVerifier.sol:19-37,44-57,97-107` at
+`17005714f151e5502c559932319a3f2f74ac2436`; the inspected solc 0.8.25, via-IR,
+optimizer-200, Cancun transcription is in
+`audit/ssz-compiled-cl-entry/solidity/inspected-cl-entry-ir.yul`.
+
+Remaining obligations are precise: constructor-supplied previous/current gindices
+and pivot are not proved to identify a deployed fork configuration; the root
+STATICCALL reply is not proved authentic to the EIP-4788 history ring; opaque
+SHA-256/FFI behavior and its width contract remain trusted. General deployment,
+compiler/opcode, gas and callee implementation correctness are excluded.
+Structural traversal and known-answer tests do not establish those external facts.
+
+Targeted validation passed on dgx-spark at
+`6044da2ba6a3d8547327889bb6b33f780eeed197`, job
+`1ee2dd06-feb6-4b7c-9808-2189a8fe9996`, exit 0, 1,252 build jobs, covering the
+registered parent, declared-sibling, compiled-entry, fork/index, root-call and
+rollback regressions. This is a predecessor receipt; combined exact-SHA results
+are reported separately. Fresh independent audit remains required.
+
+## Historical review notes — superseded registrations
+
+The following dated review is preserved as history. References below to a
+"registered" toy traversal, storage projection, or prior review decision describe
+that historical revision and do not identify the current executable parent above.
+No historical review is inherited by this integration.
+
 > Round 2 (2026-08-21). Product note plus proof audit, arbitrated from GPT 5.6 Pro and Opus 5. Fable 5 was unavailable (data-retention gate). Kimi K3 was not an allowed Task model. No em dashes. Lean is authority.
 
 SRv3 believes facts about consensus-layer validators only through SSZ Merkle proofs. A caller hands a gateway a witness; the verifier folds the branch and compares it to a trusted root; the deposit path recomputes a deposit-data root from pubkey, withdrawal credentials, amount, and signature.
