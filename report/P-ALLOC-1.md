@@ -16,7 +16,7 @@ Explicit remaining obligations:
 - `_addModule` rejects duplicate addresses (SRLib.sol200-205), while migration copies legacy addresses (101-113). A uniqueness history requires initial/migrated registry evidence and writers; it is not derived by this row.
 - Caller getDepositAllocations, P-ALLOC-2, ALLOC-to-DEPOSIT and general deployed Yul/EVM closure remain outside this claim.
 
-Targeted validation at `b0faa1161e7b3c3aad36839c7e492bd9ec39d100` (job `425295b7-1e7a-467f-aad4-dd9bf1a93ae2`) found two test syntax errors. Commit `269a10eb` fixes the record-update layout and comment before #guard. Validation of the corrected witness remains pending with this command:
+Targeted validation at `b0faa1161e7b3c3aad36839c7e492bd9ec39d100` (job `425295b7-1e7a-467f-aad4-dd9bf1a93ae2`) found two test syntax errors. Commit `269a10eb` fixes the record-update layout and comment before #guard. Corrected validation passed at `2f2316c769b7e5fc3921e473679238ad15b007c4`, job `36947603-d597-4506-9f41-619405ae6fd4` on dgx-spark, exit0 (1,235 jobs), with this command:
 
 ```sh
 REMOTE_BUILD_NODE_ID=dgx-spark REMOTE_BUILD_PASSIVE=1 remote-lean-build lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Audit.Verity.AllocationTx LidoSRv3.Tests.AllocationTxMutants

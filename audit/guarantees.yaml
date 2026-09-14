@@ -27,7 +27,7 @@
         "covered": [
           "The unchanged registered abstract checked_execute proves source checked-execution success and MathView capacity equality under all five CheckedBounds fields. The min-clamp child remains unregistered; it is not reachable-router evidence.",
           "The registered Verity correspondence uses allocateLiveFromStorage: read and cap module count at32, decode packed config, perform mapped getStakingModuleSummary calls and canonical 96-byte tuple decoding, plus the distinct type2 getTotalModuleStake call/32-byte decoder. Computed rows drive observation arrays. hLength/hBind explicitly identify the decoded source-view rows.",
-          "AllocationTxMutants now includes an ABI-valid external summary(1,0,0): it decodes, refutes active_subtraction, and causes sourceExecute failure and ALLOC_ARITHMETIC at the live decoder entry. Initial job425295b7-1e7a-467f-aad4-dd9bf1a93ae2 found two test syntax errors, corrected in269a10eb. Corrected witness validation remains pending.",
+          "AllocationTxMutants now includes an ABI-valid external summary(1,0,0): it decodes, refutes active_subtraction, and causes sourceExecute failure and ALLOC_ARITHMETIC at the live decoder entry. Corrected witness validation passed at2f2316c769b7e5fc3921e473679238ad15b007c4, job36947603-d597-4506-9f41-619405ae6fd4 on dgx-spark, exit0 (1235 jobs).",
           "Conditional type-width arithmetic from #652/#653 is preserved. The fabricated #662 write history is removed; naming-scaffold projections remain explicitly caller hypotheses. Router module count/share-limit widths do not establish uint64 external summary/stake bounds."
         ],
         "missing": [
@@ -237,17 +237,17 @@
         "A-RUNTIME-PROVENANCE"
       ],
       "reproduction": {
-        "command": "lake build LidoSRv3.Audit.Guarantees.PReserve1 LidoSRv3.Tests.ReserveMutants",
-        "expected": "checked spend-formula property with a guard-checking wrapper premise and a fresh-cache live-reserve invariant, stateful Verity refinement, rollback, both parent kill-lines (guard_drop_kill_line_refutes_parent killing the scopedWithdrawGuards conjunct on a canDeposit-dropped mutant, partition_spend_mutant_kill_line_refutes_parent killing the partition-invariant and live-reserve conjuncts on a mutated spend transition), and the stale-cache premise-necessity mutants build"
+        "command": "lake build LidoSRv3.Audit.Guarantees.PReserve1LiveWriters LidoSRv3.Tests.TrioReserve1.Differential LidoSRv3.Tests.TrioReserve1.ReportDifferential LidoSRv3.Tests.TrioReserve1.QueueFinalizeDifferential",
+        "expected": "registered actual writer/history and queue-derived withdrawal partition; physical withdrawal/report/queue-finalization regressions"
       },
-      "summary": "source_spend_preserves_withdrawal_reserve: any committed modelWithdrawDepositableEther call proves scopedWithdrawGuards (canDeposit/authorizedRouter necessarily held) and withdrawalPartitionSpendInvariant, plus liveEffectiveWithdrawalsReserve invariance under an explicit freshQueueCache hypothesis standing in for a WithdrawalQueue.unfinalizedStETH() CALL. Parent kill-lines, each refuting the parent's full predicate shape with the freshQueueCache hypothesis retained: LidoSRv3.Tests.ReserveMutants.guard_drop_kill_line_refutes_parent kills the scopedWithdrawGuards conjunct on mutantWithdrawNoCanDeposit, a guard-for-guard copy with only the canDeposit check dropped that commits a canDeposit = false call the honest model reverts; LidoSRv3.Tests.ReserveMutants.partition_spend_mutant_kill_line_refutes_parent kills the partition-invariant and live-reserve conjuncts on mutantWithdraw, a mutation of the spend transition that commits under a fresh cache while the live queue-facing reserve drops 50 to 0. staleQueueCacheKillLine_holds and the ReserveMutants stale-cache witness are hypothesis-necessity evidence only: they show the freshQueueCache premise cannot be dropped, not that the parent is false. Verity observe of withdrawWithGuards still equals specTx. unfinalizedStETH remains a cached word, not a live WQ call.",
+      "summary": "The executable parent consumes finite histories of actual physical target/rebalance writers, guarded report accounting and guarded withdrawal. Each next operation receives the actual previous World. Successful withdrawal derives its spending-stage partition from actual locator/queue-return bytes and admission, while report consumes callback results before checked accounting/rebalance. Failed withdrawals restore their own entry snapshot. Arbitrary callback preservation, deployed queue identity, target ACL and outer deployment boundaries remain explicit; historical cache-scoped source and legacy Verity theorems are retained.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PReserve1.source_spend_preserves_withdrawal_reserve"
       },
       "verity": {
         "status": "CHECKED",
-        "theorem": "LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec"
+        "theorem": "LidoSRv3.Audit.Guarantees.PReserve1LiveWriters.actual_reserve_writer_history"
       },
       "fidelity": {
         "covered": [
@@ -291,7 +291,7 @@
         "kind": "IMPLEMENTATION_PENDING",
         "work": "Keep the checked, guard-and-freshness-scoped spend-formula theorems; the relational independence fact is the P-RESERVE-1.relational child. Do not derive freshQueueCache from ReserveState alone; it stays an explicit per-call hypothesis until a live WithdrawalQueue call is modeled."
       },
-      "next_gate": "The registered parent already proves the live ZERO_AMOUNT guard on every commit. OPEN: keep freshQueueCache explicit until a live WQ CALL exists, and model setDepositsReserveTarget/report-rebalance; do not treat P-RESERVE-RELATIONAL as this parent.",
+      "next_gate": "Validate actual_reserve_writer_history and reconcile report/fidelity with the actual statement. Report finalization callback binding and arbitrary callee preservation must remain explicit; do not infer global protected-reserve invariance for arbitrary external Worlds.",
       "roadmap_priority": "DONE"
     },
     {
