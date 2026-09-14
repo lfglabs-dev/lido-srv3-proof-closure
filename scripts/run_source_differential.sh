@@ -9,7 +9,7 @@ case "${1:-}" in
 esac
 
 bash scripts/prepare_trio_validation.sh
-export PATH="$PWD/.lake/trio-tools/foundry-v1.3.1:$PATH"
+export PATH="$PWD/.lake/trio-tools/foundry-v1.3.1:$PWD/.lake/trio-tools/ripgrep-14.1.1:$PATH"
 
 # Select an explicit, checksum-pinned compiler in this private checkout. This
 # avoids Foundry installing compilers into a shared runner's SVM directory.
