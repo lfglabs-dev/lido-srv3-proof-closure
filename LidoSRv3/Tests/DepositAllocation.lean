@@ -8,8 +8,9 @@ open audit.trio.deposit.Tests.Verity.ModulePhysicalMetadataTest
 /-- Reuse the explicitly colliding test hash; the registered parent uses real
 Keccak. One physical count row is enough to expose the real underflow path. -/
 def initial : Live.World :=
-  {DepositDsmCall.before with core := DepositDsmCall.before.core.writeContractSlot
-    liveCtx.sender.val (TopupRouterCredentials.routerRoot+1) (Live.word 1)}
+  let core := DepositDsmCall.before.core.writeContractSlot
+    liveCtx.sender.val (TopupRouterCredentials.routerRoot+1) (Live.word 1)
+  {DepositDsmCall.before with core := core}
 def badSummary : TrioAlloc1.StaticOracle := fun _ _ => .returned
   (TrioAlloc1.encodeWord (sw 1) ++ TrioAlloc1.encodeWord (sw 0) ++ TrioAlloc1.encodeWord (sw 0))
 def cfg : TrioAlloc1.Config := ⟨sw DEPOSIT_SIZE,sw (2048*10^18)⟩
@@ -36,9 +37,10 @@ def separatedHash : TopupRouterCredentials.Keccak := fun bytes =>
     then Live.word 80 else Live.word 90
 
 def positiveWorld : Live.World :=
-  {initial with core := ((((initial.core.writeContractSlot 2 80 (Live.word 1)).writeContractSlot
-    2 100 (Live.word input.moduleId.val)).writeContractSlot
-    2 90 (Live.word (40+10000*2^192))))}
+  let core := initial.core.writeContractSlot 2 80 (Live.word 1)
+  let core := core.writeContractSlot 2 100 (Live.word input.moduleId.val)
+  let core := core.writeContractSlot 2 90 (Live.word (40+10000*2^192))
+  {initial with core := core}
 def honest : TrioAlloc1.StaticOracle := fun _ _ => .returned
   (TrioAlloc1.encodeWord (sw 0) ++ TrioAlloc1.encodeWord (sw 0) ++ TrioAlloc1.encodeWord (sw 1))
 
