@@ -49,7 +49,7 @@ if [[ "$test_script" == repository ]]; then
     combined_status=1
     echo 'CANDIDATE_MAKE_TEST=FAIL'
   fi
-  if lake build LidoSRv3 LidoSRv3Audit 2>&1 | tee .lake/candidate-validation/libraries.log; then echo 'CANDIDATE_LIBRARIES=PASS'; else
+  if lake build LidoSRv3 LidoSRv3Audit LidoSRv3Test AccountAddressChecks 2>&1 | tee .lake/candidate-validation/libraries.log; then echo 'CANDIDATE_LIBRARIES=PASS'; else
     combined_status=1
     echo 'CANDIDATE_LIBRARIES=FAIL'
   fi
