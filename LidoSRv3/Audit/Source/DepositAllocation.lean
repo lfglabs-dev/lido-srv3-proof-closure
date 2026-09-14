@@ -14,7 +14,7 @@ def layout (hash : Keccak) : TrioAlloc1.Layout :=
   { routerSlot := TrioAlloc1.word TopupRouterCredentials.routerRoot
     keccak := fun bytes => TrioAlloc1.word (hash (bytes.map (fun b => UInt8.ofNat b.val))).val }
 
-def storage (router : Live.Address) (world : Live.World) : TrioAlloc1.Storage :=
+def physicalWords (router : Live.Address) (world : Live.World) : TrioAlloc1.Storage :=
   fun key => TrioAlloc1.word (world.core.readContractSlot router.val key.val).val
 
 /-- `_getModuleDepositAllocation` executes the whole allocation before reading
@@ -22,7 +22,7 @@ its one-based membership position, checked subtracting one, and indexing. -/
 def select (hash : Keccak) (oracle : TrioAlloc1.StaticOracle)
     (cfg : TrioAlloc1.Config) (available id : TrioAlloc1.Word)
     (router : Live.Address) (world : Live.World) : TrioAlloc1.Execution TrioAlloc1.Word := do
-  let out ← TrioComposition.getDepositAllocationsABI (layout hash) (storage router world)
+  let out ← TrioComposition.getDepositAllocationsABI (layout hash) (physicalWords router world)
     oracle cfg available false
   let index ← TrioAlloc1.liftChecked (TrioAlloc1.checkedSub
     (DepositPhysicalAdmission.membership hash router id world) 1)
@@ -99,7 +99,7 @@ theorem execute_effects (q : StaticCall.External) (locator : Live.Address) (curs
   cases hq : DepositDsmCall.lookup q liveCtx.sender locator cursor before with
   | mk outcome trace =>
     cases outcome with
-    | error e => rfl
+    | «error» e => rfl
     | ok dsm =>
       dsimp only
       split
@@ -113,14 +113,14 @@ theorem execute_effects (q : StaticCall.External) (locator : Live.Address) (curs
             · cases ha : select hash oracle cfg available i.moduleId liveCtx.sender before [] with
               | mk outcome allocatedTrace =>
                 cases outcome with
-                | error e => rfl
+                | «error» e => rfl
                 | ok amount =>
                   dsimp only
                   cases hs : DepositPhysicalAdmission.execute hash m w
                     (DepositDsmCall.resolvedContext ctx dsm) liveCtx (withAllocation i cfg amount) before with
                   | mk outcome after attempts =>
                     cases outcome with
-                    | error e =>
+                    | «error» e =>
                       exact DepositPhysicalAdmission.failure_restores hash m w
                         (DepositDsmCall.resolvedContext ctx dsm) liveCtx (withAllocation i cfg amount)
                         before after attempts e hs

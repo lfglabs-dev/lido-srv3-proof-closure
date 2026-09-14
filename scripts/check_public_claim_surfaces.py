@@ -248,10 +248,12 @@ VERITY_HEADING = "Verity Executable Contract"
 
 # Current executable consumers; legacy public surfaces above remain preserved.
 REGISTERED_SURFACES = {'P-DEPOSIT-1': ('PDeposit1DsmCall',
-                 ('LidoSRv3.Audit.Source.DepositDsmCall', 'Compiler.Proofs.MappingSlot'),
+                 ('LidoSRv3.Audit.Source.DepositDsmCall', 'Compiler.Proofs.MappingSlot',
+                  'LidoSRv3.Audit.Source.DepositAllocation'),
                  (('theorem', 'actual_dsm_call_registered_module_suffix'),
                   ('theorem', 'actual_dsm_call_failure_restores'),
                   ('def', 'depositPhysicalKeccak'),
+                  ('theorem', 'supplied_allocation_deposit_call_slot_success_and_revert'),
                   ('theorem', 'actual_deposit_call_slot_success_and_revert'))),
  'P-TOPUP-1': ('PTopupRouterAdmissionCall',
                ('LidoSRv3.Audit.Source.TopupRouterAdmissionCall',),
