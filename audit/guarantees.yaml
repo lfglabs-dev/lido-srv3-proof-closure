@@ -247,7 +247,7 @@
       },
       "verity": {
         "status": "CHECKED",
-        "theorem": "LidoSRv3.Audit.Guarantees.PReserve1LiveWriters.actual_reserve_writer_history"
+        "theorem": "LidoSRv3.Audit.Guarantees.PReserve1LiveWriters.actual_reserve_physical_history"
       },
       "fidelity": {
         "covered": [
