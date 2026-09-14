@@ -33,6 +33,8 @@ check: test
 	@printf '%s\n' 'check ok: metadata, mutants, receipt, provenance, and executable regressions passed'
 
 test:
+	@python3 scripts/generate_ux2.py check
+	@python3 scripts/check_report_theorem_inventory.py
 	@python3 scripts/test_differential_sources.py
 	@python3 scripts/check_reproduction_targets.py
 	@python3 scripts/test_reproduction_targets.py
@@ -44,7 +46,6 @@ test:
 	@python3 scripts/test_minfirst_guard_mutation.py
 	@python3 scripts/test_cache_store_mutations.py
 	@python3 scripts/audit_metadata.py check
-	@python3 scripts/generate_ux2.py check
 	@python3 scripts/check_assumption_presentation.py
 	@python3 scripts/test_ux2.py
 	@python3 scripts/test_main_guarantees.py
@@ -63,7 +64,6 @@ test:
 	@bash scripts/test_check_no_python_evidence.sh
 	@python3 scripts/check_public_claim_surfaces.py
 	@python3 scripts/test_public_claim_surfaces.py
-	@python3 scripts/check_report_theorem_inventory.py
 	@python3 scripts/test_report_theorem_inventory.py
 	@python3 scripts/check_diagram_taxonomy.py
 	@python3 scripts/test_diagram_taxonomy.py

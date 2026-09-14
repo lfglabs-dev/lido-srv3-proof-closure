@@ -11,9 +11,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 CHECKER = "scripts/check_report_theorem_inventory.py"
-# The checker reads the published table through the shared cmark-gfm table
-# reader, so the fixture tree must carry it or every mutant would fail on an
-# import error rather than on the claim it is testing.
+# Carry the shared table reader so mutants test claims, not missing imports.
 READER = "scripts/gfm_table.py"
 LEAN = "LidoSRv3/Audit/Guarantees/PAlloc1.lean"
 REPORT = "report/P-ALLOC-1.md"
@@ -49,6 +47,8 @@ def invoke(root, ok, needle=None):
 
 
 def main():
+    positions = CHECK.declared_theorems()
+    active_line, checked_line, revert_line = positions["active_capacity_bounded"], positions["checked_execute"], positions["verity_tx_revert_restores_snapshot"]
     with tempfile.TemporaryDirectory(prefix="report-inventory-mutants-") as tmp:
         fixture = Path(tmp)
         for relative in (CHECKER, READER, LEAN, REPORT, REGISTRY):
@@ -509,12 +509,12 @@ def main():
         # otherwise the two rows collide and the narrower duplicate-field rule
         # answers first, leaving the registry-mapping rule itself unasserted.
         promoted = report.replace(
-            "| `active_capacity_bounded` | 74 | Abstract | unregistered |",
-            "| `active_capacity_bounded` | 74 | Abstract | REGISTERED as `abstract.theorem` |", 1)
+            f"| `active_capacity_bounded` | {active_line} | Abstract | unregistered |",
+            f"| `active_capacity_bounded` | {active_line} | Abstract | REGISTERED as `abstract.theorem` |", 1)
         promoted = promoted.replace(
-            "| `checked_execute` | 108 | Abstract | REGISTERED as `abstract.theorem` |",
-            "| `checked_execute` | 108 | Abstract | unregistered |", 1)
-        if promoted == report or "`checked_execute` | 108 | Abstract | unregistered" not in promoted:
+            f"| `checked_execute` | {checked_line} | Abstract | REGISTERED as `abstract.theorem` |",
+            f"| `checked_execute` | {checked_line} | Abstract | unregistered |", 1)
+        if promoted == report or f"`checked_execute` | {checked_line} | Abstract | unregistered" not in promoted:
             raise AssertionError("promotion mutant changed nothing")
         report_path.write_text(promoted, encoding="utf-8")
         invoke(fixture, False, "REGISTERED; registry names")
@@ -680,7 +680,7 @@ def main():
             ("promoted to REGISTERED",
              repeated_anchor.replace("| unregistered |",
                                      "| REGISTERED as `abstract.theorem` |", 1)),
-            ("stale line", repeated_anchor.replace("| 74 |", "| 6900 |", 1)),
+            ("stale line", repeated_anchor.replace(f"| {active_line} |", "| 6900 |", 1)),
             ("no recognized plane", repeated_anchor.replace("| Abstract |", "| n/a |", 1)),
             ("verbatim repeat", repeated_anchor),
         ):
@@ -694,16 +694,16 @@ def main():
                 report_path.write_text(report, encoding="utf-8")
 
         # A stale line number: the citation must point at the real declaration.
-        stale = report.replace("| `checked_execute` | 108 |", "| `checked_execute` | 109 |", 1)
+        stale = report.replace(f"| `checked_execute` | {checked_line} |", f"| `checked_execute` | {checked_line + 1} |", 1)
         if stale == report:
             raise AssertionError("line mutant changed nothing")
         report_path.write_text(stale, encoding="utf-8")
-        invoke(fixture, False, "checked_execute is declared at Lean line 108")
+        invoke(fixture, False, f"checked_execute is declared at Lean line {checked_line}")
         report_path.write_text(report, encoding="utf-8")
 
         # A row that names no abstract/Verity plane.
-        planeless = report.replace("| `verity_tx_revert_restores_snapshot` | 345 | Verity |",
-                                   "| `verity_tx_revert_restores_snapshot` | 345 | n/a |", 1)
+        planeless = report.replace(f"| `verity_tx_revert_restores_snapshot` | {revert_line} | Verity |",
+                                   f"| `verity_tx_revert_restores_snapshot` | {revert_line} | n/a |", 1)
         if planeless == report:
             raise AssertionError("plane mutant changed nothing")
         report_path.write_text(planeless, encoding="utf-8")
@@ -1141,7 +1141,7 @@ def main():
         # where the table declares five and the columns after it shift left.
         # The row still reads as an inventory row to the eye and is not one.
         for escape in escapes[1:]:
-            narrowed = inventory_rows[0].replace("| 108 | Abstract |",
+            narrowed = inventory_rows[0].replace(f"| {checked_line} | Abstract |",
                                                  f"| 122 {escape} Abstract |", 1)
             if narrowed == inventory_rows[0]:
                 raise AssertionError("narrowing escape mutant changed nothing")

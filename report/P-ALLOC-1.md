@@ -26,19 +26,19 @@ published status cell depends on them, and no fidelity gap is closed by them.
 
 | Theorem (`LidoSRv3.Audit.Guarantees.PAlloc1.`) | Line | Plane | Registered | Role |
 | --- | --- | --- | --- | --- |
-| `checked_execute` | 108 | Abstract | REGISTERED as `abstract.theorem` | Wave 2 parent. Under `CheckedBounds` the source-shaped executor succeeds and its capacity column equals `MathView.capacities`. Killed by `AllocationTxMutants.capacity_target_kill_line_refutes_parent`. |
-| `verity_tx_simulates_allocation_count_from_storage` | 328 | Verity | REGISTERED as `verity.theorem` | Storage-backed live-summary transaction closure: 32-capped stored module count, packed `ModuleStateConfig`, mapped `getStakingModuleSummary` staticcall, WC02 `getTotalModuleStake()` staticcall, `observe` equals `sourceView`. |
-| `active_capacity_bounded` | 74 | Abstract | unregistered | `MathView`-definitional child. `Nat.min_le_left` / `Nat.min_le_right` on a definition that already is a clamp (issue 1). Deliberately demoted out of the parent so a kill-line can exist. |
-| `source_capacities_match_canonical` | 85 | Abstract | unregistered | The statement `checked_execute` restates under the public parent name. Same proof term; kept separately so the SOURCE-refinement name stays citable. |
-| `router_order_preserved` | 279 | Abstract | unregistered | Structural list-map identity: a successful execute retains router index order. Says nothing about capacity values. |
-| `source_capacities_and_mapped_summary_transaction` | 288 | Abstract and Verity (composite) | unregistered | Conjoins `source_capacities_match_canonical` with the bounded Phase-3 `mappedSummaryTransaction` slice. Its Verity conjunct is the stub-adversary Phase-3 call, not the registered live-summary path (issue 4). |
-| `verity_tx_simulates_allocation` | 305 | Verity | unregistered | Legacy free-`count` sibling. `count` is a harness argument and summary fields are planted, which is exactly what the registered theorem closes (issues 13, 15, 19). |
-| `verity_tx_revert_restores_snapshot` | 345 | Verity | unregistered | Every revert of `allocate`, including the injected post-write failure, restores the pre-call snapshot. |
-| `checked_execute_under_pinned_shape` | 143 | Abstract | unregistered | Conditional helper: shape plus explicit arithmetic bounds imply the source parent. |
-| `checked_execute_under_pinned_shape_and_constants` | 186 | Abstract | unregistered | Conditional helper: pinned constants retain the explicit summary and allocation bounds. |
-| `checked_execute_under_type_and_allocation_bounds` | 227 | Abstract | unregistered | Conditional helper deriving checked arithmetic from typed rows and allocation bounds; not a reachability theorem. |
-| `checked_execute_under_type_and_available_bounds` | 257 | Abstract | unregistered | Conditional helper using available-capacity bounds; external summary validity remains a premise. |
-| `verity_tx_live_revert_restores_snapshot` | 380 | Verity | unregistered | Unconditional rollback of the live storage and summary-call executor. |
+| `checked_execute` | 109 | Abstract | REGISTERED as `abstract.theorem` | Wave 2 parent. Under `CheckedBounds` the source-shaped executor succeeds and its capacity column equals `MathView.capacities`. Killed by `AllocationTxMutants.capacity_target_kill_line_refutes_parent`. |
+| `verity_tx_simulates_allocation_count_from_storage` | 333 | Verity | REGISTERED as `verity.theorem` | Storage-backed live-summary transaction closure: 32-capped stored module count, packed `ModuleStateConfig`, mapped `getStakingModuleSummary` staticcall, WC02 `getTotalModuleStake()` staticcall, `observe` equals `sourceView`. |
+| `active_capacity_bounded` | 75 | Abstract | unregistered | `MathView`-definitional child. `Nat.min_le_left` / `Nat.min_le_right` on a definition that already is a clamp (issue 1). Deliberately demoted out of the parent so a kill-line can exist. |
+| `source_capacities_match_canonical` | 86 | Abstract | unregistered | The statement `checked_execute` restates under the public parent name. Same proof term; kept separately so the SOURCE-refinement name stays citable. |
+| `router_order_preserved` | 280 | Abstract | unregistered | Structural list-map identity: a successful execute retains router index order. Says nothing about capacity values. |
+| `source_capacities_and_mapped_summary_transaction` | 289 | Abstract and Verity (composite) | unregistered | Conjoins `source_capacities_match_canonical` with the bounded Phase-3 `mappedSummaryTransaction` slice. Its Verity conjunct is the stub-adversary Phase-3 call, not the registered live-summary path (issue 4). |
+| `verity_tx_simulates_allocation` | 306 | Verity | unregistered | Legacy free-`count` sibling. `count` is a harness argument and summary fields are planted, which is exactly what the registered theorem closes (issues 13, 15, 19). |
+| `verity_tx_revert_restores_snapshot` | 367 | Verity | unregistered | Every revert of `allocate`, including the injected post-write failure, restores the pre-call snapshot. |
+| `checked_execute_under_pinned_shape` | 144 | Abstract | unregistered | Conditional helper: shape plus explicit arithmetic bounds imply the source parent. |
+| `checked_execute_under_pinned_shape_and_constants` | 187 | Abstract | unregistered | Conditional helper: pinned constants retain the explicit summary and allocation bounds. |
+| `checked_execute_under_type_and_allocation_bounds` | 228 | Abstract | unregistered | Conditional helper deriving checked arithmetic from typed rows and allocation bounds; not a reachability theorem. |
+| `checked_execute_under_type_and_available_bounds` | 258 | Abstract | unregistered | Conditional helper using available-capacity bounds; external summary validity remains a premise. |
+| `verity_tx_live_revert_restores_snapshot` | 402 | Verity | unregistered | Unconditional rollback of the live storage and summary-call executor. |
 
 Cited outside this module: `LidoSRv3.Audit.Verity.AllocationTx.bindLiveOne_decodes_summary`
 (one-call ABI bridge, unregistered),

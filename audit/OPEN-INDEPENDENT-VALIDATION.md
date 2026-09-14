@@ -35,3 +35,41 @@ must remain unresolved until the intended supported domain is justified.
 
 The controller's ACK of receipts through `0ba13da5` acknowledges receipt only.
 It is not source acceptance, CLEAN, or closure of either named dependency.
+
+## Review c36729d4 at a645be9a
+
+The controller reports reviewer verdict **BLOCKED** for exact SHA
+`a645be9ad56f6212007428e3b871f399d31c8d76`. Reviewer-owned Spark job
+`c54e919b-fa93-418d-9b88-6955d02cc96f` exited 1: `make prove`, 74 differential
+cases, and the complete library/test-target build (2119 jobs) passed; `make test`
+stopped at the stale UX2 fingerprint. Independent axiom recomputation and native
+reevaluation were not reached. These results do not constitute CLEAN or source
+acceptance and do not cover a successor SHA.
+
+The writer reproduced the stale UX2 artifact and theorem-inventory coordinates
+locally. Their repair regenerates the existing derived records and updates the
+report coordinates without changing the checks or registered claims. Both checks
+now precede the expensive differential suites in `make test`.
+
+The reviewer workspace paths `/workspaces/mission-c36729d4/output/review-ledger.md`
+and `reviewer-terminal-receipt.json` were not mounted in the writer container
+when this record was made. The results above are attributed to the controller's
+handoff; they are not a writer inspection of those artifacts. An accessible copy
+has been requested. Existing author receipts remain author-collected evidence.
+
+The following findings remain open, without narrowing the intended guarantees:
+
+- **I-C367-NATIVE-COMPILER-SELECTION**: independently verify the native compiler
+  selection path and reevaluate the registered native claims; the detailed
+  reviewer diagnostic is still needed to resolve the specific selection defect.
+- **I-ALLOC1-EXECUTOR-RESULT-BRIDGE**: connect the account-qualified producer's
+  result to the registered allocation executor result. Conjoining producer
+  correspondence and the legacy result does not establish this bridge.
+- ALLOC2 decoded-loop conservation does not establish deployment correspondence.
+- AccountFrame is connected to claim execution; this does not close whole-world
+  ADDRESS writer coverage or the inherited semantic/public-facade obligations.
+
+I-REVIEW-80FE-FULL-GATE-AXIOMS, supported-module reachability, and the ABI-valid
+arbitrary-module counterexample remain open. The remaining DEPOSIT, TOPUP1,
+TOPUP2, ACCOUNT, RESERVE, ADDRESS, CONSOLIDATION/ETH, SSZ and supplemental
+obligations still require source work and a new final independent audit.
