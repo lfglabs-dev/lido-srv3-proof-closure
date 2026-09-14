@@ -1,3 +1,30 @@
+# Reviewer 56e29f61 and source-memory successor
+
+Reviewer-owned job 3a02c182-513a-4e09-a41b-ea26659cf036 passed the repository
+gate at 3df31d1e59148a8fe89e2d825934e363419ad982. Verdict is semantic BLOCKED.
+That receipt does not validate this successor.
+
+The remaining ALLOC1 report sentence calling unconditional legacy/physical
+equality open is corrected to refuted. I-ALLOC1-SUPPORTED-MODULE-REACHABILITY
+remains OPEN: authoritative implementation/registry identities plus preservation
+proofs over supported writers are required; arbitrary ABI validity is insufficient.
+The original counterexample and AccountFrame are unchanged.
+
+The ALLOC2 parent now additionally consumes the existing source memory-store /
+ABI / ordered-call distribution theorem. All earlier conjuncts remain, including
+unbounded decoded-loop conservation. Explicit separation, extent, count and
+producer-success premises are retained. This is a registered source-correspondence
+advance, not compiled-bytecode execution or deployed caller-frame closure.
+I-ALLOC2-DEPLOYED-LIBRARY-IDENTITY and compiled memory/frame refinement remain OPEN.
+
+Next native dependencies inspected: DEPOSIT still needs the available-ether getter
+and allocation STATICCALL realization to supply DepositAllocation.execute; the
+existing reserve getter's nested call context cannot be assumed equivalent.
+ADDRESS still needs whole-world renaming across all writers and deployed callee /
+precompile refinement. These remain in scope; no closure is inferred here.
+
+## Prior review records
+
 # Controller disposition following ac0200a2
 
 Independent reviewer ac0200a2 reported semantic BLOCKED at

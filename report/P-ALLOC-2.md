@@ -9,6 +9,15 @@ demand. It requires neither supplied fuel nor a successful-result premise for
 that fourth conjunct. Closed rows are filtered and the specification consumes
 each mutation. The older unit-step model remains a separate child.
 
+The fifth conjunct now consumes `SourceMemoryCallCorrespondence`: actual
+`ProducerStores.producer` writes feed `producerThenCall`, its ABI library result,
+ordered attempted-call trace, independent distribution and returned length.
+Producer success, count at most 32, disjoint arrays and explicit extent/return
+space bounds remain premises. No final memory relation or desired callee result
+is assumed. Existing overlap and distinct return-array regressions are included
+in the registered reproduction. This connects an existing source proof to the
+parent; it does not close compiled instruction or caller-frame refinement.
+
 The registered Verity parent remains `verity_tx_simulates_min_first_distribution`.
 Decoded-loop conservation is not a proof of physical ABI/memory layout, linked
 library identity, compiler/runtime refinement, supported-module reachable caps,

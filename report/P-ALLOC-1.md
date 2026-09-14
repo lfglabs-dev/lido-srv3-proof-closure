@@ -80,7 +80,9 @@ This addition does not identify the legacy persisted-output executor with the
 new producer. Supported-module reply invariants and reachable CheckedBounds,
 actual layout/hash identity, caller context, compiler memory and gas/runtime
 correspondence remain open. Independent validation dependency
-`I-REVIEW-80FE-FULL-GATE-AXIOMS` remains open; no CLEAN is inferred.
+`I-REVIEW-80FE-FULL-GATE-AXIOMS` was discharged for subsequently reviewed SHAs,
+including 3df31d1e by reviewer job 3a02c182-513a-4e09-a41b-ea26659cf036;
+no semantic CLEAN or successor validation is inferred.
 
 ## Executed final-result continuation
 
@@ -89,8 +91,12 @@ physical-account producer call tree feeds the library ABI executor, checked
 Ether conversion and final ParentOutput. All errors and module-call order are
 retained, and VM STATICCALL preserves the world. This is a result correspondence
 for the new physical executable, not an equality with legacy persisted
-observation slots. That legacy bridge, actual DELEGATECALL/memory refinement,
-linked deployment identity and supported-module reachability remain open.
+observation slots. Unconditional legacy/physical equality is refuted, as decided below. Actual
+DELEGATECALL/memory refinement and linked deployment identity remain open.
+I-ALLOC1-SUPPORTED-MODULE-REACHABILITY remains OPEN: authoritative supported-module
+implementation identities and initial/migrated registry evidence are needed,
+followed by proofs that every relevant writer preserves summary/accounting and
+stake bounds. ABI validity alone cannot supply these invariants.
 
 ## Refuted unconditional legacy bridge
 

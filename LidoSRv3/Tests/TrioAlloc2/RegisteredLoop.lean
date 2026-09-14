@@ -25,8 +25,12 @@ private def checkInterleaved : IO Unit := do
 /-- This test uses the registered parent, not a detached library helper. -/
 theorem registered_loop_consumed :
     LidoSRv3.Audit.Guarantees.PAlloc2.UnboundedProportionalLoop :=
-  LidoSRv3.Audit.Guarantees.PAlloc2.step_correspondence_and_full_loop_conservation.2.2.2
+  LidoSRv3.Audit.Guarantees.PAlloc2.step_correspondence_and_full_loop_conservation.2.2.2.1
 
 #print axioms registered_loop_consumed
 #print axioms closed_bucket_does_not_cap_step
 end LidoSRv3.Tests.TrioAlloc2.RegisteredLoop
+
+-- The memory/call proposition must be consumed by the registered parent.
+example : LidoSRv3.Audit.Guarantees.PAlloc2.SourceMemoryCallCorrespondence :=
+  LidoSRv3.Audit.Guarantees.PAlloc2.step_correspondence_and_full_loop_conservation.2.2.2.2

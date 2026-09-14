@@ -6,7 +6,7 @@ report. Changing them requires reviewing the corresponding source/metadata delta
 """
 
 CANDIDATE_INPUT_SHA256 = {
-    "audit/guarantees.yaml": "1f4109270868365250a77ddd89497c7fd6a28386dcd25f226845375460904158",
+    "audit/guarantees.yaml": "2ff2e640b7c37b4b500cddbe613a26b9fc0c0262d88cd67dda22f8a38bf4400e",
     "audit/source-map.yaml": "65de3beb60c50a5a28942ccc24d7206205dbd7a9530fc4859d4dd873ae850239",
     "audit/trust-native-decide-allowlist.txt": "52b822c37a17525b9b569f7a7e37cb49bdb35f049c0f269e54b78a544f34360f"
 }
@@ -27,7 +27,7 @@ EXPECTED_CANONICAL_CLAIMS = {
 }
 EXPECTED_CANONICAL_DETAIL_SHA256 = {
     "P-ALLOC-1": "b1499c5aa8d1eb0e5bc50f56f39d92e64d24c2833f3f289ca7dcc5eb3b3a38ed",
-    "P-ALLOC-2": "6151c62aebbe2ff63b697e4fd929ad4ef2fe6bfbfe4e80ba26e2b7b6be33f5f8",
+    "P-ALLOC-2": "da823989d09d055e815b87022274d8767387b63f45a174caf11ac0f64cfaeb5b",
     "P-DEPOSIT-1": "191cae5dbb0cb0d29626d87363c8340b23c30d9b1e00a7006ae80bfd430c1385",
     "P-TOPUP-1": "7c2c62b6c799bde7f6f270bb4f6330a5fcf4c444f6fd78dc188a947118c51cf9",
     "P-ACCOUNT-1": "06ac470d8e22d26d7af92220328a70d496a59620129251bcd6dee808cad43608",
