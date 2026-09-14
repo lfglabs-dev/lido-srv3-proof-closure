@@ -23,7 +23,7 @@ def enter (ctx : Context) (outer : ContractState) : ContractState :=
     sender := ctx.sender
     thisAddress := ctx.self }
 
-def commit (account : Address) (outer localState : ContractState) : ContractState :=
+def commit (account : Verity.Address) (outer localState : ContractState) : ContractState :=
   { outer with storageWords := fun key => match key with
       | .slot slot => if account.val = 0 then localState.readSlot slot else outer.storageWords key
       | .contractSlot owner slot =>
@@ -37,7 +37,7 @@ def commit (account : Address) (outer localState : ContractState) : ContractStat
 @[simp] theorem enter_sender (ctx : Context) (outer : ContractState) :
     (enter ctx outer).sender = ctx.sender := rfl
 
-@[simp] theorem commit_read (account : Address) (outer localState : ContractState) (slot : Nat) :
+@[simp] theorem commit_read (account : Verity.Address) (outer localState : ContractState) (slot : Nat) :
     (commit account outer localState).readContractSlot account.val slot = localState.readSlot slot := by
   by_cases h : account.val = 0 <;>
     simp [commit, ContractState.readContractSlot, ContractState.contractStorage,
@@ -45,7 +45,7 @@ def commit (account : Address) (outer localState : ContractState) : ContractStat
 
 /-- A storage-only frame cannot commit a local interpreter's changes to a
 foreign contract, including Verity's legacy unqualified account zero. -/
-theorem commit_other_account (account : Address) (outer localState : ContractState)
+theorem commit_other_account (account : Verity.Address) (outer localState : ContractState)
     (other slot : Nat) (h : other ≠ account.val) :
     (commit account outer localState).readContractSlot other slot =
       outer.readContractSlot other slot := by
