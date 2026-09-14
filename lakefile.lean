@@ -3,7 +3,25 @@ open Lake DSL
 
 package «lido-srv3-proof-closure» where
   version := v!"0.1.0"
-  testDriver := "LidoSRv3Test"
+  testDriver := "runTests"
+
+/-- Keep the Lean test library as the default; expose the preserved source
+differentials through Lake's test interface for registered remote runners.
+Each mode runs the existing script and propagates its exit status. -/
+script runTests args do
+  match args with
+  | [] => env "lake" #["build", "LidoSRv3Test"]
+  | ["topup-source"] =>
+      let tools ← env "forge" #["--version"]
+      if tools != 0 then return tools
+      env "bash" #["scripts/test_topup_source_differential.sh"]
+  | ["reserve-source"] =>
+      let tools ← env "forge" #["--version"]
+      if tools != 0 then return tools
+      env "bash" #["scripts/test_reserve_source_differential.sh"]
+  | _ =>
+      IO.eprintln "usage: lake test [topup-source|reserve-source]"
+      return 2
 
 require verity from git
   "https://github.com/lfglabs-dev/verity.git"@"e977aaad6e1a9e92e0132d41b3d33a14135a4d46"
