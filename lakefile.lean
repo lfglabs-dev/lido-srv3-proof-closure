@@ -12,15 +12,11 @@ script runTests args do
   match args with
   | [] => env "lake" #["build", "LidoSRv3Test"]
   | ["topup-source"] =>
-      let tools ← env "forge" #["--version"]
-      if tools != 0 then return tools
-      env "bash" #["scripts/test_topup_source_differential.sh"]
+      env "bash" #["scripts/run_source_differential.sh", "topup-source"]
   | ["reserve-source"] =>
-      let tools ← env "forge" #["--version"]
-      if tools != 0 then return tools
-      env "bash" #["scripts/test_reserve_source_differential.sh"]
+      env "bash" #["scripts/run_source_differential.sh", "reserve-source"]
   | _ =>
-      IO.eprintln "usage: lake test [topup-source|reserve-source]"
+      IO.eprintln "usage: lake test [-- topup-source|reserve-source]"
       return 2
 
 require verity from git
