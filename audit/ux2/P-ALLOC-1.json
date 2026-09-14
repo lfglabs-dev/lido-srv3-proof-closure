@@ -47,8 +47,8 @@
         "name": "LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.world_producer_correspondence",
         "module": "LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer",
         "file": "LidoSRv3/Audit/Source/TrioAlloc1/VerityProducer.lean",
-        "start_line": 75,
-        "end_line": 80,
+        "start_line": 76,
+        "end_line": 81,
         "doc": "",
         "statement": "theorem world_producer_correspondence (l : Layout) (input : CapacityInput)\n    (adversary : DenoteExternalCalls.AdversaryModel) (state : DenoteExternalCalls.CallState)\n    (before : Transcript) :\n    (executeWorld l input adversary state before).1 =\n      produce l (worldStorage state.world) (sourceOracle adversary state.world) input before ∧\n    (executeWorld l input adversary state before).2.world = state.world"
       }
@@ -81,7 +81,7 @@
   },
   "id": "P-ALLOC-1",
   "position": 1,
-  "summary": "checked_execute: under CheckedBounds the source executor succeeds and its capacity column equals MathView. The named capacity kill-line remains parent-shaped; active_capacity_bounded remains an unregistered Nat.min child. Verity: allocateLiveFromStorage reads and 32-caps the router count, decodes packed ModuleStateConfig fields, executes the source-derived mapped getStakingModuleSummary staticcall for each row, decodes the 96-byte (exited, deposited, depositable) ABI tuple, and for type-2 rows executes the distinct pinned getTotalModuleStake staticcall (selector 0x0c852f5c) and fail-closed 32-byte uint256 decode before allocation. It persists the computed arrays, and observe equals sourceView when those adversarial call observations decode to the expected source rows. Reachable-router CheckedBounds remains explicitly open.",
+  "summary": "checked_execute: under CheckedBounds the source executor succeeds and its capacity column equals MathView. The named capacity kill-line remains parent-shaped; active_capacity_bounded remains an unregistered Nat.min child. Verity: allocateLiveFromStorage reads and 32-caps the router count, decodes packed ModuleStateConfig fields, executes the source-derived mapped getStakingModuleSummary staticcall for each row, decodes the 96-byte (exited, deposited, depositable) ABI tuple, and for type-2 rows executes the distinct pinned getTotalModuleStake staticcall (selector 0x0c852f5c) and fail-closed 32-byte uint256 decode before allocation. It persists the computed arrays, and observe equals sourceView when those adversarial call observations decode to the expected source rows. Reachable-router CheckedBounds remains explicitly open. The registered transaction parent additionally consumes the account-qualified interleaved source producer, preserving its result and response-dependent transcript for every input and its STATICCALL world preservation. This does not equate that producer with the legacy persisted observation executor.",
   "classification": {
     "kind": "IMPLEMENTATION_PENDING",
     "work": "Retain conditional registered source/callback correspondence. Classify unconditional reachable CheckedBounds as an external module/input invariant obligation with an ABI-valid counterexample; retain call-hoisting and physical-slot limitations. Validate the witness and final combined SHA; no invented router history."
@@ -96,8 +96,8 @@
       "name": "LidoSRv3.Audit.Guarantees.PAlloc1.checked_execute",
       "module": "LidoSRv3.Audit.Guarantees.PAlloc1",
       "file": "LidoSRv3/Audit/Guarantees/PAlloc1.lean",
-      "start_line": 108,
-      "end_line": 113,
+      "start_line": 109,
+      "end_line": 114,
       "doc": "/-- **Wave 2 registered parent.**  Under `CheckedBounds`, the source-shaped\nexecutor succeeds and its capacity column equals the independent `MathView`\nmodel.  This restates `source_capacities_match_canonical` above under the\nparent's public name: it is exactly the executable content of the retired\nWave 1 parent `checked_execute_and_active_capacity_bounded`, with the\n`active_capacity_bounded` conjunct dropped. That conjunct is a\n`Nat.min_le_left`/`Nat.min_le_right` tautology on the `MathView.capacity`\n*definition* that holds for any two `Nat`s regardless of whether `execute`\ncomputed the right target or headroom (P-ALLOC-1 audit issue 1). Folding a\ndefinitional tautology into the parent meant no mutant could ever be written\nthat broke only that conjunct, so the registered parent is narrowed here to\nthe one conjunct a kill-line can actually falsify; `active_capacity_bounded`\nremains available above as an explicit, unregistered MathView-definitional\nchild. -/",
       "statement": "theorem checked_execute\n    (cfg : Config) (modules : List Module) (depositsToAllocate : Verity.Uint256)\n    (isTopUp : Bool) (hBounds : CheckedBounds cfg modules depositsToAllocate isTopUp) :\n    ∃ rows, SolidityAllocCapacity.execute cfg modules depositsToAllocate isTopUp = some rows ∧\n      rows.map (fun row => (row.capacity : Nat)) =\n        MathView.capacities cfg modules depositsToAllocate isTopUp"
     },
@@ -108,19 +108,20 @@
       "name": "LidoSRv3.Audit.Guarantees.PAlloc1.verity_tx_simulates_allocation_count_from_storage",
       "module": "LidoSRv3.Audit.Guarantees.PAlloc1",
       "file": "LidoSRv3/Audit/Guarantees/PAlloc1.lean",
-      "start_line": 328,
-      "end_line": 339,
-      "doc": "/-- Storage-backed P-ALLOC-1 live-summary transaction closure. The router\nmodule count is read from storage and capped at 32. `bindLiveAll` reads each\npacked `ModuleStateConfig`, executes the mapped summary staticcall, ABI-decodes\nthe returned `(exited, deposited, depositable)` words, and for type-2 rows\nexecutes the distinct pinned `getTotalModuleStake()` staticcall and ABI-decodes\nits uint256 word before passing rows to the allocation loop. The premise says\nthose adversarial call observations decode to the source-view rows. It does\nnot prove reachable-router `CheckedBounds`. -/",
-      "statement": "theorem verity_tx_simulates_allocation_count_from_storage\n    (adversary :\n      Compiler.CompilationModel.DenoteExternalCalls.AdversaryModel)\n    (cfg : Config)\n    (modules : List BoundModule)\n    (depositsToAllocate : Verity.Uint256) (isTopUp : Bool)\n    (state : Verity.ContractState)\n    (hLength : modules.length = min (state.readSlot modulesCountSlot).val 32)\n    (hBind : (bindLiveAll adversary state 0 modules.length) state = .success modules state) :\n    observe modules\n        ((allocateLiveFromStorage adversary cfg depositsToAllocate isTopUp).run state) =\n      sourceView cfg modules depositsToAllocate isTopUp"
+      "start_line": 333,
+      "end_line": 357,
+      "doc": "/-- Storage-backed P-ALLOC-1 live-summary transaction closure. The router\nmodule count is read from storage and capped at 32. `bindLiveAll` reads each\npacked `ModuleStateConfig`, executes the mapped summary staticcall, ABI-decodes\nthe returned `(exited, deposited, depositable)` words, and for type-2 rows\nexecutes the distinct pinned `getTotalModuleStake()` staticcall and ABI-decodes\nits uint256 word before passing rows to the allocation loop. The premise says\nthose adversarial call observations decode to the source-view rows. It does\nnot prove reachable-router `CheckedBounds`. The additional clause consumes the\ninterleaved source producer in the same physical account/world for every input,\nretaining errors and call order without clipping its count. It does not identify\nthe legacy persisted observations with that producer or discharge deployment,\nlayout/hash, gas, caller-context or supported-module reachability obligations. -/",
+      "statement": "theorem verity_tx_simulates_allocation_count_from_storage\n    (adversary :\n      Compiler.CompilationModel.DenoteExternalCalls.AdversaryModel)\n    (cfg : Config)\n    (modules : List BoundModule)\n    (depositsToAllocate : Verity.Uint256) (isTopUp : Bool)\n    (state : Verity.ContractState)\n    (hLength : modules.length = min (state.readSlot modulesCountSlot).val 32)\n    (hBind : (bindLiveAll adversary state 0 modules.length) state = .success modules state) :\n    (observe modules\n        ((allocateLiveFromStorage adversary cfg depositsToAllocate isTopUp).run state) =\n      sourceView cfg modules depositsToAllocate isTopUp) ∧\n    (∀ (layout : LidoSRv3.Audit.Source.TrioAlloc1.Layout)\n      (input : LidoSRv3.Audit.Source.TrioAlloc1.CapacityInput)\n      (gas : Nat) (before : LidoSRv3.Audit.Source.TrioAlloc1.Transcript),\n      let callState : Compiler.CompilationModel.DenoteExternalCalls.CallState :=\n        ⟨state, gas, []⟩\n      (LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.executeAccount\n        layout input adversary callState before).1 =\n        LidoSRv3.Audit.Source.TrioAlloc1.produce layout\n          (LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.accountStorage state)\n          (LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.sourceOracle adversary state)\n          input before ∧\n      (LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.executeAccount\n        layout input adversary callState before).2.world = state)"
     }
   ],
   "kill_lines": {
     "modules": [
-      "LidoSRv3.Tests.AllocationTxMutants"
+      "LidoSRv3.Tests.AllocationTxMutants",
+      "LidoSRv3.Tests.TrioAlloc1.AccountProducer"
     ],
     "reproduction": {
-      "command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Audit.Verity.AllocationTx LidoSRv3.Tests.AllocationTxMutants",
-      "expected": "checked execute + MathView match parent (min-clamp tautology demoted to an unregistered child), storage-backed 32-capped allocation transaction with packed ModuleStateConfig reads and live 96-byte getStakingModuleSummary ABI decoding, the parent capacity kill-line and summary_field_order_kill_line_refutes_decoder, plus off-by-one/wrong-binding/stale-snapshot/rollback/two-batch mutants build"
+      "command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Audit.Verity.AllocationTx LidoSRv3.Tests.AllocationTxMutants LidoSRv3.Tests.TrioAlloc1.AccountProducer",
+      "expected": "checked execute + MathView match parent (min-clamp tautology demoted to an unregistered child), storage-backed 32-capped allocation transaction with packed ModuleStateConfig reads and live 96-byte getStakingModuleSummary ABI decoding, the parent capacity kill-line and summary_field_order_kill_line_refutes_decoder, plus off-by-one/wrong-binding/stale-snapshot/rollback/two-batch mutants build; account-qualified producer rejects ABI-valid (1,0,0) summary before stake/next-module calls and distinguishes conflicting unqualified storage"
     }
   },
   "assumptions": [

@@ -1,0 +1,48 @@
+import LidoSRv3.Tests.TrioAlloc1.VerityVectors
+
+set_option maxRecDepth 4096
+namespace LidoSRv3.Tests.TrioAlloc1.AccountProducer
+open LidoSRv3.Audit.Source.TrioAlloc1
+open Compiler.CompilationModel
+
+/-- Test layout/hash only; production still requires the actual deployment
+layout. Conflicting unqualified words deliberately describe an empty router. -/
+def accountWorld (s : Storage) : _root_.Verity.ContractState :=
+  { _root_.Verity.defaultState with
+    thisAddress := 99
+    storageWords := fun key => match key with
+      | .contractSlot owner key => if owner = 99 then
+          ⟨(s (word key)).val, (s (word key)).isLt⟩ else 0
+      | _ => 0 }
+
+def badSummary : StaticOracle := fun _ _ => .returned (summary 1 0 0)
+
+def initial : DenoteExternalCalls.CallState :=
+  { world := accountWorld (storage 2 (packed 21 5000 0 2) (packed 22 5000 0 1))
+    gasRemaining := 2^256-1 }
+
+def result := VerityProducer.executeAccount layout input (vmAdversary badSummary) initial []
+
+/-- ABI-valid arbitrary replies refute unconditional allocation success. The
+physical-account producer panics after the first summary, before the WC02
+stake call and before the next module. This is not a supported-module proof. -/
+theorem inconsistent_summary_stops_calls :
+    columns result.1.1 = .error (.panic (word 0x11)) ∧
+    result.1.2.map (fun item => (item.request.target.val, item.request.payload)) =
+      [(21, summaryPayload)] := by decide +kernel
+
+/-- The obsolete unqualified projection falsely takes the empty-router path
+on this same world. The regression distinguishes the two executable paths. -/
+theorem unqualified_projection_misses_module :
+    (VerityProducer.executeWorld layout input (vmAdversary badSummary) initial []).1.2 = [] ∧
+    result.1.2.length = 1 := by decide +kernel
+
+/-- STATICCALL cannot commit the adversary's proposed selfBalance mutation. -/
+theorem static_world_preserved : result.2.world = initial.world :=
+  (VerityProducer.account_producer_correspondence layout input (vmAdversary badSummary)
+    initial []).2
+
+#print axioms inconsistent_summary_stops_calls
+#print axioms unqualified_projection_misses_module
+#print axioms static_world_preserved
+end LidoSRv3.Tests.TrioAlloc1.AccountProducer

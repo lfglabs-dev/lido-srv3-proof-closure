@@ -8,6 +8,7 @@ import LidoSRv3.Audit.Guarantees.PAlloc1TotalAdditionBounded
 import LidoSRv3.Audit.Guarantees.PAlloc1AvailableArithmeticBounded
 import LidoSRv3.Audit.Verity.AllocCapacityPhase3
 import LidoSRv3.Audit.Verity.AllocationTx
+import LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer
 
 namespace LidoSRv3.Audit.Guarantees.PAlloc1
 
@@ -324,7 +325,11 @@ the returned `(exited, deposited, depositable)` words, and for type-2 rows
 executes the distinct pinned `getTotalModuleStake()` staticcall and ABI-decodes
 its uint256 word before passing rows to the allocation loop. The premise says
 those adversarial call observations decode to the source-view rows. It does
-not prove reachable-router `CheckedBounds`. -/
+not prove reachable-router `CheckedBounds`. The additional clause consumes the
+interleaved source producer in the same physical account/world for every input,
+retaining errors and call order without clipping its count. It does not identify
+the legacy persisted observations with that producer or discharge deployment,
+layout/hash, gas, caller-context or supported-module reachability obligations. -/
 theorem verity_tx_simulates_allocation_count_from_storage
     (adversary :
       Compiler.CompilationModel.DenoteExternalCalls.AdversaryModel)
@@ -334,11 +339,28 @@ theorem verity_tx_simulates_allocation_count_from_storage
     (state : Verity.ContractState)
     (hLength : modules.length = min (state.readSlot modulesCountSlot).val 32)
     (hBind : (bindLiveAll adversary state 0 modules.length) state = .success modules state) :
-    observe modules
+    (observe modules
         ((allocateLiveFromStorage adversary cfg depositsToAllocate isTopUp).run state) =
-      sourceView cfg modules depositsToAllocate isTopUp :=
-  verity_tx_simulates_live_summary_from_storage
-    adversary cfg modules depositsToAllocate isTopUp state hLength hBind
+      sourceView cfg modules depositsToAllocate isTopUp) ∧
+    (∀ (layout : LidoSRv3.Audit.Source.TrioAlloc1.Layout)
+      (input : LidoSRv3.Audit.Source.TrioAlloc1.CapacityInput)
+      (gas : Nat) (before : LidoSRv3.Audit.Source.TrioAlloc1.Transcript),
+      let callState : Compiler.CompilationModel.DenoteExternalCalls.CallState :=
+        ⟨state, gas, []⟩
+      (LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.executeAccount
+        layout input adversary callState before).1 =
+        LidoSRv3.Audit.Source.TrioAlloc1.produce layout
+          (LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.accountStorage state)
+          (LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.sourceOracle adversary state)
+          input before ∧
+      (LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.executeAccount
+        layout input adversary callState before).2.world = state) := by
+  constructor
+  · exact verity_tx_simulates_live_summary_from_storage
+      adversary cfg modules depositsToAllocate isTopUp state hLength hBind
+  · intro layout input gas before
+    exact LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.account_producer_correspondence
+      layout input adversary ⟨state, gas, []⟩ before
 
 /-- Every revert of the allocation transaction, including the injected
 failure after intermediate map/slot writes, restores the pre-call snapshot. -/

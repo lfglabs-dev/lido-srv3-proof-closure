@@ -1,5 +1,6 @@
 import LidoSRv3.Audit.Source.TrioAlloc1.CallTree
 import Verity.Core.Model.DenoteExternalCalls
+import LidoSRv3.Audit.Source.TrioReserve1.AccountFrame
 
 /-!
 Full call-tree interpretation in pinned Verity's executable external-call DenoteExternalCalls.
@@ -79,6 +80,36 @@ theorem world_producer_correspondence (l : Layout) (input : CapacityInput)
       produce l (worldStorage state.world) (sourceOracle adversary state.world) input before ∧
     (executeWorld l input adversary state before).2.world = state.world :=
   producer_correspondence l (worldStorage state.world) input adversary state before
+
+/-- The executing router account supplies every count, enumeration and packed
+record word. The call adversary still observes the original whole world. -/
+def accountStorage (world : _root_.Verity.ContractState) : Storage := fun key =>
+  let value := world.readContractSlot world.thisAddress.val key.val
+  ⟨value.val, value.isLt⟩
+
+/-- The shared entry adapter derives this view; independent storage channels
+are never equated by a caller premise. -/
+theorem accountStorage_from_frame (world : _root_.Verity.ContractState) :
+    accountStorage world = worldStorage
+      (TrioReserve1.AccountFrame.enter ⟨world.thisAddress, world.sender⟩ world) := rfl
+
+def executeAccount (l : Layout) (input : CapacityInput)
+    (adversary : DenoteExternalCalls.AdversaryModel) (state : DenoteExternalCalls.CallState)
+    (before : Transcript := []) :=
+  execute l (accountStorage state.world) input adversary state before
+
+/-- All outcomes and response-dependent call order, without CheckedBounds,
+count clipping, successful decoding or desired-boundary hypotheses. -/
+theorem account_producer_correspondence (l : Layout) (input : CapacityInput)
+    (adversary : DenoteExternalCalls.AdversaryModel) (state : DenoteExternalCalls.CallState)
+    (before : Transcript) :
+    (executeAccount l input adversary state before).1 =
+      produce l (accountStorage state.world) (sourceOracle adversary state.world) input before ∧
+    (executeAccount l input adversary state before).2.world = state.world :=
+  producer_correspondence l (accountStorage state.world) input adversary state before
+
+#print axioms accountStorage_from_frame
+#print axioms account_producer_correspondence
 
 end VerityProducer
 end LidoSRv3.Audit.Source.TrioAlloc1

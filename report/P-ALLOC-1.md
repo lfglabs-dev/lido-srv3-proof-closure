@@ -59,3 +59,25 @@ REMOTE_BUILD_NODE_ID=dgx-spark REMOTE_BUILD_PASSIVE=1 remote-lean-build lake bui
 ```
 
 Lean v4.31.0 and Verity e977aaad6e1a9e92e0132d41b3d33a14135a4d46 are pinned. Earlier phase1 targeted builds passed, but do not validate this new witness or the final combined SHA. Fresh independent audit remains required.
+
+## Account-qualified interleaved producer
+
+The registered Verity parent retains its prior conditional persisted-observation
+conclusion and now also consumes `VerityProducer.executeAccount` on the same
+world and adversary for all producer inputs. Every count/enumeration/packed word
+comes from `readContractSlot state.thisAddress`; `AccountFrame.enter` derives
+that projection. The VM executes each STATICCALL and its reply-dependent
+continuation before constructing later calls. Success, decoder failure, revert
+and arithmetic failure retain their actual source result and transcript;
+STATICCALL preserves the physical world. The producer does not cap count at 32.
+
+`Tests.TrioAlloc1.AccountProducer` preserves the ABI-valid `(1,0,0)` summary
+counterexample: panic after the first summary prevents both its WC02 stake call
+and the next module. A conflicting empty unqualified channel would incorrectly
+skip that call. The test hash is only a fixture, not deployment evidence.
+
+This addition does not identify the legacy persisted-output executor with the
+new producer. Supported-module reply invariants and reachable CheckedBounds,
+actual layout/hash identity, caller context, compiler memory and gas/runtime
+correspondence remain open. Independent validation dependency
+`I-REVIEW-80FE-FULL-GATE-AXIOMS` remains open; no CLEAN is inferred.
