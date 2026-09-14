@@ -1,3 +1,4 @@
+import LidoSRv3.Audit.Guarantees.PReserve1UnfinalizedStaticcall
 import LidoSRv3.Audit.Guarantees.PReserve1LiveWriters
 import LidoSRv3.Audit.Guarantees.PSsz1DeclaredSiblings
 import LidoSRv3.Audit.Guarantees.PTopupRouterAdmissionCall
@@ -111,9 +112,9 @@ example : PDeposit1.guarantee.checkedLayers = [.model, .abstractTx, .source, .ve
 example : PTopup1.guarantee.checkedLayers = [.model, .abstractTx, .source, .verityTx] := by decide
 example : PAccount1.guarantee.checkedLayers = [.model, .source, .verityTx] := by decide
 
-/-- P-DEPOSIT-1's `.verityTx` layer is carried by the universal list-batch
-composition over one shared source/executable quantifier scope. -/
-example := @PDeposit1.NFrame.verity_tx_composes_nframe_deposit
+/-- Registered DEPOSIT consumer: physical suffix and executed allocation.
+Available ether, call realization and deployment/configuration remain open. -/
+example := @PDeposit1.actual_deposit_call_slot_success_and_revert
 
 example : LidoSRv3.Audit.Verity.DepositParentTx.Preconditions
     LidoSRv3.Audit.Verity.DepositParentTx.canonicalInputs

@@ -1,24 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 cd "$(dirname "$0")/.."
-solc="${SOLC_0424:-$HOME/.local/share/svm/0.4.24/solc-0.4.24}"
-if [[ ! -x "$solc" ]]; then
-  solc="$HOME/.svm/0.4.24/solc-0.4.24"
-fi
-if [[ ! -x "$solc" ]]; then
-  # Official solc 0.4.24 has no native Linux ARM64 release. Use the exact
-  # official soljson build with identical optimizer/EVM settings on such runners.
-  exec bash scripts/compile_reserve_soljson.sh
-fi
-out=solidity/out/reserve-0424
-mkdir -p "$out"
-"$solc" \
-  --bin --abi --overwrite --optimize --optimize-runs 200 \
-  --evm-version constantinople \
-  @aragon/=audit/account-fee-distribution/solidity/vendor/@aragon/ \
-  openzeppelin-solidity/=audit/account-fee-distribution/solidity/vendor/openzeppelin-solidity/ \
-  contracts/=lido-core/contracts/ \
-  --allow-paths "$(pwd)" \
-  -o "$out" \
-  solidity/reserve/pin/ReserveHarness.sol
-[[ -s "$out/ReserveHarness.bin" ]] || { echo "ReserveHarness.bin missing" >&2; exit 1; }
+# Every architecture uses the checksummed soljson + Node artifacts. Do not
+# select an unchecked SOLC_0424 or SVM native executable from the environment.
+exec bash scripts/compile_reserve_soljson.sh

@@ -1,3 +1,30 @@
+# Current independent validation status
+
+Reviewer 01ab3536 reports exact-SHA full validation at
+`d0926d6c740e1798f489808aa1b847dae245d425` PASSED: make prove, make test,
+74 differential cases, 2119 library jobs, axiom recomputation and native
+reevaluation. UX2 and theorem-coordinate repairs were independently confirmed.
+Thus I-REVIEW-80FE-FULL-GATE-AXIOMS is satisfied for that SHA; infrastructure is
+not the remaining blocker. It does not cover later source edits. Verdict remains
+**BLOCKED** for source/scope findings, not CLEAN or source acceptance.
+
+The 31 GitHub review comments were retrieved and preserved in the writer output.
+The separate reviewer workspace ledger and terminal receipt are not mounted in
+this container. This status attributes the full-gate result to the controller's
+reviewer handoff, not a writer rerun or an inspection of missing artifacts.
+
+This successor repairs the zero-code precompile dispatch and unchecked reserve
+compiler selection, and synchronizes the DEPOSIT facade/remaining allocation
+boundary and ALLOC2 report. These repairs require fresh exact-SHA execution and
+independent review. The callee's deployed precompile semantics and fork identity
+remain runtime obligations; dispatch alone is not precompile refinement.
+
+I-ALLOC1-EXECUTOR-RESULT-BRIDGE, supported-module reachability, ALLOC2 deployment,
+inherited semantic/facade gaps and remaining native phases are still open. The
+arbitrary-module counterexample is unchanged. No overall closure is claimed.
+
+## Historical review records (superseded validation status)
+
 # Independent validation dependency
 
 Reviewer `80fe125b` reviewed frozen PR #918 SHA

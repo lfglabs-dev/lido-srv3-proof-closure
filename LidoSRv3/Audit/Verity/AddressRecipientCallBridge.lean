@@ -86,6 +86,15 @@ def claimStorage (ctx : Context) (requestId hint : Nat) (recipient : Address) :
       ⟨.ok payout, { world with core := AccountFrame.commit ctx.self world.core after }, []⟩
   | .revert reason _ => ⟨.error (.reason reason), world, []⟩
 
+/-- Cancun precompiles occupy addresses 1 through 10 despite having no bytecode.
+Their execution belongs to the callee boundary, never the EOA shortcut. -/
+def emptyCodeAccount (world : World) (recipient : Address) : Prop :=
+  (world.core.codeSize recipient.val).val = 0 ∧
+    (recipient.val = 0 ∨ 10 < recipient.val)
+instance (world : World) (recipient : Address) : Decidable (emptyCodeAccount world recipient) :=
+  inferInstanceAs (Decidable ((world.core.codeSize recipient.val).val = 0 ∧
+    (recipient.val = 0 ∨ 10 < recipient.val)))
+
 /-- Exact `WithdrawalQueueBase._sendValue` call frame (lines 475--480): it is
 an EVM `CALL` to the recipient with value and **empty** calldata.  The generic
 `Live.call` helper encodes a four-byte selector, so using it here would silently
@@ -97,7 +106,7 @@ def emptyValueCall (callee : External) (ctx : Context) (recipient : Address)
   let request : Request := ⟨ctx.self, recipient, value, []⟩
   if world.balances ctx.self < value.val then
     ⟨.error (.reason "NotEnoughEther"), world, [⟨request, false, [], []⟩]⟩
-  else if (world.core.codeSize recipient.val).val = 0 then
+  else if emptyCodeAccount world recipient then
     -- EVM CALL to an EOA succeeds after value transfer; no callee is invoked.
     ⟨.ok (), transfer world ctx.self recipient value.val, [⟨request, true, [], []⟩]⟩
   else
@@ -175,11 +184,11 @@ def eoaPayoutWorld : World :=
     balances := fun address => if address = claimBridgeContext.self then 30 else 0 }
 
 theorem eoa_empty_value_call_receipt :
-    let result := emptyValueCall rejectingCallee claimBridgeContext (2 : Address) 30 eoaPayoutWorld
+    let result := emptyValueCall rejectingCallee claimBridgeContext (1002 : Address) 30 eoaPayoutWorld
     result.outcome = .ok () ∧
       result.world.balances claimBridgeContext.self = 0 ∧
-      result.world.balances (2 : Address) = 30 ∧
-      result.attempts = [⟨⟨claimBridgeContext.self, (2 : Address), 30, []⟩, true, [], []⟩] := by
+      result.world.balances (1002 : Address) = 30 ∧
+      result.attempts = [⟨⟨claimBridgeContext.self, (1002 : Address), 30, []⟩, true, [], []⟩] := by
   decide +kernel
 
 /-- The `twoClaimState` storage witness with a code-bearing recipient and a
@@ -564,9 +573,9 @@ def PayoutEffect (callee : External) (ctx : Context) (recipient : Address)
   before.balances ctx.self ≥ (Verity.Core.Uint256.ofNat payout).val ∧
     ∃ returned nested,
       attempts = [⟨request, true, returned, nested⟩] ∧
-      (((before.core.codeSize recipient.val).val = 0 ∧
+      ((emptyCodeAccount before recipient ∧
           after = credited ∧ returned = [] ∧ nested = []) ∨
-       ((before.core.codeSize recipient.val).val ≠ 0 ∧
+       (¬ emptyCodeAccount before recipient ∧
          ((callee request credited = .success returned after ∧ nested = []) ∨
            callee request credited = .successWithTrace returned after nested)))
 
@@ -579,7 +588,7 @@ theorem emptyValueCall_success (callee : External) (ctx : Context)
   by_cases hf : before.balances ctx.self < (Verity.Core.Uint256.ofNat payout).val
   · simp only [emptyValueCall, if_pos hf] at h
     contradiction
-  · by_cases he : (before.core.codeSize recipient.val).val = 0
+  · by_cases he : emptyCodeAccount before recipient
     · simpa only [emptyValueCall, if_neg hf, if_pos he] using
         (show PayoutEffect callee ctx recipient payout before
           (transfer before ctx.self recipient (Verity.Core.Uint256.ofNat payout).val)

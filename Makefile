@@ -33,6 +33,7 @@ check: test
 	@printf '%s\n' 'check ok: metadata, mutants, receipt, provenance, and executable regressions passed'
 
 test:
+	@bash scripts/test_reserve_compiler_selection.sh
 	@python3 scripts/generate_ux2.py check
 	@python3 scripts/check_report_theorem_inventory.py
 	@python3 scripts/test_differential_sources.py

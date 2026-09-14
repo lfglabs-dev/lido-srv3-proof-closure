@@ -1,34 +1,36 @@
 # P-ALLOC-2
 
-> Round 2 (2026-08-21). Product note plus proof audit, arbitrated from GPT 5.6 Pro and Opus 5. Fable 5 was unavailable (data-retention gate). Kimi K3 was not an allowed Task model. No em dashes. Lean is authority.
+The registered abstract parent `step_correspondence_and_full_loop_conservation`
+retains step correspondence, fuel-bounded conservation, and proportional model
+loop correspondence across mutations. Its fourth conjunct consumes the unbounded
+`TrioAlloc2.allocate` execution: array extent bounds yield success, independent
+`Spec.Distributes`, bucket-total conservation, and allocated amount bounded by
+demand. It requires neither supplied fuel nor a successful-result premise for
+that fourth conjunct. Closed rows are filtered and the specification consumes
+each mutation. The older unit-step model remains a separate child.
 
-Once P-ALLOC-1 has produced the two lists (current allocation, capacity), `MinFirstAllocationStrategy.allocate` distributes the requested amount: it repeatedly calls `allocateToBestCandidate` until demand is exhausted or no bucket can take more.
+The registered Verity parent remains `verity_tx_simulates_min_first_distribution`.
+Decoded-loop conservation is not a proof of physical ABI/memory layout, linked
+library identity, compiler/runtime refinement, supported-module reachable caps,
+or deployed execution. These are remaining obligations, not discharged by a
+successful build. The original ALLOC arbitrary-module counterexample remains.
 
-P-ALLOC-2 verifies each fill step and conservation across a successful fuel-bounded full loop:
+Current registry assumptions are A-VERITY-SCAFFOLD, A-SOLC-TRUSTED and
+A-RUNTIME-PROVENANCE. A-HANDWRITTEN-MINFIRST is not a current P-ALLOC-2
+registry assumption. Current source regressions include
+`Tests.TrioAlloc2.RegisteredLoop`: a closed row does not cap an open row's fill,
+and tied buckets fill by capacity before the remaining allocation moves on.
+These regressions are not paired Solidity differential evidence.
 
-- selection: the chosen bucket $b$ is the first open bucket minimizing $\mathrm{allocation}$. Ties keep the lower index (source replaces the saved candidate only on a strict $>$).
-- amount: $\mathrm{allocated} = \min(\mathrm{share},\ \min(\mathrm{upper},\ \mathrm{capacity}[b]) - \mathrm{allocation}[b])$
-  - $\mathrm{share} = \lceil \mathrm{remaining} / \mathrm{count} \rceil$ when $\mathrm{count} > 1$, else remaining
-  - count = number of open buckets sitting at that minimum
-  - upper = least allocation strictly above the minimum among open buckets, else $2^{256}-1$
-- bounds: $0 < \mathrm{allocated} \le \mathrm{remaining}$ and $\mathrm{allocation}[b] + \mathrm{allocated} \le \mathrm{capacity}[b]$
+Next work must connect the decoded loop to its actual deployed caller, physical
+memory/ABI and runtime, and close upstream supported-module invariants. It must
+not replace that work with another independent-loop helper.
 
-Note the cap at the next fill level: the served bucket rises to the level of the bucket above it and no further. That is what makes the fill proportional rather than greedy.
+## Historical audit record
 
-The registered parent (`step_correspondence_and_full_loop_conservation`) keeps the abstract model/source step correspondence and checked amount equality, and adds conservation for every successful fuel-bounded run of the independently stated proportional source loop: final allocated plus remaining equals the initial request. The proved source/executor loop equality transfers that invariant to the loop used by the Verity transaction. We do not prove the caps fed into it (P-ALLOC-1), and we do not prove Solidity or bytecode equivalence.
-
-## Proof limitations and recommendations
-
-The parent’s step conjunct is a genuine unbounded $\forall$ over finite lists and words, hypothesized on `RowsCorrespond`, source selection, openness, length $< 2^{256}$, nonzero demand, and successful `checkedAmount`. Its conclusion includes equality with independent `Model.amount`, so ceilDiv and both clamps are load-bearing. The full-loop conjunct is fuel-bounded conservation over the proportional source loop. It does not carry `RowsCorrespond` through mutations or define an independent proportional model loop.
-
-`A-HANDWRITTEN-MINFIRST` and `A-VERITY-SCAFFOLD` are load-bearing. The +1 child `selects_least_open_bucket` is a different algorithm. YAML already lists activity filtering (upstream), keccak oracle, and in-place memory mutation. Kill-lines `selection_kill_line_refutes_parent` and `headroom_clamp_kill_line_refutes_parent` are parent-shaped; they do not kill positivity, $w \le r$, or the next-level clamp, and they do not refute the Verity parent.
-
-CHECKED includes full-loop allocated/remaining conservation. It does not mean full-loop model-state correspondence, Solidity equivalence, or that capacities were built correctly.
-
-Ranked next work: define an independent proportional model loop and prove multi-step `RowsCorrespond` across mutations; keep the +1 model as a child.
-
-Theorems: `PAlloc2.step_correspondence_and_full_loop_conservation` (registered parent), `PAlloc2.source_allocate_loop_conserves_requested`, `MinFirstDistributionTx.allocateLoop_conserves_total`, `PAlloc2.forall_proportional_step_correspondence_and_bounded` (step conjunct), `PAlloc2.selects_least_open_bucket` (child), `PAlloc2.verity_tx_simulates_min_first_distribution`, `Tests.MinFirstDistributionTxMutants.selection_kill_line_refutes_parent` (step kill-line), `Tests.MinFirstDistributionTxMutants.headroom_clamp_kill_line_refutes_parent` (step kill-line).
-Assumptions: `A-HANDWRITTEN-MINFIRST`, `A-VERITY-SCAFFOLD`. Related (not listed on the YAML row): `A-ALLOC2-TX-BOUNDARY`.
+The dated sections below preserve prior findings and remediation history. Their
+statements about then-registered parents, assumptions and missing loop proofs are
+historical; the current statement and remaining obligations are described above.
 
 ## Intent
 
@@ -311,4 +313,4 @@ an open row's step toward level 5, and that a full loop fills the first tied
 bucket to capacity before allocating the remainder to the second. These are Lean
 source regressions, not paired Solidity differential receipts. The decoded-array
 result is not physical ABI/memory/deployment closure; those obligations and the
-independent full-gate/axiom dependency remain open.
+runtime refinement obligations remain open. Independent full-gate/axiom validation passed at d0926d6c, as reported by reviewer 01ab3536; that receipt does not validate successor source changes.

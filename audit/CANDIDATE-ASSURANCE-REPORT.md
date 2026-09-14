@@ -127,7 +127,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Limitations — 4 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
-- UPSTREAM-ALLOC: ModuleCall.Input.selected is an already computed allocation. This parent does not execute getDepositableEther/allocation-view calls or derive this input from P-ALLOC-1. Module id, calldata, immutable maxEB and locator identities retain typed input/deployment boundaries.
+- UPSTREAM-ALLOC: The retained suffix conjunct accepts ModuleCall.Input.selected; the added DepositAllocation.execute conjunct derives selected from the executed allocation-view producer over physical router words. Lido.getDepositableEther execution, STATICCALL/DELEGATECALL realization, module-id/calldata provenance, immutable maxEB and locator/deployment identities remain unproved boundaries.
 - MEMORY-PHASE: locator and module-return phase cursors are explicit inputs. Decoder guards execute, but free-memory-pointer origins, general memory copying and opcode gas are not proved.
 - CALLEE-BINDING: the Lido withdrawal body executes, while its getter/receiver External is universally quantified; SuffixCommitment proves the actual body and callback-result continuation, not that arbitrary callbacks implement their named deployed callees. Existing stronger ledger/conservation consumers require their explicit LocatorBound/role-distinctness hypotheses.
 - RUNTIME: physical slot calculations and the per-key beacon executable are consumed, but general deployed code, precompile dispatch, bytecode/compiler equivalence and LOG ABI/gas correspondence remain outside this source-shaped proof. Historical NFrame aggregate journals/model observation cells are not relabeled as physical storage.
