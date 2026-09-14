@@ -67,7 +67,7 @@ theorem actual_deposit_call_slot_success_and_revert
     (q : StaticCall.External) (locator : Live.Address) (cursor : Live.Word)
     (m w : Live.External) (ctx : RouterDeposit.Context) (liveCtx : Live.Context)
     (i : ModuleCall.Input) (before : Live.World) :
-    (let result := DepositDsmCall.execute q locator cursor depositPhysicalKeccak m w ctx liveCtx i before
+    (let result := DepositDsmCall.execute q locator cursor depositPhysicalKeccak m w ctx liveCtx i before;
       match result.outcome with
       | .ok _ => DepositDsmCall.Effects q locator cursor depositPhysicalKeccak m w ctx liveCtx i before
           result.world result.attempts result.locatorAttempts
