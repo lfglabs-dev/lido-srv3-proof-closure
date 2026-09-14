@@ -331,7 +331,8 @@ def SourceMemoryCallCorrespondence : Prop :=
     (aend : ap+32*((s (countSlot l)).val+1) ≤ 2^256)
     (cend : cp+32*((s (countSlot l)).val+1) ≤ 2^256)
     (countBound : (s (countSlot l)).val ≤ 32)
-    (pointer : Word) (space : pointer.val+96+32*(s (countSlot l)).val ≤ 2^32)
+    (pointer : LidoSRv3.Audit.Source.TrioAlloc1.Word)
+    (space : pointer.val+96+32*(s (countSlot l)).val ≤ 2^32)
     (trace : Trace),
     ∃ result,
       producerThenCall target memory ap cp l s oracle input pointer before trace =
