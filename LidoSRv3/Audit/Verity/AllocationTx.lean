@@ -52,8 +52,9 @@ abbrev Word := Uint256
 
 /-! ## Router storage read by SRLib.sol:498-522 -/
 
-/-- `SRStorage.getModulesCount()` (`SRLib.sol:498`). The source caps this count by
-`MAX_STAKING_MODULES_COUNT = 32` before walking router indices. -/
+/-- Legacy model observation slot, not the physical SRStorage registry slot.
+This adapter clips its modeled count to 32. The physical source producer does
+not perform that clipping; supported registry bounds need a separate proof. -/
 def modulesCountSlot : Nat := 29
 /-- `SRStorage.getModuleIdAt(i)` (`SRLib.sol:509`), map from router index to module id. -/
 def moduleIdSlot : Nat := 30
@@ -349,11 +350,10 @@ def allocate (count : Nat) (cfg : Config) (depositsToAllocate : Word)
           .success ⟨rows.map Row.currentAllocation, rows.map Row.capacity,
             addresses, total⟩ dirty
 
-/-- Allocation entry point whose loop bound comes from router storage, capped
-at the pinned `MAX_STAKING_MODULES_COUNT = 32`. This is the storage-counted
-shape of `StakingRouter.getDepositAllocations` (`StakingRouter.sol:929-936`)
-restricted to the `_getModulesAllocationAndCapacity` step (see the module
-header, "Not transcribed: SRLib.sol:403-427"). -/
+/-- Legacy allocation entry point whose model count is clipped to 32. Its
+unqualified storage and persisted observation arrays are not the physical router
+layout. The public source wrapper and account-qualified producer are separate
+executables; equality requires a derived representation relation. -/
 def allocateFromStorage (cfg : Config) (depositsToAllocate : Word)
     (isTopUp : Bool) (failAfterWrites : Bool := false) : Contract Result :=
   fun snapshot =>

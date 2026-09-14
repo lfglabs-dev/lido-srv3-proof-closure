@@ -1,4 +1,5 @@
 import LidoSRv3.Tests.TrioAlloc1.VerityVectors
+import LidoSRv3.Audit.Verity.AllocationTx
 import LidoSRv3.Audit.Source.TrioComposition.VerityParentResult
 
 set_option maxRecDepth 4096
@@ -52,6 +53,30 @@ theorem public_result_preserves_summary_failure :
     r.1.1 = .error (.panic (word 0x11)) ∧
     r.1.2.map (fun item => (item.request.target.val, item.request.payload)) =
       [(21, summaryPayload)] := by decide +kernel
+
+/-- Both legacy theorem premises can hold while the physical registry is
+nonempty. Their storage channels are distinct even in the very same world. -/
+theorem legacy_empty_length_premise :
+    ([] : List LidoSRv3.Audit.Verity.AllocationTx.BoundModule).length =
+      min (initial.world.readSlot LidoSRv3.Audit.Verity.AllocationTx.modulesCountSlot).val 32 := by
+  decide +kernel
+
+theorem legacy_empty_binding_premise :
+    (LidoSRv3.Audit.Verity.AllocationTx.bindLiveAll (vmAdversary badSummary)
+      initial.world 0 0) initial.world = .success [] initial.world := rfl
+
+/-- Counterexample to identifying the legacy observation status with the
+physical result under only the registered legacy length/binding premises.
+This is not a supported-deployment witness or an excuse to drop either claim. -/
+theorem legacy_commits_while_physical_reverts :
+    (LidoSRv3.Audit.Verity.AllocationTx.observe []
+      ((LidoSRv3.Audit.Verity.AllocationTx.allocateLiveFromStorage
+        (vmAdversary badSummary) ⟨32, 2048⟩ 32 false).run initial.world)).status =
+      .committed ∧
+    (LidoSRv3.Audit.Source.TrioComposition.VerityParentResult.execute
+      layout input.config (word input.config.maxEBType1.val) false
+      (vmAdversary badSummary) initial []).1.1 = .error (.panic (word 0x11)) := by
+  decide +kernel
 
 #print axioms inconsistent_summary_stops_calls
 #print axioms unqualified_projection_misses_module

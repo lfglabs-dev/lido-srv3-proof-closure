@@ -91,3 +91,14 @@ retained, and VM STATICCALL preserves the world. This is a result correspondence
 for the new physical executable, not an equality with legacy persisted
 observation slots. That legacy bridge, actual DELEGATECALL/memory refinement,
 linked deployment identity and supported-module reachability remain open.
+
+## Legacy bridge counterexample under investigation
+
+AccountProducer now checks a single-world counterexample: legacy unqualified
+slot 29 is zero, so the legacy length and empty binding premises hold and its
+observation commits; the account-qualified registry contains two modules, and
+the physical producer rejects ABI-valid summary (1,0,0) with panic 0x11 after
+one call. The new regression requires exact-SHA Lean validation. This is not a
+supported deployment witness. It identifies the missing representation relation:
+legacy premises alone cannot justify equating the results. No such equality is
+added as an assumption, and no original intended guarantee is narrowed.
