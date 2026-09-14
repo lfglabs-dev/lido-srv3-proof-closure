@@ -165,11 +165,7 @@ private opaque nativeProvenance (names : List Lean.Name) : IO Unit
 PHASE3 = "LidoSRv3.Audit.Verity.AllocCapacityPhase3.consumed_summary_function_spec_compiles._native.native_decide.ax_1_1"
 SSZ_DIGEST = "LidoSRv3.Audit.Verity.SszAbstractDigest.deposit_data_root_compiles._native.native_decide.ax_1_1"
 CONSOLIDATION_FLOW = "LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.forward_compiles._native.native_decide.ax_1_1"
-# Every production native-decision exception, each with the label the summary
-# reports it under.  The set is derived from this map so a new exception cannot
-# be recorded in one place and silently omitted from the audit summary in the
-# other, which is how the SSZ digest and consolidation flow came to be counted
-# as test evidence.
+# Explicit production exceptions; test disclosures cannot extend this set.
 PRODUCTION_NATIVE_LABELS = {
     PHASE3: "Phase-3 capacity",
     SSZ_DIGEST: "SSZ digest",
@@ -482,6 +478,15 @@ def observed_axioms(output: str) -> tuple[set[str], list[tuple[str, set[str]]]]:
     return set().union(*(axioms for _, axioms in reports)), reports
 
 
+def check_production_scope(reports):
+    """Test disclosure cannot authorize production dependencies."""
+    for theorem, axioms in reports:
+        if not theorem.startswith("LidoSRv3.Tests."):
+            leaked = sorted(axioms - FOUNDATIONAL_AXIOMS - PRODUCTION_NATIVE_AXIOMS)
+            if leaked:
+                fail(f"{theorem} depends on test-only native axiom(s): " + ", ".join(leaked))
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--trust-output", type=Path,
@@ -554,11 +559,7 @@ def main() -> None:
     output_missing = sorted(registered - {name for name, _ in reports})
     if output_missing:
         fail("Trust output omits registered CHECKED theorem report(s): " + ", ".join(output_missing))
-    # Trust's log has said nothing verifiable so far: every line in it is just
-    # text some command printed.  Recompute what each printed theorem really
-    # depends on and require the log to match, so the axioms checked below are
-    # the environment's and not the log's.  Saved-output mode has no environment
-    # to consult and therefore certifies a report, not a build.
+    # Recompute dependencies; saved-output mode checks only a report, not a build.
     if not args.trust_output:
         computed = environment_dependencies(sorted(printed), args.provenance_module, None)
         confirm_reported_dependencies(reports, computed)
@@ -579,6 +580,8 @@ def main() -> None:
         unexpected = sorted(axioms - allowed)
         if unexpected:
             fail(f"{theorem} emits undisclosed axiom(s): " + ", ".join(unexpected))
+    # Enforce scope even when a dependency appears in the exact disclosure set.
+    check_production_scope(reports)
     if observed != allowed:
         missing = sorted(allowed - observed)
         unexpected = sorted(observed - allowed)
@@ -591,9 +594,6 @@ def main() -> None:
     observed_native = set(NATIVE_AXIOM.findall(output))
     if observed_native != disclosed:
         fail("native-decision extraction disagrees with the complete axiom report")
-    # Only the recorded production exceptions are production evidence; every
-    # other disclosed native-decision axiom is test/mutant-only.  Subtracting a
-    # single name would bury the exceptions this summary exists to surface.
     production = sorted(PRODUCTION_NATIVE_AXIOMS & observed_native)
     test_only = observed_native - PRODUCTION_NATIVE_AXIOMS
     exceptions = ", ".join(PRODUCTION_NATIVE_LABELS[name] for name in production)

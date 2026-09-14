@@ -25,12 +25,17 @@ PY
     printf "'%s' depends on axioms: [propext, Classical.choice, Quot.sound" "$theorem"
     if (( first )); then
       while IFS= read -r name; do
-        printf ', %s' "$name"
+        [[ "$name" == LidoSRv3.Tests.* ]] || printf ', %s' "$name"
       done < "$names"
       first=0
     fi
     printf ']\n'
   done
+  printf "'LidoSRv3.Tests.TrustScope.fixture' depends on axioms: [propext"
+  while IFS= read -r name; do
+    [[ "$name" != LidoSRv3.Tests.* ]] || printf ', %s' "$name"
+  done < "$names"
+  printf ']\n'
 } > "$tmp/ok"
 python3 scripts/check_trust_axioms.py --trust-output "$tmp/ok" >/dev/null
 
@@ -55,6 +60,17 @@ reject() {
     exit 1
   fi
 }
+
+# A disclosed test axiom cannot be laundered into a registered production parent.
+python3 - "$tmp/ok" "$tmp/test-native-in-production" "$names" <<'PYTEST'
+import sys
+text = open(sys.argv[1]).read()
+native = next(n for n in open(sys.argv[3]).read().splitlines() if n.startswith("LidoSRv3.Tests."))
+text = text.replace("]", ", " + native + "]", 1)
+open(sys.argv[2], "w").write(text)
+PYTEST
+reject "$tmp/test-native-in-production" 'depends on test-only native axiom(s)' \
+  'a registered parent inheriting a disclosed test witness'
 
 # A non-native project axiom (for example `opaque injected : False`, which the
 # lexical proof-escape scanner does not forbid) is emitted by Lean as an
@@ -124,7 +140,7 @@ python3 - "$tmp/ok" "$tmp/laundered-shape-report" "$laundered" <<'PY'
 import sys
 lines = open(sys.argv[1], encoding="utf-8").read().splitlines()
 for index, line in enumerate(lines):
-    if line.endswith("]"):
+    if line.startswith("'LidoSRv3.Tests.TrustScope.fixture'"):
         lines[index] = line[:-1] + ", " + sys.argv[3] + "]"
         break
 else:

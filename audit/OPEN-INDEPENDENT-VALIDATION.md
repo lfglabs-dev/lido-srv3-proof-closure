@@ -1,3 +1,31 @@
+# Reviewer 195a578f: axiom scope remains open
+
+The controller reports an independent full-gate pass at
+554c6ad9ccdf53143018de4d5dd4ab84637d27a9 and semantic BLOCKED verdict.
+Initial admission rejection is infrastructure, not a source failure.
+
+I-TRUST-FOUNDATIONAL-ONLY remains OPEN: the disclosed inventory has 35 axioms,
+comprising three foundations, three production compilation native-decision
+witnesses and 29 test-native witnesses. Native re-evaluation is not a kernel proof.
+This successor rejects test-native dependencies in production reports, with a
+regression injecting a disclosed test axiom into a registered parent. It retains
+all exceptions and witnesses; it does not claim the inventory is foundational-only.
+
+Direct kernel reduction of the three production compilation witnesses failed on
+b164f2e72796aae7c7da1411b0cf6be2401cf9c8, job
+b33c8f90-856b-43fb-9148-bd853185bf18. All three compile propositions remained
+stuck; SSZ also exposed a misplaced option after a docstring. The unchanged prior
+proofs are restored. No theorem or counterexample was removed. The pinned compiler
+contains partial helpers (including AbiEncoding.compileUnindexedAbiEncode and
+InternalArgs.staticParamBindingNames); a genuine total compiler/refinement proof
+is required to replace native computation, not an assumed compiler result.
+
+ALLOC1 supported-module reachability, ALLOC2 compiled/deployed refinement and all
+other registered obligations remain OPEN. The arbitrary-module counterexample is
+preserved. No semantic acceptance or foundational-only closure is claimed.
+
+## Earlier review records
+
 # Reviewer 56e29f61 and source-memory successor
 
 Reviewer-owned job 3a02c182-513a-4e09-a41b-ea26659cf036 passed the repository

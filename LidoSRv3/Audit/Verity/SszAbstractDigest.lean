@@ -89,11 +89,9 @@ def spec : CompilationModel :=
 def selector : Nat := 0x5cb8e1f3
 
 /-- The typed program genuinely enters Verity's compiler. -/
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 4000000 in
 theorem deposit_data_root_compiles :
     (CompilationModel.compile spec [selector]).isOk = true := by
-  decide +kernel
+  native_decide
 
 abbrev Bytes := ByteArray
 
