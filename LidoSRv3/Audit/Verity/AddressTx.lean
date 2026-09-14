@@ -80,10 +80,10 @@ verity_contract AddressTxContract where
     -- WithdrawalQueue.sol:133  _checkWithdrawalRequestAmount(_amounts[i]);   (395-402, RequestAmountTooSmall / TooLarge)
     require amountInRange "AmountOutOfRange"
     -- WithdrawalQueue.sol:374  STETH.transferFrom(msg.sender, address(this), _amountOfStETH);   (ERC20 balance and allowance checks)
-    let balance ← getMapping balances sender
-    require (balance >= amount) "InsufficientBalance"
     let allowance ← getMapping2 allowances sender owner
     require (allowance >= amount) "InsufficientAllowance"
+    let balance ← getMapping balances sender
+    require (balance >= amount) "InsufficientBalance"
     -- Deliberately precedes the external result: failure must roll this back.
     setMapping balances sender (sub balance amount)
     require externalCallSucceeds "ExternalCallFailed"
@@ -103,14 +103,14 @@ verity_contract AddressTxContract where
     let sender ← msgSender
     require (recipient != zeroAddress) "ZeroRecipient"
     require requestExists "InvalidRequestId"
+    require requestFinalized "RequestNotFinalized"
     let wasClaimed ← getMappingUint claimed requestId
     require (wasClaimed == 0) "RequestAlreadyClaimed"
-    require requestFinalized "RequestNotFinalized"
-    require hintValid "InvalidHint"
     let ownerWord ← getMappingUint owners requestId
     require (ownerWord == addressToWord sender) "NotRequestOwner"
     -- This source-ordered effects marker is rolled back if the payout fails.
     setMappingUint claimed requestId 1
+    require hintValid "InvalidHint"
     require externalCallSucceeds "ExternalCallFailed"
     setMappingUint recipients requestId (addressToWord recipient)
 
