@@ -304,8 +304,7 @@ theorem capacity_target_kill_line_refutes_parent :
 /-- ABI-valid external summaries do not establish the active subtraction
 invariant. Router-local accounting widths cannot constrain these two replies. -/
 private def inconsistentSummary : BoundModule :=
-  { modA with summaryExitedCount := w 1, depositedCount := w 0,
-    depositableCount := w 0 }
+  { modA with summaryExitedCount := w 1, depositedCount := w 0, depositableCount := w 0 }
 
 theorem inconsistent_summary_decodes :
     decodeSummary (summaryBytes 1 0 0) = some ⟨w 1,w 0,w 0⟩ := by
@@ -328,7 +327,7 @@ private def inconsistentAdversary :
     Compiler.CompilationModel.DenoteExternalCalls.AdversaryModel :=
   { liveSummaryAdversary with result := fun _ _ => .success (summaryBytes 1 0 0) }
 
-/-- The existing live callback decoder accepts the reply; the subsequent
+/- The existing live callback decoder accepts the reply; the subsequent
 source arithmetic fails, rather than claiming unconditional allocation success. -/
 #guard match (allocateLiveFromStorage inconsistentAdversary cfg (w 0) false).run liveState with
   | .revert "ALLOC_ARITHMETIC" _ => true
