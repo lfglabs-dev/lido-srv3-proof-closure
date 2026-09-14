@@ -450,34 +450,6 @@ theorem reserve_buffered_matches_packed_low_half
   LidoSRv3.Audit.Source.ReservePackedBufferSource.unpackBuffered_of_packPair_of_bounded
     hLow
 
-/-- **Chantier 2 (Piste A, Thomas 2026-09-13) D-SEED-1/D-EVENT-1
-registered consumer of the pinned `_seedDepositsCount` bookkeeping.**
-
-The pinned `Lido.sol:877-882` `_seedDepositsCount(_amount)` performs
-`depositedPostReport += _amount` and `buffered -= _amount`, then emits
-`Unbuffered(_amount)` and `DepositedPostReportUpdated(newTotal)`.
-`ReserveSeedBookkeepingSource.seedDepositsCount` captures the two
-writes and the paired events as a source-level function.
-
-`seedDepositsCount_depositedPostReport_eq` and `_buffered_eq` in the
-source module prove the arithmetic identities; this registered
-consumer re-exports them into the P-RESERVE-1 namespace as a single
-pair, so downstream consumers get the seed-bookkeeping identity as
-proved P-RESERVE-1 lemmas without pulling in the source-module import
-directly. -/
-theorem reserve_seed_bookkeeping_identities
-    (currentDepositedPostReport currentBuffered amount : Nat) :
-    (LidoSRv3.Audit.Source.ReserveSeedBookkeepingSource.seedDepositsCount
-      currentDepositedPostReport currentBuffered amount).newDepositedPostReport =
-        currentDepositedPostReport + amount ∧
-    (LidoSRv3.Audit.Source.ReserveSeedBookkeepingSource.seedDepositsCount
-      currentDepositedPostReport currentBuffered amount).newBuffered =
-        currentBuffered - amount :=
-  ⟨LidoSRv3.Audit.Source.ReserveSeedBookkeepingSource.seedDepositsCount_depositedPostReport_eq
-      currentDepositedPostReport currentBuffered amount,
-   LidoSRv3.Audit.Source.ReserveSeedBookkeepingSource.seedDepositsCount_buffered_eq
-      currentDepositedPostReport currentBuffered amount⟩
-
 /-- Registered consumers for the payable transfer, uint128 wrapping, and
 ERC-7201 slot-determinism source facts (PR #671). -/
 theorem reserve_payable_call_frame_projections
