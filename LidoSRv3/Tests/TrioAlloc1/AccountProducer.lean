@@ -20,7 +20,7 @@ def accountWorld (s : Storage) : _root_.Verity.ContractState :=
 def badSummary : StaticOracle := fun _ _ => .returned (summary 1 0 0)
 
 def initial : DenoteExternalCalls.CallState :=
-  { world := accountWorld (storage 2 (packed 21 5000 0 2) (packed 22 5000 0 1))
+  { world := accountWorld (LidoSRv3.Tests.TrioAlloc1.«storage» 2 (packed 21 5000 0 2) (packed 22 5000 0 1))
     gasRemaining := 2^256-1 }
 
 def result := VerityProducer.executeAccount layout input (vmAdversary badSummary) initial []
