@@ -33,12 +33,12 @@ published status cell depends on them, and no fidelity gap is closed by them.
 | `router_order_preserved` | 281 | Abstract | unregistered | Structural list-map identity: a successful execute retains router index order. Says nothing about capacity values. |
 | `source_capacities_and_mapped_summary_transaction` | 290 | Abstract and Verity (composite) | unregistered | Conjoins `source_capacities_match_canonical` with the bounded Phase-3 `mappedSummaryTransaction` slice. Its Verity conjunct is the stub-adversary Phase-3 call, not the registered live-summary path (issue 4). |
 | `verity_tx_simulates_allocation` | 307 | Verity | unregistered | Legacy free-`count` sibling. `count` is a harness argument and summary fields are planted, which is exactly what the registered theorem closes (issues 13, 15, 19). |
-| `verity_tx_revert_restores_snapshot` | 380 | Verity | unregistered | Every revert of `allocate`, including the injected post-write failure, restores the pre-call snapshot. |
+| `verity_tx_revert_restores_snapshot` | 384 | Verity | unregistered | Every revert of `allocate`, including the injected post-write failure, restores the pre-call snapshot. |
 | `checked_execute_under_pinned_shape` | 145 | Abstract | unregistered | Conditional helper: shape plus explicit arithmetic bounds imply the source parent. |
 | `checked_execute_under_pinned_shape_and_constants` | 188 | Abstract | unregistered | Conditional helper: pinned constants retain the explicit summary and allocation bounds. |
 | `checked_execute_under_type_and_allocation_bounds` | 229 | Abstract | unregistered | Conditional helper deriving checked arithmetic from typed rows and allocation bounds; not a reachability theorem. |
 | `checked_execute_under_type_and_available_bounds` | 259 | Abstract | unregistered | Conditional helper using available-capacity bounds; external summary validity remains a premise. |
-| `verity_tx_live_revert_restores_snapshot` | 415 | Verity | unregistered | Unconditional rollback of the live storage and summary-call executor. |
+| `verity_tx_live_revert_restores_snapshot` | 419 | Verity | unregistered | Unconditional rollback of the live storage and summary-call executor. |
 
 Cited outside this module: `LidoSRv3.Audit.Verity.AllocationTx.bindLiveOne_decodes_summary`
 (one-call ABI bridge, unregistered),
@@ -102,3 +102,10 @@ one call. The new regression requires exact-SHA Lean validation. This is not a
 supported deployment witness. It identifies the missing representation relation:
 legacy premises alone cannot justify equating the results. No such equality is
 added as an assumption, and no original intended guarantee is narrowed.
+
+The registered physical producer clause also consumes AccountMathResult: every
+actual successful VM result has capacities equal to the independent capacity
+equations on its executed first-pass rows, source router order, and a derived
+nonoverflowing demand-plus-allocation total. These properties come from execution,
+not supplied CheckedBounds. This does not assert unconditional success for
+arbitrary module replies or equate the incompatible legacy observation state.

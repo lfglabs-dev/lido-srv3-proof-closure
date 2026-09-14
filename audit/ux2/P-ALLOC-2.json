@@ -153,10 +153,10 @@
       "unconditional loop termination (grok #416): source_allocate_conserves_without_fuel proves conservation with no fuel premise; sourceAllocateLoop_terminates proves termination from the decreasing remaining-capacity sum (MinFirstAllocationStrategy.allocate:106). Registered parent conservation previously required caller-supplied fuel to return some; this lot lifts that premise. Discharged via LidoSRv3/Audit/Spec/AllocLoopTermination.lean. Axioms only propext / Classical.choice / Quot.sound."
     ],
     "missing": [
-      "Solidity allocate does not test active (filtered upstream)",
-      "+1 Strategy and proportional Source are different algorithms",
-      "memoryArrayElement reads are proved oracle-independent: this array path reads word-addressed memory directly and does not evaluate a keccak expression",
-      "cross-call mutation of the decoded arrays"
+      "UPSTREAM: allocation does not itself test active; establish supported-module filtering and reachable input invariants from the actual upstream producer and writers. The unit-step Strategy child remains distinct from the registered proportional loop.",
+      "MEMORY/CALL: decoded proportional-loop conservation and model-loop correspondence do not establish actual compiler byte-memory allocation, aliasing, caller/callee copying, return decoding or DELEGATECALL execution. Existing memory and ABI lemmas must be connected to those executable producers.",
+      "DEPLOYMENT: bind the linked library target, deployed runtime and compiler configuration to the executed proportional implementation. The source-level closed-library interpreter does not prove arbitrary deployed code implements it. These obligations remain in scope and open.",
+      "INHERITED-FRAME: prove static-context restrictions, caller/storage identity, inherited msg.value, gas and success/revert effects across the actual public view/library boundary. A successful decoded loop is not evidence of these properties."
     ],
     "open_gap_count": 4
   },
@@ -203,10 +203,10 @@
       "Every row below still has open fidelity gaps — 84 in total. The last column counts them per row; audit/guarantees.yaml names each one."
     ],
     "not_covered": [
-      "Solidity allocate does not test active (filtered upstream)",
-      "+1 Strategy and proportional Source are different algorithms",
-      "memoryArrayElement reads are proved oracle-independent: this array path reads word-addressed memory directly and does not evaluate a keccak expression",
-      "cross-call mutation of the decoded arrays"
+      "UPSTREAM: allocation does not itself test active; establish supported-module filtering and reachable input invariants from the actual upstream producer and writers. The unit-step Strategy child remains distinct from the registered proportional loop.",
+      "MEMORY/CALL: decoded proportional-loop conservation and model-loop correspondence do not establish actual compiler byte-memory allocation, aliasing, caller/callee copying, return decoding or DELEGATECALL execution. Existing memory and ABI lemmas must be connected to those executable producers.",
+      "DEPLOYMENT: bind the linked library target, deployed runtime and compiler configuration to the executed proportional implementation. The source-level closed-library interpreter does not prove arbitrary deployed code implements it. These obligations remain in scope and open.",
+      "INHERITED-FRAME: prove static-context restrictions, caller/storage identity, inherited msg.value, gas and success/revert effects across the actual public view/library boundary. A successful decoded loop is not evidence of these properties."
     ]
   }
 }

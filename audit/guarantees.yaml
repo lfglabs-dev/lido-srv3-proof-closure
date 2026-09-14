@@ -31,12 +31,12 @@
           "Conditional type-width arithmetic from #652/#653 is preserved. The fabricated #662 write history is removed; naming-scaffold projections remain explicitly caller hypotheses. Router module count/share-limit widths do not establish uint64 external summary/stake bounds."
         ],
         "missing": [
-          "EXTERNAL-SUMMARY-INVARIANTS: SRLib.sol374-378 returns three uint256 values, consumed at517-522. ABI validity alone does not imply deposited>=max(summaryExited,accountingExited), nor bounds on deposited/depositable/totalStake. These are external module semantic obligations, not router-local write invariants. An unrestricted deployed-code proof is excluded; unconditional CheckedBounds is not asserted.",
-          "INPUT/ARITHMETIC: cfg.maxEBType1 must be nonzero and input/allocation sums, available arithmetic and target products need the stated bounds. #652/#653 prove implications from explicit uint64/count assumptions; they do not derive those assumptions from this uint256-return interface.",
-          "CALL-ORDER: bindLiveAll hoists all external summaries/stakes before sourceExecute. Solidity interleaves them with arithmetic in its first loop, so earlier arithmetic failure can prevent later calls. The current parent does not establish full source call-trace/error-order equivalence.",
-          "PHYSICAL-STORAGE: AllocationTx uses model-local slot/map indices and observation arrays. Packed field decoding is covered; correspondence of those cells to physical ERC7201 storage and emitted runtime is not. Unlike DEPOSIT/TOPUP, this row is not relabeled a physical-world consumer.",
-          "REGISTRY-REACHABILITY: SRLib._addModule checks duplicate addresses at200-205, but migration copies legacy addresses at101-113. A complete uniqueness invariant needs the initial/migrated registry and writer history. It is not a premise needed to claim unconditional allocation success here, nor derived by the current mapped-call theorem.",
-          "SCOPE: getDepositAllocations caller composition, P-ALLOC-2 and ALLOC-to-DEPOSIT execution remain separate. General Yul/EVM/deployment closure is excluded."
+          "EXTERNAL-SUMMARY-INVARIANTS: ABI-valid uint256 replies do not imply deposited>=max(summaryExited,accountingExited), nor the required deposited/depositable/totalStake bounds. Derive these from supported implementations, registry writers and deployment identity. The genuine arbitrary-module counterexample remains; unconditional CheckedBounds is not asserted.",
+          "INPUT/ARITHMETIC: cfg.maxEBType1 must be nonzero and input/allocation sums, available arithmetic and target products need the stated bounds. Existing implication lemmas do not derive those assumptions from the uint256-return interface or supported-module execution.",
+          "LEGACY-RESULT-BRIDGE: bindLiveAll hoists calls and reads model-local cells; the physical producer interleaves checked arithmetic and account-qualified reads. The registered parent now also consumes VerityParentResult.execute through library ABI and final conversion, but does not equate legacy observations with that physical result. AccountProducer.legacy_commits_while_physical_reverts refutes equality under only the old length/binding premises. A derived representation relation and trace-sensitive executor correspondence remain required, not assumed.",
+          "PHYSICAL-STORAGE: the physical producer reads account-qualified words using an explicit layout/hash. Derive its ERC7201 addressing and field correspondence from the pinned deployment; legacy slot/map indices and persisted observation arrays are not Solidity physical storage.",
+          "REGISTRY-REACHABILITY: derive count, supported-module identity, uniqueness and accounting relations from initial/migrated registry state and every relevant writer. Source interface validity alone is insufficient.",
+          "RUNTIME/DEPLOYMENT: connect the physical call-tree and byte-library executor to actual compiler memory, gas, inherited frame context, linked library code and deployed runtime. These are in scope and unresolved under the expanded proof-only goal; the current source/call-VM correspondence does not close them."
         ]
       },
       "classification": {
@@ -78,10 +78,10 @@
           "unconditional loop termination (grok #416): source_allocate_conserves_without_fuel proves conservation with no fuel premise; sourceAllocateLoop_terminates proves termination from the decreasing remaining-capacity sum (MinFirstAllocationStrategy.allocate:106). Registered parent conservation previously required caller-supplied fuel to return some; this lot lifts that premise. Discharged via LidoSRv3/Audit/Spec/AllocLoopTermination.lean. Axioms only propext / Classical.choice / Quot.sound."
         ],
         "missing": [
-          "Solidity allocate does not test active (filtered upstream)",
-          "+1 Strategy and proportional Source are different algorithms",
-          "memoryArrayElement reads are proved oracle-independent: this array path reads word-addressed memory directly and does not evaluate a keccak expression",
-          "cross-call mutation of the decoded arrays"
+          "UPSTREAM: allocation does not itself test active; establish supported-module filtering and reachable input invariants from the actual upstream producer and writers. The unit-step Strategy child remains distinct from the registered proportional loop.",
+          "MEMORY/CALL: decoded proportional-loop conservation and model-loop correspondence do not establish actual compiler byte-memory allocation, aliasing, caller/callee copying, return decoding or DELEGATECALL execution. Existing memory and ABI lemmas must be connected to those executable producers.",
+          "DEPLOYMENT: bind the linked library target, deployed runtime and compiler configuration to the executed proportional implementation. The source-level closed-library interpreter does not prove arbitrary deployed code implements it. These obligations remain in scope and open.",
+          "INHERITED-FRAME: prove static-context restrictions, caller/storage identity, inherited msg.value, gas and success/revert effects across the actual public view/library boundary. A successful decoded loop is not evidence of these properties."
         ]
       },
       "classification": {

@@ -364,16 +364,20 @@ theorem verity_tx_simulates_allocation_count_from_storage
             (LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.sourceOracle adversary state)
             input.config amount input.isTopUp before ∧
         (LidoSRv3.Audit.Source.TrioComposition.VerityParentResult.execute
-          layout input.config amount input.isTopUp adversary callState before).2.world = state)) := by
+          layout input.config amount input.isTopUp adversary callState before).2.world = state) ∧
+      LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.AccountMathResult
+        layout input adversary callState before) := by
   constructor
   · exact verity_tx_simulates_live_summary_from_storage
       adversary cfg modules depositsToAllocate isTopUp state hLength hBind
   · intro layout input gas before
     have h := LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.account_producer_correspondence
       layout input adversary ⟨state, gas, []⟩ before
-    exact ⟨h.1, h.2, fun amount =>
+    exact ⟨h.1, h.2, (fun amount =>
       LidoSRv3.Audit.Source.TrioComposition.VerityParentResult.execute_correspondence
-        layout input.config amount input.isTopUp adversary ⟨state, gas, []⟩ before⟩
+        layout input.config amount input.isTopUp adversary ⟨state, gas, []⟩ before),
+      LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.account_math_result
+        layout input adversary ⟨state, gas, []⟩ before⟩
 
 /-- Every revert of the allocation transaction, including the injected
 failure after intermediate map/slot writes, restores the pre-call snapshot. -/

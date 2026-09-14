@@ -78,6 +78,12 @@ theorem legacy_commits_while_physical_reverts :
       (vmAdversary badSummary) initial []).1.1 = .error (.panic (word 0x11)) := by
   decide +kernel
 
+/-- A successful physical execution computes both columns from real replies;
+replacing the computed capacities with zero breaks this regression. -/
+theorem honest_physical_columns :
+    columns (VerityProducer.executeAccount layout input (vmAdversary honest) initial []).1.1 =
+      .ok ([3, 3], [8, 8]) := by decide +kernel
+
 #print axioms inconsistent_summary_stops_calls
 #print axioms unqualified_projection_misses_module
 #print axioms static_world_preserved
