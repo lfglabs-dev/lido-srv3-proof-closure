@@ -5,9 +5,7 @@ import LidoSRv3.Audit.Source.ReservePayableCallSource
 import LidoSRv3.Audit.Source.ReserveSeedBookkeepingSource
 import LidoSRv3.Audit.Source.ERC7201StorageSlotSource
 import LidoSRv3.Audit.Source.SolidityUint128WrapSource
-import LidoSRv3.Audit.Source.ReserveSetTargetSource
-import LidoSRv3.Audit.Source.WithdrawalQueueFinalizeSource
-import LidoSRv3.Audit.Source.ReserveUpdateBufferedAllocationSource
+import LidoSRv3.Audit.Source.TrioReserve1.Writers
 import LidoSRv3.Audit.Guarantees.Registry
 
 namespace LidoSRv3.Audit.Guarantees.PReserve1
@@ -515,78 +513,47 @@ theorem reserve_erc7201_slot_deterministic
   LidoSRv3.Audit.Source.ERC7201StorageSlotSource.realERC7201BaseSlot_deterministic
     (oracle := oracle) (ns1 := ns1) (ns2 := ns2) h
 
-/-- Source-shaped `setDepositsReserveTarget` writer facts (PR #674). -/
-theorem reserve_set_target_preserves_partition_fields
-    (state : ReserveState) (newTarget : Word) (auth : Bool) :
-    (LidoSRv3.Audit.Source.ReserveSetTargetSource.setDepositsReserveTarget
-        state newTarget auth).buffered = state.buffered ∧
-    (LidoSRv3.Audit.Source.ReserveSetTargetSource.setDepositsReserveTarget
-        state newTarget auth).unfinalizedStETH = state.unfinalizedStETH ∧
-    (LidoSRv3.Audit.Source.ReserveSetTargetSource.setDepositsReserveTarget
-        state newTarget auth).depositedPostReport = state.depositedPostReport ∧
-    (LidoSRv3.Audit.Source.ReserveSetTargetSource.setDepositsReserveTarget
-        state newTarget auth).depositedNextReportAdjusted =
-      state.depositedNextReportAdjusted :=
-  LidoSRv3.Audit.Source.ReserveSetTargetSource.setDepositsReserveTarget_preserves_other_fields
-    state newTarget auth
+/-- Pinned internal target writer, Lido.sol:670-680. The target and effective
+reserve are distinct physical slots: increases are deferred; decreases are
+immediate. This consumes the existing executable writer correspondence and
+ordered event/balance observations. External ACL admission is a separate scope. -/
+theorem reserve_set_target_execution
+    (ctx : Source.TrioReserve1.Live.Context)
+    (before : Source.TrioReserve1.Live.World)
+    (requested : Source.TrioReserve1.Live.Word) :
+    let r := Source.TrioReserve1.Live.run
+      (Source.TrioReserve1.Live.setDepositsReserveTarget ctx requested) before
+    Source.TrioReserve1.WriterSpec.Target
+      (Source.TrioReserve1.Writers.project ctx before) requested.val
+      (Source.TrioReserve1.Writers.project ctx r.world) ∧
+    r.outcome = .ok () ∧ r.attempts = [] ∧ r.world.balances = before.balances ∧
+    r.world.logs = before.logs ++ [⟨ctx.self, "DepositsReserveTargetSet", [requested]⟩] ++
+      (if requested.val < (before.core.readContractSlot ctx.self.val
+          Source.TrioReserve1.Live.reserveSlot).val
+       then [⟨ctx.self, "DepositsReserveSet", [requested]⟩] else []) :=
+  ⟨Source.TrioReserve1.Writers.target_corresponds ctx before requested,
+   Source.TrioReserve1.Writers.target_observations ctx before requested⟩
 
-theorem reserve_set_target_writes_target
-    (state : ReserveState) (newTarget : Word) :
-    (LidoSRv3.Audit.Source.ReserveSetTargetSource.setDepositsReserveTarget
-        state newTarget true).storedDepositsReserve = newTarget :=
-  LidoSRv3.Audit.Source.ReserveSetTargetSource.setDepositsReserveTarget_of_auth state newTarget
-
-theorem reserve_set_target_noop_of_unauth
-    (state : ReserveState) (newTarget : Word) :
-    LidoSRv3.Audit.Source.ReserveSetTargetSource.setDepositsReserveTarget
-      state newTarget false = state :=
-  LidoSRv3.Audit.Source.ReserveSetTargetSource.setDepositsReserveTarget_of_unauth state newTarget
-
-/-- Source-shaped WithdrawalQueue finalization writer facts (PR #675). -/
-theorem reserve_wq_finalize_drops_unfinalized
-    (wqs : LidoSRv3.Audit.Source.WithdrawalQueueMappingSource.WithdrawalQueueStorage)
-    (finalizedAmount : Nat) :
-    (LidoSRv3.Audit.Source.WithdrawalQueueFinalizeSource.finalize
-        wqs finalizedAmount).unfinalizedStETH = wqs.unfinalizedStETH - finalizedAmount :=
-  LidoSRv3.Audit.Source.WithdrawalQueueFinalizeSource.finalize_unfinalizedStETH wqs finalizedAmount
-
-theorem reserve_wq_finalize_monotone
-    (wqs : LidoSRv3.Audit.Source.WithdrawalQueueMappingSource.WithdrawalQueueStorage)
-    (finalizedAmount : Nat) :
-    (LidoSRv3.Audit.Source.WithdrawalQueueFinalizeSource.finalize
-        wqs finalizedAmount).unfinalizedStETH ≤ wqs.unfinalizedStETH :=
-  LidoSRv3.Audit.Source.WithdrawalQueueFinalizeSource.finalize_monotone wqs finalizedAmount
-
-/-- Source-shaped report-time allocation-writer facts (PR #676). -/
-theorem reserve_update_buffered_allocation_preserves_reserve_fields
-    (state : ReserveState) (newBuffered newDepositedPostReport : Word) :
-    (LidoSRv3.Audit.Source.ReserveUpdateBufferedAllocationSource.updateBufferedEtherAllocation
-        state newBuffered newDepositedPostReport).storedDepositsReserve =
-      state.storedDepositsReserve ∧
-    (LidoSRv3.Audit.Source.ReserveUpdateBufferedAllocationSource.updateBufferedEtherAllocation
-        state newBuffered newDepositedPostReport).unfinalizedStETH = state.unfinalizedStETH :=
-  LidoSRv3.Audit.Source.ReserveUpdateBufferedAllocationSource.updateBufferedEtherAllocation_preserves_other_fields
-    state newBuffered newDepositedPostReport
-
-theorem reserve_update_buffered_allocation_writes_buffered
-    (state : ReserveState) (newBuffered newDepositedPostReport : Word) :
-    (LidoSRv3.Audit.Source.ReserveUpdateBufferedAllocationSource.updateBufferedEtherAllocation
-        state newBuffered newDepositedPostReport).buffered = newBuffered :=
-  LidoSRv3.Audit.Source.ReserveUpdateBufferedAllocationSource.updateBufferedEtherAllocation_buffered
-    state newBuffered newDepositedPostReport
-
-theorem reserve_update_buffered_allocation_writes_deposited_post_report
-    (state : ReserveState) (newBuffered newDepositedPostReport : Word) :
-    (LidoSRv3.Audit.Source.ReserveUpdateBufferedAllocationSource.updateBufferedEtherAllocation
-        state newBuffered newDepositedPostReport).depositedPostReport = newDepositedPostReport :=
-  LidoSRv3.Audit.Source.ReserveUpdateBufferedAllocationSource.updateBufferedEtherAllocation_depositedPostReport
-    state newBuffered newDepositedPostReport
-
-theorem reserve_update_buffered_allocation_clears_next_report
-    (state : ReserveState) (newBuffered newDepositedPostReport : Word) :
-    (LidoSRv3.Audit.Source.ReserveUpdateBufferedAllocationSource.updateBufferedEtherAllocation
-        state newBuffered newDepositedPostReport).depositedNextReportAdjusted = (0 : Word) :=
-  LidoSRv3.Audit.Source.ReserveUpdateBufferedAllocationSource.updateBufferedEtherAllocation_next_report
-    state newBuffered newDepositedPostReport
+/-- Pinned internal report synchronization, Lido.sol:1125-1132. This writes
+max(reserve,target) to the effective reserve, preserves the buffer and target,
+and emits only when raising the reserve. It does not clear either packed
+report accumulator. Enclosing report execution remains a separate obligation. -/
+theorem reserve_update_buffered_allocation_execution
+    (ctx : Source.TrioReserve1.Live.Context)
+    (before : Source.TrioReserve1.Live.World) :
+    let r := Source.TrioReserve1.Live.run
+      (Source.TrioReserve1.Live.updateBufferedEtherAllocation ctx) before
+    Source.TrioReserve1.WriterSpec.Rebalance
+      (Source.TrioReserve1.Writers.project ctx before)
+      (Source.TrioReserve1.Writers.project ctx r.world) ∧
+    r.outcome = .ok () ∧ r.attempts = [] ∧ r.world.balances = before.balances ∧
+    r.world.logs = before.logs ++
+      (if (before.core.readContractSlot ctx.self.val Source.TrioReserve1.Live.reserveSlot).val <
+          (before.core.readContractSlot ctx.self.val Source.TrioReserve1.Live.targetSlot).val
+       then [⟨ctx.self, "DepositsReserveSet",
+         [before.core.readContractSlot ctx.self.val Source.TrioReserve1.Live.targetSlot]⟩]
+       else []) :=
+  ⟨Source.TrioReserve1.Writers.rebalance_corresponds ctx before,
+   Source.TrioReserve1.Writers.rebalance_observations ctx before⟩
 
 end LidoSRv3.Audit.Guarantees.PReserve1
