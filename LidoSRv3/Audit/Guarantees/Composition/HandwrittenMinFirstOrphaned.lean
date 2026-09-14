@@ -73,7 +73,9 @@ theorem alloc2_source_parent_ignores_handwritten_minfirst
     PAlloc2.StepMatchesModel ∧
       PAlloc2.FullLoopConserves ∧
       PAlloc2.LoopStaysInCorrespondence :=
-  PAlloc2.step_correspondence_and_full_loop_conservation
+  ⟨PAlloc2.step_correspondence_and_full_loop_conservation.1,
+   PAlloc2.step_correspondence_and_full_loop_conservation.2.1,
+   PAlloc2.step_correspondence_and_full_loop_conservation.2.2.1⟩
 
 /-- Same statement without the ignored hypothesis: the P-ALLOC-2
 abstract parent applies universally, so its correctness does not depend
@@ -82,7 +84,9 @@ theorem alloc2_source_parent_applies_universally :
     PAlloc2.StepMatchesModel ∧
       PAlloc2.FullLoopConserves ∧
       PAlloc2.LoopStaysInCorrespondence :=
-  PAlloc2.step_correspondence_and_full_loop_conservation
+  ⟨PAlloc2.step_correspondence_and_full_loop_conservation.1,
+   PAlloc2.step_correspondence_and_full_loop_conservation.2.1,
+   PAlloc2.step_correspondence_and_full_loop_conservation.2.2.1⟩
 
 /-- The registered P-ALLOC-2 Verity-transaction parent applies
 universally without consuming any hypothesis representing the

@@ -4,6 +4,8 @@ import LidoSRv3.Audit.MinFirstAllocation
 import LidoSRv3.Audit.Verity.MinFirstAmountTx
 import LidoSRv3.Audit.Verity.MinFirstDistributionTx
 import LidoSRv3.Audit.Guarantees.Registry
+import LidoSRv3.Audit.Source.TrioAlloc2.LoopCorrespondence
+import LidoSRv3.Audit.Source.TrioAlloc2.Conservation
 
 namespace LidoSRv3.Audit.Guarantees.PAlloc2
 
@@ -283,17 +285,43 @@ abbrev LoopStaysInCorrespondence : Prop :=
         some (modelAfter, allocated.val, remaining.val) ∧
       RowsCorrespond modelAfter after
 
+/-- The actual decoded-array source loop terminates without supplied fuel.
+Success follows from memory-array extent bounds, not a postcondition premise.
+Deployment/ABI/memory correspondence remains a separate upstream obligation. -/
+def UnboundedProportionalLoop : Prop :=
+  ∀ (buckets capacities : List LidoSRv3.Audit.Source.TrioAlloc2.Word)
+    (demand : LidoSRv3.Audit.Source.TrioAlloc2.Word),
+    buckets.length ≤ capacities.length → buckets.length < 2^256 →
+    ∃ out, LidoSRv3.Audit.Source.TrioAlloc2.allocate buckets capacities demand = .ok out ∧
+      LidoSRv3.Audit.Source.TrioAlloc2.Spec.Distributes
+        (LidoSRv3.Audit.Source.TrioAlloc2.decodedRows buckets capacities)
+        demand.val out.amount.val
+        (LidoSRv3.Audit.Source.TrioAlloc2.decodedRows out.buckets capacities) ∧
+      LidoSRv3.Audit.Source.TrioAlloc2.bucketTotal out.buckets =
+        LidoSRv3.Audit.Source.TrioAlloc2.bucketTotal buckets + out.amount.val ∧
+      out.amount.val ≤ demand.val
+
+theorem unbounded_proportional_loop : UnboundedProportionalLoop := by
+  intro buckets capacities demand lengths bounded
+  obtain ⟨out, executed, distributed⟩ :=
+    LidoSRv3.Audit.Source.TrioAlloc2.distribution_exists buckets capacities demand lengths bounded
+  exact ⟨out, executed, distributed,
+    LidoSRv3.Audit.Source.TrioAlloc2.allocate_conserves buckets capacities demand out executed,
+    LidoSRv3.Audit.Source.TrioAlloc2.allocate_amount_le_demand buckets capacities demand out executed⟩
+
 /-- **Registered P-ALLOC-2 parent.**  This keeps the independent model/source
 candidate and proportional-amount equality from the step theorem load-bearing,
 and adds fuel-bounded conservation for every successful run of the full
 independently stated source allocation loop, plus multi-step row correspondence
 with an independently stated proportional model loop.  It does not identify
-that proportional loop with the separate +1 `MinFirst` child model. -/
+that proportional loop with the separate +1 `MinFirst` child model. It also
+consumes the unbounded checked source loop, deriving its success and independent
+proportional distribution/conservation from array extents alone. -/
 theorem step_correspondence_and_full_loop_conservation :
-    StepMatchesModel ∧ FullLoopConserves ∧ LoopStaysInCorrespondence :=
+    StepMatchesModel ∧ FullLoopConserves ∧ LoopStaysInCorrespondence ∧ UnboundedProportionalLoop :=
   ⟨forall_proportional_step_correspondence_and_bounded,
    source_allocate_loop_conserves_requested,
-   proportional_model_loop_preserves_rows⟩
+   proportional_model_loop_preserves_rows, unbounded_proportional_loop⟩
 
 /-! ## Verity transaction plane -/
 

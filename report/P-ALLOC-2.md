@@ -296,3 +296,19 @@ registered theorem names are unchanged
 `PAlloc2.lean` now states it is a helper and that the explicit-∀ theorem is
 the registered parent. No `sorry`/`admit`/`native_decide` in the new proofs
 (both kill-lines close by `rfl`/`decide` and `absurd`).
+
+## Unbounded registered proportional loop
+
+The abstract parent preserves its existing three conclusions and additionally
+consumes TrioAlloc2.allocate. Array extent bounds derive a successful result,
+independent Spec.Distributes (which filters closed rows and uses each mutation),
+bucket-total conservation and allocated <= demand. There is no supplied fuel or
+success premise in this additional clause. Existing TrioAlloc2 totality, loop
+correspondence and conservation proofs are reused, not replaced.
+
+Tests.TrioAlloc2.RegisteredLoop checks that a closed row at level 4 does not cap
+an open row's step toward level 5, and that a full loop fills the first tied
+bucket to capacity before allocating the remainder to the second. These are Lean
+source regressions, not paired Solidity differential receipts. The decoded-array
+result is not physical ABI/memory/deployment closure; those obligations and the
+independent full-gate/axiom dependency remain open.
