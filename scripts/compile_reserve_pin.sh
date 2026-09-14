@@ -6,8 +6,9 @@ if [[ ! -x "$solc" ]]; then
   solc="$HOME/.svm/0.4.24/solc-0.4.24"
 fi
 if [[ ! -x "$solc" ]]; then
-  echo "solc 0.4.24 not installed (expected $HOME/.local/share/svm/0.4.24/solc-0.4.24)" >&2
-  exit 1
+  # Official solc 0.4.24 has no native Linux ARM64 release. Use the exact
+  # official soljson build with identical optimizer/EVM settings on such runners.
+  exec bash scripts/compile_reserve_soljson.sh
 fi
 out=solidity/out/reserve-0424
 mkdir -p "$out"
