@@ -110,13 +110,14 @@ theorem step_effects (callee : External) (ctx : Context) (action : Action) (befo
   | withdraw amount seeds =>
     have hd := WithdrawalParent.complete callee ctx amount seeds before
     refine ⟨hd,?_⟩
+    dsimp only [execute]
     cases h : run (withdrawDepositableEther callee ctx amount seeds) before with
     | mk outcome after trace =>
       cases outcome with
       | ok u =>
         cases u
         exact withdrawal_success callee ctx amount seeds before after trace h
-      | error fault =>
+      | «error» fault =>
         rw [h] at hd
         exact WithdrawalSpec.failure_restores hd
 
