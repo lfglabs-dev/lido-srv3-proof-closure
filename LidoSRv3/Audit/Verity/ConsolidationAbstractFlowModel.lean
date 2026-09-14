@@ -65,9 +65,11 @@ def spec : CompilationModel :=
 
 def selector : Nat := 0x72510001
 
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 4000000 in
 theorem forward_compiles :
     (CompilationModel.compile spec [selector]).isOk = true := by
-  native_decide
+  decide +kernel
 
 abbrev Bytes := ByteArray
 

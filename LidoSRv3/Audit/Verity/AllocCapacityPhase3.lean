@@ -338,9 +338,11 @@ theorem typed_complete_returndata_commits_pre_call_store
   rw [hcall]
   simp [hcomplete]
 
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 4000000 in
 theorem consumed_summary_function_spec_compiles :
     (CompilationModel.compile spec [entrySelector]).isOk = true := by
-  native_decide
+  decide +kernel
 
 /-- Real P-ALLOC-1 Phase-3 consumption theorem.  The static `CallProgram`
 records typed success/revert observations; the executable Verity transaction
