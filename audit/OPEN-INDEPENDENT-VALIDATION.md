@@ -1,3 +1,30 @@
+# Latest review: ad9925df at 6b9f152f
+
+The controller reports reviewer-owned full-suite job
+40094398-2f6d-43d8-a11c-2e09af0397de FAILED (exit 1) on dgx-spark at
+6b9f152f13c3eb18a09612202177103777ddf153. UX2 failed and trust checks were
+not reached. No trust-check failure is inferred from an unexecuted check.
+The two requested reviewer artifact paths were absent from the writer container;
+an accessible copy or detailed ledger has been requested. This record preserves
+the controller report, not an inspection of those absent artifacts.
+
+The writer reproduced the stale UX2 index after the final escaped-identifier
+test edit and regenerated it. The theorem inventory check passes locally on
+6b9f152f: 13 declarations, 2 registered, current coordinates. This local result
+is not an independent full-suite receipt. Exact-SHA reproduction now checks UX2,
+theorem coordinates and the tracked-tree receipt before any remote submission;
+a shell regression verifies each failed check blocks submission and preserves
+exit 75 for pending jobs. No guard is weakened or skipped.
+
+Semantic blockers remain: a derived relation for legacy versus physical ALLOC1
+state/results, ALLOC2 memory/call/runtime/deployment correspondence, supported
+module reachability and all other remaining registered obligations. The ALLOC
+arbitrary-module counterexample and the compiled legacy/physical disagreement
+regression remain. The four documentation thread IDs requested from earlier
+reviews remain unavailable; no thread is silently declared resolved.
+
+## Previous records
+
 # Latest independent review: 00c2e31d
 
 The controller reports independent full-suite job 5a11e2aa PASSED at

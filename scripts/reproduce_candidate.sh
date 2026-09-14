@@ -6,6 +6,10 @@ expected="${1:?usage: bash scripts/reproduce_candidate.sh FULL_CANDIDATE_SHA}"
 [[ "$expected" =~ ^[0-9a-f]{40}$ ]] || { echo 'expected a full 40-hex SHA' >&2; exit 2; }
 [[ "$(git rev-parse HEAD)" == "$expected" ]] || { echo 'candidate SHA mismatch' >&2; exit 1; }
 [[ -z "$(git status --porcelain --untracked-files=all)" ]] || { echo 'candidate checkout is dirty' >&2; exit 1; }
+# Fail locally before remote admission if any exact-tree disclosure is stale.
+python3 scripts/generate_ux2.py check
+python3 scripts/check_report_theorem_inventory.py
+python3 scripts/check_validation_receipt.py
 bash scripts/check_differential_sources.sh
 python3 scripts/check_reproduction_targets.py
 # Submission is durable. Exit 75 means accepted/pending, never validation PASS.
