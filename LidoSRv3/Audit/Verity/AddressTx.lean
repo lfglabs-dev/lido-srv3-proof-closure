@@ -3,6 +3,10 @@ import LidoSRv3.Audit.Verity.AddressRecipientCallBridge
 import Verity.Core
 import Verity.Macro
 
+-- Keep proof errors visible in the remote runner's bounded log tail. The
+-- exhaustive correspondence proofs generate many redundant-simp suggestions.
+set_option linter.unusedSimpArgs false
+
 /-!
 # Legacy P-ADDRESS-1 correspondence facade
 
@@ -366,20 +370,20 @@ private theorem claim_observable_correspondence (inp : Input)
     ContractState.readMapUint, ContractState.writeMapUint,
     ContractState.storage, ContractState.storageMap,
     ContractState.storageMap2, ContractState.storageMapUint]
-  by_cases hz : inp.recipient = 0 <;> try simp_all (config := { maxSteps := 1000000 })
-  cases hExists : inp.requestExists <;> try simp_all (config := { maxSteps := 1000000 })
+  all_goals by_cases hz : inp.recipient = 0 <;> try simp_all (config := { maxSteps := 1000000 })
+  all_goals cases hExists : inp.requestExists <;> try simp_all (config := { maxSteps := 1000000 })
     [_root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind]
-  cases hClaimed : inp.requestClaimed <;> try simp_all (config := { maxSteps := 1000000 })
+  all_goals cases hClaimed : inp.requestClaimed <;> try simp_all (config := { maxSteps := 1000000 })
     [hone, _root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind]
-  cases hFinalized : inp.requestFinalized <;> try simp_all (config := { maxSteps := 1000000 })
+  all_goals cases hFinalized : inp.requestFinalized <;> try simp_all (config := { maxSteps := 1000000 })
     [_root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind]
-  cases hHint : inp.hintValid <;> try simp_all (config := { maxSteps := 1000000 })
+  all_goals cases hHint : inp.hintValid <;> try simp_all (config := { maxSteps := 1000000 })
     [_root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind]
-  by_cases howner : inp.caller = inp.requestOwner <;>
+  all_goals by_cases howner : inp.caller = inp.requestOwner <;>
     try simp_all (config := { maxSteps := 1000000 })
       [show inp.requestOwner = inp.caller ↔ inp.caller = inp.requestOwner from eq_comm,
         _root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind]
-  cases hExternal : inp.externalCallSucceeds <;> simp_all (config := { maxSteps := 1000000 })
+  all_goals cases hExternal : inp.externalCallSucceeds <;> simp_all (config := { maxSteps := 1000000 })
     [_root_.Verity.bind, Bind.bind, _root_.Verity.setMappingUint,
       ContractState.writeMapUint, ContractState.readMapUint,
       ContractState.storageMapUint]
