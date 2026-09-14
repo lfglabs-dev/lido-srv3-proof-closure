@@ -15,8 +15,10 @@ script runTests args do
       env "bash" #["scripts/run_source_differential.sh", "topup-source"]
   | ["reserve-source"] =>
       env "bash" #["scripts/run_source_differential.sh", "reserve-source"]
+  | ["repository"] =>
+      env "bash" #["scripts/run_source_differential.sh", "repository"]
   | _ =>
-      IO.eprintln "usage: lake test [-- topup-source|reserve-source]"
+      IO.eprintln "usage: lake test [-- topup-source|reserve-source|repository]"
       return 2
 
 require verity from git
@@ -26,6 +28,16 @@ require verity from git
 @[default_target]
 lean_lib «LidoSRv3» where
   globs := #[
+    .one `LidoSRv3.Audit.Verity.AllocLoopTermination,
+    .one `LidoSRv3.Audit.Verity.AddressClaimBatchUnbounded,
+    .one `LidoSRv3.Audit.Verity.AddressRecipientCallBridge,
+    .one `LidoSRv3.Audit.Verity.ConsolidationEthUnboundedFuel,
+    .one `LidoSRv3.Audit.Verity.DepositSourceEntry,
+    .one `LidoSRv3.Audit.Verity.ReportRewardsMintedTx,
+    .one `LidoSRv3.Audit.Verity.Topup2SourceEntry,
+    .one `LidoSRv3.Audit.Verity.TopupMultiCallBlockCap,
+    .one `LidoSRv3.Audit.Verity.TopupSourceEntry,
+    .one `LidoSRv3.Audit.Verity.TopupUnboundedCount,
     .one `LidoSRv3,
     .submodules `LidoSRv3.Audit.Common,
     .submodules `LidoSRv3.Audit.Guarantees,

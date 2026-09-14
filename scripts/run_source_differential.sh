@@ -4,7 +4,8 @@ cd "$(dirname "$0")/.."
 case "${1:-}" in
   topup-source) test_script=scripts/test_topup_source_differential.sh ;;
   reserve-source) test_script=scripts/test_reserve_source_differential.sh ;;
-  *) echo 'expected topup-source or reserve-source' >&2; exit 2 ;;
+  repository) test_script=repository ;;
+  *) echo 'expected topup-source, reserve-source or repository' >&2; exit 2 ;;
 esac
 
 bash scripts/prepare_trio_validation.sh
@@ -33,4 +34,10 @@ fi
 printf '%s  %s\n' "$solc_digest" "$FOUNDRY_SOLC" | sha256sum --check --strict
 chmod u+x "$FOUNDRY_SOLC"
 "$FOUNDRY_SOLC" --version
-bash "$test_script"
+if [[ "$test_script" == repository ]]; then
+  make prove
+  make test
+  lake build LidoSRv3 LidoSRv3Audit
+else
+  bash "$test_script"
+fi

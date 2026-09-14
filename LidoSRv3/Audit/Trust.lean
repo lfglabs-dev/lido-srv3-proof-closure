@@ -195,7 +195,7 @@ import LidoSRv3.Tests.AccountPackedWordsMutants
 import LidoSRv3.Audit.Verity.TopupUnboundedCount
 import LidoSRv3.Audit.Verity.TopupMultiCallBlockCap
 import LidoSRv3.Audit.Verity.AddressClaimBatchUnbounded
-import LidoSRv3.Audit.Spec.AllocLoopTermination
+import LidoSRv3.Audit.Verity.AllocLoopTermination
 import LidoSRv3.Audit.Source.DepositLinksSource
 import LidoSRv3.Tests.PackGTopupProvenanceMutants
 import LidoSRv3.Audit.Provenance.ConsolidationRequest
