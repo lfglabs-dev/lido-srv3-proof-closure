@@ -43,7 +43,7 @@ allocationSize)` at `:36-41` with a strictly increasing `uint256`
 Additive files:
 
 - `LidoSRv3/Audit/Verity/AddressClaimBatchUnbounded.lean`
-- `LidoSRv3/Audit/Spec/AllocLoopTermination.lean`
+- `LidoSRv3/Audit/Verity/AllocLoopTermination.lean`
 - `LidoSRv3/Tests/AddressClaimBatchUnboundedMutants.lean`
 - `LidoSRv3/Tests/AllocLoopTerminationMutants.lean`
 
@@ -66,9 +66,11 @@ Axioms of every export (`#print axioms`): `propext` / `Quot.sound` /
 - **lot SHAs:** `ee143402ce383b4687187e6ab67ee71c25c1c2af`,
   `cc43ebd7ac456e1e78e8af42c1e8c4c6927c7296`
 - **toolchain:** `leanprover/lean4:v4.31.0` (`68218e876d2a38b1985b8590fff244a83c321783`)
-- **targets:** `lake build LidoSRv3.Audit.Verity.AddressClaimBatchUnbounded`
-  `LidoSRv3.Audit.Spec.AllocLoopTermination`, both mutant modules, and
-  `lake build LidoSRv3Test` succeeded. `#print axioms` as above.
+- **current reproduction targets:** `lake build LidoSRv3.Audit.Verity.AddressClaimBatchUnbounded`
+  `LidoSRv3.Audit.Verity.AllocLoopTermination`, both mutant modules, and
+  `lake build LidoSRv3Test`. The historical SHAs above recorded successful
+  builds before relocation; they are not exact-SHA validation of these current
+  module paths. Fresh successor validation is required.
 
 ## Spark raccord (do not apply in this lot)
 

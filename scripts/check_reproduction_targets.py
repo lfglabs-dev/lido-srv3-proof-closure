@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Check that every registered Lake reproduction names existing project modules."""
 import json
+import re
 from pathlib import Path
 import shlex
 
@@ -11,6 +12,10 @@ def check(root):
     rows = json.loads((root / 'audit/guarantees.yaml').read_text())['guarantees']
     count = 0
     for row in rows:
+        for claim in row.get('fidelity', {}).get('covered', []):
+            for name in re.findall(r'LidoSRv3/[A-Za-z0-9_/]+\.lean', claim):
+                if not (root / name).is_file():
+                    raise ValueError(f"{row['id']}: missing covered source {name}")
         command = row.get('reproduction', {}).get('command', '')
         for token in shlex.split(command):
             if token.startswith('LidoSRv3.'):

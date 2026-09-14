@@ -16,6 +16,18 @@ with tempfile.TemporaryDirectory() as tmp:
     row = {'id': 'P-SSZ-1', 'reproduction': {'command': 'lake build ' + name}}
     registry.write_text(json.dumps({'guarantees': [row]}))
     assert check(root) == 1
+    row['fidelity'] = {'covered': ['Proof: ' + str(path.relative_to(root))]}
+    registry.write_text(json.dumps({'guarantees': [row]}))
+    assert check(root) == 1
+    row['fidelity']['covered'] = ['Proof: LidoSRv3/Audit/Spec/MovedProof.lean']
+    registry.write_text(json.dumps({'guarantees': [row]}))
+    try:
+        check(root)
+    except ValueError as error:
+        assert 'missing covered source' in str(error)
+    else:
+        raise AssertionError('accepted a removed source path in a covered claim')
+    row['fidelity']['covered'] = []
     row['reproduction']['command'] = 'lake build LidoSRv3.Audit.Source.SszDeclaredSiblings'
     registry.write_text(json.dumps({'guarantees': [row]}))
     try:

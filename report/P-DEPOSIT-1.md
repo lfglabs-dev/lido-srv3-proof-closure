@@ -1,6 +1,6 @@
 # P-DEPOSIT-1
 
-The registered executable theorem is now `PDeposit1.actual_deposit_call_slot_success_and_revert` in `LidoSRv3/Audit/Guarantees/PDeposit1DsmCall.lean`. It consumes one actual `DepositDsmCall.execute` result: success implies the complete existing call/slot effects; failure restores the entire entry `Live.World`.
+The registered executable theorem is now `PDeposit1.actual_deposit_call_slot_success_and_revert` in `LidoSRv3/Audit/Guarantees/PDeposit1DsmCall.lean`. It retains the `DepositDsmCall.execute` suffix result and additionally consumes `DepositAllocation.execute`: the executed allocation feeds the physical suffix. Success implies the corresponding call/slot effects; failure restores the entire entry `Live.World`.
 
 Previously the executable registration pointed to `NFrame.verity_tx_composes_nframe_deposit_under_router_shape`, a conditional source-link theorem over aggregate batch journals and model-local observation slots. That theorem and the abstract `source_deposit_conserves_and_rolls_back` remain unchanged and available. Their source-link, shape and conservation hypotheses do not establish the new executable limb, and this change does not turn their model slots into physical storage.
 
@@ -10,10 +10,10 @@ The pinned source is `lido-core@17005714f151e5502c559932319a3f2f74ac2436`, parti
 
 Remaining obligations are explicit:
 
-- `ModuleCall.Input.selected` comes from an upstream allocation phase. The parent does not execute its allocation/view-call producer. Module id/calldata, immutable maxEB and locator identities also retain input/deployment provenance boundaries.
+- The retained suffix conjunct takes `ModuleCall.Input.selected`; the allocation conjunct derives it from the executed ALLOC1/ALLOC2 source/ABI producer over physical router words. `Lido.getDepositableEther`, actual allocation STATICCALL/DELEGATECALL realization, module-id/calldata provenance, immutable maxEB and locator/deployment identities remain open.
 - Locator and module-return memory cursors are supplied phase inputs. Decoder guards execute; their upstream memory-state origins and general memory/gas correspondence remain open.
 - The Lido withdrawal body executes. Its getter/receiver callbacks remain an arbitrary External; the parent proves the actual body and callback-result continuation, not deployed callee correspondence. Existing physical-ledger conservation consumers need their explicit locator/role hypotheses; unconditional deployed conservation is not claimed.
-- The physical storage and beacon executables are source-shaped models. General bytecode/compiler/deployment, precompile-dispatch and LOG ABI/gas proofs stay outside scope.
+- The physical storage and beacon executables are source-shaped models. Bytecode/compiler/deployment, precompile-dispatch and LOG ABI/gas correspondences remain in scope and unproved under the expanded proof-only goal.
 
 Validation at `be77c30c6bc06add31e5816fa9076b9324878d9b` used Lean `v4.31.0` and Verity `e977aaad6e1a9e92e0132d41b3d33a14135a4d46`:
 

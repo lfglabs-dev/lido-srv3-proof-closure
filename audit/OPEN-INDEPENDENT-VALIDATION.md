@@ -1,3 +1,32 @@
+# Latest independent review at bfa08f66
+
+The controller reports reviewer-owned full-suite job
+0cbecaf8-5661-4522-909a-1b3a146508a7 PASSED (exit 0) at
+bfa08f6640fb22c5598642bb8b97a44b6b33b8eb: 74 differential cases and 2120
+library jobs. Verdict remains semantic BLOCKED, not CLEAN. Neither this receipt
+nor earlier passing receipts validate a successor SHA.
+
+ALLOC1 executor/legacy equivalence is honestly open. The same-world counterexample
+has an empty unqualified legacy slot 29 and a two-module physical registry whose
+ABI-valid (1,0,0) summary rejects; legacy length/binding premises do not equate
+these representations. Capacity equations on actual successful physical results
+are a partial result, not this missing equivalence. The original arbitrary-module
+counterexample remains unchanged.
+
+ALLOC2 deployment, actual DELEGATECALL/library identity, compiled byte-memory,
+aliasing/copy/return, runtime configuration, inherited caller/storage/value/static/
+gas, and supported reachable inputs are all still open. Source-byte and word-memory
+adapters are not substituted for these proofs. No deployment conclusion is assumed.
+
+This successor corrects the DEPOSIT report's allocation account, ADDRESS's stale
+guard-order schedule, misplaced ALLOC1 bounds docstring, moved termination-proof
+citations and current PR reproduction instructions. It also rejects nonexistent
+Lean source paths in canonical covered claims; this found additional moved-path
+citations in ACCOUNT, CONSOLIDATION-ETH and TOPUP, which are retargeted. These are
+scope/documentation repairs and regression protection, not ALLOC2 closure.
+
+## Earlier review records
+
 # Latest review: ad9925df at 6b9f152f
 
 The controller reports reviewer-owned full-suite job

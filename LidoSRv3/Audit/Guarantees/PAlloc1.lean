@@ -255,7 +255,8 @@ theorem checked_execute_under_type_and_allocation_bounds
       target_multiplication :=
         PAlloc1TargetMultBounded.target_multiplication_under_pinned_type_bounds hTypes }
 
-/-- Successful execution retains router index order. -/
+/-- Typed and available-arithmetic bounds plus the remaining shape invariants
+yield checked execution and independent capacity equations. -/
 theorem checked_execute_under_type_and_available_bounds
     (cfg : Config) (modules : List Module) (depositsToAllocate : Verity.Uint256)
     (isTopUp : Bool)
@@ -278,6 +279,7 @@ theorem checked_execute_under_type_and_available_bounds
       target_multiplication :=
         PAlloc1TargetMultBounded.target_multiplication_under_pinned_type_bounds hTypes }
 
+/-- Successful execution retains router index order. -/
 theorem router_order_preserved {cfg : Config} {modules : List Module}
     {depositsToAllocate : Verity.Uint256} {isTopUp : Bool} {rows : List Row}
     (h : SolidityAllocCapacity.execute cfg modules depositsToAllocate isTopUp = some rows) :
