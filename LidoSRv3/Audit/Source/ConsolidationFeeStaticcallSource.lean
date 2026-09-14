@@ -12,7 +12,7 @@ source-level `PredeployStaticcallResult`, not an anonymous free
 
 Pinned Solidity (17005714):
 
-- `contracts/0.8.9/vaults/WithdrawalVaultEIP7685.sol:79-81`:
+- `contracts/0.8.9/WithdrawalVaultEIP7685.sol:79-81`:
   `function _getConsolidationRequestFee() internal view returns (uint256)
   { return _getFeeFromContract(CONSOLIDATION_REQUEST); }`
 - `_getFeeFromContract` performs a STATICCALL to the
