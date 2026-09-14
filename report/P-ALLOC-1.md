@@ -14,7 +14,7 @@ Explicit remaining obligations:
 - `bindLiveAll` hoists calls before arithmetic. Solidity interleaves each row's calls and arithmetic; a failure may prevent later calls. Full trace/error-order equivalence remains open.
 - Model-local slots/maps and output observation arrays are not physical ERC7201 storage. Packed field decoding and model rollback do not establish general runtime/storage correspondence.
 - `_addModule` rejects duplicate addresses (SRLib.sol200-205), while migration copies legacy addresses (101-113). A uniqueness history requires initial/migrated registry evidence and writers; it is not derived by this row.
-- Caller getDepositAllocations, P-ALLOC-2, ALLOC-to-DEPOSIT and general deployed Yul/EVM closure remain outside this claim.
+- Caller getDepositAllocations, P-ALLOC-2, ALLOC-to-DEPOSIT and deployed Yul/EVM correspondence remain in scope of the overall proof-only goal; this registered row does not close them.
 
 ## Theorems
 
@@ -92,15 +92,15 @@ for the new physical executable, not an equality with legacy persisted
 observation slots. That legacy bridge, actual DELEGATECALL/memory refinement,
 linked deployment identity and supported-module reachability remain open.
 
-## Legacy bridge counterexample under investigation
+## Refuted unconditional legacy bridge
 
 AccountProducer now checks a single-world counterexample: legacy unqualified
 slot 29 is zero, so the legacy length and empty binding premises hold and its
 observation commits; the account-qualified registry contains two modules, and
 the physical producer rejects ABI-valid summary (1,0,0) with panic 0x11 after
-one call. The new regression requires exact-SHA Lean validation. This is not a
-supported deployment witness. It identifies the missing representation relation:
-legacy premises alone cannot justify equating the results. No such equality is
+one call. This compiled regression is retained by the controller decision. It is
+not a supported deployment witness. Legacy premises alone cannot justify equating
+the results; unconditional equality is refuted rather than awaiting proof. No such equality is
 added as an assumption, and no original intended guarantee is narrowed.
 
 The registered physical producer clause also consumes AccountMathResult: every
@@ -109,3 +109,15 @@ equations on its executed first-pass rows, source router order, and a derived
 nonoverflowing demand-plus-allocation total. These properties come from execution,
 not supplied CheckedBounds. This does not assert unconditional success for
 arbitrary module replies or equate the incompatible legacy observation state.
+
+## Controller decision: refuted equality
+
+On 2026-09-14 the controller explicitly rejected unconditional equality between
+legacy observations and physical results. The registered parent keeps its existing
+physical result/capacity facts and legacy conclusion separately; no statement or
+premise is weakened or added. `AccountProducer.legacy_empty_length_premise`,
+`legacy_empty_binding_premise` and `legacy_commits_while_physical_reverts` jointly
+refute the proposed equality on the same World. Empty legacy slot 29 coexists
+with two physical modules, and ABI-valid `(1,0,0)` causes physical rejection.
+The registered reproduction now explicitly builds this counterexample module.
+This decision does not establish supported-module reachability or deployment.

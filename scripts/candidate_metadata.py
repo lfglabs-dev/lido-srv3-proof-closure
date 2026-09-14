@@ -6,7 +6,7 @@ report. Changing them requires reviewing the corresponding source/metadata delta
 """
 
 CANDIDATE_INPUT_SHA256 = {
-    "audit/guarantees.yaml": "32b5ed504d96baa2415609cf10cf2cc86b648783027dfe6cbd18f2ad907667db",
+    "audit/guarantees.yaml": "1f4109270868365250a77ddd89497c7fd6a28386dcd25f226845375460904158",
     "audit/source-map.yaml": "65de3beb60c50a5a28942ccc24d7206205dbd7a9530fc4859d4dd873ae850239",
     "audit/trust-native-decide-allowlist.txt": "52b822c37a17525b9b569f7a7e37cb49bdb35f049c0f269e54b78a544f34360f"
 }
@@ -26,8 +26,8 @@ EXPECTED_CANONICAL_CLAIMS = {
     "P-SSZ-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.real_validator_correspondence", "CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.actual_compiled_cl_entry_complete_declared_branch", "IMPLEMENTATION_PENDING", ("A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT", "A-SOLC-TRUSTED", "A-RUNTIME-PROVENANCE")),
 }
 EXPECTED_CANONICAL_DETAIL_SHA256 = {
-    "P-ALLOC-1": "c9d3e0e2d7aa456e637d058bbe72aa360ef57bb17e12f3a5cfa9f376875fcada",
-    "P-ALLOC-2": "de29a6a4553ec7321a6567376e1ff3ee6a12fd75d7401d53ffa520d5df08d573",
+    "P-ALLOC-1": "b1499c5aa8d1eb0e5bc50f56f39d92e64d24c2833f3f289ca7dcc5eb3b3a38ed",
+    "P-ALLOC-2": "6151c62aebbe2ff63b697e4fd929ad4ef2fe6bfbfe4e80ba26e2b7b6be33f5f8",
     "P-DEPOSIT-1": "191cae5dbb0cb0d29626d87363c8340b23c30d9b1e00a7006ae80bfd430c1385",
     "P-TOPUP-1": "7c2c62b6c799bde7f6f270bb4f6330a5fcf4c444f6fd78dc188a947118c51cf9",
     "P-ACCOUNT-1": "06ac470d8e22d26d7af92220328a70d496a59620129251bcd6dee808cad43608",

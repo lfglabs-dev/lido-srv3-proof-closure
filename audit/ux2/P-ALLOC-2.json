@@ -155,7 +155,7 @@
     "missing": [
       "UPSTREAM: allocation does not itself test active; establish supported-module filtering and reachable input invariants from the actual upstream producer and writers. The unit-step Strategy child remains distinct from the registered proportional loop.",
       "MEMORY/CALL: decoded proportional-loop conservation and model-loop correspondence do not establish actual compiler byte-memory allocation, aliasing, caller/callee copying, return decoding or DELEGATECALL execution. Existing memory and ABI lemmas must be connected to those executable producers.",
-      "DEPLOYMENT: bind the linked library target, deployed runtime and compiler configuration to the executed proportional implementation. The source-level closed-library interpreter does not prove arbitrary deployed code implements it. These obligations remain in scope and open.",
+      "I-ALLOC2-DEPLOYED-LIBRARY-IDENTITY (OPEN): authoritative chain/block, linked callee address, deployed runtime bytes/codehash, library link map and compiler/runtime configuration are absent. Pinned SRLib IR retains an unresolved MinFirstAllocationStrategy linkersymbol at both delegatecall sites. Source pins and compiler IR do not establish deployed identity. Preserve this obligation; compiled memory/caller-frame refinement remains separate in-scope work.",
       "INHERITED-FRAME: prove static-context restrictions, caller/storage identity, inherited msg.value, gas and success/revert effects across the actual public view/library boundary. A successful decoded loop is not evidence of these properties."
     ],
     "open_gap_count": 4
@@ -205,7 +205,7 @@
     "not_covered": [
       "UPSTREAM: allocation does not itself test active; establish supported-module filtering and reachable input invariants from the actual upstream producer and writers. The unit-step Strategy child remains distinct from the registered proportional loop.",
       "MEMORY/CALL: decoded proportional-loop conservation and model-loop correspondence do not establish actual compiler byte-memory allocation, aliasing, caller/callee copying, return decoding or DELEGATECALL execution. Existing memory and ABI lemmas must be connected to those executable producers.",
-      "DEPLOYMENT: bind the linked library target, deployed runtime and compiler configuration to the executed proportional implementation. The source-level closed-library interpreter does not prove arbitrary deployed code implements it. These obligations remain in scope and open.",
+      "I-ALLOC2-DEPLOYED-LIBRARY-IDENTITY (OPEN): authoritative chain/block, linked callee address, deployed runtime bytes/codehash, library link map and compiler/runtime configuration are absent. Pinned SRLib IR retains an unresolved MinFirstAllocationStrategy linkersymbol at both delegatecall sites. Source pins and compiler IR do not establish deployed identity. Preserve this obligation; compiled memory/caller-frame refinement remains separate in-scope work.",
       "INHERITED-FRAME: prove static-context restrictions, caller/storage identity, inherited msg.value, gas and success/revert effects across the actual public view/library boundary. A successful decoded loop is not evidence of these properties."
     ]
   }

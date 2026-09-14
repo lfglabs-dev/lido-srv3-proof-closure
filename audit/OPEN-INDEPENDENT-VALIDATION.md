@@ -1,3 +1,34 @@
+# Controller disposition following ac0200a2
+
+Independent reviewer ac0200a2 reported semantic BLOCKED at
+140ceb701e8db31cd7768cf2a03f72ec995006c4. Its job
+399a8b1c-d7a1-425e-ac06-42e9cd70d153 passed lake test -- repository.
+This closes that SHA's infrastructure gate only; it does not validate successors.
+
+Controller decision 2026-09-14: unconditional ALLOC1 legacy-observation/physical-
+result equality is REFUTED. Preserve the existing registered physical capacity/
+result facts separately from legacy observations and retain the compiled
+arbitrary-module counterexample. No desired-result premise or narrowed theorem
+was introduced. The earlier requests below for a proof of that unconditional
+equality are superseded by this decision, not silently declared proved.
+
+I-ALLOC2-DEPLOYED-LIBRARY-IDENTITY remains OPEN. Required evidence is authoritative
+chain/block, callee, runtime bytes/codehash, link map and compiler/runtime settings.
+The pinned SRLib optimized IR has unresolved library linker symbols. Compiled
+ABI/memory/caller-frame refinement remains separate, pin-backed work still OPEN.
+See report/P-ALLOC-2.md for concrete instruction sites and current adapter limits.
+
+Citation sweep: report/P-DEPOSIT-1.md describes the registered allocation conjunct;
+AllocLoopTermination paths in audit/guarantees.yaml and
+ audit/address-alloc-unbounded/README.md resolve; the only full obsolete 4c4e SHA
+in Markdown/YAML/shell is the historical review receipt below. ADDRESS
+classification.work preserves allowance-before-balance and owner-before-hint.
+PAlloc1 bounds and router_order_preserved docstrings describe their own theorems.
+No further mismatch was found among those requested citations. Historical receipts
+remain unchanged; no unseen reviewer finding is invented or marked accepted.
+
+## Historical review records (earlier dispositions)
+
 # Latest independent review at bfa08f66
 
 The controller reports reviewer-owned full-suite job

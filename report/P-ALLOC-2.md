@@ -26,6 +26,24 @@ Next work must connect the decoded loop to its actual deployed caller, physical
 memory/ABI and runtime, and close upstream supported-module invariants. It must
 not replace that work with another independent-loop helper.
 
+## I-ALLOC2-DEPLOYED-LIBRARY-IDENTITY — OPEN
+
+Missing authoritative evidence: chain and block, linked callee address, deployed
+runtime bytes and codehash, library link map, and compiler/runtime configuration.
+The pinned artifact `audit/trio/integration/compiler-memory/SRLib.ir.yul` uses
+an unresolved `MinFirstAllocationStrategy` linker symbol at lines 2293 and 2633.
+Its SHA256 is `30d20f448233d6d51ecff8339f360444d9d3e1754566da6322cb4c8e87ed0d61`.
+The companion `inspection.json` pins source/compiler settings; it is explicitly
+compiler IR inspection, not a runtime-refinement proof or a deployment witness.
+
+Pin-backed work remains possible and required: each site writes selector
+`0x2529fbc9`, ABI-encodes both arrays and demand, executes DELEGATECALL with
+`gas()`, bubbles failure bytes, copies successful return bytes and decodes a new
+array. Connect these instructions to the existing byte-memory and ABI proofs.
+The current `MemoryTransportCall.closedCall` interpreter does not execute those
+compiled instructions or derive inherited caller/storage/value/static/gas effects.
+Those proofs remain OPEN independently of the missing deployment evidence.
+
 ## Historical audit record
 
 The dated sections below preserve prior findings and remediation history. Their
