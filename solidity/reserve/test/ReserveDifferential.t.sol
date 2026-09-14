@@ -16,6 +16,8 @@ interface IReserveHarness {
     function seedBuffer(uint256 buffered, uint256 depositedPostReport) external;
     function seedDepositsReserve(uint256 value) external;
     function seedNextReport(uint256 depositedNextReport, uint256 nonce) external;
+    function readDepositedPostReport() external view returns (uint256);
+    function readDepositedNextReportAdjusted() external view returns (uint256);
     function readDummySlot() external view returns (uint256);
     function withdrawDepositableEther(uint256 amount, uint256 seedDepositsCount) external;
     function getBufferedEther() external view returns (uint256);
@@ -176,6 +178,10 @@ contract ReserveDifferentialTest {
 
         Model memory model = runModel(modelJson(true, true, amount, buffered, stored, unfinalized, 0, 0));
         require(model.ok, "model commit");
+        require(lido.readDepositedPostReport() == model.depositedPostReport, "pin post-report");
+        require(lido.readDepositedNextReportAdjusted() == model.depositedNextReportAdjusted,
+            "pin next-report accumulator");
+        require(lido.readDepositedNextReportAdjusted() == amount, "next-report increment");
         require(model.buffered == 90 ether, "model buffer");
         require(model.wrAfter == model.wrBefore && model.wrAfter == wrBefore, "model WR");
         require(model.unfinalizedStETH == unfinalized, "model queue field");
@@ -256,7 +262,8 @@ contract ReserveDifferentialTest {
         Model memory model = runModel(modelJson(true, true, 1 ether, 100 ether, 40 ether, 10 ether, post, 0));
         require(model.ok, "model uint256 add commits");
         require(model.depositedPostReport == post + 1 ether, "model exact sum");
-        require(model.depositedPostReport != post, "not a no-op");
+        require(lido.readDepositedPostReport() == uint256(uint128(post + 1 ether)), "pin high-half wraps");
+        require(lido.readDepositedPostReport() != model.depositedPostReport, "observed packing divergence");
     }
 
     function testRouterFailAfterSpendRollsBack() public {
@@ -268,6 +275,10 @@ contract ReserveDifferentialTest {
         require(lido.getBufferedEther() == 100 ether, "spend rolled back");
         require(lido.getWithdrawalsReserve() == wr, "WR rolled back");
         require(log.count() == 0, "journal rolled back");
+        Model memory model = runModel(modelJson(true, true, 10 ether, 100 ether, 40 ether, 30 ether, 0, 0));
+        require(model.ok && model.depositedNextReportAdjusted == 10 ether, "nominal model increment");
+        require(lido.readDepositedNextReportAdjusted() == 0, "failed callback rolls next-report back");
+        require(lido.readDepositedPostReport() == 0, "failed callback rolls post-report back");
     }
 
     function testEmptyUnfinalizedStillSpendsDepositable() public {

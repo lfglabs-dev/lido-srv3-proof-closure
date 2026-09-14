@@ -33,6 +33,9 @@ check: test
 	@printf '%s\n' 'check ok: metadata, mutants, receipt, provenance, and executable regressions passed'
 
 test:
+	@python3 scripts/test_differential_sources.py
+	@python3 scripts/check_reproduction_targets.py
+	@python3 scripts/test_reproduction_targets.py
 	@bash scripts/test_minfirst_source_differential.sh
 	@bash scripts/test_deposit_source_differential.sh
 	@bash scripts/test_topup_source_differential.sh

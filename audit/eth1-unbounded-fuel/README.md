@@ -127,7 +127,7 @@ quantifies every funded non-wrapping batch at derived fuel.
 - `#print axioms` of every Verity export: `propext` / `Classical.choice` /
   `Quot.sound` (or a subset). `parent_fuel_premise_excludes_batch_29` uses none.
   No `sorryAx`.
-- `lake build LidoSRv3.Audit.Verity.ConsolidationEthUnboundedFuel` is the
+- `lake build LidoSRv3.Audit.Guarantees.Composition.ConsolidationEthUnboundedFuel` is the
   documented raccord (not applied). `LidoSRv3Test` picks up the mutant file
   via `.submodules LidoSRv3.Tests`.
 

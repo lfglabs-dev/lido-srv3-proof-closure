@@ -107,7 +107,7 @@ independence.
 ## Gates
 
 ```sh
-lake build LidoSRv3.Audit.Source.SszCompiledEntryRollback
+lake build LidoSRv3.Audit.Guarantees.Composition.SszCompiledEntryRollback
 lake build LidoSRv3.Tests.SszCompiledEntryRollbackMutants
 lake env lean LidoSRv3/Audit/Guarantees/Composition/SszCompiledEntryRollback.lean
 lake env lean LidoSRv3/Tests/SszCompiledEntryRollbackMutants.lean

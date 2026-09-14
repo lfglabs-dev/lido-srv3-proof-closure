@@ -280,22 +280,22 @@ contract TopupDifferentialTest {
     }
 
     function testMutantDroppedAssertStrandsEther() public {
-        // Honest path with a 1-wei leftover is not reachable (gwei alignment).
-        // Mutant simply omits the assert; compare storage/call success against
-        // a reversed-order revert to show the harness distinguishes copies.
         module.setAllocations(_one(2 ether));
-        log.reset();
+        // A misbehaving Lido callback overpays by one wei. The honest final
+        // balance assert must roll the complete transaction back.
+        lido.setExtraWithdrawalWei(1);
+        uint256 beforeLido = address(lido).balance;
+        uint256 beforeRouter = address(router).balance;
+        Obs memory honest = observePinned(GATEWAY, _one(0), _one(0), _pks(1), _one(5 ether));
+        require(!honest.ok && honest.selector == bytes4(0x4e487b71), "honest conservation panic");
+        require(address(lido).balance == beforeLido && address(router).balance == beforeRouter,
+            "honest rollback");
         vm.prank(GATEWAY);
         (bool ok,) = address(router).call(
             abi.encodeCall(router.topUpDroppedAssert, (moduleId, _one(0), _one(0), _pks(1), _one(5 ether)))
         );
-        require(ok, "dropped-assert copy still conserves on a gwei-aligned path");
-        log.reset();
-        vm.prank(GATEWAY);
-        (bool revOk,) = address(router).call(
-            abi.encodeCall(router.topUpReversedOrder, (moduleId, _one(0), _one(0), _pks(1), _one(5 ether)))
-        );
-        require(!revOk, "reversed-order mutant is detected");
+        require(ok, "dropped assert admits imbalance");
+        require(address(router).balance == beforeRouter + 1, "mutant strands one wei");
     }
 
     function testMutantReversedOrderRevertsOnNominal() public {
@@ -331,9 +331,19 @@ contract TopupDifferentialTest {
     }
 
     function testType1ModuleRejected() public {
-        // The registered module is type 2. A type-1 module is a separate add.
-        // This pin already enforces WC type 2; keep the type-2 module and
-        // just record that execute has no WC guard (D-WC-1).
+        MockModuleV2 type1 = new MockModuleV2(log);
+        StakingModuleConfig memory cfg = StakingModuleConfig({
+            stakeShareLimit: 10_000, priorityExitShareThreshold: 10_000,
+            stakingModuleFee: 0, treasuryFee: 0, maxDepositsPerBlock: 100,
+            minDepositBlockDistance: 1, withdrawalCredentialsType: 1
+        });
+        vm.prank(ADMIN);
+        router.addStakingModule("type1", address(type1), cfg);
+        moduleId = 2;
+        Obs memory sol = observePinned(GATEWAY, _one(0), _one(0), _pks(1), _one(5 ether));
+        require(!sol.ok && sol.selector == bytes4(keccak256("WrongWithdrawalCredentialsType()")),
+            "pin rejects type1 before module call");
+        require(log.count() == 0, "no committed calls");
         Obs memory model = runModel(modelJson("[2000000000000000000]", "none"));
         require(model.ok, "model execute has no WC-type guard");
     }

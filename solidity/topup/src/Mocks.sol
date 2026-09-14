@@ -63,6 +63,7 @@ contract MockLido {
     address public router;
     bool public depositsEnabled;
     bool public failWithdraw;
+    uint256 public extraWithdrawalWei;
 
     constructor(CallLog log_) {
         log = log_;
@@ -85,6 +86,10 @@ contract MockLido {
         failWithdraw = value;
     }
 
+    function setExtraWithdrawalWei(uint256 value) external {
+        extraWithdrawalWei = value;
+    }
+
     function getDepositableEther() external view returns (uint256) {
         return depositable;
     }
@@ -98,7 +103,7 @@ contract MockLido {
         if (failWithdraw) revert("LIDO_FAIL");
         require(amount <= depositable, "NOT_ENOUGH_ETHER");
         depositable -= amount;
-        IReceiveDepositable(router).receiveDepositableEther{value: amount}();
+        IReceiveDepositable(router).receiveDepositableEther{value: amount + extraWithdrawalWei}();
     }
 
     receive() external payable {}

@@ -32,6 +32,14 @@ contract ReserveHarness is Lido {
         _setDepositedNextReportAndLastDepositNonce(depositedNextReport, nonce);
     }
 
+    function readDepositedPostReport() external view returns (uint256) {
+        return _getDepositedPostReport();
+    }
+
+    function readDepositedNextReportAdjusted() external view returns (uint256 value) {
+        (value,) = _getDepositedNextReportAdjusted();
+    }
+
     function readDummySlot() external view returns (uint256) {
         return mutantDummySlot;
     }

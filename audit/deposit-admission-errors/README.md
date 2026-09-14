@@ -1,5 +1,27 @@
 # DEPOSIT exact local admission errors
 
+## Current candidate reproduction
+
+The dossier and its `validation/validate.py` below are historical evidence tied
+to base `b3b63586ecd72467dadc2e5ccdca220d820f15fb` and their recorded source tree. Their old import paths and
+receipts do not validate the integrated candidate. Do not run or regenerate
+those historical receipts against the current checkout.
+
+For the current candidate, verify the exact PR head first and run:
+
+```sh
+python3 scripts/check_reproduction_targets.py
+REMOTE_BUILD_NODE_ID=dgx-spark remote-lean-build lake build LidoSRv3.Audit.Guarantees.Composition.DepositAdmissionErrors LidoSRv3.Audit.Guarantees.PDeposit1AdmissionErrors LidoSRv3.Tests.DepositAdmissionErrorsRegression
+REMOTE_BUILD_NODE_ID=dgx-spark remote-lean-build lake build LidoSRv3.Audit.Trust
+```
+
+These commands compile the relocated proofs and their retained regressions.
+The repository runner additionally recomputes registered axiom dependencies;
+no historical dossier PASS is transferred to the current SHA.
+
+## Historical dossier (superseded as a current reproduction)
+
+
 Additive source candidate on accepted345 `b3b63586ecd72467dadc2e5ccdca220d820f15fb`, core `17005714f151e5502c559932319a3f2f74ac2436`. Only the three new Lean files and this dossier change. Source authoring is not independent review; a separate reviewer and root integration are required.
 
 `PDeposit1.actual_dsm_call_admission_bytes_suffix` is the consumed all-outcome public theorem. For success of the actual new executor it retains the **entire unchanged328 `DepositDsmCall.Effects`**, exact old successful result (World and both journals), and absence of a local rejection. For each actually recorded local rejection it derives the decoded DSM lookup/trace, exact first-failing physical guard, exact bytes, original World and no module attempt. For every failure it proves whole original-World rollback. There are no propositional input premises, independent successful-stage premises, initialization, fit, frame, hash-injectivity/nonalias or WC-type assumptions. The conditional success/error properties are conclusions about the executor it actually ran.
