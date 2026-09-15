@@ -132,6 +132,14 @@ views of that registry. No historical receipt validates a successor commit.
   The compiler diagnostics identify metadata/mechanics/template traversal
   reduction. The successor rewrites those exact equations without changing the
   program, introducing metadata bypasses, or adding axioms. Full trust remains open.
+- Exact `7e4a6665b89fa701bdbc3027d98a2f62d0cc03fa` job
+  `6bb4bf1f-10e2-4109-9ea0-be7c236aa40b` failed with exit 1 at
+  2026-09-15 18:42:26 UTC. The
+  [receipt](receipts/nor-source/compiler-fold-7e4a6665.json) records successful
+  unsafe-mechanics reduction, looping simplification in metadata/template
+  traversal and remaining input-validation recursion. No compiler or trust
+  acceptance follows. The successor bounds simplifier passes over the unchanged
+  finite program; it does not add a native exception or change hypotheses.
 - **Predecessor findings: reconciliation incomplete.** The missing fifth finding
   and 37-thread dispositions identified below remain unresolved. Historical
   semantic findings remain open unless concrete current evidence establishes

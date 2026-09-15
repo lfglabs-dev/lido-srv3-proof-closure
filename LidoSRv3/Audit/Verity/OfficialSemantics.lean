@@ -150,8 +150,12 @@ theorem checkedFold_compiles_to_official_ir :
               Lean.Elab.Tactic.evalTactic (← `(tactic| simp [$id:ident]))
         | _ => throwError "expected one pinned TrustSurface helper: {suffix}"
   have functionValid : validateFunctionSpec checkedFold = .ok () := by
-    simp [validateFunctionSpec, mechanics, checkedFold, Stmt.fold, Stmt.foldList,
-      Stmt.directMetadata, Stmt.childLists, Bind.bind, Except.bind, Pure.pure, Except.pure]
+    -- A single pass avoids unfolding the recursive fold beneath symbolic
+    -- child binders forever; bounded passes let concrete lists simplify.
+    iterate 12 all_goals
+      simp (config := { singlePass := true }) [validateFunctionSpec, mechanics,
+        checkedFold, Stmt.fold, Stmt.foldList, Stmt.directMetadata, Stmt.childLists,
+        Bind.bind, Except.bind, Pure.pure, Except.pure]
     all_goals (trace_state; decide_cbv)
   have validated : validateCompileInputs checkedFoldSpec [tx.functionSelector] = .ok () := by
     unfold validateCompileInputs
@@ -164,8 +168,9 @@ theorem checkedFold_compiles_to_official_ir :
           let id := Lean.mkIdent name
           Lean.Elab.Tactic.evalTactic (← `(tactic| unfold $id:ident))
       | _ => throwError "expected one pinned compiler precheck definition"
-    simp [checkedFoldSpec, functionValid, checkedFold, modulesField,
-      Bind.bind, Except.bind, Pure.pure, Except.pure]
+    simp [validateNonReentrantForkCompatibility, checkedFoldSpec, functionValid,
+      checkedFold, modulesField, Bind.bind, Except.bind, Pure.pure, Except.pure]
+    all_goals (trace_state)
     all_goals (trace_state; decide_cbv)
   have fieldSlot : findFieldWithResolvedSlot [modulesField] "modules" = some (modulesField, 7) := by
     rfl
@@ -186,9 +191,12 @@ theorem checkedFold_compiles_to_official_ir :
   have hl : checkedFold.nonReentrantLock = none := rfl
   have hr : functionReturns checkedFold = .ok [.uint256] := rfl
   have templates : (templateIntrinsicItems checkedFoldSpec).isEmpty = true := by
-    simp [templateIntrinsicItems, checkedFoldSpec, checkedFold,
-      collectTemplateIntrinsicsFromStmts, collectTemplateIntrinsicsFromStmt,
-      collectTemplateIntrinsicsFromExpr, Stmt.directMetadata, Stmt.childLists, Expr.children]
+    iterate 12 all_goals
+      simp (config := { singlePass := true }) [templateIntrinsicItems,
+        checkedFoldSpec, checkedFold, collectTemplateIntrinsicsFromStmts,
+        collectTemplateIntrinsicsFromStmt, collectTemplateIntrinsicsFromExpr,
+        Stmt.directMetadata, Stmt.childLists, Expr.children]
+    all_goals (trace_state; decide_cbv)
   have ht := List.nil_of_isEmpty templates
   unfold CompilationModel.compile
   rw [validated]
