@@ -120,7 +120,6 @@ import LidoSRv3.Audit.Guarantees.PConsolidationEth1CLProofPremise
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1AbiBridgePremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
-import LidoSRv3.Audit.Source.StakingModuleRegistrySource
 import LidoSRv3.Audit.Guarantees.PAlloc1Phase3
 import LidoSRv3.Audit.Guarantees.PAlloc2
 import LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound
@@ -973,9 +972,7 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- Fourth-step (2026-09-13): Aragon ACL hasRole via ACL mapping decoder.
 #print axioms LidoSRv3.Audit.Source.AragonACLSource.hasRole_true_of_mapping_nonzero
 -- Second-step (2026-09-13): P-ALLOC-1 per-module uint64 field bounds.
-#print axioms LidoSRv3.Audit.Source.StakingModuleRegistrySource.moduleFields_bounded_by_uint64
 -- Third-step (2026-09-13): P-ALLOC-1 SR monotonicity invariant (active_subtraction).
-#print axioms LidoSRv3.Audit.Source.StakingModuleRegistrySource.active_subtraction_bound_of_sr_monotonicity
 -- General rule (Thomas 2026-09-12) applied to P-CONSOLIDATION-ETH-1
 -- feePerRequest free Nat: naming scaffold PinnedFeeStaticcallShape
 -- names the pinned WithdrawalVaultEIP7685.sol:79-81 STATICCALL entry
@@ -1167,7 +1164,6 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- conjuncts (2026-09-13): source-level StakingModuleRegistryState names
 -- the pinned SRLib.sol Module-struct type bounds + MAX_STAKING_MODULES_COUNT
 -- = 32 registry invariant.
-#print axioms LidoSRv3.Audit.Source.StakingModuleRegistrySource.moduleCount_bounded_of_registry_state
 #print axioms LidoSRv3.Tests.ConsolidationEthUnboundedFuelMutants.truncated_fuel_batchSize_plus_three_exhausted
 #print axioms LidoSRv3.Tests.ConsolidationEthUnboundedFuelMutants.truncated_fuel_must_be_refused
 #print axioms LidoSRv3.Tests.ConsolidationEthUnboundedFuelMutants.parent_fuel_premise_excludes_batch_29

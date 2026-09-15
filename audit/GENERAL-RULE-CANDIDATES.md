@@ -375,13 +375,18 @@ Merged real-derivation first-step PRs:
 - **PR #450** — P-CONSOLIDATION-ETH-1 fee STATICCALL via
   `ConsolidationFeeStaticcallSource` (named PredeployStaticcallResult
   ABI-decoded fee).
-- **PR #451** — P-ALLOC-1 registry MAX_STAKING_MODULES_COUNT = 32
-  via `StakingModuleRegistrySource` (named StakingModuleRegistryState
-  moduleCount bound).
+- **PR #451 — retired during review preparation.** The unused
+  [registry scaffold](https://github.com/lfglabs-dev/lido-srv3-proof-closure/blob/f0099f77407db34fbd971699e395534fc067dd59/LidoSRv3/Audit/Source/StakingModuleRegistrySource.lean)
+  only projected supplied bounds. It did not execute registry transitions;
+  its `addValidators`/`_updateExitedCounters` attribution and claims of router
+  uint64 summary fields were incorrect. Only Trust diagnostics referenced it;
+  no registered consumer depended on its theorems. The actual producer and
+  writer obligations remain in P-ALLOC-1's canonical `fidelity.missing`.
 
-Each first-step routes the composition through a NAMED source-level
-function on a NAMED source state, definitionally equal to the pinned
-Solidity guard — a real derivation, not a straight-line projection.
+These historical first-step names do not establish source derivation by
+naming alone. The ALLOC scaffold above was a projection, and its retirement
+does not discharge the requested invariant. Each remaining candidate needs
+inspection of the actual producer and consumed theorem.
 The named source states are still input propositions; the follow-up
 work is per-candidate live-keyed-storage / live-STATICCALL /
 per-writer-glue derivations that consume the source state from actual
