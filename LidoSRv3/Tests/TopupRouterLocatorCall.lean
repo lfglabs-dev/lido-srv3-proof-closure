@@ -78,9 +78,8 @@ theorem precompile_locator_dispatch :
     (batch noCode).locatorAttempts = [⟨request (address 3) locator,true,true,encode 32 2,1⟩] := by decide +kernel
 
 def ordinaryNoCode : TopupGatewayRootCalls.Environment :=
-  {noCode with before := {noCode.before with core :=
-    {noCode.before.core with codeSize := fun a =>
-      if a = 20 then word 0 else noCode.before.core.codeSize a}}}
+  let e := noCode
+  {e with before := {e.before with core := {e.before.core with codeSize := fun a => if a = 20 then word 0 else e.before.core.codeSize a}}}
 
 theorem ordinary_nocode_empty_then_decoder :
     (batch ordinaryNoCode (loc := address 20)).outcome = .error (.lookup .empty) ∧
