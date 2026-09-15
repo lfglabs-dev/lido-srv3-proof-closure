@@ -283,7 +283,7 @@ theorem inventory_count : allRoutes.length = 11 := rfl
 
 theorem unsupported_count : allUnsupportedRoutes.length = 7 := rfl
 
-theorem allRoutes_nodup : allRoutes.Nodup := by native_decide
+theorem allRoutes_nodup : allRoutes.Nodup := by decide +kernel
 
 /-! ## General flow and owner/treasury/ops mutant -/
 

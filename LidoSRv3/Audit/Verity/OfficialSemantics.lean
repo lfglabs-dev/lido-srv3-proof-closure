@@ -85,7 +85,7 @@ def denote (fn : FunctionSpec) (values : List Verity.Core.Uint256) : DenoteResul
 theorem checkedFold_evaluates :
     (denote checkedFold [4, 7]).success = true ∧
       (denote checkedFold [4, 7]).returnValue = some 11 := by
-  native_decide
+  decide +kernel
 
 private def observedModuleValues : StmtOutcome → Option (List Nat)
   | .continue state | .stop state | .return _ state =>
@@ -99,20 +99,20 @@ theorem checkedFold_updates_modules_in_order :
       (execStmtList unusedOracle [modulesField]
         { world := initialWorld [4, 7], bindings := [], selector := tx.functionSelector }
         checkedFold.body) = some [5, 8] := by
-  native_decide
+  decide +kernel
 
 /-- The same official denotation observes the Solidity-style overflow guard as
 failure, rather than silently accepting wrapped arithmetic. -/
 theorem checkedFold_overflow_reverts :
     (denote checkedFold [Verity.Core.MAX_UINT256, 1]).success = false := by
-  native_decide
+  decide +kernel
 
 /-- Negative mutant: removing the guard changes the overflow observation to a
 successful wrapped result. -/
 theorem wrappingMutant_is_detected :
     (denote wrappingMutant [Verity.Core.MAX_UINT256, 1]).success = true ∧
       (denote wrappingMutant [Verity.Core.MAX_UINT256, 1]).returnValue = some 0 := by
-  native_decide
+  decide +kernel
 
 /-- The same EDSL program genuinely enters Verity's official compiler and
 produces its IR; this theorem fixes the concrete compiler entrypoint and rules

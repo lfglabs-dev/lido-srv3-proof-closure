@@ -141,7 +141,7 @@ theorem selector_memory_is_byte_precise :
     rw [Memory.readByte]
     simp [Memory.writeWord, Memory.expand, expandedLength, Memory.empty,
       summarySelectorWord, selectorByte]
-    native_decide
+    decide +kernel
 
 theorem consumed_summary_source_bridge (moduleAddress : Nat) :
     SourceCallStorageABI consumedSummaryEntry moduleAddress ∧

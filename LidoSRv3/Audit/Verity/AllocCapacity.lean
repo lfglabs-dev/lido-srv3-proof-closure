@@ -95,13 +95,13 @@ capacity `2`. -/
 theorem oneModule_observes_minimum :
     ObservesCapacity (run oneModule [100, 1000, 1, 2, 0, 0, 0]) 2 := by
   unfold ObservesCapacity
-  native_decide
+  decide +kernel
 
 /-- The checked subtraction fails exactly as the source does when exited
 validators exceed deposited validators. -/
 theorem oneModule_underflow_reverts :
     (run oneModule [100, 1000, 1, 2, 0, 1, 0]).success = false := by
-  native_decide
+  decide +kernel
 
 /-- Mutant: return the target and omit the final `min` with available
 capacity. -/
@@ -115,7 +115,7 @@ theorem noAvailableMinMutant_is_detected :
     ObservesCapacity (run oneModule [100, 1000, 1, 2, 0, 0, 0]) 2 ∧
       ¬ ObservesCapacity (run noAvailableMinMutant [100, 1000, 1, 2, 0, 0, 0]) 2 := by
   unfold ObservesCapacity
-  native_decide
+  decide +kernel
 
 theorem oneModule_compiles_to_official_ir :
     (CompilationModel.compile spec [selector]).isOk = true := by

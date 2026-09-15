@@ -28,6 +28,16 @@ views of that registry. No historical receipt validates a successor commit.
   P1–P15 receipt; production remains independent of Legacy. Fresh validation is
   required. Test modules remain separately disclosed; all selected claims receive
   actual transitive dependency recomputation.
+  Exact `4a364acc676176076fe820edaead9a0544b629d6` trust job
+  `37886f3d-0314-43cb-bd75-de331a81bd21` completed recomputation of 14,334
+  claims (1,137 explicit disclosures), then failed policy at the fee-blind
+  consolidation counterexample's nine native axioms. Its
+  [terminal receipt](receipts/nor-source/trust-4a364acc.json) records the failure;
+  this is not a complete accepted inventory. The current candidate replaces 24
+  supporting native tactic sites with kernel reduction, without changing their
+  statements, and explicitly discloses that counterexample. Kernel validation
+  is pending. Four additional compiler-success native sites remain unauthorized
+  obligations; source-site counts are not transitive axiom results.
 - **Predecessor findings: reconciliation incomplete.** The missing fifth finding
   and 37-thread dispositions identified below remain unresolved. Historical
   semantic findings remain open unless concrete current evidence establishes

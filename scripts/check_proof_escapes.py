@@ -34,8 +34,8 @@ EXTRA_SOURCE_ROOTS = ("audit/trio",)
 # mission; other differences are retained source/test line moves and API updates.
 # Exact records: candidate-native-inventory.json and kernel-witness-removals.json
 # and kernel-{account-topup,sha}-removals.json under audit/metadata-reconcile.
-NATIVE_DECIDE_COUNT = 404
-NATIVE_DECIDE_SHA256 = "a5c9ff0fc082d68db8ab60ce7180c33aa78ce11609240e1313baa3c27522a331"
+NATIVE_DECIDE_COUNT = 380
+NATIVE_DECIDE_SHA256 = "115c95b4aa8541f188fb48e32e366eef8365438ccf42f7c2316b8efafeb15697"
 ESCAPES = (
     ("sorry", re.compile(r"\bsorry\b")),
     ("admit", re.compile(r"\badmit\b")),

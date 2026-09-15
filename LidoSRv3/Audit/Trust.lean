@@ -694,9 +694,9 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- (no in-scope caller run derives it), and the packed source/target
 -- concat order is refuted by a swapped-order witness. Each pins its
 -- parent hypothesis as necessary rather than accidentally satisfied.
--- (`fee_blind_commit_kill_line_refutes_parent` is intentionally kept
--- out of this disclosure: its `native_decide` dependencies are not
--- in the accepted test/mutant-only disclosure set.)
+-- The fee-blind counterexample is also individually disclosed; native-backed
+-- supporting claims cannot be omitted to keep the observed inventory small.
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1.fee_blind_commit_kill_line_refutes_parent
 #print axioms
   LidoSRv3.Audit.Guarantees.PConsolidation1.gateway_admitted_nonzero_kill_line
 #print axioms

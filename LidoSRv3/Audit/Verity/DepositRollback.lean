@@ -193,7 +193,7 @@ def extractedFootprint :
 
 theorem allocation_extraction_matches_source_derived_prefix :
     extractedFootprint = sourceDerivedExpectedFootprint := by
-  native_decide
+  decide +kernel
 
 /-! Actual FunctionSpec execution rejects malformed ABI input before any body
 statement. `DenoteResult` exposes encoded final storage but this artifact does
@@ -207,7 +207,7 @@ def malformedTx : Denote.DenoteTransaction :=
 theorem malformed_actual_function_spec_rejects :
     (Denote.denoteFunction zeroOracle spec checkedPrefix malformedTx
       Verity.defaultState).success = false := by
-  native_decide
+  decide +kernel
 
 def openComponents : List String :=
   [ "OPEN allocation: module capacity/summary calls, type-2 total stake, MinFirst.allocate, module-index lookup, zero-module branch, and all arithmetic/array bounds"
