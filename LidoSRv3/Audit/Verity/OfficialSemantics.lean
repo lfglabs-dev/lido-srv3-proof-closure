@@ -327,12 +327,20 @@ private theorem stmtCheck_setStorageArrayElement (check : Stmt → Except String
   rw [Stmt.forDeepM]
   simp [Stmt.childLists]
 
+private theorem listForMAttach {α : Type} (xs : List α)
+    (f : α → Except String Unit) :
+    xs.attach.forM (fun x => f x.val) = xs.forM f := by
+  induction xs with
+  | nil => rfl
+  | cons x xs ih => simp [List.attach_cons, List.forM_map, ih]
+
 private theorem stmtCheck_forEach (check : Stmt → Except String Unit)
     (name : String) (count : Expr) (body : List Stmt) :
     Stmt.forDeepM check (.forEach name count body) =
       (do check (.forEach name count body); body.forM (Stmt.forDeepM check)) := by
   rw [Stmt.forDeepM]
   simp [Stmt.childLists]
+  rw [listForMAttach]
 
 private theorem exprCheck_literal (check : Expr → Except String Unit) (n : Nat) :
     Expr.forDeepM check (.literal n) = check (.literal n) := by
@@ -499,8 +507,9 @@ theorem checkedFold_compiles_to_official_ir :
           let id := Lean.mkIdent name
           Lean.Elab.Tactic.evalTactic (← `(tactic| unfold $id:ident))
       | _ => throwError "expected one pinned compiler precheck definition"
+    simp only [identifiers]
     simp [validateNonReentrantForkCompatibility, no_external_assumptions, identifiers, checkedFoldSpec, functionValid,
-      checkedFold, modulesField, Bind.bind, Except.bind, Pure.pure, Except.pure]
+      modulesField, Bind.bind, Except.bind, Pure.pure, Except.pure]
     all_goals (trace_state; decide_cbv)
   have fieldSlot : findFieldWithResolvedSlot [modulesField] "modules" = some (modulesField, 7) := by
     rfl

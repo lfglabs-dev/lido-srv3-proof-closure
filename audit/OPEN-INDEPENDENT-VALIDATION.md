@@ -690,3 +690,11 @@ not transfer a predecessor build, trust verdict or deployment acceptance.
   They contained transient failed attempts, not unique regressions or current
   validation. Current failure receipts, compiler dependency provenance, NOR
   target results, counterexamples and unresolved findings remain retained.
+
+- Exact `01132a8d057b309144531d3ab24a59b86a6032ce` job
+  `97092ad9-cb57-4a09-9d73-7e71e9406c89` failed with exit 1 at
+  2026-09-15 19:13:18 UTC, without a source bundle. The
+  [receipt](receipts/nor-source/compiler-fold-01132a8d.json) records one attached-list
+  monadic traversal goal and function/input recursion errors. The isolated
+  identifier subproof no longer reports an error. Its reuse and the traversal
+  equality are repaired next; the compiler theorem remains unaccepted.
