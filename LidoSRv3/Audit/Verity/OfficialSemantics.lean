@@ -116,6 +116,7 @@ theorem wrappingMutant_is_detected :
 
 set_option maxRecDepth 16384 in
 set_option maxHeartbeats 4000000 in
+set_option pp.maxSteps 200 in
 /-- The same EDSL program genuinely enters Verity's official compiler and
 produces its IR; this theorem fixes the concrete compiler entrypoint and rules
 out a source-only local interpreter experiment. -/
@@ -154,6 +155,7 @@ theorem checkedFold_compiles_to_official_ir :
       (compileStmtListWithFork [modulesField] [] [] .calldata [] false [] [] .cancun checkedFold.body []).isOk = true := by
     simp [checkedFold, fieldSlot, fieldType, fieldTransient, compileStmtListWithFork, compileStmtWithFork,
       compileExprWithInternals, compileRequireFailCondWithInternals,
+      compileSetStorageArrayElement, validateDynamicArrayField,
       Bind.bind, Except.bind, Pure.pure, Except.pure, Except.isOk, Except.toBool]
     all_goals decide +kernel
   have hi : checkedFold.isInternal = false := rfl
