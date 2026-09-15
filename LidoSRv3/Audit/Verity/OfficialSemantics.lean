@@ -4,8 +4,8 @@ import Verity.Core.Model.Denote
 /-!
 # Official Verity semantics smoke test
 
-This file pins the concrete semantic path available in Verity revision
-`d2d4a18a4d7021adcd90d4b03e619affe506dd54`:
+This file uses the concrete semantic path at the compiler revision pinned in
+`lake-manifest.json` and `proofs/LOCKFILE.md`:
 
 * `Compiler.CompilationModel` is the official deep EDSL/IR compiler;
 * `Compiler.CompilationModel.Denote` is the canonical denotation exported by
@@ -125,6 +125,77 @@ private def exceptUnitDecEq : DecidableEq (Except String Unit) := fun x y =>
 
 local instance : DecidableEq (Except String Unit) := exceptUnitDecEq
 
+private theorem fold_leaf {α : Type} (f : α → Stmt → StmtMetadata → α)
+    (initial : α) (stmt : Stmt) (h : stmt.childLists = []) :
+    stmt.fold f initial = f initial stmt stmt.directMetadata := by
+  rw [Stmt.fold]
+  simp [h]
+
+private theorem fold_forEach {α : Type} (f : α → Stmt → StmtMetadata → α)
+    (initial : α) (name : String) (count : Expr) (body : List Stmt) :
+    (Stmt.forEach name count body).fold f initial =
+      body.foldl (fun acc stmt => stmt.fold f acc)
+        (f initial (.forEach name count body) (Stmt.forEach name count body).directMetadata) := by
+  rw [Stmt.fold]
+  simp only [Stmt.childLists, List.attach_cons, List.attach_nil, List.foldl_cons,
+    List.foldl_nil, List.foldl_map]
+  all_goals exact List.foldl_attach
+
+private theorem templates_leaf (stmt : Stmt) (h : stmt.childLists = []) :
+    collectTemplateIntrinsicsFromStmt stmt =
+      stmt.directMetadata.subexpressions.flatMap collectTemplateIntrinsicsFromExpr := by
+  rw [collectTemplateIntrinsicsFromStmt]
+  simp [h]
+
+private theorem templates_forEach (name : String) (count : Expr) (body : List Stmt) :
+    collectTemplateIntrinsicsFromStmt (.forEach name count body) =
+      collectTemplateIntrinsicsFromExpr count ++
+        body.flatMap collectTemplateIntrinsicsFromStmt := by
+  rw [collectTemplateIntrinsicsFromStmt]
+  simp [Stmt.directMetadata, Stmt.childLists]
+
+private theorem templates_literal (n : Nat) :
+    collectTemplateIntrinsicsFromExpr (.literal n) = [] := by
+  rw [collectTemplateIntrinsicsFromExpr]
+  simp [Expr.children]
+  all_goals (intro _ _ _ _ _ _ _ h; cases h)
+
+private theorem templates_localVar (name : String) :
+    collectTemplateIntrinsicsFromExpr (.localVar name) = [] := by
+  rw [collectTemplateIntrinsicsFromExpr]
+  simp [Expr.children]
+  all_goals (intro _ _ _ _ _ _ _ h; cases h)
+
+private theorem templates_storageArrayLength (name : String) :
+    collectTemplateIntrinsicsFromExpr (.storageArrayLength name) = [] := by
+  rw [collectTemplateIntrinsicsFromExpr]
+  simp [Expr.children]
+  all_goals (intro _ _ _ _ _ _ _ h; cases h)
+
+private theorem templates_storageArrayElement (name : String) (index : Expr) :
+    collectTemplateIntrinsicsFromExpr (.storageArrayElement name index) = collectTemplateIntrinsicsFromExpr index := by
+  rw [collectTemplateIntrinsicsFromExpr]
+  simp [Expr.children]
+  all_goals (intro _ _ _ _ _ _ _ h; cases h)
+
+private theorem templates_add (a b : Expr) :
+    collectTemplateIntrinsicsFromExpr (.add a b) = collectTemplateIntrinsicsFromExpr a ++ collectTemplateIntrinsicsFromExpr b := by
+  rw [collectTemplateIntrinsicsFromExpr]
+  simp [Expr.children]
+  all_goals (intro _ _ _ _ _ _ _ h; cases h)
+
+private theorem templates_sub (a b : Expr) :
+    collectTemplateIntrinsicsFromExpr (.sub a b) = collectTemplateIntrinsicsFromExpr a ++ collectTemplateIntrinsicsFromExpr b := by
+  rw [collectTemplateIntrinsicsFromExpr]
+  simp [Expr.children]
+  all_goals (intro _ _ _ _ _ _ _ h; cases h)
+
+private theorem templates_le (a b : Expr) :
+    collectTemplateIntrinsicsFromExpr (.le a b) = collectTemplateIntrinsicsFromExpr a ++ collectTemplateIntrinsicsFromExpr b := by
+  rw [collectTemplateIntrinsicsFromExpr]
+  simp [Expr.children]
+  all_goals (intro _ _ _ _ _ _ _ h; cases h)
+
 set_option maxRecDepth 16384 in
 set_option maxHeartbeats 4000000 in
 set_option pp.maxSteps 200 in
@@ -149,13 +220,11 @@ theorem checkedFold_compiles_to_official_ir :
               let id := Lean.mkIdent name
               Lean.Elab.Tactic.evalTactic (← `(tactic| simp [$id:ident]))
         | _ => throwError "expected one pinned TrustSurface helper: {suffix}"
+  simp only [checkedFold] at mechanics
   have functionValid : validateFunctionSpec checkedFold = .ok () := by
-    -- A single pass avoids unfolding the recursive fold beneath symbolic
-    -- child binders forever; bounded passes let concrete lists simplify.
-    iterate 12 all_goals
-      simp (config := { singlePass := true }) [validateFunctionSpec, mechanics,
-        checkedFold, Stmt.fold, Stmt.foldList, Stmt.directMetadata, Stmt.childLists,
-        Bind.bind, Except.bind, Pure.pure, Except.pure]
+    simp [validateFunctionSpec, mechanics, checkedFold, fold_leaf, fold_forEach,
+      Stmt.foldList, Stmt.directMetadata, Stmt.childLists,
+      Bind.bind, Except.bind, Pure.pure, Except.pure]
     all_goals (trace_state; decide_cbv)
   have validated : validateCompileInputs checkedFoldSpec [tx.functionSelector] = .ok () := by
     unfold validateCompileInputs
@@ -170,7 +239,6 @@ theorem checkedFold_compiles_to_official_ir :
       | _ => throwError "expected one pinned compiler precheck definition"
     simp [validateNonReentrantForkCompatibility, checkedFoldSpec, functionValid,
       checkedFold, modulesField, Bind.bind, Except.bind, Pure.pure, Except.pure]
-    all_goals (trace_state)
     all_goals (trace_state; decide_cbv)
   have fieldSlot : findFieldWithResolvedSlot [modulesField] "modules" = some (modulesField, 7) := by
     rfl
@@ -191,11 +259,11 @@ theorem checkedFold_compiles_to_official_ir :
   have hl : checkedFold.nonReentrantLock = none := rfl
   have hr : functionReturns checkedFold = .ok [.uint256] := rfl
   have templates : (templateIntrinsicItems checkedFoldSpec).isEmpty = true := by
-    iterate 12 all_goals
-      simp (config := { singlePass := true }) [templateIntrinsicItems,
-        checkedFoldSpec, checkedFold, collectTemplateIntrinsicsFromStmts,
-        collectTemplateIntrinsicsFromStmt, collectTemplateIntrinsicsFromExpr,
-        Stmt.directMetadata, Stmt.childLists, Expr.children]
+    simp [templateIntrinsicItems, checkedFoldSpec, checkedFold,
+      collectTemplateIntrinsicsFromStmts, templates_leaf, templates_forEach,
+      templates_literal, templates_localVar, templates_storageArrayLength,
+      templates_storageArrayElement, templates_add, templates_sub, templates_le,
+      Stmt.directMetadata, Stmt.childLists]
     all_goals (trace_state; decide_cbv)
   have ht := List.nil_of_isEmpty templates
   unfold CompilationModel.compile

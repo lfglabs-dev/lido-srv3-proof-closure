@@ -140,6 +140,12 @@ views of that registry. No historical receipt validates a successor commit.
   traversal and remaining input-validation recursion. No compiler or trust
   acceptance follows. The successor bounds simplifier passes over the unchanged
   finite program; it does not add a native exception or change hypotheses.
+- Exact `491743e0af7ca4c993d7c711a87609ef2744e83c` job
+  `c0b343e8-1f87-4d14-ac2a-6715e9ff1bbd` failed with exit 1 at
+  2026-09-15 18:50:48 UTC. The [receipt](receipts/nor-source/compiler-fold-491743e0.json)
+  records a deterministic heartbeat timeout during function-validation
+  simplification. Bounded generic expansion did not fix the problem; the next
+  repair uses constructor-specific traversal equations without changing the program.
 - **Predecessor findings: reconciliation incomplete.** The missing fifth finding
   and 37-thread dispositions identified below remain unresolved. Historical
   semantic findings remain open unless concrete current evidence establishes
@@ -614,3 +620,42 @@ available tail. The expanded diagnostic exceeded that tail, so it does not
 establish which earlier intermediate goals passed. The successor uses explicit
 function-validation, input-validation, body-compilation and core-composition
 steps with bounded diagnostic depth. All witness statements remain unchanged.
+
+### Additional accessible finding dispositions
+
+Inspected against frozen `491743e0af7ca4c993d7c711a87609ef2744e83c`.
+“Fixed” below settles the identified source/documentation defect only; it does
+not transfer a predecessor build, trust verdict or deployment acceptance.
+
+| Finding IDs | Disposition and current evidence |
+| --- | --- |
+| 4003149923, 4016021441 | **Open.** `Verity/TopupSourceEntry.lean` still calls `TopupTx.execute`, whose own documentation identifies an allocation suffix with injected failure hooks. It does not execute the registered full router-admission parent; actual pre-call errors and ordering remain required. |
+| 4004247713 | **Fixed test defect; execution pending.** `testType1ModuleRejected` now registers a real WC-type-1 module, calls the pinned router, checks `WrongWithdrawalCredentialsType()`, and preserves the divergent legacy model result explicitly. |
+| 4004305125 | **Fixed test defect; execution pending.** RESERVE's `readDepositedNextReportAdjusted()` is compared with the model result and the actual successful increment in `ReserveDifferential.t.sol`. |
+| 4004458435 | **Open reconciliation.** `AddressTx.lean` guard ordering changed; a complete comparison of every canonical qualification with current admission/error theorems is still required. |
+| 4004576715, 4007317184 | **Fixed.** `check_report_theorem_inventory.py` passed on this SHA: 14 P-ALLOC-1 declarations, including the two registered parents; report rows match current declarations and line numbers. |
+| 4004576721 | **Fixed.** The router-order docstring immediately precedes `router_order_preserved` in `PAlloc1.lean`; the available-bounds helper has its own description. |
+| 4004640989 | **Fixed.** `lakefile.lean` explicitly registers `LidoSRv3.Audit.Verity.TopupSourceEntry`. This does not settle its semantic mismatch above. |
+| 4004640996, 4016533105 | **Open exact-final gate.** UX2 generation is part of each candidate freeze; the final exact SHA must pass `generate_ux2.py check`, including `lean_source_tree`. No earlier generated digest validates a successor. |
+| 4004707834, 4004872722 | **Open exact-final metadata gate.** Current reserve writers are exported by PReserve1; canonical theorem keys, qualifications and report descriptions must pass current metadata validation and semantic review together. |
+| 4005183903 | **Fixed current reproduction target.** `lakefile.lean` registers `Audit.Verity.AllocLoopTermination`; `check_reproduction_targets.py` passed with 110 current module references. Historical references remain subject to their recorded trees. |
+| 4005342788, 4005481901 | **Superseded as current reproduction.** The DEPOSIT admission and SSZ declared-siblings READMEs explicitly mark their old validators as historical, prohibit regeneration against the current checkout, and provide current `Guarantees.Composition` module commands. Their old source paths remain necessary for the recorded historical identities and base comparisons. |
+| 4005646134, 4005853432, 4006000057, 4006000065 | **Fixed documented target.** The four cited README/finding commands now name the relocated `Guarantees.Composition.AccountPackedWords`, `ConsolidationEthUnboundedFuel`, `SszPerfectHashOrphaned` and `TopupNoWrapOrphaned` modules. The 110-reference check passed. |
+| 4007451726 | **Fixed driver selection.** `compile_reserve_pin.sh` delegates exclusively to the checksummed soljson/Node driver; it no longer selects an unchecked SVM or `SOLC_0424` executable. Current platform execution remains a separate gate. |
+| 4007451740 | **Superseded by fork-wide open findings below.** The recipient predicate excludes addresses 1–10 under Cancun, so the cited point-evaluation case no longer enters the ordinary-account branch. This does not close Prague dispatch. |
+| 4011675197, 4014545717 | **Open semantic discrepancy.** Both `AddressRecipientCallBridge.lean` and shared `audit/trio/consolidation/LowLevel.lean` still use zero-code plus `address = 0 ∨ 10 < address`; explicit fork-aware precompile dispatch and the actual chain/fork binding remain required. |
+| 4007757554 | **Open report consistency.** P-ALLOC-2's overview now states its unbounded fourth conjunct, but the long report still needs a complete pass separating bounded earlier conjuncts from that unbounded result. |
+| 4007977986, 4007977994, 4008700951 | **Open canonical/facade reconciliation.** `report/P-DEPOSIT-1.md` now describes executed `DepositAllocation.execute` feeding the physical suffix and retains its boundaries. `PDeposit1.lean` still describes the older composed bounded facade; all registry/facade statements must agree on the current registered parent. |
+| 4008204313 | **Fixed reproduction pin handling.** `reproduce_candidate.sh` requires a caller-supplied full SHA, checks exact HEAD and clean status, checks disclosure/source pins, then dispatches the full repository gate. It no longer hardcodes an obsolete candidate. |
+| 4011127728 | **Open regression verification.** RESERVE tests seed next-report values/nonces and compare adjusted reads; coverage of a different current reference slot with a nonzero stale accumulator must still be demonstrated explicitly. |
+| 4011309469 | **Fixed stale inventory.** Removed `audit/metadata-reconcile/candidate-native-inventory.json`, whose obsolete comparison labelled 436 sites current. The only tracked reference was a checker comment, now corrected; Git history retains the comparison. `check_proof_escapes.py` retains the exact current source-site digest, explicitly distinct from actual transitive axiom recomputation. |
+| 4011857194 | **Open regression.** TOPUP's current suite still needs a source/model observation test with two unequal nonzero allocations that checks each public-key/amount identity and order; aggregate counts and totals cannot settle it. |
+| 4012053628 | **Fixed scope wording.** INTEGRATION-CANDIDATE states that source/runtime/deployment correspondence needed by the original claims remains required. It does not treat those obligations as excluded because current models compile. |
+
+- Diagnostic job `5b04b02c-344e-4ef7-8a60-15d27cb3e522` failed with exit 1
+  at 2026-09-15 18:55:52 UTC. It was accidentally dispatched after the commit
+  whitespace check failed: base `491743e0af7ca4c993d7c711a87609ef2744e83c`,
+  source bundle `730b1aaa1fa569ac43572c00c294989b166c874cda2c77ce9334347708400d6b`.
+  Its [receipt](receipts/nor-source/compiler-bundle-730b1aaa.json) is diagnostic
+  evidence only, not exact-commit validation. Dependent rewrite and constructor
+  disjointness errors informed the repair; input/function validation remains open.
