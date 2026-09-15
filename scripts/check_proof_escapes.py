@@ -33,9 +33,9 @@ EXTRA_SOURCE_ROOTS = ("audit/trio",)
 # Integration reconciliation: one synthetic-map test removed before this
 # mission; other differences are retained source/test line moves and API updates.
 # Exact records: candidate-native-inventory.json and kernel-witness-removals.json
-# under audit/metadata-reconcile; 21 test sites replaced by kernel decisions.
-NATIVE_DECIDE_COUNT = 415
-NATIVE_DECIDE_SHA256 = "b3f3801c273222fbb1316f6184baa9c9bdc469b5ed5ed928bdede2a48343ca9e"
+# and kernel-account-topup-removals.json under audit/metadata-reconcile.
+NATIVE_DECIDE_COUNT = 408
+NATIVE_DECIDE_SHA256 = "9af20dcdd0ec2b40c3d3c79dbd9fd0fc080c9818388d1d3737933168029f87f1"
 ESCAPES = (
     ("sorry", re.compile(r"\bsorry\b")),
     ("admit", re.compile(r"\badmit\b")),

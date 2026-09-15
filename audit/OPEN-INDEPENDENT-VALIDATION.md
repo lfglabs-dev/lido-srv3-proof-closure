@@ -1,3 +1,32 @@
+# Reviewer 1e6ff3a9: accounting/top-up kernel witnesses and zero-call observation
+
+Controller reports independent job a14d23ef-04c3-4136-a223-2f49c140cf75 passed
+at 87cbb0a3fd361cb9b3a78509c532778aa5af6b16; semantic verdict remains BLOCKED.
+The reviewer workspace is not mounted. GitHub comment 4010913252 exposed the
+remaining zero-allocation deposit-call blind spot and is addressed here.
+
+Seven unchanged accounting/top-up witness statements now use decide +kernel.
+Targeted dgx-spark job 88629c0f-5996-45c2-9a78-7cf9c91e5479 passed all four targets
+(1257 jobs), including the model CLI. Exact source/inventory delta is recorded in
+audit/metadata-reconcile/kernel-account-topup-removals.json. Seven native axioms
+are removed; expected remaining Trust union is seven (three foundations, three
+compiler exceptions, one SHA-engine mutant). Full successor recomputation remains
+required. I-TRUST-FOUNDATIONAL-ONLY stays OPEN; this reduction does not authorize
+any exception as foundational-only evidence.
+
+TOPUP model CLI derives depositCallCount from its actual emitted call journal.
+The differential observer counts pinned deposit calls independently of their
+value. Existing [0] and [0, 2 ether] cases now require counts zero and one on both
+sides. A zero-value call can no longer pass by contributing nothing to pushed ETH.
+Full remote Forge execution is required before accepting this test repair.
+
+ALLOC1 supported-module reachability, ALLOC2 compiled/deployed refinement and all
+remaining obligations remain OPEN. The counterexample and AccountFrame are
+unchanged. Detailed reviewer dispositions not accessible in GitHub remain pending;
+no missing ledger entry or semantic closure is invented.
+
+## Earlier review records
+
 # Reviewer e5ec2def: full-parent and reproduction repairs
 
 Controller reports independent prove/test, axiom recomputation, 74 differential
