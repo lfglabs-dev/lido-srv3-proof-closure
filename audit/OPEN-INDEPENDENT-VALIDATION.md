@@ -659,3 +659,12 @@ not transfer a predecessor build, trust verdict or deployment acceptance.
   Its [receipt](receipts/nor-source/compiler-bundle-730b1aaa.json) is diagnostic
   evidence only, not exact-commit validation. Dependent rewrite and constructor
   disjointness errors informed the repair; input/function validation remains open.
+
+- Exact `5a62b34770f651bd890e2f389425c6c6e0daec5e` job
+  `0eaa7c38-9f90-4b7b-a8bf-2962688849ae` failed with exit 1 at
+  2026-09-15 18:59:07 UTC, without a source bundle. The
+  [receipt](receipts/nor-source/compiler-fold-5a62b347.json) identifies a leaf-fold
+  proof goal and remaining logical-call/input validation recursion. Template
+  helpers no longer report errors, but the module has no passing verdict.
+  Constructor equations used by the next proof-producing evaluator remain
+  ordinary supporting claims subject to the full transitive trust check.

@@ -130,6 +130,8 @@ private theorem fold_leaf {α : Type} (f : α → Stmt → StmtMetadata → α)
     stmt.fold f initial = f initial stmt stmt.directMetadata := by
   rw [Stmt.fold]
   simp [h]
+  rw [h]
+  rfl
 
 private theorem fold_forEach {α : Type} (f : α → Stmt → StmtMetadata → α)
     (initial : α) (name : String) (count : Expr) (body : List Stmt) :
@@ -196,6 +198,126 @@ private theorem templates_le (a b : Expr) :
   simp [Expr.children]
   all_goals (intro _ _ _ _ _ _ _ h; cases h)
 
+private theorem exprAny_literal (p : Expr → Bool) (n : Nat) :
+    Expr.anyDeep p (.literal n) = (p (.literal n) || false) := by
+  rw [Expr.anyDeep]
+  simp [Expr.children, Bool.or_assoc]
+
+private theorem exprAny_localVar (p : Expr → Bool) (name : String) :
+    Expr.anyDeep p (.localVar name) = (p (.localVar name) || false) := by
+  rw [Expr.anyDeep]
+  simp [Expr.children, Bool.or_assoc]
+
+private theorem exprAny_storageArrayLength (p : Expr → Bool) (name : String) :
+    Expr.anyDeep p (.storageArrayLength name) = (p (.storageArrayLength name) || false) := by
+  rw [Expr.anyDeep]
+  simp [Expr.children, Bool.or_assoc]
+
+private theorem exprAny_storageArrayElement (p : Expr → Bool) (name : String) (index : Expr) :
+    Expr.anyDeep p (.storageArrayElement name index) = (p (.storageArrayElement name index) || index.anyDeep p) := by
+  rw [Expr.anyDeep]
+  simp [Expr.children, Bool.or_assoc]
+
+private theorem exprAny_add (p : Expr → Bool) (a b : Expr) :
+    Expr.anyDeep p (.add a b) = (p (.add a b) || (a.anyDeep p || b.anyDeep p)) := by
+  rw [Expr.anyDeep]
+  simp [Expr.children, Bool.or_assoc]
+
+private theorem exprAny_sub (p : Expr → Bool) (a b : Expr) :
+    Expr.anyDeep p (.sub a b) = (p (.sub a b) || (a.anyDeep p || b.anyDeep p)) := by
+  rw [Expr.anyDeep]
+  simp [Expr.children, Bool.or_assoc]
+
+private theorem exprAny_le (p : Expr → Bool) (a b : Expr) :
+    Expr.anyDeep p (.le a b) = (p (.le a b) || (a.anyDeep p || b.anyDeep p)) := by
+  rw [Expr.anyDeep]
+  simp [Expr.children, Bool.or_assoc]
+
+private theorem stmtAny_leaf (p : Stmt → Bool) (stmt : Stmt)
+    (h : stmt.childLists = []) : stmt.anyDeep p = p stmt := by
+  rw [Stmt.anyDeep]
+  simp [h]
+
+private theorem stmtAny_forEach (p : Stmt → Bool)
+    (name : String) (count : Expr) (body : List Stmt) :
+    (Stmt.forEach name count body).anyDeep p =
+      (p (.forEach name count body) || body.any (Stmt.anyDeep p)) := by
+  rw [Stmt.anyDeep]
+  simp [Stmt.childLists]
+
+private theorem stmtAny_letVar (p : Stmt → Bool) (name : String) (value : Expr) :
+    Stmt.anyDeep p (.letVar name value) = p (.letVar name value) := by
+  apply stmtAny_leaf
+  rfl
+
+private theorem fold_letVar {α : Type} (f : α → Stmt → StmtMetadata → α)
+    (initial : α) (name : String) (value : Expr) :
+    Stmt.fold f initial (.letVar name value) = f initial (.letVar name value) (Stmt.directMetadata (.letVar name value)) := by
+  apply fold_leaf
+  rfl
+
+private theorem stmtAny_assignVar (p : Stmt → Bool) (name : String) (value : Expr) :
+    Stmt.anyDeep p (.assignVar name value) = p (.assignVar name value) := by
+  apply stmtAny_leaf
+  rfl
+
+private theorem fold_assignVar {α : Type} (f : α → Stmt → StmtMetadata → α)
+    (initial : α) (name : String) (value : Expr) :
+    Stmt.fold f initial (.assignVar name value) = f initial (.assignVar name value) (Stmt.directMetadata (.assignVar name value)) := by
+  apply fold_leaf
+  rfl
+
+private theorem stmtAny_require (p : Stmt → Bool) (condition : Expr) (message : String) :
+    Stmt.anyDeep p (.require condition message) = p (.require condition message) := by
+  apply stmtAny_leaf
+  rfl
+
+private theorem fold_require {α : Type} (f : α → Stmt → StmtMetadata → α)
+    (initial : α) (condition : Expr) (message : String) :
+    Stmt.fold f initial (.require condition message) = f initial (.require condition message) (Stmt.directMetadata (.require condition message)) := by
+  apply fold_leaf
+  rfl
+
+private theorem stmtAny_return (p : Stmt → Bool) (value : Expr) :
+    Stmt.anyDeep p (.return value) = p (.return value) := by
+  apply stmtAny_leaf
+  rfl
+
+private theorem fold_return {α : Type} (f : α → Stmt → StmtMetadata → α)
+    (initial : α) (value : Expr) :
+    Stmt.fold f initial (.return value) = f initial (.return value) (Stmt.directMetadata (.return value)) := by
+  apply fold_leaf
+  rfl
+
+private theorem stmtAny_setStorageArrayElement (p : Stmt → Bool) (name : String) (index value : Expr) :
+    Stmt.anyDeep p (.setStorageArrayElement name index value) = p (.setStorageArrayElement name index value) := by
+  apply stmtAny_leaf
+  rfl
+
+private theorem fold_setStorageArrayElement {α : Type} (f : α → Stmt → StmtMetadata → α)
+    (initial : α) (name : String) (index value : Expr) :
+    Stmt.fold f initial (.setStorageArrayElement name index value) = f initial (.setStorageArrayElement name index value) (Stmt.directMetadata (.setStorageArrayElement name index value)) := by
+  apply fold_leaf
+  rfl
+
+attribute [local cbv_eval] fold_forEach exprAny_literal exprAny_localVar exprAny_storageArrayLength exprAny_storageArrayElement exprAny_add exprAny_sub exprAny_le stmtAny_forEach stmtAny_letVar fold_letVar stmtAny_assignVar fold_assignVar stmtAny_require fold_require stmtAny_return fold_return stmtAny_setStorageArrayElement fold_setStorageArrayElement
+
+private theorem no_external_assumptions (spec : CompilationModel)
+    (h : spec.externals = []) : collectUsedExternalAssumptions spec = [] := by
+  unfold collectUsedExternalAssumptions
+  run_tac do
+    let env ← Lean.getEnv
+    for suffix in ["collectUsedExternalAssumptionsFromStmts", "dedupExternalFunctions"] do
+      let candidates := env.constants.toList.filter fun (name, _) =>
+        name.toString.startsWith "_private.Compiler.CompilationModel.TrustSurface." &&
+          name.toString.endsWith ("." ++ suffix)
+      match candidates with
+      | [(name, _)] =>
+          let id := Lean.mkIdent name
+          Lean.Elab.Tactic.evalTactic (← `(tactic| unfold $id:ident))
+      | _ => throwError "expected one pinned TrustSurface helper: {suffix}"
+  simp [h]
+
 set_option maxRecDepth 16384 in
 set_option maxHeartbeats 4000000 in
 set_option pp.maxSteps 200 in
@@ -224,6 +346,10 @@ theorem checkedFold_compiles_to_official_ir :
   have functionValid : validateFunctionSpec checkedFold = .ok () := by
     simp [validateFunctionSpec, mechanics, checkedFold, fold_leaf, fold_forEach,
       Stmt.foldList, Stmt.directMetadata, Stmt.childLists,
+      stmtContainsUnsafeLogicalCallLike, stmtAny_leaf, stmtAny_forEach,
+      exprContainsUnsafeLogicalCallLike, exprAny_literal, exprAny_localVar,
+      exprAny_storageArrayLength, exprAny_storageArrayElement, exprAny_add,
+      exprAny_sub, exprAny_le, exprIsUnsafeLogicalNode,
       Bind.bind, Except.bind, Pure.pure, Except.pure]
     all_goals (trace_state; decide_cbv)
   have validated : validateCompileInputs checkedFoldSpec [tx.functionSelector] = .ok () := by
@@ -237,7 +363,7 @@ theorem checkedFold_compiles_to_official_ir :
           let id := Lean.mkIdent name
           Lean.Elab.Tactic.evalTactic (← `(tactic| unfold $id:ident))
       | _ => throwError "expected one pinned compiler precheck definition"
-    simp [validateNonReentrantForkCompatibility, checkedFoldSpec, functionValid,
+    simp [validateNonReentrantForkCompatibility, no_external_assumptions, checkedFoldSpec, functionValid,
       checkedFold, modulesField, Bind.bind, Except.bind, Pure.pure, Except.pure]
     all_goals (trace_state; decide_cbv)
   have fieldSlot : findFieldWithResolvedSlot [modulesField] "modules" = some (modulesField, 7) := by
