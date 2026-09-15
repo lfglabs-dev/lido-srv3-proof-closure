@@ -1,0 +1,155 @@
+{
+  "authority": "Recorded runner results. No independent review or invariant-closure claim.",
+  "runs": [
+    {
+      "job_id": "f50272ca-6037-4339-93e6-bba634c30784",
+      "state": "failed",
+      "exit_code": 1,
+      "node_id": "dgx-spark",
+      "validation": {
+        "version": 1,
+        "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+        "commit": "cf850030b60004493e6cd74201acf252ea90876f",
+        "base_tree_sha": "dcfe8c47b752111a83af3ba2e9987e06ef800646",
+        "cwd_rel_known": true,
+        "command": [
+          "lake",
+          "build",
+          "LidoSRv3.Tests.NodeOperatorsRegistrySummary"
+        ],
+        "toolchain": "leanprover/lean4:v4.31.0",
+        "source_bundle_digest": "3fbab1b6b3bd079e0eb9d6f181a97fa0bc9e50e95a0e6432caec87d8777e1356",
+        "build_protocol_version": "1",
+        "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+      },
+      "raw_receipt_path": "/workspaces/mission-1ca15c66/output/remote-f50272ca-6037-4339-93e6-bba634c30784.json",
+      "raw_receipt_sha256": "19684079b720a58870dfa69d6994b95a516f994776262cdad0a899e0cfe7aa51",
+      "scope": "Source-bundle compilation only, not clean-commit validation of the base."
+    },
+    {
+      "job_id": "7239b03d-64c8-4fbf-9243-96155d47b602",
+      "state": "failed",
+      "exit_code": 1,
+      "node_id": "dgx-spark",
+      "validation": {
+        "version": 1,
+        "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+        "commit": "cf850030b60004493e6cd74201acf252ea90876f",
+        "base_tree_sha": "dcfe8c47b752111a83af3ba2e9987e06ef800646",
+        "cwd_rel_known": true,
+        "command": [
+          "lake",
+          "build",
+          "LidoSRv3.Tests.NodeOperatorsRegistrySummary"
+        ],
+        "toolchain": "leanprover/lean4:v4.31.0",
+        "source_bundle_digest": "820a171785f567c16eb32bc9e6132af555b7a8e6e623cb53d72b8f99b9926b91",
+        "build_protocol_version": "1",
+        "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+      },
+      "raw_receipt_path": "/workspaces/mission-1ca15c66/output/remote-7239b03d-64c8-4fbf-9243-96155d47b602.json",
+      "raw_receipt_sha256": "2187f9475266fd4d1c36bdc1a6d784206a89450a2ddd8623236e01027bd3ebbf",
+      "scope": "Source-bundle compilation only, not clean-commit validation of the base."
+    },
+    {
+      "job_id": "b37d91cd-582e-4c2b-bbae-dde0c40f566c",
+      "state": "failed",
+      "exit_code": 1,
+      "node_id": "dgx-spark",
+      "validation": {
+        "version": 1,
+        "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+        "commit": "cf850030b60004493e6cd74201acf252ea90876f",
+        "base_tree_sha": "dcfe8c47b752111a83af3ba2e9987e06ef800646",
+        "cwd_rel_known": true,
+        "command": [
+          "lake",
+          "build",
+          "LidoSRv3.Tests.NodeOperatorsRegistrySummary"
+        ],
+        "toolchain": "leanprover/lean4:v4.31.0",
+        "source_bundle_digest": "643293deaa34178e69de273f5a0c59d245ba780713a41f183d0ca3d8c5b06461",
+        "build_protocol_version": "1",
+        "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+      },
+      "raw_receipt_path": "/workspaces/mission-1ca15c66/output/remote-b37d91cd-582e-4c2b-bbae-dde0c40f566c.json",
+      "raw_receipt_sha256": "2f7815011615c13cdab0b06c9e8761b5fe889834b75479ceca00028c10c7e92a",
+      "scope": "Source-bundle compilation only, not clean-commit validation of the base."
+    },
+    {
+      "job_id": "48f498eb-9d53-49a6-b990-b94703b3f223",
+      "state": "failed",
+      "exit_code": 1,
+      "node_id": "dgx-spark",
+      "validation": {
+        "version": 1,
+        "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+        "commit": "cf850030b60004493e6cd74201acf252ea90876f",
+        "base_tree_sha": "dcfe8c47b752111a83af3ba2e9987e06ef800646",
+        "cwd_rel_known": true,
+        "command": [
+          "lake",
+          "build",
+          "LidoSRv3.Tests.NodeOperatorsRegistrySummary"
+        ],
+        "toolchain": "leanprover/lean4:v4.31.0",
+        "source_bundle_digest": "8fb66e60a003c94d5ee2e34ded5a15fa5d7defe838a37df9dfe1a1094d1d5fc6",
+        "build_protocol_version": "1",
+        "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+      },
+      "raw_receipt_path": "/workspaces/mission-1ca15c66/output/remote-48f498eb-9d53-49a6-b990-b94703b3f223.json",
+      "raw_receipt_sha256": "7ce2da39eb224e43cd47e8749aedbdbd901f80f33934eead56a91f7ae1b4467f",
+      "scope": "Source-bundle compilation only, not clean-commit validation of the base."
+    },
+    {
+      "job_id": "6ded9141-baf7-40c0-bb2e-4d6f58835f2a",
+      "state": "failed",
+      "exit_code": 1,
+      "node_id": "dgx-spark",
+      "validation": {
+        "version": 1,
+        "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+        "commit": "cf850030b60004493e6cd74201acf252ea90876f",
+        "base_tree_sha": "dcfe8c47b752111a83af3ba2e9987e06ef800646",
+        "cwd_rel_known": true,
+        "command": [
+          "lake",
+          "build",
+          "LidoSRv3.Tests.NodeOperatorsRegistrySummary"
+        ],
+        "toolchain": "leanprover/lean4:v4.31.0",
+        "source_bundle_digest": "35a33a536852e4db106091bae584b81d264407d42b36c0d2b953dc225f688e47",
+        "build_protocol_version": "1",
+        "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+      },
+      "raw_receipt_path": "/workspaces/mission-1ca15c66/output/remote-6ded9141-baf7-40c0-bb2e-4d6f58835f2a.json",
+      "raw_receipt_sha256": "2708eb75f750c50ca70f7531ea656016a41b224a7750548a385844e5da46e64e",
+      "scope": "Source-bundle compilation only, not clean-commit validation of the base."
+    },
+    {
+      "job_id": "14f2f1e4-8a6d-4f8d-aaee-0063c8934ecb",
+      "state": "succeeded",
+      "exit_code": 0,
+      "node_id": "dgx-spark",
+      "validation": {
+        "version": 1,
+        "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+        "commit": "cf850030b60004493e6cd74201acf252ea90876f",
+        "base_tree_sha": "dcfe8c47b752111a83af3ba2e9987e06ef800646",
+        "cwd_rel_known": true,
+        "command": [
+          "lake",
+          "build",
+          "LidoSRv3.Tests.NodeOperatorsRegistrySummary"
+        ],
+        "toolchain": "leanprover/lean4:v4.31.0",
+        "source_bundle_digest": "c7431a3c871ea10eb34138bf3cb6edd6f8e43ac797bdcfbed9e8735c39d8c070",
+        "build_protocol_version": "1",
+        "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+      },
+      "raw_receipt_path": "/workspaces/mission-1ca15c66/output/remote-14f2f1e4-8a6d-4f8d-aaee-0063c8934ecb.json",
+      "raw_receipt_sha256": "bf3a95282055cfd4c53f1f90aca177ba85e593b528e60f3acd1e8272664bcb1e",
+      "scope": "Source-bundle compilation only, not clean-commit validation of the base."
+    }
+  ]
+}

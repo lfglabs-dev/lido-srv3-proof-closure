@@ -14,6 +14,12 @@ The [public continuation](https://github.com/lidofinance/core/blob/17005714f151e
 
 The original `legacy_commits_while_physical_reverts` is preserved separately: empty unqualified storage coexists with two physical modules. It is a storage-channel counterexample, not a scheduling-only witness. Neither counterexample establishes supported-deployment behavior. All old theorem statements remain available; synthetic persisted arrays and `ALLOC_ARITHMETIC` errors are no longer the registered Verity result.
 
+## NOR producer and writer slice
+
+[NOR summary](../LidoSRv3/Audit/Source/NodeOperatorsRegistry/Summary.lean) derives three uint64 bounds from the loaded packed word, transports them through the router's ABI decoder, and bounds the active count of a successful `firstRow` consuming that reply. Its premise identifies the actual call response; it does not assume the desired decoded values. The getter retains SafeMath's `Error("MATH_SUB_UNDERFLOW")` bytes.
+
+[Packed writers](../LidoSRv3/Audit/Source/Packed64x4.lean) preserve untouched fields. The [NOR exit writer](../LidoSRv3/Audit/Source/NodeOperatorsRegistry/ExitedValidators.lean) includes the target-limit and aggregate-maximum updates, derives admission alternatives, and restores state/events on failure. The equal-value return precedes the deposited-count guard. These lemmas do not yet establish the aggregate-sum invariant, all-writer preservation, router-accounting synchronization, or compiler storage-slot correspondence. No canonical fidelity gap is discharged by this slice alone.
+
 ## Remaining obligations
 
 - Derive supported summary/accounting/stake invariants from actual module producers and every relevant writer. The pinned `NodeOperatorsRegistry.getStakingModuleSummary` reads packed uint64 fields and checked headroom; the interface alone gives only uint256 replies. Router accounting checks relate a contemporaneous summary, not arbitrary future replies. The invented #662 history remains removed; conditional #652/#653 arithmetic is retained.

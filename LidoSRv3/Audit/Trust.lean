@@ -1,3 +1,4 @@
+import LidoSRv3.Tests.NodeOperatorsRegistrySummary
 import LidoSRv3.Audit.AllGuarantees
 import LidoSRv3.Tests.SszDeclaredSiblingsRegression
 import LidoSRv3.Tests.TopupRouterAdmissionCallRegression
@@ -2342,3 +2343,22 @@ example : (Compiler.CompilationModel.compile LidoSRv3.Audit.Verity.SszAbstractDi
 example : (Compiler.CompilationModel.compile LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.spec
     [LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.selector]).isOk = true :=
   LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.forward_compiles
+
+-- NOR packed reads, writer frames and exact-error regressions.
+#print axioms LidoSRv3.Audit.Source.Packed64x4.get_replace
+#print axioms LidoSRv3.Audit.Source.Packed64x4.get_replace_other
+#print axioms LidoSRv3.Audit.Source.Packed64x4.set_success
+#print axioms LidoSRv3.Audit.Source.Packed64x4.add_success
+#print axioms LidoSRv3.Audit.Source.Packed64x4.sub_success
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.firstRow_nor_widths
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.applyLimits_frame
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.updateMaximum_frame
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.updateExited_failure_restores
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.updateExited_admission
+#print axioms LidoSRv3.Tests.NodeOperatorsRegistrySummary.summary_field_order
+#print axioms LidoSRv3.Tests.NodeOperatorsRegistrySummary.depositable_underflow
+#print axioms LidoSRv3.Tests.NodeOperatorsRegistrySummary.safeMath_error_bytes
+#print axioms LidoSRv3.Tests.NodeOperatorsRegistrySummary.getter_does_not_establish_exit_consistency
+#print axioms LidoSRv3.Tests.NodeOperatorsRegistrySummary.accounting_exit_still_can_underflow
+#print axioms LidoSRv3.Tests.NodeOperatorsRegistrySummary.unchanged_invalid_exit_returns
+#print axioms LidoSRv3.Tests.NodeOperatorsRegistrySummary.aggregate_overflow_rolls_back
