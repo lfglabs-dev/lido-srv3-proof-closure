@@ -97,13 +97,22 @@ def commitAllocatedRow (s : State) (id depositedAfter loaded keysCount : Word) :
   let s ← updateSummaryMaxValidatorsCount s id
   pure (s, loaded, [(id, depositedAfter)])
 
-/-- The committed deposited count is derived from the actual packed setter
-and survives the maximum-update continuation. No desired post-state is supplied. -/
-theorem commitAllocatedRow_deposited (s after : State)
+/-- Derive the row's counter effects from the packed setter and maximum
+update. The aggregate deposited counter is intentionally unchanged here: the
+source adds the loaded total only after the final assertion. -/
+theorem commitAllocatedRow_effects (s after : State)
     (id depositedAfter loaded keysCount next : Word) (events : List (Word × Word))
     (success : commitAllocatedRow s id depositedAfter loaded keysCount =
       .ok (after, next, events)) :
-    (packedGet (after.operators id).signingKeysStats 3).val = depositedAfter.val := by
+    (packedGet (after.operators id).signingKeysStats 3).val = depositedAfter.val ∧
+    next = word (loaded.val + keysCount.val) ∧
+    events = [(id, depositedAfter)] ∧
+    (∀ queried, packedGet (after.operators queried).signingKeysStats 1 =
+      packedGet (s.operators queried).signingKeysStats 1) ∧
+    (∀ queried, queried ≠ id → (after.operators queried).signingKeysStats =
+      (s.operators queried).signingKeysStats) ∧
+    packedGet after.summarySigningKeysStats 1 = packedGet s.summarySigningKeysStats 1 ∧
+    packedGet after.summarySigningKeysStats 3 = packedGet s.summarySigningKeysStats 3 := by
   cases written : Packed64x4.set (s.operators id).signingKeysStats 3 depositedAfter with
   | error reason =>
     simp [commitAllocatedRow, written, bind, Except.bind] at success
@@ -113,8 +122,8 @@ theorem commitAllocatedRow_deposited (s after : State)
     | error reason =>
       simp [commitAllocatedRow, written, middle, updated, bind, Except.bind] at success
     | ok finalState =>
-      have frame := (updateMaximum_frame middle finalState id updated).1 id
-      have counter := (Packed64x4.set_success _ _ _ _ written).1
+      have frame := updateMaximum_frame middle finalState id updated
+      have counter := Packed64x4.set_success _ _ _ _ written
       simp only [commitAllocatedRow, written, bind, Except.bind] at success
       change (do
         let final ← updateSummaryMaxValidatorsCount middle id
@@ -123,9 +132,75 @@ theorem commitAllocatedRow_deposited (s after : State)
       rw [updated] at success
       simp only [bind, Except.bind, pure, Except.pure, Except.ok.injEq,
         Prod.mk.injEq] at success
-      rcases success with ⟨rfl, _⟩
-      rw [frame]
-      simpa [middle, saveOperator] using counter
+      rcases success with ⟨stateEq, countEq, eventsEq⟩
+      subst after
+      subst next
+      subst events
+      have selected : (finalState.operators id).signingKeysStats = signing := by
+        simpa [middle, saveOperator] using frame.1 id
+      have others : ∀ queried, queried ≠ id →
+          (finalState.operators queried).signingKeysStats =
+            (s.operators queried).signingKeysStats := by
+        intro queried different
+        simpa [middle, saveOperator, different] using frame.1 queried
+      refine ⟨?_, rfl, rfl, ?_, others, ?_, ?_⟩
+      · rw [selected]
+        exact counter.1
+      · intro queried
+        by_cases equal : queried = id
+        · subst queried
+          rw [selected]
+          exact counter.2 1 (by decide)
+        · rw [others queried equal]
+      · simpa [middle, saveOperator] using frame.2.1
+      · simpa [middle, saveOperator] using frame.2.2
+
+/-- Preserve the existing deposited-count statement as a projection of the
+complete counter-effects theorem. No desired post-state is supplied. -/
+theorem commitAllocatedRow_deposited (s after : State)
+    (id depositedAfter loaded keysCount next : Word) (events : List (Word × Word))
+    (success : commitAllocatedRow s id depositedAfter loaded keysCount =
+      .ok (after, next, events)) :
+    (packedGet (after.operators id).signingKeysStats 3).val = depositedAfter.val :=
+  (commitAllocatedRow_effects s after id depositedAfter loaded keysCount next events success).1
+
+/-- A committed row changes the enumerated deposited sum by exactly the
+selected counter's change. Enumeration membership and uniqueness are input
+relations still requiring physical registry binding. -/
+theorem commitAllocatedRow_deposited_sum (s after : State) (ids : List Word)
+    (id depositedAfter loaded keysCount next : Word) (events : List (Word × Word))
+    (unique : ids.Nodup) (member : id ∈ ids)
+    (success : commitAllocatedRow s id depositedAfter loaded keysCount =
+      .ok (after, next, events)) :
+    counterSum after 3 ids + (packedGet (s.operators id).signingKeysStats 3).val =
+      counterSum s 3 ids + depositedAfter.val := by
+  have effects := commitAllocatedRow_effects s after id depositedAfter loaded keysCount
+    next events success
+  exact counterSum_single_change s after 3 id depositedAfter ids unique member
+    effects.1 effects.2.2.2.2.1
+
+/-- Connecting the successful source prefix to its state continuation derives
+the exact increase in the operator sum. In particular, the key count is not
+an independent caller assertion about the post-state. -/
+theorem allocatedRow_deposited_sum (s after : State) (ids : List Word)
+    (id active start count loaded next : Word) (events : List (Word × Word))
+    (unique : ids.Nodup) (member : id ∈ ids)
+    (consistent : (packedGet (s.operators id).signingKeysStats 1).val ≤
+      (packedGet (s.operators id).signingKeysStats 3).val)
+    (hPrefix : allocatedKeyPrefix (s.operators id).signingKeysStats active =
+      .ok (.load start count))
+    (success : commitAllocatedRow s id
+      (allocatedDepositedAfter (s.operators id).signingKeysStats active) loaded count =
+        .ok (after, next, events)) :
+    counterSum after 3 ids = counterSum s 3 ids + count.val := by
+  obtain ⟨startEq, _positive, deltaEq⟩ :=
+    allocatedKeyPrefix_load_delta _ _ _ _ consistent hPrefix
+  have noOverflow := allocatedKeyPrefix_no_overflow _ _ _ consistent hPrefix
+  have sumEffect := commitAllocatedRow_deposited_sum s after ids id _ loaded count
+    next events unique member success
+  simp only [allocatedDepositedAfter, word, Nat.mod_eq_of_lt noOverflow] at sumEffect
+  have startValue := congrArg Fin.val startEq
+  omega
 
 /-- Keep the source's final INVALID distinct from the aggregate setter's
 Error(string). Neither error carries a state to commit. -/
@@ -209,5 +284,49 @@ theorem loadAllocatedRow_unchanged (s : State) (machine : EvmYul.MachineState)
     loadAllocatedRow s machine storage keyOffset position id active loaded pubkeys signatures =
       .ok (s, machine, loaded, []) := by
   simp only [loadAllocatedRow, unchanged]
+
+/-- Every successful composed row preserves each operator's exited/deposited
+ordering. The selected operator uses the source prefix's nondecrease fact;
+other operators use the actual setter/helper frame. No post-state invariant
+or aggregate consistency is assumed. -/
+theorem loadAllocatedRow_local_consistency (s after : State)
+    (machine finalMachine : EvmYul.MachineState)
+    (storage : SigningKeys.Storage) (keyOffset : SigningKeys.KeyOffset)
+    (position : EvmYul.UInt256) (id active loaded next queried : Word)
+    (pubkeys signatures : EvmYul.UInt256) (events : List (Word × Word))
+    (before : (packedGet (s.operators queried).signingKeysStats 1).val ≤
+      (packedGet (s.operators queried).signingKeysStats 3).val)
+    (success : loadAllocatedRow s machine storage keyOffset position id active loaded
+      pubkeys signatures = .ok (after, finalMachine, next, events)) :
+    (packedGet (after.operators queried).signingKeysStats 1).val ≤
+      (packedGet (after.operators queried).signingKeysStats 3).val := by
+  cases hPrefix : allocatedKeyPrefix (s.operators id).signingKeysStats active with
+  | error failure =>
+    cases failure
+    simp [loadAllocatedRow, hPrefix] at success
+  | ok action =>
+    cases action with
+    | unchanged =>
+      simp only [loadAllocatedRow, hPrefix, Except.ok.injEq, Prod.mk.injEq] at success
+      rcases success with ⟨rfl, _⟩
+      exact before
+    | load start count =>
+      have monotone := allocatedKeyPrefix_nondecreasing _ _ _ hPrefix
+      cases committed : commitAllocatedRow s id
+          (allocatedDepositedAfter (s.operators id).signingKeysStats active) loaded count with
+      | error reason =>
+        simp [loadAllocatedRow, hPrefix, committed] at success
+      | ok value =>
+        rcases value with ⟨settled, loadedAfter, rowEvents⟩
+        have effects := commitAllocatedRow_effects _ _ _ _ _ _ _ _ committed
+        simp only [loadAllocatedRow, hPrefix, committed, Except.ok.injEq,
+          Prod.mk.injEq] at success
+        rcases success with ⟨rfl, _⟩
+        by_cases equal : queried = id
+        · subst queried
+          rw [effects.2.2.2.1 id, effects.1]
+          exact Nat.le_trans before monotone
+        · rw [effects.2.2.2.2.1 queried equal]
+          exact before
 
 end LidoSRv3.Audit.Source.NodeOperatorsRegistry

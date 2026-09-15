@@ -114,21 +114,21 @@ private theorem counterSum_congr (s after : State) (field : Fin 4) (ids : List W
     simp only [counterSum, same head (by simp)]
     rw [ih (fun id member => same id (by simp [member]))]
 
-private theorem counterSum_single_change (s after : State) (id newExited : Word) (ids : List Word)
+theorem counterSum_single_change (s after : State) (field : Fin 4) (id newValue : Word) (ids : List Word)
     (unique : ids.Nodup) (member : id ∈ ids)
-    (selected : (packedGet (after.operators id).signingKeysStats 1).val = newExited.val)
+    (selected : (packedGet (after.operators id).signingKeysStats field).val = newValue.val)
     (others : ∀ queried, queried ≠ id → (after.operators queried).signingKeysStats =
       (s.operators queried).signingKeysStats) :
-    counterSum after 1 ids + (packedGet (s.operators id).signingKeysStats 1).val =
-      counterSum s 1 ids + newExited.val := by
+    counterSum after field ids + (packedGet (s.operators id).signingKeysStats field).val =
+      counterSum s field ids + newValue.val := by
   induction ids with
   | nil => simp at member
   | cons head tail ih =>
     have nodup := List.nodup_cons.mp unique
     by_cases equal : head = id
     · subst head
-      have tail_same : counterSum after 1 tail = counterSum s 1 tail :=
-        counterSum_congr s after 1 tail (fun queried belongs => by
+      have tail_same : counterSum after field tail = counterSum s field tail :=
+        counterSum_congr s after field tail (fun queried belongs => by
           have different : queried ≠ id := by intro equal; subst queried; exact nodup.1 belongs
           rw [others queried different])
       simp only [counterSum, selected, tail_same]
@@ -157,7 +157,7 @@ theorem updateExited_preserves_accounting (s after : State) (ids : List Word)
     AccountingInvariant after ids := by
   obtain ⟨selected, deposits, aggregate, aggregateDeposits, others⟩ :=
     updateExited_effects s after id newExited allowDecrease events success
-  have sum_effect := counterSum_single_change s after id newExited ids before.unique member selected others
+  have sum_effect := counterSum_single_change s after 1 id newExited ids before.unique member selected others
   have deposit_sum := counterSum_congr s after 3 ids (fun queried _ => deposits queried)
   have admitted : newExited.val ≤ (packedGet (s.operators id).signingKeysStats 3).val := by
     rcases updateExited_admission s after id newExited allowDecrease events success with unchanged | changed

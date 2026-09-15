@@ -2408,3 +2408,12 @@ example : (Compiler.CompilationModel.compile LidoSRv3.Audit.Verity.Consolidation
 #print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.finishAllocatedKeys_effect
 
 #print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.loadAllocatedRow_unchanged
+
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.commitAllocatedRow_effects
+
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.loadAllocatedRow_local_consistency
+
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.counterSum_single_change
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.commitAllocatedRow_deposited_sum
+
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.allocatedRow_deposited_sum

@@ -750,6 +750,66 @@
       "raw_receipt_path": "/workspaces/mission-1ca15c66/output/remote-9da1266a-89c7-43ec-b9c5-ed7759203cd6.json",
       "raw_receipt_sha256": "cabe6fc8caa33a46a894e0acdc04b394ea962d62cc97d849523a713d861f1f71",
       "scope": "NOR row composition, continuation proofs and all NOR summary regressions including final-assert/error ordering compiled successfully (1107 jobs). Source bundle at base970f2570; not exact-successor validation or full loader closure."
+    },
+    {
+      "job_id": "7268ebec-44ab-431a-b675-716df9066d83",
+      "mission_id": "1ca15c66-8324-4b68-9ece-0d5bebfeea98",
+      "state": "failed",
+      "exit_code": 1,
+      "created_at": "2026-09-15T15:13:24.934600869+00:00",
+      "started_at": "2026-09-15T15:13:24.961013164+00:00",
+      "finished_at": "2026-09-15T15:17:03.241050309+00:00",
+      "error": "command exited with Some(1)",
+      "artifacts": [],
+      "node_id": "dgx-spark",
+      "receipt_state": "failed",
+      "validation": {
+        "version": 1,
+        "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+        "commit": "1603a4c76f99784db35594c34ca639295d7acff3",
+        "base_tree_sha": "2e456af1253dbd7a1f8bbcabdf1aaaae643a436e",
+        "cwd_rel_known": true,
+        "command": [
+          "lake",
+          "build",
+          "LidoSRv3.Tests.NodeOperatorsRegistrySummary"
+        ],
+        "toolchain": "leanprover/lean4:v4.31.0",
+        "source_bundle_digest": "78789ce0e61c89b3487b3c1a10ee1ea96b3f60f715fd7aa1035e6ecfcd064235",
+        "build_protocol_version": "1",
+        "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+      },
+      "diagnostic": "AllocatedKeys.lean: reserved token prefix used as a hypothesis name in two new proofs. Generalized ExitedInvariant module compiled. Renamed hypotheses to hPrefix without changing statements."
+    },
+    {
+      "job_id": "ddbfef68-f444-41ef-a1ed-5aaed0e8b158",
+      "mission_id": "1ca15c66-8324-4b68-9ece-0d5bebfeea98",
+      "state": "succeeded",
+      "exit_code": 0,
+      "created_at": "2026-09-15T15:17:31.890003095+00:00",
+      "started_at": "2026-09-15T15:17:31.910891346+00:00",
+      "finished_at": "2026-09-15T15:21:02.023760827+00:00",
+      "error": null,
+      "artifacts": [],
+      "node_id": "dgx-spark",
+      "receipt_state": "succeeded",
+      "validation": {
+        "version": 1,
+        "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+        "commit": "1603a4c76f99784db35594c34ca639295d7acff3",
+        "base_tree_sha": "2e456af1253dbd7a1f8bbcabdf1aaaae643a436e",
+        "cwd_rel_known": true,
+        "command": [
+          "lake",
+          "build",
+          "LidoSRv3.Tests.NodeOperatorsRegistrySummary"
+        ],
+        "toolchain": "leanprover/lean4:v4.31.0",
+        "source_bundle_digest": "fa00c43d794f8d0f8cafeb58b6f280c8e3d9cfb6414b1f543e7bdc7cc12b2d99",
+        "build_protocol_version": "1",
+        "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+      },
+      "diagnostic": "Bundled targeted build passed all 1107 jobs, including generalized counterSum_single_change, AllocatedKeys counter-effects and deposited-sum proofs, and existing NOR regressions. Not exact-commit validation or independent review."
     }
   ]
 }
