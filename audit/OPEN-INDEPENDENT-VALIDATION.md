@@ -15,16 +15,34 @@ views of that registry. No historical receipt validates a successor commit.
   dependencies were recomputed: three foundations, zero emitted native exceptions.
   Earlier counts and foundational-only blocked verdicts below describe their own
   commits and former policy; they are not current emitted inventories.
-- **Per-claim trust coverage: open.** Sixteen public DEPOSIT/TOPUP supporting
-  theorems lacked individual disclosures at that milestone. The successor adds
-  them and extends the independent environment probe to loaded source, Verity
-  and guarantee module theorems. It requires fresh remote validation; the
-  milestone pass cannot validate this extension. Test modules remain separately
-  disclosed, and actual transitive dependencies are recomputed for every selected claim.
+- **Per-claim trust coverage: open.** The lexical DEPOSIT/TOPUP inventory
+  identified sixteen candidate disclosures; five DEPOSIT names are actually
+  under `PDeposit1.NFrame`. Exact `7d37d7367f8242457f664d750c8683299e5a9bff`
+  trust job `ae247859-3145-40d3-9dfd-8902cbe9615d` failed before recomputation
+  because those five added names were incorrectly qualified. Its
+  [failed receipt](receipts/nor-source/trust-7d37d736.json) is retained to explain
+  the repair; no expanded dependency or regression pass is claimed.
+  The successor corrects the five names and discovers all loaded audit theorem
+  modules, including model/spec/provenance support. Trust explicitly imports
+  `Legacy.SpecProofs` solely to account for the separately published superseded
+  P1–P15 receipt; production remains independent of Legacy. Fresh validation is
+  required. Test modules remain separately disclosed; all selected claims receive
+  actual transitive dependency recomputation.
 - **Predecessor findings: reconciliation incomplete.** The missing fifth finding
   and 37-thread dispositions identified below remain unresolved. Historical
   semantic findings remain open unless concrete current evidence establishes
   their disposition. No receipt cleanup may discard these obligations.
+- **Cleanup: two redundant draft traces removed.**
+  `kernel-draft-execution-1/traces.json` and `aragon-draft-execution-2/traces.json`
+  under `audit/trio/reserve1/receipts` contained identical parsed JSON to the
+  respective `kernel-execution-4917545c7aad3093bfdd6ddfa1dda4ff2cae2618` and
+  `aragon-execution-5ff24074eb374d5b79287991ece3e5206da95bfc` copies. Only
+  formatting differed. The commit-labelled copies remain because their execution
+  contexts and summaries reference them; no validation is transferred between
+  commits. Repository-wide reference checks, including audit validators, found
+  no consumer of the draft paths. Historical Git-object reads and immutable
+  links remain backed by Git history. Other receipts, inputs and unresolved
+  review findings are unchanged; broader cleanup remains incomplete.
 - **Independent paired review: pending.** The replacement website426 SHA/proof
   pin and coordinator identity are not yet available to this proof writer.
   Full NOR loader, supported-producer/all-writer, compiler/library/frame and

@@ -47,13 +47,13 @@ private unsafe def trustDependenciesImpl (names : List Lean.Name) : IO Unit := d
   Lean.enableInitializersExecution
   let env ← Lean.importModules #[{ module := `<<MODULE>> }] {} (loadExts := true)
   -- Module ownership comes from the environment, not a filename/name guess.
+  -- Test claims enter through explicit disclosures, with their dependencies intact.
   let discovered := if <<DISCOVER>> then (env.constants.toList.filterMap fun (name, info) =>
     match info, env.getModuleIdxFor? name with
     | .thmInfo _, some idx =>
       let owner := toString env.header.moduleNames[idx.toNat]!
-      if (owner.startsWith "LidoSRv3.Audit.Guarantees." ||
-          owner.startsWith "LidoSRv3.Audit.Source." ||
-          owner.startsWith "LidoSRv3.Audit.Verity.") &&
+      if (owner.startsWith "LidoSRv3.Audit." ||
+          owner.startsWith "LidoSRv3.Legacy.") &&
           !(owner.splitOn ".").contains "Tests" then some name else none
     | _, _ => none)
     else []
@@ -562,7 +562,7 @@ def main() -> None:
                                             discover=True)
         confirm_reported_dependencies(reports, computed, printed)
         print(f"trust coverage: {len(printed)} disclosures; {len(computed)} independently "
-              "recomputed claims including source, Verity and guarantee module theorems")
+              "recomputed claims including audit and separately published legacy module theorems")
         reports = sorted(computed.items())
         observed = set().union(*computed.values())
     # Provenance precedes disclosure: a native-decision name is only credible

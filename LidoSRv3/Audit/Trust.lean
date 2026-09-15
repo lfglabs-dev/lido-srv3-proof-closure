@@ -1,3 +1,6 @@
+-- Explicit trust accounting for the separately published superseded P1–P15 receipt.
+-- This import is confined to Trust; production remains independent of Legacy.
+import LidoSRv3.Legacy.SpecProofs
 import LidoSRv3.Tests.SigningKeysMemory
 import LidoSRv3.Tests.NodeOperatorsRegistrySummary
 import LidoSRv3.Audit.AllGuarantees
@@ -2419,12 +2422,12 @@ example : (Compiler.CompilationModel.compile LidoSRv3.Audit.Verity.Consolidation
 #print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.allocatedRow_deposited_sum
 
 -- Public DEPOSIT/TOPUP supporting results retain individual reader disclosures.
-#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.exactTotal_eq_exactKeys_mul
-#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.linked_exactTotal_eq_depositsValue
-#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.linked_exactTotal_eq_pushedValue
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.NFrame.exactTotal_eq_exactKeys_mul
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.NFrame.linked_exactTotal_eq_depositsValue
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.NFrame.linked_exactTotal_eq_pushedValue
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.revert_restores_state_value_and_logs
-#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.two_batch_conjunct_d_is_n_eq_two
-#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.verity_tx_composes_nframe_deposit
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.NFrame.two_batch_conjunct_d_is_n_eq_two
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.NFrame.verity_tx_composes_nframe_deposit
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.verity_tx_revert_restores_snapshot_legacy_parent
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.revert_restores_state_value_and_logs
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back_under_gateway_oracle_shape
