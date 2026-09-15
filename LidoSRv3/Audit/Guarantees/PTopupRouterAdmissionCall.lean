@@ -6,7 +6,8 @@ open TopupTimingHistory PTopupTimingHistory PTopupRouterLocatorCall
 open TopupCredentialCall (resolved)
 open TopupRouterAdmissionCall (Input Ready prior run finish selected moduleInput)
 
-/-- Entire accepted TOPUP342 conjunction, byte-for-byte below these parameter lets. -/
+/-- Retained TOPUP342 execution effects with precompile-aware locator origin.
+Actual response bytes replace the invalid generic inference of code presence. -/
 def PriorEffects (i : Input) : Prop :=
   let caller := i.caller
   let locatorCall := i.locatorCall
@@ -27,7 +28,7 @@ def PriorEffects (i : Input) : Prop :=
     TopupEntryAdmission.Admitted e.gateway caller e.before ∧
     TopupEntryAdmission.run caller locatorCall locator cursor returnBuffer hash m x e ctx deposit moduleId keys operators rows allocation = TopupEntryAdmission.ofPrior (TopupRouterLocatorCall.run locatorCall locator cursor returnBuffer hash m x e ctx deposit moduleId keys operators rows allocation) ∧
     (∃ router next raw,
-      (e.before.core.codeSize locator.val).val ≠ 0 ∧
+      ¬ audit.trio.consolidation.emptyCodeAccount e.before locator ∧
       locatorCall (TopupRouterLocatorCall.request e.gateway locator) e.before = .success raw ∧
       TopupRouterLocatorCall.decodeRouter cursor raw = .ok (router,next) ∧
       32 ≤ (word raw.length).val ∧ router.val = (word (decode (raw.take 32))).val ∧

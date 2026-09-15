@@ -21,8 +21,9 @@ def forbidden : StaticCall.External := fun _ _ => .forbiddenStateChange
 
 def batch (e : TopupGatewayRootCalls.Environment := TopupTimingHistory.base)
     (l : StaticCall.External := good) (cursor buffer : Word := word 128)
-    (zeroLimits : Bool := false) (amount : Word := word 0) :=
-  TopupRouterLocatorCall.run l locator cursor buffer TopupPhysicalCredentialGetter.hash
+    (zeroLimits : Bool := false) (amount : Word := word 0)
+    (loc : Address := locator) :=
+  TopupRouterLocatorCall.run l loc cursor buffer TopupPhysicalCredentialGetter.hash
     (TopupTimingHistory.module zeroLimits amount) reject e supplied (address 8) (word 7)
     [word 42,word 43] [word 3,word 4]
     (if zeroLimits then TopupTimingHistory.zeroRows else [row,secondRow]) (word (2^256-1))
@@ -76,10 +77,16 @@ theorem precompile_locator_dispatch :
     (batch noCode).outcome = .ok () ∧
     (batch noCode).locatorAttempts = [⟨request (address 3) locator,true,true,encode 32 2,1⟩] := by decide +kernel
 
+def ordinaryNoCode : TopupGatewayRootCalls.Environment :=
+  {noCode with before := {noCode.before with core :=
+    {noCode.before.core with codeSize := fun a =>
+      if a = 20 then word 0 else noCode.before.core.codeSize a}}}
+
 theorem ordinary_nocode_empty_then_decoder :
-    lookup good (address 3) (address 20) (word 128)
-      {noCode.before with core := {noCode.before.core with codeSize := fun _ => word 0}} =
-    ⟨.error .empty,[⟨request (address 3) (address 20),true,true,[],1⟩]⟩ := by decide +kernel
+    (batch ordinaryNoCode (loc := address 20)).outcome = .error (.lookup .empty) ∧
+    (batch ordinaryNoCode (loc := address 20)).locatorAttempts =
+      [⟨request (address 3) (address 20),true,true,[],1⟩] ∧
+    (batch ordinaryNoCode (loc := address 20)).suffix.isNone = true := by decide +kernel
 
 theorem zero_router_reaches_physical_registration :
     (batch TopupTimingHistory.base (getter (encode 32 0))).outcome =
