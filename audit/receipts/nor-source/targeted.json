@@ -600,6 +600,56 @@
       "raw_receipt_path": "/workspaces/mission-1ca15c66/output/remote-aed0d2a1-a2f7-4d01-abfd-bdbe9f6b60f8.json",
       "raw_receipt_sha256": "f7415de3d53b8e4b7266a5e7c5bd7bdedd5466cf80a682600bfa26193470e6c6",
       "scope": "Source modules compiled; unsupported pp.maxDepth option and no-progress simplification in memory proofs. No regression pass. Bundled run, not clean-base validation."
+    },
+    {
+      "job_id": "c3bd177c-0d8a-4a92-819a-8f53dfee319c",
+      "state": "succeeded",
+      "exit_code": 0,
+      "node_id": "dgx-spark",
+      "validation": {
+        "version": 1,
+        "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+        "commit": "426019f904b457918858ae3b02162f37eca5740b",
+        "base_tree_sha": "a3c6c5c2616a8ae0e2055ffb7db2068be22d84e9",
+        "cwd_rel_known": true,
+        "command": [
+          "lake",
+          "build",
+          "LidoSRv3.Tests.SigningKeysMemory"
+        ],
+        "toolchain": "leanprover/lean4:v4.31.0",
+        "source_bundle_digest": "8f22d2bd4aebad49974d492762f3372ae121b47c8b48e4d77757a575e7a751ad",
+        "build_protocol_version": "1",
+        "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+      },
+      "raw_receipt_path": "/workspaces/mission-1ca15c66/output/remote-c3bd177c-0d8a-4a92-819a-8f53dfee319c.json",
+      "raw_receipt_sha256": "f40958e8e5a5714bf3675c40cbe916ac70e591bc944f45521e9155f3bcbd5079",
+      "scope": "All seven memory regressions and two intermediate-memory proofs passed, along with source modules (1098 jobs). Bundled base426 run predates the activeWords fixture correction in160a47ca; not exact-checkpoint validation."
+    },
+    {
+      "job_id": "a1c10d95-45b9-4ba8-9435-78db0a2ded8e",
+      "state": "failed",
+      "exit_code": 7,
+      "node_id": "dgx-spark",
+      "validation": {
+        "version": 1,
+        "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+        "commit": "160a47ca77c8725980a1cf8495b2fa56bbd16928",
+        "base_tree_sha": "27983ce42c43da88881c3ce5f500fe3d641b01a8",
+        "cwd_rel_known": true,
+        "command": [
+          "lake",
+          "test",
+          "--",
+          "signing-keys-source"
+        ],
+        "toolchain": "leanprover/lean4:v4.31.0",
+        "build_protocol_version": "1",
+        "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+      },
+      "raw_receipt_path": "/workspaces/mission-1ca15c66/output/remote-a1c10d95-45b9-4ba8-9435-78db0a2ded8e.json",
+      "raw_receipt_sha256": "44dac448fe814b0a9149c4c77361832676294c51ac2b52b0961a32c77181fcf2",
+      "scope": "Exact160a47ca Solidity-control run failed before compilation: vendored Aragon SafeMath64.sol missing. No Solidity test executed; no source bundle."
     }
   ]
 }
