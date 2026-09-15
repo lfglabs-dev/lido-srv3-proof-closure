@@ -34,19 +34,29 @@ bounds. SafeMath additions/subtractions in the spend helper remain executable
 checked-`Uint256` branches. No Yul, EVM, runtime-bytecode, cryptographic, or E2E
 claim is made by this module.
 
-## Revert strings
+## Model error labels and source arithmetic
 
-Only `NOT_ENOUGH_ETHER` (Lido.sol:842), `CAN_NOT_DEPOSIT` (870),
-`APP_AUTH_FAILED` (872, via `_auth`) and `ZERO_AMOUNT` (873) are literal
-Solidity revert reasons.  The five others are invented by the model for
-branches where Solidity 0.4.24 reverts *without* a message:
+`NOT_ENOUGH_ETHER` (Lido.sol:842), `CAN_NOT_DEPOSIT` (Lido.sol:870),
+`APP_AUTH_FAILED` (Lido.sol:872) and `ZERO_AMOUNT` (Lido.sol:873) are literal source reasons. The other labels below belong to this historical
+arithmetic projection; they are not exact Solidity errors:
 
-* `ALLOCATION_ARITHMETIC`: the raw `remaining -= ...` at Lido.sol:610 and 613
-  (unchecked in 0.4.24, here `safeSub`; proved unreachable from the `min`s);
-* `DEPOSITABLE_OVERFLOW`: the raw `+` at Lido.sol:832;
-* `DEPOSITED_POST_REPORT_OVERFLOW`: SafeMath `.add` at Lido.sol:846;
-* `BUFFER_UNDERFLOW`: SafeMath `.sub` at Lido.sol:847;
-* `DEPOSITED_NEXT_REPORT_OVERFLOW`: SafeMath `.add` at Lido.sol:852.
+* `ALLOCATION_ARITHMETIC` labels added `safeSub` failures. The source's raw
+  subtractions at Lido.sol:610-613 wrap in 0.4.24; these failures are unreachable for allocations
+  constructed from the two `min` bounds.
+* `DEPOSITABLE_OVERFLOW` labels an added `safeAdd` failure. The raw addition
+  in `_getDepositableEther` (Lido.sol:832) wraps on arbitrary overflowing inputs, rather than
+  reverting. Equality therefore needs the actual allocation's sum bound.
+* `DEPOSITED_POST_REPORT_OVERFLOW` and `DEPOSITED_NEXT_REPORT_OVERFLOW`
+  stand for the SafeMath addition failures at Lido.sol:846 and Lido.sol:852, whose actual reason is
+  `MATH_ADD_OVERFLOW`.
+* `BUFFER_UNDERFLOW` stands for the SafeMath subtraction failure at Lido.sol:847, whose actual
+  reason is `MATH_SUB_UNDERFLOW`.
+
+[Lido's spend helper](https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.4.24/Lido.sol#L831-L859)
+imports @aragon/os SafeMath, pinned to version 4.4.0 in core's lockfile. The
+`source_*_matches_model` lemmas compare two Lean programs; they do not prove
+exact Solidity error/trace correspondence. Physical storage, external calls,
+packed writes and public transport require the separate live-source models.
 
 `Allocation` field order (`total, unreserved, depositsReserve,
 withdrawalsReserve`) is *not* the Solidity assignment order (607, 609, 612,

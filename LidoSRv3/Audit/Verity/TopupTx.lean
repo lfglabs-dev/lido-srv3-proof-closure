@@ -1618,11 +1618,11 @@ def executeGuardedWithThreePrefixGuards
     (cfg : SourceTopupConfig) (call : TopupCall)
     (callerIsTopUpGateway wcTypeIsType2 : Bool)
     (failure : FailurePoint) : Contract Unit := do
-  -- StakingRouter.sol:686  if (msg.sender != TOPUP_GATEWAY) revert NotAuthorized();
+  -- StakingRouter.sol:1178  if (_msgSender() != app) revert NotAuthorized();
   require (decide (callerIsTopUpGateway = true)) "NotAuthorized"
-  -- StakingRouter.sol:695  if (keyIndices.length == 0) revert EmptyKeysList();
+  -- StakingRouter.sol:769-770  if (n == 0) { revert EmptyKeysList();
   require (decide (call.keyIndices.length ≠ 0)) "EmptyKeysList"
-  -- StakingRouter.sol:702  if (wc[0] != WC_TYPE_2) revert WrongWithdrawalCredentialsType();
+  -- SRUtils.sol:42  if (!WithdrawalCredentials.isType2(_wcType)) revert ISRBase.WrongWithdrawalCredentialsType();
   require (decide (wcTypeIsType2 = true)) "WrongWithdrawalCredentialsType"
   executeGuarded cfg call failure
 

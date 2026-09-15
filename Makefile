@@ -76,7 +76,7 @@ test:
 	@python3 scripts/check_import_dag.py
 	@python3 scripts/test_import_dag.py
 	@python3 scripts/check_pinned_source.py && printf '%s\n' 'pinned source ok: cited Solidity spans and inline citations exist in lido-core at the pin'
-	@python3 scripts/check_source_annotations.py
+	@python3 scripts/check_source_annotations.py --strict
 	@lake build LidoSRv3Test
 	@lake build AccountAddressChecks
 	@printf '%s\n' 'LidoSRv3Test: mutants, vectors, nested Verity tests, and regressions compiled'
