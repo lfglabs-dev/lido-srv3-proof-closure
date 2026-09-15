@@ -32,33 +32,32 @@ NAMED_AXIOM_REPORT = re.compile(
 )
 TRUST_PRINT = re.compile(r"^\s*#print\s+axioms\s+(\S+)\s*$", re.MULTILINE)
 LEAN_MODULE = re.compile(r"[A-Za-z_][\w']*(?:\.[A-Za-z_][\w']*)*")
-# Rows this checker's own dependency probe emits, one per disclosed theorem,
-# plus a terminating count so a truncated probe fails closed.
+# Named dependency rows plus a terminating count reject truncated output.
 DEP_ROW = re.compile(r"^TAX\t([^\t\n]*)\t([^\t\n]*)\t([^\t\n]*)$", re.MULTILINE)
 DEP_END = re.compile(r"^TAX-END\t(\d+)$", re.MULTILINE)
-# Trust's own stdout is not evidence of anything: `#print axioms T` can be
-# wrapped in a block comment while `#eval IO.println "'T' does not depend on any
-# axioms"` prints a report Lean never computed, and the resulting log is
-# indistinguishable from an authentic one.  So the checker recomputes each
-# printed theorem's dependencies itself, through the very API `#print axioms`
-# uses (`Lean.collectAxioms`), in a process it controls, and confirms the log
-# against that.  A fabricated line is then a disagreement, not a pass.
-#
-# The audited module is loaded as *data* and is never imported into the probe's
-# syntactic scope.  Importing it would let it decide what the probe's own source
-# means: a module may declare `macro "collectAxioms" ...`, and a macro matches a
-# token sequence rather than a resolved name, so qualifying the call does not
-# escape it -- `Lean.collectAxioms` and `_root_.Lean.collectAxioms` are just as
-# interceptable as the bare spelling, and the substitute silently returns a
-# filtered dependency set.  `Lean.importModules` gives the probe the audited
-# environment without giving the audited code a say in how the probe elaborates,
-# which removes the possibility instead of trying to out-spell it.
+# Recompute with Lean.collectAxioms: Trust stdout can be fabricated, and a
+# commented-out #print is not disclosure. Load the audited environment as data
+# with Lean.importModules, never as a syntactic import into this probe. Otherwise
+# project macros could shadow even fully qualified collector names and forge the
+# result. Module ownership and dependencies below come from that environment.
 TRUST_DEPENDENCY_PROBE = r"""import Lean
 
 private unsafe def trustDependenciesImpl (names : List Lean.Name) : IO Unit := do
   Lean.initSearchPath (← Lean.findSysroot)
   Lean.enableInitializersExecution
   let env ← Lean.importModules #[{ module := `<<MODULE>> }] {} (loadExts := true)
+  -- Module ownership comes from the environment, not a filename/name guess.
+  let discovered := if <<DISCOVER>> then (env.constants.toList.filterMap fun (name, info) =>
+    match info, env.getModuleIdxFor? name with
+    | .thmInfo _, some idx =>
+      let owner := toString env.header.moduleNames[idx.toNat]!
+      if (owner.startsWith "LidoSRv3.Audit.Guarantees." ||
+          owner.startsWith "LidoSRv3.Audit.Source." ||
+          owner.startsWith "LidoSRv3.Audit.Verity.") &&
+          !(owner.splitOn ".").contains "Tests" then some name else none
+    | _, _ => none)
+    else []
+  let names := (names ++ discovered).eraseDups
   let collect : Lean.CoreM Unit := do
     for name in names do
       match (← Lean.getEnv).find? name with
@@ -85,8 +84,7 @@ private opaque trustDependencies (names : List Lean.Name) : IO Unit
   let names := (← IO.FS.readFile "<<NAMES>>").splitOn "\n" |>.filter (· != "")
   trustDependencies (names.map String.toName)
 """
-# Rows this checker's own Lean probe emits, one per disclosed name, plus a
-# terminating count so a truncated or partially-elaborated probe fails closed.
+# Native claim rows also require a complete terminating count.
 PROBE_ROW = re.compile(
     r"^NDP\t([^\t\n]*)\t([^\t\n]*)\t([^\t\n]*)\t([^\t\n]*)\t([^\t\n]*)\t([^\t\n]*)\t([^\t\n]*)$",
     re.MULTILINE,
@@ -341,18 +339,15 @@ def check_native_provenance(names: list[str], module: str, fixture: Path | None)
 
 
 def environment_dependencies(names: list[str], module: str,
-                             fixture: Path | None) -> dict[str, set[str]]:
-    """Recompute each named theorem's axiom dependencies from the built environment.
+                             fixture: Path | None, *, discover: bool = False) -> dict[str, set[str]]:
+    """Recompute disclosed and optionally discovered production claims.
 
-    This is the checker's own answer, obtained through `Lean.collectAxioms` --
-    the same call `#print axioms` makes -- in a process this script spawns and
-    hands the name list to.  Nothing here reads Trust's source or its log, so a
-    commented-out command or a fabricated `IO.println` cannot influence it, and
-    the probe never imports the audited module, so nothing the module declares
-    can influence how that call is elaborated either.
+    The separate probe loads the environment as data; source spelling, fabricated
+    stdout and audited syntax extensions cannot supply its dependency answers.
     """
     ordered = sorted(names)
-    output = lean_probe_output(TRUST_DEPENDENCY_PROBE, "trust-dependency",
+    probe = TRUST_DEPENDENCY_PROBE.replace("<<DISCOVER>>", "true" if discover else "false")
+    output = lean_probe_output(probe, "trust-dependency",
                                module, ordered, fixture)
     rows: dict[str, set[str]] = {}
     for name, kind, rendered in DEP_ROW.findall(output):
@@ -363,7 +358,7 @@ def environment_dependencies(names: list[str], module: str,
                  f"environment")
         rows[name] = {axiom for axiom in rendered.split(",") if axiom}
     counted = DEP_END.findall(output)
-    if len(counted) != 1 or int(counted[0]) != len(ordered):
+    if len(counted) != 1 or int(counted[0]) != len(rows) or (not discover and len(rows) != len(ordered)):
         fail("trust-dependency probe did not report on every printed theorem")
     unreported = sorted(set(ordered) - set(rows))
     if unreported:
@@ -372,14 +367,16 @@ def environment_dependencies(names: list[str], module: str,
 
 
 def confirm_reported_dependencies(reports: list[tuple[str, set[str]]],
-                                  computed: dict[str, set[str]]) -> None:
+                                  computed: dict[str, set[str]],
+                                  printed: set[str] | None = None) -> None:
     """Require Trust's log to say exactly what the environment says.
 
-    Trust's log is a convenience for readers, not evidence.  Any theorem it
-    reports on must be one Trust actually prints for, and the dependency set it
+    Each logged theorem must be actively disclosed, and the dependency set it
     shows must equal the set this checker recomputed; either way round, a
     disagreement means the log describes something other than the code.
     """
+    if printed is not None:
+        computed = {name: computed[name] for name in printed}
     reported = {name for name, _ in reports}
     fabricated = sorted(reported - set(computed))
     if fabricated:
@@ -561,8 +558,11 @@ def main() -> None:
     if output_missing:
         fail("Trust output omits registered CHECKED theorem report(s): " + ", ".join(output_missing))
     if not args.trust_output:
-        computed = environment_dependencies(sorted(printed), args.provenance_module, None)
-        confirm_reported_dependencies(reports, computed)
+        computed = environment_dependencies(sorted(printed), args.provenance_module, None,
+                                            discover=True)
+        confirm_reported_dependencies(reports, computed, printed)
+        print(f"trust coverage: {len(printed)} disclosures; {len(computed)} independently "
+              "recomputed claims including source, Verity and guarantee module theorems")
         reports = sorted(computed.items())
         observed = set().union(*computed.values())
     # Provenance precedes disclosure: a native-decision name is only credible

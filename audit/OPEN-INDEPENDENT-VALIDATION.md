@@ -1,3 +1,38 @@
+# Current review evidence and unresolved findings
+
+Canonical obligations remain in `audit/guarantees.yaml`; generated UX2 files are
+views of that registry. No historical receipt validates a successor commit.
+
+- Exact proof milestone `806f308376686d6eef750797002473d0d7435ce4` passed the
+  full configured repository suite on registered DGX Spark, job
+  `57f51984-9e08-47f2-b191-e84d2624a562`, exit 0 at 2026-09-15 15:52:05 UTC,
+  without a source bundle. Its [terminal receipt](receipts/nor-source/repository-806f3083.json)
+  is retained as active milestone evidence, not source-fidelity or deployment acceptance.
+- **Trust policy: superseded historical restriction.** Owner20260915 permits
+  foundations and only the three original compiler-success native witnesses,
+  with provenance/type/site checks and actual reevaluation. Completed kernel
+  replacements remain. At the exact milestone the existing disclosure's
+  dependencies were recomputed: three foundations, zero emitted native exceptions.
+  Earlier counts and foundational-only blocked verdicts below describe their own
+  commits and former policy; they are not current emitted inventories.
+- **Per-claim trust coverage: open.** Sixteen public DEPOSIT/TOPUP supporting
+  theorems lacked individual disclosures at that milestone. The successor adds
+  them and extends the independent environment probe to loaded source, Verity
+  and guarantee module theorems. It requires fresh remote validation; the
+  milestone pass cannot validate this extension. Test modules remain separately
+  disclosed, and actual transitive dependencies are recomputed for every selected claim.
+- **Predecessor findings: reconciliation incomplete.** The missing fifth finding
+  and 37-thread dispositions identified below remain unresolved. Historical
+  semantic findings remain open unless concrete current evidence establishes
+  their disposition. No receipt cleanup may discard these obligations.
+- **Independent paired review: pending.** The replacement website426 SHA/proof
+  pin and coordinator identity are not yet available to this proof writer.
+  Full NOR loader, supported-producer/all-writer, compiler/library/frame and
+  remaining canonical semantic obligations stay open. Deployment identity needs
+  separate authoritative chain/block/address/runtime/link/configuration evidence.
+
+## Historical review records (commit-specific evidence)
+
 # Reviewer 0badaa4a: remaining SHA witness kernel-checked
 
 Controller reports independent repository job 0aa000ce-11f7-4002-8697-7c635aee446b

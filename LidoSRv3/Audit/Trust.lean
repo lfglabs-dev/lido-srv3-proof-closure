@@ -2417,3 +2417,21 @@ example : (Compiler.CompilationModel.compile LidoSRv3.Audit.Verity.Consolidation
 #print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.commitAllocatedRow_deposited_sum
 
 #print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.allocatedRow_deposited_sum
+
+-- Public DEPOSIT/TOPUP supporting results retain individual reader disclosures.
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.exactTotal_eq_exactKeys_mul
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.linked_exactTotal_eq_depositsValue
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.linked_exactTotal_eq_pushedValue
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.revert_restores_state_value_and_logs
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.two_batch_conjunct_d_is_n_eq_two
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.verity_tx_composes_nframe_deposit
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.verity_tx_revert_restores_snapshot_legacy_parent
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.revert_restores_state_value_and_logs
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back_under_gateway_oracle_shape
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back_under_prefix_guards_shape
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.valid_result_preserves_router_order
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_guarded_revert_restores_snapshot
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_guarded_reverts_on_empty_keys
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_guarded_reverts_on_unauth
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_guarded_reverts_on_wrong_wc
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_legacy_revert_restores_snapshot

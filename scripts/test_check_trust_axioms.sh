@@ -599,6 +599,35 @@ fi
 } > "$shadowed/truthful"
 shadow_confirm "$shadowed/truthful" >/dev/null
 
+# An undisclosed claim is discovered by its defining module even when its
+# namespace differs. Its actual opaque dependency must survive recomputation.
+coverage="$tmp/coverage"
+mkdir -p "$coverage/LidoSRv3/Audit/Guarantees"
+cat > "$coverage/LidoSRv3/Audit/Guarantees/Coverage.lean" <<'LEAN'
+namespace DifferentNamespace
+axiom hidden : False
+theorem undisclosed : False := hidden
+theorem clean : True := True.intro
+end DifferentNamespace
+LEAN
+lake env lean -R "$coverage" -o "$coverage/LidoSRv3/Audit/Guarantees/Coverage.olean" \
+  "$coverage/LidoSRv3/Audit/Guarantees/Coverage.lean"
+python3 - "$coverage" <<'PY'
+import sys
+from pathlib import Path
+sys.path.insert(0, 'scripts')
+from check_trust_axioms import environment_dependencies
+names = ['DifferentNamespace.clean']
+module = 'LidoSRv3.Audit.Guarantees.Coverage'
+fixture = Path(sys.argv[1])
+direct = environment_dependencies(names, module, fixture)
+expanded = environment_dependencies(names, module, fixture, discover=True)
+assert direct == {'DifferentNamespace.clean': set()}, direct
+assert expanded['DifferentNamespace.clean'] == set(), expanded
+assert expanded['DifferentNamespace.undisclosed'] == {'DifferentNamespace.hidden'}, expanded
+print('trust coverage discovers an unprinted theorem by module and retains its opaque dependency')
+PY
+
 # An unnamed dependency line must fail closed rather than be discarded, so a
 # report Lean did emit can never go unparsed.
 cp "$tmp/ok" "$tmp/unnamed-report"
