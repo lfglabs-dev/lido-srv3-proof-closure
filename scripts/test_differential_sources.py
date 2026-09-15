@@ -33,9 +33,23 @@ def main():
         vendor = root / 'audit/account-fee-distribution/solidity/vendor/Math.sol'
         vendor.parent.mkdir(parents=True)
         vendor.write_text('// pinned vendor\n')
-        (root / '.gitignore').write_text('lido-core/\n*.extra.sol\n')
+        local_inputs = []
+        for name in [
+            'solidity/deposit/src/Harness.sol', 'solidity/topup/src/Harness.sol',
+            'solidity/topup2/src/Harness.sol', 'solidity/reserve/src/Harness.sol',
+            'solidity/signing-keys/pin/Harness.sol', 'LidoSRv3/Audit/Verity/Model.lean',
+            'audit/trio/example/Model.lean', 'foundry.toml', 'lakefile.lean',
+            'lake-manifest.json', 'lean-toolchain', 'LidoSRv3.lean',
+            'scripts/compile_reserve_soljson.cjs', 'scripts/run_topup_model.sh',
+            'scripts/nested/helper.py',
+        ]:
+            path = root / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text('// pinned fixture input\n')
+            local_inputs.append(path)
+        (root / '.gitignore').write_text('lido-core/\n*.extra.sol\n*.extra.lean\n*.extra.cjs\n')
         scripts = root / 'scripts'
-        scripts.mkdir()
+        scripts.mkdir(exist_ok=True)
         guard = scripts / 'check_differential_sources.sh'
         guard.write_text((ROOT / 'scripts/check_differential_sources.sh').read_text().replace(
             '17005714f151e5502c559932319a3f2f74ac2436', pin))
@@ -47,7 +61,7 @@ def main():
             assert (result.returncode == 0) == expected, result.stdout + result.stderr
 
         check(True)
-        for path, repo in [(dependency, core), (vendor, root)]:
+        for path, repo in [(dependency, core), (vendor, root), *((path, root) for path in local_inputs)]:
             original = path.read_text()
             path.write_text(original + '// mutation\n')
             check(False)
@@ -56,11 +70,15 @@ def main():
             git(repo, 'reset', '-q', 'HEAD', '--', str(path.relative_to(repo)))
             path.write_text(original)
             check(True)
-        extra = vendor.parent / 'ignored.extra.sol'
-        extra.write_text('// unexpected input\n')
-        check(False)
-        extra.unlink()
-        check(True)
+        for name in ['solidity/topup/src/ignored.extra.sol',
+                     'LidoSRv3/Audit/Verity/ignored.extra.lean',
+                     'scripts/nested/ignored.extra.cjs',
+                     'audit/account-fee-distribution/solidity/vendor/ignored.extra.sol']:
+            extra = root / name
+            extra.write_text('// unexpected input\n')
+            check(False)
+            extra.unlink()
+            check(True)
     print('differential source guard: clean control passes; transitive/staged/vendor/ignored mutants rejected')
 
 

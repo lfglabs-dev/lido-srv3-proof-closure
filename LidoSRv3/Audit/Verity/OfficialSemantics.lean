@@ -135,6 +135,7 @@ theorem checkedFold_compiles_to_official_ir :
     (CompilationModel.compile checkedFoldSpec [tx.functionSelector]).isOk = true := by
   have functionValid : validateFunctionSpec checkedFold = .ok () := by
     simp [validateFunctionSpec, checkedFold, Bind.bind, Except.bind, Pure.pure, Except.pure]
+    trace_state
     decide_cbv
   have validated : validateCompileInputs checkedFoldSpec [tx.functionSelector] = .ok () := by
     unfold validateCompileInputs
@@ -149,7 +150,7 @@ theorem checkedFold_compiles_to_official_ir :
       | _ => throwError "expected one pinned compiler precheck definition"
     simp [checkedFoldSpec, functionValid, checkedFold, modulesField,
       Bind.bind, Except.bind, Pure.pure, Except.pure]
-    all_goals decide_cbv
+    all_goals (trace_state; decide_cbv)
   have fieldSlot : findFieldWithResolvedSlot [modulesField] "modules" = some (modulesField, 7) := by
     rfl
   have fieldType : modulesField.ty = .dynamicArray .uint256 := rfl
@@ -163,7 +164,7 @@ theorem checkedFold_compiles_to_official_ir :
     all_goals decide_cbv
   have hi : checkedFold.isInternal = false := rfl
   have hn : checkedFold.name = "checkedFold" := rfl
-  have hs : isInteropEntrypointName "checkedFold" = false := by decide_cbv
+  have hs : isInteropEntrypointName "checkedFold" = false := by decide +kernel
   have hf : CompilationModel.applySlotAliasRanges [modulesField] [] = [modulesField] := rfl
   have hp : checkedFold.params = [] := rfl
   have hl : checkedFold.nonReentrantLock = none := rfl

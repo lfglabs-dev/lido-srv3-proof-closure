@@ -21,4 +21,12 @@ for profile in deposit topup topup2 reserve signing-keys; do
 done
 check_tree . HEAD audit/account-fee-distribution/solidity/vendor
 check_tree . HEAD audit/deposit-dsm-call/solidity/src/@openzeppelin
+# Model source, dependency pins and executable compiler/model drivers also
+# affect direct comparisons. Python bytecode caches are generated outputs;
+# source extensions below include nested helper scripts without consuming them.
+for input in foundry.toml lakefile.lean lake-manifest.json lean-toolchain \
+  LidoSRv3.lean LidoSRv3 audit/trio \
+  'scripts/*.py' 'scripts/*.sh' 'scripts/*.cjs' 'scripts/*.js' 'scripts/*.mjs' 'scripts/*.json'; do
+  check_tree . HEAD "$input"
+done
 printf '%s\n' "differential source inputs match lido-core $pin and candidate $(git rev-parse HEAD)"

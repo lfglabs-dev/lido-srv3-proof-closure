@@ -93,6 +93,38 @@ views of that registry. No historical receipt validates a successor commit.
     pre-call guard order independently of rolled-back log writes.
   Full predecessor reconciliation, including the unavailable ledger finding,
   remains required. None of these entries transfers an earlier test receipt.
+- **Older inline findings: current-source evidence at `13e68fdc`.**
+  These dispositions remain open until current validation is reconciled:
+  - 4003149917 and 4003149921: the incorrect standalone reserve models are
+    retired. `Source.TrioReserve1.Live.setDepositsReserveTarget` writes the target
+    slot and lowers the effective reserve only on a decrease;
+    `updateBufferedEtherAllocation` raises it only below target. PReserve1 exports
+    `reserve_set_target_execution` and `reserve_update_buffered_allocation_execution`
+    with ordered events and separate admission/report-parent obligations.
+  - 4004070478: `testMutantDroppedAssertStrandsEther` overpays by one wei;
+    honest execution must panic and roll back, while the dropped-assert mutant
+    must strand exactly that wei. The existing mutant is no longer vacuous.
+  - 4004070483: `testPackedPostReportWrapsOnPin` reads the actual harness field
+    and compares the high-half truncation with the deliberately different legacy
+    model result. This is a counterexample, not a legacy/source equality claim.
+  - 4004070488: `Audit.AllGuarantees` directly imports
+    `Guarantees.PReserve1UnfinalizedStaticcall` at line 1.
+  - 4004112166: the reserve profile still has no explicit code-size override.
+    Exact runtime size and effective Foundry configuration require a current
+    remote check; an earlier suite pass does not settle this finding.
+- Exact `13e68fdc24cc12ef204dcca80bcf3736f8d6d9e9` DGX job
+  `44207eda-0c14-4871-b84e-ffa240b9b099` failed with exit 1 at
+  2026-09-15 18:29:47 UTC. The
+  [receipt](receipts/nor-source/compiler-nor-13e68fdc.json) records successful
+  compilation of ByteMemoryFrame and NorArrayReread, compiler validation recursion
+  errors, and the CounterBounds abbreviation mismatch. No full trust result follows.
+  The successor states the packed-read bound explicitly and exposes the compiler
+  validation residual goals without raising limits or adding axioms.
+- 4004112172, 4004181954, 4010456351, 4011462225 and 4012431244
+  (source/model/configuration guard findings) remain open pending current full validation. The shared guard
+  now covers all pinned contracts, five harness trees, vendors, Lean source,
+  dependency/compiler configuration and script sources. Disposable local tests
+  reject staged, unstaged and ignored source/model/driver mutations.
 - **Predecessor findings: reconciliation incomplete.** The missing fifth finding
   and 37-thread dispositions identified below remain unresolved. Historical
   semantic findings remain open unless concrete current evidence establishes

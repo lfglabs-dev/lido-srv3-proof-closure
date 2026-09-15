@@ -9,7 +9,8 @@ theorem counterSum_width_bound (s : State) (field : Fin 4) (ids : List Word) :
   induction ids with
   | nil => simp [counterSum]
   | cons id rest ih =>
-    have width := packedGet_width (s.operators id).signingKeysStats field
+    have width : (packedGet (s.operators id).signingKeysStats field).val < 2^64 :=
+      packedGet_width (s.operators id).signingKeysStats field
     simp only [counterSum, List.length_cons]
     calc
       (packedGet (s.operators id).signingKeysStats field).val + counterSum s field rest
