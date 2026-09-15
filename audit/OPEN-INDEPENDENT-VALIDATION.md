@@ -668,3 +668,11 @@ not transfer a predecessor build, trust verdict or deployment acceptance.
   helpers no longer report errors, but the module has no passing verdict.
   Constructor equations used by the next proof-producing evaluator remain
   ordinary supporting claims subject to the full transitive trust check.
+
+- Exact `fef30a34e3b3ff62179a0af2cfe95f925f18f111` job
+  `d9907eac-271b-4a0e-a55e-872edf3e1625` failed with exit 1 at
+  2026-09-15 19:03:43 UTC, without a source bundle. The
+  [receipt](receipts/nor-source/compiler-fold-fef30a34.json) reports no errors
+  in the constructor helpers or empty-external lemma; function/input validation
+  still exceeds recursion depth. The next repair isolates ADT parameter-name
+  and identifier validation. No compiler-success or transitive trust pass follows.

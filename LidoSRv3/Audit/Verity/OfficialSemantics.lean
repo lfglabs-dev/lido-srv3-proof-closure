@@ -351,6 +351,38 @@ theorem checkedFold_compiles_to_official_ir :
       exprAny_storageArrayLength, exprAny_storageArrayElement, exprAny_add,
       exprAny_sub, exprAny_le, exprIsUnsafeLogicalNode,
       Bind.bind, Except.bind, Pure.pure, Except.pure]
+    run_tac do
+      let env ← Lean.getEnv
+      for suffix in ["validateAdtPayloadParamNameCollisions", "adtPayloadParamNames"] do
+        let candidates := env.constants.toList.filter fun (name, _) =>
+          name.toString.startsWith "_private.Compiler.CompilationModel.Validation." &&
+            name.toString.endsWith ("." ++ suffix)
+        match candidates with
+        | [(name, _)] =>
+            let id := Lean.mkIdent name
+            Lean.Elab.Tactic.evalTactic (← `(tactic| simp [$id:ident]))
+        | _ => throwError "expected one pinned Validation helper: {suffix}"
+    all_goals (trace_state; decide_cbv)
+  have identifiers : validateIdentifierShapes checkedFoldSpec = .ok () := by
+    simp [validateIdentifierShapes, checkedFoldSpec]
+    run_tac do
+      let env ← Lean.getEnv
+      for suffix in ["validateReservedCompilerIdentifiers", "validateFieldIdentifiers",
+          "validateFunctionIdentifierList", "validateFunctionYulIdentifiers",
+          "validateContractIdentifiers"] do
+        let candidates := env.constants.toList.filter fun (name, _) =>
+          name.toString.startsWith "_private.Compiler.CompilationModel.ValidationCalls." &&
+            name.toString.endsWith ("." ++ suffix)
+        match candidates with
+        | [(name, _)] =>
+            unless (← Lean.Elab.Tactic.getGoals).isEmpty do
+              let id := Lean.mkIdent name
+              Lean.Elab.Tactic.evalTactic (← `(tactic| simp [$id:ident,
+                validateFunctionIdentifiers, checkedFold, modulesField,
+                collectStmtListBindNames, collectStmtBindNames,
+                collectStmtListAssignedNames, collectStmtAssignedNames,
+                Bind.bind, Except.bind, Pure.pure, Except.pure]))
+        | _ => throwError "expected one pinned identifier helper: {suffix}"
     all_goals (trace_state; decide_cbv)
   have validated : validateCompileInputs checkedFoldSpec [tx.functionSelector] = .ok () := by
     unfold validateCompileInputs
@@ -363,7 +395,7 @@ theorem checkedFold_compiles_to_official_ir :
           let id := Lean.mkIdent name
           Lean.Elab.Tactic.evalTactic (← `(tactic| unfold $id:ident))
       | _ => throwError "expected one pinned compiler precheck definition"
-    simp [validateNonReentrantForkCompatibility, no_external_assumptions, checkedFoldSpec, functionValid,
+    simp [validateNonReentrantForkCompatibility, no_external_assumptions, identifiers, checkedFoldSpec, functionValid,
       checkedFold, modulesField, Bind.bind, Except.bind, Pure.pure, Except.pure]
     all_goals (trace_state; decide_cbv)
   have fieldSlot : findFieldWithResolvedSlot [modulesField] "modules" = some (modulesField, 7) := by
