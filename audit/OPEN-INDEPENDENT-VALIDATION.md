@@ -615,7 +615,7 @@ not semantic closure or axiom elimination.
 ## Current compiler reduction follow-up
 
 Exact `652cca129036` focused job `4dffa7d6-8f01-4ea9-89c0-521a1279a85a`
-failed; its [receipt](receipts/nor-source/compiler-fold-652cca12.json) retains the
+failed; its [archived receipt](https://github.com/lfglabs-dev/lido-srv3-proof-closure/blob/a3e5c6178b64d33a9ebaacb91262c7807d9b3a4f/audit/receipts/nor-source/compiler-fold-652cca12.json) retains the
 available tail. The expanded diagnostic exceeded that tail, so it does not
 establish which earlier intermediate goals passed. The successor uses explicit
 function-validation, input-validation, body-compilation and core-composition
@@ -676,3 +676,17 @@ not transfer a predecessor build, trust verdict or deployment acceptance.
   in the constructor helpers or empty-external lemma; function/input validation
   still exceeds recursion depth. The next repair isolates ADT parameter-name
   and identifier validation. No compiler-success or transitive trust pass follows.
+
+- Exact `a3e5c6178b64d33a9ebaacb91262c7807d9b3a4f` job
+  `2c354755-a861-47ac-a942-8d29c84cbf10` failed with exit 1 at
+  2026-09-15 19:10:11 UTC, without a source bundle. Its
+  [receipt](receipts/nor-source/compiler-fold-a3e5c617.json) retains function
+  recursion and closed-identifier timeout diagnostics. Constructor equations for
+  the ordered, error-short-circuiting monadic walks and kernel reduction of the
+  concrete string checks are the next repair, not an accepted compiler result.
+- Cleanup removed five superseded compiler diagnostics (`130f8aa3`, `14824248`,
+  `652cca12`, `a8cece87`, `accbcdfe`; 307,229 bytes). Tracked-reference inspection
+  found only the 652cca12 link above, now pinned to its existing Git archive.
+  They contained transient failed attempts, not unique regressions or current
+  validation. Current failure receipts, compiler dependency provenance, NOR
+  target results, counterexamples and unresolved findings remain retained.

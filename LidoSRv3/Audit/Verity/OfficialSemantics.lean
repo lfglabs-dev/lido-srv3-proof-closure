@@ -302,6 +302,110 @@ private theorem fold_setStorageArrayElement {α : Type} (f : α → Stmt → Stm
 
 attribute [local cbv_eval] fold_forEach exprAny_literal exprAny_localVar exprAny_storageArrayLength exprAny_storageArrayElement exprAny_add exprAny_sub exprAny_le stmtAny_forEach stmtAny_letVar fold_letVar stmtAny_assignVar fold_assignVar stmtAny_require fold_require stmtAny_return fold_return stmtAny_setStorageArrayElement fold_setStorageArrayElement
 
+private theorem stmtCheck_letVar (check : Stmt → Except String Unit) (name : String) (value : Expr) :
+    Stmt.forDeepM check (.letVar name value) = check (.letVar name value) := by
+  rw [Stmt.forDeepM]
+  simp [Stmt.childLists]
+
+private theorem stmtCheck_assignVar (check : Stmt → Except String Unit) (name : String) (value : Expr) :
+    Stmt.forDeepM check (.assignVar name value) = check (.assignVar name value) := by
+  rw [Stmt.forDeepM]
+  simp [Stmt.childLists]
+
+private theorem stmtCheck_require (check : Stmt → Except String Unit) (condition : Expr) (message : String) :
+    Stmt.forDeepM check (.require condition message) = check (.require condition message) := by
+  rw [Stmt.forDeepM]
+  simp [Stmt.childLists]
+
+private theorem stmtCheck_return (check : Stmt → Except String Unit) (value : Expr) :
+    Stmt.forDeepM check (.return value) = check (.return value) := by
+  rw [Stmt.forDeepM]
+  simp [Stmt.childLists]
+
+private theorem stmtCheck_setStorageArrayElement (check : Stmt → Except String Unit) (name : String) (index value : Expr) :
+    Stmt.forDeepM check (.setStorageArrayElement name index value) = check (.setStorageArrayElement name index value) := by
+  rw [Stmt.forDeepM]
+  simp [Stmt.childLists]
+
+private theorem stmtCheck_forEach (check : Stmt → Except String Unit)
+    (name : String) (count : Expr) (body : List Stmt) :
+    Stmt.forDeepM check (.forEach name count body) =
+      (do check (.forEach name count body); body.forM (Stmt.forDeepM check)) := by
+  rw [Stmt.forDeepM]
+  simp [Stmt.childLists]
+
+private theorem exprCheck_literal (check : Expr → Except String Unit) (n : Nat) :
+    Expr.forDeepM check (.literal n) = check (.literal n) := by
+  rw [Expr.forDeepM]
+  simp [Expr.children]
+
+private theorem exprCheck_localVar (check : Expr → Except String Unit) (name : String) :
+    Expr.forDeepM check (.localVar name) = check (.localVar name) := by
+  rw [Expr.forDeepM]
+  simp [Expr.children]
+
+private theorem exprCheck_storageArrayLength (check : Expr → Except String Unit) (name : String) :
+    Expr.forDeepM check (.storageArrayLength name) = check (.storageArrayLength name) := by
+  rw [Expr.forDeepM]
+  simp [Expr.children]
+
+private theorem exprCheck_storageArrayElement (check : Expr → Except String Unit) (name : String) (index : Expr) :
+    Expr.forDeepM check (.storageArrayElement name index) = (do check (.storageArrayElement name index); Expr.forDeepM check index) := by
+  rw [Expr.forDeepM]
+  simp [Expr.children]
+
+private theorem exprCheck_add (check : Expr → Except String Unit) (a b : Expr) :
+    Expr.forDeepM check (.add a b) = (do check (.add a b); Expr.forDeepM check a; Expr.forDeepM check b) := by
+  rw [Expr.forDeepM]
+  simp [Expr.children]
+
+private theorem exprCheck_sub (check : Expr → Except String Unit) (a b : Expr) :
+    Expr.forDeepM check (.sub a b) = (do check (.sub a b); Expr.forDeepM check a; Expr.forDeepM check b) := by
+  rw [Expr.forDeepM]
+  simp [Expr.children]
+
+private theorem exprCheck_le (check : Expr → Except String Unit) (a b : Expr) :
+    Expr.forDeepM check (.le a b) = (do check (.le a b); Expr.forDeepM check a; Expr.forDeepM check b) := by
+  rw [Expr.forDeepM]
+  simp [Expr.children]
+
+private theorem exprPostCheck_literal (check : Expr → Except String Unit) (n : Nat) :
+    Expr.forDeepPostM check (.literal n) = check (.literal n) := by
+  rw [Expr.forDeepPostM]
+  simp [Expr.children]
+
+private theorem exprPostCheck_localVar (check : Expr → Except String Unit) (name : String) :
+    Expr.forDeepPostM check (.localVar name) = check (.localVar name) := by
+  rw [Expr.forDeepPostM]
+  simp [Expr.children]
+
+private theorem exprPostCheck_storageArrayLength (check : Expr → Except String Unit) (name : String) :
+    Expr.forDeepPostM check (.storageArrayLength name) = check (.storageArrayLength name) := by
+  rw [Expr.forDeepPostM]
+  simp [Expr.children]
+
+private theorem exprPostCheck_storageArrayElement (check : Expr → Except String Unit) (name : String) (index : Expr) :
+    Expr.forDeepPostM check (.storageArrayElement name index) = (do Expr.forDeepPostM check index; check (.storageArrayElement name index)) := by
+  rw [Expr.forDeepPostM]
+  simp [Expr.children]
+
+private theorem exprPostCheck_add (check : Expr → Except String Unit) (a b : Expr) :
+    Expr.forDeepPostM check (.add a b) = (do Expr.forDeepPostM check a; Expr.forDeepPostM check b; check (.add a b)) := by
+  rw [Expr.forDeepPostM]
+  simp [Expr.children]
+
+private theorem exprPostCheck_sub (check : Expr → Except String Unit) (a b : Expr) :
+    Expr.forDeepPostM check (.sub a b) = (do Expr.forDeepPostM check a; Expr.forDeepPostM check b; check (.sub a b)) := by
+  rw [Expr.forDeepPostM]
+  simp [Expr.children]
+
+private theorem exprPostCheck_le (check : Expr → Except String Unit) (a b : Expr) :
+    Expr.forDeepPostM check (.le a b) = (do Expr.forDeepPostM check a; Expr.forDeepPostM check b; check (.le a b)) := by
+  rw [Expr.forDeepPostM]
+  simp [Expr.children]
+
+attribute [local cbv_eval] stmtCheck_letVar stmtCheck_assignVar stmtCheck_require stmtCheck_return stmtCheck_setStorageArrayElement stmtCheck_forEach exprCheck_literal exprCheck_localVar exprCheck_storageArrayLength exprCheck_storageArrayElement exprCheck_add exprCheck_sub exprCheck_le exprPostCheck_literal exprPostCheck_localVar exprPostCheck_storageArrayLength exprPostCheck_storageArrayElement exprPostCheck_add exprPostCheck_sub exprPostCheck_le
+
 private theorem no_external_assumptions (spec : CompilationModel)
     (h : spec.externals = []) : collectUsedExternalAssumptions spec = [] := by
   unfold collectUsedExternalAssumptions
@@ -353,7 +457,7 @@ theorem checkedFold_compiles_to_official_ir :
       Bind.bind, Except.bind, Pure.pure, Except.pure]
     run_tac do
       let env ← Lean.getEnv
-      for suffix in ["validateAdtPayloadParamNameCollisions", "adtPayloadParamNames"] do
+      for suffix in ["validateAdtPayloadParamNameCollisions", "adtPayloadParamNames", "firstDuplicateString"] do
         let candidates := env.constants.toList.filter fun (name, _) =>
           name.toString.startsWith "_private.Compiler.CompilationModel.Validation." &&
             name.toString.endsWith ("." ++ suffix)
@@ -383,7 +487,7 @@ theorem checkedFold_compiles_to_official_ir :
                 collectStmtListAssignedNames, collectStmtAssignedNames,
                 Bind.bind, Except.bind, Pure.pure, Except.pure]))
         | _ => throwError "expected one pinned identifier helper: {suffix}"
-    all_goals (trace_state; decide_cbv)
+    all_goals (trace_state; decide +kernel)
   have validated : validateCompileInputs checkedFoldSpec [tx.functionSelector] = .ok () := by
     unfold validateCompileInputs
     run_tac do
