@@ -50,6 +50,13 @@ views of that registry. No historical receipt validates a successor commit.
   Four unchanged compiler-success statements now attempt kernel reduction;
   proof-repository validation and behavioral differential checks remain pending.
   No new native exception or metadata-based validator bypass is introduced.
+  Exact `ea8295c0cd4ef7415ee02907bb8e87471400e64d` integration job
+  `76139c85-dbcf-4df3-9e3f-e6b22060bb07` failed at kernel reduction in
+  OfficialSemantics, ConsolidationFee and DepositRollback; AllocCapacity depends
+  on the failed OfficialSemantics target. The
+  [failed receipt](receipts/nor-source/compiler-witnesses-ea8295c0.json) is retained.
+  The next repair separates input validation from core compilation; it does not
+  weaken the compiler-success statement or introduce a new assumption.
 - **Predecessor findings: reconciliation incomplete.** The missing fifth finding
   and 37-thread dispositions identified below remain unresolved. Historical
   semantic findings remain open unless concrete current evidence establishes

@@ -121,6 +121,24 @@ theorem checkedFold_compiles_to_official_ir :
     (CompilationModel.compile checkedFoldSpec [tx.functionSelector]).isOk = true := by
   set_option maxRecDepth 16384 in
   set_option maxHeartbeats 4000000 in
-  decide +kernel
+  have validated : validateCompileInputs checkedFoldSpec [tx.functionSelector] = .ok () := by
+    letI : DecidableEq (Except String Unit) := fun x y =>
+      match x, y with
+      | .ok _, .ok _ => isTrue rfl
+      | .error a, .error b =>
+        if h : a = b then isTrue (h ▸ rfl)
+        else isFalse (by intro heq; cases heq; exact h rfl)
+      | .ok _, .error _ => isFalse (by intro h; cases h)
+      | .error _, .ok _ => isFalse (by intro h; cases h)
+    decide +kernel
+  unfold CompilationModel.compile
+  rw [validated]
+  simp [compileValidatedCore, checkedFoldSpec, checkedFold, modulesField,
+    compileGuardedFunctionSpec, compileFunctionSpec, compileStmtListWithFork,
+    compileStmtWithFork, compileExprWithInternals,
+    compileRequireFailCondWithInternals, validateFunctionSpec,
+    attachNonReentrantGuard, compileConstructor, functionReturns,
+    Bind.bind, Except.bind, Pure.pure, Except.pure, Except.isOk, Except.toBool]
+  all_goals decide +kernel
 
 end LidoSRv3.Audit.Verity.OfficialSemantics
