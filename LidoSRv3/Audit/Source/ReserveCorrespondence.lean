@@ -37,7 +37,8 @@ claim is made by this module.
 ## Model error labels and source arithmetic
 
 `NOT_ENOUGH_ETHER` (Lido.sol:842), `CAN_NOT_DEPOSIT` (Lido.sol:870),
-`APP_AUTH_FAILED` (Lido.sol:872) and `ZERO_AMOUNT` (Lido.sol:873) are literal source reasons. The other labels below belong to this historical
+`APP_AUTH_FAILED` (Lido.sol:1395, reached by `_auth` at Lido.sol:872) and
+`ZERO_AMOUNT` (Lido.sol:873) are literal source reasons. The other labels below belong to this historical
 arithmetic projection; they are not exact Solidity errors:
 
 * `ALLOCATION_ARITHMETIC` labels added `safeSub` failures. The source's raw
