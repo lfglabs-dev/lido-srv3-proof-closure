@@ -61,16 +61,21 @@ reject() {
   fi
 }
 
-# A disclosed test axiom cannot be laundered into a registered production parent.
-python3 - "$tmp/ok" "$tmp/test-native-in-production" "$names" <<'PYTEST'
+# Isolated disclosure mutation: no real test-native exceptions need remain.
+scope_fixture="$tmp/scope-fixture"
+mkdir -p "$scope_fixture/scripts" "$scope_fixture/audit" "$scope_fixture/LidoSRv3/Audit"
+cp scripts/check_trust_axioms.py scripts/check_proof_escapes.py "$scope_fixture/scripts/"
+cp audit/guarantees.yaml audit/trust-native-decide-allowlist.txt "$scope_fixture/audit/"
+cp LidoSRv3/Audit/Trust.lean "$scope_fixture/LidoSRv3/Audit/"
+scope_native='LidoSRv3.Tests.Scope.fixture._native.native_decide.ax_1_1'
+printf '%s\n' "$scope_native" >> "$scope_fixture/audit/trust-native-decide-allowlist.txt"
+python3 - "$tmp/ok" "$tmp/test-native-in-production" "$scope_native" <<'PYTEST'
 import sys
-text = open(sys.argv[1]).read()
-native = next(n for n in open(sys.argv[3]).read().splitlines() if n.startswith("LidoSRv3.Tests."))
-text = text.replace("]", ", " + native + "]", 1)
+text = open(sys.argv[1]).read().replace("]", ", " + sys.argv[3] + "]", 1)
 open(sys.argv[2], "w").write(text)
 PYTEST
 reject "$tmp/test-native-in-production" 'depends on test-only native axiom(s)' \
-  'a registered parent inheriting a disclosed test witness'
+  'a registered parent inheriting a disclosed test witness' "$scope_fixture/scripts/check_trust_axioms.py"
 
 # A non-native project axiom (for example `opaque injected : False`, which the
 # lexical proof-escape scanner does not forbid) is emitted by Lean as an

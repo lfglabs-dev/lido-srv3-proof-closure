@@ -816,7 +816,6 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 LidoSRv3.Audit.Verity.AllocCapacityPhase3.consumed_summary_function_spec_compiles._native.native_decide.ax_1_1
 LidoSRv3.Audit.Verity.SszAbstractDigest.deposit_data_root_compiles._native.native_decide.ax_1_1
 LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.forward_compiles._native.native_decide.ax_1_1
-LidoSRv3.Tests.PackCSszMutants.engine_mutant_disagrees_with_sha256engine._native.native_decide.ax_1_1
 ```
 
 ## Recommendation

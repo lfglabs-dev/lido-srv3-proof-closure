@@ -1,3 +1,35 @@
+# Reviewer 0badaa4a: remaining SHA witness kernel-checked
+
+Controller reports independent repository job 0aa000ce-11f7-4002-8697-7c635aee446b
+passed at 724ecde1f715647c692e4a1845c1d6e4f63360ef, including 74 differential
+cases, 2120 jobs and seven-axiom recomputation. Verdict remains semantic BLOCKED.
+
+The unchanged engine_mutant_disagrees_with_sha256engine statement now uses
+kernel reduction of the pinned pure Lean Sha256Engine.sha256 implementation.
+It is not the EvmYul opaque FFI function. Registered targeted job
+111b7db8-8430-4f05-ba37-9a2aad8369fc passed (447 jobs). The exact source receipt
+and removed axiom are in audit/metadata-reconcile/kernel-sha-removals.json.
+
+Full successor Trust recomputation must confirm six remaining axioms: the three
+foundations plus the three production compiler witnesses. No test-native axiom
+remains in the emitted disclosure. I-TRUST-FOUNDATIONAL-ONLY remains OPEN: Thomas
+has not expanded the allowed foundational set. Removing this mutant dependency
+does not prove SHA/FIPS, runtime refinement or authenticated-root correspondence.
+
+The compiler witnesses remain unchanged. The pinned compiler's scope validation
+uses partial staticParamBindingNames/internalParamYulNamesForType; source search
+found no exported equations for those helpers. A linked compiler-proof repair
+needs declared dependency ownership and a pinned result; no desired equality or
+untracked upstream edit is substituted. Earlier failed kernel attempts remain
+recorded below and are not retried as successful evidence.
+
+ALLOC1 supported-module reachability/executor correspondence, ALLOC2 compiled/
+deployed refinement and all other registered obligations remain OPEN. The ALLOC
+arbitrary-module counterexample and AccountFrame are unchanged. The reviewer
+workspace is unavailable here; no absent ledger finding is declared resolved.
+
+## Earlier review records
+
 # Reviewer 1e6ff3a9: accounting/top-up kernel witnesses and zero-call observation
 
 Controller reports independent job a14d23ef-04c3-4136-a223-2f49c140cf75 passed

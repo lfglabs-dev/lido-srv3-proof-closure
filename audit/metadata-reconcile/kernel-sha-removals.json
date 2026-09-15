@@ -1,0 +1,11 @@
+{
+  "baseline": "724ecde1f715647c692e4a1845c1d6e4f63360ef",
+  "validated_source_commit": "6e4b00c4b188235db5596fe5a1299e8931ac7248",
+  "targeted_job": "111b7db8-8430-4f05-ba37-9a2aad8369fc",
+  "baseline_count": 408,
+  "current_count": 407,
+  "current_digest": "5b1bdca4c80339b043dbd3fca5594c0d6897baddbdf5a44fb1556f90c6c6ff36",
+  "removed_axiom": "LidoSRv3.Tests.PackCSszMutants.engine_mutant_disagrees_with_sha256engine._native.native_decide.ax_1_1",
+  "source": "LidoSRv3/Tests/PackCSszMutants.lean",
+  "scope": "Unchanged SHA-engine mutant theorem now kernel-checked; full successor Trust recomputation pending."
+}
