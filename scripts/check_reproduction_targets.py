@@ -12,10 +12,10 @@ def check(root):
     rows = json.loads((root / 'audit/guarantees.yaml').read_text())['guarantees']
     count = 0
     for row in rows:
-        for claim in row.get('fidelity', {}).get('covered', []):
+        for claim in sum((row.get('fidelity', {}).get(k, []) for k in ('covered', 'missing')), []):
             for name in re.findall(r'LidoSRv3/[A-Za-z0-9_/]+\.lean', claim):
                 if not (root / name).is_file():
-                    raise ValueError(f"{row['id']}: missing covered source {name}")
+                    raise ValueError(f"{row['id']}: missing fidelity source {name}")
         command = row.get('reproduction', {}).get('command', '')
         for token in shlex.split(command):
             if token.startswith('LidoSRv3.'):

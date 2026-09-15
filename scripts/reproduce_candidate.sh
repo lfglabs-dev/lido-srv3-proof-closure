@@ -10,6 +10,8 @@ expected="${1:?usage: bash scripts/reproduce_candidate.sh FULL_CANDIDATE_SHA}"
 python3 scripts/generate_ux2.py check
 python3 scripts/check_report_theorem_inventory.py
 python3 scripts/check_validation_receipt.py
+# Populate only the recorded gitlinks; never reset a dirty submodule or use --remote.
+git submodule update --init --recursive -- lido-core
 bash scripts/check_differential_sources.sh
 python3 scripts/check_reproduction_targets.py
 # Submission is durable. Exit 75 means accepted/pending, never validation PASS.

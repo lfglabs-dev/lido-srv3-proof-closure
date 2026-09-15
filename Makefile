@@ -34,6 +34,7 @@ check: test
 
 test:
 	@bash scripts/test_reproduce_candidate.sh
+	@bash scripts/test_differential_input_scope.sh
 	@bash scripts/test_reserve_compiler_selection.sh
 	@python3 scripts/generate_ux2.py check
 	@python3 scripts/check_report_theorem_inventory.py

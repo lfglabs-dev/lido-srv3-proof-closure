@@ -16,6 +16,9 @@ check_tree() {
 # Supersets of the Solidity import closure deliberately fail closed. Comparing
 # against HEAD includes staged changes; ls-files includes ignored extra inputs.
 check_tree lido-core "$pin" contracts
+for profile in deposit topup topup2 reserve; do
+  check_tree . HEAD "solidity/$profile"
+done
 check_tree . HEAD audit/account-fee-distribution/solidity/vendor
 check_tree . HEAD audit/deposit-dsm-call/solidity/src/@openzeppelin
 printf '%s\n' "differential source inputs match lido-core $pin and candidate $(git rev-parse HEAD)"

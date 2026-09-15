@@ -24,10 +24,19 @@ with tempfile.TemporaryDirectory() as tmp:
     try:
         check(root)
     except ValueError as error:
-        assert 'missing covered source' in str(error)
+        assert 'missing fidelity source' in str(error)
     else:
         raise AssertionError('accepted a removed source path in a covered claim')
     row['fidelity']['covered'] = []
+    row['fidelity']['missing'] = ['See LidoSRv3/Audit/Verity/ConsolidationEthUnboundedFuel.lean']
+    registry.write_text(json.dumps({'guarantees': [row]}))
+    try:
+        check(root)
+    except ValueError as error:
+        assert 'missing fidelity source' in str(error)
+    else:
+        raise AssertionError('accepted a stale citation in a missing obligation')
+    row['fidelity']['missing'] = []
     row['reproduction']['command'] = 'lake build LidoSRv3.Audit.Source.SszDeclaredSiblings'
     registry.write_text(json.dumps({'guarantees': [row]}))
     try:

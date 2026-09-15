@@ -1,3 +1,35 @@
+# Reviewer e5ec2def: full-parent and reproduction repairs
+
+Controller reports independent prove/test, axiom recomputation, 74 differential
+cases and 2120 library jobs passed at 75c6329ca9a22906589b304cad2391b6ff4d16a6.
+Verdict remains semantic BLOCKED. That receipt does not validate this successor.
+
+Accessible PR findings repaired:
+- 4010194212: both ALLOC2 orphanage exports now return the exact five-conjunct
+  registered parent, including UnboundedProportionalLoop and SourceMemoryCallCorrespondence.
+- 4009933661: canonical missing-obligation fuel citation retargeted to Composition;
+  the path guard now checks both covered and missing claims, with a negative test.
+- 4010194223: exact reproduction initializes recorded lido-core gitlinks before
+  source validation. No --remote/--force/reset is used. Tests enforce initialization
+  order and reject submission on initialization failure.
+- 4010456351: direct differential input checks cover all four checkout-local
+  Solidity harness trees. Isolated tests reject staged, unstaged, untracked and
+  ignored modifications in each profile, without running Lean/Forge/network.
+
+The reviewer workspace is not mounted. GitHub exposes these four new findings;
+the controller was asked for the fifth finding / accessible ledger. Its disposition
+remains UNRESOLVED, not invented or marked accepted. Retrieved comments are preserved
+in the writer output. The 37 thread dispositions cannot be reconstructed from
+GitHub thread-open status alone.
+
+ALLOC1 supported-module reachability and physical runtime correspondence remain
+OPEN; the controller's refutation of unconditional legacy equality and the genuine
+arbitrary-module counterexample remain. ALLOC2 compiled/deployed refinement and
+foundational-only trust remain OPEN. No statement is narrowed and no native witness
+is hidden by these repairs. All other registered obligations remain in scope.
+
+## Earlier records
+
 # Kernel-checked test-witness successor
 
 Registered dgx-spark job 1f682576-7dca-4621-bae5-058b763f1794 passed both
