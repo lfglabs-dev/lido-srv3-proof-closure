@@ -3,7 +3,7 @@
   "pinned_source": "lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436",
   "verity_commit": "600a2f7a9b07f7ea532451e7d58b106347a6817a",
   "lean_toolchain": "leanprover/lean4:v4.31.0",
-  "lean_source_tree": "91ee2d43f5779b4edf4ee79b4a4295036f81ff97",
+  "lean_source_tree": "b89734cd6c7b2d0ab25f2c455f9c0920301fe20a",
   "boundary": [
     "These are proofs about a model, not about a deployed contract.",
     "The subject is a Lean model of Staking Router v3, written against pinned source lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436.",

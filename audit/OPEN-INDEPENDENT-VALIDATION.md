@@ -522,3 +522,12 @@ remain repaired; compiler-native trust, ALLOC supported-module reachability and
 compiled/deployed refinement remain OPEN. No registered statement or arbitrary-
 module counterexample was changed. This successor repairs evidence transport,
 not semantic closure or axiom elimination.
+
+## Current compiler reduction follow-up
+
+Exact `652cca129036` focused job `4dffa7d6-8f01-4ea9-89c0-521a1279a85a`
+failed; its [receipt](receipts/nor-source/compiler-fold-652cca12.json) retains the
+available tail. The expanded diagnostic exceeded that tail, so it does not
+establish which earlier intermediate goals passed. The successor uses explicit
+function-validation, input-validation, body-compilation and core-composition
+steps with bounded diagnostic depth. All witness statements remain unchanged.
