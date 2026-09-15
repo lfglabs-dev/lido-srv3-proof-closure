@@ -120,7 +120,7 @@ claim or a claim that native evaluation is kernel-only evidence.
 
 Pinned source: `17005714f151e5502c559932319a3f2f74ac2436`.
 Lean: `leanprover/lean4:v4.31.0`; Verity:
-`1e95e925736d9253df41918ce1e4858cdd8e8a8d` (linked dependency PR
+`600a2f7a9b07f7ea532451e7d58b106347a6817a` (linked dependency PR
 [verity#2409](https://github.com/lfglabs-dev/verity/pull/2409), same writer); EVMYul:
 `f7e4ee0dc8f8d5265ce822a937ab5be771f182e9`; Mathlib:
 `fabf563a7c95a166b8d7b6efca11c8b4dc9d911f`.

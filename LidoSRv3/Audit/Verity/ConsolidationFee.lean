@@ -177,7 +177,9 @@ theorem function_scaffold_entrypoint :
 
 theorem function_spec_compiles :
     (CompilationModel.compile spec [addConsolidationRequestsSelector]).isOk = true := by
-  native_decide
+  set_option maxRecDepth 16384 in
+  set_option maxHeartbeats 4000000 in
+  decide +kernel
 
 /-! ## Byte-precise memory/call model -/
 

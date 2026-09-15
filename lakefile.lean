@@ -26,7 +26,7 @@ script runTests args do
       return 2
 
 require verity from git
-  "https://github.com/lfglabs-dev/verity.git"@"1e95e925736d9253df41918ce1e4858cdd8e8a8d"
+  "https://github.com/lfglabs-dev/verity.git"@"600a2f7a9b07f7ea532451e7d58b106347a6817a"
 
 /-- Stable definitions and public guarantees. Does not compile Tests, Legacy, or Trust. -/
 @[default_target]

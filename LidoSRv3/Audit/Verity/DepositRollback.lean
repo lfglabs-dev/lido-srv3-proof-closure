@@ -175,7 +175,9 @@ theorem checked_prefix_is_actual_function_spec : spec.functions = [checkedPrefix
 
 theorem checked_prefix_compiles :
     (CompilationModel.compile spec [checkedPrefixSelector]).isOk = true := by
-  native_decide
+  set_option maxRecDepth 16384 in
+  set_option maxHeartbeats 4000000 in
+  decide +kernel
 
 /-! The expected footprint is independently written from the pinned source
 prefix.  It is not obtained by aliasing `checkedPrefix` to a second name. -/

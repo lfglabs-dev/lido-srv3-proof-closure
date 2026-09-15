@@ -119,6 +119,8 @@ produces its IR; this theorem fixes the concrete compiler entrypoint and rules
 out a source-only local interpreter experiment. -/
 theorem checkedFold_compiles_to_official_ir :
     (CompilationModel.compile checkedFoldSpec [tx.functionSelector]).isOk = true := by
-  native_decide
+  set_option maxRecDepth 16384 in
+  set_option maxHeartbeats 4000000 in
+  decide +kernel
 
 end LidoSRv3.Audit.Verity.OfficialSemantics

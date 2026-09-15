@@ -119,6 +119,8 @@ theorem noAvailableMinMutant_is_detected :
 
 theorem oneModule_compiles_to_official_ir :
     (CompilationModel.compile spec [selector]).isOk = true := by
-  native_decide
+  set_option maxRecDepth 16384 in
+  set_option maxHeartbeats 4000000 in
+  decide +kernel
 
 end LidoSRv3.Audit.Verity.AllocCapacity

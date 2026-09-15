@@ -35,9 +35,21 @@ views of that registry. No historical receipt validates a successor commit.
   [terminal receipt](receipts/nor-source/trust-4a364acc.json) records the failure;
   this is not a complete accepted inventory. The current candidate replaces 24
   supporting native tactic sites with kernel reduction, without changing their
-  statements, and explicitly discloses that counterexample. Kernel validation
-  is pending. Four additional compiler-success native sites remain unauthorized
+  statements, and explicitly discloses that counterexample. Exact
+  `3c3f692fb8d7bdf06ed46e56f531921cc08f3ec2` passed the eight targeted modules
+  (1,285 build jobs) on DGX Spark, job `291fa239-d39a-4423-8f2d-40ff938a7851`,
+  exit 0 with no source bundle. The
+  [receipt](receipts/nor-source/kernel-supporting-3c3f692f.json) supports that
+  build result, not a complete transitive trust verdict.
+  Four additional compiler-success native sites remain unauthorized
   obligations; source-site counts are not transitive axiom results.
+  The current draft pins compiler `600a2f7a9b07f7ea532451e7d58b106347a6817a`,
+  whose two unsafe-mechanics traversals use terminating recursion instead of
+  partial definitions. Its [kernel-test receipt](receipts/nor-source/compiler-traversal-600a2f7a.json)
+  records exact dependency job `9c841e8c-ba6f-471a-b41e-427fec1c9a6c`, exit 0.
+  Four unchanged compiler-success statements now attempt kernel reduction;
+  proof-repository validation and behavioral differential checks remain pending.
+  No new native exception or metadata-based validator bypass is introduced.
 - **Predecessor findings: reconciliation incomplete.** The missing fifth finding
   and 37-thread dispositions identified below remain unresolved. Historical
   semantic findings remain open unless concrete current evidence establishes
