@@ -133,10 +133,26 @@ produces its IR; this theorem fixes the concrete compiler entrypoint and rules
 out a source-only local interpreter experiment. -/
 theorem checkedFold_compiles_to_official_ir :
     (CompilationModel.compile checkedFoldSpec [tx.functionSelector]).isOk = true := by
+  have mechanics : collectUnguardedUnsafeBoundaryMechanicsFromStmts checkedFold.body = [] := by
+    simp only [checkedFold, collectUnguardedUnsafeBoundaryMechanicsFromStmts]
+    run_tac do
+      let env ← Lean.getEnv
+      for suffix in ["collectUnguardedLowLevelMechanicsFromStmts",
+          "collectUnguardedLowLevelStmtMechanics", "collectLowLevelExprMechanics",
+          "dedupPreserve"] do
+        let candidates := env.constants.toList.filter fun (name, _) =>
+          name.toString.startsWith "_private.Compiler.CompilationModel.TrustSurface." &&
+            name.toString.endsWith ("." ++ suffix)
+        match candidates with
+        | [(name, _)] =>
+            unless (← Lean.Elab.Tactic.getGoals).isEmpty do
+              let id := Lean.mkIdent name
+              Lean.Elab.Tactic.evalTactic (← `(tactic| simp [$id:ident]))
+        | _ => throwError "expected one pinned TrustSurface helper: {suffix}"
   have functionValid : validateFunctionSpec checkedFold = .ok () := by
-    simp [validateFunctionSpec, checkedFold, Bind.bind, Except.bind, Pure.pure, Except.pure]
-    trace_state
-    decide_cbv
+    simp [validateFunctionSpec, mechanics, checkedFold, Stmt.fold, Stmt.foldList,
+      Stmt.directMetadata, Stmt.childLists, Bind.bind, Except.bind, Pure.pure, Except.pure]
+    all_goals (trace_state; decide_cbv)
   have validated : validateCompileInputs checkedFoldSpec [tx.functionSelector] = .ok () := by
     unfold validateCompileInputs
     run_tac do
@@ -169,7 +185,10 @@ theorem checkedFold_compiles_to_official_ir :
   have hp : checkedFold.params = [] := rfl
   have hl : checkedFold.nonReentrantLock = none := rfl
   have hr : functionReturns checkedFold = .ok [.uint256] := rfl
-  have templates : (templateIntrinsicItems checkedFoldSpec).isEmpty = true := by decide_cbv
+  have templates : (templateIntrinsicItems checkedFoldSpec).isEmpty = true := by
+    simp [templateIntrinsicItems, checkedFoldSpec, checkedFold,
+      collectTemplateIntrinsicsFromStmts, collectTemplateIntrinsicsFromStmt,
+      collectTemplateIntrinsicsFromExpr, Stmt.directMetadata, Stmt.childLists, Expr.children]
   have ht := List.nil_of_isEmpty templates
   unfold CompilationModel.compile
   rw [validated]

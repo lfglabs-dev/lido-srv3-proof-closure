@@ -125,6 +125,13 @@ views of that registry. No historical receipt validates a successor commit.
   now covers all pinned contracts, five harness trees, vendors, Lean source,
   dependency/compiler configuration and script sources. Disposable local tests
   reject staged, unstaged and ignored source/model/driver mutations.
+- Exact `071a95dcd1f72850de363949e54e0bb716efda4e` job
+  `5d6e63db-0049-48c7-bf21-5762ed0c40fe` failed only OfficialSemantics,
+  exit 1 at 2026-09-15 18:36:20 UTC. CounterBounds compiled successfully;
+  the [receipt](receipts/nor-source/compiler-nor-071a95dc.json) records both.
+  The compiler diagnostics identify metadata/mechanics/template traversal
+  reduction. The successor rewrites those exact equations without changing the
+  program, introducing metadata bypasses, or adding axioms. Full trust remains open.
 - **Predecessor findings: reconciliation incomplete.** The missing fifth finding
   and 37-thread dispositions identified below remain unresolved. Historical
   semantic findings remain open unless concrete current evidence establishes
