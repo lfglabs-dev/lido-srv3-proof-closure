@@ -2362,3 +2362,13 @@ example : (Compiler.CompilationModel.compile LidoSRv3.Audit.Verity.Consolidation
 #print axioms LidoSRv3.Tests.NodeOperatorsRegistrySummary.accounting_exit_still_can_underflow
 #print axioms LidoSRv3.Tests.NodeOperatorsRegistrySummary.unchanged_invalid_exit_returns
 #print axioms LidoSRv3.Tests.NodeOperatorsRegistrySummary.aggregate_overflow_rolls_back
+
+-- NOR exit-writer aggregate conservation and transactional invariant preservation.
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.updateExited_effects
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.updateExited_preserves_accounting
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.executeUpdateExited_preserves_accounting
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.AccountingInvariant.exited_le_deposited
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.updated_summary_consistent
+#print axioms LidoSRv3.Tests.NodeOperatorsRegistrySummary.initial_accounting
+#print axioms LidoSRv3.Tests.NodeOperatorsRegistrySummary.exit_update_directions
+#print axioms LidoSRv3.Tests.NodeOperatorsRegistrySummary.missing_aggregate_write_refutes_accounting

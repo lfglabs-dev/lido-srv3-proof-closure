@@ -1,4 +1,4 @@
-import LidoSRv3.Audit.Source.NodeOperatorsRegistry.ExitedValidators
+import LidoSRv3.Audit.Source.NodeOperatorsRegistry.ExitedInvariant
 
 namespace LidoSRv3.Tests.NodeOperatorsRegistrySummary
 open LidoSRv3.Audit.Source.TrioAlloc1
@@ -67,5 +67,50 @@ theorem aggregate_overflow_rolls_back :
       result.events = [] ∧
       (result.state.operators (word 0)).signingKeysStats = (before.operators (word 0)).signingKeysStats := by
   decide +kernel
+
+def consistentState : State :=
+  { operators := fun _ =>
+      { signingKeysStats := word (5 + 2 * 2^64 + 5 * 2^192)
+        targetValidatorsStats := word (5 * 2^128) }
+    summarySigningKeysStats := word (5 + 2 * 2^64 + 5 * 2^192) }
+
+theorem initial_accounting : AccountingInvariant consistentState [word 0] := by
+  constructor
+  · simp
+  · decide +kernel
+  · decide +kernel
+  · intro id member
+    simp only [List.mem_singleton] at member
+    subst id
+    decide +kernel
+
+/-- Increasing and decreasing exits both update the aggregate exactly. The
+target maximum already matches, so the unrelated maximum field is unchanged. -/
+theorem exit_update_directions :
+    let increased := executeUpdateExited consistentState (word 0) (word 3) false
+    let decreased := executeUpdateExited consistentState (word 0) (word 1) true
+    increased.result = .ok () ∧ decreased.result = .ok () ∧
+      (packedGet increased.state.summarySigningKeysStats 1).val = 3 ∧
+      (packedGet decreased.state.summarySigningKeysStats 1).val = 1 ∧
+      (packedGet increased.state.summarySigningKeysStats 0).val = 5 ∧
+      increased.events = [(word 0, word 3)] ∧ decreased.events = [(word 0, word 1)] := by
+  decide +kernel
+
+/-- Omitting the aggregate write while changing the operator is observable
+by the invariant, even though each individual count remains in range. -/
+theorem missing_aggregate_write_refutes_accounting :
+    let broken := saveOperator consistentState (word 0)
+      { consistentState.operators (word 0) with
+        signingKeysStats := word (5 + 3 * 2^64 + 5 * 2^192) }
+    ¬ AccountingInvariant broken [word 0] := by
+  dsimp only
+  intro invariant
+  have impossible :
+      (packedGet consistentState.summarySigningKeysStats 1).val ≠
+        counterSum (saveOperator consistentState (word 0)
+          { consistentState.operators (word 0) with
+            signingKeysStats := word (5 + 3 * 2^64 + 5 * 2^192) }) 1 [word 0] := by
+    decide +kernel
+  exact impossible invariant.exited_sum
 
 end LidoSRv3.Tests.NodeOperatorsRegistrySummary
