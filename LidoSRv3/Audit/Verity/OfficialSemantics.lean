@@ -114,12 +114,11 @@ theorem wrappingMutant_is_detected :
       (denote wrappingMutant [Verity.Core.MAX_UINT256, 1]).returnValue = some 0 := by
   decide +kernel
 
+set_option maxRecDepth 16384 in
+set_option maxHeartbeats 4000000 in
 /-- The same EDSL program genuinely enters Verity's official compiler and
 produces its IR; this theorem fixes the concrete compiler entrypoint and rules
 out a source-only local interpreter experiment. -/
-set_option maxRecDepth 16384 in
-set_option maxHeartbeats 4000000 in
-set_option pp.maxDepth 8 in
 theorem checkedFold_compiles_to_official_ir :
     (CompilationModel.compile checkedFoldSpec [tx.functionSelector]).isOk = true := by
   letI : DecidableEq (Except String Unit) := fun x y =>
@@ -131,19 +130,22 @@ theorem checkedFold_compiles_to_official_ir :
     | .ok _, .error _ => isFalse (by intro h; cases h)
     | .error _, .ok _ => isFalse (by intro h; cases h)
   have functionValid : validateFunctionSpec checkedFold = .ok () := by
+    simp only [validateFunctionSpec, checkedFold]
     decide +kernel
   have validated : validateCompileInputs checkedFoldSpec [tx.functionSelector] = .ok () := by
     decide +kernel
+  have fieldSlot : findFieldWithResolvedSlot [modulesField] "modules" = some (modulesField, 7) := by
+    rfl
   have bodyValid :
       (compileStmtListWithFork [modulesField] [] [] .calldata [] false [] [] .cancun checkedFold.body []).isOk = true := by
-    simp [checkedFold, modulesField, compileStmtListWithFork, compileStmtWithFork,
+    simp [checkedFold, fieldSlot, compileStmtListWithFork, compileStmtWithFork,
       compileExprWithInternals, compileRequireFailCondWithInternals,
       Bind.bind, Except.bind, Pure.pure, Except.pure, Except.isOk, Except.toBool]
     all_goals decide +kernel
   have hi : checkedFold.isInternal = false := rfl
   have hn : checkedFold.name = "checkedFold" := rfl
   have hs : isInteropEntrypointName "checkedFold" = false := by decide +kernel
-  have hf : applySlotAliasRanges [modulesField] [] = [modulesField] := rfl
+  have hf : CompilationModel.applySlotAliasRanges [modulesField] [] = [modulesField] := rfl
   have hp : checkedFold.params = [] := rfl
   have hl : checkedFold.nonReentrantLock = none := rfl
   have hr : functionReturns checkedFold = .ok [.uint256] := rfl
