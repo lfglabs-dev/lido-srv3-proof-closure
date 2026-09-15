@@ -1,4 +1,4 @@
-import LidoSRv3.Audit.Source.SszCompiledEntryRollback
+import LidoSRv3.Audit.Guarantees.Composition.SszCompiledEntryRollback
 import LidoSRv3.Tests.SszCompiledClEntryRegression
 import LidoSRv3.Audit.Source.SszCompiledReply
 import LidoSRv3.Audit.Source.SszProofCalldataLoop

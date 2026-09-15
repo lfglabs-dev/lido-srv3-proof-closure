@@ -1,4 +1,4 @@
-import LidoSRv3.Audit.Verity.TopupUnboundedCount
+import LidoSRv3.Audit.Guarantees.Composition.TopupUnboundedCount
 import LidoSRv3.Audit.Verity.Topup2DistributionTx
 
 /-! P-TOPUP-2 unbounded-count consumer vectors. -/

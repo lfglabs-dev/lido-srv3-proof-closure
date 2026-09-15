@@ -1,4 +1,4 @@
-import LidoSRv3.Audit.Source.AccountPackedWords
+import LidoSRv3.Audit.Guarantees.Composition.AccountPackedWords
 import LidoSRv3.Audit.Verity.HandleOracleReportTx
 
 /-!
@@ -143,7 +143,7 @@ theorem sample_observe_balances :
 theorem sample_observe_total :
     (observe sampleInput ((handleOracleReport sampleInput 1).run defaultState)).total =
       30 := by
-  native_decide
+  decide +kernel
 
 theorem sample_observe_unpacks :
     (storedModuleWords ((handleOracleReport sampleInput 1).run defaultState)).map
@@ -164,24 +164,24 @@ theorem sample_persist_is_packed_zero :
     ((persistBalances [10, 20] defaultState).readArray moduleBalancesSlot).map
         (fun w => w.val) =
       [packModule ⟨10, 0, 0⟩, packModule ⟨20, 0, 0⟩] := by
-  native_decide
+  decide +kernel
 
 theorem sample_getter_recovers :
     ((persistBalances [10, 20] defaultState).readArray moduleBalancesSlot).map
         (fun w => (getStakingModuleStateAccounting w.val).1) =
       [10, 20] := by
-  native_decide
+  decide +kernel
 
 theorem sample_width32_kill_line :
     unpackWidth32 (packModule ⟨two32 + 1, 0, 0⟩) = 1 ∧
       (unpackModule (packModule ⟨two32 + 1, 0, 0⟩)).validatorsBalanceGwei =
         two32 + 1 := by
-  native_decide
+  decide +kernel
 
 theorem sample_offset64_kill_line :
     writeOffset64 0 10 ≠ packModule ⟨10, 0, 0⟩ ∧
       (unpackModule (writeOffset64 0 10)).exitedValidatorsCount = 10 := by
-  native_decide
+  decide +kernel
 
 #print axioms width32_misses_parent_balance
 #print axioms offset64_disagrees_parent_ofNat

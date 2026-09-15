@@ -1,4 +1,4 @@
-import LidoSRv3.Audit.Guarantees.PAddress1StETHTransferCalls
+import LidoSRv3.Audit.Source.Effects.PAddress1StETHTransferCalls
 
 /-! Full-Lido transferFrom: physical allowance FIRST, then the accepted
 physical transfer implementation on the actual allowance-returned World.

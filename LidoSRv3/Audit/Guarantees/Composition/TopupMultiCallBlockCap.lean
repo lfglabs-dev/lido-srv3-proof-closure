@@ -1,5 +1,5 @@
 import LidoSRv3.Audit.Guarantees.PTopup2
-import LidoSRv3.Audit.Verity.TopupUnboundedCount
+import LidoSRv3.Audit.Guarantees.Composition.TopupUnboundedCount
 
 /-!
 # P-TOPUP-2 same-block n-call bound

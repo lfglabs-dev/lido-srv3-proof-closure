@@ -5,8 +5,8 @@ and `lean-toolchain`.
 
 | Component | Reference |
 | --- | --- |
-| Lido core | `af095e48bbc1c3841c2c9936219c8461af01056b` |
-| Verity | `e977aaad6e1a9e92e0132d41b3d33a14135a4d46` |
+| Lido core | `17005714f151e5502c559932319a3f2f74ac2436` |
+| Verity | `600a2f7a9b07f7ea532451e7d58b106347a6817a` |
 | Lean | `v4.31.0` |
 
 Current claims live in `LidoSRv3.Audit`. `LidoSRv3.Legacy` is older model

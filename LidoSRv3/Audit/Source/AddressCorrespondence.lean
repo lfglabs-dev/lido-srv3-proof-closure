@@ -139,11 +139,11 @@ def admitted (inp : Input) : Bool :=
         (decide (inp.caller = inp.requestOwner) || inp.callerIsApprovedForAll ||
           inp.callerIsTokenApproved)
   | .requestWithdrawals =>
-      !inp.paused && inp.amountInRange && inp.callerBalanceSufficient &&
-        inp.callerAllowanceSufficient && inp.externalCallSucceeds
+      !inp.paused && inp.amountInRange && inp.callerAllowanceSufficient &&
+        inp.callerBalanceSufficient && inp.externalCallSucceeds
   | .claimWithdrawalsTo =>
-      decide (inp.recipient ≠ 0) && inp.requestExists && !inp.requestClaimed &&
-        inp.requestFinalized && inp.hintValid && decide (inp.caller = inp.requestOwner) &&
+      decide (inp.recipient ≠ 0) && inp.requestExists && inp.requestFinalized &&
+        !inp.requestClaimed && decide (inp.caller = inp.requestOwner) && inp.hintValid &&
         inp.externalCallSucceeds
   | .unwrap =>
       decide (inp.amount ≠ 0) && inp.callerBalanceSufficient && inp.externalCallSucceeds
@@ -153,8 +153,8 @@ deliberately omits any fixed `caller = owner` test. -/
 def permissionlessAdmission (inp : Input) : Bool :=
   match inp.entryPoint with
   | .requestWithdrawals =>
-      !inp.paused && inp.amountInRange && inp.callerBalanceSufficient &&
-        inp.callerAllowanceSufficient && inp.externalCallSucceeds
+      !inp.paused && inp.amountInRange && inp.callerAllowanceSufficient &&
+        inp.callerBalanceSufficient && inp.externalCallSucceeds
   | .unwrap =>
       decide (inp.amount ≠ 0) && inp.callerBalanceSufficient && inp.externalCallSucceeds
   | _ => admitted inp

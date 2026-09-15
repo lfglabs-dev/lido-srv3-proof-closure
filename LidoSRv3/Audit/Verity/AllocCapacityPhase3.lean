@@ -1,4 +1,5 @@
 import Compiler.CompilationModel
+import Lean
 import Verity.Core
 import Verity.Core.Model.CallProgramRollback
 import Verity.Core.Model.DenoteMemory
@@ -14,6 +15,9 @@ the source-shaped pre-call storage transition, and transaction rollback of that
 transition in Verity's executable `Contract.run` model.  It does not claim Yul,
 EVM, deployed storage layout, or a full allocation-loop refinement.
 -/
+
+set_option pp.maxSteps 500
+set_option pp.deepTerms.threshold 12
 
 namespace LidoSRv3.Audit.Verity.AllocCapacityPhase3
 
@@ -137,7 +141,7 @@ theorem selector_memory_is_byte_precise :
     rw [Memory.readByte]
     simp [Memory.writeWord, Memory.expand, expandedLength, Memory.empty,
       summarySelectorWord, selectorByte]
-    native_decide
+    decide +kernel
 
 theorem consumed_summary_source_bridge (moduleAddress : Nat) :
     SourceCallStorageABI consumedSummaryEntry moduleAddress ∧
@@ -338,9 +342,84 @@ theorem typed_complete_returndata_commits_pre_call_store
   rw [hcall]
   simp [hcomplete]
 
+private def exceptUnitDecEq : DecidableEq (Except String Unit) := fun x y =>
+  match x, y with
+  | .ok _, .ok _ => isTrue rfl
+  | .error a, .error b =>
+    if h : a = b then isTrue (h ▸ rfl)
+    else isFalse (by intro heq; cases heq; exact h rfl)
+  | .ok _, .error _ => isFalse (by intro h; cases h)
+  | .error _, .ok _ => isFalse (by intro h; cases h)
+
+local instance : DecidableEq (Except String Unit) := exceptUnitDecEq
+
+/-- Validation uses the declared local obligations; the opaque mechanics
+collector need not be evaluated to establish that this guard is discharged. -/
+theorem consumedSummaryEntry_validates : validateFunctionSpec consumedSummaryEntry = .ok () := by
+  have documented : consumedSummaryEntry.localObligations.isEmpty = false := rfl
+  simp only [validateFunctionSpec, documented, Bool.and_false, Bool.false_and]
+  decide +kernel
+
+set_option maxRecDepth 16384 in
+set_option maxHeartbeats 4000000 in
+theorem consumedSummaryEntry_inputs_validate : validateCompileInputs spec [entrySelector] = .ok () := by
+  unfold validateCompileInputs
+  run_tac do
+    let env ← Lean.getEnv
+    let candidates := env.constants.toList.filter fun (name, _) =>
+      name.toString.endsWith ".validateCompileInputsBeforeFieldWriteConflict"
+    match candidates with
+    | [(name, _)] =>
+        let id := Lean.mkIdent name
+        Lean.Elab.Tactic.evalTactic (← `(tactic| unfold $id:ident))
+    | _ => throwError "expected one pinned compiler precheck definition"
+  have hi : consumedSummaryEntry.isInternal = false := rfl
+  have hn : consumedSummaryEntry.name = "consumeOneModuleSummary" := rfl
+  simp [spec, consumedSummaryEntry_validates, hi, hn, List.filter_cons,
+    Bind.bind, Except.bind, Pure.pure, Except.pure]
+  all_goals decide +kernel
+
+theorem consumedSummaryEntry_body_compiles :
+    (compileStmtListWithFork canonicalFields [] [] .calldata [] false ["depositable", "moduleId", "moduleAddress"] [] .cancun consumedSummaryEntry.body []).isOk = true := by
+  simp [consumedSummaryEntry, consumedSummaryBody, sourceParameters, canonicalFields, compileStmtListWithFork, compileStmtWithFork,
+    compileExprWithInternals, compileRequireFailCondWithInternals, compileSetStorage,
+    Bind.bind, Except.bind, Pure.pure, Except.pure, Except.isOk, Except.toBool]
+  all_goals decide +kernel
+
+theorem consumedSummaryEntry_no_templates : (templateIntrinsicItems spec).isEmpty = true := by
+  decide +kernel
+
+set_option maxRecDepth 16384 in
+set_option maxHeartbeats 4000000 in
+theorem consumedSummaryEntry_core_compiles :
+    (compileValidatedCore spec [entrySelector]).isOk = true := by
+  have hi : consumedSummaryEntry.isInternal = false := rfl
+  have hn : consumedSummaryEntry.name = "consumeOneModuleSummary" := rfl
+  have hs : isInteropEntrypointName "consumeOneModuleSummary" = false := by decide +kernel
+  have hf : applySlotAliasRanges canonicalFields [] = canonicalFields := rfl
+  have hp : consumedSummaryEntry.params = sourceParameters := rfl
+  have hl : consumedSummaryEntry.nonReentrantLock = none := rfl
+  have hr : functionReturns consumedSummaryEntry = .ok [.uint256] := rfl
+  have ht := List.nil_of_isEmpty consumedSummaryEntry_no_templates
+  have hbody := consumedSummaryEntry_body_compiles
+  cases hb : compileStmtListWithFork canonicalFields [] [] .calldata [] false ["depositable", "moduleId", "moduleAddress"] [] .cancun consumedSummaryEntry.body []
+  · rename_i err
+    simp [hb, Except.isOk, Except.toBool] at hbody
+  · rename_i body
+    unfold compileValidatedCore
+    rw [ht]
+    simp [spec, compileGuardedFunctionSpec, compileFunctionSpec,
+      consumedSummaryEntry_validates, hi, hn, hs, hf, hp, hl, hr, hb,
+      attachNonReentrantGuard, compileConstructor,
+      pickUniqueFunctionByName, List.filter_cons, List.mapM_cons, List.map_cons, List.map_nil, sourceParameters,
+      Bind.bind, Except.bind, Pure.pure, Except.pure, Except.isOk, Except.toBool]
+
 theorem consumed_summary_function_spec_compiles :
     (CompilationModel.compile spec [entrySelector]).isOk = true := by
-  native_decide
+  unfold CompilationModel.compile
+  rw [consumedSummaryEntry_inputs_validate]
+  exact consumedSummaryEntry_core_compiles
+
 
 /-- Real P-ALLOC-1 Phase-3 consumption theorem.  The static `CallProgram`
 records typed success/revert observations; the executable Verity transaction

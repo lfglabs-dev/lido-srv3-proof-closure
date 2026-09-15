@@ -9,7 +9,7 @@
         "LidoSRv3.Audit.Source.TrioAlloc1.Relational.producer_iff",
         "LidoSRv3.Audit.Source.TrioAlloc1.producer_math_view",
         "LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredProducer.success",
-        "LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.world_producer_correspondence"
+        "LidoSRv3.Audit.Guarantees.PAlloc1.account_allocation_result"
       ],
       "covered": [
         "Storage-backed module reads, response-dependent calls and checked calculations follow the modeled source order.",

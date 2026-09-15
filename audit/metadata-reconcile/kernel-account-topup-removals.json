@@ -1,0 +1,47 @@
+{
+  "baseline": "87cbb0a3fd361cb9b3a78509c532778aa5af6b16",
+  "validated_source_commit": "f7e7f5c2ad68ce86b01cd27746a3d9484beb05a5",
+  "targeted_job": "88629c0f-5996-45c2-9a78-7cf9c91e5479",
+  "baseline_count": 415,
+  "current_count": 408,
+  "current_digest": "9af20dcdd0ec2b40c3d3c79dbd9fd0fc080c9818388d1d3737933168029f87f1",
+  "removed_records": [
+    [
+      "LidoSRv3/Tests/AccountPackedWordsMutants.lean",
+      146,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/AccountPackedWordsMutants.lean",
+      167,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/AccountPackedWordsMutants.lean",
+      173,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/AccountPackedWordsMutants.lean",
+      179,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/AccountPackedWordsMutants.lean",
+      184,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/PackGTopupProvenanceMutants.lean",
+      28,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/PackJTopupEthJournalMutants.lean",
+      58,
+      "native_decide"
+    ]
+  ],
+  "added_records": [],
+  "scope": "Seven unchanged statements now kernel-checked; successor full Trust recomputation pending."
+}

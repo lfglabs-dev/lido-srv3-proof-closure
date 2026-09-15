@@ -1,0 +1,22 @@
+{
+  "base_commit": "469818bf1e60e7e7312f3e141b68a24227a01627",
+  "durable_job": "f1f58922-c1eb-43dc-a70f-ee6632b13c84",
+  "exit_code": 0,
+  "strict_before_exit_code": 1,
+  "strict_after_exit_code": 0,
+  "scope": "Local Python checks only; citation comments and strict gate corrected. No Lean theorem changes or modeling closure claimed. Exact successor remote validation separate.",
+  "logs": [
+    {
+      "path": "/workspaces/mission-1ca15c66/output/source-annotations-before-strict.log",
+      "sha256": "250f9f735c29ab8f102952af8ba2188955edb50af300d220388d7ec19de540d1"
+    },
+    {
+      "path": "/workspaces/mission-1ca15c66/output/source-annotations-after-strict.log",
+      "sha256": "959d5c929cca8cc29959afbfbd36c0fe7d274f783aeda3bee2f066d7aa412844"
+    },
+    {
+      "path": "/workspaces/mission-1ca15c66/output/pinned-source-citation-fix.log",
+      "sha256": "36942ee0c9928825501e8bf3743861e05fc6b15b05385c725cb48bb7b1e698cb"
+    }
+  ]
+}

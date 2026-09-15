@@ -1,4 +1,4 @@
-import LidoSRv3.Audit.Guarantees.PAddress1StETHQuoteCalls
+import LidoSRv3.Audit.Source.Effects.PAddress1StETHQuoteCalls
 /-! Actual Lido getPooledEthByShares executed by WstETH's canonical STATICCALL.
 The dynamic target comes from physical slot7 on the actual preburn world. -/
 namespace LidoSRv3.Audit.Source.AddressStETHConversionCalls

@@ -28,7 +28,7 @@ function _callAddConsolidationRequest(
 * `callAddConsolidationRequest` is that CALL through `lowLevelCall`,
   then the source's own revert (`RequestAdditionFailed`) on a failed CALL,
   then `emit ConsolidationRequestAdded(request)` on success. Low-level
-  `.call` has no target-code guard: a code-less target accepts with empty
+  `.call` has no target-code guard: an ordinary empty-code account accepts with empty
   return data after the value transfer (`callAdd_no_code_accepted`).
 * `addConsolidationRequestsLoop` is the per-pair loop of lines 68-72
   (`_validatePublicKey` source, `_validatePublicKey` target, hop).
@@ -64,10 +64,10 @@ body instead of assuming them.
   OPEN. The gateway→vault ABI hop is composed in `Composition.lean`
   (Solidity ABI framing of `(bytes[], bytes[])`; `executeVaultCalldata`).
 * The fee STATICCALL attempt is not recorded in the trace
-  (`getConsolidationRequestFee`, `attempts := []`); the code-less acceptance
-  arm of `lowLevelCall` does not exclude precompiles (`LowLevel.lean`);
-  `predeployBody` is a simplified stand-in (`Predeploy.lean`). Recorded, not
-  closed (`LOW-LEVEL-CALL.md`).
+  (`getConsolidationRequestFee`, `attempts := []`). CALL now excludes Cancun
+  precompiles from ordinary empty-code acceptance; STATICCALL uses the same
+  predicate. `predeployBody` is a simplified stand-in
+  (`Predeploy.lean`); its runtime refinement remains open.
 
 Pin `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`.
 Codec lemmas are reused, not reopened. P-CONSOLIDATION remains OPEN.
@@ -226,7 +226,7 @@ accepts with empty return data after the value transfer, so the vault emits
 code-guarded primitive misstated. -/
 theorem callAdd_no_code_accepted (callee : External) (ctx : Context) (inbox : Live.Address)
     (pair : ProducedPair) (fee : Live.Word) (w : World)
-    (hc : (w.core.codeSize inbox.val).val = 0) (hb : fee.val ≤ w.balances ctx.self) :
+    (hc : emptyCodeAccount w inbox) (hb : fee.val ≤ w.balances ctx.self) :
     callAddConsolidationRequest callee ctx inbox pair fee w =
       ⟨.ok (), { transfer w ctx.self inbox fee.val with
           logs := w.logs ++ [requestAddedEvent ctx.self (vaultCallPayload pair)] },
@@ -239,7 +239,7 @@ it is the acceptance arm (`callAdd_no_code_accepted`), not the revert the
 code-guarded primitive produced. -/
 theorem callAdd_no_code (callee : External) (ctx : Context) (inbox : Live.Address)
     (pair : ProducedPair) (fee : Live.Word) (w : World)
-    (hc : (w.core.codeSize inbox.val).val = 0) (hb : fee.val ≤ w.balances ctx.self) :
+    (hc : emptyCodeAccount w inbox) (hb : fee.val ≤ w.balances ctx.self) :
     callAddConsolidationRequest callee ctx inbox pair fee w =
       ⟨.ok (), { transfer w ctx.self inbox fee.val with
           logs := w.logs ++ [requestAddedEvent ctx.self (vaultCallPayload pair)] },
@@ -260,7 +260,7 @@ theorem callAdd_unfunded (callee : External) (ctx : Context) (inbox : Live.Addre
 with `RequestAdditionFailed`, and no event is committed. -/
 theorem callAdd_rejected (callee : External) (ctx : Context) (inbox : Live.Address)
     (pair : ProducedPair) (fee : Live.Word) (w : World) (data : Bytes)
-    (hc : (w.core.codeSize inbox.val).val ≠ 0) (hb : fee.val ≤ w.balances ctx.self)
+    (hc : ¬ emptyCodeAccount w inbox) (hb : fee.val ≤ w.balances ctx.self)
     (hr : callee (hopRequest ctx inbox pair fee) (transfer w ctx.self inbox fee.val) =
       .rejected data) :
     callAddConsolidationRequest callee ctx inbox pair fee w =
@@ -274,7 +274,7 @@ theorem callAdd_rejected (callee : External) (ctx : Context) (inbox : Live.Addre
 value transfer, plus `ConsolidationRequestAdded(source ++ target)`. -/
 theorem callAdd_accepted (callee : External) (ctx : Context) (inbox : Live.Address)
     (pair : ProducedPair) (fee : Live.Word) (w after : World) (data : Bytes)
-    (hc : (w.core.codeSize inbox.val).val ≠ 0) (hb : fee.val ≤ w.balances ctx.self)
+    (hc : ¬ emptyCodeAccount w inbox) (hb : fee.val ≤ w.balances ctx.self)
     (hr : callee (hopRequest ctx inbox pair fee) (transfer w ctx.self inbox fee.val) =
       .success data after) :
     callAddConsolidationRequest callee ctx inbox pair fee w =
@@ -465,7 +465,7 @@ private theorem callAdd_success_frame (callee : External) (ctx : Context) (inbox
         (callAddConsolidationRequest callee ctx inbox pair fee w).world.balances
         ctx.self inbox fee.val := by
   have hb := callAdd_success_funded callee ctx inbox pair fee w h
-  by_cases hc : (w.core.codeSize inbox.val).val = 0
+  by_cases hc : emptyCodeAccount w inbox
   · -- EOA arm: no callee run; the transfer itself is the frame.
     rw [callAdd_no_code_accepted callee ctx inbox pair fee w hc hb]
     refine ⟨?_, ?_⟩
@@ -924,7 +924,7 @@ theorem refund_error_restores (callee : External) (ctx : Context) (recipient : L
 /-- Recipient rejects the plain value transfer (line 302-305). -/
 theorem refund_rejected (callee : External) (ctx : Context) (recipient : Live.Address)
     (refund : Live.Word) (w : World) (data : Bytes) (hz : refund.val ≠ 0)
-    (hc : (w.core.codeSize (resolveAddress recipient ctx.sender).val).val ≠ 0)
+    (hc : ¬ emptyCodeAccount w (resolveAddress recipient ctx.sender))
     (hb : refund.val ≤ w.balances ctx.self)
     (hr : callee (refundRequest ctx refund recipient)
       (transfer w ctx.self (resolveAddress recipient ctx.sender) refund.val) = .rejected data) :
@@ -938,7 +938,7 @@ theorem refund_rejected (callee : External) (ctx : Context) (recipient : Live.Ad
 /-- Recipient accepts: the remainder left the gateway. -/
 theorem refund_accepted (callee : External) (ctx : Context) (recipient : Live.Address)
     (refund : Live.Word) (w after : World) (data : Bytes) (hz : refund.val ≠ 0)
-    (hc : (w.core.codeSize (resolveAddress recipient ctx.sender).val).val ≠ 0)
+    (hc : ¬ emptyCodeAccount w (resolveAddress recipient ctx.sender))
     (hb : refund.val ≤ w.balances ctx.self)
     (hr : callee (refundRequest ctx refund recipient)
       (transfer w ctx.self (resolveAddress recipient ctx.sender) refund.val) = .success data after) :
@@ -953,7 +953,7 @@ with empty return data after the value transfer, so `_refundFee` succeeds.
 This is the valid refund path the code-guarded primitive rejected. -/
 theorem refund_no_code_accepted (callee : External) (ctx : Context) (recipient : Live.Address)
     (refund : Live.Word) (w : World) (hz : refund.val ≠ 0)
-    (hc : (w.core.codeSize (resolveAddress recipient ctx.sender).val).val = 0)
+    (hc : emptyCodeAccount w (resolveAddress recipient ctx.sender))
     (hb : refund.val ≤ w.balances ctx.self) :
     refundFee callee ctx refund recipient w =
       ⟨.ok (), transfer w ctx.self (resolveAddress recipient ctx.sender) refund.val,

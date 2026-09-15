@@ -55,7 +55,7 @@ theorem beacon_as_consolidation_kill_line_refutes_dest_restriction :
   have hmem :
       ({ dest := .consolidationRequest, wei := ⟨3⟩ } : EthJournalLeg) ∈
         mutantBeaconAsConsolidation := by
-    native_decide
+    decide +kernel
   have hfalse := h _ hmem
   simp [isTopupJournalDest] at hfalse
 

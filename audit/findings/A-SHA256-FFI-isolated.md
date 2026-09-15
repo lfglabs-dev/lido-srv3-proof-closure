@@ -40,7 +40,7 @@ This gives the split Thomas requested:
 
 ## Lean proof
 
-`LidoSRv3/Audit/Provenance/SszSha256Isolation.lean` provides six
+`LidoSRv3/Audit/Guarantees/Composition/SszSha256Isolation.lean` provides six
 orphelinat theorems, all clean under `{propext, Classical.choice,
 Quot.sound}`:
 
@@ -103,7 +103,7 @@ axiom is threaded through any registered parent.
 
 ## Actions taken in this commit
 
-- Added `LidoSRv3/Audit/Provenance/SszSha256Isolation.lean` with the
+- Added `LidoSRv3/Audit/Guarantees/Composition/SszSha256Isolation.lean` with the
   six orphelinat theorems above.
 - Registered the six theorems in `LidoSRv3/Audit/Trust.lean` via
   `#print axioms`.

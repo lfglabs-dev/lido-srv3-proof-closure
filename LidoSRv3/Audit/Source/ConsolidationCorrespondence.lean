@@ -755,14 +755,14 @@ theorem fee_blind_commit_kill_line_refutes_parent :
       [{ source := Verity.Core.Uint256.ofNat 11
          target := Verity.Core.Uint256.ofNat 21
          sourceLen := publicKeyBytes, targetLen := publicKeyBytes }],
-    fun _ => by native_decide, by native_decide,
+    fun _ => by decide +kernel, by decide +kernel,
     ⟨[{ source := Verity.Core.Uint256.ofNat 11
         target := Verity.Core.Uint256.ofNat 21
         sourceLen := publicKeyBytes, targetLen := publicKeyBytes }],
-      by native_decide, by native_decide, by native_decide, by native_decide,
-      by native_decide, rfl⟩,
-    by native_decide, ?_⟩
+      by decide +kernel, by decide +kernel, by decide +kernel, by decide +kernel,
+      by decide +kernel, rfl⟩,
+    by decide +kernel, ?_⟩
   rintro ⟨requests, _, _, _, _, _, _, hFeeNe, _⟩
-  exact hFeeNe (by native_decide)
+  exact hFeeNe (by decide +kernel)
 
 end LidoSRv3.Audit.SolidityConsolidation

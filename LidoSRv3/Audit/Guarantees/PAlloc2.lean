@@ -4,6 +4,9 @@ import LidoSRv3.Audit.MinFirstAllocation
 import LidoSRv3.Audit.Verity.MinFirstAmountTx
 import LidoSRv3.Audit.Verity.MinFirstDistributionTx
 import LidoSRv3.Audit.Guarantees.Registry
+import LidoSRv3.Audit.Source.TrioAlloc2.LoopCorrespondence
+import LidoSRv3.Audit.Source.TrioAlloc2.Conservation
+import LidoSRv3.Audit.Source.TrioComposition.MemoryTransportCall
 
 namespace LidoSRv3.Audit.Guarantees.PAlloc2
 
@@ -283,17 +286,81 @@ abbrev LoopStaysInCorrespondence : Prop :=
         some (modelAfter, allocated.val, remaining.val) ∧
       RowsCorrespond modelAfter after
 
+/-- The actual decoded-array source loop terminates without supplied fuel.
+Success follows from memory-array extent bounds, not a postcondition premise.
+Deployment/ABI/memory correspondence remains a separate upstream obligation. -/
+def UnboundedProportionalLoop : Prop :=
+  ∀ (buckets capacities : List LidoSRv3.Audit.Source.TrioAlloc2.Word)
+    (demand : LidoSRv3.Audit.Source.TrioAlloc2.Word),
+    buckets.length ≤ capacities.length → buckets.length < 2^256 →
+    ∃ out, LidoSRv3.Audit.Source.TrioAlloc2.allocate buckets capacities demand = .ok out ∧
+      LidoSRv3.Audit.Source.TrioAlloc2.Spec.Distributes
+        (LidoSRv3.Audit.Source.TrioAlloc2.decodedRows buckets capacities)
+        demand.val out.amount.val
+        (LidoSRv3.Audit.Source.TrioAlloc2.decodedRows out.buckets capacities) ∧
+      LidoSRv3.Audit.Source.TrioAlloc2.bucketTotal out.buckets =
+        LidoSRv3.Audit.Source.TrioAlloc2.bucketTotal buckets + out.amount.val ∧
+      out.amount.val ≤ demand.val
+
+theorem unbounded_proportional_loop : UnboundedProportionalLoop := by
+  intro buckets capacities demand lengths bounded
+  obtain ⟨out, executed, distributed⟩ :=
+    LidoSRv3.Audit.Source.TrioAlloc2.distribution_exists buckets capacities demand lengths bounded
+  exact ⟨out, executed, distributed,
+    LidoSRv3.Audit.Source.TrioAlloc2.allocate_conserves buckets capacities demand out executed,
+    LidoSRv3.Audit.Source.TrioAlloc2.allocate_amount_le_demand buckets capacities demand out executed⟩
+
+section SourceMemoryCall
+open LidoSRv3.Audit.Source.TrioAlloc1
+open LidoSRv3.Audit.Source.TrioComposition
+open LidoSRv3.Audit.Source.TrioComposition.MemoryTransport
+open LidoSRv3.Audit.Source.TrioComposition.MemoryTransportCall
+
+/-- Source memory producer, ABI library call and ordered return observation.
+This does not identify the configured target with deployed code or establish
+compiled caller-frame semantics. Producer success and explicit memory bounds
+are retained; no desired library result or final memory relation is assumed. -/
+def SourceMemoryCallCorrespondence : Prop :=
+  ∀
+    (target : Address) (memory : MemoryWords) (ap cp : Nat)
+    (l : Layout) (s : Storage) (oracle : StaticOracle) (input : CapacityInput)
+    (before after : Transcript) (output : CapacityOutput) (final : MemoryWords)
+    (executed : CallTree.evaluate oracle (ProducerStores.producer memory ap cp l s input) before =
+      (.ok (output,final),after))
+    (separate : Disjoint ap (s (countSlot l)).val cp (s (countSlot l)).val)
+    (aend : ap+32*((s (countSlot l)).val+1) ≤ 2^256)
+    (cend : cp+32*((s (countSlot l)).val+1) ≤ 2^256)
+    (countBound : (s (countSlot l)).val ≤ 32)
+    (pointer : LidoSRv3.Audit.Source.TrioAlloc1.Word)
+    (space : pointer.val+96+32*(s (countSlot l)).val ≤ 2^32)
+    (trace : Trace),
+    ∃ result,
+      producerThenCall target memory ap cp l s oracle input pointer before trace =
+        (.ok result,trace ++ (after.drop before.length).map staticEvent ++
+          [⟨request target final ap cp input.depositsToAllocate,
+            .returned (LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.encodeReturn result)⟩]) ∧
+      LidoSRv3.Audit.Source.TrioAlloc2.Spec.Distributes (LidoSRv3.Audit.Source.TrioAlloc2.decodedRows output.allocations output.capacities)
+        input.depositsToAllocate.val result.amount.val
+        (LidoSRv3.Audit.Source.TrioAlloc2.decodedRows result.buckets output.capacities) ∧
+      result.buckets.length = (s (countSlot l)).val
+
+end SourceMemoryCall
+
 /-- **Registered P-ALLOC-2 parent.**  This keeps the independent model/source
 candidate and proportional-amount equality from the step theorem load-bearing,
 and adds fuel-bounded conservation for every successful run of the full
 independently stated source allocation loop, plus multi-step row correspondence
 with an independently stated proportional model loop.  It does not identify
-that proportional loop with the separate +1 `MinFirst` child model. -/
+that proportional loop with the separate +1 `MinFirst` child model. It also
+consumes the unbounded checked source loop, deriving its success and independent
+proportional distribution/conservation from array extents alone. -/
 theorem step_correspondence_and_full_loop_conservation :
-    StepMatchesModel ∧ FullLoopConserves ∧ LoopStaysInCorrespondence :=
+    StepMatchesModel ∧ FullLoopConserves ∧ LoopStaysInCorrespondence ∧
+      UnboundedProportionalLoop ∧ SourceMemoryCallCorrespondence :=
   ⟨forall_proportional_step_correspondence_and_bounded,
    source_allocate_loop_conserves_requested,
-   proportional_model_loop_preserves_rows⟩
+   proportional_model_loop_preserves_rows, unbounded_proportional_loop,
+   LidoSRv3.Audit.Source.TrioComposition.MemoryTransportCall.producer_observed_library_distributes⟩
 
 /-! ## Verity transaction plane -/
 

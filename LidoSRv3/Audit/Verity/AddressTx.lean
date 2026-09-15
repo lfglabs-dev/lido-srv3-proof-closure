@@ -3,6 +3,10 @@ import LidoSRv3.Audit.Verity.AddressRecipientCallBridge
 import Verity.Core
 import Verity.Macro
 
+-- Keep proof errors visible in the remote runner's bounded log tail. The
+-- exhaustive correspondence proofs generate many redundant-simp suggestions.
+set_option linter.unusedSimpArgs false
+
 /-!
 # Legacy P-ADDRESS-1 correspondence facade
 
@@ -80,10 +84,10 @@ verity_contract AddressTxContract where
     -- WithdrawalQueue.sol:133  _checkWithdrawalRequestAmount(_amounts[i]);   (395-402, RequestAmountTooSmall / TooLarge)
     require amountInRange "AmountOutOfRange"
     -- WithdrawalQueue.sol:374  STETH.transferFrom(msg.sender, address(this), _amountOfStETH);   (ERC20 balance and allowance checks)
-    let balance ← getMapping balances sender
-    require (balance >= amount) "InsufficientBalance"
     let allowance ← getMapping2 allowances sender owner
     require (allowance >= amount) "InsufficientAllowance"
+    let balance ← getMapping balances sender
+    require (balance >= amount) "InsufficientBalance"
     -- Deliberately precedes the external result: failure must roll this back.
     setMapping balances sender (sub balance amount)
     require externalCallSucceeds "ExternalCallFailed"
@@ -103,14 +107,14 @@ verity_contract AddressTxContract where
     let sender ← msgSender
     require (recipient != zeroAddress) "ZeroRecipient"
     require requestExists "InvalidRequestId"
+    require requestFinalized "RequestNotFinalized"
     let wasClaimed ← getMappingUint claimed requestId
     require (wasClaimed == 0) "RequestAlreadyClaimed"
-    require requestFinalized "RequestNotFinalized"
-    require hintValid "InvalidHint"
     let ownerWord ← getMappingUint owners requestId
     require (ownerWord == addressToWord sender) "NotRequestOwner"
     -- This source-ordered effects marker is rolled back if the payout fails.
     setMappingUint claimed requestId 1
+    require hintValid "InvalidHint"
     require externalCallSucceeds "ExternalCallFailed"
     setMappingUint recipients requestId (addressToWord recipient)
 
@@ -366,20 +370,20 @@ private theorem claim_observable_correspondence (inp : Input)
     ContractState.readMapUint, ContractState.writeMapUint,
     ContractState.storage, ContractState.storageMap,
     ContractState.storageMap2, ContractState.storageMapUint]
-  by_cases hz : inp.recipient = 0 <;> try simp_all (config := { maxSteps := 1000000 })
-  cases hExists : inp.requestExists <;> try simp_all (config := { maxSteps := 1000000 })
+  all_goals by_cases hz : inp.recipient = 0 <;> try simp_all (config := { maxSteps := 1000000 })
+  all_goals cases hExists : inp.requestExists <;> try simp_all (config := { maxSteps := 1000000 })
     [_root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind]
-  cases hClaimed : inp.requestClaimed <;> try simp_all (config := { maxSteps := 1000000 })
+  all_goals cases hClaimed : inp.requestClaimed <;> try simp_all (config := { maxSteps := 1000000 })
     [hone, _root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind]
-  cases hFinalized : inp.requestFinalized <;> try simp_all (config := { maxSteps := 1000000 })
+  all_goals cases hFinalized : inp.requestFinalized <;> try simp_all (config := { maxSteps := 1000000 })
     [_root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind]
-  cases hHint : inp.hintValid <;> try simp_all (config := { maxSteps := 1000000 })
+  all_goals cases hHint : inp.hintValid <;> try simp_all (config := { maxSteps := 1000000 })
     [_root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind]
-  by_cases howner : inp.caller = inp.requestOwner <;>
+  all_goals by_cases howner : inp.caller = inp.requestOwner <;>
     try simp_all (config := { maxSteps := 1000000 })
       [show inp.requestOwner = inp.caller ↔ inp.caller = inp.requestOwner from eq_comm,
         _root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind]
-  cases hExternal : inp.externalCallSucceeds <;> simp_all (config := { maxSteps := 1000000 })
+  all_goals cases hExternal : inp.externalCallSucceeds <;> simp_all (config := { maxSteps := 1000000 })
     [_root_.Verity.bind, Bind.bind, _root_.Verity.setMappingUint,
       ContractState.writeMapUint, ContractState.readMapUint,
       ContractState.storageMapUint]

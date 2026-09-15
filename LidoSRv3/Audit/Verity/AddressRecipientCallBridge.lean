@@ -1,5 +1,5 @@
 import LidoSRv3.Audit.Verity.AddressClaimBatchTx
-import LidoSRv3.Audit.Source.TrioReserve1.Live
+import LidoSRv3.Audit.Source.TrioReserve1.AccountFrame
 
 /-!
 # P-ADDRESS-1 recipient CALL bridge
@@ -34,6 +34,8 @@ abbrev External := LidoSRv3.Audit.Source.TrioReserve1.Live.External
 abbrev Exec := LidoSRv3.Audit.Source.TrioReserve1.Live.Exec
 abbrev Address := _root_.Verity.Address
 abbrev Bytes := LidoSRv3.Audit.Source.TrioReserve1.Live.Bytes
+
+open LidoSRv3.Audit.Source.TrioReserve1
 
 local instance : DecidableEq Log := by
   intro a b
@@ -70,18 +72,28 @@ def callWithCalldata (callee : External) (ctx : Context) (target : Address)
         ⟨.error (.bubbled data), world, [⟨request, false, data, nested⟩]⟩
 
 /-- Lift the pinned storage transition into the whole-world interpreter.  The
-state supplied to `claimOne` receives the live transaction sender; every
-queue/checkpoint read and the claimed/locked write therefore remains on the
-physical channels used by `AddressClaimBatchTx`. -/
+state supplied to `claimOne` projects the executing account's physical words
+and receives the live sender/self. Commit writes only that account's words back;
+frame-local sender/memory and foreign account channels are not overwritten. -/
 def claimStorage (ctx : Context) (requestId hint : Nat) (recipient : Address) :
     Exec Nat := fun world =>
-  let before := { world.core with sender := ctx.sender }
+  let before := AccountFrame.enter ctx world.core
   -- `_claim` owns every validation (and hence error ordering).  In particular
   -- do not calculate a prospective payout before it has checked finalization,
   -- ownership, and hints.
   match claimOne requestId hint recipient before with
-  | .success payout after => ⟨.ok payout, { world with core := after }, []⟩
+  | .success payout after =>
+      ⟨.ok payout, { world with core := AccountFrame.commit ctx.self world.core after }, []⟩
   | .revert reason _ => ⟨.error (.reason reason), world, []⟩
+
+/-- Cancun precompiles occupy addresses 1 through 10 despite having no bytecode.
+Their execution belongs to the callee boundary, never the EOA shortcut. -/
+def emptyCodeAccount (world : World) (recipient : Address) : Prop :=
+  (world.core.codeSize recipient.val).val = 0 ∧
+    (recipient.val = 0 ∨ 10 < recipient.val)
+instance (world : World) (recipient : Address) : Decidable (emptyCodeAccount world recipient) :=
+  inferInstanceAs (Decidable ((world.core.codeSize recipient.val).val = 0 ∧
+    (recipient.val = 0 ∨ 10 < recipient.val)))
 
 /-- Exact `WithdrawalQueueBase._sendValue` call frame (lines 475--480): it is
 an EVM `CALL` to the recipient with value and **empty** calldata.  The generic
@@ -94,7 +106,7 @@ def emptyValueCall (callee : External) (ctx : Context) (recipient : Address)
   let request : Request := ⟨ctx.self, recipient, value, []⟩
   if world.balances ctx.self < value.val then
     ⟨.error (.reason "NotEnoughEther"), world, [⟨request, false, [], []⟩]⟩
-  else if (world.core.codeSize recipient.val).val = 0 then
+  else if emptyCodeAccount world recipient then
     -- EVM CALL to an EOA succeeds after value transfer; no callee is invoked.
     ⟨.ok (), transfer world ctx.self recipient value.val, [⟨request, true, [], []⟩]⟩
   else
@@ -172,11 +184,11 @@ def eoaPayoutWorld : World :=
     balances := fun address => if address = claimBridgeContext.self then 30 else 0 }
 
 theorem eoa_empty_value_call_receipt :
-    let result := emptyValueCall rejectingCallee claimBridgeContext (2 : Address) 30 eoaPayoutWorld
+    let result := emptyValueCall rejectingCallee claimBridgeContext (1002 : Address) 30 eoaPayoutWorld
     result.outcome = .ok () ∧
       result.world.balances claimBridgeContext.self = 0 ∧
-      result.world.balances (2 : Address) = 30 ∧
-      result.attempts = [⟨⟨claimBridgeContext.self, (2 : Address), 30, []⟩, true, [], []⟩] := by
+      result.world.balances (1002 : Address) = 30 ∧
+      result.attempts = [⟨⟨claimBridgeContext.self, (1002 : Address), 30, []⟩, true, [], []⟩] := by
   decide +kernel
 
 /-- The `twoClaimState` storage witness with a code-bearing recipient and a
@@ -561,9 +573,9 @@ def PayoutEffect (callee : External) (ctx : Context) (recipient : Address)
   before.balances ctx.self ≥ (Verity.Core.Uint256.ofNat payout).val ∧
     ∃ returned nested,
       attempts = [⟨request, true, returned, nested⟩] ∧
-      (((before.core.codeSize recipient.val).val = 0 ∧
+      ((emptyCodeAccount before recipient ∧
           after = credited ∧ returned = [] ∧ nested = []) ∨
-       ((before.core.codeSize recipient.val).val ≠ 0 ∧
+       (¬ emptyCodeAccount before recipient ∧
          ((callee request credited = .success returned after ∧ nested = []) ∨
            callee request credited = .successWithTrace returned after nested)))
 
@@ -576,7 +588,7 @@ theorem emptyValueCall_success (callee : External) (ctx : Context)
   by_cases hf : before.balances ctx.self < (Verity.Core.Uint256.ofNat payout).val
   · simp only [emptyValueCall, if_pos hf] at h
     contradiction
-  · by_cases he : (before.core.codeSize recipient.val).val = 0
+  · by_cases he : emptyCodeAccount before recipient
     · simpa only [emptyValueCall, if_neg hf, if_pos he] using
         (show PayoutEffect callee ctx recipient payout before
           (transfer before ctx.self recipient (Verity.Core.Uint256.ofNat payout).val)
@@ -607,18 +619,23 @@ by its sole CALL, then that CALL's returned world receives the source events. -/
 def ClaimEffect (callee : External) (ctx : Context) (requestId hint : Nat)
     (recipient : Address) (before after : World) (attempts : List Attempt) : Prop :=
   ∃ payout dirty called,
-    claimOne requestId hint recipient {before.core with sender := ctx.sender} =
+    claimOne requestId hint recipient (AccountFrame.enter ctx before.core) =
       .success payout dirty ∧
     requestId ≠ 0 ∧
-    requestId ≤ (before.core.readSlot lastFinalizedRequestIdPosition).val ∧
-    requestClaimed (requestMetadataWord before.core requestId) = false ∧
-    requestOwner (requestMetadataWord before.core requestId) = ctx.sender ∧
+    requestId ≤ (before.core.readContractSlot ctx.self.val lastFinalizedRequestIdPosition).val ∧
+    requestClaimed (requestMetadataWord (AccountFrame.enter ctx before.core) requestId) = false ∧
+    requestOwner (requestMetadataWord (AccountFrame.enter ctx before.core) requestId) = ctx.sender ∧
     payout < 2 ^ 256 ∧
-    (∃ removed, prepareClaim requestId hint recipient {before.core with sender := ctx.sender} =
+    (∃ removed, prepareClaim requestId hint recipient (AccountFrame.enter ctx before.core) =
       .success payout removed ∧ payout ≤ (removed.readSlot lockedEtherAmountPosition).val ∧
       dirty = removed.writeSlot lockedEtherAmountPosition
         (.ofNat ((removed.readSlot lockedEtherAmountPosition).val - payout))) ∧
-    PayoutEffect callee ctx recipient payout {before with core := dirty} called attempts ∧
+    (∀ (wordIndex : Nat), (AccountFrame.commit ctx.self before.core dirty).readContractSlot ctx.self.val wordIndex =
+      dirty.readSlot wordIndex) ∧
+    (∀ (other wordIndex : Nat), other ≠ ctx.self.val →
+      (AccountFrame.commit ctx.self before.core dirty).readContractSlot other wordIndex =
+        before.core.readContractSlot other wordIndex) ∧
+    PayoutEffect callee ctx recipient payout {before with core := AccountFrame.commit ctx.self before.core dirty} called attempts ∧
     after = claimEvents ctx requestId recipient payout called
 
 /-- A chain records every actual intermediate world, including the callback
@@ -637,11 +654,11 @@ inductive ClaimChain (callee : External) (ctx : Context) (recipient : Address) :
 private theorem claimStorage_success (ctx : Context) (requestId hint : Nat)
     (recipient : Address) (before : World) (payout : Nat)
     (h : (claimStorage ctx requestId hint recipient before).outcome = .ok payout) :
-    ∃ dirty, claimOne requestId hint recipient {before.core with sender := ctx.sender} =
+    ∃ dirty, claimOne requestId hint recipient (AccountFrame.enter ctx before.core) =
       .success payout dirty ∧
-      (claimStorage ctx requestId hint recipient before).world = {before with core := dirty} ∧
+      (claimStorage ctx requestId hint recipient before).world = {before with core := AccountFrame.commit ctx.self before.core dirty} ∧
       (claimStorage ctx requestId hint recipient before).attempts = [] := by
-  cases hc : claimOne requestId hint recipient {before.core with sender := ctx.sender} with
+  cases hc : claimOne requestId hint recipient (AccountFrame.enter ctx before.core) with
   | success amount dirty =>
     simp only [claimStorage, hc] at h ⊢
     cases h
@@ -663,7 +680,9 @@ theorem claimTo_success (callee : External) (ctx : Context) (requestId hint : Na
   have hg := claimOne_success_guards requestId hint recipient _ dirty payout hd
   obtain ⟨removed, hprep, hlocked, hfit, hdirty⟩ :=
     claimOne_success_storage requestId hint recipient _ dirty payout hd
-  refine ⟨payout, dirty, (payoutCall callee ctx recipient payout (claimStorage ctx requestId hint recipient before).world).world, hd, hg.1, hg.2.1, hg.2.2.1, hg.2.2.2, hfit, ⟨removed, hprep, hlocked, hdirty⟩, ?_, ?_⟩
+  refine ⟨payout, dirty, (payoutCall callee ctx recipient payout (claimStorage ctx requestId hint recipient before).world).world, hd, hg.1, hg.2.1, hg.2.2.1, hg.2.2.2, hfit, ⟨removed, hprep, hlocked, hdirty⟩,
+    AccountFrame.commit_read ctx.self before.core dirty,
+    AccountFrame.commit_other_account ctx.self before.core dirty, ?_, ?_⟩
   · have hat : (claimTo callee ctx requestId hint recipient before).attempts =
         (payoutCall callee ctx recipient payout
           (claimStorage ctx requestId hint recipient before).world).attempts := by

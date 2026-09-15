@@ -21,6 +21,8 @@ FILES = (
     "LidoSRv3/Audit/AllGuarantees.lean",
     "LidoSRv3/Audit/Guarantees/PDeposit1.lean",
     "LidoSRv3/Audit/Guarantees/PTopup1.lean",
+    "LidoSRv3/Audit/Guarantees/PDeposit1DsmCall.lean",
+    "LidoSRv3/Audit/Guarantees/PTopupRouterAdmissionCall.lean",
 )
 
 
@@ -47,6 +49,19 @@ with tempfile.TemporaryDirectory() as tmp:
     # Positive control: every existing allowed import and declaration is accepted.
     run(fixture, True)
 
+    for module, theorem in (
+        ("PDeposit1DsmCall", "actual_deposit_call_slot_success_and_revert"),
+        ("PTopupRouterAdmissionCall", "actual_topup_admission_calls_wei_and_revert"),
+    ):
+        parent = fixture / f"LidoSRv3/Audit/Guarantees/{module}.lean"
+        source = parent.read_text()
+        changed = source.replace(f"theorem {theorem}", "theorem detached_parent", 1)
+        if changed == source:
+            raise AssertionError("registered-parent mutation changed nothing")
+        parent.write_text(changed)
+        run(fixture, False, "registered executable parent surface differs")
+        parent.write_text(source)
+
     deposit = fixture / "LidoSRv3/Audit/Guarantees/PDeposit1.lean"
     deposit_original = deposit.read_text(encoding="utf-8")
     deposit.write_text(
@@ -64,7 +79,7 @@ with tempfile.TemporaryDirectory() as tmp:
     original = readme.read_text(encoding="utf-8")
     readme.write_text(
         original.replace(
-            "| 3 | `P-DEPOSIT-1` | CHECKED | CHECKED — composed finite list-batch executable transaction |",
+            "| 3 | `P-DEPOSIT-1` | CHECKED | CHECKED — actual DSM/module/withdrawal/beacon execution |",
             "| 3 | `P-DEPOSIT-1` | CHECKED | PARTIAL |",
             1,
         ),

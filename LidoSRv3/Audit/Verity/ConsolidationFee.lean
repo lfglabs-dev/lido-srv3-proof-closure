@@ -177,7 +177,9 @@ theorem function_scaffold_entrypoint :
 
 theorem function_spec_compiles :
     (CompilationModel.compile spec [addConsolidationRequestsSelector]).isOk = true := by
-  native_decide
+  set_option maxRecDepth 16384 in
+  set_option maxHeartbeats 4000000 in
+  decide +kernel
 
 /-! ## Byte-precise memory/call model -/
 
@@ -240,7 +242,7 @@ def payload (encoded : MemoryRequest) : List Nat :=
   (payloadBytes encoded).map (·.val)
 
 theorem abiWord_48_decodes :
-    decodeWordBytes (List.ofFn (abiWord 48)) = 48 := by native_decide
+    decodeWordBytes (List.ofFn (abiWord 48)) = 48 := by decide +kernel
 
 theorem encodeDynamicElement_length_48 (bytes : Pubkey) (h : bytes.length = 48) :
     decodeMemoryWord (encodeDynamicElement bytes) 0 = 48 := by

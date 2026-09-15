@@ -84,13 +84,11 @@ modeled `handleOracleReport`, the `rewardsRead` step is written strictly before
 any nonzero `rewardsMinted` step, read directly from the transaction step
 clock: whenever `0 < tick(mint)`, then `tick(read) < tick(mint)`.
 
-Read-before-mint discipline. Kept as an unregistered sub-theorem after
-chantier 3 (Thomas 2026-09-13) upgraded the registered parent to also cover
-write-before-read: the deployed risk is the router-write before the
-`getStakingRewardsDistribution` read (`AccountingOracle.sol:513-517` →
-`Accounting.sol:277`), not read→mint alone. The combined registered parent
-`router_accounting_order_discipline` below conjoins both orderings on the
-same transaction. -/
+The registered parent also covers modeled write-before-read ordering. The
+source first [pushes validator balances](https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.9/oracle/AccountingOracle.sol#L513-L521)
+and later [reads rewards distribution](https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.9/Accounting.sol#L265-L277).
+Connecting these modeled steps to the actual cross-contract execution and
+fee calculation remains required. -/
 theorem mint_after_read_discipline : mintAfterReadDiscipline :=
   mintAfterReadDiscipline_holds
 
@@ -104,38 +102,32 @@ abbrev writeRouterBeforeRead :=
 abbrev writeRouterBeforeReadDisciplineOf :=
   LidoSRv3.Audit.Verity.HandleOracleReportTx.writeRouterBeforeReadDisciplineOf
 
-/-- Write-router-before-read discipline applied to the real transaction. -/
+/-- Write-router-before-read discipline applied to the modeled transaction. -/
 abbrev writeRouterBeforeReadDiscipline :=
   LidoSRv3.Audit.Verity.HandleOracleReportTx.writeRouterBeforeReadDiscipline
 
-/-- "The combined ordering discipline on the deployed AccountingOracle →
-StakingRouter → Accounting → StakingRouter path": both write-before-read
-and read-before-mint on the same transaction. -/
+/-- Combined write-before-read and read-before-mint discipline on the same
+modeled transaction, corresponding to the intended cross-contract source path. -/
 abbrev routerAccountingOrderDisciplineOf :=
   LidoSRv3.Audit.Verity.HandleOracleReportTx.routerAccountingOrderDisciplineOf
 
-/-- Combined ordering discipline applied to the real transaction. -/
+/-- Combined ordering discipline applied to the modeled transaction. -/
 abbrev routerAccountingOrderDiscipline :=
   LidoSRv3.Audit.Verity.HandleOracleReportTx.routerAccountingOrderDiscipline
 
-/-- **P-ACCOUNT-1, abstract plane (chantier 3, Thomas 2026-09-13).**
+/-- **P-ACCOUNT-1, abstract plane.**
 
-On every committed execution of the modeled `handleOracleReport`, both
-orderings on the deployed AccountingOracle → StakingRouter → Accounting →
-StakingRouter path hold, read directly from the transaction step clock:
+On every committed execution of the modeled `handleOracleReport`, the
+transaction step clock records both orderings:
 
-1. **write-router-before-read** — the `AccountingOracle.submitReportData`
-   validator-balances push through
-   `StakingRouter.reportValidatorBalancesByStakingModule`
-   (`AccountingOracle.sol:513-517`) is stamped strictly before
-   `Accounting.handleOracleReport`'s
-   `_stakingRouter.getStakingRewardsDistribution()` read
-   (`Accounting.sol:277`), so fee shares are always derived from the
-   just-written module weights, never from stale balances;
-2. **read-before-mint** — the `rewardsRead` step precedes any nonzero
-   `rewardsMinted` step, so a positive fee is minted only after the read of
-   fresh balances (the previously-registered `mint_after_read_discipline`
-   above, kept as unregistered sub-theorem).
+1. the modeled router-balances write precedes the modeled rewards read;
+2. the rewards read precedes any nonzero modeled fee mint.
+
+These ticks do not establish that `sharesToMintAsFees` was computed from
+the report, prestate or router distribution: it is still a caller-supplied
+argument. The source's actual fee producer and public cross-contract
+transport must be connected separately. In particular, ordering alone does
+not prove that a minted amount uses the just-written module weights.
 
 The ticks are `stampStep`'s reads of the transaction-local `sequenceSlot`
 clock (reset at the top of the commit branch), not per-call-site constants,

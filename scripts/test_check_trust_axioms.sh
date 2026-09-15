@@ -5,7 +5,7 @@ tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 
 names="$tmp/names"
-grep -v '^#\|^$' audit/trust-native-decide-allowlist.txt > "$names"
+sed '/^#/d; /^$/d' audit/trust-native-decide-allowlist.txt > "$names"
 mapfile -t checked < <(python3 - <<'PY'
 import json
 for row in json.load(open("audit/guarantees.yaml", encoding="utf-8"))["guarantees"]:
@@ -25,14 +25,19 @@ PY
     printf "'%s' depends on axioms: [propext, Classical.choice, Quot.sound" "$theorem"
     if (( first )); then
       while IFS= read -r name; do
-        printf ', %s' "$name"
+        [[ "$name" == LidoSRv3.Tests.* ]] || printf ', %s' "$name"
       done < "$names"
       first=0
     fi
     printf ']\n'
   done
+  printf "'LidoSRv3.Tests.TrustScope.fixture' depends on axioms: [propext"
+  while IFS= read -r name; do
+    [[ "$name" != LidoSRv3.Tests.* ]] || printf ', %s' "$name"
+  done < "$names"
+  printf ']\n'
 } > "$tmp/ok"
-python3 scripts/check_trust_axioms.py --trust-output "$tmp/ok" >/dev/null
+
 
 # The newly registered digest theorem must be emitted and checked by the
 # normal Trust command; its actual dependency set is not fabricated here.
@@ -55,6 +60,27 @@ reject() {
     exit 1
   fi
 }
+
+# Saved-output success checks report consistency only. Actual environment
+# provenance and reevaluation are exercised by the executable fixtures below.
+python3 scripts/check_trust_axioms.py --trust-output "$tmp/ok"
+python3 scripts/test_foundational_trust.py
+
+# Isolated disclosure mutation: no real test-native exceptions need remain.
+scope_fixture="$tmp/scope-fixture"
+mkdir -p "$scope_fixture/scripts" "$scope_fixture/audit" "$scope_fixture/LidoSRv3/Audit"
+cp scripts/check_trust_axioms.py scripts/check_proof_escapes.py scripts/foundational_trust.py "$scope_fixture/scripts/"
+cp audit/guarantees.yaml audit/trust-native-decide-allowlist.txt "$scope_fixture/audit/"
+cp LidoSRv3/Audit/Trust.lean "$scope_fixture/LidoSRv3/Audit/"
+scope_native='LidoSRv3.Tests.Scope.fixture._native.native_decide.ax_1_1'
+printf '%s\n' "$scope_native" >> "$scope_fixture/audit/trust-native-decide-allowlist.txt"
+python3 - "$tmp/ok" "$tmp/test-native-in-production" "$scope_native" <<'PYTEST'
+import sys
+text = open(sys.argv[1]).read().replace("]", ", " + sys.argv[3] + "]", 1)
+open(sys.argv[2], "w").write(text)
+PYTEST
+reject "$tmp/test-native-in-production" 'depends on test-only native axiom(s)' \
+  'a registered parent inheriting a disclosed test witness' "$scope_fixture/scripts/check_trust_axioms.py"
 
 # A non-native project axiom (for example `opaque injected : False`, which the
 # lexical proof-escape scanner does not forbid) is emitted by Lean as an
@@ -90,7 +116,7 @@ reject "$tmp/injected-opaque-registered" 'emits undisclosed axiom(s): LidoSRv3.A
 # disclosure stays authoritative for every other case here.
 fixture="$tmp/laundering-fixture"
 mkdir -p "$fixture/scripts" "$fixture/audit" "$fixture/LidoSRv3/Audit"
-cp scripts/check_trust_axioms.py scripts/check_proof_escapes.py "$fixture/scripts/"
+cp scripts/check_trust_axioms.py scripts/check_proof_escapes.py scripts/foundational_trust.py "$fixture/scripts/"
 cp audit/guarantees.yaml "$fixture/audit/guarantees.yaml"
 cp LidoSRv3/Audit/Trust.lean "$fixture/LidoSRv3/Audit/Trust.lean"
 cp audit/trust-native-decide-allowlist.txt "$fixture/audit/trust-native-decide-allowlist.txt"
@@ -107,7 +133,7 @@ reject "$tmp/injected-opaque-report" \
 # successfully; only the source declaration distinguishes it.
 launder="$tmp/laundered-shape-fixture"
 mkdir -p "$launder/scripts" "$launder/audit" "$launder/LidoSRv3/Audit" "$launder/LidoSRv3/Tests"
-cp scripts/check_trust_axioms.py scripts/check_proof_escapes.py "$launder/scripts/"
+cp scripts/check_trust_axioms.py scripts/check_proof_escapes.py scripts/foundational_trust.py "$launder/scripts/"
 cp audit/guarantees.yaml "$launder/audit/guarantees.yaml"
 cp LidoSRv3/Audit/Trust.lean "$launder/LidoSRv3/Audit/Trust.lean"
 cp audit/trust-native-decide-allowlist.txt "$launder/audit/trust-native-decide-allowlist.txt"
@@ -124,7 +150,7 @@ python3 - "$tmp/ok" "$tmp/laundered-shape-report" "$laundered" <<'PY'
 import sys
 lines = open(sys.argv[1], encoding="utf-8").read().splitlines()
 for index, line in enumerate(lines):
-    if line.endswith("]"):
+    if line.startswith("'LidoSRv3.Tests.TrustScope.fixture'"):
         lines[index] = line[:-1] + ", " + sys.argv[3] + "]"
         break
 else:
@@ -136,10 +162,10 @@ reject "$tmp/laundered-shape-report" \
   'a source-declared axiom wearing generated native-decision spelling' \
   "$launder/scripts/check_trust_axioms.py"
 
-# The same fixture without the source declaration is accepted, so the negative
-# above is carried by provenance alone and not by some unrelated rejection.
+# Removing the source declaration reaches the separate authorization gate.
 rm "$launder/LidoSRv3/Tests/Injected.lean"
-python3 "$launder/scripts/check_trust_axioms.py" --trust-output "$tmp/laundered-shape-report" >/dev/null
+reject "$tmp/laundered-shape-report" 'authorized trust BLOCKED' \
+  'disclosed native fixture without a forged source declaration' "$launder/scripts/check_trust_axioms.py"
 
 # Executable provenance regression.  Scanning sources for the literal `_native`
 # token is necessary but not sufficient: a project command elaborator can build
@@ -368,7 +394,7 @@ probe >/dev/null
 # never computed -- the other half of the spoof exercised below.
 commented="$tmp/commented-fixture"
 mkdir -p "$commented/scripts" "$commented/audit" "$commented/LidoSRv3/Audit"
-cp scripts/check_trust_axioms.py scripts/check_proof_escapes.py "$commented/scripts/"
+cp scripts/check_trust_axioms.py scripts/check_proof_escapes.py scripts/foundational_trust.py "$commented/scripts/"
 cp audit/guarantees.yaml "$commented/audit/guarantees.yaml"
 cp audit/trust-native-decide-allowlist.txt "$commented/audit/trust-native-decide-allowlist.txt"
 smothered="$(python3 - "$commented/LidoSRv3/Audit/Trust.lean" <<'PY'
@@ -405,10 +431,9 @@ reject "$tmp/ok" \
   'a registered theorem disclosed only by a commented-out #print axioms command' \
   "$commented/scripts/check_trust_axioms.py"
 
-# Restoring that one command makes the same fixture pass, so the rejection is
-# carried by the comment and not by anything else in the copied tree.
+# Restoring the command restores report consistency, not environment evidence.
 cp LidoSRv3/Audit/Trust.lean "$commented/LidoSRv3/Audit/Trust.lean"
-python3 "$commented/scripts/check_trust_axioms.py" --trust-output "$tmp/ok" >/dev/null
+python3 "$commented/scripts/check_trust_axioms.py" --trust-output "$tmp/ok"
 
 # Executable spoofing regression.  Trust's log is only text some command
 # printed: `#eval IO.println` can emit a well-formed report for a theorem whose
@@ -573,6 +598,51 @@ fi
   printf "'%s' does not depend on any axioms\n" 'LidoSRv3.Tests.Shadowed.clean'
 } > "$shadowed/truthful"
 shadow_confirm "$shadowed/truthful" >/dev/null
+
+# An undisclosed claim is discovered by its defining module even when its
+# namespace differs. Its actual opaque dependency must survive recomputation.
+coverage="$tmp/coverage"
+mkdir -p "$coverage/LidoSRv3/Audit/Guarantees"
+cat > "$coverage/LidoSRv3/Audit/Guarantees/Coverage.lean" <<'LEAN'
+namespace DifferentNamespace
+axiom hidden : False
+theorem undisclosed : False := hidden
+theorem clean : True := True.intro
+end DifferentNamespace
+LEAN
+lake env lean -R "$coverage" -o "$coverage/LidoSRv3/Audit/Guarantees/Coverage.olean" \
+  "$coverage/LidoSRv3/Audit/Guarantees/Coverage.lean"
+# This production module is deliberately not imported by Coverage. Building
+# a module is insufficient: broad discovery must explicitly load it as data.
+cat > "$coverage/LidoSRv3/Audit/Guarantees/Unimported.lean" <<'LEAN'
+namespace UnimportedNamespace
+axiom hidden : False
+theorem supporting : False := hidden
+end UnimportedNamespace
+LEAN
+cat > "$coverage/lakefile.lean" <<'LEAN'
+lean_lib «LidoSRv3» where
+  globs := #[.submodules `LidoSRv3.Audit.Guarantees]
+LEAN
+lake env lean -R "$coverage" -o "$coverage/LidoSRv3/Audit/Guarantees/Unimported.olean" \
+  "$coverage/LidoSRv3/Audit/Guarantees/Unimported.lean"
+python3 - "$coverage" <<'PY'
+import sys
+from pathlib import Path
+sys.path.insert(0, 'scripts')
+from check_trust_axioms import environment_dependencies
+names = ['DifferentNamespace.clean']
+module = 'LidoSRv3.Audit.Guarantees.Coverage'
+fixture = Path(sys.argv[1])
+direct = environment_dependencies(names, module, fixture)
+expanded = environment_dependencies(names, module, fixture, discover=True)
+assert direct == {'DifferentNamespace.clean': set()}, direct
+assert expanded['DifferentNamespace.clean'] == set(), expanded
+assert expanded['DifferentNamespace.undisclosed'] == {'DifferentNamespace.hidden'}, expanded
+assert 'UnimportedNamespace.supporting' not in direct, direct
+assert expanded['UnimportedNamespace.supporting'] == {'UnimportedNamespace.hidden'}, expanded
+print('trust coverage discovers an unprinted theorem by module and retains its opaque dependency')
+PY
 
 # An unnamed dependency line must fail closed rather than be discarded, so a
 # report Lean did emit can never go unparsed.

@@ -2,9 +2,7 @@
 # Adding a row is forbidden; new inversions fail the check.
 
 # rule: spec-verity
-LidoSRv3.Audit.Spec.AddressClaimBatchCorrespondence LidoSRv3.Audit.Verity.AddressClaimBatchTx
 LidoSRv3.Audit.Spec.AddressClaimCorrespondence LidoSRv3.Audit.Verity.AddressClaimBatchTx
-LidoSRv3.Audit.Spec.AddressClaimFuelCorrespondence LidoSRv3.Audit.Verity.AddressClaimBatchTx
 LidoSRv3.Audit.Spec.AddressClaimKeccakSlots LidoSRv3.Audit.Verity.AddressClaimBatchTx
 LidoSRv3.Audit.Spec.AllocExecCorrespondence LidoSRv3.Audit.Verity.DepositParentTx
 LidoSRv3.Audit.Spec.AllocationCorrespondence LidoSRv3.Audit.Verity.DepositParentTx

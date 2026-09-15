@@ -141,6 +141,11 @@ theorem call_success (external : StaticCall.External) (caller : Live.Address)
     (call external caller timestamp world).attempts =
       [⟨request caller timestamp,true,true,data,1⟩] := by
   unfold call audit.trio.consolidation.lowLevelStaticCall at h ⊢
+  have ordinary : audit.trio.consolidation.emptyCodeAccount world target ↔
+      (world.core.codeSize target.val).val = 0 := by
+    have ht : 10 < target.val := by decide +kernel
+    simp [audit.trio.consolidation.emptyCodeAccount, ht]
+  simp only [ordinary] at h ⊢
   by_cases hc : (world.core.codeSize target.val).val = 0
   · simp only [hc,if_true,Except.ok.injEq] at h
     subst data

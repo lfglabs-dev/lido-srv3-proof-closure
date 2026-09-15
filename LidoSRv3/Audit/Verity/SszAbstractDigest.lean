@@ -1,4 +1,5 @@
 import Compiler.CompilationModel
+import Lean
 import Compiler.Modules.Precompiles
 import Compiler.Sha256.Engine
 import Verity.Core.Model.DenoteSha256
@@ -17,6 +18,9 @@ correctness and the address-2 precompile correspondence remain an explicit
 campaign assumption. The checked statement binds bytes, widths, call order,
 and digest composition only.
 -/
+
+set_option pp.maxSteps 500
+set_option pp.deepTerms.threshold 12
 
 namespace LidoSRv3.Audit.Verity.SszAbstractDigest
 
@@ -89,9 +93,83 @@ def spec : CompilationModel :=
 def selector : Nat := 0x5cb8e1f3
 
 /-- The typed program genuinely enters Verity's compiler. -/
+private def exceptUnitDecEq : DecidableEq (Except String Unit) := fun x y =>
+  match x, y with
+  | .ok _, .ok _ => isTrue rfl
+  | .error a, .error b =>
+    if h : a = b then isTrue (h ▸ rfl)
+    else isFalse (by intro heq; cases heq; exact h rfl)
+  | .ok _, .error _ => isFalse (by intro h; cases h)
+  | .error _, .ok _ => isFalse (by intro h; cases h)
+
+local instance : DecidableEq (Except String Unit) := exceptUnitDecEq
+
+/-- Validation uses the declared local obligations; the opaque mechanics
+collector need not be evaluated to establish that this guard is discharged. -/
+theorem depositDataRoot_validates : validateFunctionSpec depositDataRoot = .ok () := by
+  have documented : depositDataRoot.localObligations.isEmpty = false := rfl
+  simp only [validateFunctionSpec, documented, Bool.and_false, Bool.false_and]
+  decide +kernel
+
+set_option maxRecDepth 16384 in
+set_option maxHeartbeats 4000000 in
+theorem depositDataRoot_inputs_validate : validateCompileInputs spec [selector] = .ok () := by
+  unfold validateCompileInputs
+  run_tac do
+    let env ← Lean.getEnv
+    let candidates := env.constants.toList.filter fun (name, _) =>
+      name.toString.endsWith ".validateCompileInputsBeforeFieldWriteConflict"
+    match candidates with
+    | [(name, _)] =>
+        let id := Lean.mkIdent name
+        Lean.Elab.Tactic.evalTactic (← `(tactic| unfold $id:ident))
+    | _ => throwError "expected one pinned compiler precheck definition"
+  have hi : depositDataRoot.isInternal = false := rfl
+  have hn : depositDataRoot.name = "depositDataRootAbstractDigest" := rfl
+  simp [spec, depositDataRoot_validates, hi, hn, List.filter_cons,
+    Bind.bind, Except.bind, Pure.pure, Except.pure]
+  all_goals decide +kernel
+
+theorem depositDataRoot_body_compiles :
+    (compileStmtListWithFork [] [] [] .calldata [] false ["publicKeyOffset", "withdrawalCredentialsOffset", "signatureOffset", "amountLE"] [] .cancun depositDataRoot.body []).isOk = true := by
+  simp [depositDataRoot, lit, param, localExpr, copy, store, hashPair, Compiler.Modules.Precompiles.sha256, Compiler.Modules.Precompiles.sha256Memory, Compiler.Modules.Precompiles.sha256MemoryModule, compileStmtListWithFork, compileStmtWithFork,
+    compileExprWithInternals, compileExprListWithInternals,
+    Bind.bind, Except.bind, Pure.pure, Except.pure, Except.isOk, Except.toBool]
+  all_goals decide +kernel
+
+theorem depositDataRoot_no_templates : (templateIntrinsicItems spec).isEmpty = true := by
+  decide +kernel
+
+set_option maxRecDepth 16384 in
+set_option maxHeartbeats 4000000 in
+theorem depositDataRoot_core_compiles :
+    (compileValidatedCore spec [selector]).isOk = true := by
+  have hi : depositDataRoot.isInternal = false := rfl
+  have hn : depositDataRoot.name = "depositDataRootAbstractDigest" := rfl
+  have hs : isInteropEntrypointName "depositDataRootAbstractDigest" = false := by decide +kernel
+  have hf : applySlotAliasRanges [] [] = [] := rfl
+  have hp : depositDataRoot.params = [{ name := "publicKeyOffset", ty := .uint256 }, { name := "withdrawalCredentialsOffset", ty := .uint256 }, { name := "signatureOffset", ty := .uint256 }, { name := "amountLE", ty := .bytes32 }] := rfl
+  have hl : depositDataRoot.nonReentrantLock = none := rfl
+  have hr : functionReturns depositDataRoot = .ok [.uint256] := rfl
+  have ht := List.nil_of_isEmpty depositDataRoot_no_templates
+  have hbody := depositDataRoot_body_compiles
+  cases hb : compileStmtListWithFork [] [] [] .calldata [] false ["publicKeyOffset", "withdrawalCredentialsOffset", "signatureOffset", "amountLE"] [] .cancun depositDataRoot.body [] with
+  | error err => simp [hb, Except.isOk, Except.toBool] at hbody
+  | ok body =>
+    unfold compileValidatedCore
+    rw [ht]
+    simp [spec, compileGuardedFunctionSpec, compileFunctionSpec,
+      depositDataRoot_validates, hi, hn, hs, hf, hp, hl, hr, hb,
+      attachNonReentrantGuard, compileConstructor,
+      pickUniqueFunctionByName, List.filter_cons, List.mapM_cons, List.map_cons, List.map_nil,
+      Bind.bind, Except.bind, Pure.pure, Except.pure, Except.isOk, Except.toBool]
+
 theorem deposit_data_root_compiles :
     (CompilationModel.compile spec [selector]).isOk = true := by
-  native_decide
+  unfold CompilationModel.compile
+  rw [depositDataRoot_inputs_validate]
+  exact depositDataRoot_core_compiles
+
 
 abbrev Bytes := ByteArray
 

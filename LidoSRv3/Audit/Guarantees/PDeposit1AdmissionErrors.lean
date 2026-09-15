@@ -1,4 +1,4 @@
-import LidoSRv3.Audit.Source.DepositAdmissionErrors
+import LidoSRv3.Audit.Guarantees.Composition.DepositAdmissionErrors
 namespace LidoSRv3.Audit.Guarantees.PDeposit1
 set_option autoImplicit false
 open LidoSRv3.Audit.Source TrioReserve1 audit.trio.deposit

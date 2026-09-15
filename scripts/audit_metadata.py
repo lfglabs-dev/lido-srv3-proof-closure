@@ -26,6 +26,9 @@ from source_spans import span_identity
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
 SOURCE_FIDELITY = AUDIT / "SOURCE-FIDELITY.md"
+from candidate_metadata import (CANDIDATE_INPUT_SHA256, EXPECTED_CANONICAL_CLAIMS,
+                                EXPECTED_CANONICAL_DETAIL_SHA256)
+
 R1_REVIEW_BASE = "e8a597f742433475c89382e2eaf96b8475baa214"
 # Bind the report inputs to the recorded Git object and exact bytes.
 # Changed inputs must never inherit an earlier source review.
@@ -37,6 +40,8 @@ R1_REPORT_INPUT_SHA256 = {
     "audit/source-map.yaml": "0711e13088159cc092c4a4cfdf2111eedefa39b744d02dbe1957db31da30cd2e",
     "audit/trust-native-decide-allowlist.txt": "4676e3021844b17f62e9fcb11069c5a09fcede77977b5af2242c455bfa7d38c6",
 }
+
+# Candidate synchronization fingerprints; NOT an independent review basis.
 CANONICAL_IDS = [
     "P-ALLOC-1", "P-ALLOC-2", "P-DEPOSIT-1", "P-TOPUP-1",
     "P-ACCOUNT-1", "P-RESERVE-1", "P-CONSOLIDATION-ETH-1", "P-ADDRESS-1",
@@ -70,38 +75,12 @@ ASSUMPTION_FIELDS = {
 }
 PINNED = {
     "lido_core": ("https://github.com/lidofinance/core.git", "17005714f151e5502c559932319a3f2f74ac2436"),
-    "verity": ("https://github.com/lfglabs-dev/verity.git", "e977aaad6e1a9e92e0132d41b3d33a14135a4d46"),
+    "verity": ("https://github.com/lfglabs-dev/verity.git", "600a2f7a9b07f7ea532451e7d58b106347a6817a"),
     "evmyullean": ("https://github.com/lfglabs-dev/EVMYulLean.git", "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9"),
     "mathlib": ("https://github.com/leanprover-community/mathlib4.git", "fabf563a7c95a166b8d7b6efca11c8b4dc9d911f"),
 }
-EXPECTED_AUTHORITY = "Lean theorem statements and proofs are authoritative; metadata classifies but never closes evidence."
-EXPECTED_OBJECTIVE = "Prove an abstract Lean model, a Verity Lean library program, and a Verity Executable Contract for each guarantee, or classify the gap. General Yul/EVM/deployment closure is out of scope; SSZ alone carries a targeted Yul binding."
-EXPECTED_CANONICAL_CLAIMS = {
-    "P-ALLOC-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAlloc1.checked_execute", "CHECKED", "LidoSRv3.Audit.Guarantees.PAlloc1.verity_tx_simulates_allocation_count_from_storage", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-SOLC-TRUSTED", "A-RUNTIME-PROVENANCE")),
-    "P-ALLOC-2": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAlloc2.step_correspondence_and_full_loop_conservation", "CHECKED", "LidoSRv3.Audit.Guarantees.PAlloc2.verity_tx_simulates_min_first_distribution", "IMPLEMENTATION_PENDING", ("A-VERITY-SCAFFOLD", "A-SOLC-TRUSTED", "A-RUNTIME-PROVENANCE")),
-    "P-DEPOSIT-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back", "CHECKED", "LidoSRv3.Audit.Guarantees.PDeposit1.NFrame.verity_tx_composes_nframe_deposit_under_router_shape", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-SOLC-TRUSTED", "A-RUNTIME-PROVENANCE")),
-    "P-TOPUP-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back", "CHECKED", "LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source_with_nonzero_wrap_close", "IMPLEMENTATION_PENDING", ("A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-SOLC-TRUSTED", "A-RUNTIME-PROVENANCE")),
-    "P-ACCOUNT-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAccount1.router_accounting_order_discipline", "CHECKED", "LidoSRv3.Audit.Guarantees.PAccount1.verity_tx_simulates_oracle_report", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-SOLC-TRUSTED", "A-RUNTIME-PROVENANCE")),
-    "P-RESERVE-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PReserve1.source_spend_preserves_withdrawal_reserve", "CHECKED", "LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-SOLC-TRUSTED", "A-RUNTIME-PROVENANCE")),
-    "P-CONSOLIDATION-ETH-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PConsolidationEth1.eth_flow_parent_at_canonical", "CHECKED", "LidoSRv3.Audit.Guarantees.PConsolidationEth1.verity_tx_success_and_revert_partition", "IMPLEMENTATION_PENDING", ("A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-SOLC-TRUSTED", "A-RUNTIME-PROVENANCE")),
-    "P-ADDRESS-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAddress1.universal_address_writer_equivariance", "CHECKED", "LidoSRv3.Audit.Guarantees.PAddress1.abstract_source_verity_tx_address_equivariance", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-SOLC-TRUSTED", "A-RUNTIME-PROVENANCE")),
-    "P-TOPUP-2": ("CHECKED", "LidoSRv3.Audit.Guarantees.PTopup2.router_exact_sum_bounded_under_gateway_shape", "CHECKED", "LidoSRv3.Audit.Guarantees.PTopup2.verity_tx_simulates_topup2_spec", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-SOLC-TRUSTED", "A-RUNTIME-PROVENANCE")),
-    "P-CONSOLIDATION-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity_from_gateway", "CHECKED", "LidoSRv3.Audit.Guarantees.PConsolidation1.verity_tx_simulates_consolidation", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-SOLC-TRUSTED", "A-RUNTIME-PROVENANCE")),
-    "P-SSZ-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.real_validator_correspondence", "CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.actual_compiled_cl_entry_complete_declared_branch", "IMPLEMENTATION_PENDING", ("A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT", "A-SOLC-TRUSTED", "A-RUNTIME-PROVENANCE")),
-}
-EXPECTED_CANONICAL_DETAIL_SHA256 = {
-    "P-ALLOC-1": "819c94c10ef768a7f121039a13d7f6865257eafd6a5faa56147ea193a29df041",
-    "P-ALLOC-2": "605ae32bda595b9d0847ceccd826c9a7d76e1a99e3d617b7d1dc140ee940855b",
-    "P-DEPOSIT-1": "320e945499b68a8c23bce8d0ecdee958938a8ba10e63a233327702fa2e6fe6d7",
-    "P-TOPUP-1": "4615640461047b5e362765403e56e7bd3134d4975f85314826c9b927a23f6f91",
-    "P-ACCOUNT-1": "384e194ee3c3da6b66f532442104d65f6aea80eed5ef0207a643383a5ce0949a",
-    "P-RESERVE-1": "017d2ba5238fff006cff0e904c5eb405d51c5a54e023b95a1d5e0175df7fd2b7",
-    "P-CONSOLIDATION-ETH-1": "5f182e386487d0e8509b3d7d1ffb178705fa62a78602feb43442836ced4b8b9a",
-    "P-ADDRESS-1": "f92b9cd14691bde29d53d75990625059d51fbe043e94e991a3b446d9e8b6ba37",
-    "P-TOPUP-2": "aa114745909c7e21be3ec147f2b5678d55b4cfc435998df0d13275d4f9c8f9d9",
-    "P-CONSOLIDATION-1": "420fda1c57d95e4d7f54b973348f9594f040e1aca3eaa06d0c70ee4ec0e717f3",
-    "P-SSZ-1": "02a17f6aad36762480eb7d89ae929af7499931fded1d9084a37e7776bb444b73",
-}
+EXPECTED_AUTHORITY = 'Lean theorem statements and proofs are authoritative; metadata never closes evidence. CHECKED records theorem registration, not semantic acceptance. Owner20260915 permits foundations plus exactly three existing compiler-success native witnesses, subject to exact emitted inventory, type/provenance and native reevaluation. Kernel replacements are retained; unrelated axioms remain rejected.'
+EXPECTED_OBJECTIVE = 'Close every remaining obligation behind the 11 main Lido SRv3 guarantees and all supporting registered rows without weakening intended claims. Source, interface, compiler/runtime/hash, caller-frame and deployment-identity correspondences needed by these claims remain in scope until proved. Missing evidence is an open obligation, not closure. No merge, deployment or website work; final acceptance requires fresh independent exact-SHA review.'
 EXPECTED_PRIORITIES = {
     "P-RESERVE-1": "DONE",
     "P-DEPOSIT-1": "DONE", "P-TOPUP-1": "DONE", "P-ACCOUNT-1": "DONE",
@@ -221,34 +200,32 @@ def validate_pins(lock, manifest, source_map):
             "Trust native-decision allowlist differs")
     trust_names = [line.strip() for line in TRUST_NATIVE_DECIDE_ALLOWLIST.read_text(encoding="utf-8").splitlines()
                    if line.strip() and not line.lstrip().startswith("#")]
-    require(len(trust_names) == len(set(trust_names)) and trust_names,
-            "Trust native-decision allowlist must be nonempty and unique")
+    require(len(trust_names) == len(set(trust_names)),
+            "Trust native-decision inventory must be unique")
     production_native = {
         "LidoSRv3.Audit.Verity.AllocCapacityPhase3.consumed_summary_function_spec_compiles._native.native_decide.ax_1_1",
         "LidoSRv3.Audit.Verity.SszAbstractDigest.deposit_data_root_compiles._native.native_decide.ax_1_1",
         "LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.forward_compiles._native.native_decide.ax_1_1",
     }
-    require(production_native <= set(trust_names) and
-            all(name in production_native or name.startswith("LidoSRv3.Tests.") for name in trust_names),
-            "Trust native-decision allowlist contains an undisclosed production dependency")
-    # The report publishes these as the exact emitted native-decision axioms.
-    # An arbitrary project axiom must not be presentable as one of them.
+    # Reject the type category before checking exact authorized identities.
     require(all(NATIVE_DECIDE_AXIOM.fullmatch(name) for name in trust_names),
             "Trust native-decision allowlist documents a non-native axiom")
+    require(set(trust_names) <= production_native,
+            "Trust native-decision allowlist contains an undisclosed production dependency")
     require(source_map.get("schema") == "lido-srv3-minimal-11-source-map-v3", "source-map schema differs")
     require(source_map.get("pinned_source") == f"lidofinance/core@{PINNED['lido_core'][1]}", "source-map pin differs")
     require(source_map.get("scope") == {
         "public_guarantee_count": 11,
         "assurance_contract": ["ABSTRACT_LEAN", "FAITHFUL_VERITY"],
-        "general_yul_evm_deployment": "OUT_OF_SCOPE",
-        "ssz_deployed_yul_binding": "TARGETED_ONLY",
+        "general_yul_evm_deployment": "IN_SCOPE_OPEN",
+        "ssz_deployed_yul_binding": "REQUIRED_OPEN",
         "metadata_is_proof_progress": False,
     }, "source-map assurance scope differs")
     require(source_map.get("accepted_risks") == {
         "baseline": "DEV-431-READY_NOT_AUDIT-CERT",
-        "multi_node_certification": "UNAVAILABLE_OR_PARTIAL_NON_BLOCKING",
-        "sha256_ffi": "OPAQUE",
-        "solc": "TRUSTED_WHEN_ARTIFACTS_ARE_PRODUCED",
+        "multi_node_certification": "INDEPENDENT_EXACT_SHA_REQUIRED",
+        "sha256_ffi": "REFINEMENT_REQUIRED_OPEN",
+        "solc": "COMPILED_RUNTIME_CORRESPONDENCE_REQUIRED_OPEN",
     }, "source-map accepted risks differ")
     require(source_map.get("ssz_claim") == {
         "level": "STRUCTURAL_AND_TARGETED_BINDING_PENDING",
@@ -284,7 +261,7 @@ def validate_pins(lock, manifest, source_map):
 
 
 def validate_r1_review_basis():
-    """Require the complete rendered-report input family at R1's basis."""
+    """Preserve historical R1 integrity; bind current candidate separately."""
     for relative, expected_digest in R1_REPORT_INPUT_SHA256.items():
         result = subprocess.run(
             ["git", "-C", str(ROOT), "show", f"{R1_REVIEW_BASE}:{relative}"],
@@ -299,8 +276,8 @@ def validate_r1_review_basis():
         require(hashlib.sha256(reviewed_canonical).hexdigest() == expected_digest,
                 f"R1 review basis digest differs for {relative}")
         current_canonical = canonical_review_input_bytes(relative, (ROOT / relative).read_bytes())
-        require(current_canonical == reviewed_canonical,
-                f"R1 review basis input family differs for {relative}")
+        require(hashlib.sha256(current_canonical).hexdigest() == CANDIDATE_INPUT_SHA256[relative],
+                f"candidate input family differs for {relative}")
 
 
 def validate_assumptions(data):
@@ -416,9 +393,9 @@ def validate_guarantees(data, assumption_ids):
             require(binding == {"status": "OPEN", "scope": "SSZ helper/wrapper Yul fragment only", "imported_digest": None, "deployed_digest": None, "assumption": "A-SOLC-TRUSTED"}, "P-SSZ-1: targeted deployed-Yul binding differs")
         else:
             require("special_bindings" not in row, f"{row['id']}: deployment/Yul bindings are SSZ-only")
-        forbidden = " ".join([row["next_gate"], *row["fidelity"]["missing"]]).lower()
-        if row["id"] != "P-SSZ-1":
-            require(not re.search(r"\b(yul|evm|bytecode|runtime provenance|deployment provenance)\b", forbidden), f"{row['id']}: general Yul/EVM/deployment work reintroduced")
+        # General compiler/runtime/deployment work remains in scope for every
+        # guarantee. Exact detail fingerprints above still bind each next gate;
+        # do not reject truthful scheduling merely for naming that work.
     return rows
 
 
@@ -755,9 +732,9 @@ def rendered(rows, source_map):
         )
     else:
         gap_note = "No row is gap-free."
-    report = [header + "# R1 final auditor report\n\n",
+    report = [header + "# Candidate assurance report — independent audit pending\n\n",
         "## Decision\n\n",
-        f"Review basis: structured inputs including the accepted TOPUP constructor provenance disclosure (theorem registrations and statuses unchanged; prior PR250 basis `ffd6ae4d5be0a5e1e7d1be335700e58ca90771f5` and exact input delta retained in `audit/metadata-reconcile/report-basis.json`; this revision is not a new independent certification; trio composition scoped separately) `{R1_REVIEW_BASE}`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.\n\n",
+        f"This is the current integration candidate, not an acceptance record or audit certificate. Historical R1 inputs remain pinned at `{R1_REVIEW_BASE}` and its report is preserved separately; its review does not apply to changed statements. The candidate fingerprints synchronize metadata only. CHECKED identifies Lean theorem registrations, whose exact-SHA build results and limitations must be read in the candidate validation record. Fresh independent audit is required. General compiler, deployed-code and chain-state correspondence remain required and OPEN. Owner20260915 additionally authorizes exactly three existing compiler-success native witnesses with type/provenance checks and reevaluation; kernel replacements are retained. This is scoped compiler/runtime trust, not kernel-only or deployed-runtime evidence.\n\n",
         "## Architecture and evidence boundary\n\n",
         "The evidence stack is: pinned Lido source spans → source-shaped/abstract Lean specifications → Verity Lean program and `Contract.run` transaction observables → named theorem and negative-mutant receipts. Revert theorems concern the modeled snapshot and journal. External calls, storage observations, and source correspondences have only the scope stated per row. Lean theorem names are authoritative; metadata records classification and fidelity, never proof progress.\n\n",
         "Pinned upstream source is `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`; Verity is pinned in `audit/artifacts.lock.json`; Lean is `leanprover/lean4:v4.31.0`. Canonical source anchors are immutable permalinks in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance. Supplemental rows deliberately have no independent source-map target unless their parent mapping says otherwise.\n\n",
@@ -815,15 +792,15 @@ def rendered(rows, source_map):
         "- **ETH confinement:** `P-ETH-JOURNAL-1` is a modeled journal exclusion result, not global ETH confinement across live contracts, arbitrary calls, or deployment state.\n",
         "- **Oracle sanity:** `P-ORACLE-SUPPLY-1` covers the registered source-domain/computed-mint model; it does not prove oracle-report truth, committee/oracle authorization, all report sanity, or live storage/execution correspondence.\n",
         "- **Broad token semantics:** NOT YET. `P-TOKEN-1` is registered only as a bounded subordinate row: the pinned WithdrawalQueue request-creation control prefix composed with owner-operated `transferFrom` custody hops. It establishes the two-sided amount bound, the line-130 owner fallback, non-ownerless custody over arbitrary hop chains, owner-operated authorization, and installation of the recipient as owner per hop. It does **not** establish general ERC-20/ERC-721/WstETH approvals, allowances, balances, `STETH.transferFrom` movement, share conversion, queue storage, finalization, claim/redeem, events, or adversarial recipient semantics, and it is not a canonical guarantee.\n",
-        "- **Deployment identity:** NOT YET. Neither a pinned source span, a constructor literal, a configured endpoint, a runtime receipt, nor a model address proves deployed bytecode/codehash/chain identity. General Yul/EVM/deployment provenance is out of scope; the SSZ targeted binding remains OPEN.\n\n",
+        "- **Deployment identity:** NOT YET. Neither a pinned source span, a constructor literal, a configured endpoint, a runtime receipt, nor a model address proves deployed bytecode/codehash/chain identity. General Yul/EVM/deployment provenance needed by registered claims remains required and OPEN, including the SSZ binding.\n\n",
         "## Proof-escape and receipt acceptance\n\n",
-        "`LidoSRv3.Audit.Trust` is the public axiom surface. It permits only Lean foundations (`propext`, `Classical.choice`, `Quot.sound`) plus the three explicitly recorded production exceptions (P-ALLOC-1 Phase-3 capacity, SSZ digest, consolidation flow) and the exact test/mutant-only native-decision names below; the run summary reports each production exception by name rather than folding it into the test-only count. `scripts/check_trust_axioms.py` rebuilds and reruns Trust, parses every emitted named axiom report (including Lean's empty-set spelling), and fails closed on any missing or unexpected dependency, including a production-parent or opaque project axiom. Neither Trust's source text nor its log is taken as evidence: a `#print axioms` line reads the same inside a `/- -/` block, and an `#eval IO.println` can emit a report Lean never computed, so disclosure is read from active commands only, with comments and strings blanked first, and every printed theorem's dependencies are recomputed by the checker itself through the same `Lean.collectAxioms` call `#print axioms` makes, in a probe it spawns that imports only `Lean` and loads the audited module as data, so audited code contributes declarations but never elaborates the probe measuring it — a macro bound to the collector's token sequence would otherwise intercept that call in every spelling, fully qualified ones included. The published log is then confirmed against that recomputation, and a report that hides, invents, or misstates a dependency fails closed. A disclosed native-decision name is bound to provenance rather than spelling: no project Lean source may declare a name in Lean's compiler-generated `_native.native_decide` namespace, so an `opaque` merely spelled like a generated axiom cannot be laundered into the allowed set. That lexical guard only rules out spellings a source can be scanned for, and nothing the environment records about a declaration is evidence of who created it: an elaborator can assemble the name from fragments, give it the reflection type, and register it at a line that genuinely contains `native_decide`. Each disclosed name is therefore vouched for by re-establishing its own claim rather than its origin — the checker recompiles and runs the `Bool` expression the axiom asserts is `true`, which is the same evidence `native_decide` itself relies on — while the recorded kind, type, module, and site conditions are retained only to keep the disclosed set inside the pinned tactic inventory. `scripts/check_proof_escapes.py` mechanically scans every production project Lean source, including top-level library roots, after removing comments and strings: project `sorry`, `admit`, `axiom`, equivalent `constant` declarations, `unsafe`, and `Lean.ofReduceBool` fail closed, and the complete `native_decide` inventory is pinned so additions also fail closed; its negative regression mutates an imported module, the top-level library root, and the Trust entrypoint. `audit/validation-receipt.txt` binds the current tracked tree excluding itself. A green receipt and metadata/public-surface checks establish synchronization, not semantic closure.\n\n",
+        '`LidoSRv3.Audit.Trust` is the public axiom surface. Owner20260915 accepts foundations plus exactly the three existing compiler-success native witnesses documented in I-TRUST-COMPILER-KERNEL.md. Retained kernel proofs may eliminate those dependencies; the inventory below records expected emitted names, not required exceptions. `scripts/check_trust_axioms.py` rebuilds and reruns Trust, recomputes named dependencies using an independent Lean.collectAxioms probe, enforces the exact inventory, and checks the type, source site and native reevaluation of any disclosed native Boolean claim. The final fixed-name authorization gate rejects unrelated production or test axioms. Saved-output mode checks a report only. Native evaluation expands compiler/runtime trust and is not a kernel proof or runtime/deployment correctness. No theorem or modeling obligation is removed to pass the gate. Source proof-escape scanning and the exact tactic inventory remain enforced. The validation receipt binds the tracked tree excluding itself; metadata synchronization is not semantic closure.\n\n',
         "### Exact emitted native-decision axioms\n\n```text\n" + "\n".join(trust_names) + "\n```\n\n",
         "## Recommendation\n\n",
-        "**Q1:** close the first end-to-end fidelity gap rather than adding claims: independently bind one production deployment artifact (constructor inputs, runtime codehash, chain/address) to the already pinned source and one modeled value-moving endpoint, then prove the correspondence or retain it explicitly NOT YET.\n",
+        "Stop for fresh independent audit of the combined candidate and its explicit validation failures and interface limitations. No general deployment proof or certification is claimed.\n",
     ])
     return {"ROADMAP.md": roadmap, "STATUS.md": status, "REPRODUCE.md": reproduce,
-            "R1-FINAL-AUDITOR-REPORT.md": "".join(report)}
+            "CANDIDATE-ASSURANCE-REPORT.md": "".join(report)}
 
 
 def main():
@@ -839,7 +816,7 @@ def main():
     if args.command == "generate":
         for name, content in views.items():
             (AUDIT / name).write_text(content, encoding="utf-8")
-        print("generated audit/ROADMAP.md audit/STATUS.md audit/REPRODUCE.md audit/R1-FINAL-AUDITOR-REPORT.md")
+        print("generated audit/ROADMAP.md audit/STATUS.md audit/REPRODUCE.md audit/CANDIDATE-ASSURANCE-REPORT.md")
     else:
         for name, content in views.items():
             require((AUDIT / name).read_text(encoding="utf-8") == content, f"{name} is stale; run scripts/audit_metadata.py generate")

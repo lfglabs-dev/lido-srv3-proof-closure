@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail closed unless every axiom emitted by Trust is explicitly allowed."""
+"""Check provenance, exact emitted inventory and scoped compiler authorization."""
 
 from __future__ import annotations
 
@@ -11,6 +11,7 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
+from foundational_trust import ACCEPTED_COMPILER_AXIOMS, require_authorized
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -31,61 +32,17 @@ NAMED_AXIOM_REPORT = re.compile(
 )
 TRUST_PRINT = re.compile(r"^\s*#print\s+axioms\s+(\S+)\s*$", re.MULTILINE)
 LEAN_MODULE = re.compile(r"[A-Za-z_][\w']*(?:\.[A-Za-z_][\w']*)*")
-# Rows this checker's own dependency probe emits, one per disclosed theorem,
-# plus a terminating count so a truncated probe fails closed.
+# Named dependency rows plus a terminating count reject truncated output.
 DEP_ROW = re.compile(r"^TAX\t([^\t\n]*)\t([^\t\n]*)\t([^\t\n]*)$", re.MULTILINE)
 DEP_END = re.compile(r"^TAX-END\t(\d+)$", re.MULTILINE)
-# Trust's own stdout is not evidence of anything: `#print axioms T` can be
-# wrapped in a block comment while `#eval IO.println "'T' does not depend on any
-# axioms"` prints a report Lean never computed, and the resulting log is
-# indistinguishable from an authentic one.  So the checker recomputes each
-# printed theorem's dependencies itself, through the very API `#print axioms`
-# uses (`Lean.collectAxioms`), in a process it controls, and confirms the log
-# against that.  A fabricated line is then a disagreement, not a pass.
-#
-# The audited module is loaded as *data* and is never imported into the probe's
-# syntactic scope.  Importing it would let it decide what the probe's own source
-# means: a module may declare `macro "collectAxioms" ...`, and a macro matches a
-# token sequence rather than a resolved name, so qualifying the call does not
-# escape it -- `Lean.collectAxioms` and `_root_.Lean.collectAxioms` are just as
-# interceptable as the bare spelling, and the substitute silently returns a
-# filtered dependency set.  `Lean.importModules` gives the probe the audited
-# environment without giving the audited code a say in how the probe elaborates,
-# which removes the possibility instead of trying to out-spell it.
-TRUST_DEPENDENCY_PROBE = r"""import Lean
+# Recompute with Lean.collectAxioms: Trust stdout can be fabricated, and a
+# commented-out #print is not disclosure. Load the audited environment as data
+# with Lean.importModules, never as a syntactic import into this probe. Otherwise
+# project macros could shadow even fully qualified collector names and forge the
+# result. Module ownership and dependencies below come from that environment.
+from trust_dependency_probe import TRUST_DEPENDENCY_PROBE
 
-private unsafe def trustDependenciesImpl (names : List Lean.Name) : IO Unit := do
-  Lean.initSearchPath (← Lean.findSysroot)
-  Lean.enableInitializersExecution
-  let env ← Lean.importModules #[{ module := `<<MODULE>> }] {} (loadExts := true)
-  let collect : Lean.CoreM Unit := do
-    for name in names do
-      match (← Lean.getEnv).find? name with
-      | none => IO.println s!"TAX\t{name}\tmissing\t"
-      | some info =>
-        let kind := match info with
-          | .thmInfo _ => "theorem"
-          | .axiomInfo _ => "axiom"
-          | .defnInfo _ => "definition"
-          | .opaqueInfo _ => "opaque"
-          | _ => "other"
-        let axioms ← Lean.collectAxioms name
-        let rendered :=
-          String.intercalate "," ((axioms.qsort Lean.Name.lt).map toString).toList
-        IO.println s!"TAX\t{name}\t{kind}\t{rendered}"
-  let _ ← collect.toIO
-    { fileName := "<trust-dependency-probe>", fileMap := default } { env := env }
-  IO.println s!"TAX-END\t{names.length}"
-
-@[implemented_by trustDependenciesImpl]
-private opaque trustDependencies (names : List Lean.Name) : IO Unit
-
-#eval do
-  let names := (← IO.FS.readFile "<<NAMES>>").splitOn "\n" |>.filter (· != "")
-  trustDependencies (names.map String.toName)
-"""
-# Rows this checker's own Lean probe emits, one per disclosed name, plus a
-# terminating count so a truncated or partially-elaborated probe fails closed.
+# Native claim rows also require a complete terminating count.
 PROBE_ROW = re.compile(
     r"^NDP\t([^\t\n]*)\t([^\t\n]*)\t([^\t\n]*)\t([^\t\n]*)\t([^\t\n]*)\t([^\t\n]*)\t([^\t\n]*)$",
     re.MULTILINE,
@@ -165,17 +122,13 @@ private opaque nativeProvenance (names : List Lean.Name) : IO Unit
 PHASE3 = "LidoSRv3.Audit.Verity.AllocCapacityPhase3.consumed_summary_function_spec_compiles._native.native_decide.ax_1_1"
 SSZ_DIGEST = "LidoSRv3.Audit.Verity.SszAbstractDigest.deposit_data_root_compiles._native.native_decide.ax_1_1"
 CONSOLIDATION_FLOW = "LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.forward_compiles._native.native_decide.ax_1_1"
-# Every production native-decision exception, each with the label the summary
-# reports it under.  The set is derived from this map so a new exception cannot
-# be recorded in one place and silently omitted from the audit summary in the
-# other, which is how the SSZ digest and consolidation flow came to be counted
-# as test evidence.
+# Explicit production exceptions; test disclosures cannot extend this set.
 PRODUCTION_NATIVE_LABELS = {
     PHASE3: "Phase-3 capacity",
     SSZ_DIGEST: "SSZ digest",
     CONSOLIDATION_FLOW: "consolidation flow",
 }
-PRODUCTION_NATIVE_AXIOMS = set(PRODUCTION_NATIVE_LABELS)
+PRODUCTION_NATIVE_AXIOMS = ACCEPTED_COMPILER_AXIOMS
 FOUNDATIONAL_AXIOMS = {"propext", "Classical.choice", "Quot.sound"}
 
 
@@ -343,19 +296,45 @@ def check_native_provenance(names: list[str], module: str, fixture: Path | None)
     verify_native_provenance(ordered, output, sites)
 
 
-def environment_dependencies(names: list[str], module: str,
-                             fixture: Path | None) -> dict[str, set[str]]:
-    """Recompute each named theorem's axiom dependencies from the built environment.
+def production_probe_modules(root: Path) -> list[str]:
+    """Select scope from the import gate; dependencies still come from Lean.
 
-    This is the checker's own answer, obtained through `Lean.collectAxioms` --
-    the same call `#print axioms` makes -- in a process this script spawns and
-    hands the name list to.  Nothing here reads Trust's source or its log, so a
-    commented-out command or a fabricated `IO.println` cannot influence it, and
-    the probe never imports the audited module, so nothing the module declares
-    can influence how that call is elaborated either.
+    An unimported production module is not exempt. Missing compiled artifacts
+    fail the subsequent import instead of silently reducing the theorem set.
+    """
+    from check_import_dag import is_excluded_from_production, production_glob_gaps
+    gaps = production_glob_gaps(root)
+    if gaps:
+        fail("production modules missing from Lake: " + ", ".join(gaps))
+    paths = [root / "LidoSRv3.lean", *(root / "LidoSRv3").rglob("*.lean")]
+    modules = []
+    for path in paths:
+        relative = path.relative_to(root).as_posix()
+        if path.is_file() and not is_excluded_from_production(relative):
+            name = relative[:-5].replace("/", ".")
+            if not LEAN_MODULE.fullmatch(name):
+                fail("malformed production module: " + name)
+            modules.append(name)
+    return sorted(set(modules))
+
+
+def environment_dependencies(names: list[str], module: str,
+                             fixture: Path | None, *, discover: bool = False) -> dict[str, set[str]]:
+    """Recompute disclosed and optionally discovered production claims.
+
+    The separate probe loads the environment as data; source spelling, fabricated
+    stdout and audited syntax extensions cannot supply its dependency answers.
     """
     ordered = sorted(names)
-    output = lean_probe_output(TRUST_DEPENDENCY_PROBE, "trust-dependency",
+    modules = [module]
+    if discover and (fixture is None or (fixture / "lakefile.lean").is_file()):
+        modules.extend(production_probe_modules(fixture or ROOT))
+    imports = "#[" + ", ".join("{ module := `" + name + " }"
+                              for name in sorted(set(modules))) + "]"
+    probe = (TRUST_DEPENDENCY_PROBE
+             .replace("<<DISCOVER>>", "true" if discover else "false")
+             .replace("<<MODULES>>", imports))
+    output = lean_probe_output(probe, "trust-dependency",
                                module, ordered, fixture)
     rows: dict[str, set[str]] = {}
     for name, kind, rendered in DEP_ROW.findall(output):
@@ -366,7 +345,7 @@ def environment_dependencies(names: list[str], module: str,
                  f"environment")
         rows[name] = {axiom for axiom in rendered.split(",") if axiom}
     counted = DEP_END.findall(output)
-    if len(counted) != 1 or int(counted[0]) != len(ordered):
+    if len(counted) != 1 or int(counted[0]) != len(rows) or (not discover and len(rows) != len(ordered)):
         fail("trust-dependency probe did not report on every printed theorem")
     unreported = sorted(set(ordered) - set(rows))
     if unreported:
@@ -375,14 +354,16 @@ def environment_dependencies(names: list[str], module: str,
 
 
 def confirm_reported_dependencies(reports: list[tuple[str, set[str]]],
-                                  computed: dict[str, set[str]]) -> None:
+                                  computed: dict[str, set[str]],
+                                  printed: set[str] | None = None) -> None:
     """Require Trust's log to say exactly what the environment says.
 
-    Trust's log is a convenience for readers, not evidence.  Any theorem it
-    reports on must be one Trust actually prints for, and the dependency set it
+    Each logged theorem must be actively disclosed, and the dependency set it
     shows must equal the set this checker recomputed; either way round, a
     disagreement means the log describes something other than the code.
     """
+    if printed is not None:
+        computed = {name: computed[name] for name in printed}
     reported = {name for name, _ in reports}
     fabricated = sorted(reported - set(computed))
     if fabricated:
@@ -417,8 +398,8 @@ def disclosed_names() -> set[str]:
     unshaped = sorted(name for name in names if not NATIVE_AXIOM.fullmatch(name))
     if unshaped:
         fail("allowlist documents non-native axiom(s): " + ", ".join(unshaped))
-    if not PRODUCTION_NATIVE_AXIOMS <= names:
-        fail("allowlist omits a documented production native-decision dependency")
+    # Compiler exceptions may disappear after kernel proof replacement. The
+    # exact emitted-inventory comparison below still rejects hidden dependencies.
     if any(name not in PRODUCTION_NATIVE_AXIOMS and not name.startswith("LidoSRv3.Tests.") for name in names):
         fail("allowlist contains a non-test native-decision dependency")
     return names
@@ -482,6 +463,15 @@ def observed_axioms(output: str) -> tuple[set[str], list[tuple[str, set[str]]]]:
     return set().union(*(axioms for _, axioms in reports)), reports
 
 
+def check_production_scope(reports):
+    """Test disclosure cannot authorize production dependencies."""
+    for theorem, axioms in reports:
+        if not theorem.startswith("LidoSRv3.Tests."):
+            leaked = sorted(axioms - FOUNDATIONAL_AXIOMS - PRODUCTION_NATIVE_AXIOMS)
+            if leaked:
+                fail(f"{theorem} depends on test-only native axiom(s): " + ", ".join(leaked))
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--trust-output", type=Path,
@@ -531,7 +521,7 @@ def main() -> None:
         # a policy shim; this is the actual Trust command, not a cached log.
         env.setdefault("SANDBOXED_REMOTE_EXECUTION", "1")
         build = subprocess.run(
-            ["lake", "build", "LidoSRv3.Audit.Trust"],
+            ["lake", "build", "LidoSRv3", "LidoSRv3.Audit.Trust"],
             cwd=ROOT, env=env, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
         )
         if build.returncode:
@@ -554,14 +544,12 @@ def main() -> None:
     output_missing = sorted(registered - {name for name, _ in reports})
     if output_missing:
         fail("Trust output omits registered CHECKED theorem report(s): " + ", ".join(output_missing))
-    # Trust's log has said nothing verifiable so far: every line in it is just
-    # text some command printed.  Recompute what each printed theorem really
-    # depends on and require the log to match, so the axioms checked below are
-    # the environment's and not the log's.  Saved-output mode has no environment
-    # to consult and therefore certifies a report, not a build.
     if not args.trust_output:
-        computed = environment_dependencies(sorted(printed), args.provenance_module, None)
-        confirm_reported_dependencies(reports, computed)
+        computed = environment_dependencies(sorted(printed), args.provenance_module, None,
+                                            discover=True)
+        confirm_reported_dependencies(reports, computed, printed)
+        print(f"trust coverage: {len(printed)} disclosures; {len(computed)} independently "
+              "recomputed claims including audit and separately published legacy module theorems")
         reports = sorted(computed.items())
         observed = set().union(*computed.values())
     # Provenance precedes disclosure: a native-decision name is only credible
@@ -579,6 +567,7 @@ def main() -> None:
         unexpected = sorted(axioms - allowed)
         if unexpected:
             fail(f"{theorem} emits undisclosed axiom(s): " + ", ".join(unexpected))
+    check_production_scope(reports)
     if observed != allowed:
         missing = sorted(allowed - observed)
         unexpected = sorted(observed - allowed)
@@ -591,9 +580,7 @@ def main() -> None:
     observed_native = set(NATIVE_AXIOM.findall(output))
     if observed_native != disclosed:
         fail("native-decision extraction disagrees with the complete axiom report")
-    # Only the recorded production exceptions are production evidence; every
-    # other disclosed native-decision axiom is test/mutant-only.  Subtracting a
-    # single name would bury the exceptions this summary exists to surface.
+    require_authorized(reports)
     production = sorted(PRODUCTION_NATIVE_AXIOMS & observed_native)
     test_only = observed_native - PRODUCTION_NATIVE_AXIOMS
     exceptions = ", ".join(PRODUCTION_NATIVE_LABELS[name] for name in production)

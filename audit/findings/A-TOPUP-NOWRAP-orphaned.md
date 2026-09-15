@@ -22,7 +22,7 @@ require a general no-wrap premise", and its `removal_path` in
 `audit/assumptions.yaml` is "Review each consuming theorem before removing
 this registry identifier."
 
-## Proof (see `LidoSRv3/Audit/Provenance/TopupNoWrapOrphaned.lean`)
+## Proof (see `LidoSRv3/Audit/Guarantees/Composition/TopupNoWrapOrphaned.lean`)
 
 Three theorems exhibit the orphanage:
 
@@ -50,7 +50,7 @@ in `LidoSRv3.Audit.Trust`.
 ## Reproduction
 
 ```bash
-lake build LidoSRv3.Audit.Provenance.TopupNoWrapOrphaned
+lake build LidoSRv3.Audit.Guarantees.Composition.TopupNoWrapOrphaned
 lake build LidoSRv3.Audit.Trust
 python3 scripts/check_trust_axioms.py
 ```

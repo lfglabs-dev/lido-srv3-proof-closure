@@ -1,3 +1,4 @@
+import LidoSRv3.Audit.Guarantees.PAddress1
 import LidoSRv3.Audit.Verity.AddressAdmission
 import LidoSRv3.Audit.Verity.AddressTx
 import LidoSRv3.Audit.Model.AddressClaimJournalLegacy
@@ -111,7 +112,8 @@ private def fixedOwnerGateWitness : Input :=
 
 /-- **Kill-line refuting the registered P-ADDRESS-1 parent
 (`PAddress1.universal_address_writer_equivariance`) on a mutant of its own
-model.**  The negated statement is the parent's exact predicate shape with the
+model.** The actual live-batch conjunct is retained unchanged; the mutation
+falsifies the source-shaped renaming conjunct. The negated statement is the parent's exact predicate shape with the
 mutant `runFixedOwnerGated` substituted for `run`: the same nonzero-caller
 binders and BOTH conclusion conjuncts (admission-bit equality and
 committed-post renaming).  (The wave-4 parent carried an
@@ -129,11 +131,12 @@ since that theorem is stated over a disconnected toy `FunctionSpec` that never
 mentions `SolidityAddress.run`. -/
 theorem fixed_owner_gate_kill_line_refutes_parent :
     ¬ ∀ (a₁ a₂ : Address), a₁ ≠ 0 → a₂ ≠ 0 → ∀ (inp : Input),
-        succeeds (runFixedOwnerGated (renameInput a₁ a₂ inp)) =
+        (succeeds (runFixedOwnerGated (renameInput a₁ a₂ inp)) =
           succeeds (runFixedOwnerGated inp) ∧
         ∀ post, runFixedOwnerGated inp = .committed post →
           runFixedOwnerGated (renameInput a₁ a₂ inp) =
-            .committed (renamePost a₁ a₂ post) := by
+            .committed (renamePost a₁ a₂ post)) ∧
+        LidoSRv3.Audit.Guarantees.PAddress1.LiveClaimBatchBehavior := by
   intro h
   have hcex := h 1 2 (by decide) (by decide) fixedOwnerGateWitness
   have hBoth :
@@ -142,7 +145,7 @@ theorem fixed_owner_gate_kill_line_refutes_parent :
         runFixedOwnerGated (renameInput 1 2 fixedOwnerGateWitness) ≠
           .committed (renamePost 1 2 ⟨1, 1, 1, 1⟩) :=
     ⟨by decide, by decide⟩
-  exact hBoth.2 (hcex.2 ⟨1, 1, 1, 1⟩ (by decide))
+  exact hBoth.2 (hcex.1.2 ⟨1, 1, 1, 1⟩ (by decide))
 
 /-- **Sibling evidence: admission projection only.**  Refutes the parent's
 first conclusion conjunct on the same fixed-owner-gated mutant, WITHOUT the
@@ -183,11 +186,12 @@ renaming the original committed post requires owner `2`.  Thus the full parent
 shape is false solely through its committed-post conjunct. -/
 theorem fixed_owner_writer_kill_line_refutes_parent :
     ¬ ∀ (a₁ a₂ : Address), a₁ ≠ 0 → a₂ ≠ 0 → ∀ (inp : Input),
-        succeeds (runFixedOwnerWriter (renameInput a₁ a₂ inp)) =
+        (succeeds (runFixedOwnerWriter (renameInput a₁ a₂ inp)) =
           succeeds (runFixedOwnerWriter inp) ∧
         ∀ post, runFixedOwnerWriter inp = .committed post →
           runFixedOwnerWriter (renameInput a₁ a₂ inp) =
-            .committed (renamePost a₁ a₂ post) := by
+            .committed (renamePost a₁ a₂ post)) ∧
+        LidoSRv3.Audit.Guarantees.PAddress1.LiveClaimBatchBehavior := by
   intro h
   have hcex := h 1 2 (by decide) (by decide) (eligibleUnwrap 1)
   have hcommit :
@@ -197,7 +201,7 @@ theorem fixed_owner_writer_kill_line_refutes_parent :
       runFixedOwnerWriter (renameInput 1 2 (eligibleUnwrap 1)) ≠
         .committed (renamePost 1 2 ⟨1, 1, 1, 1⟩) := by
     decide
-  exact hne (hcex.2 ⟨1, 1, 1, 1⟩ hcommit)
+  exact hne (hcex.1.2 ⟨1, 1, 1, 1⟩ hcommit)
 
 /-- Retained for the denote-admission subordinate row only: the disconnected
 toy `AddressAdmission.ownerGated` mutant is not a kill-line for the registered

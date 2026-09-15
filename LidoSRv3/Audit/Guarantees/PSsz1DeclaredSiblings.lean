@@ -1,4 +1,4 @@
-import LidoSRv3.Audit.Source.SszDeclaredSiblings
+import LidoSRv3.Audit.Guarantees.Composition.SszDeclaredSiblings
 /-! Same actual compiled330 success and inherited ShaWidth, now authenticating
 all ABI-declared indexed siblings. The complete prior public consequence is
 retained before the added conjunction; no new fit/frame/canonicality premise. -/

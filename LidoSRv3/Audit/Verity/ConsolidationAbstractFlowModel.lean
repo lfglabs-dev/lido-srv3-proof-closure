@@ -1,4 +1,8 @@
 import Compiler.CompilationModel
+import Lean
+
+set_option pp.maxSteps 500
+set_option pp.deepTerms.threshold 12
 
 /-!
 # P-CONSOLIDATION-1 abstract flow model
@@ -65,9 +69,81 @@ def spec : CompilationModel :=
 
 def selector : Nat := 0x72510001
 
+private def exceptUnitDecEq : DecidableEq (Except String Unit) := fun x y =>
+  match x, y with
+  | .ok _, .ok _ => isTrue rfl
+  | .error a, .error b =>
+    if h : a = b then isTrue (h ▸ rfl)
+    else isFalse (by intro heq; cases heq; exact h rfl)
+  | .ok _, .error _ => isFalse (by intro h; cases h)
+  | .error _, .ok _ => isFalse (by intro h; cases h)
+
+local instance : DecidableEq (Except String Unit) := exceptUnitDecEq
+
+/-- Validation uses the declared local obligations; the opaque mechanics
+collector need not be evaluated to establish that this guard is discharged. -/
+theorem forward_validates : validateFunctionSpec forward = .ok () := by
+  have documented : forward.localObligations.isEmpty = false := rfl
+  simp only [validateFunctionSpec, documented, Bool.and_false, Bool.false_and]
+  decide +kernel
+
+set_option maxRecDepth 16384 in
+set_option maxHeartbeats 4000000 in
+theorem forward_inputs_validate : validateCompileInputs spec [selector] = .ok () := by
+  unfold validateCompileInputs
+  run_tac do
+    let env ← Lean.getEnv
+    let candidates := env.constants.toList.filter fun (name, _) =>
+      name.toString.endsWith ".validateCompileInputsBeforeFieldWriteConflict"
+    match candidates with
+    | [(name, _)] =>
+        let id := Lean.mkIdent name
+        Lean.Elab.Tactic.evalTactic (← `(tactic| unfold $id:ident))
+    | _ => throwError "expected one pinned compiler precheck definition"
+  have hi : forward.isInternal = false := rfl
+  have hn : forward.name = "forwardConsolidationRequest" := rfl
+  simp [spec, forward_validates, hi, hn, List.filter_cons,
+    Bind.bind, Except.bind, Pure.pure, Except.pure]
+  all_goals decide +kernel
+
+theorem forward_body_compiles :
+    (compileStmtListWithFork [] [] [] .calldata [] false [] [] .cancun forward.body []).isOk = true := by
+  simp [forward, lit, compileStmtListWithFork, compileStmtWithFork,
+    compileExprWithInternals, compileRequireFailCondWithInternals,
+    Bind.bind, Except.bind, Pure.pure, Except.pure, Except.isOk, Except.toBool]
+
+theorem forward_no_templates : (templateIntrinsicItems spec).isEmpty = true := by
+  decide +kernel
+
+set_option maxRecDepth 16384 in
+set_option maxHeartbeats 4000000 in
+theorem forward_core_compiles :
+    (compileValidatedCore spec [selector]).isOk = true := by
+  have hi : forward.isInternal = false := rfl
+  have hn : forward.name = "forwardConsolidationRequest" := rfl
+  have hs : isInteropEntrypointName "forwardConsolidationRequest" = false := by decide +kernel
+  have hf : applySlotAliasRanges [] [] = [] := rfl
+  have hp : forward.params = [] := rfl
+  have hl : forward.nonReentrantLock = none := rfl
+  have hr : functionReturns forward = .ok [.uint256] := rfl
+  have ht := List.nil_of_isEmpty forward_no_templates
+  have hbody := forward_body_compiles
+  cases hb : compileStmtListWithFork [] [] [] .calldata [] false [] [] .cancun forward.body [] with
+  | error err => simp [hb, Except.isOk, Except.toBool] at hbody
+  | ok body =>
+    unfold compileValidatedCore
+    rw [ht]
+    simp [spec, compileGuardedFunctionSpec, compileFunctionSpec,
+      forward_validates, hi, hn, hs, hf, hp, hl, hr, hb,
+      attachNonReentrantGuard, compileConstructor,
+      pickUniqueFunctionByName, List.filter_cons, List.mapM_cons,
+      Bind.bind, Except.bind, Pure.pure, Except.pure, Except.isOk, Except.toBool]
+
 theorem forward_compiles :
     (CompilationModel.compile spec [selector]).isOk = true := by
-  native_decide
+  unfold CompilationModel.compile
+  rw [forward_inputs_validate]
+  exact forward_core_compiles
 
 abbrev Bytes := ByteArray
 

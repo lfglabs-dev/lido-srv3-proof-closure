@@ -1,4 +1,4 @@
-import LidoSRv3.Audit.Guarantees.PTopupRouterLocatorCall
+import LidoSRv3.Audit.Source.Effects.PTopupRouterLocatorCall
 
 /-! Physical TopUpGateway onlyRole/whenResumed admission before the complete
 locator/credentials/root/module/history executor. Typed entry after the outer

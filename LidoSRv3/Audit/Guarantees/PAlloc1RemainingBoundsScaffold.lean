@@ -12,17 +12,17 @@ uint64 type bounds by `PAlloc1TargetMultBounded` (PR #439). This
 module names the pinned invariants for the three remaining
 conjuncts:
 
-- `active_subtraction` — SRStorage `addValidators` /
-  `_updateExitedCounters` monotonicity invariant.
+- `active_subtraction` — a caller-supplied relation between external summary
+  counts and the router accounting count; no router write history is derived.
 - `total_addition` — `MAX_STAKING_MODULES_COUNT = 32` + per-module
   uint64 `allocationEntry` bound.
 - `available_arithmetic` — uint64 bounds on `activeCount` and
   `depositableCount`.
 
 **Status: naming scaffold, not a full composition.** The three
-derivation theorems are trivial projections; live SRStorage
-invariants and pinned StakingModule type-bound source models are the
-follow-up. -/
+derivation theorems are trivial projections; external summary-interface invariants and input bounds remain obligations.
+The pinned summary ABI returns uint256 fields; uint64 bounds on those replies
+do not follow from router-local storage widths. -/
 
 namespace LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
 
