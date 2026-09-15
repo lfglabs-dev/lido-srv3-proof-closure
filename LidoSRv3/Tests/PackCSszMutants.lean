@@ -49,6 +49,8 @@ def mutantEngine (data : ByteArray) : ByteArray :=
 theorem engine_mutant_disagrees_with_sha256engine :
     (Sha256Engine.sha256 ByteArray.empty).data.toList ≠
       (mutantEngine ByteArray.empty).data.toList := by
-  native_decide
+  set_option maxRecDepth 8192 in
+  set_option maxHeartbeats 4000000 in
+  decide +kernel
 
 end LidoSRv3.Tests.PackCSszMutants
