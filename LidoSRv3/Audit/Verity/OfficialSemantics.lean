@@ -114,6 +114,17 @@ theorem wrappingMutant_is_detected :
       (denote wrappingMutant [Verity.Core.MAX_UINT256, 1]).returnValue = some 0 := by
   decide +kernel
 
+private def exceptUnitDecEq : DecidableEq (Except String Unit) := fun x y =>
+  match x, y with
+  | .ok _, .ok _ => isTrue rfl
+  | .error a, .error b =>
+    if h : a = b then isTrue (h ▸ rfl)
+    else isFalse (by intro heq; cases heq; exact h rfl)
+  | .ok _, .error _ => isFalse (by intro h; cases h)
+  | .error _, .ok _ => isFalse (by intro h; cases h)
+
+local instance : DecidableEq (Except String Unit) := exceptUnitDecEq
+
 set_option maxRecDepth 16384 in
 set_option maxHeartbeats 4000000 in
 set_option pp.maxSteps 200 in
@@ -122,14 +133,6 @@ produces its IR; this theorem fixes the concrete compiler entrypoint and rules
 out a source-only local interpreter experiment. -/
 theorem checkedFold_compiles_to_official_ir :
     (CompilationModel.compile checkedFoldSpec [tx.functionSelector]).isOk = true := by
-  letI : DecidableEq (Except String Unit) := fun x y =>
-    match x, y with
-    | .ok _, .ok _ => isTrue rfl
-    | .error a, .error b =>
-      if h : a = b then isTrue (h ▸ rfl)
-      else isFalse (by intro heq; cases heq; exact h rfl)
-    | .ok _, .error _ => isFalse (by intro h; cases h)
-    | .error _, .ok _ => isFalse (by intro h; cases h)
   have functionValid : validateFunctionSpec checkedFold = .ok () := by
     simp [validateFunctionSpec, checkedFold, Bind.bind, Except.bind, Pure.pure, Except.pure]
     decide +kernel
