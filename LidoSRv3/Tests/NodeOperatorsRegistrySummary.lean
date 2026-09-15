@@ -132,4 +132,16 @@ theorem allocated_load_delta_fixture :
       .ok (.load (word 5) (word 4)) := by
   decide +kernel
 
+/-- The final assertion wins even when the subsequent aggregate addition
+would overflow its packed deposited field. -/
+theorem allocated_final_assert_before_overflow :
+    let s := { consistentState with summarySigningKeysStats := word ((2^64-1) * 2^192) }
+    (match finishAllocatedKeys s (word 1) (word 2) with
+      | .error .invalid => true
+      | _ => false) = true ∧
+    (match finishAllocatedKeys s (word 1) (word 1) with
+      | .error (.revert reason) => reason == LidoSRv3.Audit.Source.Packed64x4.errorString "PACKED_OVERFLOW"
+      | _ => false) = true := by
+  decide +kernel
+
 end LidoSRv3.Tests.NodeOperatorsRegistrySummary

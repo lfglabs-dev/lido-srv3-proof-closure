@@ -650,6 +650,106 @@
       "raw_receipt_path": "/workspaces/mission-1ca15c66/output/remote-a1c10d95-45b9-4ba8-9435-78db0a2ded8e.json",
       "raw_receipt_sha256": "44dac448fe814b0a9149c4c77361832676294c51ac2b52b0961a32c77181fcf2",
       "scope": "Exact160a47ca Solidity-control run failed before compilation: vendored Aragon SafeMath64.sol missing. No Solidity test executed; no source bundle."
+    },
+    {
+      "job_id": "f78b4baa-27a3-4e55-bf43-6a5f5e2cc5b4",
+      "state": "failed",
+      "exit_code": 1,
+      "node_id": "dgx-spark",
+      "validation": {
+        "version": 1,
+        "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+        "commit": "970f25703f4b03ef21696eed602c09528ec5583d",
+        "base_tree_sha": "bcbd81eac6c7bc05e17d14b1766b6bb79399567d",
+        "cwd_rel_known": true,
+        "command": [
+          "lake",
+          "build",
+          "LidoSRv3.Tests.NodeOperatorsRegistrySummary"
+        ],
+        "toolchain": "leanprover/lean4:v4.31.0",
+        "source_bundle_digest": "cbaaa40d80045e4fea7b888743086e664042e0304d4ebbbe20bf4cfc4d0197da",
+        "build_protocol_version": "1",
+        "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+      },
+      "raw_receipt_path": "/workspaces/mission-1ca15c66/output/remote-f78b4baa-27a3-4e55-bf43-6a5f5e2cc5b4.json",
+      "raw_receipt_sha256": "cd3da40c5227dddf7cd7484f2956ab5f5ecf27828aeb7a9f6ff53825eab52b5c",
+      "scope": "Bundled NOR row-composition build failed: imported simplification closes the existing prefix equality branch before a redundant exact tactic. No regression pass; not clean-base validation."
+    },
+    {
+      "job_id": "1909207b-5bb3-41b7-b227-a6808b7e2b65",
+      "state": "failed",
+      "exit_code": 1,
+      "node_id": "dgx-spark",
+      "validation": {
+        "version": 1,
+        "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+        "commit": "970f25703f4b03ef21696eed602c09528ec5583d",
+        "base_tree_sha": "bcbd81eac6c7bc05e17d14b1766b6bb79399567d",
+        "cwd_rel_known": true,
+        "command": [
+          "lake",
+          "build",
+          "LidoSRv3.Tests.NodeOperatorsRegistrySummary"
+        ],
+        "toolchain": "leanprover/lean4:v4.31.0",
+        "source_bundle_digest": "d9644b64f55f66d6fb0a144b3ad28a243c3da09efebda28a66745f80c7d6aa03",
+        "build_protocol_version": "1",
+        "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+      },
+      "raw_receipt_path": "/workspaces/mission-1ca15c66/output/remote-1909207b-5bb3-41b7-b227-a6808b7e2b65.json",
+      "raw_receipt_sha256": "dfdde074d107ef77f7a678bd936ac566089b50e6619b2dd6132953c569430d5d",
+      "scope": "NOR source module including row composition and new continuation proofs compiled. Regression module failed on unqualified Packed64x4.errorString name. No regression pass; bundled validation only."
+    },
+    {
+      "job_id": "a26508a2-3f7b-4616-b93a-bb54a34942a9",
+      "state": "failed",
+      "exit_code": 1,
+      "node_id": "dgx-spark",
+      "validation": {
+        "version": 1,
+        "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+        "commit": "970f25703f4b03ef21696eed602c09528ec5583d",
+        "base_tree_sha": "bcbd81eac6c7bc05e17d14b1766b6bb79399567d",
+        "cwd_rel_known": true,
+        "command": [
+          "lake",
+          "build",
+          "LidoSRv3.Tests.NodeOperatorsRegistrySummary"
+        ],
+        "toolchain": "leanprover/lean4:v4.31.0",
+        "source_bundle_digest": "34a54c4026c6f0a93bcd863c1e4e38b8c2240e082fa81e8167ffd3b725847f54",
+        "build_protocol_version": "1",
+        "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+      },
+      "raw_receipt_path": "/workspaces/mission-1ca15c66/output/remote-a26508a2-3f7b-4616-b93a-bb54a34942a9.json",
+      "raw_receipt_sha256": "0fc92fb3c975a434274766adc81756ee270ac223ef4d7563e45d8d0ff8a5e838",
+      "scope": "NOR source proofs compiled. Regression failed Decidable synthesis for a proposition-valued match over the state result; replacing its exact-error observations with decidable Boolean checks. No regression pass; bundled validation only."
+    },
+    {
+      "job_id": "9da1266a-89c7-43ec-b9c5-ed7759203cd6",
+      "state": "succeeded",
+      "exit_code": 0,
+      "node_id": "dgx-spark",
+      "validation": {
+        "version": 1,
+        "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+        "commit": "970f25703f4b03ef21696eed602c09528ec5583d",
+        "base_tree_sha": "bcbd81eac6c7bc05e17d14b1766b6bb79399567d",
+        "cwd_rel_known": true,
+        "command": [
+          "lake",
+          "build",
+          "LidoSRv3.Tests.NodeOperatorsRegistrySummary"
+        ],
+        "toolchain": "leanprover/lean4:v4.31.0",
+        "source_bundle_digest": "0cd665b2dfbe39a392b606c31ded5624349eca04078931e5f16fc0917a38b7b1",
+        "build_protocol_version": "1",
+        "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+      },
+      "raw_receipt_path": "/workspaces/mission-1ca15c66/output/remote-9da1266a-89c7-43ec-b9c5-ed7759203cd6.json",
+      "raw_receipt_sha256": "cabe6fc8caa33a46a894e0acdc04b394ea962d62cc97d849523a713d861f1f71",
+      "scope": "NOR row composition, continuation proofs and all NOR summary regressions including final-assert/error ordering compiled successfully (1107 jobs). Source bundle at base970f2570; not exact-successor validation or full loader closure."
     }
   ]
 }

@@ -2400,3 +2400,11 @@ example : (Compiler.CompilationModel.compile LidoSRv3.Audit.Verity.Consolidation
 #print axioms LidoSRv3.Audit.Source.ByteMemory.read_in_bounds
 
 #print axioms LidoSRv3.Tests.SigningKeysMemory.slot_producer_memory_survives
+
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.commitAllocatedRow_deposited
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.finishAllocatedKeys_mismatch
+#print axioms LidoSRv3.Tests.NodeOperatorsRegistrySummary.allocated_final_assert_before_overflow
+
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.finishAllocatedKeys_effect
+
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.loadAllocatedRow_unchanged
