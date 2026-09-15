@@ -486,6 +486,11 @@ theorem checkedFold_compiles_to_official_ir :
             let id := Lean.mkIdent name
             Lean.Elab.Tactic.evalTactic (← `(tactic| simp [$id:ident]))
         | _ => throwError "expected one pinned Validation helper: {suffix}"
+    simp [functionReturns, validateReturnShapesInStmt, validateReturnShapesNode,
+      validateStmtParamReferences, validateStmtParamReferencesNode,
+      Stmt.checkRec, stmtCheck_forEach, stmtCheck_letVar, stmtCheck_assignVar,
+      stmtCheck_require, stmtCheck_return, stmtCheck_setStorageArrayElement,
+      Bind.bind, Except.bind, Pure.pure, Except.pure]
     all_goals (trace_state; decide_cbv)
   have identifiers : validateIdentifierShapes checkedFoldSpec = .ok () := by
     simp [validateIdentifierShapes, checkedFoldSpec]
@@ -520,7 +525,9 @@ theorem checkedFold_compiles_to_official_ir :
           Lean.Elab.Tactic.evalTactic (← `(tactic| unfold $id:ident))
       | _ => throwError "expected one pinned compiler precheck definition"
     simp only [identifiers]
-    simp [validateNonReentrantForkCompatibility, no_external_assumptions, identifiers, checkedFoldSpec, functionValid,
+    simp [firstInvalidSlotAliasRange, firstSlotAliasSourceOverlap,
+      firstUnsupportedInternalDynamicParam, validateNonReentrantForkCompatibility,
+      no_external_assumptions, identifiers, checkedFoldSpec, functionValid,
       checkedFold, modulesField, Bind.bind, Except.bind, Pure.pure, Except.pure]
     all_goals (trace_state; decide_cbv)
   have fieldSlot : findFieldWithResolvedSlot [modulesField] "modules" = some (modulesField, 7) := by

@@ -722,3 +722,11 @@ not transfer a predecessor build, trust verdict or deployment acceptance.
   [receipt](receipts/nor-source/compiler-fold-afda00ed.json) reports no traversal
   helper errors but remaining function/input recursion. The next proof isolates
   ADT placement and enables reduction diagnostics; no full pass is claimed.
+
+- Exact `6d218ab3504dc1d1d726fd9e818fc9c9d8e2be2a` job
+  `3afbb4db-86be-453c-84c2-d91807779c04` failed with exit 1 at
+  2026-09-15 19:24:52 UTC, without a source bundle. The
+  [receipt](receipts/nor-source/compiler-fold-6d218ab3.json) includes reduction
+  diagnostics: ADT placement no longer fails, while return-shape/function and
+  slot-alias/input validation remain unreduced. The next repair unfolds those
+  actual checks, without changing program fields, statement or hypotheses.
