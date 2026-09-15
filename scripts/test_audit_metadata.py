@@ -193,7 +193,7 @@ def main():
         # A valid widened Trust allowlist must fail the review-basis binding.
         trust_allowlist = tpath.read_text(encoding="utf-8")
         widened = trust_allowlist + (
-            "LidoSRv3.Tests.Injected.review_basis_widening"
+            "LidoSRv3.Audit.Verity.AllocCapacityPhase3.consumed_summary_function_spec_compiles"
             "._native.native_decide.ax_1_1\n"
         )
         tpath.write_text(widened, encoding="utf-8")

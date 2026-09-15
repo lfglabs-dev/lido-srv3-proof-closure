@@ -381,6 +381,49 @@ theorem verity_tx_simulates_allocation_count_from_storage
       LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.account_math_result
         layout input adversary ⟨state, gas, []⟩ before⟩
 
+/-- Registered account-qualified allocation result. Unlike the retained legacy
+observation theorem above, this entry has no assumed successful binding or
+clipped count. It preserves all producer outcomes and module-call observations,
+derives successful capacity equations from the executed rows, and composes the
+public allocation continuation on the same world.
+
+[SRLib allocation](https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/sr/SRLib.sol#L391-L431)
+and [capacity loops](https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/sr/SRLib.sol#L493-L559).
+The abstract `checked_execute` remains unchanged. Gas sufficiency, deployed
+layout/code identity and compiled library execution are separate obligations. -/
+theorem account_allocation_result
+    (layout : LidoSRv3.Audit.Source.TrioAlloc1.Layout)
+    (input : LidoSRv3.Audit.Source.TrioAlloc1.CapacityInput)
+    (adversary : Compiler.CompilationModel.DenoteExternalCalls.AdversaryModel)
+    (state : Compiler.CompilationModel.DenoteExternalCalls.CallState)
+    (before : LidoSRv3.Audit.Source.TrioAlloc1.Transcript) :
+    (LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.executeAccount
+      layout input adversary state before).1 =
+      LidoSRv3.Audit.Source.TrioAlloc1.produce layout
+        (LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.accountStorage state.world)
+        (LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.sourceOracle adversary state.world)
+        input before ∧
+    (LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.executeAccount
+      layout input adversary state before).2.world = state.world ∧
+    LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.AccountMathResult
+      layout input adversary state before ∧
+    (∀ amount,
+      (LidoSRv3.Audit.Source.TrioComposition.VerityParentResult.execute
+        layout input.config amount input.isTopUp adversary state before).1 =
+        LidoSRv3.Audit.Source.TrioComposition.getDepositAllocationsABI layout
+          (LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.accountStorage state.world)
+          (LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.sourceOracle adversary state.world)
+          input.config amount input.isTopUp before ∧
+      (LidoSRv3.Audit.Source.TrioComposition.VerityParentResult.execute
+        layout input.config amount input.isTopUp adversary state before).2.world = state.world) := by
+  have h := LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.account_producer_correspondence
+    layout input adversary state before
+  exact ⟨h.1, h.2,
+    LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.account_math_result
+      layout input adversary state before,
+    fun amount => LidoSRv3.Audit.Source.TrioComposition.VerityParentResult.execute_correspondence
+      layout input.config amount input.isTopUp adversary state before⟩
+
 /-- Every revert of the allocation transaction, including the injected
 failure after intermediate map/slot writes, restores the pre-call snapshot. -/
 theorem verity_tx_revert_restores_snapshot
@@ -397,8 +440,8 @@ theorem verity_tx_revert_restores_snapshot
 open LidoSRv3.Audit.Verity.AllocationTx in
 /-- **Chantier 3 (Piste A, 2026-09-13): Contract.run rollback for the
 live-summary entry point.**  Every revert of
-`allocateLiveFromStorage` — the actual entry point wired into the
-registered Verity parent `verity_tx_simulates_allocation_count_from_storage`
+`allocateLiveFromStorage` — the historical entry point retained in
+`verity_tx_simulates_allocation_count_from_storage`
 — restores the pre-call snapshot.  Includes the injected late-
 failure path exercised by `live_injected_after_writes_rolls_back`,
 which fires after every summary/stake staticcall has bound its row

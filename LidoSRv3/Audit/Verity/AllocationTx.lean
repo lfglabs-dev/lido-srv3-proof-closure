@@ -3,9 +3,9 @@ import LidoSRv3.Audit.Verity.AllocCapacityPhase3
 import Verity.Core
 
 /-!
-# P-ALLOC-1 allocation transaction
+# P-ALLOC-1 legacy observation transaction
 
-Handwritten model of `SRLib._getModulesAllocationAndCapacity` from
+Retained historical model of `SRLib._getModulesAllocationAndCapacity` from
 `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`, `SRLib.sol:493-559`,
 wrapped as the storage-counted transaction `StakingRouter.getDepositAllocations`
 (`StakingRouter.sol:929-936`, see the `getDepositAllocations` abbrev below).
@@ -35,12 +35,16 @@ columns of `_getModulesAllocationAndCapacity`.
 One interpreter (`AllocCapacity.firstLoop` / `secondLoop`). Binding follows
 `getModuleIdAt` then the packed `moduleState.config`. `isActive` is
 `StakingModuleStatus.Active` (`status == 0`); `isType2` is
-`WithdrawalCredentials.isType2` (`wcType == 2`). The registered live path
+`WithdrawalCredentials.isType2` (`wcType == 2`). The legacy live path
 executes the mapped selector-only summary static call, ABI-decodes its three
 uint256 return words, and on type-2 rows executes the distinct pinned
 `getTotalModuleStake` static call before entering the allocation loop.
 
 Computed columns persist as storage arrays; `observe` reads those arrays.
+The registered account-qualified producer is `PAlloc1.account_allocation_result`;
+this model remains for existing arithmetic/rollback consumers and counterexamples.
+Its observation cells and synthetic error strings do not model source storage or
+exact Solidity failure data.
 -/
 
 namespace LidoSRv3.Audit.Verity.AllocationTx
@@ -65,7 +69,7 @@ def moduleConfigSlot : Nat := 31
 /-- `moduleState.accounting.exitedValidatorsCount` (`SRLib.sol:522`). -/
 def accountingExitedSlot : Nat := 35
 /-- Planted summaries remain only for the legacy/free-count sibling path and
-test seeding. The registered live path does not read these three maps. -/
+test seeding. The legacy live path does not read these three maps. -/
 def summaryExitedSlot : Nat := 36
 def summaryDepositedSlot : Nat := 37
 def summaryDepositableSlot : Nat := 38

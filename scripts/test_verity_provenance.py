@@ -21,7 +21,7 @@ FILES = (
     "verity/targets/source-map.json",
     "proofs/LOCKFILE.md",
 )
-PIN = "e977aaad6e1a9e92e0132d41b3d33a14135a4d46"
+PIN = "1e95e925736d9253df41918ce1e4858cdd8e8a8d"
 OTHER = "0" * 40
 
 

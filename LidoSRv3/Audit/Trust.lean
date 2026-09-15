@@ -52,6 +52,7 @@ import LidoSRv3.Audit.Guarantees.PTopup1ActualContinuation
 import LidoSRv3.Audit.Guarantees.PSsz1ActualDeposit
 import LidoSRv3.Audit.Guarantees.PDeposit1ActualPipeline
 import LidoSRv3.Audit.Source.TrioAlloc1.Determinism
+import LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer
 import LidoSRv3.Audit.Source.TrioAlloc1.CapacitySpec
 import LidoSRv3.Audit.Source.TrioAlloc2.LoopCorrespondence
 import LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredParent
@@ -62,6 +63,7 @@ import LidoSRv3.Audit.Source.TrioReserve1.PhysicalReserve
 import LidoSRv3.Audit.Source.TrioReserve1.PhysicalSequence
 import LidoSRv3.Audit.Source.TrioReserve1.AllocationFlow
 import LidoSRv3.Audit.Source.TrioReserve1.Transfers
+import LidoSRv3.Audit.Source.TrioReserve1.WithdrawalSpec
 import LidoSRv3.Audit.Guarantees.PEthConfinement1
 import LidoSRv3.Audit.Guarantees.PMintConsumer1
 import LidoSRv3.Tests.EthConfinementMutants
@@ -2324,3 +2326,23 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity_from_gateway
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidation1.gateway_vault_live_success_and_revert
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidationValue1.official_denote_succeeds_and_justified_forwards_msg_value_from_gateway
+
+-- Reviewer 8f198d99: recompute these source-relation dependencies explicitly.
+#print axioms LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.world_producer_correspondence
+#print axioms LidoSRv3.Audit.Source.TrioReserve1.WithdrawalSpec.failure_restores
+
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc1.account_allocation_result
+
+-- Type checks keep the three owner-scoped witnesses attached to compilation
+-- of their existing specifications and selectors, even after proof replacement.
+example : (Compiler.CompilationModel.compile LidoSRv3.Audit.Verity.AllocCapacityPhase3.spec
+    [LidoSRv3.Audit.Verity.AllocCapacityPhase3.entrySelector]).isOk = true :=
+  LidoSRv3.Audit.Verity.AllocCapacityPhase3.consumed_summary_function_spec_compiles
+
+example : (Compiler.CompilationModel.compile LidoSRv3.Audit.Verity.SszAbstractDigest.spec
+    [LidoSRv3.Audit.Verity.SszAbstractDigest.selector]).isOk = true :=
+  LidoSRv3.Audit.Verity.SszAbstractDigest.deposit_data_root_compiles
+
+example : (Compiler.CompilationModel.compile LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.spec
+    [LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.selector]).isOk = true :=
+  LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.forward_compiles

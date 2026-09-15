@@ -15,14 +15,16 @@ script runTests args do
       env "bash" #["scripts/run_source_differential.sh", "topup-source"]
   | ["reserve-source"] =>
       env "bash" #["scripts/run_source_differential.sh", "reserve-source"]
+  | ["trust"] =>
+      env "bash" #["scripts/run_trust_validation.sh"]
   | ["repository"] =>
       env "bash" #["scripts/run_source_differential.sh", "repository"]
   | _ =>
-      IO.eprintln "usage: lake test [-- topup-source|reserve-source|repository]"
+      IO.eprintln "usage: lake test [-- topup-source|reserve-source|trust|repository]"
       return 2
 
 require verity from git
-  "https://github.com/lfglabs-dev/verity.git"@"e977aaad6e1a9e92e0132d41b3d33a14135a4d46"
+  "https://github.com/lfglabs-dev/verity.git"@"1e95e925736d9253df41918ce1e4858cdd8e8a8d"
 
 /-- Stable definitions and public guarantees. Does not compile Tests, Legacy, or Trust. -/
 @[default_target]

@@ -4,7 +4,7 @@
 
 ## Decision
 
-This is the current integration candidate, not an acceptance record or audit certificate. Historical R1 inputs remain pinned at `e8a597f742433475c89382e2eaf96b8475baa214` and its report is preserved separately; its review does not apply to changed statements. The candidate fingerprints synchronize metadata only. CHECKED identifies Lean theorem registrations, whose exact-SHA build results and limitations must be read in the candidate validation record. Fresh independent audit is required. General compiler, deployed-code and chain-state correspondence remain required and OPEN. The only authorized axioms are propext, Quot.sound and Classical.choice; any native dependency blocks foundational-only acceptance.
+This is the current integration candidate, not an acceptance record or audit certificate. Historical R1 inputs remain pinned at `e8a597f742433475c89382e2eaf96b8475baa214` and its report is preserved separately; its review does not apply to changed statements. The candidate fingerprints synchronize metadata only. CHECKED identifies Lean theorem registrations, whose exact-SHA build results and limitations must be read in the candidate validation record. Fresh independent audit is required. General compiler, deployed-code and chain-state correspondence remain required and OPEN. Owner20260915 additionally authorizes exactly three existing compiler-success native witnesses with type/provenance checks and reevaluation; kernel replacements are retained. This is scoped compiler/runtime trust, not kernel-only or deployed-runtime evidence.
 
 ## Architecture and evidence boundary
 
@@ -57,9 +57,9 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 ### `P-ALLOC-1`
 
-**Accepted theorem planes.** Abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PAlloc1.checked_execute`. Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PAlloc1.verity_tx_simulates_allocation_count_from_storage`.
+**Accepted theorem planes.** Abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PAlloc1.checked_execute`. Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PAlloc1.account_allocation_result`.
 
-**Proof shape / exact domain statement.** checked_execute: under CheckedBounds the source executor succeeds and its capacity column equals MathView. The named capacity kill-line remains parent-shaped; active_capacity_bounded remains an unregistered Nat.min child. Verity: allocateLiveFromStorage reads and 32-caps the router count, decodes packed ModuleStateConfig fields, executes the source-derived mapped getStakingModuleSummary staticcall for each row, decodes the 96-byte (exited, deposited, depositable) ABI tuple, and for type-2 rows executes the distinct pinned getTotalModuleStake staticcall (selector 0x0c852f5c) and fail-closed 32-byte uint256 decode before allocation. It persists the computed arrays, and observe equals sourceView when those adversarial call observations decode to the expected source rows. Reachable-router CheckedBounds remains explicitly open. The registered transaction parent additionally consumes the account-qualified interleaved source producer, preserving its result and response-dependent transcript for every input and its STATICCALL world preservation. This does not equate that producer with the legacy persisted observation executor. Controller decision 2026-09-14: unconditional legacy-observation/physical-result equivalence is REFUTED, not a theorem premise or a pending equality proof. The registered physical result/capacity facts remain separate from legacy observations.
+**Proof shape / exact domain statement.** The unchanged abstract checked_execute proves successful capacity calculation and MathView equality under all five CheckedBounds conditions. The registered Verity account_allocation_result executes the account-qualified interleaved producer for every input without a successful-binding premise or clipped count. It preserves the producer result and response-dependent module-call transcript, derives successful capacity equations from the executed first-loop rows, and composes the public allocation continuation on the same world. Legacy persisted observation theorems remain as historical regression evidence; their synthetic storage and errors are not the registered physical result. Supported-module invariants, compiled call/memory behavior and deployed identities remain open.
 
 **Source/artifact provenance.** `MAPPED`; 13 immutable pinned source span(s) in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance.
 
@@ -69,11 +69,11 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 - EXTERNAL-SUMMARY-INVARIANTS: ABI-valid uint256 replies do not imply deposited>=max(summaryExited,accountingExited), nor the required deposited/depositable/totalStake bounds. Derive these from supported implementations, registry writers and deployment identity. The genuine arbitrary-module counterexample remains; unconditional CheckedBounds is not asserted.
 - INPUT/ARITHMETIC: cfg.maxEBType1 must be nonzero and input/allocation sums, available arithmetic and target products need the stated bounds. Existing implication lemmas do not derive those assumptions from the uint256-return interface or supported-module execution.
-- REPRESENTATION/RUNTIME: unconditional legacy-observation = physical-result equality is REFUTED by AccountProducer.legacy_commits_while_physical_reverts under the original length/binding premises. Controller accepts the existing parent consuming separate physical result/capacity facts; no equality is assumed. Deriving supported physical runtime/trace correspondence remains open; the counterexample is not a supported-deployment witness.
-- PHYSICAL-STORAGE: the physical producer reads account-qualified words using an explicit layout/hash. Derive its ERC7201 addressing and field correspondence from the pinned deployment; legacy slot/map indices and persisted observation arrays are not Solidity physical storage.
+- REPRESENTATION/OBSERVATIONS: AccountProducer.legacy_commits_while_physical_reverts uses different storage channels; it is not a scheduling-only counterexample. RelatedStorage separately defines matching ordered count/config/accounting inputs and exhibits distinct first failures under one target/payload-dependent oracle. Neither a finite honest-columns control nor STATICCALL world preservation establishes universal successful-path equality or full error/call/gas equivalence. Registry migration to account_allocation_result removes reliance on that false full equivalence; remaining meaningful legacy consumers still require inspection.
+- PHYSICAL-STORAGE: the registered producer reads account-qualified words using an explicit layout/hash. Derive ERC7201 addressing and field correspondence from pinned source and bind the actual router identity. The regression relation compares router inputs only; persisted legacy arrays are not physical source storage.
 - REGISTRY-REACHABILITY: derive count, supported-module identity, uniqueness and accounting relations from initial/migrated registry state and every relevant writer. Source interface validity alone is insufficient.
-- RUNTIME/DEPLOYMENT: connect the physical call-tree and byte-library executor to actual compiler memory, gas, inherited frame context, linked library code and deployed runtime. These are in scope and unresolved under the expanded proof-only goal; the current source/call-VM correspondence does not close them.
-- I-TRUST-COMPILER-KERNEL (OPEN): the corresponding AllocCapacityPhase3, SszAbstractDigest or ConsolidationAbstractFlowModel compilation witness still consumes its named native_decide axiom. Re-evaluation/disclosure is not authorization. Eliminate the dependency while preserving the compilation claim; foundational-only trust currently fails.
+- RUNTIME/DEPLOYMENT: connect the physical call-tree and byte-library executor to actual compiler memory, gas, inherited frame context and linked library execution. Deployment instantiation separately needs authoritative chain/block, router/library addresses, deployed runtime bytes/codehash, link map and constructor configuration; these are unavailable here.
+- I-TRUST-COMPILER-KERNEL (VALIDATION PENDING): the three existing compiler-success statements are retained with structured kernel replacements. Owner20260915 also permits native_decide for exactly those original witnesses, with expanded compiler/runtime trust, exact provenance/type checks and reevaluation. Fresh exact-SHA environment checks are required; this policy and the targeted builds do not establish overall runtime or deployment correctness.
 **Trio source composition.** The new source path reads physical count/configuration, executes each response-dependent module call and checked arithmetic in source order, then performs the capacity pass. Count is derived for modeled initialization/ACL/public-writer histories; the raw-state theorem takes count <=32. It does not cap an arbitrary corrupt count. The stored producer derives output arrays from executed per-row writes.
 
 **Composition validation.** SOURCE COMPOSITION CANDIDATE; final independent review and official exact-source gates pending. Legacy primary guarantee registrations remain unchanged.
@@ -83,9 +83,9 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 **Composition premises and exclusions.** Compiler interpretation of aligned, non-overlapping observed word loads/stores and copies; omitted private cache/configuration/scratch writes obey the stated frame and cache-field relations. Configured linked library identity, storage/hash interpretation, entry pointer provenance and primitive crypto/consensus bindings are explicit; general compiled/deployed-code and gas verification remain required and open. count <=32; pointer +1184*count+704 <=2^32, or modeled initialization/writer history with pointer <=2^31 and finite storage separation; migration and other writer histories excluded.
 
 
-**Classification.** **IMPLEMENTATION_PENDING** — Retain conditional registered source/callback correspondence. Classify unconditional reachable CheckedBounds as an external module/input invariant obligation with an ABI-valid counterexample; retain call-hoisting and physical-slot limitations. Validate the witness and final combined SHA; no invented router history. Preserve the refutation of unconditional legacy/physical equality and separate physical result/capacity conclusions, as decided by the controller; do not attempt the false equality.
+**Classification.** **IMPLEMENTATION_PENDING** — Migrate the registered Verity consumer to the account-qualified producer while retaining the original abstract capacity theorem and legacy counterexamples. Derive supported module and registry invariants from actual producers/writers; finish meaningful consumer migration and compiled memory/call refinement. Distinguish unavailable deployment identity evidence from untreated modeling work.
 
-**Next gate.** Validate the external-summary bound counterexample, then continue RESERVE/SSZ review and combined-SHA checks for fresh independent audit. Unconditional CheckedBounds is not claimed; external module semantics and migration/runtime boundaries remain open.
+**Next gate.** Validate account_allocation_result and matched-storage/error regressions on Spark, inspect remaining meaningful legacy consumers, derive supported-module invariants, and reproduce full exact-SHA checks before independent review. A bundled targeted pass is not clean-SHA or deployed-runtime validation.
 
 ### `P-ALLOC-2`
 
@@ -400,7 +400,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 **Limitations — 2 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
 - parent guarantee composition
-- I-TRUST-COMPILER-KERNEL (OPEN): the corresponding AllocCapacityPhase3, SszAbstractDigest or ConsolidationAbstractFlowModel compilation witness still consumes its named native_decide axiom. Re-evaluation/disclosure is not authorization. Eliminate the dependency while preserving the compilation claim; foundational-only trust currently fails.
+- I-TRUST-COMPILER-KERNEL (VALIDATION PENDING): the three existing compiler-success statements are retained with structured kernel replacements. Owner20260915 also permits native_decide for exactly those original witnesses, with expanded compiler/runtime trust, exact provenance/type checks and reevaluation. Fresh exact-SHA environment checks are required; this policy and the targeted builds do not establish overall runtime or deployment correctness.
 
 **Classification.** **IMPLEMENTATION_PENDING** — Implement and compose the listed missing fidelity without widening the guarantee.
 
@@ -419,7 +419,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 **Limitations — 2 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
 - parent guarantee composition
-- I-TRUST-COMPILER-KERNEL (OPEN): the corresponding AllocCapacityPhase3, SszAbstractDigest or ConsolidationAbstractFlowModel compilation witness still consumes its named native_decide axiom. Re-evaluation/disclosure is not authorization. Eliminate the dependency while preserving the compilation claim; foundational-only trust currently fails.
+- I-TRUST-COMPILER-KERNEL (VALIDATION PENDING): the three existing compiler-success statements are retained with structured kernel replacements. Owner20260915 also permits native_decide for exactly those original witnesses, with expanded compiler/runtime trust, exact provenance/type checks and reevaluation. Fresh exact-SHA environment checks are required; this policy and the targeted builds do not establish overall runtime or deployment correctness.
 
 **Classification.** **IMPLEMENTATION_PENDING** — Implement and compose the listed missing fidelity without widening the guarantee.
 
@@ -811,14 +811,12 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 ## Proof-escape and receipt acceptance
 
-`LidoSRv3.Audit.Trust` is the public axiom surface. Only `propext`, `Quot.sound`, and `Classical.choice` are authorized. The three exact compiler-native dependencies below are disclosed debt, not permitted exceptions; foundational-only trust currently fails. `scripts/check_trust_axioms.py` rebuilds and reruns Trust, recomputes every printed dependency through Lean.collectAxioms in an independent probe, checks reported dependencies against that environment, and re-evaluates each disclosed native Boolean. These diagnostics detect fabricated reports, declaration spoofing, and stale native results but do not turn native evaluation into a kernel proof. After those diagnostics, `foundational_trust.require_foundational` rejects every non-foundational dependency, including properly disclosed production or test native axioms. Saved-output mode applies the same policy but supplies no build evidence. No theorem or obligation is removed to pass this gate. Source proof-escape scanning and the exact native tactic inventory remain enforced. The validation receipt binds the current tracked tree excluding itself; metadata synchronization is not semantic closure.
+`LidoSRv3.Audit.Trust` is the public axiom surface. Owner20260915 accepts foundations plus exactly the three existing compiler-success native witnesses documented in I-TRUST-COMPILER-KERNEL.md. Retained kernel proofs may eliminate those dependencies; the inventory below records expected emitted names, not required exceptions. `scripts/check_trust_axioms.py` rebuilds and reruns Trust, recomputes named dependencies using an independent Lean.collectAxioms probe, enforces the exact inventory, and checks the type, source site and native reevaluation of any disclosed native Boolean claim. The final fixed-name authorization gate rejects unrelated production or test axioms. Saved-output mode checks a report only. Native evaluation expands compiler/runtime trust and is not a kernel proof or runtime/deployment correctness. No theorem or modeling obligation is removed to pass the gate. Source proof-escape scanning and the exact tactic inventory remain enforced. The validation receipt binds the tracked tree excluding itself; metadata synchronization is not semantic closure.
 
 ### Exact emitted native-decision axioms
 
 ```text
-LidoSRv3.Audit.Verity.AllocCapacityPhase3.consumed_summary_function_spec_compiles._native.native_decide.ax_1_1
-LidoSRv3.Audit.Verity.SszAbstractDigest.deposit_data_root_compiles._native.native_decide.ax_1_1
-LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.forward_compiles._native.native_decide.ax_1_1
+
 ```
 
 ## Recommendation

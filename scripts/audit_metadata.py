@@ -75,11 +75,11 @@ ASSUMPTION_FIELDS = {
 }
 PINNED = {
     "lido_core": ("https://github.com/lidofinance/core.git", "17005714f151e5502c559932319a3f2f74ac2436"),
-    "verity": ("https://github.com/lfglabs-dev/verity.git", "e977aaad6e1a9e92e0132d41b3d33a14135a4d46"),
+    "verity": ("https://github.com/lfglabs-dev/verity.git", "1e95e925736d9253df41918ce1e4858cdd8e8a8d"),
     "evmyullean": ("https://github.com/lfglabs-dev/EVMYulLean.git", "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9"),
     "mathlib": ("https://github.com/leanprover-community/mathlib4.git", "fabf563a7c95a166b8d7b6efca11c8b4dc9d911f"),
 }
-EXPECTED_AUTHORITY = 'Lean theorem statements and proofs are authoritative; metadata never closes evidence. CHECKED records theorem registration, not semantic acceptance. The only authorized axioms are propext, Quot.sound and Classical.choice; disclosed native dependencies remain blocking obligations.'
+EXPECTED_AUTHORITY = 'Lean theorem statements and proofs are authoritative; metadata never closes evidence. CHECKED records theorem registration, not semantic acceptance. Owner20260915 permits foundations plus exactly three existing compiler-success native witnesses, subject to exact emitted inventory, type/provenance and native reevaluation. Kernel replacements are retained; unrelated axioms remain rejected.'
 EXPECTED_OBJECTIVE = 'Close every remaining obligation behind the 11 main Lido SRv3 guarantees and all supporting registered rows without weakening intended claims. Source, interface, compiler/runtime/hash, caller-frame and deployment-identity correspondences needed by these claims remain in scope until proved. Missing evidence is an open obligation, not closure. No merge, deployment or website work; final acceptance requires fresh independent exact-SHA review.'
 EXPECTED_PRIORITIES = {
     "P-RESERVE-1": "DONE",
@@ -200,20 +200,18 @@ def validate_pins(lock, manifest, source_map):
             "Trust native-decision allowlist differs")
     trust_names = [line.strip() for line in TRUST_NATIVE_DECIDE_ALLOWLIST.read_text(encoding="utf-8").splitlines()
                    if line.strip() and not line.lstrip().startswith("#")]
-    require(len(trust_names) == len(set(trust_names)) and trust_names,
-            "Trust native-decision allowlist must be nonempty and unique")
+    require(len(trust_names) == len(set(trust_names)),
+            "Trust native-decision inventory must be unique")
     production_native = {
         "LidoSRv3.Audit.Verity.AllocCapacityPhase3.consumed_summary_function_spec_compiles._native.native_decide.ax_1_1",
         "LidoSRv3.Audit.Verity.SszAbstractDigest.deposit_data_root_compiles._native.native_decide.ax_1_1",
         "LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.forward_compiles._native.native_decide.ax_1_1",
     }
-    require(production_native <= set(trust_names) and
-            all(name in production_native or name.startswith("LidoSRv3.Tests.") for name in trust_names),
-            "Trust native-decision allowlist contains an undisclosed production dependency")
-    # The report publishes these as the exact emitted native-decision axioms.
-    # An arbitrary project axiom must not be presentable as one of them.
+    # Reject the type category before checking exact authorized identities.
     require(all(NATIVE_DECIDE_AXIOM.fullmatch(name) for name in trust_names),
             "Trust native-decision allowlist documents a non-native axiom")
+    require(set(trust_names) <= production_native,
+            "Trust native-decision allowlist contains an undisclosed production dependency")
     require(source_map.get("schema") == "lido-srv3-minimal-11-source-map-v3", "source-map schema differs")
     require(source_map.get("pinned_source") == f"lidofinance/core@{PINNED['lido_core'][1]}", "source-map pin differs")
     require(source_map.get("scope") == {
@@ -739,7 +737,7 @@ def rendered(rows, source_map):
         gap_note = "No row is gap-free."
     report = [header + "# Candidate assurance report — independent audit pending\n\n",
         "## Decision\n\n",
-        f"This is the current integration candidate, not an acceptance record or audit certificate. Historical R1 inputs remain pinned at `{R1_REVIEW_BASE}` and its report is preserved separately; its review does not apply to changed statements. The candidate fingerprints synchronize metadata only. CHECKED identifies Lean theorem registrations, whose exact-SHA build results and limitations must be read in the candidate validation record. Fresh independent audit is required. General compiler, deployed-code and chain-state correspondence remain required and OPEN. The only authorized axioms are propext, Quot.sound and Classical.choice; any native dependency blocks foundational-only acceptance.\n\n",
+        f"This is the current integration candidate, not an acceptance record or audit certificate. Historical R1 inputs remain pinned at `{R1_REVIEW_BASE}` and its report is preserved separately; its review does not apply to changed statements. The candidate fingerprints synchronize metadata only. CHECKED identifies Lean theorem registrations, whose exact-SHA build results and limitations must be read in the candidate validation record. Fresh independent audit is required. General compiler, deployed-code and chain-state correspondence remain required and OPEN. Owner20260915 additionally authorizes exactly three existing compiler-success native witnesses with type/provenance checks and reevaluation; kernel replacements are retained. This is scoped compiler/runtime trust, not kernel-only or deployed-runtime evidence.\n\n",
         "## Architecture and evidence boundary\n\n",
         "The evidence stack is: pinned Lido source spans → source-shaped/abstract Lean specifications → Verity Lean program and `Contract.run` transaction observables → named theorem and negative-mutant receipts. Revert theorems concern the modeled snapshot and journal. External calls, storage observations, and source correspondences have only the scope stated per row. Lean theorem names are authoritative; metadata records classification and fidelity, never proof progress.\n\n",
         "Pinned upstream source is `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`; Verity is pinned in `audit/artifacts.lock.json`; Lean is `leanprover/lean4:v4.31.0`. Canonical source anchors are immutable permalinks in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance. Supplemental rows deliberately have no independent source-map target unless their parent mapping says otherwise.\n\n",
@@ -799,7 +797,7 @@ def rendered(rows, source_map):
         "- **Broad token semantics:** NOT YET. `P-TOKEN-1` is registered only as a bounded subordinate row: the pinned WithdrawalQueue request-creation control prefix composed with owner-operated `transferFrom` custody hops. It establishes the two-sided amount bound, the line-130 owner fallback, non-ownerless custody over arbitrary hop chains, owner-operated authorization, and installation of the recipient as owner per hop. It does **not** establish general ERC-20/ERC-721/WstETH approvals, allowances, balances, `STETH.transferFrom` movement, share conversion, queue storage, finalization, claim/redeem, events, or adversarial recipient semantics, and it is not a canonical guarantee.\n",
         "- **Deployment identity:** NOT YET. Neither a pinned source span, a constructor literal, a configured endpoint, a runtime receipt, nor a model address proves deployed bytecode/codehash/chain identity. General Yul/EVM/deployment provenance needed by registered claims remains required and OPEN, including the SSZ binding.\n\n",
         "## Proof-escape and receipt acceptance\n\n",
-        '`LidoSRv3.Audit.Trust` is the public axiom surface. Only `propext`, `Quot.sound`, and `Classical.choice` are authorized. The three exact compiler-native dependencies below are disclosed debt, not permitted exceptions; foundational-only trust currently fails. `scripts/check_trust_axioms.py` rebuilds and reruns Trust, recomputes every printed dependency through Lean.collectAxioms in an independent probe, checks reported dependencies against that environment, and re-evaluates each disclosed native Boolean. These diagnostics detect fabricated reports, declaration spoofing, and stale native results but do not turn native evaluation into a kernel proof. After those diagnostics, `foundational_trust.require_foundational` rejects every non-foundational dependency, including properly disclosed production or test native axioms. Saved-output mode applies the same policy but supplies no build evidence. No theorem or obligation is removed to pass this gate. Source proof-escape scanning and the exact native tactic inventory remain enforced. The validation receipt binds the current tracked tree excluding itself; metadata synchronization is not semantic closure.\n\n',
+        '`LidoSRv3.Audit.Trust` is the public axiom surface. Owner20260915 accepts foundations plus exactly the three existing compiler-success native witnesses documented in I-TRUST-COMPILER-KERNEL.md. Retained kernel proofs may eliminate those dependencies; the inventory below records expected emitted names, not required exceptions. `scripts/check_trust_axioms.py` rebuilds and reruns Trust, recomputes named dependencies using an independent Lean.collectAxioms probe, enforces the exact inventory, and checks the type, source site and native reevaluation of any disclosed native Boolean claim. The final fixed-name authorization gate rejects unrelated production or test axioms. Saved-output mode checks a report only. Native evaluation expands compiler/runtime trust and is not a kernel proof or runtime/deployment correctness. No theorem or modeling obligation is removed to pass the gate. Source proof-escape scanning and the exact tactic inventory remain enforced. The validation receipt binds the tracked tree excluding itself; metadata synchronization is not semantic closure.\n\n',
         "### Exact emitted native-decision axioms\n\n```text\n" + "\n".join(trust_names) + "\n```\n\n",
         "## Recommendation\n\n",
         "Stop for fresh independent audit of the combined candidate and its explicit validation failures and interface limitations. No general deployment proof or certification is claimed.\n",

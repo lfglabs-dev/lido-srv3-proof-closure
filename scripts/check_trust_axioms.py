@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check provenance/disclosure, then enforce foundational-only trust."""
+"""Check provenance, exact emitted inventory and scoped compiler authorization."""
 
 from __future__ import annotations
 
@@ -11,6 +11,7 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
+from foundational_trust import ACCEPTED_COMPILER_AXIOMS, require_authorized
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -171,7 +172,7 @@ PRODUCTION_NATIVE_LABELS = {
     SSZ_DIGEST: "SSZ digest",
     CONSOLIDATION_FLOW: "consolidation flow",
 }
-PRODUCTION_NATIVE_AXIOMS = set(PRODUCTION_NATIVE_LABELS)
+PRODUCTION_NATIVE_AXIOMS = ACCEPTED_COMPILER_AXIOMS
 FOUNDATIONAL_AXIOMS = {"propext", "Classical.choice", "Quot.sound"}
 
 
@@ -413,8 +414,8 @@ def disclosed_names() -> set[str]:
     unshaped = sorted(name for name in names if not NATIVE_AXIOM.fullmatch(name))
     if unshaped:
         fail("allowlist documents non-native axiom(s): " + ", ".join(unshaped))
-    if not PRODUCTION_NATIVE_AXIOMS <= names:
-        fail("allowlist omits a documented production native-decision dependency")
+    # Compiler exceptions may disappear after kernel proof replacement. The
+    # exact emitted-inventory comparison below still rejects hidden dependencies.
     if any(name not in PRODUCTION_NATIVE_AXIOMS and not name.startswith("LidoSRv3.Tests.") for name in names):
         fail("allowlist contains a non-test native-decision dependency")
     return names
@@ -592,8 +593,7 @@ def main() -> None:
     observed_native = set(NATIVE_AXIOM.findall(output))
     if observed_native != disclosed:
         fail("native-decision extraction disagrees with the complete axiom report")
-    from foundational_trust import require_foundational
-    require_foundational(reports)
+    require_authorized(reports)
     production = sorted(PRODUCTION_NATIVE_AXIOMS & observed_native)
     test_only = observed_native - PRODUCTION_NATIVE_AXIOMS
     exceptions = ", ".join(PRODUCTION_NATIVE_LABELS[name] for name in production)

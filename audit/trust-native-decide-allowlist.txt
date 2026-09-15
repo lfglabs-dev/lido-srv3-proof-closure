@@ -1,9 +1,7 @@
-# Exact native-decision axioms mechanically emitted by Audit.Trust.
-#
-# The first three entries are the documented P-ALLOC-1 Phase-3, P-SSZ-1
-# abstract-digest, and P-CONSOLIDATION-1 abstract-flow production exceptions.
-# No test-native axioms remain in this emitted inventory.
-# The three compiler witnesses remain non-foundational obligations.
-LidoSRv3.Audit.Verity.AllocCapacityPhase3.consumed_summary_function_spec_compiles._native.native_decide.ax_1_1
-LidoSRv3.Audit.Verity.SszAbstractDigest.deposit_data_root_compiles._native.native_decide.ax_1_1
-LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.forward_compiles._native.native_decide.ax_1_1
+# Exact native-decision inventory emitted by Audit.Trust after the retained
+# kernel replacements. No native axioms are expected in this environment.
+# Owner20260915 separately authorizes exactly the three compiler witness names
+# in scripts/foundational_trust.py, conditional on type/provenance checks and
+# native reevaluation. Authorization does not require a dependency to be emitted.
+# Any future emitted dependency must be inventoried exactly and independently
+# authorized; test names and disclosure cannot extend that authorization.

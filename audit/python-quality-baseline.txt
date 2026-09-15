@@ -2,9 +2,8 @@
 # scripts at or above the line limit. Rows may only shrink or disappear;
 # deleting a row re-pins BASELINE_BLOB in scripts/check_python_quality.py.
 
-audit_metadata.py 832
+audit_metadata.py 830
 audit_metadata.py:rendered 30
-audit_metadata.py:validate_pins 22
 check_deployed_code.py:main 39
 check_diagram_taxonomy.py 628
 check_diagram_taxonomy.py:main 74

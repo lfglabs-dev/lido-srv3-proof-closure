@@ -82,7 +82,7 @@ asserted across arbitrary callbacks.
 ## Remaining obligations
 
 - ADDRESS: global renaming across physical Worlds, code and arbitrary callees;
-  other writer-body equivariance; exact error/log encoding and excluded deployed
+  other writer-body equivariance; exact error/log encoding and still-open deployed
   interpretation. The actual claim chain is covered, not a whole-deployment theorem.
 - CONSOLIDATION: gateway lines 201–207 DSM/precondition, locator and withdrawal-
   credential witness prefix; already-credited outer entry/ABI inputs; memory
@@ -104,18 +104,24 @@ asserted across arbitrary callbacks.
   and opaque SHA-256/FFI correctness/width. No cryptographic or deployed binding
   follows merely from a structural branch proof.
 
-General Yul/EVM/deployment closure remains excluded. Foundational Lean axioms
+The source/runtime/deployment correspondences needed by the original claims
+remain required and open under the expanded proof-only goal. Foundational Lean axioms
 `propext`, `Classical.choice`, and `Quot.sound` are distinguished from opaque
 semantic interfaces. No project axiom, sorry, admitted conclusion or new native
-proof site was introduced. The inherited native inventory remains 436 sites;
-its exact retained/moved/deleted records are in
-`audit/metadata-reconcile/candidate-native-inventory.json`.
+proof site was introduced. The current native tactic inventory is enforced by `scripts/check_proof_escapes.py`;
+historical removal records remain under `audit/metadata-reconcile/`. Disclosure
+alone never authorizes a dependency. Owner20260915 separately accepts exactly
+three compiler-success native witnesses, with type/provenance checks and native
+reevaluation. Their salvaged kernel replacements remain in the candidate. The
+gate rejects unrelated dependencies; this policy is not a runtime correctness
+claim or a claim that native evaluation is kernel-only evidence.
 
 ## Validation contract
 
 Pinned source: `17005714f151e5502c559932319a3f2f74ac2436`.
 Lean: `leanprover/lean4:v4.31.0`; Verity:
-`e977aaad6e1a9e92e0132d41b3d33a14135a4d46`; EVMYul:
+`1e95e925736d9253df41918ce1e4858cdd8e8a8d` (linked dependency PR
+[verity#2409](https://github.com/lfglabs-dev/verity/pull/2409), same writer); EVMYul:
 `f7e4ee0dc8f8d5265ce822a937ab5be771f182e9`; Mathlib:
 `fabf563a7c95a166b8d7b6efca11c8b4dc9d911f`.
 

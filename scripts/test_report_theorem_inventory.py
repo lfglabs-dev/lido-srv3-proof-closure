@@ -63,7 +63,7 @@ def main():
         report = report_path.read_text(encoding="utf-8")
         registry = json.loads(registry_path.read_text(encoding="utf-8"))
 
-        invoke(fixture, True, "13 P-ALLOC-1 theorems, 2 registered")
+        invoke(fixture, True, "14 P-ALLOC-1 theorems, 2 registered")
 
         # An inventory row silently dropped: the guarantee would read as having
         # fewer moving parts than it has.
@@ -196,7 +196,7 @@ def main():
                              f"{not_a_declaration}\n\n"
                              "end LidoSRv3.Audit.Guarantees.PAlloc1", 1),
                 encoding="utf-8")
-            invoke(fixture, True, "13 P-ALLOC-1 theorems")
+            invoke(fixture, True, "14 P-ALLOC-1 theorems")
             lean_path.write_text(lean, encoding="utf-8")
 
         # Blanking must preserve the line the keyword sits on, or the row that
@@ -216,7 +216,7 @@ def main():
             f"{anchor}\n| `disclosed_noted` | {noted_line} | Abstract | "
             "unregistered | Line-comment round-trip fixture. |", 1),
             encoding="utf-8")
-        invoke(fixture, True, "14 P-ALLOC-1 theorems")
+        invoke(fixture, True, "15 P-ALLOC-1 theorems")
         lean_path.write_text(lean, encoding="utf-8")
         report_path.write_text(report, encoding="utf-8")
 
@@ -239,7 +239,7 @@ def main():
             f"{anchor}\n| `disclosed_wrapped` | {keyword_line} | Abstract | "
             "unregistered | Wrapped-declaration round-trip fixture. |", 1),
             encoding="utf-8")
-        invoke(fixture, True, "14 P-ALLOC-1 theorems")
+        invoke(fixture, True, "15 P-ALLOC-1 theorems")
         report_path.write_text(report.replace(
             anchor,
             f"{anchor}\n| `disclosed_wrapped` | {keyword_line + 1} | Abstract | "
@@ -298,7 +298,7 @@ def main():
             "unregistered | Letter-like identifier round-trip fixture. |", 1)
         lean_path.write_text(widened_lean, encoding="utf-8")
         report_path.write_text(widened_report, encoding="utf-8")
-        invoke(fixture, True, "14 P-ALLOC-1 theorems")
+        invoke(fixture, True, "15 P-ALLOC-1 theorems")
         lean_path.write_text(lean, encoding="utf-8")
         report_path.write_text(report, encoding="utf-8")
 
@@ -322,7 +322,7 @@ def main():
                              f"{not_a_declaration}\n\n"
                              "end LidoSRv3.Audit.Guarantees.PAlloc1", 1),
                 encoding="utf-8")
-            invoke(fixture, True, "13 P-ALLOC-1 theorems")
+            invoke(fixture, True, "14 P-ALLOC-1 theorems")
             lean_path.write_text(lean, encoding="utf-8")
 
         # Lean block comments nest.  Prose inside a comment that merely begins a
@@ -340,7 +340,7 @@ def main():
                              f"{commented}\n\n"
                              "end LidoSRv3.Audit.Guarantees.PAlloc1", 1),
                 encoding="utf-8")
-            invoke(fixture, True, "13 P-ALLOC-1 theorems")
+            invoke(fixture, True, "14 P-ALLOC-1 theorems")
             lean_path.write_text(lean, encoding="utf-8")
 
         # The scanner must resume reading source at the outer comment's real
@@ -471,7 +471,7 @@ def main():
                          "/- theorem «only prose escaped» : True := trivial -/\n\n"
                          "end LidoSRv3.Audit.Guarantees.PAlloc1", 1),
             encoding="utf-8")
-        invoke(fixture, True, "13 P-ALLOC-1 theorems")
+        invoke(fixture, True, "14 P-ALLOC-1 theorems")
         lean_path.write_text(lean, encoding="utf-8")
 
         # And the escaped name must round-trip: the row parser has to accept the
@@ -490,7 +490,7 @@ def main():
             "unregistered | Escaped-identifier round-trip fixture. |", 1)
         lean_path.write_text(escaped_lean, encoding="utf-8")
         report_path.write_text(escaped_report, encoding="utf-8")
-        invoke(fixture, True, "14 P-ALLOC-1 theorems")
+        invoke(fixture, True, "15 P-ALLOC-1 theorems")
         lean_path.write_text(lean, encoding="utf-8")
         report_path.write_text(report, encoding="utf-8")
 
@@ -737,7 +737,7 @@ def main():
             rendered = layout.format(**parts)
             report_path.write_text(report.replace(layout_anchor, rendered, 1),
                                    encoding="utf-8")
-            invoke(fixture, True, "13 P-ALLOC-1 theorems")
+            invoke(fixture, True, "14 P-ALLOC-1 theorems")
 
             report_path.write_text(
                 report.replace(layout_anchor, f"{layout_anchor}\n{rendered}", 1),
@@ -797,7 +797,7 @@ def main():
                 f"{layout_anchor}\n| `{qualified}` | {keyword_line} | Abstract | "
                 "unregistered | Scope round-trip fixture. |", 1),
                 encoding="utf-8")
-            invoke(fixture, True, "14 P-ALLOC-1 theorems")
+            invoke(fixture, True, "15 P-ALLOC-1 theorems")
             lean_path.write_text(lean, encoding="utf-8")
             report_path.write_text(report, encoding="utf-8")
 
@@ -817,8 +817,8 @@ def main():
                                  "after the inventory to relocate a row into")
         inventory_rows = [line for line in section.group("body").splitlines()
                           if CHECK.ROW.match(line)]
-        if len(inventory_rows) != 13:
-            raise AssertionError(f"expected 13 inventory rows, read {len(inventory_rows)}")
+        if len(inventory_rows) != 14:
+            raise AssertionError(f"expected 14 inventory rows, read {len(inventory_rows)}")
         for line in inventory_rows:
             name = CHECK.ROW.match(line).group("name")
             needle = ("prints inventory row(s) outside the rendered theorem table: "
@@ -909,7 +909,7 @@ def main():
                 if reordered == report or f"{last}\n{line}\n" not in reordered:
                     raise AssertionError(f"reorder mutant for {name} changed nothing")
                 report_path.write_text(reordered, encoding="utf-8")
-                invoke(fixture, True, "13 P-ALLOC-1 theorems")
+                invoke(fixture, True, "14 P-ALLOC-1 theorems")
             for hide in non_rendered:
                 hidden = reordered.replace(line, hide(line), 1)
                 if hidden == reordered:
@@ -967,7 +967,7 @@ def main():
                        f"<div>\n## Theorems\n{inventory_rows[0]}\n</div>"):
             report_path.write_text(report.replace(
                 "## Theorems", f"{quoted}\n\n## Theorems", 1), encoding="utf-8")
-            invoke(fixture, True, "13 P-ALLOC-1 theorems")
+            invoke(fixture, True, "14 P-ALLOC-1 theorems")
             report_path.write_text(report, encoding="utf-8")
 
         # And a row outside the section publishes nothing either when it is
@@ -976,7 +976,7 @@ def main():
                        f"<div>\n{inventory_rows[0]}\n</div>"):
             report_path.write_text(report.replace(
                 elsewhere, f"{elsewhere}\n\n{quoted}\n", 1), encoding="utf-8")
-            invoke(fixture, True, "13 P-ALLOC-1 theorems")
+            invoke(fixture, True, "14 P-ALLOC-1 theorems")
             report_path.write_text(report, encoding="utf-8")
 
         # The opposite failure is worse than the one being fixed: masking text
@@ -1001,7 +1001,7 @@ def main():
             report_path.write_text(
                 report.replace("## Theorems", f"{still_rendered}\n\n## Theorems", 1),
                 encoding="utf-8")
-            invoke(fixture, True, "13 P-ALLOC-1 theorems")
+            invoke(fixture, True, "14 P-ALLOC-1 theorems")
             report_path.write_text(report, encoding="utf-8")
 
         # The sharpest form of that failure is a line that only resembles an
@@ -1017,7 +1017,7 @@ def main():
             report_path.write_text(
                 report.replace(inventory_rows[0], f"{inert}\n{inventory_rows[0]}", 1),
                 encoding="utf-8")
-            invoke(fixture, True, "13 P-ALLOC-1 theorems")
+            invoke(fixture, True, "14 P-ALLOC-1 theorems")
             report_path.write_text(report, encoding="utf-8")
 
         # The mirror of that family.  A complete tag alone on its line is HTML
@@ -1083,7 +1083,7 @@ def main():
             if indented == report:
                 raise AssertionError("short-indent control changed nothing")
             report_path.write_text(indented, encoding="utf-8")
-            invoke(fixture, True, "13 P-ALLOC-1 theorems")
+            invoke(fixture, True, "14 P-ALLOC-1 theorems")
             report_path.write_text(report, encoding="utf-8")
 
         # Adversarial (certified defect 1 family): an escaped pipe is a `|`
@@ -1133,7 +1133,7 @@ def main():
                 raise AssertionError("escaped-pipe row mutant changed nothing")
             report_path.write_text(report.replace(inventory_rows[0], spoiled_row, 1),
                                    encoding="utf-8")
-            invoke(fixture, True, "13 P-ALLOC-1 theorems")
+            invoke(fixture, True, "14 P-ALLOC-1 theorems")
             report_path.write_text(report, encoding="utf-8")
 
         # The rejecting half of the same family: escaping a pipe that separates
@@ -1156,7 +1156,7 @@ def main():
         report_path.write_text(
             report.replace(delimiter, "| :--- | ---: | :-: | --- | --- |", 1),
             encoding="utf-8")
-        invoke(fixture, True, "13 P-ALLOC-1 theorems")
+        invoke(fixture, True, "14 P-ALLOC-1 theorems")
         report_path.write_text(report, encoding="utf-8")
 
         invoke(fixture, True)

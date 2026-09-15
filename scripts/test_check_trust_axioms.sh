@@ -5,7 +5,7 @@ tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 
 names="$tmp/names"
-grep -v '^#\|^$' audit/trust-native-decide-allowlist.txt > "$names"
+sed '/^#/d; /^$/d' audit/trust-native-decide-allowlist.txt > "$names"
 mapfile -t checked < <(python3 - <<'PY'
 import json
 for row in json.load(open("audit/guarantees.yaml", encoding="utf-8"))["guarantees"]:
@@ -61,9 +61,9 @@ reject() {
   fi
 }
 
-# A faithfully disclosed native compiler axiom is still unauthorized. The
-# provenance and exact-inventory diagnostics above must not make this a pass.
-reject "$tmp/ok" 'foundational-only trust BLOCKED' 'disclosed compiler-native dependencies'
+# Saved-output success checks report consistency only. Actual environment
+# provenance and reevaluation are exercised by the executable fixtures below.
+python3 scripts/check_trust_axioms.py --trust-output "$tmp/ok"
 python3 scripts/test_foundational_trust.py
 
 # Isolated disclosure mutation: no real test-native exceptions need remain.
@@ -162,9 +162,9 @@ reject "$tmp/laundered-shape-report" \
   'a source-declared axiom wearing generated native-decision spelling' \
   "$launder/scripts/check_trust_axioms.py"
 
-# Removing the source declaration reaches the separate foundational-only gate.
+# Removing the source declaration reaches the separate authorization gate.
 rm "$launder/LidoSRv3/Tests/Injected.lean"
-reject "$tmp/laundered-shape-report" 'foundational-only trust BLOCKED' \
+reject "$tmp/laundered-shape-report" 'authorized trust BLOCKED' \
   'disclosed native fixture without a forged source declaration' "$launder/scripts/check_trust_axioms.py"
 
 # Executable provenance regression.  Scanning sources for the literal `_native`
@@ -431,10 +431,9 @@ reject "$tmp/ok" \
   'a registered theorem disclosed only by a commented-out #print axioms command' \
   "$commented/scripts/check_trust_axioms.py"
 
-# Restoring the command reaches the distinct foundational-only gate.
+# Restoring the command restores report consistency, not environment evidence.
 cp LidoSRv3/Audit/Trust.lean "$commented/LidoSRv3/Audit/Trust.lean"
-reject "$tmp/ok" 'foundational-only trust BLOCKED' \
-  'restored Trust command with unauthorized native dependencies' "$commented/scripts/check_trust_axioms.py"
+python3 "$commented/scripts/check_trust_axioms.py" --trust-output "$tmp/ok"
 
 # Executable spoofing regression.  Trust's log is only text some command
 # printed: `#eval IO.println` can emit a well-formed report for a theorem whose
