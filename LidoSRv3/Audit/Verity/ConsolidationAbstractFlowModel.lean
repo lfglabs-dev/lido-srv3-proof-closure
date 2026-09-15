@@ -69,6 +69,7 @@ theorem forward_compiles :
     (CompilationModel.compile spec [selector]).isOk = true := by
   set_option maxRecDepth 65536 in
   set_option maxHeartbeats 4000000 in
+  set_option cbv.maxSteps 2000000 in
   cbv
 
 abbrev Bytes := ByteArray
