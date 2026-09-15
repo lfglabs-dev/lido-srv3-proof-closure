@@ -250,6 +250,81 @@
       "raw_receipt_path": "/workspaces/mission-1ca15c66/output/remote-08fad426-236e-43f1-8b07-9b6ede013dc8.json",
       "raw_receipt_sha256": "4742255b86120e416c4e049004b1af253f49826e123a19393a8e7a8b409e59fb",
       "scope": "Source-bundle compilation only, not clean-commit validation of the base."
+    },
+    {
+      "job_id": "2789ba5c-fbe5-4759-ae93-4bac46a07f16",
+      "state": "failed",
+      "exit_code": 1,
+      "node_id": "dgx-spark",
+      "validation": {
+        "version": 1,
+        "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+        "commit": "4db87547f557fe01063c3bd1d9c5a64b8aa7b972",
+        "base_tree_sha": "822a3ac5201fcac297ff9c81d0abec7f1337e088",
+        "cwd_rel_known": true,
+        "command": [
+          "lake",
+          "build",
+          "LidoSRv3.Tests.NodeOperatorsRegistrySummary"
+        ],
+        "toolchain": "leanprover/lean4:v4.31.0",
+        "source_bundle_digest": "768868c57ed724ffce49c89f827987e50e03f1da007b84b6c00e8ce6fbfc0e39",
+        "build_protocol_version": "1",
+        "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+      },
+      "raw_receipt_path": "/workspaces/mission-1ca15c66/output/remote-2789ba5c-fbe5-4759-ae93-4bac46a07f16.json",
+      "raw_receipt_sha256": "ab07a7b61404ad74591c603928761616794d414fce46ffd1ae02e2cf9b429b2c",
+      "scope": "Loader-prefix source-bundle compilation and NOR regressions; not clean-commit validation of the base or a full loader proof."
+    },
+    {
+      "job_id": "2e7551e8-e9f7-47c8-876d-f33fd10d58f4",
+      "state": "failed",
+      "exit_code": 1,
+      "node_id": "dgx-spark",
+      "validation": {
+        "version": 1,
+        "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+        "commit": "4db87547f557fe01063c3bd1d9c5a64b8aa7b972",
+        "base_tree_sha": "822a3ac5201fcac297ff9c81d0abec7f1337e088",
+        "cwd_rel_known": true,
+        "command": [
+          "lake",
+          "build",
+          "LidoSRv3.Tests.NodeOperatorsRegistrySummary"
+        ],
+        "toolchain": "leanprover/lean4:v4.31.0",
+        "source_bundle_digest": "82e8d042dc15b71587701e34434ff61888b2063addf2cb4c07e719acdf77b593",
+        "build_protocol_version": "1",
+        "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+      },
+      "raw_receipt_path": "/workspaces/mission-1ca15c66/output/remote-2e7551e8-e9f7-47c8-876d-f33fd10d58f4.json",
+      "raw_receipt_sha256": "b6abefca2e8aa36cc7d03d6eb8dd9956e3020de058dcd634cd004f70167326c0",
+      "scope": "Loader-prefix source-bundle compilation and NOR regressions; not clean-commit validation of the base or a full loader proof."
+    },
+    {
+      "job_id": "7cc963f0-fbe3-4402-af97-2034708018d4",
+      "state": "succeeded",
+      "exit_code": 0,
+      "node_id": "dgx-spark",
+      "validation": {
+        "version": 1,
+        "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+        "commit": "4db87547f557fe01063c3bd1d9c5a64b8aa7b972",
+        "base_tree_sha": "822a3ac5201fcac297ff9c81d0abec7f1337e088",
+        "cwd_rel_known": true,
+        "command": [
+          "lake",
+          "build",
+          "LidoSRv3.Tests.NodeOperatorsRegistrySummary"
+        ],
+        "toolchain": "leanprover/lean4:v4.31.0",
+        "source_bundle_digest": "24faabebcce1dd67aa6c2436c317d978be7f4c7b114d7b515b40183cf0fd8dbf",
+        "build_protocol_version": "1",
+        "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+      },
+      "raw_receipt_path": "/workspaces/mission-1ca15c66/output/remote-7cc963f0-fbe3-4402-af97-2034708018d4.json",
+      "raw_receipt_sha256": "5de278a6ce3cce9e68a977b80e2875d2581e7bce2067c2e51e2cd358a77b1483",
+      "scope": "Loader-prefix source-bundle compilation and NOR regressions; not clean-commit validation of the base or a full loader proof."
     }
   ]
 }

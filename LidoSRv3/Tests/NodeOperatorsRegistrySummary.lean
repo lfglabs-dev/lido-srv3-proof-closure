@@ -1,4 +1,4 @@
-import LidoSRv3.Audit.Source.NodeOperatorsRegistry.ExitedInvariant
+import LidoSRv3.Audit.Source.NodeOperatorsRegistry.AllocatedKeys
 
 namespace LidoSRv3.Tests.NodeOperatorsRegistrySummary
 open LidoSRv3.Audit.Source.TrioAlloc1
@@ -112,5 +112,24 @@ theorem missing_aggregate_write_refutes_accounting :
             signingKeysStats := word (5 + 3 * 2^64 + 5 * 2^192) }) 1 [word 0] := by
     decide +kernel
   exact impossible invariant.exited_sum
+
+/-- Invalid incoming accounting permits the wrap-to-equal early continuation.
+Replacing raw addition with checked addition would change this outcome. -/
+theorem allocated_wrap_to_equal_continues :
+    allocatedKeyPrefix (word (2 * 2^64 + 2^192)) (word (2^256-1)) =
+      .ok .unchanged := by
+  decide +kernel
+
+/-- With exited <= deposited, the analogous wrap is rejected by INVALID. -/
+theorem allocated_wrap_asserts :
+    allocatedKeyPrefix (word (2 * 2^64 + 2 * 2^192)) (word (2^256-1)) =
+      .error .invalid := by
+  decide +kernel
+
+/-- A real increase starts at the old deposited count and loads the delta. -/
+theorem allocated_load_delta_fixture :
+    allocatedKeyPrefix (word (2 * 2^64 + 5 * 2^192)) (word 7) =
+      .ok (.load (word 5) (word 4)) := by
+  decide +kernel
 
 end LidoSRv3.Tests.NodeOperatorsRegistrySummary

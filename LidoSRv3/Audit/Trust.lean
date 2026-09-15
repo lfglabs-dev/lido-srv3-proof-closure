@@ -2372,3 +2372,10 @@ example : (Compiler.CompilationModel.compile LidoSRv3.Audit.Verity.Consolidation
 #print axioms LidoSRv3.Tests.NodeOperatorsRegistrySummary.initial_accounting
 #print axioms LidoSRv3.Tests.NodeOperatorsRegistrySummary.exit_update_directions
 #print axioms LidoSRv3.Tests.NodeOperatorsRegistrySummary.missing_aggregate_write_refutes_accounting
+
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.allocatedKeyPrefix_nondecreasing
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.allocatedKeyPrefix_no_overflow
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.allocatedKeyPrefix_load_delta
+#print axioms LidoSRv3.Tests.NodeOperatorsRegistrySummary.allocated_wrap_to_equal_continues
+#print axioms LidoSRv3.Tests.NodeOperatorsRegistrySummary.allocated_wrap_asserts
+#print axioms LidoSRv3.Tests.NodeOperatorsRegistrySummary.allocated_load_delta_fixture
