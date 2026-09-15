@@ -3,6 +3,15 @@
 Canonical obligations remain in `audit/guarantees.yaml`; generated UX2 files are
 views of that registry. No historical receipt validates a successor commit.
 
+- **Current coordination (2026-09-15).** Replacement website writer
+  `d2e6ef99-9fcb-4aa8-b26e-68c05ece65ee` is active. Coordinator-assigned reviewer
+  `a52bfddf-43d2-4cbc-bfe2-d3782708ff2a` is reviewing exact website
+  `83187e3d260c5aed481b1ece42e280fc5742fe23` / proof
+  `4a364acc676176076fe820edaead9a0544b629d6` read-only. Orchestrator status reports
+  native `claudecode` / `claude-fable-5-1`; runtime confirmation and the earlier
+  complete finding ledger were requested. No duplicate reviewer was created and
+  the old website writer was not reactivated. This historical-pair review is not
+  current-candidate acceptance. Earlier infrastructure failures remain historical.
 - Exact proof milestone `806f308376686d6eef750797002473d0d7435ce4` passed the
   full configured repository suite on registered DGX Spark, job
   `57f51984-9e08-47f2-b191-e84d2624a562`, exit 0 at 2026-09-15 15:52:05 UTC,
@@ -706,3 +715,10 @@ not transfer a predecessor build, trust verdict or deployment acceptance.
   lemma was stated with `List.forM` while simplification normalized the goal to
   `forM`. Input validation advances past identifier checking to concrete function
   parameter/return fields. The successor fixes those reductions; no pass is transferred.
+
+- Exact `afda00ed5ffbe9a89fd3cc6273b8608cf5f8082c` job
+  `d8fa6560-e566-45ba-805d-93941b393db6` failed with exit 1 at
+  2026-09-15 19:19:40 UTC, without a source bundle. Its
+  [receipt](receipts/nor-source/compiler-fold-afda00ed.json) reports no traversal
+  helper errors but remaining function/input recursion. The next proof isolates
+  ADT placement and enables reduction diagnostics; no full pass is claimed.

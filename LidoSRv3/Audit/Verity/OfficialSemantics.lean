@@ -430,6 +430,8 @@ private theorem no_external_assumptions (spec : CompilationModel)
       | _ => throwError "expected one pinned TrustSurface helper: {suffix}"
   simp [h]
 
+set_option diagnostics true in
+set_option diagnostics.threshold 1000 in
 set_option maxRecDepth 16384 in
 set_option maxHeartbeats 4000000 in
 set_option pp.maxSteps 200 in
@@ -455,8 +457,18 @@ theorem checkedFold_compiles_to_official_ir :
               Lean.Elab.Tactic.evalTactic (← `(tactic| simp [$id:ident]))
         | _ => throwError "expected one pinned TrustSurface helper: {suffix}"
   simp only [checkedFold] at mechanics
+  have noAdt : validateNoUnsupportedAdtConstructInStmtList checkedFold.body = .ok () := by
+    simp [checkedFold, validateNoUnsupportedAdtConstructInStmtList,
+      Stmt.checkRecList, Stmt.forDeepListM, stmtCheck_forEach,
+      stmtCheck_letVar, stmtCheck_assignVar, stmtCheck_require, stmtCheck_return,
+      stmtCheck_setStorageArrayElement, validateNoUnsupportedAdtConstructNode,
+      exprContainsAdtConstruct, Expr.foldBool, exprContainsAdtConstructNode,
+      exprAny_literal, exprAny_localVar, exprAny_storageArrayLength,
+      exprAny_storageArrayElement, exprAny_add, exprAny_sub, exprAny_le]
+    all_goals (trace_state; decide +kernel)
   have functionValid : validateFunctionSpec checkedFold = .ok () := by
-    simp [validateFunctionSpec, mechanics, checkedFold, fold_leaf, fold_forEach,
+    simp only [validateFunctionSpec, noAdt]
+    simp [mechanics, checkedFold, fold_leaf, fold_forEach,
       Stmt.foldList, Stmt.directMetadata, Stmt.childLists,
       stmtContainsUnsafeLogicalCallLike, stmtAny_leaf, stmtAny_forEach,
       exprContainsUnsafeLogicalCallLike, exprAny_literal, exprAny_localVar,
