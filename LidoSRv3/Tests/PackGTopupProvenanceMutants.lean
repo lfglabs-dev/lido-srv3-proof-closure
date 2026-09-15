@@ -25,7 +25,7 @@ theorem dead_beacon_model_kill_line_disagrees_with_pin :
     mutantBeaconAddress.toNat ≠ PTopup1.canonicalBeaconDepositAddress ∧
       mutantBeaconAddress.toNat ≠
         LidoSRv3.Audit.Verity.TopupTx.beaconAddress.toNat := by
-  native_decide
+  decide +kernel
 
 /-- Honest pin remains the production literal; the mutant is not that pin. -/
 example :

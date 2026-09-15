@@ -44,6 +44,7 @@ contract TopupDifferentialTest {
         uint256 pushed;
         string names;
         uint256 callCount;
+        uint256 depositCallCount;
     }
 
     function setUp() public {
@@ -115,6 +116,7 @@ contract TopupDifferentialTest {
         if (o.ok) {
             o.pulled = vm.parseJsonUint(raw, ".pulled");
             o.pushed = vm.parseJsonUint(raw, ".pushed");
+            o.depositCallCount = vm.parseJsonUint(raw, ".depositCallCount");
         } else {
             o.revertText = vm.parseJsonString(raw, ".revert");
         }
@@ -141,7 +143,10 @@ contract TopupDifferentialTest {
             CallLog.Item memory item = log.at(i);
             names = string.concat(names, i == 0 ? item.name : string.concat(",", item.name));
             if (keccak256(bytes(item.name)) == keccak256("withdrawDepositableEther")) pulled += item.arg0;
-            if (keccak256(bytes(item.name)) == keccak256("deposit")) pushed += item.value;
+            if (keccak256(bytes(item.name)) == keccak256("deposit")) {
+                pushed += item.value;
+                ++o.depositCallCount;
+            }
         }
         o.names = names;
         if (ok) {
@@ -165,6 +170,7 @@ contract TopupDifferentialTest {
         Obs memory sol = observePinned(GATEWAY, _one(0), _one(0), _pks(1), _one(5 ether));
         Obs memory model = runModel(modelJson("[0]", "none"));
         require(sol.ok && model.ok, "zero alloc commits");
+        require(sol.depositCallCount == 0 && model.depositCallCount == 0, "zero allocation made deposit call");
         require(sol.pulled == 0 && model.pulled == 0 && sol.pushed == 0, "no ether");
     }
 
@@ -233,6 +239,7 @@ contract TopupDifferentialTest {
         Obs memory sol = observePinned(GATEWAY, _two(0, 1), _two(0, 0), _pks(2), _two(5 ether, 5 ether));
         Obs memory model = runModel(modelJson("[0,2000000000000000000]", "none"));
         require(sol.ok && model.ok, "skip zero");
+        require(sol.depositCallCount == 1 && model.depositCallCount == 1, "zero skip call count");
         require(sol.pulled == 2 ether && model.pulled == 2 ether);
         require(sol.pushed == 2 ether && model.pushed == 2 ether);
     }

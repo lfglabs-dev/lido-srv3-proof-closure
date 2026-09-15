@@ -110,6 +110,9 @@ def encode (allocations : List Nat) (failure : FailurePoint) : String :=
         ",\"pulled\":" ++ jsonNat obs.pulled ++
         ",\"pushed\":" ++ jsonNat obs.pushed ++
         ",\"allocationTotal\":" ++ jsonNat obs.allocationTotal ++
+        ",\"depositCallCount\":" ++ jsonNat
+          ((after.calls.drop defaultState.calls.length).filter
+            (fun c => c.name == "deposit" && c.target == beaconAddress.toNat)).length ++
         ",\"calls\":" ++ jsonCalls (after.calls.drop defaultState.calls.length) ++
         ",\"events\":[]" ++
       "}"
