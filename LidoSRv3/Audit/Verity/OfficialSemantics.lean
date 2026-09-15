@@ -114,73 +114,13 @@ theorem wrappingMutant_is_detected :
       (denote wrappingMutant [Verity.Core.MAX_UINT256, 1]).returnValue = some 0 := by
   decide +kernel
 
-private def exceptUnitDecEq : DecidableEq (Except String Unit) := fun x y =>
-  match x, y with
-  | .ok _, .ok _ => isTrue rfl
-  | .error a, .error b =>
-    if h : a = b then isTrue (h ▸ rfl)
-    else isFalse (by intro heq; cases heq; exact h rfl)
-  | .ok _, .error _ => isFalse (by intro h; cases h)
-  | .error _, .ok _ => isFalse (by intro h; cases h)
-
-local instance : DecidableEq (Except String Unit) := exceptUnitDecEq
-
 set_option maxRecDepth 16384 in
 set_option maxHeartbeats 4000000 in
-set_option pp.maxSteps 200 in
-/-- The same EDSL program genuinely enters Verity's official compiler and
-produces its IR; this theorem fixes the concrete compiler entrypoint and rules
-out a source-only local interpreter experiment. -/
+/-- Compile the unchanged program using equation-theorem evaluation, avoiding
+kernel expansion of well-founded accessibility proofs on large literals.
+The resulting theorem still requires the normal transitive trust gate. -/
 theorem checkedFold_compiles_to_official_ir :
     (CompilationModel.compile checkedFoldSpec [tx.functionSelector]).isOk = true := by
-  have functionValid : validateFunctionSpec checkedFold = .ok () := by
-    simp [validateFunctionSpec, checkedFold, Bind.bind, Except.bind, Pure.pure, Except.pure]
-    decide +kernel
-  have validated : validateCompileInputs checkedFoldSpec [tx.functionSelector] = .ok () := by
-    unfold validateCompileInputs
-    run_tac do
-      let env ← Lean.getEnv
-      let candidates := env.constants.toList.filter fun (name, _) =>
-        name.toString.endsWith ".validateCompileInputsBeforeFieldWriteConflict"
-      match candidates with
-      | [(name, _)] =>
-          let id := Lean.mkIdent name
-          Lean.Elab.Tactic.evalTactic (← `(tactic| unfold $id:ident))
-      | _ => throwError "expected one pinned compiler precheck definition"
-    simp [checkedFoldSpec, functionValid, checkedFold, modulesField,
-      Bind.bind, Except.bind, Pure.pure, Except.pure]
-    all_goals decide +kernel
-  have fieldSlot : findFieldWithResolvedSlot [modulesField] "modules" = some (modulesField, 7) := by
-    rfl
-  have fieldType : modulesField.ty = .dynamicArray .uint256 := rfl
-  have fieldTransient : modulesField.isTransient = false := rfl
-  have bodyValid :
-      (compileStmtListWithFork [modulesField] [] [] .calldata [] false [] [] .cancun checkedFold.body []).isOk = true := by
-    simp [checkedFold, fieldSlot, fieldType, fieldTransient, compileStmtListWithFork, compileStmtWithFork,
-      compileExprWithInternals, compileRequireFailCondWithInternals,
-      compileSetStorageArrayElement, validateDynamicArrayField,
-      Bind.bind, Except.bind, Pure.pure, Except.pure, Except.isOk, Except.toBool]
-    all_goals decide +kernel
-  have hi : checkedFold.isInternal = false := rfl
-  have hn : checkedFold.name = "checkedFold" := rfl
-  have hs : isInteropEntrypointName "checkedFold" = false := by decide +kernel
-  have hf : CompilationModel.applySlotAliasRanges [modulesField] [] = [modulesField] := rfl
-  have hp : checkedFold.params = [] := rfl
-  have hl : checkedFold.nonReentrantLock = none := rfl
-  have hr : functionReturns checkedFold = .ok [.uint256] := rfl
-  have templates : (templateIntrinsicItems checkedFoldSpec).isEmpty = true := by decide +kernel
-  have ht := List.nil_of_isEmpty templates
-  unfold CompilationModel.compile
-  rw [validated]
-  simp only [bind, Except.bind]
-  cases hb : compileStmtListWithFork [modulesField] [] [] .calldata [] false [] [] .cancun checkedFold.body []
-  · simp [hb, Except.isOk, Except.toBool] at bodyValid
-  · unfold compileValidatedCore
-    rw [ht]
-    simp [checkedFoldSpec, compileGuardedFunctionSpec, compileFunctionSpec,
-      functionValid, hi, hn, hs, hf, hp, hl, hr, hb,
-      attachNonReentrantGuard, compileConstructor, pickUniqueFunctionByName,
-      List.filter_cons, List.mapM_cons, List.map_cons, List.map_nil,
-      Bind.bind, Except.bind, Pure.pure, Except.pure, Except.isOk, Except.toBool]
+  decide_cbv
 
 end LidoSRv3.Audit.Verity.OfficialSemantics

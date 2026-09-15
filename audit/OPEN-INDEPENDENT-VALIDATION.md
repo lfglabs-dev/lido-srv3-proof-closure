@@ -57,6 +57,14 @@ views of that registry. No historical receipt validates a successor commit.
   [failed receipt](receipts/nor-source/compiler-witnesses-ea8295c0.json) is retained.
   The next repair separates input validation from core compilation; it does not
   weaken the compiler-success statement or introduce a new assumption.
+- **Compiler witness repair remains open.** Exact
+  `3c4f8d0b3617706f3efa9d538d764d02d6ad9f38` job
+  `fd78b6a9-cdb2-4b78-ae6f-3ede42c0308e` terminated as failed at
+  2026-09-15 18:17:11 UTC with a null exit code and no final-target diagnostic.
+  Its [receipt](receipts/nor-source/compiler-fold-3c4f8d0b.json) proves neither
+  theorem rejection nor acceptance. The successor uses Lean's proof-producing
+  equation evaluator for the unchanged checked-fold compilation statement;
+  actual transitive trust and full validation remain required.
 - **Predecessor findings: reconciliation incomplete.** The missing fifth finding
   and 37-thread dispositions identified below remain unresolved. Historical
   semantic findings remain open unless concrete current evidence establishes
