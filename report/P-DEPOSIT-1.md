@@ -65,4 +65,5 @@ execution and its exact request/returndata, not nonzero code size: a precompile
 can return bytes with zero EXTCODESIZE. Ordinary-empty-account failure helpers
 now state that premise explicitly. The registered execution obligations remain;
 precompile semantics, fork/runtime binding and paired differential coverage are
-still open. Shared locator STATICCALL dispatch has not yet received this repair.
+still open. Shared locator STATICCALL now uses the same precompile-aware
+dispatch predicate and consumes the returned bytes; this is not runtime refinement.

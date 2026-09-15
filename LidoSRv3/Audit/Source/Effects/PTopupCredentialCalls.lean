@@ -14,7 +14,7 @@ theorem actual_credential_root_module_memory_effects (getter : StaticCall.Extern
     (h : (TopupCredentialCall.run getter credentialCursor returnBuffer hash m x e ctx deposit moduleId keys operators rows allocation).outcome = .ok ()) :
     checkLengths (TopupBatchRootCalls.environment e).cfg rows.length keys.length operators.length rows.length rows.length = .ok () ∧
     ∃ wc nextCredential rawCredential,
-      (e.before.core.codeSize ctx.sender.val).val ≠ 0 ∧
+      ¬ audit.trio.consolidation.emptyCodeAccount e.before ctx.sender ∧
       getter (request e.gateway ctx.sender moduleId) e.before = .success rawCredential ∧
       decodeCredentials credentialCursor rawCredential = .ok (wc,nextCredential) ∧
       32 ≤ (word rawCredential.length).val ∧ wc = word (decode (rawCredential.take 32)) ∧

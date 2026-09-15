@@ -13,8 +13,8 @@ fails before the callee runs.
 CALL dispatch excludes Cancun precompiles (addresses 1 through 10) from the
 empty-code shortcut. Their result comes from the external interpreter, including
 rejection and rollback. Fork/runtime binding and correctness of that interpreter
-remain open. STATICCALL below still has the inherited precompile-dispatch gap;
-its no-code behavior must not be advertised as general EVM correspondence.
+remain open. STATICCALL uses the same dispatch predicate and preserves its
+static observation, without granting the interpreter a writable reply world.
 
 Pinned usages at `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`:
 
@@ -90,11 +90,25 @@ modified. -/
 def lowLevelStaticCall (external : StaticCall.External) (caller target : Address)
     (payload : Bytes) (w : World) : StaticCall.Result :=
   let req : Request := ⟨caller, target, word 0, payload⟩
-  if (w.core.codeSize target.val).val = 0 then ⟨.ok [], [⟨req, true, true, [], 1⟩]⟩
+  if emptyCodeAccount w target then ⟨.ok [], [⟨req, true, true, [], 1⟩]⟩
   else match external req w with
     | .success data => ⟨.ok data, [⟨req, true, true, data, 1⟩]⟩
     | .rejected data => ⟨.error data, [⟨req, true, false, data, 1⟩]⟩
     | .forbiddenStateChange => ⟨.error [], [⟨req, true, false, [], 1⟩]⟩
+
+/-- Cancun precompiles execute through the static interpreter even with zero
+code size. The exact request, returndata and rejection flag are retained. -/
+theorem lowLevelStaticCall_precompile (external : StaticCall.External)
+    (caller target : Address) (payload : Bytes) (w : World)
+    (hp : 1 ≤ target.val ∧ target.val ≤ 10) :
+    lowLevelStaticCall external caller target payload w =
+      let req : Request := ⟨caller, target, word 0, payload⟩
+      match external req w with
+      | .success data => ⟨.ok data, [⟨req, true, true, data, 1⟩]⟩
+      | .rejected data => ⟨.error data, [⟨req, true, false, data, 1⟩]⟩
+      | .forbiddenStateChange => ⟨.error [], [⟨req, true, false, [], 1⟩]⟩ := by
+  have hn : ¬ emptyCodeAccount w target := by unfold emptyCodeAccount; omega
+  simp [lowLevelStaticCall, hn]
 
 /-- Exhaustive branch shape of the low-level CALL on any world. -/
 theorem lowLevelCall_shape (external : External) (ctx : Context) (target : Address)
@@ -156,10 +170,10 @@ theorem lowLevelCall_success_funded (external : External) (ctx : Context) (targe
 /-- Exhaustive branch shape of the low-level STATICCALL. -/
 theorem lowLevelStaticCall_shape (external : StaticCall.External) (caller target : Address)
     (payload : Bytes) (w : World) :
-    ((w.core.codeSize target.val).val = 0 ∧
+    (emptyCodeAccount w target ∧
       lowLevelStaticCall external caller target payload w =
         ⟨.ok [], [⟨⟨caller, target, word 0, payload⟩, true, true, [], 1⟩]⟩) ∨
-    ((w.core.codeSize target.val).val ≠ 0 ∧
+    (¬ emptyCodeAccount w target ∧
       ((∃ data, external ⟨caller, target, word 0, payload⟩ w = .success data ∧
         lowLevelStaticCall external caller target payload w =
           ⟨.ok data, [⟨⟨caller, target, word 0, payload⟩, true, true, data, 1⟩]⟩) ∨
@@ -170,7 +184,7 @@ theorem lowLevelStaticCall_shape (external : StaticCall.External) (caller target
         lowLevelStaticCall external caller target payload w =
           ⟨.error [], [⟨⟨caller, target, word 0, payload⟩, true, false, [], 1⟩]⟩))) := by
   unfold lowLevelStaticCall
-  by_cases hc : (w.core.codeSize target.val).val = 0
+  by_cases hc : emptyCodeAccount w target
   · exact Or.inl ⟨hc, by simp [hc]⟩
   · refine Or.inr ⟨hc, ?_⟩
     cases hr : external ⟨caller, target, word 0, payload⟩ w with

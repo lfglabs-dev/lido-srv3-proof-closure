@@ -38,7 +38,7 @@ theorem actual_locator_timing_credential_root_module_memory_history
     (keys operators : List Word) (rows : List Row) (allocation : Word)
     (h : (TopupRouterLocatorCall.run locatorCall locator cursor returnBuffer hash m x e ctx deposit moduleId keys operators rows allocation).outcome = .ok ()) :
     ∃ router next raw,
-      (e.before.core.codeSize locator.val).val ≠ 0 ∧
+      ¬ audit.trio.consolidation.emptyCodeAccount e.before locator ∧
       locatorCall (TopupRouterLocatorCall.request e.gateway locator) e.before = .success raw ∧
       TopupRouterLocatorCall.decodeRouter cursor raw = .ok (router,next) ∧
       32 ≤ (word raw.length).val ∧ router.val = (word (decode (raw.take 32))).val ∧

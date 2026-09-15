@@ -45,7 +45,14 @@ example : LidoSRv3.Audit.Source.DepositDsmCall.decodeAddress (Live.word (2^64-33
 
 def noCode := {before with core := {before.core with codeSize := fun _ => Live.word 0}}
 example : (run query noCode).outcome = .error .empty := by decide +kernel
-example : (run query noCode).locatorAttempts = [⟨LidoSRv3.Audit.Source.DepositDsmCall.request liveCtx.sender locator,true,true,[],1⟩] := by decide +kernel
+example : (run query noCode).locatorAttempts = [⟨LidoSRv3.Audit.Source.DepositDsmCall.request liveCtx.sender locator,true,true,Live.encode 32 7,1⟩] := by decide +kernel
+
+-- Locator 3 is a precompile address: zero code does not suppress its reply.
+example : (run query noCode).attempts.length = 1 := by decide +kernel
+example : (LidoSRv3.Audit.Source.DepositDsmCall.lookup query liveCtx.sender locator cursor noCode).outcome =
+    .ok ⟨7,by decide⟩ := by decide +kernel
+example : (LidoSRv3.Audit.Source.DepositDsmCall.lookup query liveCtx.sender (addr 30) cursor noCode).outcome =
+    .error .empty := by decide +kernel
 
 def positive := LidoSRv3.Audit.Source.DepositDsmCall.execute query locator cursor hash
   positiveModule withdrawalExternal supplied liveCtx input before

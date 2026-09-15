@@ -168,7 +168,7 @@ theorem run_admitted (g : Environment) (hash : TopupRouterCredentials.Keccak)
 
 theorem auth_origin (g : Environment) (router : Address) (before : World) (allowed : Address) (next : Word) (trace : List NestedAttempt)
     (h : authLookup g router before = ⟨.ok (allowed,next),trace⟩) :
-    (before.core.codeSize g.locator.val).val ≠ 0 ∧ ∃ raw,
+    ¬ audit.trio.consolidation.emptyCodeAccount before g.locator ∧ ∃ raw,
       g.locatorCall (request router g.locator authSelector) before = .success raw ∧
       TopupRouterLocatorCall.decodeRouter g.authCursor raw = .ok (allowed,next) ∧
       32 ≤ (word raw.length).val ∧ allowed.val = (word (decode (raw.take 32))).val ∧
@@ -176,7 +176,7 @@ theorem auth_origin (g : Environment) (router : Address) (before : World) (allow
       g.authCursor.val + 32 = next.val ∧ next.val < 2^64 ∧
       trace = [⟨request router g.locator authSelector,true,true,raw,1⟩] := by
   unfold authLookup audit.trio.consolidation.lowLevelStaticCall at h
-  by_cases hc : (before.core.codeSize g.locator.val).val = 0
+  by_cases hc : audit.trio.consolidation.emptyCodeAccount before g.locator
   · simp only [hc,if_true] at h
     have hd := congrArg TopupRouterLocatorCall.LookupResult.outcome h
     have hb := (TopupRouterLocatorCall.decode_fields g.authCursor [] allowed next hd).1
@@ -196,7 +196,7 @@ theorem auth_origin (g : Environment) (router : Address) (before : World) (allow
 theorem canDeposit_origin (g : Environment) (router lido : Address) (before : World)
     (value : Bool) (next : Word) (trace : List NestedAttempt)
     (h : canDeposit g router lido before = ⟨.ok (value,next),trace⟩) :
-    (before.core.codeSize lido.val).val ≠ 0 ∧ ∃ raw,
+    ¬ audit.trio.consolidation.emptyCodeAccount before lido ∧ ∃ raw,
       g.canDepositCall (request router lido canDepositSelector) before = .success raw ∧
       decodeBool g.canDepositCursor raw = .ok (value,next) ∧
       32 ≤ (word raw.length).val ∧ (word (decode (raw.take 32))).val ≤ 1 ∧
@@ -205,7 +205,7 @@ theorem canDeposit_origin (g : Environment) (router lido : Address) (before : Wo
       g.canDepositCursor.val + 32 = next.val ∧ next.val < 2^64 ∧
       trace = [⟨request router lido canDepositSelector,true,true,raw,1⟩] := by
   unfold canDeposit audit.trio.consolidation.lowLevelStaticCall at h
-  by_cases hc : (before.core.codeSize lido.val).val = 0
+  by_cases hc : audit.trio.consolidation.emptyCodeAccount before lido
   · simp only [hc,if_true] at h
     have hd := congrArg BoolResult.outcome h
     have hb := (decodeBool_fields g.canDepositCursor [] value next hd).1

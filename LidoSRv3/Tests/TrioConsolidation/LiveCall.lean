@@ -275,4 +275,14 @@ example : refundFee rejectingInbox gatewayCtx (Live.word 5) (addr 9) gatewayWorl
     gatewayWorld [0xFF] (by decide +kernel) (by decide +kernel)
     (by decide +kernel) rfl
 
+/-- Static precompile dispatch preserves actual returndata and failure, then
+feeds the vault's fee decoder. These are interpreter doubles, not SHA/KZG proofs. -/
+example : (lowLevelStaticCall (fun _ _ => .rejected [0xAA]) gateway (addr 9) [] gatewayWorld).outcome =
+    .error [0xAA] := by decide +kernel
+example : (getConsolidationRequestFee feeStatic gatewayCtx (addr 9) gatewayWorld).outcome =
+    .ok fee := by decide +kernel
+example : (lowLevelStaticCall (fun _ _ => .forbiddenStateChange) gateway (addr 10)
+    [] gatewayWorld).attempts = [⟨⟨gateway,addr 10,Live.word 0,[]⟩,true,false,[],1⟩] := by
+  decide +kernel
+
 end LidoSRv3.Tests.TrioConsolidation.LiveCall

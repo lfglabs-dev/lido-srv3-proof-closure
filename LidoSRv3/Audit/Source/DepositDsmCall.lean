@@ -31,8 +31,8 @@ structure LookupResult where
   deriving DecidableEq
 
 /-- The existing low-level STATICCALL models ordinary no-code success with
-empty bytes; the following decoder rejects that success. Precompile dispatch
-is outside this inherited no-code arm. No writable reply World exists. -/
+empty bytes; the following decoder rejects that success. Cancun precompile dispatch
+uses the external interpreter. No writable reply World exists. -/
 def lookup (locatorExternal : StaticCall.External) (router locator : Live.Address)
     (cursor : Live.Word) (before : Live.World) : LookupResult :=
   let r := audit.trio.consolidation.lowLevelStaticCall locatorExternal router locator
@@ -103,12 +103,12 @@ theorem decodeAddress_fields (cursor : Live.Word) (raw : Live.Bytes) (dsm : Trio
         exact ⟨by omega,rfl⟩
       · contradiction
 
-/-- An accepted address came from the actual coded locator response, with
+/-- An accepted address came from the actual locator interpreter response, with
 canonical high bits and its successful STATICCALL observation. -/
 theorem lookup_origin (locatorExternal : StaticCall.External) (router locator : Live.Address)
     (cursor : Live.Word) (before : Live.World) (dsm : TrioAlloc1.Address)
     (trace : List Live.NestedAttempt) (h : lookup locatorExternal router locator cursor before = ⟨.ok dsm,trace⟩) :
-    (before.core.codeSize locator.val).val ≠ 0 ∧ ∃ raw,
+    ¬ audit.trio.consolidation.emptyCodeAccount before locator ∧ ∃ raw,
       locatorExternal (request router locator) before = .success raw ∧
       decodeAddress cursor raw = .ok dsm ∧
       32 ≤ (Live.word raw.length).val ∧ dsm.val = Live.decode (raw.take 32) ∧
@@ -139,7 +139,7 @@ def Effects (locatorExternal : StaticCall.External) (locator : Live.Address) (cu
     (liveCtx : Live.Context) (i : ModuleCall.Input) (before after : Live.World)
     (attempts : List Live.Attempt) (staticTrace : List Live.NestedAttempt) : Prop :=
   ∃ dsm raw,
-    (before.core.codeSize locator.val).val ≠ 0 ∧
+    ¬ audit.trio.consolidation.emptyCodeAccount before locator ∧
     locatorExternal (request liveCtx.sender locator) before = .success raw ∧
     decodeAddress cursor raw = .ok dsm ∧
     32 ≤ (Live.word raw.length).val ∧ dsm.val = Live.decode (raw.take 32) ∧

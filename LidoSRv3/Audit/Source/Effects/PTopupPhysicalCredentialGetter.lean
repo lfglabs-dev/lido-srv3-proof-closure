@@ -20,7 +20,7 @@ theorem actual_physical_credential_root_module_memory_effects
       TopupRouterCredentials.typeOf (e.before.core.readContractSlot ctx.sender.val
         (TopupRouterCredentials.moduleSlot hash moduleId)) = 2 ∧
       wc.val % 2^248 = (TopupRouterCredentials.raw ctx.sender e.before).val % 2^248 ∧
-      (e.before.core.codeSize ctx.sender.val).val ≠ 0 ∧
+      ¬ audit.trio.consolidation.emptyCodeAccount e.before ctx.sender ∧
       TopupPhysicalCredentialGetter.dispatch hash (request e.gateway ctx.sender moduleId) e.before = .success rawCredential ∧
       decodeCredentials credentialCursor rawCredential = .ok (wc,nextCredential) ∧
       32 ≤ (word rawCredential.length).val ∧ wc = word (decode (rawCredential.take 32)) ∧

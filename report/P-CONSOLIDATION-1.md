@@ -25,10 +25,11 @@ are Lean execution regressions, not paired Solidity/precompile equivalence tests
 
 Remaining obligations:
 
-- Shared low-level STATICCALL still bypasses precompile execution at zero-code
-  targets. Locator-origin claims relying on that branch need repair. Cancun fork
-  binding, actual precompile semantics, and differential precompile coverage
-  remain required; the CALL dispatch repair does not discharge them.
+- Shared STATICCALL now excludes Cancun precompiles from empty-code acceptance
+  and retains the interpreter response, including rejection and static-state-change
+  failure. The fee consumer and locator-origin certificates consume that execution.
+  Cancun fork binding, actual precompile semantics and paired differential coverage
+  remain required; dispatch lemmas do not discharge these obligations.
 
 - The input world is already credited with the outer transaction value. Outer ABI decoding and payable-credit execution are not derived here.
 - Gateway lines 201-207 perform the DSM/precondition check, locator lookup and target withdrawal-credential witness validation between counting and quota use. These operations are omitted. The theorem therefore establishes the declared physical-entry/quota/settlement model, not whole-function admission or beacon validator eligibility. The selected vault/inbox and request groups remain inputs at this boundary.

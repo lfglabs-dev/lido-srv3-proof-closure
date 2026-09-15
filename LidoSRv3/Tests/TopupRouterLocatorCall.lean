@@ -71,9 +71,15 @@ def noCode : TopupGatewayRootCalls.Environment :=
   let e := TopupTimingHistory.base
   {e with before := {e.before with core := {e.before.core with codeSize := fun a => if a = 9 then word 0 else e.before.core.codeSize a}}}
 
+/-- The previous zero-code locator fixture is address 9, a Cancun precompile. -/
+theorem precompile_locator_dispatch :
+    (batch noCode).outcome = .ok () ∧
+    (batch noCode).locatorAttempts = [⟨request (address 3) locator,true,true,encode 32 2,1⟩] := by decide +kernel
+
 theorem ordinary_nocode_empty_then_decoder :
-    (batch noCode).outcome = .error (.lookup .empty) ∧
-    (batch noCode).locatorAttempts = [⟨request (address 3) locator,true,true,[],1⟩] := by decide +kernel
+    lookup good (address 3) (address 20) (word 128)
+      {noCode.before with core := {noCode.before.core with codeSize := fun _ => word 0}} =
+    ⟨.error .empty,[⟨request (address 3) (address 20),true,true,[],1⟩]⟩ := by decide +kernel
 
 theorem zero_router_reaches_physical_registration :
     (batch TopupTimingHistory.base (getter (encode 32 0))).outcome =

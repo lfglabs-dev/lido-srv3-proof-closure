@@ -65,8 +65,8 @@ body instead of assuming them.
   (Solidity ABI framing of `(bytes[], bytes[])`; `executeVaultCalldata`).
 * The fee STATICCALL attempt is not recorded in the trace
   (`getConsolidationRequestFee`, `attempts := []`). CALL now excludes Cancun
-  precompiles from ordinary empty-code acceptance; STATICCALL still needs
-  that dispatch repair. `predeployBody` is a simplified stand-in
+  precompiles from ordinary empty-code acceptance; STATICCALL uses the same
+  predicate. `predeployBody` is a simplified stand-in
   (`Predeploy.lean`); its runtime refinement remains open.
 
 Pin `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`.

@@ -72,7 +72,7 @@ The ordinary-account helpers now require this explicit predicate. Their earlier
 zero-code-only statements were false for precompiles; that correction does not
 restrict the registered gateway/vault parent to EOAs.
 
-STATICCALL still has the original zero-code shortcut and remains open. Neither
+STATICCALL now uses the same predicate and retains its static attempt and reply. Neither
 the Cancun fork binding nor the supplied interpreter's precompile implementation
 is established by these CALL dispatch lemmas. Paired Solidity/precompile tests
 also remain outstanding.
@@ -227,8 +227,7 @@ them beyond "decodes to some arrays".
 * `predeployBody` is a simplified stand-in: no source-address field, three
   queue words per request instead of EIP-7251's four-word entries, no
   empty-calldata fee read via CALL, no dequeue path (§3).
-* The STATICCALL code-less shortcut still needs precompile dispatch repair.
-  CALL now enforces the ordinary-account predicate (§1); full precompile
+* CALL and STATICCALL enforce the ordinary-account predicate (§1); full precompile
   semantics, fork binding and runtime correspondence remain open.
 * `RequestAdditionFailed(request)` / `InvalidPublicKeyLength(pubkey)` /
   panics remain `Fault.reason` names; request octets remain in the attempt

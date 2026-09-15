@@ -78,8 +78,8 @@ structure LookupResult where
   deriving DecidableEq
 
 /-- Ordinary no-code transport succeeds empty and reaches allocation/decoder.
-No 0.8.9 EXTCODESIZE precheck is inserted; precompiles retain the inherited
-lowLevelStaticCall boundary. The getter exposes no writable reply World. -/
+No 0.8.9 EXTCODESIZE precheck is inserted; Cancun precompiles dispatch through the
+lowLevelStaticCall external interpreter. The getter exposes no writable reply World. -/
 def lookup (getter : StaticCall.External) (gateway router : Address) (moduleId cursor : Word)
     (before : World) : LookupResult :=
   let r := audit.trio.consolidation.lowLevelStaticCall getter gateway router
@@ -91,14 +91,14 @@ def lookup (getter : StaticCall.External) (gateway router : Address) (moduleId c
 theorem lookup_origin (getter : StaticCall.External) (gateway router : Address)
     (moduleId cursor : Word) (before : World) (wc next : Word) (trace : List NestedAttempt)
     (h : lookup getter gateway router moduleId cursor before = ⟨.ok (wc,next),trace⟩) :
-    (before.core.codeSize router.val).val ≠ 0 ∧ ∃ raw,
+    ¬ audit.trio.consolidation.emptyCodeAccount before router ∧ ∃ raw,
       getter (request gateway router moduleId) before = .success raw ∧
       decodeCredentials cursor raw = .ok (wc,next) ∧
       32 ≤ (word raw.length).val ∧ wc = word (decode (raw.take 32)) ∧
       finalizeAllocation cursor 32 = .ok next ∧ cursor.val + 32 = next.val ∧ next.val < 2^64 ∧
       trace = [⟨request gateway router moduleId,true,true,raw,1⟩] := by
   unfold lookup audit.trio.consolidation.lowLevelStaticCall at h
-  by_cases hc : (before.core.codeSize router.val).val = 0
+  by_cases hc : audit.trio.consolidation.emptyCodeAccount before router
   · simp only [hc,if_true] at h
     have hd := congrArg LookupResult.outcome h
     have hb := (decode_fields cursor [] wc next hd).1
