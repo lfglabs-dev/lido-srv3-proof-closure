@@ -10,17 +10,11 @@ precheck: a code-less target (EOA or not-yet-deployed address) *accepts* with
 empty return data, after the value transfer for CALL. Only an unfunded caller
 fails before the callee runs.
 
-Premise of the code-less arm (residual named by the #295 review 3bb8da69,
-recorded, not closed): precompile addresses (`0x01`-`0x0a` and later
-additions) have no code yet execute, and some of them fail on an empty
-payload (`0x09` blake2f, `0x0a` KZG point evaluation). The rule below treats
-every code-less target as accepting, which is exact for EOAs and undeployed
-addresses only. Every theorem stated on the code-less arm
-(`callAdd_no_code_accepted`, `refund_no_code_accepted`, the fee read on a
-code-less target) is to be read with "the target is not a precompile" as a
-premise. Exposure at the pinned call sites is nil (`CONSOLIDATION_REQUEST`
-has code; the refund recipient is chosen by the role holder), but the model
-does not enforce the premise.
+CALL dispatch excludes Cancun precompiles (addresses 1 through 10) from the
+empty-code shortcut. Their result comes from the external interpreter, including
+rejection and rollback. Fork/runtime binding and correctness of that interpreter
+remain open. STATICCALL below still has the inherited precompile-dispatch gap;
+its no-code behavior must not be advertised as general EVM correspondence.
 
 Pinned usages at `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`:
 
@@ -42,6 +36,15 @@ namespace audit.trio.consolidation
 open LidoSRv3.Audit.Source.TrioReserve1
 open LidoSRv3.Audit.Source.TrioReserve1.Live
 
+/-- Ordinary empty-code account under Cancun dispatch. Later-fork additions
+require an updated fork binding; zero code alone never identifies an EOA. -/
+def emptyCodeAccount (w : World) (target : Address) : Prop :=
+  (w.core.codeSize target.val).val = 0 ∧ (target.val = 0 ∨ 10 < target.val)
+
+instance (w : World) (target : Address) : Decidable (emptyCodeAccount w target) :=
+  inferInstanceAs (Decidable ((w.core.codeSize target.val).val = 0 ∧
+    (target.val = 0 ∨ 10 < target.val)))
+
 /-- Low-level `target.call{value: value}(payload)`. No target-code guard: a
 code-less target (EOA or undeployed address; **not a precompile**, see the
 module docstring) accepts with empty return data after the value transfer. An
@@ -53,7 +56,7 @@ def lowLevelCall (external : External) (ctx : Context) (target : Address)
   let req : Request := ⟨ctx.self, target, value, payload⟩
   if w.balances ctx.self < value.val then
     ⟨.error (.bubbled []), w, [⟨req, false, [], []⟩]⟩
-  else if (w.core.codeSize target.val).val = 0 then
+  else if emptyCodeAccount w target then
     ⟨.ok [], transfer w ctx.self target value.val, [⟨req, true, [], []⟩]⟩
   else
     match external req (transfer w ctx.self target value.val) with
@@ -61,6 +64,22 @@ def lowLevelCall (external : External) (ctx : Context) (target : Address)
     | .success data after => ⟨.ok data, after, [⟨req, true, data, []⟩]⟩
     | .successWithTrace data after nested => ⟨.ok data, after, [⟨req, true, data, nested⟩]⟩
     | .rejectedWithTrace data nested => ⟨.error (.bubbled data), w, [⟨req, false, data, nested⟩]⟩
+
+/-- Precompile rejection is observed even when EXTCODESIZE is zero. The
+provisional credit is rolled back, retaining the actual failed CALL request. -/
+theorem lowLevelCall_precompile_rejected (external : External) (ctx : Context)
+    (target : Address) (payload : Bytes) (value : Word) (w : World) (data : Bytes)
+    (hp : 1 ≤ target.val ∧ target.val ≤ 10)
+    (hb : value.val ≤ w.balances ctx.self)
+    (hr : external ⟨ctx.self, target, value, payload⟩
+      (transfer w ctx.self target value.val) = .rejected data) :
+    lowLevelCall external ctx target payload value w =
+      ⟨.error (.bubbled data), w,
+        [⟨⟨ctx.self, target, value, payload⟩, false, data, []⟩]⟩ := by
+  have hn : ¬ emptyCodeAccount w target := by
+    unfold emptyCodeAccount
+    omega
+  simp [lowLevelCall, Nat.not_lt.mpr hb, hn, hr]
 
 /-- Low-level `target.staticcall(payload)` (e.g. `_getFeeFromContract`'s
 `staticcall("")`). No target-code guard: a code-less target (EOA or
@@ -83,11 +102,11 @@ theorem lowLevelCall_shape (external : External) (ctx : Context) (target : Addre
     (w.balances ctx.self < value.val ∧
       lowLevelCall external ctx target payload value w =
         ⟨.error (.bubbled []), w, [⟨⟨ctx.self, target, value, payload⟩, false, [], []⟩]⟩) ∨
-    (value.val ≤ w.balances ctx.self ∧ (w.core.codeSize target.val).val = 0 ∧
+    (value.val ≤ w.balances ctx.self ∧ emptyCodeAccount w target ∧
       lowLevelCall external ctx target payload value w =
         ⟨.ok [], transfer w ctx.self target value.val,
           [⟨⟨ctx.self, target, value, payload⟩, true, [], []⟩]⟩) ∨
-    (value.val ≤ w.balances ctx.self ∧ (w.core.codeSize target.val).val ≠ 0 ∧
+    (value.val ≤ w.balances ctx.self ∧ ¬ emptyCodeAccount w target ∧
       ((∃ data, external ⟨ctx.self, target, value, payload⟩
           (transfer w ctx.self target value.val) = .rejected data ∧
         lowLevelCall external ctx target payload value w =
@@ -109,7 +128,7 @@ theorem lowLevelCall_shape (external : External) (ctx : Context) (target : Addre
   by_cases hb : w.balances ctx.self < value.val
   · exact Or.inl ⟨hb, by simp [hb]⟩
   · have hf : value.val ≤ w.balances ctx.self := Nat.not_lt.mp hb
-    by_cases hc : (w.core.codeSize target.val).val = 0
+    by_cases hc : emptyCodeAccount w target
     · exact Or.inr (Or.inl ⟨hf, hc, by simp [hb, hc]⟩)
     · refine Or.inr (Or.inr ⟨hf, hc, ?_⟩)
       cases hr : external ⟨ctx.self, target, value, payload⟩

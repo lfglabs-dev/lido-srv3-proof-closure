@@ -243,4 +243,19 @@ example : refundFee rejectingInbox gatewayCtx (Live.word 5) stranger gatewayWorl
   refund_no_code_accepted rejectingInbox gatewayCtx stranger (Live.word 5) gatewayWorld
     (by native_decide) (by native_decide) (by native_decide)
 
+/-- A zero-code Cancun precompile is not the EOA acceptance shortcut. This
+checks the failed request and returndata as well as rollback of the credit. -/
+example : lowLevelCall rejectingInbox gatewayCtx (addr 9) [] (Live.word 5) gatewayWorld =
+    ⟨.error (.bubbled [0xFF]), gatewayWorld,
+      [⟨⟨gateway, addr 9, Live.word 5, []⟩, false, [0xFF], []⟩]⟩ :=
+  lowLevelCall_precompile_rejected rejectingInbox gatewayCtx (addr 9) []
+    (Live.word 5) gatewayWorld [0xFF] (by decide +kernel) (by decide +kernel) rfl
+
+/-- The public refund producer maps the same precompile rejection to its
+source error and preserves the failed CALL, rather than committing a refund. -/
+example : refundFee rejectingInbox gatewayCtx (Live.word 5) (addr 9) gatewayWorld =
+    ⟨.error (.reason "FeeRefundFailed"), gatewayWorld,
+      [⟨⟨gateway, addr 9, Live.word 5, []⟩, false, [0xFF], []⟩]⟩ := by
+  decide +kernel
+
 end LidoSRv3.Tests.TrioConsolidation.LiveCall
