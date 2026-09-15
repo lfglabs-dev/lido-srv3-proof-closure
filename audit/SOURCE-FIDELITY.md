@@ -69,7 +69,7 @@ for each delivery. Added premises cannot count as unconditional strengthening.
 
 ## Stage A disclosure
 
-Stage A changes only two disclosures; all eleven statuses and all 84 canonical fidelity-gap entries remain. No assumption is discharged. It adds no executed differential test
+Stage A changes only two disclosures; all eleven statuses and all 85 canonical fidelity-gap entries remain. No assumption is discharged. It adds no executed differential test
 and does not satisfy the source-model completion gates for B–F.
 
 The additive Stage B allocation boundary slice is described in

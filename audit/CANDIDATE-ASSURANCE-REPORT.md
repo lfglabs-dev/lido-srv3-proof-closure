@@ -4,7 +4,7 @@
 
 ## Decision
 
-This is the current integration candidate, not an acceptance record or audit certificate. Historical R1 inputs remain pinned at `e8a597f742433475c89382e2eaf96b8475baa214` and its report is preserved separately; its review does not apply to changed statements. The candidate fingerprints synchronize metadata only. CHECKED identifies Lean theorem registrations, whose exact-SHA build results and limitations must be read in the candidate validation record. Fresh independent audit is required. General compiler, deployed-code and chain-state correspondence remain excluded.
+This is the current integration candidate, not an acceptance record or audit certificate. Historical R1 inputs remain pinned at `e8a597f742433475c89382e2eaf96b8475baa214` and its report is preserved separately; its review does not apply to changed statements. The candidate fingerprints synchronize metadata only. CHECKED identifies Lean theorem registrations, whose exact-SHA build results and limitations must be read in the candidate validation record. Fresh independent audit is required. General compiler, deployed-code and chain-state correspondence remain required and OPEN. The only authorized axioms are propext, Quot.sound and Classical.choice; any native dependency blocks foundational-only acceptance.
 
 ## Architecture and evidence boundary
 
@@ -18,7 +18,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 | Claim | Abstract | Verity | Fidelity gaps | Classification |
 | --- | --- | --- | --- | --- |
-| [`P-ALLOC-1`](#p-alloc-1) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
+| [`P-ALLOC-1`](#p-alloc-1) | CHECKED | CHECKED | 7 open | **IMPLEMENTATION_PENDING** |
 | [`P-ALLOC-2`](#p-alloc-2) | CHECKED | CHECKED | 4 open | **IMPLEMENTATION_PENDING** |
 | [`P-DEPOSIT-1`](#p-deposit-1) | CHECKED | CHECKED | 4 open | **IMPLEMENTATION_PENDING** |
 | [`P-TOPUP-1`](#p-topup-1) | CHECKED | CHECKED | 5 open | **IMPLEMENTATION_PENDING** |
@@ -31,8 +31,8 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 | [`P-SSZ-1`](#p-ssz-1) | CHECKED | CHECKED | 9 open | **IMPLEMENTATION_PENDING** |
 | [`P-SSZ-1.deposit-data-root`](#p-ssz-1deposit-data-root) | CHECKED | PARTIAL | 1 open | **IMPLEMENTATION_PENDING** |
 | [`P-SSZ-1.gindex-concat`](#p-ssz-1gindex-concat) | CHECKED | PARTIAL | 1 open | **IMPLEMENTATION_PENDING** |
-| [`P-SSZ-1.abstract-digest`](#p-ssz-1abstract-digest) | CHECKED | PARTIAL | 1 open | **IMPLEMENTATION_PENDING** |
-| [`P-CONSOLIDATION-1.abstract-flow-model`](#p-consolidation-1abstract-flow-model) | CHECKED | PARTIAL | 1 open | **IMPLEMENTATION_PENDING** |
+| [`P-SSZ-1.abstract-digest`](#p-ssz-1abstract-digest) | CHECKED | PARTIAL | 2 open | **IMPLEMENTATION_PENDING** |
+| [`P-CONSOLIDATION-1.abstract-flow-model`](#p-consolidation-1abstract-flow-model) | CHECKED | PARTIAL | 2 open | **IMPLEMENTATION_PENDING** |
 | [`P-ALLOC-1.eugene-bound`](#p-alloc-1eugene-bound) | CHECKED | PARTIAL | 1 open | **IMPLEMENTATION_PENDING** |
 | [`P-ADDRESS-1.yul-interface-harness`](#p-address-1yul-interface-harness) | OPEN | PARTIAL | 1 open | **IMPLEMENTATION_PENDING** |
 | [`P-DEPOSIT-1.verity-tx-rollback.tx`](#p-deposit-1verity-tx-rollbacktx) | CHECKED | CHECKED | 0 open | **NONE** |
@@ -65,7 +65,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`
 
-**Limitations — 6 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+**Limitations — 7 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
 - EXTERNAL-SUMMARY-INVARIANTS: ABI-valid uint256 replies do not imply deposited>=max(summaryExited,accountingExited), nor the required deposited/depositable/totalStake bounds. Derive these from supported implementations, registry writers and deployment identity. The genuine arbitrary-module counterexample remains; unconditional CheckedBounds is not asserted.
 - INPUT/ARITHMETIC: cfg.maxEBType1 must be nonzero and input/allocation sums, available arithmetic and target products need the stated bounds. Existing implication lemmas do not derive those assumptions from the uint256-return interface or supported-module execution.
@@ -73,13 +73,14 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 - PHYSICAL-STORAGE: the physical producer reads account-qualified words using an explicit layout/hash. Derive its ERC7201 addressing and field correspondence from the pinned deployment; legacy slot/map indices and persisted observation arrays are not Solidity physical storage.
 - REGISTRY-REACHABILITY: derive count, supported-module identity, uniqueness and accounting relations from initial/migrated registry state and every relevant writer. Source interface validity alone is insufficient.
 - RUNTIME/DEPLOYMENT: connect the physical call-tree and byte-library executor to actual compiler memory, gas, inherited frame context, linked library code and deployed runtime. These are in scope and unresolved under the expanded proof-only goal; the current source/call-VM correspondence does not close them.
+- I-TRUST-COMPILER-KERNEL (OPEN): the corresponding AllocCapacityPhase3, SszAbstractDigest or ConsolidationAbstractFlowModel compilation witness still consumes its named native_decide axiom. Re-evaluation/disclosure is not authorization. Eliminate the dependency while preserving the compilation claim; foundational-only trust currently fails.
 **Trio source composition.** The new source path reads physical count/configuration, executes each response-dependent module call and checked arithmetic in source order, then performs the capacity pass. Count is derived for modeled initialization/ACL/public-writer histories; the raw-state theorem takes count <=32. It does not cap an arbitrary corrupt count. The stored producer derives output arrays from executed per-row writes.
 
 **Composition validation.** SOURCE COMPOSITION CANDIDATE; final independent review and official exact-source gates pending. Legacy primary guarantee registrations remain unchanged.
 
 **Composition evidence.** `LidoSRv3.Audit.Source.TrioAlloc1.Relational.producer_iff`, `LidoSRv3.Audit.Source.TrioAlloc1.producer_math_view`, `LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredProducer.success`, `LidoSRv3.Audit.Source.TrioComposition.LifecycleHistory.stored_parent_iff`, `LidoSRv3.Audit.Source.TrioComposition.VerityParent.stored_correspondence`
 
-**Composition premises and exclusions.** Compiler interpretation of aligned, non-overlapping observed word loads/stores and copies; omitted private cache/configuration/scratch writes obey the stated frame and cache-field relations. Configured linked library identity, storage/hash interpretation, entry pointer provenance and primitive crypto/consensus bindings are explicit; general compiled/deployed-code and gas verification are excluded. count <=32; pointer +1184*count+704 <=2^32, or modeled initialization/writer history with pointer <=2^31 and finite storage separation; migration and other writer histories excluded.
+**Composition premises and exclusions.** Compiler interpretation of aligned, non-overlapping observed word loads/stores and copies; omitted private cache/configuration/scratch writes obey the stated frame and cache-field relations. Configured linked library identity, storage/hash interpretation, entry pointer provenance and primitive crypto/consensus bindings are explicit; general compiled/deployed-code and gas verification remain required and open. count <=32; pointer +1184*count+704 <=2^32, or modeled initialization/writer history with pointer <=2^31 and finite storage separation; migration and other writer histories excluded.
 
 
 **Classification.** **IMPLEMENTATION_PENDING** — Retain conditional registered source/callback correspondence. Classify unconditional reachable CheckedBounds as an external module/input invariant obligation with an ABI-valid counterexample; retain call-hoisting and physical-slot limitations. Validate the witness and final combined SHA; no invented router history. Preserve the refutation of unconditional legacy/physical equality and separate physical result/capacity conclusions, as decided by the controller; do not attempt the false equality.
@@ -108,7 +109,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Composition evidence.** `LidoSRv3.Audit.Source.TrioAlloc2.allocate_refines`, `LidoSRv3.Audit.Source.TrioAlloc2.distribution_exists`, `LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredParent.public_iff`, `LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredParent.success`, `LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredParent.positive_calls`, `LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredParent.trace_shape`
 
-**Composition premises and exclusions.** Compiler interpretation of aligned, non-overlapping observed word loads/stores and copies; omitted private cache/configuration/scratch writes obey the stated frame and cache-field relations. Configured linked library identity, storage/hash interpretation, entry pointer provenance and primitive crypto/consensus bindings are explicit; general compiled/deployed-code and gas verification are excluded. count <=32; pointer +1184*count+704 <=2^32, or modeled initialization/writer history with pointer <=2^31 and finite storage separation; migration and other writer histories excluded.
+**Composition premises and exclusions.** Compiler interpretation of aligned, non-overlapping observed word loads/stores and copies; omitted private cache/configuration/scratch writes obey the stated frame and cache-field relations. Configured linked library identity, storage/hash interpretation, entry pointer provenance and primitive crypto/consensus bindings are explicit; general compiled/deployed-code and gas verification remain required and open. count <=32; pointer +1184*count+704 <=2^32, or modeled initialization/writer history with pointer <=2^31 and finite storage separation; migration and other writer histories excluded.
 
 
 **Classification.** **IMPLEMENTATION_PENDING** — Keep the checked proportional model/source multi-step correspondence and conservation in the parent, with the +1 model as a separate child. The direct-memory/keccak boundary is discharged only for memoryArrayElement reads; cross-call mutation and upstream active filtering remain open. Do not merge the algorithms or claim Solidity equivalence.
@@ -196,7 +197,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 - DEPLOYMENT-IDENTITIES: Pipeline.Config provides the locator, queue, router, oracle and consensus identities/configuration. The theorem executes their dispatchers and all call failures; it does not prove that these configured identities equal a deployed registry, establish role distinctness, or prove general bytecode/compiler correspondence.
 - FINAL-CALLBACK-PRESERVATION: the theorem derives the partition at the actual spending-stage entry. It does not claim the same protected reserve after arbitrary unknown callback effects. Such a global invariant requires the named callees to preserve the relevant physical state or a stronger shared-interface contract.
 - ENTRY-SCOPE: target/rebalance actions are existing internal writers. The target setter outer ACL, ABI/payable frame setup and broader report admission/deployment context are not inferred from this history. A history is separate transactions, not an invented atomic Solidity batch; later revert retains earlier commits.
-- CALLEE-SEMANTICS: physical queue/locator/router/oracle/consensus source dispatchers are included, while unknown selectors remain explicit external behavior. General precompile dispatch, gas and byte-level LOG/compiler/deployed-runtime correspondence remain excluded.
+- CALLEE-SEMANTICS: physical queue/locator/router/oracle/consensus source dispatchers are included, while unknown selectors remain explicit external behavior. General precompile dispatch, gas and byte-level LOG/compiler/deployed-runtime correspondence are unproved here and remain in scope.
 - VALIDATION: compilation of Differential entry modules is not execution of their external differential suites. The historical15-test Solidity reserve harness receipt applies only to its earlier SHA and scope; combined exact-SHA harness/repository checks remain required.
 **Trio source composition.** Independent ordered status, authorization/locator, live queue/frame calls, ABI decoding, partition arithmetic, spending and receiver-tail relations cover every withdrawal outcome and root rollback. Physical protection is separately proved for the concrete bound queue/consensus/receiver pipeline, including final physical accounting and the next live queue demand. Generic arbitrary successful callbacks are not promised reserve protection.
 
@@ -204,7 +205,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Composition evidence.** `LidoSRv3.Audit.Source.TrioComposition.ReserveLeafSpend.withdrawal_corresponds`, `LidoSRv3.Audit.Source.TrioReserve1.AllocationFlow.withdrawal_corresponds`, `LidoSRv3.Audit.Source.TrioReserve1.PhysicalReserve.success_preserves`, `LidoSRv3.Audit.Source.TrioReserve1.PhysicalSequence.corresponds`, `LidoSRv3.Audit.Source.TrioReserve1.Transfers.credit_bound_from_aggregate`
 
-**Composition premises and exclusions.** Compiler interpretation of aligned, non-overlapping observed word loads/stores and copies; omitted private cache/configuration/scratch writes obey the stated frame and cache-field relations. Configured linked library identity, storage/hash interpretation, entry pointer provenance and primitive crypto/consensus bindings are explicit; general compiled/deployed-code and gas verification are excluded. Concrete-pipeline protection takes physical address/code bindings, admitted amount, queue/frame computations, seed arithmetic, funding and queue/Lido separation. Balance credit bounds use an explicit aggregate-world bound. Sequence claims cover the modeled internal/committed transitions only.
+**Composition premises and exclusions.** Compiler interpretation of aligned, non-overlapping observed word loads/stores and copies; omitted private cache/configuration/scratch writes obey the stated frame and cache-field relations. Configured linked library identity, storage/hash interpretation, entry pointer provenance and primitive crypto/consensus bindings are explicit; general compiled/deployed-code and gas verification remain required and open. Concrete-pipeline protection takes physical address/code bindings, admitted amount, queue/frame computations, seed arithmetic, funding and queue/Lido separation. Balance credit bounds use an explicit aggregate-world bound. Sequence claims cover the modeled internal/committed transitions only.
 
 
 **Classification.** **IMPLEMENTATION_PENDING** — Validate the registered physical writer/callee history and reconcile final checks. Keep exact deployment/outer-entry/final-callback-preservation boundaries; never substitute a cached demand or supplied successful-call record for a producer.
@@ -316,7 +317,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 - Outer transaction ABI/payable-credit boundary: before is already value-credited; this theorem does not derive that outer credit.
 - Gateway source lines201-207 DSM/precondition, locator and withdrawal-credential witness checks are omitted between counting and quota execution. Configured vault/inbox and grouped witnesses are inputs at this boundary; whole-function admission and beacon validator eligibility are not established.
 - Source memory allocation extents and general lazy malformed-ABI error ordering remain unproved. The actual producer/decoder result must not be generalized to all malformed calldata.
-- Predeploy implementation correctness, LOG ABI, gas and general deployed-bytecode/interpreter refinement are outside the scoped executable model. External and StaticCall.External remain named executable interfaces.
+- Predeploy implementation correctness, LOG ABI, gas and general deployed-bytecode/interpreter refinement are not established by this executable model and remain in scope. External and StaticCall.External remain named executable interfaces.
 - Historical registered abstract source_consolidation_preserves_eligibility_value_atomicity_from_gateway retains supplied hMsgValue boundary equality, hCountPos and hFeeNonzero. These are conditional source-plane assumptions, not evidence for the executable parent; fee-zero behavior is not excluded by the actual parent.
 - No equivalence between the whole physical-entry/live-world executor and the historical slot-free ConsolidationTx projection is asserted. Its separate readArray/source-plane premises remain limited to that projection.
 
@@ -396,9 +397,10 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Assumptions.** `A-SHA256-FFI`, `A-MULTI-NODE-TRANSPORT`
 
-**Limitations — 1 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+**Limitations — 2 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
 - parent guarantee composition
+- I-TRUST-COMPILER-KERNEL (OPEN): the corresponding AllocCapacityPhase3, SszAbstractDigest or ConsolidationAbstractFlowModel compilation witness still consumes its named native_decide axiom. Re-evaluation/disclosure is not authorization. Eliminate the dependency while preserving the compilation claim; foundational-only trust currently fails.
 
 **Classification.** **IMPLEMENTATION_PENDING** — Implement and compose the listed missing fidelity without widening the guarantee.
 
@@ -414,9 +416,10 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Assumptions.** `A-VERITY-SCAFFOLD`
 
-**Limitations — 1 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+**Limitations — 2 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
 - parent guarantee composition
+- I-TRUST-COMPILER-KERNEL (OPEN): the corresponding AllocCapacityPhase3, SszAbstractDigest or ConsolidationAbstractFlowModel compilation witness still consumes its named native_decide axiom. Re-evaluation/disclosure is not authorization. Eliminate the dependency while preserving the compilation claim; foundational-only trust currently fails.
 
 **Classification.** **IMPLEMENTATION_PENDING** — Implement and compose the listed missing fidelity without widening the guarantee.
 
@@ -804,11 +807,11 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 - **ETH confinement:** `P-ETH-JOURNAL-1` is a modeled journal exclusion result, not global ETH confinement across live contracts, arbitrary calls, or deployment state.
 - **Oracle sanity:** `P-ORACLE-SUPPLY-1` covers the registered source-domain/computed-mint model; it does not prove oracle-report truth, committee/oracle authorization, all report sanity, or live storage/execution correspondence.
 - **Broad token semantics:** NOT YET. `P-TOKEN-1` is registered only as a bounded subordinate row: the pinned WithdrawalQueue request-creation control prefix composed with owner-operated `transferFrom` custody hops. It establishes the two-sided amount bound, the line-130 owner fallback, non-ownerless custody over arbitrary hop chains, owner-operated authorization, and installation of the recipient as owner per hop. It does **not** establish general ERC-20/ERC-721/WstETH approvals, allowances, balances, `STETH.transferFrom` movement, share conversion, queue storage, finalization, claim/redeem, events, or adversarial recipient semantics, and it is not a canonical guarantee.
-- **Deployment identity:** NOT YET. Neither a pinned source span, a constructor literal, a configured endpoint, a runtime receipt, nor a model address proves deployed bytecode/codehash/chain identity. General Yul/EVM/deployment provenance is out of scope; the SSZ targeted binding remains OPEN.
+- **Deployment identity:** NOT YET. Neither a pinned source span, a constructor literal, a configured endpoint, a runtime receipt, nor a model address proves deployed bytecode/codehash/chain identity. General Yul/EVM/deployment provenance needed by registered claims remains required and OPEN, including the SSZ binding.
 
 ## Proof-escape and receipt acceptance
 
-`LidoSRv3.Audit.Trust` is the public axiom surface. It permits only Lean foundations (`propext`, `Classical.choice`, `Quot.sound`) plus the three explicitly recorded production exceptions (P-ALLOC-1 Phase-3 capacity, SSZ digest, consolidation flow) and the exact test/mutant-only native-decision names below; the run summary reports each production exception by name rather than folding it into the test-only count. `scripts/check_trust_axioms.py` rebuilds and reruns Trust, parses every emitted named axiom report (including Lean's empty-set spelling), and fails closed on any missing or unexpected dependency, including a production-parent or opaque project axiom. Neither Trust's source text nor its log is taken as evidence: a `#print axioms` line reads the same inside a `/- -/` block, and an `#eval IO.println` can emit a report Lean never computed, so disclosure is read from active commands only, with comments and strings blanked first, and every printed theorem's dependencies are recomputed by the checker itself through the same `Lean.collectAxioms` call `#print axioms` makes, in a probe it spawns that imports only `Lean` and loads the audited module as data, so audited code contributes declarations but never elaborates the probe measuring it — a macro bound to the collector's token sequence would otherwise intercept that call in every spelling, fully qualified ones included. The published log is then confirmed against that recomputation, and a report that hides, invents, or misstates a dependency fails closed. A disclosed native-decision name is bound to provenance rather than spelling: no project Lean source may declare a name in Lean's compiler-generated `_native.native_decide` namespace, so an `opaque` merely spelled like a generated axiom cannot be laundered into the allowed set. That lexical guard only rules out spellings a source can be scanned for, and nothing the environment records about a declaration is evidence of who created it: an elaborator can assemble the name from fragments, give it the reflection type, and register it at a line that genuinely contains `native_decide`. Each disclosed name is therefore vouched for by re-establishing its own claim rather than its origin — the checker recompiles and runs the `Bool` expression the axiom asserts is `true`, which is the same evidence `native_decide` itself relies on — while the recorded kind, type, module, and site conditions are retained only to keep the disclosed set inside the pinned tactic inventory. `scripts/check_proof_escapes.py` mechanically scans every production project Lean source, including top-level library roots, after removing comments and strings: project `sorry`, `admit`, `axiom`, equivalent `constant` declarations, `unsafe`, and `Lean.ofReduceBool` fail closed, and the complete `native_decide` inventory is pinned so additions also fail closed; its negative regression mutates an imported module, the top-level library root, and the Trust entrypoint. `audit/validation-receipt.txt` binds the current tracked tree excluding itself. A green receipt and metadata/public-surface checks establish synchronization, not semantic closure.
+`LidoSRv3.Audit.Trust` is the public axiom surface. Only `propext`, `Quot.sound`, and `Classical.choice` are authorized. The three exact compiler-native dependencies below are disclosed debt, not permitted exceptions; foundational-only trust currently fails. `scripts/check_trust_axioms.py` rebuilds and reruns Trust, recomputes every printed dependency through Lean.collectAxioms in an independent probe, checks reported dependencies against that environment, and re-evaluates each disclosed native Boolean. These diagnostics detect fabricated reports, declaration spoofing, and stale native results but do not turn native evaluation into a kernel proof. After those diagnostics, `foundational_trust.require_foundational` rejects every non-foundational dependency, including properly disclosed production or test native axioms. Saved-output mode applies the same policy but supplies no build evidence. No theorem or obligation is removed to pass this gate. Source proof-escape scanning and the exact native tactic inventory remain enforced. The validation receipt binds the current tracked tree excluding itself; metadata synchronization is not semantic closure.
 
 ### Exact emitted native-decision axioms
 

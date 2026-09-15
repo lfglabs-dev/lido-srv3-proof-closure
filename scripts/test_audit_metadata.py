@@ -15,27 +15,27 @@ from test_metadata_history import preserve_historical_inputs, restore_candidate_
 ROOT = Path(__file__).resolve().parents[1]
 def reject_html_stage_a_families(reject, module):
     """A Stage A heading inside any CommonMark HTML block is invisible."""
-    table_then_type_7 = "| heading |\n| --- |\n| body |\n{}\n## Stage A disclosure\n\nAll 84 canonical fidelity-gap entries remain.\n\n"
+    table_then_type_7 = "| heading |\n| --- |\n| body |\n{}\n## Stage A disclosure\n\nAll 85 canonical fidelity-gap entries remain.\n\n"
     nested_table_then_type_7 = (
         "- list item\n\n{}| heading |\n{}| --- |\n{}| body |\n"
         "<span>\n## Stage A disclosure\n\n"
-        "All 84 canonical fidelity-gap entries remain.\n\n"
+        "All 85 canonical fidelity-gap entries remain.\n\n"
     )
-    list_marker_table_then_type_7 = "- | heading |\n  | --- |\n  | body |\n<span>\n## Stage A disclosure\n\nAll 84 canonical fidelity-gap entries remain.\n\n"
+    list_marker_table_then_type_7 = "- | heading |\n  | --- |\n  | body |\n<span>\n## Stage A disclosure\n\nAll 85 canonical fidelity-gap entries remain.\n\n"
     table_then_indented_code_then_type_7 = (
         "| heading |\n| --- |\n| body |\n{}code\n"
         "<span>\n## Stage A disclosure\n\n"
-        "All 84 canonical fidelity-gap entries remain.\n\n"
+        "All 85 canonical fidelity-gap entries remain.\n\n"
     )
     bodies = (
-        "<pre>\n## Stage A disclosure\n\nAll 84 canonical fidelity-gap entries remain.\n</pre>\n\n",
-        "<?stage-a\n## Stage A disclosure\n\nAll 84 canonical fidelity-gap entries remain.\n?>\n\n",
-        "<![CDATA[\n## Stage A disclosure\n\nAll 84 canonical fidelity-gap entries remain.\n]]>\n\n",
-        "<!--\n## Stage A disclosure\n\nAll 84 canonical fidelity-gap entries remain.\n-->\n\n",
-        "<div>\n## Stage A disclosure\n\nAll 84 canonical fidelity-gap entries remain.\n\n",
-        "<stage-a>\n## Stage A disclosure\n\nAll 84 canonical fidelity-gap entries remain.\n\n",
-        "Prelude\n=======\n<span>\n## Stage A disclosure\n\nAll 84 canonical fidelity-gap entries remain.\n\n",
-        *(table_then_type_7.format(tag) for tag in ("<span>", "</span>", "<stage-a data-gap=\"84\">")),
+        "<pre>\n## Stage A disclosure\n\nAll 85 canonical fidelity-gap entries remain.\n</pre>\n\n",
+        "<?stage-a\n## Stage A disclosure\n\nAll 85 canonical fidelity-gap entries remain.\n?>\n\n",
+        "<![CDATA[\n## Stage A disclosure\n\nAll 85 canonical fidelity-gap entries remain.\n]]>\n\n",
+        "<!--\n## Stage A disclosure\n\nAll 85 canonical fidelity-gap entries remain.\n-->\n\n",
+        "<div>\n## Stage A disclosure\n\nAll 85 canonical fidelity-gap entries remain.\n\n",
+        "<stage-a>\n## Stage A disclosure\n\nAll 85 canonical fidelity-gap entries remain.\n\n",
+        "Prelude\n=======\n<span>\n## Stage A disclosure\n\nAll 85 canonical fidelity-gap entries remain.\n\n",
+        *(table_then_type_7.format(tag) for tag in ("<span>", "</span>", "<stage-a data-gap=\"85\">")),
         *(nested_table_then_type_7.format(" " * indent, " " * indent, " " * indent)
           for indent in (4, 5)),
         list_marker_table_then_type_7,
@@ -110,18 +110,18 @@ def main():
         invoke(fixture, True)
         invoke(fixture, True, command="check")
         source_fidelity = fpath.read_text(encoding="utf-8")
-        stale = re.sub(r"all\s+84\s+canonical\s+fidelity-gap\s+entries\s+remain\.", "all 83 canonical fidelity-gap entries remain.", source_fidelity)
+        stale = re.sub(r"all\s+85\s+canonical\s+fidelity-gap\s+entries\s+remain\.", "all 84 canonical fidelity-gap entries remain.", source_fidelity)
         fpath.write_text(stale, encoding="utf-8"); invoke(fixture, False, "SOURCE-FIDELITY: Stage A disclosure lead paragraph must visibly disclose all canonical fidelity gaps")
-        fpath.write_text(stale + "\n## Elsewhere\n\nAll 84 canonical fidelity-gap entries remain.\n", encoding="utf-8"); invoke(fixture, False, "SOURCE-FIDELITY: Stage A disclosure lead paragraph must visibly disclose all canonical fidelity gaps")
-        later_stage_a = stale.replace("and does not satisfy the source-model completion gates for B–F.\n", "and does not satisfy the source-model completion gates for B–F.\n\nA later Stage A paragraph says all 84 canonical fidelity-gap entries remain.\n", 1)
+        fpath.write_text(stale + "\n## Elsewhere\n\nAll 85 canonical fidelity-gap entries remain.\n", encoding="utf-8"); invoke(fixture, False, "SOURCE-FIDELITY: Stage A disclosure lead paragraph must visibly disclose all canonical fidelity gaps")
+        later_stage_a = stale.replace("and does not satisfy the source-model completion gates for B–F.\n", "and does not satisfy the source-model completion gates for B–F.\n\nA later Stage A paragraph says all 85 canonical fidelity-gap entries remain.\n", 1)
         fpath.write_text(later_stage_a, encoding="utf-8"); invoke(fixture, False, "SOURCE-FIDELITY: Stage A disclosure lead paragraph must visibly disclose all canonical fidelity gaps")
-        duplicate_stage_a = source_fidelity.replace("## Stage A disclosure\n", "## Stage A disclosure\n\nAll 84 canonical fidelity-gap entries remain.\n\n## Stage A disclosure\n", 1)
+        duplicate_stage_a = source_fidelity.replace("## Stage A disclosure\n", "## Stage A disclosure\n\nAll 85 canonical fidelity-gap entries remain.\n\n## Stage A disclosure\n", 1)
         fpath.write_text(duplicate_stage_a, encoding="utf-8"); invoke(fixture, False, "SOURCE-FIDELITY: require exactly one visible Stage A disclosure section")
         def reject_hidden_stage_a(hidden):
             fpath.write_text(hidden + stale, encoding="utf-8")
             invoke(fixture, False, "SOURCE-FIDELITY: Stage A disclosure lead paragraph must visibly disclose all canonical fidelity gaps")
-        reject_hidden_stage_a("```markdown\n## Stage A disclosure\n\nAll 84 canonical fidelity-gap entries remain.\n```\n\n")
-        reject_hidden_stage_a("<!--\n## Stage A disclosure\n\nAll 84 canonical fidelity-gap entries remain.\n-->\n\n")
+        reject_hidden_stage_a("```markdown\n## Stage A disclosure\n\nAll 85 canonical fidelity-gap entries remain.\n```\n\n")
+        reject_hidden_stage_a("<!--\n## Stage A disclosure\n\nAll 85 canonical fidelity-gap entries remain.\n-->\n\n")
         # Reject an invisible Stage A heading borrowing later visible text.
         for prefix in (
             "| A | B |\n| --- | --- |\n| 1 | 2 |\n",
@@ -306,14 +306,14 @@ def main():
         readme_path = fixture / "README.md"
         readme = readme_path.read_text(encoding="utf-8")
         for mutated, needle in (
-            (readme.replace("| 1 | `P-ALLOC-1` | CHECKED | CHECKED | 6 open |",
+            (readme.replace("| 1 | `P-ALLOC-1` | CHECKED | CHECKED | 7 open |",
                             "| 1 | `P-ALLOC-1` | CHECKED | CHECKED | 0 open |"),
              "P-ALLOC-1 discloses 0 fidelity gaps"),
-            (readme.replace("| 1 | `P-ALLOC-1` | CHECKED | CHECKED | 6 open |",
+            (readme.replace("| 1 | `P-ALLOC-1` | CHECKED | CHECKED | 7 open |",
                             "| 1 | `P-ALLOC-1` | CHECKED | CHECKED |"),
              "P-ALLOC-1 row is missing its `N open` fidelity-gap cell"),
-            (readme.replace("84 in total", "some in total"),
-             "must render the 84 total fidelity gaps as visible text"),
+            (readme.replace("85 in total", "some in total"),
+             "must render the 85 total fidelity gaps as visible text"),
             (readme.replace("not about a deployed contract", "about a deployed contract"),
              "must render the model-vs-deployed boundary as visible text"),
         ):
@@ -423,8 +423,8 @@ def main():
         block = opening.group("block")
         title = readme.split("\n", 1)[0]
         for sentence, muted, needle in (
-            ("84 in total", "counted below",
-             "headline blockquote must render the 84 total fidelity gaps as visible text"),
+            ("85 in total", "counted below",
+             "headline blockquote must render the 85 total fidelity gaps as visible text"),
             ("not about a deployed contract", "about a Lean model",
              "headline blockquote must render the model-vs-deployed boundary as "
              "visible text"),
@@ -503,7 +503,7 @@ def main():
             # Thread r3909320734: a full or collapsed reference link names its
             # definition in a second bracket group, which renders as nothing.
             # Recognising only the `(` form left the whole sentence standing in
-            # `[details][not about a deployed contract; 84 in total]` as if a
+            # `[details][not about a deployed contract; 85 in total]` as if a
             # reader met it.  The definition is appended so the link really does
             # form and CommonMark really does render only "details".
             readme_path.write_text(
@@ -578,7 +578,7 @@ def main():
             readme.replace(title, "# Renamed Heading", 1),
             readme.replace(block, f"{block}> - An extra headline note.\n", 1),
             f"{readme}\n## Appendix\n\nRestated: these are proofs "
-            "not about a deployed contract, with 84 in total.\n",
+            "not about a deployed contract, with 85 in total.\n",
         ):
             if still_qualified == readme:
                 raise AssertionError("headline-block control changed nothing")
@@ -590,7 +590,7 @@ def main():
         # the gate would reject a headline a reader plainly meets and no edit to
         # the README could satisfy it.  Each sentence is muted in place and
         # restated in a form whose rendered characters still spell it exactly.
-        for sentence, muted in (("84 in total", "counted below"),
+        for sentence, muted in (("85 in total", "counted below"),
                                 ("not about a deployed contract", "about a Lean model")):
             muted_block = block.replace(sentence, muted, 1)
             for restated in (

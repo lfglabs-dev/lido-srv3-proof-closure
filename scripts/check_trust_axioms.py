@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail closed unless every axiom emitted by Trust is explicitly allowed."""
+"""Check provenance/disclosure, then enforce foundational-only trust."""
 
 from __future__ import annotations
 
@@ -559,7 +559,6 @@ def main() -> None:
     output_missing = sorted(registered - {name for name, _ in reports})
     if output_missing:
         fail("Trust output omits registered CHECKED theorem report(s): " + ", ".join(output_missing))
-    # Recompute dependencies; saved-output mode checks only a report, not a build.
     if not args.trust_output:
         computed = environment_dependencies(sorted(printed), args.provenance_module, None)
         confirm_reported_dependencies(reports, computed)
@@ -580,7 +579,6 @@ def main() -> None:
         unexpected = sorted(axioms - allowed)
         if unexpected:
             fail(f"{theorem} emits undisclosed axiom(s): " + ", ".join(unexpected))
-    # Enforce scope even when a dependency appears in the exact disclosure set.
     check_production_scope(reports)
     if observed != allowed:
         missing = sorted(allowed - observed)
@@ -594,6 +592,8 @@ def main() -> None:
     observed_native = set(NATIVE_AXIOM.findall(output))
     if observed_native != disclosed:
         fail("native-decision extraction disagrees with the complete axiom report")
+    from foundational_trust import require_foundational
+    require_foundational(reports)
     production = sorted(PRODUCTION_NATIVE_AXIOMS & observed_native)
     test_only = observed_native - PRODUCTION_NATIVE_AXIOMS
     exceptions = ", ".join(PRODUCTION_NATIVE_LABELS[name] for name in production)

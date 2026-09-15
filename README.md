@@ -12,7 +12,7 @@
 >   about the model, not about that deployment.
 > - `CHECKED` means *the named Lean theorem builds*. It does not mean audited,
 >   verified on chain, or closed.
-> - **Every row below still has open fidelity gaps — 84 in total.** The last
+> - **Every row below still has open fidelity gaps — 85 in total.** The last
 >   column counts them per row; `audit/guarantees.yaml` names each one.
 
 This repo holds Lean evidence for eleven Staking Router v3 guarantees on that
@@ -27,7 +27,7 @@ Each guarantee is proved in three layers, except where a guarantee notes otherwi
 2. **Verity Lean library** — a Lean program of the Solidity control flow that uses the Verity Lean library (`uint256`, overflow, revert). When it succeeds, its results match the abstract model.
 3. **Verity Executable Contract** — the same logic as a Verity contract over a `ContractState` (`Contract.run`). Its observables match the Verity Lean library program, and a revert restores the pre-call state.
 
-We do not claim to have verified the bytecode. `CHECKED` means the named Lean theorem builds; `audit/guarantees.yaml` `fidelity.missing` lists the live Lido surfaces that theorem does not cover. If the Verity Executable Contract cannot close, the registry names one gap. Yul, EVM, runtime bytecode, and deployment provenance are out of scope.
+We do not claim to have verified the bytecode. `CHECKED` means the named Lean theorem builds; `audit/guarantees.yaml` `fidelity.missing` lists the live Lido surfaces that theorem does not cover. If the Verity Executable Contract cannot close, the registry names one gap. Yul, EVM, runtime bytecode, and deployment provenance needed by the registered claims remain required and open. The authorized axiom set is only `propext`, `Quot.sound`, and `Classical.choice`; the three remaining native compiler dependencies block foundational-only trust even when their diagnostics pass.
 
 The **Fidelity gaps** column is the count of `fidelity.missing` entries the
 registry records for that row: live Lido surfaces the CHECKED theorem does
@@ -36,7 +36,7 @@ check` fails closed if a count here drifts from the registry.
 
 | # | ID | Abstract Lean | Verity Executable Contract | Fidelity gaps |
 | --- | --- | --- | --- | --- |
-| 1 | `P-ALLOC-1` | CHECKED | CHECKED | 6 open |
+| 1 | `P-ALLOC-1` | CHECKED | CHECKED | 7 open |
 | 2 | `P-ALLOC-2` | CHECKED | CHECKED | 4 open |
 | 3 | `P-DEPOSIT-1` | CHECKED | CHECKED — actual DSM/module/withdrawal/beacon execution | 4 open |
 | 4 | `P-TOPUP-1` | CHECKED | CHECKED | 5 open |

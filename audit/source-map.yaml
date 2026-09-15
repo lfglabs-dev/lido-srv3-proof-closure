@@ -8,15 +8,15 @@
       "ABSTRACT_LEAN",
       "FAITHFUL_VERITY"
     ],
-    "general_yul_evm_deployment": "OUT_OF_SCOPE",
-    "ssz_deployed_yul_binding": "TARGETED_ONLY",
+    "general_yul_evm_deployment": "IN_SCOPE_OPEN",
+    "ssz_deployed_yul_binding": "REQUIRED_OPEN",
     "metadata_is_proof_progress": false
   },
   "accepted_risks": {
     "baseline": "DEV-431-READY_NOT_AUDIT-CERT",
-    "multi_node_certification": "UNAVAILABLE_OR_PARTIAL_NON_BLOCKING",
-    "sha256_ffi": "OPAQUE",
-    "solc": "TRUSTED_WHEN_ARTIFACTS_ARE_PRODUCED"
+    "multi_node_certification": "INDEPENDENT_EXACT_SHA_REQUIRED",
+    "sha256_ffi": "REFINEMENT_REQUIRED_OPEN",
+    "solc": "COMPILED_RUNTIME_CORRESPONDENCE_REQUIRED_OPEN"
   },
   "ssz_claim": {
     "level": "STRUCTURAL_AND_TARGETED_BINDING_PENDING",
@@ -171,7 +171,7 @@
         "correspondence_status": "SOURCE COMPOSITION CANDIDATE; final independent review and official exact-source gates pending. Legacy primary guarantee registrations remain unchanged.",
         "premises": [
           "Compiler interpretation of aligned, non-overlapping observed word loads/stores and copies; omitted private cache/configuration/scratch writes obey the stated frame and cache-field relations.",
-          "Configured linked library identity, storage/hash interpretation, entry pointer provenance and primitive crypto/consensus bindings are explicit; general compiled/deployed-code and gas verification are excluded.",
+          "Configured linked library identity, storage/hash interpretation, entry pointer provenance and primitive crypto/consensus bindings are explicit; general compiled/deployed-code and gas verification remain required and open.",
           "count <=32; pointer +1184*count+704 <=2^32, or modeled initialization/writer history with pointer <=2^31 and finite storage separation; migration and other writer histories excluded."
         ]
       },
@@ -271,7 +271,7 @@
         "correspondence_status": "SOURCE COMPOSITION CANDIDATE; final independent review and official exact-source gates pending. Legacy primary guarantee registrations remain unchanged.",
         "premises": [
           "Compiler interpretation of aligned, non-overlapping observed word loads/stores and copies; omitted private cache/configuration/scratch writes obey the stated frame and cache-field relations.",
-          "Configured linked library identity, storage/hash interpretation, entry pointer provenance and primitive crypto/consensus bindings are explicit; general compiled/deployed-code and gas verification are excluded.",
+          "Configured linked library identity, storage/hash interpretation, entry pointer provenance and primitive crypto/consensus bindings are explicit; general compiled/deployed-code and gas verification remain required and open.",
           "count <=32; pointer +1184*count+704 <=2^32, or modeled initialization/writer history with pointer <=2^31 and finite storage separation; migration and other writer histories excluded."
         ]
       },
@@ -711,7 +711,7 @@
         "correspondence_status": "SOURCE COMPOSITION CANDIDATE; final independent review and official exact-source gates pending. Legacy primary guarantee registrations remain unchanged.",
         "premises": [
           "Compiler interpretation of aligned, non-overlapping observed word loads/stores and copies; omitted private cache/configuration/scratch writes obey the stated frame and cache-field relations.",
-          "Configured linked library identity, storage/hash interpretation, entry pointer provenance and primitive crypto/consensus bindings are explicit; general compiled/deployed-code and gas verification are excluded.",
+          "Configured linked library identity, storage/hash interpretation, entry pointer provenance and primitive crypto/consensus bindings are explicit; general compiled/deployed-code and gas verification remain required and open.",
           "Concrete-pipeline protection takes physical address/code bindings, admitted amount, queue/frame computations, seed arithmetic, funding and queue/Lido separation. Balance credit bounds use an explicit aggregate-world bound. Sequence claims cover the modeled internal/committed transitions only."
         ]
       }

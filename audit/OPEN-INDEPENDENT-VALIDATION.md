@@ -396,3 +396,29 @@ compiled memory/caller-frame refinement, the three compiler native exceptions,
 and remaining registered source/runtime obligations stay OPEN. Unconditional
 legacy/physical equality remains REFUTED by the preserved counterexample under
 the controller's explicit specification decision. No semantic acceptance claimed.
+
+
+### c42fa05c reconciliation and foundational-only gate repair
+
+The controller reports c42fa05c BLOCKED at 2bffd2ecc637df7bb1035845ad6692d040ccca5d,
+with independent full prove/test, 74 Solidity tests, 2,120 library jobs and axiom
+recomputation passing. DEPOSIT terminality and earlier source gates were credited.
+The reviewer workspace paths are not mounted here; no unseen ledger findings are
+claimed inspected. Historical c367 UX2 and inventory defects are repaired in the
+current tree, and compiler *selection* uses the checked soljson/Node route. Compiler
+*native trust* is different: the three compiler theorem dependencies remain open.
+
+This successor changes the mandatory trust check to reject all non-foundational
+dependencies after provenance/recomputation, including the three disclosed native
+compiler dependencies. Tests reject each current dependency and test-only names;
+existing spoofing/disclosure tests retain their separate failure reasons. A full
+repository check must now fail foundational-only trust until kernel proofs replace
+those dependencies. Diagnostic success is no longer a way around this requirement.
+This is an enforcement repair, not axiom elimination. See I-TRUST-COMPILER-KERNEL.md.
+
+The registry objective and source-map scope now retain compiler, deployed-code,
+caller-frame and runtime/hash obligations; the generated assurance report no longer
+says they are excluded or that the three native dependencies are permitted. No
+statement, Trust print, original counterexample or registered row was removed.
+I-ALLOC1-SUPPORTED-MODULE-REACHABILITY, I-ALLOC2-DEPLOYED-LIBRARY-IDENTITY, compiled
+ALLOC refinement and the remaining native roadmap obligations remain OPEN.

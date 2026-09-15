@@ -175,9 +175,10 @@
       "REPRESENTATION/RUNTIME: unconditional legacy-observation = physical-result equality is REFUTED by AccountProducer.legacy_commits_while_physical_reverts under the original length/binding premises. Controller accepts the existing parent consuming separate physical result/capacity facts; no equality is assumed. Deriving supported physical runtime/trace correspondence remains open; the counterexample is not a supported-deployment witness.",
       "PHYSICAL-STORAGE: the physical producer reads account-qualified words using an explicit layout/hash. Derive its ERC7201 addressing and field correspondence from the pinned deployment; legacy slot/map indices and persisted observation arrays are not Solidity physical storage.",
       "REGISTRY-REACHABILITY: derive count, supported-module identity, uniqueness and accounting relations from initial/migrated registry state and every relevant writer. Source interface validity alone is insufficient.",
-      "RUNTIME/DEPLOYMENT: connect the physical call-tree and byte-library executor to actual compiler memory, gas, inherited frame context, linked library code and deployed runtime. These are in scope and unresolved under the expanded proof-only goal; the current source/call-VM correspondence does not close them."
+      "RUNTIME/DEPLOYMENT: connect the physical call-tree and byte-library executor to actual compiler memory, gas, inherited frame context, linked library code and deployed runtime. These are in scope and unresolved under the expanded proof-only goal; the current source/call-VM correspondence does not close them.",
+      "I-TRUST-COMPILER-KERNEL (OPEN): the corresponding AllocCapacityPhase3, SszAbstractDigest or ConsolidationAbstractFlowModel compilation witness still consumes its named native_decide axiom. Re-evaluation/disclosure is not authorization. Eliminate the dependency while preserving the compilation claim; foundational-only trust currently fails."
     ],
-    "open_gap_count": 6
+    "open_gap_count": 7
   },
   "source_spans": [
     {
@@ -291,7 +292,7 @@
       "The subject is a Lean model of Staking Router v3, written against pinned source lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436.",
       "No theorem here binds to deployed bytecode, a runtime codehash, a constructor, or a chain address. The SRv3 contracts are deployed on mainnet with lidofinance/core v4.0.0 (2026-07-24; StakingRouter proxy 0xFdDf38947aFB03C621C71b06C9C70bce73f12999, TopUpGateway proxy 0x3FC2C71579D80790Aaa3fc7Be8B66ac39dC57374); the theorems still speak about the model, not about that deployment.",
       "CHECKED means *the named Lean theorem builds*. It does not mean audited, verified on chain, or closed.",
-      "Every row below still has open fidelity gaps — 84 in total. The last column counts them per row; audit/guarantees.yaml names each one."
+      "Every row below still has open fidelity gaps — 85 in total. The last column counts them per row; audit/guarantees.yaml names each one."
     ],
     "not_covered": [
       "EXTERNAL-SUMMARY-INVARIANTS: ABI-valid uint256 replies do not imply deposited>=max(summaryExited,accountingExited), nor the required deposited/depositable/totalStake bounds. Derive these from supported implementations, registry writers and deployment identity. The genuine arbitrary-module counterexample remains; unconditional CheckedBounds is not asserted.",
@@ -299,7 +300,8 @@
       "REPRESENTATION/RUNTIME: unconditional legacy-observation = physical-result equality is REFUTED by AccountProducer.legacy_commits_while_physical_reverts under the original length/binding premises. Controller accepts the existing parent consuming separate physical result/capacity facts; no equality is assumed. Deriving supported physical runtime/trace correspondence remains open; the counterexample is not a supported-deployment witness.",
       "PHYSICAL-STORAGE: the physical producer reads account-qualified words using an explicit layout/hash. Derive its ERC7201 addressing and field correspondence from the pinned deployment; legacy slot/map indices and persisted observation arrays are not Solidity physical storage.",
       "REGISTRY-REACHABILITY: derive count, supported-module identity, uniqueness and accounting relations from initial/migrated registry state and every relevant writer. Source interface validity alone is insufficient.",
-      "RUNTIME/DEPLOYMENT: connect the physical call-tree and byte-library executor to actual compiler memory, gas, inherited frame context, linked library code and deployed runtime. These are in scope and unresolved under the expanded proof-only goal; the current source/call-VM correspondence does not close them."
+      "RUNTIME/DEPLOYMENT: connect the physical call-tree and byte-library executor to actual compiler memory, gas, inherited frame context, linked library code and deployed runtime. These are in scope and unresolved under the expanded proof-only goal; the current source/call-VM correspondence does not close them.",
+      "I-TRUST-COMPILER-KERNEL (OPEN): the corresponding AllocCapacityPhase3, SszAbstractDigest or ConsolidationAbstractFlowModel compilation witness still consumes its named native_decide axiom. Re-evaluation/disclosure is not authorization. Eliminate the dependency while preserving the compilation claim; foundational-only trust currently fails."
     ]
   }
 }

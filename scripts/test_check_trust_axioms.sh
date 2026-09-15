@@ -37,7 +37,7 @@ PY
   done < "$names"
   printf ']\n'
 } > "$tmp/ok"
-python3 scripts/check_trust_axioms.py --trust-output "$tmp/ok" >/dev/null
+
 
 # The newly registered digest theorem must be emitted and checked by the
 # normal Trust command; its actual dependency set is not fabricated here.
@@ -61,10 +61,15 @@ reject() {
   fi
 }
 
+# A faithfully disclosed native compiler axiom is still unauthorized. The
+# provenance and exact-inventory diagnostics above must not make this a pass.
+reject "$tmp/ok" 'foundational-only trust BLOCKED' 'disclosed compiler-native dependencies'
+python3 scripts/test_foundational_trust.py
+
 # Isolated disclosure mutation: no real test-native exceptions need remain.
 scope_fixture="$tmp/scope-fixture"
 mkdir -p "$scope_fixture/scripts" "$scope_fixture/audit" "$scope_fixture/LidoSRv3/Audit"
-cp scripts/check_trust_axioms.py scripts/check_proof_escapes.py "$scope_fixture/scripts/"
+cp scripts/check_trust_axioms.py scripts/check_proof_escapes.py scripts/foundational_trust.py "$scope_fixture/scripts/"
 cp audit/guarantees.yaml audit/trust-native-decide-allowlist.txt "$scope_fixture/audit/"
 cp LidoSRv3/Audit/Trust.lean "$scope_fixture/LidoSRv3/Audit/"
 scope_native='LidoSRv3.Tests.Scope.fixture._native.native_decide.ax_1_1'
@@ -111,7 +116,7 @@ reject "$tmp/injected-opaque-registered" 'emits undisclosed axiom(s): LidoSRv3.A
 # disclosure stays authoritative for every other case here.
 fixture="$tmp/laundering-fixture"
 mkdir -p "$fixture/scripts" "$fixture/audit" "$fixture/LidoSRv3/Audit"
-cp scripts/check_trust_axioms.py scripts/check_proof_escapes.py "$fixture/scripts/"
+cp scripts/check_trust_axioms.py scripts/check_proof_escapes.py scripts/foundational_trust.py "$fixture/scripts/"
 cp audit/guarantees.yaml "$fixture/audit/guarantees.yaml"
 cp LidoSRv3/Audit/Trust.lean "$fixture/LidoSRv3/Audit/Trust.lean"
 cp audit/trust-native-decide-allowlist.txt "$fixture/audit/trust-native-decide-allowlist.txt"
@@ -128,7 +133,7 @@ reject "$tmp/injected-opaque-report" \
 # successfully; only the source declaration distinguishes it.
 launder="$tmp/laundered-shape-fixture"
 mkdir -p "$launder/scripts" "$launder/audit" "$launder/LidoSRv3/Audit" "$launder/LidoSRv3/Tests"
-cp scripts/check_trust_axioms.py scripts/check_proof_escapes.py "$launder/scripts/"
+cp scripts/check_trust_axioms.py scripts/check_proof_escapes.py scripts/foundational_trust.py "$launder/scripts/"
 cp audit/guarantees.yaml "$launder/audit/guarantees.yaml"
 cp LidoSRv3/Audit/Trust.lean "$launder/LidoSRv3/Audit/Trust.lean"
 cp audit/trust-native-decide-allowlist.txt "$launder/audit/trust-native-decide-allowlist.txt"
@@ -157,10 +162,10 @@ reject "$tmp/laundered-shape-report" \
   'a source-declared axiom wearing generated native-decision spelling' \
   "$launder/scripts/check_trust_axioms.py"
 
-# The same fixture without the source declaration is accepted, so the negative
-# above is carried by provenance alone and not by some unrelated rejection.
+# Removing the source declaration reaches the separate foundational-only gate.
 rm "$launder/LidoSRv3/Tests/Injected.lean"
-python3 "$launder/scripts/check_trust_axioms.py" --trust-output "$tmp/laundered-shape-report" >/dev/null
+reject "$tmp/laundered-shape-report" 'foundational-only trust BLOCKED' \
+  'disclosed native fixture without a forged source declaration' "$launder/scripts/check_trust_axioms.py"
 
 # Executable provenance regression.  Scanning sources for the literal `_native`
 # token is necessary but not sufficient: a project command elaborator can build
@@ -389,7 +394,7 @@ probe >/dev/null
 # never computed -- the other half of the spoof exercised below.
 commented="$tmp/commented-fixture"
 mkdir -p "$commented/scripts" "$commented/audit" "$commented/LidoSRv3/Audit"
-cp scripts/check_trust_axioms.py scripts/check_proof_escapes.py "$commented/scripts/"
+cp scripts/check_trust_axioms.py scripts/check_proof_escapes.py scripts/foundational_trust.py "$commented/scripts/"
 cp audit/guarantees.yaml "$commented/audit/guarantees.yaml"
 cp audit/trust-native-decide-allowlist.txt "$commented/audit/trust-native-decide-allowlist.txt"
 smothered="$(python3 - "$commented/LidoSRv3/Audit/Trust.lean" <<'PY'
@@ -426,10 +431,10 @@ reject "$tmp/ok" \
   'a registered theorem disclosed only by a commented-out #print axioms command' \
   "$commented/scripts/check_trust_axioms.py"
 
-# Restoring that one command makes the same fixture pass, so the rejection is
-# carried by the comment and not by anything else in the copied tree.
+# Restoring the command reaches the distinct foundational-only gate.
 cp LidoSRv3/Audit/Trust.lean "$commented/LidoSRv3/Audit/Trust.lean"
-python3 "$commented/scripts/check_trust_axioms.py" --trust-output "$tmp/ok" >/dev/null
+reject "$tmp/ok" 'foundational-only trust BLOCKED' \
+  'restored Trust command with unauthorized native dependencies' "$commented/scripts/check_trust_axioms.py"
 
 # Executable spoofing regression.  Trust's log is only text some command
 # printed: `#eval IO.println` can emit a well-formed report for a theorem whose
