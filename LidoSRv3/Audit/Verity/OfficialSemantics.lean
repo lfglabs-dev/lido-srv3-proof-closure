@@ -329,7 +329,7 @@ private theorem stmtCheck_setStorageArrayElement (check : Stmt → Except String
 
 private theorem listForMAttach {α : Type} (xs : List α)
     (f : α → Except String Unit) :
-    xs.attach.forM (fun x => f x.val) = xs.forM f := by
+    forM xs.attach (fun x => f x.val) = forM xs f := by
   induction xs with
   | nil => rfl
   | cons x xs ih => simp [List.attach_cons, List.forM_map, ih]
@@ -509,7 +509,7 @@ theorem checkedFold_compiles_to_official_ir :
       | _ => throwError "expected one pinned compiler precheck definition"
     simp only [identifiers]
     simp [validateNonReentrantForkCompatibility, no_external_assumptions, identifiers, checkedFoldSpec, functionValid,
-      modulesField, Bind.bind, Except.bind, Pure.pure, Except.pure]
+      checkedFold, modulesField, Bind.bind, Except.bind, Pure.pure, Except.pure]
     all_goals (trace_state; decide_cbv)
   have fieldSlot : findFieldWithResolvedSlot [modulesField] "modules" = some (modulesField, 7) := by
     rfl

@@ -698,3 +698,11 @@ not transfer a predecessor build, trust verdict or deployment acceptance.
   monadic traversal goal and function/input recursion errors. The isolated
   identifier subproof no longer reports an error. Its reuse and the traversal
   equality are repaired next; the compiler theorem remains unaccepted.
+
+- Exact `853675ab04919683b09a609b6af9fb5a4cffebcd` job
+  `d208a7ef-b38e-40ce-8469-9c5db5c4dc52` failed with exit 1 at
+  2026-09-15 19:16:35 UTC, without a source bundle. Its
+  [receipt](receipts/nor-source/compiler-fold-853675ab.json) shows the attached-list
+  lemma was stated with `List.forM` while simplification normalized the goal to
+  `forM`. Input validation advances past identifier checking to concrete function
+  parameter/return fields. The successor fixes those reductions; no pass is transferred.
