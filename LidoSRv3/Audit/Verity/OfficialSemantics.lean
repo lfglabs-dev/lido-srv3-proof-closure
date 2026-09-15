@@ -130,15 +130,29 @@ theorem checkedFold_compiles_to_official_ir :
     | .ok _, .error _ => isFalse (by intro h; cases h)
     | .error _, .ok _ => isFalse (by intro h; cases h)
   have functionValid : validateFunctionSpec checkedFold = .ok () := by
-    simp only [validateFunctionSpec, checkedFold]
+    simp [validateFunctionSpec, checkedFold, Bind.bind, Except.bind, Pure.pure, Except.pure]
     decide +kernel
   have validated : validateCompileInputs checkedFoldSpec [tx.functionSelector] = .ok () := by
-    decide +kernel
+    unfold validateCompileInputs
+    run_tac do
+      let env ← Lean.getEnv
+      let candidates := env.constants.toList.filter fun (name, _) =>
+        name.toString.endsWith ".validateCompileInputsBeforeFieldWriteConflict"
+      match candidates with
+      | [(name, _)] =>
+          let id := Lean.mkIdent name
+          Lean.Elab.Tactic.evalTactic (← `(tactic| unfold $id:ident))
+      | _ => throwError "expected one pinned compiler precheck definition"
+    simp [checkedFoldSpec, functionValid, checkedFold, modulesField,
+      Bind.bind, Except.bind, Pure.pure, Except.pure]
+    all_goals decide +kernel
   have fieldSlot : findFieldWithResolvedSlot [modulesField] "modules" = some (modulesField, 7) := by
     rfl
+  have fieldType : modulesField.ty = .dynamicArray .uint256 := rfl
+  have fieldTransient : modulesField.isTransient = false := rfl
   have bodyValid :
       (compileStmtListWithFork [modulesField] [] [] .calldata [] false [] [] .cancun checkedFold.body []).isOk = true := by
-    simp [checkedFold, fieldSlot, compileStmtListWithFork, compileStmtWithFork,
+    simp [checkedFold, fieldSlot, fieldType, fieldTransient, compileStmtListWithFork, compileStmtWithFork,
       compileExprWithInternals, compileRequireFailCondWithInternals,
       Bind.bind, Except.bind, Pure.pure, Except.pure, Except.isOk, Except.toBool]
     all_goals decide +kernel
