@@ -28,3 +28,19 @@ requires separately declared linked-dependency PR ownership and validation; this
 writer has not edited the pinned dependency or claimed that ownership. There is
 no premise assuming the desired compilation result. Runtime/deployment and
 supported-module reachability obligations are separate and remain open.
+
+
+The retained test.log of job 8fddeaae was recovered by registered read-only job
+75bf7dfb-b70c-4a36-b177-9e94a03c8947. Its line 1069 identifies precisely these
+three unauthorized compiler dependencies; no inventory mismatch caused that run.
+The excerpt and SHA256 are committed under audit/receipts/8fddeaae/.
+
+A subsequent `cbv` attempt on the unchanged consolidation compilation statement
+failed: 6aae3cd9 reached recursion 16384; 67983778 reached the separate simplifier
+step limit with recursion 65536; 5f04dc8d reached recursion with a 2,000,000-step
+budget; 765c03e6 reached recursion after registering the existing Bool.and_false
+kernel theorem as a local evaluation rule. No axiom was removed. The original
+proof was restored. These resource-limit failures do not prove impossibility or
+identify an opaque helper as the sole cause. In particular, consolidation's
+forward.params is empty, so scalar parameter-binding helpers alone do not
+explain that witness's failure. A structured compiler proof remains necessary.

@@ -56,8 +56,8 @@ if [[ "$test_script" == repository ]]; then
   echo 'CANDIDATE_GATE_DIAGNOSTICS_BEGIN'
   # Retain compiler failures and differential totals at the end of bounded
   # remote receipt tails, after verbose Trust axiom output.
-  rg -n -A 5 '^error:|Traceback|failed:|AssertionError|Suite result:|^make:.*Error' \
-    .lake/candidate-validation/{prove,test,libraries}.log | tail -160 || true
+  bash scripts/emit_candidate_gate_diagnostics.sh \
+    .lake/candidate-validation/{prove,test,libraries}.log
   echo 'CANDIDATE_GATE_DIAGNOSTICS_END'
   if [[ "$proof_report_ready" == 1 ]]; then
     echo 'CANDIDATE_PROOF_REPORT_BEGIN'

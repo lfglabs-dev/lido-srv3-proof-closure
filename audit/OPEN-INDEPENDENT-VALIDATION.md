@@ -422,3 +422,21 @@ says they are excluded or that the three native dependencies are permitted. No
 statement, Trust print, original counterexample or registered row was removed.
 I-ALLOC1-SUPPORTED-MODULE-REACHABILITY, I-ALLOC2-DEPLOYED-LIBRARY-IDENTITY, compiled
 ALLOC refinement and the remaining native roadmap obligations remain OPEN.
+
+
+### Exact trust rejection recovered after cd294876
+
+Registered read-only job 75bf7dfb recovered the original cd294876 test.log from
+its retained Spark checkout. Line 1069 names the three unauthorized native
+compiler axioms; line 1070 is Makefile:65. The excerpt is committed with a digest
+under audit/receipts/8fddeaae, as writer-collected evidence, not independent review.
+No duplicate full suite was submitted. The diagnostic exporter now includes
+leading context before Make failures and recognizes foundational-only rejection;
+regressions cover that line and an unrecognized checker rejection.
+
+Bounded consolidation kernel-evaluation attempts failed and its original proof
+was restored. The native inventory is unchanged. UX2/inventory/compiler-selection
+remain repaired; compiler-native trust, ALLOC supported-module reachability and
+compiled/deployed refinement remain OPEN. No registered statement or arbitrary-
+module counterexample was changed. This successor repairs evidence transport,
+not semantic closure or axiom elimination.
