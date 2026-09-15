@@ -74,10 +74,15 @@ theorem actual_deposit_call_slot_success_and_revert
       | .error _ => result.world = before) ∧
     (∀ (oracle : TrioAlloc1.StaticOracle) (cfg : TrioAlloc1.Config) (available : TrioAlloc1.Word),
       DepositAllocation.Effects q locator cursor depositPhysicalKeccak oracle cfg available m w ctx liveCtx i before
-        (DepositAllocation.execute q locator cursor depositPhysicalKeccak oracle cfg available m w ctx liveCtx i before)) :=
+        (DepositAllocation.execute q locator cursor depositPhysicalKeccak oracle cfg available m w ctx liveCtx i before) ∧
+      DepositAllocation.AllocationFailureStops q locator cursor depositPhysicalKeccak oracle cfg available
+        m w ctx liveCtx i before) :=
   ⟨supplied_allocation_deposit_call_slot_success_and_revert q locator cursor m w ctx liveCtx i before,
-   fun oracle cfg available => DepositAllocation.execute_effects q locator cursor depositPhysicalKeccak
-     oracle cfg available m w ctx liveCtx i before⟩
+   fun oracle cfg available =>
+     ⟨DepositAllocation.execute_effects q locator cursor depositPhysicalKeccak
+        oracle cfg available m w ctx liveCtx i before,
+      DepositAllocation.allocation_failure_stops q locator cursor depositPhysicalKeccak
+        oracle cfg available m w ctx liveCtx i before⟩⟩
 
 #print axioms actual_deposit_call_slot_success_and_revert
 end LidoSRv3.Audit.Guarantees.PDeposit1

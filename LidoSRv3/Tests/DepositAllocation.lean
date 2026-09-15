@@ -60,6 +60,32 @@ private def checkProducedAllocation : IO Unit := do
       throw (IO.userError "missing executed allocation summary call")
 #eval checkProducedAllocation
 
+/-- Malformed successful STATICCALL bytes fail in the allocation decoder. They
+cannot be mistaken for a zero allocation or reach an otherwise accepting module. -/
+def malformedSummary : TrioAlloc1.StaticOracle := fun _ _ => .returned []
+
+def malformedExecution := LidoSRv3.Audit.Source.DepositAllocation.execute
+  DepositDsmCall.query DepositDsmCall.locator DepositDsmCall.cursor separatedHash malformedSummary cfg
+  (sw DEPOSIT_SIZE) (answer (ModuleCall.encodeReturn [] [])) reject
+  DepositDsmCall.supplied liveCtx input positiveWorld
+
+theorem malformed_summary_blocks_module :
+    malformedExecution.outcome = .error .empty ∧
+    malformedExecution.attempts = [] ∧
+    malformedExecution.allocationAttempts.length = 1 := by decide +kernel
+
+/-- The registered parent's new conjunct is universal in callbacks and World;
+this specialization checks that the parent actually exports terminality. -/
+example (q : StaticCall.External) (locator : Live.Address) (cursor : Live.Word)
+    (oracle : TrioAlloc1.StaticOracle) (config : TrioAlloc1.Config) (available : TrioAlloc1.Word)
+    (m w : Live.External) (ctx : RouterDeposit.Context) (liveCtx : Live.Context)
+    (i : ModuleCall.Input) (before : Live.World) :
+    LidoSRv3.Audit.Source.DepositAllocation.AllocationFailureStops q locator cursor
+      LidoSRv3.Audit.Guarantees.PDeposit1.depositPhysicalKeccak oracle config available
+      m w ctx liveCtx i before :=
+  ((LidoSRv3.Audit.Guarantees.PDeposit1.actual_deposit_call_slot_success_and_revert
+    q locator cursor m w ctx liveCtx i before).2 oracle config available).2
+
 #print axioms allocation_failure_blocks_module
 #print axioms unauthorized_precedes_allocation
 end LidoSRv3.Tests.DepositAllocation

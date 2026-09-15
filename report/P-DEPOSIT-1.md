@@ -40,3 +40,21 @@ cursor provenance, and deployment/runtime/hash correspondence. The generic test
 hash is only a fixture; the registered parent supplies concrete Keccak. The ALLOC
 arbitrary-summary counterexample remains valid and is exercised through DEPOSIT.
 No paired Solidity differential or independent full-gate acceptance is implied.
+
+## Terminal allocation failures
+
+The registered allocation conjunct now also consumes
+`DepositAllocation.AllocationFailureStops`. For every actual successful DSM
+lookup and admitted active physical module, an executed allocation failure yields
+the exact mapped fault, the complete entry World, no module/withdrawal/beacon
+attempts, and the unchanged locator and allocation transcripts. This covers every
+allocation failure constructor, not only the arbitrary-module arithmetic example.
+The statement does not assume allocation success or legacy/physical equivalence.
+
+`Tests/DepositAllocation.lean` retains the genuine arbitrary-module underflow
+counterexample and adds malformed successful summary bytes against an accepting
+module callback. It also projects the universal failure statement directly from
+the registered parent. These are Lean source-execution regressions, not additional
+paired Solidity differential vectors. The available-ether producer, supported
+module reachability, compiled/deployed allocation and other boundaries above
+remain open.

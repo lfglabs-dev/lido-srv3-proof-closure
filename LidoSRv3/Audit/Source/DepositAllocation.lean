@@ -130,5 +130,34 @@ theorem execute_effects (q : StaticCall.External) (locator : Live.Address) (curs
                         (DepositDsmCall.resolvedContext ctx dsm) liveCtx (withAllocation i cfg amount)
                         before after attempts hs⟩
 
+/-- A reached allocation failure is terminal, including decoder failures and
+checked arithmetic failures. This records the complete result, not just rollback:
+no module/withdrawal/beacon CALL is issued and both preceding transcripts survive.
+The premises describe the executed prefix and allocation, never a desired result. -/
+def AllocationFailureStops (q : StaticCall.External) (locator : Live.Address)
+    (cursor : Live.Word) (hash : Keccak) (oracle : TrioAlloc1.StaticOracle)
+    (cfg : TrioAlloc1.Config) (available : TrioAlloc1.Word) (m w : Live.External)
+    (ctx : RouterDeposit.Context) (liveCtx : Live.Context) (i : ModuleCall.Input)
+    (before : Live.World) : Prop :=
+  ∀ dsm staticTrace e allocationTrace,
+    DepositDsmCall.lookup q liveCtx.sender locator cursor before = ⟨.ok dsm,staticTrace⟩ →
+    ctx.caller = dsm →
+    DepositPhysicalAdmission.membership hash liveCtx.sender i.moduleId before ≠ 0 →
+    DepositPhysicalAdmission.status
+      (DepositPhysicalAdmission.config hash liveCtx.sender i.moduleId before) = 0 →
+    select hash oracle cfg available i.moduleId liveCtx.sender before [] =
+      (.error e,allocationTrace) →
+    execute q locator cursor hash oracle cfg available m w ctx liveCtx i before =
+      ⟨.error (fault e),before,[],staticTrace,allocationTrace⟩
+
+theorem allocation_failure_stops (q : StaticCall.External) (locator : Live.Address)
+    (cursor : Live.Word) (hash : Keccak) (oracle : TrioAlloc1.StaticOracle)
+    (cfg : TrioAlloc1.Config) (available : TrioAlloc1.Word) (m w : Live.External)
+    (ctx : RouterDeposit.Context) (liveCtx : Live.Context) (i : ModuleCall.Input)
+    (before : Live.World) :
+    AllocationFailureStops q locator cursor hash oracle cfg available m w ctx liveCtx i before := by
+  intro dsm staticTrace e allocationTrace lookup authorized member active allocated
+  simp [execute, lookup, DepositDsmCall.resolvedContext, authorized, member, active, allocated]
+
 #print axioms execute_effects
 end LidoSRv3.Audit.Source.DepositAllocation

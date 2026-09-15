@@ -374,3 +374,25 @@ I-REVIEW-80FE-FULL-GATE-AXIOMS, supported-module reachability, and the ABI-valid
 arbitrary-module counterexample remain open. The remaining DEPOSIT, TOPUP1,
 TOPUP2, ACCOUNT, RESERVE, ADDRESS, CONSOLIDATION/ETH, SSZ and supplemental
 obligations still require source work and a new final independent audit.
+
+
+### DEPOSIT terminal-allocation failure strengthening after e86a37c1
+
+The registered parent retains both prior suffix and executed-allocation effects
+and additionally derives exact terminal failure behavior for every reached
+allocation failure: mapped fault, entry World, no suffix calls, preserved locator
+and allocation attempts. Added a malformed-return regression and a parent
+projection test; retained the arbitrary-module counterexample. This closes the
+missing universal failure-observation statement, not deployment correspondence.
+
+Historical c36729d4 UX2/inventory/compiler-selection repairs remain present.
+The supplied ledger path is not mounted in this writer; the preserved disposition
+and controller's consolidated findings were used, without inventing unseen
+findings. Current local inventory and compiler-selection checks pass. The e86a37c1
+full-suite receipt is prior-head evidence only after these edits.
+
+I-ALLOC1-SUPPORTED-MODULE-REACHABILITY, I-ALLOC2-DEPLOYED-LIBRARY-IDENTITY,
+compiled memory/caller-frame refinement, the three compiler native exceptions,
+and remaining registered source/runtime obligations stay OPEN. Unconditional
+legacy/physical equality remains REFUTED by the preserved counterexample under
+the controller's explicit specification decision. No semantic acceptance claimed.

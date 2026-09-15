@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 83cf48cc98e7fcedd63666627a8f769678240280
+validated-tree: b7cc4b3bc19764dd8720699d8cb9c8a5f5e29a12
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
