@@ -65,6 +65,8 @@ def spec : CompilationModel :=
 
 def selector : Nat := 0x72510001
 
+attribute [local cbv_eval] Bool.and_false
+
 theorem forward_compiles :
     (CompilationModel.compile spec [selector]).isOk = true := by
   set_option maxRecDepth 65536 in
