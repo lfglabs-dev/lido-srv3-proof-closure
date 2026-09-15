@@ -85,8 +85,8 @@
       "name": "LidoSRv3.Audit.Guarantees.PTopupRouterAdmissionCall.actual_topup_admission_calls_wei_and_revert",
       "module": "LidoSRv3.Audit.Guarantees.PTopupRouterAdmissionCall",
       "file": "LidoSRv3/Audit/Guarantees/PTopupRouterAdmissionCall.lean",
-      "start_line": 86,
-      "end_line": 91,
+      "start_line": 87,
+      "end_line": 92,
       "doc": "/-- Registered executable parent. The computed success branch provides the\nentire earlier conjunction; every error restores the same entry World.\nThe typed seam still excludes allocation-view calls and outer gateway/router\nABI transport. These omissions are not assumed boundary equalities. -/",
       "statement": "theorem actual_topup_admission_calls_wei_and_revert\n    (g : TopupRouterAdmissionCallGates.Environment) (input : Input) :\n    let i := { input with hash := physicalKeccak }\n    match (run g i).outcome with\n    | .ok _ => ActualEffects g i\n    | .error _ => (run g i).world = i.gateway.before"
     }
