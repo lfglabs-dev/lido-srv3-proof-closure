@@ -174,6 +174,34 @@ contract TopupDifferentialTest {
         require(sol.pulled == 0 && model.pulled == 0 && sol.pushed == 0, "no ether");
     }
 
+    function testZeroTargetPausedLidoPrecedesModuleFailure() public {
+        // The source guard uses the rounded target BEFORE allocateDeposits;
+        // a zero module return alone does not enter this branch.
+        lido.setDepositable(0);
+        lido.setCanDeposit(false);
+        module.setAllocations(_one(0));
+        module.setFailAllocate(true);
+        uint256 lidoBalance = address(lido).balance;
+        uint256 routerBalance = address(router).balance;
+        Obs memory paused = observePinned(GATEWAY, _one(0), _one(0), _pks(1), _one(5 ether));
+        require(!paused.ok && paused.selector == StakingRouter.LidoDepositsPaused.selector,
+            "zero-target pause must precede module failure");
+        require(paused.callCount == 0, "no committed calls on pause");
+        require(address(lido).balance == lidoBalance && address(router).balance == routerBalance,
+            "paused balances unchanged");
+
+        // Positive control: enabling deposits reaches the configured failing
+        // module. The different error distinguishes pre-call guard ordering
+        // even though reverted call-log writes are rolled back in both cases.
+        lido.setCanDeposit(true);
+        vm.prank(GATEWAY);
+        (bool enabledOk, bytes memory enabledError) = address(router).call(
+            abi.encodeCall(StakingRouter.topUp, (moduleId, _one(0), _one(0), _pks(1), _one(5 ether))));
+        require(!enabledOk && keccak256(enabledError) ==
+            keccak256(abi.encodeWithSignature("Error(string)", "MODULE_FAIL")),
+            "enabled zero target reaches exact module failure");
+    }
+
     function testEmptyKeysList() public {
         log.reset();
         vm.prank(GATEWAY);

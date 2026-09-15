@@ -55,9 +55,10 @@ carrying the registry wording, the two registered theorems with their exact
 Lean statement, file and lines, the assumptions, the open fidelity gaps, the
 pinned source spans, and the model-vs-deployed boundary; `scripts/generate_ux2.py
 check` fails closed if a record says anything the registry or Lean does not.
-The generated R1 acceptance record is `audit/R1-FINAL-AUDITOR-REPORT.md`; it
-covers every registered canonical and supplemental row without promoting it to
-a deployment, bytecode, or audit-certification claim.
+The current generated candidate report is `audit/CANDIDATE-ASSURANCE-REPORT.md`;
+it records pending review and remaining limitations.
+`audit/R1-FINAL-AUDITOR-REPORT.md` is retained historical output and does not
+validate this candidate or establish deployment, bytecode, or audit acceptance.
 
 ## Reproduce
 

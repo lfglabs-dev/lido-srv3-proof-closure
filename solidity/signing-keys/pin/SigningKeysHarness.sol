@@ -28,4 +28,15 @@ contract SigningKeysHarness {
         if (aliasBuffers) signatures = keys;
         POSITION.loadKeysSigs(7, start, count, keys, signatures, 0);
     }
+    // A later NOR row appends at the number of keys already loaded. Leave
+    // prefix/suffix capacity poisoned so the source test observes the frame.
+    function loadAt(uint256 start, uint256 count, uint256 offset, uint256 capacity)
+        external view returns (bytes memory keys, bytes memory signatures)
+    {
+        (keys, signatures) = SigningKeys.initKeysSigsBuf(capacity);
+        for (uint256 i; i < keys.length; ++i) keys[i] = byte(0xa5);
+        for (i = 0; i < signatures.length; ++i) signatures[i] = byte(0xa5);
+        POSITION.loadKeysSigs(7, start, count, keys, signatures, offset);
+    }
+
 }

@@ -24,7 +24,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = Path("scripts")
 BASELINE = Path("audit/python-quality-baseline.txt")
-BASELINE_BLOB = "b85e991aa96e3da9c4b93f1de8f600eb8636beca"
+BASELINE_BLOB = "71461948d1f0f4273e9aa669bca83b2a45bf56c4"
 MAX_COMPLEXITY = 22
 MAX_LINES = 500
 BRANCHES = (ast.If, ast.For, ast.AsyncFor, ast.While, ast.ExceptHandler, ast.With,

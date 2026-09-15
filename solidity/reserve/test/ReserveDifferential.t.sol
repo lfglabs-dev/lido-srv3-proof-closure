@@ -213,6 +213,31 @@ contract ReserveDifferentialTest {
         require(!model.ok && keccak256(bytes(model.revertText)) == keccak256("CAN_NOT_DEPOSIT"));
     }
 
+    function testCanNotDepositStoppedWithoutBunker() public {
+        seed(100 ether, 40 ether, 30 ether, 7 ether);
+        lido.seedNextReport(9 ether, 1);
+        queue.setBunker(false);
+        require(lido.canDeposit(), "active control");
+        lido.seedStopped();
+        require(!lido.canDeposit(), "stopped protocol must disable deposits");
+        uint256 routerBalance = address(router).balance;
+        (bool ok, bytes memory ret) = callWithdraw(address(router), 1 ether);
+        Model memory model = runModel(modelJson(
+            false, true, 1 ether, 100 ether, 40 ether, 30 ether, 7 ether, 9 ether));
+        require(!ok && !model.ok, "stopped withdrawal must revert");
+        require(keccak256(bytes(revertString(ret))) == keccak256("CAN_NOT_DEPOSIT"), "pin stopped error");
+        require(keccak256(bytes(model.revertText)) == keccak256("CAN_NOT_DEPOSIT"), "model stopped error");
+        require(lido.getBufferedEther() == model.buffered && model.buffered == 100 ether, "buffer rollback");
+        require(lido.getDepositsReserve() == model.storedDepositsReserve
+            && model.storedDepositsReserve == 40 ether, "reserve rollback");
+        require(lido.readDepositedPostReport() == model.depositedPostReport
+            && model.depositedPostReport == 7 ether, "post-report rollback");
+        require(lido.readDepositedNextReportAdjusted() == model.depositedNextReportAdjusted
+            && model.depositedNextReportAdjusted == 9 ether, "next-report rollback");
+        require(log.count() == 0 && address(router).balance == routerBalance, "no payment");
+        require(address(lido).balance == 100 ether, "Lido balance rollback");
+    }
+
     function testNotEnoughEtherDoesNotRaidWithdrawals() public {
         // depositable = depositsReserve + unreserved = 40 + (100-40-30) = 70
         seed(100 ether, 40 ether, 30 ether, 0);

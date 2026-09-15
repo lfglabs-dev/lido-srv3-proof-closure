@@ -40,50 +40,8 @@ DEP_END = re.compile(r"^TAX-END\t(\d+)$", re.MULTILINE)
 # with Lean.importModules, never as a syntactic import into this probe. Otherwise
 # project macros could shadow even fully qualified collector names and forge the
 # result. Module ownership and dependencies below come from that environment.
-TRUST_DEPENDENCY_PROBE = r"""import Lean
+from trust_dependency_probe import TRUST_DEPENDENCY_PROBE
 
-private unsafe def trustDependenciesImpl (names : List Lean.Name) : IO Unit := do
-  Lean.initSearchPath (← Lean.findSysroot)
-  Lean.enableInitializersExecution
-  let env ← Lean.importModules #[{ module := `<<MODULE>> }] {} (loadExts := true)
-  -- Module ownership comes from the environment, not a filename/name guess.
-  -- Test claims enter through explicit disclosures, with their dependencies intact.
-  let discovered := if <<DISCOVER>> then (env.constants.toList.filterMap fun (name, info) =>
-    match info, env.getModuleIdxFor? name with
-    | .thmInfo _, some idx =>
-      let owner := toString env.header.moduleNames[idx.toNat]!
-      if (owner.startsWith "LidoSRv3.Audit." ||
-          owner.startsWith "LidoSRv3.Legacy.") &&
-          !(owner.splitOn ".").contains "Tests" then some name else none
-    | _, _ => none)
-    else []
-  let names := (names ++ discovered).eraseDups
-  let collect : Lean.CoreM Unit := do
-    for name in names do
-      match (← Lean.getEnv).find? name with
-      | none => IO.println s!"TAX\t{name}\tmissing\t"
-      | some info =>
-        let kind := match info with
-          | .thmInfo _ => "theorem"
-          | .axiomInfo _ => "axiom"
-          | .defnInfo _ => "definition"
-          | .opaqueInfo _ => "opaque"
-          | _ => "other"
-        let axioms ← Lean.collectAxioms name
-        let rendered :=
-          String.intercalate "," ((axioms.qsort Lean.Name.lt).map toString).toList
-        IO.println s!"TAX\t{name}\t{kind}\t{rendered}"
-  let _ ← collect.toIO
-    { fileName := "<trust-dependency-probe>", fileMap := default } { env := env }
-  IO.println s!"TAX-END\t{names.length}"
-
-@[implemented_by trustDependenciesImpl]
-private opaque trustDependencies (names : List Lean.Name) : IO Unit
-
-#eval do
-  let names := (← IO.FS.readFile "<<NAMES>>").splitOn "\n" |>.filter (· != "")
-  trustDependencies (names.map String.toName)
-"""
 # Native claim rows also require a complete terminating count.
 PROBE_ROW = re.compile(
     r"^NDP\t([^\t\n]*)\t([^\t\n]*)\t([^\t\n]*)\t([^\t\n]*)\t([^\t\n]*)\t([^\t\n]*)\t([^\t\n]*)$",
@@ -338,6 +296,28 @@ def check_native_provenance(names: list[str], module: str, fixture: Path | None)
     verify_native_provenance(ordered, output, sites)
 
 
+def production_probe_modules(root: Path) -> list[str]:
+    """Select scope from the import gate; dependencies still come from Lean.
+
+    An unimported production module is not exempt. Missing compiled artifacts
+    fail the subsequent import instead of silently reducing the theorem set.
+    """
+    from check_import_dag import is_excluded_from_production, production_glob_gaps
+    gaps = production_glob_gaps(root)
+    if gaps:
+        fail("production modules missing from Lake: " + ", ".join(gaps))
+    paths = [root / "LidoSRv3.lean", *(root / "LidoSRv3").rglob("*.lean")]
+    modules = []
+    for path in paths:
+        relative = path.relative_to(root).as_posix()
+        if path.is_file() and not is_excluded_from_production(relative):
+            name = relative[:-5].replace("/", ".")
+            if not LEAN_MODULE.fullmatch(name):
+                fail("malformed production module: " + name)
+            modules.append(name)
+    return sorted(set(modules))
+
+
 def environment_dependencies(names: list[str], module: str,
                              fixture: Path | None, *, discover: bool = False) -> dict[str, set[str]]:
     """Recompute disclosed and optionally discovered production claims.
@@ -346,7 +326,14 @@ def environment_dependencies(names: list[str], module: str,
     stdout and audited syntax extensions cannot supply its dependency answers.
     """
     ordered = sorted(names)
-    probe = TRUST_DEPENDENCY_PROBE.replace("<<DISCOVER>>", "true" if discover else "false")
+    modules = [module]
+    if discover and (fixture is None or (fixture / "lakefile.lean").is_file()):
+        modules.extend(production_probe_modules(fixture or ROOT))
+    imports = "#[" + ", ".join("{ module := `" + name + " }"
+                              for name in sorted(set(modules))) + "]"
+    probe = (TRUST_DEPENDENCY_PROBE
+             .replace("<<DISCOVER>>", "true" if discover else "false")
+             .replace("<<MODULES>>", imports))
     output = lean_probe_output(probe, "trust-dependency",
                                module, ordered, fixture)
     rows: dict[str, set[str]] = {}
@@ -534,7 +521,7 @@ def main() -> None:
         # a policy shim; this is the actual Trust command, not a cached log.
         env.setdefault("SANDBOXED_REMOTE_EXECUTION", "1")
         build = subprocess.run(
-            ["lake", "build", "LidoSRv3.Audit.Trust"],
+            ["lake", "build", "LidoSRv3", "LidoSRv3.Audit.Trust"],
             cwd=ROOT, env=env, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
         )
         if build.returncode:

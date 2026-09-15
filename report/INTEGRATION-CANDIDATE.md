@@ -135,8 +135,8 @@ REMOTE_BUILD_NODE_ID=dgx-spark REMOTE_BUILD_PASSIVE=1 remote-lean-build lake tes
 ```
 
 This invokes `make prove`, `make test` and the production/audit library build,
-recording separate failures. `make test` includes all five pinned Solidity
-MINFIRST/DEPOSIT/TOPUP/TOPUP2/RESERVE differential suites, metadata mutation
+recording separate failures. `make test` includes all six pinned Solidity
+MINFIRST/DEPOSIT/TOPUP/TOPUP2/RESERVE/SigningKeys source suites, metadata mutation
 checks, proof/trust/provenance/import gates and regression builds. Merely
 compiling a differential CLI is not executing its external comparisons.
 

@@ -393,12 +393,9 @@ def validate_guarantees(data, assumption_ids):
             require(binding == {"status": "OPEN", "scope": "SSZ helper/wrapper Yul fragment only", "imported_digest": None, "deployed_digest": None, "assumption": "A-SOLC-TRUSTED"}, "P-SSZ-1: targeted deployed-Yul binding differs")
         else:
             require("special_bindings" not in row, f"{row['id']}: deployment/Yul bindings are SSZ-only")
-        # Missing fidelity must disclose excluded deployment boundaries honestly.
-        # Reject scheduling general closure as work; exact detail fingerprints
-        # separately bind the disclosure (including every missing-fidelity item).
-        forbidden = " ".join([row["next_gate"], row["classification"].get("work", "")]).lower()
-        if row["id"] != "P-SSZ-1":
-            require(not re.search(r"\b(yul|evm|bytecode|runtime provenance|deployment provenance)\b", forbidden), f"{row['id']}: general Yul/EVM/deployment work reintroduced")
+        # General compiler/runtime/deployment work remains in scope for every
+        # guarantee. Exact detail fingerprints above still bind each next gate;
+        # do not reject truthful scheduling merely for naming that work.
     return rows
 
 

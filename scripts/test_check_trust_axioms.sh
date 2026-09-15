@@ -612,6 +612,20 @@ end DifferentNamespace
 LEAN
 lake env lean -R "$coverage" -o "$coverage/LidoSRv3/Audit/Guarantees/Coverage.olean" \
   "$coverage/LidoSRv3/Audit/Guarantees/Coverage.lean"
+# This production module is deliberately not imported by Coverage. Building
+# a module is insufficient: broad discovery must explicitly load it as data.
+cat > "$coverage/LidoSRv3/Audit/Guarantees/Unimported.lean" <<'LEAN'
+namespace UnimportedNamespace
+axiom hidden : False
+theorem supporting : False := hidden
+end UnimportedNamespace
+LEAN
+cat > "$coverage/lakefile.lean" <<'LEAN'
+lean_lib «LidoSRv3» where
+  globs := #[.submodules `LidoSRv3.Audit.Guarantees]
+LEAN
+lake env lean -R "$coverage" -o "$coverage/LidoSRv3/Audit/Guarantees/Unimported.olean" \
+  "$coverage/LidoSRv3/Audit/Guarantees/Unimported.lean"
 python3 - "$coverage" <<'PY'
 import sys
 from pathlib import Path
@@ -625,6 +639,8 @@ expanded = environment_dependencies(names, module, fixture, discover=True)
 assert direct == {'DifferentNamespace.clean': set()}, direct
 assert expanded['DifferentNamespace.clean'] == set(), expanded
 assert expanded['DifferentNamespace.undisclosed'] == {'DifferentNamespace.hidden'}, expanded
+assert 'UnimportedNamespace.supporting' not in direct, direct
+assert expanded['UnimportedNamespace.supporting'] == {'UnimportedNamespace.hidden'}, expanded
 print('trust coverage discovers an unprinted theorem by module and retains its opaque dependency')
 PY
 

@@ -65,6 +65,34 @@ views of that registry. No historical receipt validates a successor commit.
   theorem rejection nor acceptance. The successor uses Lean's proof-producing
   equation evaluator for the unchanged checked-fold compilation statement;
   actual transitive trust and full validation remain required.
+- Exact `5b2f5d90b8af863e2d18dd9ae83cf9a70e94e449` job
+  `08e5b528-17a3-4ade-9bc4-f9b293e5c449` failed with exit 1 at
+  2026-09-15 18:21:05 UTC: whole-program equation evaluation reached its
+  recursion limit. The [receipt](receipts/nor-source/compiler-fold-5b2f5d90.json)
+  is retained; the successor evaluates separate compiler validation/body steps.
+- **Current accessible review reconciliation.** GitHub returned 56 threads on
+  2026-09-15, including later findings beyond the earlier 37-thread snapshot.
+  Thread-open/outdated flags do not establish a semantic disposition. These
+  findings remain **open pending exact successor validation** after implementation:
+  - 4017716489: `scripts/check_trust_axioms.py` loads all production modules;
+    `scripts/trust_dependency_probe.py` recomputes actual dependencies. The
+    negative fixture adds a production theorem outside the entry import closure.
+    Earlier 14,334-claim results did not cover every production module.
+  - 4018104942: `scripts/audit_metadata.py` permits required runtime next gates;
+    exact registry fingerprints remain enforced.
+  - 4018104953 and 4016746339: README points to the current candidate report,
+    labels R1 historical, and INTEGRATION-CANDIDATE lists all six source suites.
+  - 4017867813: the compiler driver selects Linux/Darwin and arm64/x64 archives
+    using published Node v22.14.0 digests. Darwin runtime testing remains pending.
+  - 4018506287: SigningKeys source controls exercise two distinct keys at nonzero
+    buffer offset and check untouched prefix/suffix bytes.
+  - 4014339861: RESERVE exercises stopped Lido with bunker mode disabled,
+    exact errors, state rollback and no payment.
+  - 4016896423: TOPUP exercises a zero rounded target with deposits disabled;
+    the enabled control reaches the exact configured module failure, checking
+    pre-call guard order independently of rolled-back log writes.
+  Full predecessor reconciliation, including the unavailable ledger finding,
+  remains required. None of these entries transfers an earlier test receipt.
 - **Predecessor findings: reconciliation incomplete.** The missing fifth finding
   and 37-thread dispositions identified below remain unresolved. Historical
   semantic findings remain open unless concrete current evidence establishes
