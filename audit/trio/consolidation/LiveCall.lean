@@ -28,7 +28,7 @@ function _callAddConsolidationRequest(
 * `callAddConsolidationRequest` is that CALL through `lowLevelCall`,
   then the source's own revert (`RequestAdditionFailed`) on a failed CALL,
   then `emit ConsolidationRequestAdded(request)` on success. Low-level
-  `.call` has no target-code guard: a code-less target accepts with empty
+  `.call` has no target-code guard: an ordinary empty-code account accepts with empty
   return data after the value transfer (`callAdd_no_code_accepted`).
 * `addConsolidationRequestsLoop` is the per-pair loop of lines 68-72
   (`_validatePublicKey` source, `_validatePublicKey` target, hop).
@@ -64,10 +64,10 @@ body instead of assuming them.
   OPEN. The gateway→vault ABI hop is composed in `Composition.lean`
   (Solidity ABI framing of `(bytes[], bytes[])`; `executeVaultCalldata`).
 * The fee STATICCALL attempt is not recorded in the trace
-  (`getConsolidationRequestFee`, `attempts := []`); the code-less acceptance
-  arm of `lowLevelCall` does not exclude precompiles (`LowLevel.lean`);
-  `predeployBody` is a simplified stand-in (`Predeploy.lean`). Recorded, not
-  closed (`LOW-LEVEL-CALL.md`).
+  (`getConsolidationRequestFee`, `attempts := []`). CALL now excludes Cancun
+  precompiles from ordinary empty-code acceptance; STATICCALL still needs
+  that dispatch repair. `predeployBody` is a simplified stand-in
+  (`Predeploy.lean`); its runtime refinement remains open.
 
 Pin `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`.
 Codec lemmas are reused, not reopened. P-CONSOLIDATION remains OPEN.

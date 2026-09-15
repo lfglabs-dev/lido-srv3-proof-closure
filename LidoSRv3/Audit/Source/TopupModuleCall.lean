@@ -52,18 +52,18 @@ def call (hash : TopupRouterCredentials.Keccak) (callee : External)
 
 /- The pinned solc 0.8.25 typed allocateDeposits call has no code-size
 precheck: ordinary no-code targets return empty bytes and the caller decoder
-rejects them. Precompile dispatch is outside this inherited no-code model arm. -/
+rejects them. Cancun precompiles are dispatched to the external interpreter. -/
 
 /-- Actual successful CALL origin, including ordinary no-code empty acceptance.
-A decoded successful module execution will derive the positive-code domain. -/
+A decoded success excludes ordinary empty-code acceptance; it need not have code. -/
 theorem call_success_origin (hash : TopupRouterCredentials.Keccak) (callee : External)
     (ctx : Context) (i : Input) (before after : World) (raw : Bytes) (trace : List Attempt)
     (h : call hash callee ctx i before = ⟨.ok raw,after,trace⟩) :
     let target := moduleAddress hash ctx.self i.moduleId before
     let req : Request := ⟨ctx.self,target,word 0,payload i⟩
-    ((before.core.codeSize target.val).val = 0 ∧ raw = [] ∧
+    (audit.trio.consolidation.emptyCodeAccount before target ∧ raw = [] ∧
       after = transfer before ctx.self target 0 ∧ trace = [⟨req,true,[],[]⟩]) ∨
-    ((before.core.codeSize target.val).val ≠ 0 ∧
+    (¬ audit.trio.consolidation.emptyCodeAccount before target ∧
       ((callee req (transfer before ctx.self target 0) = .success raw after ∧
         trace = [⟨req,true,raw,[]⟩]) ∨
        ∃ nested, callee req (transfer before ctx.self target 0) = .successWithTrace raw after nested ∧
@@ -92,7 +92,7 @@ theorem call_success_origin (hash : TopupRouterCredentials.Keccak) (callee : Ext
 and records the exact attempted request. No external interpreter is invoked. -/
 theorem call_no_code (hash : TopupRouterCredentials.Keccak) (callee : External)
     (ctx : Context) (i : Input) (before : World)
-    (hc : (before.core.codeSize (moduleAddress hash ctx.self i.moduleId before).val).val = 0) :
+    (hc : audit.trio.consolidation.emptyCodeAccount before (moduleAddress hash ctx.self i.moduleId before)) :
     call hash callee ctx i before =
       ⟨.ok [], transfer before ctx.self (moduleAddress hash ctx.self i.moduleId before) 0,
        [⟨⟨ctx.self,moduleAddress hash ctx.self i.moduleId before,word 0,payload i⟩,true,[],[]⟩]⟩ := by
@@ -122,7 +122,7 @@ theorem decoded_call_has_code (hash : TopupRouterCredentials.Keccak) (callee : E
     (allocations : List Word)
     (h : call hash callee ctx i before = ⟨.ok raw,after,trace⟩)
     (hd : decodeReturn raw = .ok allocations) :
-    (before.core.codeSize (moduleAddress hash ctx.self i.moduleId before).val).val ≠ 0 := by
+    ¬ audit.trio.consolidation.emptyCodeAccount before (moduleAddress hash ctx.self i.moduleId before) := by
   rcases call_success_origin hash callee ctx i before after raw trace h with he | he
   · rcases he with ⟨_,rfl,_,_⟩
     simp [decodeReturn] at hd
@@ -251,7 +251,7 @@ theorem failure_restores (hash : TopupRouterCredentials.Keccak) (m e : External)
 failure restores the complete entry world and retains the successful CALL. -/
 theorem execute_no_code (hash : TopupRouterCredentials.Keccak) (m x : External)
     (ctx : Context) (beacon : Address) (i : Input) (before : World)
-    (hc : (before.core.codeSize (moduleAddress hash ctx.sender i.moduleId before).val).val = 0) :
+    (hc : audit.trio.consolidation.emptyCodeAccount before (moduleAddress hash ctx.sender i.moduleId before)) :
     execute hash m x ctx beacon i before =
       ⟨.error .empty,before,
        [⟨⟨ctx.sender,moduleAddress hash ctx.sender i.moduleId before,word 0,payload i⟩,true,[],[]⟩]⟩ := by
@@ -261,11 +261,12 @@ theorem execute_no_code (hash : TopupRouterCredentials.Keccak) (m x : External)
   simp only [decodeReturn, List.length_nil, Nat.zero_lt_succ, if_true] at hp
   simpa [execute,Live.run,hp,fail,LidoSRv3.Audit.Verity.TopupBeaconFundedTx.routerContext]
 
-/-- Full decoded success derives code presence; callers need no new premise. -/
+/-- Full decoded success excludes ordinary empty-code acceptance. The historical
+name is retained, but code presence alone is not a consequence for precompiles. -/
 theorem execute_success_has_code (hash : TopupRouterCredentials.Keccak) (m x : External)
     (ctx : Context) (beacon : Address) (i : Input) (before : World)
     (h : (execute hash m x ctx beacon i before).outcome = .ok ()) :
-    (before.core.codeSize (moduleAddress hash ctx.sender i.moduleId before).val).val ≠ 0 := by
+    ¬ audit.trio.consolidation.emptyCodeAccount before (moduleAddress hash ctx.sender i.moduleId before) := by
   intro hc
   rw [execute_no_code hash m x ctx beacon i before hc] at h
   cases h

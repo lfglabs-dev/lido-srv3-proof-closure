@@ -48,8 +48,8 @@ Solidity's low-level `<address>.call{value}(payload)` issues it:
 | Arm | Rule |
 | --- | --- |
 | caller balance `< value` | failed attempt, no callee run, world unchanged |
-| target has no code | **accepted**, empty return data, world = value transfer (EOA arm) |
-| target has code | callee runs on the credited world; rejection restores the incoming world |
+| ordinary empty-code account (excluding Cancun precompiles 1–10) | **accepted**, empty return data, world = value transfer (EOA arm) |
+| coded target or Cancun precompile | callee runs on the credited world; rejection restores the incoming world |
 
 The existing `CallData.invoke` / `StaticCall.call` (typed, code-guarded
 high-level calls) are untouched; they remain correct for the interface calls
@@ -64,16 +64,18 @@ Consumers:
 | `WithdrawalVaultEIP7685.sol:115` `CONSOLIDATION_REQUEST.call{value: fee}(request)` | `callAddConsolidationRequest` = `lowLevelCall callee ctx inbox (vaultCallPayload pair) fee` |
 | `ConsolidationGateway.sol:302` `recipient.call{value: refund}("")` | `refundFee` = `lowLevelCall callee ctx (resolveAddress recipient sender) [] refund` |
 
-Residual of the code-less arm (review 3bb8da69, not closed here): the EVM
-treats precompile addresses (`0x01`-`0x0a` and later additions) as code-less
-yet executing accounts; `lowLevelCall` / `lowLevelStaticCall` answer
-"accepted, empty return data" for every code-less target, which is exact
-for EOAs and undeployed addresses but not for precompiles (an empty payload
-to `0x09` blake2f or `0x0a` KZG point evaluation fails on chain). The
-theorems below are therefore stated for targets that are not precompiles;
-the practical exposure is nil (the refund recipient is chosen by the role
-holder; `CONSOLIDATION_REQUEST` has code), but the premise is now written
-into the docstrings rather than implied.
+Current CALL correction: `emptyCodeAccount` enforces both zero code size and
+exclusion of Cancun addresses 1–10. Precompile execution uses the external
+interpreter, including failures and rollback. `lowLevelCall_precompile_rejected`
+proves this for every address in that range and every rejection response.
+The ordinary-account helpers now require this explicit predicate. Their earlier
+zero-code-only statements were false for precompiles; that correction does not
+restrict the registered gateway/vault parent to EOAs.
+
+STATICCALL still has the original zero-code shortcut and remains open. Neither
+the Cancun fork binding nor the supplied interpreter's precompile implementation
+is established by these CALL dispatch lemmas. Paired Solidity/precompile tests
+also remain outstanding.
 
 `callAdd_no_code_accepted` (also under the stable name `callAdd_no_code`
 that #281 inspected): a code-less, funded hop target accepts, the
@@ -225,9 +227,9 @@ them beyond "decodes to some arrays".
 * `predeployBody` is a simplified stand-in: no source-address field, three
   queue words per request instead of EIP-7251's four-word entries, no
   empty-calldata fee read via CALL, no dequeue path (§3).
-* The code-less acceptance arm of `lowLevelCall` / `lowLevelStaticCall` is
-  exact for EOAs and undeployed addresses, not for precompiles; the no-code
-  theorems are read with "target is not a precompile" as a premise (§1).
+* The STATICCALL code-less shortcut still needs precompile dispatch repair.
+  CALL now enforces the ordinary-account predicate (§1); full precompile
+  semantics, fork binding and runtime correspondence remain open.
 * `RequestAdditionFailed(request)` / `InvalidPublicKeyLength(pubkey)` /
   panics remain `Fault.reason` names; request octets remain in the attempt
   trace.

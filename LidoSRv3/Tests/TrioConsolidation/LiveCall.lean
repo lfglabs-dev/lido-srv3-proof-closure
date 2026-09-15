@@ -243,6 +243,21 @@ example : refundFee rejectingInbox gatewayCtx (Live.word 5) stranger gatewayWorl
   refund_no_code_accepted rejectingInbox gatewayCtx stranger (Live.word 5) gatewayWorld
     (by native_decide) (by native_decide) (by native_decide)
 
+/-- All ten Cancun precompile addresses bypass the empty-code shortcut;
+its lower and upper neighbouring ordinary addresses still take it. -/
+example : (List.range 10).all (fun n =>
+    decide (¬ emptyCodeAccount gatewayWorld (addr (n + 1)))) = true := by
+  decide +kernel
+example : emptyCodeAccount gatewayWorld (addr 0) ∧
+    emptyCodeAccount gatewayWorld (addr 11) := by
+  decide +kernel
+
+/-- A successful precompile interpreter reply is retained, not replaced by
+EOA empty returndata. This is a dispatch double, not cryptographic refinement. -/
+example : (lowLevelCall (fun _ w => .success [0x42] w) gatewayCtx (addr 1)
+    [] (Live.word 5) gatewayWorld).outcome = .ok [0x42] := by
+  decide +kernel
+
 /-- A zero-code Cancun precompile is not the EOA acceptance shortcut. This
 checks the failed request and returndata as well as rollback of the credit. -/
 example : lowLevelCall rejectingInbox gatewayCtx (addr 9) [] (Live.word 5) gatewayWorld =
@@ -256,6 +271,8 @@ source error and preserves the failed CALL, rather than committing a refund. -/
 example : refundFee rejectingInbox gatewayCtx (Live.word 5) (addr 9) gatewayWorld =
     ⟨.error (.reason "FeeRefundFailed"), gatewayWorld,
       [⟨⟨gateway, addr 9, Live.word 5, []⟩, false, [0xFF], []⟩]⟩ := by
-  decide +kernel
+  exact refund_rejected rejectingInbox gatewayCtx (addr 9) (Live.word 5)
+    gatewayWorld [0xFF] (by decide +kernel) (by decide +kernel)
+    (by decide +kernel) rfl
 
 end LidoSRv3.Tests.TrioConsolidation.LiveCall

@@ -58,3 +58,11 @@ the registered parent. These are Lean source-execution regressions, not addition
 paired Solidity differential vectors. The available-ether producer, supported
 module reachability, compiled/deployed allocation and other boundaries above
 remain open.
+
+The shared module CALL dispatch now excludes Cancun precompiles from the
+ordinary empty-code shortcut. A decoded reply establishes external-interpreter
+execution and its exact request/returndata, not nonzero code size: a precompile
+can return bytes with zero EXTCODESIZE. Ordinary-empty-account failure helpers
+now state that premise explicitly. The registered execution obligations remain;
+precompile semantics, fork/runtime binding and paired differential coverage are
+still open. Shared locator STATICCALL dispatch has not yet received this repair.

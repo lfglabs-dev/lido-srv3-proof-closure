@@ -16,7 +16,19 @@ The historical abstract `source_consolidation_preserves_eligibility_value_atomic
 
 Source basis: `lido-core@17005714f151e5502c559932319a3f2f74ac2436`, especially `contracts/0.8.25/consolidation/ConsolidationGateway.sol:185-222`, its fee/refund helpers and modifiers, and the configured WithdrawalVault EIP-7685 fee/request implementation. The existing checked-multiply, exact-fee, then per-key validation order is preserved. The preserved patch based on `962a349bb0258ed7b05ce21aca2d12ca11cae54a` proposed registering the settlement suffix; its composition intent is reused with the stronger current physical-entry derivations.
 
+The value-bearing inbox/refund CALL now excludes Cancun precompiles 1–10
+from ordinary empty-code acceptance. The callee interpreter produces their
+response; rejection rolls back the provisional credit and retains the failed
+request and returndata. Regressions check all ten dispatch addresses, neighbouring
+ordinary addresses, and the refund producer’s mapped error and rollback. These
+are Lean execution regressions, not paired Solidity/precompile equivalence tests.
+
 Remaining obligations:
+
+- Shared low-level STATICCALL still bypasses precompile execution at zero-code
+  targets. Locator-origin claims relying on that branch need repair. Cancun fork
+  binding, actual precompile semantics, and differential precompile coverage
+  remain required; the CALL dispatch repair does not discharge them.
 
 - The input world is already credited with the outer transaction value. Outer ABI decoding and payable-credit execution are not derived here.
 - Gateway lines 201-207 perform the DSM/precondition check, locator lookup and target withdrawal-credential witness validation between counting and quota use. These operations are omitted. The theorem therefore establishes the declared physical-entry/quota/settlement model, not whole-function admission or beacon validator eligibility. The selected vault/inbox and request groups remain inputs at this boundary.

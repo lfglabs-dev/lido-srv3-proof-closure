@@ -224,3 +224,11 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
     `TopUpGateway.sol:234–236`: `if (totalLimits > 0) _setLastTopUpData()`. A all-zero-limit batch does not move the last-top-up timestamp, so a second call in the same block is allowed. Lean `allocate` has no last-top-up field (issue 13). `well_formed_batch` has no such conjunct.
 
     *Scenario.* Three validators all already at target (limits 0). Live `topUp` succeeds, does not write last-top-up, and a second `topUp` in the same block is allowed. A later non-zero batch in that block also succeeds. If Lean modeled block distance as “any previous allocate,” it would wrongly reject the second call. The CHECKED tx cannot represent either policy: it has no timestamp at all.
+
+The shared module CALL dispatch now excludes Cancun precompiles from the
+ordinary empty-code shortcut. A decoded reply establishes external-interpreter
+execution and its exact request/returndata, not nonzero code size: a precompile
+can return bytes with zero EXTCODESIZE. Ordinary-empty-account failure helpers
+now state that premise explicitly. The registered execution obligations remain;
+precompile semantics, fork/runtime binding and paired differential coverage are
+still open. Shared locator STATICCALL dispatch has not yet received this repair.
