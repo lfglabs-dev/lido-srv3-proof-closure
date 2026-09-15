@@ -197,10 +197,10 @@
     {
       "path": "contracts/0.8.9/WithdrawalVault.sol",
       "function": "constructor",
-      "start_line": 63,
+      "start_line": 61,
       "end_line": 78,
       "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
-      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.9/WithdrawalVault.sol#L63-L78"
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.9/WithdrawalVault.sol#L61-L78"
     },
     {
       "path": "contracts/0.8.9/WithdrawalVault.sol",

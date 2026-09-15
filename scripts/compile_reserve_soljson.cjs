@@ -7,7 +7,7 @@ const version = soljson.cwrap('version', 'string', [])();
 if (!version.startsWith('0.4.24+commit.e67f0147.')) {
   throw new Error(`wrong solc version: ${version}`);
 }
-console.log(`RESERVE soljson compiler: ${version}`);
+console.log(`soljson compiler: ${version}`);
 const remappings = [
   ['@aragon/', 'audit/account-fee-distribution/solidity/vendor/@aragon/'],
   ['openzeppelin-solidity/', 'audit/account-fee-distribution/solidity/vendor/openzeppelin-solidity/'],
@@ -30,7 +30,9 @@ function addSource(name) {
     addSource(imported);
   }
 }
-const entry = 'solidity/reserve/pin/ReserveHarness.sol';
+const entry = process.argv[3] || 'solidity/reserve/pin/ReserveHarness.sol';
+const contractName = process.argv[4] || 'ReserveHarness';
+if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(contractName)) throw new Error('invalid contract name');
 addSource(entry);
 const input = {language: 'Solidity', sources, settings: {
   optimizer: {enabled: true, runs: 200},
@@ -38,7 +40,8 @@ const input = {language: 'Solidity', sources, settings: {
   remappings: remappings.map(([prefix, target]) => `${prefix}=${target}`),
   outputSelection: {'*': {'*': ['abi', 'evm.bytecode.object']}},
 }};
-const out = 'solidity/out/reserve-0424';
+const out = process.argv[5] || 'solidity/out/reserve-0424';
+if (!out.startsWith('solidity/out/') || out.split('/').includes('..')) throw new Error('invalid output directory');
 fs.mkdirSync(out, {recursive: true});
 fs.writeFileSync(`${out}/standard-input.json`, JSON.stringify(input));
 const raw = soljson.cwrap('compileStandard', 'string', ['string', 'number'])(JSON.stringify(input), 0);
@@ -46,8 +49,8 @@ fs.writeFileSync(`${out}/standard-output.json`, raw);
 const output = JSON.parse(raw);
 for (const diagnostic of output.errors || []) console.error(diagnostic.formattedMessage || diagnostic.message);
 if ((output.errors || []).some(e => e.severity === 'error')) process.exit(1);
-const contract = output.contracts[entry].ReserveHarness;
-if (!contract.evm.bytecode.object) throw new Error('ReserveHarness bytecode missing');
-fs.writeFileSync(`${out}/ReserveHarness.bin`, contract.evm.bytecode.object);
-fs.writeFileSync(`${out}/ReserveHarness.abi`, JSON.stringify(contract.abi));
-console.log(`RESERVE compiled ${Object.keys(sources).length} pinned source files`);
+const contract = output.contracts[entry][contractName];
+if (!contract.evm.bytecode.object) throw new Error(`${contractName} bytecode missing`);
+fs.writeFileSync(`${out}/${contractName}.bin`, contract.evm.bytecode.object);
+fs.writeFileSync(`${out}/${contractName}.abi`, JSON.stringify(contract.abi));
+console.log(`${contractName} compiled from ${entry} using ${Object.keys(sources).length} source files`);

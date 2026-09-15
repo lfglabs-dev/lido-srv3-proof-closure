@@ -531,3 +531,13 @@ still reads the *input* witness, not the persisted words, and the `path` /
     `Ssz.lean:91–97`: `| _ :: sides, [] => traverseBranch combine leaf sides []` drops remaining sides and returns the current leaf. `verifyProof` requires `branch.length == path.length`, so this arm is dead *through* `bindOperation`. A direct `traverseBranch` call with a long path and a short branch still “succeeds.”
 
     *Counterexample.* Path length 5, branch length 2, `combine := fun _ _ => 0`, expected root 0. `verifyProof` is false (arity). `traverseBranch` returns 0. Nothing in the CHECKED parent uses the extra-path arm, and production `SSZ.verifyProof` would not silently drop gindex bits. Combined with issue 1 (constant `combine`), a mismatched witness can still look like a root if someone calls the folder directly. The CHECKED bind uses the arity check; the folder itself does not.
+
+## Deposit-root source anchors
+
+The BeaconChainDepositor spans in the source map refer to
+[`_computeDepositDataRootWithAmount`](https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/lib/BeaconChainDepositor.sol#L120-L135).
+That function uses `bytes32` hash results and explicit `bytes16(0)` and
+`bytes24(0)` padding in nested packed encodings. It does not declare
+`SHA256_DIGEST_LENGTH` or `DEPOSIT_DATA_LENGTH`; the old span labels were
+inaccurate. Correcting those labels does not discharge the SHA behavior or
+compiler correspondence boundaries.

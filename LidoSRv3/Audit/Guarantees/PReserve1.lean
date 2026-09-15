@@ -339,11 +339,12 @@ Restates `source_spend_preserves_withdrawal_reserve` with added
 `_hWrapShape` premises NAMING the pinned Solidity uint128 wrap
 semantics via `SolidityUint128WrapSource.toUint128` and
 `wrappedAdd`.  The Verity model's allocation helper uses `safeSub`
-and returns `ALLOCATION_ARITHMETIC` on overflow; the pinned 0.4.24
+and returns `ALLOCATION_ARITHMETIC` on underflow; the pinned 0.4.24
 helper does raw `remaining -=` (unchecked wrap).  On the packed
-uint128 pair `buffered` / `depositedPostReport` at Lido.sol:131-132,
-each half wraps mod 2^128 — the model treats them as unbounded
-`Nat` accumulators.
+uint128 pair, the [actual setter](https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.4.24/utils/UnstructuredStorageExt.sol#L44-L46)
+truncates both inputs through a mask and a uint256 shift. The historical
+Verity projection instead keeps `buffered` and `depositedPostReport` as
+unbounded `Nat` accumulators.
 
 This bridge NAMES the pinned uint128 wrap semantics at the parent's
 ENUNCE via three `SolidityUint128WrapSource` equations:

@@ -15,12 +15,14 @@ script runTests args do
       env "bash" #["scripts/run_source_differential.sh", "topup-source"]
   | ["reserve-source"] =>
       env "bash" #["scripts/run_source_differential.sh", "reserve-source"]
+  | ["signing-keys-source"] =>
+      env "bash" #["scripts/run_source_differential.sh", "signing-keys-source"]
   | ["trust"] =>
       env "bash" #["scripts/run_trust_validation.sh"]
   | ["repository"] =>
       env "bash" #["scripts/run_source_differential.sh", "repository"]
   | _ =>
-      IO.eprintln "usage: lake test [-- topup-source|reserve-source|trust|repository]"
+      IO.eprintln "usage: lake test [-- topup-source|reserve-source|signing-keys-source|trust|repository]"
       return 2
 
 require verity from git

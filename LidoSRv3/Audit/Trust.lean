@@ -1,3 +1,4 @@
+import LidoSRv3.Tests.SigningKeysMemory
 import LidoSRv3.Tests.NodeOperatorsRegistrySummary
 import LidoSRv3.Audit.AllGuarantees
 import LidoSRv3.Tests.SszDeclaredSiblingsRegression
@@ -2379,3 +2380,23 @@ example : (Compiler.CompilationModel.compile LidoSRv3.Audit.Verity.Consolidation
 #print axioms LidoSRv3.Tests.NodeOperatorsRegistrySummary.allocated_wrap_to_equal_continues
 #print axioms LidoSRv3.Tests.NodeOperatorsRegistrySummary.allocated_wrap_asserts
 #print axioms LidoSRv3.Tests.NodeOperatorsRegistrySummary.allocated_load_delta_fixture
+
+#print axioms LidoSRv3.Audit.Source.SigningKeys.loadKeysSigs_zero
+#print axioms LidoSRv3.Tests.SigningKeysMemory.key_overlap_and_shift
+#print axioms LidoSRv3.Tests.SigningKeysMemory.signature_and_frame
+#print axioms LidoSRv3.Tests.SigningKeysMemory.aliased_buffers_overwrite_key
+#print axioms LidoSRv3.Tests.SigningKeysMemory.destination_index_wraps
+#print axioms LidoSRv3.Tests.SigningKeysMemory.loop_source_index_wraps
+
+#print axioms LidoSRv3.Tests.SigningKeysMemory.storage_slot_wraps
+
+#print axioms LidoSRv3.Audit.Source.SigningKeys.loop_index_increment
+
+#print axioms LidoSRv3.Audit.Source.SigningKeys.loadKeysSigs_execution
+
+#print axioms LidoSRv3.Audit.Source.ByteMemory.write_in_bounds
+#print axioms LidoSRv3.Audit.Source.ByteMemory.write_in_bounds_bytes
+#print axioms LidoSRv3.Audit.Source.ByteMemory.write_in_bounds_size
+#print axioms LidoSRv3.Audit.Source.ByteMemory.read_in_bounds
+
+#print axioms LidoSRv3.Tests.SigningKeysMemory.slot_producer_memory_survives

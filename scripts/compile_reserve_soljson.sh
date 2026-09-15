@@ -31,4 +31,4 @@ tar -xJf "$tools/node.tar.xz" -C "$tools" --strip-components=1 \
   "node-v22.14.0-linux-$arch/bin/node"
 fetch_checked 'https://raw.githubusercontent.com/ethereum/solc-bin/gh-pages/bin/soljson-v0.4.24+commit.e67f0147.js' \
   "$tools/soljson.js" 9d9ec631865882a435fc577126fe068ccdf9c3962aa439acb2cdd0794907fccc
-"$tools/bin/node" scripts/compile_reserve_soljson.cjs "$tools/soljson.js"
+"$tools/bin/node" scripts/compile_reserve_soljson.cjs "$tools/soljson.js" "$@"

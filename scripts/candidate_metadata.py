@@ -7,7 +7,7 @@ report. Changing them requires reviewing the corresponding source/metadata delta
 
 CANDIDATE_INPUT_SHA256 = {
     "audit/guarantees.yaml": "8e83fa53e3b311a3182ea2e6f19cc1669335a8a9743a15234757a00b8325271e",
-    "audit/source-map.yaml": "24833d15096cbd7cb8e5d2683b2d4e513a817498ec425f50a75cdc50c02bdf2d",
+    "audit/source-map.yaml": "6d6e6a3c2b34faa4556c2938b9c098c3297fc35640f3ffe5c90790ca18c5cbc0",
     "audit/trust-native-decide-allowlist.txt": "41b3048a7d18e32af1b585e8a7ecc1fcb6615033947f5e655ae30bda1e71f375"
 }
 

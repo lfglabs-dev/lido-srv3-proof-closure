@@ -325,6 +325,281 @@
       "raw_receipt_path": "/workspaces/mission-1ca15c66/output/remote-7cc963f0-fbe3-4402-af97-2034708018d4.json",
       "raw_receipt_sha256": "5de278a6ce3cce9e68a977b80e2875d2581e7bce2067c2e51e2cd358a77b1483",
       "scope": "Loader-prefix source-bundle compilation and NOR regressions; not clean-commit validation of the base or a full loader proof."
+    },
+    {
+      "job_id": "a64d312a-0a28-4788-a0b1-a5b24cd21a14",
+      "state": "failed",
+      "exit_code": 1,
+      "node_id": "dgx-spark",
+      "validation": {
+        "version": 1,
+        "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+        "commit": "426019f904b457918858ae3b02162f37eca5740b",
+        "base_tree_sha": "a3c6c5c2616a8ae0e2055ffb7db2068be22d84e9",
+        "cwd_rel_known": true,
+        "command": [
+          "lake",
+          "build",
+          "LidoSRv3.Tests.SigningKeysMemory"
+        ],
+        "toolchain": "leanprover/lean4:v4.31.0",
+        "source_bundle_digest": "b4f9b79d748b9a9eca2c9cd7c0630d99bd0c90547ad457d38a448460874bce79",
+        "build_protocol_version": "1",
+        "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+      },
+      "raw_receipt_path": "/workspaces/mission-1ca15c66/output/remote-a64d312a-0a28-4788-a0b1-a5b24cd21a14.json",
+      "raw_receipt_sha256": "7d85391fe75a8b1ceb893f193f9ca7b27ca1e7187d83b57916a3c3d5f9597eeb",
+      "scope": "SigningKeys primitive memory source-bundle build. Failed at the loop-index proof projection; not clean-commit validation of the base."
+    },
+    {
+      "job_id": "22fa3875-e0f8-4fba-9f5a-cefb9ab88856",
+      "state": "failed",
+      "exit_code": 1,
+      "node_id": "dgx-spark",
+      "validation": {
+        "version": 1,
+        "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+        "commit": "426019f904b457918858ae3b02162f37eca5740b",
+        "base_tree_sha": "a3c6c5c2616a8ae0e2055ffb7db2068be22d84e9",
+        "cwd_rel_known": true,
+        "command": [
+          "lake",
+          "build",
+          "LidoSRv3.Tests.SigningKeysMemory"
+        ],
+        "toolchain": "leanprover/lean4:v4.31.0",
+        "source_bundle_digest": "36ce472311271b33160e3f0495e28cd260570f7e190fc7641ec6fde309054467",
+        "build_protocol_version": "1",
+        "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+      },
+      "raw_receipt_path": "/workspaces/mission-1ca15c66/output/remote-22fa3875-e0f8-4fba-9f5a-cefb9ab88856.json",
+      "raw_receipt_sha256": "c2a12deeca0edbf967691a450b5f1e4e92138a30ab20d2a53a911a48daf724c8",
+      "scope": "SigningKeys source and loop theorem compiled; kernel regression evaluation stuck on platform-dependent byte padding and an ambiguous test Storage type. Bundled run, not clean-base validation."
+    },
+    {
+      "job_id": "cf6127e3-6199-4440-a040-64af8850ff80",
+      "state": "failed",
+      "exit_code": 1,
+      "node_id": "dgx-spark",
+      "validation": {
+        "version": 1,
+        "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+        "commit": "426019f904b457918858ae3b02162f37eca5740b",
+        "base_tree_sha": "a3c6c5c2616a8ae0e2055ffb7db2068be22d84e9",
+        "cwd_rel_known": true,
+        "command": [
+          "lake",
+          "build",
+          "LidoSRv3.Tests.SigningKeysMemory"
+        ],
+        "toolchain": "leanprover/lean4:v4.31.0",
+        "source_bundle_digest": "f56ac30b98268d81bcf2a5298a4d26a90ae8641f23703af13c247792778a4240",
+        "build_protocol_version": "1",
+        "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+      },
+      "raw_receipt_path": "/workspaces/mission-1ca15c66/output/remote-cf6127e3-6199-4440-a040-64af8850ff80.json",
+      "raw_receipt_sha256": "7f3bec0fb38e07251837ef8805c014108f5b61dee146cb9a6646b4a123dbe7c7",
+      "scope": "SigningKeys source compiled. Regression proof normalization exceeded recursion/heartbeat limits; no regression pass. Bundled run, not clean-base validation."
+    },
+    {
+      "job_id": "147ebcc1-5fb8-4aa6-aa74-aa5f88e39472",
+      "state": "failed",
+      "exit_code": 1,
+      "node_id": "dgx-spark",
+      "validation": {
+        "version": 1,
+        "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+        "commit": "426019f904b457918858ae3b02162f37eca5740b",
+        "base_tree_sha": "a3c6c5c2616a8ae0e2055ffb7db2068be22d84e9",
+        "cwd_rel_known": true,
+        "command": [
+          "lake",
+          "build",
+          "LidoSRv3.Tests.SigningKeysMemory"
+        ],
+        "toolchain": "leanprover/lean4:v4.31.0",
+        "source_bundle_digest": "8532ede02615a4b48d307544fdab7aef33e4eda7b25e1ff61742550f117ea995",
+        "build_protocol_version": "1",
+        "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+      },
+      "raw_receipt_path": "/workspaces/mission-1ca15c66/output/remote-147ebcc1-5fb8-4aa6-aa74-aa5f88e39472.json",
+      "raw_receipt_sha256": "3c58e63765be82f5f7b142593335178c95f36b8c40a98dc80754175888fc4455",
+      "scope": "ByteMemory helper build failed on literal-versus-cast zero padding and copySlice length simplification. SigningKeys source compiled. Bundled run, not clean-base validation."
+    },
+    {
+      "job_id": "0732c500-ffc9-41c4-9403-ef69f668e212",
+      "state": "failed",
+      "exit_code": 1,
+      "node_id": "dgx-spark",
+      "validation": {
+        "version": 1,
+        "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+        "commit": "426019f904b457918858ae3b02162f37eca5740b",
+        "base_tree_sha": "a3c6c5c2616a8ae0e2055ffb7db2068be22d84e9",
+        "cwd_rel_known": true,
+        "command": [
+          "lake",
+          "build",
+          "LidoSRv3.Tests.SigningKeysMemory"
+        ],
+        "toolchain": "leanprover/lean4:v4.31.0",
+        "source_bundle_digest": "06613fb3d5e7aeaedb40052224825c7509c5eb5814040545a98dc6e7a5174eae",
+        "build_protocol_version": "1",
+        "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+      },
+      "raw_receipt_path": "/workspaces/mission-1ca15c66/output/remote-0732c500-ffc9-41c4-9403-ef69f668e212.json",
+      "raw_receipt_sha256": "389218c813e3bd46cff5cbd278bd71cc64d6fa400c1a77d69fc46ec2e9f5928d",
+      "scope": "ByteMemory zero-padding rewrite still failed to match USize forms. SigningKeys source compiled. Bundled run, not clean-base validation."
+    },
+    {
+      "job_id": "558c884e-e2b5-41ec-932e-066503c30940",
+      "state": "failed",
+      "exit_code": 1,
+      "node_id": "dgx-spark",
+      "validation": {
+        "version": 1,
+        "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+        "commit": "426019f904b457918858ae3b02162f37eca5740b",
+        "base_tree_sha": "a3c6c5c2616a8ae0e2055ffb7db2068be22d84e9",
+        "cwd_rel_known": true,
+        "command": [
+          "lake",
+          "build",
+          "LidoSRv3.Tests.SigningKeysMemory"
+        ],
+        "toolchain": "leanprover/lean4:v4.31.0",
+        "source_bundle_digest": "efd027d517515dbd9420ef65033ee53440d333a5586c91bf7ee0d4ef874d96f9",
+        "build_protocol_version": "1",
+        "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+      },
+      "raw_receipt_path": "/workspaces/mission-1ca15c66/output/remote-558c884e-e2b5-41ec-932e-066503c30940.json",
+      "raw_receipt_sha256": "bc79da2b96cf028444a62926f237d31d919e3db843e0d2fca78d527f6ebf08e0",
+      "scope": "ByteMemory write lemmas compiled; read proof left byte-array append-empty goal. SigningKeys source compiled. Bundled run, not clean-base validation."
+    },
+    {
+      "job_id": "5210f449-b9aa-43de-939f-b02f6d2aa63e",
+      "state": "failed",
+      "exit_code": 1,
+      "node_id": "dgx-spark",
+      "validation": {
+        "version": 1,
+        "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+        "commit": "426019f904b457918858ae3b02162f37eca5740b",
+        "base_tree_sha": "a3c6c5c2616a8ae0e2055ffb7db2068be22d84e9",
+        "cwd_rel_known": true,
+        "command": [
+          "lake",
+          "build",
+          "LidoSRv3.Tests.SigningKeysMemory"
+        ],
+        "toolchain": "leanprover/lean4:v4.31.0",
+        "source_bundle_digest": "1c83bfe1d84a160d36542cc95ee88f7c08a253bf20ba9dedce48258cc7d633ec",
+        "build_protocol_version": "1",
+        "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+      },
+      "raw_receipt_path": "/workspaces/mission-1ca15c66/output/remote-5210f449-b9aa-43de-939f-b02f6d2aa63e.json",
+      "raw_receipt_sha256": "ba82c81c07476af524737de65e1930aef54a41c53041a1c8dc32cc57fa6d3d95",
+      "scope": "ByteMemory and SigningKeys source modules compiled; two concrete loop tests failed because simplification did not expose the loop body. Bundled run, not clean-base validation. Remaining five test proofs reported no errors."
+    },
+    {
+      "job_id": "2f30cc83-6c69-4f8e-9e29-2d989fbf6782",
+      "state": "failed",
+      "exit_code": 1,
+      "node_id": "dgx-spark",
+      "validation": {
+        "version": 1,
+        "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+        "commit": "426019f904b457918858ae3b02162f37eca5740b",
+        "base_tree_sha": "a3c6c5c2616a8ae0e2055ffb7db2068be22d84e9",
+        "cwd_rel_known": true,
+        "command": [
+          "lake",
+          "build",
+          "LidoSRv3.Tests.SigningKeysMemory"
+        ],
+        "toolchain": "leanprover/lean4:v4.31.0",
+        "source_bundle_digest": "090fc4ea0fae369f1b25ca6d15c8f9f7c4a0042832ec4cd81e3092a30c6ee12b",
+        "build_protocol_version": "1",
+        "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+      },
+      "raw_receipt_path": "/workspaces/mission-1ca15c66/output/remote-2f30cc83-6c69-4f8e-9e29-2d989fbf6782.json",
+      "raw_receipt_sha256": "cdf542d4a0121e276ab62e055912b584a7aa66379c64063d57534b6a893c43c4",
+      "scope": "Memory regression optimization failed to parse the compound simp discharger; loop bodies now exposed. Returning to the previously accepted byte normalization and single kernel discharger. Bundled run, not clean-base validation."
+    },
+    {
+      "job_id": "53759732-60ff-4dfb-8b84-2e932ca6ee2a",
+      "state": "failed",
+      "exit_code": 1,
+      "node_id": "dgx-spark",
+      "validation": {
+        "version": 1,
+        "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+        "commit": "426019f904b457918858ae3b02162f37eca5740b",
+        "base_tree_sha": "a3c6c5c2616a8ae0e2055ffb7db2068be22d84e9",
+        "cwd_rel_known": true,
+        "command": [
+          "lake",
+          "build",
+          "LidoSRv3.Tests.SigningKeysMemory"
+        ],
+        "toolchain": "leanprover/lean4:v4.31.0",
+        "source_bundle_digest": "ddeee7ef6379b2ee82b4c6661cac3203329ad51201582c02bc4d5e2b70aedff9",
+        "build_protocol_version": "1",
+        "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+      },
+      "raw_receipt_path": "/workspaces/mission-1ca15c66/output/remote-53759732-60ff-4dfb-8b84-2e932ca6ee2a.json",
+      "raw_receipt_sha256": "16d2dc03784820f17e1a51fe88145c9a9bc162455a4c9547fd75b7254c10f8d5",
+      "scope": "Source modules compiled; two loop regression proofs exceeded one million heartbeats during simplification/type equality. Remaining five proofs reported no errors. Bundled run, not clean-base validation."
+    },
+    {
+      "job_id": "86431d86-9b31-46f8-b87c-3298c64b5d5f",
+      "state": "failed",
+      "exit_code": 1,
+      "node_id": "dgx-spark",
+      "validation": {
+        "version": 1,
+        "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+        "commit": "426019f904b457918858ae3b02162f37eca5740b",
+        "base_tree_sha": "a3c6c5c2616a8ae0e2055ffb7db2068be22d84e9",
+        "cwd_rel_known": true,
+        "command": [
+          "lake",
+          "build",
+          "LidoSRv3.Tests.SigningKeysMemory"
+        ],
+        "toolchain": "leanprover/lean4:v4.31.0",
+        "source_bundle_digest": "20f5ef471075f42c59b1398d784ee3f682abd050c301f6dd71573b3ee914603f",
+        "build_protocol_version": "1",
+        "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+      },
+      "raw_receipt_path": "/workspaces/mission-1ca15c66/output/remote-86431d86-9b31-46f8-b87c-3298c64b5d5f.json",
+      "raw_receipt_sha256": "405b50bbe517beaa3e9d6c7378c5de1bfd7f8e11615ea911ba5f2e01470664b6",
+      "scope": "Source modules compiled; memory regressions failed. Bounded terminal log omitted initial errors but retained Decidable reduction stuck on nested write-size expressions. No regression pass claimed. Bundled run, not clean-base validation."
+    },
+    {
+      "job_id": "aed0d2a1-a2f7-4d01-abfd-bdbe9f6b60f8",
+      "state": "failed",
+      "exit_code": 1,
+      "node_id": "dgx-spark",
+      "validation": {
+        "version": 1,
+        "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+        "commit": "426019f904b457918858ae3b02162f37eca5740b",
+        "base_tree_sha": "a3c6c5c2616a8ae0e2055ffb7db2068be22d84e9",
+        "cwd_rel_known": true,
+        "command": [
+          "lake",
+          "build",
+          "LidoSRv3.Tests.SigningKeysMemory"
+        ],
+        "toolchain": "leanprover/lean4:v4.31.0",
+        "source_bundle_digest": "28ed5ff0254318aba1802c73e0ca35ed03295385d80404177c1c2d8e32efd722",
+        "build_protocol_version": "1",
+        "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+      },
+      "raw_receipt_path": "/workspaces/mission-1ca15c66/output/remote-aed0d2a1-a2f7-4d01-abfd-bdbe9f6b60f8.json",
+      "raw_receipt_sha256": "f7415de3d53b8e4b7266a5e7c5bd7bdedd5466cf80a682600bfa26193470e6c6",
+      "scope": "Source modules compiled; unsupported pp.maxDepth option and no-progress simplification in memory proofs. No regression pass. Bundled run, not clean-base validation."
     }
   ]
 }

@@ -65,3 +65,14 @@ fs_permissions = [{ access = "read", path = "./" }]
 remappings = [
   "contracts/=lido-core/contracts/"
 ]
+
+# Actual 0.4.24 SigningKeys library bytecode; see test_signing_keys_source.sh.
+[profile.signing_keys_source]
+src = "solidity/signing-keys/src"
+test = "solidity/signing-keys/test"
+out = "solidity/out/signing-keys"
+cache_path = "solidity/cache/signing-keys"
+solc_version = "0.8.25"
+via_ir = false
+evm_version = "cancun"
+fs_permissions = [{ access = "read", path = "./solidity/out/signing-keys-0424" }]

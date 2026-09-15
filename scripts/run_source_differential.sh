@@ -4,8 +4,9 @@ cd "$(dirname "$0")/.."
 case "${1:-}" in
   topup-source) test_script=scripts/test_topup_source_differential.sh ;;
   reserve-source) test_script=scripts/test_reserve_source_differential.sh ;;
+  signing-keys-source) test_script=scripts/test_signing_keys_source.sh ;;
   repository) test_script=repository ;;
-  *) echo 'expected topup-source, reserve-source or repository' >&2; exit 2 ;;
+  *) echo 'expected topup-source, reserve-source, signing-keys-source or repository' >&2; exit 2 ;;
 esac
 
 bash scripts/prepare_trio_validation.sh

@@ -46,6 +46,7 @@ test:
 	@bash scripts/test_topup_source_differential.sh
 	@bash scripts/test_topup2_source_differential.sh
 	@bash scripts/test_reserve_source_differential.sh
+	@bash scripts/test_signing_keys_source.sh
 	@python3 scripts/test_minfirst_guard_mutation.py
 	@python3 scripts/test_cache_store_mutations.py
 	@python3 scripts/audit_metadata.py check
