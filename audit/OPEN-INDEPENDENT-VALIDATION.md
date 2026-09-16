@@ -745,3 +745,13 @@ not transfer a predecessor build, trust verdict or deployment acceptance.
   recursion (`OfficialSemantics.lean:443,521,560`). The follow-up uses
   `decide +kernel` on those isolated lemmas. Independent-review F2/F3/F4 and
   the trust `native_decide` policy stay OPEN, not discharged.
+
+- Exact `1c87aa8f9150d9b80d568322f9992d1bab96723f` job
+  `5a424946-ba75-4689-82d1-988d2852dbda` failed at 2026-09-16 20:09:01 UTC
+  with a null exit code after compiling CompilationModel (61/62) and stalling
+  on `LidoSRv3.Audit.Verity.OfficialSemantics`. No final-target diagnostic was
+  emitted. Residual is `OfficialSemantics.lean:496` (`functionValid` /
+  `validateFunctionSpec` + return-shape `forM`) and `OfficialSemantics.lean:543`
+  (`validated` / remaining `validateCompileInputs` walk). Two Spark attempts
+  (`a9e91e20` on `a2e12b15`, `5a424946` on `1c87aa8f`) are exhausted. F2/F3/F4
+  and trust `native_decide` remain OPEN.
