@@ -3,15 +3,21 @@
 Canonical obligations remain in `audit/guarantees.yaml`; generated UX2 files are
 views of that registry. No historical receipt validates a successor commit.
 
-- **Current coordination (2026-09-15).** Replacement website writer
-  `d2e6ef99-9fcb-4aa8-b26e-68c05ece65ee` is active. Coordinator-assigned reviewer
-  `a52bfddf-43d2-4cbc-bfe2-d3782708ff2a` is reviewing exact website
-  `83187e3d260c5aed481b1ece42e280fc5742fe23` / proof
-  `4a364acc676176076fe820edaead9a0544b629d6` read-only. Orchestrator status reports
-  native `claudecode` / `claude-fable-5-1`; runtime confirmation and the earlier
-  complete finding ledger were requested. No duplicate reviewer was created and
-  the old website writer was not reactivated. This historical-pair review is not
-  current-candidate acceptance. Earlier infrastructure failures remain historical.
+- **Current coordination (2026-09-16).** Successor of `d08209c113e4032fd9f9126c6234cfe41109cb6e`
+  isolates remaining return-shape/function and slot-alias/input compiler checks
+  with constructor equations. Predecessor `6d218ab3504dc1d1d726fd9e818fc9c9d8e2be2a`
+  job `3afbb4db-86be-453c-84c2-d91807779c04` failed exit 1; targeted compiler job
+  `e16036f4-3dc1-4cf0-903e-d4f12bddda55` is failed/inaccessible and ignored. Trust
+  `native_decide` policy is unchanged: foundations plus only the three original
+  compiler-success native exceptions, with provenance/type/site checks; kernel
+  replacement of this witness is attempted, not an expanded allowlist. Known
+  modeling discrepancies remain OPEN, not CLEAN: F2 CALL-only gas is not Solidity
+  transaction gas; F3 opaque SHA FFI / `A-SHA256-FFI`; F4 supplied ABI/layout/
+  count/depth/memory/FFI32 hypotheses. ALLOC1 supported-module reachability,
+  ALLOC2 deployed library identity, I-TRUST-FOUNDATIONAL-ONLY, and NOR loader
+  composition remain OPEN. The unavailable predecessor-ledger finding is not
+  invented. Website writer `d2e6ef99` / reviewer `a52bfddf` historical-pair
+  review is not this candidate.
 - Exact proof milestone `806f308376686d6eef750797002473d0d7435ce4` passed the
   full configured repository suite on registered DGX Spark, job
   `57f51984-9e08-47f2-b191-e84d2624a562`, exit 0 at 2026-09-15 15:52:05 UTC,
@@ -730,3 +736,10 @@ not transfer a predecessor build, trust verdict or deployment acceptance.
   diagnostics: ADT placement no longer fails, while return-shape/function and
   slot-alias/input validation remain unreduced. The next repair unfolds those
   actual checks, without changing program fields, statement or hypotheses.
+
+- Exact `d08209c113e4032fd9f9126c6234cfe41109cb6e` has no bound Spark receipt;
+  job `e16036f4-3dc1-4cf0-903e-d4f12bddda55` is ignored as failed/inaccessible.
+  This successor isolates `functionReturns`, empty `slotAliasRanges`, and
+  `firstUnsupportedInternalDynamicParam` as constructor equations before the
+  remaining compile-input walk. Independent-review F2/F3/F4 and the trust
+  `native_decide` policy stay OPEN modeling discrepancies, not discharged.

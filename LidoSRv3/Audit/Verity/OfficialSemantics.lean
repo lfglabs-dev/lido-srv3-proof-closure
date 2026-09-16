@@ -430,6 +430,26 @@ private theorem no_external_assumptions (spec : CompilationModel)
       | _ => throwError "expected one pinned TrustSurface helper: {suffix}"
   simp [h]
 
+private theorem empty_slot_alias_ranges_valid :
+    firstInvalidSlotAliasRange ([] : List SlotAliasRange) = none := by
+  simp [firstInvalidSlotAliasRange]
+
+private theorem empty_slot_alias_sources_disjoint :
+    firstSlotAliasSourceOverlap ([] : List SlotAliasRange) = none := by
+  unfold firstSlotAliasSourceOverlap
+  rfl
+
+private theorem checkedFold_no_unsupported_internal_dynamic :
+    firstUnsupportedInternalDynamicParam [checkedFold] = none := by
+  unfold firstUnsupportedInternalDynamicParam
+  simp [checkedFold]
+
+private theorem checkedFold_functionReturns :
+    functionReturns checkedFold = .ok [.uint256] := rfl
+
+attribute [local cbv_eval] empty_slot_alias_ranges_valid empty_slot_alias_sources_disjoint
+  checkedFold_no_unsupported_internal_dynamic checkedFold_functionReturns
+
 set_option diagnostics true in
 set_option diagnostics.threshold 1000 in
 set_option maxRecDepth 16384 in
@@ -440,6 +460,13 @@ produces its IR; this theorem fixes the concrete compiler entrypoint and rules
 out a source-only local interpreter experiment. -/
 theorem checkedFold_compiles_to_official_ir :
     (CompilationModel.compile checkedFoldSpec [tx.functionSelector]).isOk = true := by
+  have hr : functionReturns checkedFold = .ok [.uint256] := checkedFold_functionReturns
+  have noAlias : firstInvalidSlotAliasRange checkedFoldSpec.slotAliasRanges = none := by
+    simp [checkedFoldSpec, empty_slot_alias_ranges_valid]
+  have noAliasOverlap : firstSlotAliasSourceOverlap checkedFoldSpec.slotAliasRanges = none := by
+    simp [checkedFoldSpec, empty_slot_alias_sources_disjoint]
+  have noDyn : firstUnsupportedInternalDynamicParam checkedFoldSpec.functions = none := by
+    simp [checkedFoldSpec, checkedFold_no_unsupported_internal_dynamic]
   have mechanics : collectUnguardedUnsafeBoundaryMechanicsFromStmts checkedFold.body = [] := by
     simp only [checkedFold, collectUnguardedUnsafeBoundaryMechanicsFromStmts]
     run_tac do
@@ -467,7 +494,7 @@ theorem checkedFold_compiles_to_official_ir :
       exprAny_storageArrayElement, exprAny_add, exprAny_sub, exprAny_le]
     all_goals (trace_state; decide +kernel)
   have functionValid : validateFunctionSpec checkedFold = .ok () := by
-    simp only [validateFunctionSpec, noAdt]
+    simp only [validateFunctionSpec, noAdt, hr]
     simp [mechanics, checkedFold, fold_leaf, fold_forEach,
       Stmt.foldList, Stmt.directMetadata, Stmt.childLists,
       stmtContainsUnsafeLogicalCallLike, stmtAny_leaf, stmtAny_forEach,
@@ -486,7 +513,7 @@ theorem checkedFold_compiles_to_official_ir :
             let id := Lean.mkIdent name
             Lean.Elab.Tactic.evalTactic (← `(tactic| simp [$id:ident]))
         | _ => throwError "expected one pinned Validation helper: {suffix}"
-    simp [functionReturns, validateReturnShapesInStmt, validateReturnShapesNode,
+    simp [hr, validateReturnShapesInStmt, validateReturnShapesNode,
       validateStmtParamReferences, validateStmtParamReferencesNode,
       Stmt.checkRec, stmtCheck_forEach, stmtCheck_letVar, stmtCheck_assignVar,
       stmtCheck_require, stmtCheck_return, stmtCheck_setStorageArrayElement,
@@ -524,11 +551,12 @@ theorem checkedFold_compiles_to_official_ir :
           let id := Lean.mkIdent name
           Lean.Elab.Tactic.evalTactic (← `(tactic| unfold $id:ident))
       | _ => throwError "expected one pinned compiler precheck definition"
-    simp only [identifiers]
-    simp [firstInvalidSlotAliasRange, firstSlotAliasSourceOverlap,
-      firstUnsupportedInternalDynamicParam, validateNonReentrantForkCompatibility,
+    simp only [identifiers, noAlias, noAliasOverlap, noDyn, functionValid, hr]
+    simp [validateNonReentrantForkCompatibility,
       no_external_assumptions, identifiers, checkedFoldSpec, functionValid,
-      checkedFold, modulesField, Bind.bind, Except.bind, Pure.pure, Except.pure]
+      checkedFold, modulesField, firstDuplicateName, firstDuplicateFunctionParamName,
+      firstDuplicateConstructorParamName, firstFieldWriteSlotConflict,
+      Bind.bind, Except.bind, Pure.pure, Except.pure]
     all_goals (trace_state; decide_cbv)
   have fieldSlot : findFieldWithResolvedSlot [modulesField] "modules" = some (modulesField, 7) := by
     rfl
@@ -547,7 +575,6 @@ theorem checkedFold_compiles_to_official_ir :
   have hf : CompilationModel.applySlotAliasRanges [modulesField] [] = [modulesField] := rfl
   have hp : checkedFold.params = [] := rfl
   have hl : checkedFold.nonReentrantLock = none := rfl
-  have hr : functionReturns checkedFold = .ok [.uint256] := rfl
   have templates : (templateIntrinsicItems checkedFoldSpec).isEmpty = true := by
     simp [templateIntrinsicItems, checkedFoldSpec, checkedFold,
       collectTemplateIntrinsicsFromStmts, templates_leaf, templates_forEach,
