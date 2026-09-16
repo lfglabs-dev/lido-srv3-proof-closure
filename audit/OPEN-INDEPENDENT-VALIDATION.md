@@ -739,7 +739,9 @@ not transfer a predecessor build, trust verdict or deployment acceptance.
 
 - Exact `d08209c113e4032fd9f9126c6234cfe41109cb6e` has no bound Spark receipt;
   job `e16036f4-3dc1-4cf0-903e-d4f12bddda55` is ignored as failed/inaccessible.
-  This successor isolates `functionReturns`, empty `slotAliasRanges`, and
-  `firstUnsupportedInternalDynamicParam` as constructor equations before the
-  remaining compile-input walk. Independent-review F2/F3/F4 and the trust
-  `native_decide` policy stay OPEN modeling discrepancies, not discharged.
+  Successor `a2e12b1546a6c187ffdf145f0c1e96e2f0187570` job
+  `a9e91e20-2708-4c1c-aaca-af57c407413b` failed exit 1: `goFns` did not reduce
+  after unfold, and `decide_cbv` on return-shape/compile-input still hit
+  recursion (`OfficialSemantics.lean:443,521,560`). The follow-up uses
+  `decide +kernel` on those isolated lemmas. Independent-review F2/F3/F4 and
+  the trust `native_decide` policy stay OPEN, not discharged.

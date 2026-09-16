@@ -441,8 +441,7 @@ private theorem empty_slot_alias_sources_disjoint :
 
 private theorem checkedFold_no_unsupported_internal_dynamic :
     firstUnsupportedInternalDynamicParam [checkedFold] = none := by
-  unfold firstUnsupportedInternalDynamicParam
-  simp [checkedFold]
+  decide +kernel
 
 private theorem checkedFold_functionReturns :
     functionReturns checkedFold = .ok [.uint256] := rfl
@@ -467,6 +466,8 @@ theorem checkedFold_compiles_to_official_ir :
     simp [checkedFoldSpec, empty_slot_alias_sources_disjoint]
   have noDyn : firstUnsupportedInternalDynamicParam checkedFoldSpec.functions = none := by
     simp [checkedFoldSpec, checkedFold_no_unsupported_internal_dynamic]
+  have noWriteConflict : firstFieldWriteSlotConflict [modulesField] = none := by
+    decide +kernel
   have mechanics : collectUnguardedUnsafeBoundaryMechanicsFromStmts checkedFold.body = [] := by
     simp only [checkedFold, collectUnguardedUnsafeBoundaryMechanicsFromStmts]
     run_tac do
@@ -518,7 +519,7 @@ theorem checkedFold_compiles_to_official_ir :
       Stmt.checkRec, stmtCheck_forEach, stmtCheck_letVar, stmtCheck_assignVar,
       stmtCheck_require, stmtCheck_return, stmtCheck_setStorageArrayElement,
       Bind.bind, Except.bind, Pure.pure, Except.pure]
-    all_goals (trace_state; decide_cbv)
+    all_goals (trace_state; decide +kernel)
   have identifiers : validateIdentifierShapes checkedFoldSpec = .ok () := by
     simp [validateIdentifierShapes, checkedFoldSpec]
     run_tac do
@@ -551,13 +552,14 @@ theorem checkedFold_compiles_to_official_ir :
           let id := Lean.mkIdent name
           Lean.Elab.Tactic.evalTactic (← `(tactic| unfold $id:ident))
       | _ => throwError "expected one pinned compiler precheck definition"
-    simp only [identifiers, noAlias, noAliasOverlap, noDyn, functionValid, hr]
+    simp only [identifiers, noAlias, noAliasOverlap, noDyn, functionValid, hr,
+      noWriteConflict]
     simp [validateNonReentrantForkCompatibility,
       no_external_assumptions, identifiers, checkedFoldSpec, functionValid,
       checkedFold, modulesField, firstDuplicateName, firstDuplicateFunctionParamName,
-      firstDuplicateConstructorParamName, firstFieldWriteSlotConflict,
+      firstDuplicateConstructorParamName,
       Bind.bind, Except.bind, Pure.pure, Except.pure]
-    all_goals (trace_state; decide_cbv)
+    all_goals (trace_state; decide +kernel)
   have fieldSlot : findFieldWithResolvedSlot [modulesField] "modules" = some (modulesField, 7) := by
     rfl
   have fieldType : modulesField.ty = .dynamicArray .uint256 := rfl
