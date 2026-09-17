@@ -770,3 +770,10 @@ not transfer a predecessor build, trust verdict or deployment acceptance.
   (`OfficialSemantics.lean:452,461`). The follow-up expands those `forM`
   walks constructor-by-constructor instead of `decide +kernel`. F2/F3/F4
   and trust `native_decide` stay OPEN.
+
+- Exact `e0be8dc2ee486a8e9c0bd298a6ce1045dc35c5d5` job
+  `bb9e21cf-dd16-4e91-aeee-232304fe9bc3` failed exit 1: kernel timeout on
+  `returnShape_forEachBody` (`OfficialSemantics.lean:483`) and type mismatch
+  at `:515` (`forDeepM node` vs `validateReturnShapesInStmt`). The follow-up
+  rewrites those body lemmas through `Except.bind` and a definitional
+  `forDeepM`/`validate*` equality. F2/F3/F4 stay OPEN.
