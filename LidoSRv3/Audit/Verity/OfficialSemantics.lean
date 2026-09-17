@@ -453,71 +453,56 @@ private theorem returnShape_letVar (name : String) (value : Expr) :
     validateReturnShapesInStmt "checkedFold" [] [.uint256] false (.letVar name value) = .ok () := by
   unfold validateReturnShapesInStmt Stmt.checkRec
   rw [stmtCheck_letVar]
-  simp [validateReturnShapesNode]
+  simp [validateReturnShapesNode, Pure.pure, Except.pure]
 
 private theorem returnShape_assignVar (name : String) (value : Expr) :
     validateReturnShapesInStmt "checkedFold" [] [.uint256] false (.assignVar name value) = .ok () := by
   unfold validateReturnShapesInStmt Stmt.checkRec
   rw [stmtCheck_assignVar]
-  simp [validateReturnShapesNode]
+  simp [validateReturnShapesNode, Pure.pure, Except.pure]
 
 private theorem returnShape_require (condition : Expr) (message : String) :
     validateReturnShapesInStmt "checkedFold" [] [.uint256] false (.require condition message) = .ok () := by
   unfold validateReturnShapesInStmt Stmt.checkRec
   rw [stmtCheck_require]
-  simp [validateReturnShapesNode]
+  simp [validateReturnShapesNode, Pure.pure, Except.pure]
 
 private theorem returnShape_setStorageArrayElement (name : String) (index value : Expr) :
     validateReturnShapesInStmt "checkedFold" [] [.uint256] false
       (.setStorageArrayElement name index value) = .ok () := by
   unfold validateReturnShapesInStmt Stmt.checkRec
   rw [stmtCheck_setStorageArrayElement]
-  simp [validateReturnShapesNode]
+  simp [validateReturnShapesNode, Pure.pure, Except.pure]
 
 private theorem returnShape_return (value : Expr) :
     validateReturnShapesInStmt "checkedFold" [] [.uint256] false (.return value) = .ok () := by
   unfold validateReturnShapesInStmt Stmt.checkRec
   rw [stmtCheck_return]
-  simp [validateReturnShapesNode]
+  simp [validateReturnShapesNode, Pure.pure, Except.pure]
+
+private def checkedFoldLoopBody : List Stmt :=
+  [ .letVar "value" (.storageArrayElement "modules" (.localVar "i"))
+  , .require
+      (.le (.localVar "value")
+        (.sub (.literal Verity.Core.MAX_UINT256) (.localVar "total")))
+      "Panic(0x11): arithmetic overflow"
+  , .assignVar "total" (.add (.localVar "total") (.localVar "value"))
+  , .setStorageArrayElement "modules" (.localVar "i")
+      (.add (.localVar "value") (.literal 1)) ]
 
 private theorem returnShape_forEachBody :
-    (do
-      validateReturnShapesInStmt "checkedFold" [] [.uint256] false
-        (.letVar "value" (.storageArrayElement "modules" (.localVar "i")))
-      validateReturnShapesInStmt "checkedFold" [] [.uint256] false
-        (.require
-          (.le (.localVar "value")
-            (.sub (.literal Verity.Core.MAX_UINT256) (.localVar "total")))
-          "Panic(0x11): arithmetic overflow")
-      validateReturnShapesInStmt "checkedFold" [] [.uint256] false
-        (.assignVar "total" (.add (.localVar "total") (.localVar "value")))
-      validateReturnShapesInStmt "checkedFold" [] [.uint256] false
-        (.setStorageArrayElement "modules" (.localVar "i")
-          (.add (.localVar "value") (.literal 1)))
-      ) = .ok () := by
-  rw [returnShape_letVar]
-  simp only [Except.bind]
-  rw [returnShape_require]
-  simp only [Except.bind]
-  rw [returnShape_assignVar]
-  simp only [Except.bind]
-  rw [returnShape_setStorageArrayElement]
-  simp only [Except.bind]
+    checkedFoldLoopBody.forM
+      (validateReturnShapesInStmt "checkedFold" [] [.uint256] false) = .ok () := by
+  simp [checkedFoldLoopBody, returnShape_letVar, returnShape_require,
+    returnShape_assignVar, returnShape_setStorageArrayElement,
+    Bind.bind, Except.bind]
 
 private theorem returnShape_forEach :
     validateReturnShapesInStmt "checkedFold" [] [.uint256] false
-      (.forEach "i" (.storageArrayLength "modules")
-        [ .letVar "value" (.storageArrayElement "modules" (.localVar "i"))
-        , .require
-            (.le (.localVar "value")
-              (.sub (.literal Verity.Core.MAX_UINT256) (.localVar "total")))
-            "Panic(0x11): arithmetic overflow"
-        , .assignVar "total" (.add (.localVar "total") (.localVar "value"))
-        , .setStorageArrayElement "modules" (.localVar "i")
-            (.add (.localVar "value") (.literal 1)) ]) = .ok () := by
+      (.forEach "i" (.storageArrayLength "modules") checkedFoldLoopBody) = .ok () := by
   unfold validateReturnShapesInStmt Stmt.checkRec
   rw [stmtCheck_forEach]
-  simp [validateReturnShapesNode, Bind.bind, Except.bind, Pure.pure, Except.pure]
+  simp only [validateReturnShapesNode, Pure.pure, Except.pure, Bind.bind, Except.bind]
   have h :
       Stmt.forDeepM (validateReturnShapesNode "checkedFold" [] [.uint256] false) =
         validateReturnShapesInStmt "checkedFold" [] [.uint256] false := rfl
@@ -534,71 +519,44 @@ private theorem paramRef_letVar (name : String) (value : Expr) :
     validateStmtParamReferences "checkedFold" [] (.letVar name value) = .ok () := by
   unfold validateStmtParamReferences Stmt.checkRec
   rw [stmtCheck_letVar]
-  simp [validateStmtParamReferencesNode]
+  simp [validateStmtParamReferencesNode, Pure.pure, Except.pure]
 
 private theorem paramRef_assignVar (name : String) (value : Expr) :
     validateStmtParamReferences "checkedFold" [] (.assignVar name value) = .ok () := by
   unfold validateStmtParamReferences Stmt.checkRec
   rw [stmtCheck_assignVar]
-  simp [validateStmtParamReferencesNode]
+  simp [validateStmtParamReferencesNode, Pure.pure, Except.pure]
 
 private theorem paramRef_require (condition : Expr) (message : String) :
     validateStmtParamReferences "checkedFold" [] (.require condition message) = .ok () := by
   unfold validateStmtParamReferences Stmt.checkRec
   rw [stmtCheck_require]
-  simp [validateStmtParamReferencesNode]
+  simp [validateStmtParamReferencesNode, Pure.pure, Except.pure]
 
 private theorem paramRef_setStorageArrayElement (name : String) (index value : Expr) :
     validateStmtParamReferences "checkedFold" []
       (.setStorageArrayElement name index value) = .ok () := by
   unfold validateStmtParamReferences Stmt.checkRec
   rw [stmtCheck_setStorageArrayElement]
-  simp [validateStmtParamReferencesNode]
+  simp [validateStmtParamReferencesNode, Pure.pure, Except.pure]
 
 private theorem paramRef_return (value : Expr) :
     validateStmtParamReferences "checkedFold" [] (.return value) = .ok () := by
   unfold validateStmtParamReferences Stmt.checkRec
   rw [stmtCheck_return]
-  simp [validateStmtParamReferencesNode]
+  simp [validateStmtParamReferencesNode, Pure.pure, Except.pure]
 
 private theorem paramRef_forEachBody :
-    (do
-      validateStmtParamReferences "checkedFold" []
-        (.letVar "value" (.storageArrayElement "modules" (.localVar "i")))
-      validateStmtParamReferences "checkedFold" []
-        (.require
-          (.le (.localVar "value")
-            (.sub (.literal Verity.Core.MAX_UINT256) (.localVar "total")))
-          "Panic(0x11): arithmetic overflow")
-      validateStmtParamReferences "checkedFold" []
-        (.assignVar "total" (.add (.localVar "total") (.localVar "value")))
-      validateStmtParamReferences "checkedFold" []
-        (.setStorageArrayElement "modules" (.localVar "i")
-          (.add (.localVar "value") (.literal 1)))
-      ) = .ok () := by
-  rw [paramRef_letVar]
-  simp only [Except.bind]
-  rw [paramRef_require]
-  simp only [Except.bind]
-  rw [paramRef_assignVar]
-  simp only [Except.bind]
-  rw [paramRef_setStorageArrayElement]
-  simp only [Except.bind]
+    checkedFoldLoopBody.forM (validateStmtParamReferences "checkedFold" []) = .ok () := by
+  simp [checkedFoldLoopBody, paramRef_letVar, paramRef_require, paramRef_assignVar,
+    paramRef_setStorageArrayElement, Bind.bind, Except.bind]
 
 private theorem paramRef_forEach :
     validateStmtParamReferences "checkedFold" []
-      (.forEach "i" (.storageArrayLength "modules")
-        [ .letVar "value" (.storageArrayElement "modules" (.localVar "i"))
-        , .require
-            (.le (.localVar "value")
-              (.sub (.literal Verity.Core.MAX_UINT256) (.localVar "total")))
-            "Panic(0x11): arithmetic overflow"
-        , .assignVar "total" (.add (.localVar "total") (.localVar "value"))
-        , .setStorageArrayElement "modules" (.localVar "i")
-            (.add (.localVar "value") (.literal 1)) ]) = .ok () := by
+      (.forEach "i" (.storageArrayLength "modules") checkedFoldLoopBody) = .ok () := by
   unfold validateStmtParamReferences Stmt.checkRec
   rw [stmtCheck_forEach]
-  simp [validateStmtParamReferencesNode, Bind.bind, Except.bind, Pure.pure, Except.pure]
+  simp only [validateStmtParamReferencesNode, Pure.pure, Except.pure, Bind.bind, Except.bind]
   have h :
       Stmt.forDeepM (validateStmtParamReferencesNode "checkedFold" []) =
         validateStmtParamReferences "checkedFold" [] := rfl

@@ -777,3 +777,9 @@ not transfer a predecessor build, trust verdict or deployment acceptance.
   at `:515` (`forDeepM node` vs `validateReturnShapesInStmt`). The follow-up
   rewrites those body lemmas through `Except.bind` and a definitional
   `forDeepM`/`validate*` equality. F2/F3/F4 stay OPEN.
+
+- Exact `889bf2d239049bed2225470e813aca57f67245be` job
+  `ecab6666-4627-49f9-a60f-8484f4fa1984` failed exit 1: node lemmas left
+  `pure () = Except.ok ()` (`OfficialSemantics.lean:453`) and `forEach`
+  expected `List.forM`. Follow-up discharges `Pure.pure`/`Except.pure` and
+  states loop bodies as `checkedFoldLoopBody.forM`. F2/F3/F4 stay OPEN.
