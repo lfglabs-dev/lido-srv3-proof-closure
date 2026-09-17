@@ -3,15 +3,15 @@
 Canonical obligations remain in `audit/guarantees.yaml`; generated UX2 files are
 views of that registry. No historical receipt validates a successor commit.
 
-- **Current coordination (2026-09-17).** Exact `dbfec01050816e4bc4585c636b5073839459888f`
-  job `c1097989-0b98-42a7-af60-3e874078e505` failed with null exit after
-  CompilationModel 61/62 (~40 min); no OfficialSemantics diagnostic. Residual
-  is still `checkedFold_validates` (`OfficialSemantics.lean:667`) unfolding
-  `validateFunctionSpec` into `Stmt.controlFlow` / `Stmt.fold`. Follow-up
-  unfolds with `iota := false`, rewrites the documented-obligation `&&`
-  conjunct, then constructor-discharges remaining checks. Trust
-  `native_decide` policy is unchanged: foundations plus only the three original
-  compiler-success native exceptions; this commit does not expand the allowlist.
+- **Current coordination (2026-09-17).** Exact `79657d9a06c8ad820f76ae2a7da6b4b808f00607`
+  job `c5b94fc7-05e2-4fe6-84a4-d0b5b20ea3df` failed with null exit after
+  CompilationModel 61/62 (~30 min); no OfficialSemantics diagnostic. Residual
+  is `checkedFold_validates` (`OfficialSemantics.lean:676`): `simp only
+  [validateFunctionSpec]` still dsimp-reduces the hanging collector let.
+  Follow-up `delta`s the definition, rewrites the documented-obligation `&&`
+  conjunct, and keeps `dsimp := false`. Trust `native_decide` policy is
+  unchanged: foundations plus only the three original compiler-success native
+  exceptions; this commit does not expand the allowlist.
   Known modeling discrepancies remain OPEN, not CLEAN: F2 CALL-only gas is not
   Solidity transaction gas; F3 opaque SHA FFI / `A-SHA256-FFI`; F4 supplied
   ABI/layout/count/depth/memory/FFI32 hypotheses. ALLOC1 supported-module
@@ -880,3 +880,11 @@ not transfer a predecessor build, trust verdict or deployment acceptance.
   Follow-up unfolds with `iota := false` then rewrites the documented
   `&&` conjunct. F2/F3/F4 stay OPEN. Trust `native_decide` allowlist is
   unchanged.
+
+- Exact `79657d9a06c8ad820f76ae2a7da6b4b808f00607` job
+  `c5b94fc7-05e2-4fe6-84a4-d0b5b20ea3df` failed with null exit after
+  CompilationModel 61/62 (~30 min); no OfficialSemantics diagnostic. Residual
+  is `checkedFold_validates` (`OfficialSemantics.lean:676`) still hanging
+  `simp only [validateFunctionSpec]` via dsimp of `Stmt.foldList`. Follow-up
+  uses `delta validateFunctionSpec` and `dsimp := false`. F2/F3/F4 stay OPEN.
+  Trust `native_decide` allowlist is unchanged.

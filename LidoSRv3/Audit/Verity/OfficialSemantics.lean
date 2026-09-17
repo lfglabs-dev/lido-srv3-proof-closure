@@ -671,8 +671,12 @@ private theorem checkedFold_no_unsafe_logical :
     exprAny_storageArrayLength, exprAny_storageArrayElement, exprAny_add,
     exprAny_sub, exprAny_le, exprIsUnsafeLogicalNode]
 
-/-- Rewrite the documented-obligation guard without iota/zeta on the hanging
-collector conjunct; remaining checks use constructor lemmas, not `Stmt.fold`. -/
+/-- Delta-unfold `validateFunctionSpec` without dsimp/zeta/iota, then rewrite
+the documented-obligation conjunct so the hanging collector is never reduced. -/
+set_option diagnostics true in
+set_option diagnostics.threshold 1000 in
+set_option maxRecDepth 16384 in
+set_option maxHeartbeats 4000000 in
 theorem checkedFold_validates :
     validateFunctionSpec checkedFold = .ok () := by
   have documented : checkedFold.localObligations.isEmpty = false := rfl
@@ -686,15 +690,14 @@ theorem checkedFold_validates :
       exprContainsAdtConstruct, Expr.foldBool, exprContainsAdtConstructNode,
       exprAny_literal, exprAny_localVar, exprAny_storageArrayLength]
     all_goals decide +kernel
-  simp (config := {zeta := false, zetaUnused := false, iota := false, failIfUnchanged := false}) only
-    [validateFunctionSpec]
+  delta validateFunctionSpec
   rw [noEmptyYul, documented]
-  simp (config := {zeta := false, zetaUnused := false, iota := false}) only
-    [Bool.and_false, Bool.false_and]
-  simp (config := {zeta := false, zetaUnused := true, iota := true}) only
+  rw [Bool.and_false, Bool.false_and]
+  simp (config := {zeta := false, zetaUnused := true, iota := true, dsimp := false}) only
     [↓reduceIte, Bind.bind, Except.bind, Pure.pure, Except.pure]
-  simp [noAdt, hr, noLogical, checkedFold_return_shapes, checkedFold_param_refs,
-    exceptBind_ok, exceptBind_okVal, Bind.bind, Except.bind, Pure.pure, Except.pure]
+  simp (config := {dsimp := false}) [noAdt, hr, noLogical, checkedFold_return_shapes,
+    checkedFold_param_refs, exceptBind_ok, exceptBind_okVal,
+    Bind.bind, Except.bind, Pure.pure, Except.pure]
   run_tac do
     let env ← Lean.getEnv
     for suffix in ["validateAdtPayloadParamNameCollisions", "adtPayloadParamNames", "firstDuplicateString",
@@ -706,10 +709,10 @@ theorem checkedFold_validates :
       | [(name, _)] =>
           unless (← Lean.Elab.Tactic.getGoals).isEmpty do
             let id := Lean.mkIdent name
-            Lean.Elab.Tactic.evalTactic (← `(tactic| simp [$id:ident]))
+            Lean.Elab.Tactic.evalTactic (← `(tactic| simp (config := {dsimp := false}) [$id:ident]))
       | _ => throwError "expected one pinned Validation helper: {suffix}"
-  simp [hr, checkedFold_return_shapes, checkedFold_param_refs, exceptBind_ok,
-    Bind.bind, Except.bind, Pure.pure, Except.pure]
+  simp (config := {dsimp := false}) [hr, checkedFold_return_shapes, checkedFold_param_refs,
+    exceptBind_ok, Bind.bind, Except.bind, Pure.pure, Except.pure]
   all_goals decide +kernel
 
 set_option maxRecDepth 16384 in
