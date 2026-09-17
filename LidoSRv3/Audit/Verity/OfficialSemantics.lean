@@ -597,7 +597,7 @@ private theorem checkedFold_no_unguarded_mechanics :
     let env ← Lean.getEnv
     for suffix in ["collectUnguardedLowLevelMechanicsFromStmts",
         "collectUnguardedLowLevelStmtMechanics", "collectLowLevelExprMechanics",
-        "dedupPreserve"] do
+        "isUnsafeBoundaryMechanic", "dedupPreserve"] do
       let candidates := env.constants.toList.filter fun (name, _) =>
         name.toString.startsWith "_private.Compiler.CompilationModel.TrustSurface." &&
           name.toString.endsWith ("." ++ suffix)
@@ -605,9 +605,9 @@ private theorem checkedFold_no_unguarded_mechanics :
       | [(name, _)] =>
           unless (← Lean.Elab.Tactic.getGoals).isEmpty do
             let id := Lean.mkIdent name
-            Lean.Elab.Tactic.evalTactic (← `(tactic| simp [$id:ident]))
+            Lean.Elab.Tactic.evalTactic (← `(tactic| unfold $id:ident))
       | _ => throwError "expected one pinned TrustSurface helper: {suffix}"
-  all_goals decide +kernel
+  simp [checkedFoldLoopBody, List.flatMap, List.filter, List.append]
 
 set_option maxRecDepth 16384 in
 set_option maxHeartbeats 4000000 in

@@ -832,3 +832,17 @@ not transfer a predecessor build, trust verdict or deployment acceptance.
   equals that SHA. Residual remains `checkedFold_validates` mechanics fold
   (`OfficialSemantics.lean:596`) nested inside the validator. Follow-up
   isolates `checkedFold_no_unguarded_mechanics`. F2/F3/F4 stay OPEN.
+
+- Exact `4fe887df83ac37029801ad916f0b4d5dc9cee781` job
+  `af7ea496-0d9d-44b0-b576-ea3f682311ae` failed with null exit after
+  CompilationModel 61/62 (~24 min). Isolated `checkedFold_no_unguarded_mechanics`
+  still hung `decide +kernel`. Follow-up unfolds
+  `collectUnguardedLowLevelStmtMechanics` constructor-by-constructor. F2/F3/F4
+  stay OPEN.
+
+- Exact `4fe887df83ac37029801ad916f0b4d5dc9cee781` job
+  `af7ea496-0d9d-44b0-b576-ea3f682311ae` failed with null exit after
+  CompilationModel 61/62 (~24 min). Residual is still
+  `checkedFold_no_unguarded_mechanics` (`OfficialSemantics.lean:593`) hanging
+  on `decide +kernel`. Follow-up unfolds TrustSurface helpers and reduces the
+  empty mechanic lists by `simp`. F2/F3/F4 stay OPEN.
