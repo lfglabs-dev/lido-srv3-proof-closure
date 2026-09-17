@@ -1,5 +1,7 @@
 # P-ACCOUNT-1
 
+> **Registration update (2026-09-17).** The registered Verity parent of this row is now `PAccount1.actual_report_accounting_call` (`LidoSRv3/Audit/Guarantees/PAccount1AccountingCall.lean`): on a committed report/fee execution, `Prepared` states that the module balances are written first, the rewards distribution is read from the router state holding those writes, and the fee is a checked function of that distribution; a nonzero fee goes through the locator-resolved accounting call, the payments and the treasury STATICCALL, a zero fee makes no accounting call, and `actual_report_accounting_call_failure_restores` restores the original world on any revert. The abstract ordering parent `router_accounting_order_discipline` is unchanged; `verity_tx_simulates_oracle_report` described below remains built and printed as evidence.
+
 > Round 2 (2026-08-21). Product note plus proof audit, arbitrated from GPT 5.6 Pro and Opus 5. Fable 5 was unavailable (data-retention gate). Kimi K3 was not an allowed Task model. No em dashes. Lean is authority.
 
 Once per frame `AccountingOracle.submitReportData` pushes a per-module validator balance vector through `StakingRouter.reportValidatorBalancesByStakingModule`, then `Accounting.handleOracleReport` derives the fee distribution from that fresh router state, mints the fee shares, and records them last through `reportRewardsMinted`. Recording the mint before the fresh read would pay fees against stale module weights.

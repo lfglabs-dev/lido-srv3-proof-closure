@@ -82,6 +82,43 @@ They discharge the runtime-code identity strand of `A-RUNTIME-PROVENANCE`
 down to "fixture bytes = mainnet runtime code, sha256 = X, codehash = H" for
 those two contracts. Historical block-number binding is a separate follow-up.
 
+Step 1c (Thomas 2026-09-17) extends the same fixture pattern to the rest of
+the SRv3 pipeline in `fixtures/deployed/srv3-identities.json`, verified by
+`scripts/verify_srv3_identities.py` (a `make test` target; with `ETH_RPC_URL`
+it also re-reads the proxies, `StakingRouter.getStakingModules()`, the locator
+getters and `AccountingOracle.getConsensusContract()` on the live chain):
+
+- the link map of the StakingRouter implementation: `SRLib`
+  (`0xc0be9942fd8f54ab126a5f0ba649a90049ccad14`, codehash
+  `229241c1e92c1e6637f8d725f96dd1d28d9b4847376dd7c94644ba5075278e64`, 21
+  PUSH20 sites) and `BeaconChainDepositor`
+  (`0xf98ac162eab766bdb9507c3584c00c535b8f6216`, codehash
+  `6797d364cb1333d35eee131f2ad344d9617e3df82be294c8a87bc400801cfbb9`, 3 sites),
+  and the `MinFirstAllocationStrategy` library linked into SRLib
+  (`0x98f1da239a199574a4f7f371fd8fc0a872022c73`, codehash
+  `6b5903d7b3609cfd3640a078471331f0b0f6effb5eade6d5f56e99fced33dca0`, 1 site);
+- the four registered staking modules and their implementations:
+  NodeOperatorsRegistry (id 1) and SimpleDVT (id 2) share
+  `0x6828b023e737f96b168acd0b5c6351971a4f81ae` (codehash
+  `125bca109785e7910597ce9cd368ae9ba26d62b245adaecce6a84a6934df9e4b`), CSModule
+  (id 3) `0x63992a86f009fcc796a8369feefb68880aef4e3a` (codehash
+  `ad8440167e7f77ee8608b98317881e8e0a5af0698a0bd1bcdc9b0eaebd22a55b`),
+  CuratedModuleV2 (id 4) `0x959fc67fe53c8a6c7a1aed73430aa07a36ed9337` (codehash
+  `f7bc4da51d6f2f0f1394fd0bd084feaf2bde68a4dcb00d5354d679761c9c0560`);
+- the LidoLocator implementation `0xf2ffb952e129a63f0614ff87126e1d4a494a2313`
+  (codehash `d6f9c11ca7f1480827784165c28b406960050a4b21267d3efcfc9852b786d9ce`)
+  and, through its getters, the WithdrawalQueueERC721 implementation
+  `0xe42c659dc09109566720ea8b2de186c2be7d94d9` (codehash
+  `7606999c03ae51ffb1d29b8b80a0d0cf85912f32f088ba1a52c45df312c36e64`), the
+  AccountingOracle implementation `0xe4f03d1107d1905b6f2a28fcb6af221e0ce19136`
+  (codehash `f8312f2b0c6973525ea0fd0b38d6b1a98afcfe214babd614498648fc254cef20`)
+  and its HashConsensus `0xd624b08c83baecf0807dd2c6880c3154a5f0b288` (codehash
+  `6ea7bf85038c3fffa4b909373e773cd899ee4278c582ea3c1d6524b35a69dfa4`).
+
+All values were read at mainnet block 25997829 and are block-independent while
+the code is not upgraded. CSModule and CuratedModuleV2 are built outside
+`lidofinance/core`, so only their address and codehash identity is recorded.
+
 The contract addresses are listed in the script and come from
 [Lido's deployment documentation](https://docs.lido.fi/deployed-contracts).
 The Curated Module v2 uses a separate repository, so only its on-chain code

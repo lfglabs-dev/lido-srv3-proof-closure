@@ -1,5 +1,7 @@
 # P-TOPUP-2
 
+> **Registration update (2026-09-17).** The registered Verity parent of this row is now `PTopup2.actual_module_batch_bound` (`LidoSRv3/Audit/Guarantees/PTopup2ActualBatch.lean`): for a completed successful batch, the gateway witness loop produced the per-key limits, the module CALL was made with those keys and limits, and its decoded allocations sum to at most the packed router block cap (uint64 gwei) × 10^9, zero and empty returns included. The admission chain `PTopupRouterAdmissionCall.actual_topup_admission_calls_wei_and_revert` consumes the same batch effects. The historical memory-array executor `verity_tx_simulates_topup2_spec` described below remains built and printed as evidence.
+
 > Round 2 (2026-08-21). Product note plus proof audit, arbitrated from GPT 5.6 Pro and Opus 5. Fable 5 was unavailable (data-retention gate). Kimi K3 was not an allowed Task model. No em dashes. Lean is authority.
 
 P-TOPUP-2 is the per-block ceiling on Electra compounding top-ups. The product question is whether one call can top up more gwei than governance allows in a block. The answer the row gives is narrower.
