@@ -2,12 +2,12 @@
   "schema": "lido-srv3-ux2-guarantee-v1",
   "id": "P-ACCOUNT-1",
   "position": 5,
-  "summary": "Chantier 3 (mandate 2026-09-13) upgrades the registered ABSTRACT parent from mint_after_read_discipline (read→mint ordering only) to router_accounting_order_discipline, the conjunction of write-router-before-read and read-before-mint over the same handleOracleReport transaction. On every committed modeled handleOracleReport: (1) the AccountingOracle.submitReportData validator-balances push through StakingRouter.reportValidatorBalancesByStakingModule (AccountingOracle.sol:513-517) is stamped strictly before Accounting.handleOracleReport's _stakingRouter.getStakingRewardsDistribution() read (Accounting.sol:277) — the write-router-before-read conjunct is the deployed risk Thomas 2026-09-13 flagged as the real ordering, not just read→mint; (2) the rewardsReadSlot tick is stamped strictly before any nonzero rewardsMintedSlot tick — mint_after_read_discipline is kept as an unregistered sub-theorem of the combined parent. Both are refuted by pure call-site reordering mutants: write_router_before_read_kill_line (handleOracleReportReadBeforeWrite moves stampStep balancesWrittenSlot below stampStep rewardsReadSlot) and mint_order_kill_line (handleOracleReportMintBeforeRead moves stampStep rewardsMintedSlot above stampStep rewardsReadSlot). The demoted source_report_before_reward child now uses premise-free sourceTraceRetired; legacy fullReportSucceeds APIs remain compatibility adapters and carry no registered load-bearing premise. Not submitReportData; sharesToMintAsFees is an argument.",
+  "summary": "Registration update (2026-09-17): the Verity parent is now PAccount1.actual_report_accounting_call, the executed report/fee path whose Prepared data flow the published claim reads; the abstract ordering parent router_accounting_order_discipline is unchanged and the historical verity_tx_simulates_oracle_report remains built and printed as evidence. Historical summary: Chantier 3 (mandate 2026-09-13) upgrades the registered ABSTRACT parent from mint_after_read_discipline (read→mint ordering only) to router_accounting_order_discipline, the conjunction of write-router-before-read and read-before-mint over the same handleOracleReport transaction. On every committed modeled handleOracleReport: (1) the AccountingOracle.submitReportData validator-balances push through StakingRouter.reportValidatorBalancesByStakingModule (AccountingOracle.sol:513-517) is stamped strictly before Accounting.handleOracleReport's _stakingRouter.getStakingRewardsDistribution() read (Accounting.sol:277) — the write-router-before-read conjunct is the deployed risk Thomas 2026-09-13 flagged as the real ordering, not just read→mint; (2) the rewardsReadSlot tick is stamped strictly before any nonzero rewardsMintedSlot tick — mint_after_read_discipline is kept as an unregistered sub-theorem of the combined parent. Both are refuted by pure call-site reordering mutants: write_router_before_read_kill_line (handleOracleReportReadBeforeWrite moves stampStep balancesWrittenSlot below stampStep rewardsReadSlot) and mint_order_kill_line (handleOracleReportMintBeforeRead moves stampStep rewardsMintedSlot above stampStep rewardsReadSlot). The demoted source_report_before_reward child now uses premise-free sourceTraceRetired; legacy fullReportSucceeds APIs remain compatibility adapters and carry no registered load-bearing premise. Not submitReportData; sharesToMintAsFees is an argument.",
   "classification": {
     "kind": "IMPLEMENTATION_PENDING",
     "work": "Keep the checked router_accounting_order_discipline theorem (write-router-before-read AND mint-after-read conjunction) and its two call-site-reordering kill-lines as the registered abstract parent, and keep the step ticks sourced from the sequenceSlot clock rather than from call-site constants; keep source_report_before_reward as the demoted source-plane child. Do not widen to submitReportData."
   },
-  "next_gate": "Chantier 3 (Thomas 2026-09-13) upgrades the registered abstract parent to router_accounting_order_discipline (write-router-before-read AND read-before-mint), naming the real deployed risk AccountingOracle.sol:513-517 → Accounting.sol:277. Both conjuncts are refuted by pure call-site reordering kill-lines. fullReportSucceeds is retired from the demoted child; OPEN: model later full-report failure surfaces only if widening is explicitly authorized. Do not widen to submitReportData.",
+  "next_gate": "2026-09-17: registered Verity parent switched to actual_report_accounting_call to match the published data-flow claim; the historical model executor is retained as evidence only. Chantier 3 (Thomas 2026-09-13) upgrades the registered abstract parent to router_accounting_order_discipline (write-router-before-read AND read-before-mint), naming the real deployed risk AccountingOracle.sol:513-517 → Accounting.sol:277. Both conjuncts are refuted by pure call-site reordering kill-lines. fullReportSucceeds is retired from the demoted child; OPEN: model later full-report failure surfaces only if widening is explicitly authorized. Do not widen to submitReportData.",
   "roadmap_priority": "DONE",
   "theorems": [
     {
@@ -26,22 +26,23 @@
       "plane": "verity",
       "role": "registered Verity Executable Contract parent (audit/guarantees.yaml verity.theorem)",
       "status": "CHECKED",
-      "name": "LidoSRv3.Audit.Guarantees.PAccount1.verity_tx_simulates_oracle_report",
-      "module": "LidoSRv3.Audit.Guarantees.PAccount1",
-      "file": "LidoSRv3/Audit/Guarantees/PAccount1.lean",
-      "start_line": 66,
-      "end_line": 69,
-      "doc": "/-- **P-ACCOUNT-1, Verity plane.**  `observe` of `handleOracleReport` equals\n`sourceView`.\n\nVerity child. `observe` of `handleOracleReport` (balance array + total/flag\nslots) equals the independently stated `sourceView`. Not `submitReportData`;\n`sharesToMintAsFees` is an argument, not a computed fee. -/",
-      "statement": "theorem verity_tx_simulates_oracle_report\n    (i : ReportInput) (sharesToMintAsFees : Nat) (state : Verity.ContractState) :\n    observe i ((handleOracleReport i sharesToMintAsFees).run state) =\n      sourceView i sharesToMintAsFees"
+      "name": "LidoSRv3.Audit.Guarantees.PAccount1.actual_report_accounting_call",
+      "module": "LidoSRv3.Audit.Guarantees.PAccount1AccountingCall",
+      "file": "LidoSRv3/Audit/Guarantees/PAccount1AccountingCall.lean",
+      "start_line": 12,
+      "end_line": 18,
+      "doc": "/-- Actual physical-target legacy CALL, decoded immutable getter response\nconsumed by mint authorization after report/getter/checked fees, followed by\nreal payments and treasury STATICCALL. Full340/324 conclusions are retained\non the explicitly derived context. Effective deployed getter identity remains\na boundary; no frame, supplied auth equality or successful-stage premise. -/",
+      "statement": "theorem actual_report_accounting_call (accounting : AccountingCall.Environment)\n    (treasury : TreasuryCall.Environment) (x : Input) (before post : World)\n    (fee : FeeResult) (events : List Event) (payments : Payments) (treasuryAttempts : Attempts)\n    (h : (execute accounting treasury x before).outcome =\n      .committed post fee events payments treasuryAttempts) :\n    Success accounting treasury x before post fee events payments treasuryAttempts\n      (execute accounting treasury x before).accountingAttempts"
     }
   ],
   "kill_lines": {
     "modules": [
-      "LidoSRv3.Tests.HandleOracleReportTxMutants"
+      "LidoSRv3.Tests.HandleOracleReportTxMutants",
+      "LidoSRv3.Tests.AccountAccountingCall"
     ],
     "reproduction": {
-      "command": "lake build LidoSRv3.Audit.Guarantees.PAccount1 LidoSRv3.Audit.Verity.HandleOracleReportTx LidoSRv3.Tests.HandleOracleReportTxMutants",
-      "expected": "mint-after-read discipline over clock-stamped balance-write/read/mint ticks, with its pure call-site reordering kill-line on a valid nonempty report, plus the handleOracleReport-shaped Contract.run transaction and mutants"
+      "command": "lake build LidoSRv3.Audit.Guarantees.PAccount1 LidoSRv3.Audit.Verity.HandleOracleReportTx LidoSRv3.Tests.HandleOracleReportTxMutants LidoSRv3.Audit.Guarantees.PAccount1AccountingCall LidoSRv3.Tests.AccountAccountingCall",
+      "expected": "Registered Verity parent actual_report_accounting_call builds: a committed report/fee execution satisfies Success (Prepared: balances written, distribution read from the written router state, checked fee from that distribution; nonzero fee resolves the accounting address and goes through the accounting call, payments and treasury STATICCALL; zero fee makes no accounting call), and actual_report_accounting_call_failure_restores builds (reverted execution restores the original world). Historical evidence: mint-after-read discipline over clock-stamped balance-write/read/mint ticks, with its pure call-site reordering kill-line on a valid nonempty report, plus the handleOracleReport-shaped Contract.run transaction and mutants"
     }
   },
   "assumptions": [
@@ -84,6 +85,7 @@
   ],
   "fidelity": {
     "covered": [
+      "registered Verity parent actual_report_accounting_call: on a committed report/fee execution, module balances are written first, the rewards distribution is read from the router state holding those writes, the fee is a checked function of that distribution, nonzero fees go through the locator-resolved accounting call, payments and treasury STATICCALL; actual_report_accounting_call_failure_restores restores the original world on any revert",
       "chantier 3 (mandate 2026-09-13): registered abstract parent router_accounting_order_discipline conjoins two orderings on the same handleOracleReport transaction — (a) write_router_before_read_discipline (balancesWrittenSlot tick < rewardsReadSlot tick when read is nonzero; AccountingOracle.sol:513-517 → Accounting.sol:277 ordering), and (b) mint_after_read_discipline (rewardsReadSlot tick < rewardsMintedSlot tick when mint is nonzero). The write-before-read conjunct is Thomas 2026-09-13's real-risk ordering (getStakingRewardsDistribution must read the just-written router snapshot, not stale weights); mint-after-read is retained as unregistered sub-theorem. Two pure call-site reordering kill-lines refute each conjunct on mutant handleOracleReports whose only change is the position of one stampStep call: write_router_before_read_kill_line (handleOracleReportReadBeforeWrite) and mint_order_kill_line (handleOracleReportMintBeforeRead).",
       "mint-after-read order discipline over the two raw tx-storage ticks, which are stamped from a transaction-local step clock rather than written as call-site constants, refuted on the sub-theorem itself by a pure call-site reordering kill-line mutant that edits no literal and rebinds no slot",
       "balance-write, accounting, rewards-read, and rewards-minted steps are clock-stamped; storedSteps requires the balance-write tick instead of hard-coding balancesWritten",

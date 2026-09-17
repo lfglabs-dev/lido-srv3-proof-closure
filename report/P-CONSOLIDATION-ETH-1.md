@@ -1,5 +1,7 @@
 # P-CONSOLIDATION-ETH-1
 
+> **Registration update (2026-09-17).** The registered Verity parent of this row is now `PConsolidation1.gateway_vault_live_success_and_revert` (`LidoSRv3/Audit/Guarantees/PConsolidation1ActualGatewayVault.lean`), the physical gateway-to-vault executor that the published fee/refund claim reads: gateway and vault fee STATICCALL observations, checked count × fee and refund, the value-bearing vault and inbox CALLs, the refund CALL, and root rollback of the credited entry world. It makes no fee-positivity claim and asserts no final recipient credit across arbitrary callbacks. `verity_tx_success_and_revert_partition` and the ensemble evidence below remain built and printed in `Trust.lean` as historical evidence; `A-ABSTRACT-TX` stays on the row for that evidence and the abstract call-journal parent.
+
 > Round 2 (2026-08-21). Product note plus proof audit, arbitrated from GPT 5.6 Pro and Opus 5. Fable 5 was unavailable (data-retention gate). Kimi K3 was not an allowed Task model. No em dashes. Lean is authority.
 
 
