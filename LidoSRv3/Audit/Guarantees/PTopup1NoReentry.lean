@@ -45,4 +45,6 @@ theorem actual_continuation_locator_conserves_no_reentry (hash : TopupRouterCred
       before bound lido_ne_router router_ne_beacon h,
     confined_of_noReentry hNo⟩
 
+#print axioms actual_continuation_locator_conserves_no_reentry
+
 end LidoSRv3.Audit.Guarantees.PTopup1NoReentry

@@ -45,4 +45,6 @@ theorem actual_physical_metadata_conserves_no_reentry (hash : Keccak) (k : Queue
       after attempts bound lido_ne_router router_ne_beacon h,
     confined_of_noReentry hNo⟩
 
+#print axioms actual_physical_metadata_conserves_no_reentry
+
 end LidoSRv3.Audit.Guarantees.PDeposit1NoReentry

@@ -16,12 +16,15 @@ premise is the accepted assumption `A-NO-REENTRY`. -/
 
 namespace LidoSRv3.Audit.Guarantees.PAddress1NoReentry
 
-open _root_.Verity
 open LidoSRv3.Audit.Verity.AddressClaimBatchTx
 open LidoSRv3.Audit.Source.TrioReserve1
-open LidoSRv3.Audit.Source.TrioReserve1.Live
+open LidoSRv3.Audit.Source.TrioReserve1.Live (Attempt transfer NestedAttempt)
 open LidoSRv3.Audit.Source.NoReentry
 open LidoSRv3.Audit.Verity.AddressRecipientCallBridge
+
+/-! `World`, `Context`, `External` and `Address` below are the bridge's
+abbreviations of the `Live` types; the `Live` namespace itself is not opened
+to keep those names unambiguous. -/
 
 /-- The recipient CALL hands back the committed queue storage and the
 provisional-transfer balance. -/
@@ -29,8 +32,8 @@ theorem payout_returns_committed (callee : External) (ctx : Context) (recipient 
     (payout : Nat) (before after : World) (attempts : List Attempt)
     (hNo : NoReentry callee [ctx.self])
     (h : PayoutEffect callee ctx recipient payout before after attempts) :
-    (∀ slot, after.core.readContractSlot ctx.self.val slot =
-      before.core.readContractSlot ctx.self.val slot) ∧
+    (∀ k : Nat, after.core.readContractSlot ctx.self.val k =
+      before.core.readContractSlot ctx.self.val k) ∧
     after.balances ctx.self =
       (transfer before ctx.self recipient (Verity.Core.Uint256.ofNat payout).val).balances ctx.self := by
   obtain ⟨_, returned, nested, _, hcase⟩ := h
@@ -39,9 +42,9 @@ theorem payout_returns_committed (callee : External) (ctx : Context) (recipient 
   · subst hafter
     exact ⟨fun _ => rfl, rfl⟩
   · have hr := returns_success hNo hcall ctx.self hself
-    exact ⟨fun slot => (hr.1 slot).trans rfl, hr.2⟩
+    exact ⟨fun k => (hr.1 k).trans rfl, hr.2⟩
   · have hr := (returns_successWithTrace hNo hcall).1 ctx.self hself
-    exact ⟨fun slot => (hr.1 slot).trans rfl, hr.2⟩
+    exact ⟨fun k => (hr.1 k).trans rfl, hr.2⟩
 
 /-- One actual claim under A-NO-REENTRY: the world after the recipient CALL
 holds exactly the claim's committed (dirty) queue storage, so the claimed bit
@@ -104,5 +107,8 @@ theorem actual_claim_batch_no_reentry (callee : External) (ctx : Context)
       NestedRejects [ctx.self] attempt.nested := by
   obtain ⟨_, _, hchain⟩ := runClaimWithdrawalsTo_success callee ctx requestIds hints recipient before h
   exact ⟨hchain, chain_nested_rejects callee ctx recipient hNo hchain⟩
+
+#print axioms claim_returns_committed_storage
+#print axioms actual_claim_batch_no_reentry
 
 end LidoSRv3.Audit.Guarantees.PAddress1NoReentry

@@ -13,7 +13,10 @@ written by `spendDepositableEther` itself.
 
 **Status:** corollary of the registered `actual_reserve_physical_history`
 (`step_effects`, `withdrawal_success`); the premise is the accepted assumption
-`A-NO-REENTRY`. -/
+`A-NO-REENTRY`.
+
+Binder names avoid the Verity DSL keywords (`slot`, `external`) that the
+`Compiler.Proofs` import of `PReserve1LiveWriters` reserves. -/
 
 namespace LidoSRv3.Audit.Guarantees.PReserve1NoReentry
 
@@ -31,13 +34,13 @@ theorem bind_success_world {α β : Type} (first : Exec α) (next : α → Exec 
   simp only [bindExec, ha]
 
 /-- `updateSeeds` writes only `seedSlot`. -/
-theorem seeds_other_slot (ctx : Context) (seeds : Word) (w : World) (slot : Nat)
-    (hs : slot ≠ seedSlot) :
-    (WithdrawalTail.updateSeeds ctx seeds w).world.core.readContractSlot ctx.self.val slot =
-      w.core.readContractSlot ctx.self.val slot := by
+theorem seeds_other_slot (ctx : Context) (seeds : Word) (w : World) (k : Nat)
+    (hs : k ≠ seedSlot) :
+    (WithdrawalTail.updateSeeds ctx seeds w).world.core.readContractSlot ctx.self.val k =
+      w.core.readContractSlot ctx.self.val k := by
   by_cases hz : seeds.val = 0
   · rw [WithdrawalTail.seeds_zero ctx seeds w hz]
-    all_goals rfl
+    try rfl
   · have hn : 0 < seeds.val := Nat.pos_of_ne_zero hz
     by_cases hb : (w.core.readContractSlot ctx.self.val seedSlot).val % width + seeds.val <
         Verity.Core.UINT256_MODULUS
@@ -45,22 +48,22 @@ theorem seeds_other_slot (ctx : Context) (seeds : Word) (w : World) (slot : Nat)
       unfold WithdrawalTail.seedWorld
       exact Pipeline.read_other_slot _ _ _ _ _ _ hs
     · rw [WithdrawalTail.seeds_overflow ctx seeds w hn (Nat.not_lt.mp hb)]
-      all_goals rfl
+      try rfl
 
 /-- A successful `finish` is a successful seed update followed by a successful
 router CALL whose returned world is the final world. -/
-theorem finish_success (external : External) (ctx : Context) (router : Address)
+theorem finish_success (callee : External) (ctx : Context) (router : Address)
     (amount seeds : Word) (w after : World) (trace : List Attempt)
-    (h : WithdrawalTail.finish external ctx router amount seeds w = ⟨.ok (), after, trace⟩) :
+    (h : WithdrawalTail.finish callee ctx router amount seeds w = ⟨.ok (), after, trace⟩) :
     (WithdrawalTail.updateSeeds ctx seeds w).outcome = .ok () ∧
     ∃ data,
-      (call external ctx router 0x13ae8460 amount
+      (call callee ctx router 0x13ae8460 amount
         (WithdrawalTail.updateSeeds ctx seeds w).world).outcome = .ok data ∧
-      (call external ctx router 0x13ae8460 amount
+      (call callee ctx router 0x13ae8460 amount
         (WithdrawalTail.updateSeeds ctx seeds w).world).world = after := by
-  have ho : (WithdrawalTail.finish external ctx router amount seeds w).outcome = .ok () := by
+  have ho : (WithdrawalTail.finish callee ctx router amount seeds w).outcome = .ok () := by
     rw [h]
-  have hw : (WithdrawalTail.finish external ctx router amount seeds w).world = after := by
+  have hw : (WithdrawalTail.finish callee ctx router amount seeds w).world = after := by
     rw [h]
   unfold WithdrawalTail.finish at ho hw
   obtain ⟨u, hu, hrest, hworld⟩ := bind_success_world _ _ _ _ ho
@@ -92,9 +95,27 @@ theorem withdraw_success_final_reserve (callee : External) (ctx : Context)
   refine ⟨spent, ⟨statusWorld, spendWorld, s, r, p, t, router, hs, hr, hsender, hnz, hp, hpart,
     hfin, htrace⟩, ?_⟩
   obtain ⟨_, data, _, hworld⟩ := finish_success callee ctx router amount seeds spent after t hfin
-  rw [← hworld, call_storage hNo ctx router 0x13ae8460 amount _ ctx.self
-    (List.mem_singleton.mpr rfl) reserveSlot]
+  have hself : ctx.self ∈ [ctx.self] := List.mem_singleton.mpr rfl
+  rw [← hworld, call_storage hNo ctx router 0x13ae8460 amount _ ctx.self hself reserveSlot]
   exact seeds_other_slot ctx seeds spent reserveSlot (by decide)
+
+/-- A successful `.withdraw` step of the physical history is a successful root
+run of `withdrawDepositableEther` with the step's world and trace. -/
+theorem withdraw_step_run (callee : External) (ctx : Context) (amount seeds : Word)
+    (before : World)
+    (h : (execute callee ctx (.withdraw amount seeds) before).outcome = .ok ()) :
+    run (withdrawDepositableEther callee ctx amount seeds) before =
+      ⟨.ok (), (execute callee ctx (.withdraw amount seeds) before).world,
+        (execute callee ctx (.withdraw amount seeds) before).attempts⟩ := by
+  have h' : (run (withdrawDepositableEther callee ctx amount seeds) before).outcome = .ok () := h
+  show run (withdrawDepositableEther callee ctx amount seeds) before =
+    ⟨.ok (), (run (withdrawDepositableEther callee ctx amount seeds) before).world,
+      (run (withdrawDepositableEther callee ctx amount seeds) before).attempts⟩
+  cases hx : run (withdrawDepositableEther callee ctx amount seeds) before with
+  | mk o w' tr =>
+    rw [hx] at h'
+    cases h'
+    rfl
 
 /-- Registered-parent corollary: a successful `.withdraw` step of the physical
 history, under A-NO-REENTRY on the physical callee, leaves the reserve word
@@ -120,10 +141,13 @@ theorem actual_reserve_history_final_reserve (c : Pipeline.Config)
           s ++ r ++ p ++ t) ∧
       (execute (physicalExternal c staticOther other) ctx (.withdraw amount seeds) before).world.core.readContractSlot
           ctx.self.val reserveSlot =
-        spent.core.readContractSlot ctx.self.val reserveSlot := by
-  have he := step_effects (physicalExternal c staticOther other) ctx (.withdraw amount seeds) before
-  simp only [Effects, h] at he
-  exact withdraw_success_final_reserve (physicalExternal c staticOther other) ctx amount seeds
-    before _ _ hNo he.2
+        spent.core.readContractSlot ctx.self.val reserveSlot :=
+  withdraw_success_final_reserve (physicalExternal c staticOther other) ctx amount seeds
+    before _ _ hNo
+    (withdrawal_success (physicalExternal c staticOther other) ctx amount seeds before _ _
+      (withdraw_step_run (physicalExternal c staticOther other) ctx amount seeds before h))
+
+#print axioms withdraw_success_final_reserve
+#print axioms actual_reserve_history_final_reserve
 
 end LidoSRv3.Audit.Guarantees.PReserve1NoReentry

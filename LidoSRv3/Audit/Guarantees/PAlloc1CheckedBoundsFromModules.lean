@@ -32,11 +32,13 @@ consumed by the registered abstract parent `PAlloc1.checked_execute`:
 (`audit/assumptions.yaml`, `A-SUPPORTED-MODULES`), not a theorem about the
 deployed modules. Binding the enumerated operator ids, the registry storage and
 every writer of CSM/NOR to the deployed runtimes remains the assumption's
-removal path. -/
+removal path.
+
+Words are built with `Verity.Core.Uint256.ofNat` (the project's `Uint256` is
+the abbreviation `Verity.Uint256` of that structure). -/
 
 namespace LidoSRv3.Audit.Guarantees.PAlloc1CheckedBoundsFromModules
 
-open Verity
 open Verity.Stdlib.Math
 open LidoSRv3.Audit.AllocCapacity
 open LidoSRv3.Audit.Source.SRStorageExitedMonotonicity
@@ -63,18 +65,18 @@ structure SupportedModule (m : Module) : Prop where
   registry : ∃ (s : RegistryState) (ids : List RegistryWord)
       (ops : List Operation) (c : ExitedCounters),
     ids.length ≤ operatorCap ∧
-    m.depositedCount = Uint256.ofNat (counterSum s 3 ids) ∧
-    m.summaryExitedCount = Uint256.ofNat (counterSum s 1 ids) ∧
+    m.depositedCount = Verity.Core.Uint256.ofNat (counterSum s 3 ids) ∧
+    m.summaryExitedCount = Verity.Core.Uint256.ofNat (counterSum s 1 ids) ∧
     applyOperations genesis ops = some c ∧
-    (c.depositedCount : Nat) = counterSum s 3 ids ∧
-    (c.summaryExitedCount : Nat) = counterSum s 1 ids ∧
+    c.depositedCount.val = counterSum s 3 ids ∧
+    c.summaryExitedCount.val = counterSum s 1 ids ∧
     c.accountingExitedCount = m.accountingExitedCount
 
 /-- The A-SUPPORTED-MODULES premise for one allocation call: nonzero
 `maxEBType1`, every registered module supported, and the pinned type bounds of
 `SRLib.sol`'s module struct and allocation entry. -/
 structure SupportedModules (cfg : Config) (modules : List Module)
-    (depositsToAllocate : Uint256) (isTopUp : Bool) : Prop where
+    (depositsToAllocate : Verity.Core.Uint256) (isTopUp : Bool) : Prop where
   maxEBType1_nonzero : cfg.maxEBType1 ≠ 0
   supported : ∀ m ∈ modules, SupportedModule m
   typeBounds : PAlloc1TargetMultBounded.PinnedStakingModuleTypeBounds
@@ -84,64 +86,62 @@ structure SupportedModules (cfg : Config) (modules : List Module)
   availableBounds : PAlloc1AvailableArithmeticBounded.PinnedAvailableArithmeticBounds
     cfg modules isTopUp
 
-/-- Two words with equal values are equal. -/
-theorem uint256_ext {a b : Uint256} (h : a.val = b.val) : a = b := by
-  cases a
-  cases b
-  simp only at h
-  subst h
-  rfl
-
 /-- `counterSum_lt_word`: under the 200-operator cap the packed sum fits one
 word, so the `uint256` reply carries the registry sum exactly. -/
 theorem counter_reply_exact (s : RegistryState) (field : Fin 4) (ids : List RegistryWord)
     (hcap : ids.length ≤ operatorCap) :
-    (Uint256.ofNat (counterSum s field ids)).val = counterSum s field ids :=
-  Nat.mod_eq_of_lt
-    (LidoSRv3.Audit.Source.NodeOperatorsRegistry.counterSum_lt_word s field ids hcap)
+    (Verity.Core.Uint256.ofNat (counterSum s field ids)).val = counterSum s field ids := by
+  have hlt : counterSum s field ids < Verity.Core.Uint256.modulus :=
+    LidoSRv3.Audit.Source.NodeOperatorsRegistry.counterSum_lt_word s field ids hcap
+  show counterSum s field ids % Verity.Core.Uint256.modulus = counterSum s field ids
+  exact Nat.mod_eq_of_lt hlt
 
 /-- `reachable_state_is_monotone` transported to the module's replies: a
 supported module satisfies the `active_subtraction` conjunct. -/
 theorem active_subtraction_of_supported (m : Module) (h : SupportedModule m) :
-    (wordMax m.summaryExitedCount m.accountingExitedCount : Nat) ≤ (m.depositedCount : Nat) := by
+    (wordMax m.summaryExitedCount m.accountingExitedCount).val ≤ m.depositedCount.val := by
   obtain ⟨s, ids, ops, c, hcap, hdep, hexit, hops, hcdep, hcexit, hcacc⟩ := h.registry
-  have hmono : (wordMax c.summaryExitedCount c.accountingExitedCount : Nat) ≤
-      (c.depositedCount : Nat) :=
+  have hmono : (wordMax c.summaryExitedCount c.accountingExitedCount).val ≤
+      c.depositedCount.val :=
     reachable_state_is_monotone ops c hops
   have hd : m.depositedCount = c.depositedCount := by
-    apply uint256_ext
+    apply Verity.Core.Uint256.ext
     rw [hdep, counter_reply_exact s 3 ids hcap, hcdep]
   have he : m.summaryExitedCount = c.summaryExitedCount := by
-    apply uint256_ext
+    apply Verity.Core.Uint256.ext
     rw [hexit, counter_reply_exact s 1 ids hcap, hcexit]
   rw [hd, he, ← hcacc]
   exact hmono
 
 /-- The composition: A-SUPPORTED-MODULES yields all five `CheckedBounds` fields. -/
 theorem checkedBounds_of_supportedModules {cfg : Config} {modules : List Module}
-    {depositsToAllocate : Uint256} {isTopUp : Bool}
+    {depositsToAllocate : Verity.Core.Uint256} {isTopUp : Bool}
     (h : SupportedModules cfg modules depositsToAllocate isTopUp) :
-    CheckedBounds cfg modules depositsToAllocate isTopUp where
-  maxEBType1_nonzero := h.maxEBType1_nonzero
-  active_subtraction := fun m hm => active_subtraction_of_supported m (h.supported m hm)
-  total_addition :=
-    PAlloc1TotalAdditionBounded.total_addition_under_pinned_bounds h.entryBounds
-  available_arithmetic :=
-    PAlloc1AvailableArithmeticBounded.available_arithmetic_under_pinned_bounds h.availableBounds
-  target_multiplication :=
-    PAlloc1TargetMultBounded.target_multiplication_under_pinned_type_bounds h.typeBounds
+    CheckedBounds cfg modules depositsToAllocate isTopUp :=
+  { maxEBType1_nonzero := h.maxEBType1_nonzero
+    active_subtraction := fun m hm => active_subtraction_of_supported m (h.supported m hm)
+    total_addition :=
+      PAlloc1TotalAdditionBounded.total_addition_under_pinned_bounds h.entryBounds
+    available_arithmetic :=
+      PAlloc1AvailableArithmeticBounded.available_arithmetic_under_pinned_bounds h.availableBounds
+    target_multiplication :=
+      PAlloc1TargetMultBounded.target_multiplication_under_pinned_type_bounds h.typeBounds }
 
 /-- Registered P-ALLOC-1 consumer under A-SUPPORTED-MODULES: checked execution
 succeeds and its capacity column equals the independent `MathView`
 specification. This is `PAlloc1.checked_execute` with `CheckedBounds` derived
 from `SupportedModules` instead of supplied by the caller. -/
 theorem checked_execute_under_supported_modules
-    (cfg : Config) (modules : List Module) (depositsToAllocate : Uint256) (isTopUp : Bool)
+    (cfg : Config) (modules : List Module) (depositsToAllocate : Verity.Core.Uint256)
+    (isTopUp : Bool)
     (h : SupportedModules cfg modules depositsToAllocate isTopUp) :
     ∃ rows, SolidityAllocCapacity.execute cfg modules depositsToAllocate isTopUp = some rows ∧
       rows.map (fun row => (row.capacity : Nat)) =
         MathView.capacities cfg modules depositsToAllocate isTopUp :=
   PAlloc1.checked_execute cfg modules depositsToAllocate isTopUp
     (checkedBounds_of_supportedModules h)
+
+#print axioms checkedBounds_of_supportedModules
+#print axioms checked_execute_under_supported_modules
 
 end LidoSRv3.Audit.Guarantees.PAlloc1CheckedBoundsFromModules
