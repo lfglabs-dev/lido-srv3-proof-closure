@@ -449,22 +449,146 @@ private theorem checkedFold_functionReturns :
 attribute [local cbv_eval] empty_slot_alias_ranges_valid empty_slot_alias_sources_disjoint
   checkedFold_no_unsupported_internal_dynamic checkedFold_functionReturns
 
+private theorem returnShape_letVar (name : String) (value : Expr) :
+    validateReturnShapesInStmt "checkedFold" [] [.uint256] false (.letVar name value) = .ok () := by
+  unfold validateReturnShapesInStmt Stmt.checkRec
+  rw [stmtCheck_letVar]
+  rfl
+
+private theorem returnShape_assignVar (name : String) (value : Expr) :
+    validateReturnShapesInStmt "checkedFold" [] [.uint256] false (.assignVar name value) = .ok () := by
+  unfold validateReturnShapesInStmt Stmt.checkRec
+  rw [stmtCheck_assignVar]
+  rfl
+
+private theorem returnShape_require (condition : Expr) (message : String) :
+    validateReturnShapesInStmt "checkedFold" [] [.uint256] false (.require condition message) = .ok () := by
+  unfold validateReturnShapesInStmt Stmt.checkRec
+  rw [stmtCheck_require]
+  rfl
+
+private theorem returnShape_setStorageArrayElement (name : String) (index value : Expr) :
+    validateReturnShapesInStmt "checkedFold" [] [.uint256] false
+      (.setStorageArrayElement name index value) = .ok () := by
+  unfold validateReturnShapesInStmt Stmt.checkRec
+  rw [stmtCheck_setStorageArrayElement]
+  rfl
+
+private theorem returnShape_return (value : Expr) :
+    validateReturnShapesInStmt "checkedFold" [] [.uint256] false (.return value) = .ok () := by
+  unfold validateReturnShapesInStmt Stmt.checkRec
+  rw [stmtCheck_return]
+  rfl
+
+private theorem returnShape_forEachBody :
+    (do
+      validateReturnShapesInStmt "checkedFold" [] [.uint256] false
+        (.letVar "value" (.storageArrayElement "modules" (.localVar "i")))
+      validateReturnShapesInStmt "checkedFold" [] [.uint256] false
+        (.require
+          (.le (.localVar "value")
+            (.sub (.literal Verity.Core.MAX_UINT256) (.localVar "total")))
+          "Panic(0x11): arithmetic overflow")
+      validateReturnShapesInStmt "checkedFold" [] [.uint256] false
+        (.assignVar "total" (.add (.localVar "total") (.localVar "value")))
+      validateReturnShapesInStmt "checkedFold" [] [.uint256] false
+        (.setStorageArrayElement "modules" (.localVar "i")
+          (.add (.localVar "value") (.literal 1)))
+      ) = .ok () := by
+  simp [returnShape_letVar, returnShape_require, returnShape_assignVar,
+    returnShape_setStorageArrayElement, Bind.bind, Except.bind, Pure.pure, Except.pure]
+
+private theorem returnShape_forEach :
+    validateReturnShapesInStmt "checkedFold" [] [.uint256] false
+      (.forEach "i" (.storageArrayLength "modules")
+        [ .letVar "value" (.storageArrayElement "modules" (.localVar "i"))
+        , .require
+            (.le (.localVar "value")
+              (.sub (.literal Verity.Core.MAX_UINT256) (.localVar "total")))
+            "Panic(0x11): arithmetic overflow"
+        , .assignVar "total" (.add (.localVar "total") (.localVar "value"))
+        , .setStorageArrayElement "modules" (.localVar "i")
+            (.add (.localVar "value") (.literal 1)) ]) = .ok () := by
+  unfold validateReturnShapesInStmt Stmt.checkRec
+  rw [stmtCheck_forEach]
+  simp [validateReturnShapesNode, Bind.bind, Except.bind, Pure.pure, Except.pure]
+  exact returnShape_forEachBody
+
 private theorem checkedFold_return_shapes :
     checkedFold.body.forM
       (validateReturnShapesInStmt "checkedFold" [] [.uint256] false) = .ok () := by
-  simp [checkedFold, validateReturnShapesInStmt, validateReturnShapesNode,
-    Stmt.checkRec, stmtCheck_forEach, stmtCheck_letVar, stmtCheck_assignVar,
-    stmtCheck_require, stmtCheck_return, stmtCheck_setStorageArrayElement,
+  simp [checkedFold, returnShape_letVar, returnShape_forEach, returnShape_return,
     Bind.bind, Except.bind, Pure.pure, Except.pure]
-  all_goals decide +kernel
+
+private theorem paramRef_letVar (name : String) (value : Expr) :
+    validateStmtParamReferences "checkedFold" [] (.letVar name value) = .ok () := by
+  unfold validateStmtParamReferences Stmt.checkRec
+  rw [stmtCheck_letVar]
+  rfl
+
+private theorem paramRef_assignVar (name : String) (value : Expr) :
+    validateStmtParamReferences "checkedFold" [] (.assignVar name value) = .ok () := by
+  unfold validateStmtParamReferences Stmt.checkRec
+  rw [stmtCheck_assignVar]
+  rfl
+
+private theorem paramRef_require (condition : Expr) (message : String) :
+    validateStmtParamReferences "checkedFold" [] (.require condition message) = .ok () := by
+  unfold validateStmtParamReferences Stmt.checkRec
+  rw [stmtCheck_require]
+  rfl
+
+private theorem paramRef_setStorageArrayElement (name : String) (index value : Expr) :
+    validateStmtParamReferences "checkedFold" []
+      (.setStorageArrayElement name index value) = .ok () := by
+  unfold validateStmtParamReferences Stmt.checkRec
+  rw [stmtCheck_setStorageArrayElement]
+  rfl
+
+private theorem paramRef_return (value : Expr) :
+    validateStmtParamReferences "checkedFold" [] (.return value) = .ok () := by
+  unfold validateStmtParamReferences Stmt.checkRec
+  rw [stmtCheck_return]
+  rfl
+
+private theorem paramRef_forEachBody :
+    (do
+      validateStmtParamReferences "checkedFold" []
+        (.letVar "value" (.storageArrayElement "modules" (.localVar "i")))
+      validateStmtParamReferences "checkedFold" []
+        (.require
+          (.le (.localVar "value")
+            (.sub (.literal Verity.Core.MAX_UINT256) (.localVar "total")))
+          "Panic(0x11): arithmetic overflow")
+      validateStmtParamReferences "checkedFold" []
+        (.assignVar "total" (.add (.localVar "total") (.localVar "value")))
+      validateStmtParamReferences "checkedFold" []
+        (.setStorageArrayElement "modules" (.localVar "i")
+          (.add (.localVar "value") (.literal 1)))
+      ) = .ok () := by
+  simp [paramRef_letVar, paramRef_require, paramRef_assignVar,
+    paramRef_setStorageArrayElement, Bind.bind, Except.bind, Pure.pure, Except.pure]
+
+private theorem paramRef_forEach :
+    validateStmtParamReferences "checkedFold" []
+      (.forEach "i" (.storageArrayLength "modules")
+        [ .letVar "value" (.storageArrayElement "modules" (.localVar "i"))
+        , .require
+            (.le (.localVar "value")
+              (.sub (.literal Verity.Core.MAX_UINT256) (.localVar "total")))
+            "Panic(0x11): arithmetic overflow"
+        , .assignVar "total" (.add (.localVar "total") (.localVar "value"))
+        , .setStorageArrayElement "modules" (.localVar "i")
+            (.add (.localVar "value") (.literal 1)) ]) = .ok () := by
+  unfold validateStmtParamReferences Stmt.checkRec
+  rw [stmtCheck_forEach]
+  simp [validateStmtParamReferencesNode, Bind.bind, Except.bind, Pure.pure, Except.pure]
+  exact paramRef_forEachBody
 
 private theorem checkedFold_param_refs :
     checkedFold.body.forM (validateStmtParamReferences "checkedFold" []) = .ok () := by
-  simp [checkedFold, validateStmtParamReferences, validateStmtParamReferencesNode,
-    Stmt.checkRec, stmtCheck_forEach, stmtCheck_letVar, stmtCheck_assignVar,
-    stmtCheck_require, stmtCheck_return, stmtCheck_setStorageArrayElement,
+  simp [checkedFold, paramRef_letVar, paramRef_forEach, paramRef_return,
     Bind.bind, Except.bind, Pure.pure, Except.pure]
-  all_goals decide +kernel
 
 set_option maxRecDepth 16384 in
 set_option maxHeartbeats 4000000 in

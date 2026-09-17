@@ -763,3 +763,10 @@ not transfer a predecessor build, trust verdict or deployment acceptance.
   no longer walks those validators inline. Residuals at
   `OfficialSemantics.lean:496` and `:543` are the previous inline `have`s.
   F2/F3/F4 and trust `native_decide` stay OPEN.
+
+- Exact `2794cf192bf099150120d36dbb01ea6a2dd008d9` job
+  `52344f9f-b951-4bfd-88ec-486427f8378b` failed exit 1: kernel deterministic
+  timeout on `checkedFold_return_shapes` / `checkedFold_param_refs`
+  (`OfficialSemantics.lean:452,461`). The follow-up expands those `forM`
+  walks constructor-by-constructor instead of `decide +kernel`. F2/F3/F4
+  and trust `native_decide` stay OPEN.
