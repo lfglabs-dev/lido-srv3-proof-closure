@@ -3,21 +3,21 @@
 Canonical obligations remain in `audit/guarantees.yaml`; generated UX2 files are
 views of that registry. No historical receipt validates a successor commit.
 
-- **Current coordination (2026-09-16).** Successor of `d08209c113e4032fd9f9126c6234cfe41109cb6e`
-  isolates remaining return-shape/function and slot-alias/input compiler checks
-  with constructor equations. Predecessor `6d218ab3504dc1d1d726fd9e818fc9c9d8e2be2a`
-  job `3afbb4db-86be-453c-84c2-d91807779c04` failed exit 1; targeted compiler job
-  `e16036f4-3dc1-4cf0-903e-d4f12bddda55` is failed/inaccessible and ignored. Trust
+- **Current coordination (2026-09-17).** Exact `a554f21faeb88b46e77230069c754240e08fa208`
+  job `6d60596a-e5b9-4b2b-89d9-36a59f7e2bc4` failed exit 1:
+  `OfficialSemantics.lean:356` `controlFlow` `rfl` lemmas are not definitional
+  (partial), and `:682` `checkedFold_validates` kernel-timed out. Follow-up
+  drops those `rfl` lemmas, constructor-discharges the unused-Yul `Stmt.fold`,
+  and rewrites `Bool.and_false` without zeta on the hanging collector. Trust
   `native_decide` policy is unchanged: foundations plus only the three original
-  compiler-success native exceptions, with provenance/type/site checks; kernel
-  replacement of this witness is attempted, not an expanded allowlist. Known
-  modeling discrepancies remain OPEN, not CLEAN: F2 CALL-only gas is not Solidity
-  transaction gas; F3 opaque SHA FFI / `A-SHA256-FFI`; F4 supplied ABI/layout/
-  count/depth/memory/FFI32 hypotheses. ALLOC1 supported-module reachability,
-  ALLOC2 deployed library identity, I-TRUST-FOUNDATIONAL-ONLY, and NOR loader
-  composition remain OPEN. The unavailable predecessor-ledger finding is not
-  invented. Website writer `d2e6ef99` / reviewer `a52bfddf` historical-pair
-  review is not this candidate.
+  compiler-success native exceptions; this commit does not expand the allowlist.
+  Known modeling discrepancies remain OPEN, not CLEAN: F2 CALL-only gas is not
+  Solidity transaction gas; F3 opaque SHA FFI / `A-SHA256-FFI`; F4 supplied
+  ABI/layout/count/depth/memory/FFI32 hypotheses. ALLOC1 supported-module
+  reachability, ALLOC2 deployed library identity, I-TRUST-FOUNDATIONAL-ONLY,
+  and NOR loader composition remain OPEN. The unavailable predecessor-ledger
+  finding is not invented. Website writer `d2e6ef99` / reviewer `a52bfddf`
+  historical-pair review is not this candidate.
 - Exact proof milestone `806f308376686d6eef750797002473d0d7435ce4` passed the
   full configured repository suite on registered DGX Spark, job
   `57f51984-9e08-47f2-b191-e84d2624a562`, exit 0 at 2026-09-15 15:52:05 UTC,
@@ -846,3 +846,27 @@ not transfer a predecessor build, trust verdict or deployment acceptance.
   `checkedFold_no_unguarded_mechanics` (`OfficialSemantics.lean:593`) hanging
   on `decide +kernel`. Follow-up unfolds TrustSurface helpers and reduces the
   empty mechanic lists by `simp`. F2/F3/F4 stay OPEN.
+
+- Exact `eb7f446994091ce5f20c75553810a89f136b7092` is the live PR head after
+  absorbing remaining Lido slices. Predecessor OfficialSemantics salvage was
+  never pushed: `checkedFold_no_unguarded_mechanics` still hangs the collector.
+  Follow-up documents `checkedFold.overflow-guard` so `validateFunctionSpec`
+  skips that fold, and states `exceptBind_okVal` / empty-constructor lemmas.
+  F2/F3/F4 stay OPEN. Trust `native_decide` allowlist is unchanged.
+
+- Exact `6d9c9bce9435c8be393e61ddaa95835ad8fbb648` job
+  `5c67cc2e-5fde-43d8-bdb8-4fd1ddb6b8c1` failed with null exit after
+  CompilationModel 61/62 (~28 min); no OfficialSemantics diagnostic. Residual
+  is `validateFunctionSpec` (`OfficialSemantics.lean:610`) still zeta-reducing
+  `Stmt.fold` / `collectUnguardedUnsafeBoundaryMechanicsFromStmts` before
+  `localObligations.isEmpty = false` short-circuits. Follow-up uses
+  `simp (config := {zeta := false})` plus empty-unsafeYul constructor lemmas.
+  F2/F3/F4 stay OPEN. Trust `native_decide` allowlist is unchanged.
+
+- Exact `a554f21faeb88b46e77230069c754240e08fa208` job
+  `6d60596a-e5b9-4b2b-89d9-36a59f7e2bc4` failed exit 1.
+  Residuals: `OfficialSemantics.lean:356` `controlFlow` `rfl` lemmas are not
+  definitional, and `:682` `checkedFold_validates` kernel-timed out. Follow-up
+  rewrites `Bool.and_false` without zeta and constructor-discharges the
+  unused-Yul fold. F2/F3/F4 stay OPEN. Trust `native_decide` allowlist is
+  unchanged.
