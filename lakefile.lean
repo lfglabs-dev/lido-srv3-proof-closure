@@ -73,6 +73,7 @@ lean_lib «LidoSRv3» where
     .one `LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel,
     .one `LidoSRv3.Audit.Verity.ConsolidationCallFragment,
     .one `LidoSRv3.Audit.Verity.ConsolidationFee,
+    .one `LidoSRv3.Audit.Verity.ConsolidationEthUnboundedFuel,
     .one `LidoSRv3.Audit.Verity.ConsolidationOfficialDenoteSuccess,
     .one `LidoSRv3.Audit.Verity.ConsolidationTx,
     .one `LidoSRv3.Audit.Verity.ConsolidationValueTx,
