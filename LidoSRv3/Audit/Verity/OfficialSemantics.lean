@@ -22,6 +22,8 @@ omits the check exhibits EVM word wraparound.
 
 namespace LidoSRv3.Audit.Verity.OfficialSemantics
 
+run_cmd Lean.logInfo "OfficialSemantics: module body started"
+
 open Compiler
 open Compiler.CompilationModel
 open Compiler.CompilationModel.Denote
@@ -691,8 +693,10 @@ theorem checkedFold_validates :
       exprAny_literal, exprAny_localVar, exprAny_storageArrayLength]
     all_goals decide +kernel
   delta validateFunctionSpec
-  rw [noEmptyYul, documented]
-  rw [Bool.and_false, Bool.false_and]
+  extract_lets rawYulObligations unguardedMechanics
+  with_reducible rw [noEmptyYul, documented]
+  with_reducible rw [Bool.and_false, Bool.false_and]
+  clear rawYulObligations unguardedMechanics
   simp (config := {zeta := false, zetaUnused := true, iota := true, dsimp := false}) only
     [↓reduceIte, Bind.bind, Except.bind, Pure.pure, Except.pure]
   simp (config := {dsimp := false}) [noAdt, hr, noLogical, checkedFold_return_shapes,

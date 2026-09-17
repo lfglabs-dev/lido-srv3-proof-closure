@@ -3,13 +3,13 @@
 Canonical obligations remain in `audit/guarantees.yaml`; generated UX2 files are
 views of that registry. No historical receipt validates a successor commit.
 
-- **Current coordination (2026-09-17).** Exact `79657d9a06c8ad820f76ae2a7da6b4b808f00607`
-  job `c5b94fc7-05e2-4fe6-84a4-d0b5b20ea3df` failed with null exit after
-  CompilationModel 61/62 (~30 min); no OfficialSemantics diagnostic. Residual
-  is `checkedFold_validates` (`OfficialSemantics.lean:676`): `simp only
-  [validateFunctionSpec]` still dsimp-reduces the hanging collector let.
-  Follow-up `delta`s the definition, rewrites the documented-obligation `&&`
-  conjunct, and keeps `dsimp := false`. Trust `native_decide` policy is
+- **Current coordination (2026-09-17).** Exact `27f7f2b9715f070c1c30259d13ab73b4daa6770b`
+  job `28518447-15ef-4614-8c0f-259dd225b32f` failed with null exit after
+  CompilationModel 61/62 (~39 min); no OfficialSemantics diagnostic. Residual
+  is `checkedFold_validates` (`OfficialSemantics.lean:680`): `rw` of
+  `noEmptyYul` still WHNF-reduces `Stmt.fold` on `forEach`. Follow-up
+  `extract_lets` the hanging collector, rewrites at reducible transparency,
+  and emits a flushed module-start log. Trust `native_decide` policy is
   unchanged: foundations plus only the three original compiler-success native
   exceptions; this commit does not expand the allowlist.
   Known modeling discrepancies remain OPEN, not CLEAN: F2 CALL-only gas is not
@@ -888,3 +888,11 @@ not transfer a predecessor build, trust verdict or deployment acceptance.
   `simp only [validateFunctionSpec]` via dsimp of `Stmt.foldList`. Follow-up
   uses `delta validateFunctionSpec` and `dsimp := false`. F2/F3/F4 stay OPEN.
   Trust `native_decide` allowlist is unchanged.
+
+- Exact `27f7f2b9715f070c1c30259d13ab73b4daa6770b` job
+  `28518447-15ef-4614-8c0f-259dd225b32f` failed with null exit after
+  CompilationModel 61/62 (~39 min); no OfficialSemantics diagnostic. Residual
+  is `checkedFold_validates` (`OfficialSemantics.lean:680`) hanging on `rw`
+  of the unused-Yul fold lemma. Follow-up `extract_lets` the collector and
+  rewrites at reducible transparency. F2/F3/F4 stay OPEN. Trust
+  `native_decide` allowlist is unchanged.
