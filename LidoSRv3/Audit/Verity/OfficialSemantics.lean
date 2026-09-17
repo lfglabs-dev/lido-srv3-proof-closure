@@ -339,10 +339,10 @@ private theorem exceptForM_nil {α : Type} (f : α → Except String Unit) :
 
 private theorem exceptForM_cons {α : Type} (a : α) (as : List α)
     (f : α → Except String Unit) :
-    ForM.forM (a :: as) f = (do f a; ForM.forM as f) := rfl
+    ForM.forM (a :: as) f = Bind.bind (f a) (fun _ => ForM.forM as f) := rfl
 
-private theorem exceptBind_ok (f : Unit → Except String Unit) :
-    Except.bind (.ok ()) f = f () := rfl
+private theorem exceptBind_ok (k : Except String Unit) :
+    Bind.bind (Except.ok () : Except String Unit) (fun _ => k) = k := rfl
 
 private theorem returnShapeNode_forEach (name : String) (count : Expr) (body : List Stmt) :
     validateReturnShapesNode "checkedFold" [] [.uint256] false (.forEach name count body) =

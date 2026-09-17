@@ -799,3 +799,8 @@ not transfer a predecessor build, trust verdict or deployment acceptance.
   `4d0ec6f4-d53d-4fdf-94de-2396c1304c52` failed exit 1: `simp only [Except.bind]`
   made no progress after rewriting `.ok ()` (`OfficialSemantics.lean:505`).
   Follow-up uses `exceptBind_ok` and node-level `forEach` `rfl` lemmas. F2/F3/F4 stay OPEN.
+
+- Exact `13c43d5a8622ba9769a2b8db213b064e415fd4d6` job
+  `32cde0b6-7632-4f67-bc62-ba9f3644fdca` failed exit 1: `Except.bind` did not
+  match `do Except.ok (); forM ...` (`OfficialSemantics.lean:514`). Follow-up
+  states cons/bind as `Bind.bind`. F2/F3/F4 stay OPEN.
