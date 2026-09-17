@@ -341,6 +341,16 @@ private theorem exceptForM_cons {α : Type} (a : α) (as : List α)
     (f : α → Except String Unit) :
     ForM.forM (a :: as) f = (do f a; ForM.forM as f) := rfl
 
+private theorem exceptBind_ok (f : Unit → Except String Unit) :
+    Except.bind (.ok ()) f = f () := rfl
+
+private theorem returnShapeNode_forEach (name : String) (count : Expr) (body : List Stmt) :
+    validateReturnShapesNode "checkedFold" [] [.uint256] false (.forEach name count body) =
+      .ok () := rfl
+
+private theorem paramRefNode_forEach (name : String) (count : Expr) (body : List Stmt) :
+    validateStmtParamReferencesNode "checkedFold" [] (.forEach name count body) = .ok () := rfl
+
 private theorem stmtCheck_forEach (check : Stmt → Except String Unit)
     (name : String) (count : Expr) (body : List Stmt) :
     Stmt.forDeepM check (.forEach name count body) =
@@ -501,38 +511,30 @@ private theorem returnShape_forEachBody :
     ForM.forM checkedFoldLoopBody
       (validateReturnShapesInStmt "checkedFold" [] [.uint256] false) = .ok () := by
   unfold checkedFoldLoopBody
-  rw [exceptForM_cons, returnShape_letVar]
-  simp only [Except.bind]
-  rw [exceptForM_cons, returnShape_require]
-  simp only [Except.bind]
-  rw [exceptForM_cons, returnShape_assignVar]
-  simp only [Except.bind]
-  rw [exceptForM_cons, returnShape_setStorageArrayElement]
-  simp only [Except.bind]
+  rw [exceptForM_cons, returnShape_letVar, exceptBind_ok]
+  rw [exceptForM_cons, returnShape_require, exceptBind_ok]
+  rw [exceptForM_cons, returnShape_assignVar, exceptBind_ok]
+  rw [exceptForM_cons, returnShape_setStorageArrayElement, exceptBind_ok]
   rw [exceptForM_nil]
 
 private theorem returnShape_forEach :
     validateReturnShapesInStmt "checkedFold" [] [.uint256] false
       (.forEach "i" (.storageArrayLength "modules") checkedFoldLoopBody) = .ok () := by
   unfold validateReturnShapesInStmt Stmt.checkRec
-  rw [stmtCheck_forEach]
-  simp only [validateReturnShapesNode, Pure.pure, Except.pure, Bind.bind, Except.bind]
+  rw [stmtCheck_forEach, returnShapeNode_forEach, exceptBind_ok]
   have h :
       Stmt.forDeepM (validateReturnShapesNode "checkedFold" [] [.uint256] false) =
         validateReturnShapesInStmt "checkedFold" [] [.uint256] false := rfl
-  simp only [h]
+  rw [h]
   exact returnShape_forEachBody
 
 private theorem checkedFold_return_shapes :
     ForM.forM checkedFold.body
       (validateReturnShapesInStmt "checkedFold" [] [.uint256] false) = .ok () := by
   unfold checkedFold
-  rw [exceptForM_cons, returnShape_letVar]
-  simp only [Except.bind]
-  rw [exceptForM_cons, returnShape_forEach]
-  simp only [Except.bind]
-  rw [exceptForM_cons, returnShape_return]
-  simp only [Except.bind]
+  rw [exceptForM_cons, returnShape_letVar, exceptBind_ok]
+  rw [exceptForM_cons, returnShape_forEach, exceptBind_ok]
+  rw [exceptForM_cons, returnShape_return, exceptBind_ok]
   rw [exceptForM_nil]
 
 private theorem paramRef_letVar (name : String) (value : Expr) :
@@ -569,37 +571,29 @@ private theorem paramRef_return (value : Expr) :
 private theorem paramRef_forEachBody :
     ForM.forM checkedFoldLoopBody (validateStmtParamReferences "checkedFold" []) = .ok () := by
   unfold checkedFoldLoopBody
-  rw [exceptForM_cons, paramRef_letVar]
-  simp only [Except.bind]
-  rw [exceptForM_cons, paramRef_require]
-  simp only [Except.bind]
-  rw [exceptForM_cons, paramRef_assignVar]
-  simp only [Except.bind]
-  rw [exceptForM_cons, paramRef_setStorageArrayElement]
-  simp only [Except.bind]
+  rw [exceptForM_cons, paramRef_letVar, exceptBind_ok]
+  rw [exceptForM_cons, paramRef_require, exceptBind_ok]
+  rw [exceptForM_cons, paramRef_assignVar, exceptBind_ok]
+  rw [exceptForM_cons, paramRef_setStorageArrayElement, exceptBind_ok]
   rw [exceptForM_nil]
 
 private theorem paramRef_forEach :
     validateStmtParamReferences "checkedFold" []
       (.forEach "i" (.storageArrayLength "modules") checkedFoldLoopBody) = .ok () := by
   unfold validateStmtParamReferences Stmt.checkRec
-  rw [stmtCheck_forEach]
-  simp only [validateStmtParamReferencesNode, Pure.pure, Except.pure, Bind.bind, Except.bind]
+  rw [stmtCheck_forEach, paramRefNode_forEach, exceptBind_ok]
   have h :
       Stmt.forDeepM (validateStmtParamReferencesNode "checkedFold" []) =
         validateStmtParamReferences "checkedFold" [] := rfl
-  simp only [h]
+  rw [h]
   exact paramRef_forEachBody
 
 private theorem checkedFold_param_refs :
     ForM.forM checkedFold.body (validateStmtParamReferences "checkedFold" []) = .ok () := by
   unfold checkedFold
-  rw [exceptForM_cons, paramRef_letVar]
-  simp only [Except.bind]
-  rw [exceptForM_cons, paramRef_forEach]
-  simp only [Except.bind]
-  rw [exceptForM_cons, paramRef_return]
-  simp only [Except.bind]
+  rw [exceptForM_cons, paramRef_letVar, exceptBind_ok]
+  rw [exceptForM_cons, paramRef_forEach, exceptBind_ok]
+  rw [exceptForM_cons, paramRef_return, exceptBind_ok]
   rw [exceptForM_nil]
 
 set_option maxRecDepth 16384 in

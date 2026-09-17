@@ -794,3 +794,8 @@ not transfer a predecessor build, trust verdict or deployment acceptance.
   `df1af20f-7bea-4830-8a86-6158e8ef4778` failed exit 1: `List.forM_cons` did
   not apply to `ForM.forM` (`OfficialSemantics.lean:497,524`). Follow-up adds
   `exceptForM_cons`/`exceptForM_nil` and rewrites those. F2/F3/F4 stay OPEN.
+
+- Exact `83d937d6eb91b4322a1e513504888de698887907` job
+  `4d0ec6f4-d53d-4fdf-94de-2396c1304c52` failed exit 1: `simp only [Except.bind]`
+  made no progress after rewriting `.ok ()` (`OfficialSemantics.lean:505`).
+  Follow-up uses `exceptBind_ok` and node-level `forEach` `rfl` lemmas. F2/F3/F4 stay OPEN.
