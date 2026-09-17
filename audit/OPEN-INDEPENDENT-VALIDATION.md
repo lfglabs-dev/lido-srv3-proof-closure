@@ -810,3 +810,9 @@ not transfer a predecessor build, trust verdict or deployment acceptance.
   `checkedFold` inlined the loop list so `returnShape_forEach` did not match
   (`OfficialSemantics.lean:536`). Follow-up shares `checkedFoldLoopBody` in
   the function spec. F2/F3/F4 stay OPEN.
+
+- Exact `9fa4ec48ccfa63bb3f473575fd609f792bc6ed58` job
+  `44c94a51-f8ad-4568-8687-13fa7b4c2366` failed exit 1: ForM lemmas closed;
+  remaining `mechanics` fold (`OfficialSemantics.lean:596`) and `decide_cbv`
+  recursion on `bodyValid`/`templates` (`:688,:701`). Follow-up finishes
+  those with `decide +kernel`. F2/F3/F4 stay OPEN.

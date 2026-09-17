@@ -609,6 +609,7 @@ theorem checkedFold_validates :
               let id := Lean.mkIdent name
               Lean.Elab.Tactic.evalTactic (← `(tactic| simp [$id:ident]))
         | _ => throwError "expected one pinned TrustSurface helper: {suffix}"
+    all_goals decide +kernel
   simp only [checkedFold] at mechanics
   have noAdt : validateNoUnsupportedAdtConstructInStmtList checkedFold.body = .ok () := by
     simp [checkedFold, validateNoUnsupportedAdtConstructInStmtList,
@@ -685,7 +686,7 @@ theorem checkedFold_compiles_to_official_ir :
       compileExprWithInternals, compileRequireFailCondWithInternals,
       compileSetStorageArrayElement, validateDynamicArrayField,
       Bind.bind, Except.bind, Pure.pure, Except.pure, Except.isOk, Except.toBool]
-    all_goals decide_cbv
+    all_goals decide +kernel
   have hi : checkedFold.isInternal = false := rfl
   have hn : checkedFold.name = "checkedFold" := rfl
   have hs : isInteropEntrypointName "checkedFold" = false := by decide +kernel
@@ -698,7 +699,7 @@ theorem checkedFold_compiles_to_official_ir :
       templates_literal, templates_localVar, templates_storageArrayLength,
       templates_storageArrayElement, templates_add, templates_sub, templates_le,
       Stmt.directMetadata, Stmt.childLists]
-    all_goals (trace_state; decide_cbv)
+    all_goals decide +kernel
   have ht := List.nil_of_isEmpty templates
   unfold CompilationModel.compile
   rw [validated]
