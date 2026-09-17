@@ -8,7 +8,8 @@
         "A-SOURCE-SHAPED": "We assume the handwritten Lean models represent the Solidity behaviour described by this guarantee.",
         "A-ABSTRACT-TX": "The model defines transaction success and failure without executing EVM bytecode.",
         "A-VERITY-SCAFFOLD": "We also assume Verity correctly models the calls, storage and rollback used by these proofs.",
-        "A-CLASSICAL-CHOICE": "Lean proofs may use classical choice alongside propext and Quot.sound; these foundational axioms remain visible in Trust output."
+        "A-CLASSICAL-CHOICE": "Lean proofs may use classical choice alongside propext and Quot.sound; these foundational axioms remain visible in Trust output.",
+        "A-NO-REENTRY": "We assume the external callees (module obtainDepositData bodies, the beacon deposit contract, the EIP-7251 predeploy, the WithdrawalQueue finalization callback and the configured refund recipient) do not call back into Lido, the router or the gateway."
       },
       "mitigation": "The linked code and correspondence notes let you review what is modeled and what remains open. Tests and mutations check specific cases; they do not establish full correspondence."
     },

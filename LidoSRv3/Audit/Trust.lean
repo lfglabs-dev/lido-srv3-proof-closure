@@ -126,6 +126,12 @@ import LidoSRv3.Audit.Guarantees.PConsolidationEth1AbiBridgePremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
 import LidoSRv3.Audit.Guarantees.PAlloc1CheckedBoundsFromModules
+import LidoSRv3.Audit.Source.NoReentry
+import LidoSRv3.Audit.Guarantees.PDeposit1NoReentry
+import LidoSRv3.Audit.Guarantees.PTopup1NoReentry
+import LidoSRv3.Audit.Guarantees.PReserve1NoReentry
+import LidoSRv3.Audit.Guarantees.PConsolidationEth1NoReentry
+import LidoSRv3.Audit.Guarantees.PAddress1NoReentry
 import LidoSRv3.Audit.Guarantees.PAlloc1Phase3
 import LidoSRv3.Audit.Guarantees.PAlloc2
 import LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound
@@ -990,6 +996,25 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1CheckedBoundsFromModules.active_subtraction_of_supported
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1CheckedBoundsFromModules.checkedBounds_of_supportedModules
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1CheckedBoundsFromModules.checked_execute_under_supported_modules
+-- A-NO-REENTRY (Thomas 2026-09-17, step 1b): Source/NoReentry names the premise on
+-- the Live external-call interpreter (calls targeting the protected addresses are
+-- rejected; accepted replies return the protected storage/balances unchanged; no
+-- accepted nested call into them). Corollaries of the five exact-returned-world
+-- parents: DEPOSIT-1, TOPUP-1, RESERVE-1 (final reserve), ETH-1 (gateway/vault
+-- storage after settlement) and ADDRESS-1 (claimed bit after the recipient CALL).
+-- The premise is the accepted assumption, not a theorem about deployed callees.
+#print axioms LidoSRv3.Audit.Source.NoReentry.call_storage
+#print axioms LidoSRv3.Audit.Source.NoReentry.call_balance
+#print axioms LidoSRv3.Audit.Source.NoReentry.call_self_rejected
+#print axioms LidoSRv3.Audit.Source.NoReentry.call_nested_rejects
+#print axioms LidoSRv3.Audit.Source.NoReentry.confined_of_noReentry
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1NoReentry.actual_physical_metadata_conserves_no_reentry
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1NoReentry.actual_continuation_locator_conserves_no_reentry
+#print axioms LidoSRv3.Audit.Guarantees.PReserve1NoReentry.withdraw_success_final_reserve
+#print axioms LidoSRv3.Audit.Guarantees.PReserve1NoReentry.actual_reserve_history_final_reserve
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1NoReentry.settlement_preserves_gateway_and_vault_storage
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1NoReentry.claim_returns_committed_storage
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1NoReentry.actual_claim_batch_no_reentry
 -- General rule (Thomas 2026-09-12) applied to P-CONSOLIDATION-ETH-1
 -- feePerRequest free Nat: naming scaffold PinnedFeeStaticcallShape
 -- names the pinned WithdrawalVaultEIP7685.sol:79-81 STATICCALL entry

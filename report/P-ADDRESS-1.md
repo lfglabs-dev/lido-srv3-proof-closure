@@ -41,3 +41,7 @@ lake build LidoSRv3.Audit.Guarantees.PAddress1 \
 ```
 
 This is an unfinished candidate for independent audit, not a claim of deployed closure.
+
+## No re-entry (A-NO-REENTRY, 2026-09-17)
+
+[PAddress1NoReentry](../LidoSRv3/Audit/Guarantees/PAddress1NoReentry.lean) proves `claim_returns_committed_storage` (under `NoReentry callee [queue]`, the world after the recipient CALL holds exactly the claim's committed dirty storage, so the claimed bit and the locked-ether write are final, and the queue balance is the provisional payout transfer) and the registered-parent corollary `actual_claim_batch_no_reentry` (the same-world claim chain of `runClaimWithdrawalsTo_success` plus: no accepted nested attempt in the batch transcript targets the queue). Final recipient net credit is still not asserted. The premise is assumed, not proved for the recipient.

@@ -28,3 +28,7 @@ REMOTE_BUILD_NODE_ID=dgx-spark REMOTE_BUILD_PASSIVE=1 remote-lean-build lake bui
 The registered theorem reports only `propext`, `Classical.choice` and `Quot.sound`. Admission, actual root/per-key effects, wei bounds and physical history regressions passed.
 
 The earlier job `46b9f3c2` failed during checkout because submission preceded push; no Lean result came from it. Combined exact-SHA validation and fresh independent audit remain required.
+
+## No re-entry (A-NO-REENTRY, 2026-09-17)
+
+[PTopup1NoReentry](../LidoSRv3/Audit/Guarantees/PTopup1NoReentry.lean) restates `actual_continuation_locator_conserves` under the accepted assumption `A-NO-REENTRY` on the residual module/beacon interpreter (`NoReentry other [lido, router]`) and adds `Confined other [lido, router]`: storage of Lido and the router is unchanged by every CALL reaching that interpreter, no such CALL into them succeeds, and no accepted nested call into them is recorded. The premise is assumed, not proved for the deployed callees.

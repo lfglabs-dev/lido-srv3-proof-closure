@@ -29,3 +29,7 @@ lake build LidoSRv3.Audit.Guarantees.PReserve1LiveWriters LidoSRv3.Tests.TrioRes
 ```
 
 Both history theorems printed only foundational axioms. Earlier failed jobs are retained in the mission receipts; their parser/case-split errors are corrected at this SHA. Those historical runs used Lean v4.31.0 and Verity e977aaad6e1a9e92e0132d41b3d33a14135a4d46. The current dependency pin is recorded in `proofs/LOCKFILE.md`. Building differential entry modules is not execution of their external harness cases. The historical 15-case Solidity RESERVE harness pass applies to its earlier SHA/scope. Combined-SHA validation and fresh independent audit remain required.
+
+## No re-entry (A-NO-REENTRY, 2026-09-17)
+
+[PReserve1NoReentry](../LidoSRv3/Audit/Guarantees/PReserve1NoReentry.lean) proves `actual_reserve_history_final_reserve`: for a successful `.withdraw` step of the registered physical history, under `NoReentry (physicalExternal c staticOther other) [lido]`, the `WithdrawSuccess` stage worlds are exposed and the final reserve word equals the reserve word at the end of the spending stage, because the router `receiveDepositableEther` CALL returns Lido storage unchanged (`call_storage`) and `updateSeeds` writes only `seedSlot`. The premise is assumed, not proved for the queue, oracle or module callee bodies.

@@ -424,3 +424,7 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
     `sinkNode "Lido" true 6` (`PConsolidationEth1CompositionTx.lean:229–230`) cannot revert. Live `Lido.receiveWithdrawals` (`Lido.sol:530–534`) is `_auth(_withdrawalVault())` — only the vault may call. The parent `withdrawalsToLido` constructor never runs on this ensemble (issue 15), but `lidoAddr` is still in the world and would accept any hop.
 
     *Scenario.* A mutant gateway pays Lido instead of the vault. Lean `Lido` sink accepts; `escrowed` still sums to `msgValue` (issue 8). Live `receiveWithdrawals` from the gateway reverts (not the vault). The CHECKED conservation conjunct cannot see a rejected Lido payment because the sink is `accepts := true`. Same shape as issue 11 (refund).
+
+## No re-entry (A-NO-REENTRY, 2026-09-17)
+
+[PConsolidationEth1NoReentry](../LidoSRv3/Audit/Guarantees/PConsolidationEth1NoReentry.lean) proves `settlement_preserves_gateway_and_vault_storage`: after a successful `PhysicalEntrySettlement.execute`, under `NoReentry callee [gateway, vault]`, the gateway's and the vault's storage in the final world equal the post-quota storage; the per-request inbox CALLs (`loop_slot`) and the refund CALL (`refund_slot`) change neither. A reverting refund or Lido sink stays outside the modeled success shapes. The premise is assumed, not proved for the EIP-7251 predeploy or the refund recipient.

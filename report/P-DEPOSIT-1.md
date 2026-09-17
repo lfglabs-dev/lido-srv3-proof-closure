@@ -67,3 +67,7 @@ now state that premise explicitly. The registered execution obligations remain;
 precompile semantics, fork/runtime binding and paired differential coverage are
 still open. Shared locator STATICCALL now uses the same precompile-aware
 dispatch predicate and consumes the returned bytes; this is not runtime refinement.
+
+## No re-entry (A-NO-REENTRY, 2026-09-17)
+
+[PDeposit1NoReentry](../LidoSRv3/Audit/Guarantees/PDeposit1NoReentry.lean) restates `actual_physical_metadata_conserves` under the accepted assumption `A-NO-REENTRY` on the residual module/beacon interpreter `other` (`NoReentry other [lido, router]`, [Source/NoReentry.lean](../LidoSRv3/Audit/Source/NoReentry.lean)) and adds `Confined other [lido, router]`: every CALL reaching that interpreter leaves Lido and router storage unchanged, never succeeds when it targets either, and records no accepted nested call into them. The premise is assumed, not proved for the deployed module bodies or the beacon deposit contract.
