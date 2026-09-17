@@ -789,3 +789,8 @@ not transfer a predecessor build, trust verdict or deployment acceptance.
   `returnShape_forEachBody` (`OfficialSemantics.lean:493`) leaving
   `pure PUnit.unit = Except.ok ()`. Follow-up unfolds the four `forM` cons
   cells and rewrites each lemma instead of a combined `simp`. F2/F3/F4 stay OPEN.
+
+- Exact `790004c4e53d247b7c8cdc879a3e8ba0f6aefcb6` job
+  `df1af20f-7bea-4830-8a86-6158e8ef4778` failed exit 1: `List.forM_cons` did
+  not apply to `ForM.forM` (`OfficialSemantics.lean:497,524`). Follow-up adds
+  `exceptForM_cons`/`exceptForM_nil` and rewrites those. F2/F3/F4 stay OPEN.

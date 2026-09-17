@@ -334,6 +334,13 @@ private theorem listForMAttach {α : Type} (xs : List α)
   | nil => rfl
   | cons x xs ih => simp [List.attach_cons, List.forM_map, ih]
 
+private theorem exceptForM_nil {α : Type} (f : α → Except String Unit) :
+    ForM.forM ([] : List α) f = .ok () := rfl
+
+private theorem exceptForM_cons {α : Type} (a : α) (as : List α)
+    (f : α → Except String Unit) :
+    ForM.forM (a :: as) f = (do f a; ForM.forM as f) := rfl
+
 private theorem stmtCheck_forEach (check : Stmt → Except String Unit)
     (name : String) (count : Expr) (body : List Stmt) :
     Stmt.forDeepM check (.forEach name count body) =
@@ -491,18 +498,18 @@ private def checkedFoldLoopBody : List Stmt :=
       (.add (.localVar "value") (.literal 1)) ]
 
 private theorem returnShape_forEachBody :
-    checkedFoldLoopBody.forM
+    ForM.forM checkedFoldLoopBody
       (validateReturnShapesInStmt "checkedFold" [] [.uint256] false) = .ok () := by
   unfold checkedFoldLoopBody
-  simp only [List.forM_cons, List.forM_nil]
-  rw [returnShape_letVar]
+  rw [exceptForM_cons, returnShape_letVar]
   simp only [Except.bind]
-  rw [returnShape_require]
+  rw [exceptForM_cons, returnShape_require]
   simp only [Except.bind]
-  rw [returnShape_assignVar]
+  rw [exceptForM_cons, returnShape_assignVar]
   simp only [Except.bind]
-  rw [returnShape_setStorageArrayElement]
-  simp only [Except.bind, Pure.pure, Except.pure]
+  rw [exceptForM_cons, returnShape_setStorageArrayElement]
+  simp only [Except.bind]
+  rw [exceptForM_nil]
 
 private theorem returnShape_forEach :
     validateReturnShapesInStmt "checkedFold" [] [.uint256] false
@@ -517,16 +524,16 @@ private theorem returnShape_forEach :
   exact returnShape_forEachBody
 
 private theorem checkedFold_return_shapes :
-    checkedFold.body.forM
+    ForM.forM checkedFold.body
       (validateReturnShapesInStmt "checkedFold" [] [.uint256] false) = .ok () := by
   unfold checkedFold
-  simp only [List.forM_cons, List.forM_nil]
-  rw [returnShape_letVar]
+  rw [exceptForM_cons, returnShape_letVar]
   simp only [Except.bind]
-  rw [returnShape_forEach]
+  rw [exceptForM_cons, returnShape_forEach]
   simp only [Except.bind]
-  rw [returnShape_return]
-  simp only [Except.bind, Pure.pure, Except.pure]
+  rw [exceptForM_cons, returnShape_return]
+  simp only [Except.bind]
+  rw [exceptForM_nil]
 
 private theorem paramRef_letVar (name : String) (value : Expr) :
     validateStmtParamReferences "checkedFold" [] (.letVar name value) = .ok () := by
@@ -560,17 +567,17 @@ private theorem paramRef_return (value : Expr) :
   simp [validateStmtParamReferencesNode, Pure.pure, Except.pure]
 
 private theorem paramRef_forEachBody :
-    checkedFoldLoopBody.forM (validateStmtParamReferences "checkedFold" []) = .ok () := by
+    ForM.forM checkedFoldLoopBody (validateStmtParamReferences "checkedFold" []) = .ok () := by
   unfold checkedFoldLoopBody
-  simp only [List.forM_cons, List.forM_nil]
-  rw [paramRef_letVar]
+  rw [exceptForM_cons, paramRef_letVar]
   simp only [Except.bind]
-  rw [paramRef_require]
+  rw [exceptForM_cons, paramRef_require]
   simp only [Except.bind]
-  rw [paramRef_assignVar]
+  rw [exceptForM_cons, paramRef_assignVar]
   simp only [Except.bind]
-  rw [paramRef_setStorageArrayElement]
-  simp only [Except.bind, Pure.pure, Except.pure]
+  rw [exceptForM_cons, paramRef_setStorageArrayElement]
+  simp only [Except.bind]
+  rw [exceptForM_nil]
 
 private theorem paramRef_forEach :
     validateStmtParamReferences "checkedFold" []
@@ -585,15 +592,15 @@ private theorem paramRef_forEach :
   exact paramRef_forEachBody
 
 private theorem checkedFold_param_refs :
-    checkedFold.body.forM (validateStmtParamReferences "checkedFold" []) = .ok () := by
+    ForM.forM checkedFold.body (validateStmtParamReferences "checkedFold" []) = .ok () := by
   unfold checkedFold
-  simp only [List.forM_cons, List.forM_nil]
-  rw [paramRef_letVar]
+  rw [exceptForM_cons, paramRef_letVar]
   simp only [Except.bind]
-  rw [paramRef_forEach]
+  rw [exceptForM_cons, paramRef_forEach]
   simp only [Except.bind]
-  rw [paramRef_return]
-  simp only [Except.bind, Pure.pure, Except.pure]
+  rw [exceptForM_cons, paramRef_return]
+  simp only [Except.bind]
+  rw [exceptForM_nil]
 
 set_option maxRecDepth 16384 in
 set_option maxHeartbeats 4000000 in
