@@ -1,0 +1,241 @@
+{
+  "schema": "lido-srv3-deployed-identities-v1",
+  "recorded_at": {
+    "block": 25997829,
+    "rpc": "https://ethereum-rpc.publicnode.com",
+    "date": "2026-09-17"
+  },
+  "note": "Step 1c of the not-proven cleanup (Thomas 2026-09-17). Runtime fixtures are eth_getCode results; codehash is keccak256 of the runtime (EIP-1052 EXTCODEHASH), block-independent while the code is not upgraded. scripts/verify_srv3_identities.py re-hashes every fixture, re-extracts every linked library address at its recorded PUSH20 offsets, and under ETH_RPC_URL re-reads the proxies, StakingRouter.getStakingModules(), the locator getters, AccountingOracle.getConsensusContract() and the live code.",
+  "staking_router": {
+    "proxy": "0xfddf38947afb03c621c71b06c9c70bce73f12999",
+    "implementation": "0xdd76927045435c7605cf6f5f978cfb8cabdb5f80",
+    "registered_modules": [
+      {
+        "id": 1,
+        "name": "NodeOperatorsRegistry",
+        "address": "0x55032650b14df07b85bf18a3a3ec8e0af2e028d5",
+        "implementation": "0x6828b023e737f96b168acd0b5c6351971a4f81ae",
+        "proxy_kind": "aragon-app-proxy"
+      },
+      {
+        "id": 2,
+        "name": "SimpleDVT",
+        "address": "0xae7b191a31f627b4eb1d4dac64eab9976995b433",
+        "implementation": "0x6828b023e737f96b168acd0b5c6351971a4f81ae",
+        "proxy_kind": "aragon-app-proxy"
+      },
+      {
+        "id": 3,
+        "name": "CSModule",
+        "address": "0xda7de2ecddfccc6c3af10108db212acbbf9ea83f",
+        "implementation": "0x63992a86f009fcc796a8369feefb68880aef4e3a",
+        "proxy_kind": "eip1967"
+      },
+      {
+        "id": 4,
+        "name": "CuratedModuleV2",
+        "address": "0xda5f930ce326eb5205085d66c72a4e79d60cb8c1",
+        "implementation": "0x959fc67fe53c8a6c7a1aed73430aa07a36ed9337",
+        "proxy_kind": "eip1967"
+      }
+    ]
+  },
+  "locator": {
+    "proxy": "0xc1d0b3de6792bf6b4b37eccdcc24e45978cfd2eb",
+    "implementation": "0xf2ffb952e129a63f0614ff87126e1d4a494a2313",
+    "source": "Lido.getLidoLocator() on 0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+    "getters": {
+      "stakingRouter()": "0xfddf38947afb03c621c71b06c9c70bce73f12999",
+      "withdrawalQueue()": "0x889edc2edab5f40e902b864ad4d7ade8e412f9b1",
+      "accountingOracle()": "0x852ded011285fe67063a08005c71a85690503cee",
+      "validatorsExitBusOracle()": "0x0de4ea0184c2ad0baca7183356aea5b8d5bf5c6e",
+      "depositSecurityModule()": "0xf573e9e3de1f86b085417ab294f56e7920b4e9be",
+      "lido()": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+      "withdrawalVault()": "0xb9d7934878b5fb9610b3fe8a5e441e8fad7e293f",
+      "topUpGateway()": "0x3fc2c71579d80790aaa3fc7be8b66ac39dc57374",
+      "consolidationGateway()": "0x17be979344f2c2cc806229a532d92f8742c10462"
+    },
+    "consensus": {
+      "AccountingOracle.getConsensusContract()": "0xd624b08c83baecf0807dd2c6880c3154a5f0b288"
+    }
+  },
+  "link_map": {
+    "StakingRouter_implementation": {
+      "address": "0xdd76927045435c7605cf6f5f978cfb8cabdb5f80",
+      "fixture_path": "fixtures/deployed/StakingRouter-impl-runtime.bin",
+      "fixture_codehash_keccak256": "9cd5d45ddde5f74d3867aa22c98fd79a85df89d202145bc588173d92e00600ec",
+      "links": {
+        "contracts/0.8.25/sr/SRLib.sol:SRLib": {
+          "address": "0xc0be9942fd8f54ab126a5f0ba649a90049ccad14",
+          "push20_offsets": [
+            1658,
+            2254,
+            2450,
+            2631,
+            3116,
+            3881,
+            4189,
+            4347,
+            5478,
+            6237,
+            6741,
+            6993,
+            7259,
+            8533,
+            9133,
+            11233,
+            11762,
+            12466,
+            15576,
+            18479,
+            19539
+          ]
+        },
+        "contracts/0.8.25/lib/BeaconChainDepositor.sol:BeaconChainDepositor": {
+          "address": "0xf98ac162eab766bdb9507c3584c00c535b8f6216",
+          "push20_offsets": [
+            9823,
+            10028,
+            15746
+          ]
+        }
+      }
+    },
+    "SRLib": {
+      "address": "0xc0be9942fd8f54ab126a5f0ba649a90049ccad14",
+      "fixture_path": "fixtures/deployed/SRLib-runtime.bin",
+      "fixture_codehash_keccak256": "229241c1e92c1e6637f8d725f96dd1d28d9b4847376dd7c94644ba5075278e64",
+      "links": {
+        "contracts/common/lib/MinFirstAllocationStrategy.sol:MinFirstAllocationStrategy": {
+          "address": "0x98f1da239a199574a4f7f371fd8fc0a872022c73",
+          "push20_offsets": [
+            8631
+          ]
+        }
+      }
+    }
+  },
+  "deployed_runtimes": {
+    "SRLib": {
+      "fixture_path": "fixtures/deployed/SRLib-runtime.bin",
+      "address": "0xc0be9942fd8f54ab126a5f0ba649a90049ccad14",
+      "role": "library linked into StakingRouter_implementation (contracts/0.8.25/sr/SRLib.sol:SRLib, Sourcify match, solc 0.8.25); every SRLib public function is reached by DELEGATECALL",
+      "chain": "mainnet",
+      "fixture_size_bytes": 12461,
+      "fixture_sha256": "577dfdc916a511c2486ccdcf2f51757c087f3a50d1769d5bcfb55b35aa1c0bd3",
+      "fixture_codehash_keccak256": "229241c1e92c1e6637f8d725f96dd1d28d9b4847376dd7c94644ba5075278e64",
+      "solidity": "contracts/0.8.25/sr/SRLib.sol",
+      "sourcify": "https://sourcify.dev/server/v2/contract/1/0xc0be9942fd8f54ab126a5f0ba649a90049ccad14"
+    },
+    "BeaconChainDepositor_lib": {
+      "fixture_path": "fixtures/deployed/BeaconChainDepositor-lib-runtime.bin",
+      "address": "0xf98ac162eab766bdb9507c3584c00c535b8f6216",
+      "role": "library linked into StakingRouter_implementation (contracts/0.8.25/lib/BeaconChainDepositor.sol; dispatcher carries makeBeaconChainTopUp 0x811d1d0f and makeBeaconChainDeposits32ETH 0xae4f0669)",
+      "chain": "mainnet",
+      "fixture_size_bytes": 3076,
+      "fixture_sha256": "303b6479f1c034fcdb41ef766da9c9e93accfdfa69981f73a67f6fc01774bbd1",
+      "fixture_codehash_keccak256": "6797d364cb1333d35eee131f2ad344d9617e3df82be294c8a87bc400801cfbb9",
+      "solidity": "contracts/0.8.25/lib/BeaconChainDepositor.sol",
+      "selectors": {
+        "makeBeaconChainTopUp(IDepositContract,bytes,bytes[],uint256[])": "0x811d1d0f",
+        "makeBeaconChainDeposits32ETH(IDepositContract,uint256,bytes,bytes,bytes)": "0xae4f0669"
+      }
+    },
+    "MinFirstAllocationStrategy_lib": {
+      "fixture_path": "fixtures/deployed/MinFirstAllocationStrategy-lib-runtime.bin",
+      "address": "0x98f1da239a199574a4f7f371fd8fc0a872022c73",
+      "role": "library linked into SRLib (contracts/common/lib/MinFirstAllocationStrategy.sol; public allocate 0x2529fbc9 reached by DELEGATECALL from SRLib.sol:415)",
+      "chain": "mainnet",
+      "fixture_size_bytes": 1013,
+      "fixture_sha256": "91b2cbf2657b70f0cfc0420e7366ca60e22c85e01c38034b1c981b20f0e197c7",
+      "fixture_codehash_keccak256": "6b5903d7b3609cfd3640a078471331f0b0f6effb5eade6d5f56e99fced33dca0",
+      "solidity": "contracts/common/lib/MinFirstAllocationStrategy.sol",
+      "selectors": {
+        "allocate(uint256[],uint256[],uint256)": "0x2529fbc9"
+      }
+    },
+    "NodeOperatorsRegistry_implementation": {
+      "fixture_path": "fixtures/deployed/NodeOperatorsRegistry-impl-runtime.bin",
+      "address": "0x6828b023e737f96b168acd0b5c6351971a4f81ae",
+      "role": "implementation behind the Aragon AppProxyUpgradeable proxies of staking modules 1 (NodeOperatorsRegistry) and 2 (SimpleDVT); resolved with implementation()",
+      "chain": "mainnet",
+      "fixture_size_bytes": 23067,
+      "fixture_sha256": "f63e14db4bad1ab89c0c49eb1dce82df76edd3bffad596c1a5055749694d0e86",
+      "fixture_codehash_keccak256": "125bca109785e7910597ce9cd368ae9ba26d62b245adaecce6a84a6934df9e4b",
+      "solidity": "contracts/0.4.24/nos/NodeOperatorsRegistry.sol",
+      "proxies": {
+        "1": "0x55032650b14df07b85bf18a3a3ec8e0af2e028d5",
+        "2": "0xae7b191a31f627b4eb1d4dac64eab9976995b433"
+      }
+    },
+    "CSModule_implementation": {
+      "fixture_path": "fixtures/deployed/CSModule-impl-runtime.bin",
+      "address": "0x63992a86f009fcc796a8369feefb68880aef4e3a",
+      "role": "implementation behind the OssifiableProxy of staking module 3 (CSModule); resolved from the EIP-1967 implementation slot",
+      "chain": "mainnet",
+      "fixture_size_bytes": 24317,
+      "fixture_sha256": "2548f87362d4fa9c0f90777b8f951cd3427f162e3aa0dbf3c5deb7609814902b",
+      "fixture_codehash_keccak256": "ad8440167e7f77ee8608b98317881e8e0a5af0698a0bd1bcdc9b0eaebd22a55b",
+      "solidity": "lidofinance/community-staking-module (not in lidofinance/core)",
+      "proxies": {
+        "3": "0xda7de2ecddfccc6c3af10108db212acbbf9ea83f"
+      }
+    },
+    "CuratedModuleV2_implementation": {
+      "fixture_path": "fixtures/deployed/CuratedModuleV2-impl-runtime.bin",
+      "address": "0x959fc67fe53c8a6c7a1aed73430aa07a36ed9337",
+      "role": "implementation behind the proxy of staking module 4 (CuratedModuleV2, built outside lidofinance/core); resolved from the EIP-1967 implementation slot",
+      "chain": "mainnet",
+      "fixture_size_bytes": 23505,
+      "fixture_sha256": "6d876f9989dbeb486228f40d711ed0076caaf1befb5505cda5668289943cdf13",
+      "fixture_codehash_keccak256": "f7bc4da51d6f2f0f1394fd0bd084feaf2bde68a4dcb00d5354d679761c9c0560",
+      "solidity": "separate repository (src/CuratedModule.sol, solc 0.8.33)",
+      "proxies": {
+        "4": "0xda5f930ce326eb5205085d66c72a4e79d60cb8c1"
+      }
+    },
+    "LidoLocator_implementation": {
+      "fixture_path": "fixtures/deployed/LidoLocator-impl-runtime.bin",
+      "address": "0xf2ffb952e129a63f0614ff87126e1d4a494a2313",
+      "role": "implementation behind the LidoLocator OssifiableProxy 0xc1d0b3de6792bf6b4b37eccdcc24e45978cfd2eb (Lido.getLidoLocator()); resolved from the EIP-1967 implementation slot",
+      "chain": "mainnet",
+      "fixture_size_bytes": 1984,
+      "fixture_sha256": "c24be1103aa695f858cc35849b747923c178c672d411268795a984a217723998",
+      "fixture_codehash_keccak256": "d6f9c11ca7f1480827784165c28b406960050a4b21267d3efcfc9852b786d9ce",
+      "solidity": "contracts/0.8.9/LidoLocator.sol",
+      "proxy": "0xc1d0b3de6792bf6b4b37eccdcc24e45978cfd2eb"
+    },
+    "WithdrawalQueueERC721_implementation": {
+      "fixture_path": "fixtures/deployed/WithdrawalQueueERC721-impl-runtime.bin",
+      "address": "0xe42c659dc09109566720ea8b2de186c2be7d94d9",
+      "role": "implementation behind locator.withdrawalQueue() proxy 0x889edc2edab5f40e902b864ad4d7ade8e412f9b1; resolved from the EIP-1967 implementation slot",
+      "chain": "mainnet",
+      "fixture_size_bytes": 24190,
+      "fixture_sha256": "95501f0f9cdc2f936c2c26dc1a0ac3a6b9409b57d562cf715af2837749d203d6",
+      "fixture_codehash_keccak256": "7606999c03ae51ffb1d29b8b80a0d0cf85912f32f088ba1a52c45df312c36e64",
+      "solidity": "contracts/0.8.9/WithdrawalQueueERC721.sol",
+      "proxy": "0x889edc2edab5f40e902b864ad4d7ade8e412f9b1"
+    },
+    "AccountingOracle_implementation": {
+      "fixture_path": "fixtures/deployed/AccountingOracle-impl-runtime.bin",
+      "address": "0xe4f03d1107d1905b6f2a28fcb6af221e0ce19136",
+      "role": "implementation behind locator.accountingOracle() proxy 0x852ded011285fe67063a08005c71a85690503cee; resolved from the EIP-1967 implementation slot",
+      "chain": "mainnet",
+      "fixture_size_bytes": 17757,
+      "fixture_sha256": "dcbcd1dbb50baebfdad143cc430f4ac23e552764e3149cb7e8171e0e0639f4ba",
+      "fixture_codehash_keccak256": "f8312f2b0c6973525ea0fd0b38d6b1a98afcfe214babd614498648fc254cef20",
+      "solidity": "contracts/0.8.9/oracle/AccountingOracle.sol",
+      "proxy": "0x852ded011285fe67063a08005c71a85690503cee"
+    },
+    "HashConsensus_AccountingOracle": {
+      "fixture_path": "fixtures/deployed/HashConsensus-AccountingOracle-runtime.bin",
+      "address": "0xd624b08c83baecf0807dd2c6880c3154a5f0b288",
+      "role": "AccountingOracle.getConsensusContract(); not proxied",
+      "chain": "mainnet",
+      "fixture_size_bytes": 13199,
+      "fixture_sha256": "c70a0a1670e9214534fde713307fd7514c55e5abb3a2b7e5a0a2a529ae9c9354",
+      "fixture_codehash_keccak256": "6ea7bf85038c3fffa4b909373e773cd899ee4278c582ea3c1d6524b35a69dfa4",
+      "solidity": "contracts/0.8.9/oracle/HashConsensus.sol"
+    }
+  }
+}

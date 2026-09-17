@@ -91,6 +91,10 @@ test:
 	@python3 scripts/verify_lido_immutable.py
 	@python3 scripts/verify_consolidation_request_immutable.py
 	@python3 scripts/verify_deposit_thirty_two_ether.py
+	@# Step 1c (Thomas 2026-09-17): SRLib/BeaconChainDepositor/MinFirst link map,
+	@# registered module implementations, locator/queue/oracle/consensus
+	@# identities, all by EIP-1052 codehash (fixtures/deployed/srv3-identities.json).
+	@python3 scripts/verify_srv3_identities.py
 	@test -s fixtures/solidity-reference/stakingRouter.getDepositAllocations.test.ts
 	@test -s fixtures/solidity-reference/stakingRouter.rewards.test.ts
 	@test -s fixtures/solidity-reference/stakingRouter.status-control.test.ts
