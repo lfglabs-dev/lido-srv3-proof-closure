@@ -783,3 +783,9 @@ not transfer a predecessor build, trust verdict or deployment acceptance.
   `pure () = Except.ok ()` (`OfficialSemantics.lean:453`) and `forEach`
   expected `List.forM`. Follow-up discharges `Pure.pure`/`Except.pure` and
   states loop bodies as `checkedFoldLoopBody.forM`. F2/F3/F4 stay OPEN.
+
+- Exact `c4e82674d0d7e7333a95949899ad60c04c56cac1` job
+  `5c04e23f-0215-4399-9963-ea7ebf032d98` failed exit 1: kernel timeout on
+  `returnShape_forEachBody` (`OfficialSemantics.lean:493`) leaving
+  `pure PUnit.unit = Except.ok ()`. Follow-up unfolds the four `forM` cons
+  cells and rewrites each lemma instead of a combined `simp`. F2/F3/F4 stay OPEN.

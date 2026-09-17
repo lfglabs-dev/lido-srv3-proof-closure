@@ -493,9 +493,16 @@ private def checkedFoldLoopBody : List Stmt :=
 private theorem returnShape_forEachBody :
     checkedFoldLoopBody.forM
       (validateReturnShapesInStmt "checkedFold" [] [.uint256] false) = .ok () := by
-  simp [checkedFoldLoopBody, returnShape_letVar, returnShape_require,
-    returnShape_assignVar, returnShape_setStorageArrayElement,
-    Bind.bind, Except.bind]
+  unfold checkedFoldLoopBody
+  simp only [List.forM_cons, List.forM_nil]
+  rw [returnShape_letVar]
+  simp only [Except.bind]
+  rw [returnShape_require]
+  simp only [Except.bind]
+  rw [returnShape_assignVar]
+  simp only [Except.bind]
+  rw [returnShape_setStorageArrayElement]
+  simp only [Except.bind, Pure.pure, Except.pure]
 
 private theorem returnShape_forEach :
     validateReturnShapesInStmt "checkedFold" [] [.uint256] false
@@ -512,8 +519,14 @@ private theorem returnShape_forEach :
 private theorem checkedFold_return_shapes :
     checkedFold.body.forM
       (validateReturnShapesInStmt "checkedFold" [] [.uint256] false) = .ok () := by
-  simp [checkedFold, returnShape_letVar, returnShape_forEach, returnShape_return,
-    Bind.bind, Except.bind, Pure.pure, Except.pure]
+  unfold checkedFold
+  simp only [List.forM_cons, List.forM_nil]
+  rw [returnShape_letVar]
+  simp only [Except.bind]
+  rw [returnShape_forEach]
+  simp only [Except.bind]
+  rw [returnShape_return]
+  simp only [Except.bind, Pure.pure, Except.pure]
 
 private theorem paramRef_letVar (name : String) (value : Expr) :
     validateStmtParamReferences "checkedFold" [] (.letVar name value) = .ok () := by
@@ -548,8 +561,16 @@ private theorem paramRef_return (value : Expr) :
 
 private theorem paramRef_forEachBody :
     checkedFoldLoopBody.forM (validateStmtParamReferences "checkedFold" []) = .ok () := by
-  simp [checkedFoldLoopBody, paramRef_letVar, paramRef_require, paramRef_assignVar,
-    paramRef_setStorageArrayElement, Bind.bind, Except.bind]
+  unfold checkedFoldLoopBody
+  simp only [List.forM_cons, List.forM_nil]
+  rw [paramRef_letVar]
+  simp only [Except.bind]
+  rw [paramRef_require]
+  simp only [Except.bind]
+  rw [paramRef_assignVar]
+  simp only [Except.bind]
+  rw [paramRef_setStorageArrayElement]
+  simp only [Except.bind, Pure.pure, Except.pure]
 
 private theorem paramRef_forEach :
     validateStmtParamReferences "checkedFold" []
@@ -565,8 +586,14 @@ private theorem paramRef_forEach :
 
 private theorem checkedFold_param_refs :
     checkedFold.body.forM (validateStmtParamReferences "checkedFold" []) = .ok () := by
-  simp [checkedFold, paramRef_letVar, paramRef_forEach, paramRef_return,
-    Bind.bind, Except.bind, Pure.pure, Except.pure]
+  unfold checkedFold
+  simp only [List.forM_cons, List.forM_nil]
+  rw [paramRef_letVar]
+  simp only [Except.bind]
+  rw [paramRef_forEach]
+  simp only [Except.bind]
+  rw [paramRef_return]
+  simp only [Except.bind, Pure.pure, Except.pure]
 
 set_option maxRecDepth 16384 in
 set_option maxHeartbeats 4000000 in
