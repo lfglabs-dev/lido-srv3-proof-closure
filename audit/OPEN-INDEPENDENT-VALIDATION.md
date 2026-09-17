@@ -755,3 +755,11 @@ not transfer a predecessor build, trust verdict or deployment acceptance.
   (`validated` / remaining `validateCompileInputs` walk). Two Spark attempts
   (`a9e91e20` on `a2e12b15`, `5a424946` on `1c87aa8f`) are exhausted. F2/F3/F4
   and trust `native_decide` remain OPEN.
+
+- Successor of `1441f4df578ef30cfcb01d327f19d2984ff2d459` splits
+  `validateFunctionSpec` and `validateCompileInputs` into standalone
+  `checkedFold_validates` / `checkedFold_inputs_validate` theorems (same shape
+  as AllocCapacity/SSZ/Consolidation compiler witnesses) so the compile proof
+  no longer walks those validators inline. Residuals at
+  `OfficialSemantics.lean:496` and `:543` are the previous inline `have`s.
+  F2/F3/F4 and trust `native_decide` stay OPEN.

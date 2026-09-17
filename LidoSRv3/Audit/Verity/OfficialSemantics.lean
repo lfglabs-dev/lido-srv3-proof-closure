@@ -449,25 +449,28 @@ private theorem checkedFold_functionReturns :
 attribute [local cbv_eval] empty_slot_alias_ranges_valid empty_slot_alias_sources_disjoint
   checkedFold_no_unsupported_internal_dynamic checkedFold_functionReturns
 
-set_option diagnostics true in
-set_option diagnostics.threshold 1000 in
+private theorem checkedFold_return_shapes :
+    checkedFold.body.forM
+      (validateReturnShapesInStmt "checkedFold" [] [.uint256] false) = .ok () := by
+  simp [checkedFold, validateReturnShapesInStmt, validateReturnShapesNode,
+    Stmt.checkRec, stmtCheck_forEach, stmtCheck_letVar, stmtCheck_assignVar,
+    stmtCheck_require, stmtCheck_return, stmtCheck_setStorageArrayElement,
+    Bind.bind, Except.bind, Pure.pure, Except.pure]
+  all_goals decide +kernel
+
+private theorem checkedFold_param_refs :
+    checkedFold.body.forM (validateStmtParamReferences "checkedFold" []) = .ok () := by
+  simp [checkedFold, validateStmtParamReferences, validateStmtParamReferencesNode,
+    Stmt.checkRec, stmtCheck_forEach, stmtCheck_letVar, stmtCheck_assignVar,
+    stmtCheck_require, stmtCheck_return, stmtCheck_setStorageArrayElement,
+    Bind.bind, Except.bind, Pure.pure, Except.pure]
+  all_goals decide +kernel
+
 set_option maxRecDepth 16384 in
 set_option maxHeartbeats 4000000 in
-set_option pp.maxSteps 200 in
-/-- The same EDSL program genuinely enters Verity's official compiler and
-produces its IR; this theorem fixes the concrete compiler entrypoint and rules
-out a source-only local interpreter experiment. -/
-theorem checkedFold_compiles_to_official_ir :
-    (CompilationModel.compile checkedFoldSpec [tx.functionSelector]).isOk = true := by
+theorem checkedFold_validates :
+    validateFunctionSpec checkedFold = .ok () := by
   have hr : functionReturns checkedFold = .ok [.uint256] := checkedFold_functionReturns
-  have noAlias : firstInvalidSlotAliasRange checkedFoldSpec.slotAliasRanges = none := by
-    simp [checkedFoldSpec, empty_slot_alias_ranges_valid]
-  have noAliasOverlap : firstSlotAliasSourceOverlap checkedFoldSpec.slotAliasRanges = none := by
-    simp [checkedFoldSpec, empty_slot_alias_sources_disjoint]
-  have noDyn : firstUnsupportedInternalDynamicParam checkedFoldSpec.functions = none := by
-    simp [checkedFoldSpec, checkedFold_no_unsupported_internal_dynamic]
-  have noWriteConflict : firstFieldWriteSlotConflict [modulesField] = none := by
-    decide +kernel
   have mechanics : collectUnguardedUnsafeBoundaryMechanicsFromStmts checkedFold.body = [] := by
     simp only [checkedFold, collectUnguardedUnsafeBoundaryMechanicsFromStmts]
     run_tac do
@@ -493,73 +496,63 @@ theorem checkedFold_compiles_to_official_ir :
       exprContainsAdtConstruct, Expr.foldBool, exprContainsAdtConstructNode,
       exprAny_literal, exprAny_localVar, exprAny_storageArrayLength,
       exprAny_storageArrayElement, exprAny_add, exprAny_sub, exprAny_le]
-    all_goals (trace_state; decide +kernel)
-  have functionValid : validateFunctionSpec checkedFold = .ok () := by
-    simp only [validateFunctionSpec, noAdt, hr]
-    simp [mechanics, checkedFold, fold_leaf, fold_forEach,
-      Stmt.foldList, Stmt.directMetadata, Stmt.childLists,
-      stmtContainsUnsafeLogicalCallLike, stmtAny_leaf, stmtAny_forEach,
-      exprContainsUnsafeLogicalCallLike, exprAny_literal, exprAny_localVar,
-      exprAny_storageArrayLength, exprAny_storageArrayElement, exprAny_add,
-      exprAny_sub, exprAny_le, exprIsUnsafeLogicalNode,
-      Bind.bind, Except.bind, Pure.pure, Except.pure]
-    run_tac do
-      let env ← Lean.getEnv
-      for suffix in ["validateAdtPayloadParamNameCollisions", "adtPayloadParamNames", "firstDuplicateString"] do
-        let candidates := env.constants.toList.filter fun (name, _) =>
-          name.toString.startsWith "_private.Compiler.CompilationModel.Validation." &&
-            name.toString.endsWith ("." ++ suffix)
-        match candidates with
-        | [(name, _)] =>
-            let id := Lean.mkIdent name
-            Lean.Elab.Tactic.evalTactic (← `(tactic| simp [$id:ident]))
-        | _ => throwError "expected one pinned Validation helper: {suffix}"
-    simp [hr, validateReturnShapesInStmt, validateReturnShapesNode,
-      validateStmtParamReferences, validateStmtParamReferencesNode,
-      Stmt.checkRec, stmtCheck_forEach, stmtCheck_letVar, stmtCheck_assignVar,
-      stmtCheck_require, stmtCheck_return, stmtCheck_setStorageArrayElement,
-      Bind.bind, Except.bind, Pure.pure, Except.pure]
-    all_goals (trace_state; decide +kernel)
-  have identifiers : validateIdentifierShapes checkedFoldSpec = .ok () := by
-    simp [validateIdentifierShapes, checkedFoldSpec]
-    run_tac do
-      let env ← Lean.getEnv
-      for suffix in ["validateReservedCompilerIdentifiers", "validateFieldIdentifiers",
-          "validateFunctionIdentifierList", "validateFunctionYulIdentifiers",
-          "validateContractIdentifiers"] do
-        let candidates := env.constants.toList.filter fun (name, _) =>
-          name.toString.startsWith "_private.Compiler.CompilationModel.ValidationCalls." &&
-            name.toString.endsWith ("." ++ suffix)
-        match candidates with
-        | [(name, _)] =>
-            unless (← Lean.Elab.Tactic.getGoals).isEmpty do
-              let id := Lean.mkIdent name
-              Lean.Elab.Tactic.evalTactic (← `(tactic| simp [$id:ident,
-                validateFunctionIdentifiers, checkedFold, modulesField,
-                collectStmtListBindNames, collectStmtBindNames,
-                collectStmtListAssignedNames, collectStmtAssignedNames,
-                Bind.bind, Except.bind, Pure.pure, Except.pure]))
-        | _ => throwError "expected one pinned identifier helper: {suffix}"
-    all_goals (trace_state; decide +kernel)
-  have validated : validateCompileInputs checkedFoldSpec [tx.functionSelector] = .ok () := by
-    unfold validateCompileInputs
-    run_tac do
-      let env ← Lean.getEnv
+    all_goals decide +kernel
+  simp only [validateFunctionSpec, noAdt, hr]
+  simp [mechanics, checkedFold, fold_leaf, fold_forEach,
+    Stmt.foldList, Stmt.directMetadata, Stmt.childLists,
+    stmtContainsUnsafeLogicalCallLike, stmtAny_leaf, stmtAny_forEach,
+    exprContainsUnsafeLogicalCallLike, exprAny_literal, exprAny_localVar,
+    exprAny_storageArrayLength, exprAny_storageArrayElement, exprAny_add,
+    exprAny_sub, exprAny_le, exprIsUnsafeLogicalNode,
+    Bind.bind, Except.bind, Pure.pure, Except.pure]
+  run_tac do
+    let env ← Lean.getEnv
+    for suffix in ["validateAdtPayloadParamNameCollisions", "adtPayloadParamNames", "firstDuplicateString"] do
       let candidates := env.constants.toList.filter fun (name, _) =>
-        name.toString.endsWith ".validateCompileInputsBeforeFieldWriteConflict"
+        name.toString.startsWith "_private.Compiler.CompilationModel.Validation." &&
+          name.toString.endsWith ("." ++ suffix)
       match candidates with
       | [(name, _)] =>
           let id := Lean.mkIdent name
-          Lean.Elab.Tactic.evalTactic (← `(tactic| unfold $id:ident))
-      | _ => throwError "expected one pinned compiler precheck definition"
-    simp only [identifiers, noAlias, noAliasOverlap, noDyn, functionValid, hr,
-      noWriteConflict]
-    simp [validateNonReentrantForkCompatibility,
-      no_external_assumptions, identifiers, checkedFoldSpec, functionValid,
-      checkedFold, modulesField, firstDuplicateName, firstDuplicateFunctionParamName,
-      firstDuplicateConstructorParamName,
-      Bind.bind, Except.bind, Pure.pure, Except.pure]
-    all_goals (trace_state; decide +kernel)
+          Lean.Elab.Tactic.evalTactic (← `(tactic| simp [$id:ident]))
+      | _ => throwError "expected one pinned Validation helper: {suffix}"
+  simp [hr, checkedFold_return_shapes, checkedFold_param_refs,
+    Bind.bind, Except.bind, Pure.pure, Except.pure]
+  all_goals decide +kernel
+
+set_option maxRecDepth 16384 in
+set_option maxHeartbeats 4000000 in
+theorem checkedFold_inputs_validate :
+    validateCompileInputs checkedFoldSpec [tx.functionSelector] = .ok () := by
+  unfold validateCompileInputs
+  run_tac do
+    let env ← Lean.getEnv
+    let candidates := env.constants.toList.filter fun (name, _) =>
+      name.toString.endsWith ".validateCompileInputsBeforeFieldWriteConflict"
+    match candidates with
+    | [(name, _)] =>
+        let id := Lean.mkIdent name
+        Lean.Elab.Tactic.evalTactic (← `(tactic| unfold $id:ident))
+    | _ => throwError "expected one pinned compiler precheck definition"
+  have hi : checkedFold.isInternal = false := rfl
+  have hn : checkedFold.name = "checkedFold" := rfl
+  simp [checkedFoldSpec, checkedFold_validates, hi, hn, List.filter_cons,
+    Bind.bind, Except.bind, Pure.pure, Except.pure]
+  all_goals decide +kernel
+
+set_option diagnostics true in
+set_option diagnostics.threshold 1000 in
+set_option maxRecDepth 16384 in
+set_option maxHeartbeats 4000000 in
+set_option pp.maxSteps 200 in
+/-- The same EDSL program genuinely enters Verity's official compiler and
+produces its IR; this theorem fixes the concrete compiler entrypoint and rules
+out a source-only local interpreter experiment. -/
+theorem checkedFold_compiles_to_official_ir :
+    (CompilationModel.compile checkedFoldSpec [tx.functionSelector]).isOk = true := by
+  have functionValid := checkedFold_validates
+  have validated := checkedFold_inputs_validate
+  have hr : functionReturns checkedFold = .ok [.uint256] := checkedFold_functionReturns
   have fieldSlot : findFieldWithResolvedSlot [modulesField] "modules" = some (modulesField, 7) := by
     rfl
   have fieldType : modulesField.ty = .dynamicArray .uint256 := rfl
