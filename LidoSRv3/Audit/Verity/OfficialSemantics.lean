@@ -307,6 +307,78 @@ private theorem fold_setStorageArrayElement {α : Type} (f : α → Stmt → Stm
   apply fold_leaf
   rfl
 
+private def emptyUnsafeYulAcc (acc : Bool) (s : Stmt) (_ : StmtMetadata) : Bool :=
+  match s with
+  | .unsafeYul fragment => acc || fragment.obligations.isEmpty
+  | _ => acc
+
+private theorem fold_emptyUnsafeYul_letVar (name : String) (value : Expr) :
+    Stmt.fold emptyUnsafeYulAcc false (.letVar name value) = false := by
+  rw [fold_letVar]; rfl
+
+private theorem fold_emptyUnsafeYul_assignVar (name : String) (value : Expr) :
+    Stmt.fold emptyUnsafeYulAcc false (.assignVar name value) = false := by
+  rw [fold_assignVar]; rfl
+
+private theorem fold_emptyUnsafeYul_require (condition : Expr) (message : String) :
+    Stmt.fold emptyUnsafeYulAcc false (.require condition message) = false := by
+  rw [fold_require]; rfl
+
+private theorem fold_emptyUnsafeYul_return (value : Expr) :
+    Stmt.fold emptyUnsafeYulAcc false (.return value) = false := by
+  rw [fold_return]; rfl
+
+private theorem fold_emptyUnsafeYul_setStorageArrayElement (name : String) (index value : Expr) :
+    Stmt.fold emptyUnsafeYulAcc false (.setStorageArrayElement name index value) = false := by
+  rw [fold_setStorageArrayElement]; rfl
+
+private theorem fold_emptyUnsafeYul_forEachBody :
+    checkedFoldLoopBody.foldl (fun acc stmt => stmt.fold emptyUnsafeYulAcc acc) false = false := by
+  unfold checkedFoldLoopBody
+  simp [List.foldl_cons, List.foldl_nil, fold_letVar, fold_require, fold_assignVar,
+    fold_setStorageArrayElement, emptyUnsafeYulAcc]
+
+private theorem fold_emptyUnsafeYul_forEach :
+    Stmt.fold emptyUnsafeYulAcc false
+      (.forEach "i" (.storageArrayLength "modules") checkedFoldLoopBody) = false := by
+  rw [fold_forEach]
+  change checkedFoldLoopBody.foldl (fun acc stmt => stmt.fold emptyUnsafeYulAcc acc) false = false
+  exact fold_emptyUnsafeYul_forEachBody
+
+private theorem checkedFold_no_empty_unsafeYul :
+    (checkedFold.body.any fun stmt => stmt.fold emptyUnsafeYulAcc false) = false := by
+  unfold checkedFold
+  rw [List.any_cons, fold_emptyUnsafeYul_letVar, Bool.false_or]
+  rw [List.any_cons, fold_emptyUnsafeYul_forEach, Bool.false_or]
+  rw [List.any_cons, fold_emptyUnsafeYul_return, Bool.false_or]
+  rfl
+
+private theorem controlFlow_letVar (name : String) (value : Expr) :
+    Stmt.controlFlow (.letVar name value) = .fallsThrough := rfl
+
+private theorem controlFlow_assignVar (name : String) (value : Expr) :
+    Stmt.controlFlow (.assignVar name value) = .fallsThrough := rfl
+
+private theorem controlFlow_require (condition : Expr) (message : String) :
+    Stmt.controlFlow (.require condition message) = .mayReverting := rfl
+
+private theorem controlFlow_return (value : Expr) :
+    Stmt.controlFlow (.return value) = .returns := rfl
+
+private theorem controlFlow_setStorageArrayElement (name : String) (index value : Expr) :
+    Stmt.controlFlow (.setStorageArrayElement name index value) = .fallsThrough := rfl
+
+private theorem controlFlow_forEach (name : String) (count : Expr) (body : List Stmt) :
+    Stmt.controlFlow (.forEach name count body) =
+      ControlFlowSummary.union .fallsThrough (Stmt.controlFlowList body) := rfl
+
+private theorem controlFlowList_nil :
+    Stmt.controlFlowList ([] : List Stmt) = .fallsThrough := rfl
+
+private theorem controlFlowList_cons (stmt : Stmt) (rest : List Stmt) :
+    Stmt.controlFlowList (stmt :: rest) =
+      ControlFlowSummary.seq (Stmt.controlFlow stmt) (Stmt.controlFlowList rest) := rfl
+
 attribute [local cbv_eval] fold_forEach exprAny_literal exprAny_localVar exprAny_storageArrayLength exprAny_storageArrayElement exprAny_add exprAny_sub exprAny_le stmtAny_forEach stmtAny_letVar fold_letVar stmtAny_assignVar fold_assignVar stmtAny_require fold_require stmtAny_return fold_return stmtAny_setStorageArrayElement fold_setStorageArrayElement
 
 private theorem stmtCheck_letVar (check : Stmt → Except String Unit) (name : String) (value : Expr) :
@@ -605,13 +677,52 @@ private theorem checkedFold_param_refs :
   rw [exceptForM_cons, paramRef_return, exceptBind_ok]
   rw [exceptForM_nil]
 
-/-- Validation uses the declared local obligations; the opaque mechanics
-collector need not be evaluated to establish that this guard is discharged. -/
+/-- Validation uses the declared local obligations; unused `Stmt.fold` lets
+are not zeta-reduced, so the hanging collector is never evaluated. -/
 theorem checkedFold_validates :
     validateFunctionSpec checkedFold = .ok () := by
   have documented : checkedFold.localObligations.isEmpty = false := rfl
-  simp only [validateFunctionSpec, documented, Bool.and_false, Bool.false_and]
-  decide +kernel
+  have noEmptyYul := checkedFold_no_empty_unsafeYul
+  simp (config := {zeta := false, zetaUnused := true}) only
+    [validateFunctionSpec, documented, noEmptyYul, Bool.and_false, Bool.false_and]
+  have hr : functionReturns checkedFold = .ok [.uint256] := checkedFold_functionReturns
+  have noAdt : validateNoUnsupportedAdtConstructInStmtList checkedFold.body = .ok () := by
+    simp [checkedFold, validateNoUnsupportedAdtConstructInStmtList,
+      Stmt.checkRecList, Stmt.forDeepListM, stmtCheck_forEach,
+      stmtCheck_letVar, stmtCheck_assignVar, stmtCheck_require, stmtCheck_return,
+      stmtCheck_setStorageArrayElement, validateNoUnsupportedAdtConstructNode,
+      exprContainsAdtConstruct, Expr.foldBool, exprContainsAdtConstructNode,
+      exprAny_literal, exprAny_localVar, exprAny_storageArrayLength,
+      exprAny_storageArrayElement, exprAny_add, exprAny_sub, exprAny_le]
+    all_goals decide +kernel
+  simp [checkedFold, noAdt, hr,
+    Stmt.directMetadata, Stmt.childLists,
+    stmtContainsUnsafeLogicalCallLike, stmtAny_leaf, stmtAny_forEach,
+    stmtAny_letVar, stmtAny_assignVar, stmtAny_require, stmtAny_return,
+    stmtAny_setStorageArrayElement,
+    exprContainsUnsafeLogicalCallLike, exprAny_literal, exprAny_localVar,
+    exprAny_storageArrayLength, exprAny_storageArrayElement, exprAny_add,
+    exprAny_sub, exprAny_le, exprIsUnsafeLogicalNode,
+    controlFlow_letVar, controlFlow_assignVar, controlFlow_require,
+    controlFlow_return, controlFlow_setStorageArrayElement, controlFlow_forEach,
+    controlFlowList_nil, controlFlowList_cons, checkedFoldLoopBody,
+    Bind.bind, Except.bind, Pure.pure, Except.pure]
+  run_tac do
+    let env ← Lean.getEnv
+    for suffix in ["validateAdtPayloadParamNameCollisions", "adtPayloadParamNames", "firstDuplicateString",
+        "stmtListAlwaysReturnsOrReverts"] do
+      let candidates := env.constants.toList.filter fun (name, _) =>
+        name.toString.startsWith "_private.Compiler.CompilationModel.Validation." &&
+          name.toString.endsWith ("." ++ suffix)
+      match candidates with
+      | [(name, _)] =>
+          unless (← Lean.Elab.Tactic.getGoals).isEmpty do
+            let id := Lean.mkIdent name
+            Lean.Elab.Tactic.evalTactic (← `(tactic| simp [$id:ident]))
+      | _ => throwError "expected one pinned Validation helper: {suffix}"
+  simp [hr, checkedFold_return_shapes, checkedFold_param_refs, exceptBind_ok, exceptBind_okVal,
+    Bind.bind, Except.bind, Pure.pure, Except.pure]
+  all_goals decide +kernel
 
 set_option maxRecDepth 16384 in
 set_option maxHeartbeats 4000000 in

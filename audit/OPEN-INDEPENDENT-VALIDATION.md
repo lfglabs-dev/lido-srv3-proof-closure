@@ -3,20 +3,22 @@
 Canonical obligations remain in `audit/guarantees.yaml`; generated UX2 files are
 views of that registry. No historical receipt validates a successor commit.
 
-- **Current coordination (2026-09-17).** Live head `eb7f446994091ce5f20c75553810a89f136b7092`
-  still hangs `checkedFold_no_unguarded_mechanics` inside `validateFunctionSpec`.
-  This successor documents a local overflow-guard obligation so
-  `validateFunctionSpec` can skip that collector, and adds `exceptBind_okVal` /
-  `compileConstructor none` / `pickUniqueFunctionByName` constructor lemmas.
-  Trust `native_decide` policy is unchanged: foundations plus only the three
-  original compiler-success native exceptions; this commit does not expand the
-  allowlist. Known modeling discrepancies remain OPEN, not CLEAN: F2 CALL-only
-  gas is not Solidity transaction gas; F3 opaque SHA FFI / `A-SHA256-FFI`; F4
-  supplied ABI/layout/count/depth/memory/FFI32 hypotheses. ALLOC1
-  supported-module reachability, ALLOC2 deployed library identity,
-  I-TRUST-FOUNDATIONAL-ONLY, and NOR loader composition remain OPEN. The
-  unavailable predecessor-ledger finding is not invented. Website writer
-  `d2e6ef99` / reviewer `a52bfddf` historical-pair review is not this candidate.
+- **Current coordination (2026-09-17).** Exact `6d9c9bce9435c8be393e61ddaa95835ad8fbb648`
+  job `5c67cc2e-5fde-43d8-bdb8-4fd1ddb6b8c1` failed with null exit after
+  CompilationModel 61/62 (~28 min); no OfficialSemantics diagnostic. Default
+  `simp` zeta still substituted `collectUnguardedUnsafeBoundaryMechanicsFromStmts`
+  before `Bool.and` short-circuit. Follow-up keeps zeta off, discharges the
+  unused-Yul `Stmt.fold` with constructor lemmas, and retains
+  `exceptBind_okVal` / empty-constructor lemmas. Trust `native_decide` policy
+  is unchanged: foundations plus only the three original compiler-success
+  native exceptions; this commit does not expand the allowlist. Known modeling
+  discrepancies remain OPEN, not CLEAN: F2 CALL-only gas is not Solidity
+  transaction gas; F3 opaque SHA FFI / `A-SHA256-FFI`; F4 supplied
+  ABI/layout/count/depth/memory/FFI32 hypotheses. ALLOC1 supported-module
+  reachability, ALLOC2 deployed library identity, I-TRUST-FOUNDATIONAL-ONLY,
+  and NOR loader composition remain OPEN. The unavailable predecessor-ledger
+  finding is not invented. Website writer `d2e6ef99` / reviewer `a52bfddf`
+  historical-pair review is not this candidate.
 - Exact proof milestone `806f308376686d6eef750797002473d0d7435ce4` passed the
   full configured repository suite on registered DGX Spark, job
   `57f51984-9e08-47f2-b191-e84d2624a562`, exit 0 at 2026-09-15 15:52:05 UTC,
@@ -851,4 +853,13 @@ not transfer a predecessor build, trust verdict or deployment acceptance.
   never pushed: `checkedFold_no_unguarded_mechanics` still hangs the collector.
   Follow-up documents `checkedFold.overflow-guard` so `validateFunctionSpec`
   skips that fold, and states `exceptBind_okVal` / empty-constructor lemmas.
+  F2/F3/F4 stay OPEN. Trust `native_decide` allowlist is unchanged.
+
+- Exact `6d9c9bce9435c8be393e61ddaa95835ad8fbb648` job
+  `5c67cc2e-5fde-43d8-bdb8-4fd1ddb6b8c1` failed with null exit after
+  CompilationModel 61/62 (~28 min); no OfficialSemantics diagnostic. Residual
+  is `validateFunctionSpec` (`OfficialSemantics.lean:610`) still zeta-reducing
+  `Stmt.fold` / `collectUnguardedUnsafeBoundaryMechanicsFromStmts` before
+  `localObligations.isEmpty = false` short-circuits. Follow-up uses
+  `simp (config := {zeta := false})` plus empty-unsafeYul constructor lemmas.
   F2/F3/F4 stay OPEN. Trust `native_decide` allowlist is unchanged.
