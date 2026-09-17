@@ -29,24 +29,26 @@ open Compiler.CompilationModel.Denote
 def modulesField : Field :=
   { name := "modules", ty := .dynamicArray .uint256, «slot» := some 7 }
 
+private def checkedFoldLoopBody : List Stmt :=
+  [ .letVar "value" (.storageArrayElement "modules" (.localVar "i"))
+  -- `.add` is wrapping in the official denotation.  Solidity 0.8
+  -- checked addition is therefore expressed in source order as this
+  -- guard followed by the arithmetic operation.
+  , .require
+      (.le (.localVar "value")
+        (.sub (.literal Verity.Core.MAX_UINT256) (.localVar "total")))
+      "Panic(0x11): arithmetic overflow"
+  , .assignVar "total" (.add (.localVar "total") (.localVar "value"))
+  , .setStorageArrayElement "modules" (.localVar "i")
+      (.add (.localVar "value") (.literal 1)) ]
+
 def checkedFold : FunctionSpec :=
   { name := "checkedFold"
     params := []
     returnType := some .uint256
     body :=
       [ .letVar "total" (.literal 0)
-      , .forEach "i" (.storageArrayLength "modules")
-          [ .letVar "value" (.storageArrayElement "modules" (.localVar "i"))
-          -- `.add` is wrapping in the official denotation.  Solidity 0.8
-          -- checked addition is therefore expressed in source order as this
-          -- guard followed by the arithmetic operation.
-          , .require
-              (.le (.localVar "value")
-                (.sub (.literal Verity.Core.MAX_UINT256) (.localVar "total")))
-              "Panic(0x11): arithmetic overflow"
-          , .assignVar "total" (.add (.localVar "total") (.localVar "value"))
-          , .setStorageArrayElement "modules" (.localVar "i")
-              (.add (.localVar "value") (.literal 1)) ]
+      , .forEach "i" (.storageArrayLength "modules") checkedFoldLoopBody
       , .return (.localVar "total") ] }
 
 def checkedFoldSpec : CompilationModel :=
@@ -496,16 +498,6 @@ private theorem returnShape_return (value : Expr) :
   unfold validateReturnShapesInStmt Stmt.checkRec
   rw [stmtCheck_return]
   simp [validateReturnShapesNode, Pure.pure, Except.pure]
-
-private def checkedFoldLoopBody : List Stmt :=
-  [ .letVar "value" (.storageArrayElement "modules" (.localVar "i"))
-  , .require
-      (.le (.localVar "value")
-        (.sub (.literal Verity.Core.MAX_UINT256) (.localVar "total")))
-      "Panic(0x11): arithmetic overflow"
-  , .assignVar "total" (.add (.localVar "total") (.localVar "value"))
-  , .setStorageArrayElement "modules" (.localVar "i")
-      (.add (.localVar "value") (.literal 1)) ]
 
 private theorem returnShape_forEachBody :
     ForM.forM checkedFoldLoopBody

@@ -804,3 +804,9 @@ not transfer a predecessor build, trust verdict or deployment acceptance.
   `32cde0b6-7632-4f67-bc62-ba9f3644fdca` failed exit 1: `Except.bind` did not
   match `do Except.ok (); forM ...` (`OfficialSemantics.lean:514`). Follow-up
   states cons/bind as `Bind.bind`. F2/F3/F4 stay OPEN.
+
+- Exact `e1e5aa7b690baa46414a6c2d59fa9c284cc10c94` job
+  `6b932371-7878-4bff-9ea3-aec493024c5b` failed exit 1: unfolding
+  `checkedFold` inlined the loop list so `returnShape_forEach` did not match
+  (`OfficialSemantics.lean:536`). Follow-up shares `checkedFoldLoopBody` in
+  the function spec. F2/F3/F4 stay OPEN.
