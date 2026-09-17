@@ -125,6 +125,7 @@ import LidoSRv3.Audit.Guarantees.PConsolidationEth1CLProofPremise
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1AbiBridgePremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
+import LidoSRv3.Audit.Guarantees.PAlloc1CheckedBoundsFromModules
 import LidoSRv3.Audit.Guarantees.PAlloc1Phase3
 import LidoSRv3.Audit.Guarantees.PAlloc2
 import LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound
@@ -978,6 +979,17 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.AragonACLSource.hasRole_true_of_mapping_nonzero
 -- Second-step (2026-09-13): P-ALLOC-1 per-module uint64 field bounds.
 -- Third-step (2026-09-13): P-ALLOC-1 SR monotonicity invariant (active_subtraction).
+-- A-SUPPORTED-MODULES (Thomas 2026-09-17, step 1a): PAlloc1CheckedBoundsFromModules
+-- composes NodeOperatorsRegistry.counterSum_lt_word (exact uint256 replies under
+-- the 200-operator cap), SRStorageExitedMonotonicity.reachable_state_is_monotone
+-- (admitted-writer histories keep exited <= deposited) and the three pinned
+-- type-bound lemmas into CheckedBounds; the premise SupportedModules is the
+-- accepted assumption, not a theorem about the deployed modules.
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.counterSum_lt_word
+#print axioms LidoSRv3.Audit.Source.SRStorageExitedMonotonicity.reachable_state_is_monotone
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc1CheckedBoundsFromModules.active_subtraction_of_supported
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc1CheckedBoundsFromModules.checkedBounds_of_supportedModules
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc1CheckedBoundsFromModules.checked_execute_under_supported_modules
 -- General rule (Thomas 2026-09-12) applied to P-CONSOLIDATION-ETH-1
 -- feePerRequest free Nat: naming scaffold PinnedFeeStaticcallShape
 -- names the pinned WithdrawalVaultEIP7685.sol:79-81 STATICCALL entry

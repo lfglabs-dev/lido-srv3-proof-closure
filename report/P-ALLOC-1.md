@@ -78,3 +78,7 @@ Those historical runs used Lean v4.31.0 and Verity e977aaad6e1a9e92e0132d41b3d33
 
 
 Current migration and matched-storage tests require targeted and final exact-SHA validation; the historical receipts above do not validate them.
+
+## Supported modules (A-SUPPORTED-MODULES, 2026-09-17)
+
+[PAlloc1CheckedBoundsFromModules](../LidoSRv3/Audit/Guarantees/PAlloc1CheckedBoundsFromModules.lean) names the accepted assumption `A-SUPPORTED-MODULES` as the premise `SupportedModules`: every registered module is the pinned NodeOperatorsRegistry or CSM implementation, its summary replies are the registry's packed counter sums over at most 200 operators, its counters were reached from genesis by the admitted writers, and the module struct and allocation entry respect the pinned uint16/uint64 widths. `checkedBounds_of_supportedModules` derives all five `CheckedBounds` fields from that premise by composing `NodeOperatorsRegistry.counterSum_lt_word` (the `uint256` reply is the exact registry sum), `SRStorageExitedMonotonicity.reachable_state_is_monotone` (exited ≤ deposited on every admitted history) and the `PAlloc1{TargetMult,TotalAddition,AvailableArithmetic}Bounded` lemmas. `checked_execute_under_supported_modules` re-exports `checked_execute` under it. The premise is assumed for the deployed modules, not proved; the arbitrary-module counterexample still shows that unconditional `CheckedBounds` is false.

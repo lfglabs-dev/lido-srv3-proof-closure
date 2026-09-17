@@ -17,7 +17,8 @@
       "title": "The deployed contracts correspond to the source we reviewed.",
       "parts": {
         "A-SOLC-TRUSTED": "We assume the compiler and compilation pipeline preserve the source behaviour.",
-        "A-RUNTIME-PROVENANCE": "We assume the deployed contracts and proxy implementations correspond to the pinned source."
+        "A-RUNTIME-PROVENANCE": "We assume the deployed contracts and proxy implementations correspond to the pinned source.",
+        "A-SUPPORTED-MODULES": "We assume the router's registered modules are the pinned NodeOperatorsRegistry and CSM implementations at their deployed addresses, with storage reachable only through their admitted writers."
       },
       "mitigation": "The verification guide provides external checks of implementation addresses, on-chain code and verified source bundles. Its --recompile option prints instructions; it does not run a local compilation. Compiler correctness remains trusted."
     },

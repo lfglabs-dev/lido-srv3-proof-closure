@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-EXPECTED_PARTS = {'model-source': {'A-VERITY-SCAFFOLD', 'A-CLASSICAL-CHOICE', 'A-SOURCE-SHAPED', 'A-ABSTRACT-TX'}, 'source-chain': {'A-RUNTIME-PROVENANCE', 'A-SOLC-TRUSTED'}, 'primitives-transport': {'A-MULTI-NODE-TRANSPORT', 'A-SHA256-FFI'}}
+EXPECTED_PARTS = {'model-source': {'A-VERITY-SCAFFOLD', 'A-CLASSICAL-CHOICE', 'A-SOURCE-SHAPED', 'A-ABSTRACT-TX'}, 'source-chain': {'A-RUNTIME-PROVENANCE', 'A-SOLC-TRUSTED', 'A-SUPPORTED-MODULES'}, 'primitives-transport': {'A-MULTI-NODE-TRANSPORT', 'A-SHA256-FFI'}}
 
 
 
