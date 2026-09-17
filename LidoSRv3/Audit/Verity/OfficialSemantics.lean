@@ -590,27 +590,31 @@ private theorem checkedFold_param_refs :
 
 set_option maxRecDepth 16384 in
 set_option maxHeartbeats 4000000 in
+private theorem checkedFold_no_unguarded_mechanics :
+    collectUnguardedUnsafeBoundaryMechanicsFromStmts checkedFold.body = [] := by
+  simp only [checkedFold, collectUnguardedUnsafeBoundaryMechanicsFromStmts]
+  run_tac do
+    let env ← Lean.getEnv
+    for suffix in ["collectUnguardedLowLevelMechanicsFromStmts",
+        "collectUnguardedLowLevelStmtMechanics", "collectLowLevelExprMechanics",
+        "dedupPreserve"] do
+      let candidates := env.constants.toList.filter fun (name, _) =>
+        name.toString.startsWith "_private.Compiler.CompilationModel.TrustSurface." &&
+          name.toString.endsWith ("." ++ suffix)
+      match candidates with
+      | [(name, _)] =>
+          unless (← Lean.Elab.Tactic.getGoals).isEmpty do
+            let id := Lean.mkIdent name
+            Lean.Elab.Tactic.evalTactic (← `(tactic| simp [$id:ident]))
+      | _ => throwError "expected one pinned TrustSurface helper: {suffix}"
+  all_goals decide +kernel
+
+set_option maxRecDepth 16384 in
+set_option maxHeartbeats 4000000 in
 theorem checkedFold_validates :
     validateFunctionSpec checkedFold = .ok () := by
   have hr : functionReturns checkedFold = .ok [.uint256] := checkedFold_functionReturns
-  have mechanics : collectUnguardedUnsafeBoundaryMechanicsFromStmts checkedFold.body = [] := by
-    simp only [checkedFold, collectUnguardedUnsafeBoundaryMechanicsFromStmts]
-    run_tac do
-      let env ← Lean.getEnv
-      for suffix in ["collectUnguardedLowLevelMechanicsFromStmts",
-          "collectUnguardedLowLevelStmtMechanics", "collectLowLevelExprMechanics",
-          "dedupPreserve"] do
-        let candidates := env.constants.toList.filter fun (name, _) =>
-          name.toString.startsWith "_private.Compiler.CompilationModel.TrustSurface." &&
-            name.toString.endsWith ("." ++ suffix)
-        match candidates with
-        | [(name, _)] =>
-            unless (← Lean.Elab.Tactic.getGoals).isEmpty do
-              let id := Lean.mkIdent name
-              Lean.Elab.Tactic.evalTactic (← `(tactic| simp [$id:ident]))
-        | _ => throwError "expected one pinned TrustSurface helper: {suffix}"
-    all_goals decide +kernel
-  simp only [checkedFold] at mechanics
+  have mechanics := checkedFold_no_unguarded_mechanics
   have noAdt : validateNoUnsupportedAdtConstructInStmtList checkedFold.body = .ok () := by
     simp [checkedFold, validateNoUnsupportedAdtConstructInStmtList,
       Stmt.checkRecList, Stmt.forDeepListM, stmtCheck_forEach,

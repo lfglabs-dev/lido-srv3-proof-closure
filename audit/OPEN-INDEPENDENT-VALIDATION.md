@@ -816,3 +816,19 @@ not transfer a predecessor build, trust verdict or deployment acceptance.
   remaining `mechanics` fold (`OfficialSemantics.lean:596`) and `decide_cbv`
   recursion on `bodyValid`/`templates` (`:688,:701`). Follow-up finishes
   those with `decide +kernel`. F2/F3/F4 stay OPEN.
+
+- Exact `1aff6fb18e285bf8dee9ed6345afefa8bfc5fea4` job
+  `9c134dd6-af64-42d0-9d16-3eacb5e75fc1` failed with null exit after
+  CompilationModel 61/62 and no OfficialSemantics diagnostic (~59 min).
+  Residual remains `checkedFold_validates` / `validateFunctionSpec`
+  (`OfficialSemantics.lean:593`) and `checkedFold_inputs_validate`
+  (`:648`). Follow-up isolates the unguarded-mechanics fold as its own
+  kernel lemma. F2/F3/F4 stay OPEN. Trust `native_decide` allowlist is
+  unchanged.
+
+- Exact `1aff6fb18e285bf8dee9ed6345afefa8bfc5fea4` job
+  `9c134dd6-af64-42d0-9d16-3eacb5e75fc1` failed with null exit after
+  CompilationModel 61/62; no OfficialSemantics diagnostic. Live PR head
+  equals that SHA. Residual remains `checkedFold_validates` mechanics fold
+  (`OfficialSemantics.lean:596`) nested inside the validator. Follow-up
+  isolates `checkedFold_no_unguarded_mechanics`. F2/F3/F4 stay OPEN.
