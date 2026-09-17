@@ -662,13 +662,23 @@ private theorem checkedFold_param_refs :
   rw [exceptForM_cons, paramRef_return, exceptBind_ok]
   rw [exceptForM_nil]
 
-/-- Rewrite the documented-obligation guard without zeta-substituting the
-hanging `Stmt.fold` collector; unused lets are dropped afterwards. -/
+private theorem checkedFold_no_unsafe_logical :
+    checkedFold.body.any stmtContainsUnsafeLogicalCallLike = false := by
+  simp [checkedFold, checkedFoldLoopBody, stmtContainsUnsafeLogicalCallLike,
+    stmtAny_forEach, stmtAny_letVar, stmtAny_assignVar, stmtAny_require,
+    stmtAny_return, stmtAny_setStorageArrayElement,
+    exprContainsUnsafeLogicalCallLike, exprAny_literal, exprAny_localVar,
+    exprAny_storageArrayLength, exprAny_storageArrayElement, exprAny_add,
+    exprAny_sub, exprAny_le, exprIsUnsafeLogicalNode]
+
+/-- Rewrite the documented-obligation guard without iota/zeta on the hanging
+collector conjunct; remaining checks use constructor lemmas, not `Stmt.fold`. -/
 theorem checkedFold_validates :
     validateFunctionSpec checkedFold = .ok () := by
   have documented : checkedFold.localObligations.isEmpty = false := rfl
   have noEmptyYul := checkedFold_no_empty_unsafeYul
   have hr : functionReturns checkedFold = .ok [.uint256] := checkedFold_functionReturns
+  have noLogical := checkedFold_no_unsafe_logical
   have noAdt : validateNoUnsupportedAdtConstructInStmtList checkedFold.body = .ok () := by
     simp [checkedFold, validateNoUnsupportedAdtConstructInStmtList,
       Stmt.checkRecList, Stmt.forDeepListM, stmtCheck_forEach,
@@ -676,21 +686,14 @@ theorem checkedFold_validates :
       exprContainsAdtConstruct, Expr.foldBool, exprContainsAdtConstructNode,
       exprAny_literal, exprAny_localVar, exprAny_storageArrayLength]
     all_goals decide +kernel
-  unfold validateFunctionSpec
+  simp (config := {zeta := false, zetaUnused := false, iota := false, failIfUnchanged := false}) only
+    [validateFunctionSpec]
   rw [noEmptyYul, documented]
-  rw [Bool.and_false, Bool.false_and]
-  simp (config := {zeta := false, zetaUnused := true, failIfUnchanged := false}) only
+  simp (config := {zeta := false, zetaUnused := false, iota := false}) only
+    [Bool.and_false, Bool.false_and]
+  simp (config := {zeta := false, zetaUnused := true, iota := true}) only
     [↓reduceIte, Bind.bind, Except.bind, Pure.pure, Except.pure]
-  simp [checkedFold, noAdt, hr, stmtContainsUnsafeLogicalCallLike,
-    stmtAny_forEach, stmtAny_letVar, stmtAny_assignVar, stmtAny_require,
-    stmtAny_return, stmtAny_setStorageArrayElement,
-    exprContainsUnsafeLogicalCallLike, exprAny_literal, exprAny_localVar,
-    exprAny_storageArrayLength, exprAny_storageArrayElement, exprAny_add,
-    exprAny_sub, exprAny_le, exprIsUnsafeLogicalNode, checkedFoldLoopBody,
-    Stmt.controlFlow, Stmt.controlFlowList, ControlFlowSummary.seq,
-    ControlFlowSummary.union, ControlFlowSummary.alwaysReturnsOrReverts,
-    ControlFlowSummary.fallsThrough, ControlFlowSummary.mayReverting,
-    ControlFlowSummary.returns, checkedFold_return_shapes, checkedFold_param_refs,
+  simp [noAdt, hr, noLogical, checkedFold_return_shapes, checkedFold_param_refs,
     exceptBind_ok, exceptBind_okVal, Bind.bind, Except.bind, Pure.pure, Except.pure]
   run_tac do
     let env ← Lean.getEnv

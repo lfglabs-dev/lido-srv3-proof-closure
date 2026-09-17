@@ -3,12 +3,13 @@
 Canonical obligations remain in `audit/guarantees.yaml`; generated UX2 files are
 views of that registry. No historical receipt validates a successor commit.
 
-- **Current coordination (2026-09-17).** Exact `a554f21faeb88b46e77230069c754240e08fa208`
-  job `6d60596a-e5b9-4b2b-89d9-36a59f7e2bc4` failed exit 1:
-  `OfficialSemantics.lean:356` `controlFlow` `rfl` lemmas are not definitional
-  (partial), and `:682` `checkedFold_validates` kernel-timed out. Follow-up
-  drops those `rfl` lemmas, constructor-discharges the unused-Yul `Stmt.fold`,
-  and rewrites `Bool.and_false` without zeta on the hanging collector. Trust
+- **Current coordination (2026-09-17).** Exact `dbfec01050816e4bc4585c636b5073839459888f`
+  job `c1097989-0b98-42a7-af60-3e874078e505` failed with null exit after
+  CompilationModel 61/62 (~40 min); no OfficialSemantics diagnostic. Residual
+  is still `checkedFold_validates` (`OfficialSemantics.lean:667`) unfolding
+  `validateFunctionSpec` into `Stmt.controlFlow` / `Stmt.fold`. Follow-up
+  unfolds with `iota := false`, rewrites the documented-obligation `&&`
+  conjunct, then constructor-discharges remaining checks. Trust
   `native_decide` policy is unchanged: foundations plus only the three original
   compiler-success native exceptions; this commit does not expand the allowlist.
   Known modeling discrepancies remain OPEN, not CLEAN: F2 CALL-only gas is not
@@ -869,4 +870,13 @@ not transfer a predecessor build, trust verdict or deployment acceptance.
   definitional, and `:682` `checkedFold_validates` kernel-timed out. Follow-up
   rewrites `Bool.and_false` without zeta and constructor-discharges the
   unused-Yul fold. F2/F3/F4 stay OPEN. Trust `native_decide` allowlist is
+  unchanged.
+
+- Exact `dbfec01050816e4bc4585c636b5073839459888f` job
+  `c1097989-0b98-42a7-af60-3e874078e505` failed with null exit after
+  CompilationModel 61/62 (~40 min); no OfficialSemantics diagnostic. Residual
+  is `checkedFold_validates` (`OfficialSemantics.lean:667`) still reducing
+  `Stmt.controlFlow` / `Stmt.fold` after unfolding `validateFunctionSpec`.
+  Follow-up unfolds with `iota := false` then rewrites the documented
+  `&&` conjunct. F2/F3/F4 stay OPEN. Trust `native_decide` allowlist is
   unchanged.
