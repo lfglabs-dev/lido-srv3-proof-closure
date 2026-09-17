@@ -309,7 +309,7 @@ private theorem fold_setStorageArrayElement {α : Type} (f : α → Stmt → Stm
 
 private def emptyUnsafeYulAcc (acc : Bool) (s : Stmt) (_ : StmtMetadata) : Bool :=
   match s with
-  | .unsafeYul fragment => acc || fragment.obligations.isEmpty
+  | Stmt.unsafeYul fragment => acc || fragment.obligations.isEmpty
   | _ => acc
 
 private theorem fold_emptyUnsafeYul_letVar (name : String) (value : Expr) :
@@ -346,38 +346,23 @@ private theorem fold_emptyUnsafeYul_forEach :
   exact fold_emptyUnsafeYul_forEachBody
 
 private theorem checkedFold_no_empty_unsafeYul :
-    (checkedFold.body.any fun stmt => stmt.fold emptyUnsafeYulAcc false) = false := by
+    (checkedFold.body.any fun stmt =>
+      stmt.fold
+        (fun acc s _ =>
+          match s with
+          | Stmt.unsafeYul fragment => acc || fragment.obligations.isEmpty
+          | _ => acc)
+        false) = false := by
+  have h : (fun acc s _ =>
+      match s with
+      | Stmt.unsafeYul fragment => acc || fragment.obligations.isEmpty
+      | _ => acc) = emptyUnsafeYulAcc := rfl
+  simp only [h]
   unfold checkedFold
   rw [List.any_cons, fold_emptyUnsafeYul_letVar, Bool.false_or]
   rw [List.any_cons, fold_emptyUnsafeYul_forEach, Bool.false_or]
   rw [List.any_cons, fold_emptyUnsafeYul_return, Bool.false_or]
   rfl
-
-private theorem controlFlow_letVar (name : String) (value : Expr) :
-    Stmt.controlFlow (.letVar name value) = .fallsThrough := rfl
-
-private theorem controlFlow_assignVar (name : String) (value : Expr) :
-    Stmt.controlFlow (.assignVar name value) = .fallsThrough := rfl
-
-private theorem controlFlow_require (condition : Expr) (message : String) :
-    Stmt.controlFlow (.require condition message) = .mayReverting := rfl
-
-private theorem controlFlow_return (value : Expr) :
-    Stmt.controlFlow (.return value) = .returns := rfl
-
-private theorem controlFlow_setStorageArrayElement (name : String) (index value : Expr) :
-    Stmt.controlFlow (.setStorageArrayElement name index value) = .fallsThrough := rfl
-
-private theorem controlFlow_forEach (name : String) (count : Expr) (body : List Stmt) :
-    Stmt.controlFlow (.forEach name count body) =
-      ControlFlowSummary.union .fallsThrough (Stmt.controlFlowList body) := rfl
-
-private theorem controlFlowList_nil :
-    Stmt.controlFlowList ([] : List Stmt) = .fallsThrough := rfl
-
-private theorem controlFlowList_cons (stmt : Stmt) (rest : List Stmt) :
-    Stmt.controlFlowList (stmt :: rest) =
-      ControlFlowSummary.seq (Stmt.controlFlow stmt) (Stmt.controlFlowList rest) := rfl
 
 attribute [local cbv_eval] fold_forEach exprAny_literal exprAny_localVar exprAny_storageArrayLength exprAny_storageArrayElement exprAny_add exprAny_sub exprAny_le stmtAny_forEach stmtAny_letVar fold_letVar stmtAny_assignVar fold_assignVar stmtAny_require fold_require stmtAny_return fold_return stmtAny_setStorageArrayElement fold_setStorageArrayElement
 
@@ -677,36 +662,36 @@ private theorem checkedFold_param_refs :
   rw [exceptForM_cons, paramRef_return, exceptBind_ok]
   rw [exceptForM_nil]
 
-/-- Validation uses the declared local obligations; unused `Stmt.fold` lets
-are not zeta-reduced, so the hanging collector is never evaluated. -/
+/-- Rewrite the documented-obligation guard without zeta-substituting the
+hanging `Stmt.fold` collector; unused lets are dropped afterwards. -/
 theorem checkedFold_validates :
     validateFunctionSpec checkedFold = .ok () := by
   have documented : checkedFold.localObligations.isEmpty = false := rfl
   have noEmptyYul := checkedFold_no_empty_unsafeYul
-  simp (config := {zeta := false, zetaUnused := true}) only
-    [validateFunctionSpec, documented, noEmptyYul, Bool.and_false, Bool.false_and]
   have hr : functionReturns checkedFold = .ok [.uint256] := checkedFold_functionReturns
   have noAdt : validateNoUnsupportedAdtConstructInStmtList checkedFold.body = .ok () := by
     simp [checkedFold, validateNoUnsupportedAdtConstructInStmtList,
       Stmt.checkRecList, Stmt.forDeepListM, stmtCheck_forEach,
-      stmtCheck_letVar, stmtCheck_assignVar, stmtCheck_require, stmtCheck_return,
-      stmtCheck_setStorageArrayElement, validateNoUnsupportedAdtConstructNode,
+      stmtCheck_letVar, stmtCheck_return, validateNoUnsupportedAdtConstructNode,
       exprContainsAdtConstruct, Expr.foldBool, exprContainsAdtConstructNode,
-      exprAny_literal, exprAny_localVar, exprAny_storageArrayLength,
-      exprAny_storageArrayElement, exprAny_add, exprAny_sub, exprAny_le]
+      exprAny_literal, exprAny_localVar, exprAny_storageArrayLength]
     all_goals decide +kernel
-  simp [checkedFold, noAdt, hr,
-    Stmt.directMetadata, Stmt.childLists,
-    stmtContainsUnsafeLogicalCallLike, stmtAny_leaf, stmtAny_forEach,
-    stmtAny_letVar, stmtAny_assignVar, stmtAny_require, stmtAny_return,
-    stmtAny_setStorageArrayElement,
+  unfold validateFunctionSpec
+  rw [noEmptyYul, documented]
+  rw [Bool.and_false, Bool.false_and]
+  simp (config := {zeta := false, zetaUnused := true, failIfUnchanged := false}) only
+    [↓reduceIte, Bind.bind, Except.bind, Pure.pure, Except.pure]
+  simp [checkedFold, noAdt, hr, stmtContainsUnsafeLogicalCallLike,
+    stmtAny_forEach, stmtAny_letVar, stmtAny_assignVar, stmtAny_require,
+    stmtAny_return, stmtAny_setStorageArrayElement,
     exprContainsUnsafeLogicalCallLike, exprAny_literal, exprAny_localVar,
     exprAny_storageArrayLength, exprAny_storageArrayElement, exprAny_add,
-    exprAny_sub, exprAny_le, exprIsUnsafeLogicalNode,
-    controlFlow_letVar, controlFlow_assignVar, controlFlow_require,
-    controlFlow_return, controlFlow_setStorageArrayElement, controlFlow_forEach,
-    controlFlowList_nil, controlFlowList_cons, checkedFoldLoopBody,
-    Bind.bind, Except.bind, Pure.pure, Except.pure]
+    exprAny_sub, exprAny_le, exprIsUnsafeLogicalNode, checkedFoldLoopBody,
+    Stmt.controlFlow, Stmt.controlFlowList, ControlFlowSummary.seq,
+    ControlFlowSummary.union, ControlFlowSummary.alwaysReturnsOrReverts,
+    ControlFlowSummary.fallsThrough, ControlFlowSummary.mayReverting,
+    ControlFlowSummary.returns, checkedFold_return_shapes, checkedFold_param_refs,
+    exceptBind_ok, exceptBind_okVal, Bind.bind, Except.bind, Pure.pure, Except.pure]
   run_tac do
     let env ← Lean.getEnv
     for suffix in ["validateAdtPayloadParamNameCollisions", "adtPayloadParamNames", "firstDuplicateString",
@@ -720,7 +705,7 @@ theorem checkedFold_validates :
             let id := Lean.mkIdent name
             Lean.Elab.Tactic.evalTactic (← `(tactic| simp [$id:ident]))
       | _ => throwError "expected one pinned Validation helper: {suffix}"
-  simp [hr, checkedFold_return_shapes, checkedFold_param_refs, exceptBind_ok, exceptBind_okVal,
+  simp [hr, checkedFold_return_shapes, checkedFold_param_refs, exceptBind_ok,
     Bind.bind, Except.bind, Pure.pure, Except.pure]
   all_goals decide +kernel
 

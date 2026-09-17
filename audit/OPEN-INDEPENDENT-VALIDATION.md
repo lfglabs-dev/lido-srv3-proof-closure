@@ -3,17 +3,16 @@
 Canonical obligations remain in `audit/guarantees.yaml`; generated UX2 files are
 views of that registry. No historical receipt validates a successor commit.
 
-- **Current coordination (2026-09-17).** Exact `6d9c9bce9435c8be393e61ddaa95835ad8fbb648`
-  job `5c67cc2e-5fde-43d8-bdb8-4fd1ddb6b8c1` failed with null exit after
-  CompilationModel 61/62 (~28 min); no OfficialSemantics diagnostic. Default
-  `simp` zeta still substituted `collectUnguardedUnsafeBoundaryMechanicsFromStmts`
-  before `Bool.and` short-circuit. Follow-up keeps zeta off, discharges the
-  unused-Yul `Stmt.fold` with constructor lemmas, and retains
-  `exceptBind_okVal` / empty-constructor lemmas. Trust `native_decide` policy
-  is unchanged: foundations plus only the three original compiler-success
-  native exceptions; this commit does not expand the allowlist. Known modeling
-  discrepancies remain OPEN, not CLEAN: F2 CALL-only gas is not Solidity
-  transaction gas; F3 opaque SHA FFI / `A-SHA256-FFI`; F4 supplied
+- **Current coordination (2026-09-17).** Exact `a554f21faeb88b46e77230069c754240e08fa208`
+  job `6d60596a-e5b9-4b2b-89d9-36a59f7e2bc4` failed exit 1:
+  `OfficialSemantics.lean:356` `controlFlow` `rfl` lemmas are not definitional
+  (partial), and `:682` `checkedFold_validates` kernel-timed out. Follow-up
+  drops those `rfl` lemmas, constructor-discharges the unused-Yul `Stmt.fold`,
+  and rewrites `Bool.and_false` without zeta on the hanging collector. Trust
+  `native_decide` policy is unchanged: foundations plus only the three original
+  compiler-success native exceptions; this commit does not expand the allowlist.
+  Known modeling discrepancies remain OPEN, not CLEAN: F2 CALL-only gas is not
+  Solidity transaction gas; F3 opaque SHA FFI / `A-SHA256-FFI`; F4 supplied
   ABI/layout/count/depth/memory/FFI32 hypotheses. ALLOC1 supported-module
   reachability, ALLOC2 deployed library identity, I-TRUST-FOUNDATIONAL-ONLY,
   and NOR loader composition remain OPEN. The unavailable predecessor-ledger
@@ -863,3 +862,11 @@ not transfer a predecessor build, trust verdict or deployment acceptance.
   `localObligations.isEmpty = false` short-circuits. Follow-up uses
   `simp (config := {zeta := false})` plus empty-unsafeYul constructor lemmas.
   F2/F3/F4 stay OPEN. Trust `native_decide` allowlist is unchanged.
+
+- Exact `a554f21faeb88b46e77230069c754240e08fa208` job
+  `6d60596a-e5b9-4b2b-89d9-36a59f7e2bc4` failed exit 1.
+  Residuals: `OfficialSemantics.lean:356` `controlFlow` `rfl` lemmas are not
+  definitional, and `:682` `checkedFold_validates` kernel-timed out. Follow-up
+  rewrites `Bool.and_false` without zeta and constructor-discharges the
+  unused-Yul fold. F2/F3/F4 stay OPEN. Trust `native_decide` allowlist is
+  unchanged.
