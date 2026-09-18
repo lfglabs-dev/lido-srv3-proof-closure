@@ -134,6 +134,7 @@ import LidoSRv3.Audit.Guarantees.PConsolidationEth1NoReentry
 import LidoSRv3.Audit.Guarantees.PAddress1NoReentry
 import LidoSRv3.Audit.Guarantees.PTopup2SameBlock
 import LidoSRv3.Audit.Guarantees.PTopup2ValidatorChecks
+import LidoSRv3.Audit.Source.TrioComposition.AllocSeam
 import LidoSRv3.Audit.Guarantees.PReserve1TargetAdmission
 import LidoSRv3.Audit.Guarantees.PConsolidation1VaultCalldata
 import LidoSRv3.Audit.Guarantees.PAlloc1Phase3
@@ -2281,6 +2282,18 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PReserve1TargetAdmission.actual_reserve_guarded_physical_history
 #print axioms LidoSRv3.Audit.Guarantees.PReserve1TargetAdmission.physical_target_denied
 #print axioms LidoSRv3.Audit.Guarantees.PReserve1TargetAdmission.physical_target_allowed
+-- P-ALLOC-2 seam from P-ALLOC-1 (Thomas 2026-09-18, step 2a): the rows of a
+-- successful executed capacity producer satisfy RowsCorrespond, candidate
+-- agreement, openness of the selected candidate and the length bound; the
+-- registered step theorem is instantiated on them.
+#print axioms LidoSRv3.Audit.Source.TrioComposition.AllocSeam.toWord_val
+#print axioms LidoSRv3.Audit.Source.TrioComposition.AllocSeam.rows_correspond
+#print axioms LidoSRv3.Audit.Source.TrioComposition.AllocSeam.candidate_agrees
+#print axioms LidoSRv3.Audit.Source.TrioComposition.AllocSeam.selected_open
+#print axioms LidoSRv3.Audit.Source.TrioComposition.AllocSeam.firstLoop_length
+#print axioms LidoSRv3.Audit.Source.TrioComposition.AllocSeam.rows_length_lt_modulus
+#print axioms LidoSRv3.Audit.Source.TrioComposition.AllocSeam.account_rows_seam
+#print axioms LidoSRv3.Audit.Source.TrioComposition.AllocSeam.account_step_bounded
 
 -- P-ADDRESS-1 unbounded observe receipt (grok #416): the live
 -- AddressClaimBatchTx loop already iterates arbitrary request/hint

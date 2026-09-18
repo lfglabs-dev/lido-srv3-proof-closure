@@ -341,3 +341,7 @@ bucket to capacity before allocating the remainder to the second. These are Lean
 source regressions, not paired Solidity differential receipts. The decoded-array
 result is not physical ABI/memory/deployment closure; those obligations and the
 runtime refinement obligations remain open. Independent full-gate/axiom validation passed at d0926d6c, as reported by reviewer 01ab3536; that receipt does not validate successor source changes.
+
+## Seam from the executed capacity producer (2026-09-18)
+
+[AllocSeam](../LidoSRv3/Audit/Source/TrioComposition/AllocSeam.lean) builds the rows `SRLib._getDepositAllocations` hands to `MinFirstAllocationStrategy.allocate` from a successful run of the executed capacity producer (`VerityProducer.executeAccount`, P-ALLOC-1's `account_allocation_result`): `sourceRows` / `modelRows` pair the produced allocation and capacity arrays by index. `account_rows_seam` proves `RowsCorrespond`, candidate agreement, openness of a selected candidate and the length bound (the row count is the stored module count, a word below `2^256`); `account_step_bounded` instantiates the registered step theorem `forall_proportional_step_correspondence_and_bounded` on those rows. Axioms: `propext`, `Classical.choice`, `Quot.sound`.
