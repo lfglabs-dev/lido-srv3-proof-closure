@@ -134,6 +134,7 @@ import LidoSRv3.Audit.Guarantees.PConsolidationEth1NoReentry
 import LidoSRv3.Audit.Guarantees.PAddress1NoReentry
 import LidoSRv3.Audit.Guarantees.PTopup2SameBlock
 import LidoSRv3.Audit.Guarantees.PTopup2ValidatorChecks
+import LidoSRv3.Audit.Guarantees.PConsolidation1VaultCalldata
 import LidoSRv3.Audit.Guarantees.PAlloc1Phase3
 import LidoSRv3.Audit.Guarantees.PAlloc2
 import LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound
@@ -2255,6 +2256,19 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PTopup2ValidatorChecks.seam_pubkeys
 #print axioms LidoSRv3.Audit.Guarantees.PTopup2ValidatorChecks.wrong_credential_type_rejected
 #print axioms LidoSRv3.Audit.Guarantees.PTopup2ValidatorChecks.wrong_pubkey_length_rejected
+-- P-CONSOLIDATION-1 malformed calldata (Thomas 2026-09-18, step 2f): the vault
+-- argument decoder is characterized on every calldata against Solidity's lazy
+-- bytes[] calldata accessor (sound, complete, total); a non-well-formed block
+-- is rejected by the vault dispatcher before the fee quote, the request loop
+-- and every state change.
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1VaultCalldata.decodeOffsetSeq_access
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1VaultCalldata.decodeOffsetSeq_none
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1VaultCalldata.decodeOffsetSeq_of_access
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1VaultCalldata.decodeVaultArgs_iff
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1VaultCalldata.decodeVaultArgs_total
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1VaultCalldata.vault_rejects_malformed
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1VaultCalldata.vault_reply_well_formed
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1VaultCalldata.gateway_args_well_formed
 
 -- P-ADDRESS-1 unbounded observe receipt (grok #416): the live
 -- AddressClaimBatchTx loop already iterates arbitrary request/hint

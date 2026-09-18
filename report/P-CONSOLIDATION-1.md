@@ -48,3 +48,7 @@ lake build LidoSRv3.Audit.Guarantees.PConsolidation1ActualGatewayVault \
 ```
 
 Combined exact-SHA validation and fresh independent audit remain required. No merge or closure certification is requested.
+
+## Malformed calldata: the vault argument decoder is total (2026-09-18)
+
+[PConsolidation1VaultCalldata](../LidoSRv3/Audit/Guarantees/PConsolidation1VaultCalldata.lean) characterizes `decodeVaultArgs`, the decoder `GatewayCall.vaultExternal` runs before the inbox fee quote, the request loop and every state change, against an independent specification of Solidity's lazy `bytes[] calldata` accessor (`elementAccess`): a decoded array is exactly what index-by-index access returns (sound), every index accessing successfully yields the decoder's result (complete), a rejected array has a failing index, and every argument block either decodes to the unique lazily well-formed pair or is rejected with no such pair (`decodeVaultArgs_iff`, `decodeVaultArgs_total`). Hence any calldata that is not a lazily well-formed pair of byte arrays behind the selector is refused with `rejected []` (`vault_rejects_malformed`), every other reply came from a well-formed block (`vault_reply_well_formed`), and the composed executor's own block is the round-trip special case (`gateway_args_well_formed`). The eager model and the lazy source differ on malformed input only in revert data and attempt trace, never in the final reverted state. Axioms: `propext`, `Classical.choice`, `Quot.sound`.
