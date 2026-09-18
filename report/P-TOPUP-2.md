@@ -243,3 +243,7 @@ dispatch predicate and consumes the returned bytes; this is not runtime refineme
 ## Validator pre-checks before the module reply (2026-09-18)
 
 [PTopup2ValidatorChecks](../LidoSRv3/Audit/Guarantees/PTopup2ValidatorChecks.lean) proves on the registered admission chain `TopupRouterAdmissionCall.run` that the module-reply seam is reached only with a credential word whose first byte is `0x02` and a successful root loop over 48-byte pubkeys (`seam_shapes`, `seam_pubkeys`), and that any other shape is rejected at its stage: a non-`0x02` word returns `wrongWithdrawalCredentials` (`wrong_credential_type_rejected`), a row whose pubkey is not 48 bytes returns a gateway fault (`wrong_pubkey_length_rejected`), both with the entry world and no module CALL (`ready = none`). Block distance and root recency are the chain's `TopupTimingHistory.gates`. Axioms: `propext`, `Classical.choice`, `Quot.sound`.
+
+## Outer transport and allocation views (2026-09-18)
+
+[PTopup1AllocationViews](../LidoSRv3/Audit/Guarantees/PTopup1AllocationViews.lean) produces the admission chain's allocation word from the executed `LIDO.getDepositableEther` and top-up allocation views on the entry world and derives the registered admission effects at that word (`success`); a failed view reverts at the entry world (`failure`). The gateway-to-router ABI CALL frame is implicit, as for every registered executable parent. Axioms: `propext`, `Classical.choice`, `Quot.sound`.

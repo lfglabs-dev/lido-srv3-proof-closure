@@ -134,6 +134,7 @@ import LidoSRv3.Audit.Guarantees.PConsolidationEth1NoReentry
 import LidoSRv3.Audit.Guarantees.PAddress1NoReentry
 import LidoSRv3.Audit.Guarantees.PTopup2SameBlock
 import LidoSRv3.Audit.Guarantees.PTopup2ValidatorChecks
+import LidoSRv3.Audit.Guarantees.PTopup1AllocationViews
 import LidoSRv3.Audit.Guarantees.PDeposit1AllocationViews
 import LidoSRv3.Audit.Guarantees.PAccount1SubmitReport
 import LidoSRv3.Audit.Source.TrioComposition.AllocSeam
@@ -2305,6 +2306,16 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1AllocationViews.deposit_with_lido_view
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1AllocationViews.physicalWords_eq_accountStorage
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1AllocationViews.allocation_view_is_vm_execution
+-- P-TOPUP-1 / P-TOPUP-2 allocation views (Thomas 2026-09-18, step 2b-ii):
+-- LIDO.getDepositableEther and the top-up allocation view produce
+-- Input.allocation of the registered admission entry; a failed view reverts
+-- at the entry world; the registered effects hold at the produced word.
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1AllocationViews.run_ok_lookup
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1AllocationViews.allocationView_success
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1AllocationViews.success
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1AllocationViews.failure
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1AllocationViews.success_with_lido_view
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1AllocationViews.topup_view_is_vm_execution
 -- P-ACCOUNT-1 whole transaction (Thomas 2026-09-18, step 2g): the
 -- submitReportData entry gates compose with the registered report/fee
 -- executor; the executor's checked fee is the entry's feeEther; a committed
