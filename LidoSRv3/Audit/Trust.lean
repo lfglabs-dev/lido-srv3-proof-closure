@@ -134,6 +134,7 @@ import LidoSRv3.Audit.Guarantees.PConsolidationEth1NoReentry
 import LidoSRv3.Audit.Guarantees.PAddress1NoReentry
 import LidoSRv3.Audit.Guarantees.PTopup2SameBlock
 import LidoSRv3.Audit.Guarantees.PTopup2ValidatorChecks
+import LidoSRv3.Audit.Guarantees.PDeposit1AllocationViews
 import LidoSRv3.Audit.Guarantees.PAccount1SubmitReport
 import LidoSRv3.Audit.Source.TrioComposition.AllocSeam
 import LidoSRv3.Audit.Guarantees.PReserve1TargetAdmission
@@ -2295,6 +2296,15 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.TrioComposition.AllocSeam.rows_length_lt_modulus
 #print axioms LidoSRv3.Audit.Source.TrioComposition.AllocSeam.account_rows_seam
 #print axioms LidoSRv3.Audit.Source.TrioComposition.AllocSeam.account_step_bounded
+-- P-DEPOSIT-1 allocation views (Thomas 2026-09-18, step 2b-i): Lido's
+-- getDepositableEther view served through the router's STATICCALL at its
+-- source position of the deposit allocation chain; the consumed allocation
+-- view is the Verity-VM allocation execution of P-ALLOC-1.
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1AllocationViews.view_success
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1AllocationViews.execute_effects
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1AllocationViews.deposit_with_lido_view
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1AllocationViews.physicalWords_eq_accountStorage
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1AllocationViews.allocation_view_is_vm_execution
 -- P-ACCOUNT-1 whole transaction (Thomas 2026-09-18, step 2g): the
 -- submitReportData entry gates compose with the registered report/fee
 -- executor; the executor's checked fee is the entry's feeEther; a committed
