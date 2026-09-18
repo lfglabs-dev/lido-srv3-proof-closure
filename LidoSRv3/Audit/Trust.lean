@@ -133,6 +133,7 @@ import LidoSRv3.Audit.Guarantees.PReserve1NoReentry
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1NoReentry
 import LidoSRv3.Audit.Guarantees.PAddress1NoReentry
 import LidoSRv3.Audit.Guarantees.PTopup2SameBlock
+import LidoSRv3.Audit.Guarantees.PTopup2ValidatorChecks
 import LidoSRv3.Audit.Guarantees.PAlloc1Phase3
 import LidoSRv3.Audit.Guarantees.PAlloc2
 import LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound
@@ -2245,6 +2246,15 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PTopup2SameBlock.runMany_locked
 #print axioms LidoSRv3.Audit.Guarantees.PTopup2SameBlock.same_block_actual_batches_le_cap
 #print axioms LidoSRv3.Audit.Guarantees.PTopup2SameBlock.same_block_actual_batches_le_blockCap
+-- P-TOPUP-2 validator pre-checks (Thomas 2026-09-18, step 2d): the registered
+-- admission chain reaches its module-reply seam only with a 0x02 credential
+-- word and 48-byte pubkeys; every other shape is rejected at its stage with
+-- the entry world and no module CALL.
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2ValidatorChecks.loop_success_pubkeys
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2ValidatorChecks.seam_shapes
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2ValidatorChecks.seam_pubkeys
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2ValidatorChecks.wrong_credential_type_rejected
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2ValidatorChecks.wrong_pubkey_length_rejected
 
 -- P-ADDRESS-1 unbounded observe receipt (grok #416): the live
 -- AddressClaimBatchTx loop already iterates arbitrary request/hint

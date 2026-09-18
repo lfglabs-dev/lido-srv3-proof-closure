@@ -327,7 +327,7 @@ Premises: `blockNumber ≠ 0` (sentinel), `blockNumber < 2^32` (uint32 field),
 `0 < minBlockDistance` at entry, and `ConfigStable` for every call (the
 batch's callees leave the gateway's `minBlockDistance` field and the router's
 cap word unchanged). No `lastTopUpBlock ≤ blockNumber` premise is needed. -/
-theorem same_block_actual_batches_le_cap (gateway : Address) (ctx : Context)
+theorem same_block_actual_batches_le_cap_chain (gateway : Address) (ctx : Context)
     (blockNumber timestamp cap : Nat) (hBlock : blockNumber ≠ 0) (hWidth : blockNumber < 2^32) :
     ∀ (calls : List Batch) (w : World),
       0 < TopupTimingHistory.minDistance gateway w →
@@ -347,7 +347,7 @@ theorem same_block_actual_batches_le_cap (gateway : Address) (ctx : Context)
           rw [if_pos hp]
           simp only [hc]
         simp only [runMany, hs, List.sum_cons, Nat.zero_add]
-        exact same_block_actual_batches_le_cap gateway ctx blockNumber timestamp cap hBlock hWidth
+        exact same_block_actual_batches_le_cap_chain gateway ctx blockNumber timestamp cap hBlock hWidth
           bs w hDist hCap hbs
       | ok r =>
         cases ho : r.outcome with
@@ -357,7 +357,7 @@ theorem same_block_actual_batches_le_cap (gateway : Address) (ctx : Context)
             rw [if_pos hp]
             simp only [hc, ho]
           simp only [runMany, hs, List.sum_cons, Nat.zero_add]
-          exact same_block_actual_batches_le_cap gateway ctx blockNumber timestamp cap hBlock hWidth
+          exact same_block_actual_batches_le_cap_chain gateway ctx blockNumber timestamp cap hBlock hWidth
             bs w hDist hCap hbs
         | ok u =>
           cases u
@@ -397,12 +397,31 @@ theorem same_block_actual_batches_le_cap (gateway : Address) (ctx : Context)
               rw [if_pos hp]
               simp only [hc, ho, if_neg hlim]
             simp only [runMany, hs, List.sum_cons, hzero, Nat.zero_add]
-            exact same_block_actual_batches_le_cap gateway ctx blockNumber timestamp cap hBlock hWidth
+            exact same_block_actual_batches_le_cap_chain gateway ctx blockNumber timestamp cap hBlock hWidth
               bs r.world hDist' hCap' hbs
     · have hs := step_blocked gateway ctx blockNumber timestamp b w hp
       simp only [runMany, hs, List.sum_cons, Nat.zero_add]
-      exact same_block_actual_batches_le_cap gateway ctx blockNumber timestamp cap hBlock hWidth
+      exact same_block_actual_batches_le_cap_chain gateway ctx blockNumber timestamp cap hBlock hWidth
         bs w hDist hCap hbs
+
+/-- **Same-block bound on the actual consumer.** On an initialized gateway
+(`minBlockDistance ≥ 1`), at a nonzero uint32 block, `n` sequential calls of
+`TopupBatchConsumer.run` through the gateway's distance gate and history write
+allocate in total at most the packed router block cap (in wei) read at the
+first call. At most one call commits a positive allocation: it writes
+`lastTopUpBlock`, and every later call of the block fails the gate.
+
+Premises: `blockNumber ≠ 0` (sentinel), `blockNumber < 2^32` (uint32 field),
+`0 < minBlockDistance` at entry, and `ConfigStable` for every call (the
+batch's callees leave the gateway's `minBlockDistance` field and the router's
+cap word unchanged). No `lastTopUpBlock ≤ blockNumber` premise is needed. -/
+theorem same_block_actual_batches_le_cap (gateway : Address) (ctx : Context)
+    (blockNumber timestamp cap : Nat) (hBlock : blockNumber ≠ 0) (hWidth : blockNumber < 2^32)
+    (calls : List Batch) (w : World) (hDist : 0 < TopupTimingHistory.minDistance gateway w)
+    (hCap : (blockCap ctx.sender w).val = cap) (hStable : ∀ b ∈ calls, ConfigStable gateway ctx b) :
+    (runMany gateway ctx blockNumber timestamp w calls).1.sum ≤ cap * 10^9 :=
+  same_block_actual_batches_le_cap_chain gateway ctx blockNumber timestamp cap hBlock hWidth
+    calls w hDist hCap hStable
 
 /-- The chain's cap is the registered per-batch cap: with the router cap read
 at entry, the bound is `blockCap * GWEI` in the units of
@@ -425,6 +444,7 @@ theorem same_block_actual_batches_le_blockCap (gateway : Address) (ctx : Context
 #print axioms lock_blockCap
 #print axioms locked_blocks
 #print axioms runMany_locked
+#print axioms same_block_actual_batches_le_cap_chain
 #print axioms same_block_actual_batches_le_cap
 #print axioms same_block_actual_batches_le_blockCap
 #print axioms distance_of_admitted
