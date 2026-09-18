@@ -134,6 +134,7 @@ import LidoSRv3.Audit.Guarantees.PConsolidationEth1NoReentry
 import LidoSRv3.Audit.Guarantees.PAddress1NoReentry
 import LidoSRv3.Audit.Guarantees.PTopup2SameBlock
 import LidoSRv3.Audit.Guarantees.PTopup2ValidatorChecks
+import LidoSRv3.Audit.Guarantees.PAccount1SubmitReport
 import LidoSRv3.Audit.Source.TrioComposition.AllocSeam
 import LidoSRv3.Audit.Guarantees.PReserve1TargetAdmission
 import LidoSRv3.Audit.Guarantees.PConsolidation1VaultCalldata
@@ -2294,6 +2295,16 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Source.TrioComposition.AllocSeam.rows_length_lt_modulus
 #print axioms LidoSRv3.Audit.Source.TrioComposition.AllocSeam.account_rows_seam
 #print axioms LidoSRv3.Audit.Source.TrioComposition.AllocSeam.account_step_bounded
+-- P-ACCOUNT-1 whole transaction (Thomas 2026-09-18, step 2g): the
+-- submitReportData entry gates compose with the registered report/fee
+-- executor; the executor's checked fee is the entry's feeEther; a committed
+-- run yields Success/Prepared and any failure restores the entry world.
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1SubmitReport.guard_sender
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1SubmitReport.guard_hash
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1SubmitReport.checked_fee_ether
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1SubmitReport.committed_success
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1SubmitReport.failure_restores
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1SubmitReport.guard_failure_no_body
 
 -- P-ADDRESS-1 unbounded observe receipt (grok #416): the live
 -- AddressClaimBatchTx loop already iterates arbitrary request/hint
