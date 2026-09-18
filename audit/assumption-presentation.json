@@ -6,10 +6,9 @@
       "title": "The models represent the contract behaviour correctly.",
       "parts": {
         "A-SOURCE-SHAPED": "We assume the handwritten Lean models represent the Solidity behaviour described by this guarantee.",
-        "A-HANDWRITTEN-MINFIRST": "The independent min-first model is handwritten. Its full correspondence with Solidity and EVM execution remains open.",
         "A-ABSTRACT-TX": "The model defines transaction success and failure without executing EVM bytecode.",
         "A-VERITY-SCAFFOLD": "We also assume Verity correctly models the calls, storage and rollback used by these proofs.",
-        "A-YUL-INTERFACE": "The handwritten Yul and direct bytecode require a separate correspondence proof; this report does not connect them to Solidity."
+        "A-CLASSICAL-CHOICE": "Lean proofs may use classical choice alongside propext and Quot.sound; these foundational axioms remain visible in Trust output."
       },
       "mitigation": "The linked code and correspondence notes let you review what is modeled and what remains open. Tests and mutations check specific cases; they do not establish full correspondence."
     },
@@ -23,15 +22,13 @@
       "mitigation": "The verification guide provides external checks of implementation addresses, on-chain code and verified source bundles. Its --recompile option prints instructions; it does not run a local compilation. Compiler correctness remains trusted."
     },
     {
-      "id": "deployment-constants",
-      "title": "The configured addresses and deposit amounts match the deployment.",
+      "id": "primitives-transport",
+      "title": "Hashing and transported build evidence have explicit trust boundaries.",
       "parts": {
-        "A-DEPOSIT-CONTRACT": "We assume the configured deposit recipient is the deployed beacon deposit contract.",
-        "A-TOPUP-BEACON-ADDRESS": "We assume the configured top-up recipient is the deployed beacon deposit contract.",
-        "A-CANONICAL-REQUEST-ADDRESS": "We assume the configured consolidation request target matches the canonical deployed predeploy.",
-        "A-DEPOSIT-32-ETHER": "We assume both per-validator deposit amounts equal 32 ETH in the deployment."
+        "A-SHA256-FFI": "SHA-256 behavior comes from an opaque FFI/precompile interface; structural SSZ proofs do not prove the hash implementation correct.",
+        "A-MULTI-NODE-TRANSPORT": "Remote build receipts require exact source and toolchain identity checks; a successful job is not an independent audit."
       },
-      "mitigation": "Compare constructor arguments and immutables with deployment artifacts. The verification guide does not establish all of these identities; matching the amounts alone does not identify the recipient."
+      "mitigation": "Retain pinned artifacts, known-answer vectors and exact job receipts. Keep cryptographic correctness and independent review obligations explicit."
     }
   ]
 }

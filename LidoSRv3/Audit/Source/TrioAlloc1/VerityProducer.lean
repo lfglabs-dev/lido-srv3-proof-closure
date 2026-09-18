@@ -1,5 +1,7 @@
 import LidoSRv3.Audit.Source.TrioAlloc1.CallTree
+import LidoSRv3.Audit.Source.TrioAlloc1.CapacitySpec
 import Verity.Core.Model.DenoteExternalCalls
+import LidoSRv3.Audit.Source.TrioReserve1.AccountFrame
 
 /-!
 Full call-tree interpretation in pinned Verity's executable external-call DenoteExternalCalls.
@@ -79,6 +81,61 @@ theorem world_producer_correspondence (l : Layout) (input : CapacityInput)
       produce l (worldStorage state.world) (sourceOracle adversary state.world) input before ∧
     (executeWorld l input adversary state before).2.world = state.world :=
   producer_correspondence l (worldStorage state.world) input adversary state before
+
+/-- The executing router account supplies every count, enumeration and packed
+record word. The call adversary still observes the original whole world. -/
+def accountStorage (world : _root_.Verity.ContractState) : Storage := fun key =>
+  let value := world.readContractSlot world.thisAddress.val key.val
+  ⟨value.val, value.isLt⟩
+
+/-- The shared entry adapter derives this view; independent storage channels
+are never equated by a caller premise. -/
+theorem accountStorage_from_frame (world : _root_.Verity.ContractState) :
+    accountStorage world = worldStorage
+      (TrioReserve1.AccountFrame.enter ⟨world.thisAddress, world.sender⟩ world) := rfl
+
+def executeAccount (l : Layout) (input : CapacityInput)
+    (adversary : DenoteExternalCalls.AdversaryModel) (state : DenoteExternalCalls.CallState)
+    (before : Transcript := []) :=
+  execute l (accountStorage state.world) input adversary state before
+
+/-- All outcomes and response-dependent call order, without CheckedBounds,
+count clipping, successful decoding or desired-boundary hypotheses. -/
+theorem account_producer_correspondence (l : Layout) (input : CapacityInput)
+    (adversary : DenoteExternalCalls.AdversaryModel) (state : DenoteExternalCalls.CallState)
+    (before : Transcript) :
+    (executeAccount l input adversary state before).1 =
+      produce l (accountStorage state.world) (sourceOracle adversary state.world) input before ∧
+    (executeAccount l input adversary state before).2.world = state.world :=
+  producer_correspondence l (accountStorage state.world) input adversary state before
+
+/-- Mathematical meaning of the actual VM result. Rows and totals are obtained
+from the executed first pass; callers do not supply them or assume their bounds. -/
+def AccountMathResult (l : Layout) (input : CapacityInput)
+    (adversary : DenoteExternalCalls.AdversaryModel) (state : DenoteExternalCalls.CallState)
+    (before : Transcript) : Prop :=
+  ∀ output after, (executeAccount l input adversary state before).1 = (.ok output, after) →
+    (∃ rows total middle,
+      firstLoop l (accountStorage state.world) (sourceOracle adversary state.world) input
+        ((accountStorage state.world) (countSlot l)).val 0 input.depositsToAllocate before =
+          (.ok (rows, total), middle) ∧
+      total.val = input.depositsToAllocate.val + (rows.map (fun r => r.allocation.val)).sum ∧
+      output.capacities.map Fin.val = rows.map (CapacitySpec.capacity input total) ∧
+      RouterOrderRelated (routerOrder l (accountStorage state.world)) output) ∧
+    input.depositsToAllocate.val + (output.allocations.map Fin.val).sum < 2^256
+
+theorem account_math_result (l : Layout) (input : CapacityInput)
+    (adversary : DenoteExternalCalls.AdversaryModel) (state : DenoteExternalCalls.CallState)
+    (before : Transcript) : AccountMathResult l input adversary state before := by
+  intro output after returned
+  have executed := (account_producer_correspondence l input adversary state before).1.symm.trans returned
+  exact ⟨producer_math_view l (accountStorage state.world) (sourceOracle adversary state.world)
+      input before after output executed,
+    producer_total_bound l (accountStorage state.world) (sourceOracle adversary state.world)
+      input before after output executed⟩
+
+#print axioms accountStorage_from_frame
+#print axioms account_producer_correspondence
 
 end VerityProducer
 end LidoSRv3.Audit.Source.TrioAlloc1

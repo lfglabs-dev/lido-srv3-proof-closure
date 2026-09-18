@@ -6,7 +6,8 @@ open TopupTimingHistory PTopupTimingHistory PTopupRouterLocatorCall
 open TopupCredentialCall (resolved)
 open TopupRouterAdmissionCall (Input Ready prior run finish selected moduleInput)
 
-/-- Entire accepted TOPUP342 conjunction, byte-for-byte below these parameter lets. -/
+/-- Retained TOPUP342 execution effects with precompile-aware locator origin.
+Actual response bytes replace the invalid generic inference of code presence. -/
 def PriorEffects (i : Input) : Prop :=
   let caller := i.caller
   let locatorCall := i.locatorCall
@@ -27,7 +28,7 @@ def PriorEffects (i : Input) : Prop :=
     TopupEntryAdmission.Admitted e.gateway caller e.before ∧
     TopupEntryAdmission.run caller locatorCall locator cursor returnBuffer hash m x e ctx deposit moduleId keys operators rows allocation = TopupEntryAdmission.ofPrior (TopupRouterLocatorCall.run locatorCall locator cursor returnBuffer hash m x e ctx deposit moduleId keys operators rows allocation) ∧
     (∃ router next raw,
-      (e.before.core.codeSize locator.val).val ≠ 0 ∧
+      ¬ audit.trio.consolidation.emptyCodeAccount e.before locator ∧
       locatorCall (TopupRouterLocatorCall.request e.gateway locator) e.before = .success raw ∧
       TopupRouterLocatorCall.decodeRouter cursor raw = .ok (router,next) ∧
       32 ≤ (word raw.length).val ∧ router.val = (word (decode (raw.take 32))).val ∧
@@ -63,6 +64,41 @@ theorem actual_router_admission_complete_prior (g : TopupRouterAdmissionCallGate
 theorem actual_gateway_entry_failure_restores (g : TopupRouterAdmissionCallGates.Environment) (i : Input)
     (fault : TopupRouterAdmissionCall.Error) (h : (run g i).outcome = .error fault) :
     (run g i).world = i.gateway.before := TopupRouterAdmissionCall.failure_restores g i fault h
+
+/-- Full admission and retained physical/root/module/per-key/history effects.
+This is the complete existing success conclusion, including actual call facts. -/
+def ActualEffects (g : TopupRouterAdmissionCallGates.Environment) (i : Input) : Prop :=
+    PriorEffects i ∧ (run g i).world = (prior i).world ∧ (run g i).projection = some (prior i) ∧
+    ∃ p, (run g i).ready = some p ∧ prior i = finish i p ∧
+      TopupRouterAdmissionCallGates.Admitted g i.hash i.gateway.gateway (selected i p) (moduleInput i p) i.gateway.before ∧
+      TopupRouterAdmissionCallGates.CallFacts g i.gateway.gateway (selected i p) (moduleInput i p) i.gateway.before ∧
+      (run g i).admissionAttempts = (TopupRouterAdmissionCallGates.run g i.hash i.gateway.gateway (selected i p) (moduleInput i p) i.gateway.before).attempts
+
+/-- Bind the registered physical storage consumer to the concrete hash engine.
+Generic helpers and small-slot fixtures remain separately parameterized. -/
+def physicalKeccak : TopupRouterCredentials.Keccak := fun bytes =>
+  word (EvmYul.fromByteArrayBigEndian
+    (KeccakEngine.keccak256 (ByteArray.mk bytes.toArray)))
+
+/-- Registered executable parent. The computed success branch provides the
+entire earlier conjunction; every error restores the same entry World.
+The typed seam still excludes allocation-view calls and outer gateway/router
+ABI transport. These omissions are not assumed boundary equalities. -/
+theorem actual_topup_admission_calls_wei_and_revert
+    (g : TopupRouterAdmissionCallGates.Environment) (input : Input) :
+    let i := { input with hash := physicalKeccak }
+    match (run g i).outcome with
+    | .ok _ => ActualEffects g i
+    | .error _ => (run g i).world = i.gateway.before := by
+  dsimp only
+  cases h : (run g { input with hash := physicalKeccak }).outcome with
+  | ok value =>
+    cases value
+    exact actual_router_admission_complete_prior g _ h
+  | «error» fault =>
+    exact actual_gateway_entry_failure_restores g _ fault h
+
+#print axioms actual_topup_admission_calls_wei_and_revert
 
 #print axioms actual_router_admission_complete_prior
 #print axioms actual_gateway_entry_failure_restores

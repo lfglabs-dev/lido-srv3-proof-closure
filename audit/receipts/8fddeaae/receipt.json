@@ -1,0 +1,16 @@
+{
+  "failed_job": "8fddeaae-c14a-4fcf-9952-dcb2316cb82e",
+  "failed_commit": "cd2948767db4778a9db867946c9c1cbada4a563e",
+  "retrieval_job": "75bf7dfb-b70c-4a36-b177-9e94a03c8947",
+  "node": "dgx-spark",
+  "retrieval_command": "lake env lean audit/receipt-tools/ReadValidationLog.lean",
+  "evidence_owner": "writer-collected registered runner retrieval; not independent acceptance",
+  "source": "retained exact-candidate .lake/candidate-validation/test.log",
+  "line_range": [
+    1058,
+    1070
+  ],
+  "sha256": "9d88663ef0b81ce73026aca5f66a45cb3553caef55c7717d05271a8b3c1dc5bf",
+  "cause": "foundational-only trust rejects three disclosed compiler-native dependencies",
+  "inventory_mismatch": false
+}

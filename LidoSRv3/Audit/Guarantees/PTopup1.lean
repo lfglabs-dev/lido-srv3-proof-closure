@@ -1021,4 +1021,46 @@ theorem verity_tx_legacy_revert_restores_snapshot
     rollback = state :=
   Verity.TopupTx.revert_restores_snapshot allocations failure state rollback reason h
 
+/-- Partial wrapper rollback facts preserved from PR #668. The wrapper checks
+three inputs before `executeGuarded`; it omits other source admission guards
+and does not derive its booleans from physical state. These facts therefore do
+not close the registered parent's source prefix or call-journal correspondence.
+Errors here are model strings, not encoded Solidity revert selectors. -/
+theorem verity_tx_guarded_reverts_on_unauth
+    (cfg : SourceTopupConfig)
+    (call : Verity.TopupTx.TopupCall)
+    (wcTypeIsType2 : Bool)
+    (failure : Verity.TopupTx.FailurePoint)
+    (state : Verity.ContractState) :
+    (Verity.TopupTx.executeGuardedWithThreePrefixGuards
+        cfg call false wcTypeIsType2 failure).run state =
+      Verity.ContractResult.revert "NotAuthorized" state :=
+  Verity.TopupTx.executeGuardedWithThreePrefixGuards_reverts_on_unauth
+    cfg call wcTypeIsType2 failure state
+
+theorem verity_tx_guarded_reverts_on_empty_keys
+    (cfg : SourceTopupConfig)
+    (call : Verity.TopupTx.TopupCall)
+    (wcTypeIsType2 : Bool)
+    (failure : Verity.TopupTx.FailurePoint)
+    (state : Verity.ContractState)
+    (hEmpty : call.keyIndices.length = 0) :
+    (Verity.TopupTx.executeGuardedWithThreePrefixGuards
+        cfg call true wcTypeIsType2 failure).run state =
+      Verity.ContractResult.revert "EmptyKeysList" state :=
+  Verity.TopupTx.executeGuardedWithThreePrefixGuards_reverts_on_empty_keys
+    cfg call wcTypeIsType2 failure state hEmpty
+
+theorem verity_tx_guarded_reverts_on_wrong_wc
+    (cfg : SourceTopupConfig)
+    (call : Verity.TopupTx.TopupCall)
+    (failure : Verity.TopupTx.FailurePoint)
+    (state : Verity.ContractState)
+    (hNonempty : call.keyIndices.length ≠ 0) :
+    (Verity.TopupTx.executeGuardedWithThreePrefixGuards
+        cfg call true false failure).run state =
+      Verity.ContractResult.revert "WrongWithdrawalCredentialsType" state :=
+  Verity.TopupTx.executeGuardedWithThreePrefixGuards_reverts_on_wrong_wc
+    cfg call failure state hNonempty
+
 end LidoSRv3.Audit.Guarantees.PTopup1

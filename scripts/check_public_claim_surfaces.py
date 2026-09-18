@@ -21,18 +21,15 @@ CLAIMS = {
         "abstract_theorem": "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back",
         "verity_status": "CHECKED",
         "verity_theorem": (
-            "LidoSRv3.Audit.Guarantees.PDeposit1.NFrame."
-            "verity_tx_composes_nframe_deposit"
+            'LidoSRv3.Audit.Guarantees.PDeposit1.actual_deposit_call_slot_success_and_revert'
         ),
         "module": "PDeposit1",
         "layers": ".model, .abstractTx, .source, .verityTx",
-        "imports": (
-            "LidoSRv3.Audit.Trace",
-            "LidoSRv3.Audit.Source.DepositCorrespondence",
-            "LidoSRv3.Audit.Verity.DepositParentTx",
-            "LidoSRv3.Audit.Verity.DepositNFrameTx",
-            "LidoSRv3.Audit.Guarantees.Registry",
-        ),
+        "imports": ('LidoSRv3.Audit.Trace',
+ 'LidoSRv3.Audit.Source.DepositCorrespondence',
+ 'LidoSRv3.Audit.Verity.DepositParentTx',
+ 'LidoSRv3.Audit.Verity.DepositNFrameTx',
+ 'LidoSRv3.Audit.Guarantees.Registry'),
         # The composed claim is a single theorem quantified over the source
         # configuration/input, the transaction input and the entry state, so its
         # bridge (`LinksSource`), the two arithmetic links it needs, and the
@@ -84,77 +81,73 @@ CLAIMS = {
         # other side: one wei short on the Lido ledger refutes the whole
         # bundle at the funding guard, and the executable transaction then
         # reverts with exactly `NOT_ENOUGH_ETHER` back to the entry snapshot.
-        "declarations": (
-            ("def", "guarantee"),
-            ("def", "canonicalDepositContractAddress"),
-            ("def", "thirtyTwoEtherWei"),
-            ("theorem", "revert_restores_state_value_and_logs"),
-            # Readable-statement vocabulary (syntactic sugar only): `abbrev`s
-            # naming the registered parents' conjuncts.
-            ("abbrev", "CommittedPushConserves"),
-            ("abbrev", "NonConservingDeploymentReverts"),
-            ("theorem", "source_deposit_conserves_and_rolls_back"),
-            ("theorem", "source_router_balance_unchanged"),
-            ("theorem", "source_reverting_branch_moves_no_ether"),
-            ("theorem", "source_nonconserving_deployment_reverts"),
-            ("structure", "LinksSource"),
-            ("theorem", "linked_total_eq_pushedValue"),
-            ("theorem", "linked_total_eq_depositsValue"),
-            ("theorem", "linked_deployment_push_is_word_bounded"),
-            ("theorem", "linked_conserving_deployment_pull_is_word_bounded"),
-            ("theorem", "verity_tx_revert_restores_snapshot"),
-            ("theorem", "verity_tx_composes_deposit_conservation_and_rollback"),
-            ("def", "canonicalSourceConfig"),
-            ("def", "canonicalSourceInput"),
-            ("theorem", "canonical_links_source"),
-            ("theorem", "canonical_composition_witness"),
-            ("def", "skewedPullConfig"),
-            ("theorem", "linked_hypotheses_do_not_bound_the_line_972_product"),
-            ("theorem", "skewed_pull_witness_turned_away_before_line_972"),
-            ("theorem", "line_972_product_le_module_allocation"),
-            ("theorem", "encodable_allocation_bounds_line_972_product"),
-            ("theorem", "in_range_commit_is_word_bounded"),
-            ("def", "oversizedSourceInput"),
-            ("theorem", "oversized_input_is_outside_the_source_domain"),
-            ("theorem", "oversized_input_exceeds_word"),
-            ("theorem", "oversized_run_commits"),
-            ("theorem", "abstract_parent_covers_inputs_the_verity_plane_omits"),
-            ("def", "manyKeySourceInput"),
-            ("theorem", "manyKey_input_is_within_the_source_domain"),
-            ("theorem", "manyKey_run_commits"),
-            ("def", "nLinks"),
-            ("theorem", "manyKey_links_source_two_legs"),
-            ("def", "manyKeyUnderfundedEntry"),
-            ("theorem", "manyKey_entry_state_guards_are_load_bearing"),
-            ("theorem", "manyKey_underfunded_entry_reverts_at_not_enough_ether"),
-            ("structure", "LinksSource"),
-            ("theorem", "exactTotal_eq_exactKeys_mul"),
-            ("theorem", "linked_exactTotal_eq_pushedValue"),
-            ("theorem", "linked_exactTotal_eq_depositsValue"),
-            ("abbrev", "ExecutesNFrameJournal"),
-            ("abbrev", "ExactTotalIsSourcePush"),
-            ("abbrev", "ConservingDeploymentPullsExactTotal"),
-            ("theorem", "verity_tx_composes_nframe_deposit"),
-            ("theorem", "two_batch_conjunct_d_is_n_eq_two"),
-        ),
+        "declarations": (('def', 'guarantee'),
+ ('def', 'canonicalDepositContractAddress'),
+ ('def', 'thirtyTwoEtherWei'),
+ ('theorem', 'revert_restores_state_value_and_logs'),
+ ('abbrev', 'CommittedPushConserves'),
+ ('abbrev', 'NonConservingDeploymentReverts'),
+ ('theorem', 'source_deposit_conserves_and_rolls_back'),
+ ('theorem', 'source_router_balance_unchanged'),
+ ('theorem', 'source_reverting_branch_moves_no_ether'),
+ ('theorem', 'source_nonconserving_deployment_reverts'),
+ ('structure', 'LinksSource'),
+ ('theorem', 'linked_total_eq_pushedValue'),
+ ('theorem', 'linked_total_eq_depositsValue'),
+ ('theorem', 'linked_deployment_push_is_word_bounded'),
+ ('theorem', 'linked_conserving_deployment_pull_is_word_bounded'),
+ ('theorem', 'verity_tx_revert_restores_snapshot'),
+ ('theorem', 'verity_tx_revert_restores_snapshot_legacy_parent'),
+ ('theorem', 'verity_tx_composes_deposit_conservation_and_rollback'),
+ ('def', 'canonicalSourceConfig'),
+ ('def', 'canonicalSourceInput'),
+ ('theorem', 'canonical_links_source'),
+ ('theorem', 'canonical_composition_witness'),
+ ('def', 'skewedPullConfig'),
+ ('theorem', 'linked_hypotheses_do_not_bound_the_line_972_product'),
+ ('theorem', 'skewed_pull_witness_turned_away_before_line_972'),
+ ('theorem', 'line_972_product_le_module_allocation'),
+ ('theorem', 'encodable_allocation_bounds_line_972_product'),
+ ('theorem', 'in_range_commit_is_word_bounded'),
+ ('def', 'oversizedSourceInput'),
+ ('theorem', 'oversized_input_is_outside_the_source_domain'),
+ ('theorem', 'oversized_input_exceeds_word'),
+ ('theorem', 'oversized_run_commits'),
+ ('theorem', 'abstract_parent_covers_inputs_the_verity_plane_omits'),
+ ('def', 'manyKeySourceInput'),
+ ('theorem', 'manyKey_input_is_within_the_source_domain'),
+ ('theorem', 'manyKey_run_commits'),
+ ('def', 'nLinks'),
+ ('theorem', 'manyKey_links_source_two_legs'),
+ ('def', 'manyKeyUnderfundedEntry'),
+ ('theorem', 'manyKey_entry_state_guards_are_load_bearing'),
+ ('theorem', 'manyKey_underfunded_entry_reverts_at_not_enough_ether'),
+ ('structure', 'LinksSource'),
+ ('theorem', 'exactTotal_eq_exactKeys_mul'),
+ ('theorem', 'linked_exactTotal_eq_pushedValue'),
+ ('theorem', 'linked_exactTotal_eq_depositsValue'),
+ ('abbrev', 'ExecutesNFrameJournal'),
+ ('abbrev', 'ExactTotalIsSourcePush'),
+ ('abbrev', 'ConservingDeploymentPullsExactTotal'),
+ ('theorem', 'verity_tx_composes_nframe_deposit'),
+ ('theorem', 'two_batch_conjunct_d_is_n_eq_two')),
     },
     "P-TOPUP-1": {
         "abstract_theorem": "LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back",
         "verity_status": "CHECKED",
         "verity_theorem": (
-            "LidoSRv3.Audit.Guarantees.PTopup1."
-            "verity_tx_simulates_source_with_nonzero_wrap_close"
+            'LidoSRv3.Audit.Guarantees.PTopupRouterAdmissionCall.actual_topup_admission_calls_wei_and_revert'
         ),
         "module": "PTopup1",
         "layers": ".model, .abstractTx, .source, .verityTx",
-        "imports": (
-            "LidoSRv3.Audit.Allocation",
-            "LidoSRv3.Audit.Trace",
-            "LidoSRv3.Audit.Source.TopupCorrespondence",
-            "LidoSRv3.Audit.Source.TopupParentCorrespondence",
-            "LidoSRv3.Audit.Verity.TopupTx",
-            "LidoSRv3.Audit.Guarantees.Registry",
-        ),
+        "imports": ('LidoSRv3.Audit.Allocation',
+ 'LidoSRv3.Audit.Trace',
+ 'LidoSRv3.Audit.Source.TopupCorrespondence',
+ 'LidoSRv3.Audit.Source.TopupParentCorrespondence',
+ 'LidoSRv3.Audit.Source.TopupPrefixGuardsSource',
+ 'LidoSRv3.Audit.Source.TopupGatewayRoleViaOracleSource',
+ 'LidoSRv3.Audit.Verity.TopupTx',
+ 'LidoSRv3.Audit.Guarantees.Registry'),
         # source_wrap_precludes_value_moving_commit / source_module_guard_required /
         # source_wc_type2_guard_required precede source_topup_conserves_and_rolls_back
         # because that theorem's proof term now folds all three in as
@@ -181,55 +174,54 @@ CLAIMS = {
         # `executeGuarded` (module frame + guards) rather than only about the
         # free-allocation `execute`.  A reader must not be able to quote either
         # CHECKED row without all three.
-        "declarations": (
-            ("def", "guarantee"),
-            ("def", "canonicalBeaconDepositAddress"),
-            # Accepted constructor obstruction: source-only provenance is
-            # insufficient, and remains an explicit runtime assumption.
-            ("structure", "TopupConstructorInput"),
-            ("def", "PinnedTopupConstructorAdmitted"),
-            ("def", "wrongBeaconConstructorInput"),
-            ("theorem", "pinned_constructor_span_does_not_determine_beacon_address"),
-            ("theorem", "no_source_only_beacon_address_derivation"),
-            ("theorem", "valid_result_preserves_router_order"),
-            ("theorem", "revert_restores_state_value_and_logs"),
-            ("theorem", "source_wrap_precludes_value_moving_commit"),
-            ("theorem", "source_module_guard_required"),
-            ("theorem", "source_wc_type2_guard_required"),
-            ("theorem", "source_allocation_guards_required"),
-            ("theorem", "source_over_target_guard_required"),
-            # Readable-statement vocabulary (syntactic sugar only): `abbrev`s
-            # naming the five conjuncts of the registered abstract parent and
-            # the shared guard prefixes; unfolding them gives the same Prop.
-            ("abbrev", "pulled"),
-            ("abbrev", "pushed"),
-            ("abbrev", "Conserves"),
-            ("abbrev", "RevertRestoresSnapshot"),
-            ("abbrev", "ConservesAndRollsBack"),
-            ("abbrev", "GivenWellFormedInputs"),
-            ("abbrev", "GivenActiveModule"),
-            ("abbrev", "UnregisteredModuleReverts"),
-            ("abbrev", "WrapMovesNoValue"),
-            ("abbrev", "WrongWcTypeReverts"),
-            ("abbrev", "RunFollowsAllocationLoop"),
-            ("theorem", "source_topup_conserves_and_rolls_back"),
-            ("theorem", "source_router_balance_unchanged"),
-            ("theorem", "source_reverting_branch_moves_no_ether"),
-            ("theorem", "source_balance_guards_discharged"),
-            ("theorem", "source_unchecked_accumulation_faithful"),
-            ("theorem", "source_pinned_config_discharges_pubkey_guard"),
-            ("theorem", "verity_tx_simulates_source"),
-            ("theorem", "verity_wrap_to_zero_is_empty_commit"),
-            ("theorem", "verity_nonzero_wrap_witness_reverts_and_restores"),
-            ("theorem", "verity_nonzero_wrap_reverts_and_restores"),
-            ("def", "VerityCommittingSimulation"),
-            ("def", "VerityGuardedReturndataSimulation"),
-            # Readable-statement vocabulary for the registered Verity parent.
-            ("abbrev", "NonzeroWrapRevertsAndRestores"),
-            ("abbrev", "EveryReturndataIsGuarded"),
-            ("def", "SourceTopupCallCorresponds"),
-            ("theorem", "verity_tx_simulates_source_with_nonzero_wrap_close"),
-        ),
+        "declarations": (('def', 'guarantee'),
+ ('def', 'canonicalBeaconDepositAddress'),
+ ('structure', 'TopupConstructorInput'),
+ ('def', 'PinnedTopupConstructorAdmitted'),
+ ('def', 'wrongBeaconConstructorInput'),
+ ('theorem', 'pinned_constructor_span_does_not_determine_beacon_address'),
+ ('theorem', 'no_source_only_beacon_address_derivation'),
+ ('theorem', 'valid_result_preserves_router_order'),
+ ('theorem', 'revert_restores_state_value_and_logs'),
+ ('theorem', 'source_wrap_precludes_value_moving_commit'),
+ ('theorem', 'source_module_guard_required'),
+ ('theorem', 'source_wc_type2_guard_required'),
+ ('theorem', 'source_allocation_guards_required'),
+ ('theorem', 'source_over_target_guard_required'),
+ ('abbrev', 'pulled'),
+ ('abbrev', 'pushed'),
+ ('abbrev', 'Conserves'),
+ ('abbrev', 'RevertRestoresSnapshot'),
+ ('abbrev', 'ConservesAndRollsBack'),
+ ('abbrev', 'GivenWellFormedInputs'),
+ ('abbrev', 'GivenActiveModule'),
+ ('abbrev', 'UnregisteredModuleReverts'),
+ ('abbrev', 'WrapMovesNoValue'),
+ ('abbrev', 'WrongWcTypeReverts'),
+ ('abbrev', 'RunFollowsAllocationLoop'),
+ ('theorem', 'source_topup_conserves_and_rolls_back'),
+ ('theorem', 'source_topup_conserves_and_rolls_back_under_prefix_guards_shape'),
+ ('theorem', 'source_topup_conserves_and_rolls_back_under_gateway_oracle_shape'),
+ ('theorem', 'source_router_balance_unchanged'),
+ ('theorem', 'source_reverting_branch_moves_no_ether'),
+ ('theorem', 'source_balance_guards_discharged'),
+ ('theorem', 'source_unchecked_accumulation_faithful'),
+ ('theorem', 'source_pinned_config_discharges_pubkey_guard'),
+ ('theorem', 'verity_tx_simulates_source'),
+ ('theorem', 'verity_wrap_to_zero_is_empty_commit'),
+ ('theorem', 'verity_nonzero_wrap_witness_reverts_and_restores'),
+ ('theorem', 'verity_nonzero_wrap_reverts_and_restores'),
+ ('def', 'VerityCommittingSimulation'),
+ ('def', 'VerityGuardedReturndataSimulation'),
+ ('abbrev', 'NonzeroWrapRevertsAndRestores'),
+ ('abbrev', 'EveryReturndataIsGuarded'),
+ ('def', 'SourceTopupCallCorresponds'),
+ ('theorem', 'verity_tx_simulates_source_with_nonzero_wrap_close'),
+ ('theorem', 'verity_tx_guarded_revert_restores_snapshot'),
+ ('theorem', 'verity_tx_legacy_revert_restores_snapshot'),
+ ('theorem', 'verity_tx_guarded_reverts_on_unauth'),
+ ('theorem', 'verity_tx_guarded_reverts_on_empty_keys'),
+ ('theorem', 'verity_tx_guarded_reverts_on_wrong_wc')),
     },
 }
 
@@ -253,6 +245,24 @@ README_ID_CELL = re.compile(r"^`([^`]+)`$")
 # and still pass.  The header must name this column exactly once.
 VERITY_HEADING = "Verity Executable Contract"
 
+
+# Current executable consumers; legacy public surfaces above remain preserved.
+REGISTERED_SURFACES = {'P-DEPOSIT-1': ('PDeposit1DsmCall',
+                 ('LidoSRv3.Audit.Source.DepositDsmCall', 'Compiler.Proofs.MappingSlot',
+                  'LidoSRv3.Audit.Source.DepositAllocation'),
+                 (('theorem', 'actual_dsm_call_registered_module_suffix'),
+                  ('theorem', 'actual_dsm_call_failure_restores'),
+                  ('def', 'depositPhysicalKeccak'),
+                  ('theorem', 'supplied_allocation_deposit_call_slot_success_and_revert'),
+                  ('theorem', 'actual_deposit_call_slot_success_and_revert'))),
+ 'P-TOPUP-1': ('PTopupRouterAdmissionCall',
+               ('LidoSRv3.Audit.Source.TopupRouterAdmissionCall',),
+               (('def', 'PriorEffects'),
+                ('theorem', 'actual_router_admission_complete_prior'),
+                ('theorem', 'actual_gateway_entry_failure_restores'),
+                ('def', 'ActualEffects'),
+                ('def', 'physicalKeccak'),
+                ('theorem', 'actual_topup_admission_calls_wei_and_revert')))}
 
 def readme_status_rows(readme: str) -> dict[str, list[tuple[int, list[str]]]]:
     """The rendered status rows, indexed by claim ID, with the Verity column."""
@@ -451,6 +461,11 @@ def check(root: Path) -> None:
             fail(f"{lean_path}: imports differ from the structural allowlist")
         if declarations != expected["declarations"]:
             fail(f"{lean_path}: public declarations differ from the structural allowlist")
+
+    for claim_id, (module, expected_imports, expected_declarations) in REGISTERED_SURFACES.items():
+        path = root / f"LidoSRv3/Audit/Guarantees/{module}.lean"
+        if lean_surface(read(path)) != (expected_imports, expected_declarations):
+            fail(f"{claim_id}: registered executable parent surface differs")
 
     if "Verity Executable Contract" not in readme:
         fail("README: missing the Verity Executable Contract assurance objective")

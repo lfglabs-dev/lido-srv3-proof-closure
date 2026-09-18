@@ -1,0 +1,25 @@
+{
+  "job_id": "7177f99e-41c9-4eab-849f-7792c2255934",
+  "state": "succeeded",
+  "exit_code": 0,
+  "node_id": "dgx-spark",
+  "validation": {
+    "version": 1,
+    "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+    "commit": "f0099f77407db34fbd971699e395534fc067dd59",
+    "base_tree_sha": "10b2a894ebdd4c08d52b5f6dca19e984f18aae9b",
+    "cwd_rel_known": true,
+    "command": [
+      "lake",
+      "test",
+      "--",
+      "trust"
+    ],
+    "toolchain": "leanprover/lean4:v4.31.0",
+    "build_protocol_version": "1",
+    "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+  },
+  "raw_receipt_sha256": "773d8a8f3dd62a640e0b38bee3b074a87fbae3df89b24827e2b7ae4499b672d7",
+  "raw_receipt_path": "/workspaces/mission-1ca15c66/output/remote-7177f99e-41c9-4eab-849f-7792c2255934.json",
+  "scope": "Exact-commit trust gate and adversarial trust regressions only. No source bundle. Not full repository validation, independent review, or Solidity modeling closure."
+}

@@ -3,15 +3,45 @@ open Lake DSL
 
 package «lido-srv3-proof-closure» where
   version := v!"0.1.0"
-  testDriver := "LidoSRv3Test"
+  testDriver := "runTests"
+
+/-- Keep the Lean test library as the default; expose the preserved source
+differentials through Lake's test interface for registered remote runners.
+Each mode runs the existing script and propagates its exit status. -/
+script runTests args do
+  match args with
+  | [] => env "lake" #["build", "LidoSRv3Test"]
+  | ["topup-source"] =>
+      env "bash" #["scripts/run_source_differential.sh", "topup-source"]
+  | ["reserve-source"] =>
+      env "bash" #["scripts/run_source_differential.sh", "reserve-source"]
+  | ["signing-keys-source"] =>
+      env "bash" #["scripts/run_source_differential.sh", "signing-keys-source"]
+  | ["trust"] =>
+      env "bash" #["scripts/run_trust_validation.sh"]
+  | ["repository"] =>
+      env "bash" #["scripts/run_source_differential.sh", "repository"]
+  | _ =>
+      IO.eprintln "usage: lake test [-- topup-source|reserve-source|signing-keys-source|trust|repository]"
+      return 2
 
 require verity from git
-  "https://github.com/lfglabs-dev/verity.git"@"e977aaad6e1a9e92e0132d41b3d33a14135a4d46"
+  "https://github.com/lfglabs-dev/verity.git"@"600a2f7a9b07f7ea532451e7d58b106347a6817a"
 
 /-- Stable definitions and public guarantees. Does not compile Tests, Legacy, or Trust. -/
 @[default_target]
 lean_lib «LidoSRv3» where
   globs := #[
+    .one `LidoSRv3.Audit.Verity.AllocLoopTermination,
+    .one `LidoSRv3.Audit.Verity.AddressClaimBatchUnbounded,
+    .one `LidoSRv3.Audit.Verity.AddressRecipientCallBridge,
+    .one `LidoSRv3.Audit.Guarantees.Composition.ConsolidationEthUnboundedFuel,
+    .one `LidoSRv3.Audit.Verity.DepositSourceEntry,
+    .one `LidoSRv3.Audit.Verity.ReportRewardsMintedTx,
+    .one `LidoSRv3.Audit.Verity.Topup2SourceEntry,
+    .one `LidoSRv3.Audit.Guarantees.Composition.TopupMultiCallBlockCap,
+    .one `LidoSRv3.Audit.Verity.TopupSourceEntry,
+    .one `LidoSRv3.Audit.Guarantees.Composition.TopupUnboundedCount,
     .one `LidoSRv3,
     .submodules `LidoSRv3.Audit.Common,
     .submodules `LidoSRv3.Audit.Guarantees,
@@ -43,6 +73,7 @@ lean_lib «LidoSRv3» where
     .one `LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel,
     .one `LidoSRv3.Audit.Verity.ConsolidationCallFragment,
     .one `LidoSRv3.Audit.Verity.ConsolidationFee,
+    .one `LidoSRv3.Audit.Verity.ConsolidationEthUnboundedFuel,
     .one `LidoSRv3.Audit.Verity.ConsolidationOfficialDenoteSuccess,
     .one `LidoSRv3.Audit.Verity.ConsolidationTx,
     .one `LidoSRv3.Audit.Verity.ConsolidationValueTx,
@@ -63,6 +94,7 @@ lean_lib «LidoSRv3» where
     .one `LidoSRv3.Audit.Verity.PConsolidationEth1RefundTx,
     .one `LidoSRv3.Audit.Verity.PConsolidationEth1RequestTx,
     .one `LidoSRv3.Audit.Verity.ReserveRelationalTx,
+    .one `LidoSRv3.Audit.Verity.ReserveSourceEntry,
     .one `LidoSRv3.Audit.Verity.SszAbstractDigest,
     .one `LidoSRv3.Audit.Verity.SszEncodingTx,
     .one `LidoSRv3.Audit.Verity.SszTxSimulation,

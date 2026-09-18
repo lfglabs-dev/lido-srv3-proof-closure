@@ -46,7 +46,7 @@ A-ABSTRACT-TX hypothesis.
 
 ## Lean proof
 
-`LidoSRv3/Audit/Provenance/DepositAbstractTxOrphaned.lean` provides
+`LidoSRv3/Audit/Guarantees/Composition/DepositAbstractTxOrphaned.lean` provides
 four theorems, all clean under `{propext, Classical.choice, Quot.sound}`:
 
 1. `source_parent_ignores_abstract_tx` -- for any caller-supplied
@@ -87,7 +87,7 @@ axioms.
 
 ## Actions taken in this commit
 
-- Added `LidoSRv3/Audit/Provenance/DepositAbstractTxOrphaned.lean`
+- Added `LidoSRv3/Audit/Guarantees/Composition/DepositAbstractTxOrphaned.lean`
   with the four orphelinat theorems above.
 - Registered the four theorems in `LidoSRv3/Audit/Trust.lean` via
   `#print axioms`.

@@ -33,13 +33,23 @@ check: test
 	@printf '%s\n' 'check ok: metadata, mutants, receipt, provenance, and executable regressions passed'
 
 test:
+	@bash scripts/test_reproduce_candidate.sh
+	@bash scripts/test_differential_input_scope.sh
+	@bash scripts/test_reserve_compiler_selection.sh
+	@python3 scripts/generate_ux2.py check
+	@python3 scripts/check_report_theorem_inventory.py
+	@python3 scripts/test_differential_sources.py
+	@python3 scripts/check_reproduction_targets.py
+	@python3 scripts/test_reproduction_targets.py
 	@bash scripts/test_minfirst_source_differential.sh
 	@bash scripts/test_deposit_source_differential.sh
+	@bash scripts/test_topup_source_differential.sh
 	@bash scripts/test_topup2_source_differential.sh
+	@bash scripts/test_reserve_source_differential.sh
+	@bash scripts/test_signing_keys_source.sh
 	@python3 scripts/test_minfirst_guard_mutation.py
 	@python3 scripts/test_cache_store_mutations.py
 	@python3 scripts/audit_metadata.py check
-	@python3 scripts/generate_ux2.py check
 	@python3 scripts/check_assumption_presentation.py
 	@python3 scripts/test_ux2.py
 	@python3 scripts/test_main_guarantees.py
@@ -52,13 +62,13 @@ test:
 	@python3 scripts/test_check_validation_receipt.py
 	@python3 scripts/check_proof_escapes.py
 	@bash scripts/test_check_proof_escapes.sh
+	@bash scripts/test_candidate_gate_diagnostics.sh
 	@bash scripts/test_check_trust_axioms.sh
 	@python3 scripts/check_trust_axioms.py
 	@bash scripts/check_no_python_evidence.sh
 	@bash scripts/test_check_no_python_evidence.sh
 	@python3 scripts/check_public_claim_surfaces.py
 	@python3 scripts/test_public_claim_surfaces.py
-	@python3 scripts/check_report_theorem_inventory.py
 	@python3 scripts/test_report_theorem_inventory.py
 	@python3 scripts/check_diagram_taxonomy.py
 	@python3 scripts/test_diagram_taxonomy.py
@@ -66,8 +76,8 @@ test:
 	@bash scripts/check_provenance_guards.sh
 	@python3 scripts/check_import_dag.py
 	@python3 scripts/test_import_dag.py
-	@python3 scripts/check_pinned_source.py >/dev/null && printf '%s\n' 'pinned source ok: cited Solidity spans and inline citations exist in lido-core at the pin'
-	@python3 scripts/check_source_annotations.py
+	@python3 scripts/check_pinned_source.py && printf '%s\n' 'pinned source ok: cited Solidity spans and inline citations exist in lido-core at the pin'
+	@python3 scripts/check_source_annotations.py --strict
 	@lake build LidoSRv3Test
 	@lake build AccountAddressChecks
 	@printf '%s\n' 'LidoSRv3Test: mutants, vectors, nested Verity tests, and regressions compiled'
@@ -78,6 +88,7 @@ test:
 	@# pinned fixture bytes, checks the artifact SHA-256 matches, and
 	@# re-extracts every named immutable at its recorded byte offset.
 	@python3 scripts/verify_beacon_deposit_immutable.py
+	@python3 scripts/verify_lido_immutable.py
 	@python3 scripts/verify_consolidation_request_immutable.py
 	@python3 scripts/verify_deposit_thirty_two_ether.py
 	@test -s fixtures/solidity-reference/stakingRouter.getDepositAllocations.test.ts

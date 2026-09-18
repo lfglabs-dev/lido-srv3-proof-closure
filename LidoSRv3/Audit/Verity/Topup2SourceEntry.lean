@@ -82,7 +82,7 @@ def toWords (xs : List Nat) : List Word :=
 def wordVals (xs : List Word) : List Nat :=
   xs.map (·.val)
 
-def encode (effective pending requested topUpLimits : List Nat)
+def encode (effective pending requested topUpLimits slashedOrExited : List Nat)
     (target minTopUp remainingCap moduleLimit valueGwei : Nat) : String :=
   let eW := toWords effective
   let pW := toWords pending
@@ -93,11 +93,12 @@ def encode (effective pending requested topUpLimits : List Nat)
   let cW := Uint256.ofNat remainingCap
   let sW := Uint256.ofNat moduleLimit
   let vW := Uint256.ofNat valueGwei
+  let flags := slashedOrExited.map (fun n => n != 0)
   let limits :=
-    match sourceLimits eW pW tW mW with
+    match sourceLimits eW pW flags tW mW with
     | some xs => wordVals xs
     | none => ([] : List Nat)
-  match sourceRun eW pW rW lW tW mW cW sW vW with
+  match sourceRun eW pW rW lW flags tW mW cW sW vW with
   | some (allocs, remaining, used) =>
       "{" ++
         "\"ok\":true" ++
@@ -122,29 +123,32 @@ def encode (effective pending requested topUpLimits : List Nat)
       "}"
 
 def runJson (json : String) : Except String String :=
-  match
-    field json "effective" >>= parseNatList,
-    field json "pending" >>= parseNatList,
-    field json "requested" >>= parseNatList,
-    field json "topUpLimits" >>= parseNatList,
-    field json "target" >>= parseNatRaw,
-    field json "minTopUp" >>= parseNatRaw,
-    field json "remainingCap" >>= parseNatRaw,
-    field json "moduleLimit" >>= parseNatRaw,
-    field json "valueGwei" >>= parseNatRaw
-  with
-  | some e, some p, some r, some l, some t, some m, some c, some s, some v =>
-      .ok (encode e p r l t m c s v)
-  | none, _, _, _, _, _, _, _, _ => .error "invalid effective JSON"
-  | _, none, _, _, _, _, _, _, _ => .error "invalid pending JSON"
-  | _, _, none, _, _, _, _, _, _ => .error "invalid requested JSON"
-  | _, _, _, none, _, _, _, _, _ => .error "invalid topUpLimits JSON"
-  | _, _, _, _, none, _, _, _, _ => .error "invalid target JSON"
-  | _, _, _, _, _, none, _, _, _ => .error "invalid minTopUp JSON"
-  | _, _, _, _, _, _, none, _, _ => .error "invalid remainingCap JSON"
-  | _, _, _, _, _, _, _, none, _ => .error "invalid moduleLimit JSON"
-  | _, _, _, _, _, _, _, _, none => .error "invalid valueGwei JSON"
-
+  match field json "slashedOrExited" >>= parseNatList with
+  | none => .error "invalid slashedOrExited JSON"
+  | some flags =>
+    if !flags.all (fun n => n <= 1) then .error "flags must be zero or one" else
+    match
+      field json "effective" >>= parseNatList,
+      field json "pending" >>= parseNatList,
+      field json "requested" >>= parseNatList,
+      field json "topUpLimits" >>= parseNatList,
+      field json "target" >>= parseNatRaw,
+      field json "minTopUp" >>= parseNatRaw,
+      field json "remainingCap" >>= parseNatRaw,
+      field json "moduleLimit" >>= parseNatRaw,
+      field json "valueGwei" >>= parseNatRaw
+    with
+    | some e, some p, some r, some l, some t, some m, some c, some s, some v =>
+        .ok (encode e p r l flags t m c s v)
+    | none, _, _, _, _, _, _, _, _ => .error "invalid effective JSON"
+    | _, none, _, _, _, _, _, _, _ => .error "invalid pending JSON"
+    | _, _, none, _, _, _, _, _, _ => .error "invalid requested JSON"
+    | _, _, _, none, _, _, _, _, _ => .error "invalid topUpLimits JSON"
+    | _, _, _, _, none, _, _, _, _ => .error "invalid target JSON"
+    | _, _, _, _, _, none, _, _, _ => .error "invalid minTopUp JSON"
+    | _, _, _, _, _, _, none, _, _ => .error "invalid remainingCap JSON"
+    | _, _, _, _, _, _, _, none, _ => .error "invalid moduleLimit JSON"
+    | _, _, _, _, _, _, _, _, none => .error "invalid valueGwei JSON"
 end LidoSRv3.Audit.Verity.Topup2SourceEntry
 
 def main (args : List String) : IO UInt32 := do

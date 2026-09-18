@@ -1,4 +1,4 @@
-import LidoSRv3.Audit.Guarantees.PAddress1StETHConversionCalls
+import LidoSRv3.Audit.Source.Effects.PAddress1StETHConversionCalls
 
 /-! Actual pinned full-Lido StETH.transfer specialization, consumed by the
 postburn WstETH CALL. Physical mapping slot0 is checked against full Lido's

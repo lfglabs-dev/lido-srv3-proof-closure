@@ -54,9 +54,9 @@ theorem call_success_origin (callee : Live.External) (router address : Live.Addr
     (trace : List Live.Attempt)
     (h : call callee router address count data before = ⟨.ok raw,after,trace⟩) :
     let req : Live.Request := ⟨router,address,Live.word 0,payload count data⟩
-    ((before.core.codeSize address.val).val = 0 ∧ raw = [] ∧
+    (audit.trio.consolidation.emptyCodeAccount before address ∧ raw = [] ∧
       after = Live.transfer before router address 0 ∧ trace = [⟨req,true,[],[]⟩]) ∨
-    ((before.core.codeSize address.val).val ≠ 0 ∧
+    (¬ audit.trio.consolidation.emptyCodeAccount before address ∧
       ((callee req (Live.transfer before router address 0) = .success raw after ∧
         trace = [⟨req,true,raw,[]⟩]) ∨
        ∃ nested, callee req (Live.transfer before router address 0) = .successWithTrace raw after nested ∧
@@ -83,7 +83,7 @@ theorem call_success_origin (callee : Live.External) (router address : Live.Addr
 
 theorem call_no_code (callee : Live.External) (router address : Live.Address)
     (count : Nat) (data : Live.Bytes) (before : Live.World)
-    (hc : (before.core.codeSize address.val).val = 0) :
+    (hc : audit.trio.consolidation.emptyCodeAccount before address) :
     call callee router address count data before =
       ⟨.ok [], Live.transfer before router address 0,
         [⟨⟨router,address,Live.word 0,payload count data⟩,true,[],[]⟩]⟩ := by
@@ -240,14 +240,14 @@ def encodeReturn (keys signatures : Live.Bytes) : Live.Bytes :=
   Live.encode 32 64 ++ Live.encode 32 (96 + (pad keys).length) ++
     Live.encode 32 keys.length ++ pad keys ++ Live.encode 32 signatures.length ++ pad signatures
 
-/-- A decoded CALL necessarily ran the arbitrary coded callee, rather than
+/-- A decoded CALL necessarily ran the external interpreter, rather than
 succeeding through the ordinary-no-code empty-return rule. -/
 theorem decoded_call_origin (callee : Live.External) (router address : Live.Address)
     (count : Nat) (data : Live.Bytes) (before after : Live.World) (raw : Live.Bytes)
     (trace : List Live.Attempt) (decoded : Data) (cursor next : Live.Word)
     (hc : call callee router address count data before = ⟨.ok raw,after,trace⟩)
     (hd : decodeReturn cursor raw = .ok (decoded,next)) :
-    (before.core.codeSize address.val).val ≠ 0 ∧
+    ¬ audit.trio.consolidation.emptyCodeAccount before address ∧
     let req : Live.Request := ⟨router,address,Live.word 0,payload count data⟩
     ((callee req (Live.transfer before router address 0) = .success raw after ∧
       trace = [⟨req,true,raw,[]⟩]) ∨

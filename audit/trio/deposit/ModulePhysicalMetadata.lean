@@ -173,7 +173,7 @@ theorem success_effects (hash : Keccak) (m w : Live.External)
       let address := moduleAddress hash liveCtx.sender i before
       let count := target hash liveCtx.sender i before
       let req : Live.Request := ⟨liveCtx.sender,address,Live.word 0,payload count i.depositCalldata⟩
-      (before.core.codeSize address.val).val ≠ 0 ∧
+      ¬ audit.trio.consolidation.emptyCodeAccount before address ∧
       ((m req (Live.transfer before liveCtx.sender address 0) = .success c.raw c.moduleWorld ∧
          c.moduleTrace = [⟨req,true,c.raw,[]⟩]) ∨
        ∃ nested, m req (Live.transfer before liveCtx.sender address 0) = .successWithTrace c.raw c.moduleWorld nested ∧

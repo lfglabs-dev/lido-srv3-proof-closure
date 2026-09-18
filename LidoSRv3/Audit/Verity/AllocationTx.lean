@@ -3,9 +3,9 @@ import LidoSRv3.Audit.Verity.AllocCapacityPhase3
 import Verity.Core
 
 /-!
-# P-ALLOC-1 allocation transaction
+# P-ALLOC-1 legacy observation transaction
 
-Handwritten model of `SRLib._getModulesAllocationAndCapacity` from
+Retained historical model of `SRLib._getModulesAllocationAndCapacity` from
 `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`, `SRLib.sol:493-559`,
 wrapped as the storage-counted transaction `StakingRouter.getDepositAllocations`
 (`StakingRouter.sol:929-936`, see the `getDepositAllocations` abbrev below).
@@ -35,12 +35,16 @@ columns of `_getModulesAllocationAndCapacity`.
 One interpreter (`AllocCapacity.firstLoop` / `secondLoop`). Binding follows
 `getModuleIdAt` then the packed `moduleState.config`. `isActive` is
 `StakingModuleStatus.Active` (`status == 0`); `isType2` is
-`WithdrawalCredentials.isType2` (`wcType == 2`). The registered live path
+`WithdrawalCredentials.isType2` (`wcType == 2`). The legacy live path
 executes the mapped selector-only summary static call, ABI-decodes its three
 uint256 return words, and on type-2 rows executes the distinct pinned
 `getTotalModuleStake` static call before entering the allocation loop.
 
 Computed columns persist as storage arrays; `observe` reads those arrays.
+The registered account-qualified producer is `PAlloc1.account_allocation_result`;
+this model remains for existing arithmetic/rollback consumers and counterexamples.
+Its observation cells and synthetic error strings do not model source storage or
+exact Solidity failure data.
 -/
 
 namespace LidoSRv3.Audit.Verity.AllocationTx
@@ -52,8 +56,9 @@ abbrev Word := Uint256
 
 /-! ## Router storage read by SRLib.sol:498-522 -/
 
-/-- `SRStorage.getModulesCount()` (`SRLib.sol:498`). The source caps this count by
-`MAX_STAKING_MODULES_COUNT = 32` before walking router indices. -/
+/-- Legacy model observation slot, not the physical SRStorage registry slot.
+This adapter clips its modeled count to 32. The physical source producer does
+not perform that clipping; supported registry bounds need a separate proof. -/
 def modulesCountSlot : Nat := 29
 /-- `SRStorage.getModuleIdAt(i)` (`SRLib.sol:509`), map from router index to module id. -/
 def moduleIdSlot : Nat := 30
@@ -64,7 +69,7 @@ def moduleConfigSlot : Nat := 31
 /-- `moduleState.accounting.exitedValidatorsCount` (`SRLib.sol:522`). -/
 def accountingExitedSlot : Nat := 35
 /-- Planted summaries remain only for the legacy/free-count sibling path and
-test seeding. The registered live path does not read these three maps. -/
+test seeding. The legacy live path does not read these three maps. -/
 def summaryExitedSlot : Nat := 36
 def summaryDepositedSlot : Nat := 37
 def summaryDepositableSlot : Nat := 38
@@ -349,11 +354,10 @@ def allocate (count : Nat) (cfg : Config) (depositsToAllocate : Word)
           .success ⟨rows.map Row.currentAllocation, rows.map Row.capacity,
             addresses, total⟩ dirty
 
-/-- Allocation entry point whose loop bound comes from router storage, capped
-at the pinned `MAX_STAKING_MODULES_COUNT = 32`. This is the storage-counted
-shape of `StakingRouter.getDepositAllocations` (`StakingRouter.sol:929-936`)
-restricted to the `_getModulesAllocationAndCapacity` step (see the module
-header, "Not transcribed: SRLib.sol:403-427"). -/
+/-- Legacy allocation entry point whose model count is clipped to 32. Its
+unqualified storage and persisted observation arrays are not the physical router
+layout. The public source wrapper and account-qualified producer are separate
+executables; equality requires a derived representation relation. -/
 def allocateFromStorage (cfg : Config) (depositsToAllocate : Word)
     (isTopUp : Bool) (failAfterWrites : Bool := false) : Contract Result :=
   fun snapshot =>

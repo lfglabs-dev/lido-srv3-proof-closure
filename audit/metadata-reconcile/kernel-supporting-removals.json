@@ -1,0 +1,159 @@
+{
+  "baseline": "4a364acc676176076fe820edaead9a0544b629d6",
+  "baseline_count": 404,
+  "current_count": 380,
+  "current_digest": "115c95b4aa8541f188fb48e32e366eef8365438ccf42f7c2316b8efafeb15697",
+  "removed_records": [
+    [
+      "LidoSRv3/Audit/Model/EthWorld.lean",
+      286,
+      "theorem allRoutes_nodup : allRoutes.Nodup := by native_decide"
+    ],
+    [
+      "LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean",
+      758,
+      "fun _ => by native_decide, by native_decide,"
+    ],
+    [
+      "LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean",
+      758,
+      "fun _ => by native_decide, by native_decide,"
+    ],
+    [
+      "LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean",
+      762,
+      "by native_decide, by native_decide, by native_decide, by native_decide,"
+    ],
+    [
+      "LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean",
+      762,
+      "by native_decide, by native_decide, by native_decide, by native_decide,"
+    ],
+    [
+      "LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean",
+      762,
+      "by native_decide, by native_decide, by native_decide, by native_decide,"
+    ],
+    [
+      "LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean",
+      762,
+      "by native_decide, by native_decide, by native_decide, by native_decide,"
+    ],
+    [
+      "LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean",
+      763,
+      "by native_decide, rfl\u27e9,"
+    ],
+    [
+      "LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean",
+      764,
+      "by native_decide, ?_\u27e9"
+    ],
+    [
+      "LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean",
+      766,
+      "exact hFeeNe (by native_decide)"
+    ],
+    [
+      "LidoSRv3/Audit/Verity/AllocCapacity.lean",
+      98,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Audit/Verity/AllocCapacity.lean",
+      104,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Audit/Verity/AllocCapacity.lean",
+      118,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Audit/Verity/AllocCapacityPhase3.lean",
+      144,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Audit/Verity/ConsolidationFee.lean",
+      243,
+      "decodeWordBytes (List.ofFn (abiWord 48)) = 48 := by native_decide"
+    ],
+    [
+      "LidoSRv3/Audit/Verity/DepositRollback.lean",
+      196,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Audit/Verity/DepositRollback.lean",
+      210,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Audit/Verity/OfficialSemantics.lean",
+      88,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Audit/Verity/OfficialSemantics.lean",
+      102,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Audit/Verity/OfficialSemantics.lean",
+      108,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Audit/Verity/OfficialSemantics.lean",
+      115,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Audit/Verity/TopupPackedStorage.lean",
+      97,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Audit/Verity/TopupPackedStorage.lean",
+      107,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Audit/Verity/TopupPackedStorage.lean",
+      113,
+      "native_decide"
+    ]
+  ],
+  "statement_changes": false,
+  "validation": {
+    "commit": "3c3f692fb8d7bdf06ed46e56f531921cc08f3ec2",
+    "job_id": "291fa239-d39a-4423-8f2d-40ff938a7851",
+    "state": "succeeded",
+    "exit_code": 0,
+    "receipt": "audit/receipts/nor-source/kernel-supporting-3c3f692f.json",
+    "scope": "Eight targeted modules, 1285 build jobs. Expanded transitive trust recomputation remains required."
+  },
+  "remaining_non_test_native_sites": [
+    [
+      "LidoSRv3/Audit/Verity/AllocCapacity.lean",
+      122,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Audit/Verity/ConsolidationFee.lean",
+      180,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Audit/Verity/DepositRollback.lean",
+      178,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Audit/Verity/OfficialSemantics.lean",
+      122,
+      "native_decide"
+    ]
+  ]
+}

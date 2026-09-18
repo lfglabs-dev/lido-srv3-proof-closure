@@ -4,15 +4,8 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-EXPECTED_PARTS = {
-    "model-source": {
-        "A-SOURCE-SHAPED", "A-HANDWRITTEN-MINFIRST", "A-ABSTRACT-TX",
-        "A-VERITY-SCAFFOLD", "A-YUL-INTERFACE",
-    },
-    "source-chain": {"A-SOLC-TRUSTED", "A-RUNTIME-PROVENANCE"},
-    "deployment-constants": {"A-DEPOSIT-CONTRACT", "A-TOPUP-BEACON-ADDRESS",
-                             "A-CANONICAL-REQUEST-ADDRESS", "A-DEPOSIT-32-ETHER"},
-}
+EXPECTED_PARTS = {'model-source': {'A-VERITY-SCAFFOLD', 'A-CLASSICAL-CHOICE', 'A-SOURCE-SHAPED', 'A-ABSTRACT-TX'}, 'source-chain': {'A-RUNTIME-PROVENANCE', 'A-SOLC-TRUSTED'}, 'primitives-transport': {'A-MULTI-NODE-TRANSPORT', 'A-SHA256-FFI'}}
+
 
 
 def validate(catalog, assumptions, guarantees):
@@ -21,7 +14,7 @@ def validate(catalog, assumptions, guarantees):
     known = {row["id"] for row in assumptions["assumptions"]}
     groups = catalog["groups"]
     if [group["id"] for group in groups] != list(EXPECTED_PARTS):
-        raise ValueError("expected model, deployment and configured-value groups")
+        raise ValueError("expected model, source-chain and primitive/transport groups")
     seen = set()
     for group in groups:
         parts = group["parts"]

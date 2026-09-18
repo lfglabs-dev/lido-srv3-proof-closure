@@ -1,0 +1,117 @@
+{
+  "baseline": "e8b4f9deb32205ade8afa27d5120a46dd0ae0055",
+  "validated_source_commit": "771d7dff9e6f4ec51be841f8d44c0fca3d11b80d",
+  "targeted_job": "1f682576-7dca-4621-bae5-058b763f1794",
+  "baseline_count": 436,
+  "current_count": 415,
+  "current_digest": "b3f3801c273222fbb1316f6184baa9c9bdc469b5ed5ed928bdede2a48343ca9e",
+  "removed_records": [
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      240,
+      "by native_decide, by native_decide, by native_decide,"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      240,
+      "by native_decide, by native_decide, by native_decide,"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      240,
+      "by native_decide, by native_decide, by native_decide,"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      241,
+      "by native_decide, by native_decide, by native_decide\u27e9"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      241,
+      "by native_decide, by native_decide, by native_decide\u27e9"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      241,
+      "by native_decide, by native_decide, by native_decide\u27e9"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      258,
+      "by native_decide, by native_decide, by native_decide,"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      258,
+      "by native_decide, by native_decide, by native_decide,"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      258,
+      "by native_decide, by native_decide, by native_decide,"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      259,
+      "by native_decide, by native_decide, by native_decide\u27e9"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      259,
+      "by native_decide, by native_decide, by native_decide\u27e9"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      259,
+      "by native_decide, by native_decide, by native_decide\u27e9"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      279,
+      "by native_decide, by native_decide, by native_decide,"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      279,
+      "by native_decide, by native_decide, by native_decide,"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      279,
+      "by native_decide, by native_decide, by native_decide,"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      280,
+      "by native_decide, by native_decide, by native_decide,"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      280,
+      "by native_decide, by native_decide, by native_decide,"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      280,
+      "by native_decide, by native_decide, by native_decide,"
+    ],
+    [
+      "LidoSRv3/Tests/ConsolidationTxMutants.lean",
+      281,
+      "by native_decide\u27e9"
+    ],
+    [
+      "LidoSRv3/Tests/TopupReturnBufferMutants.lean",
+      19,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Tests/TopupReturnBufferMutants.lean",
+      44,
+      "native_decide"
+    ]
+  ],
+  "added_records": [],
+  "scope": "Same statements/witnesses; native_decide replaced by decide +kernel. Full Trust recomputation pending."
+}

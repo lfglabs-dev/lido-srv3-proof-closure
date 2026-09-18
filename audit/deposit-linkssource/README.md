@@ -43,7 +43,7 @@ ALLOC outputs validator counts. It never writes those two fields.
 
 Additive files:
 
-- `LidoSRv3/Audit/Source/DepositLinksSource.lean`
+- `LidoSRv3/Audit/Guarantees/Composition/DepositLinksSource.lean`
 - `LidoSRv3/Tests/DepositLinksSourceMutants.lean`
 
 | Theorem | Source span | Claim |

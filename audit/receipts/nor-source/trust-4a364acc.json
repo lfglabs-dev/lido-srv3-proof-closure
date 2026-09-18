@@ -1,0 +1,30 @@
+{
+  "job_id": "37886f3d-0314-43cb-bd75-de331a81bd21",
+  "mission_id": "1ca15c66-8324-4b68-9ece-0d5bebfeea98",
+  "state": "failed",
+  "exit_code": 1,
+  "created_at": "2026-09-15T16:18:58.960405577+00:00",
+  "started_at": "2026-09-15T16:18:58.985979240+00:00",
+  "finished_at": "2026-09-15T16:37:13.266253036+00:00",
+  "error": "command exited with Some(1)",
+  "log_tail": "Submodule 'lido-core' (https://github.com/lidofinance/core.git) registered for path 'lido-core'\nCloning into '/var/lib/sandboxed-node/checkouts/9acda983bdcdf557/.tmp-07eef00b-450c-4c2c-85ad-73caa22a0ec2/lido-core'...\nFrom https://github.com/lidofinance/core\n * branch            17005714f151e5502c559932319a3f2f74ac2436 -> FETCH_HEAD\nSubmodule path 'lido-core': checked out '17005714f151e5502c559932319a3f2f74ac2436'\nHEAD is now at 4a364ac Correct nested trust names and remove redundant draft traces\ninfo: verity: cloning https://github.com/lfglabs-dev/verity.git\ninfo: verity: checking out revision '1e95e925736d9253df41918ce1e4858cdd8e8a8d'\ninfo: evmyul: cloning https://github.com/lfglabs-dev/EVMYulLean.git\ninfo: evmyul: checking out revision 'f7e4ee0dc8f8d5265ce822a937ab5be771f182e9'\ninfo: mathlib: cloning https://github.com/leanprover-community/mathlib4.git\ninfo: mathlib: checking out revision 'fabf563a7c95a166b8d7b6efca11c8b4dc9d911f'\ninfo: plausible: cloning https://github.com/leanprover-community/plausible\ninfo: plausible: checking out revision '63045536fe95024e6c18fc7b48e03f506701c5bc'\ninfo: LeanSearchClient: cloning https://github.com/leanprover-community/LeanSearchClient\ninfo: LeanSearchClient: checking out revision 'c5d5b8fe6e5158def25cd28eb94e4141ad97c843'\ninfo: importGraph: cloning https://github.com/leanprover-community/import-graph\ninfo: importGraph: checking out revision '5c7542ed018c78194f1e2b903eaf6a792b74c03d'\ninfo: proofwidgets: cloning https://github.com/leanprover-community/ProofWidgets4\ninfo: proofwidgets: checking out revision '24b0d9dc081c5423f8eec7e866c441e5184f29d9'\ninfo: aesop: cloning https://github.com/leanprover-community/aesop\ninfo: aesop: checking out revision 'e3cb2f741431ce31bf73549fb52316a57368b06f'\ninfo: Qq: cloning https://github.com/leanprover-community/quote4\ninfo: Qq: checking out revision 'f46324995fca5f0483b742e4eb4daec7f4ee50d2'\ninfo: batteries: cloning https://github.com/leanprover-community/batteries\ninfo: batteries: checking out revision 'fa08db58b30eb033edcdab331bba000827f9f785'\ninfo: Cli: cloning https://github.com/leanprover/lean4-cli\ninfo: Cli: checking out revision '92564e5770e4d09f2d86dfbf8ada1e9c715b384c'\ntrust coverage: 1137 disclosures; 14334 independently recomputed claims including audit and separately published legacy module theorems\ntrust-axiom check failed: LidoSRv3.Audit.Guarantees.PConsolidation1.fee_blind_commit_kill_line_refutes_parent emits undisclosed axiom(s): LidoSRv3.Audit.SolidityConsolidation.fee_blind_commit_kill_line_refutes_parent._native.native_decide.ax_1_1, LidoSRv3.Audit.SolidityConsolidation.fee_blind_commit_kill_line_refutes_parent._native.native_decide.ax_1_2, LidoSRv3.Audit.SolidityConsolidation.fee_blind_commit_kill_line_refutes_parent._native.native_decide.ax_1_3, LidoSRv3.Audit.SolidityConsolidation.fee_blind_commit_kill_line_refutes_parent._native.native_decide.ax_1_4, LidoSRv3.Audit.SolidityConsolidation.fee_blind_commit_kill_line_refutes_parent._native.native_decide.ax_1_5, LidoSRv3.Audit.SolidityConsolidation.fee_blind_commit_kill_line_refutes_parent._native.native_decide.ax_1_6, LidoSRv3.Audit.SolidityConsolidation.fee_blind_commit_kill_line_refutes_parent._native.native_decide.ax_1_7, LidoSRv3.Audit.SolidityConsolidation.fee_blind_commit_kill_line_refutes_parent._native.native_decide.ax_1_8, LidoSRv3.Audit.SolidityConsolidation.fee_blind_commit_kill_line_refutes_parent._native.native_decide.ax_1_9\n",
+  "artifacts": [],
+  "node_id": "dgx-spark",
+  "receipt_state": "failed",
+  "validation": {
+    "version": 1,
+    "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+    "commit": "4a364acc676176076fe820edaead9a0544b629d6",
+    "base_tree_sha": "f1cad06a19d70f97fba54ad4baa365f5519bf877",
+    "cwd_rel_known": true,
+    "command": [
+      "lake",
+      "test",
+      "--",
+      "trust"
+    ],
+    "toolchain": "leanprover/lean4:v4.31.0",
+    "build_protocol_version": "1",
+    "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+  }
+}

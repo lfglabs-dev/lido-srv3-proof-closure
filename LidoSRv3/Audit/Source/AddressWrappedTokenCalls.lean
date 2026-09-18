@@ -1,4 +1,4 @@
-import LidoSRv3.Audit.Guarantees.PAddress1WrappedRequestCalls
+import LidoSRv3.Audit.Source.Effects.PAddress1WrappedRequestCalls
 import LidoSRv3.Audit.Source.TrioReserve1.ReplyABI
 import LidoSRv3.Audit.Source.TrioReserve1.ABI
 

@@ -1,5 +1,5 @@
 import LidoSRv3.Audit.Guarantees.PDeposit1
-import LidoSRv3.Audit.Source.DepositLinksSource
+import LidoSRv3.Audit.Guarantees.Composition.DepositLinksSource
 
 /-! # P-DEPOSIT-1 registered abstract parent — LinksSource-derived composition
 

@@ -175,7 +175,9 @@ theorem checked_prefix_is_actual_function_spec : spec.functions = [checkedPrefix
 
 theorem checked_prefix_compiles :
     (CompilationModel.compile spec [checkedPrefixSelector]).isOk = true := by
-  native_decide
+  set_option maxRecDepth 16384 in
+  set_option maxHeartbeats 4000000 in
+  decide +kernel
 
 /-! The expected footprint is independently written from the pinned source
 prefix.  It is not obtained by aliasing `checkedPrefix` to a second name. -/
@@ -193,7 +195,7 @@ def extractedFootprint :
 
 theorem allocation_extraction_matches_source_derived_prefix :
     extractedFootprint = sourceDerivedExpectedFootprint := by
-  native_decide
+  decide +kernel
 
 /-! Actual FunctionSpec execution rejects malformed ABI input before any body
 statement. `DenoteResult` exposes encoded final storage but this artifact does
@@ -207,7 +209,7 @@ def malformedTx : Denote.DenoteTransaction :=
 theorem malformed_actual_function_spec_rejects :
     (Denote.denoteFunction zeroOracle spec checkedPrefix malformedTx
       Verity.defaultState).success = false := by
-  native_decide
+  decide +kernel
 
 def openComponents : List String :=
   [ "OPEN allocation: module capacity/summary calls, type-2 total stake, MinFirst.allocate, module-index lookup, zero-module branch, and all arithmetic/array bounds"

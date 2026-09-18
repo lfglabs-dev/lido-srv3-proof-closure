@@ -98,8 +98,8 @@ gwei accumulator. Signal only; do not publish.
 
 ## Additive files
 
-- `LidoSRv3/Audit/Verity/TopupUnboundedCount.lean`
-- `LidoSRv3/Audit/Verity/TopupMultiCallBlockCap.lean`
+- `LidoSRv3/Audit/Guarantees/Composition/TopupUnboundedCount.lean`
+- `LidoSRv3/Audit/Guarantees/Composition/TopupMultiCallBlockCap.lean`
 - `LidoSRv3/Tests/TopupUnboundedCountMutants.lean`
 - `LidoSRv3/Tests/TopupUnboundedMultiCallMutants.lean`
 - `audit/topup2-unbounded/README.md` (this file)

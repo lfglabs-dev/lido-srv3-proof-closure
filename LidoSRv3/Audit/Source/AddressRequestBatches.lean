@@ -1,5 +1,5 @@
-import LidoSRv3.Audit.Guarantees.PAddress1RequestCalls
-import LidoSRv3.Audit.Guarantees.PAddress1WrappedTransferCalls
+import LidoSRv3.Audit.Source.Effects.PAddress1RequestCalls
+import LidoSRv3.Audit.Source.Effects.PAddress1WrappedTransferCalls
 
 /-! Pinned WQ request batch's entry pause check and ordered typed-array loop.
 Physical memory allocation, outer ABI decoding and gas are outside this source

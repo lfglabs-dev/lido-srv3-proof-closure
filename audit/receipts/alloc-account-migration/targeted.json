@@ -1,0 +1,85 @@
+{
+  "authority": "Recorded runner results, not independent review or a clean-commit gate.",
+  "runs": [
+    {
+      "job_id": "5dc09932-f868-4ce6-8ebc-cbccc272e64f",
+      "state": "failed",
+      "exit_code": 1,
+      "node_id": "dgx-spark",
+      "validation": {
+        "version": 1,
+        "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+        "commit": "df0845148a3f9de24b334035811e68d01a73eaf9",
+        "base_tree_sha": "0e9d41c5f8ce3f23bce2a1b4b636596fdc295237",
+        "cwd_rel_known": true,
+        "command": [
+          "lake",
+          "build",
+          "LidoSRv3.Audit.Guarantees.PAlloc1",
+          "LidoSRv3.Tests.TrioAlloc1.AccountProducer",
+          "LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel"
+        ],
+        "toolchain": "leanprover/lean4:v4.31.0",
+        "source_bundle_digest": "cd00858ebfdb2955cec87a47d5cf4e7f272b9228ad95f20f7de97f4a0e691053",
+        "build_protocol_version": "1",
+        "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+      },
+      "raw_receipt_sha256": "572136a5b3dedea42eb4024261dcaae072246b56ddc3432f8be336777c12d966",
+      "raw_receipt_path": "/workspaces/mission-1ca15c66/output/remote-5dc09932-f868-4ce6-8ebc-cbccc272e64f.json",
+      "scope": "Source-bundle result only; not clean validation of the base commit."
+    },
+    {
+      "job_id": "dff24d48-6e3c-4300-967e-3c3ba74f49d6",
+      "state": "failed",
+      "exit_code": 1,
+      "node_id": "dgx-spark",
+      "validation": {
+        "version": 1,
+        "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+        "commit": "df0845148a3f9de24b334035811e68d01a73eaf9",
+        "base_tree_sha": "0e9d41c5f8ce3f23bce2a1b4b636596fdc295237",
+        "cwd_rel_known": true,
+        "command": [
+          "lake",
+          "build",
+          "LidoSRv3.Audit.Guarantees.PAlloc1",
+          "LidoSRv3.Tests.TrioAlloc1.AccountProducer",
+          "LidoSRv3.Audit.Verity.SszAbstractDigest",
+          "LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel"
+        ],
+        "toolchain": "leanprover/lean4:v4.31.0",
+        "source_bundle_digest": "52d8d6b6c7f59f9cd094dbbb12f5db2f4084b03ddc22dbebd0a2864edf433557",
+        "build_protocol_version": "1",
+        "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+      },
+      "raw_receipt_sha256": "0c278a90113a9627136bce79f097dbe04e751c8ba9a4391ad409b249100c03de",
+      "raw_receipt_path": "/workspaces/mission-1ca15c66/output/remote-dff24d48-6e3c-4300-967e-3c3ba74f49d6.json",
+      "scope": "Source-bundle result only; not clean validation of the base commit."
+    },
+    {
+      "job_id": "22408ede-aed7-473f-b53c-11d23441c6ea",
+      "state": "succeeded",
+      "exit_code": 0,
+      "node_id": "dgx-spark",
+      "validation": {
+        "version": 1,
+        "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+        "commit": "df0845148a3f9de24b334035811e68d01a73eaf9",
+        "base_tree_sha": "0e9d41c5f8ce3f23bce2a1b4b636596fdc295237",
+        "cwd_rel_known": true,
+        "command": [
+          "lake",
+          "build",
+          "LidoSRv3.Tests.TrioAlloc1.AccountProducer"
+        ],
+        "toolchain": "leanprover/lean4:v4.31.0",
+        "source_bundle_digest": "f1613aec3ae56788c04888ffcb3ac81d19925d50da115ca68bfb5c5c445f24a1",
+        "build_protocol_version": "1",
+        "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+      },
+      "raw_receipt_sha256": "01d113316828b3ee80a86a40ea6199b86b4ad17b80feef4d86e9472c80827b49",
+      "raw_receipt_path": "/workspaces/mission-1ca15c66/output/remote-22408ede-aed7-473f-b53c-11d23441c6ea.json",
+      "scope": "Source-bundle result only; not clean validation of the base commit."
+    }
+  ]
+}

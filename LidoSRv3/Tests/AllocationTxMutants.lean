@@ -301,4 +301,36 @@ theorem capacity_target_kill_line_refutes_parent :
   refine ⟨⟨by decide, by decide, by decide, by decide, by decide⟩, ⟨_, rfl⟩,
     by decide⟩
 
+/-- ABI-valid external summaries do not establish the active subtraction
+invariant. Router-local accounting widths cannot constrain these two replies. -/
+private def inconsistentSummary : BoundModule :=
+  { modA with summaryExitedCount := w 1, depositedCount := w 0, depositableCount := w 0 }
+
+theorem inconsistent_summary_decodes :
+    decodeSummary (summaryBytes 1 0 0) = some ⟨w 1,w 0,w 0⟩ := by
+  decide +kernel
+
+theorem inconsistent_summary_refutes_checked_bounds :
+    ¬ CheckedBounds cfg [toSourceModule inconsistentSummary] (w 0) false := by
+  intro h
+  have hb := h.active_subtraction (toSourceModule inconsistentSummary) (by simp)
+  have hn : ¬ ((wordMax (toSourceModule inconsistentSummary).summaryExitedCount
+      (toSourceModule inconsistentSummary).accountingExitedCount : Nat) ≤
+      ((toSourceModule inconsistentSummary).depositedCount : Nat)) := by decide +kernel
+  exact hn hb
+
+theorem inconsistent_summary_source_reverts :
+    sourceExecute cfg [inconsistentSummary] (w 0) false = none := by
+  decide +kernel
+
+private def inconsistentAdversary :
+    Compiler.CompilationModel.DenoteExternalCalls.AdversaryModel :=
+  { liveSummaryAdversary with result := fun _ _ => .success (summaryBytes 1 0 0) }
+
+/- The existing live callback decoder accepts the reply; the subsequent
+source arithmetic fails, rather than claiming unconditional allocation success. -/
+#guard match (allocateLiveFromStorage inconsistentAdversary cfg (w 0) false).run liveState with
+  | .revert "ALLOC_ARITHMETIC" _ => true
+  | _ => false
+
 end LidoSRv3.Tests.AllocationTxMutants

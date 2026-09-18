@@ -17,10 +17,11 @@ Pinned Solidity (17005714):
   `STETH.transferFrom(msg.sender, address(this), _amountOfStETH)` at
   `contracts/0.8.9/WithdrawalQueue.sol:132-135` (loop) via
   `_requestWithdrawal:374`.
-- `_claim` → value CALL to `_recipient` at
-  `contracts/0.8.9/WithdrawalQueueBase.sol:472`.
+- `_claim` → `_sendValue(_recipient, ethWithDiscount)` at
+  `contracts/0.8.9/WithdrawalQueueBase.sol:477`, then the value CALL at
+  `WithdrawalQueueBase.sol:529`.
 - `unwrap` → `stETH.transfer(msg.sender, stETHAmount)` at
-  `contracts/0.4.24/WstETH.sol:73`.
+  `contracts/0.6.12/WstETH.sol:73`.
 - `transferFrom` → no external call (Transfer event only) at
   `contracts/0.8.9/WithdrawalQueueERC721.sol:248`.
 
@@ -56,7 +57,8 @@ def bridgeOutcomeForRequestWithdrawals (calleeSucceeded : Bool) : BridgeCallOutc
   { succeeded := calleeSucceeded }
 
 /-- Source-level `BridgeCallOutcome` for the `_claim` writer.
-Names value CALL to `_recipient` at `WithdrawalQueueBase.sol:472`. -/
+Names the `_sendValue` call at `WithdrawalQueueBase.sol:477` and its value
+CALL to `_recipient` at `WithdrawalQueueBase.sol:529`. -/
 def bridgeOutcomeForClaimWithdrawals (calleeSucceeded : Bool) : BridgeCallOutcome :=
   { succeeded := calleeSucceeded }
 

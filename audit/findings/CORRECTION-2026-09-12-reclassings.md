@@ -101,7 +101,7 @@ the corresponding guarantee-level `assumptions` lists:
 ### `P-RESERVE-1` "live WithdrawalQueue.unfinalizedStETH call"
 - **Prior removal**: PR #408 (`integrate(grok #404): P-RESERVE-1 live
   unfinalizedStETH STATICCALL`).
-- **Why it was wrong**: `LidoSRv3/Audit/Source/ReserveUnfinalizedCall.lean`
+- **Why it was wrong**: `LidoSRv3/Audit/Guarantees/Composition/ReserveUnfinalizedCall.lean`
   is a consumer module that derives `freshQueueCache` from a live
   STATICCALL observation, but the registered parent theorem
   `source_spend_preserves_withdrawal_reserve` still takes
@@ -113,7 +113,7 @@ the corresponding guarantee-level `assumptions` lists:
 ### `P-ACCOUNT-1` "packed uint64 accounting words"
 - **Prior removal**: PR #418 (`integrate(grok #399): P-ACCOUNT-1
   packed uint64 accounting words`).
-- **Why it was wrong**: `LidoSRv3/Audit/Source/AccountPackedWords.lean`
+- **Why it was wrong**: `LidoSRv3/Audit/Guarantees/Composition/AccountPackedWords.lean`
   proves the pack/unpack round-trip only for the DEGENERATE case
   `pack ⟨b, 0, 0⟩` (zero exit / zero pending). The general packed
   layout with nonzero exited/pending fields is not linked to the

@@ -72,7 +72,8 @@ theorem alloc2_source_parent_ignores_handwritten_minfirst
     (_hHandwrittenMinFirstFaithful : HandwrittenMinFirstFaithful) :
     PAlloc2.StepMatchesModel ∧
       PAlloc2.FullLoopConserves ∧
-      PAlloc2.LoopStaysInCorrespondence :=
+      PAlloc2.LoopStaysInCorrespondence ∧
+      PAlloc2.UnboundedProportionalLoop ∧ PAlloc2.SourceMemoryCallCorrespondence :=
   PAlloc2.step_correspondence_and_full_loop_conservation
 
 /-- Same statement without the ignored hypothesis: the P-ALLOC-2
@@ -81,7 +82,8 @@ on the faithfulness of the handwritten +1 `MinFirst` model. -/
 theorem alloc2_source_parent_applies_universally :
     PAlloc2.StepMatchesModel ∧
       PAlloc2.FullLoopConserves ∧
-      PAlloc2.LoopStaysInCorrespondence :=
+      PAlloc2.LoopStaysInCorrespondence ∧
+      PAlloc2.UnboundedProportionalLoop ∧ PAlloc2.SourceMemoryCallCorrespondence :=
   PAlloc2.step_correspondence_and_full_loop_conservation
 
 /-- The registered P-ALLOC-2 Verity-transaction parent applies

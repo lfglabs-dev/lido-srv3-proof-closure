@@ -10,17 +10,11 @@ precheck: a code-less target (EOA or not-yet-deployed address) *accepts* with
 empty return data, after the value transfer for CALL. Only an unfunded caller
 fails before the callee runs.
 
-Premise of the code-less arm (residual named by the #295 review 3bb8da69,
-recorded, not closed): precompile addresses (`0x01`-`0x0a` and later
-additions) have no code yet execute, and some of them fail on an empty
-payload (`0x09` blake2f, `0x0a` KZG point evaluation). The rule below treats
-every code-less target as accepting, which is exact for EOAs and undeployed
-addresses only. Every theorem stated on the code-less arm
-(`callAdd_no_code_accepted`, `refund_no_code_accepted`, the fee read on a
-code-less target) is to be read with "the target is not a precompile" as a
-premise. Exposure at the pinned call sites is nil (`CONSOLIDATION_REQUEST`
-has code; the refund recipient is chosen by the role holder), but the model
-does not enforce the premise.
+CALL dispatch excludes Cancun precompiles (addresses 1 through 10) from the
+empty-code shortcut. Their result comes from the external interpreter, including
+rejection and rollback. Fork/runtime binding and correctness of that interpreter
+remain open. STATICCALL uses the same dispatch predicate and preserves its
+static observation, without granting the interpreter a writable reply world.
 
 Pinned usages at `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`:
 
@@ -42,6 +36,15 @@ namespace audit.trio.consolidation
 open LidoSRv3.Audit.Source.TrioReserve1
 open LidoSRv3.Audit.Source.TrioReserve1.Live
 
+/-- Ordinary empty-code account under Cancun dispatch. Later-fork additions
+require an updated fork binding; zero code alone never identifies an EOA. -/
+def emptyCodeAccount (w : World) (target : Address) : Prop :=
+  (w.core.codeSize target.val).val = 0 ∧ (target.val = 0 ∨ 10 < target.val)
+
+instance (w : World) (target : Address) : Decidable (emptyCodeAccount w target) :=
+  inferInstanceAs (Decidable ((w.core.codeSize target.val).val = 0 ∧
+    (target.val = 0 ∨ 10 < target.val)))
+
 /-- Low-level `target.call{value: value}(payload)`. No target-code guard: a
 code-less target (EOA or undeployed address; **not a precompile**, see the
 module docstring) accepts with empty return data after the value transfer. An
@@ -53,7 +56,7 @@ def lowLevelCall (external : External) (ctx : Context) (target : Address)
   let req : Request := ⟨ctx.self, target, value, payload⟩
   if w.balances ctx.self < value.val then
     ⟨.error (.bubbled []), w, [⟨req, false, [], []⟩]⟩
-  else if (w.core.codeSize target.val).val = 0 then
+  else if emptyCodeAccount w target then
     ⟨.ok [], transfer w ctx.self target value.val, [⟨req, true, [], []⟩]⟩
   else
     match external req (transfer w ctx.self target value.val) with
@@ -61,6 +64,22 @@ def lowLevelCall (external : External) (ctx : Context) (target : Address)
     | .success data after => ⟨.ok data, after, [⟨req, true, data, []⟩]⟩
     | .successWithTrace data after nested => ⟨.ok data, after, [⟨req, true, data, nested⟩]⟩
     | .rejectedWithTrace data nested => ⟨.error (.bubbled data), w, [⟨req, false, data, nested⟩]⟩
+
+/-- Precompile rejection is observed even when EXTCODESIZE is zero. The
+provisional credit is rolled back, retaining the actual failed CALL request. -/
+theorem lowLevelCall_precompile_rejected (external : External) (ctx : Context)
+    (target : Address) (payload : Bytes) (value : Word) (w : World) (data : Bytes)
+    (hp : 1 ≤ target.val ∧ target.val ≤ 10)
+    (hb : value.val ≤ w.balances ctx.self)
+    (hr : external ⟨ctx.self, target, value, payload⟩
+      (transfer w ctx.self target value.val) = .rejected data) :
+    lowLevelCall external ctx target payload value w =
+      ⟨.error (.bubbled data), w,
+        [⟨⟨ctx.self, target, value, payload⟩, false, data, []⟩]⟩ := by
+  have hn : ¬ emptyCodeAccount w target := by
+    unfold emptyCodeAccount
+    omega
+  simp [lowLevelCall, Nat.not_lt.mpr hb, hn, hr]
 
 /-- Low-level `target.staticcall(payload)` (e.g. `_getFeeFromContract`'s
 `staticcall("")`). No target-code guard: a code-less target (EOA or
@@ -71,11 +90,25 @@ modified. -/
 def lowLevelStaticCall (external : StaticCall.External) (caller target : Address)
     (payload : Bytes) (w : World) : StaticCall.Result :=
   let req : Request := ⟨caller, target, word 0, payload⟩
-  if (w.core.codeSize target.val).val = 0 then ⟨.ok [], [⟨req, true, true, [], 1⟩]⟩
+  if emptyCodeAccount w target then ⟨.ok [], [⟨req, true, true, [], 1⟩]⟩
   else match external req w with
     | .success data => ⟨.ok data, [⟨req, true, true, data, 1⟩]⟩
     | .rejected data => ⟨.error data, [⟨req, true, false, data, 1⟩]⟩
     | .forbiddenStateChange => ⟨.error [], [⟨req, true, false, [], 1⟩]⟩
+
+/-- Cancun precompiles execute through the static interpreter even with zero
+code size. The exact request, returndata and rejection flag are retained. -/
+theorem lowLevelStaticCall_precompile (external : StaticCall.External)
+    (caller target : Address) (payload : Bytes) (w : World)
+    (hp : 1 ≤ target.val ∧ target.val ≤ 10) :
+    lowLevelStaticCall external caller target payload w =
+      let req : Request := ⟨caller, target, word 0, payload⟩
+      match external req w with
+      | .success data => ⟨.ok data, [⟨req, true, true, data, 1⟩]⟩
+      | .rejected data => ⟨.error data, [⟨req, true, false, data, 1⟩]⟩
+      | .forbiddenStateChange => ⟨.error [], [⟨req, true, false, [], 1⟩]⟩ := by
+  have hn : ¬ emptyCodeAccount w target := by unfold emptyCodeAccount; omega
+  simp [lowLevelStaticCall, hn]
 
 /-- Exhaustive branch shape of the low-level CALL on any world. -/
 theorem lowLevelCall_shape (external : External) (ctx : Context) (target : Address)
@@ -83,11 +116,11 @@ theorem lowLevelCall_shape (external : External) (ctx : Context) (target : Addre
     (w.balances ctx.self < value.val ∧
       lowLevelCall external ctx target payload value w =
         ⟨.error (.bubbled []), w, [⟨⟨ctx.self, target, value, payload⟩, false, [], []⟩]⟩) ∨
-    (value.val ≤ w.balances ctx.self ∧ (w.core.codeSize target.val).val = 0 ∧
+    (value.val ≤ w.balances ctx.self ∧ emptyCodeAccount w target ∧
       lowLevelCall external ctx target payload value w =
         ⟨.ok [], transfer w ctx.self target value.val,
           [⟨⟨ctx.self, target, value, payload⟩, true, [], []⟩]⟩) ∨
-    (value.val ≤ w.balances ctx.self ∧ (w.core.codeSize target.val).val ≠ 0 ∧
+    (value.val ≤ w.balances ctx.self ∧ ¬ emptyCodeAccount w target ∧
       ((∃ data, external ⟨ctx.self, target, value, payload⟩
           (transfer w ctx.self target value.val) = .rejected data ∧
         lowLevelCall external ctx target payload value w =
@@ -109,7 +142,7 @@ theorem lowLevelCall_shape (external : External) (ctx : Context) (target : Addre
   by_cases hb : w.balances ctx.self < value.val
   · exact Or.inl ⟨hb, by simp [hb]⟩
   · have hf : value.val ≤ w.balances ctx.self := Nat.not_lt.mp hb
-    by_cases hc : (w.core.codeSize target.val).val = 0
+    by_cases hc : emptyCodeAccount w target
     · exact Or.inr (Or.inl ⟨hf, hc, by simp [hb, hc]⟩)
     · refine Or.inr (Or.inr ⟨hf, hc, ?_⟩)
       cases hr : external ⟨ctx.self, target, value, payload⟩
@@ -137,10 +170,10 @@ theorem lowLevelCall_success_funded (external : External) (ctx : Context) (targe
 /-- Exhaustive branch shape of the low-level STATICCALL. -/
 theorem lowLevelStaticCall_shape (external : StaticCall.External) (caller target : Address)
     (payload : Bytes) (w : World) :
-    ((w.core.codeSize target.val).val = 0 ∧
+    (emptyCodeAccount w target ∧
       lowLevelStaticCall external caller target payload w =
         ⟨.ok [], [⟨⟨caller, target, word 0, payload⟩, true, true, [], 1⟩]⟩) ∨
-    ((w.core.codeSize target.val).val ≠ 0 ∧
+    (¬ emptyCodeAccount w target ∧
       ((∃ data, external ⟨caller, target, word 0, payload⟩ w = .success data ∧
         lowLevelStaticCall external caller target payload w =
           ⟨.ok data, [⟨⟨caller, target, word 0, payload⟩, true, true, data, 1⟩]⟩) ∨
@@ -151,7 +184,7 @@ theorem lowLevelStaticCall_shape (external : StaticCall.External) (caller target
         lowLevelStaticCall external caller target payload w =
           ⟨.error [], [⟨⟨caller, target, word 0, payload⟩, true, false, [], 1⟩]⟩))) := by
   unfold lowLevelStaticCall
-  by_cases hc : (w.core.codeSize target.val).val = 0
+  by_cases hc : emptyCodeAccount w target
   · exact Or.inl ⟨hc, by simp [hc]⟩
   · refine Or.inr ⟨hc, ?_⟩
     cases hr : external ⟨caller, target, word 0, payload⟩ w with

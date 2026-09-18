@@ -1,5 +1,27 @@
 # SSZ complete declared siblings
 
+## Current candidate reproduction
+
+The dossier and its `validation/validate.py` below are historical evidence tied
+to base `4207bb0578b0a6821cd1d78b1f3a4bb08f277905` and their recorded source tree. Their old import paths and
+receipts do not validate the integrated candidate. Do not run or regenerate
+those historical receipts against the current checkout.
+
+For the current candidate, verify the exact PR head first and run:
+
+```sh
+python3 scripts/check_reproduction_targets.py
+REMOTE_BUILD_NODE_ID=dgx-spark remote-lean-build lake build LidoSRv3.Audit.Guarantees.Composition.SszDeclaredSiblings LidoSRv3.Audit.Guarantees.PSsz1DeclaredSiblings LidoSRv3.Tests.SszDeclaredSiblingsRegression
+REMOTE_BUILD_NODE_ID=dgx-spark remote-lean-build lake build LidoSRv3.Audit.Trust
+```
+
+These commands compile the relocated proofs and their retained regressions.
+The repository runner additionally recomputes registered axiom dependencies;
+no historical dossier PASS is transferred to the current SHA.
+
+## Historical dossier (superseded as a current reproduction)
+
+
 Additive source packet on main346 `4207bb0578b0a6821cd1d78b1f3a4bb08f277905`, tree `f67fb673536a4c1be3908c4437b23a9c59cc0bed`. Pinned Solidity core: `17005714f151e5502c559932319a3f2f74ac2436`. No old executor or public file is modified.
 
 `PSsz1.actual_compiled_cl_entry_complete_declared_branch` consumes exactly the same actual `SszCompiledClEntry.run` success and inherited `SszProofCommitted.ShaWidth` as SSZ330. Its conclusion preserves the entire old public branch consequence verbatim, on the same witnesses, before adding:

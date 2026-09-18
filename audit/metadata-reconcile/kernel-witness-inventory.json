@@ -1,0 +1,40 @@
+{
+  "baseline": "df0845148a3f9de24b334035811e68d01a73eaf9",
+  "baseline_count": 407,
+  "baseline_digest": "5b1bdca4c80339b043dbd3fca5594c0d6897baddbdf5a44fb1556f90c6c6ff36",
+  "current_count": 404,
+  "current_digest": "a5c9ff0fc082d68db8ab60ce7180c33aa78ce11609240e1313baa3c27522a331",
+  "removed_records": [
+    [
+      "LidoSRv3/Audit/Verity/AllocCapacityPhase3.lean",
+      343,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Audit/Verity/ConsolidationAbstractFlowModel.lean",
+      70,
+      "native_decide"
+    ],
+    [
+      "LidoSRv3/Audit/Verity/SszAbstractDigest.lean",
+      94,
+      "native_decide"
+    ]
+  ],
+  "moved_records": [
+    {
+      "before": [
+        "LidoSRv3/Audit/Verity/AllocCapacityPhase3.lean",
+        140,
+        "native_decide"
+      ],
+      "after": [
+        "LidoSRv3/Audit/Verity/AllocCapacityPhase3.lean",
+        144,
+        "native_decide"
+      ]
+    }
+  ],
+  "added_records": [],
+  "reason": "Retained kernel proofs replace exactly the three owner-accepted compiler-success native witnesses; one existing native site moves after commentary. Static inventory only; environment provenance/type/dependency validation is separate."
+}

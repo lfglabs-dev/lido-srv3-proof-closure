@@ -4,8 +4,12 @@ import LidoSRv3.Audit.Source.Alloc1CompositeBoundsSource
 import LidoSRv3.Audit.Guarantees.Registry
 import LidoSRv3.Audit.Guarantees.PAlloc1TargetMultBounded
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
+import LidoSRv3.Audit.Guarantees.PAlloc1TotalAdditionBounded
+import LidoSRv3.Audit.Guarantees.PAlloc1AvailableArithmeticBounded
 import LidoSRv3.Audit.Verity.AllocCapacityPhase3
 import LidoSRv3.Audit.Verity.AllocationTx
+import LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer
+import LidoSRv3.Audit.Source.TrioComposition.VerityParentResult
 
 namespace LidoSRv3.Audit.Guarantees.PAlloc1
 
@@ -204,6 +208,77 @@ theorem checked_execute_under_pinned_shape_and_constants
   checked_execute_under_pinned_shape cfg modules depositsToAllocate isTopUp
     hMaxEB hTypes hShape
 
+/-- **Chantier 3 (Piste A, Thomas 2026-09-13) `total_addition` real
+derivation.**
+
+Analog of `checked_execute_under_pinned_shape` where the
+`total_addition` conjunct of `CheckedBounds` is DERIVED from real
+arithmetic on `PinnedAllocationEntryBounds` (MAX_STAKING_MODULES_COUNT
+= 32, uint64 `depositsToAllocate`, uint64 per-module
+`allocationEntry`), not passed through from `PinnedSRAllocation-
+BoundsShape.totalAdditionInvariant`.  Via `PAlloc1TotalAdditionBounded.
+total_addition_under_pinned_bounds`: `deposits + Σ entries ≤ (32 + 1)
+* (2^64 - 1) ≈ 6·10^20 << MAX_UINT256 = 2^256 - 1`.
+
+Two of the four `CheckedBounds` conjuncts are now derived from real
+bounds (target_multiplication via `PAlloc1TargetMultBounded`;
+total_addition via `PAlloc1TotalAdditionBounded`).  `active_subtraction`
+and `available_arithmetic` remain caller-supplied premises for now
+(see `fidelity.missing`; live SRStorage monotonicity + per-module uint64
+caps derivation is the follow-up). -/
+theorem checked_execute_under_type_and_allocation_bounds
+    (cfg : Config) (modules : List Module) (depositsToAllocate : Verity.Uint256)
+    (isTopUp : Bool)
+    (hMaxEB : cfg.maxEBType1 ≠ 0)
+    (hTypes : PAlloc1TargetMultBounded.PinnedStakingModuleTypeBounds
+      cfg modules depositsToAllocate)
+    (hAlloc : PAlloc1TotalAdditionBounded.PinnedAllocationEntryBounds
+      cfg modules depositsToAllocate)
+    (hActiveSubtr : ∀ m ∈ modules,
+      (wordMax m.summaryExitedCount m.accountingExitedCount : Nat)
+        ≤ (m.depositedCount : Nat))
+    (hAvailArith : ∀ m ∈ modules, m.isActive = true →
+      (if isTopUp && m.isType2 then
+        MathView.activeCount m * (cfg.maxEBType2 : Nat) ≤ Verity.Core.MAX_UINT256
+      else
+        MathView.allocationEntry cfg m + (m.depositableCount : Nat) ≤
+          Verity.Core.MAX_UINT256)) :
+    ∃ rows, SolidityAllocCapacity.execute cfg modules depositsToAllocate isTopUp = some rows ∧
+      rows.map (fun row => (row.capacity : Nat)) =
+        MathView.capacities cfg modules depositsToAllocate isTopUp :=
+  checked_execute cfg modules depositsToAllocate isTopUp
+    { maxEBType1_nonzero := hMaxEB
+      active_subtraction := hActiveSubtr
+      total_addition :=
+        PAlloc1TotalAdditionBounded.total_addition_under_pinned_bounds hAlloc
+      available_arithmetic := hAvailArith
+      target_multiplication :=
+        PAlloc1TargetMultBounded.target_multiplication_under_pinned_type_bounds hTypes }
+
+/-- Typed and available-arithmetic bounds plus the remaining shape invariants
+yield checked execution and independent capacity equations. -/
+theorem checked_execute_under_type_and_available_bounds
+    (cfg : Config) (modules : List Module) (depositsToAllocate : Verity.Uint256)
+    (isTopUp : Bool)
+    (hMaxEB : cfg.maxEBType1 ≠ 0)
+    (hTypes : PAlloc1TargetMultBounded.PinnedStakingModuleTypeBounds
+      cfg modules depositsToAllocate)
+    (hAvail : PAlloc1AvailableArithmeticBounded.PinnedAvailableArithmeticBounds
+      cfg modules isTopUp)
+    (hShape : PAlloc1RemainingBoundsScaffold.PinnedSRAllocationBoundsShape
+      cfg modules depositsToAllocate isTopUp) :
+    ∃ rows, SolidityAllocCapacity.execute cfg modules depositsToAllocate isTopUp = some rows ∧
+      rows.map (fun row => (row.capacity : Nat)) =
+        MathView.capacities cfg modules depositsToAllocate isTopUp :=
+  checked_execute cfg modules depositsToAllocate isTopUp
+    { maxEBType1_nonzero := hMaxEB
+      active_subtraction := hShape.activeSubtractionInvariant
+      total_addition := hShape.totalAdditionInvariant
+      available_arithmetic :=
+        PAlloc1AvailableArithmeticBounded.available_arithmetic_under_pinned_bounds hAvail
+      target_multiplication :=
+        PAlloc1TargetMultBounded.target_multiplication_under_pinned_type_bounds hTypes }
+
 /-- Successful execution retains router index order. -/
 theorem router_order_preserved {cfg : Config} {modules : List Module}
     {depositsToAllocate : Verity.Uint256} {isTopUp : Bool} {rows : List Row}
@@ -253,7 +328,11 @@ the returned `(exited, deposited, depositable)` words, and for type-2 rows
 executes the distinct pinned `getTotalModuleStake()` staticcall and ABI-decodes
 its uint256 word before passing rows to the allocation loop. The premise says
 those adversarial call observations decode to the source-view rows. It does
-not prove reachable-router `CheckedBounds`. -/
+not prove reachable-router `CheckedBounds`. The additional clause consumes the
+interleaved source producer in the same physical account/world for every input,
+retaining errors and call order without clipping its count. It does not identify
+the legacy persisted observations with that producer or discharge deployment,
+layout/hash, gas, caller-context or supported-module reachability obligations. -/
 theorem verity_tx_simulates_allocation_count_from_storage
     (adversary :
       Compiler.CompilationModel.DenoteExternalCalls.AdversaryModel)
@@ -263,11 +342,87 @@ theorem verity_tx_simulates_allocation_count_from_storage
     (state : Verity.ContractState)
     (hLength : modules.length = min (state.readSlot modulesCountSlot).val 32)
     (hBind : (bindLiveAll adversary state 0 modules.length) state = .success modules state) :
-    observe modules
+    (observe modules
         ((allocateLiveFromStorage adversary cfg depositsToAllocate isTopUp).run state) =
-      sourceView cfg modules depositsToAllocate isTopUp :=
-  verity_tx_simulates_live_summary_from_storage
-    adversary cfg modules depositsToAllocate isTopUp state hLength hBind
+      sourceView cfg modules depositsToAllocate isTopUp) ∧
+    (∀ (layout : LidoSRv3.Audit.Source.TrioAlloc1.Layout)
+      (input : LidoSRv3.Audit.Source.TrioAlloc1.CapacityInput)
+      (gas : Nat) (before : LidoSRv3.Audit.Source.TrioAlloc1.Transcript),
+      let callState : Compiler.CompilationModel.DenoteExternalCalls.CallState :=
+        ⟨state, gas, []⟩
+      (LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.executeAccount
+        layout input adversary callState before).1 =
+        LidoSRv3.Audit.Source.TrioAlloc1.produce layout
+          (LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.accountStorage state)
+          (LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.sourceOracle adversary state)
+          input before ∧
+      (LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.executeAccount
+        layout input adversary callState before).2.world = state ∧
+      (∀ amount,
+        (LidoSRv3.Audit.Source.TrioComposition.VerityParentResult.execute
+          layout input.config amount input.isTopUp adversary callState before).1 =
+          LidoSRv3.Audit.Source.TrioComposition.getDepositAllocationsABI layout
+            (LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.accountStorage state)
+            (LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.sourceOracle adversary state)
+            input.config amount input.isTopUp before ∧
+        (LidoSRv3.Audit.Source.TrioComposition.VerityParentResult.execute
+          layout input.config amount input.isTopUp adversary callState before).2.world = state) ∧
+      LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.AccountMathResult
+        layout input adversary callState before) := by
+  constructor
+  · exact verity_tx_simulates_live_summary_from_storage
+      adversary cfg modules depositsToAllocate isTopUp state hLength hBind
+  · intro layout input gas before
+    have h := LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.account_producer_correspondence
+      layout input adversary ⟨state, gas, []⟩ before
+    exact ⟨h.1, h.2, (fun amount =>
+      LidoSRv3.Audit.Source.TrioComposition.VerityParentResult.execute_correspondence
+        layout input.config amount input.isTopUp adversary ⟨state, gas, []⟩ before),
+      LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.account_math_result
+        layout input adversary ⟨state, gas, []⟩ before⟩
+
+/-- Registered account-qualified allocation result. Unlike the retained legacy
+observation theorem above, this entry has no assumed successful binding or
+clipped count. It preserves all producer outcomes and module-call observations,
+derives successful capacity equations from the executed rows, and composes the
+public allocation continuation on the same world.
+
+[SRLib allocation](https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/sr/SRLib.sol#L391-L431)
+and [capacity loops](https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/sr/SRLib.sol#L493-L559).
+The abstract `checked_execute` remains unchanged. Gas sufficiency, deployed
+layout/code identity and compiled library execution are separate obligations. -/
+theorem account_allocation_result
+    (layout : LidoSRv3.Audit.Source.TrioAlloc1.Layout)
+    (input : LidoSRv3.Audit.Source.TrioAlloc1.CapacityInput)
+    (adversary : Compiler.CompilationModel.DenoteExternalCalls.AdversaryModel)
+    (state : Compiler.CompilationModel.DenoteExternalCalls.CallState)
+    (before : LidoSRv3.Audit.Source.TrioAlloc1.Transcript) :
+    (LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.executeAccount
+      layout input adversary state before).1 =
+      LidoSRv3.Audit.Source.TrioAlloc1.produce layout
+        (LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.accountStorage state.world)
+        (LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.sourceOracle adversary state.world)
+        input before ∧
+    (LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.executeAccount
+      layout input adversary state before).2.world = state.world ∧
+    LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.AccountMathResult
+      layout input adversary state before ∧
+    (∀ amount,
+      (LidoSRv3.Audit.Source.TrioComposition.VerityParentResult.execute
+        layout input.config amount input.isTopUp adversary state before).1 =
+        LidoSRv3.Audit.Source.TrioComposition.getDepositAllocationsABI layout
+          (LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.accountStorage state.world)
+          (LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.sourceOracle adversary state.world)
+          input.config amount input.isTopUp before ∧
+      (LidoSRv3.Audit.Source.TrioComposition.VerityParentResult.execute
+        layout input.config amount input.isTopUp adversary state before).2.world = state.world) := by
+  have h := LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.account_producer_correspondence
+    layout input adversary state before
+  exact ⟨h.1, h.2,
+    LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.account_math_result
+      layout input adversary state before,
+    fun amount => LidoSRv3.Audit.Source.TrioComposition.VerityParentResult.execute_correspondence
+      layout input.config amount input.isTopUp adversary state before⟩
 
 /-- Every revert of the allocation transaction, including the injected
 failure after intermediate map/slot writes, restores the pre-call snapshot. -/
@@ -285,8 +440,8 @@ theorem verity_tx_revert_restores_snapshot
 open LidoSRv3.Audit.Verity.AllocationTx in
 /-- **Chantier 3 (Piste A, 2026-09-13): Contract.run rollback for the
 live-summary entry point.**  Every revert of
-`allocateLiveFromStorage` — the actual entry point wired into the
-registered Verity parent `verity_tx_simulates_allocation_count_from_storage`
+`allocateLiveFromStorage` — the historical entry point retained in
+`verity_tx_simulates_allocation_count_from_storage`
 — restores the pre-call snapshot.  Includes the injected late-
 failure path exercised by `live_injected_after_writes_rolls_back`,
 which fires after every summary/stake staticcall has bound its row

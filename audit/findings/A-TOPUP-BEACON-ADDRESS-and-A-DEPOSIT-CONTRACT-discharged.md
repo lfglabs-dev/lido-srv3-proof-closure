@@ -55,7 +55,7 @@ matches (this is the exact `A-RUNTIME-PROVENANCE` check for this
 immutable).
 
 The Lean proof lives in
-`LidoSRv3/Audit/Provenance/BeaconDepositAddress.lean` and is composed
+`LidoSRv3/Audit/Guarantees/Composition/BeaconDepositAddress.lean` and is composed
 of six theorems, each depending only on the accepted trust base
 `{propext, Classical.choice, Quot.sound}` (three actually depend on no
 axioms at all):
@@ -98,7 +98,7 @@ axioms at all):
 - Extended `audit/artifacts.lock.json` with the
   `deployed_bytecode.StakingRouter_implementation` entry (proxy,
   implementation, fixture path/size/SHA-256, immutable extraction).
-- Added `LidoSRv3/Audit/Provenance/BeaconDepositAddress.lean` with the
+- Added `LidoSRv3/Audit/Guarantees/Composition/BeaconDepositAddress.lean` with the
   six theorems above.
 - Registered the six theorems in `LidoSRv3/Audit/Trust.lean`.
 - Removed `A-TOPUP-BEACON-ADDRESS` and `A-DEPOSIT-CONTRACT` from

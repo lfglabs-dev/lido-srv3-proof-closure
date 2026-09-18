@@ -1,4 +1,4 @@
-import LidoSRv3.Audit.Spec.AllocLoopTermination
+import LidoSRv3.Audit.Verity.AllocLoopTermination
 
 /-! P-ALLOC-2 unconditional `sourceAllocateLoop` termination vectors. -/
 

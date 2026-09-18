@@ -20,7 +20,7 @@ do **not** consume the caller-supplied premise
 registry text already records that `PerfectDepositEncoding` "is used only
 by the unregistered uniqueness child" (`deposit_unique_of_perfect`).
 
-## Proof (see `LidoSRv3/Audit/Provenance/SszPerfectHashOrphaned.lean`)
+## Proof (see `LidoSRv3/Audit/Guarantees/Composition/SszPerfectHashOrphaned.lean`)
 
 Three theorems exhibit the orphanage:
 
@@ -47,7 +47,7 @@ registered in `LidoSRv3.Audit.Trust`.
 ## Reproduction
 
 ```bash
-lake build LidoSRv3.Audit.Provenance.SszPerfectHashOrphaned
+lake build LidoSRv3.Audit.Guarantees.Composition.SszPerfectHashOrphaned
 lake build LidoSRv3.Audit.Trust
 python3 scripts/check_trust_axioms.py
 ```

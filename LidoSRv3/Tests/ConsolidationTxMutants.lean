@@ -237,8 +237,8 @@ theorem value_blind_debit_kill_line_refutes_preserves_eth_balance_slotFree :
         observeFromJournal state (.success result after) ∧
       after.selfBalance ≠ state.selfBalance :=
   ⟨pair 11 21, valState, ofObservables valObs, valAfterPlainSlotFree,
-    by native_decide, by native_decide, by native_decide,
-    by native_decide, by native_decide, by native_decide⟩
+    by decide +kernel, by decide +kernel, by decide +kernel,
+    by decide +kernel, by decide +kernel, by decide +kernel⟩
 
 theorem double_debit_kill_line_refutes_preserves_eth_balance_slotFree :
     ∃ (inputs : Inputs) (state : Verity.ContractState)
@@ -255,8 +255,8 @@ theorem double_debit_kill_line_refutes_preserves_eth_balance_slotFree :
         observeFromJournal state (.success result after) ∧
       after.selfBalance ≠ state.selfBalance :=
   ⟨pair 11 21, valState, ofObservables valObs, valAfterDoubleSlotFree,
-    by native_decide, by native_decide, by native_decide,
-    by native_decide, by native_decide, by native_decide⟩
+    by decide +kernel, by decide +kernel, by decide +kernel,
+    by decide +kernel, by decide +kernel, by decide +kernel⟩
 
 theorem journal_value_blind_kill_line_refutes_exact_forwarding_slotFree :
     ∃ (inputs : Inputs) (state : Verity.ContractState)
@@ -276,9 +276,9 @@ theorem journal_value_blind_kill_line_refutes_exact_forwarding_slotFree :
       ((after.calls.drop state.calls.length).map (·.value)).sum ≠
         inputs.msgValue.val :=
   ⟨pair 11 21, valState, ofObservables valObs, valAfterJournalBlindSlotFree,
-    by native_decide, by native_decide, by native_decide,
-    by native_decide, by native_decide, by native_decide,
-    by native_decide⟩
+    by decide +kernel, by decide +kernel, by decide +kernel,
+    by decide +kernel, by decide +kernel, by decide +kernel,
+    by decide +kernel⟩
 
 /-! ## Entry-credit overflow: CALL-value credit must reject Uint256 wrap
 

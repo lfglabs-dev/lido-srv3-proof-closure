@@ -26,6 +26,20 @@ theorem zero_recipient_rejects_before_claim :
       .error (.reason "ZeroRecipient") ∧
     (runClaimWithdrawalsTo acceptingCallee ctx [1] [1] 0 before).attempts = [] := by decide +kernel
 
+/-- Cancun point-evaluation rejects empty input even though its code size is zero.
+The old zero-code shortcut commits and therefore fails this regression. -/
+theorem precompile_rejection_restores_transfer :
+    (emptyValueCall rejectingCallee ctx 10 30 before).outcome =
+      .error (.reason "CantSendValueRecipientMayHaveReverted") ∧
+    (emptyValueCall rejectingCallee ctx 10 30 before).world.balances ctx.self = 100 ∧
+    (emptyValueCall rejectingCallee ctx 10 30 before).attempts =
+      [⟨⟨ctx.self, 10, 30, []⟩, false, [0xff], []⟩] := by decide +kernel
+
+/-- The adjacent ordinary empty-code account still receives value without code. -/
+theorem after_precompile_range_is_eoa :
+    (emptyValueCall rejectingCallee ctx 11 30 before).outcome = .ok () ∧
+    (emptyValueCall rejectingCallee ctx 11 30 before).world.balances ctx.self = 70 := by decide +kernel
+
 /-- A genuine root failure restores any state, not only a test fixture. -/
 theorem failed_batch_restores_world (callee : External) (context : Context)
     (ids hints : List Nat) (recipient : Verity.Address) (world : World) (fault : Fault)
