@@ -132,6 +132,7 @@ import LidoSRv3.Audit.Guarantees.PTopup1NoReentry
 import LidoSRv3.Audit.Guarantees.PReserve1NoReentry
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1NoReentry
 import LidoSRv3.Audit.Guarantees.PAddress1NoReentry
+import LidoSRv3.Audit.Guarantees.PTopup2SameBlock
 import LidoSRv3.Audit.Guarantees.PAlloc1Phase3
 import LidoSRv3.Audit.Guarantees.PAlloc2
 import LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound
@@ -2228,6 +2229,22 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Verity.TopupMultiCallBlockCap.setter_refuses_zero
 #print axioms LidoSRv3.Audit.Verity.TopupMultiCallBlockCap.no_lock_two_call_exceeds_cap
 #print axioms LidoSRv3.Audit.Verity.TopupMultiCallBlockCap.router_only_two_call_exceeds_cap
+-- P-TOPUP-2 same-block bound on the actual consumer (Thomas 2026-09-18,
+-- step 2c): the historical `runMany` argument ported to repeated
+-- `TopupBatchConsumer.run`, with the gateway's `lastTopUpBlock` and
+-- `minBlockDistance` read from its packed storage word and the history
+-- write conditioned on the loop's `totalLimits`. Premises: nonzero uint32
+-- block, `minBlockDistance ≥ 1` at entry, and `ConfigStable` (the batch's
+-- callees leave the gateway distance field and the router cap unchanged).
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2SameBlock.consume_success
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2SameBlock.allocated_le_cap
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2SameBlock.allocated_le_totalLimits
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2SameBlock.lock_lastBlock
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2SameBlock.lock_minDistance
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2SameBlock.locked_blocks
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2SameBlock.runMany_locked
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2SameBlock.same_block_actual_batches_le_cap
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2SameBlock.same_block_actual_batches_le_blockCap
 
 -- P-ADDRESS-1 unbounded observe receipt (grok #416): the live
 -- AddressClaimBatchTx loop already iterates arbitrary request/hint
