@@ -41,7 +41,7 @@ structure Observed (α : Type) where
   attempts : List NestedAttempt
 
 def request (caller target : Address) (selector : Nat) : Request :=
-  ⟨caller,target,word 0,encode 4 selector⟩
+  ⟨caller,target,Live.word 0,encode 4 selector⟩
 
 /-- Return-valued typed STATICCALL: no code precheck (a code-less target
 answers empty bytes and fails the decoder), callee bytes forwarded on failure. -/
@@ -153,7 +153,7 @@ theorem preconditions_success (sexternal : StaticCall.External) (ctx : Context)
 def compoundingPrefix : Nat := 0x02 <<< 248
 
 /-- Line 378: `bytes32(COMPOUNDING_PREFIX | uint160(vaultAddress))`. -/
-def credentials (vault : Address) : Word := word (compoundingPrefix ||| vault.val)
+def credentials (vault : Address) : Word := Live.word (compoundingPrefix ||| vault.val)
 
 /-- Lines 368-379: the configured vault read from the locator. Its 0x02
 credentials are `credentials vault`. -/

@@ -14,7 +14,7 @@ namespace audit.trio.consolidation.GatewayAdmission
 open LidoSRv3.Audit.Source.TrioReserve1 LidoSRv3.Audit.Source.TrioReserve1.Live
 
 /-- Static prefix: role/balance/pause, pure guards and count, DSM/Lido, vault. -/
-def prefix (sexternal : StaticCall.External) (ctx : Context) (locator : Address)
+def entryPrefix (sexternal : StaticCall.External) (ctx : Context) (locator : Address)
     (msgValue : Word) (groups : List WitnessGroupBytes) (before : World) :
     GatewayPreconditions.Observed Address :=
   match PhysicalEntrySettlement.gates ctx msgValue before with
@@ -41,12 +41,12 @@ def Admitted (sexternal : StaticCall.External) (ctx : Context) (locator : Addres
 
 theorem prefix_success (sexternal : StaticCall.External) (ctx : Context) (locator : Address)
     (msgValue : Word) (groups : List WitnessGroupBytes) (before : World) (vault : Address)
-    (h : (prefix sexternal ctx locator msgValue groups before).outcome = .ok vault) :
+    (h : (entryPrefix sexternal ctx locator msgValue groups before).outcome = .ok vault) :
     Admitted sexternal ctx locator msgValue groups before vault ∧
-    (prefix sexternal ctx locator msgValue groups before).attempts =
+    (entryPrefix sexternal ctx locator msgValue groups before).attempts =
       (GatewayPreconditions.preconditions sexternal ctx locator before).attempts ++
       (GatewayPreconditions.vaultData sexternal ctx locator before).attempts := by
-  unfold prefix at h ⊢
+  unfold entryPrefix at h ⊢
   cases hg : PhysicalEntrySettlement.gates ctx msgValue before with
   | «error» f => simp [hg] at h
   | ok u =>
@@ -63,7 +63,7 @@ theorem prefix_success (sexternal : StaticCall.External) (ctx : Context) (locato
         simp only [hpre] at h ⊢
         have hc := (PhysicalQuotaSettlement.prepare_success _ _ _ _ _ hp).1
         subst hc
-        exact ⟨⟨PhysicalEntrySettlement.gates_success _ _ _ hg,hp,hpre,h⟩,rfl⟩
+        exact ⟨⟨PhysicalEntrySettlement.gates_success _ _ _ hg,hp,hpre,h⟩,by trivial⟩
 
 structure Result where
   outcome : Except Fault Unit
@@ -77,7 +77,7 @@ precede the suffix trace. -/
 def execute (callee : External) (sexternal : StaticCall.External) (ctx : Context)
     (locator gateway inbox recipient : Address) (msgValue : Word)
     (groups : List WitnessGroupBytes) (before : World) : Result :=
-  let p := prefix sexternal ctx locator msgValue groups before
+  let p := entryPrefix sexternal ctx locator msgValue groups before
   match p.outcome with
   | .error f => ⟨.error f,before,p.attempts,none,none⟩
   | .ok vault =>
@@ -89,21 +89,21 @@ theorem execute_success (callee : External) (sexternal : StaticCall.External) (c
     (groups : List WitnessGroupBytes) (before : World)
     (h : (execute callee sexternal ctx locator gateway inbox recipient msgValue groups before).outcome = .ok ()) :
     ∃ vault, Admitted sexternal ctx locator msgValue groups before vault ∧
-      (prefix sexternal ctx locator msgValue groups before).outcome = .ok vault ∧
+      (entryPrefix sexternal ctx locator msgValue groups before).outcome = .ok vault ∧
       (PhysicalEntrySettlement.execute callee sexternal ctx vault gateway inbox recipient msgValue groups before).outcome = .ok () ∧
       execute callee sexternal ctx locator gateway inbox recipient msgValue groups before =
         ⟨.ok (),(PhysicalEntrySettlement.execute callee sexternal ctx vault gateway inbox recipient msgValue groups before).world,
-          (prefix sexternal ctx locator msgValue groups before).attempts ++
+          (entryPrefix sexternal ctx locator msgValue groups before).attempts ++
             (PhysicalEntrySettlement.execute callee sexternal ctx vault gateway inbox recipient msgValue groups before).trace,
           some vault,
           some (PhysicalEntrySettlement.execute callee sexternal ctx vault gateway inbox recipient msgValue groups before)⟩ := by
   unfold execute at h ⊢
   try dsimp only at h ⊢
-  cases hp : (prefix sexternal ctx locator msgValue groups before).outcome with
+  cases hp : (entryPrefix sexternal ctx locator msgValue groups before).outcome with
   | «error» f => simp [hp] at h
   | ok vault =>
     simp only [hp] at h ⊢
-    exact ⟨vault,(prefix_success _ _ _ _ _ _ _ hp).1,hp,h,by rw [h]⟩
+    exact ⟨vault,(prefix_success _ _ _ _ _ _ _ hp).1,by trivial,h,by rw [h]⟩
 
 theorem failure_restores (callee : External) (sexternal : StaticCall.External) (ctx : Context)
     (locator gateway inbox recipient : Address) (msgValue : Word)
@@ -112,8 +112,8 @@ theorem failure_restores (callee : External) (sexternal : StaticCall.External) (
     (execute callee sexternal ctx locator gateway inbox recipient msgValue groups before).world = before := by
   unfold execute at h ⊢
   try dsimp only at h ⊢
-  cases hp : (prefix sexternal ctx locator msgValue groups before).outcome with
-  | «error» g => simp [hp]
+  cases hp : (entryPrefix sexternal ctx locator msgValue groups before).outcome with
+  | «error» g => simp
   | ok vault =>
     simp only [hp] at h ⊢
     exact PhysicalEntrySettlement.failure_restores _ _ _ _ _ _ _ _ _ _ _ h

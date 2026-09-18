@@ -43,24 +43,44 @@ consolidation gateway follows once we have (a) a `RealValidatorInput`
 holding the pinned validator's fields and (b) the P-SSZ-1 parent's
 conclusions.
 
-**Status: naming scaffold, not a full composition** — same status as
-the sibling fee-STATICCALL premise module
-`PConsolidationEth1FeeStaticcallPremise.lean`. The theorem
-`cl_proof_derived_under_pinned_cl_proof_shape` below is a straight-line
-projection under the shape. A full composition additionally requires:
+**Status (2026-09-18, step 3a of the "not proven" cleanup): the three
+pieces this scaffold named are now tree-resident and composed.** The
+theorem `cl_proof_derived_under_pinned_cl_proof_shape` below is kept as
+the original straight-line projection under the shape; the real
+composition lives in:
 
-  - A Verity model of `_validatePubKeyWCProof`'s executable frame,
-    typed on `Live.World`;
-  - A cross-guarantee Verity theorem tying P-SSZ-1's
-    `real_validator_correspondence` output into
-    `PhysicalEntrySettlement`'s per-group gate;
-  - An ABI decoder for `sha256Pair(pubkeyRoot(pubkey),
-    withdrawalCredentials)` on the gateway's calldata.
+  - (a) `audit.trio.consolidation.WitnessProof.validate` — the typed
+    executable model of `_validatePubKeyWCProof` on `Live.World`:
+    `_verifySlot`, the key/credentials leaf, the fork-aware generalized
+    index (P-SSZ-1's `sourceNeighbor`/`sourceConcat` transcriptions of
+    `GIndex.shr`/`concat`), the EIP-4788 STATICCALL through the existing
+    low-level static primitive, and P-SSZ-1's `SszProofFold.sourceVerify`
+    under `SszProofCalldataStep.ffiPair`; `WitnessProof.validate_success`
+    derives `WitnessProof.Passed`, which carries P-SSZ-1's
+    `SszProofFold.Branch` from the leaf to the received root.
+  - (b) `audit.trio.consolidation.GatewayWitnessAdmission.execute` — the
+    per-group gate `WitnessProof.validateAll` composed between the
+    DSM/locator prefix (`GatewayAdmission.entryPrefix`) and
+    `PhysicalEntrySettlement.execute` on the read vault; the registered
+    Verity parent
+    `PConsolidation1.gateway_witness_admission_live_success_and_revert`
+    (LidoSRv3/Audit/Guarantees/PConsolidation1WitnessAdmission.lean)
+    derives, on a committed run, `WitnessProof.Passed` for every group
+    together with `GatewayVaultEffects`, and the entry-world rollback on
+    any failure.
+  - (c) `WitnessProof.pubkeyRoot` / `WitnessProof.leaf` /
+    `WitnessProof.decodeRoot` / `WitnessProof.credentialsWord` — the
+    decoders of `sha256Pair(pubkeyRoot(pubkey), withdrawalCredentials)`:
+    the 48-byte key check and 16-byte zero padding of `BLS.pubkeyRoot`,
+    the two returndata-size guards, `bytes32(COMPOUNDING_PREFIX |
+    uint160(vault))`, and `abi.decode(data, (bytes32))` of the
+    BEACON_ROOTS reply.
 
-None of the three are tree-resident yet; those residuals are named
-here so the composition entry point is explicit and load-bearing on
-the P-SSZ-1 parent's premises rather than an isolated scaffold. -/
-
+What remains a stated assumption there: SHA-256 is the opaque engine FFI
+(A-SHA256-FFI) and the beacon root is the accepted interpreter's reply
+(`gateway_witness_admission_authentic_root` takes EIP-4788 authenticity
+as an explicit hypothesis). The outer transaction ABI decoding into
+`WitnessProof.WitnessGroup` and the payable credit remain outside. -/
 namespace LidoSRv3.Audit.Guarantees.PConsolidationEth1CLProofPremise
 
 open LidoSRv3.Audit.Guarantees.PSsz1

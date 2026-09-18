@@ -28,7 +28,7 @@ theorem gateway_admission_live_success_and_revert
         GatewayVaultEffects callee sexternal ctx vault gateway inbox recipient msgValue groups before ∧
         result.world = (PhysicalEntrySettlement.execute callee sexternal ctx vault gateway inbox
           recipient msgValue groups before).world ∧
-        result.trace = (GatewayAdmission.prefix sexternal ctx locator msgValue groups before).attempts ++
+        result.trace = (GatewayAdmission.entryPrefix sexternal ctx locator msgValue groups before).attempts ++
           (PhysicalEntrySettlement.execute callee sexternal ctx vault gateway inbox
             recipient msgValue groups before).trace
     | .error _ => result.world = before := by
