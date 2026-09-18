@@ -3,13 +3,14 @@
 Canonical obligations remain in `audit/guarantees.yaml`; generated UX2 files are
 views of that registry. No historical receipt validates a successor commit.
 
-- **Current coordination (2026-09-17).** Exact `27f7f2b9715f070c1c30259d13ab73b4daa6770b`
-  job `28518447-15ef-4614-8c0f-259dd225b32f` failed with null exit after
-  CompilationModel 61/62 (~39 min); no OfficialSemantics diagnostic. Residual
-  is `checkedFold_validates` (`OfficialSemantics.lean:680`): `rw` of
-  `noEmptyYul` still WHNF-reduces `Stmt.fold` on `forEach`. Follow-up
-  `extract_lets` the hanging collector, rewrites at reducible transparency,
-  and emits a flushed module-start log. Trust `native_decide` policy is
+- **Current coordination (2026-09-17).** Exact `34313cf4ce70b198f1d43280557b4d8f9948bdc6`
+  job `b9d0b564-7a6f-445b-aeb7-afe8ec5c817d` failed with null exit after
+  CompilationModel 61/62 (~36 min); no OfficialSemantics diagnostic, including
+  the `logInfo` module-start. Residual is WHNF of partial `Stmt.fold` on
+  `forEach` during `validateFunctionSpec`. Follow-up proves unused-Yul fold
+  lemmas first, then marks `Stmt.fold` / `foldList` /
+  `collectUnguardedUnsafeBoundaryMechanicsFromStmts` locally irreducible, and
+  emits flushed `OFFSEM-MARKER` logs. Trust `native_decide` policy is
   unchanged: foundations plus only the three original compiler-success native
   exceptions; this commit does not expand the allowlist.
   Known modeling discrepancies remain OPEN, not CLEAN: F2 CALL-only gas is not
@@ -896,3 +897,11 @@ not transfer a predecessor build, trust verdict or deployment acceptance.
   of the unused-Yul fold lemma. Follow-up `extract_lets` the collector and
   rewrites at reducible transparency. F2/F3/F4 stay OPEN. Trust
   `native_decide` allowlist is unchanged.
+
+- Exact `34313cf4ce70b198f1d43280557b4d8f9948bdc6` job
+  `b9d0b564-7a6f-445b-aeb7-afe8ec5c817d` failed with null exit after
+  CompilationModel 61/62 (~36 min); no OfficialSemantics diagnostic. Residual
+  is WHNF of `Stmt.fold` on `forEach` (`OfficialSemantics.lean:343` /
+  `validateFunctionSpec`). Follow-up marks `Stmt.fold` locally irreducible
+  after constructor lemmas. F2/F3/F4 stay OPEN. Trust `native_decide`
+  allowlist is unchanged.
