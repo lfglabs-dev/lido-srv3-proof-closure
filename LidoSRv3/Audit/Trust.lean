@@ -134,6 +134,7 @@ import LidoSRv3.Audit.Guarantees.PConsolidationEth1NoReentry
 import LidoSRv3.Audit.Guarantees.PAddress1NoReentry
 import LidoSRv3.Audit.Guarantees.PTopup2SameBlock
 import LidoSRv3.Audit.Guarantees.PTopup2ValidatorChecks
+import LidoSRv3.Audit.Guarantees.PReserve1TargetAdmission
 import LidoSRv3.Audit.Guarantees.PConsolidation1VaultCalldata
 import LidoSRv3.Audit.Guarantees.PAlloc1Phase3
 import LidoSRv3.Audit.Guarantees.PAlloc2
@@ -2269,6 +2270,17 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidation1VaultCalldata.vault_rejects_malformed
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidation1VaultCalldata.vault_reply_well_formed
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidation1VaultCalldata.gateway_args_well_formed
+-- P-RESERVE-1 reserve-target access control (Thomas 2026-09-18, step 2e):
+-- the public setter's Aragon `_auth` (kernel/ACL CALL) is an admission stage
+-- of the physical writer history; denial and admission follow from the stored
+-- permission graph.
+#print axioms LidoSRv3.Audit.Guarantees.PReserve1TargetAdmission.target_success
+#print axioms LidoSRv3.Audit.Guarantees.PReserve1TargetAdmission.target_denied
+#print axioms LidoSRv3.Audit.Guarantees.PReserve1TargetAdmission.guarded_step
+#print axioms LidoSRv3.Audit.Guarantees.PReserve1TargetAdmission.actual_reserve_guarded_history
+#print axioms LidoSRv3.Audit.Guarantees.PReserve1TargetAdmission.actual_reserve_guarded_physical_history
+#print axioms LidoSRv3.Audit.Guarantees.PReserve1TargetAdmission.physical_target_denied
+#print axioms LidoSRv3.Audit.Guarantees.PReserve1TargetAdmission.physical_target_allowed
 
 -- P-ADDRESS-1 unbounded observe receipt (grok #416): the live
 -- AddressClaimBatchTx loop already iterates arbitrary request/hint
