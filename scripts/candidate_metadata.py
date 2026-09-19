@@ -6,7 +6,7 @@ report. Changing them requires reviewing the corresponding source/metadata delta
 """
 
 CANDIDATE_INPUT_SHA256 = {
-    "audit/guarantees.yaml": "a4fdd4ec8ee45de3c73f9760dfc51d79305646cad3c97e13559c4f1ae1528886",
+    "audit/guarantees.yaml": "580e1aa399d4bf8603651303850222fd5d964b0abd90e9863fa4c5e55590783a",
     "audit/source-map.yaml": "6d6e6a3c2b34faa4556c2938b9c098c3297fc35640f3ffe5c90790ca18c5cbc0",
     "audit/trust-native-decide-allowlist.txt": "41b3048a7d18e32af1b585e8a7ecc1fcb6615033947f5e655ae30bda1e71f375"
 }
@@ -19,10 +19,10 @@ EXPECTED_CANONICAL_CLAIMS = {
     "P-TOPUP-1": ('CHECKED', 'LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back', 'CHECKED', 'LidoSRv3.Audit.Guarantees.PTopupRouterAdmissionCall.actual_topup_admission_calls_wei_and_revert', 'IMPLEMENTATION_PENDING', ('A-ABSTRACT-TX', 'A-SOURCE-SHAPED', 'A-VERITY-SCAFFOLD', 'A-SOLC-TRUSTED', 'A-RUNTIME-PROVENANCE', 'A-NO-REENTRY')),
     "P-ACCOUNT-1": ('CHECKED', 'LidoSRv3.Audit.Guarantees.PAccount1.router_accounting_order_discipline', 'CHECKED', 'LidoSRv3.Audit.Guarantees.PAccount1.actual_report_accounting_call', 'IMPLEMENTATION_PENDING', ('A-SOURCE-SHAPED', 'A-VERITY-SCAFFOLD', 'A-SOLC-TRUSTED', 'A-RUNTIME-PROVENANCE')),
     "P-RESERVE-1": ('CHECKED', 'LidoSRv3.Audit.Guarantees.PReserve1.source_spend_preserves_withdrawal_reserve', 'CHECKED', 'LidoSRv3.Audit.Guarantees.PReserve1LiveWriters.actual_reserve_physical_history', 'IMPLEMENTATION_PENDING', ('A-SOURCE-SHAPED', 'A-VERITY-SCAFFOLD', 'A-SOLC-TRUSTED', 'A-RUNTIME-PROVENANCE', 'A-NO-REENTRY')),
-    "P-CONSOLIDATION-ETH-1": ('CHECKED', 'LidoSRv3.Audit.Guarantees.PConsolidationEth1.eth_flow_parent_at_canonical', 'CHECKED', 'LidoSRv3.Audit.Guarantees.PConsolidation1.gateway_vault_live_success_and_revert', 'IMPLEMENTATION_PENDING', ('A-ABSTRACT-TX', 'A-SOURCE-SHAPED', 'A-VERITY-SCAFFOLD', 'A-SOLC-TRUSTED', 'A-RUNTIME-PROVENANCE', 'A-NO-REENTRY')),
+    "P-CONSOLIDATION-ETH-1": ('CHECKED', 'LidoSRv3.Audit.Guarantees.PConsolidationEth1.eth_flow_parent_at_canonical', 'CHECKED', 'LidoSRv3.Audit.Guarantees.PConsolidation1.gateway_witness_admission_live_success_and_revert', 'IMPLEMENTATION_PENDING', ('A-ABSTRACT-TX', 'A-SOURCE-SHAPED', 'A-VERITY-SCAFFOLD', 'A-SOLC-TRUSTED', 'A-RUNTIME-PROVENANCE', 'A-NO-REENTRY', 'A-SHA256-FFI')),
     "P-ADDRESS-1": ('CHECKED', 'LidoSRv3.Audit.Guarantees.PAddress1.universal_address_writer_equivariance', 'CHECKED', 'LidoSRv3.Audit.Guarantees.PAddress1.abstract_source_verity_tx_address_equivariance', 'IMPLEMENTATION_PENDING', ('A-SOURCE-SHAPED', 'A-VERITY-SCAFFOLD', 'A-SOLC-TRUSTED', 'A-RUNTIME-PROVENANCE', 'A-NO-REENTRY')),
     "P-TOPUP-2": ('CHECKED', 'LidoSRv3.Audit.Guarantees.PTopup2.router_exact_sum_bounded_under_gateway_shape', 'CHECKED', 'LidoSRv3.Audit.Guarantees.PTopup2.actual_module_batch_bound', 'IMPLEMENTATION_PENDING', ('A-SOURCE-SHAPED', 'A-VERITY-SCAFFOLD', 'A-SOLC-TRUSTED', 'A-RUNTIME-PROVENANCE')),
-    "P-CONSOLIDATION-1": ('CHECKED', 'LidoSRv3.Audit.Guarantees.PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity_from_gateway', 'CHECKED', 'LidoSRv3.Audit.Guarantees.PConsolidation1.gateway_vault_live_success_and_revert', 'IMPLEMENTATION_PENDING', ('A-SOURCE-SHAPED', 'A-VERITY-SCAFFOLD', 'A-SOLC-TRUSTED', 'A-RUNTIME-PROVENANCE')),
+    "P-CONSOLIDATION-1": ('CHECKED', 'LidoSRv3.Audit.Guarantees.PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity_from_gateway', 'CHECKED', 'LidoSRv3.Audit.Guarantees.PConsolidation1.gateway_witness_admission_live_success_and_revert', 'IMPLEMENTATION_PENDING', ('A-SOURCE-SHAPED', 'A-VERITY-SCAFFOLD', 'A-SOLC-TRUSTED', 'A-RUNTIME-PROVENANCE', 'A-SHA256-FFI')),
     "P-SSZ-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.real_validator_correspondence", "CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.actual_compiled_cl_entry_complete_declared_branch", "IMPLEMENTATION_PENDING", ("A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT", "A-SOLC-TRUSTED", "A-RUNTIME-PROVENANCE")),
 }
 EXPECTED_CANONICAL_DETAIL_SHA256 = {
@@ -32,9 +32,9 @@ EXPECTED_CANONICAL_DETAIL_SHA256 = {
     "P-TOPUP-1": "bbc27b12e2eafbb661c9dd1bebceba7ea00e71606c9a075309fdc20f11462dce",
     "P-ACCOUNT-1": "5cbb5fe1b404fd75161d666231792a728eb91caf5de6af29fe58371b8494e81b",
     "P-RESERVE-1": "1ce8879384dbd9da986d20f3ddaa0e3a5ca8b520d6e91cb92ef54629dd3cd6f9",
-    "P-CONSOLIDATION-ETH-1": "ea20254695e56b757219205682423b139e377c01574d8f77d00d912d251eb5f1",
+    "P-CONSOLIDATION-ETH-1": "d7266a4d024b2a6c7655869de9b3f3385e13484a0286d6674f053f64cd3deb90",
     "P-ADDRESS-1": "6fe5cf0df3a018a3c142096427333b5659c2f568d64446707c0a75e059941b65",
     "P-TOPUP-2": "9cd5e6cdaf782aa2ca40d9fc8d519a51f0a97d472e71d4c4f6c838aab27571b0",
-    "P-CONSOLIDATION-1": "b7587d5c485553333b2c98fcba36619c7ab59597d3a06e9fa820f91310f0a689",
+    "P-CONSOLIDATION-1": "65f6a4d77f43c697f0b04e85fbde2802acd83ac9afe994b04eaf962ca2c679b1",
     "P-SSZ-1": "761b258d12e90d0f1d6ae6d4202a9336692b1941f16d2c81b3f168e6f119d39c",
 }

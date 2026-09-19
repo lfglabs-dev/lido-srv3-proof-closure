@@ -52,6 +52,9 @@ import LidoSRv3.Tests.DepositPhysicalMetadataRegression
 import LidoSRv3.Audit.Guarantees.PDeposit1PhysicalMetadata
 import LidoSRv3.Tests.ConsolidationGatewayCallRegression
 import LidoSRv3.Audit.Guarantees.PConsolidation1ActualGatewayVault
+import LidoSRv3.Audit.Guarantees.PConsolidation1GatewayAdmission
+import LidoSRv3.Audit.Guarantees.PConsolidation1WitnessAdmission
+import LidoSRv3.Tests.TrioConsolidation.GatewayAdmission
 import LidoSRv3.Audit.Guarantees.PTopup1ActualBatch
 import LidoSRv3.Audit.Guarantees.PTopup1ActualContinuation
 import LidoSRv3.Audit.Guarantees.PSsz1ActualDeposit
@@ -1742,6 +1745,17 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms audit.trio.consolidation.PhysicalEntrySettlement.gates_success
 #print axioms audit.trio.consolidation.PhysicalEntrySettlement.execute_success
 #print axioms audit.trio.consolidation.PhysicalEntrySettlement.failure_restores
+-- Step 3a (2026-09-18): the gateway's DSM/locator/witness prefix executed on
+-- the entry World before the physical entry (ConsolidationGateway.sol:201-207).
+#print axioms audit.trio.consolidation.GatewayPreconditions.preconditions_success
+#print axioms audit.trio.consolidation.GatewayPreconditions.vaultData_success
+#print axioms audit.trio.consolidation.GatewayAdmission.prefix_success
+#print axioms audit.trio.consolidation.GatewayAdmission.execute_success
+#print axioms audit.trio.consolidation.GatewayAdmission.failure_restores
+#print axioms audit.trio.consolidation.WitnessProof.validate_success
+#print axioms audit.trio.consolidation.WitnessProof.validateAll_success
+#print axioms audit.trio.consolidation.GatewayWitnessAdmission.execute_success
+#print axioms audit.trio.consolidation.GatewayWitnessAdmission.failure_restores
 
 -- Exact deposit admission error origins consume the complete DSM suffix.
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.actual_dsm_call_admission_bytes_suffix
@@ -2461,6 +2475,13 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PReserve1LiveWriters.actual_reserve_physical_history
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity_from_gateway
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidation1.gateway_vault_live_success_and_revert
+-- Step 3a (2026-09-18): registered whole-prefix parent of P-CONSOLIDATION-1 and
+-- P-CONSOLIDATION-ETH-1 (DSM/Lido preconditions, locator vault read, per-group
+-- _validatePubKeyWCProof, then the retained GatewayVaultEffects); the displayed
+-- executor above is kept as the suffix it consumes.
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1.gateway_admission_live_success_and_revert
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1.gateway_witness_admission_live_success_and_revert
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1.gateway_witness_admission_authentic_root
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidationValue1.official_denote_succeeds_and_justified_forwards_msg_value_from_gateway
 
 -- Reviewer 8f198d99: recompute these source-relation dependencies explicitly.
