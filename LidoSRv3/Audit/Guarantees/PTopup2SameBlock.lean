@@ -31,9 +31,12 @@ Premises, stated once for the chain:
   field and the router's packed block cap unchanged. On the pinned source only
   `_setMinBlockDistance` and the router's own setters write those words; in
   this model the module and withdrawal callees are arbitrary interpreters that
-  may return any world, so the preservation is an explicit premise rather than
-  a theorem about deployed callees. Deriving it under `A-NO-REENTRY` is a
-  follow-up.
+  may return any world, so this module states the preservation as a premise.
+  `PTopup2ConfigNoReentry.configStable_of_noReentry` derives it from
+  A-NO-REENTRY (module callee, beacon deposit contract, Lido's dispatch) up to
+  the router's own `receiveDepositableEther` callback keeping the cap word,
+  and `same_block_actual_batches_le_cap_no_reentry` is the same-block bound
+  without this premise.
 
 The historical premise `lastTopUpBlock ≤ blockNumber` is not needed: a stored
 block above the current one fails the gate and the call reverts.

@@ -137,6 +137,7 @@ import LidoSRv3.Audit.Guarantees.PConsolidationEth1NoReentry
 import LidoSRv3.Audit.Guarantees.PAddress1NoReentry
 import LidoSRv3.Audit.Guarantees.PTopup2SameBlock
 import LidoSRv3.Audit.Guarantees.PTopup2ValidatorChecks
+import LidoSRv3.Audit.Guarantees.PTopup2ConfigNoReentry
 import LidoSRv3.Audit.Guarantees.PAddress1LiveRenaming
 import LidoSRv3.Audit.Guarantees.PTopup1AllocationViews
 import LidoSRv3.Audit.Guarantees.PDeposit1AllocationViews
@@ -2283,6 +2284,12 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PTopup2ValidatorChecks.seam_pubkeys
 #print axioms LidoSRv3.Audit.Guarantees.PTopup2ValidatorChecks.wrong_credential_type_rejected
 #print axioms LidoSRv3.Audit.Guarantees.PTopup2ValidatorChecks.wrong_pubkey_length_rejected
+-- P-TOPUP-2 ConfigStable from A-NO-REENTRY (caveat C1, 2026-09-19): the
+-- same-block bound's callee premise is derived for the gateway word and, up
+-- to the router's own receiveDepositableEther callback, for the router cap.
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2ConfigNoReentry.configStable_of_noReentry
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2ConfigNoReentry.same_block_actual_batches_le_cap_no_reentry
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2ConfigNoReentry.same_block_actual_batches_le_blockCap_no_reentry
 -- P-CONSOLIDATION-1 malformed calldata (Thomas 2026-09-18, step 2f): the vault
 -- argument decoder is characterized on every calldata against Solidity's lazy
 -- bytes[] calldata accessor (sound, complete, total); a non-well-formed block
