@@ -137,6 +137,7 @@ import LidoSRv3.Audit.Guarantees.PConsolidationEth1NoReentry
 import LidoSRv3.Audit.Guarantees.PAddress1NoReentry
 import LidoSRv3.Audit.Guarantees.PTopup2SameBlock
 import LidoSRv3.Audit.Guarantees.PTopup2ValidatorChecks
+import LidoSRv3.Audit.Guarantees.PAddress1LiveRenaming
 import LidoSRv3.Audit.Guarantees.PTopup1AllocationViews
 import LidoSRv3.Audit.Guarantees.PDeposit1AllocationViews
 import LidoSRv3.Audit.Guarantees.PAccount1SubmitReport
@@ -1026,6 +1027,13 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1NoReentry.settlement_preserves_gateway_and_vault_storage
 #print axioms LidoSRv3.Audit.Guarantees.PAddress1NoReentry.claim_returns_committed_storage
 #print axioms LidoSRv3.Audit.Guarantees.PAddress1NoReentry.actual_claim_batch_no_reentry
+-- P-ADDRESS-1 live renaming (step 3c, 2026-09-19): renaming sender and
+-- request owners commutes with the registered live claim batch for every
+-- abstract LiveRenaming of the queue world and every equivariant recipient
+-- callee; committed batches, their claim chains and the A-NO-REENTRY
+-- transcript transport.
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1LiveRenaming.runClaimWithdrawalsTo_rename
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1LiveRenaming.actual_claim_batch_rename
 -- General rule (Thomas 2026-09-12) applied to P-CONSOLIDATION-ETH-1
 -- feePerRequest free Nat: naming scaffold PinnedFeeStaticcallShape
 -- names the pinned WithdrawalVaultEIP7685.sol:79-81 STATICCALL entry
