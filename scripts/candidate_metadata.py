@@ -6,7 +6,7 @@ report. Changing them requires reviewing the corresponding source/metadata delta
 """
 
 CANDIDATE_INPUT_SHA256 = {
-    "audit/guarantees.yaml": "98215bad0077559fa2bd200315a1581be36a0091a8c3274a5088a1e88c69520b",
+    "audit/guarantees.yaml": "bbe7991471ed6906f9aaa2a7b3f76711f210a51fffda41c64509ccbb1b0d0801",
     "audit/source-map.yaml": "6d6e6a3c2b34faa4556c2938b9c098c3297fc35640f3ffe5c90790ca18c5cbc0",
     "audit/trust-native-decide-allowlist.txt": "41b3048a7d18e32af1b585e8a7ecc1fcb6615033947f5e655ae30bda1e71f375"
 }
@@ -26,15 +26,15 @@ EXPECTED_CANONICAL_CLAIMS = {
     "P-SSZ-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.real_validator_correspondence", "CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.actual_compiled_cl_entry_complete_declared_branch", "IMPLEMENTATION_PENDING", ("A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT", "A-SOLC-TRUSTED", "A-RUNTIME-PROVENANCE")),
 }
 EXPECTED_CANONICAL_DETAIL_SHA256 = {
-    "P-ALLOC-1": "d4ddb86616f3a64d82352b9ab91ce900483137de921d47b9f6f4763cd2a6f816",
-    "P-ALLOC-2": "0e740a710f1dc7b8110b8ed43ef4cc75dae08fd0aa8b80fa0c82e099f2501efa",
+    "P-ALLOC-1": "016f32af0fecd3b992eb1bedc1e399acd3f55f71222927f1ddbbc3d41b2fd879",
+    "P-ALLOC-2": "46818dd059e387d957bb684b14904af1da50112c6ea3eab9452d540593c2fb43",
     "P-DEPOSIT-1": "9c50dec0a7e3e95aa17ab9da6925f2a2b8021030467345e92d1562521ac51517",
     "P-TOPUP-1": "407a1a0df3cc76d26547605328d8dceb0b107376b7b67b209ed9446740b495ef",
     "P-ACCOUNT-1": "ff5d9bf073fb6684e37187aa6f039b0ffb09809852d94f539af94b7b3e1d499c",
-    "P-RESERVE-1": "1ce8879384dbd9da986d20f3ddaa0e3a5ca8b520d6e91cb92ef54629dd3cd6f9",
+    "P-RESERVE-1": "f007ec2cf7c008f8a23cfab86729a6ec44681a80b46add819a4bd9df7f647583",
     "P-CONSOLIDATION-ETH-1": "d7266a4d024b2a6c7655869de9b3f3385e13484a0286d6674f053f64cd3deb90",
     "P-ADDRESS-1": "a12051f53c9b2b9f075ff4209336a6dca552ddfd85b64d98c6da1377f37929ed",
     "P-TOPUP-2": "8f00698895bc27c579cc055e4baff3448eb4a135a193bf1ba095be834856a3ae",
-    "P-CONSOLIDATION-1": "0144b41700d54359c89d41eb1d1141d98c3d7d64a6e5773f53427ab10d1a6ae4",
-    "P-SSZ-1": "761b258d12e90d0f1d6ae6d4202a9336692b1941f16d2c81b3f168e6f119d39c",
+    "P-CONSOLIDATION-1": "5923421b13be8720d10fce9b2bdd71f4f4780e9adb71b3c84c2a3e98f5d22d0b",
+    "P-SSZ-1": "7ba188314a46a584fd267d3749496e86c6f2b133a22de996fa2dd29409a6bedf",
 }

@@ -160,14 +160,14 @@
     ],
     "missing": [
       "SSZ.verifyProof on production gindices",
-      "SHA-256 functional correctness of the opaque model/precompile symbol",
+      "SHA-256 functional correctness of the opaque model/precompile symbol (PERMANENT ASSUMPTION A-SHA256-FFI, relabelled 2026-09-19 from an open obligation to the card's Assumed line; no refinement is claimed)",
       "refinement equating the opaque sha256 symbol with Sha256Engine.sha256 used by the abstract digest child",
       "imported-to-deployed helper/wrapper Yul fragment binding",
-      "the state-root anchor (lhs), the concat operand's pow byte (rhsPow), and the tx child's fork version / claimed root remain independently supplied, non-deposit chain-level values",
+      "the state-root anchor (lhs), the concat operand's pow byte (rhsPow), and the tx child's fork version / claimed root remain independently supplied, non-deposit chain-level values (composition half CLOSED 2026-09-19: the verifier's typed model is consumed inside the whole consolidation gateway run by GatewayWitnessAdmission / WitnessProof.validateAll against the EIP-4788 root read in that run; residual: the deposit chain's anchor, pow byte and fork/claimed-root values stay supplied inputs of the SSZ child)",
       "the general Verity EncodingInput API still permits independent fields, but verity_tx_one_object_matches_sourceView provides a TX-level derived-input theorem from one ComposedSszInput",
       "chantier 3 disclosure (mandate 2026-09-12): the demoted parent verity_tx_simulates_ssz_encoding (child P-SSZ-1.encoding-simulation) still models a dummy validator at gindex 2 with an injective Nat.pair combine — an object CLValidatorVerifier._verifyValidator never checks; it is retained only as child regression evidence and is not the registered Verity parent of P-SSZ-1",
       "chantier 3 disclosure (mandate 2026-09-12): the new registered parent actual_compiled_cl_entry_complete_declared_branch consumes ShaWidth (SszProofCommitted.ShaWidth) as an inherited SHA-output-width side condition on the opaque engine.sha256 FFI; SHA-256 functional correctness of that opaque symbol remains A-SHA256-FFI, and no refinement to an independently certified SHA-256/precompile has been proved",
-      "chantier 3 disclosure (mandate 2026-09-12): EIP-4788 history-ring authenticity is not represented; the BEACON_ROOTS callee is the accepted StaticCall.External interpreter on typed Live.World rather than the pinned EIP-4788 precompile contract, and its return bytes are threaded as the branch root without a live-deployment or codehash binding"
+      "EIP-4788 history-ring authenticity (PERMANENT ASSUMPTION relabelled 2026-09-19 to the card's Assumed line; consumed as the explicit hypothesis of gateway_witness_admission_authentic_root). chantier 3 disclosure (mandate 2026-09-12): EIP-4788 history-ring authenticity is not represented; the BEACON_ROOTS callee is the accepted StaticCall.External interpreter on typed Live.World rather than the pinned EIP-4788 precompile contract, and its return bytes are threaded as the branch root without a live-deployment or codehash binding"
     ],
     "open_gap_count": 9
   },
@@ -295,14 +295,14 @@
     ],
     "not_covered": [
       "SSZ.verifyProof on production gindices",
-      "SHA-256 functional correctness of the opaque model/precompile symbol",
+      "SHA-256 functional correctness of the opaque model/precompile symbol (PERMANENT ASSUMPTION A-SHA256-FFI, relabelled 2026-09-19 from an open obligation to the card's Assumed line; no refinement is claimed)",
       "refinement equating the opaque sha256 symbol with Sha256Engine.sha256 used by the abstract digest child",
       "imported-to-deployed helper/wrapper Yul fragment binding",
-      "the state-root anchor (lhs), the concat operand's pow byte (rhsPow), and the tx child's fork version / claimed root remain independently supplied, non-deposit chain-level values",
+      "the state-root anchor (lhs), the concat operand's pow byte (rhsPow), and the tx child's fork version / claimed root remain independently supplied, non-deposit chain-level values (composition half CLOSED 2026-09-19: the verifier's typed model is consumed inside the whole consolidation gateway run by GatewayWitnessAdmission / WitnessProof.validateAll against the EIP-4788 root read in that run; residual: the deposit chain's anchor, pow byte and fork/claimed-root values stay supplied inputs of the SSZ child)",
       "the general Verity EncodingInput API still permits independent fields, but verity_tx_one_object_matches_sourceView provides a TX-level derived-input theorem from one ComposedSszInput",
       "chantier 3 disclosure (mandate 2026-09-12): the demoted parent verity_tx_simulates_ssz_encoding (child P-SSZ-1.encoding-simulation) still models a dummy validator at gindex 2 with an injective Nat.pair combine — an object CLValidatorVerifier._verifyValidator never checks; it is retained only as child regression evidence and is not the registered Verity parent of P-SSZ-1",
       "chantier 3 disclosure (mandate 2026-09-12): the new registered parent actual_compiled_cl_entry_complete_declared_branch consumes ShaWidth (SszProofCommitted.ShaWidth) as an inherited SHA-output-width side condition on the opaque engine.sha256 FFI; SHA-256 functional correctness of that opaque symbol remains A-SHA256-FFI, and no refinement to an independently certified SHA-256/precompile has been proved",
-      "chantier 3 disclosure (mandate 2026-09-12): EIP-4788 history-ring authenticity is not represented; the BEACON_ROOTS callee is the accepted StaticCall.External interpreter on typed Live.World rather than the pinned EIP-4788 precompile contract, and its return bytes are threaded as the branch root without a live-deployment or codehash binding"
+      "EIP-4788 history-ring authenticity (PERMANENT ASSUMPTION relabelled 2026-09-19 to the card's Assumed line; consumed as the explicit hypothesis of gateway_witness_admission_authentic_root). chantier 3 disclosure (mandate 2026-09-12): EIP-4788 history-ring authenticity is not represented; the BEACON_ROOTS callee is the accepted StaticCall.External interpreter on typed Live.World rather than the pinned EIP-4788 precompile contract, and its return bytes are threaded as the branch root without a live-deployment or codehash binding"
     ]
   }
 }
