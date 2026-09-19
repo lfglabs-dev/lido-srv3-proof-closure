@@ -83,12 +83,20 @@ private def unusedOracle : DenoteOracle :=
   { mappingSlot := fun _ _ => 0
     keccakMemorySlice := fun _ _ _ => 0 }
 
+run_cmd do
+  IO.println "OFFSEM-MARKER 01 defs"
+  (← IO.getStdout).flush
+
 def denote (fn : FunctionSpec) (values : List Verity.Core.Uint256) : DenoteResult :=
   denoteFunction unusedOracle { checkedFoldSpec with functions := [fn] }
     fn tx (initialWorld values)
 
 /-- A concrete official-denotation evaluation: ordered iteration reads
 `[4, 7]`, performs both checked additions, and returns `11`. -/
+run_cmd do
+  IO.println "OFFSEM-MARKER 02 checkedFold_evaluates"
+  (← IO.getStdout).flush
+
 theorem checkedFold_evaluates :
     (denote checkedFold [4, 7]).success = true ∧
       (denote checkedFold [4, 7]).returnValue = some 11 := by
@@ -101,6 +109,10 @@ private def observedModuleValues : StmtOutcome → Option (List Nat)
 
 /-- The same run observes router order and the per-module updates, not only the
 returned accumulator. -/
+run_cmd do
+  IO.println "OFFSEM-MARKER 03 updates_in_order"
+  (← IO.getStdout).flush
+
 theorem checkedFold_updates_modules_in_order :
     observedModuleValues
       (execStmtList unusedOracle [modulesField]
@@ -110,12 +122,20 @@ theorem checkedFold_updates_modules_in_order :
 
 /-- The same official denotation observes the Solidity-style overflow guard as
 failure, rather than silently accepting wrapped arithmetic. -/
+run_cmd do
+  IO.println "OFFSEM-MARKER 04 overflow_reverts"
+  (← IO.getStdout).flush
+
 theorem checkedFold_overflow_reverts :
     (denote checkedFold [Verity.Core.MAX_UINT256, 1]).success = false := by
   decide +kernel
 
 /-- Negative mutant: removing the guard changes the overflow observation to a
 successful wrapped result. -/
+run_cmd do
+  IO.println "OFFSEM-MARKER 05 wrappingMutant"
+  (← IO.getStdout).flush
+
 theorem wrappingMutant_is_detected :
     (denote wrappingMutant [Verity.Core.MAX_UINT256, 1]).success = true ∧
       (denote wrappingMutant [Verity.Core.MAX_UINT256, 1]).returnValue = some 0 := by
@@ -363,6 +383,8 @@ private theorem checkedFold_no_empty_unsafeYul :
   rw [List.any_cons, fold_emptyUnsafeYul_forEach, Bool.false_or]
   rw [List.any_cons, fold_emptyUnsafeYul_return, Bool.false_or]
   rfl
+
+attribute [local irreducible] Stmt.fold Stmt.foldList collectUnguardedUnsafeBoundaryMechanicsFromStmts
 
 attribute [local cbv_eval] fold_forEach exprAny_literal exprAny_localVar exprAny_storageArrayLength exprAny_storageArrayElement exprAny_add exprAny_sub exprAny_le stmtAny_forEach stmtAny_letVar fold_letVar stmtAny_assignVar fold_assignVar stmtAny_require fold_require stmtAny_return fold_return stmtAny_setStorageArrayElement fold_setStorageArrayElement
 
@@ -662,52 +684,31 @@ private theorem checkedFold_param_refs :
   rw [exceptForM_cons, paramRef_return, exceptBind_ok]
   rw [exceptForM_nil]
 
-/-- Rewrite the documented-obligation guard without zeta-substituting the
-hanging `Stmt.fold` collector; unused lets are dropped afterwards. -/
-theorem checkedFold_validates :
-    validateFunctionSpec checkedFold = .ok () := by
-  have documented : checkedFold.localObligations.isEmpty = false := rfl
-  have noEmptyYul := checkedFold_no_empty_unsafeYul
-  have hr : functionReturns checkedFold = .ok [.uint256] := checkedFold_functionReturns
-  have noAdt : validateNoUnsupportedAdtConstructInStmtList checkedFold.body = .ok () := by
-    simp [checkedFold, validateNoUnsupportedAdtConstructInStmtList,
-      Stmt.checkRecList, Stmt.forDeepListM, stmtCheck_forEach,
-      stmtCheck_letVar, stmtCheck_return, validateNoUnsupportedAdtConstructNode,
-      exprContainsAdtConstruct, Expr.foldBool, exprContainsAdtConstructNode,
-      exprAny_literal, exprAny_localVar, exprAny_storageArrayLength]
-    all_goals decide +kernel
-  unfold validateFunctionSpec
-  rw [noEmptyYul, documented]
-  rw [Bool.and_false, Bool.false_and]
-  simp (config := {zeta := false, zetaUnused := true, failIfUnchanged := false}) only
-    [↓reduceIte, Bind.bind, Except.bind, Pure.pure, Except.pure]
-  simp [checkedFold, noAdt, hr, stmtContainsUnsafeLogicalCallLike,
+private theorem checkedFold_no_unsafe_logical :
+    checkedFold.body.any stmtContainsUnsafeLogicalCallLike = false := by
+  simp [checkedFold, checkedFoldLoopBody, stmtContainsUnsafeLogicalCallLike,
     stmtAny_forEach, stmtAny_letVar, stmtAny_assignVar, stmtAny_require,
     stmtAny_return, stmtAny_setStorageArrayElement,
     exprContainsUnsafeLogicalCallLike, exprAny_literal, exprAny_localVar,
     exprAny_storageArrayLength, exprAny_storageArrayElement, exprAny_add,
-    exprAny_sub, exprAny_le, exprIsUnsafeLogicalNode, checkedFoldLoopBody,
-    Stmt.controlFlow, Stmt.controlFlowList, ControlFlowSummary.seq,
-    ControlFlowSummary.union, ControlFlowSummary.alwaysReturnsOrReverts,
-    ControlFlowSummary.fallsThrough, ControlFlowSummary.mayReverting,
-    ControlFlowSummary.returns, checkedFold_return_shapes, checkedFold_param_refs,
-    exceptBind_ok, exceptBind_okVal, Bind.bind, Except.bind, Pure.pure, Except.pure]
-  run_tac do
-    let env ← Lean.getEnv
-    for suffix in ["validateAdtPayloadParamNameCollisions", "adtPayloadParamNames", "firstDuplicateString",
-        "stmtListAlwaysReturnsOrReverts"] do
-      let candidates := env.constants.toList.filter fun (name, _) =>
-        name.toString.startsWith "_private.Compiler.CompilationModel.Validation." &&
-          name.toString.endsWith ("." ++ suffix)
-      match candidates with
-      | [(name, _)] =>
-          unless (← Lean.Elab.Tactic.getGoals).isEmpty do
-            let id := Lean.mkIdent name
-            Lean.Elab.Tactic.evalTactic (← `(tactic| simp [$id:ident]))
-      | _ => throwError "expected one pinned Validation helper: {suffix}"
-  simp [hr, checkedFold_return_shapes, checkedFold_param_refs, exceptBind_ok,
-    Bind.bind, Except.bind, Pure.pure, Except.pure]
-  all_goals decide +kernel
+    exprAny_sub, exprAny_le, exprIsUnsafeLogicalNode]
+
+/-- `Stmt.fold` is locally irreducible, so the hanging collector stays opaque.
+The documented obligation plus the unused-Yul constructor lemma skip it. -/
+run_cmd do
+  IO.println "OFFSEM-MARKER 16 validates"
+  (← IO.getStdout).flush
+
+theorem checkedFold_validates :
+    validateFunctionSpec checkedFold = .ok () := by
+  have documented : checkedFold.localObligations.isEmpty = false := rfl
+  have noEmptyYul := checkedFold_no_empty_unsafeYul
+  simp only [validateFunctionSpec, documented, noEmptyYul, Bool.and_false, Bool.false_and]
+  decide +kernel
+
+run_cmd do
+  IO.println "OFFSEM-MARKER 17 inputs-validate"
+  (← IO.getStdout).flush
 
 set_option maxRecDepth 16384 in
 set_option maxHeartbeats 4000000 in
@@ -737,6 +738,10 @@ set_option pp.maxSteps 200 in
 /-- The same EDSL program genuinely enters Verity's official compiler and
 produces its IR; this theorem fixes the concrete compiler entrypoint and rules
 out a source-only local interpreter experiment. -/
+run_cmd do
+  IO.println "OFFSEM-MARKER 18 compiles-to-ir"
+  (← IO.getStdout).flush
+
 theorem checkedFold_compiles_to_official_ir :
     (CompilationModel.compile checkedFoldSpec [tx.functionSelector]).isOk = true := by
   have functionValid := checkedFold_validates
