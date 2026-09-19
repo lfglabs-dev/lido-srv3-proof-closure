@@ -137,6 +137,7 @@ import LidoSRv3.Audit.Guarantees.PConsolidationEth1NoReentry
 import LidoSRv3.Audit.Guarantees.PAddress1NoReentry
 import LidoSRv3.Audit.Guarantees.PTopup2SameBlock
 import LidoSRv3.Audit.Guarantees.PTopup2ValidatorChecks
+import LidoSRv3.Audit.Guarantees.PAccount1SubmitReportGuards
 import LidoSRv3.Audit.Guarantees.PConsolidation1VaultLazy
 import LidoSRv3.Audit.Guarantees.PTopup1AllocationViewsSeated
 import LidoSRv3.Audit.Guarantees.PTopup2ConfigNoReentry
@@ -2374,6 +2375,16 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1SubmitReport.committed_success
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1SubmitReport.failure_restores
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1SubmitReport.guard_failure_no_body
+-- P-ACCOUNT-1 entry guards (caveat C4, 2026-09-19): the pinned submitReportData
+-- ladder (version, ref slot, consensus version, hash, report presence,
+-- deadline, already-processing) executes before the registered executor.
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1SubmitReportGuards.guard_contract_version
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1SubmitReportGuards.guard_ref_slot
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1SubmitReportGuards.guard_deadline
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1SubmitReportGuards.entry_revert_no_body
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1SubmitReportGuards.refines_entry
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1SubmitReportGuards.committed_success
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1SubmitReportGuards.failure_restores
 
 -- P-ADDRESS-1 unbounded observe receipt (grok #416): the live
 -- AddressClaimBatchTx loop already iterates arbitrary request/hint
