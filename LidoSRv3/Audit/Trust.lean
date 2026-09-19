@@ -137,6 +137,7 @@ import LidoSRv3.Audit.Guarantees.PConsolidationEth1NoReentry
 import LidoSRv3.Audit.Guarantees.PAddress1NoReentry
 import LidoSRv3.Audit.Guarantees.PTopup2SameBlock
 import LidoSRv3.Audit.Guarantees.PTopup2ValidatorChecks
+import LidoSRv3.Audit.Guarantees.PConsolidation1VaultLazy
 import LidoSRv3.Audit.Guarantees.PTopup1AllocationViewsSeated
 import LidoSRv3.Audit.Guarantees.PTopup2ConfigNoReentry
 import LidoSRv3.Audit.Guarantees.PAddress1LiveRenaming
@@ -2304,6 +2305,14 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidation1VaultCalldata.vault_rejects_malformed
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidation1VaultCalldata.vault_reply_well_formed
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidation1VaultCalldata.gateway_args_well_formed
+-- P-CONSOLIDATION-1 lazy calldata accessors (caveat C3, 2026-09-19): the
+-- lazy vault dispatcher equals the eager one on well-formed argument blocks
+-- and rejects exactly when it rejects; the difference is confined to revert
+-- data and attempt trace.
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1VaultLazy.lazy_eq_eager_wellFormed
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1VaultLazy.lazy_rejects_malformed
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1VaultLazy.eager_caller_restored
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1VaultLazy.lazy_caller_restored
 -- P-RESERVE-1 reserve-target access control (Thomas 2026-09-18, step 2e):
 -- the public setter's Aragon `_auth` (kernel/ACL CALL) is an admission stage
 -- of the physical writer history; denial and admission follow from the stored

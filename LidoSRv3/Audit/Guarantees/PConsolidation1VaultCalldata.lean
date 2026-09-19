@@ -28,8 +28,10 @@ Consequently any calldata that is not a lazily well-formed pair of byte arrays
 behind the selector is refused by the vault dispatcher with `rejected []`:
 no fee quote, no request, no state change (`vault_rejects_malformed`,
 `vault_reply_well_formed`). The model decodes eagerly where Solidity accesses
-lazily inside the loop; on malformed input the two differ only in the revert
-data and the attempted-call trace, never in the final (reverted) state.
+lazily inside the loop; `PConsolidation1VaultLazy` models the lazy accessors
+and proves the two dispatchers equal on every well-formed argument block and
+both rejecting on every malformed one, so the difference is confined to the
+revert data and the attempted-call trace, never the final (reverted) state.
 
 Pinned `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`.
 -/
