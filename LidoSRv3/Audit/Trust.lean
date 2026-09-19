@@ -137,6 +137,7 @@ import LidoSRv3.Audit.Guarantees.PConsolidationEth1NoReentry
 import LidoSRv3.Audit.Guarantees.PAddress1NoReentry
 import LidoSRv3.Audit.Guarantees.PTopup2SameBlock
 import LidoSRv3.Audit.Guarantees.PTopup2ValidatorChecks
+import LidoSRv3.Audit.Guarantees.PTopup1AllocationViewsSeated
 import LidoSRv3.Audit.Guarantees.PTopup2ConfigNoReentry
 import LidoSRv3.Audit.Guarantees.PAddress1LiveRenaming
 import LidoSRv3.Audit.Guarantees.PTopup1AllocationViews
@@ -2341,6 +2342,15 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- at the entry world; the registered effects hold at the produced word.
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1AllocationViews.run_ok_lookup
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1AllocationViews.allocationView_success
+-- Allocation views at their source position (caveat C2, 2026-09-19): the
+-- registered router-body gates split into status checks and the zero-target
+-- gate, the views are seated between them, and the source error and attempt
+-- order is proved.
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1AllocationViewsSeated.gates_split
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1AllocationViewsSeated.success
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1AllocationViewsSeated.failure
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1AllocationViewsSeated.status_before_views
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1AllocationViewsSeated.prefix_before_views
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1AllocationViews.success
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1AllocationViews.failure
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1AllocationViews.success_with_lido_view

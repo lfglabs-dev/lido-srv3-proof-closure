@@ -26,12 +26,12 @@ with the produced allocation. `success` derives the lookup, the view results
 and the registered `ActualEffects` at the produced allocation; `failure`
 restores the entry world for every failing arm, including a failed view call.
 
-Ordering caveat, stated rather than hidden: the composed model issues the two
-view calls before the gateway's own admission prefix (role, pause, lengths,
-timing, credentials, roots) rather than inside the router's body after its
-status checks. Both are read-only STATICCALLs, so only the reported error and
-the attempt trace can differ when both the prefix and a view fail; the final
-state on every failure is the entry world in both orders.
+Ordering: this module issues the two view calls before the gateway's own
+admission prefix. `PTopup1AllocationViewsSeated.runSeated` re-seats them at
+their source position (inside the router body after its status checks, before
+the zero-target gate) and proves the same success effects, entry-world
+rollback, and the source error and attempt order; the views are evaluated on
+the entry world in both, so the produced allocation agrees.
 
 The ABI producer's library call is the byte executor of `libraryThroughABI`;
 the gateway-to-router ABI CALL frame between the Verity model and the EVM is
