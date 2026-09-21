@@ -175,11 +175,97 @@ def spec : CompilationModel :=
 theorem function_scaffold_entrypoint :
     spec.functions = [addConsolidationRequests] := rfl
 
+private def exceptUnitDecEq : DecidableEq (Except String Unit) := fun x y =>
+  match x, y with
+  | .ok _, .ok _ => isTrue rfl
+  | .error a, .error b =>
+    if h : a = b then isTrue (h ▸ rfl)
+    else isFalse (by intro heq; cases heq; exact h rfl)
+  | .ok _, .error _ => isFalse (by intro h; cases h)
+  | .error _, .ok _ => isFalse (by intro h; cases h)
+
+local instance : DecidableEq (Except String Unit) := exceptUnitDecEq
+
+/- Check the declared obligations before assembling the compiled contract. -/
+set_option maxRecDepth 16384 in
+set_option maxHeartbeats 800000 in
+private theorem compiler_function_validates : validateFunctionSpec addConsolidationRequests = .ok () := by
+  have documented : addConsolidationRequests.localObligations.isEmpty = false := rfl
+  simp only [validateFunctionSpec, documented, Bool.and_false, Bool.false_and]
+  decide +kernel
+
+/- Full transparency evaluates the compiler's private validation definitions.
+The result is a reflexivity proof checked by Lean's kernel, not a native witness.
+Keeping the validation expression intact avoids duplicating its nested matches. -/
+set_option maxRecDepth 16384 in
+set_option maxHeartbeats 800000 in
+private theorem compiler_inputs_validate : validateCompileInputs spec [addConsolidationRequestsSelector] = .ok () := by
+  run_tac Lean.Elab.Tactic.liftMetaTactic fun goal => Lean.Meta.withTransparency .all do
+    goal.refl
+    pure []
+
+set_option maxRecDepth 16384 in
+set_option maxHeartbeats 800000 in
+private theorem compiler_body_compiles :
+    (compileStmtListWithFork ([] : List Field) [] [] .calldata [] false
+      ["sourcePubkeys", "targetPubkeys"] [] .cancun addConsolidationRequests.body []).isOk = true := by
+  simp [addConsolidationRequests, consolidationRequestLoopBody, elementLength, compileStmtListWithFork, compileStmtWithFork,
+    compileExprWithInternals, compileExprListWithInternals, compileRequireFailCondWithInternals,
+    Bind.bind, Except.bind, Pure.pure, Except.pure, Except.isOk, Except.toBool]
+  all_goals decide +kernel
+
+set_option maxRecDepth 16384 in
+set_option maxHeartbeats 800000 in
+private theorem compiler_constructor_compiles :
+    (compileConstructor ([] : List Field) [] [] [] spec.constructor).isOk = true := by
+  simp [spec, compileConstructor, compileStmtListWithFork,
+    compileStmtWithFork, compileExprWithInternals, compileRequireFailCondWithInternals,
+    Bind.bind, Except.bind, Pure.pure, Except.pure, Except.isOk, Except.toBool]
+  all_goals decide +kernel
+
+set_option maxRecDepth 16384 in
+set_option maxHeartbeats 800000 in
+private theorem compiler_no_templates : (templateIntrinsicItems spec).isEmpty = true := by
+  decide +kernel
+
+set_option maxRecDepth 16384 in
+set_option maxHeartbeats 800000 in
+private theorem compiler_core_compiles :
+    (compileValidatedCore spec [addConsolidationRequestsSelector]).isOk = true := by
+  have hi : addConsolidationRequests.isInternal = false := rfl
+  have hn : addConsolidationRequests.name = "addConsolidationRequests" := rfl
+  have hs : isInteropEntrypointName "addConsolidationRequests" = false := by decide +kernel
+  have hf : applySlotAliasRanges ([] : List Field) [] = ([] : List Field) := rfl
+  have hp : addConsolidationRequests.params =
+      [{ name := "sourcePubkeys", ty := .array .bytes },
+       { name := "targetPubkeys", ty := .array .bytes }] := rfl
+  have hl : addConsolidationRequests.nonReentrantLock = none := rfl
+  have hr : CompilationModel.functionReturns addConsolidationRequests = .ok [] := rfl
+  have ht := List.nil_of_isEmpty compiler_no_templates
+  have hbody := compiler_body_compiles
+  have hctor := compiler_constructor_compiles
+  cases hb : compileStmtListWithFork ([] : List Field) [] [] .calldata [] false
+      ["sourcePubkeys", "targetPubkeys"] [] .cancun addConsolidationRequests.body [] with
+  | error err => simp [hb, Except.isOk, Except.toBool] at hbody
+  | ok body =>
+    cases hc : compileConstructor ([] : List Field) [] [] [] spec.constructor with
+    | error err => simp [hc, Except.isOk, Except.toBool] at hctor
+    | ok ctor =>
+      simp only [spec] at hc
+      unfold compileValidatedCore
+      rw [ht]
+      simp [spec, compileGuardedFunctionSpec, compileFunctionSpec,
+        compiler_function_validates, hi, hn, hs, hf, hp, hl, hr, hb, hc,
+        attachNonReentrantGuard, pickUniqueFunctionByName,
+        List.mapM_cons, List.map_cons, List.map_nil,
+        Bind.bind, Except.bind, Pure.pure, Except.pure, Except.isOk, Except.toBool]
+
+/-- Compiler acceptance is composed from validation, body and constructor checks. -/
 theorem function_spec_compiles :
     (CompilationModel.compile spec [addConsolidationRequestsSelector]).isOk = true := by
-  set_option maxRecDepth 16384 in
-  set_option maxHeartbeats 4000000 in
-  decide +kernel
+  unfold CompilationModel.compile
+  rw [compiler_inputs_validate]
+  exact compiler_core_compiles
 
 /-! ## Byte-precise memory/call model -/
 
