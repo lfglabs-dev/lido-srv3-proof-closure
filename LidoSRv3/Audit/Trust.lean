@@ -541,18 +541,11 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAddressBatch1.p_address_batch_1_fuel_bounded_live_claim_batch
 #print axioms LidoSRv3.Audit.Guarantees.PAddressBatch1.p_address_batch_1_unbounded_recipient_rename
 #print axioms LidoSRv3.Audit.Guarantees.PAddressBatch1.p_address_batch_1_fuel_bounded_recipient_rename
--- Physical PhysicalClaimSlots invariant identity: every state satisfies
--- the physical-slot invariant by definition of the live executable
--- lenses (proved by ⟨rfl, rfl, rfl, rfl⟩). The related
--- `physical_queue_slots_are_keccak_derivation`,
--- `physical_checkpoint_slots_are_keccak_derivation`, and
--- `p_address_batch_1_physical_keccak_slots` identities each additionally
--- depend on `Compiler.Proofs.solidityMappingSlot_injective` — a Verity
--- library axiom outside the check_trust_axioms.py allowed set — so
--- they are intentionally not disclosed here. The underlying theorems
--- still exist in `AddressClaimKeccakSlots` / `PAddressBatch1`; only
--- their axiom disclosure is restricted to keep the Trust surface
--- inside the foundations-only boundary the checker enforces.
+-- Slot identities are definitional. The two map-separation results carry
+-- explicit non-collision premises rather than a Keccak injectivity axiom.
+#print axioms LidoSRv3.Audit.Spec.AddressClaimKeccakSlots.physical_queue_slots_are_keccak_derivation
+#print axioms LidoSRv3.Audit.Spec.AddressClaimKeccakSlots.physical_checkpoint_slots_are_keccak_derivation
+#print axioms LidoSRv3.Audit.Guarantees.PAddressBatch1.p_address_batch_1_physical_keccak_slots
 #print axioms LidoSRv3.Audit.Spec.AddressClaimKeccakSlots.physical_claim_slots
 #print axioms LidoSRv3.Tests.PackN4AddressBatchMutants.swapped_three_payout_order_kill_line_refutes_parent
 #print axioms LidoSRv3.Tests.PackN4AddressBatchMutants.fixed_dest_rename_kill_line_refutes_parent
@@ -2050,9 +2043,7 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.PackN4AddressBatchMutants.fixed_dest_unbounded_rename_kill_line
 #print axioms LidoSRv3.Tests.PackN4AddressBatchMutants.three_claim_batch_ready
 #print axioms LidoSRv3.Tests.PackN4AddressBatchMutants.three_claim_batch_parent_instance
--- (plus_one_channel_is_a_different_keccak_map intentionally kept out:
--- transitively depends on `Compiler.Proofs.solidityMappingSlot_injective`
--- which is outside the check_trust_axioms.py allowlist.)
+#print axioms LidoSRv3.Tests.PackN4AddressBatchMutants.plus_one_channel_is_a_different_keccak_map
 #print axioms LidoSRv3.Tests.PackN6ConsolValueMutants.zero_value_call_sum
 
 -- MinFirstDistributionTx x3: `sourceAllocateLoop_eq_allocateLoop`

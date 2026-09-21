@@ -32,15 +32,12 @@ NAMED_AXIOM_REPORT = re.compile(
 )
 TRUST_PRINT = re.compile(r"^\s*#print\s+axioms\s+(\S+)\s*$", re.MULTILINE)
 LEAN_MODULE = re.compile(r"[A-Za-z_][\w']*(?:\.[A-Za-z_][\w']*)*")
-# Named dependency rows plus a terminating count reject truncated output.
-DEP_ROW = re.compile(r"^TAX\t([^\t\n]*)\t([^\t\n]*)\t([^\t\n]*)$", re.MULTILINE)
-DEP_END = re.compile(r"^TAX-END\t(\d+)$", re.MULTILINE)
 # Recompute with Lean.collectAxioms: Trust stdout can be fabricated, and a
 # commented-out #print is not disclosure. Load the audited environment as data
 # with Lean.importModules, never as a syntactic import into this probe. Otherwise
 # project macros could shadow even fully qualified collector names and forge the
 # result. Module ownership and dependencies below come from that environment.
-from trust_dependency_probe import TRUST_DEPENDENCY_PROBE
+from trust_dependency_probe import collect_environment_dependencies
 
 # Native claim rows also require a complete terminating count.
 PROBE_ROW = re.compile(
@@ -325,32 +322,11 @@ def environment_dependencies(names: list[str], module: str,
     The separate probe loads the environment as data; source spelling, fabricated
     stdout and audited syntax extensions cannot supply its dependency answers.
     """
-    ordered = sorted(names)
     modules = [module]
     if discover and (fixture is None or (fixture / "lakefile.lean").is_file()):
         modules.extend(production_probe_modules(fixture or ROOT))
-    imports = "#[" + ", ".join("{ module := `" + name + " }"
-                              for name in sorted(set(modules))) + "]"
-    probe = (TRUST_DEPENDENCY_PROBE
-             .replace("<<DISCOVER>>", "true" if discover else "false")
-             .replace("<<MODULES>>", imports))
-    output = lean_probe_output(probe, "trust-dependency",
-                               module, ordered, fixture)
-    rows: dict[str, set[str]] = {}
-    for name, kind, rendered in DEP_ROW.findall(output):
-        if name in rows:
-            fail(f"trust-dependency probe reported {name} more than once")
-        if kind == "missing":
-            fail(f"Trust prints axioms for {name}, which does not exist in the built "
-                 f"environment")
-        rows[name] = {axiom for axiom in rendered.split(",") if axiom}
-    counted = DEP_END.findall(output)
-    if len(counted) != 1 or int(counted[0]) != len(rows) or (not discover and len(rows) != len(ordered)):
-        fail("trust-dependency probe did not report on every printed theorem")
-    unreported = sorted(set(ordered) - set(rows))
-    if unreported:
-        fail("trust-dependency probe reported nothing for: " + ", ".join(unreported))
-    return rows
+    return collect_environment_dependencies(names, module, fixture, discover, modules,
+                                            lean_probe_output, fail)
 
 
 def confirm_reported_dependencies(reports: list[tuple[str, set[str]]],

@@ -275,11 +275,13 @@ theorem aliased_plus_one_map_fails_physical_slot
       requestId hint recipient h).2.1
   simpa [requestMetadataWordAliasedMap, hphys] using hdistinct
 
-/-- The `queuePosition + 1` channel is a different keccak map, not the
-next word of `queuePosition`. -/
-theorem plus_one_channel_is_a_different_keccak_map (requestId : Nat) :
+/-- Distinct mapping-base inputs require an explicit non-collision premise
+to yield distinct keccak slots. This does not prove Keccak injectivity. -/
+theorem plus_one_channel_is_a_different_keccak_map (requestId : Nat)
+    (distinctBases : Compiler.Proofs.solidityMappingSlot (queuePosition + 1) requestId ≠
+      Compiler.Proofs.solidityMappingSlot queuePosition requestId) :
     Compiler.Proofs.solidityMappingSlot (queuePosition + 1) requestId ≠
       Compiler.Proofs.solidityMappingSlot queuePosition requestId :=
-  (physical_queue_slots_are_keccak_derivation requestId).2.2
+  (physical_queue_slots_are_keccak_derivation requestId distinctBases).2.2
 
 end LidoSRv3.Tests.PackN4AddressBatchMutants

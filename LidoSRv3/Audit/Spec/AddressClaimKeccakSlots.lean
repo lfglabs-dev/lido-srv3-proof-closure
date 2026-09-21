@@ -20,10 +20,13 @@ open LidoSRv3.Audit.Verity.AddressClaimBatchTx
 open _root_.Verity
 open Compiler.Proofs
 
-/-- Hyp-free naming of the keccak derivation. Metadata is the next word
+/-- Naming of the keccak derivation, with map separation explicitly assumed.
+Metadata is the next word
 after `keccak256(abi.encode(requestId, queuePosition))`, and the
 `queuePosition + 1` channel is a different mapping base. -/
-theorem physical_queue_slots_are_keccak_derivation (requestId : Nat) :
+theorem physical_queue_slots_are_keccak_derivation (requestId : Nat)
+    (distinctBases : solidityMappingSlot (queuePosition + 1) requestId ≠
+      solidityMappingSlot queuePosition requestId) :
     queueAmountsPhysicalSlot requestId = solidityMappingSlot queuePosition requestId ∧
       queueMetadataPhysicalSlot requestId =
         (solidityMappingSlot queuePosition requestId + 1) %
@@ -31,9 +34,13 @@ theorem physical_queue_slots_are_keccak_derivation (requestId : Nat) :
       solidityMappingSlot (queuePosition + 1) requestId ≠
         solidityMappingSlot queuePosition requestId :=
   ⟨mappingSlotLocation_zero queuePosition requestId, rfl,
-    solidityMappingSlot_ne (Or.inl (Nat.succ_ne_self queuePosition))⟩
+    distinctBases⟩
 
-theorem physical_checkpoint_slots_are_keccak_derivation (hint : Nat) :
+/-- Checkpoint slot identities are definitional; different mapping bases have
+separate hashes only under the stated non-collision premise. -/
+theorem physical_checkpoint_slots_are_keccak_derivation (hint : Nat)
+    (distinctBases : solidityMappingSlot (checkpointsPosition + 1) hint ≠
+      solidityMappingSlot checkpointsPosition hint) :
     checkpointFromPhysicalSlot hint = solidityMappingSlot checkpointsPosition hint ∧
       checkpointRatePhysicalSlot hint =
         (solidityMappingSlot checkpointsPosition hint + 1) %
@@ -41,7 +48,7 @@ theorem physical_checkpoint_slots_are_keccak_derivation (hint : Nat) :
       solidityMappingSlot (checkpointsPosition + 1) hint ≠
         solidityMappingSlot checkpointsPosition hint :=
   ⟨mappingSlotLocation_zero checkpointsPosition hint, rfl,
-    solidityMappingSlot_ne (Or.inl (Nat.succ_ne_self checkpointsPosition))⟩
+    distinctBases⟩
 
 /-- The `EnumerableSet.UintSet._indexes` mapping is the struct member after
 `_values`: its base is the owner's outer-map value plus one *before* the

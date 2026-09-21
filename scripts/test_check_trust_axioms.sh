@@ -626,6 +626,19 @@ lean_lib «LidoSRv3» where
 LEAN
 lake env lean -R "$coverage" -o "$coverage/LidoSRv3/Audit/Guarantees/Unimported.olean" \
   "$coverage/LidoSRv3/Audit/Guarantees/Unimported.lean"
+# Each standalone driver owns a legitimate root main. Discovery must retain
+# both modules and their otherwise unprinted opaque-dependent claims.
+for driver in Left Right; do
+  cat > "$coverage/LidoSRv3/Audit/Guarantees/${driver}SourceEntry.lean" <<LEAN
+def main : IO Unit := pure ()
+namespace ${driver}Entry
+axiom hidden : False
+theorem overlooked : False := hidden
+end ${driver}Entry
+LEAN
+  lake env lean -R "$coverage" -o "$coverage/LidoSRv3/Audit/Guarantees/${driver}SourceEntry.olean" \
+    "$coverage/LidoSRv3/Audit/Guarantees/${driver}SourceEntry.lean"
+done
 python3 - "$coverage" <<'PY'
 import sys
 from pathlib import Path
@@ -641,8 +654,42 @@ assert expanded['DifferentNamespace.clean'] == set(), expanded
 assert expanded['DifferentNamespace.undisclosed'] == {'DifferentNamespace.hidden'}, expanded
 assert 'UnimportedNamespace.supporting' not in direct, direct
 assert expanded['UnimportedNamespace.supporting'] == {'UnimportedNamespace.hidden'}, expanded
-print('trust coverage discovers an unprinted theorem by module and retains its opaque dependency')
+assert expanded['LeftEntry.overlooked'] == {'LeftEntry.hidden'}, expanded
+assert expanded['RightEntry.overlooked'] == {'RightEntry.hidden'}, expanded
+print('trust coverage retains unprinted and standalone-driver theorem dependencies')
 PY
+
+# Equal names and axiom sets cannot hide different statements in separate
+# driver environments. Compare the full compiled types, not only dependencies.
+cat >> "$coverage/LidoSRv3/Audit/Guarantees/LeftSourceEntry.lean" <<'LEAN'
+theorem SharedDriver.claim : True := True.intro
+LEAN
+cat >> "$coverage/LidoSRv3/Audit/Guarantees/RightSourceEntry.lean" <<'LEAN'
+theorem SharedDriver.claim : 0 = 0 := rfl
+LEAN
+for driver in Left Right; do
+  lake env lean -R "$coverage" -o "$coverage/LidoSRv3/Audit/Guarantees/${driver}SourceEntry.olean" \
+    "$coverage/LidoSRv3/Audit/Guarantees/${driver}SourceEntry.lean"
+done
+python3 - "$coverage" <<'CHECK_TYPES'
+import contextlib
+import io
+import sys
+from pathlib import Path
+sys.path.insert(0, 'scripts')
+from check_trust_axioms import environment_dependencies
+error = io.StringIO()
+with contextlib.redirect_stderr(error):
+    try:
+        environment_dependencies(['DifferentNamespace.clean'],
+            'LidoSRv3.Audit.Guarantees.Coverage', Path(sys.argv[1]), discover=True)
+    except SystemExit as rejected:
+        message = error.getvalue() + str(rejected)
+        assert 'conflicting compiled declaration' in message, message
+    else:
+        raise AssertionError('different statements with the same name were accepted')
+print('trust coverage rejects conflicting statements across standalone drivers')
+CHECK_TYPES
 
 # An unnamed dependency line must fail closed rather than be discarded, so a
 # report Lean did emit can never go unparsed.
