@@ -31,11 +31,17 @@ fetch_checked() {
       "$url" --output "$dest.part"
     mv "$dest.part" "$dest"
   fi
-  if command -v sha256sum >/dev/null 2>&1; then
-    printf '%s  %s\n' "$digest" "$dest" | sha256sum --check --strict
-  else
-    printf '%s  %s\n' "$digest" "$dest" | shasum --algorithm 256 --check
-  fi
+  python3 - "$dest" "$digest" <<'CHECKSUM'
+import hashlib
+import pathlib
+import sys
+
+artifact = pathlib.Path(sys.argv[1])
+actual = hashlib.sha256(artifact.read_bytes()).hexdigest()
+if actual != sys.argv[2]:
+    raise SystemExit(f"SHA-256 mismatch: {artifact}")
+print(f"{artifact.name}: OK")
+CHECKSUM
 }
 fetch_checked "https://nodejs.org/dist/v22.14.0/node-v22.14.0-$node_platform.tar.xz" \
   "$tools/node-$node_platform.tar.xz" "$node_digest"
