@@ -69,7 +69,7 @@ python3 scripts/test_foundational_trust.py
 # Isolated disclosure mutation: no real test-native exceptions need remain.
 scope_fixture="$tmp/scope-fixture"
 mkdir -p "$scope_fixture/scripts" "$scope_fixture/audit" "$scope_fixture/LidoSRv3/Audit"
-cp scripts/check_trust_axioms.py scripts/check_proof_escapes.py scripts/foundational_trust.py "$scope_fixture/scripts/"
+cp scripts/check_trust_axioms.py scripts/check_proof_escapes.py scripts/foundational_trust.py scripts/trust_dependency_probe.py "$scope_fixture/scripts/"
 cp audit/guarantees.yaml audit/trust-native-decide-allowlist.txt "$scope_fixture/audit/"
 cp LidoSRv3/Audit/Trust.lean "$scope_fixture/LidoSRv3/Audit/"
 scope_native='LidoSRv3.Tests.Scope.fixture._native.native_decide.ax_1_1'
@@ -116,7 +116,7 @@ reject "$tmp/injected-opaque-registered" 'emits undisclosed axiom(s): LidoSRv3.A
 # disclosure stays authoritative for every other case here.
 fixture="$tmp/laundering-fixture"
 mkdir -p "$fixture/scripts" "$fixture/audit" "$fixture/LidoSRv3/Audit"
-cp scripts/check_trust_axioms.py scripts/check_proof_escapes.py scripts/foundational_trust.py "$fixture/scripts/"
+cp scripts/check_trust_axioms.py scripts/check_proof_escapes.py scripts/foundational_trust.py scripts/trust_dependency_probe.py "$fixture/scripts/"
 cp audit/guarantees.yaml "$fixture/audit/guarantees.yaml"
 cp LidoSRv3/Audit/Trust.lean "$fixture/LidoSRv3/Audit/Trust.lean"
 cp audit/trust-native-decide-allowlist.txt "$fixture/audit/trust-native-decide-allowlist.txt"
@@ -133,7 +133,7 @@ reject "$tmp/injected-opaque-report" \
 # successfully; only the source declaration distinguishes it.
 launder="$tmp/laundered-shape-fixture"
 mkdir -p "$launder/scripts" "$launder/audit" "$launder/LidoSRv3/Audit" "$launder/LidoSRv3/Tests"
-cp scripts/check_trust_axioms.py scripts/check_proof_escapes.py scripts/foundational_trust.py "$launder/scripts/"
+cp scripts/check_trust_axioms.py scripts/check_proof_escapes.py scripts/foundational_trust.py scripts/trust_dependency_probe.py "$launder/scripts/"
 cp audit/guarantees.yaml "$launder/audit/guarantees.yaml"
 cp LidoSRv3/Audit/Trust.lean "$launder/LidoSRv3/Audit/Trust.lean"
 cp audit/trust-native-decide-allowlist.txt "$launder/audit/trust-native-decide-allowlist.txt"
@@ -394,7 +394,7 @@ probe >/dev/null
 # never computed -- the other half of the spoof exercised below.
 commented="$tmp/commented-fixture"
 mkdir -p "$commented/scripts" "$commented/audit" "$commented/LidoSRv3/Audit"
-cp scripts/check_trust_axioms.py scripts/check_proof_escapes.py scripts/foundational_trust.py "$commented/scripts/"
+cp scripts/check_trust_axioms.py scripts/check_proof_escapes.py scripts/foundational_trust.py scripts/trust_dependency_probe.py "$commented/scripts/"
 cp audit/guarantees.yaml "$commented/audit/guarantees.yaml"
 cp audit/trust-native-decide-allowlist.txt "$commented/audit/trust-native-decide-allowlist.txt"
 smothered="$(python3 - "$commented/LidoSRv3/Audit/Trust.lean" <<'PY'
