@@ -14,6 +14,11 @@
 >   verified on chain, or closed.
 > - **Every row below still has open fidelity gaps — 85 in total.** The last
 >   column counts them per row; `audit/guarantees.yaml` names each one.
+> - **`CHECKED` is conditional, and one gap has no theorem to compose.** Every
+>   row is proved under named premises — the named-premises table below gives
+>   them per row, and `A-SHA256-FFI` is HIGH severity. The `P-ADDRESS-1` live
+>   equivariance of the `transferFrom`, `requestWithdrawals` and `unwrap`
+>   bodies is a named gap, not a discharged one.
 
 This repo holds Lean evidence for eleven Staking Router v3 guarantees on that
 pinned source. The table below is the status. Not every row is closed.
@@ -59,6 +64,54 @@ The current generated candidate report is `audit/CANDIDATE-ASSURANCE-REPORT.md`;
 it records pending review and remaining limitations.
 `audit/R1-FINAL-AUDITOR-REPORT.md` is retained historical output and does not
 validate this candidate or establish deployment, bytecode, or audit acceptance.
+
+## Named premises and the remaining not-proven gap
+
+`CHECKED` above means the named Lean theorem builds *under the premises the
+registry records for that row*. `audit/assumptions.yaml` states each premise's
+risk, severity, violation impact and removal path; the table below is the
+per-row membership, so a reader meets it beside the status table instead of only
+in the registry. `scripts/check_assumption_presentation.py` fails closed if a
+cell here drifts from `audit/guarantees.yaml`.
+
+| ID | Named premises the row is proved under |
+| --- | --- |
+| `P-ALLOC-1` | `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`, `A-SUPPORTED-MODULES` |
+| `P-ALLOC-2` | `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE` |
+| `P-DEPOSIT-1` | `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`, `A-NO-REENTRY` |
+| `P-TOPUP-1` | `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`, `A-NO-REENTRY` |
+| `P-ACCOUNT-1` | `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE` |
+| `P-RESERVE-1` | `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`, `A-NO-REENTRY` |
+| `P-CONSOLIDATION-ETH-1` | `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`, `A-NO-REENTRY`, `A-SHA256-FFI` |
+| `P-ADDRESS-1` | `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`, `A-NO-REENTRY` |
+| `P-TOPUP-2` | `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE` |
+| `P-CONSOLIDATION-1` | `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`, `A-SHA256-FFI` |
+| `P-SSZ-1` | `A-SHA256-FFI`, `A-MULTI-NODE-TRANSPORT`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE` |
+
+`A-SOLC-TRUSTED` and `A-RUNTIME-PROVENANCE` carry every row. `A-SHA256-FFI` is
+the only HIGH-severity premise on the table: digest-value and proof-verification
+claims fail if SHA-256 behavior differs from the abstract oracle, and the
+`SszSha256Isolation` attempt is recorded as reclassing that premise, not
+discharging it. `A-NO-REENTRY` and `A-SUPPORTED-MODULES` are the premises the
+2026-09-17/19 not-proven retirement added (both named 2026-09-17): the rows
+they carry were strengthened by naming a hypothesis, not by removing one, and
+`audit/guarantees.yaml` names on each affected row the gap the premise carries
+and what it derives there.
+
+### The remaining not-proven gap
+
+One `P-ADDRESS-1` gap is carried by no premise above and cannot be closed by
+adding one. Live sender/owner renaming is registered for the claim batch only
+(`PAddress1LiveRenaming.runClaimWithdrawalsTo_rename`,
+`actual_claim_batch_rename`). The tree holds no live-body renaming theorem for
+`transferFrom`, `requestWithdrawals` or `unwrap`, so there is nothing to compose
+them from; those writers keep source-shaped projection coverage whose four-input
+projection still carries environment booleans. Closing this needs new live-body
+proofs. No named assumption can honestly discharge it, because the missing
+content is the theorem itself — so the not-proven bullet stays published rather
+than being retired into a premise. `audit/guarantees.yaml` records it as the
+2026-09-21 named gap on the `P-ADDRESS-1` row, and
+`audit/OPEN-INDEPENDENT-VALIDATION.md` carries the exact-head receipt context.
 
 ## Reproduce
 
