@@ -4,6 +4,7 @@ pragma solidity 0.8.25;
 import {TopupHarness} from "../src/TopupHarness.sol";
 import {CallLog, MockLocator, MockLido, MockModuleV2, MockDeposit, MinimalProxy} from "../src/Mocks.sol";
 import {StakingRouter} from "../../../lido-core/contracts/0.8.25/sr/StakingRouter.sol";
+import {ISRBase} from "../../../lido-core/contracts/0.8.25/sr/ISRBase.sol";
 import {StakingModuleConfig, StakingModuleStatus} from "contracts/0.8.25/sr/SRTypes.sol";
 
 interface VmTopup {
@@ -184,7 +185,7 @@ contract TopupDifferentialTest {
         uint256 lidoBalance = address(lido).balance;
         uint256 routerBalance = address(router).balance;
         Obs memory paused = observePinned(GATEWAY, _one(0), _one(0), _pks(1), _one(5 ether));
-        require(!paused.ok && paused.selector == StakingRouter.LidoDepositsPaused.selector,
+        require(!paused.ok && paused.selector == ISRBase.LidoDepositsPaused.selector,
             "zero-target pause must precede module failure");
         require(paused.callCount == 0, "no committed calls on pause");
         require(address(lido).balance == lidoBalance && address(router).balance == routerBalance,
