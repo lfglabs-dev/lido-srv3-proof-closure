@@ -91,12 +91,12 @@ def denote (fn : FunctionSpec) (values : List Verity.Core.Uint256) : DenoteResul
   denoteFunction unusedOracle { checkedFoldSpec with functions := [fn] }
     fn tx (initialWorld values)
 
-/-- A concrete official-denotation evaluation: ordered iteration reads
-`[4, 7]`, performs both checked additions, and returns `11`. -/
 run_cmd do
   IO.println "OFFSEM-MARKER 02 checkedFold_evaluates"
   (← IO.getStdout).flush
 
+/-- A concrete official-denotation evaluation: ordered iteration reads
+`[4, 7]`, performs both checked additions, and returns `11`. -/
 theorem checkedFold_evaluates :
     (denote checkedFold [4, 7]).success = true ∧
       (denote checkedFold [4, 7]).returnValue = some 11 := by
@@ -107,12 +107,12 @@ private def observedModuleValues : StmtOutcome → Option (List Nat)
       some ((state.world.readArray 7).map (fun value => value.val))
   | .revert => none
 
-/-- The same run observes router order and the per-module updates, not only the
-returned accumulator. -/
 run_cmd do
   IO.println "OFFSEM-MARKER 03 updates_in_order"
   (← IO.getStdout).flush
 
+/-- The same run observes router order and the per-module updates, not only the
+returned accumulator. -/
 theorem checkedFold_updates_modules_in_order :
     observedModuleValues
       (execStmtList unusedOracle [modulesField]
@@ -120,22 +120,22 @@ theorem checkedFold_updates_modules_in_order :
         checkedFold.body) = some [5, 8] := by
   decide +kernel
 
-/-- The same official denotation observes the Solidity-style overflow guard as
-failure, rather than silently accepting wrapped arithmetic. -/
 run_cmd do
   IO.println "OFFSEM-MARKER 04 overflow_reverts"
   (← IO.getStdout).flush
 
+/-- The same official denotation observes the Solidity-style overflow guard as
+failure, rather than silently accepting wrapped arithmetic. -/
 theorem checkedFold_overflow_reverts :
     (denote checkedFold [Verity.Core.MAX_UINT256, 1]).success = false := by
   decide +kernel
 
-/-- Negative mutant: removing the guard changes the overflow observation to a
-successful wrapped result. -/
 run_cmd do
   IO.println "OFFSEM-MARKER 05 wrappingMutant"
   (← IO.getStdout).flush
 
+/-- Negative mutant: removing the guard changes the overflow observation to a
+successful wrapped result. -/
 theorem wrappingMutant_is_detected :
     (denote wrappingMutant [Verity.Core.MAX_UINT256, 1]).success = true ∧
       (denote wrappingMutant [Verity.Core.MAX_UINT256, 1]).returnValue = some 0 := by
@@ -384,7 +384,9 @@ private theorem checkedFold_no_empty_unsafeYul :
   rw [List.any_cons, fold_emptyUnsafeYul_return, Bool.false_or]
   rfl
 
-attribute [local irreducible] Stmt.fold Stmt.foldList collectUnguardedUnsafeBoundaryMechanicsFromStmts
+-- `Stmt.fold` is already `[irreducible]` (well-founded recursion), so only the
+-- non-recursive wrappers need the local marker.
+attribute [local irreducible] Stmt.foldList collectUnguardedUnsafeBoundaryMechanicsFromStmts
 
 attribute [local cbv_eval] fold_forEach exprAny_literal exprAny_localVar exprAny_storageArrayLength exprAny_storageArrayElement exprAny_add exprAny_sub exprAny_le stmtAny_forEach stmtAny_letVar fold_letVar stmtAny_assignVar fold_assignVar stmtAny_require fold_require stmtAny_return fold_return stmtAny_setStorageArrayElement fold_setStorageArrayElement
 
@@ -686,19 +688,15 @@ private theorem checkedFold_param_refs :
 
 private theorem checkedFold_no_unsafe_logical :
     checkedFold.body.any stmtContainsUnsafeLogicalCallLike = false := by
-  simp [checkedFold, checkedFoldLoopBody, stmtContainsUnsafeLogicalCallLike,
-    stmtAny_forEach, stmtAny_letVar, stmtAny_assignVar, stmtAny_require,
-    stmtAny_return, stmtAny_setStorageArrayElement,
-    exprContainsUnsafeLogicalCallLike, exprAny_literal, exprAny_localVar,
-    exprAny_storageArrayLength, exprAny_storageArrayElement, exprAny_add,
-    exprAny_sub, exprAny_le, exprIsUnsafeLogicalNode]
+  decide +kernel
 
-/-- `Stmt.fold` is locally irreducible, so the hanging collector stays opaque.
-The documented obligation plus the unused-Yul constructor lemma skip it. -/
 run_cmd do
   IO.println "OFFSEM-MARKER 16 validates"
   (← IO.getStdout).flush
 
+/-- `Stmt.fold` is `[irreducible]` (well-founded recursion) and `Stmt.foldList`
+is marked locally irreducible above, so the hanging collector stays opaque.
+The documented obligation plus the unused-Yul constructor lemma skip it. -/
 theorem checkedFold_validates :
     validateFunctionSpec checkedFold = .ok () := by
   have documented : checkedFold.localObligations.isEmpty = false := rfl
@@ -730,18 +728,15 @@ theorem checkedFold_inputs_validate :
     Bind.bind, Except.bind, Pure.pure, Except.pure]
   all_goals decide +kernel
 
-set_option diagnostics true in
-set_option diagnostics.threshold 1000 in
-set_option maxRecDepth 16384 in
-set_option maxHeartbeats 4000000 in
-set_option pp.maxSteps 200 in
-/-- The same EDSL program genuinely enters Verity's official compiler and
-produces its IR; this theorem fixes the concrete compiler entrypoint and rules
-out a source-only local interpreter experiment. -/
 run_cmd do
   IO.println "OFFSEM-MARKER 18 compiles-to-ir"
   (← IO.getStdout).flush
 
+set_option maxRecDepth 16384 in
+set_option maxHeartbeats 4000000 in
+/-- The same EDSL program genuinely enters Verity's official compiler and
+produces its IR; this theorem fixes the concrete compiler entrypoint and rules
+out a source-only local interpreter experiment. -/
 theorem checkedFold_compiles_to_official_ir :
     (CompilationModel.compile checkedFoldSpec [tx.functionSelector]).isOk = true := by
   have functionValid := checkedFold_validates
@@ -750,14 +745,15 @@ theorem checkedFold_compiles_to_official_ir :
   have fieldSlot : findFieldWithResolvedSlot [modulesField] "modules" = some (modulesField, 7) := by
     rfl
   have fieldType : modulesField.ty = .dynamicArray .uint256 := rfl
-  have fieldTransient : modulesField.isTransient = false := rfl
   have bodyValid :
       (compileStmtListWithFork [modulesField] [] [] .calldata [] false [] [] .cancun checkedFold.body []).isOk = true := by
-    simp [checkedFold, fieldSlot, fieldType, fieldTransient, compileStmtListWithFork, compileStmtWithFork,
+    -- `checkedFoldLoopBody` is a separate `private def`; without unfolding it the
+    -- `forEach` body stays folded and the compiler equations cannot fire on it.
+    simp [checkedFold, checkedFoldLoopBody, fieldSlot, fieldType,
+      compileStmtListWithFork, compileStmtWithFork,
       compileExprWithInternals, compileRequireFailCondWithInternals,
       compileSetStorageArrayElement, validateDynamicArrayField,
       Bind.bind, Except.bind, Pure.pure, Except.pure, Except.isOk, Except.toBool]
-    all_goals decide +kernel
   have hi : checkedFold.isInternal = false := rfl
   have hn : checkedFold.name = "checkedFold" := rfl
   have hs : isInteropEntrypointName "checkedFold" = false := by decide +kernel
@@ -768,12 +764,13 @@ theorem checkedFold_compiles_to_official_ir :
   have hfb := pickUnique_fallback
   have hrecv := pickUnique_receive
   have templates : (templateIntrinsicItems checkedFoldSpec).isEmpty = true := by
-    simp [templateIntrinsicItems, checkedFoldSpec, checkedFold,
+    -- Same reason as `bodyValid`: without `checkedFoldLoopBody` the `forEach`
+    -- body stays folded and the collector lemmas cannot fire on it.
+    simp [templateIntrinsicItems, checkedFoldSpec, checkedFold, checkedFoldLoopBody,
       collectTemplateIntrinsicsFromStmts, templates_leaf, templates_forEach,
       templates_literal, templates_localVar, templates_storageArrayLength,
       templates_storageArrayElement, templates_add, templates_sub, templates_le,
       Stmt.directMetadata, Stmt.childLists]
-    all_goals decide +kernel
   have ht := List.nil_of_isEmpty templates
   unfold CompilationModel.compile
   rw [validated]
