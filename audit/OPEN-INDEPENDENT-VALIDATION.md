@@ -3,6 +3,27 @@
 Canonical obligations remain in `audit/guarantees.yaml`; generated UX2 files are
 views of that registry. No historical receipt validates a successor commit.
 
+- **Current coordination (2026-09-21).** Exact `a06dc49448b10d2b895e2c036e91b40f761c2d7a`
+  job `9e12e8a0-4b33-4113-b1bf-890827a9efea` passed (exit 0, 1608 jobs) on
+  dgx-spark: every cleanup module of the 2026-09-17/19 not-proven retirement at
+  the pushed registry head — the A-SUPPORTED-MODULES composition
+  (`PAlloc1CheckedBoundsFromModules`), the A-NO-REENTRY corollaries
+  (`PDeposit1NoReentry`, `PTopup1NoReentry`, `PReserve1NoReentry`,
+  `PConsolidationEth1NoReentry`, `PAddress1NoReentry`, `NoReentry`), the
+  allocation views and seams, the reserve-target admission, the oracle entry
+  guards, the lazy calldata accessors, the gateway witness admission and its
+  kernel regressions, and the claim-batch live renaming
+  (`PAddress1LiveRenaming`). Exact
+  `a06dc49448b10d2b895e2c036e91b40f761c2d7a` job
+  `c328f9a3-1254-494a-bde3-d8275f5dd2ac` passed (exit 0, 1273 jobs) on
+  dgx-spark: `LidoSRv3.Audit.Guarantees.PAddress1`, the strengthened registered
+  P-ADDRESS-1 parent. The live branch head equalled the validated commit at
+  receipt time. Remaining named gap, not composable from existing theorems:
+  live equivariance of the full `transferFrom`, `requestWithdrawals` and
+  `unwrap` bodies — the only `LiveRenaming` theorems in the tree are the claim
+  batch's; those writers keep source-shaped projection coverage only and the
+  site's Not-proven bullet stays.
+
 - **Current coordination (2026-09-17).** Exact `34313cf4ce70b198f1d43280557b4d8f9948bdc6`
   job `b9d0b564-7a6f-445b-aeb7-afe8ec5c817d` failed with null exit after
   CompilationModel 61/62 (~36 min); no OfficialSemantics diagnostic, including
