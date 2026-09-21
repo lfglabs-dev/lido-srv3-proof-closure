@@ -3,6 +3,28 @@
 Canonical obligations remain in `audit/guarantees.yaml`; generated UX2 files are
 views of that registry. No historical receipt validates a successor commit.
 
+- **Current coordination (2026-09-21, notproven-final-batch).** Exact
+  `b95e73ac267f5cb6ec27b1880396067e18fc707c` (the pushed H4 head) job
+  `a62859a7-11c2-4fe8-bc80-0f3db44e93fd` passed (exit 0, 1608 jobs) on
+  dgx-spark: the full cleanup module set of the 2026-09-17/19 not-proven
+  retirement, revalidated at the exact final-batch head. Exact
+  `b95e73ac267f5cb6ec27b1880396067e18fc707c` job
+  `67aaee39-4247-460a-adfc-5d3ea65f4b12` passed (exit 0) on dgx-spark:
+  `LidoSRv3.Audit.Guarantees.PAddress1`. A full default `lake build` at the
+  same commit (job `6f8d927f-39cf-45cf-9d95-b82b1e5c7c59`, exit 1) fails only
+  in the known-open compiler-witness modules (`OfficialSemantics`,
+  `ConsolidationFee`, `DepositRollback`, `SszCompiledBeforeRootClass`); those
+  failures are the open kernel-reduction work recorded below, not part of the
+  not-proven retirement, and no retirement module is affected. Final-batch
+  disposition: every website/registry Not-proven bullet that is composable
+  from existing theorems under the named premises (A-SUPPORTED-MODULES,
+  A-NO-REENTRY, A-SHA256-FFI) was retired by the H1-H4 commits on this branch;
+  the single remaining bullet (P-ADDRESS-1 other writers: live equivariance of
+  the full `transferFrom`, `requestWithdrawals` and `unwrap` bodies) is not
+  composable — the only `LiveRenaming` theorems in the tree are the claim
+  batch's — so it stays published as the named gap, and the bonus vs
+  historical 9-guarantee distinction is unchanged.
+
 - **Current coordination (2026-09-21).** Exact `a06dc49448b10d2b895e2c036e91b40f761c2d7a`
   job `9e12e8a0-4b33-4113-b1bf-890827a9efea` passed (exit 0, 1608 jobs) on
   dgx-spark: every cleanup module of the 2026-09-17/19 not-proven retirement at
