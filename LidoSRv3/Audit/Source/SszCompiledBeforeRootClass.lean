@@ -120,7 +120,7 @@ theorem slotSibling_mismatch_is_invalidSlot (st : EVM.State)
   split
   · rename_i h2
     exact (Nat.not_lt.mpr hlen h2).elim
-  ·     have hlt : branch.length - 2 < branch.length := by omega
+  · have hlt : branch.length - 2 < branch.length := by omega
     simp [hlt, hne] -- `hne` closes the sibling-compare branch when it remains
 
 /-- In this model, `.panic32` is unreachable: after `length ≥ 2`,

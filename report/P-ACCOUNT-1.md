@@ -234,4 +234,11 @@ doc comments, this report, `audit/guarantees.yaml`, `scripts/audit_metadata.py`)
 
 ## Entry guards (2026-09-19)
 
-[PAccount1SubmitReportGuards](../LidoSRv3/Audit/Guarantees/PAccount1SubmitReportGuards.lean) executes the pinned `submitReportData` ladder in source order: the sender gate, `_checkContractVersion`, `_checkConsensusData` (ref slot, consensus version, data hash), `_startProcessing` (report present, processing deadline, ref slot not already processing, the `LAST_PROCESSING_REF_SLOT` write and `ProcessingStarted`), then the registered report/fee executor. The oracle words the entry reads are inputs (`OracleState`, `CallArgs`); the checks on them are executed with the source's errors (`guard_*`, `entry_revert_no_body`). `refines_entry` gives the registered entry on the passing ladder; `committed_success` and `failure_restores` carry over. Outside the modeled body, as one stated assumption: extra-data processing and the withdrawal queue's `onOracleReport` call. Axioms: `propext`, `Classical.choice`, `Quot.sound`.
+[PAccount1SubmitReportGuards](../LidoSRv3/Audit/Guarantees/PAccount1SubmitReportGuards.lean) executes the pinned `submitReportData` ladder in source order: the sender gate, `_checkContractVersion`, `_checkConsensusData` (ref slot, consensus version, data hash), `_startProcessing` (report present, processing deadline, ref slot not already processing, the `LAST_PROCESSING_REF_SLOT` write and a `processingStarted` result flag; the source's `ProcessingStarted` EVM log is not modeled), then the registered report/fee executor. The oracle words the entry reads are inputs (`OracleState`, `CallArgs`); the checks on them are executed with the source's errors (`guard_*`, `entry_revert_no_body`). `refines_entry` gives the registered entry on the passing ladder under the coherence premise `d.consensusHash = o.reportHash`; `committed_success` and `failure_restores` carry over. Outside the modeled body, as one stated assumption: extra-data processing and the withdrawal queue's `onOracleReport` call. Axioms: `propext`, `Classical.choice`, `Quot.sound`.
+
+### Delivery clarification (2026-09-21)
+
+The C4 entry refinement and its success/rollback corollaries retain the explicit
+coherence premise `d.consensusHash = o.reportHash`. The `processingStarted`
+result flag is modeled; the `ProcessingStarted` EVM log is not emitted by this
+model. Deriving the entry guards does not derive this coherence premise.

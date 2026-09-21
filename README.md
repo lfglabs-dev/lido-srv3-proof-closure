@@ -16,7 +16,7 @@
 >   column counts them per row; `audit/guarantees.yaml` names each one.
 > - **`CHECKED` is conditional, and one gap has no theorem to compose.** Every
 >   row is proved under named premises — the named-premises table below gives
->   them per row, and `A-SHA256-FFI` is HIGH severity. The `P-ADDRESS-1` live
+>   them per row, and `A-SHA256-FFI` and `A-EIP4788-AUTHENTIC` are HIGH severity. The `P-ADDRESS-1` live
 >   equivariance of the `transferFrom`, `requestWithdrawals` and `unwrap`
 >   bodies is a named gap, not a discharged one.
 
@@ -82,14 +82,14 @@ cell here drifts from `audit/guarantees.yaml`.
 | `P-TOPUP-1` | `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`, `A-NO-REENTRY` |
 | `P-ACCOUNT-1` | `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE` |
 | `P-RESERVE-1` | `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`, `A-NO-REENTRY` |
-| `P-CONSOLIDATION-ETH-1` | `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`, `A-NO-REENTRY`, `A-SHA256-FFI` |
+| `P-CONSOLIDATION-ETH-1` | `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`, `A-NO-REENTRY`, `A-SHA256-FFI`, `A-EIP4788-AUTHENTIC` |
 | `P-ADDRESS-1` | `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`, `A-NO-REENTRY` |
 | `P-TOPUP-2` | `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE` |
-| `P-CONSOLIDATION-1` | `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`, `A-SHA256-FFI` |
-| `P-SSZ-1` | `A-SHA256-FFI`, `A-MULTI-NODE-TRANSPORT`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE` |
+| `P-CONSOLIDATION-1` | `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`, `A-SHA256-FFI`, `A-EIP4788-AUTHENTIC` |
+| `P-SSZ-1` | `A-SHA256-FFI`, `A-MULTI-NODE-TRANSPORT`, `A-SOLC-TRUSTED`, `A-RUNTIME-PROVENANCE`, `A-EIP4788-AUTHENTIC` |
 
-`A-SOLC-TRUSTED` and `A-RUNTIME-PROVENANCE` carry every row. `A-SHA256-FFI` is
-the only HIGH-severity premise on the table: digest-value and proof-verification
+`A-SOLC-TRUSTED` and `A-RUNTIME-PROVENANCE` carry every row. HIGH-severity premises on the table: `A-EIP4788-AUTHENTIC`, `A-SHA256-FFI`.
+Beacon-history authenticity is assumed; digest-value and proof-verification
 claims fail if SHA-256 behavior differs from the abstract oracle, and the
 `SszSha256Isolation` attempt is recorded as reclassing that premise, not
 discharging it. `A-NO-REENTRY` and `A-SUPPORTED-MODULES` are the premises the

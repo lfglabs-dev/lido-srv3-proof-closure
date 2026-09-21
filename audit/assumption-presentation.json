@@ -28,7 +28,8 @@
       "title": "Hashing and transported build evidence have explicit trust boundaries.",
       "parts": {
         "A-SHA256-FFI": "SHA-256 behavior comes from an opaque FFI/precompile interface; structural SSZ proofs do not prove the hash implementation correct.",
-        "A-MULTI-NODE-TRANSPORT": "Remote build receipts require exact source and toolchain identity checks; a successful job is not an independent audit."
+        "A-MULTI-NODE-TRANSPORT": "Remote build receipts require exact source and toolchain identity checks; a successful job is not an independent audit.",
+        "A-EIP4788-AUTHENTIC": "We assume the BEACON_ROOTS reply is the authentic EIP-4788 beacon root for the requested timestamp; the history-ring implementation is not proved."
       },
       "mitigation": "Retain pinned artifacts, known-answer vectors and exact job receipts. Keep cryptographic correctness and independent review obligations explicit."
     }

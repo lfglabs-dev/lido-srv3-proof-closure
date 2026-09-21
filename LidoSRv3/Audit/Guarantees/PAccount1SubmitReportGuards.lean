@@ -23,10 +23,11 @@ registered executor as the body. The oracle words are inputs of this model, as
 
 * `guard_*`: each failing check reverts with the source's error, executes no
   body, makes no accounting attempt and leaves the oracle state unchanged.
-* `refines_entry`: on the passing ladder the outcome is the registered
+* `refines_entry`: under `hcoh : d.consensusHash = o.reportHash`, on the passing ladder the outcome is the registered
   `PAccount1SubmitReport.submitReportData` outcome, so `committed_success`
   and `failure_restores` carry over: a committed run passed all eight checks,
-  wrote `lastProcessingRefSlot := reportRefSlot`, emitted `ProcessingStarted`
+  wrote `lastProcessingRefSlot := reportRefSlot`, set the `processingStarted`
+  result flag (the source event is not represented as an EVM log)
   and yields the registered `Success` data flow at the entry's fee.
 
 Outside the modeled body, as one stated assumption: extra-data processing

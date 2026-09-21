@@ -10,7 +10,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import audit_metadata  # noqa: E402
 import gfm_table  # noqa: E402
 
-EXPECTED_PARTS = {'model-source': {'A-VERITY-SCAFFOLD', 'A-CLASSICAL-CHOICE', 'A-SOURCE-SHAPED', 'A-ABSTRACT-TX', 'A-NO-REENTRY'}, 'source-chain': {'A-RUNTIME-PROVENANCE', 'A-SOLC-TRUSTED', 'A-SUPPORTED-MODULES'}, 'primitives-transport': {'A-MULTI-NODE-TRANSPORT', 'A-SHA256-FFI'}}
+EXPECTED_PARTS = {'model-source': {'A-VERITY-SCAFFOLD', 'A-CLASSICAL-CHOICE', 'A-SOURCE-SHAPED', 'A-ABSTRACT-TX', 'A-NO-REENTRY'}, 'source-chain': {'A-RUNTIME-PROVENANCE', 'A-SOLC-TRUSTED', 'A-SUPPORTED-MODULES'}, 'primitives-transport': {'A-MULTI-NODE-TRANSPORT', 'A-SHA256-FFI', 'A-EIP4788-AUTHENTIC'}}
 
 
 
@@ -113,10 +113,11 @@ def validate_readme_severity(assumptions, guarantees):
             "row and the table must say so; a severity stated only in the registry does "
             "not qualify the CHECKED cells above")
     if len(high) != 1:
-        raise ValueError(
-            f"README: the registry now carries {len(high)} HIGH-severity premises on "
-            f"canonical rows ({', '.join(high) or 'none'}), so the README sentence "
-            "naming a single one is no longer true and must be rewritten")
+        expected = "HIGH-severity premises on the table: " + ", ".join(
+            f"`{premise}`" for premise in high) + "."
+        if expected not in readme or claim in readme:
+            raise ValueError(
+                f"README: disclose the exact HIGH-severity premises: {expected}")
 
 
 def main():

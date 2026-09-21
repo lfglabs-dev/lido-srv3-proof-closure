@@ -26,7 +26,8 @@ the exact relation to the eager one:
   caller's world (`eager_caller_restored`, `lazy_caller_restored`);
 * the difference on malformed input is confined to the revert data and the
   attempt trace: the eager dispatcher answers `rejected []` before any
-  attempt, the lazy one answers the source's revert data after the fee
+  attempt, the lazy one returns model error data, without a proof of exact source ABI
+  revert bytes, after the fee
   STATICCALL and the requests that precede the first failing access.
 
 **Status:** real theorems with complete proofs; axioms `propext`,

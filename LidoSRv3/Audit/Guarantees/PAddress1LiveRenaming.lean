@@ -22,9 +22,9 @@ it performs: the metadata word of every request has its owner field renamed
 those of `renameAddress a₁ a₂ o`, every other claim channel (finalized id,
 checkpoint index, locked ether, amounts, checkpoints) is unchanged, balances
 and code are fixed, and the queue's own two events have their sender word
-renamed. Such a pair exists exactly when the owner-bearing keccak families do
-not collide with the other claim channels; that premise is the content of the
-structure, not an axiom.
+renamed. Existence of such a pair is an explicit premise. No concrete instance or
+equivalence between its existence and slot-family collision freedom is proved
+here. The conditional theorem does not close global live-state equivariance.
 
 **Weakening, stated in the open.** The recipient is an arbitrary callee
 `External := Request → World → Reply`; nothing forces it to answer the renamed

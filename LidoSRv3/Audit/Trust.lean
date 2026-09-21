@@ -3,6 +3,7 @@
 import LidoSRv3.Legacy.SpecProofs
 import LidoSRv3.Tests.SigningKeysMemory
 import LidoSRv3.Tests.NodeOperatorsRegistrySummary
+import LidoSRv3.Audit.Verity.OfficialSemantics
 import LidoSRv3.Audit.AllGuarantees
 import LidoSRv3.Tests.SszDeclaredSiblingsRegression
 import LidoSRv3.Tests.TopupRouterAdmissionCallRegression
@@ -2099,10 +2100,16 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Verity.SubmitReportEntryTx.entry_reverts_on_hash_mismatch
 #print axioms LidoSRv3.Audit.Verity.SubmitReportEntryTx.entry_observe_simulates_source_at_computed_mint
 
--- (OfficialSemantics checkedFold_* / wrappingMutant_is_detected all
--- rely on `native_decide` transitively and are intentionally kept
--- out of this disclosure to keep the Trust surface inside the
--- foundations-only boundary the checker enforces.)
+-- OfficialSemantics is a synthetic compiler/denotation smoke test, not a
+-- Lido source-correspondence theorem. The repaired kernel proofs are included
+-- in the dependency inventory; no native decision axiom is expected.
+#print axioms LidoSRv3.Audit.Verity.OfficialSemantics.checkedFold_evaluates
+#print axioms LidoSRv3.Audit.Verity.OfficialSemantics.checkedFold_updates_modules_in_order
+#print axioms LidoSRv3.Audit.Verity.OfficialSemantics.checkedFold_overflow_reverts
+#print axioms LidoSRv3.Audit.Verity.OfficialSemantics.wrappingMutant_is_detected
+#print axioms LidoSRv3.Audit.Verity.OfficialSemantics.checkedFold_validates
+#print axioms LidoSRv3.Audit.Verity.OfficialSemantics.checkedFold_inputs_validate
+#print axioms LidoSRv3.Audit.Verity.OfficialSemantics.checkedFold_compiles_to_official_ir
 
 -- A-TOPUP-NOWRAP orphanage proof (see
 -- `audit/findings/A-TOPUP-NOWRAP-orphaned.md`): the two registered
@@ -2389,7 +2396,8 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- P-ORACLE-SUPPLY-1 entry premises (2026-09-21): the supply row's entry parent
 -- took senderAllowed / consensusHashMatches as supplied premises; these compose
 -- the executed ladder above with that parent on the shared SubmitReportData, so
--- the premises are derived. The opaque consensus-hash equality (no keccak256
+-- the entry guards are derived under d.consensusHash = o.reportHash.
+-- This coherence premise is retained. The opaque consensus-hash equality (no keccak256
 -- preimage) and extra-data processing stay open on the row.
 #print axioms LidoSRv3.Audit.Guarantees.POracleSupply1EntryGuards.guards_discharge_entry_premises
 #print axioms LidoSRv3.Audit.Guarantees.POracleSupply1EntryGuards.body_run_passed
