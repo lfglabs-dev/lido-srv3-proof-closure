@@ -117,10 +117,60 @@ theorem noAvailableMinMutant_is_detected :
   unfold ObservesCapacity
   decide +kernel
 
+/- Input checks use fully transparent reflexivity, checked by the kernel. -/
+set_option maxRecDepth 16384 in
+set_option maxHeartbeats 800000 in
+private theorem compiler_inputs_validate : validateCompileInputs spec [selector] = .ok () := by
+  run_tac Lean.Elab.Tactic.liftMetaTactic fun goal => Lean.Meta.withTransparency .all do
+    goal.refl
+    pure []
+
+set_option maxRecDepth 16384 in
+set_option maxHeartbeats 800000 in
+private theorem compiler_function_validates : validateFunctionSpec oneModule = .ok () := by
+  run_tac Lean.Elab.Tactic.liftMetaTactic fun goal => Lean.Meta.withTransparency .all do
+    goal.refl
+    pure []
+
+set_option maxRecDepth 16384 in
+set_option maxHeartbeats 800000 in
+private theorem compiler_body_compiles :
+    (compileStmtListWithFork [] [] [] .calldata [] false
+      (oneModule.params.map (·.name)) [] .cancun oneModule.body []).isOk = true := by
+  simp [oneModule, activeBody, maxWord, compileStmtListWithFork, compileStmtWithFork,
+    compileExprWithInternals, compileExprListWithInternals, compileRequireFailCondWithInternals,
+    Bind.bind, Except.bind, Pure.pure, Except.pure, Except.isOk, Except.toBool]
+  all_goals decide +kernel
+
+private theorem compiler_no_templates : (templateIntrinsicItems spec).isEmpty = true := by
+  decide +kernel
+
+set_option maxRecDepth 16384 in
+set_option maxHeartbeats 800000 in
+private theorem compiler_core_compiles : (compileValidatedCore spec [selector]).isOk = true := by
+  have hi : oneModule.isInternal = false := rfl
+  have hn : oneModule.name = "oneModuleAllocCapacity" := rfl
+  have hs : isInteropEntrypointName "oneModuleAllocCapacity" = false := by decide +kernel
+  have hf : CompilationModel.applySlotAliasRanges [] [] = [] := rfl
+  have hl : oneModule.nonReentrantLock = none := rfl
+  have hr : CompilationModel.functionReturns oneModule = .ok [.uint256] := rfl
+  have ht := List.nil_of_isEmpty compiler_no_templates
+  have hbody := compiler_body_compiles
+  cases hb : compileStmtListWithFork [] [] [] .calldata [] false
+      (oneModule.params.map (·.name)) [] .cancun oneModule.body [] with
+  | error err => simp [hb, Except.isOk, Except.toBool] at hbody
+  | ok body =>
+    unfold compileValidatedCore
+    rw [ht]
+    simp [spec, compileGuardedFunctionSpec, compileFunctionSpec,
+      compiler_function_validates, hi, hn, hs, hf, hl, hr, hb,
+      attachNonReentrantGuard, compileConstructor, pickUniqueFunctionByName,
+      List.mapM_cons, Bind.bind, Except.bind, Pure.pure, Except.pure, Except.isOk, Except.toBool]
+
 theorem oneModule_compiles_to_official_ir :
     (CompilationModel.compile spec [selector]).isOk = true := by
-  set_option maxRecDepth 16384 in
-  set_option maxHeartbeats 4000000 in
-  decide +kernel
+  unfold CompilationModel.compile
+  rw [compiler_inputs_validate]
+  exact compiler_core_compiles
 
 end LidoSRv3.Audit.Verity.AllocCapacity
