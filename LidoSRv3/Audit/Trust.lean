@@ -371,7 +371,6 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Spec.OracleFrameCorrespondence.account_parent_remains_order_only
 #print axioms LidoSRv3.Audit.Spec.OracleFrameCorrespondence.eugene_bound_cited
 #print axioms LidoSRv3.Tests.PackEOracleFrameMutants.computed_fee_kill_line_refutes_oracle_frame
-#print axioms LidoSRv3.Audit.Spec.ConsolidationObserveCorrespondence.observe_success_payloads_reread_maps
 #print axioms LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.abstract_flow_refinement
 -- ConsolidationAbstractFlowModel structural family: `forward_compiles`
 -- documents the forward-flow compilation identity; `payload_length`
