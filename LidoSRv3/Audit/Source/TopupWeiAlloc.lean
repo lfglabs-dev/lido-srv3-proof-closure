@@ -1,4 +1,4 @@
-import LidoSRv3.Audit.Guarantees.PTopup2
+import LidoSRv3.Audit.Source.TopupBudget
 import Verity.Core
 
 /-!
@@ -10,7 +10,11 @@ budget in gwei (`consumeBudget` / `transition`).  This module does
 **not** edit that walk and does **not** compose with P-TOPUP-1.
 
 It records the pinned live unit conversions and the router's admission
-of a **module-selected** `allocateDeposits` return.
+of a **module-selected** `allocateDeposits` return.  The gwei unit and
+the leftover-budget walk it contrasts against come from the source-layer
+`LidoSRv3.Audit.Source.TopupBudget` (re-exported by
+`LidoSRv3.Audit.Guarantees.PTopup2`), so this module needs no
+Source → Guarantees edge.
 
 Pinned `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`:
 
@@ -31,9 +35,9 @@ rounded target.  That is not `consumeBudget`.
 
 namespace LidoSRv3.Audit.Source.TopupWeiAlloc
 
-open LidoSRv3.Audit.Guarantees.PTopup2
+open LidoSRv3.Audit.Source.TopupBudget (consumeBudget)
 
-abbrev GWEI : Nat := LidoSRv3.Audit.Guarantees.PTopup2.GWEI
+abbrev GWEI : Nat := LidoSRv3.Audit.Source.TopupBudget.GWEI
 
 /-! ## Live wei conversion -/
 
@@ -297,6 +301,6 @@ theorem module_policy_not_consumeBudget :
       (moduleRight.allocations.map divGwei) ≠ consumeLeft := by
   refine ⟨moduleRight_admitted, consumeLeft_eq, ?_⟩
   simp [moduleRight, consumeLeft, consumeBudget, twoKeyCandidatesGwei, divGwei,
-    mulGwei, GWEI, LidoSRv3.Audit.Guarantees.PTopup2.GWEI]
+    mulGwei, GWEI, LidoSRv3.Audit.Source.TopupBudget.GWEI]
 
 end LidoSRv3.Audit.Source.TopupWeiAlloc

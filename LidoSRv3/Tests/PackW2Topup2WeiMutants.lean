@@ -29,8 +29,10 @@ theorem raw_valueWei_mutant_on_five_gwei_eq_five_billion_ne_five :
       mutantBudgetRawWei alignedFiveGweiBatch ≠ 5 ∧
       transitionBudget alignedFiveGweiBatch alignedFiveGweiCfg = 5 := by
   refine ⟨?eqWei, ?neFive, aligned_five_gwei_budget⟩
-  · simp [mutantBudgetRawWei, alignedFiveGweiBatch, GWEI]
-  · simp [mutantBudgetRawWei, alignedFiveGweiBatch, GWEI]
+  · simp [mutantBudgetRawWei, alignedFiveGweiBatch, GWEI,
+      LidoSRv3.Audit.Source.TopupBudget.GWEI]
+  · simp [mutantBudgetRawWei, alignedFiveGweiBatch, GWEI,
+      LidoSRv3.Audit.Source.TopupBudget.GWEI]
 
 /-- Honest aligned conversion still holds on that witness. -/
 example : transitionBudget alignedFiveGweiBatch alignedFiveGweiCfg = 5 :=

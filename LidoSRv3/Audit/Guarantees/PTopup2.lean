@@ -1,11 +1,15 @@
 import LidoSRv3.Audit.Guarantees.Registry
+import LidoSRv3.Audit.Source.TopupBudget
 import LidoSRv3.Audit.Source.TopupCorrespondence
 import Mathlib.Data.List.Forall2
 
 namespace LidoSRv3.Audit.Guarantees.PTopup2
 
-/-- One Gwei in wei.  The gateway rejects values not aligned to this unit. -/
-def GWEI : Nat := 10 ^ 9
+/-- One Gwei in wei.  The gateway rejects values not aligned to this unit.
+The definition lives in the source layer (`Source.TopupBudget`) so source
+consumers do not need a Source → Guarantees edge; this alias keeps the
+registered name. -/
+abbrev GWEI : Nat := LidoSRv3.Audit.Source.TopupBudget.GWEI
 
 /-- Validator fields consumed by the pinned verifier and `_evaluateTopUpLimit`. -/
 structure Validator where
@@ -58,19 +62,19 @@ structure TopupBatch where
   currentTimestamp : Nat
 
 /-- Consume `budget` from left to right.  This is the state transition from
-per-validator candidate amounts to actual allocations. -/
-def consumeBudget : Nat → List Nat → List Nat
-  | _, [] => []
-  | budget, amount :: amounts =>
-      let allocated := min amount budget
-      allocated :: consumeBudget (budget - allocated) amounts
+per-validator candidate amounts to actual allocations.  The definition lives
+in the source layer (`Source.TopupBudget`); this alias keeps the registered
+name. -/
+abbrev consumeBudget : Nat → List Nat → List Nat :=
+  LidoSRv3.Audit.Source.TopupBudget.consumeBudget
 
 private theorem consumeBudget_sum_le (budget : Nat) (amounts : List Nat) :
     (consumeBudget budget amounts).sum ≤ budget := by
   induction amounts generalizing budget with
-  | nil => simp [consumeBudget]
+  | nil => simp [consumeBudget, LidoSRv3.Audit.Source.TopupBudget.consumeBudget]
   | cons amount amounts ih =>
-      simp only [consumeBudget, List.sum_cons]
+      simp only [consumeBudget, LidoSRv3.Audit.Source.TopupBudget.consumeBudget,
+        List.sum_cons]
       have hmin : min amount budget ≤ budget := Nat.min_le_right _ _
       have htail := ih (budget - min amount budget)
       exact Nat.le_trans (Nat.add_le_add_left htail _)
@@ -79,9 +83,10 @@ private theorem consumeBudget_sum_le (budget : Nat) (amounts : List Nat) :
 private theorem consumeBudget_sum_le_sum (budget : Nat) (amounts : List Nat) :
     (consumeBudget budget amounts).sum ≤ amounts.sum := by
   induction amounts generalizing budget with
-  | nil => simp [consumeBudget]
+  | nil => simp [consumeBudget, LidoSRv3.Audit.Source.TopupBudget.consumeBudget]
   | cons amount amounts ih =>
-      simp only [consumeBudget, List.sum_cons]
+      simp only [consumeBudget, LidoSRv3.Audit.Source.TopupBudget.consumeBudget,
+        List.sum_cons]
       exact Nat.add_le_add (Nat.min_le_left _ _) (ih _)
 
 /-- The leftover walk never gives a key more than its independently evaluated
@@ -90,9 +95,9 @@ theorem consumeBudget_per_key_le (budget : Nat) (amounts : List Nat) :
     List.Forall₂ (fun allocated candidate => allocated ≤ candidate)
       (consumeBudget budget amounts) amounts := by
   induction amounts generalizing budget with
-  | nil => simp [consumeBudget]
+  | nil => simp [consumeBudget, LidoSRv3.Audit.Source.TopupBudget.consumeBudget]
   | cons amount amounts ih =>
-      simp only [consumeBudget]
+      simp only [consumeBudget, LidoSRv3.Audit.Source.TopupBudget.consumeBudget]
       exact .cons (Nat.min_le_left _ _) (ih _)
 
 /-- Candidate amounts are independently capped by the evaluated validator

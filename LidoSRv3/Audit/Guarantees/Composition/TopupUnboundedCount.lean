@@ -52,9 +52,11 @@ the unbounded consumer does not depend on a hidden finite-count premise. -/
 theorem leftover_walk_sum_le_budget :
     ∀ (budget : Nat) (keys : List Nat),
       (consumeBudget budget keys).sum ≤ budget
-  | _, [] => by simp [consumeBudget]
+  | _, [] => by
+      simp [consumeBudget, LidoSRv3.Audit.Source.TopupBudget.consumeBudget]
   | budget, amount :: amounts => by
-      simp only [consumeBudget, List.sum_cons]
+      simp only [consumeBudget, LidoSRv3.Audit.Source.TopupBudget.consumeBudget,
+        List.sum_cons]
       have hmin : min amount budget ≤ budget := Nat.min_le_right _ _
       have htail := leftover_walk_sum_le_budget (budget - min amount budget) amounts
       exact Nat.le_trans (Nat.add_le_add_left htail _)
@@ -63,9 +65,11 @@ theorem leftover_walk_sum_le_budget :
 theorem leftover_walk_sum_le_keys :
     ∀ (budget : Nat) (keys : List Nat),
       (consumeBudget budget keys).sum ≤ keys.sum
-  | _, [] => by simp [consumeBudget]
+  | _, [] => by
+      simp [consumeBudget, LidoSRv3.Audit.Source.TopupBudget.consumeBudget]
   | budget, amount :: amounts => by
-      simp only [consumeBudget, List.sum_cons]
+      simp only [consumeBudget, LidoSRv3.Audit.Source.TopupBudget.consumeBudget,
+        List.sum_cons]
       exact Nat.add_le_add (Nat.min_le_left _ _)
         (leftover_walk_sum_le_keys (budget - min amount budget) amounts)
 

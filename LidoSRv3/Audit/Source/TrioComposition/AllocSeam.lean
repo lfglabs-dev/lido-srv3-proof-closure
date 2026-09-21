@@ -1,5 +1,6 @@
-import LidoSRv3.Audit.Guarantees.PAlloc1
-import LidoSRv3.Audit.Guarantees.PAlloc2
+import LidoSRv3.Audit.MinFirstAllocation
+import LidoSRv3.Audit.Source.MinFirstProportionalStep
+import LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer
 
 /-!
 # ALLOC-1 to ALLOC-2 seam: the produced arrays are ALLOC-2's inputs
@@ -24,6 +25,11 @@ This module builds the rows from a successful producer output
 * `account_step_bounded` — the registered P-ALLOC-2 step theorem instantiated
   on the produced rows: the checked proportional amount is positive, bounded by
   the remaining demand and capacity-safe, for every successful checked step.
+
+The proportional-step fact itself lives in the source layer
+(`LidoSRv3.Audit.Source.MinFirstProportionalStep`, re-stated with an
+identical statement by `LidoSRv3.Audit.Guarantees.PAlloc2`), so this module
+needs no Source → Guarantees edge.
 
 The producer's words are `Fin (2^256)`; ALLOC-2's are Verity words. The
 conversion `toWord` is value-preserving (`toWord_val`).
@@ -172,7 +178,7 @@ theorem account_step_bounded (layout : Layout) (input : CapacityInput)
       best.allocation.val + w.val ≤ best.capacity.val := by
   obtain ⟨hRows, _, hOpen, _, hLen⟩ :=
     account_rows_seam layout input adversary state before after o h
-  exact LidoSRv3.Audit.Guarantees.PAlloc2.forall_proportional_step_correspondence_and_bounded
+  exact LidoSRv3.Audit.Source.MinFirstProportionalStep.forall_proportional_step_correspondence_and_bounded
     (modelRows o) (sourceRows o) best allocationSize w hRows hSelected
     (hOpen best hSelected).2 hLen hSize hAmount
 

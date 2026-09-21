@@ -1,5 +1,4 @@
 import LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTxUniversal
-import LidoSRv3.Audit.Guarantees.PConsolidationEth1
 
 /-!
 # P-CONSOLIDATION-ETH-1: derived unbounded success consumer
