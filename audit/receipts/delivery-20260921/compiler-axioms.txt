@@ -1,0 +1,9 @@
+'LidoSRv3.Audit.Verity.ConsolidationFee.function_spec_compiles' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Verity.DepositRollback.checked_prefix_compiles' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'LidoSRv3.Audit.Verity.AllocCapacity.oneModule_compiles_to_official_ir' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
