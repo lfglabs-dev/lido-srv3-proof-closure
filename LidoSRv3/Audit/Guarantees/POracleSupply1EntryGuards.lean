@@ -130,11 +130,11 @@ theorem supply_entry_source_domain_under_executed_guards
     d maxShareRate state hs hh hCap hDom hExact hDiv).2.2.2.2⟩
 
 section checks
-variable (hs : senderAllowed d = true)
 
 /-- `_checkContractVersion`: a version mismatch reverts with the source's
 error and reaches no supply entry. -/
-theorem contract_version_checked (h : a.contractVersion ≠ o.contractVersion) :
+theorem contract_version_checked (hs : senderAllowed d = true)
+    (h : a.contractVersion ≠ o.contractVersion) :
     PAccount1SubmitReportGuards.submitReportDataGuarded accounting treasury accountingAddress
         layout o a d before =
       PAccount1SubmitReportGuards.revertWith o "UNEXPECTED_CONTRACT_VERSION" :=
@@ -142,7 +142,8 @@ theorem contract_version_checked (h : a.contractVersion ≠ o.contractVersion) :
     o a d before hs h
 
 /-- `_checkConsensusData`, ref slot. -/
-theorem ref_slot_checked (hv : a.contractVersion = o.contractVersion)
+theorem ref_slot_checked (hs : senderAllowed d = true)
+    (hv : a.contractVersion = o.contractVersion)
     (h : a.refSlot ≠ o.reportRefSlot) :
     PAccount1SubmitReportGuards.submitReportDataGuarded accounting treasury accountingAddress
         layout o a d before =
@@ -151,7 +152,8 @@ theorem ref_slot_checked (hv : a.contractVersion = o.contractVersion)
     o a d before hs hv h
 
 /-- `_checkConsensusData`, consensus version. -/
-theorem consensus_version_checked (hv : a.contractVersion = o.contractVersion)
+theorem consensus_version_checked (hs : senderAllowed d = true)
+    (hv : a.contractVersion = o.contractVersion)
     (hr : a.refSlot = o.reportRefSlot) (h : a.consensusVersion ≠ o.consensusVersion) :
     PAccount1SubmitReportGuards.submitReportDataGuarded accounting treasury accountingAddress
         layout o a d before =
@@ -160,7 +162,8 @@ theorem consensus_version_checked (hv : a.contractVersion = o.contractVersion)
     o a d before hs hv hr h
 
 /-- `_startProcessing`, processing deadline. -/
-theorem deadline_checked (hv : a.contractVersion = o.contractVersion)
+theorem deadline_checked (hs : senderAllowed d = true)
+    (hv : a.contractVersion = o.contractVersion)
     (hr : a.refSlot = o.reportRefSlot) (hc : a.consensusVersion = o.consensusVersion)
     (hh : d.dataHash = o.reportHash) (hn : o.reportHash ≠ 0)
     (h : o.processingDeadlineTime < o.time) :
@@ -176,6 +179,8 @@ end checks
 #print axioms supply_entry_under_executed_guards
 #print axioms supply_entry_source_domain_under_executed_guards
 #print axioms contract_version_checked
+#print axioms ref_slot_checked
+#print axioms consensus_version_checked
 #print axioms deadline_checked
 
 end LidoSRv3.Audit.Guarantees.POracleSupply1EntryGuards

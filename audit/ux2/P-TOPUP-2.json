@@ -65,8 +65,8 @@
       "name": "LidoSRv3.Audit.Guarantees.PTopup2.router_exact_sum_bounded_under_gateway_shape",
       "module": "LidoSRv3.Audit.Guarantees.PTopup2",
       "file": "LidoSRv3/Audit/Guarantees/PTopup2.lean",
-      "start_line": 437,
-      "end_line": 442,
+      "start_line": 442,
+      "end_line": 447,
       "doc": "/-- **P-TOPUP-2, abstract plane (chantier 4bis, Thomas 2026-09-12):\nnew registered abstract parent under the gateway-shape premise.**\n\nUnder the pinned gateway construction of `topUpLimits[i]` (bounded by\nuint64 * gwei) and key-count bound (bounded by uint64), the sum is\nunder `2^256`, so no wrap occurs. Combined with the router's aggregate\nguard at line 737, the EXACT sum is bounded by\n`maxTopUpPerBlockGwei * gwei`.\n\nResidual named in `fidelity.missing`: the premise assumes the caller\nconstructs its `topUpLimits` as the pinned `TopUpGateway.sol:226`\ndoes; under `StakingRouter.topUp:686` (`_checkAppAuth(_getTopUpGateway())`)\nthis is the only admitted caller today. Under any non-gateway caller\nthe `router_source_cap_within_block_cap` (retained as lemma) bounds\nonly the WRAPPED sum. -/",
       "statement": "theorem router_exact_sum_bounded_under_gateway_shape\n    {cfg : SolidityTopup.SourceTopupConfig} {inp : SolidityTopup.SourceTopupInput}\n    (hShape : GatewayShapedInput inp)\n    (hAggr : SolidityTopup.accumulated inp ≤\n      SolidityTopup.smDepositableEthAmountRounded cfg inp) :\n    SolidityTopup.allocSum inp.allocations ≤ inp.maxTopUpPerBlockGwei * cfg.gwei"
     },

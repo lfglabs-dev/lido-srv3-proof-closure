@@ -84,8 +84,8 @@
       "name": "LidoSRv3.Audit.Guarantees.PAlloc2.step_correspondence_and_full_loop_conservation",
       "module": "LidoSRv3.Audit.Guarantees.PAlloc2",
       "file": "LidoSRv3/Audit/Guarantees/PAlloc2.lean",
-      "start_line": 357,
-      "end_line": 359,
+      "start_line": 375,
+      "end_line": 377,
       "doc": "/-- **Registered P-ALLOC-2 parent.**  This keeps the independent model/source\ncandidate and proportional-amount equality from the step theorem load-bearing,\nand adds fuel-bounded conservation for every successful run of the full\nindependently stated source allocation loop, plus multi-step row correspondence\nwith an independently stated proportional model loop.  It does not identify\nthat proportional loop with the separate +1 `MinFirst` child model. It also\nconsumes the unbounded checked source loop, deriving its success and independent\nproportional distribution/conservation from array extents alone. -/",
       "statement": "theorem step_correspondence_and_full_loop_conservation :\n    StepMatchesModel ∧ FullLoopConserves ∧ LoopStaysInCorrespondence ∧\n      UnboundedProportionalLoop ∧ SourceMemoryCallCorrespondence"
     },
@@ -96,8 +96,8 @@
       "name": "LidoSRv3.Audit.Guarantees.PAlloc2.verity_tx_simulates_min_first_distribution",
       "module": "LidoSRv3.Audit.Guarantees.PAlloc2",
       "file": "LidoSRv3/Audit/Guarantees/PAlloc2.lean",
-      "start_line": 20,
-      "end_line": 31,
+      "start_line": 21,
+      "end_line": 32,
       "doc": "/-- If the two memory arrays decode to `buckets`/`capacities`, then\n`observe` of `allocate` (persisted bucket array plus totals) equals\n`sourceView` of the separately defined `sourceAllocateLoop`; the copied loop\nequations are connected to the executor by a proved equality theorem.\nNot the +1 `selects_least_open_bucket` model. -/",
       "statement": "theorem verity_tx_simulates_min_first_distribution\n    (buckets capacities : List MinFirstAllocation.Source.Word)\n    (allocationSize : MinFirstAllocation.Source.Word) (state : Verity.ContractState)\n    (hBuckets : Verity.MinFirstDistributionTx.readArray state \"buckets\"\n      Verity.MinFirstDistributionTx.bucketsBase buckets.length = some buckets)\n    (hCapacities : Verity.MinFirstDistributionTx.readArray state \"capacities\"\n      Verity.MinFirstDistributionTx.capacitiesBase capacities.length = some capacities) :\n    Verity.MinFirstDistributionTx.observe buckets\n        ((Verity.MinFirstDistributionTx.allocate buckets.length capacities.length\n          allocationSize).run\n        state) =\n      Verity.MinFirstDistributionTx.sourceView buckets capacities allocationSize"
     }

@@ -138,6 +138,7 @@ import LidoSRv3.Audit.Guarantees.PAddress1NoReentry
 import LidoSRv3.Audit.Guarantees.PTopup2SameBlock
 import LidoSRv3.Audit.Guarantees.PTopup2ValidatorChecks
 import LidoSRv3.Audit.Guarantees.PAccount1SubmitReportGuards
+import LidoSRv3.Audit.Guarantees.POracleSupply1EntryGuards
 import LidoSRv3.Audit.Guarantees.PConsolidation1VaultLazy
 import LidoSRv3.Audit.Guarantees.PTopup1AllocationViewsSeated
 import LidoSRv3.Audit.Guarantees.PTopup2ConfigNoReentry
@@ -2385,6 +2386,17 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1SubmitReportGuards.refines_entry
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1SubmitReportGuards.committed_success
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1SubmitReportGuards.failure_restores
+-- P-ORACLE-SUPPLY-1 entry premises (2026-09-21): the supply row's entry parent
+-- took senderAllowed / consensusHashMatches as supplied premises; these compose
+-- the executed ladder above with that parent on the shared SubmitReportData, so
+-- the premises are derived. The opaque consensus-hash equality (no keccak256
+-- preimage) and extra-data processing stay open on the row.
+#print axioms LidoSRv3.Audit.Guarantees.POracleSupply1EntryGuards.guards_discharge_entry_premises
+#print axioms LidoSRv3.Audit.Guarantees.POracleSupply1EntryGuards.body_run_passed
+#print axioms LidoSRv3.Audit.Guarantees.POracleSupply1EntryGuards.supply_entry_under_executed_guards
+#print axioms LidoSRv3.Audit.Guarantees.POracleSupply1EntryGuards.supply_entry_source_domain_under_executed_guards
+#print axioms LidoSRv3.Audit.Guarantees.POracleSupply1EntryGuards.contract_version_checked
+#print axioms LidoSRv3.Audit.Guarantees.POracleSupply1EntryGuards.deadline_checked
 
 -- P-ADDRESS-1 unbounded observe receipt (grok #416): the live
 -- AddressClaimBatchTx loop already iterates arbitrary request/hint

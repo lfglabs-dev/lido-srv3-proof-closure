@@ -113,6 +113,21 @@ than being retired into a premise. `audit/guarantees.yaml` records it as the
 2026-09-21 named gap on the `P-ADDRESS-1` row, and
 `audit/OPEN-INDEPENDENT-VALIDATION.md` carries the exact-head receipt context.
 
+A second gap is **named, not retired**, on the bonus `P-ORACLE-SUPPLY-1` row.
+Half of its first not-proven bullet was retired on 2026-09-21: the pinned
+`AccountingOracle.submitReportData` contract-version, consensus-version,
+ref-slot and processing-deadline checks are now executed rather than assumed,
+because `POracleSupply1EntryGuards` composes caveat C4's executed ladder
+(`PAccount1SubmitReportGuards`) with that row's entry parent on the same
+`SubmitReportData`, making `senderAllowed` and `consensusHashMatches`
+conclusions instead of hypotheses. What stays published as not proven: the
+consensus hash is compared as an opaque word (`consensusHashMatches d` is
+`d.dataHash == d.consensusHash`), no `keccak256` preimage of the ABI-encoded
+report calldata is modeled, and extra-data processing remains outside the
+modeled body. No named assumption discharges either residual — a premise
+asserting the preimage would assert the missing content — so both stay on the
+row rather than being retired into a premise.
+
 ## Reproduce
 
 Needs [elan](https://github.com/leanprover/elan), Lean 4.31.0, Python 3.10+
