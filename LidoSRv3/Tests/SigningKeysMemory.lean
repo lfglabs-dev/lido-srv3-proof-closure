@@ -26,16 +26,51 @@ private def dirty : MachineState :=
 private def result : MachineState :=
   loadOne dirty storage (u 10) (u 96) (u 224) (u 0) (u 0)
 
+private def zeroMemory : ByteArray :=
+  (repeated 165 128 ++ repeated 0 48 ++ repeated 165 80 ++
+    repeated 0 96 ++ repeated 165 160).toByteArray
+
+private def pointerMemory : ByteArray :=
+  (repeated 165 64 ++ repeated 0 30 ++ [4, 0] ++ repeated 165 416).toByteArray
+
+/- Keep memory checks on lists: reducing repeated ByteArray construction in
+   the kernel duplicates large array terms. These rewrites preserve the actual
+   mstore/write/read operations and all original assertions. -/
+private theorem mstore_memory (m : MachineState) (a v : UInt256) :
+    (m.mstore a v).memory = v.toByteArray.write 0 m.memory a.toNat 32 := by rfl
+
+private theorem write_lists (source destination : List UInt8) (s d n : Nat)
+    (nonempty : 0 < n) (sourceFits : s + n ≤ source.length)
+    (destinationFits : d + n ≤ destination.length) :
+    source.toByteArray.write s destination.toByteArray d n =
+      (destination.extract 0 d ++ source.extract s (s+n) ++
+        destination.extract (d+n) destination.length).toByteArray := by
+  rw [LidoSRv3.Audit.Source.ByteMemory.write_in_bounds_bytes _ _ _ _ _ nonempty
+    (by simpa only [List.size_toByteArray] using sourceFits)
+    (by simpa only [List.size_toByteArray] using destinationFits)]
+  simp only [ByteArray.ext_iff, ← Array.toList_inj, ByteArray.data_append,
+    ByteArray.data_extract, List.data_toByteArray, Array.toList_append,
+    Array.toList_extract, List.toList_toArray, List.size_toByteArray]
+
+syntax "signing_memory_bounds" : tactic
+macro_rules
+  | `(tactic| signing_memory_bounds) => `(tactic|
+      ((try simp only [List.size_toByteArray, List.length_reverse,
+        LidoSRv3.Audit.Source.SszWordBytes.fixedLE_length]) <;> decide +kernel))
+
 /-- All 48 public-key bytes survive the overlap. Poison in the unused low half
 of the second storage word must not leak into the result. -/
 theorem key_overlap_and_shift :
     (result.memory.readWithPadding 128 48).data.toList = key := by
-  simp only [result, loadOne, loadKeysSigs, loadLoop, loadIteration, MachineState.mstore,
-    MachineState.writeWord, writeBytes,
-    LidoSRv3.Audit.Source.SszWordBytes.actual_word_bytes]
-  simp (disch := decide +kernel) only
-    [LidoSRv3.Audit.Source.ByteMemory.write_in_bounds_bytes,
-      LidoSRv3.Audit.Source.ByteMemory.read_in_bounds]
+  simp only [result, loadOne, loadKeysSigs, loadLoop, loadIteration, mstore_memory,
+    LidoSRv3.Audit.Source.SszWordBytes.actual_word_bytes,
+    LidoSRv3.Audit.Source.SszWordBytes.fixedBE, dirty, zeroMemory, pointerMemory]
+  simp (disch := signing_memory_bounds) only [write_lists]
+  simp (disch := signing_memory_bounds) only [LidoSRv3.Audit.Source.ByteMemory.read_in_bounds]
+  simp only [ByteArray.ext_iff, ← Array.toList_inj, dirty, zeroMemory, pointerMemory,
+    ByteArray.data_append, ByteArray.data_extract, List.data_toByteArray,
+    Array.toList_append, Array.toList_extract, List.toList_toArray,
+    List.size_toByteArray, Array.getD_eq_getD_getElem?, ← Array.getElem?_toList]
   decide +kernel
 
 theorem signature_and_frame :
@@ -45,12 +80,15 @@ theorem signature_and_frame :
     result.memory.data.getD 176 0 = 165 ∧
     result.memory.data.getD 255 0 = 165 ∧
     result.memory.data.getD 352 0 = 165 := by
-  simp only [result, loadOne, loadKeysSigs, loadLoop, loadIteration, MachineState.mstore,
-    MachineState.writeWord, writeBytes,
-    LidoSRv3.Audit.Source.SszWordBytes.actual_word_bytes]
-  simp (disch := decide +kernel) only
-    [LidoSRv3.Audit.Source.ByteMemory.write_in_bounds_bytes,
-      LidoSRv3.Audit.Source.ByteMemory.read_in_bounds]
+  simp only [result, loadOne, loadKeysSigs, loadLoop, loadIteration, mstore_memory,
+    LidoSRv3.Audit.Source.SszWordBytes.actual_word_bytes,
+    LidoSRv3.Audit.Source.SszWordBytes.fixedBE, dirty, zeroMemory, pointerMemory]
+  simp (disch := signing_memory_bounds) only [write_lists]
+  simp (disch := signing_memory_bounds) only [LidoSRv3.Audit.Source.ByteMemory.read_in_bounds]
+  simp only [ByteArray.ext_iff, ← Array.toList_inj, dirty, zeroMemory, pointerMemory,
+    ByteArray.data_append, ByteArray.data_extract, List.data_toByteArray,
+    Array.toList_append, Array.toList_extract, List.toList_toArray,
+    List.size_toByteArray, Array.getD_eq_getD_getElem?, ← Array.getElem?_toList]
   decide +kernel
 
 /-- Assembly permits aliasing: the later signature stores overwrite the key.
@@ -58,49 +96,55 @@ An independent pair of output lists would miss this source behavior. -/
 theorem aliased_buffers_overwrite_key :
     ((loadOne dirty storage (u 10) (u 96) (u 96) (u 0) (u 0)).memory.readWithPadding
       128 48).data.toList = repeated 51 32 ++ repeated 52 16 := by
-  simp only [result, loadOne, loadKeysSigs, loadLoop, loadIteration, MachineState.mstore,
-    MachineState.writeWord, writeBytes,
-    LidoSRv3.Audit.Source.SszWordBytes.actual_word_bytes]
-  simp (disch := decide +kernel) only
-    [LidoSRv3.Audit.Source.ByteMemory.write_in_bounds_bytes,
-      LidoSRv3.Audit.Source.ByteMemory.read_in_bounds]
+  simp only [result, loadOne, loadKeysSigs, loadLoop, loadIteration, mstore_memory,
+    LidoSRv3.Audit.Source.SszWordBytes.actual_word_bytes,
+    LidoSRv3.Audit.Source.SszWordBytes.fixedBE, dirty, zeroMemory, pointerMemory]
+  simp (disch := signing_memory_bounds) only [write_lists]
+  simp (disch := signing_memory_bounds) only [LidoSRv3.Audit.Source.ByteMemory.read_in_bounds]
+  simp only [ByteArray.ext_iff, ← Array.toList_inj, dirty, zeroMemory, pointerMemory,
+    ByteArray.data_append, ByteArray.data_extract, List.data_toByteArray,
+    Array.toList_append, Array.toList_extract, List.toList_toArray,
+    List.size_toByteArray, Array.getD_eq_getD_getElem?, ← Array.getElem?_toList]
   decide +kernel
 
 /-- The addition of buffer offset and loop index wraps before multiplication. -/
 theorem destination_index_wraps :
     ((loadOne dirty storage (u 10) (u 96) (u 224) (u (2^256-1)) (u 1)).memory.readWithPadding
       128 48).data.toList = key := by
-  simp only [result, loadOne, loadKeysSigs, loadLoop, loadIteration, MachineState.mstore,
-    MachineState.writeWord, writeBytes,
-    LidoSRv3.Audit.Source.SszWordBytes.actual_word_bytes]
-  simp (disch := decide +kernel) only
-    [LidoSRv3.Audit.Source.ByteMemory.write_in_bounds_bytes,
-      LidoSRv3.Audit.Source.ByteMemory.read_in_bounds]
+  simp only [result, loadOne, loadKeysSigs, loadLoop, loadIteration, mstore_memory,
+    LidoSRv3.Audit.Source.SszWordBytes.actual_word_bytes,
+    LidoSRv3.Audit.Source.SszWordBytes.fixedBE, dirty, zeroMemory, pointerMemory]
+  simp (disch := signing_memory_bounds) only [write_lists]
+  simp (disch := signing_memory_bounds) only [LidoSRv3.Audit.Source.ByteMemory.read_in_bounds]
+  simp only [ByteArray.ext_iff, ← Array.toList_inj, dirty, zeroMemory, pointerMemory,
+    ByteArray.data_append, ByteArray.data_extract, List.data_toByteArray,
+    Array.toList_append, Array.toList_extract, List.toList_toArray,
+    List.size_toByteArray, Array.getD_eq_getD_getElem?, ← Array.getElem?_toList]
   decide +kernel
-
--- Concrete intermediate memories keep the loop controls compositional.
--- Each equality is proved from the actual mstore sequence before being reused.
-private def zeroMemory : ByteArray :=
-  (repeated 165 128 ++ repeated 0 48 ++ repeated 165 80 ++
-    repeated 0 96 ++ repeated 165 160).toByteArray
 
 private theorem zero_first_memory :
     (loadOne dirty storage (u 20) (u 96) (u 224) (u 0) (u 0)).memory = zeroMemory := by
-  simp only [loadOne, MachineState.mstore, MachineState.writeWord, writeBytes,
-    LidoSRv3.Audit.Source.SszWordBytes.actual_word_bytes]
-  simp (disch := decide +kernel) only
-    [LidoSRv3.Audit.Source.ByteMemory.write_in_bounds_bytes]
+  simp only [loadOne, mstore_memory,
+    LidoSRv3.Audit.Source.SszWordBytes.actual_word_bytes,
+    LidoSRv3.Audit.Source.SszWordBytes.fixedBE, dirty, zeroMemory, pointerMemory]
+  simp (disch := signing_memory_bounds) only [write_lists]
+  simp only [ByteArray.ext_iff, ← Array.toList_inj, dirty, zeroMemory, pointerMemory,
+    ByteArray.data_append, ByteArray.data_extract, List.data_toByteArray,
+    Array.toList_append, Array.toList_extract, List.toList_toArray,
+    List.size_toByteArray, Array.getD_eq_getD_getElem?, ← Array.getElem?_toList]
   decide +kernel
 
-private def pointerMemory : ByteArray :=
-  (repeated 165 64 ++ repeated 0 30 ++ [4, 0] ++ repeated 165 416).toByteArray
 
 private theorem pointer_memory :
     (dirty.mstore (u 64) (u 1024)).memory = pointerMemory := by
-  simp only [MachineState.mstore, MachineState.writeWord, writeBytes,
-    LidoSRv3.Audit.Source.SszWordBytes.actual_word_bytes]
-  simp (disch := decide +kernel) only
-    [LidoSRv3.Audit.Source.ByteMemory.write_in_bounds_bytes]
+  simp only [mstore_memory,
+    LidoSRv3.Audit.Source.SszWordBytes.actual_word_bytes,
+    LidoSRv3.Audit.Source.SszWordBytes.fixedBE, dirty, zeroMemory, pointerMemory]
+  simp (disch := signing_memory_bounds) only [write_lists]
+  simp only [ByteArray.ext_iff, ← Array.toList_inj, dirty, zeroMemory, pointerMemory,
+    ByteArray.data_append, ByteArray.data_extract, List.data_toByteArray,
+    Array.toList_append, Array.toList_extract, List.toList_toArray,
+    List.size_toByteArray, Array.getD_eq_getD_getElem?, ← Array.getElem?_toList]
   decide +kernel
 
 /-- Two iterations advance destinations and wrap the source key index. -/
@@ -116,11 +160,15 @@ theorem loop_source_index_wraps :
   have memory_eq : first.memory = zeroMemory := by
     rw [← first_eq]
     exact zero_first_memory
-  simp only [loadOne, MachineState.mstore, MachineState.writeWord, writeBytes,
-    memory_eq, LidoSRv3.Audit.Source.SszWordBytes.actual_word_bytes]
-  simp (disch := decide +kernel) only
-    [LidoSRv3.Audit.Source.ByteMemory.write_in_bounds_bytes,
-      LidoSRv3.Audit.Source.ByteMemory.read_in_bounds]
+  simp only [loadOne, mstore_memory,
+    memory_eq, LidoSRv3.Audit.Source.SszWordBytes.actual_word_bytes,
+    LidoSRv3.Audit.Source.SszWordBytes.fixedBE, zeroMemory, pointerMemory]
+  simp (disch := signing_memory_bounds) only [write_lists]
+  simp (disch := signing_memory_bounds) only [LidoSRv3.Audit.Source.ByteMemory.read_in_bounds]
+  simp only [ByteArray.ext_iff, ← Array.toList_inj, dirty, zeroMemory, pointerMemory,
+    ByteArray.data_append, ByteArray.data_extract, List.data_toByteArray,
+    Array.toList_append, Array.toList_extract, List.toList_toArray,
+    List.size_toByteArray, Array.getD_eq_getD_getElem?, ← Array.getElem?_toList]
   decide +kernel
 
 /-- Consecutive storage slots use EVM word addition, including wrap at 2^256. -/
@@ -129,12 +177,15 @@ theorem storage_slot_wraps :
       if slot.toNat = 0 then packed (repeated 77 16 ++ repeated 255 16) else u 0
     ((loadOne dirty wrappedStorage (u (2^256-1)) (u 96) (u 224) (u 0) (u 0)).memory.readWithPadding
       128 48).data.toList = repeated 0 32 ++ repeated 77 16 := by
-  simp only [result, loadOne, loadKeysSigs, loadLoop, loadIteration, MachineState.mstore,
-    MachineState.writeWord, writeBytes,
-    LidoSRv3.Audit.Source.SszWordBytes.actual_word_bytes]
-  simp (disch := decide +kernel) only
-    [LidoSRv3.Audit.Source.ByteMemory.write_in_bounds_bytes,
-      LidoSRv3.Audit.Source.ByteMemory.read_in_bounds]
+  simp only [result, loadOne, loadKeysSigs, loadLoop, loadIteration, mstore_memory,
+    LidoSRv3.Audit.Source.SszWordBytes.actual_word_bytes,
+    LidoSRv3.Audit.Source.SszWordBytes.fixedBE, dirty, zeroMemory, pointerMemory]
+  simp (disch := signing_memory_bounds) only [write_lists]
+  simp (disch := signing_memory_bounds) only [LidoSRv3.Audit.Source.ByteMemory.read_in_bounds]
+  simp only [ByteArray.ext_iff, ← Array.toList_inj, dirty, zeroMemory, pointerMemory,
+    ByteArray.data_append, ByteArray.data_extract, List.data_toByteArray,
+    Array.toList_append, Array.toList_extract, List.toList_toArray,
+    List.size_toByteArray, Array.getD_eq_getD_getElem?, ← Array.getElem?_toList]
   decide +kernel
 
 /-- The slot producer's ABI encoding can change memory. Discarding its updated
@@ -152,11 +203,15 @@ theorem slot_producer_memory_survives :
   have memory_eq : first.memory = pointerMemory := by
     rw [← first_eq]
     exact pointer_memory
-  simp only [loadOne, MachineState.mstore, MachineState.writeWord, writeBytes,
-    memory_eq, LidoSRv3.Audit.Source.SszWordBytes.actual_word_bytes]
-  simp (disch := decide +kernel) only
-    [LidoSRv3.Audit.Source.ByteMemory.write_in_bounds_bytes,
-      LidoSRv3.Audit.Source.ByteMemory.read_in_bounds]
+  simp only [loadOne, mstore_memory,
+    memory_eq, LidoSRv3.Audit.Source.SszWordBytes.actual_word_bytes,
+    LidoSRv3.Audit.Source.SszWordBytes.fixedBE, zeroMemory, pointerMemory]
+  simp (disch := signing_memory_bounds) only [write_lists]
+  simp (disch := signing_memory_bounds) only [LidoSRv3.Audit.Source.ByteMemory.read_in_bounds]
+  simp only [ByteArray.ext_iff, ← Array.toList_inj, dirty, zeroMemory, pointerMemory,
+    ByteArray.data_append, ByteArray.data_extract, List.data_toByteArray,
+    Array.toList_append, Array.toList_extract, List.toList_toArray,
+    List.size_toByteArray, Array.getD_eq_getD_getElem?, ← Array.getElem?_toList]
   decide +kernel
 
 end LidoSRv3.Tests.SigningKeysMemory
