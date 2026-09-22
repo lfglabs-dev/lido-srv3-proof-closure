@@ -1,5 +1,10 @@
 # Lido SRv3 Proof Closure
 
+Start with [the delivery scope and validation results](report/DELIVERY-20260921.md).
+The eleven guarantees, assumptions and reproduction commands below describe the
+current candidate. Independent review remains pending. Older audit dossiers are
+retained as evidence and do not override the current registry or validation receipt.
+
 > ### These are proofs about a model, not about a deployed contract.
 >
 > - The subject is a **Lean model** of Staking Router v3, written against pinned
@@ -32,7 +37,7 @@ Each guarantee is proved in three layers, except where a guarantee notes otherwi
 2. **Verity Lean library** — a Lean program of the Solidity control flow that uses the Verity Lean library (`uint256`, overflow, revert). When it succeeds, its results match the abstract model.
 3. **Verity Executable Contract** — the same logic as a Verity contract over a `ContractState` (`Contract.run`). Its observables match the Verity Lean library program, and a revert restores the pre-call state.
 
-We do not claim to have verified the bytecode. `CHECKED` means the named Lean theorem builds; `audit/guarantees.yaml` `fidelity.missing` lists the live Lido surfaces that theorem does not cover. If the Verity Executable Contract cannot close, the registry names one gap. Yul, EVM, runtime bytecode, and deployment provenance needed by the registered claims remain required and open. Owner20260915 additionally accepts native evaluation for exactly three compiler-success witnesses, with type/provenance checks and reevaluation. Their kernel proof replacements are retained. This scoped compiler/runtime trust is not kernel-only evidence or deployed-runtime correctness; unrelated axioms remain rejected. See [compiler trust](audit/I-TRUST-COMPILER-KERNEL.md).
+We do not claim to have verified the bytecode. `CHECKED` means the named Lean theorem builds; `audit/guarantees.yaml` `fidelity.missing` lists the live Lido surfaces that theorem does not cover. If the Verity Executable Contract cannot close, the registry names one gap. Yul, EVM, runtime bytecode, and deployment provenance needed by the registered claims remain required and open. The current delivery uses kernel-checked compiler witnesses. The complete dependency audit accepts only `propext`, `Classical.choice` and `Quot.sound`; no native proof exception is used. This does not prove the Solidity compiler correct or establish deployed-runtime correspondence. See [compiler trust](audit/I-TRUST-COMPILER-KERNEL.md) and the [validation receipt](audit/receipts/delivery-20260921/validation.json).
 
 The **Fidelity gaps** column is the count of `fidelity.missing` entries the
 registry records for that row: live Lido surfaces the CHECKED theorem does

@@ -1,47 +1,37 @@
 # Compiler witnesses and scoped trust
 
-Owner20260915 authorizes native evaluation for exactly these existing witnesses
-under `LidoSRv3.Audit.Verity`:
+The current delivery uses Verity `600a2f7a9b07f7ea532451e7d58b106347a6817a`
+and Lean 4.31.0. The compiler-success witnesses are kernel-checked proofs of
+compilation acceptance. They do not prove compiler correctness or correspondence
+with deployed bytecode.
 
-- `AllocCapacityPhase3.consumed_summary_function_spec_compiles`
-- `SszAbstractDigest.deposit_data_root_compiles`
-- `ConsolidationAbstractFlowModel.forward_compiles`
+The complete dependency audit checks 1,259 explicit disclosures and 16,645
+compiled claims. Only `propext`, `Classical.choice` and `Quot.sound` occur;
+no native proof exception is used. See the [delivery report](../report/DELIVERY-20260921.md)
+and [hashed validation logs](receipts/delivery-20260921/validation.json).
+Independent review remains separate and pending.
 
-This permits additional trust in Lean's compiler and native runtime for those
-Boolean decisions. It is not kernel-only evidence and does not prove Solidity
-runtime, deployment or compiler correctness. It authorizes no unrelated axiom,
-including a test-native dependency inherited by a production theorem.
+`trust-native-decide-allowlist.txt` is empty. `scripts/check_trust_axioms.py`
+recomputes dependencies from the compiled environment, including supporting
+claims and standalone drivers. The current gate calls `require_foundational`;
+the older three-name authorization retained in `scripts/foundational_trust.py`
+does not relax that gate. Saved-output checks alone are not environment validation.
 
-## Current candidate
+The earlier authorization covered exactly three witnesses under
+`LidoSRv3.Audit.Verity`: `AllocCapacityPhase3.consumed_summary_function_spec_compiles`,
+`SszAbstractDigest.deposit_data_root_compiles`, and
+`ConsolidationAbstractFlowModel.forward_compiles`. Their kernel replacements are
+retained. The delivery also repairs the allocation, deposit and consolidation
+compiler-success witnesses described in the delivery report.
 
-The salvaged proofs retain the same compilation statements and replace these
-three native decisions with structured kernel proofs, using Verity
-`1e95e925736d9253df41918ce1e4858cdd8e8a8d` ([dependency PR2409](https://github.com/lfglabs-dev/verity/pull/2409)).
-Targeted bundled runs compiled these replacements; final exact-SHA environment
-checks and independent review remain required. No whole-candidate trust pass is
-inferred from those builds.
-
-`trust-native-decide-allowlist.txt` records the exact emitted inventory, now
-expected empty. Authorization is a separate fixed three-name set in
-`scripts/foundational_trust.py`; a kernel replacement need not keep an accepted
-native dependency alive. `check_trust_axioms.py` independently recomputes named
-dependencies, verifies exact emitted inventory, and checks any emitted native
-axiom's safe Boolean reflection type, source module/site and closed expression
-by native reevaluation. Source-declared generated names, hidden dependencies,
-false/unevaluable expressions and unrelated axioms remain rejected. Saved-output
-mode checks a report only; it is not environment validation.
-
-The static inventory delta is recorded in
-[ kernel-witness-inventory.json ](metadata-reconcile/kernel-witness-inventory.json):
-407 to 404 tactic sites, exactly three removed and one existing site moved.
-Project-wide test tactic occurrences are distinct from dependencies emitted by
-`Audit.Trust`. Kernel proof replacements do not settle ALLOC reachability,
-compiled memory/call fidelity or deployed runtime identities.
+Supported-module invariants, compiled memory/call fidelity and deployed runtime
+identities remain separate proof boundaries.
 
 ## Historical attempts and receipts
 
-The following record describes earlier pins and the policy in force at the time;
-its rejected native dependencies are accepted only under the later scope above.
+The following record describes earlier pins and the policy in force at the time.
+References to remaining compiler work or native exceptions below are historical;
+the current validation and foundation-only policy are described above.
 
 At Verity `e977aaad6e1a9e92e0132d41b3d33a14135a4d46`,
 `Compiler/CompilationModel/ScopeValidation.lean:55,64` calls
