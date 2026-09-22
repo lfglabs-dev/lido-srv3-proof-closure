@@ -1,4 +1,4 @@
-import LidoSRv3.Audit.Guarantees.PAddress1WrappedTokenCalls
+import LidoSRv3.Audit.Source.Effects.PAddress1WrappedTokenCalls
 
 /-! Actual pinned OZ3.4.0 WstETH transferFrom consumed by the already joined
 WithdrawalQueue→unwrap execution. Qualified token storage, source-ordered fresh

@@ -16,7 +16,7 @@ open audit.trio.deposit.ModuleCall (finalizeAllocation)
 theorem decode_at_credentials_next_128 :
     decodeReturnAtCredentialsNext (word 128) credRaw moduleRaw =
       .ok (credWord, word 160, [word 1, word 9], word 384) := by
-  native_decide
+  decide +kernel
 
 theorem decode_at_credentials_next_disjoint_128 :
     ∃ postRaw,
@@ -41,7 +41,7 @@ theorem locator_at_128 :
 theorem decode_at_credentials_next_160 :
     decodeReturnAtCredentialsNext (word 160) credRaw moduleRaw =
       .ok (credWord, word 192, [word 1, word 9], word 416) := by
-  native_decide
+  decide +kernel
 
 theorem decode_after_locator_128 :
     decodeReturnAfterLocator (word 128) locRaw credRaw moduleRaw =

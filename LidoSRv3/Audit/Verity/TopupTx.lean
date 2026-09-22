@@ -1608,6 +1608,62 @@ def executeGuarded (cfg : SourceTopupConfig) (call : TopupCall) (failure : Failu
   let returned ← allocateDeposits call
   guardedSourceStage cfg call returned failure
 
+/-- Partial prefix wrapper retained from PR #668. It checks supplied gateway
+and credential booleans plus key nonemptiness before the module call. It does
+not execute `_validateTopUpInputs`, module lookup/status, allocation getters,
+or the zero-target `LIDO.canDeposit` guard. The booleans are not derived from
+physical source state. Consequently this wrapper does not establish source
+prefix equivalence or the complete source call journal. -/
+def executeGuardedWithThreePrefixGuards
+    (cfg : SourceTopupConfig) (call : TopupCall)
+    (callerIsTopUpGateway wcTypeIsType2 : Bool)
+    (failure : FailurePoint) : Contract Unit := do
+  -- StakingRouter.sol:1178  if (_msgSender() != app) revert NotAuthorized();
+  require (decide (callerIsTopUpGateway = true)) "NotAuthorized"
+  -- StakingRouter.sol:769-770  if (n == 0) { revert EmptyKeysList();
+  require (decide (call.keyIndices.length ≠ 0)) "EmptyKeysList"
+  -- SRUtils.sol:42  if (!WithdrawalCredentials.isType2(_wcType)) revert ISRBase.WrongWithdrawalCredentialsType();
+  require (decide (wcTypeIsType2 = true)) "WrongWithdrawalCredentialsType"
+  executeGuarded cfg call failure
+
+/-- The partial wrapper rejects a false authorization input. -/
+theorem executeGuardedWithThreePrefixGuards_reverts_on_unauth
+    (cfg : SourceTopupConfig) (call : TopupCall) (wcTypeIsType2 : Bool)
+    (failure : FailurePoint) (state : ContractState) :
+    (executeGuardedWithThreePrefixGuards cfg call false wcTypeIsType2 failure).run state =
+      ContractResult.revert "NotAuthorized" state := by
+  simp [executeGuardedWithThreePrefixGuards, Contract.run, Bind.bind,
+    _root_.Verity.bind, _root_.Verity.require]
+
+/-- The partial wrapper rejects empty key indices after its authorization check. -/
+theorem executeGuardedWithThreePrefixGuards_reverts_on_empty_keys
+    (cfg : SourceTopupConfig) (call : TopupCall)
+    (wcTypeIsType2 : Bool) (failure : FailurePoint) (state : ContractState)
+    (hEmpty : call.keyIndices.length = 0) :
+    (executeGuardedWithThreePrefixGuards cfg call true wcTypeIsType2 failure).run state =
+      ContractResult.revert "EmptyKeysList" state := by
+  simp [executeGuardedWithThreePrefixGuards, Contract.run, Bind.bind,
+    _root_.Verity.bind, _root_.Verity.require, hEmpty]
+
+/-- The partial wrapper rejects a false credential-type input. -/
+theorem executeGuardedWithThreePrefixGuards_reverts_on_wrong_wc
+    (cfg : SourceTopupConfig) (call : TopupCall) (failure : FailurePoint)
+    (state : ContractState) (hNonempty : call.keyIndices.length ≠ 0) :
+    (executeGuardedWithThreePrefixGuards cfg call true false failure).run state =
+      ContractResult.revert "WrongWithdrawalCredentialsType" state := by
+  simp [executeGuardedWithThreePrefixGuards, Contract.run, Bind.bind,
+    _root_.Verity.bind, _root_.Verity.require, hNonempty]
+
+/-- When these three checks pass, the partial wrapper reduces to `executeGuarded`.
+Other source prefix guards remain absent from this wrapper. -/
+theorem executeGuardedWithThreePrefixGuards_of_all_pass
+    (cfg : SourceTopupConfig) (call : TopupCall) (failure : FailurePoint)
+    (state : ContractState) (hNonempty : call.keyIndices.length ≠ 0) :
+    (executeGuardedWithThreePrefixGuards cfg call true true failure).run state =
+      (executeGuarded cfg call failure).run state := by
+  simp [executeGuardedWithThreePrefixGuards, Contract.run, Bind.bind,
+    _root_.Verity.bind, _root_.Verity.require, hNonempty]
+
 /-- The binding statement.  `executeGuarded` journals the module frame and then
 runs the guard-and-spend stage on *that frame's returndata*; the allocation
 array is not a free argument of the guarded transaction. -/

@@ -1,34 +1,63 @@
 # P-ALLOC-2
 
-> Round 2 (2026-08-21). Product note plus proof audit, arbitrated from GPT 5.6 Pro and Opus 5. Fable 5 was unavailable (data-retention gate). Kimi K3 was not an allowed Task model. No em dashes. Lean is authority.
+The registered abstract parent `step_correspondence_and_full_loop_conservation`
+retains step correspondence, fuel-bounded conservation, and proportional model
+loop correspondence across mutations. Its fourth conjunct consumes the unbounded
+`TrioAlloc2.allocate` execution: array extent bounds yield success, independent
+`Spec.Distributes`, bucket-total conservation, and allocated amount bounded by
+demand. It requires neither supplied fuel nor a successful-result premise for
+that fourth conjunct. Closed rows are filtered and the specification consumes
+each mutation. The older unit-step model remains a separate child.
 
-Once P-ALLOC-1 has produced the two lists (current allocation, capacity), `MinFirstAllocationStrategy.allocate` distributes the requested amount: it repeatedly calls `allocateToBestCandidate` until demand is exhausted or no bucket can take more.
+The fifth conjunct now consumes `SourceMemoryCallCorrespondence`: actual
+`ProducerStores.producer` writes feed `producerThenCall`, its ABI library result,
+ordered attempted-call trace, independent distribution and returned length.
+Producer success, count at most 32, disjoint arrays and explicit extent/return
+space bounds remain premises. No final memory relation or desired callee result
+is assumed. Existing overlap and distinct return-array regressions are included
+in the registered reproduction. This connects an existing source proof to the
+parent; it does not close compiled instruction or caller-frame refinement.
 
-P-ALLOC-2 verifies each fill step and conservation across a successful fuel-bounded full loop:
+The registered Verity parent remains `verity_tx_simulates_min_first_distribution`.
+Decoded-loop conservation is not a proof of physical ABI/memory layout, linked
+library identity, compiler/runtime refinement, supported-module reachable caps,
+or deployed execution. These are remaining obligations, not discharged by a
+successful build. The original ALLOC arbitrary-module counterexample remains.
 
-- selection: the chosen bucket $b$ is the first open bucket minimizing $\mathrm{allocation}$. Ties keep the lower index (source replaces the saved candidate only on a strict $>$).
-- amount: $\mathrm{allocated} = \min(\mathrm{share},\ \min(\mathrm{upper},\ \mathrm{capacity}[b]) - \mathrm{allocation}[b])$
-  - $\mathrm{share} = \lceil \mathrm{remaining} / \mathrm{count} \rceil$ when $\mathrm{count} > 1$, else remaining
-  - count = number of open buckets sitting at that minimum
-  - upper = least allocation strictly above the minimum among open buckets, else $2^{256}-1$
-- bounds: $0 < \mathrm{allocated} \le \mathrm{remaining}$ and $\mathrm{allocation}[b] + \mathrm{allocated} \le \mathrm{capacity}[b]$
+Current registry assumptions are A-VERITY-SCAFFOLD, A-SOLC-TRUSTED and
+A-RUNTIME-PROVENANCE. A-HANDWRITTEN-MINFIRST is not a current P-ALLOC-2
+registry assumption. Current source regressions include
+`Tests.TrioAlloc2.RegisteredLoop`: a closed row does not cap an open row's fill,
+and tied buckets fill by capacity before the remaining allocation moves on.
+These regressions are not paired Solidity differential evidence.
 
-Note the cap at the next fill level: the served bucket rises to the level of the bucket above it and no further. That is what makes the fill proportional rather than greedy.
+Next work must connect the decoded loop to its actual deployed caller, physical
+memory/ABI and runtime, and close upstream supported-module invariants. It must
+not replace that work with another independent-loop helper.
 
-The registered parent (`step_correspondence_and_full_loop_conservation`) keeps the abstract model/source step correspondence and checked amount equality, and adds conservation for every successful fuel-bounded run of the independently stated proportional source loop: final allocated plus remaining equals the initial request. The proved source/executor loop equality transfers that invariant to the loop used by the Verity transaction. We do not prove the caps fed into it (P-ALLOC-1), and we do not prove Solidity or bytecode equivalence.
+## I-ALLOC2-DEPLOYED-LIBRARY-IDENTITY — OPEN
 
-## Proof limitations and recommendations
+Missing authoritative evidence: chain and block, linked callee address, deployed
+runtime bytes and codehash, library link map, and compiler/runtime configuration.
+The pinned artifact `audit/trio/integration/compiler-memory/SRLib.ir.yul` uses
+an unresolved `MinFirstAllocationStrategy` linker symbol at lines 2293 and 2633.
+Its SHA256 is `30d20f448233d6d51ecff8339f360444d9d3e1754566da6322cb4c8e87ed0d61`.
+The companion `inspection.json` pins source/compiler settings; it is explicitly
+compiler IR inspection, not a runtime-refinement proof or a deployment witness.
 
-The parent’s step conjunct is a genuine unbounded $\forall$ over finite lists and words, hypothesized on `RowsCorrespond`, source selection, openness, length $< 2^{256}$, nonzero demand, and successful `checkedAmount`. Its conclusion includes equality with independent `Model.amount`, so ceilDiv and both clamps are load-bearing. The full-loop conjunct is fuel-bounded conservation over the proportional source loop. It does not carry `RowsCorrespond` through mutations or define an independent proportional model loop.
+Pin-backed work remains possible and required: each site writes selector
+`0x2529fbc9`, ABI-encodes both arrays and demand, executes DELEGATECALL with
+`gas()`, bubbles failure bytes, copies successful return bytes and decodes a new
+array. Connect these instructions to the existing byte-memory and ABI proofs.
+The current `MemoryTransportCall.closedCall` interpreter does not execute those
+compiled instructions or derive inherited caller/storage/value/static/gas effects.
+Those proofs remain OPEN independently of the missing deployment evidence.
 
-`A-HANDWRITTEN-MINFIRST` and `A-VERITY-SCAFFOLD` are load-bearing. The +1 child `selects_least_open_bucket` is a different algorithm. YAML already lists activity filtering (upstream), keccak oracle, and in-place memory mutation. Kill-lines `selection_kill_line_refutes_parent` and `headroom_clamp_kill_line_refutes_parent` are parent-shaped; they do not kill positivity, $w \le r$, or the next-level clamp, and they do not refute the Verity parent.
+## Historical audit record
 
-CHECKED includes full-loop allocated/remaining conservation. It does not mean full-loop model-state correspondence, Solidity equivalence, or that capacities were built correctly.
-
-Ranked next work: define an independent proportional model loop and prove multi-step `RowsCorrespond` across mutations; keep the +1 model as a child.
-
-Theorems: `PAlloc2.step_correspondence_and_full_loop_conservation` (registered parent), `PAlloc2.source_allocate_loop_conserves_requested`, `MinFirstDistributionTx.allocateLoop_conserves_total`, `PAlloc2.forall_proportional_step_correspondence_and_bounded` (step conjunct), `PAlloc2.selects_least_open_bucket` (child), `PAlloc2.verity_tx_simulates_min_first_distribution`, `Tests.MinFirstDistributionTxMutants.selection_kill_line_refutes_parent` (step kill-line), `Tests.MinFirstDistributionTxMutants.headroom_clamp_kill_line_refutes_parent` (step kill-line).
-Assumptions: `A-HANDWRITTEN-MINFIRST`, `A-VERITY-SCAFFOLD`. Related (not listed on the YAML row): `A-ALLOC2-TX-BOUNDARY`.
+The dated sections below preserve prior findings and remediation history. Their
+statements about then-registered parents, assumptions and missing loop proofs are
+historical; the current statement and remaining obligations are described above.
 
 ## Intent
 
@@ -296,3 +325,23 @@ registered theorem names are unchanged
 `PAlloc2.lean` now states it is a helper and that the explicit-∀ theorem is
 the registered parent. No `sorry`/`admit`/`native_decide` in the new proofs
 (both kill-lines close by `rfl`/`decide` and `absurd`).
+
+## Unbounded registered proportional loop
+
+The abstract parent preserves its existing three conclusions and additionally
+consumes TrioAlloc2.allocate. Array extent bounds derive a successful result,
+independent Spec.Distributes (which filters closed rows and uses each mutation),
+bucket-total conservation and allocated <= demand. There is no supplied fuel or
+success premise in this additional clause. Existing TrioAlloc2 totality, loop
+correspondence and conservation proofs are reused, not replaced.
+
+Tests.TrioAlloc2.RegisteredLoop checks that a closed row at level 4 does not cap
+an open row's step toward level 5, and that a full loop fills the first tied
+bucket to capacity before allocating the remainder to the second. These are Lean
+source regressions, not paired Solidity differential receipts. The decoded-array
+result is not physical ABI/memory/deployment closure; those obligations and the
+runtime refinement obligations remain open. Independent full-gate/axiom validation passed at d0926d6c, as reported by reviewer 01ab3536; that receipt does not validate successor source changes.
+
+## Seam from the executed capacity producer (2026-09-18)
+
+[AllocSeam](../LidoSRv3/Audit/Source/TrioComposition/AllocSeam.lean) builds the rows `SRLib._getDepositAllocations` hands to `MinFirstAllocationStrategy.allocate` from a successful run of the executed capacity producer (`VerityProducer.executeAccount`, P-ALLOC-1's `account_allocation_result`): `sourceRows` / `modelRows` pair the produced allocation and capacity arrays by index. `account_rows_seam` proves `RowsCorrespond`, candidate agreement, openness of a selected candidate and the length bound (the row count is the stored module count, a word below `2^256`); `account_step_bounded` instantiates the registered step theorem `forall_proportional_step_correspondence_and_bounded` on those rows. Axioms: `propext`, `Classical.choice`, `Quot.sound`.

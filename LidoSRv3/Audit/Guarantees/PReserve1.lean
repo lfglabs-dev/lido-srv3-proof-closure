@@ -5,6 +5,7 @@ import LidoSRv3.Audit.Source.ReservePayableCallSource
 import LidoSRv3.Audit.Source.ReserveSeedBookkeepingSource
 import LidoSRv3.Audit.Source.ERC7201StorageSlotSource
 import LidoSRv3.Audit.Source.SolidityUint128WrapSource
+import LidoSRv3.Audit.Source.TrioReserve1.Writers
 import LidoSRv3.Audit.Guarantees.Registry
 
 namespace LidoSRv3.Audit.Guarantees.PReserve1
@@ -338,11 +339,12 @@ Restates `source_spend_preserves_withdrawal_reserve` with added
 `_hWrapShape` premises NAMING the pinned Solidity uint128 wrap
 semantics via `SolidityUint128WrapSource.toUint128` and
 `wrappedAdd`.  The Verity model's allocation helper uses `safeSub`
-and returns `ALLOCATION_ARITHMETIC` on overflow; the pinned 0.4.24
+and returns `ALLOCATION_ARITHMETIC` on underflow; the pinned 0.4.24
 helper does raw `remaining -=` (unchecked wrap).  On the packed
-uint128 pair `buffered` / `depositedPostReport` at Lido.sol:131-132,
-each half wraps mod 2^128 — the model treats them as unbounded
-`Nat` accumulators.
+uint128 pair, the [actual setter](https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.4.24/utils/UnstructuredStorageExt.sol#L44-L46)
+truncates both inputs through a mask and a uint256 shift. The historical
+Verity projection instead keeps `buffered` and `depositedPostReport` as
+unbounded `Nat` accumulators.
 
 This bridge NAMES the pinned uint128 wrap semantics at the parent's
 ENUNCE via three `SolidityUint128WrapSource` equations:
@@ -417,5 +419,114 @@ theorem verity_tx_preserves_withdrawal_reserve
     (h : (ReserveContract.withdrawWithGuards inputs amount).run state = .success () after) :
     withdrawalPartitionSpendInvariant (decode state) (decode after) amount :=
   verity_commit_preserves_withdrawal_reserve inputs state after amount h
+
+/-- **Chantier 2 (Piste A, Thomas 2026-09-13) D-PACK-1 registered
+consumer of the pinned uint128 packed pair round-trip.**
+
+The pinned `Lido.sol:131-132` packs `buffered` (low 128 bits) and
+`depositedPostReport` (high 128 bits) into a single `uint256` storage
+slot.  Reading `buffered` from that packed slot requires the low-half
+extraction `packedWord & type(uint128).max`; the source-level function
+is `LidoSRv3.Audit.Source.ReservePackedBufferSource.unpackBuffered`.
+
+`unpackBuffered_of_packPair_of_bounded` (in the source module) proves
+the pack/unpack round-trip: under the pinned `buffered ≤ uint128Max`
+type-width premise on `buffered : uint128`, the low-half extraction
+of `packPair buffered depositedPostReport` recovers `buffered`.
+
+This registered consumer theorem carries the round-trip fact into the
+P-RESERVE-1 namespace, so any downstream consumer that receives a
+`packedWord` and a bounded `buffered` witness gets the projection
+identity as a proved P-RESERVE-1 lemma.  This is not a naming scaffold:
+the proof invokes the round-trip theorem non-trivially (it is not a
+`rfl` — the modular arithmetic on `+` and `*` inside `packPair` needs
+the boundedness premise to eliminate the low-half mod, which the source
+module discharges via `Nat.add_mul_mod_self_right` + `Nat.mod_eq_of_lt`). -/
+theorem reserve_buffered_matches_packed_low_half
+    (buffered depositedPostReport : Nat)
+    (hLow : buffered ≤ LidoSRv3.Audit.Source.ReservePackedBufferSource.uint128Max) :
+    LidoSRv3.Audit.Source.ReservePackedBufferSource.unpackBuffered
+        (LidoSRv3.Audit.Source.ReservePackedBufferSource.packPair
+          buffered depositedPostReport) = buffered :=
+  LidoSRv3.Audit.Source.ReservePackedBufferSource.unpackBuffered_of_packPair_of_bounded
+    hLow
+
+/-- Registered consumers for the payable transfer, uint128 wrapping, and
+ERC-7201 slot-determinism source facts (PR #671). -/
+theorem reserve_payable_call_frame_projections
+    (stakingRouterAddr amount selectorPrefix : Nat) :
+    (LidoSRv3.Audit.Source.ReservePayableCallSource.receiveDepositableEtherFrame
+        stakingRouterAddr amount selectorPrefix).target = stakingRouterAddr ∧
+    (LidoSRv3.Audit.Source.ReservePayableCallSource.receiveDepositableEtherFrame
+        stakingRouterAddr amount selectorPrefix).value = amount ∧
+    (LidoSRv3.Audit.Source.ReservePayableCallSource.receiveDepositableEtherFrame
+        stakingRouterAddr amount selectorPrefix).calldata = [] :=
+  ⟨LidoSRv3.Audit.Source.ReservePayableCallSource.receiveDepositableEtherFrame_target_eq
+      stakingRouterAddr amount selectorPrefix,
+   LidoSRv3.Audit.Source.ReservePayableCallSource.receiveDepositableEtherFrame_value_eq
+      stakingRouterAddr amount selectorPrefix,
+   LidoSRv3.Audit.Source.ReservePayableCallSource.receiveDepositableEtherFrame_calldata_eq
+      stakingRouterAddr amount selectorPrefix⟩
+
+theorem reserve_uint128_wrap_identities
+    (x a b : Nat)
+    (hSum : a + b < LidoSRv3.Audit.Source.SolidityUint128WrapSource.uint128Modulus) :
+    LidoSRv3.Audit.Source.SolidityUint128WrapSource.toUint128
+        (LidoSRv3.Audit.Source.SolidityUint128WrapSource.toUint128 x) =
+      LidoSRv3.Audit.Source.SolidityUint128WrapSource.toUint128 x ∧
+    LidoSRv3.Audit.Source.SolidityUint128WrapSource.checkedAddOverflow a b = false :=
+  ⟨LidoSRv3.Audit.Source.SolidityUint128WrapSource.toUint128_idem x,
+   LidoSRv3.Audit.Source.SolidityUint128WrapSource.checkedAddOverflow_false_of_bounded hSum⟩
+
+theorem reserve_erc7201_slot_deterministic
+    (oracle : LidoSRv3.Audit.Source.KeccakConcreteCommitmentSource.KeccakOracle)
+    (ns1 ns2 : String) (h : ns1 = ns2) :
+    LidoSRv3.Audit.Source.ERC7201StorageSlotSource.realERC7201BaseSlot oracle ns1 =
+      LidoSRv3.Audit.Source.ERC7201StorageSlotSource.realERC7201BaseSlot oracle ns2 :=
+  LidoSRv3.Audit.Source.ERC7201StorageSlotSource.realERC7201BaseSlot_deterministic
+    (oracle := oracle) (ns1 := ns1) (ns2 := ns2) h
+
+/-- Pinned internal target writer, Lido.sol:670-680. The target and effective
+reserve are distinct physical slots: increases are deferred; decreases are
+immediate. This consumes the existing executable writer correspondence and
+ordered event/balance observations. External ACL admission is a separate scope. -/
+theorem reserve_set_target_execution
+    (ctx : Source.TrioReserve1.Live.Context)
+    (before : Source.TrioReserve1.Live.World)
+    (requested : Source.TrioReserve1.Live.Word) :
+    let r := Source.TrioReserve1.Live.run
+      (Source.TrioReserve1.Live.setDepositsReserveTarget ctx requested) before
+    Source.TrioReserve1.WriterSpec.Target
+      (Source.TrioReserve1.Writers.project ctx before) requested.val
+      (Source.TrioReserve1.Writers.project ctx r.world) ∧
+    r.outcome = .ok () ∧ r.attempts = [] ∧ r.world.balances = before.balances ∧
+    r.world.logs = before.logs ++ [⟨ctx.self, "DepositsReserveTargetSet", [requested]⟩] ++
+      (if requested.val < (before.core.readContractSlot ctx.self.val
+          Source.TrioReserve1.Live.reserveSlot).val
+       then [⟨ctx.self, "DepositsReserveSet", [requested]⟩] else []) :=
+  ⟨Source.TrioReserve1.Writers.target_corresponds ctx before requested,
+   Source.TrioReserve1.Writers.target_observations ctx before requested⟩
+
+/-- Pinned internal report synchronization, Lido.sol:1125-1132. This writes
+max(reserve,target) to the effective reserve, preserves the buffer and target,
+and emits only when raising the reserve. It does not clear either packed
+report accumulator. Enclosing report execution remains a separate obligation. -/
+theorem reserve_update_buffered_allocation_execution
+    (ctx : Source.TrioReserve1.Live.Context)
+    (before : Source.TrioReserve1.Live.World) :
+    let r := Source.TrioReserve1.Live.run
+      (Source.TrioReserve1.Live.updateBufferedEtherAllocation ctx) before
+    Source.TrioReserve1.WriterSpec.Rebalance
+      (Source.TrioReserve1.Writers.project ctx before)
+      (Source.TrioReserve1.Writers.project ctx r.world) ∧
+    r.outcome = .ok () ∧ r.attempts = [] ∧ r.world.balances = before.balances ∧
+    r.world.logs = before.logs ++
+      (if (before.core.readContractSlot ctx.self.val Source.TrioReserve1.Live.reserveSlot).val <
+          (before.core.readContractSlot ctx.self.val Source.TrioReserve1.Live.targetSlot).val
+       then [⟨ctx.self, "DepositsReserveSet",
+         [before.core.readContractSlot ctx.self.val Source.TrioReserve1.Live.targetSlot]⟩]
+       else []) :=
+  ⟨Source.TrioReserve1.Writers.rebalance_corresponds ctx before,
+   Source.TrioReserve1.Writers.rebalance_observations ctx before⟩
 
 end LidoSRv3.Audit.Guarantees.PReserve1

@@ -98,7 +98,7 @@
       "LidoSRv3.Tests.SszDeclaredSiblingsRegression"
     ],
     "reproduction": {
-      "command": "lake build LidoSRv3.Audit.Guarantees.PSsz1 LidoSRv3.Audit.Guarantees.PSsz1CompiledClEntry LidoSRv3.Audit.Guarantees.PSsz1DeclaredSiblings LidoSRv3.Audit.Source.SszCompiledClEntry LidoSRv3.Audit.Source.SszDeclaredSiblings LidoSRv3.Audit.Verity.SszEncodingTx LidoSRv3.Tests.SszEncodingTxMutants LidoSRv3.Tests.SszRegression LidoSRv3.Tests.SszCompiledClEntryRegression LidoSRv3.Tests.SszDeclaredSiblingsRegression",
+      "command": "lake build LidoSRv3.Audit.Guarantees.PSsz1 LidoSRv3.Audit.Guarantees.PSsz1CompiledClEntry LidoSRv3.Audit.Guarantees.PSsz1DeclaredSiblings LidoSRv3.Audit.Source.SszCompiledClEntry LidoSRv3.Audit.Guarantees.Composition.SszDeclaredSiblings LidoSRv3.Audit.Verity.SszEncodingTx LidoSRv3.Tests.SszEncodingTxMutants LidoSRv3.Tests.SszRegression LidoSRv3.Tests.SszCompiledClEntryRegression LidoSRv3.Tests.SszDeclaredSiblingsRegression",
       "expected": "deposit_root_iff proves the named Spec SszWitness.Correspondence at .clValidatorVerifier; actual_compiled_cl_entry_complete_declared_branch proves that a successful SszCompiledClEntry.run (the compiled harness of _verifyValidator, selector 0x2e77b4ba) authenticates the calldata-decoded slot/proposer, one BEACON_ROOTS STATICCALL, its typed sourceWrapper generalized index, the pinned _validatorHashTreeRoot layout (48-byte key octets, decoded fields, calldata word 164), the independent Merkle branch fold from that leaf to the returned root's firstWord, and the complete ABI-declared sibling sequence (declaredWords = proof depth = log2 gindex, 3 ≤ length ≤ 247, penultimate sibling matches the paired slot/proposer chunk); the demoted verity_tx_simulates_ssz_encoding is preserved as the child P-SSZ-1.encoding-simulation on the traversal EncodingInput at gindex 2 with Nat.pair combine; composed_ssz_encoding and its kill-lines remain child evidence; SSZ encoding mutants, regression tests, compiled-entry regressions, and declared-siblings regressions build; SHA-256 remains A-SHA256-FFI"
     }
   },
@@ -133,11 +133,20 @@
     {
       "id": "A-RUNTIME-PROVENANCE",
       "severity": "MEDIUM",
-      "risk": "Canonical runtime, codehash, fork configuration, and address provenance are unavailable; Mock-derived evidence is non-production evidence.",
+      "risk": "Canonical runtime, codehash, fork configuration, and address provenance are unavailable in general; Mock-derived evidence is non-production evidence. Chantier 4 (Thomas 2026-09-13) narrows this for two deployed-runtime fixtures under `fixtures/deployed/` to exact identifiers: `WithdrawalVault_implementation` at `0xfB4521BD151BFB45DB6045D2d07e58e0f597e340` with EIP-1052 codehash `0xd1e0d1b48e4f5abd04bdfd14805366f0cf7946b7bb41b7a5ad8652361f3e3d36` (mainnet, block-independent at any block where the immutable code has not been upgraded — the implementation slot on the WithdrawalVault_proxy `0xB9D7934878B5FB9610B3fE8A5e441e8fad7E293f` points at this deployed runtime, and the runtime is not upgradeable); `StakingRouter_implementation` at `0xDD76927045435C7605cf6f5F978cfb8CABDb5F80` with codehash `0x9cd5d45ddde5f74d3867aa22c98fd79a85df89d202145bc588173d92e00600ec` (same block-independence rationale). Under `ETH_RPC_URL`, the `verify_*_immutable.py` scripts re-fetch and re-verify against the live chain, so a mismatch fails the build; without `ETH_RPC_URL`, they enforce the pinned codehash. Step 1c (Thomas 2026-09-17) extends the fixtures to `fixtures/deployed/srv3-identities.json`, recording by EIP-1052 codehash the SRLib library linked into the router (`0xc0be9942fd8f54ab126a5f0ba649a90049ccad14`) with its 21 PUSH20 link sites, the BeaconChainDepositor library (`0xf98ac162eab766bdb9507c3584c00c535b8f6216`, 3 sites), the MinFirstAllocationStrategy library linked into SRLib (`0x98f1da239a199574a4f7f371fd8fc0a872022c73`, 1 site), the implementations behind the four registered staking modules (NodeOperatorsRegistry/SimpleDVT `0x6828b023e737f96b168acd0b5c6351971a4f81ae`, CSModule `0x63992a86f009fcc796a8369feefb68880aef4e3a`, CuratedModuleV2 `0x959fc67fe53c8a6c7a1aed73430aa07a36ed9337`), the LidoLocator implementation (`0xf2ffb952e129a63f0614ff87126e1d4a494a2313`) and its withdrawalQueue/accountingOracle implementations (`0xe42c659dc09109566720ea8b2de186c2be7d94d9`, `0xe4f03d1107d1905b6f2a28fcb6af221e0ce19136`) and the AccountingOracle HashConsensus (`0xd624b08c83baecf0807dd2c6880c3154a5f0b288`); `scripts/verify_srv3_identities.py` enforces the fixture hashes and link-map offsets and, under `ETH_RPC_URL`, re-reads the proxies, `getStakingModules()`, the locator getters and the live code. For every other contract or configuration under this assumption, the generic reduction stands.",
       "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem. Chantier 4 (Thomas 2026-09-13) narrows this for the two deployed-runtime fixtures under `fixtures/deployed/` by recording their exact EIP-1052 EXTCODEHASH (keccak256 of the runtime bytecode) in `audit/artifacts.lock.json`: `WithdrawalVault_implementation` (0xfB4521BD151BFB45DB6045D2d07e58e0f597e340) codehash = 0xd1e0d1b48e4f5abd04bdfd14805366f0cf7946b7bb41b7a5ad8652361f3e3d36, `StakingRouter_implementation` (0xDD76927045435C7605cf6f5F978cfb8CABDb5F80) codehash = 0x9cd5d45ddde5f74d3867aa22c98fd79a85df89d202145bc588173d92e00600ec. That is the exact identifier `EXTCODEHASH <implementation>` on any Ethereum node returns for either implementation at any block where the code has not been upgraded. The `verify_*_immutable.py` scripts (invoked from `make test`) recompute keccak256 of the fixture and reject any mismatch; under `ETH_RPC_URL` they also refetch and re-verify against the live chain.",
       "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
       "validation": "Applies to every guarantee. scripts/check_deployed_code.py reads each proxy implementation slot, hashes the on-chain bytecode and compares the verified source with the pinned lido-core checkout; PROVENANCE.md explains the procedure. Chantier 4 additions: for the two deployed-runtime fixtures the exact EIP-1052 codehash is recorded (see `justification`) and enforced by `scripts/verify_beacon_deposit_immutable.py`, `scripts/verify_consolidation_request_immutable.py`, and `scripts/verify_deposit_thirty_two_ether.py` (all three are `make test` targets). A mismatch between the recomputed keccak256 and the recorded codehash fails the build; `ETH_RPC_URL` enables live re-verification against the current chain state.",
-      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface. Chantier 4 (Thomas 2026-09-13) narrows the runtime-identity strand for two deployed fixtures to the exact EIP-1052 codehash values above; historical block-number binding and the remaining contracts remain follow-up work."
+      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface. Chantier 4 (Thomas 2026-09-13) narrows the runtime-identity strand for two deployed fixtures to the exact EIP-1052 codehash values above; step 1c (Thomas 2026-09-17) adds the SRLib/BeaconChainDepositor/MinFirstAllocationStrategy link map, the registered module implementations and the locator/queue/oracle/consensus identities by codehash (`fixtures/deployed/srv3-identities.json`); historical block-number binding, constructor configuration and the remaining contracts remain follow-up work."
+    },
+    {
+      "id": "A-EIP4788-AUTHENTIC",
+      "severity": "HIGH",
+      "risk": "The accepted BEACON_ROOTS external interpreter is assumed to return the authentic EIP-4788 beacon root for the requested timestamp. The history-ring implementation and its deployed behavior are not proved.",
+      "justification": "Names an existing environment boundary and the explicit hypothesis of gateway_witness_admission_authentic_root. This registration does not change a theorem or prove the boundary.",
+      "violation_impact": "A Merkle branch may verify against bytes supplied by the interpreter without establishing membership under the authentic beacon root.",
+      "validation": "Check the timestamp/request and returned-word correspondence in the existing SSZ and consolidation theorems. The canonical address alone does not establish history authenticity.",
+      "removal_path": "Future work: prove the EIP-4788 history-ring interpreter and bind it to the deployed predeploy; outside the current delivery scope."
     }
   ],
   "fidelity": {
@@ -160,14 +169,14 @@
     ],
     "missing": [
       "SSZ.verifyProof on production gindices",
-      "SHA-256 functional correctness of the opaque model/precompile symbol",
+      "SHA-256 functional correctness of the opaque model/precompile symbol (PERMANENT ASSUMPTION A-SHA256-FFI, relabelled 2026-09-19 from an open obligation to the card's Assumed line; no refinement is claimed)",
       "refinement equating the opaque sha256 symbol with Sha256Engine.sha256 used by the abstract digest child",
       "imported-to-deployed helper/wrapper Yul fragment binding",
-      "the state-root anchor (lhs), the concat operand's pow byte (rhsPow), and the tx child's fork version / claimed root remain independently supplied, non-deposit chain-level values",
+      "the state-root anchor (lhs), the concat operand's pow byte (rhsPow), and the tx child's fork version / claimed root remain independently supplied, non-deposit chain-level values (composition half CLOSED 2026-09-19: the verifier's typed model is consumed inside the whole consolidation gateway run by GatewayWitnessAdmission / WitnessProof.validateAll against the EIP-4788 root read in that run; residual: the deposit chain's anchor, pow byte and fork/claimed-root values stay supplied inputs of the SSZ child)",
       "the general Verity EncodingInput API still permits independent fields, but verity_tx_one_object_matches_sourceView provides a TX-level derived-input theorem from one ComposedSszInput",
       "chantier 3 disclosure (mandate 2026-09-12): the demoted parent verity_tx_simulates_ssz_encoding (child P-SSZ-1.encoding-simulation) still models a dummy validator at gindex 2 with an injective Nat.pair combine — an object CLValidatorVerifier._verifyValidator never checks; it is retained only as child regression evidence and is not the registered Verity parent of P-SSZ-1",
       "chantier 3 disclosure (mandate 2026-09-12): the new registered parent actual_compiled_cl_entry_complete_declared_branch consumes ShaWidth (SszProofCommitted.ShaWidth) as an inherited SHA-output-width side condition on the opaque engine.sha256 FFI; SHA-256 functional correctness of that opaque symbol remains A-SHA256-FFI, and no refinement to an independently certified SHA-256/precompile has been proved",
-      "chantier 3 disclosure (mandate 2026-09-12): EIP-4788 history-ring authenticity is not represented; the BEACON_ROOTS callee is the accepted StaticCall.External interpreter on typed Live.World rather than the pinned EIP-4788 precompile contract, and its return bytes are threaded as the branch root without a live-deployment or codehash binding"
+      "EIP-4788 history-ring authenticity (A-EIP4788-AUTHENTIC; PERMANENT ASSUMPTION relabelled 2026-09-19 to the card's Assumed line; consumed as the explicit hypothesis of gateway_witness_admission_authentic_root). chantier 3 disclosure (mandate 2026-09-12): EIP-4788 history-ring authenticity is not represented; the BEACON_ROOTS callee is the accepted StaticCall.External interpreter on typed Live.World rather than the pinned EIP-4788 precompile contract, and its return bytes are threaded as the branch root without a live-deployment or codehash binding"
     ],
     "open_gap_count": 9
   },
@@ -283,22 +292,6 @@
       "end_line": 22,
       "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
       "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/lib/BeaconChainDepositor.sol#L22-L22"
-    },
-    {
-      "path": "contracts/0.8.25/lib/BeaconChainDepositor.sol",
-      "function": "SHA256_DIGEST_LENGTH and zero padding literals",
-      "start_line": 126,
-      "end_line": 133,
-      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
-      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/lib/BeaconChainDepositor.sol#L126-L133"
-    },
-    {
-      "path": "contracts/0.8.25/lib/BeaconChainDepositor.sol",
-      "function": "DEPOSIT_DATA_LENGTH ABI input shape",
-      "start_line": 120,
-      "end_line": 135,
-      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
-      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/lib/BeaconChainDepositor.sol#L120-L135"
     }
   ],
   "boundary": {
@@ -307,18 +300,19 @@
       "The subject is a Lean model of Staking Router v3, written against pinned source lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436.",
       "No theorem here binds to deployed bytecode, a runtime codehash, a constructor, or a chain address. The SRv3 contracts are deployed on mainnet with lidofinance/core v4.0.0 (2026-07-24; StakingRouter proxy 0xFdDf38947aFB03C621C71b06C9C70bce73f12999, TopUpGateway proxy 0x3FC2C71579D80790Aaa3fc7Be8B66ac39dC57374); the theorems still speak about the model, not about that deployment.",
       "CHECKED means *the named Lean theorem builds*. It does not mean audited, verified on chain, or closed.",
-      "Every row below still has open fidelity gaps — 107 in total. The last column counts them per row; audit/guarantees.yaml names each one."
+      "Every row below still has open fidelity gaps — 85 in total. The last column counts them per row; audit/guarantees.yaml names each one.",
+      "CHECKED is conditional, and one gap has no theorem to compose. Every row is proved under named premises — the named-premises table below gives them per row, and A-SHA256-FFI and A-EIP4788-AUTHENTIC are HIGH severity. The P-ADDRESS-1 live equivariance of the transferFrom, requestWithdrawals and unwrap bodies is a named gap, not a discharged one."
     ],
     "not_covered": [
       "SSZ.verifyProof on production gindices",
-      "SHA-256 functional correctness of the opaque model/precompile symbol",
+      "SHA-256 functional correctness of the opaque model/precompile symbol (PERMANENT ASSUMPTION A-SHA256-FFI, relabelled 2026-09-19 from an open obligation to the card's Assumed line; no refinement is claimed)",
       "refinement equating the opaque sha256 symbol with Sha256Engine.sha256 used by the abstract digest child",
       "imported-to-deployed helper/wrapper Yul fragment binding",
-      "the state-root anchor (lhs), the concat operand's pow byte (rhsPow), and the tx child's fork version / claimed root remain independently supplied, non-deposit chain-level values",
+      "the state-root anchor (lhs), the concat operand's pow byte (rhsPow), and the tx child's fork version / claimed root remain independently supplied, non-deposit chain-level values (composition half CLOSED 2026-09-19: the verifier's typed model is consumed inside the whole consolidation gateway run by GatewayWitnessAdmission / WitnessProof.validateAll against the EIP-4788 root read in that run; residual: the deposit chain's anchor, pow byte and fork/claimed-root values stay supplied inputs of the SSZ child)",
       "the general Verity EncodingInput API still permits independent fields, but verity_tx_one_object_matches_sourceView provides a TX-level derived-input theorem from one ComposedSszInput",
       "chantier 3 disclosure (mandate 2026-09-12): the demoted parent verity_tx_simulates_ssz_encoding (child P-SSZ-1.encoding-simulation) still models a dummy validator at gindex 2 with an injective Nat.pair combine — an object CLValidatorVerifier._verifyValidator never checks; it is retained only as child regression evidence and is not the registered Verity parent of P-SSZ-1",
       "chantier 3 disclosure (mandate 2026-09-12): the new registered parent actual_compiled_cl_entry_complete_declared_branch consumes ShaWidth (SszProofCommitted.ShaWidth) as an inherited SHA-output-width side condition on the opaque engine.sha256 FFI; SHA-256 functional correctness of that opaque symbol remains A-SHA256-FFI, and no refinement to an independently certified SHA-256/precompile has been proved",
-      "chantier 3 disclosure (mandate 2026-09-12): EIP-4788 history-ring authenticity is not represented; the BEACON_ROOTS callee is the accepted StaticCall.External interpreter on typed Live.World rather than the pinned EIP-4788 precompile contract, and its return bytes are threaded as the branch root without a live-deployment or codehash binding"
+      "EIP-4788 history-ring authenticity (A-EIP4788-AUTHENTIC; PERMANENT ASSUMPTION relabelled 2026-09-19 to the card's Assumed line; consumed as the explicit hypothesis of gateway_witness_admission_authentic_root). chantier 3 disclosure (mandate 2026-09-12): EIP-4788 history-ring authenticity is not represented; the BEACON_ROOTS callee is the accepted StaticCall.External interpreter on typed Live.World rather than the pinned EIP-4788 precompile contract, and its return bytes are threaded as the branch root without a live-deployment or codehash binding"
     ]
   }
 }

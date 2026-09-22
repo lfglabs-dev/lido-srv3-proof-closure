@@ -1,3 +1,10 @@
+-- Explicit trust accounting for the separately published superseded P1–P15 receipt.
+-- This import is confined to Trust; production remains independent of Legacy.
+import LidoSRv3.Legacy.SpecProofs
+import LidoSRv3.Tests.SigningKeysMemory
+import LidoSRv3.Tests.NodeOperatorsRegistrySummary
+import LidoSRv3.Audit.Verity.OfficialSemantics
+import LidoSRv3.Audit.AllGuarantees
 import LidoSRv3.Tests.SszDeclaredSiblingsRegression
 import LidoSRv3.Tests.TopupRouterAdmissionCallRegression
 import LidoSRv3.Tests.DepositAdmissionErrorsRegression
@@ -46,11 +53,15 @@ import LidoSRv3.Tests.DepositPhysicalMetadataRegression
 import LidoSRv3.Audit.Guarantees.PDeposit1PhysicalMetadata
 import LidoSRv3.Tests.ConsolidationGatewayCallRegression
 import LidoSRv3.Audit.Guarantees.PConsolidation1ActualGatewayVault
+import LidoSRv3.Audit.Guarantees.PConsolidation1GatewayAdmission
+import LidoSRv3.Audit.Guarantees.PConsolidation1WitnessAdmission
+import LidoSRv3.Tests.TrioConsolidation.GatewayAdmission
 import LidoSRv3.Audit.Guarantees.PTopup1ActualBatch
 import LidoSRv3.Audit.Guarantees.PTopup1ActualContinuation
 import LidoSRv3.Audit.Guarantees.PSsz1ActualDeposit
 import LidoSRv3.Audit.Guarantees.PDeposit1ActualPipeline
 import LidoSRv3.Audit.Source.TrioAlloc1.Determinism
+import LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer
 import LidoSRv3.Audit.Source.TrioAlloc1.CapacitySpec
 import LidoSRv3.Audit.Source.TrioAlloc2.LoopCorrespondence
 import LidoSRv3.Audit.Source.TrioComposition.FinalMemoryStoredParent
@@ -61,6 +72,7 @@ import LidoSRv3.Audit.Source.TrioReserve1.PhysicalReserve
 import LidoSRv3.Audit.Source.TrioReserve1.PhysicalSequence
 import LidoSRv3.Audit.Source.TrioReserve1.AllocationFlow
 import LidoSRv3.Audit.Source.TrioReserve1.Transfers
+import LidoSRv3.Audit.Source.TrioReserve1.WithdrawalSpec
 import LidoSRv3.Audit.Guarantees.PEthConfinement1
 import LidoSRv3.Audit.Guarantees.PMintConsumer1
 import LidoSRv3.Tests.EthConfinementMutants
@@ -117,7 +129,27 @@ import LidoSRv3.Audit.Guarantees.PConsolidationEth1CLProofPremise
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1AbiBridgePremise
 import LidoSRv3.Audit.Source.ConsolidationFeeStaticcallSource
 import LidoSRv3.Audit.Guarantees.PAlloc1RemainingBoundsScaffold
-import LidoSRv3.Audit.Source.StakingModuleRegistrySource
+import LidoSRv3.Audit.Guarantees.PAlloc1CheckedBoundsFromModules
+import LidoSRv3.Audit.Source.NoReentry
+import LidoSRv3.Audit.Guarantees.PDeposit1NoReentry
+import LidoSRv3.Audit.Guarantees.PTopup1NoReentry
+import LidoSRv3.Audit.Guarantees.PReserve1NoReentry
+import LidoSRv3.Audit.Guarantees.PConsolidationEth1NoReentry
+import LidoSRv3.Audit.Guarantees.PAddress1NoReentry
+import LidoSRv3.Audit.Guarantees.PTopup2SameBlock
+import LidoSRv3.Audit.Guarantees.PTopup2ValidatorChecks
+import LidoSRv3.Audit.Guarantees.PAccount1SubmitReportGuards
+import LidoSRv3.Audit.Guarantees.POracleSupply1EntryGuards
+import LidoSRv3.Audit.Guarantees.PConsolidation1VaultLazy
+import LidoSRv3.Audit.Guarantees.PTopup1AllocationViewsSeated
+import LidoSRv3.Audit.Guarantees.PTopup2ConfigNoReentry
+import LidoSRv3.Audit.Guarantees.PAddress1LiveRenaming
+import LidoSRv3.Audit.Guarantees.PTopup1AllocationViews
+import LidoSRv3.Audit.Guarantees.PDeposit1AllocationViews
+import LidoSRv3.Audit.Guarantees.PAccount1SubmitReport
+import LidoSRv3.Audit.Source.TrioComposition.AllocSeam
+import LidoSRv3.Audit.Guarantees.PReserve1TargetAdmission
+import LidoSRv3.Audit.Guarantees.PConsolidation1VaultCalldata
 import LidoSRv3.Audit.Guarantees.PAlloc1Phase3
 import LidoSRv3.Audit.Guarantees.PAlloc2
 import LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound
@@ -139,7 +171,7 @@ import LidoSRv3.Audit.Verity.PConsolidationEth1RequestTx
 import LidoSRv3.Tests.PConsolidationEth1RefundTxMutants
 import LidoSRv3.Tests.PConsolidationEth1RequestTxMutants
 import LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants
-import LidoSRv3.Audit.Verity.ConsolidationEthUnboundedFuel
+import LidoSRv3.Audit.Guarantees.Composition.ConsolidationEthUnboundedFuel
 import LidoSRv3.Tests.ConsolidationEthUnboundedFuelMutants
 import LidoSRv3.Audit.Guarantees.PSsz1
 import LidoSRv3.Audit.Verity.SszEncodingTx
@@ -182,28 +214,28 @@ import LidoSRv3.Audit.Verity.ConsolidationFee
 import LidoSRv3.Audit.Provenance.Deposit
 import LidoSRv3.Tests.PackGDepositProvenanceMutants
 import LidoSRv3.Audit.Provenance.TopupBeacon
-import LidoSRv3.Audit.Provenance.TopupNoWrapOrphaned
-import LidoSRv3.Audit.Provenance.SszPerfectHashOrphaned
-import LidoSRv3.Audit.Provenance.SszSha256Isolation
-import LidoSRv3.Audit.Provenance.HandwrittenMinFirstOrphaned
-import LidoSRv3.Audit.Provenance.AbstractTxIsolation
+import LidoSRv3.Audit.Guarantees.Composition.TopupNoWrapOrphaned
+import LidoSRv3.Audit.Guarantees.Composition.SszPerfectHashOrphaned
+import LidoSRv3.Audit.Guarantees.Composition.SszSha256Isolation
+import LidoSRv3.Audit.Guarantees.Composition.HandwrittenMinFirstOrphaned
+import LidoSRv3.Audit.Guarantees.Composition.AbstractTxIsolation
 import LidoSRv3.Audit.Source.AddressSingleton
-import LidoSRv3.Audit.Source.ReserveUnfinalizedCall
+import LidoSRv3.Audit.Guarantees.Composition.ReserveUnfinalizedCall
 import LidoSRv3.Audit.Source.AccountFeeShares
-import LidoSRv3.Audit.Source.AccountPackedWords
+import LidoSRv3.Audit.Guarantees.Composition.AccountPackedWords
 import LidoSRv3.Tests.AccountPackedWordsMutants
-import LidoSRv3.Audit.Verity.TopupUnboundedCount
-import LidoSRv3.Audit.Verity.TopupMultiCallBlockCap
+import LidoSRv3.Audit.Guarantees.Composition.TopupUnboundedCount
+import LidoSRv3.Audit.Guarantees.Composition.TopupMultiCallBlockCap
 import LidoSRv3.Audit.Verity.AddressClaimBatchUnbounded
-import LidoSRv3.Audit.Spec.AllocLoopTermination
-import LidoSRv3.Audit.Source.DepositLinksSource
+import LidoSRv3.Audit.Verity.AllocLoopTermination
+import LidoSRv3.Audit.Guarantees.Composition.DepositLinksSource
 import LidoSRv3.Tests.PackGTopupProvenanceMutants
 import LidoSRv3.Audit.Provenance.ConsolidationRequest
-import LidoSRv3.Audit.Provenance.CanonicalRequestAddress
-import LidoSRv3.Audit.Provenance.BeaconDepositAddress
+import LidoSRv3.Audit.Guarantees.Composition.CanonicalRequestAddress
+import LidoSRv3.Audit.Guarantees.Composition.BeaconDepositAddress
 import LidoSRv3.Audit.Provenance.LidoAddress
 import LidoSRv3.Audit.Provenance.DepositThirtyTwoEther
-import LidoSRv3.Audit.Provenance.DepositAbstractTxOrphaned
+import LidoSRv3.Audit.Guarantees.Composition.DepositAbstractTxOrphaned
 import LidoSRv3.Tests.PackGEth1ProvenanceMutants
 import LidoSRv3.Audit.Spec.DepositEthJournalCorrespondence
 import LidoSRv3.Tests.PackJDepositEthJournalMutants
@@ -266,7 +298,7 @@ import LidoSRv3.Tests.AddressRequestCalls
 import LidoSRv3.Audit.Source.AccountingCorrespondence
 import LidoSRv3.Audit.Source.AddressCorrespondence
 import LidoSRv3.Audit.Source.TopupPointerOrigin
-import LidoSRv3.Audit.Source.TopupKeccakOracle
+import LidoSRv3.Audit.Guarantees.Composition.TopupKeccakOracle
 import LidoSRv3.Audit.Source.AllocCapacityCorrespondence
 import LidoSRv3.Audit.Source.BeaconRootsCorrespondence
 import LidoSRv3.Audit.Source.MinFirstAmountCorrespondence
@@ -371,6 +403,7 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Spec.OracleFrameCorrespondence.account_parent_remains_order_only
 #print axioms LidoSRv3.Audit.Spec.OracleFrameCorrespondence.eugene_bound_cited
 #print axioms LidoSRv3.Tests.PackEOracleFrameMutants.computed_fee_kill_line_refutes_oracle_frame
+-- The synthetic-map payload witness was retired with its observation slots.
 #print axioms LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.abstract_flow_refinement
 -- ConsolidationAbstractFlowModel structural family: `forward_compiles`
 -- documents the forward-flow compilation identity; `payload_length`
@@ -508,18 +541,11 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAddressBatch1.p_address_batch_1_fuel_bounded_live_claim_batch
 #print axioms LidoSRv3.Audit.Guarantees.PAddressBatch1.p_address_batch_1_unbounded_recipient_rename
 #print axioms LidoSRv3.Audit.Guarantees.PAddressBatch1.p_address_batch_1_fuel_bounded_recipient_rename
--- Physical PhysicalClaimSlots invariant identity: every state satisfies
--- the physical-slot invariant by definition of the live executable
--- lenses (proved by ⟨rfl, rfl, rfl, rfl⟩). The related
--- `physical_queue_slots_are_keccak_derivation`,
--- `physical_checkpoint_slots_are_keccak_derivation`, and
--- `p_address_batch_1_physical_keccak_slots` identities each additionally
--- depend on `Compiler.Proofs.solidityMappingSlot_injective` — a Verity
--- library axiom outside the check_trust_axioms.py allowed set — so
--- they are intentionally not disclosed here. The underlying theorems
--- still exist in `AddressClaimKeccakSlots` / `PAddressBatch1`; only
--- their axiom disclosure is restricted to keep the Trust surface
--- inside the foundations-only boundary the checker enforces.
+-- Slot identities are definitional. The two map-separation results carry
+-- explicit non-collision premises rather than a Keccak injectivity axiom.
+#print axioms LidoSRv3.Audit.Spec.AddressClaimKeccakSlots.physical_queue_slots_are_keccak_derivation
+#print axioms LidoSRv3.Audit.Spec.AddressClaimKeccakSlots.physical_checkpoint_slots_are_keccak_derivation
+#print axioms LidoSRv3.Audit.Guarantees.PAddressBatch1.p_address_batch_1_physical_keccak_slots
 #print axioms LidoSRv3.Audit.Spec.AddressClaimKeccakSlots.physical_claim_slots
 #print axioms LidoSRv3.Tests.PackN4AddressBatchMutants.swapped_three_payout_order_kill_line_refutes_parent
 #print axioms LidoSRv3.Tests.PackN4AddressBatchMutants.fixed_dest_rename_kill_line_refutes_parent
@@ -686,9 +712,9 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- (no in-scope caller run derives it), and the packed source/target
 -- concat order is refuted by a swapped-order witness. Each pins its
 -- parent hypothesis as necessary rather than accidentally satisfied.
--- (`fee_blind_commit_kill_line_refutes_parent` is intentionally kept
--- out of this disclosure: its `native_decide` dependencies are not
--- in the accepted test/mutant-only disclosure set.)
+-- The fee-blind counterexample is also individually disclosed; native-backed
+-- supporting claims cannot be omitted to keep the observed inventory small.
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1.fee_blind_commit_kill_line_refutes_parent
 #print axioms
   LidoSRv3.Audit.Guarantees.PConsolidation1.gateway_admitted_nonzero_kill_line
 #print axioms
@@ -969,9 +995,44 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- Fourth-step (2026-09-13): Aragon ACL hasRole via ACL mapping decoder.
 #print axioms LidoSRv3.Audit.Source.AragonACLSource.hasRole_true_of_mapping_nonzero
 -- Second-step (2026-09-13): P-ALLOC-1 per-module uint64 field bounds.
-#print axioms LidoSRv3.Audit.Source.StakingModuleRegistrySource.moduleFields_bounded_by_uint64
 -- Third-step (2026-09-13): P-ALLOC-1 SR monotonicity invariant (active_subtraction).
-#print axioms LidoSRv3.Audit.Source.StakingModuleRegistrySource.active_subtraction_bound_of_sr_monotonicity
+-- A-SUPPORTED-MODULES (Thomas 2026-09-17, step 1a): PAlloc1CheckedBoundsFromModules
+-- composes NodeOperatorsRegistry.counterSum_lt_word (exact uint256 replies under
+-- the 200-operator cap), SRStorageExitedMonotonicity.reachable_state_is_monotone
+-- (admitted-writer histories keep exited <= deposited) and the three pinned
+-- type-bound lemmas into CheckedBounds; the premise SupportedModules is the
+-- accepted assumption, not a theorem about the deployed modules.
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.counterSum_lt_word
+#print axioms LidoSRv3.Audit.Source.SRStorageExitedMonotonicity.reachable_state_is_monotone
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc1CheckedBoundsFromModules.active_subtraction_of_supported
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc1CheckedBoundsFromModules.checkedBounds_of_supportedModules
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc1CheckedBoundsFromModules.checked_execute_under_supported_modules
+-- A-NO-REENTRY (Thomas 2026-09-17, step 1b): Source/NoReentry names the premise on
+-- the Live external-call interpreter (calls targeting the protected addresses are
+-- rejected; accepted replies return the protected storage/balances unchanged; no
+-- accepted nested call into them). Corollaries of the five exact-returned-world
+-- parents: DEPOSIT-1, TOPUP-1, RESERVE-1 (final reserve), ETH-1 (gateway/vault
+-- storage after settlement) and ADDRESS-1 (claimed bit after the recipient CALL).
+-- The premise is the accepted assumption, not a theorem about deployed callees.
+#print axioms LidoSRv3.Audit.Source.NoReentry.call_storage
+#print axioms LidoSRv3.Audit.Source.NoReentry.call_balance
+#print axioms LidoSRv3.Audit.Source.NoReentry.call_self_rejected
+#print axioms LidoSRv3.Audit.Source.NoReentry.call_nested_rejects
+#print axioms LidoSRv3.Audit.Source.NoReentry.confined_of_noReentry
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1NoReentry.actual_physical_metadata_conserves_no_reentry
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1NoReentry.actual_continuation_locator_conserves_no_reentry
+#print axioms LidoSRv3.Audit.Guarantees.PReserve1NoReentry.withdraw_success_final_reserve
+#print axioms LidoSRv3.Audit.Guarantees.PReserve1NoReentry.actual_reserve_history_final_reserve
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1NoReentry.settlement_preserves_gateway_and_vault_storage
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1NoReentry.claim_returns_committed_storage
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1NoReentry.actual_claim_batch_no_reentry
+-- P-ADDRESS-1 live renaming (step 3c, 2026-09-19): renaming sender and
+-- request owners commutes with the registered live claim batch for every
+-- abstract LiveRenaming of the queue world and every equivariant recipient
+-- callee; committed batches, their claim chains and the A-NO-REENTRY
+-- transcript transport.
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1LiveRenaming.runClaimWithdrawalsTo_rename
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1LiveRenaming.actual_claim_batch_rename
 -- General rule (Thomas 2026-09-12) applied to P-CONSOLIDATION-ETH-1
 -- feePerRequest free Nat: naming scaffold PinnedFeeStaticcallShape
 -- names the pinned WithdrawalVaultEIP7685.sol:79-81 STATICCALL entry
@@ -1163,7 +1224,6 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 -- conjuncts (2026-09-13): source-level StakingModuleRegistryState names
 -- the pinned SRLib.sol Module-struct type bounds + MAX_STAKING_MODULES_COUNT
 -- = 32 registry invariant.
-#print axioms LidoSRv3.Audit.Source.StakingModuleRegistrySource.moduleCount_bounded_of_registry_state
 #print axioms LidoSRv3.Tests.ConsolidationEthUnboundedFuelMutants.truncated_fuel_batchSize_plus_three_exhausted
 #print axioms LidoSRv3.Tests.ConsolidationEthUnboundedFuelMutants.truncated_fuel_must_be_refused
 #print axioms LidoSRv3.Tests.ConsolidationEthUnboundedFuelMutants.parent_fuel_premise_excludes_batch_29
@@ -1692,6 +1752,17 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms audit.trio.consolidation.PhysicalEntrySettlement.gates_success
 #print axioms audit.trio.consolidation.PhysicalEntrySettlement.execute_success
 #print axioms audit.trio.consolidation.PhysicalEntrySettlement.failure_restores
+-- Step 3a (2026-09-18): the gateway's DSM/locator/witness prefix executed on
+-- the entry World before the physical entry (ConsolidationGateway.sol:201-207).
+#print axioms audit.trio.consolidation.GatewayPreconditions.preconditions_success
+#print axioms audit.trio.consolidation.GatewayPreconditions.vaultData_success
+#print axioms audit.trio.consolidation.GatewayAdmission.prefix_success
+#print axioms audit.trio.consolidation.GatewayAdmission.execute_success
+#print axioms audit.trio.consolidation.GatewayAdmission.failure_restores
+#print axioms audit.trio.consolidation.WitnessProof.validate_success
+#print axioms audit.trio.consolidation.WitnessProof.validateAll_success
+#print axioms audit.trio.consolidation.GatewayWitnessAdmission.execute_success
+#print axioms audit.trio.consolidation.GatewayWitnessAdmission.failure_restores
 
 -- Exact deposit admission error origins consume the complete DSM suffix.
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.actual_dsm_call_admission_bytes_suffix
@@ -1972,9 +2043,7 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.PackN4AddressBatchMutants.fixed_dest_unbounded_rename_kill_line
 #print axioms LidoSRv3.Tests.PackN4AddressBatchMutants.three_claim_batch_ready
 #print axioms LidoSRv3.Tests.PackN4AddressBatchMutants.three_claim_batch_parent_instance
--- (plus_one_channel_is_a_different_keccak_map intentionally kept out:
--- transitively depends on `Compiler.Proofs.solidityMappingSlot_injective`
--- which is outside the check_trust_axioms.py allowlist.)
+#print axioms LidoSRv3.Tests.PackN4AddressBatchMutants.plus_one_channel_is_a_different_keccak_map
 #print axioms LidoSRv3.Tests.PackN6ConsolValueMutants.zero_value_call_sum
 
 -- MinFirstDistributionTx x3: `sourceAllocateLoop_eq_allocateLoop`
@@ -2022,10 +2091,16 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Verity.SubmitReportEntryTx.entry_reverts_on_hash_mismatch
 #print axioms LidoSRv3.Audit.Verity.SubmitReportEntryTx.entry_observe_simulates_source_at_computed_mint
 
--- (OfficialSemantics checkedFold_* / wrappingMutant_is_detected all
--- rely on `native_decide` transitively and are intentionally kept
--- out of this disclosure to keep the Trust surface inside the
--- foundations-only boundary the checker enforces.)
+-- OfficialSemantics is a synthetic compiler/denotation smoke test, not a
+-- Lido source-correspondence theorem. The repaired kernel proofs are included
+-- in the dependency inventory; no native decision axiom is expected.
+#print axioms LidoSRv3.Audit.Verity.OfficialSemantics.checkedFold_evaluates
+#print axioms LidoSRv3.Audit.Verity.OfficialSemantics.checkedFold_updates_modules_in_order
+#print axioms LidoSRv3.Audit.Verity.OfficialSemantics.checkedFold_overflow_reverts
+#print axioms LidoSRv3.Audit.Verity.OfficialSemantics.wrappingMutant_is_detected
+#print axioms LidoSRv3.Audit.Verity.OfficialSemantics.checkedFold_validates
+#print axioms LidoSRv3.Audit.Verity.OfficialSemantics.checkedFold_inputs_validate
+#print axioms LidoSRv3.Audit.Verity.OfficialSemantics.checkedFold_compiles_to_official_ir
 
 -- A-TOPUP-NOWRAP orphanage proof (see
 -- `audit/findings/A-TOPUP-NOWRAP-orphaned.md`): the two registered
@@ -2186,6 +2261,141 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Verity.TopupMultiCallBlockCap.setter_refuses_zero
 #print axioms LidoSRv3.Audit.Verity.TopupMultiCallBlockCap.no_lock_two_call_exceeds_cap
 #print axioms LidoSRv3.Audit.Verity.TopupMultiCallBlockCap.router_only_two_call_exceeds_cap
+-- P-TOPUP-2 same-block bound on the actual consumer (Thomas 2026-09-18,
+-- step 2c): the historical `runMany` argument ported to repeated
+-- `TopupBatchConsumer.run`, with the gateway's `lastTopUpBlock` and
+-- `minBlockDistance` read from its packed storage word and the history
+-- write conditioned on the loop's `totalLimits`. Premises: nonzero uint32
+-- block, `minBlockDistance ≥ 1` at entry, and `ConfigStable` (the batch's
+-- callees leave the gateway distance field and the router cap unchanged).
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2SameBlock.consume_success
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2SameBlock.allocated_le_cap
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2SameBlock.allocated_le_totalLimits
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2SameBlock.lock_lastBlock
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2SameBlock.lock_minDistance
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2SameBlock.locked_blocks
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2SameBlock.runMany_locked
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2SameBlock.same_block_actual_batches_le_cap
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2SameBlock.same_block_actual_batches_le_blockCap
+-- P-TOPUP-2 validator pre-checks (Thomas 2026-09-18, step 2d): the registered
+-- admission chain reaches its module-reply seam only with a 0x02 credential
+-- word and 48-byte pubkeys; every other shape is rejected at its stage with
+-- the entry world and no module CALL.
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2ValidatorChecks.loop_success_pubkeys
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2ValidatorChecks.seam_shapes
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2ValidatorChecks.seam_pubkeys
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2ValidatorChecks.wrong_credential_type_rejected
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2ValidatorChecks.wrong_pubkey_length_rejected
+-- P-TOPUP-2 ConfigStable from A-NO-REENTRY (caveat C1, 2026-09-19): the
+-- same-block bound's callee premise is derived for the gateway word and, up
+-- to the router's own receiveDepositableEther callback, for the router cap.
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2ConfigNoReentry.configStable_of_noReentry
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2ConfigNoReentry.same_block_actual_batches_le_cap_no_reentry
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2ConfigNoReentry.same_block_actual_batches_le_blockCap_no_reentry
+-- P-CONSOLIDATION-1 malformed calldata (Thomas 2026-09-18, step 2f): the vault
+-- argument decoder is characterized on every calldata against Solidity's lazy
+-- bytes[] calldata accessor (sound, complete, total); a non-well-formed block
+-- is rejected by the vault dispatcher before the fee quote, the request loop
+-- and every state change.
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1VaultCalldata.decodeOffsetSeq_access
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1VaultCalldata.decodeOffsetSeq_none
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1VaultCalldata.decodeOffsetSeq_of_access
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1VaultCalldata.decodeVaultArgs_iff
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1VaultCalldata.decodeVaultArgs_total
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1VaultCalldata.vault_rejects_malformed
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1VaultCalldata.vault_reply_well_formed
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1VaultCalldata.gateway_args_well_formed
+-- P-CONSOLIDATION-1 lazy calldata accessors (caveat C3, 2026-09-19): the
+-- lazy vault dispatcher equals the eager one on well-formed argument blocks
+-- and rejects exactly when it rejects; the difference is confined to revert
+-- data and attempt trace.
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1VaultLazy.lazy_eq_eager_wellFormed
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1VaultLazy.lazy_rejects_malformed
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1VaultLazy.eager_caller_restored
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1VaultLazy.lazy_caller_restored
+-- P-RESERVE-1 reserve-target access control (Thomas 2026-09-18, step 2e):
+-- the public setter's Aragon `_auth` (kernel/ACL CALL) is an admission stage
+-- of the physical writer history; denial and admission follow from the stored
+-- permission graph.
+#print axioms LidoSRv3.Audit.Guarantees.PReserve1TargetAdmission.target_success
+#print axioms LidoSRv3.Audit.Guarantees.PReserve1TargetAdmission.target_denied
+#print axioms LidoSRv3.Audit.Guarantees.PReserve1TargetAdmission.guarded_step
+#print axioms LidoSRv3.Audit.Guarantees.PReserve1TargetAdmission.actual_reserve_guarded_history
+#print axioms LidoSRv3.Audit.Guarantees.PReserve1TargetAdmission.actual_reserve_guarded_physical_history
+#print axioms LidoSRv3.Audit.Guarantees.PReserve1TargetAdmission.physical_target_denied
+#print axioms LidoSRv3.Audit.Guarantees.PReserve1TargetAdmission.physical_target_allowed
+-- P-ALLOC-2 seam from P-ALLOC-1 (Thomas 2026-09-18, step 2a): the rows of a
+-- successful executed capacity producer satisfy RowsCorrespond, candidate
+-- agreement, openness of the selected candidate and the length bound; the
+-- registered step theorem is instantiated on them.
+#print axioms LidoSRv3.Audit.Source.TrioComposition.AllocSeam.toWord_val
+#print axioms LidoSRv3.Audit.Source.TrioComposition.AllocSeam.rows_correspond
+#print axioms LidoSRv3.Audit.Source.TrioComposition.AllocSeam.candidate_agrees
+#print axioms LidoSRv3.Audit.Source.TrioComposition.AllocSeam.selected_open
+#print axioms LidoSRv3.Audit.Source.TrioComposition.AllocSeam.firstLoop_length
+#print axioms LidoSRv3.Audit.Source.TrioComposition.AllocSeam.rows_length_lt_modulus
+#print axioms LidoSRv3.Audit.Source.TrioComposition.AllocSeam.account_rows_seam
+#print axioms LidoSRv3.Audit.Source.TrioComposition.AllocSeam.account_step_bounded
+-- P-DEPOSIT-1 allocation views (Thomas 2026-09-18, step 2b-i): Lido's
+-- getDepositableEther view served through the router's STATICCALL at its
+-- source position of the deposit allocation chain; the consumed allocation
+-- view is the Verity-VM allocation execution of P-ALLOC-1.
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1AllocationViews.view_success
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1AllocationViews.execute_effects
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1AllocationViews.deposit_with_lido_view
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1AllocationViews.physicalWords_eq_accountStorage
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1AllocationViews.allocation_view_is_vm_execution
+-- P-TOPUP-1 / P-TOPUP-2 allocation views (Thomas 2026-09-18, step 2b-ii):
+-- LIDO.getDepositableEther and the top-up allocation view produce
+-- Input.allocation of the registered admission entry; a failed view reverts
+-- at the entry world; the registered effects hold at the produced word.
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1AllocationViews.run_ok_lookup
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1AllocationViews.allocationView_success
+-- Allocation views at their source position (caveat C2, 2026-09-19): the
+-- registered router-body gates split into status checks and the zero-target
+-- gate, the views are seated between them, and the source error and attempt
+-- order is proved.
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1AllocationViewsSeated.gates_split
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1AllocationViewsSeated.success
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1AllocationViewsSeated.failure
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1AllocationViewsSeated.status_before_views
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1AllocationViewsSeated.prefix_before_views
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1AllocationViews.success
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1AllocationViews.failure
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1AllocationViews.success_with_lido_view
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1AllocationViews.topup_view_is_vm_execution
+-- P-ACCOUNT-1 whole transaction (Thomas 2026-09-18, step 2g): the
+-- submitReportData entry gates compose with the registered report/fee
+-- executor; the executor's checked fee is the entry's feeEther; a committed
+-- run yields Success/Prepared and any failure restores the entry world.
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1SubmitReport.guard_sender
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1SubmitReport.guard_hash
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1SubmitReport.checked_fee_ether
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1SubmitReport.committed_success
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1SubmitReport.failure_restores
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1SubmitReport.guard_failure_no_body
+-- P-ACCOUNT-1 entry guards (caveat C4, 2026-09-19): the pinned submitReportData
+-- ladder (version, ref slot, consensus version, hash, report presence,
+-- deadline, already-processing) executes before the registered executor.
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1SubmitReportGuards.guard_contract_version
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1SubmitReportGuards.guard_ref_slot
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1SubmitReportGuards.guard_deadline
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1SubmitReportGuards.entry_revert_no_body
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1SubmitReportGuards.refines_entry
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1SubmitReportGuards.committed_success
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1SubmitReportGuards.failure_restores
+-- P-ORACLE-SUPPLY-1 entry premises (2026-09-21): the supply row's entry parent
+-- took senderAllowed / consensusHashMatches as supplied premises; these compose
+-- the executed ladder above with that parent on the shared SubmitReportData, so
+-- the entry guards are derived under d.consensusHash = o.reportHash.
+-- This coherence premise is retained. The opaque consensus-hash equality (no keccak256
+-- preimage) and extra-data processing stay open on the row.
+#print axioms LidoSRv3.Audit.Guarantees.POracleSupply1EntryGuards.guards_discharge_entry_premises
+#print axioms LidoSRv3.Audit.Guarantees.POracleSupply1EntryGuards.body_run_passed
+#print axioms LidoSRv3.Audit.Guarantees.POracleSupply1EntryGuards.supply_entry_under_executed_guards
+#print axioms LidoSRv3.Audit.Guarantees.POracleSupply1EntryGuards.supply_entry_source_domain_under_executed_guards
+#print axioms LidoSRv3.Audit.Guarantees.POracleSupply1EntryGuards.contract_version_checked
+#print axioms LidoSRv3.Audit.Guarantees.POracleSupply1EntryGuards.deadline_checked
 
 -- P-ADDRESS-1 unbounded observe receipt (grok #416): the live
 -- AddressClaimBatchTx loop already iterates arbitrary request/hint
@@ -2314,3 +2524,129 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Provenance.DepositAbstractTxOrphaned.source_parent_applies_universally
 #print axioms LidoSRv3.Audit.Provenance.DepositAbstractTxOrphaned.verity_parent_ignores_abstract_tx
 #print axioms LidoSRv3.Audit.Provenance.DepositAbstractTxOrphaned.verity_parent_applies_universally
+
+-- Current registered consumers: historical prints above remain scoped to their declarations.
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.actual_deposit_call_slot_success_and_revert
+#print axioms LidoSRv3.Audit.Guarantees.PTopupRouterAdmissionCall.actual_topup_admission_calls_wei_and_revert
+#print axioms LidoSRv3.Audit.Guarantees.PReserve1LiveWriters.actual_reserve_physical_history
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity_from_gateway
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1.gateway_vault_live_success_and_revert
+-- Step 3a (2026-09-18): registered whole-prefix parent of P-CONSOLIDATION-1 and
+-- P-CONSOLIDATION-ETH-1 (DSM/Lido preconditions, locator vault read, per-group
+-- _validatePubKeyWCProof, then the retained GatewayVaultEffects); the displayed
+-- executor above is kept as the suffix it consumes.
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1.gateway_admission_live_success_and_revert
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1.gateway_witness_admission_live_success_and_revert
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidation1.gateway_witness_admission_authentic_root
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidationValue1.official_denote_succeeds_and_justified_forwards_msg_value_from_gateway
+
+-- Reviewer 8f198d99: recompute these source-relation dependencies explicitly.
+#print axioms LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer.world_producer_correspondence
+#print axioms LidoSRv3.Audit.Source.TrioReserve1.WithdrawalSpec.failure_restores
+
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc1.account_allocation_result
+
+-- Type checks keep the three owner-scoped witnesses attached to compilation
+-- of their existing specifications and selectors, even after proof replacement.
+example : (Compiler.CompilationModel.compile LidoSRv3.Audit.Verity.AllocCapacityPhase3.spec
+    [LidoSRv3.Audit.Verity.AllocCapacityPhase3.entrySelector]).isOk = true :=
+  LidoSRv3.Audit.Verity.AllocCapacityPhase3.consumed_summary_function_spec_compiles
+
+example : (Compiler.CompilationModel.compile LidoSRv3.Audit.Verity.SszAbstractDigest.spec
+    [LidoSRv3.Audit.Verity.SszAbstractDigest.selector]).isOk = true :=
+  LidoSRv3.Audit.Verity.SszAbstractDigest.deposit_data_root_compiles
+
+example : (Compiler.CompilationModel.compile LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.spec
+    [LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.selector]).isOk = true :=
+  LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.forward_compiles
+
+-- NOR packed reads, writer frames and exact-error regressions.
+#print axioms LidoSRv3.Audit.Source.Packed64x4.get_replace
+#print axioms LidoSRv3.Audit.Source.Packed64x4.get_replace_other
+#print axioms LidoSRv3.Audit.Source.Packed64x4.set_success
+#print axioms LidoSRv3.Audit.Source.Packed64x4.add_success
+#print axioms LidoSRv3.Audit.Source.Packed64x4.sub_success
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.firstRow_nor_widths
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.applyLimits_frame
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.updateMaximum_frame
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.updateExited_failure_restores
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.updateExited_admission
+#print axioms LidoSRv3.Tests.NodeOperatorsRegistrySummary.summary_field_order
+#print axioms LidoSRv3.Tests.NodeOperatorsRegistrySummary.depositable_underflow
+#print axioms LidoSRv3.Tests.NodeOperatorsRegistrySummary.safeMath_error_bytes
+#print axioms LidoSRv3.Tests.NodeOperatorsRegistrySummary.getter_does_not_establish_exit_consistency
+#print axioms LidoSRv3.Tests.NodeOperatorsRegistrySummary.accounting_exit_still_can_underflow
+#print axioms LidoSRv3.Tests.NodeOperatorsRegistrySummary.unchanged_invalid_exit_returns
+#print axioms LidoSRv3.Tests.NodeOperatorsRegistrySummary.aggregate_overflow_rolls_back
+
+-- NOR exit-writer aggregate conservation and transactional invariant preservation.
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.updateExited_effects
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.updateExited_preserves_accounting
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.executeUpdateExited_preserves_accounting
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.AccountingInvariant.exited_le_deposited
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.updated_summary_consistent
+#print axioms LidoSRv3.Tests.NodeOperatorsRegistrySummary.initial_accounting
+#print axioms LidoSRv3.Tests.NodeOperatorsRegistrySummary.exit_update_directions
+#print axioms LidoSRv3.Tests.NodeOperatorsRegistrySummary.missing_aggregate_write_refutes_accounting
+
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.allocatedKeyPrefix_nondecreasing
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.allocatedKeyPrefix_no_overflow
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.allocatedKeyPrefix_load_delta
+#print axioms LidoSRv3.Tests.NodeOperatorsRegistrySummary.allocated_wrap_to_equal_continues
+#print axioms LidoSRv3.Tests.NodeOperatorsRegistrySummary.allocated_wrap_asserts
+#print axioms LidoSRv3.Tests.NodeOperatorsRegistrySummary.allocated_load_delta_fixture
+
+#print axioms LidoSRv3.Audit.Source.SigningKeys.loadKeysSigs_zero
+#print axioms LidoSRv3.Tests.SigningKeysMemory.key_overlap_and_shift
+#print axioms LidoSRv3.Tests.SigningKeysMemory.signature_and_frame
+#print axioms LidoSRv3.Tests.SigningKeysMemory.aliased_buffers_overwrite_key
+#print axioms LidoSRv3.Tests.SigningKeysMemory.destination_index_wraps
+#print axioms LidoSRv3.Tests.SigningKeysMemory.loop_source_index_wraps
+
+#print axioms LidoSRv3.Tests.SigningKeysMemory.storage_slot_wraps
+
+#print axioms LidoSRv3.Audit.Source.SigningKeys.loop_index_increment
+
+#print axioms LidoSRv3.Audit.Source.SigningKeys.loadKeysSigs_execution
+
+#print axioms LidoSRv3.Audit.Source.ByteMemory.write_in_bounds
+#print axioms LidoSRv3.Audit.Source.ByteMemory.write_in_bounds_bytes
+#print axioms LidoSRv3.Audit.Source.ByteMemory.write_in_bounds_size
+#print axioms LidoSRv3.Audit.Source.ByteMemory.read_in_bounds
+
+#print axioms LidoSRv3.Tests.SigningKeysMemory.slot_producer_memory_survives
+
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.commitAllocatedRow_deposited
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.finishAllocatedKeys_mismatch
+#print axioms LidoSRv3.Tests.NodeOperatorsRegistrySummary.allocated_final_assert_before_overflow
+
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.finishAllocatedKeys_effect
+
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.loadAllocatedRow_unchanged
+
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.commitAllocatedRow_effects
+
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.loadAllocatedRow_local_consistency
+
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.counterSum_single_change
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.commitAllocatedRow_deposited_sum
+
+#print axioms LidoSRv3.Audit.Source.NodeOperatorsRegistry.allocatedRow_deposited_sum
+
+-- Public DEPOSIT/TOPUP supporting results retain individual reader disclosures.
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.NFrame.exactTotal_eq_exactKeys_mul
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.NFrame.linked_exactTotal_eq_depositsValue
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.NFrame.linked_exactTotal_eq_pushedValue
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.revert_restores_state_value_and_logs
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.NFrame.two_batch_conjunct_d_is_n_eq_two
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.NFrame.verity_tx_composes_nframe_deposit
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.verity_tx_revert_restores_snapshot_legacy_parent
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.revert_restores_state_value_and_logs
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back_under_gateway_oracle_shape
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back_under_prefix_guards_shape
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.valid_result_preserves_router_order
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_guarded_revert_restores_snapshot
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_guarded_reverts_on_empty_keys
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_guarded_reverts_on_unauth
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_guarded_reverts_on_wrong_wc
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_legacy_revert_restores_snapshot

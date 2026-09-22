@@ -1,5 +1,7 @@
 # P-TOPUP-2
 
+> **Registration update (2026-09-17).** The registered Verity parent of this row is now `PTopup2.actual_module_batch_bound` (`LidoSRv3/Audit/Guarantees/PTopup2ActualBatch.lean`): for a completed successful batch, the gateway witness loop produced the per-key limits, the module CALL was made with those keys and limits, and its decoded allocations sum to at most the packed router block cap (uint64 gwei) × 10^9, zero and empty returns included. The admission chain `PTopupRouterAdmissionCall.actual_topup_admission_calls_wei_and_revert` consumes the same batch effects. The historical memory-array executor `verity_tx_simulates_topup2_spec` described below remains built and printed as evidence.
+
 > Round 2 (2026-08-21). Product note plus proof audit, arbitrated from GPT 5.6 Pro and Opus 5. Fable 5 was unavailable (data-retention gate). Kimi K3 was not an allowed Task model. No em dashes. Lean is authority.
 
 P-TOPUP-2 is the per-block ceiling on Electra compounding top-ups. The product question is whether one call can top up more gwei than governance allows in a block. The answer the row gives is narrower.
@@ -224,3 +226,32 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
     `TopUpGateway.sol:234–236`: `if (totalLimits > 0) _setLastTopUpData()`. A all-zero-limit batch does not move the last-top-up timestamp, so a second call in the same block is allowed. Lean `allocate` has no last-top-up field (issue 13). `well_formed_batch` has no such conjunct.
 
     *Scenario.* Three validators all already at target (limits 0). Live `topUp` succeeds, does not write last-top-up, and a second `topUp` in the same block is allowed. A later non-zero batch in that block also succeeds. If Lean modeled block distance as “any previous allocate,” it would wrongly reject the second call. The CHECKED tx cannot represent either policy: it has no timestamp at all.
+
+The shared module CALL dispatch now excludes Cancun precompiles from the
+ordinary empty-code shortcut. A decoded reply establishes external-interpreter
+execution and its exact request/returndata, not nonzero code size: a precompile
+can return bytes with zero EXTCODESIZE. Ordinary-empty-account failure helpers
+now state that premise explicitly. The registered execution obligations remain;
+precompile semantics, fork/runtime binding and paired differential coverage are
+still open. Shared locator STATICCALL now uses the same precompile-aware
+dispatch predicate and consumes the returned bytes; this is not runtime refinement.
+
+## Same-block aggregate on the actual consumer (2026-09-18)
+
+[PTopup2SameBlock](../LidoSRv3/Audit/Guarantees/PTopup2SameBlock.lean) proves `same_block_actual_batches_le_cap`: `n` sequential same-block calls of the registered consumer `TopupBatchConsumer.run`, each admitted through `_isBlockDistancePassed` on the gateway's packed word (`TopupTimingHistory.lastBlock` / `minDistance`) and followed by `_setLastTopUpData` iff the loop's `totalLimits` is positive, allocate in total at most the packed router block cap (in wei) read at the first call; at most one call commits a positive allocation. Premises: `blockNumber ≠ 0` (sentinel), `blockNumber < 2^32` (uint32 field; the truncation at `2^32` is the known source counterexample), `minBlockDistance ≥ 1` at entry, and `ConfigStable` — the batch's callees leave the gateway's `minBlockDistance` field and the router's packed cap unchanged (on the pinned source only the setters write them; the model's callees are arbitrary interpreters, so this is a stated premise, with its derivation under `A-NO-REENTRY` as follow-up). The historical `lastTopUpBlock ≤ blockNumber` premise is not needed. The chain composes completed transactions; nested admission during the module CALL is outside it. Axioms: `propext`, `Classical.choice`, `Quot.sound`.
+
+## Validator pre-checks before the module reply (2026-09-18)
+
+[PTopup2ValidatorChecks](../LidoSRv3/Audit/Guarantees/PTopup2ValidatorChecks.lean) proves on the registered admission chain `TopupRouterAdmissionCall.run` that the module-reply seam is reached only with a credential word whose first byte is `0x02` and a successful root loop over 48-byte pubkeys (`seam_shapes`, `seam_pubkeys`), and that any other shape is rejected at its stage: a non-`0x02` word returns `wrongWithdrawalCredentials` (`wrong_credential_type_rejected`), a row whose pubkey is not 48 bytes returns a gateway fault (`wrong_pubkey_length_rejected`), both with the entry world and no module CALL (`ready = none`). Block distance and root recency are the chain's `TopupTimingHistory.gates`. Axioms: `propext`, `Classical.choice`, `Quot.sound`.
+
+## Outer transport and allocation views (2026-09-18)
+
+[PTopup1AllocationViews](../LidoSRv3/Audit/Guarantees/PTopup1AllocationViews.lean) produces the admission chain's allocation word from the executed `LIDO.getDepositableEther` and top-up allocation views on the entry world and derives the registered admission effects at that word (`success`); a failed view reverts at the entry world (`failure`). The gateway-to-router ABI CALL frame is implicit, as for every registered executable parent. Axioms: `propext`, `Classical.choice`, `Quot.sound`.
+
+## ConfigStable from A-NO-REENTRY (2026-09-19)
+
+[PTopup2ConfigNoReentry](../LidoSRv3/Audit/Guarantees/PTopup2ConfigNoReentry.lean) derives the same-block bound's `ConfigStable` premise. `Keeps` (a program leaves one storage word of one account unchanged) is closed under the `Live` monad and every primitive the batch executor uses, and `configStable_of_noReentry` composes it through Lido's `withdrawDepositableEther` dispatch, the module `allocateDeposits` CALL, the beacon deposit loop and the router continuation. The gateway's `minBlockDistance` word follows from A-NO-REENTRY alone (module callee, beacon deposit contract, Lido's dispatch not writing the gateway, Lido not being the gateway). The router's cap word follows from A-NO-REENTRY for the module callee and the beacon contract; the residual premise is that the router's own `receiveDepositableEther` callback keeps that word (`KeepsSlot b.withdrawalExternal router (routerRoot + 5)`), because a router-protected `NoReentry` would reject that legitimate callback. `same_block_actual_batches_le_cap_no_reentry` is the registered bound without `ConfigStable`. Axioms: `propext`, `Classical.choice`, `Quot.sound`.
+
+## Allocation views at their source position (2026-09-19)
+
+[PTopup1AllocationViewsSeated](../LidoSRv3/Audit/Guarantees/PTopup1AllocationViewsSeated.lean) closes the ordering caveat of the allocation views. `gates_split` shows the registered router-body gates are `statusChecks` (auth, input validation, module state, credential type) followed by `zeroTargetGate` (the conditional `canDeposit`), attempts included; `runSeated` walks the gateway prefix, runs the status checks, the two views, the zero-target gate and the registered `finish` at the produced allocation, exactly the order of `StakingRouter.topUp`. `success` gives the registered run's outcome, world, projection and seam at the produced allocation with `ActualEffects`, and the attempt trace `status ++ views ++ zero-target`; `failure` restores the entry world; `status_before_views` and `prefix_before_views` give the source error precedence. Axioms: `propext`, `Classical.choice`, `Quot.sound`.

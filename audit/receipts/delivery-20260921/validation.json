@@ -1,0 +1,37 @@
+{
+  "validatedCommit": "aca331d535b335bb4aa7990fd2d53e1240f5c0e6",
+  "proofSourceTree": "2ab1d336ce40df6fabf25b934aaff548fcab83ae",
+  "testEnvironment": {
+    "platform": "macOS arm64",
+    "lean": "4.31.0",
+    "python": "3.14.3",
+    "bash": "5.3.15",
+    "forge": "1.5.0",
+    "solidity": "0.8.25 and checksummed 0.4.24 soljson",
+    "LEAN_NUM_THREADS": "2",
+    "RAYON_NUM_THREADS": "2",
+    "pathPrefix": "/opt/homebrew/bin"
+  },
+  "commands": [
+    {
+      "command": "make prove",
+      "exitCode": 0,
+      "log": "audit/receipts/delivery-20260921/prove.log.gz",
+      "logSha256": "c8a6f2230a00e078d643450183f9225e6d6d073e58a53b4dcf7f42a83790a302"
+    },
+    {
+      "command": "make test",
+      "exitCode": 0,
+      "log": "audit/receipts/delivery-20260921/test.log.gz",
+      "logSha256": "a0ed99a86ddb9184bb5fc78f6431e8487d4a17a806592bb88f45cfeeb12f402b"
+    },
+    {
+      "command": "lake build LidoSRv3 LidoSRv3Audit LidoSRv3Test AccountAddressChecks",
+      "exitCode": 0,
+      "log": "audit/receipts/delivery-20260921/libraries.log.gz",
+      "logSha256": "0965bdb9e378729806c85fcaca2e02bb34363ffe18d2668400ea934d9c2f42d1"
+    }
+  ],
+  "differentialAndSigningKeyTests": 80,
+  "independentReviewStatus": "PENDING"
+}

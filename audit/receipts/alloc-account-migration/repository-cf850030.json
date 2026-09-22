@@ -1,0 +1,26 @@
+{
+  "job_id": "16e41527-17ef-4dcb-9bad-f9a24ba793e0",
+  "state": "failed",
+  "exit_code": 1,
+  "node_id": "dgx-spark",
+  "validation": {
+    "version": 1,
+    "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+    "commit": "cf850030b60004493e6cd74201acf252ea90876f",
+    "base_tree_sha": "dcfe8c47b752111a83af3ba2e9987e06ef800646",
+    "cwd_rel_known": true,
+    "command": [
+      "lake",
+      "test",
+      "--",
+      "repository"
+    ],
+    "toolchain": "leanprover/lean4:v4.31.0",
+    "build_protocol_version": "1",
+    "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+  },
+  "raw_receipt_sha256": "30f54dee05fcef6ea372875cd36618c3b317773a22ea5e1e76b2dfdf53034ea8",
+  "raw_receipt_path": "/workspaces/mission-1ca15c66/output/remote-16e41527-17ef-4dcb-9bad-f9a24ba793e0.json",
+  "scope": "Exact-commit combined gate failed. Requested Lean libraries passed. make test stopped at stale generated audit/ux2/P-ALLOC-1.json; remaining tests were not established. No source bundle. No semantic acceptance or independent review.",
+  "diagnostics": ".lake/candidate-validation/test.log-2-differential input guard: all four profiles reject staged, unstaged, untracked and ignored mutations\n.lake/candidate-validation/test.log-3-reserve compiler dispatch: unchecked override bypassed\n.lake/candidate-validation/test.log-4-ux2 artifact error: audit/ux2/P-ALLOC-1.json differs from the registry and Lean sources; run `scripts/generate_ux2.py generate`\n.lake/candidate-validation/test.log:5:make: *** [Makefile:39: test] Error 1"
+}

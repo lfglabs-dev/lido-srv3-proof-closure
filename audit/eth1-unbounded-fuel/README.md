@@ -50,7 +50,7 @@ not edited.
 
 Additive files only:
 
-- `LidoSRv3/Audit/Verity/ConsolidationEthUnboundedFuel.lean`
+- `LidoSRv3/Audit/Guarantees/Composition/ConsolidationEthUnboundedFuel.lean`
 - `LidoSRv3/Tests/ConsolidationEthUnboundedFuelMutants.lean`
 - `audit/eth1-unbounded-fuel/README.md` (this file)
 
@@ -120,14 +120,14 @@ quantifies every funded non-wrapping batch at derived fuel.
 - Toolchain `leanprover/lean4:v4.31.0` (`Lake 5.0.0`, Lean commit `68218e876d2a`).
 - Solidity pin `17005714f151e5502c559932319a3f2f74ac2436` (Gateway 185–223,
   Vault 199–208, EIP7685 56–73, Bus 383–406).
-- `lake env lean LidoSRv3/Audit/Verity/ConsolidationEthUnboundedFuel.lean`: passed.
+- `lake env lean LidoSRv3/Audit/Guarantees/Composition/ConsolidationEthUnboundedFuel.lean`: passed.
 - `lake env lean LidoSRv3/Tests/ConsolidationEthUnboundedFuelMutants.lean`: passed.
 - `lake build LidoSRv3Test`: passed (1948 jobs); mutant module built at job
   1916 with the same axiom surface.
 - `#print axioms` of every Verity export: `propext` / `Classical.choice` /
   `Quot.sound` (or a subset). `parent_fuel_premise_excludes_batch_29` uses none.
   No `sorryAx`.
-- `lake build LidoSRv3.Audit.Verity.ConsolidationEthUnboundedFuel` is the
+- `lake build LidoSRv3.Audit.Guarantees.Composition.ConsolidationEthUnboundedFuel` is the
   documented raccord (not applied). `LidoSRv3Test` picks up the mutant file
   via `.submodules LidoSRv3.Tests`.
 

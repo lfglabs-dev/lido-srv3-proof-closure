@@ -1,260 +1,42 @@
 # P-TOPUP-1
 
-> Round 2 (2026-08-21). Product note plus proof audit, arbitrated from GPT 5.6 Pro and Opus 5. Fable 5 was unavailable (data-retention gate). Kimi K3 was not an allowed Task model. No em dashes. Lean is authority.
+The registered executable theorem is `PTopupRouterAdmissionCall.actual_topup_admission_calls_wei_and_revert`. It consumes `TopupRouterAdmissionCall.run` with concrete Keccak hashing. The success branch provides the complete existing admission/root/module/per-key/history conjunction; every error restores the entry World. It supplies no independent stage-success or desired frame-equality premise.
 
-When the top-up gateway asks the router to raise existing type-2 validators above 32 ETH, `StakingRouter.topUp` (`lidofinance/core@17005714`, lines 679-759) pulls one lump sum out of Lido and forwards it key by key to the beacon deposit contract. P-TOPUP-1 verifies that the lump and the forwarded total are the same wei, and that anything that fails takes the whole transaction with it.
+Previously the executable registration pointed to `PTopup1.verity_tx_simulates_source_with_nonzero_wrap_close`, whose conjunction mixes guarded and legacy allocation-only planes. That theorem and `source_topup_conserves_and_rolls_back` remain unchanged and available. Their Boolean/source-link and abstract-observation premises are not used as evidence for this actual chain.
 
-The pull and the push are two readings of one array. The router sums `allocations` at line 732, inside the `unchecked` block, pulls that sum at line 744, and the depositor loop sends `_amounts[i]` per key:
+The executed prefix checks physical gateway role/resume, array lengths and timing, calls the router locator, obtains physical credentials through its getter, and executes the witness/root loop. Before the module continuation, actual router locator return bytes determine caller admission; input lengths, module registration/status/type and conditional zero-target Lido canDeposit checks execute in source order. The external admission calls retain their actual requests and decoded results.
 
-- $\mathrm{pulled} = \mathrm{accumulated} = (\sum_i a_i) \bmod 2^{256}$, the on-chain `unchecked` reading
-- $\mathrm{pushed} = \sum_i a_i$, exact (`loopPushed_eq_allocSum`)
-- committing a value-moving top-up requires $\mathrm{pulled} = \mathrm{pushed}$, which is the `assert` at line 755
+Physical uint64 gateway fields and checked witness headroom produce the wei limits passed to the module. The retained `TopupBatchRootCalls.Success` proves the total is exact and below one word. `TopupRootCallEffects.Effects` connects the same arrays to actual allocateDeposits request/reply bytes and decoded allocations, whose guarded sum is exact and bounded by the physical router block cap times 10^9. The actual module-returned World feeds the continuation: zero total emits an event without withdrawal; positive total executes Lido withdrawal with zero seed count and the per-key beacon helper. Its calls, payloads, values, balances, physical count at beacon slot32, events and attempts feed the parent. Physical gateway history updates use the returned World.
 
-Below $2^{256}$ the two readings coincide. At or above $2^{256}$ the wrapped pull is strictly under the exact push, so a nonzero wrap still aborts (`wrapInput` allocations $[2^{256}-1, 2]$ reverts `revertAssertBalanceUnchanged` because wrapped pull $1$ is not exact push $2^{256}+1$). Wrap-to-zero (`[2^{256}-1, 1]$) is `committedNoTopUp` with $\mathrm{pulled} = \mathrm{pushed} = 0$, not a revert.
+Source pin: `lido-core@17005714f151e5502c559932319a3f2f74ac2436`, `contracts/0.8.25/sr/StakingRouter.sol:686-756` and `TopUpGateway.sol`. No new executor replaces the existing derivations. Reused source commits include `ed043832023c75e04adf76ea05c3ac96f3353897` (consumed router admission calls) and `c0e2fe625f423c3f9b804b64e65d635c5af6d896` (actual root batch physical effects).
 
-Over-target (line 737), zero-sum (line 741), Lido-side amount guards (Lido.sol 842/873), the line-744 pull, the funded router balance, and the line-755 assert all read $\mathrm{wrappedTotal}$. `source_topup_conserves_and_rolls_back` also folds in: an unregistered module reverts, and non-type-2 credentials revert. `verity_tx_simulates_source` matches observables on the committing path under $\mathrm{allocations.length} \le 2^{256}$, each allocation a uint256 word, and `run.reverts = false`. It does not assume `NoUncheckedWrap`. We do not prove where the per-key amounts come from (P-TOPUP-2), nor the allocation feeding them (P-ALLOC-1/2).
+Explicit remaining boundaries:
 
-## Proof limitations and recommendations
+- The outer gateway-to-router ABI CALL is not executed by this typed composition. Transported arguments and identities have no assumed deployed frame equality.
+- `Input.allocation` is an arbitrary upstream word. The cap/rounding proof works for every such value, but the preceding getDepositableEther/module-allocation view calls and their failures are omitted.
+- Outer ABI and phase-memory-cursor origins, fork/gindex configuration, beacon data/divisor and SHA precompile identities need separate binding.
+- Lido withdrawal accounting executes; its getter/receiver callbacks still require named-callee correspondence. Module and callback effects are consumed without assumed ledger preservation. The beacon helper is a source-shaped physical callee model, not general deployed bytecode/LOG ABI/gas closure.
 
-The residual exact-reading gap is closed. Both planes now read $\mathrm{wrappedTotal} = \mathrm{exactTotal} \bmod 2^{256}$ at line 737, line 741, and Lido.sol 842/873. Abstract conjunct 3 is wrap precludes a value-moving commit. Verity no longer assumes `NoUncheckedWrap`; wrap-to-zero is an executed empty success.
+The preserved Solidity differential harness passed 19 tests at `bcc5ef6873b524242db7a7c1e1921510c80cc052` on dgx-spark (job `666c5a01-838a-488f-93cf-e313d3280215`). It tests the historical CLI and deliberately exhibits caller, empty-key and missing-journal divergences. That pass does not certify this new registered chain.
 
-The nonzero-wrap quantifier gap is closed. The committing conjunct still carries `hCommit` (`(run cfg inp).reverts = false`), but the registered Verity parent `verity_tx_simulates_source_with_nonzero_wrap_close` conjoins it with an unbounded $\forall$ over uint256-word allocation lists: whenever the exact sum reaches $2^{256}$ and the unchecked total is nonzero, `execute` reverts, `Contract.run` restores the exact entry snapshot, and `observe` reports non-committed. The nonzero-wrap case is therefore an executed Verity observation rather than a case excluded by `hCommit`. YAML `fidelity.missing` now records only beacon-address provenance.
+Targeted validation at `62008e7d34602b1b40fa0f716a63bc3a59a26257` passed with exit 0 (1,390 jobs) as job `f35d5eca-6c18-4e37-af6b-2bc3d934ac0d`, using Lean v4.31.0 and Verity e977aaad6e1a9e92e0132d41b3d33a14135a4d46:
 
-Kill-lines on module / WC / assert-drop / unwrapped-accumulator are parent-shaped. The conservation kill-line uses a wrap witness far from the pinned `uint64` config. Abstract rollback on `TxObservation` is definitional.
+```sh
+REMOTE_BUILD_NODE_ID=dgx-spark REMOTE_BUILD_PASSIVE=1 remote-lean-build lake build LidoSRv3.Audit.Guarantees.PTopupRouterAdmissionCall LidoSRv3.Tests.TopupRouterAdmissionCallRegression LidoSRv3.Tests.TopupRootCallEffectsRegression LidoSRv3.Tests.TopupWeiBoundsMutants LidoSRv3.Tests.TopupTimingHistory
+```
 
-CHECKED does not mean bytecode, extracted Solidity, Lido book-keeping, or that the amounts themselves are correct (a consistent wrong array satisfies every conjunct).
+The registered theorem reports only `propext`, `Classical.choice` and `Quot.sound`. Admission, actual root/per-key effects, wei bounds and physical history regressions passed.
 
-Ranked next work: discharge the named `A-TOPUP-BEACON-ADDRESS` provenance assumption from deployment artifacts; do not derive a top-up LinksSource from ALLOC. The general nonzero-wrap Verity revert shape and the wrapped-zero execution subcase are both checked.
+The earlier job `46b9f3c2` failed during checkout because submission preceded push; no Lean result came from it. Combined exact-SHA validation and fresh independent audit remain required.
 
-Theorems: `PTopup1.source_topup_conserves_and_rolls_back` (registered abstract parent), `PTopup1.verity_tx_simulates_source_with_nonzero_wrap_close` (registered Verity parent), `PTopup1.verity_nonzero_wrap_reverts_and_restores` (universal nonzero-wrap close), `PTopup1.verity_wrap_to_zero_is_empty_commit` (wrap-to-zero partition), `TopupTxMutants.dropped_conservation_assert_kill_line_refutes_parent` (kill-line).
-Assumptions: `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-TOPUP-NOWRAP`, `A-VERITY-SCAFFOLD`, `A-TOPUP-BEACON-ADDRESS`.
+## No re-entry (A-NO-REENTRY, 2026-09-17)
 
-## Registered Theorem
+[PTopup1NoReentry](../LidoSRv3/Audit/Guarantees/PTopup1NoReentry.lean) restates `actual_continuation_locator_conserves` under the accepted assumption `A-NO-REENTRY` on the residual module/beacon interpreter (`NoReentry other [lido, router]`) and adds `Confined other [lido, router]`: storage of Lido and the router is unchanged by every CALL reaching that interpreter, no such CALL into them succeeds, and no accepted nested call into them is recorded. The premise is assumed, not proved for the deployed callees.
 
-`source_topup_conserves_and_rolls_back` is the single theorem registered as
-P-TOPUP-1's CHECKED abstract claim in `audit/guarantees.yaml`. Its type is a
-four-conjunct claim, not just conservation/rollback:
+## Allocation views as the producer of the router's allocation (2026-09-18)
 
-| Conjunct | Claim |
-|---|---|
-| 1 (conservation/rollback) | `pulled = pushed` on every branch — genuinely assert-backed since wave 5: `run`'s value-moving tail reads the on-chain `unchecked` accumulator (the line-732 sum reduced mod 2^256) for the line-744 pull, the funded router balance, and the line-755 assert, so reaching the commit means the assert passed with the wrapped pull equal to the exact push; a reverting outcome restores pre-state (`A-ABSTRACT-TX`) |
-| 2 (module guard) | `moduleExists = false` ⇒ `run` returns `revertStakingModuleUnregistered` |
-| 3 (wrap discharge) | If the unchecked sum wraps mod 2^256, `run` itself moves no wei (`pulled = pushed = 0`). A nonzero wrap still aborts on the value-moving tail; wrap-to-zero is `committedNoTopUp`. `A-TOPUP-NOWRAP` lives here, in the wrap antecedent, and in the discharged-balance-guard theorems — not in conjunct 1, and not as a Verity parent hypothesis |
-| 4 (WC-type guard) | `wcTypeIsType2 = false` ⇒ `run` returns `revertWrongWithdrawalCredentialsType` |
+[PTopup1AllocationViews](../LidoSRv3/Audit/Guarantees/PTopup1AllocationViews.lean) produces `Input.allocation` of the registered admission entry from executed calls: the router's STATICCALL to Lido's `getDepositableEther` view and `_getModuleDepositAllocation` with the top-up flag (`StakingRouter.sol:697-700`), composed on the entry world for the router the locator returns. `success`: a committed composed run passed the locator lookup, both views succeeded and the registered `ActualEffects` hold at the produced allocation (`success_with_lido_view` adds Lido's `available = depositsReserve + unreserved`); `failure`: every failing arm, including a failed view call, returns the gateway's entry world. Ordering caveat: the read-only views are issued before the gateway's admission prefix, so only the reported error and attempt trace can differ when both fail. The gateway-to-router ABI CALL frame is implicit. Axioms: `propext`, `Classical.choice`, `Quot.sound`.
 
-Each conjunct is proved by, and stated identically to, a standalone lemma
-(`source_module_guard_required`, `source_wrap_precludes_value_moving_commit`,
-`source_wc_type2_guard_required`) kept in the same file for readability; the
-registered theorem's proof term is a direct `⟨_, _, _, _⟩` bundling of those
-four facts. `verity_tx_simulates_source` is the separate CHECKED Verity claim.
+## Allocation views at their source position (2026-09-19)
 
-Folding conjuncts 2–4 into the registered theorem (rather than leaving them as
-unregistered siblings) means a regression in any one of them — dropping a
-`require`, or losing the wrap-branch assert — breaks `source_topup_conserves_and_rolls_back`
-itself, which is the theorem `audit/guarantees.yaml`, `scripts/audit_metadata.py`,
-and `scripts/check_public_claim_surfaces.py` all track, not only a sibling
-lemma the assurance registry never cites.
-
-## Wave 2: Folding Guards Into the Registered Parent
-
-Wave 1 (`aea23ba`) added `source_wrap_implies_assert_revert`,
-`source_module_guard_required`, and `source_wc_type2_guard_required` as
-theorems in this module, plus three "kill-line" mutants in
-`TopupTxMutants.lean` pinning their concrete behavior. None of the three was a
-conjunct of the registered `source_topup_conserves_and_rolls_back`, so a
-regression that silently dropped one of those guards from `run` (or lost the
-wrap discharge) would have broken only a sibling lemma the registry never
-cites — the registered theorem, and the `make test` gate built around it,
-would have kept passing.
-
-Wave 2 closes that gap by making `source_topup_conserves_and_rolls_back`'s own
-type the four-conjunct claim above, and by rewriting the three kill-line
-mutants (below) to derive their conclusion from a direct projection of that
-same registered theorem at a concrete witness, instead of an independent
-`by decide`. A regression in any guard or the wrap discharge now fails the
-registered theorem's build, and every kill-line that projects from it fails
-right along with it.
-
-## Wave 4: Real Kill-Lines on Mutants of the Parent's Own Model
-
-Wave-4 review found that the wave-2 "kill-lines" were still not kill-lines:
-each merely *projected* the registered parent's own conjuncts at concrete
-inputs, proving the HONEST model satisfies the parent. No mutant artifact was
-defined and nothing was refuted; conjunct 1 (conservation) had no kill-line at
-all; and `A-TOPUP-NOWRAP` was misattributed to conjunct 1, whose exact-`Nat`
-conservation is in fact unconditional.
-
-Wave 4 remediates this in `LidoSRv3/Tests/TopupTxMutants.lean`:
-
-- The three projections are renamed honestly to
-  `guard_discharge_at_wrapping_input`,
-  `guard_discharge_at_unregistered_module_input`, and
-  `guard_discharge_at_non_type2_wc_input`. They remain as positive controls
-  (honest-side witnesses projected from the registered parent); nothing in the
-  audit metadata or this report calls them kill-lines anymore.
-- Four real kill-lines are added, each defined over a MUTANT of the parent's
-  own model (a copy of `SolidityTopup.run` / `SolidityTopupParent.accumulated`
-  with exactly one guard deleted or one reading changed) and proving the
-  negation of the same predicate the corresponding parent conjunct proves for
-  the honest model.
-
-### Kill-Line Mapping
-
-| Kill line | Mutant of the parent's model | Registered conjunct refuted on the mutant | Concrete witness |
-|---|---|---|---|
-| `dropped_conservation_assert_kill_line_refutes_parent` | `mutantRunNoAssert`: the routed `run` with ONLY the line-755 `assert` deleted (surgical since wave 5; `mutantRunNoAssert_eq_run_of_assert_passing` / `mutantRunNoAssert_commits_where_assert_fires` pin the single edit down) | conjunct 1: mutant COMMITS with `pulled = 1 ≠ 2^256 + 1 = pushed` | `allocations = [2^256 - 1, 2]` with all limits/balances above the exact sum |
-| `dropped_module_guard_kill_line_refutes_parent` | `mutantRunNoModuleGuard`: `run` without the `_requireModuleIdExists` require | conjunct 2: at an unregistered-module witness with all antecedents true, the mutant COMMITS instead of returning `revertStakingModuleUnregistered` | `moduleExists = false`, single key, allocation `[5]` |
-| `dropped_wc_guard_kill_line_refutes_parent` | `mutantRunNoWcGuard`: `run` without the `_requireWCType2` require | conjunct 4: at a non-type-2 witness with all antecedents true, the mutant COMMITS instead of returning `revertWrongWithdrawalCredentialsType` | `wcTypeIsType2 = false`, single key, allocation `[5]` |
-| `unwrapped_accumulator_kill_line_refutes_parent` | `mutantRunUnwrapped`: the assert-drop mutant's dual — the routed `run` with the `unchecked` wrap ignored, so the pull, funded-balance guard, and line-755 assert all read the exact `Nat` sum (equivalently, the pre-wave-5 honest `run`) | conjunct 3: at the wrapping witness, the honest routed `run` reverts via the assert while the wrap-ignoring mutant COMMITS with `pulled = pushed = 2^256 + 1` | `allocations = [2^256 - 1, 2]` |
-
-The Verity-plane mutants earlier in that file
-(`skipped_allocation_write_rejected`, `dropped_push_rejected`, etc.) refute
-`observe … ≠ sourceObservables` for mutated Verity executes — the sibling
-faithful plane, not the registered abstract parent's conjuncts — and are
-unchanged.
-
-## Wave 5 (2026-08-19): Routing the Wrap Through `run`; a Surgical Conservation Kill-Line
-
-Wave-5 review found the wave-4 conservation kill-line
-`dropped_conservation_assert_kill_line_refutes_parent` was built on a
-MULTI-EDIT mutant: the wave-4 `mutantRunPushNoAssert` (1) deleted the
-line-755 assert branch, (2) rewrote the pull field from the exact
-`totalAllocated` to the wrapping `accumulated`, and (3) rewrote
-balance-after to the wrapped reading. At the witness `wrapInput`
-(`allocations = [2^256 - 1, 2]`) the honest exact-`Nat` assert was DEAD
-(`totalAllocated = pushedValue = 2^256 + 1`, never fires), so the kill's
-lethality came entirely from edit (2) — the pull-field wrap rewrite — not
-from the advertised assert deletion. Counterfactual: assert-drop alone
-leaves `pulled = pushed`; the pull rewrite alone kills even with the assert
-kept. The kill-line therefore did not demonstrate what its name and the
-YAML/report claimed (that dropping the line-755 assert breaks conservation).
-
-Wave 5 remediates this by closing the first wave-4 fidelity gap — "wrap
-accumulator is not routed through `run`" — and rebuilding the kill-line on
-the routed model:
-
-- **Routing** (`LidoSRv3/Audit/Source/TopupCorrespondence.lean`): the honest
-  `run`'s value-moving tail `runPush` now reads the on-chain `unchecked`
-  accumulator semantics — the line-732 sum reduced mod 2^256, exposed as
-  `SolidityTopup.accumulated` — for the line-744 pull field, the funded
-  router-balance guard, and the line-755 assert, matching
-  `StakingRouter.sol` line 732's `unchecked` block and the line 744 pull.
-  `routerBalanceAfter` and the `Outcome` accessors are updated consistently,
-  and the exact-`Nat` reading (`totalAllocated`) remains available where the
-  earlier guards use it. Wave 5 stated this as a theorem
-  `run_reverts_of_wrap`: "the honest `run` reverts on any wrapping batch."
-  **That was too strong and was corrected in wave 6** — a wrap-to-zero batch
-  takes the line-741 `committedNoTopUp` branch and does not revert. No theorem
-  of that name survives. The surviving pair is
-  `SolidityTopup.run_wrap_precludes_value_moving_commit`
-  (`TopupCorrespondence.lean:1173`), which proves any wrapping batch has
-  `pulled = 0 ∧ pushed = 0`, and `SolidityTopup.run_wrap_nonzero_reverts`
-  (`:1197`), which recovers "wrap ⇒ reverts" only under the extra hypothesis
-  `accumulated inp ≠ 0`. Every other guard/branch is unchanged; the over-target
-  comparison (line 737), the zero-sum test (line 741), and the Lido-side
-  amount guards (`Lido.sol` 842/873) still read the exact `Nat` sum — a
-  residual fidelity gap, now recorded in `audit/guarantees.yaml`, under which
-  a wrap can change *which* revert fires first but not that a wrapping batch
-  moves no wei.
-- **Re-aimed parent** (`LidoSRv3/Audit/Guarantees/PTopup1.lean`): conjunct 1
-  is now genuinely assert-backed — under a wrap the commit cannot happen (the
-  assert fires), so conservation on the commit branch is real content, not a
-  same-array `Nat` fact. Wave 5 restated conjunct 3 as "wrap ⇒ `run` reverts"
-  (`¬ NoUncheckedWrap inp → (run cfg inp).reverts = true`) under a lemma then
-  called `source_wrap_implies_revert`. **Wave 6 replaced both**: the registered
-  conjunct 3 is now `PTopup1.source_wrap_precludes_value_moving_commit`
-  (`PTopup1.lean:56–60`), concluding `(run cfg inp).pulled = 0 ∧
-  (run cfg inp).pushed = 0`, because wrap-to-zero commits empty rather than
-  reverting. Conjuncts 2 and 4 are intact.
-  `SolidityTopupParent.accumulated`/`routerBalanceAfterWrapped` were retired;
-  the parent module now uses the routed `SolidityTopup.accumulated` /
-  `routerBalanceAfter`.
-- **Surgical kill-line** (`LidoSRv3/Tests/TopupTxMutants.lean`):
-  `mutantRunNoAssert` is now the routed `run` with ONLY the line-755 assert
-  branch deleted — a single edit. Two characterization theorems in the
-  P-DEPOSIT-1 style pin the edit down:
-  `mutantRunNoAssert_eq_run_of_assert_passing` (wherever the assert passes,
-  the mutant coincides with the honest `run`, branch for branch) and
-  `mutantRunNoAssert_commits_where_assert_fires` (wherever the honest `run`
-  hits `revertAssertBalanceUnchanged`, the mutant commits the push). The
-  kill-line then honestly shows: dropping the assert lets the wrapping batch
-  `wrapInput` commit with `pulled = 1 ≠ 2^256 + 1 = pushed` — the wrapped
-  pull against the exact push.
-- **Dual kept, honestly labeled**: `mutantAccumulatedUnwrapped` is retired;
-  `unwrapped_accumulator_kill_line_refutes_parent` now runs on
-  `mutantRunUnwrapped`, the assert-drop mutant's dual — the routed `run`
-  with the wrap ignored (equivalently, the pre-wave-5 honest `run`). At
-  `wrapInput` the honest routed `run` reverts via the assert while the
-  wrap-ignoring mutant commits with `pulled = pushed = 2^256 + 1`, showing
-  the routing itself is load-bearing for the wrap discharge. The module/WC
-  guard mutants and their kill-lines are unchanged (wave-5 review verified
-  them surgical).
-- **Verity plane**: `verity_tx_simulates_source` still builds unchanged in
-  statement; its `pulled`/`pushed` conjuncts now bridge `accumulated` and
-  the exact `allocSum` via `allocSumUnchecked_eq_allocSum` under the
-  `NoUncheckedWrap` premise. No commit values changed on the Verity
-  witnesses — they do not wrap, so the wrapped and exact readings coincide
-  there. The `guard_discharge_at_wrapping_input` positive control now shows
-  the honest `run` itself reverting at `wrapInput`, and pins the revert to
-  the line-755 assert (`run killCfg wrapInput = .revertAssertBalanceUnchanged`).
-
-## Wave 6: wrappedTotal on both planes
-
-The residual exact-reading guards now read the same wrapped word the chain
-reads. Over-target (line 737), zero-sum (line 741), Lido-side amount guards
-(`Lido.sol` 842/873), the line 744 pull, the funded router balance, and the
-line 755 `assert` all use `accumulated` (`wrappedTotal = exactTotal % 2^256`).
-
-Conjunct 3 is therefore `source_wrap_precludes_value_moving_commit`, not wrap
-implies revert. `wrap_to_zero_commits_no_topup` shows
-`allocations = [2^256-1, 1]` committing `committedNoTopUp` with
-`pulled = pushed = 0`. A nonzero wrap at `wrapInput` still hits the line-755
-assert. The four surgical kill-lines are unchanged in predicate: dropping the
-assert still commits `pulled ≠ pushed`; the wrap-ignoring dual still commits
-the wrapping batch.
-
-Verity `verity_tx_simulates_source` dropped the `NoUncheckedWrap` hypothesis.
-It keeps `hLen`, a per-allocation uint256 bound `hAmt` (strictly weaker than
-sum no-wrap), and `hCommit`. Wrap-to-zero is included as
-`execute_observes_source_wrapped_zero`.
-
-## Wave 7: closing the nonzero-wrap quantifier gap
-
-The registered Verity parent is now
-`verity_tx_simulates_source_with_nonzero_wrap_close`, the conjunction of the
-committing correspondence above with `verity_nonzero_wrap_reverts_and_restores`.
-The latter is universal in the allocation list: for every `allocations` whose
-entries are uint256 words, if `allocSum allocations ≥ 2^256` and
-`allocSumUnchecked allocations ≠ 0`, then the wrapped pull cannot fund the exact
-push schedule, so `execute` reverts with `Contract.run` returning the exact entry
-snapshot and `observe … |>.committed = false`. The old finite witness
-`[2^256 - 1, 2]` is retained as `verity_nonzero_wrap_witness_reverts_and_restores`,
-a concrete regression instance of that universal statement rather than the
-evidence for it. Together with `verity_wrap_to_zero_is_empty_commit` this
-partitions every wrapping batch on the executed plane, so nonzero wrap is no
-longer excluded by `hCommit`.
-
-## Wave 8: hybrid lane aligned, no Verity NoUncheckedWrap parent remains
-
-The hybrid bridge `TopupHybrid.verity_tx_simulates_source` still carried the
-`NoUncheckedWrap` premise the registered parents had already dropped. After the
-wrapped-total routing of `run`'s value-moving tail the premise was unreferenced
-in its proof (the build log warned so), while the guarantees row already stated
-"NoUncheckedWrap is not a Verity parent hypothesis". The premise is removed, so
-the hybrid simulation now holds for every input: a nonzero wrap executes the
-mapped revert branch and `Contract.run` restores the snapshot, wrap-to-zero
-executes the call-free empty commit, matching abstract conjunct 3 and the
-registered Verity parent. Two `TopupHybridMutants` theorems instantiate the
-generalized parent at the wrapping witnesses `wrapInput` (nonzero wrap,
-executed `ROUTER_BALANCE_CHANGED` revert to the entry snapshot) and
-`wrapToZeroInput` (empty commit), inputs the retired premise excluded;
-`Trust.lean` prints axioms for all three. Outcome: universal lifting, not a
-YAML-encoded limitation; the P-TOPUP-1 row is unchanged.
-
-## Scope Exclusions
-
-- Per-validator amount computation and limit accounting → P-TOPUP-2.
-- Allocation algorithm producing `_amounts` → P-ALLOC-1/2.
-- SSZ deposit-data-root → P-SSZ-1.
-- Beacon-address provenance: named assumption, not a parent conjunct.
-- `LinksSource` derivation from ALLOC deferred until live loops are in place.
+[PTopup1AllocationViewsSeated](../LidoSRv3/Audit/Guarantees/PTopup1AllocationViewsSeated.lean) closes the ordering caveat of the allocation views. `gates_split` shows the registered router-body gates are `statusChecks` (auth, input validation, module state, credential type) followed by `zeroTargetGate` (the conditional `canDeposit`), attempts included; `runSeated` walks the gateway prefix, runs the status checks, the two views, the zero-target gate and the registered `finish` at the produced allocation, exactly the order of `StakingRouter.topUp`. `success` gives the registered run's outcome, world, projection and seam at the produced allocation with `ActualEffects`, and the attempt trace `status ++ views ++ zero-target`; `failure` restores the entry world; `status_before_views` and `prefix_before_views` give the source error precedence. Axioms: `propext`, `Classical.choice`, `Quot.sound`.

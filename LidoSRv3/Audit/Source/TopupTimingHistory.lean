@@ -1,4 +1,4 @@
-import LidoSRv3.Audit.Guarantees.PTopupPhysicalCredentialGetter
+import LidoSRv3.Audit.Source.Effects.PTopupPhysicalCredentialGetter
 
 /-! core17005714 TopUpGateway:159–235,323–345,380–388. Typed phase with
 physical temporal admission and the final packed history write. The actual

@@ -1,5 +1,7 @@
 # P-ACCOUNT-1
 
+> **Registration update (2026-09-17).** The registered Verity parent of this row is now `PAccount1.actual_report_accounting_call` (`LidoSRv3/Audit/Guarantees/PAccount1AccountingCall.lean`): on a committed report/fee execution, `Prepared` states that the module balances are written first, the rewards distribution is read from the router state holding those writes, and the fee is a checked function of that distribution; a nonzero fee goes through the locator-resolved accounting call, the payments and the treasury STATICCALL, a zero fee makes no accounting call, and `actual_report_accounting_call_failure_restores` restores the original world on any revert. The abstract ordering parent `router_accounting_order_discipline` is unchanged; `verity_tx_simulates_oracle_report` described below remains built and printed as evidence.
+
 > Round 2 (2026-08-21). Product note plus proof audit, arbitrated from GPT 5.6 Pro and Opus 5. Fable 5 was unavailable (data-retention gate). Kimi K3 was not an allowed Task model. No em dashes. Lean is authority.
 
 Once per frame `AccountingOracle.submitReportData` pushes a per-module validator balance vector through `StakingRouter.reportValidatorBalancesByStakingModule`, then `Accounting.handleOracleReport` derives the fee distribution from that fresh router state, mints the fee shares, and records them last through `reportRewardsMinted`. Recording the mint before the fresh read would pay fees against stale module weights.
@@ -182,9 +184,9 @@ doc comments, this report, `audit/guarantees.yaml`, `scripts/audit_metadata.py`)
     *Counterexample mutant.* Skip `writeAll` and still write the three flag slots plus the total. `storedSteps` still emits `.balancesWritten [10, 20]` from the input list. Combined with issue 3 (`observe` already takes balances from `i.balancesGwei`), a no-op map write is invisible *and* the “balances were written” step cannot be turned off. The CHECKED ordering starts with a constructor the storage never recorded.
 
 11. **`sharesToMintAsFees` is an argument, not a fee computation.**
-    Live `Accounting.handleOracleReport` obtains `sharesToMintAsFees` from `_simulateOracleReport` / `_calculateProtocolFees` on the just-written balances (`Accounting.sol:135–144`, `403–412`). Lean `handleOracleReport i sharesToMintAsFees` takes the number from the caller.
+    Live `Accounting.handleOracleReport` snapshots the prestate and calls `_simulateOracleReport` (`Accounting.sol:137–143`). That simulation calls `_calculateProtocolFees` with the report, derived update and internal share count (`Accounting.sol:227–233`); the fee helper reads the router's rewards distribution (`Accounting.sol:265–292`). The later mint consumes this computed result (`Accounting.sol:403–412`). Lean `handleOracleReport i sharesToMintAsFees` takes the number from the caller.
 
-    *Scenario.* Balances `[10, 20]` should mint 0 (no reward delta). Caller passes `sharesToMintAsFees = 7`. Lean writes `rewardsMintedSlot = 3` (its "written" tick) and the four-step trace. The abstract theorem’s `hFees : 0 < shares` is satisfied by the same argument. The CHECKED “mint only after reading this snapshot” never computes a mint from the snapshot; it mints whatever the harness asked for.
+    *Scenario.* Choose an otherwise accepted report whose unified CL balance is at most its principal CL balance. The source fee calculation returns zero on this branch (`Accounting.sol:317–333`); a module-balance vector such as `[10, 20]` alone does not establish that condition. Caller-supplied `sharesToMintAsFees = 7` can still produce the Lean mint flag and four-step trace, with the abstract theorem's `hFees : 0 < shares` satisfied by that same argument. The missing connection is from the actual prestate, report and router distribution to the computed mint, not merely equality with an input vector.
 
 12. **Three copy-paste accumulators plus a copy-paste step list.**
     `checkedTotal64` (Nat), `checkedTotal256` (word `safeAdd`), `txCheckedTotal` (another word `safeAdd`) are the same recursion. `verityTxSuccessfulSteps` (`AccountingCorrespondence.lean:93–97`) is character-identical to `successfulSteps` (`:86–89`).
@@ -225,3 +227,18 @@ doc comments, this report, `audit/guarantees.yaml`, `scripts/audit_metadata.py`)
     Live `StakingRouter.reportValidatorBalancesByStakingModule` (`:285–289`) is `onlyRole(REPORT_EXITED_VALIDATORS_ROLE)` then `SRLib._report…`. Issue 17 is Accounting’s `accountingOracle` check. This is the *router* gate on the write the guarantee is named for.
 
     *Scenario.* A caller without that role invokes the router with matching id/balance lists. Live reverts. Lean `handleOracleReport` commits the four-step trace. Combined with issue 6 (registered is an input), anyone who can satisfy list equality can “write balances before mint” in the CHECKED tx. The named ordering is not an authorized router transition.
+
+## The complete oracle transaction (2026-09-18)
+
+[PAccount1SubmitReport](../LidoSRv3/Audit/Guarantees/PAccount1SubmitReport.lean) links `SubmitReportEntryTx.submitReportDataTx` to `ReportFeeAccountingCall.execute`: `submitReportData` keeps the entry's sender and consensus-hash gates (`guard_sender`, `guard_hash` agree with the Verity entry's reverts) and runs the registered report/fee executor on the entry-derived input. `checked_fee_ether` shows the executor's checked fee pipeline mints exactly the pinned shares of the entry's `feeEther d`; `committed_success` derives the registered `Success` data flow (write, then read, then checked fee) with that fee; `failure_restores` restores the entry world on any reverted body and `guard_failure_no_body` executes no body on a guard failure. Live membership, the caller role, the report data and the fee parameters remain inputs. Axioms: `propext`, `Classical.choice`, `Quot.sound`.
+
+## Entry guards (2026-09-19)
+
+[PAccount1SubmitReportGuards](../LidoSRv3/Audit/Guarantees/PAccount1SubmitReportGuards.lean) executes the pinned `submitReportData` ladder in source order: the sender gate, `_checkContractVersion`, `_checkConsensusData` (ref slot, consensus version, data hash), `_startProcessing` (report present, processing deadline, ref slot not already processing, the `LAST_PROCESSING_REF_SLOT` write and a `processingStarted` result flag; the source's `ProcessingStarted` EVM log is not modeled), then the registered report/fee executor. The oracle words the entry reads are inputs (`OracleState`, `CallArgs`); the checks on them are executed with the source's errors (`guard_*`, `entry_revert_no_body`). `refines_entry` gives the registered entry on the passing ladder under the coherence premise `d.consensusHash = o.reportHash`; `committed_success` and `failure_restores` carry over. Outside the modeled body, as one stated assumption: extra-data processing and the withdrawal queue's `onOracleReport` call. Axioms: `propext`, `Classical.choice`, `Quot.sound`.
+
+### Delivery clarification (2026-09-21)
+
+The C4 entry refinement and its success/rollback corollaries retain the explicit
+coherence premise `d.consensusHash = o.reportHash`. The `processingStarted`
+result flag is modeled; the `ProcessingStarted` EVM log is not emitted by this
+model. Deriving the entry guards does not derive this coherence premise.

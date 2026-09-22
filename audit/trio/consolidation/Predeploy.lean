@@ -189,7 +189,7 @@ theorem predeploy_fee_read (ctx : Context) (inbox : Live.Address) (w : World)
         [⟨⟨ctx.self, inbox, word 0, []⟩, true, true,
           encode 32 (w.core.readContractSlot inbox.val predeployFeeSlot).val, 1⟩]⟩ := by
     unfold lowLevelStaticCall predeployStaticBody
-    simp [hc, Live.word, word]
+    simp [emptyCodeAccount, hc, Live.word, word]
   have hmain := feeRead_ok predeployStaticBody ctx inbox w
     (encode 32 (w.core.readContractSlot inbox.val predeployFeeSlot).val) _ hcall
     (ABI.encode_length 32 _)

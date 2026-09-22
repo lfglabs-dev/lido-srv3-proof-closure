@@ -30,7 +30,7 @@ and `guarantees.yaml` are not edited.
 
 Additive files:
 
-- `LidoSRv3/Audit/Source/ReserveUnfinalizedCall.lean`
+- `LidoSRv3/Audit/Guarantees/Composition/ReserveUnfinalizedCall.lean`
 - `LidoSRv3/Tests/ReserveUnfinalizedCallMutants.lean`
 
 | Theorem | Source span | Claim |

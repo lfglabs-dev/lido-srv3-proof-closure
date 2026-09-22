@@ -1,9 +1,13 @@
 import LidoSRv3.Audit.StrategyProofs
 import LidoSRv3.Audit.Source.MinFirstCorrespondence
+import LidoSRv3.Audit.Source.MinFirstProportionalStep
 import LidoSRv3.Audit.MinFirstAllocation
 import LidoSRv3.Audit.Verity.MinFirstAmountTx
 import LidoSRv3.Audit.Verity.MinFirstDistributionTx
 import LidoSRv3.Audit.Guarantees.Registry
+import LidoSRv3.Audit.Source.TrioAlloc2.LoopCorrespondence
+import LidoSRv3.Audit.Source.TrioAlloc2.Conservation
+import LidoSRv3.Audit.Source.TrioComposition.MemoryTransportCall
 
 namespace LidoSRv3.Audit.Guarantees.PAlloc2
 
@@ -60,14 +64,18 @@ theorem source_selects_same_next_target
 MODEL/SOURCE representations used by the proportional mutation slice.
 Together with `source_amount_correspondence` below this is registered parent
 evidence; the remaining OPEN step is folding amount equality into the
-registered parent's conclusion and lifting it to a full-loop theorem. -/
+registered parent's conclusion and lifting it to a full-loop theorem.
+
+The proof lives in the source layer
+(`LidoSRv3.Audit.Source.MinFirstProportionalStep`) so source consumers can
+cite it without a Source → Guarantees edge; the statement is unchanged. -/
 theorem full_candidate_correspondence
     (hRows : MinFirstAllocation.RowsCorrespond model source) :
     Option.map (fun b => (b.allocation, b.capacity))
         (MinFirstAllocation.Model.candidate? model) =
       Option.map (fun r => (r.allocation.val, r.capacity.val))
         (MinFirstAllocation.Source.candidate? source) :=
-  MinFirstAllocation.candidate_correspondence hRows
+  LidoSRv3.Audit.Source.MinFirstProportionalStep.full_candidate_correspondence hRows
 
 /-! ## Proportional amount, pinned source lines 88--106 -/
 
@@ -76,6 +84,9 @@ The proportional allocation amount at source lines 102--105 is the value of the
 unbounded model amount, whenever the checked `uint256` arithmetic succeeds.  The
 array-length premise is what reflects a Solidity candidate count back into
 `Nat`; an EVM memory array cannot hold `2^256` entries.
+
+Proof forwarded from `LidoSRv3.Audit.Source.MinFirstProportionalStep`;
+statement unchanged.
 -/
 theorem source_amount_correspondence
     {model : List MinFirstAllocation.Model.Bucket}
@@ -89,13 +100,17 @@ theorem source_amount_correspondence
     (hCap : mbest.capacity = sbest.capacity.val)
     (hAmount : MinFirstAllocation.Source.checkedAmount source allocationSize sbest = some w) :
     MinFirstAllocation.Model.amount model allocationSize.val mbest = w.val :=
-  MinFirstAllocation.amount_correspondence hRows hLen hAlloc hCap hAmount
+  LidoSRv3.Audit.Source.MinFirstProportionalStep.source_amount_correspondence
+    hRows hLen hAlloc hCap hAmount
 
 /--
 The pinned source subtracts once, after the inner `Math256.min`, whereas the
 audit's `Source.checkedAmount` distributes that subtraction over the `min`.
 This discharges the difference rather than assuming it: for any best candidate
 with free space the two expressions are the same `Option`.
+
+Proof forwarded from `LidoSRv3.Audit.Source.MinFirstProportionalStep`;
+statement unchanged.
 -/
 theorem source_pinned_expression_shape
     {rs : List MinFirstAllocation.Source.Row}
@@ -104,13 +119,16 @@ theorem source_pinned_expression_shape
     (hOpen : MinFirstAllocation.Source.hasFreeSpace best = true) :
     MinFirstAllocation.pinnedAmount rs allocationSize best =
       MinFirstAllocation.Source.checkedAmount rs allocationSize best :=
-  MinFirstAllocation.pinnedAmount_eq_checkedAmount hOpen
+  LidoSRv3.Audit.Source.MinFirstProportionalStep.source_pinned_expression_shape hOpen
 
 /--
 The pinned checked arithmetic of lines 102--106 never reverts for an open best
 candidate, and the resulting word makes strict progress without breaching the
 candidate's capacity or underflowing the remaining demand.  These are exactly
 the premises `Source.Execute.mutate` carries as hypotheses.
+
+Proof forwarded from `LidoSRv3.Audit.Source.MinFirstProportionalStep`;
+statement unchanged.
 -/
 theorem source_amount_totality
     {rs : List MinFirstAllocation.Source.Row}
@@ -122,9 +140,8 @@ theorem source_amount_totality
     (hAmount : MinFirstAllocation.Source.checkedAmount rs allocationSize best = some w) :
     0 < w.val ∧ w.val ≤ allocationSize.val ∧
       best.allocation.val + w.val ≤ best.capacity.val :=
-  ⟨MinFirstAllocation.checkedAmount_pos hOpen hLen hSize hAmount,
-   MinFirstAllocation.checkedAmount_le_size hOpen hLen hAmount,
-   MinFirstAllocation.checkedAmount_le_headroom hOpen hAmount⟩
+  LidoSRv3.Audit.Source.MinFirstProportionalStep.source_amount_totality
+    hOpen hLen hSize hAmount
 
 /-- **Helper (wave-1 parent with implicit binders; the registered parent is
 now the explicit-∀ `forall_proportional_step_correspondence_and_bounded`
@@ -138,7 +155,10 @@ conjunct pins the model scan's result to the *selected* row, so `hSelected`
 is load-bearing; and whenever the checked `uint256` amount for the selected
 candidate succeeds, it is positive, does not exceed the remaining demand, and
 keeps the candidate within its capacity (`best.allocation + w ≤
-best.capacity`, i.e. the allocation never runs over headroom). -/
+best.capacity`, i.e. the allocation never runs over headroom).
+
+Proof forwarded from `LidoSRv3.Audit.Source.MinFirstProportionalStep`;
+statement unchanged. -/
 theorem proportional_step_correspondence_and_bounded
     {model : List MinFirstAllocation.Model.Bucket}
     {source : List MinFirstAllocation.Source.Row}
@@ -156,9 +176,8 @@ theorem proportional_step_correspondence_and_bounded
       ⟨best.allocation.val, best.capacity.val⟩ = w.val ∧
     0 < w.val ∧ w.val ≤ allocationSize.val ∧
       best.allocation.val + w.val ≤ best.capacity.val :=
-  ⟨by rw [full_candidate_correspondence hRows, hSelected]; rfl,
-   source_amount_correspondence hRows hLen rfl rfl hAmount,
-   source_amount_totality hOpen hLen hSize hAmount⟩
+  LidoSRv3.Audit.Source.MinFirstProportionalStep.proportional_step_correspondence_and_bounded
+    hRows hSelected hOpen hLen hSize hAmount
 
 /-- **Explicit ∀ registered parent (P-ALLOC-2).** Universal closure over
 valid model/source rows and `allocationSize`: for every model/source pair
@@ -168,7 +187,10 @@ correspondence holds and the amount is positive, bounded by the remaining
  demand, and capacity-safe. It also identifies the checked source word with
 the independent unbounded `Model.amount`, making the proportional `ceilDiv`
 and both model clamps load-bearing parent content. The `∀` is explicit so the bound is not an
-existential witness over one allocationSize. -/
+existential witness over one allocationSize.
+
+Proof forwarded from `LidoSRv3.Audit.Source.MinFirstProportionalStep`;
+statement unchanged. -/
 theorem forall_proportional_step_correspondence_and_bounded :
     ∀ (model : List MinFirstAllocation.Model.Bucket)
       (source : List MinFirstAllocation.Source.Row)
@@ -186,8 +208,7 @@ theorem forall_proportional_step_correspondence_and_bounded :
         ⟨best.allocation.val, best.capacity.val⟩ = w.val ∧
       0 < w.val ∧ w.val ≤ allocationSize.val ∧
         best.allocation.val + w.val ≤ best.capacity.val :=
-  fun _ _ _ _ _ hRows hSelected hOpen hLen hSize hAmount =>
-    proportional_step_correspondence_and_bounded hRows hSelected hOpen hLen hSize hAmount
+  LidoSRv3.Audit.Source.MinFirstProportionalStep.forall_proportional_step_correspondence_and_bounded
 
 /-- A successful full run of the independently stated pinned-source allocation
 loop conserves the requested demand, for every fuel bound and every number of
@@ -283,17 +304,81 @@ abbrev LoopStaysInCorrespondence : Prop :=
         some (modelAfter, allocated.val, remaining.val) ∧
       RowsCorrespond modelAfter after
 
+/-- The actual decoded-array source loop terminates without supplied fuel.
+Success follows from memory-array extent bounds, not a postcondition premise.
+Deployment/ABI/memory correspondence remains a separate upstream obligation. -/
+def UnboundedProportionalLoop : Prop :=
+  ∀ (buckets capacities : List LidoSRv3.Audit.Source.TrioAlloc2.Word)
+    (demand : LidoSRv3.Audit.Source.TrioAlloc2.Word),
+    buckets.length ≤ capacities.length → buckets.length < 2^256 →
+    ∃ out, LidoSRv3.Audit.Source.TrioAlloc2.allocate buckets capacities demand = .ok out ∧
+      LidoSRv3.Audit.Source.TrioAlloc2.Spec.Distributes
+        (LidoSRv3.Audit.Source.TrioAlloc2.decodedRows buckets capacities)
+        demand.val out.amount.val
+        (LidoSRv3.Audit.Source.TrioAlloc2.decodedRows out.buckets capacities) ∧
+      LidoSRv3.Audit.Source.TrioAlloc2.bucketTotal out.buckets =
+        LidoSRv3.Audit.Source.TrioAlloc2.bucketTotal buckets + out.amount.val ∧
+      out.amount.val ≤ demand.val
+
+theorem unbounded_proportional_loop : UnboundedProportionalLoop := by
+  intro buckets capacities demand lengths bounded
+  obtain ⟨out, executed, distributed⟩ :=
+    LidoSRv3.Audit.Source.TrioAlloc2.distribution_exists buckets capacities demand lengths bounded
+  exact ⟨out, executed, distributed,
+    LidoSRv3.Audit.Source.TrioAlloc2.allocate_conserves buckets capacities demand out executed,
+    LidoSRv3.Audit.Source.TrioAlloc2.allocate_amount_le_demand buckets capacities demand out executed⟩
+
+section SourceMemoryCall
+open LidoSRv3.Audit.Source.TrioAlloc1
+open LidoSRv3.Audit.Source.TrioComposition
+open LidoSRv3.Audit.Source.TrioComposition.MemoryTransport
+open LidoSRv3.Audit.Source.TrioComposition.MemoryTransportCall
+
+/-- Source memory producer, ABI library call and ordered return observation.
+This does not identify the configured target with deployed code or establish
+compiled caller-frame semantics. Producer success and explicit memory bounds
+are retained; no desired library result or final memory relation is assumed. -/
+def SourceMemoryCallCorrespondence : Prop :=
+  ∀
+    (target : Address) (memory : MemoryWords) (ap cp : Nat)
+    (l : Layout) (s : Storage) (oracle : StaticOracle) (input : CapacityInput)
+    (before after : Transcript) (output : CapacityOutput) (final : MemoryWords)
+    (executed : CallTree.evaluate oracle (ProducerStores.producer memory ap cp l s input) before =
+      (.ok (output,final),after))
+    (separate : Disjoint ap (s (countSlot l)).val cp (s (countSlot l)).val)
+    (aend : ap+32*((s (countSlot l)).val+1) ≤ 2^256)
+    (cend : cp+32*((s (countSlot l)).val+1) ≤ 2^256)
+    (countBound : (s (countSlot l)).val ≤ 32)
+    (pointer : LidoSRv3.Audit.Source.TrioAlloc1.Word)
+    (space : pointer.val+96+32*(s (countSlot l)).val ≤ 2^32)
+    (trace : Trace),
+    ∃ result,
+      producerThenCall target memory ap cp l s oracle input pointer before trace =
+        (.ok result,trace ++ (after.drop before.length).map staticEvent ++
+          [⟨request target final ap cp input.depositsToAllocate,
+            .returned (LidoSRv3.Audit.Source.TrioAlloc2.LibraryABI.encodeReturn result)⟩]) ∧
+      LidoSRv3.Audit.Source.TrioAlloc2.Spec.Distributes (LidoSRv3.Audit.Source.TrioAlloc2.decodedRows output.allocations output.capacities)
+        input.depositsToAllocate.val result.amount.val
+        (LidoSRv3.Audit.Source.TrioAlloc2.decodedRows result.buckets output.capacities) ∧
+      result.buckets.length = (s (countSlot l)).val
+
+end SourceMemoryCall
+
 /-- **Registered P-ALLOC-2 parent.**  This keeps the independent model/source
 candidate and proportional-amount equality from the step theorem load-bearing,
 and adds fuel-bounded conservation for every successful run of the full
 independently stated source allocation loop, plus multi-step row correspondence
 with an independently stated proportional model loop.  It does not identify
-that proportional loop with the separate +1 `MinFirst` child model. -/
+that proportional loop with the separate +1 `MinFirst` child model. It also
+consumes the unbounded checked source loop, deriving its success and independent
+proportional distribution/conservation from array extents alone. -/
 theorem step_correspondence_and_full_loop_conservation :
-    StepMatchesModel ∧ FullLoopConserves ∧ LoopStaysInCorrespondence :=
+    StepMatchesModel ∧ FullLoopConserves ∧ LoopStaysInCorrespondence ∧
+      UnboundedProportionalLoop ∧ SourceMemoryCallCorrespondence :=
   ⟨forall_proportional_step_correspondence_and_bounded,
    source_allocate_loop_conserves_requested,
-   proportional_model_loop_preserves_rows⟩
+   proportional_model_loop_preserves_rows, unbounded_proportional_loop,
+   LidoSRv3.Audit.Source.TrioComposition.MemoryTransportCall.producer_observed_library_distributes⟩
 
 /-! ## Verity transaction plane -/
 

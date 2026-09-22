@@ -1,4 +1,4 @@
-import LidoSRv3.Audit.Guarantees.PAddress1PermitRequestCalls
+import LidoSRv3.Audit.Source.Effects.PAddress1PermitRequestCalls
 
 /-! Actual Lido0.4.24 getSharesByPooledEth quote on contract-qualified physical
 words, consumed by the existing request/unwrap/batch/permit chain. No supplied

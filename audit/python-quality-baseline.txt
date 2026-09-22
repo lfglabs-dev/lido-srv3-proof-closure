@@ -2,9 +2,8 @@
 # scripts at or above the line limit. Rows may only shrink or disappear;
 # deleting a row re-pins BASELINE_BLOB in scripts/check_python_quality.py.
 
-audit_metadata.py 840
+audit_metadata.py 827
 audit_metadata.py:rendered 30
-audit_metadata.py:validate_pins 22
 check_deployed_code.py:main 39
 check_diagram_taxonomy.py 628
 check_diagram_taxonomy.py:main 74
@@ -13,7 +12,7 @@ check_proof_escapes.py:strip_comments_and_strings 23
 check_report_theorem_inventory.py 634
 check_report_theorem_inventory.py:main 42
 check_source_annotations.py:main 53
-check_trust_axioms.py 609
+check_trust_axioms.py 572
 check_trust_axioms.py:main 31
 check_verity_provenance.py 823
 check_verity_provenance.py:_strip_html_comments 93

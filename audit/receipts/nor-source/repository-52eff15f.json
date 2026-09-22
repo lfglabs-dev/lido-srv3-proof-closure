@@ -1,0 +1,25 @@
+{
+  "job_id": "ccbfce85-e59d-42fa-91c3-0dddc93c7caf",
+  "state": "succeeded",
+  "exit_code": 0,
+  "node_id": "dgx-spark",
+  "validation": {
+    "version": 1,
+    "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+    "commit": "52eff15fd8da0cea0776aa194495906a8db3c0ed",
+    "base_tree_sha": "d707df0852254702a093435cc7e28f141c0548f2",
+    "cwd_rel_known": true,
+    "command": [
+      "lake",
+      "test",
+      "--",
+      "repository"
+    ],
+    "toolchain": "leanprover/lean4:v4.31.0",
+    "build_protocol_version": "1",
+    "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+  },
+  "raw_receipt_path": "/workspaces/mission-1ca15c66/output/remote-ccbfce85-e59d-42fa-91c3-0dddc93c7caf.json",
+  "raw_receipt_sha256": "31ad55479f97670f64994acba2121b88024018586e7287505bcabb96f4ce0b9b",
+  "scope": "Exact-commit configured repository gate passed: make prove, make test, requested Lean libraries and configured source differentials. No source bundle. Not independent review, Solidity modeling closure, or deployment validation."
+}

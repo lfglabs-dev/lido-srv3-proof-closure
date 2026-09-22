@@ -41,8 +41,12 @@ theorem wrong_caller : (lookup getter (address 4) (address 2) (word 7) (word 128
     .error (.bubbled [0xba]) := by decide +kernel
 
 def noCode : World := {env.before with core := {env.before.core with codeSize := fun _ => word 0}}
-theorem ordinary_no_code_attempt : lookup getter (address 3) (address 2) (word 7) (word 128) noCode =
-    ⟨.error .empty,[⟨request (address 3) (address 2) (word 7),true,true,[],1⟩]⟩ := by decide +kernel
+theorem ordinary_no_code_attempt : lookup getter (address 3) (address 20) (word 7) (word 128) noCode =
+    ⟨.error .empty,[⟨request (address 3) (address 20) (word 7),true,true,[],1⟩]⟩ := by decide +kernel
+
+/-- Address 2 is a precompile, not the ordinary-account fixture above. -/
+theorem precompile_getter_attempt : lookup getter (address 3) (address 2) (word 7) (word 128) noCode =
+    ⟨.ok (credentials,word 160),[⟨request (address 3) (address 2) (word 7),true,true,raw,1⟩]⟩ := by decide +kernel
 
 theorem full_batch_success : batch.outcome = .ok () := by decide +kernel
 

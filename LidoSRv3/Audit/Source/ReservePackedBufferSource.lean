@@ -1,37 +1,25 @@
-/-! # Lido buffered+depositedPostReport packed uint128 pair source model
+/-!
+Packed buffered-ether and post-report-deposit projection for
+[Lido's pair setter](https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.4.24/Lido.sol#L1507-L1513).
+The delegated [storage helper](https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.4.24/utils/UnstructuredStorageExt.sol#L38-L46)
+stores `(high << 128) | (low & UINT128_LOW_MASK)`. The mask discards
+low-argument bits above bit 127; the uint256 shift discards high-argument
+bits above bit 127. Packing performs no checked addition or range guard.
 
-**General rule (Thomas 2026-09-13, real derivation naming the pinned
-Lido.sol:131-132 packed uint128 buffered+depositedPostReport pair as
-a source-level function.)**
-
-Chantier: grok differential #419 flags D-PACK-1 — Verity does not
-model the packed uint128 pair `buffered` / `depositedPostReport`
-(`Lido.sol:131-132`). A seeded `depositedPostReport = uint128.max +
-1 ether` still fits uint256 SafeMath in the model, but the pin's
-0.4.24 `<< 128` wraps the high half.
-
-This composition names the packed uint128 pair as a source-level
-function: `packed = buffered | (depositedPostReport << 128)` (both
-truncated to uint128). Under a pinned "both halves ≤ uint128.max"
-premise, no wrap occurs; otherwise the addition triggers a wrap.
-
-Pinned Solidity (17005714):
-
-- `Lido.sol:131-132`: `bytes32 constant BUFFERED_ETHER_AND_DEPOSITED_POST_REPORT_POSITION = ...` with:
-  - low uint128: `buffered`
-  - high uint128: `depositedPostReport`
-- Reading: `packedBuffer >> 128` for the high half, low uint128 mask
-  for the low half.
-
-**Status:** first real derivation naming the D-PACK-1 divergence
-(grok #419) as a source-level packed uint128 pair. -/
+`packPair` expresses the resulting word with modular halves and arithmetic
+addition of disjoint bit ranges. Its round-trip theorem recovers the low
+input when that input fits 128 bits. This arithmetic projection does not
+itself connect the setter to live account storage or prove the complete
+withdrawal transition, and its bounded theorem does not rule out truncation
+on arbitrary source inputs.
+-/
 
 namespace LidoSRv3.Audit.Source.ReservePackedBufferSource
 
 /-- uint128 upper bound: 2^128 - 1. -/
 def uint128Max : Nat := 2 ^ 128 - 1
 
-/-- uint128 mask: 2^128. -/
+/-- uint128 modulus: 2^128. -/
 def uint128Modulus : Nat := 2 ^ 128
 
 /-- Source-level definition of the pinned packed uint128 pair:

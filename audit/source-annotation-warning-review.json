@@ -1,0 +1,206 @@
+{
+  "version": 1,
+  "source_commit": "17005714f151e5502c559932319a3f2f74ac2436",
+  "reviewed_candidate": "bf5658bfac3e3b1bd420b96c330060657e2a39ee",
+  "scope": "Manual review of the 22 identifier-presence warnings. This is citation evidence only, not a Solidity correspondence proof. The checker remains unchanged; model and IR names may continue to warn.",
+  "entries": [
+    {
+      "file": "LidoSRv3/Audit/Guarantees/Composition/DepositLinksSource.lean",
+      "original_line": 47,
+      "source_file": "StakingRouter.sol",
+      "source_span": "966-967",
+      "identifier": "publicKeysBatchLength",
+      "disposition": "reviewed_model_or_ir_name",
+      "rationale": "Lean publicKeysBatchLength names the source publicKeysBatch.length modulo/division at 966\u2013967."
+    },
+    {
+      "file": "LidoSRv3/Audit/Guarantees/Composition/DepositLinksSource.lean",
+      "original_line": 196,
+      "source_file": "BeaconChainDepositor.sol",
+      "source_span": "53-63",
+      "identifier": "firstAmount",
+      "disposition": "reviewed_model_or_ir_name",
+      "rationale": "Lean firstAmount names the batch total; source loops over keys and sends DEPOSIT_SIZE at 57."
+    },
+    {
+      "file": "LidoSRv3/Audit/Guarantees/Composition/DepositLinksSource.lean",
+      "original_line": 199,
+      "source_file": "BeaconChainDepositor.sol",
+      "source_span": "53-63",
+      "identifier": "loopPushed",
+      "disposition": "reviewed_model_or_ir_name",
+      "rationale": "Lean loopPushed sums the per-key DEPOSIT_SIZE transfers in this source loop."
+    },
+    {
+      "file": "LidoSRv3/Audit/Guarantees/Composition/SszCompiledEntryRollback.lean",
+      "original_line": 48,
+      "source_file": "CLValidatorVerifier.sol",
+      "source_span": "103-107",
+      "identifier": "decodeRoot",
+      "disposition": "reviewed_model_or_ir_name",
+      "rationale": "decodeRoot is a model/IR name; source staticcall, failure guard and abi.decode occupy 104\u2013106."
+    },
+    {
+      "file": "LidoSRv3/Audit/Guarantees/PDeposit1.lean",
+      "original_line": 1163,
+      "source_file": "StakingRouter.sol",
+      "source_span": "978",
+      "identifier": "shouldPull",
+      "disposition": "reviewed_model_or_ir_name",
+      "rationale": "shouldPull is the model predicate for the source early return when actualDepositsCount is zero."
+    },
+    {
+      "file": "LidoSRv3/Audit/Guarantees/PReserve1.lean",
+      "original_line": 230,
+      "source_file": "Lido.sol",
+      "source_span": "877-882",
+      "identifier": "_hSeedShape",
+      "disposition": "reviewed_model_or_ir_name",
+      "rationale": "_hSeedShape is explicitly a caller premise about the cited seed-count update and event, not a source identifier."
+    },
+    {
+      "file": "LidoSRv3/Audit/Source/BridgePerWriterGlue.lean",
+      "original_line": 59,
+      "source_file": "WithdrawalQueueBase.sol",
+      "source_span": "472",
+      "identifier": "_recipient",
+      "disposition": "citation_corrected",
+      "rationale": "Corrected the wrong amount-calculation reference: _claim calls _sendValue at 477; the value CALL is at 529."
+    },
+    {
+      "file": "LidoSRv3/Audit/Source/ConsolidationCorrespondence.lean",
+      "original_line": 456,
+      "source_file": "ConsolidationGateway.sol",
+      "source_span": "189",
+      "identifier": "hGatewayAdmittedNonzero",
+      "disposition": "reviewed_model_or_ir_name",
+      "rationale": "hGatewayAdmittedNonzero is explicitly a premise; the cited source rejects zero msg.value."
+    },
+    {
+      "file": "LidoSRv3/Audit/Source/DepositCorrespondence.lean",
+      "original_line": 610,
+      "source_file": "StakingRouter.sol",
+      "source_span": "996",
+      "identifier": "run",
+      "disposition": "reviewed_model_or_ir_name",
+      "rationale": "run is the Lean function; the cited source is the balance equality assertion removed by the mutant."
+    },
+    {
+      "file": "LidoSRv3/Audit/Source/ReserveCorrespondence.lean",
+      "original_line": 40,
+      "source_file": "Lido.sol",
+      "source_span": "872",
+      "identifier": "APP_AUTH_FAILED",
+      "disposition": "helper_location_clarified",
+      "rationale": "Clarified that the literal APP_AUTH_FAILED is at 1395 in the address overload invoked at 872."
+    },
+    {
+      "file": "LidoSRv3/Audit/Source/ReserveCorrespondence.lean",
+      "original_line": 52,
+      "source_file": "Lido.sol",
+      "source_span": "847",
+      "identifier": "BUFFER_UNDERFLOW",
+      "disposition": "reviewed_model_or_ir_name",
+      "rationale": "BUFFER_UNDERFLOW is explicitly a historical model label, not the source reason; source sub uses MATH_SUB_UNDERFLOW."
+    },
+    {
+      "file": "LidoSRv3/Audit/Source/SszCompiledAfterRootClass.lean",
+      "original_line": 207,
+      "source_file": "CLValidatorVerifier.sol",
+      "source_span": "103-107",
+      "identifier": "rootNotFound",
+      "disposition": "reviewed_model_or_ir_name",
+      "rationale": "rootNotFound is the Lean error constructor corresponding to Solidity RootNotFound at 105."
+    },
+    {
+      "file": "LidoSRv3/Audit/Source/SszCompiledGIndex.lean",
+      "original_line": 29,
+      "source_file": "GIndex.sol",
+      "source_span": "22-29",
+      "identifier": "fun_pack",
+      "disposition": "reviewed_model_or_ir_name",
+      "rationale": "fun_pack is explicitly the IR name; Solidity pack uses the uint248 guard and shift/or at 22\u201329."
+    },
+    {
+      "file": "LidoSRv3/Audit/Source/TopupCorrespondence.lean",
+      "original_line": 24,
+      "source_file": "Lido.sol",
+      "source_span": "842",
+      "identifier": "amount",
+      "disposition": "reviewed_model_or_ir_name",
+      "rationale": "amount is the router amount; the cited Lido guard calls the transported value _depositAmount."
+    },
+    {
+      "file": "LidoSRv3/Audit/Source/TopupCorrespondence.lean",
+      "original_line": 261,
+      "source_file": "StakingRouter.sol",
+      "source_span": "686",
+      "identifier": "SRTopupCallerContext",
+      "disposition": "reviewed_model_or_ir_name",
+      "rationale": "SRTopupCallerContext is the Lean context corresponding to the cited _checkAppAuth call."
+    },
+    {
+      "file": "LidoSRv3/Audit/Source/TopupPointerOrigin.lean",
+      "original_line": 286,
+      "source_file": "StakingRouter.sol",
+      "source_span": "717\u2013719",
+      "identifier": "decodeReturn",
+      "disposition": "reviewed_model_or_ir_name",
+      "rationale": "decodeReturn is the Lean/IR decoder for the cited allocateDeposits returndata, not a Solidity identifier."
+    },
+    {
+      "file": "LidoSRv3/Audit/Source/TopupWeiBounds.lean",
+      "original_line": 10,
+      "source_file": "TopUpGateway.sol",
+      "source_span": "42",
+      "identifier": "GatewayConfig",
+      "disposition": "reviewed_model_or_ir_name",
+      "rationale": "GatewayConfig is the Lean configuration; source uint64 storage fields are at 42 and 47."
+    },
+    {
+      "file": "LidoSRv3/Audit/Ssz.lean",
+      "original_line": 153,
+      "source_file": "SSZ.sol",
+      "source_span": "199",
+      "identifier": "pathAux",
+      "disposition": "reviewed_model_or_ir_name",
+      "rationale": "pathAux is the Lean path recursion; cited source shifts index and selects the sibling side at 199\u2013200."
+    },
+    {
+      "file": "LidoSRv3/Audit/Verity/AllocationTx.lean",
+      "original_line": 78,
+      "source_file": "SRLib.sol",
+      "source_span": "499",
+      "identifier": "totalValidators",
+      "disposition": "reviewed_model_or_ir_name",
+      "rationale": "The annotation lists three distinct source locations: allocations 499, capacities 534, totalValidators 506; the warning only checks 499."
+    },
+    {
+      "file": "LidoSRv3/Audit/Verity/DepositParentTx.lean",
+      "original_line": 69,
+      "source_file": "Lido.sol",
+      "source_span": "869",
+      "identifier": "lidoCallOk",
+      "disposition": "reviewed_model_or_ir_name",
+      "rationale": "lidoCallOk is explicitly a modeled callee outcome for the withdrawDepositableEther entry at 869."
+    },
+    {
+      "file": "LidoSRv3/Audit/Verity/TopupTx.lean",
+      "original_line": 379,
+      "source_file": "StakingRouter.sol",
+      "source_span": "742",
+      "identifier": "lidoStub",
+      "disposition": "reviewed_model_or_ir_name",
+      "rationale": "lidoStub is explicitly the modeled Lido callee. The following cited router balance operations are separate omissions."
+    },
+    {
+      "file": "diagram/README.md",
+      "original_line": 73,
+      "source_file": "UpgradeTemporaryAdmin.sol",
+      "source_span": "68",
+      "identifier": "EVMScriptExecutor",
+      "disposition": "reviewed_model_or_ir_name",
+      "rationale": "EVMScriptExecutor is a contract role name; source uses the evmScriptExecutor local obtained from EasyTrack at 68."
+    }
+  ]
+}

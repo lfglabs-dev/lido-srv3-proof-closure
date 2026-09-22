@@ -1,4 +1,4 @@
-import LidoSRv3.Audit.Verity.TopupMultiCallBlockCap
+import LidoSRv3.Audit.Guarantees.Composition.TopupMultiCallBlockCap
 
 /-! P-TOPUP-2 same-block n-call vectors. -/
 

@@ -1,5 +1,9 @@
 # P-CONSOLIDATION-ETH-1
 
+> **Registration update (2026-09-18, step 3a).** The registered Verity parent of this row is now `PConsolidation1.gateway_witness_admission_live_success_and_revert` (`LidoSRv3/Audit/Guarantees/PConsolidation1WitnessAdmission.lean`, shared with P-CONSOLIDATION-1): the gateway's DSM/Lido preconditions, locator vault read and per-group `_validatePubKeyWCProof` checks execute on the entry World before the fee/refund executor described in the 2026-09-17 note, and any failure restores the entry World. The role, pause and quota guards are now derived conclusions of the registered parent; the CL-proof scaffold `PConsolidationEth1CLProofPremise` is superseded by `audit.trio.consolidation.WitnessProof`. SHA-256 stays the opaque FFI (A-SHA256-FFI) and EIP-4788 authenticity stays an explicit hypothesis.
+
+> **Registration update (2026-09-17).** The registered Verity parent of this row is now `PConsolidation1.gateway_vault_live_success_and_revert` (`LidoSRv3/Audit/Guarantees/PConsolidation1ActualGatewayVault.lean`), the physical gateway-to-vault executor that the published fee/refund claim reads: gateway and vault fee STATICCALL observations, checked count × fee and refund, the value-bearing vault and inbox CALLs, the refund CALL, and root rollback of the credited entry world. It makes no fee-positivity claim and asserts no final recipient credit across arbitrary callbacks. `verity_tx_success_and_revert_partition` and the ensemble evidence below remain built and printed in `Trust.lean` as historical evidence; `A-ABSTRACT-TX` stays on the row for that evidence and the abstract call-journal parent.
+
 > Round 2 (2026-08-21). Product note plus proof audit, arbitrated from GPT 5.6 Pro and Opus 5. Fable 5 was unavailable (data-retention gate). Kimi K3 was not an allowed Task model. No em dashes. Lean is authority.
 
 
@@ -422,3 +426,7 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
     `sinkNode "Lido" true 6` (`PConsolidationEth1CompositionTx.lean:229–230`) cannot revert. Live `Lido.receiveWithdrawals` (`Lido.sol:530–534`) is `_auth(_withdrawalVault())` — only the vault may call. The parent `withdrawalsToLido` constructor never runs on this ensemble (issue 15), but `lidoAddr` is still in the world and would accept any hop.
 
     *Scenario.* A mutant gateway pays Lido instead of the vault. Lean `Lido` sink accepts; `escrowed` still sums to `msgValue` (issue 8). Live `receiveWithdrawals` from the gateway reverts (not the vault). The CHECKED conservation conjunct cannot see a rejected Lido payment because the sink is `accepts := true`. Same shape as issue 11 (refund).
+
+## No re-entry (A-NO-REENTRY, 2026-09-17)
+
+[PConsolidationEth1NoReentry](../LidoSRv3/Audit/Guarantees/PConsolidationEth1NoReentry.lean) proves `settlement_preserves_gateway_and_vault_storage`: after a successful `PhysicalEntrySettlement.execute`, under `NoReentry callee [gateway, vault]`, the gateway's and the vault's storage in the final world equal the post-quota storage; the per-request inbox CALLs (`loop_slot`) and the refund CALL (`refund_slot`) change neither. A reverting refund or Lido sink stays outside the modeled success shapes. The premise is assumed, not proved for the EIP-7251 predeploy or the refund recipient.

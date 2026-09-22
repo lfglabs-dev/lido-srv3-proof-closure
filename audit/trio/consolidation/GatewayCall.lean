@@ -90,9 +90,12 @@ def vaultBody (callee : External) (sexternal : StaticCall.External)
                   ⟨.error (panic 1), r.world, s.attempts ++ r.trace⟩
                 else ⟨.ok (), r.world, s.attempts ++ r.trace⟩
 
-/-- Dispatcher consumes actual calldata. Eager element decoding remains a
-known malformed-input ordering gap; canonical gateway calldata is connected
-by the round-trip proof, not supplied decoded arrays. -/
+/-- Dispatcher consumes actual calldata. Element decoding is eager here;
+`PConsolidation1VaultLazy.vaultLazy` is the same dispatcher with solc's lazy
+accessors, equal to this one on every well-formed argument block and rejecting
+exactly when this one rejects, so the difference is confined to the revert
+data and the attempt trace. Canonical gateway calldata is connected by the
+round-trip proof, not supplied decoded arrays. -/
 def vaultExternal (callee : External) (sexternal : StaticCall.External)
     (gateway inbox : Address) : External := fun request credited =>
   if request.payload.take 4 ≠ selector then .rejected []

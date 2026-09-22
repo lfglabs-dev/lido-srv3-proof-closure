@@ -49,6 +49,11 @@ on it; the EVM/source bridge remains necessary.
    their successful/reverting behavior need a common execution proof. A theorem
    must derive that nested positive admissions are impossible on the intended
    domain, or account for them; adding a `noReentry` premise would not close it.
+   (Note, Thomas 2026-09-17: this reading is overridden for the five ledger
+   rows DEPOSIT-1, TOPUP-1, RESERVE-1, ETH-1 and ADDRESS-1, where the accepted
+   assumption `A-NO-REENTRY` (`LidoSRv3/Audit/Source/NoReentry.lean`) constrains
+   only the callee interpreter of exact-returned-world theorems; the per-block
+   cap argument here is unchanged.)
 2. **Real truncating storage boundary.** At block 2^32, writing the block yields
    zero and activates the sentinel. At block 2^32+100, subtraction from stored
    100 also permits another call. Likewise timestamp 2^32 is stored as zero.

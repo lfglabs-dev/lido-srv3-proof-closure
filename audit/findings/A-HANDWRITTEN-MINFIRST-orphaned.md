@@ -63,7 +63,7 @@ in the audit.
 
 ## Lean proof
 
-`LidoSRv3/Audit/Provenance/HandwrittenMinFirstOrphaned.lean` provides
+`LidoSRv3/Audit/Guarantees/Composition/HandwrittenMinFirstOrphaned.lean` provides
 four theorems, all clean under `{propext, Classical.choice, Quot.sound}`:
 
 1. `alloc2_source_parent_ignores_handwritten_minfirst` — for any
@@ -102,7 +102,7 @@ axioms.
 
 ## Actions taken in this commit
 
-- Added `LidoSRv3/Audit/Provenance/HandwrittenMinFirstOrphaned.lean`
+- Added `LidoSRv3/Audit/Guarantees/Composition/HandwrittenMinFirstOrphaned.lean`
   with the four orphelinat theorems above.
 - Registered the four theorems in `LidoSRv3/Audit/Trust.lean` via
   `#print axioms`.

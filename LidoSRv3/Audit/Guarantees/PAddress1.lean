@@ -13,10 +13,8 @@ open LidoSRv3.Audit.SolidityAddress
 
 abbrev Address := Nat
 
-/-- P-ADDRESS-1 remains OPEN: the source-shaped transition and its executable
-Verity composition are checked, while full live-receipt renaming
-has not been established.  In particular, no source-level
-renaming theorem is presented as consuming the live CALL/world receipt. -/
+/-- P-ADDRESS-1 consumes source-shaped renaming and actual physical claim-batch
+execution. Global renaming of the live caller/callee world remains OPEN. -/
 def guarantee : Guarantee := ⟨.pAddress1, [.model, .source, .verityTx]⟩
 
 /-!
@@ -221,6 +219,26 @@ abbrev RenamedRunObservesRenamedView (a₁ a₂ : Verity.Address)
         (stateFor (renameInput a₁ a₂ inp))) =
     postAddressView inp.entryPoint (renamePost a₁ a₂ post)
 
+open LidoSRv3.Audit.Verity.AddressRecipientCallBridge in
+/-- Every actual root batch produces either the source-ordered physical
+claim/CALL/event chain or complete world rollback. No supplied admission bit,
+stage-success bundle, journal-only executor, or singleton state is used.
+`ClaimChain` retains each intermediate callback-returned world; its per-step
+`ClaimEffect` includes packed ownership, checked storage writes, funding,
+the executed value CALL, returned data/trace, and source events.
+
+This is necessary execution behavior, not a global state-permutation theorem
+or a deployed EVM interpreter correspondence. Arbitrary successful callbacks
+can spend their credit or alter claimed storage; neither is assumed preserved. -/
+abbrev LiveClaimBatchBehavior : Prop :=
+  ∀ (callee : External) (ctx : Context) (requestIds hints : List Nat)
+    (recipient : Verity.Address) (before : World),
+    let result := runClaimWithdrawalsTo callee ctx requestIds hints recipient before
+    match result.outcome with
+    | .ok _ => recipient ≠ Verity.zeroAddress ∧ requestIds.length = hints.length ∧
+        ClaimChain callee ctx recipient requestIds hints before result.world result.attempts
+    | .error _ => result.world = before
+
 /-- Two nonzero callers have the same source-shaped admission bit, and a
 successful post-state renames under the swap.
 
@@ -252,14 +270,26 @@ below needs only `a₁, a₂ ≠ 0`), and `singletonActorEntryPoint` is provably
 content while reading as a real exclusion. Carrying either as an unused
 binder would hide that they are premise-free rather than making the claim
 more honest. -/
-/- Source-level universal writer equivariance.  This theorem does not consume
-the live `claimWithdrawalsTo` receipt; full live-receipt renaming remains a separate unproved ambition. -/
+/- Preserve source-level universal writer equivariance and consume the actual
+physical claim/CALL/rollback executor. Full live-receipt renaming remains open. -/
 theorem universal_address_writer_equivariance
     (a₁ a₂ : Verity.Address) (h₁ : a₁ ≠ 0) (h₂ : a₂ ≠ 0)
     (inp : LidoSRv3.Audit.SolidityAddress.Input) :
-    AdmissionIsCallerBlind a₁ a₂ inp ∧ PostStateRenamesWithCaller a₁ a₂ inp := by
-  exact ⟨source_admission_nondiscriminatory a₁ a₂ h₁ h₂ inp,
-    fun post h => universal_post_state_equivariance a₁ a₂ h₁ h₂ inp post h⟩
+    (AdmissionIsCallerBlind a₁ a₂ inp ∧ PostStateRenamesWithCaller a₁ a₂ inp) ∧
+      LiveClaimBatchBehavior := by
+  refine ⟨⟨source_admission_nondiscriminatory a₁ a₂ h₁ h₂ inp,
+    fun post h => universal_post_state_equivariance a₁ a₂ h₁ h₂ inp post h⟩, ?_⟩
+  intro callee ctx requestIds hints recipient before
+  dsimp only
+  cases h : (LidoSRv3.Audit.Verity.AddressRecipientCallBridge.runClaimWithdrawalsTo
+      callee ctx requestIds hints recipient before).outcome with
+  | ok value =>
+      cases value
+      exact LidoSRv3.Audit.Verity.AddressRecipientCallBridge.runClaimWithdrawalsTo_success
+        callee ctx requestIds hints recipient before h
+  | «error» fault =>
+      exact LidoSRv3.Audit.Verity.AddressRecipientCallBridge.claim_withdrawals_to_revert_restores_caller_and_callee_world
+        callee ctx requestIds hints recipient before fault h
 
 /-- Two nonzero callers have the same source-shaped admission bit, and a
 successful post-state renames under the swap. Verity composition adds

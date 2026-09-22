@@ -1,38 +1,17 @@
 import LidoSRv3.Audit.Model.AllocCapacity
 
-/-! # P-ALLOC-1 `target_multiplication` conjunct derived from pinned type bounds
+/-! # Conditional bound for ALLOC target multiplication
 
-**General rule (Thomas 2026-09-12), applied to ALLOC-1 CheckedBounds
-target_multiplication conjunct.**
+[SRLib](https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/sr/SRLib.sol#L506-L552)
+uses a uint256 total accumulator. Its uint64 bound below is a caller premise,
+not a Solidity field width. The stored share is uint16; using 10000 as a
+divisor does not itself establish a bound on arbitrary stored share values.
 
-The registered abstract parent of P-ALLOC-1
-(`checked_execute` in `LidoSRv3.Audit.Guarantees.PAlloc1`) consumes
-`CheckedBounds cfg modules depositsToAllocate isTopUp` as a caller
-hypothesis. Its four conjuncts are:
-
-1. `maxEBType1_nonzero : cfg.maxEBType1 ≠ 0`
-2. `active_subtraction : ...` (per-module exited ≤ deposited)
-3. `total_addition : ...` (∑ allocationEntry ≤ MAX_UINT256)
-4. `available_arithmetic : ...` (per-module capacity ≤ MAX_UINT256)
-5. `target_multiplication : shareLimit * totalValidators ≤ MAX_UINT256`
-
-Per Thomas 2026-09-12: `stakeShareLimit ≤ 10000` (uint16 in the pinned
-`StakingModule` struct, and additionally bounded by the total basis
-points constant 10000) and `totalValidators` is bounded by uint64,
-so `stakeShareLimit * totalValidators ≤ 65535 * (2^64 - 1) < 2^80`,
-FAR below `MAX_UINT256 = 2^256 - 1`.
-
-The composition below derives the `target_multiplication` conjunct of
-`CheckedBounds` from an explicit `PinnedStakingModuleTypeBounds`
-premise. The other three conjuncts have per-module dynamic dependencies
-that require additional invariants beyond type bounds; they remain as
-follow-up work per the general rule.
-
-Residual (in `fidelity.missing`): the premise assumes the pinned
-`StakingModule` struct layout (`shareLimit : uint16` and
-`totalValidators : uint64` per SRLib.sol). The other three CheckedBounds
-conjuncts (active_subtraction, total_addition, available_arithmetic)
-require additional invariants and are separately follow-ups. -/
+The arithmetic theorem is retained unchanged: supplied uint16 share and uint64
+total bounds imply the uint256 target product bound. `checked_execute` still
+requires all five CheckedBounds fields. Supported summaries, total accumulation
+and input/configuration bounds must be derived from actual producers/writers.
+-/
 
 namespace LidoSRv3.Audit.Guarantees.PAlloc1TargetMultBounded
 
@@ -40,19 +19,14 @@ open Verity
 open Verity.Stdlib.Math
 open LidoSRv3.Audit.AllocCapacity
 
-/-- The pinned `StakingModule` struct declares `stakeShareLimit :
-uint16` (SRLib.sol Module definition), so `shareLimit ≤ 2^16 - 1 =
-65535`. Additionally the router uses `TOTAL_BASIS_POINTS = 10000`
-as the divisor at SRLib.sol:552, so admissible share limits are
-`shareLimit ≤ 10000` in practice. -/
+/-- Numeric upper bound for the stored uint16 share field. -/
 def uint16Max : Nat := 2 ^ 16 - 1
 
-/-- The pinned `totalValidators` accumulator (SRLib.sol:506, 532)
-sums `depositsToAllocate + Σ validatorsCount` where each contributes
-count is uint64-bounded (validator index domain). -/
+/-- Numeric bound used by the explicit total-accumulator premise below.
+The source total accumulator itself is uint256. -/
 def uint64Max : Nat := 2 ^ 64 - 1
 
-/-- Pinned type-bound premise on `StakingModule.shareLimit` and the
+/-- Conditional bounds on the share field and the
 `totalValidators` accumulator: `shareLimit ≤ 2^16 - 1` and
 `totalValidators cfg modules deposits ≤ 2^64 - 1`. -/
 structure PinnedStakingModuleTypeBounds

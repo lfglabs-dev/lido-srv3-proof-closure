@@ -27,7 +27,7 @@ with no `abstract_tx_faithful`-style axiom in sight:**
 
 This is the same "scope disclosure, not load-bearing kernel
 hypothesis" pattern that PR #400 discharged for `A-SHA256-FFI`. The
-theorems in `LidoSRv3/Audit/Provenance/AbstractTxIsolation.lean`
+theorems in `LidoSRv3/Audit/Guarantees/Composition/AbstractTxIsolation.lean`
 exhibit each registered parent applying universally regardless of
 whether a caller supplies an `AbstractTxFaithful` premise. The
 premise is ignored by every parent's proof term.
@@ -89,7 +89,7 @@ belong.
 
 ## Lean proof
 
-`LidoSRv3/Audit/Provenance/AbstractTxIsolation.lean` provides four
+`LidoSRv3/Audit/Guarantees/Composition/AbstractTxIsolation.lean` provides four
 orphelinat theorems, all clean under `{propext, Classical.choice,
 Quot.sound}`:
 
@@ -124,7 +124,7 @@ All four are registered in `LidoSRv3/Audit/Trust.lean` via
 
 ## Actions taken in this commit
 
-- Added `LidoSRv3/Audit/Provenance/AbstractTxIsolation.lean` with the
+- Added `LidoSRv3/Audit/Guarantees/Composition/AbstractTxIsolation.lean` with the
   four orphelinat theorems above.
 - Registered the four theorems in `LidoSRv3/Audit/Trust.lean` via
   `#print axioms`.

@@ -1,4 +1,4 @@
-import LidoSRv3.Audit.Guarantees.PTopupTimingHistory
+import LidoSRv3.Audit.Source.Effects.PTopupTimingHistory
 
 /-! core17005714 TopUpGateway: typed length and temporal admission precede
 an actual LOCATOR.stakingRouter STATICCALL. Its canonical address is consumed
@@ -56,7 +56,7 @@ def lookup (locatorCall : StaticCall.External) (gateway locator : Address)
 theorem lookup_origin (locatorCall : StaticCall.External) (gateway locator : Address)
     (cursor : Word) (before : World) (router : Address) (next : Word) (trace : List NestedAttempt)
     (h : lookup locatorCall gateway locator cursor before = ⟨.ok (router,next),trace⟩) :
-    (before.core.codeSize locator.val).val ≠ 0 ∧ ∃ raw,
+    ¬ audit.trio.consolidation.emptyCodeAccount before locator ∧ ∃ raw,
       locatorCall (request gateway locator) before = .success raw ∧
       decodeRouter cursor raw = .ok (router,next) ∧
       32 ≤ (word raw.length).val ∧ router.val = (word (decode (raw.take 32))).val ∧
@@ -64,7 +64,7 @@ theorem lookup_origin (locatorCall : StaticCall.External) (gateway locator : Add
       cursor.val + 32 = next.val ∧ next.val < 2^64 ∧
       trace = [⟨request gateway locator,true,true,raw,1⟩] := by
   unfold lookup audit.trio.consolidation.lowLevelStaticCall at h
-  by_cases hc : (before.core.codeSize locator.val).val = 0
+  by_cases hc : audit.trio.consolidation.emptyCodeAccount before locator
   · simp only [hc,if_true] at h
     have hd := congrArg LookupResult.outcome h
     have hb := (decode_fields cursor [] router next hd).1

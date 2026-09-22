@@ -1,4 +1,4 @@
-import LidoSRv3.Audit.Guarantees.PTopupCredentialCalls
+import LidoSRv3.Audit.Source.Effects.PTopupCredentialCalls
 import LidoSRv3.Audit.Source.DepositPhysicalAdmission
 
 /-! Selected StakingRouter credentials getter, core17005714. Actual calldata

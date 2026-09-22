@@ -17,6 +17,17 @@ test = "solidity/minfirst/test"
 out = "solidity/out/minfirst"
 cache_path = "solidity/cache/minfirst"
 
+# Pinned StakingRouter.topUp against TopupTx.execute via FFI (grok #414).
+[profile.topup_source]
+src = "solidity/topup/src"
+test = "solidity/topup/test"
+out = "solidity/out/topup"
+cache_path = "solidity/cache/topup"
+remappings = [
+  "contracts/=lido-core/contracts/",
+  "@openzeppelin/contracts-v5.2/=audit/deposit-dsm-call/solidity/src/@openzeppelin/contracts-v5.2/"
+]
+
 # Pinned StakingRouter.deposit against DepositNFrameTx via FFI (grok #412).
 [profile.deposit_source]
 src = "solidity/deposit/src"
@@ -38,3 +49,30 @@ remappings = [
   "contracts/=lido-core/contracts/",
   "@openzeppelin/contracts-v5.2/=audit/deposit-dsm-call/solidity/src/@openzeppelin/contracts-v5.2/"
 ]
+
+# Pinned Lido.withdrawDepositableEther vs modelWithdrawDepositableEther via FFI (grok #419).
+# The 0.4.24 Lido pin is compiled by scripts/test_reserve_source_differential.sh
+# (Foundry 1.8 does not resolve solc 0.4.24); the test deploys that bytecode.
+[profile.reserve_source]
+src = "solidity/reserve/src"
+test = "solidity/reserve/test"
+out = "solidity/out/reserve"
+cache_path = "solidity/cache/reserve"
+solc_version = "0.8.25"
+via_ir = false
+evm_version = "cancun"
+fs_permissions = [{ access = "read", path = "./" }]
+remappings = [
+  "contracts/=lido-core/contracts/"
+]
+
+# Actual 0.4.24 SigningKeys library bytecode; see test_signing_keys_source.sh.
+[profile.signing_keys_source]
+src = "solidity/signing-keys/src"
+test = "solidity/signing-keys/test"
+out = "solidity/out/signing-keys"
+cache_path = "solidity/cache/signing-keys"
+solc_version = "0.8.25"
+via_ir = false
+evm_version = "cancun"
+fs_permissions = [{ access = "read", path = "./solidity/out/signing-keys-0424" }]

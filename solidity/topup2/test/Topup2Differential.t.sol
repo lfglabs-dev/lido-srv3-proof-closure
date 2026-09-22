@@ -122,12 +122,22 @@ contract Topup2DifferentialTest {
         out = string.concat(out, "]");
     }
 
-    function modelJson(
+    // Unslashed, unexited witness domain used by the nominal vectors below.
+    function modelJson(uint256[] memory effective, uint256[] memory pending,
+        uint256[] memory requested, uint256[] memory limits, uint256 cap)
+        internal view returns (string memory)
+    {
+        return modelJsonWithFlags(effective, pending, requested, limits, cap,
+            new uint256[](effective.length));
+    }
+
+    function modelJsonWithFlags(
         uint256[] memory effective,
         uint256[] memory pending,
         uint256[] memory requested,
         uint256[] memory topUpLimits,
-        uint256 remainingCap
+        uint256 remainingCap,
+        uint256[] memory flags
     ) internal view returns (string memory) {
         return string.concat(
             "{\"effective\":",
@@ -138,6 +148,8 @@ contract Topup2DifferentialTest {
             _jsonList(requested),
             ",\"topUpLimits\":",
             _jsonList(topUpLimits),
+            ",\"slashedOrExited\":",
+            _jsonList(flags),
             ",\"target\":\"",
             vm.toString(TARGET),
             "\",\"minTopUp\":\"",
@@ -266,15 +278,15 @@ contract Topup2DifferentialTest {
         require(model.limitCount == 0, "sourceLimits none");
     }
 
-    function testSlashZeroOnPinModelIgnoresFlag() public {
+    function testSlashZeroAgreesWithSourceFlag() public {
         uint64 effective = 12_000_000_000;
         uint256 gap = TARGET - effective;
         uint256 sol = gateway.evaluateLimit(_vw(effective, FAR, true), 0);
         require(sol == 0, "pin slash");
-        // Model evaluate has no slash flag. Supplied [0] != evaluated [gap] => none. D-SLASH-1.
-        Model memory model = runModel(modelJson(_one(effective), _one(0), _one(gap), _one(0), type(uint64).max));
-        require(!model.ok, "inconsistent limits");
-        require(model.limits[0] == gap, "model still evaluates gap");
+        // The executable source flag is derived from this same slashed witness.
+        Model memory model = runModel(modelJsonWithFlags(_one(effective), _one(0), _one(gap), _one(0), type(uint64).max, _one(1)));
+        require(model.ok && model.used == 0, "slashed validator allocates zero");
+        require(model.limits[0] == sol, "source and pinned limit agree");
     }
 
     function testUnauthorizedCaller() public {
