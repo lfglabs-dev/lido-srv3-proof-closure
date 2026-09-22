@@ -13,9 +13,11 @@ Independent review remains separate and pending.
 
 `trust-native-decide-allowlist.txt` is empty. `scripts/check_trust_axioms.py`
 recomputes dependencies from the compiled environment, including supporting
-claims and standalone drivers. The current gate calls `require_foundational`;
-the older three-name authorization retained in `scripts/foundational_trust.py`
-does not relax that gate. Saved-output checks alone are not environment validation.
+claims and standalone drivers. It rejects dependencies outside the foundations
+and the exact disclosed allowlist before calling `require_authorized`. Since
+the current allowlist is empty, the older three-name authorization retained in
+`scripts/foundational_trust.py` permits no additional dependency in this delivery.
+Saved-output checks alone are not environment validation.
 
 The earlier authorization covered exactly three witnesses under
 `LidoSRv3.Audit.Verity`: `AllocCapacityPhase3.consumed_summary_function_spec_compiles`,
