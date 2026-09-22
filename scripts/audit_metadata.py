@@ -279,7 +279,6 @@ def validate_r1_review_basis():
         require(hashlib.sha256(current_canonical).hexdigest() == CANDIDATE_INPUT_SHA256[relative],
                 f"candidate input family differs for {relative}")
 
-
 def validate_assumptions(data):
     require(data.get("schema") == "lido-srv3-assumptions-v2", "assumption schema differs")
     rows = data.get("assumptions")
