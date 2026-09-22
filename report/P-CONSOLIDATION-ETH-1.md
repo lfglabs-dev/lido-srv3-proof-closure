@@ -429,4 +429,9 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
 
 ## No re-entry (A-NO-REENTRY, 2026-09-17)
 
+The consolidation refund recipient is a per-call argument. `NoReentry` assumes storage and balance preservation as well as rejection of
+nested calls into protected addresses. The corollary does not prove those
+properties for arbitrary recipient bodies. CEI ordering alone does not imply
+this stronger preservation premise.
+
 [PConsolidationEth1NoReentry](../LidoSRv3/Audit/Guarantees/PConsolidationEth1NoReentry.lean) proves `settlement_preserves_gateway_and_vault_storage`: after a successful `PhysicalEntrySettlement.execute`, under `NoReentry callee [gateway, vault]`, the gateway's and the vault's storage in the final world equal the post-quota storage; the per-request inbox CALLs (`loop_slot`) and the refund CALL (`refund_slot`) change neither. A reverting refund or Lido sink stays outside the modeled success shapes. The premise is assumed, not proved for the EIP-7251 predeploy or the refund recipient.
