@@ -1,10 +1,5 @@
 # Lido SRv3 Proof Closure
 
-Start with [the delivery scope and validation results](report/DELIVERY-20260921.md).
-The eleven guarantees, assumptions and reproduction commands below describe the
-current candidate. Independent review remains pending. Older audit dossiers are
-retained as evidence and do not override the current registry or validation receipt.
-
 > ### These are proofs about a model, not about a deployed contract.
 >
 > - The subject is a **Lean model** of Staking Router v3, written against pinned
@@ -24,6 +19,11 @@ retained as evidence and do not override the current registry or validation rece
 >   them per row, and `A-SHA256-FFI` and `A-EIP4788-AUTHENTIC` are HIGH severity. The `P-ADDRESS-1` live
 >   equivariance of the `transferFrom`, `requestWithdrawals` and `unwrap`
 >   bodies is a named gap, not a discharged one.
+
+Start with [the delivery scope and validation results](report/DELIVERY-20260921.md).
+The eleven guarantees, assumptions and reproduction commands below describe the
+current candidate. Independent review remains pending. Older audit dossiers are
+retained as evidence and do not override the current registry or validation receipt.
 
 This repo holds Lean evidence for eleven Staking Router v3 guarantees on that
 pinned source. The table below is the status. Not every row is closed.
