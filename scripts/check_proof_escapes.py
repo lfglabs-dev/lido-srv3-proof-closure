@@ -36,8 +36,8 @@ EXTRA_SOURCE_ROOTS = ("audit/trio",)
 # and kernel-{account-topup,sha}-removals.json under audit/metadata-reconcile.
 # The obsolete candidate-native-inventory comparison is archived in Git history;
 # only this exact site digest is current, and it is not a transitive axiom verdict.
-NATIVE_DECIDE_COUNT = 376
-NATIVE_DECIDE_SHA256 = "72c3c798f13ed7ff55ff22d2b8d7ac2a44f657f016b1a64b6dd1ec20fd47ba76"
+NATIVE_DECIDE_COUNT = 372
+NATIVE_DECIDE_SHA256 = "2c13856c3e44bd3490ba8d41cb1a03f79ae8dbe552fc2afaa58be80a21c38de2"
 ESCAPES = (
     ("sorry", re.compile(r"\bsorry\b")),
     ("admit", re.compile(r"\badmit\b")),

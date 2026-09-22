@@ -36,11 +36,10 @@ parents' `#print axioms` outputs is a subset of `{propext,
 Classical.choice, Quot.sound}`; none supplies or consumes a
 `abstract_tx_faithful` axiom (or any axiom whose name shape encodes
 the abstract-vs-executable observation gap). This is the same
-"scope disclosure, not load-bearing hypothesis" pattern discharged by
-`SszSha256Isolation.lean` for A-SHA256-FFI. The theorems below make
-that pattern load-bearing by exhibiting the registered parents
-applying universally regardless of any caller-supplied
-`AbstractTxFaithful` premise.
+structural-wrapper pattern in `SszSha256Isolation.lean`. Neither set of
+wrappers discharges a modeling assumption: an unused faithfulness premise
+provides no correspondence evidence. A-ABSTRACT-TX remains assumed for
+its registered consumers.
 
 **What still needs the abstract-vs-executable substitution.** The
 statements themselves do reference `TxObservation` (P-TOPUP-1's

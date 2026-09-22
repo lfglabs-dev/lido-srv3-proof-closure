@@ -1,16 +1,19 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 7946d567b4c2753f6e816209657c95c3a7116074
+validated-tree: 279cf2db15a30f81d68c7306f2fab6b1b110773c
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
 
-Candidate status: exact-tree identity only. Combined validation is pending;
-prior targeted remote passes and the failed 50d7cf08859e repository run are
-recorded separately. This header does not promote historical receipts below
-to current-SHA validation or independent review. No audit certificate is issued.
+Candidate status: this file checks exact-tree identity only. Executable
+validation is recorded in audit/receipts/delivery-20260921/validation.json,
+which names the tested commit, proof source tree and hashed logs. Consult that
+receipt for the commands and results; this header does not certify a build.
+Independent review of the final proof/site pair and live RPC re-verification
+remain separate from the local recorded-fixture checks. No audit certificate
+is issued.
 
 Historical validation evidence (each applies only to its stated predecessor)
 ---------------------------------------------------------------------------

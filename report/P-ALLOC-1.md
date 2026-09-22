@@ -81,4 +81,14 @@ Current migration and matched-storage tests require targeted and final exact-SHA
 
 ## Supported modules (A-SUPPORTED-MODULES, 2026-09-17)
 
-[PAlloc1CheckedBoundsFromModules](../LidoSRv3/Audit/Guarantees/PAlloc1CheckedBoundsFromModules.lean) names the accepted assumption `A-SUPPORTED-MODULES` as the premise `SupportedModules`: every registered module is the pinned NodeOperatorsRegistry or CSM implementation, its summary replies are the registry's packed counter sums over at most 200 operators, its counters were reached from genesis by the admitted writers, and the module struct and allocation entry respect the pinned uint16/uint64 widths. `checkedBounds_of_supportedModules` derives all five `CheckedBounds` fields from that premise by composing `NodeOperatorsRegistry.counterSum_lt_word` (the `uint256` reply is the exact registry sum), `SRStorageExitedMonotonicity.reachable_state_is_monotone` (exited ≤ deposited on every admitted history) and the `PAlloc1{TargetMult,TotalAddition,AvailableArithmetic}Bounded` lemmas. `checked_execute_under_supported_modules` re-exports `checked_execute` under it. The premise is assumed for the deployed modules, not proved; the arbitrary-module counterexample still shows that unconditional `CheckedBounds` is false.
+[PAlloc1CheckedBoundsFromModules](../LidoSRv3/Audit/Guarantees/PAlloc1CheckedBoundsFromModules.lean)
+composes the explicit `SupportedModules` premise into `CheckedBounds` through
+`checkedBounds_of_supportedModules`. Each module must admit NOR-style packed
+counter sums over at most 200 operators and an admitted counter history. That
+representation is not established for any deployed implementation, including
+CSM and CuratedModuleV2, whose sources are outside the core pin. The arithmetic
+premises bound shares by uint16, counts/entries/totals by uint64, module count
+by 32 and maxEBType2 by uint128 in wei, with nonzero maxEBType1. The last bound
+admits the pinned 2048 ETH configuration. The registered supporting consumer
+`checked_execute_under_supported_modules` retains these premises; module
+identity checks do not prove them.

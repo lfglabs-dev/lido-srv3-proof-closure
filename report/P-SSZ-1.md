@@ -32,6 +32,11 @@ registered parent, declared-sibling, compiled-entry, fork/index, root-call and
 rollback regressions. This is a predecessor receipt; combined exact-SHA results
 are reported separately. Fresh independent audit remains required.
 
+The abstract `real_validator_correspondence` parent restates the model's
+leaf, index, fold and canonical-address definitions. Its name does not imply
+Solidity correspondence. The compiled-entry result above carries the execution
+claim. Neither it nor the structural SHA-256 wrappers proves hash correctness.
+
 ## Historical review notes — superseded registrations
 
 The following dated review is preserved as history. References below to a

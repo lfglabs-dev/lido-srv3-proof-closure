@@ -279,7 +279,6 @@ def validate_r1_review_basis():
         require(hashlib.sha256(current_canonical).hexdigest() == CANDIDATE_INPUT_SHA256[relative],
                 f"candidate input family differs for {relative}")
 
-
 def validate_assumptions(data):
     require(data.get("schema") == "lido-srv3-assumptions-v2", "assumption schema differs")
     rows = data.get("assumptions")
@@ -707,6 +706,7 @@ def rendered(rows, source_map):
         )
     status = header + "\n".join(lines) + "\n"
     reproduce = header + "# REPRODUCE\n\n" + "\n".join(f"- `{r['id']}`: `{r['reproduction']['command']}` — {r['reproduction']['expected']}" for r in canonical) + "\n"
+    reproduce += "\n## Trust-check resources\n\nThe transitive trust probe reached approximately 15 GiB RSS in an independent Linux run and was OOM-killed on a 15 GiB VM. It passed after swap was added (one reviewer used 24 GiB swap). Allow memory headroom or swap; 16 GiB RAM alone is not a validated minimum.\n"
     # This is a review surface, not another source of truth.  Keep the final
     # auditor slice derived from the same structured registry as STATUS and
     # REPRODUCE so it cannot quietly widen a claim or omit a registered child.

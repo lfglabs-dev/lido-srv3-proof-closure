@@ -7,7 +7,7 @@ report. Changing them requires reviewing the corresponding source/metadata delta
 
 # Delivery disclosure correction, 2026-09-21; historical review fingerprints unchanged.
 
-CANDIDATE_INPUT_SHA256 = {'audit/guarantees.yaml': 'd833a44199c76a75d7fbae0e068a2ccf4cfcb452bec825bd5e29357191a277c8',
+CANDIDATE_INPUT_SHA256 = {'audit/guarantees.yaml': '80febe3c9fe32f41505924574b4945add94d930100d4bdd174b6651fb5703daa',
  'audit/source-map.yaml': '6d6e6a3c2b34faa4556c2938b9c098c3297fc35640f3ffe5c90790ca18c5cbc0',
  'audit/trust-native-decide-allowlist.txt': '41b3048a7d18e32af1b585e8a7ecc1fcb6615033947f5e655ae30bda1e71f375'}
 
@@ -95,9 +95,9 @@ EXPECTED_CANONICAL_DETAIL_SHA256 = {'P-ALLOC-1': '016f32af0fecd3b992eb1bedc1e399
  'P-DEPOSIT-1': '9c50dec0a7e3e95aa17ab9da6925f2a2b8021030467345e92d1562521ac51517',
  'P-TOPUP-1': '407a1a0df3cc76d26547605328d8dceb0b107376b7b67b209ed9446740b495ef',
  'P-ACCOUNT-1': '1c86b780eb0a9419ca9851fea0e1fb90a58f8f31cc4bd2e6b8a62dd32673010c',
- 'P-RESERVE-1': 'f007ec2cf7c008f8a23cfab86729a6ec44681a80b46add819a4bd9df7f647583',
+ 'P-RESERVE-1': '6aae142abf1d10d0190e48045da9927fd7f7b48b92482e75301ea5be979da52a',
  'P-CONSOLIDATION-ETH-1': 'd7266a4d024b2a6c7655869de9b3f3385e13484a0286d6674f053f64cd3deb90',
  'P-ADDRESS-1': '9a520266cdcc0562beeab77b345dee4a72feb412afab071e721ca4b27138d3e8',
  'P-TOPUP-2': '8f00698895bc27c579cc055e4baff3448eb4a135a193bf1ba095be834856a3ae',
  'P-CONSOLIDATION-1': '5923421b13be8720d10fce9b2bdd71f4f4780e9adb71b3c84c2a3e98f5d22d0b',
- 'P-SSZ-1': 'eaea5958e1ac9254c0c428fd35cc3d4383fe95d812467fd905edd2ab0fa3f87d'}
+ 'P-SSZ-1': '33ec3269a8d6cffa154e003f28ab3538962d65106aee1fc92859b8f46369b79b'}

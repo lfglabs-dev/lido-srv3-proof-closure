@@ -1,6 +1,6 @@
 {
-  "validatedCommit": "aca331d535b335bb4aa7990fd2d53e1240f5c0e6",
-  "proofSourceTree": "2ab1d336ce40df6fabf25b934aaff548fcab83ae",
+  "validatedCommit": "c1b424a0864068bf7cce0d028503bd1c6d7ef494",
+  "proofSourceTree": "f351539d0d93d113aa9aaf5d133c500d26d626e7",
   "testEnvironment": {
     "platform": "macOS arm64",
     "lean": "4.31.0",
@@ -17,21 +17,39 @@
       "command": "make prove",
       "exitCode": 0,
       "log": "audit/receipts/delivery-20260921/prove.log.gz",
-      "logSha256": "c8a6f2230a00e078d643450183f9225e6d6d073e58a53b4dcf7f42a83790a302"
+      "logSha256": "aa86e422b883758f191d486c418095e7b803d8150bad659020dfb11ad394e4d2",
+      "executedCommit": "85778cb33d8763ade9455991bcbe4aacd834560d"
     },
     {
       "command": "make test",
       "exitCode": 0,
       "log": "audit/receipts/delivery-20260921/test.log.gz",
-      "logSha256": "a0ed99a86ddb9184bb5fc78f6431e8487d4a17a806592bb88f45cfeeb12f402b"
+      "logSha256": "e1ec79c9ecefbfa736c81607ed6112c9ccf4e6bbadbe58ed98c02d5a1ece0d72",
+      "startedCommit": "b0650abc0ac409e5ddbbcbe547eff348b31976dd",
+      "completedCommit": "c1b424a0864068bf7cce0d028503bd1c6d7ef494"
     },
     {
       "command": "lake build LidoSRv3 LidoSRv3Audit LidoSRv3Test AccountAddressChecks",
       "exitCode": 0,
       "log": "audit/receipts/delivery-20260921/libraries.log.gz",
-      "logSha256": "0965bdb9e378729806c85fcaca2e02bb34363ffe18d2668400ea934d9c2f42d1"
+      "logSha256": "35fc0378df7bcf5b1992005e6ce2a53cd49545ab62025c61a849673b246ef38c",
+      "executedCommit": "c1b424a0864068bf7cce0d028503bd1c6d7ef494"
     }
   ],
   "differentialAndSigningKeyTests": 80,
-  "independentReviewStatus": "PENDING"
+  "independentReviewStatus": "PENDING",
+  "revisionScope": "All three runs use the same proofSourceTree. After make prove, generated legacy proof logs and two validator bookkeeping edits were committed. During make test, only four property reports and the tree-identity receipt changed; their theorem inventory was rechecked. No Lean, build or test input changed during make test. The final library build ran at validatedCommit.",
+  "additionalChecks": [
+    {
+      "command": "lake env lean audit/trio/deposit/Deposit.lean",
+      "exitCode": 0,
+      "log": "audit/receipts/delivery-20260921/deposit-constructor.log.gz",
+      "logSha256": "8c8f16d05cdfe2abac715a5ddebe75f482956e5a2f62d1b58554367c5e1d9bfd"
+    },
+    {
+      "command": "python3 scripts/check_report_theorem_inventory.py",
+      "exitCode": 0,
+      "executedCommit": "c1b424a0864068bf7cce0d028503bd1c6d7ef494"
+    }
+  ]
 }

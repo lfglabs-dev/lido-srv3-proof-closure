@@ -6,36 +6,19 @@ import LidoSRv3.Audit.Guarantees.PAlloc1TotalAdditionBounded
 import LidoSRv3.Audit.Guarantees.PAlloc1AvailableArithmeticBounded
 import LidoSRv3.Audit.Guarantees.PAlloc1
 
-/-! # P-ALLOC-1 `CheckedBounds` from supported modules (A-SUPPORTED-MODULES)
+/-! # CheckedBounds from an assumed module representation
 
-**Assumption A-SUPPORTED-MODULES (Thomas 2026-09-17, step 1a of the
-"not proven" cleanup):** the router's registered modules are the pinned
-`NodeOperatorsRegistry` and `CSModule` at their deployed addresses, and their
-storage is reachable only through the admitted writers.
+SupportedModules is an explicit premise, not a theorem about deployed modules.
+It requires NOR-style counter sums over at most 200 operators and admitted
+counter histories for each module, plus per-call arithmetic bounds. Applying
+that representation to NOR, CSM and CuratedModuleV2 remains unproved.
 
-This module names that assumption as the premise `SupportedModules` and
-composes three existing results into the five-field `CheckedBounds` premise
-consumed by the registered abstract parent `PAlloc1.checked_execute`:
-
-- `NodeOperatorsRegistry.counterSum_lt_word` (NOR's 200-operator cap,
-  `NodeOperatorsRegistry.sol:93`): the registry's packed counter sum fits one
-  word, so the `uint256` summary reply is that sum exactly, without wrap.
-- `SRStorageExitedMonotonicity.reachable_state_is_monotone`: every counter
-  state reached from genesis by the admitted `addValidators` /
-  `_updateExitedCounters` writers satisfies `exited ≤ deposited`, which is the
-  `active_subtraction` conjunct.
-- `PAlloc1TargetMultBounded`, `PAlloc1TotalAdditionBounded` and
-  `PAlloc1AvailableArithmeticBounded`: the pinned uint16/uint64 type bounds and
-  `MAX_STAKING_MODULES_COUNT = 32` derive the three arithmetic conjuncts.
-
-**Status:** the premise is an accepted registry assumption
-(`audit/assumptions.yaml`, `A-SUPPORTED-MODULES`), not a theorem about the
-deployed modules. Binding the enumerated operator ids, the registry storage and
-every writer of CSM/NOR to the deployed runtimes remains the assumption's
-removal path.
-
-Words are built with `Verity.Core.Uint256.ofNat` (the project's `Uint256` is
-the abbreviation `Verity.Uint256` of that structure). -/
+The composition uses the registry counter-sum and monotonicity lemmas to
+justify subtraction, and the three arithmetic lemmas to bound uint256
+operations. The numeric premises include uint16 shares, uint64 counts,
+allocation entries and totals, and uint128 maxEBType2 in wei; they are not
+all consequences of Solidity field widths.
+-/
 
 namespace LidoSRv3.Audit.Guarantees.PAlloc1CheckedBoundsFromModules
 
@@ -73,8 +56,7 @@ structure SupportedModule (m : Module) : Prop where
     c.accountingExitedCount = m.accountingExitedCount
 
 /-- The A-SUPPORTED-MODULES premise for one allocation call: nonzero
-`maxEBType1`, every registered module supported, and the pinned type bounds of
-`SRLib.sol`'s module struct and allocation entry. -/
+`maxEBType1`, every registered module supported, and explicit representation and numeric bounds; see each structure below. -/
 structure SupportedModules (cfg : Config) (modules : List Module)
     (depositsToAllocate : Verity.Core.Uint256) (isTopUp : Bool) : Prop where
   maxEBType1_nonzero : cfg.maxEBType1 ≠ 0
