@@ -1,5 +1,5 @@
 {
-  "validatedCommit": "e710e548c0f361305d1d23c8bb81fc48736e6487",
+  "validatedCommit": "aca331d535b335bb4aa7990fd2d53e1240f5c0e6",
   "proofSourceTree": "2ab1d336ce40df6fabf25b934aaff548fcab83ae",
   "testEnvironment": {
     "platform": "macOS arm64",
@@ -17,19 +17,19 @@
       "command": "make prove",
       "exitCode": 0,
       "log": "audit/receipts/delivery-20260921/prove.log.gz",
-      "logSha256": "e24f3959b7830e0ef393237d48f005d4b82670655dda527c85f239a606eb7166"
+      "logSha256": "c8a6f2230a00e078d643450183f9225e6d6d073e58a53b4dcf7f42a83790a302"
     },
     {
       "command": "make test",
       "exitCode": 0,
       "log": "audit/receipts/delivery-20260921/test.log.gz",
-      "logSha256": "2a6d338d272f5447f64ffd967c4a1f15af3549492a2bde25b670a82478b6ff93"
+      "logSha256": "a0ed99a86ddb9184bb5fc78f6431e8487d4a17a806592bb88f45cfeeb12f402b"
     },
     {
       "command": "lake build LidoSRv3 LidoSRv3Audit LidoSRv3Test AccountAddressChecks",
       "exitCode": 0,
       "log": "audit/receipts/delivery-20260921/libraries.log.gz",
-      "logSha256": "f31c65067f061b7fbf1e6c16ccde2ad079cd67b4fbb2dd2975858d650fa4c040"
+      "logSha256": "0965bdb9e378729806c85fcaca2e02bb34363ffe18d2668400ea934d9c2f42d1"
     }
   ],
   "differentialAndSigningKeyTests": 80,
