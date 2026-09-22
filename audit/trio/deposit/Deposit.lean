@@ -17,7 +17,7 @@ def thirtyTwoEtherWei : Nat := 32 * 10 ^ 18
 /-- `BeaconChainDepositor.DEPOSIT_SIZE` at the pinned source line 24. -/
 def DEPOSIT_SIZE : Nat := thirtyTwoEtherWei
 def canonicalDepositContract : Address :=
-  ⟨0x00000000219ab540356cBB839Cbe05303d7705Fa, by native_decide⟩
+  ⟨0x00000000219ab540356cBB839Cbe05303d7705Fa, by decide⟩
 
 /-- Values admitted by the pinned constructor source. This identifies no
 deployed router or creation transaction. -/
@@ -35,8 +35,8 @@ structure ArtifactAssumptions (constructor : ConstructorInputs) : Prop where
   A_DEPOSIT_32_ETHER : constructor.maxEBType1.val = thirtyTwoEtherWei
 
 def openConstructorCounterexample : ConstructorInputs :=
-  { depositContract := ⟨0xDEAD, by native_decide⟩
-    maxEBType1 := ⟨64 * 10 ^ 18, by native_decide⟩ }
+  { depositContract := ⟨0xDEAD, by decide⟩
+    maxEBType1 := ⟨64 * 10 ^ 18, by decide⟩ }
 
 theorem pinned_constructor_does_not_discharge_artifact_identities :
     PinnedConstructorAdmitted openConstructorCounterexample ∧
@@ -46,7 +46,7 @@ theorem pinned_constructor_does_not_discharge_artifact_identities :
     omega
   · intro h
     have wrong : openConstructorCounterexample.depositContract ≠
-        canonicalDepositContract := by native_decide
+        canonicalDepositContract := by decide
     exact wrong h.A_DEPOSIT_CONTRACT
 
 /-- Deposit data independently returned by the selected staking module.  The

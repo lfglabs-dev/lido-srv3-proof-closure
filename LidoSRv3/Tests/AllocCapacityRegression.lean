@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Source.AllocCapacityCorrespondence
+import LidoSRv3.Audit.Guarantees.PAlloc1AvailableArithmeticBounded
 
 /-! Concrete negative mutants for the canonical P-ALLOC-1 semantics. Each
 regression becomes false if the named source construct is replaced by its
@@ -12,6 +13,29 @@ open LidoSRv3.Audit.AllocCapacity
 open LidoSRv3.Audit.SolidityAllocCapacity
 
 def cfg : Config := ⟨32, 64⟩
+
+/-- Values from scripts/upgrade/upgrade-params-mainnet.toml at the Solidity pin.
+These are wei amounts. The former uint64 bound excluded this configuration. -/
+def mainnetConfig : Config := ⟨32000000000000000000, 2048000000000000000000⟩
+
+theorem mainnet_effective_balance_bounds :
+    mainnetConfig.maxEBType1 ≠ 0 ∧
+    (mainnetConfig.maxEBType2 : Nat) >
+      Audit.Guarantees.PAlloc1AvailableArithmeticBounded.uint64Max ∧
+    (mainnetConfig.maxEBType2 : Nat) ≤
+      Audit.Guarantees.PAlloc1AvailableArithmeticBounded.uint128Max := by decide
+
+/-- A nonempty type-2 top-up input satisfies the revised arithmetic structure
+with the actual configured balances. This is not a deployed-module invariant. -/
+theorem mainnet_available_bounds_example :
+    Audit.Guarantees.PAlloc1AvailableArithmeticBounded.PinnedAvailableArithmeticBounds
+      mainnetConfig
+      [{ moduleId := 1, shareLimit := 10000, isActive := true, isType2 := true,
+         depositableCount := 1, depositedCount := 1, summaryExitedCount := 0,
+         accountingExitedCount := 0, totalModuleStake := 32000000000000000000 }] true := by
+  constructor <;> simp [mainnetConfig, MathView.activeCount, MathView.allocationEntry,
+    Audit.Guarantees.PAlloc1AvailableArithmeticBounded.uint64Max,
+    Audit.Guarantees.PAlloc1AvailableArithmeticBounded.uint128Max] <;> decide
 
 def activeModule : Module := {
   moduleId := 7, shareLimit := 5000, isActive := true, isType2 := false

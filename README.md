@@ -184,7 +184,7 @@ One guarantee:
 lake build LidoSRv3.Audit.Guarantees.PReserve1
 ```
 
-PDF: `make report` writes `dist/lido-srv3-formal-methods-report.pdf`.
+Legacy PDF (superseded June 2026 P1–P15 scope): `make report` writes `dist/lido-srv3-formal-methods-report.pdf`.
 
 ## Layout
 

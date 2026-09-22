@@ -791,48 +791,9 @@ def RealValidatorInput.chosenFirstValidatorGI
   if input.provenSlot < input.pivotSlot then gIFirstValidatorPrev
   else gIFirstValidatorCurr
 
-/-- Registered ABSTRACT parent for P-SSZ-1 (Thomas 2026-09-13).
-
-The four bulleted pieces name the real deployed objects
-`CLValidatorVerifier._verifyValidator` checks, and jointly discharge
-the intended source-plane correspondence between the SSZ Merkle-fold
-verifier and the pinned `Validator` container merkleization:
-
-1. **8-leaf pairwise `Validator` layout** — `input.leaf` unfolds
-   definitionally to the pinned pairwise schedule
-   `validatorHashTreeRoot oracle input.validator` transcribed from
-   `CLValidatorVerifier.sol:65-85`. Not the `Nat.pair` dummy the
-   downgraded `deposit_root_iff` scaffolded.
-
-2. **Fork-aware gindex choice** — `chosenFirstValidatorGI` picks
-   `GI_FIRST_VALIDATOR_PREV` iff `provenSlot < pivotSlot`, matching
-   the ternary at `CLValidatorVerifier.sol:97-100`. The conjunct
-   names the branch on the abstract input; the numerical pivot
-   arithmetic (`.shr`, `GIndex.concat`) is proved elsewhere by
-   `GIndexConcatCorrespondence`.
-
-3. **`SSZ.verifyProof` iff `foldPath` reaches the claimed root** —
-   `SszVerifyProofSource.verifyProof` reduces (by definition of its
-   `decide`) to Merkle-fold equality, which is exactly the
-   `foldPath oracle input.leaf input.siblings = input.parentBlockRoot`
-   fact that Solidity's `verifyProof` (`common/lib/SSZ.sol:179`)
-   checks. Under `A-SHA256-FFI` `oracle.hash` remains opaque; the
-   equivalence itself does not depend on `oracle` being FIPS
-   SHA-256.
-
-4. **EIP-4788 anchor identity** — the anchor premise binds
-   `input.eip4788Call` to the canonical
-   `BeaconRootsEip4788Source.canonicalCall input.timestamp` at the
-   pinned predeploy address `0x000F3df6D732807Ef1319fB7B8bB8522d0Beac02`
-   (`CLValidatorVerifier.sol:27`, `103-107`). EIP-4788 history-ring
-   authenticity itself remains OPEN and is not represented on the
-   abstract plane.
-
-Anchors (`parentBlockRoot`, fork version, claimed root) remain
-independently supplied here — the compiled entry
-`actual_compiled_cl_entry_complete_declared_branch` binds them to
-executed calldata / STATICCALL replies, so the abstract and Verity
-planes share the same real-object vocabulary. -/
+/-- Definitional model-shape restatement: the chosen leaf, index, fold and
+canonical-address definitions satisfy these relationships. This is not a
+correspondence theorem for Solidity or the deployed verifier. -/
 theorem real_validator_correspondence
     (input : RealValidatorInput)
     (hEip4788Anchor : input.eip4788Call = canonicalCall input.timestamp)

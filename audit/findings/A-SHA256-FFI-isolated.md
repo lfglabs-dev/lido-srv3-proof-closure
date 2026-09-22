@@ -1,3 +1,5 @@
+> Superseded scope claim: A-SHA256-FFI remains assumed. The structural wrappers do not prove hash correspondence; their unused faithfulness parameters have been removed. The account below records an earlier attempt, not a discharge.
+
 # Finding: A-SHA256-FFI isolated to a mandatory scope boundary — retired from every consumer's assumptions list
 
 **Category:** Assumption isolation (Thomas's requested "scinde les énoncés pour que la partie indépendante soit inconditionnelle").
